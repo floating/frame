@@ -1,0 +1,91 @@
+@font-face
+  font-family 'OpenSans'
+  font-weight 200
+  src url('../../../app/style/fonts/OpenSans/OpenSans-Light.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-style normal
+  font-weight 300
+  src url('../../../app/style/fonts/OpenSans/OpenSans-Regular.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-weight 400
+  src url('../../../app/style/fonts/OpenSans/OpenSans-SemiBold.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-style bold
+  font-weight 600
+  src url('../../../app/style/fonts/OpenSans/OpenSans-Bold.ttf')
+
+// Colors
+bg = #dce1e8
+v = #4e5758
+outerspace = #212d2e
+spacewhite = #f7fbff
+
+// Shadows
+cardDrop = 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
+
+// Transistions
+standard = .24s cubic-bezier(.82,0,.12,1) all
+standardSlow = .48s cubic-bezier(.82,0,.12,1) all
+
+body
+  background bg
+  color spacewhite
+  font-family OpenSans
+  font-weight 200
+  font-size 20px
+  color outerspace
+
+  #dapp
+    height 100%
+    width 100%
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+
+    .current
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+
+      .account
+        padding-bottom 40px
+
+      .address
+        letter-spacing 3px
+        font-size 32px
+        padding-bottom 40px
+
+    .sendTest
+      display flex
+      justify-content center
+      align-items center
+      background spacewhite
+      border-radius 4px
+      padding 40px
+      box-shadow cardDrop
+      cursor pointer
+
+    .errorMessage
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+      font-size 30px
+
+      .providerErrorSub
+        margin-top 10px
+        display flex
+        justify-content center
+        align-items center
+        font-size 16px
+
+        span
+          padding 4px

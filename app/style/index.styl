@@ -1,0 +1,216 @@
+@font-face
+  font-family 'OpenSans'
+  font-weight 200
+  src url('style/fonts/OpenSans/OpenSans-Light.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-style normal
+  font-weight 300
+  src url('style/fonts/OpenSans/OpenSans-Regular.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-weight 400
+  src url('style/fonts/OpenSans/OpenSans-SemiBold.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-style bold
+  font-weight 600
+  src url('style/fonts/OpenSans/OpenSans-Bold.ttf')
+
+@font-face
+  font-family 'FiraCode'
+  font-weight 300
+  src url('style/fonts/FiraCode/FiraCode-Retina.ttf')
+
+// Colors
+bg = #dce1e8
+v = #4e5758
+outerspace = #212d2e
+spacewhite = #f7fbff
+
+// Shadows
+cardDrop = box-shadow 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
+
+// Transistions
+standard = .24s cubic-bezier(.82,0,.12,1) all
+standardSlow = .48s cubic-bezier(.82,0,.12,1) all
+// 0.18s cubic-bezier(0.8, 1, 0.2, 1) all
+
+html, body
+  margin 0
+  border 0
+  background bg
+  font-family OpenSans
+  -webkit-app-region drag
+  overflow hidden
+  color outerspace
+
+div
+  user-select none
+  cursor default
+
+.panel
+  #bar
+    right 360px
+
+  #bot
+    left 5px
+    right 360px
+
+  #drop
+    left 5px
+    bottom 5px
+    right 360px
+    border-radius 3px
+
+  #views
+    right 360px
+    bottom 5px
+    left 5px
+    border-bottom-right-radius 3px
+    border-bottom-left-radius 3px
+
+    .screen
+      z-index 20000
+
+.session
+  position fixed
+  top 0px
+  right 15px
+  height 37px
+  font-weight 400
+  border-bottom-left-radius 4px
+  display flex
+  justify-content center
+  align-items center
+  user-select none
+  cursor default
+  font-size 14px
+  transition standard
+  z-index 1000
+
+.macTitle
+  width 80px
+  height 37px
+  position absolute
+  top 0
+  left 0
+
+  &:hover
+    .titleClose
+      background #fc615d
+
+    .titleMin
+      background #fdbd41
+
+    .titleFull
+      background #34c84a
+
+.titleClose
+  width 12px
+  height 12px
+  background rgba(0,0,50,0.15)
+  position absolute
+  left 13px
+  top 13px
+  border-radius 50%
+
+.titleMin
+  width 12px
+  height 12px
+  background rgba(0,0,50,0.15)
+  position absolute
+  left 33px
+  top 13px
+  border-radius 50%
+
+.titleFull
+  width 12px
+  height 12px
+  background rgba(0,0,50,0.15)
+  position absolute
+  left 53px
+  top 13px
+  border-radius 50%
+
+#drop
+  position absolute
+  background rgba(0,0,50,0.07)
+  box-shadow 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
+  top 37px
+  right 0
+  bottom 0
+  left 0
+  z-index 1000
+  border-radius 0px
+  overflow hidden
+  transition standard
+
+#container
+  position absolute
+  left 70px
+  right 10px
+  top 0px
+  bottom 0px
+
+.deviceInfo
+  width calc(100% - 20px)
+  padding 10px
+  margin 10px
+  border-radius 3px
+  font-size 16px
+  -webkit-app-region no-drag
+  word-wrap break-word
+  white-space normal
+  border 1px solid rgba(0,0,0,0.2)
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+  box-sizing border-box
+  text-align center
+
+#views
+  position fixed
+  top 71px
+  left 0
+  right 0px
+  bottom 0
+  border-top-right-radius 0px
+  border-top-left-radius 0px
+  border-bottom-right-radius 0px
+  border-bottom-left-radius 0px
+  overflow hidden
+  transition standard
+  z-index 1100
+
+#screen
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
+  background white
+  opacity 1
+  z-index 1200
+
+.view
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
+
+webview
+  height 100%
+  width 100%
+
+.hidden
+  visibility hidden
+
+@import '../App/Panel/style'
+@import '../App/Tabs/style'
+@import '../App/Navigation/style'

@@ -1,0 +1,146 @@
+#tabs
+  position absolute
+  left 80px
+  right 100px
+  top 0px
+  height 37px
+  transition standard
+
+  #tabsInset
+    position relative
+    width 100%
+    height 100%
+
+.panel #tabs
+  right 400px
+
+.tab
+  position absolute
+  top 10px
+  height 27px
+  -webkit-app-region no-drag
+  user-select none
+  cursor default
+  transition 0.05s cubic-bezier(0.8, 1, 0.2, 1) left
+  z-index 1400
+
+  .tabSVG
+    fill rgba(238, 240, 244, 1)
+    pointer-events none
+
+  .bg
+    svg
+      pointer-events none
+      display block
+      position absolute
+      top 0
+      left -5px
+      right -5px
+      z-index 1001
+
+  .title
+    pointer-events none
+    user-select none
+    cursor default
+    display block
+    position absolute
+    top 0
+    left 32px
+    right 32px
+    z-index 1002
+    height 27px
+    display flex
+    align-items center
+    overflow hidden
+    white-space nowrap
+    text-overflow clip
+    font-size 12px
+    font-weight 300
+
+.newTab
+  position absolute
+  top 10px
+  width 30px
+  height 25px
+  display flex
+  justify-content center
+  align-items center
+  font-size 20px
+  user-select none
+  cursor default
+  color rgba(0, 0, 0, 0.6)
+
+.currentTab
+  transition 0s linear left
+  z-index 2400
+  
+  .tabSVG
+    fill #fcfdff
+    z-index 2900
+
+  .bgShadow
+    .tabSVG
+      display inline
+      fill rgba(0, 0, 0, 0.07)
+
+.tabIcon
+  pointer-events none
+  user-select none
+  display block
+  position absolute
+  top 0
+  left 5px
+  z-index 1002
+  height 27px
+  width 27px
+  display flex
+  justify-content center
+  align-items center
+
+.tabIconImg
+  width 16px
+  height 16px
+  border-radius 2px
+
+.tabClose
+  user-select none
+  cursor default
+  display block
+  position absolute
+  top 0
+  right 5px
+  bottom 0px
+  z-index 1002
+  height 27px
+  width 27px
+  display flex
+  justify-content center
+  align-items center
+
+.tabCloseButton
+  width 17px
+  height 17px
+  background rgba(0,0,0,0.1)
+  border-radius 50%
+  display flex
+  justify-content center
+  align-items center
+
+  svg
+    fill rgba(0,0,0,0.2)
+    margin-bottom 0px
+
+  &:hover
+    background rgba(255,150,150,1)
+
+    svg
+      fill rgba(255,255,255,1)
+
+.bgShadow
+  position absolute
+  top -1px
+  left -5px
+  pointer-events none
+
+  .tabSVG
+    display none

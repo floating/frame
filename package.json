@@ -1,0 +1,61 @@
+{
+  "name": "Frame",
+  "version": "0.0.0",
+  "description": "A cross-platform Ethereum provider interface",
+  "main": "main",
+  "scripts": {
+    "start": "npm run launch",
+    "demo": "npm install && electron-rebuild && npm run dev",
+    "dev": "npm run test:rpc & npm run launch & npm run test:dapp",
+    "test": "standard",
+    "launch": "TRAY_ONLY=true electron ./main",
+    "open": "electron ./main",
+    "electron-rebuild": "electron-rebuild",
+    "test:dapp": "parcel ./test/dapp/index.html --open",
+    "test:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
+  },
+  "author": "C. Jordan Muir",
+  "dependencies": {
+    "@ledgerhq/hw-app-eth": "^3.0.0",
+    "@ledgerhq/hw-transport-node-hid": "^4.2.0",
+    "bip32-path": "^0.4.2",
+    "electron-positioner": "^3.0.0",
+    "electron-store": "^1.3.0",
+    "ethereumjs-tx": "^1.3.3",
+    "node-hid": "^0.7.2",
+    "octicons": "^7.1.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-restore": "^0.1.1",
+    "stylus": "^0.54.5",
+    "trezor.js": "^6.13.5",
+    "usb-detection": "^2.0.1",
+    "uuid": "^3.2.1",
+    "web3": "^1.0.0-beta.27",
+    "web3-providers-http": "^1.0.0-beta.30",
+    "web3-providers-ipc": "^1.0.0-beta.30",
+    "web3-providers-ws": "^1.0.0-beta.30"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-eslint": "^8.2.2",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "electron": "^1.7.10",
+    "electron-packager": "^11.0.1",
+    "electron-rebuild": "^1.6.0",
+    "ganache-cli": "^6.1.0",
+    "mocha": "^5.0.1",
+    "parcel-bundler": "^1.6.2",
+    "standard": "^11.0.0"
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  }
+}

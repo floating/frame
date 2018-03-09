@@ -1,0 +1,121 @@
+.signerRequests
+  position relative
+  z-index 200
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+  padding 20px 20px 0px 20px
+  font-weight 200
+  background #e7e8ef
+
+  .noRequests
+    font-weight 200
+    font-size 16px
+    margin-bottom 40px
+
+  .signerRequestTitle
+    height: 30px
+    display flex
+    justify-content center
+    align-items center
+
+  .signerRequestItems
+    overflow scroll
+
+  .signerRequest
+    border-radius 3px
+    display flex
+    justify-content space-between
+    align-items center
+    position relative
+    width 100%
+    background #f5f6f9
+    overflow hidden
+    margin-bottom 20px
+
+  .signerRequestSuccess
+    background #23ff8b
+
+    .approveTransactionPayload
+      color #116338
+
+  .signerRequestPending
+    background #23aaff
+    .approveTransactionPayload
+      color #0d3a56
+
+  .signerRequestDeclined
+    background #f57c73
+    .approveTransactionPayload
+      color #491410
+
+  .requestNotice
+    height 120px
+    font-size 16px
+    display flex
+    justify-content center
+    align-items center
+
+  .approveTransaction
+    display flex
+    width 100%
+    margin-bottom 65px
+    flex-direction column
+
+    .approveTransactionTitle
+      padding 10px
+      background #fdfdfe
+      font-weight 400
+      font-size 14px
+
+    .approveTransactionPayload
+      padding 6px
+      font-size 11px
+      font-weight 300
+      
+      div
+        white-space nowrap
+
+  .unknownType
+    display flex
+    justify-content center
+    align-items center
+    width 100%
+    margin-bottom 60px
+    padding 20px
+
+  .requestApprove
+    position absolute
+    left 0
+    right 0
+    bottom 0
+    height 60px
+    border-bottom-left-radius 3px
+    border-bottom-right-radius 3px
+    font-weight 400
+    font-size 12px
+    text-transform uppercase
+    letter-spacing 2px
+    background #fdfdfe
+
+    .requestDecline
+      position absolute
+      left 0
+      top 0
+      bottom 0
+      width 50%
+      display flex
+      justify-content center
+      align-items center
+
+    .requestSign
+      position absolute
+      right 0
+      top 0
+      bottom 0
+      width 50%
+      display flex
+      justify-content center
+      align-items center
+      border-top-left-radius 6px

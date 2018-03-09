@@ -1,0 +1,103 @@
+.panel
+  #panelPush
+    right 0
+
+#panelPush
+  position absolute
+  right -365px
+  bottom 0
+  top 0px
+  width 360px
+  transition standard
+
+#panel
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  -webkit-app-region drag
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+  transition standard
+  transition-delay 0.18s
+
+.panelRequest
+  width 100%
+  padding 10px
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+
+  .panelRequestBlock
+    padding 10px 15px
+    margin 15px
+    border-radius 3px
+    background white
+    font-size 14px
+    font-weight bold
+
+.panelRequestGrant
+  margin-top 40px
+  padding-top 0px
+  width 100%
+
+.panelRequestGrantOption
+  background green
+  margin 15px
+  padding 0px
+  height 40px
+  border-radius 20px
+  display flex
+  justify-content center
+  align-items center
+  background rgba(0, 0, 0, 0.08)
+  -webkit-app-region no-drag
+  
+  &:hover
+    background rgba(0, 0, 0, 0.78)
+
+#panelTop
+  position absolute
+  top 0
+  right 0
+  left 0
+  height 0
+
+#panelScroll
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  display flex
+  justify-content center
+  align-items center
+
+  #panelSlide
+    overflow-x hidden
+    overflow-y scroll
+    max-height 100%
+    width 100%
+
+  #panelSlide::-webkit-scrollbar
+    display none
+
+  #panelWrap
+    width 100%
+    padding-top 23px
+
+.panelBot
+  padding 20px
+  display flex
+  justify-content center
+  margin-left 5px
+
+  svg
+    fill rgba(0, 0, 50, 0.1)
+
+@import '../Signer/style'
+@import '../Session/style'
