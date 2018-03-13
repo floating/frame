@@ -11,25 +11,16 @@
 <h3 align="center">A cross-platform Ethereum provider interface :tada:</h3>
 <br>
 <p align="center">
-  <a href="#try-it">Try It!</a> ⁃
   <a href="#features">Features</a> ⁃
   <a href="#downloads">Downloads</a> ⁃
+  <a href="#try-it">Try It!</a> ⁃
   <a href="#related">Related</a>
 </p>
 <br>
 
 ![FrameDemo](https://record.nyc3.digitaloceanspaces.com/FrameDemoMicro.gif)
 
-Frame interfaces with the Ethereum network and signature providers (such as a Ledger or Trezor) to create an OS-level provider that can be used with any dapp. Frame was created to be a user-friendly way to securely and transparently interact with dapps and the Ethereum network.
-
-### Try it!
-```bash
-# Clone Frame
-› git clone https://github.com/floating/frame
-
-# Run Frame Demo
-› npm run demo
-```
+Frame interfaces with the Ethereum network and signature providers (such as a Ledger or Trezor) to create an OS-level provider that can be used with any web, desktop or command-line dapp. Frame was created to be a user-friendly way to securely and transparently interact with dapps and the Ethereum network.
 
 ### Features
 - **First-class Hardware Support**
@@ -44,7 +35,17 @@ Frame interfaces with the Ethereum network and signature providers (such as a Le
   - macOS, Windows and Linux!
   
 ### Downloads
-  - Frame is currently under development. macOS, Windows and Linux distributions will be made available soon.
+  - **Frame is currently under development.** macOS, Windows and Linux distributions will be made available soon. 
+  
+### Try it!
+If you're running macOS and want to try Frame, a demo is available by running...
+```bash
+# Clone Frame
+› git clone https://github.com/floating/frame
 
+# Run Frame Demo
+› npm run demo
+```
+  
 ### Related
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps.
