@@ -16,7 +16,7 @@ ipcMain.on('removePermission', (e, host, permission) => store.removePermission(h
 
 app.on('ready', () => {
   windows.tray()
-  process.env.TRAY_ONLY ? app.dock.hide() : windows.create()
+  if (app.dock) app.dock.hide()
 })
 
 app.on('activate', () => {
