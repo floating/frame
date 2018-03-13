@@ -38,7 +38,6 @@ Frame interfaces with the Ethereum network and signature providers (such as a Le
   - **Frame is currently under development.** macOS, Windows and Linux distributions will be made available soon. 
   
 ### Try it!
-If you're running macOS and want to try Frame, a demo is available by running...
 ```bash
 # Clone Frame
 › git clone https://github.com/floating/frame
@@ -46,6 +45,8 @@ If you're running macOS and want to try Frame, a demo is available by running...
 # Run Frame Demo
 › npm run demo
 ```
+
+Note: If you're on Windows please make sure you have run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.
   
 ### Related
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps.
