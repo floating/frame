@@ -41,6 +41,7 @@ const api = {
     windows.tray.focus()
     windows.tray.setVisibleOnAllWorkspaces(false)
     windows.tray.setResizable(false)
+    if (process.platform === 'win32') pos.y = 50
     windows.tray.setPosition(pos.x, pos.y)
     let activeScreen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
     windows.tray.setSize(360, activeScreen.size.height - bounds.height - 50, false)
