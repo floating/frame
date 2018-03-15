@@ -3,10 +3,9 @@ const { app, ipcMain } = require('electron')
 const store = require('./store')
 const signers = require('./signers')
 const windows = require('./windows')
+require('./rpc')
 
 let quit = false
-
-require('./rpc')
 
 console.log(process.versions.chrome)
 console.log(process.versions.electron)
@@ -26,7 +25,7 @@ app.on('activate', () => {
 
 app.on('will-quit', e => {
   if (!quit) e.preventDefault()
-  app.dock.hide()
+  if (app.dock) app.dock.hide()
   setTimeout(() => {
     quit = true
     app.quit()
