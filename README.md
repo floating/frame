@@ -46,7 +46,9 @@ Frame interfaces with the Ethereum network and signature providers (such as a Le
 › npm run demo
 ```
 
-Note: If you're on Windows please make sure you have run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.
+**On Windows:** Run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.
+
+**On Ubuntu:** Run `sudo apt-get install libappindicator1` **before** running the demo. You can find more info about this here: https://github.com/electron/electron/issues/1347.
   
 ### Related
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps.
