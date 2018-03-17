@@ -54,6 +54,18 @@ class App extends React.Component {
       }, 3700)
     })
   }
+  getBalance () {
+    this.web3.eth.getBalance(this.state.accounts[0]).then(res => {
+      this.setState({txMessage: `Balance: ${this.web3.utils.fromWei(res)}`})
+    }).catch(err => {
+      console.log('getBalance err:', err)
+      this.setState({txMessage: 'Error: ' + err.message})
+    }).finally(_ => {
+      setTimeout(() => {
+        this.setState({txMessage: ''})
+      }, 3700)
+    })
+  }
   render () {
     return (
       <div id='dapp'>
@@ -69,6 +81,9 @@ class App extends React.Component {
                 <div className='address'>{this.state.accounts}</div>
                 <div className='sendTest' onClick={() => this.testTransaction()}>
                   {'Send Test Transaction'}
+                </div>
+                <div className='getBalance' onClick={() => this.getBalance()}>
+                  {'Get Balance'}
                 </div>
               </div>
             )
