@@ -78,6 +78,18 @@ class App extends React.Component {
       }, 3700)
     })
   }
+  getTransactionCount () {
+    this.web3.eth.getTransactionCount(this.state.accounts[0]).then(res => {
+      this.setState({txMessage: `Transactions sent: ${res}`})
+    }).catch(err => {
+      console.log('getTransactionCount err:', err)
+      this.setState({txMessage: 'Error: ' + err.message})
+    }).finally(_ => {
+      setTimeout(() => {
+        this.setState({txMessage: ''})
+      }, 3700)
+    })
+  }
   render () {
     return (
       <div id='dapp'>
@@ -91,14 +103,19 @@ class App extends React.Component {
               <div className='current'>
                 <div className='account'>{'Current Account:'}</div>
                 <div className='address'>{this.state.accounts}</div>
-                <div className='sendTest' onClick={() => this.testTransaction()}>
-                  {'Send Test Transaction'}
-                </div>
-                <div className='getBalance' onClick={() => this.getBalance()}>
-                  {'Get Balance'}
-                </div>
-                <div className='getGasPrice' onClick={() => this.getGasPrice()}>
-                  {'Get Gas Price'}
+                <div className='button-wrap'>
+                  <div className='button' onClick={() => this.testTransaction()}>
+                    {'Send Test Transaction'}
+                  </div>
+                  <div className='button' onClick={() => this.getBalance()}>
+                    {'View Balance'}
+                  </div>
+                  <div className='button' onClick={() => this.getGasPrice()}>
+                    {'View Gas Price'}
+                  </div>
+                  <div className='button' onClick={() => this.getTransactionCount()}>
+                    {'View Transaction Count'}
+                  </div>
                 </div>
               </div>
             )
