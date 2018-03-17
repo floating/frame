@@ -17,6 +17,11 @@ class Requests extends React.Component {
       this.tPin = ''
     }
   }
+  supplyPassword (password) {
+    rpc('supplyPassword', this.props.id, password, (err, status) => {
+      if (err) throw new Error(err)
+    })
+  }
   minimize () {
     this.setState({minimized: true})
   }
@@ -46,7 +51,7 @@ class Requests extends React.Component {
           requests.map((req, i) => {
             let requestClass = 'signerRequest'
             if (req.status === 'success') requestClass += ' signerRequestSuccess'
-            if (req.status === 'declined') requestClass += ' signerRequestDeclined'
+            if (req.status === 'declined' || req.status === 'error') requestClass += ' signerRequestDeclined'
             if (req.status === 'pending') requestClass += ' signerRequestPending'
             return (
               <div key={i} className={requestClass}>
@@ -66,10 +71,21 @@ class Requests extends React.Component {
                 ) : (
                   <div className='unknownType'>{'Unknown: ' + req.type}</div>
                 )}
-                <div className='requestApprove'>
-                  <div className='requestDecline' onClick={() => this.decline(req.handlerId)}>{'Decline'}</div>
-                  <div className='requestSign' onClick={() => this.approve(req.handlerId, req)}>{'Sign'}</div>
-                </div>
+                {req.require === 'password' ? (
+                  <div className='requestApproveWithPassword'>
+                    <input className='passwordInput' onChange={e => this.setState({password: e.target.value})} />
+                    <div className='passwordInputLabel'>{'Account Password'}</div>
+                    <div className='requestApprove'>
+                      <div className='requestDecline' onClick={() => this.decline(req.handlerId)}>{'Decline'}</div>
+                      <div className='requestSign' onClick={() => this.supplyPassword(this.state.password)}>{'Approve'}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='requestApprove'>
+                    <div className='requestDecline' onClick={() => this.decline(req.handlerId)}>{'Decline'}</div>
+                    <div className='requestSign' onClick={() => this.approve(req.handlerId, req)}>{'Sign'}</div>
+                  </div>
+                )}
               </div>
             )
           })

@@ -7,6 +7,7 @@ const windows = require('../windows')
 const trezor = require('./trezor')
 const ledger = require('./ledger')
 const hot = require('./hot')
+const go = require('./go')
 
 // Connected Signers
 const signers = {}
@@ -15,6 +16,7 @@ const signers = {}
 trezor(signers)
 ledger(signers)
 hot(signers)
+go(signers)
 
 let current = null
 
@@ -36,20 +38,26 @@ module.exports = {
     if (!signers[current]) cb(new Error('No Account Selected'))
     signers[current].getCoinbase(cb)
   },
-  signTransaction: (rawTx, cb) => {
+  signTransaction: (rawTx, cb, send) => {
+    let reqId = rawTx.handlerId
+    delete rawTx.handlerId
     if (!signers[current]) cb(new Error('No Account Selected'))
-    signers[current].signTransaction(rawTx, cb)
+    signers[current].signTransaction(rawTx, cb, send, reqId)
   },
   close: () => {
     usbDetect.stopMonitoring()
   },
   trezorPin: (id, pin, cb) => {
-    if (!signers[id]) cb(new Error('No Account Selected'))
+    if (!signers[id]) cb(new Error('Account: ' + id + ' Not Selected'))
     if (signers[id].setPin) {
       signers[id].setPin(null, pin)
       cb(null, {status: 'ok'})
     } else {
       cb(new Error('Set pin not avaliable...'))
     }
+  },
+  supplyPassword: (id, password, cb) => {
+    if (!signers[id]) cb(new Error('Account: ' + id + ' Not Selected'))
+    signers[id].supplyPassword(password, cb)
   }
 }

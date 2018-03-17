@@ -34,9 +34,15 @@ export const requestPending = (u, id) => {
   u('signer.requests', id, 'notice', notice => 'Signature Pending')
 }
 
+export const supplyPassword = (u, id) => {
+  u('signer.requests', id, 'require', require => 'password')
+  u('signer.requests', id, 'notice', notice => 'Need Password')
+}
+
 export const requestSuccess = (u, id, res) => {
   u('signer.requests', id, 'status', status => 'success')
   u('signer.requests', id, 'notice', notice => 'Signature Succesful')
+  u('signer.requests', id, 'require', require => null)
   setTimeout(() => {
     u('signer.requests', requests => {
       delete requests[id]
@@ -48,9 +54,14 @@ export const requestSuccess = (u, id, res) => {
 export const requestError = (u, id, err) => {
   u('signer.requests', id, 'status', status => 'error')
   u('signer.requests', id, 'notice', notice => err.message)
+  u('signer.requests', id, 'require', require => null)
+  console.log('reqError action id: ' + id)
   setTimeout(() => {
     u('signer.requests', requests => {
+      console.log(requests)
+      console.log(requests[id])
       delete requests[id]
+      console.log(requests)
       return requests
     })
   }, 1800)

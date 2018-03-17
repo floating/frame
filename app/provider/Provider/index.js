@@ -6,13 +6,14 @@ const uuid = require('uuid/v4')
 
 const WSProvider = require('web3-providers-ws')
 const HTTPProvider = require('web3-providers-http')
+const IPCProvider = require('web3-providers-ipc')
 
 const rpc = require('../../rpc')
 const store = require('../../store')
 
 class Provider {
-  constructor (url) {
-    this.url = url
+  constructor (location) {
+    this.location = location
     this.store = store
     this.provider = this.createProvider()
     this.signer = this.getSigner()
@@ -39,13 +40,13 @@ class Provider {
     })
   }
   createProvider () {
-    if (this.url) {
-      let protocol = (new URL(this.url)).protocol
-      if (protocol === 'http:' || protocol === 'https:') return new HTTPProvider(this.url)
-      if (protocol === 'ws:' || protocol === 'wss:') return new WSProvider(this.url)
-      // return new IPCProvider()
+    if (this.location) {
+      let protocol = (new URL(this.location)).protocol
+      if (protocol === 'http:' || protocol === 'https:') return new HTTPProvider(this.location)
+      if (protocol === 'ws:' || protocol === 'wss:') return new WSProvider(this.location)
+      return new IPCProvider(this.location)
     } else {
-      throw new Error('Requested remote provider connection without url.')
+      throw new Error('Requested provider connection without setting provider location.')
     }
   }
   getSigner () {
@@ -57,7 +58,7 @@ class Provider {
     this.provider.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, cb)
   }
   approveRequest (req, cb) {
-    let rawTx = req.data
+    let rawTx = Object.assign({}, req.data, {handlerId: req.handlerId})
     rpc('signTransaction', rawTx, (err, signedTx) => { // Sign Transaction
       if (err) {
         if (this.handlers[req.handlerId]) this.handlers[req.handlerId](err)

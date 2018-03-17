@@ -20,6 +20,12 @@ rpc('getSigners', (err, signers) => {
 ipcRenderer.on('main:addSigner', (e, signer) => store.addSigner(signer))
 ipcRenderer.on('main:removeSigner', (e, signer) => store.removeSigner(signer))
 ipcRenderer.on('main:updateSigner', (e, signer) => store.updateSigner(signer))
+ipcRenderer.on('main:supplyPassword', (e, id) => store.supplyPassword(id))
+ipcRenderer.on('main:requestError', (e, id, text) => {
+  id = JSON.parse(id)
+  text = JSON.parse(text)
+  store.requestError(id, {message: text})
+})
 ipcRenderer.on('main:setSigner', (e, signer) => store.setSigner(signer))
 
 // Replace events with observers

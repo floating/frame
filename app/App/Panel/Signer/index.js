@@ -68,7 +68,7 @@ class Signer extends React.Component {
                 <div className='signerAddress'>{this.props.accounts}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}
-            <Requests id={this.props.id} accounts={this.props.accounts} minimized={this.state.minimized} />
+            <Requests id={this.props.id} accounts={this.props.accounts} minimized={this.state.minimized} status={this.props.status} type={this.props.type} />
             {type === 'Trezor' && this.props.status === 'Need Pin' ? (
               <div className='trezorPinWrap'>
                 <div className='trezorPinInput'>

@@ -7,7 +7,8 @@ const rpc = {
   getCoinbase: signers.getCoinbase,
   getSigners: signers.getSigners,
   setSigner: signers.setSigner,
-  trezorPin: signers.trezorPin
+  trezorPin: signers.trezorPin,
+  supplyPassword: signers.supplyPassword
 }
 
 const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
@@ -17,5 +18,9 @@ ipcMain.on('main:rpc', (event, id, method, ...args) => {
   id = unwrap(id)
   method = unwrap(method)
   args = args.map(arg => unwrap(arg))
-  rpc[method](...args, (...args) => event.sender.send('main:rpc', id, ...args.map(arg => wrap(arg))))
+  rpc[method](
+    ...args,
+    (...args) => event.sender.send('main:rpc', id, ...args.map(arg => wrap(arg))),
+    (channel, ...args) => event.sender.send(channel, ...args.map(arg => wrap(arg)))
+  )
 })
