@@ -66,6 +66,18 @@ class App extends React.Component {
       }, 3700)
     })
   }
+  getGasPrice () {
+    this.web3.eth.getGasPrice().then(res => {
+      this.setState({txMessage: `Gas price: ${this.web3.utils.fromWei(res)}`})
+    }).catch(err => {
+      console.log('getGasPrice err:', err)
+      this.setState({txMessage: 'Error: ' + err.message})
+    }).finally(_ => {
+      setTimeout(() => {
+        this.setState({txMessage: ''})
+      }, 3700)
+    })
+  }
   render () {
     return (
       <div id='dapp'>
@@ -84,6 +96,9 @@ class App extends React.Component {
                 </div>
                 <div className='getBalance' onClick={() => this.getBalance()}>
                   {'Get Balance'}
+                </div>
+                <div className='getGasPrice' onClick={() => this.getGasPrice()}>
+                  {'Get Gas Price'}
                 </div>
               </div>
             )
