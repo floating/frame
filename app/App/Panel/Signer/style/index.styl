@@ -73,6 +73,27 @@
     display flex
     z-index 2002
 
+    .signerIndicator
+      position absolute
+      left 5px
+      top 0
+      display flex
+      align-items center
+      justify-content center
+
+      &Status
+        svg
+          fill #d6d6d6
+
+        &.active
+          svg
+            fill #3ce671
+
+      &Text
+        margin-left 5px
+        font-size 10px
+        font-weight 300
+
     .signerType
       position relative
       top 0px
