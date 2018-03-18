@@ -20,10 +20,10 @@ module.exports = (props) => (
           <div className='tHash-wrap'>
             {Object.keys(props.transactions).map((tHash, i) => (
               <div className='tHash' key={i} onClick={props.setCurrentTransaction(tHash)}>
-                {props.transactions[tHash].blockNumber === null ? (
+                {props.transactions[tHash].status === 'pending' ? (
                   <span className='tHash-pending' dangerouslySetInnerHTML={{__html: octicons['kebab-horizontal'].toSVG({height: 24})}} />
                 ) : (
-                  <span className='tHash-done' dangerouslySetInnerHTML={{__html: octicons['primitive-dot'].toSVG({height: 24})}} />
+                  <span className='tHash-verified' dangerouslySetInnerHTML={{__html: octicons['primitive-dot'].toSVG({height: 24})}} />
                 )}
                 {tHash}
               </div>
