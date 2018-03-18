@@ -8,9 +8,6 @@ import rpc from '../../../rpc'
 import Requests from './Requests'
 
 class Signer extends React.Component {
-  constructor (...args) {
-    super(...args)
-  }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
     if (this.tPin.length === 4) {
