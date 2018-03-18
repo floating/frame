@@ -12,7 +12,11 @@ export const panelRequest = (u, request, cb) => {
   u('panel.show', v => true)
 }
 
-export const setPermissions = (u, permissions) => u('permissions', permissions)
+export const toggleSettings = u => {
+  u('panel.view', view => view === 'settings' ? 'home' : 'settings')
+}
+
+export const setPermissions = (u, permissions) => u('permissions', () => permissions)
 
 export const addProviderEvent = (u, payload) => {
   u('provider.events', events => {

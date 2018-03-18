@@ -4,7 +4,10 @@ const PersistStore = require('electron-store') // Stored remotely in future on I
 const persist = new PersistStore()
 
 let initial = {
-  panel: {show: false},
+  panel: {
+    show: false,
+    view: 'home'
+  },
   view: {current: '', list: [], data: {}},
   permissions: persist.get('permissions') || {},
   signers: [],
@@ -14,7 +17,7 @@ let initial = {
     requests: {}
   },
   frame: {
-    type: process.env.FRAME_TYPE === 'tray' ? 'tray' : 'window'
+    type: process.env.FRAME_TYPE || 'window'
   },
   provider: {
     events: []
