@@ -6,7 +6,7 @@ const persist = new PersistStore()
 let initial = {
   panel: {
     show: false,
-    view: 'home'
+    view: 'default'
   },
   view: {current: '', list: [], data: {}},
   permissions: persist.get('permissions') || {},
@@ -14,7 +14,8 @@ let initial = {
   signer: {
     minimized: false,
     current: '',
-    requests: {}
+    requests: {},
+    view: 'default'
   },
   frame: {
     type: process.env.FRAME_TYPE || 'window'

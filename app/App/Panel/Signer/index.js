@@ -32,7 +32,8 @@ class Signer extends React.Component {
     this.selected = current && !minimized
     let type = this.props.type
     let signerClass = current ? 'signer current' : 'signer'
-    let signerIndicatorStatusClass = current ? 'signerIndicatorStatus active' : 'signerIndicatorStatus'
+    let signerIndicator = current ? 'signerIndicator signerIndicatorActive' : 'signerIndicator'
+    let signerSettings = this.selected ? 'signerSettingsMenu signerSettingsActive' : 'signerSettingsMenu'
     if (this.selected) signerClass += ' selectedSigner'
     if (this.props.status === 'ok') signerClass += ' okSigner'
     if (this.props.status === 'loading') return null
@@ -40,10 +41,16 @@ class Signer extends React.Component {
       <div className={signerClass}>
         <div className='signerWrap'>
           <div className='signerTop'>
-            <span className='signerIndicator'>
-              <span className={signerIndicatorStatusClass} dangerouslySetInnerHTML={{__html: octicons['primitive-dot'].toSVG({height: 24})}} />
-              {current && <span className='signerIndicatorText'>active</span>}
-            </span>
+            <div className={signerIndicator}>
+              <div className='signerIndicatorIcon'>
+                <span dangerouslySetInnerHTML={{__html: octicons['pulse'].toSVG({height: 23})}} />
+              </div>
+            </div>
+            <div onClick={() => this.store.toggelSignerSettings()} className={signerSettings}>
+              <div className='signerIndicatorIcon'>
+                <span dangerouslySetInnerHTML={{__html: octicons['gear'].toSVG({height: 21})}} />
+              </div>
+            </div>
             <div className='signerType' onClick={() => { if (this.props.status === 'ok') this.select() }}>
               <div className='signerImage'>
                 {(_ => {
@@ -69,7 +76,13 @@ class Signer extends React.Component {
                 <div className='signerAddress'>{this.props.accounts}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}
-            <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
+            {this.store('signer.view') === 'settings' ? (
+              <div className='signerSettings'>
+                {'Signer Settings'}
+              </div>
+            ) : (
+              <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
+            )}
             {type === 'Trezor' && this.props.status === 'Need Pin' ? (
               <div className='trezorPinWrap'>
                 <div className='trezorPinInput'>

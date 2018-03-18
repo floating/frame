@@ -13,7 +13,11 @@ export const panelRequest = (u, request, cb) => {
 }
 
 export const toggleSettings = u => {
-  u('panel.view', view => view === 'settings' ? 'home' : 'settings')
+  u('panel.view', view => view === 'settings' ? 'default' : 'settings')
+}
+
+export const toggelSignerSettings = u => {
+  u('signer.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
 export const setPermissions = (u, permissions) => u('permissions', () => permissions)

@@ -15,7 +15,7 @@ class Panel extends React.Component {
     return (
       <div id='panel'>
         <div className='panelMenu'>
-          <div onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['settings'].toSVG({height: 20})}} />
+          <div onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['settings'].toSVG({height: 21})}} />
         </div>
         <div id='panelScroll'>
           <div id='panelSlide'>
