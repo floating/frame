@@ -31,7 +31,8 @@ class Signer extends React.Component {
     let minimized = this.store('signer.minimized')
     this.selected = current && !minimized
     let type = this.props.type
-    let signerClass = current ? 'signer signer.current' : 'signer'
+    let signerClass = current ? 'signer current' : 'signer'
+    let signerIndicatorStatusClass = current ? 'signerIndicatorStatus active' : 'signerIndicatorStatus'
     if (this.selected) signerClass += ' selectedSigner'
     if (this.props.status === 'ok') signerClass += ' okSigner'
     if (this.props.status === 'loading') return null
@@ -39,6 +40,10 @@ class Signer extends React.Component {
       <div className={signerClass}>
         <div className='signerWrap'>
           <div className='signerTop'>
+            <span className='signerIndicator'>
+              <span className={signerIndicatorStatusClass} dangerouslySetInnerHTML={{__html: octicons['primitive-dot'].toSVG({height: 24})}} />
+              {current && <span className='signerIndicatorText'>active</span>}
+            </span>
             <div className='signerType' onClick={() => { if (this.props.status === 'ok') this.select() }}>
               <div className='signerImage'>
                 {(_ => {
