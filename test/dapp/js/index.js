@@ -97,7 +97,7 @@ class App extends React.Component {
     })
   }
   setCurrentTransaction = (tHash) => e => {
-    this.setState({currentTransaction: this.store('transactions')[tHash].data})
+    this.setState({currentTransaction: this.store('transactions', tHash, 'data')})
   }
   startPoll (txHash) {
     this[txHash] = setInterval(() => {
