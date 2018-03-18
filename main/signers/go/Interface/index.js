@@ -105,15 +105,7 @@ class Interface extends Signer {
       id: 1,
       jsonrpc: '2.0',
       method: 'account_signTransaction',
-      params: [{
-        gas: rawTx.gas,
-        gasPrice: rawTx.gasPrice,
-        nonce: rawTx.nonce,
-        to: rawTx.to,
-        value: rawTx.value,
-        data: rawTx.data || '0x',
-        from: rawTx.from
-      }]
+      params: [rawTx]
     }
     this.handlers.currentTx = {rawTx, cb, send, reqId}
     this.provider.send(req, (err, res) => console.log(err))
