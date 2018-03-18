@@ -73,6 +73,72 @@
     display flex
     z-index 2002
 
+    .signerIndicator
+      position absolute
+      left 0
+      top 0
+      display flex
+      align-items center
+      justify-content center
+      height 55px
+      width 55px
+      flex-direction column
+      text-align center
+
+      .signerIndicatorIcon
+        height 51px
+        width 51px
+        border-radius 26px
+        // background rgba(0, 0, 50, 0.1)
+        display flex
+        align-items center
+        justify-content center
+
+        svg
+          fill #3ce671
+          opacity 0
+
+    .signerIndicatorActive
+      .signerIndicatorIcon
+        // background rgba(0, 255, 50, 0.1)
+        svg
+          fill #3ce671
+          opacity 1
+
+    .signerSettingsMenu
+      position absolute
+      right 0
+      top 0
+      display flex
+      align-items center
+      justify-content center
+      height 55px
+      width 55px
+      flex-direction column
+
+      .signerIndicatorIcon
+        height 51px
+        width 51px
+        border-radius 26px
+        // background rgba(0, 0, 50, 0.1)
+        display flex
+        align-items center
+        justify-content center
+
+        svg
+          fill outerspace
+          opacity 0
+
+    .signerSettingsActive
+      .signerIndicatorIcon
+        svg
+            opacity 0.6
+
+    .signerSettingsActive:hover
+      .signerIndicatorIcon
+        svg
+            opacity 1
+
     .signerType
       position relative
       top 0px
@@ -310,5 +376,10 @@
 
   .signerTop
     opacity 1
+
+.signerSettings
+  display flex
+  justify-content center
+  padding 60px 0px 60px 0px
 
 @import '../Requests/style'

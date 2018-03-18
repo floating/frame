@@ -56,7 +56,7 @@
   align-items center
   background rgba(0, 0, 0, 0.08)
   -webkit-app-region no-drag
-  
+
   &:hover
     background rgba(0, 0, 0, 0.78)
 
@@ -99,5 +99,25 @@
   svg
     fill rgba(0, 0, 50, 0.1)
 
+.panelMenu
+  position absolute
+  right 0
+  top 0
+  height 40px
+  width 40px
+  display flex
+  justify-content center
+  align-items center
+  -webkit-app-region no-drag
+  z-index 10
+
+  svg
+    fill outerspace
+    opacity 0.6
+
+.panelMenu:hover
+    svg
+      opacity 1
+
 @import '../Signer/style'
-@import '../Session/style'
+@import '../Settings/style'
