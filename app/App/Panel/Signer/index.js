@@ -10,7 +10,6 @@ import Requests from './Requests'
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = {minimized: true}
   }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
@@ -22,18 +21,18 @@ class Signer extends React.Component {
     }
   }
   select () {
-    this.setState({minimized: !this.state.minimized})
+    this.store.toggleMinimized()
     let current = this.store('signer.current') === this.props.id
     if (!current) {
       rpc('setSigner', this.props.id, (err, status) => {
         if (err) return console.log(err)
-        // Signer Change Success
       })
     }
   }
   render () {
     let current = this.store('signer.current') === this.props.id
-    this.selected = current && !this.state.minimized
+    let minimized = this.store('signer.minimized')
+    this.selected = current && !minimized
     let type = this.props.type
     let signerClass = current ? 'signer signer.current' : 'signer'
     if (this.selected) signerClass += ' selectedSigner'
@@ -68,7 +67,7 @@ class Signer extends React.Component {
                 <div className='signerAddress'>{this.props.accounts}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}
-            <Requests id={this.props.id} accounts={this.props.accounts} minimized={this.state.minimized} />
+            <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
             {type === 'Trezor' && this.props.status === 'Need Pin' ? (
               <div className='trezorPinWrap'>
                 <div className='trezorPinInput'>

@@ -91,7 +91,14 @@ export const addSigner = (u, signer) => u('signers', signers => {
   return signers
 })
 
-export const setSigner = (u, signer) => u('signer.current', _ => signer.id)
+export const setSigner = (u, signer) => {
+  u('signer.current', _ => signer.id)
+  u('signer.minimized', _ => false)
+}
+
+export const toggleMinimized = (u, signer) => {
+  u('signer.minimized', minimized => !minimized)
+}
 
 export const removeSigner = (u, signer) => u('signers', signers => {
   let target = signers.map(sign => sign.id).indexOf(signer.id)
