@@ -5,17 +5,37 @@
   justify-content center
 
 .currentTransaction
-  font-size 24px
-  text-align center
+  padding 50px
+  font-size 16px
+
+  .transaction-detail
+    margin 15px 0
+
+  .transaction-key
+    text-transform capitalize
+    font-weight bold
 
 .tHash-wrap
   text-align center
 
-.tHash
-  cursor pointer
+  .tHash
+    cursor pointer
+    margin 10px
+    display flex
+    justify-content center
+    align-items center
+    background spacewhite
+    border-radius 4px
+    padding 20px
+    box-shadow cardDrop
+    font-size 14px
+
+    .tHash-done
+      margin-right 10px
+      fill #3ce671
 
 .back
   position absolute
-  top 10px
+  top 48%
   left 10px
   cursor pointer

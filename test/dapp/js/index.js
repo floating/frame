@@ -17,7 +17,7 @@ class App extends React.Component {
     super(...args)
     this.state = {
       accounts: [],
-      transactions: [],
+      transactions: {},
       showTransactions: false,
       currentTransaction: '',
       providerError: ''
@@ -52,10 +52,10 @@ class App extends React.Component {
     }
     this.web3.eth.sendTransaction(tx).then(res => {
       let transactions = this.state.transactions
-      transactions.push(res.transactionHash)
+      transactions[res.transactionHash] = {hash: res.transactionHash}
       this.setState({txMessage: `Successful Transaction: ${res.transactionHash}`, transactions})
     }).catch(err => {
-      console.log(err)
+      console.log('sendTranction err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
     }).finally(_ => {
       setTimeout(() => {
@@ -65,7 +65,7 @@ class App extends React.Component {
   }
   getBalance = () => {
     this.web3.eth.getBalance(this.state.accounts[0]).then(res => {
-      this.setState({txMessage: `Balance: ${this.web3.utils.fromWei(res)}`})
+      this.setState({txMessage: `Balance: ${Web3.utils.fromWei(res)}`})
     }).catch(err => {
       console.log('getBalance err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
@@ -77,7 +77,7 @@ class App extends React.Component {
   }
   getGasPrice = () => {
     this.web3.eth.getGasPrice().then(res => {
-      this.setState({txMessage: `Gas price: ${this.web3.utils.fromWei(res)}`})
+      this.setState({txMessage: `Gas price: ${Web3.utils.fromWei(res)}`})
     }).catch(err => {
       console.log('getGasPrice err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
@@ -87,24 +87,34 @@ class App extends React.Component {
       }, 3700)
     })
   }
-  getTransaction = (tHash) => e => {
-    this.web3.eth.getTransaction(tHash).then(res => {
-      this.setState({currentTransaction: res})
-    }).catch(err => {
-      console.log('getTransaction err:', err)
-      this.setState({txMessage: 'Error: ' + err.message})
-    })
+  setCurrentTransaction = (tHash) => e => {
+    this.setState({currentTransaction: this.state.transactions[tHash]})
   }
-  toggleTransactions = () => {
-    this.setState({showTransactions: !this.state.showTransactions})
+  toggleTransactions = (resetCurrent) => e => {
+    if (resetCurrent) {
+      this.setState({currentTransaction: ''})
+    } else if (!this.state.showTransactions) { // about to view transactions
+      Promise.all(Object.keys(this.state.transactions).map(tHash => this.web3.eth.getTransaction(tHash))).then(res => {
+        let currentTransactions = res.reduce((acc, cur) => {
+          acc[cur.hash] = cur
+          return acc
+        }, {})
+        this.setState({showTransactions: true, currentTransaction: '', transactions: currentTransactions})
+      }).catch(err => {
+        console.log('promise all err:', err)
+        this.setState({txMessage: 'Error: ' + err.message})
+      })
+    } else { // going back to main view
+      this.setState({showTransactions: false, currentTransaction: ''})
+    }
   }
   render () {
     if (this.state.showTransactions) {
       return (
         <Transactions
-          getTransaction={this.getTransaction}
           transactions={this.state.transactions}
           toggleTransactions={this.toggleTransactions}
+          setCurrentTransaction={this.setCurrentTransaction}
           currentTransaction={this.state.currentTransaction} />
       )
     } else {
@@ -130,8 +140,8 @@ class App extends React.Component {
                     <div className='button' onClick={this.getGasPrice}>
                       {'View Gas Price'}
                     </div>
-                    <div className='button' onClick={this.toggleTransactions}>
-                      {'View Transactions'}
+                    <div className='button' onClick={this.toggleTransactions(false)}>
+                      {`View Transactions (${Object.keys(this.state.transactions).length})`}
                     </div>
                   </div>
                 </div>
