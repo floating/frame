@@ -8,8 +8,15 @@ const Restore = require('react-restore')
 const svg = require('../../../app/svg')
 const Transactions = require('./Transactions')
 
-let state = {ws: true}
-let actions = {ws: (u, connected) => u('ws', ws => connected)}
+let state = {ws: true, transactions: {}}
+let actions = {
+  ws: (u, connected) => u('ws', ws => connected),
+  insertTransaction: (u, tx) => u('transactions', transactions => {
+    transactions[tx.hash] = {status: 'pending', data: tx}
+    return transactions
+  }),
+  updateTransaction: (u, tHash, update) => u('transactions', tHash, tx => Object.assign({}, tx, update))
+}
 const store = Restore.create(state, actions)
 
 class App extends React.Component {
@@ -17,7 +24,6 @@ class App extends React.Component {
     super(...args)
     this.state = {
       accounts: [],
-      transactions: {},
       showTransactions: false,
       currentTransaction: '',
       providerError: ''
@@ -51,9 +57,12 @@ class App extends React.Component {
       from: this.state.accounts[0]
     }
     this.web3.eth.sendTransaction(tx).then(res => {
-      let transactions = this.state.transactions
-      transactions[res.transactionHash] = {hash: res.transactionHash}
-      this.setState({txMessage: `Successful Transaction: ${res.transactionHash}`, transactions})
+      this.store.insertTransaction({hash: res.transactionHash})
+      setTimeout(() => {
+        this.store.updateTransaction(res.transactionHash, {status: 'verified'})
+      }, 10000)
+      this.setState({txMessage: `Successful Transaction: ${res.transactionHash}`})
+      this.startPoll(res.transactionHash)
     }).catch(err => {
       console.log('sendTranction err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
@@ -88,22 +97,37 @@ class App extends React.Component {
     })
   }
   setCurrentTransaction = (tHash) => e => {
-    this.setState({currentTransaction: this.state.transactions[tHash]})
+    this.setState({currentTransaction: this.store('transactions')[tHash].data})
+  }
+  startPoll (txHash) {
+    this[txHash] = setInterval(() => {
+      if (Object.keys(this.store('transactions')).length > 0) {
+        let pendingMap = Object.keys(this.store('transactions')).reduce((acc, tHash) => {
+          if (this.store('transactions')[tHash].status === 'pending') {
+            acc[tHash] = this.store('transactions')[tHash]
+          }
+          return acc
+        }, {})
+        if (Object.keys(pendingMap).length > 0) {
+          Promise.all(Object.keys(pendingMap).map(tHash => this.web3.eth.getTransaction(tHash))).then(res => {
+            res.forEach(newTx => { this.store.updateTransaction(newTx.hash, {data: newTx}) })
+          }).catch(err => {
+            console.log('polling getTransaction err:', err)
+            this.setState({txMessage: 'Error: ' + err.message})
+          })
+        } else if (this[txHash]) {
+          clearInterval(this[txHash])
+        }
+      } else if (this[txHash]) {
+        clearInterval(this[txHash])
+      }
+    }, 2500)
   }
   toggleTransactions = (resetCurrent) => e => {
     if (resetCurrent) {
       this.setState({currentTransaction: ''})
     } else if (!this.state.showTransactions) { // about to view transactions
-      Promise.all(Object.keys(this.state.transactions).map(tHash => this.web3.eth.getTransaction(tHash))).then(res => {
-        let currentTransactions = res.reduce((acc, cur) => {
-          acc[cur.hash] = cur
-          return acc
-        }, {})
-        this.setState({showTransactions: true, currentTransaction: '', transactions: currentTransactions})
-      }).catch(err => {
-        console.log('promise all err:', err)
-        this.setState({txMessage: 'Error: ' + err.message})
-      })
+      this.setState({showTransactions: true, currentTransaction: ''})
     } else { // going back to main view
       this.setState({showTransactions: false, currentTransaction: ''})
     }
@@ -112,7 +136,7 @@ class App extends React.Component {
     if (this.state.showTransactions) {
       return (
         <Transactions
-          transactions={this.state.transactions}
+          transactions={this.store('transactions')}
           toggleTransactions={this.toggleTransactions}
           setCurrentTransaction={this.setCurrentTransaction}
           currentTransaction={this.state.currentTransaction} />
@@ -141,7 +165,7 @@ class App extends React.Component {
                       {'View Gas Price'}
                     </div>
                     <div className='button' onClick={this.toggleTransactions(false)}>
-                      {`View Transactions (${Object.keys(this.state.transactions).length})`}
+                      {`View Transactions (${Object.keys(this.store('transactions')).length})`}
                     </div>
                   </div>
                 </div>
