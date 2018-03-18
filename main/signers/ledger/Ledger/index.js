@@ -20,6 +20,7 @@ class Ledger extends Signer {
       this.update()
     }).catch(err => {
       this.status = err.message
+      if (err.statusCode === 27904) this.status = 'Wrong Application, Select the Ethereum Application on Your Ledger'
       if (err.statusCode === 26368) this.status = 'Select the Ethereum Application on Your Ledger'
       if (err.statusCode === 26625) this.status = 'Device Is Asleep'
       this.update()
