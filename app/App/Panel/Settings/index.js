@@ -7,8 +7,8 @@ class Settings extends React.Component {
       <div className='settings'>
         <div className='settingsTitle'>{'Local Settings'}</div>
         <div className='settingsItems'>
-          <div className='settingsItem'>
-            {'Setting #1'}
+          <div className='settingsItem' onClick={_ => this.store.runLocalNode()}>
+            {'Run local node? ' + this.store('local.node.run')}
           </div>
         </div>
       </div>

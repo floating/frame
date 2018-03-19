@@ -16,6 +16,8 @@ export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
+export const runLocalNode = u => u('local.node.run', run => !run)
+
 export const toggelSignerSettings = u => {
   u('signer.view', view => view === 'settings' ? 'default' : 'settings')
 }
