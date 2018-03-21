@@ -63,15 +63,24 @@ body
         font-size 32px
         padding-bottom 40px
 
-    .sendTest
+    .button-wrap
       display flex
-      justify-content center
-      align-items center
-      background spacewhite
-      border-radius 4px
-      padding 40px
-      box-shadow cardDrop
-      cursor pointer
+      flex-direction row
+      flex-wrap wrap
+      width 48%
+
+      .button
+        width 150px
+        margin 10px
+        display flex
+        justify-content center
+        align-items center
+        background spacewhite
+        border-radius 4px
+        padding 20px
+        box-shadow cardDrop
+        cursor pointer
+        font-size 14px
 
     .errorMessage
       display flex
@@ -89,3 +98,5 @@ body
 
         span
           padding 4px
+
+@import '../js/Transactions/style'
