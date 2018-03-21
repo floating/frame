@@ -48,6 +48,10 @@ export const giveAccess = (u, origin, access) => {
   })
 }
 
+export const toggleAccess = (u, origin) => {
+  u('permissions', origin, 'provider', provider => !provider)
+}
+
 export const requestPending = (u, id) => {
   u('signer.requests', id, 'status', status => 'pending')
   u('signer.requests', id, 'notice', notice => 'Signature Pending')

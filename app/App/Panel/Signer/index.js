@@ -78,7 +78,14 @@ class Signer extends React.Component {
             ) : <div className='signerStatus'>{this.props.status}</div>}
             {this.store('signer.view') === 'settings' ? (
               <div className='signerSettings'>
-                {'Signer Settings'}
+                {Object.keys(this.store('permissions')).sort().map(o => {
+                  return (
+                    <div className='signerPermission' onClick={_ => this.store.toggleAccess(o)}>
+                      <div>{o}</div>
+                      <div>{' :: ' + this.store('permissions', o).provider}</div>
+                    </div>
+                  )
+                })}
               </div>
             ) : (
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
