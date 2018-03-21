@@ -1,0 +1,20 @@
+{
+  "name": "Frame",
+  "version": "0.0.0",
+  "manifest_version": 0,
+  "description": "Frame",
+  "homepage_url": "https://github.com/floating/frame",
+  "background": {
+    "scripts": ["index.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_title": "Frame"
+  },
+  "permissions": [
+    "activeTab",
+    "https://*/*",
+    "http://*/*",
+    "tabs"
+  ]
+}
