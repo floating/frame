@@ -9,6 +9,9 @@ import state from './state'
 import rpc from '../rpc'
 import provider from '../provider'
 
+const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
+const persist = new PersistStore()
+
 const store = Restore.create(state(), actions)
 store.events = new EventEmitter()
 
@@ -39,5 +42,7 @@ store.observer(() => {
     document.body.className = document.body.className.replace(' panel', '')
   }
 })
+
+store.observer(_ => persist.set('permissions', store('permissions')))
 
 module.exports = store

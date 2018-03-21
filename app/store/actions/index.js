@@ -34,7 +34,16 @@ export const addProviderEvent = (u, payload) => {
 export const addRequest = (u, request) => {
   u('signer.requests', (requests, state) => {
     if (state.frame.type === 'tray') ipcRenderer.send('frame:showTray')
-    requests[request.handlerId] = request
+    if (request.type === 'approveTransaction') requests[request.handlerId] = request
+    if (request.type === 'requestProvider') requests[request.origin] = request
+    return requests
+  })
+}
+
+export const giveAccess = (u, origin, access) => {
+  u('permissions', origin, 'provider', provider => access)
+  u('signer.requests', (requests, state) => {
+    delete requests[origin]
     return requests
   })
 }
