@@ -78,11 +78,14 @@ class Signer extends React.Component {
             ) : <div className='signerStatus'>{this.props.status}</div>}
             {this.store('signer.view') === 'settings' ? (
               <div className='signerSettings'>
+                <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
                 {Object.keys(this.store('permissions')).sort().map(o => {
                   return (
                     <div className='signerPermission' onClick={_ => this.store.toggleAccess(o)}>
-                      <div>{o}</div>
-                      <div>{' :: ' + this.store('permissions', o).provider}</div>
+                      <div className='signerPermissionOrigin'>{o}</div>
+                      <div className={this.store('permissions', o).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
+                        <div className='signerPermissionToggleSwitch' />
+                      </div>
                     </div>
                   )
                 })}

@@ -17,6 +17,7 @@ export const toggleSettings = u => {
 }
 
 export const runLocalNode = u => u('local.node.run', run => !run)
+export const runOnStartup = u => u('local.startup', startup => !startup)
 
 export const toggelSignerSettings = u => {
   u('signer.view', view => view === 'settings' ? 'default' : 'settings')

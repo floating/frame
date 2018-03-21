@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A cross-platform Ethereum provider interface",
   "main": "main",
   "scripts": {
@@ -57,5 +57,6 @@
   },
   "standard": {
     "parser": "babel-eslint"
-  }
+  },
+  "repository": "github:floating/frame"
 }

@@ -89,20 +89,19 @@
         height 51px
         width 51px
         border-radius 26px
-        // background rgba(0, 0, 50, 0.1)
         display flex
         align-items center
         justify-content center
 
         svg
-          fill #3ce671
+          transition standard
+          fill #27eac6
           opacity 0
 
     .signerIndicatorActive
       .signerIndicatorIcon
-        // background rgba(0, 255, 50, 0.1)
         svg
-          fill #3ce671
+          fill #27eac6
           opacity 1
 
     .signerSettingsMenu
@@ -120,7 +119,6 @@
         height 51px
         width 51px
         border-radius 26px
-        // background rgba(0, 0, 50, 0.1)
         display flex
         align-items center
         justify-content center
@@ -228,7 +226,7 @@
     justify-content center
     align-items center
     font-size 14px
-    font-weight 500
+    font-weight 200
     text-transform capitalize
     text-align center
     top 95px
@@ -380,6 +378,47 @@
 .signerSettings
   display flex
   justify-content center
-  padding 60px 0px 60px 0px
+  padding 00px 0px 60px 0px
+  flex-direction column
+
+  .signerSettingsTitle
+    display flex
+    justify-content center
+    align-items center
+    height 40px
+
+.signerPermission
+  display flex
+  justify-content space-between
+  align-items center
+  padding 20px
+
+
+  .signerPermissionOrigin
+    background transparent
+
+  .signerPermissionToggle
+    position relative
+    background rgb(244, 66, 131)
+    height 30px
+    width 50px
+    border-radius 20px
+    transition standard
+
+    .signerPermissionToggleSwitch
+      position absolute
+      top 2px
+      left 2px
+      bottom 2px
+      width 26px
+      border-radius 15px
+      background white
+      transition standard
+
+  .signerPermissionToggleOn
+    background #27eac6
+    .signerPermissionToggleSwitch
+        position absolute
+        left 22px
 
 @import '../Requests/style'

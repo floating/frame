@@ -24,6 +24,7 @@ let initial = {
     events: []
   },
   local: {
+    startup: false,
     node: {
       run: false,
       backup: 'http://rinkby.infura.com'
