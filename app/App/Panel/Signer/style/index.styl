@@ -73,6 +73,70 @@
     display flex
     z-index 2002
 
+    .signerIndicator
+      position absolute
+      left 0
+      top 0
+      display flex
+      align-items center
+      justify-content center
+      height 55px
+      width 55px
+      flex-direction column
+      text-align center
+
+      .signerIndicatorIcon
+        height 51px
+        width 51px
+        border-radius 26px
+        display flex
+        align-items center
+        justify-content center
+
+        svg
+          transition standard
+          fill #27eac6
+          opacity 0
+
+    .signerIndicatorActive
+      .signerIndicatorIcon
+        svg
+          fill #27eac6
+          opacity 1
+
+    .signerSettingsMenu
+      position absolute
+      right 0
+      top 0
+      display flex
+      align-items center
+      justify-content center
+      height 55px
+      width 55px
+      flex-direction column
+
+      .signerIndicatorIcon
+        height 51px
+        width 51px
+        border-radius 26px
+        display flex
+        align-items center
+        justify-content center
+
+        svg
+          fill outerspace
+          opacity 0
+
+    .signerSettingsActive
+      .signerIndicatorIcon
+        svg
+            opacity 0.6
+
+    .signerSettingsActive:hover
+      .signerIndicatorIcon
+        svg
+            opacity 1
+
     .signerType
       position relative
       top 0px
@@ -162,7 +226,7 @@
     justify-content center
     align-items center
     font-size 14px
-    font-weight 500
+    font-weight 200
     text-transform capitalize
     text-align center
     top 95px
@@ -310,5 +374,51 @@
 
   .signerTop
     opacity 1
+
+.signerSettings
+  display flex
+  justify-content center
+  padding 00px 0px 60px 0px
+  flex-direction column
+
+  .signerSettingsTitle
+    display flex
+    justify-content center
+    align-items center
+    height 40px
+
+.signerPermission
+  display flex
+  justify-content space-between
+  align-items center
+  padding 20px
+
+
+  .signerPermissionOrigin
+    background transparent
+
+  .signerPermissionToggle
+    position relative
+    background rgb(244, 66, 131)
+    height 30px
+    width 50px
+    border-radius 20px
+    transition standard
+
+    .signerPermissionToggleSwitch
+      position absolute
+      top 2px
+      left 2px
+      bottom 2px
+      width 26px
+      border-radius 15px
+      background white
+      transition standard
+
+  .signerPermissionToggleOn
+    background #27eac6
+    .signerPermissionToggleSwitch
+        position absolute
+        left 22px
 
 @import '../Requests/style'

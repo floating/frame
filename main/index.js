@@ -7,8 +7,9 @@ require('./rpc')
 
 let quit = false
 
-console.log(process.versions.chrome)
-console.log(process.versions.electron)
+console.log('Chrome: v' + process.versions.chrome)
+console.log('Electron: v' + process.versions.electron)
+console.log('Node: v' + process.versions.node)
 
 ipcMain.on('addPermission', (e, host, permission) => store.addPermission(host, permission))
 ipcMain.on('removePermission', (e, host, permission) => store.removePermission(host, permission))
