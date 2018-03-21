@@ -76,7 +76,7 @@ class Signer extends React.Component {
                 <div className='signerAddress'>{this.props.accounts}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}
-            {this.store('signer.view') === 'settings' ? (
+            {this.selected && this.store('signer.view') === 'settings' ? (
               <div className='signerSettings'>
                 <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
                 {Object.keys(this.store('permissions')).sort().map(o => {
