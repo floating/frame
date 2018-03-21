@@ -16,6 +16,9 @@ export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
+export const runLocalNode = u => u('local.node.run', run => !run)
+export const runOnStartup = u => u('local.startup', startup => !startup)
+
 export const toggelSignerSettings = u => {
   u('signer.view', view => view === 'settings' ? 'default' : 'settings')
 }
@@ -32,9 +35,22 @@ export const addProviderEvent = (u, payload) => {
 export const addRequest = (u, request) => {
   u('signer.requests', (requests, state) => {
     if (state.frame.type === 'tray') ipcRenderer.send('frame:showTray')
-    requests[request.handlerId] = request
+    if (request.type === 'approveTransaction') requests[request.handlerId] = request
+    if (request.type === 'requestProvider') requests[request.origin] = request
     return requests
   })
+}
+
+export const giveAccess = (u, origin, access) => {
+  u('permissions', origin, 'provider', provider => access)
+  u('signer.requests', (requests, state) => {
+    delete requests[origin]
+    return requests
+  })
+}
+
+export const toggleAccess = (u, origin) => {
+  u('permissions', origin, 'provider', provider => !provider)
 }
 
 export const requestPending = (u, id) => {

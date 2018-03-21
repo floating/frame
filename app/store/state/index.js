@@ -22,6 +22,13 @@ let initial = {
   },
   provider: {
     events: []
+  },
+  local: {
+    startup: false,
+    node: {
+      run: false,
+      backup: 'http://rinkby.infura.com'
+    }
   }
 }
 

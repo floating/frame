@@ -1,11 +1,11 @@
 {
   "name": "Frame",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A cross-platform Ethereum provider interface",
   "main": "main",
   "scripts": {
     "start": "npm run launch",
-    "demo": "npm install && electron-rebuild && npm run dev",
+    "build": "npm install && electron-rebuild",
     "dev": "npm-run-all --parallel test:rpc launch test:dapp",
     "test": "standard",
     "launch": "electron ./main",
@@ -57,5 +57,6 @@
   },
   "standard": {
     "parser": "babel-eslint"
-  }
+  },
+  "repository": "github:floating/frame"
 }
