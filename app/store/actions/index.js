@@ -36,12 +36,13 @@ export const addRequest = (u, request) => {
   u('signer.requests', (requests, state) => {
     if (state.frame.type === 'tray') ipcRenderer.send('frame:showTray')
     if (request.type === 'approveTransaction') requests[request.handlerId] = request
-    if (request.type === 'requestProvider') requests[request.origin] = request
+    if (request.type === 'requestProvider') requests[request.origin.replace('.', '')] = request
     return requests
   })
 }
 
 export const giveAccess = (u, origin, access) => {
+  origin = origin.replace('.', '')
   u('permissions', origin, 'provider', provider => access)
   u('signer.requests', (requests, state) => {
     delete requests[origin]
@@ -50,6 +51,7 @@ export const giveAccess = (u, origin, access) => {
 }
 
 export const toggleAccess = (u, origin) => {
+  origin = origin.replace('.', '')
   u('permissions', origin, 'provider', provider => !provider)
 }
 
