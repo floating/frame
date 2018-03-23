@@ -1,16 +1,23 @@
 {
   "name": "Frame",
   "version": "0.0.0",
-  "manifest_version": 0,
+  "manifest_version": 2,
   "description": "Frame",
   "homepage_url": "https://github.com/floating/frame",
   "background": {
-    "scripts": ["index.js"],
-    "persistent": true
+    "scripts": ["index.js"]
   },
   "browser_action": {
     "default_title": "Frame"
   },
+  "content_scripts" : [{
+    "matches": ["file://*/*", "http://*/*", "https://*/*"],
+    "js": ["inject.js"],
+    "run_at": "document_start"
+  }],
+  "web_accessible_resources": [
+    "frame.js"
+  ],
   "permissions": [
     "activeTab",
     "https://*/*",

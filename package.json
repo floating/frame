@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npm run launch",
     "build": "npm install && electron-rebuild",
+    "build:extension": "copyfiles -f ./extension/* ./extension/build && parcel build ./extension/build/frame.js -d ./extension/build",
     "dev": "npm-run-all --parallel test:rpc launch test:dapp",
     "test": "standard",
     "launch": "electron ./main",
@@ -46,6 +47,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
+    "copyfiles": "^2.0.0",
     "electron": "^1.8.4",
     "electron-packager": "^11.1.0",
     "electron-rebuild": "^1.7.3",
