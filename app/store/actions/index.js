@@ -41,9 +41,9 @@ export const addRequest = (u, request) => {
   })
 }
 
-export const giveAccess = (u, origin, access) => {
-  origin = origin.replace('.', '')
-  u('permissions', origin, 'provider', provider => access)
+export const giveAccess = (u, req, access) => {
+  let origin = req.origin.replace('.', '')
+  u('permissions', origin, _ => ({origin: req.origin, provider: access}))
   u('signer.requests', (requests, state) => {
     delete requests[origin]
     return requests
@@ -51,8 +51,7 @@ export const giveAccess = (u, origin, access) => {
 }
 
 export const toggleAccess = (u, origin) => {
-  origin = origin.replace('.', '')
-  u('permissions', origin, 'provider', provider => !provider)
+  u('permissions', origin.replace('.', ''), 'provider', provider => !provider)
 }
 
 export const requestPending = (u, id) => {

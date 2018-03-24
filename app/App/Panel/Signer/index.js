@@ -79,16 +79,41 @@ class Signer extends React.Component {
             {this.selected && this.store('signer.view') === 'settings' ? (
               <div className='signerSettings'>
                 <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
-                {Object.keys(this.store('permissions')).sort().map(o => {
-                  return (
-                    <div className='signerPermission' onClick={_ => this.store.toggleAccess(o)}>
-                      <div className='signerPermissionOrigin'>{o}</div>
-                      <div className={this.store('permissions', o).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
-                        <div className='signerPermissionToggleSwitch' />
+                {Object.keys(this.store('permissions')).length === 0 ? (
+                  <div className='signerPermission'>
+                    <div className='signerPermissionOrigin'>{'No Permissions Set'}</div>
+                  </div>
+                ) : (
+                  Object.keys(this.store('permissions')).sort().map(o => {
+                    return (
+                      <div className='signerPermission' onClick={_ => this.store.toggleAccess(o)}>
+                        <div className='signerPermissionOrigin'>{this.store('permissions', o).origin}</div>
+                        <div className={this.store('permissions', o).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
+                          <div className='signerPermissionToggleSwitch' />
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })
+                )}
+                <div className='signerSettingsTitle'>{'App Info'}</div>
+                <div className='appInfo'>
+                  <div className='appInfoLine'>
+                    <div>{'Frame'}</div>
+                    <div>{'v 0.0.0'}</div>
+                  </div>
+                  <div className='appInfoLine'>
+                    <div>{'Chrome'}</div>
+                    <div>{'v ' + process.versions.chrome}</div>
+                  </div>
+                  <div className='appInfoLine'>
+                    <div>{'Electron'}</div>
+                    <div>{'v ' + process.versions.electron}</div>
+                  </div>
+                  <div className='appInfoLine'>
+                    <div>{'Node'}</div>
+                    <div>{'v ' + process.versions.node}</div>
+                  </div>
+                </div>
               </div>
             ) : (
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
