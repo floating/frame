@@ -100,19 +100,19 @@ class Signer extends React.Component {
                 <div className='appInfo'>
                   <div className='appInfoLine'>
                     <div>{'Frame'}</div>
-                    <div>{'v 0.0.0'}</div>
+                    <div>{'v0.0.0'}</div>
                   </div>
                   <div className='appInfoLine'>
                     <div>{'Chrome'}</div>
-                    <div>{'v ' + process.versions.chrome}</div>
+                    <div>{'v' + process.versions.chrome}</div>
                   </div>
                   <div className='appInfoLine'>
                     <div>{'Electron'}</div>
-                    <div>{'v ' + process.versions.electron}</div>
+                    <div>{'v' + process.versions.electron}</div>
                   </div>
                   <div className='appInfoLine'>
                     <div>{'Node'}</div>
-                    <div>{'v ' + process.versions.node}</div>
+                    <div>{'v' + process.versions.node}</div>
                   </div>
                 </div>
               </div>

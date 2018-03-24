@@ -33,7 +33,8 @@ export const addProviderEvent = (u, payload) => {
 }
 
 export const addRequest = (u, request) => {
-  u('signer.view', view => 'default')
+  u('signer.minimized', _ => false)
+  u('signer.view', _ => 'default')
   u('signer.requests', (requests, state) => {
     if (state.frame.type === 'tray') ipcRenderer.send('frame:showTray')
     if (request.type === 'approveTransaction') requests[request.handlerId] = request
