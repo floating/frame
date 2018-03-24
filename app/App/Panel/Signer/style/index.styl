@@ -164,12 +164,18 @@ thin = rgba(0, 50, 50, 0.04)
     .signerSettingsActive
       .signerIndicatorIcon
         svg
-            opacity 0.6
+          opacity 0.6
 
     .signerSettingsActive:hover
       .signerIndicatorIcon
         svg
             opacity 1
+
+    .signerSettingsActive.signerSettingsOpen
+      .signerIndicatorIcon
+        svg
+          fill good
+          opacity 1
 
     .signerType
       position relative

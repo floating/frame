@@ -34,6 +34,7 @@ class Signer extends React.Component {
     let signerClass = current ? 'signer current' : 'signer'
     let signerIndicator = current ? 'signerIndicator signerIndicatorActive' : 'signerIndicator'
     let signerSettings = this.selected ? 'signerSettingsMenu signerSettingsActive' : 'signerSettingsMenu'
+    if (this.store('signer.view') === 'settings') signerSettings += ' signerSettingsOpen'
     if (this.selected) signerClass += ' selectedSigner'
     if (this.props.status === 'ok') signerClass += ' okSigner'
     if (this.props.status === 'loading') return null
