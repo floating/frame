@@ -8,6 +8,7 @@ import Signer from './Signer'
 import Settings from './Settings'
 
 // <Restore.DevTools />
+// <div className='panelMenuItem'>{svg.logo(19)}</div>
 
 class Panel extends React.Component {
   render () {
@@ -15,7 +16,7 @@ class Panel extends React.Component {
     return (
       <div id='panel'>
         <div className='panelMenu'>
-          <div onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['settings'].toSVG({height: 21})}} />
+          <div className='panelMenuItem' onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['dashboard'].toSVG({height: 22})}} />
         </div>
         <div id='panelScroll'>
           <div id='panelSlide'>

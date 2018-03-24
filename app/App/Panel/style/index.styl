@@ -101,23 +101,29 @@
 
 .panelMenu
   position absolute
+  left 0
   right 0
   top 0
   height 40px
-  width 40px
   display flex
-  justify-content center
+  justify-content flex-end
   align-items center
   -webkit-app-region no-drag
   z-index 10
 
-  svg
-    fill outerspace
-    opacity 0.6
-
-.panelMenu:hover
+  .panelMenuItem
+    width 40px
+    height 40px
+    display flex
+    justify-content center
+    align-items center
     svg
-      opacity 1
+      fill outerspace
+      opacity 0.6
+
+  .panelMenuItem:hover
+      svg
+        opacity 1
 
 @import '../Signer/style'
 @import '../Settings/style'

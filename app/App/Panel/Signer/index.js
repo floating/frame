@@ -49,7 +49,7 @@ class Signer extends React.Component {
             </div>
             <div onClick={() => this.store.toggelSignerSettings()} className={signerSettings}>
               <div className='signerIndicatorIcon'>
-                <span dangerouslySetInnerHTML={{__html: octicons['gear'].toSVG({height: 21})}} />
+                <span dangerouslySetInnerHTML={{__html: octicons['settings'].toSVG({height: 23})}} />
               </div>
             </div>
             <div className='signerType' onClick={() => { if (this.props.status === 'ok') this.select() }}>
