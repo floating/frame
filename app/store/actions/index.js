@@ -38,23 +38,24 @@ export const addRequest = (u, request) => {
   u('signer.view', _ => 'default')
   u('signer.requests', (requests, state) => {
     if (state.frame.type === 'tray') ipcRenderer.send('frame:showTray')
-    if (request.type === 'approveTransaction') requests[request.handlerId] = request
-    if (request.type === 'requestProvider') requests[request.origin.replace('.', '')] = request
+    let reqs = Object.keys(requests)
+    let reqIndex = reqs.map(id => requests[id].origin).indexOf(request.origin)
+    request.handlerId = reqIndex === -1 ? uuid() : requests[reqs[reqIndex]].handlerId
+    requests[request.handlerId] = request
     return requests
   })
 }
 
 export const giveAccess = (u, req, access) => {
-  let origin = req.origin.replace('.', '')
-  u('permissions', origin, _ => ({origin: req.origin, provider: access}))
+  u('permissions', req.handlerId, _ => ({handlerId: req.handlerId, origin: req.origin, provider: access}))
   u('signer.requests', (requests, state) => {
-    delete requests[origin]
+    delete requests[req.handlerId]
     return requests
   })
 }
 
-export const toggleAccess = (u, origin) => {
-  u('permissions', origin.replace('.', ''), 'provider', provider => !provider)
+export const toggleAccess = (u, handlerId) => {
+  u('permissions', handlerId, 'provider', provider => !provider)
 }
 
 export const requestPending = (u, id) => {
@@ -93,14 +94,6 @@ export const declineRequest = (u, id) => {
       return requests
     })
   }, 1800)
-}
-
-export const addHostPermission = (u, host, permission) => {
-  u('permissions', permissions => {
-    permissions[host] = permissions[host] || []
-    permissions[host].push(permission)
-    return permissions
-  })
 }
 
 export const updateSigners = (u, signers) => u('signers', _ => signers)

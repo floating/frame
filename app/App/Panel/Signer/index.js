@@ -89,11 +89,11 @@ class Signer extends React.Component {
                     <div className='signerPermissionOrigin'>{'No Permissions Set'}</div>
                   </div>
                 ) : (
-                  Object.keys(this.store('permissions')).sort().map(o => {
+                  Object.keys(this.store('permissions')).map(id => this.store('permissions')[id]).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
                     return (
-                      <div className='signerPermission' key={o} onClick={_ => this.store.toggleAccess(o)}>
-                        <div className='signerPermissionOrigin'>{this.store('permissions', o).origin}</div>
-                        <div className={this.store('permissions', o).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
+                      <div className='signerPermission' key={o.handlerId} onClick={_ => this.store.toggleAccess(o.handlerId)}>
+                        <div className='signerPermissionOrigin'>{this.store('permissions', o.handlerId).origin}</div>
+                        <div className={this.store('permissions', o.handlerId).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
                           <div className='signerPermissionToggleSwitch' />
                         </div>
                       </div>

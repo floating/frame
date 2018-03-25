@@ -23,7 +23,7 @@ const api = {
     windows.tray.setMovable(false)
     windows.tray.on('blur', _ => api.hideTray())
     windows.tray.positioner = new Positioner(windows.tray)
-    windows.tray.openDevTools()
+    // windows.tray.openDevTools()
   },
   trayClick: (e, newBounds) => {
     if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()

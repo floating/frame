@@ -3,10 +3,12 @@ import store from '../store'
 
 const allowed = (req, proceed) => {
   let obs = store.observer(_ => {
-    let permissions = store('permissions', req.origin.replace('.', ''))
-    if (!permissions) return store.addRequest({type: 'requestProvider', origin: req.origin, notice: `${req.origin} is requesting access to the provider.`})
+    let permissions = store('permissions')
+    let perms = Object.keys(permissions).map(id => permissions[id])
+    let permIndex = perms.map(p => p.origin).indexOf(req.origin)
+    if (permIndex === -1) return store.addRequest({type: 'requestProvider', origin: req.origin, notice: `${req.origin} is requesting access to the provider.`})
     setTimeout(_ => obs.remove(), 0) // Add fix for this pattern in restore
-    permissions.provider ? proceed(req.accept(null, req.origin)) : req.reject()
+    perms[permIndex].provider ? proceed(req.accept(null, req.origin)) : req.reject()
   })
 }
 module.exports = () => {
