@@ -1,6 +1,8 @@
 import provider from '../provider'
 import store from '../store'
 
+let connections = []
+
 const allowed = (req, proceed) => {
   let obs = store.observer(_ => {
     let permissions = store('permissions')
@@ -11,23 +13,36 @@ const allowed = (req, proceed) => {
     perms[permIndex].provider ? proceed(req.accept(null, req.origin)) : req.reject()
   })
 }
-module.exports = () => {
-  let http = require('http').createServer()
-  http.listen(1248)
-  let WSServer = require('websocket').server
-  let ws = new WSServer({httpServer: http})
-  ws.on('request', req => {
-    allowed(req, socket => {
-      socket.on('message', data => {
-        if (data.type !== 'utf8') return
-        let payload = JSON.parse(data.utf8Data)
-        let handlerId = payload.handlerId
-        delete payload.handlerId
-        provider.sendAsync(payload, (err, res) => {
-          socket.send(JSON.stringify({type: 'response', handlerId, err, res}))
+
+module.exports = {
+  start: () => {
+    let http = require('http').createServer()
+    http.listen(1248)
+    let WSServer = require('websocket').server
+    let ws = new WSServer({httpServer: http})
+    ws.on('request', req => {
+      allowed(req, socket => {
+        connections.push({origin: req.origin, socket})
+        socket.on('message', data => {
+          if (data.type !== 'utf8') return
+          let payload = JSON.parse(data.utf8Data)
+          let handlerId = payload.handlerId
+          delete payload.handlerId
+          provider.sendAsync(payload, (err, res) => {
+            socket.send(JSON.stringify({type: 'response', handlerId, err, res}))
+          })
         })
+        socket.on('close', socket => console.log('Socket Disconnect: No Reconnect Setup'))
       })
-      socket.on('close', socket => console.log('Socket Disconnect: No Reconnect Setup'))
     })
-  })
+  },
+  close: origin => {
+    connections = connections.filter(connection => {
+      if (connection.origin === origin) {
+        connection.socket.close()
+        return false
+      }
+      return true
+    })
+  }
 }

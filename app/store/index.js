@@ -62,4 +62,12 @@ store.observer(() => {
   }
 })
 
+store.observer(() => {
+  let ws = require('../ws')
+  let permissions = store('permissions')
+  Object.keys(permissions).forEach(id => {
+    if (permissions[id].provider === false) if (ws.close) ws.close(permissions[id].origin)
+  })
+})
+
 module.exports = store
