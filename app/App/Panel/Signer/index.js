@@ -32,9 +32,13 @@ class Signer extends React.Component {
     this.selected = current && !minimized
     let type = this.props.type
     let signerClass = current ? 'signer current' : 'signer'
-    let signerIndicator = current ? 'signerIndicator signerIndicatorActive' : 'signerIndicator'
+    let signerIndicator = this.selected ? 'signerIndicator signerIndicatorActive' : 'signerIndicator'
     let signerSettings = this.selected ? 'signerSettingsMenu signerSettingsActive' : 'signerSettingsMenu'
-    if (this.store('signer.view') === 'settings') signerSettings += ' signerSettingsOpen'
+    if (this.store('signer.view') === 'settings') {
+      signerSettings += ' signerSettingsOpen'
+    } else {
+      signerIndicator += ' signerIndicatorOpen'
+    }
     if (this.selected) signerClass += ' selectedSigner'
     if (this.props.status === 'ok') signerClass += ' okSigner'
     if (this.props.status === 'loading') return null
@@ -44,10 +48,10 @@ class Signer extends React.Component {
           <div className='signerTop'>
             <div className={signerIndicator}>
               <div className='signerIndicatorIcon'>
-                <span dangerouslySetInnerHTML={{__html: octicons['pulse'].toSVG({height: 23})}} />
+                <span onClick={() => this.store.setSignerView('default')} dangerouslySetInnerHTML={{__html: octicons['pulse'].toSVG({height: 23})}} />
               </div>
             </div>
-            <div onClick={() => this.store.toggelSignerSettings()} className={signerSettings}>
+            <div onClick={() => this.store.setSignerView('settings')} className={signerSettings}>
               <div className='signerIndicatorIcon'>
                 <span dangerouslySetInnerHTML={{__html: octicons['settings'].toSVG({height: 23})}} />
               </div>
@@ -87,7 +91,7 @@ class Signer extends React.Component {
                 ) : (
                   Object.keys(this.store('permissions')).sort().map(o => {
                     return (
-                      <div className='signerPermission' onClick={_ => this.store.toggleAccess(o)}>
+                      <div className='signerPermission' key={o} onClick={_ => this.store.toggleAccess(o)}>
                         <div className='signerPermissionOrigin'>{this.store('permissions', o).origin}</div>
                         <div className={this.store('permissions', o).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
                           <div className='signerPermissionToggleSwitch' />

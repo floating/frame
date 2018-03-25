@@ -124,14 +124,22 @@
         justify-content center
 
         svg
-          transition standard
-          fill good
+          fill outerspace
           opacity 0
 
     .signerIndicatorActive
       .signerIndicatorIcon
         svg
-          fill good
+          opacity 0.4
+
+    .signerIndicatorActive:hover
+      .signerIndicatorIcon
+        svg
+            opacity 0.5
+
+    .signerIndicatorActive.signerIndicatorOpen
+      .signerIndicatorIcon
+        svg
           opacity 1
 
     .signerSettingsMenu
@@ -160,17 +168,16 @@
     .signerSettingsActive
       .signerIndicatorIcon
         svg
-          opacity 0.6
+          opacity 0.4
 
     .signerSettingsActive:hover
       .signerIndicatorIcon
         svg
-            opacity 1
+            opacity 0.5
 
     .signerSettingsActive.signerSettingsOpen
       .signerIndicatorIcon
         svg
-          fill good
           opacity 1
 
     .signerType
