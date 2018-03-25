@@ -37,10 +37,12 @@ export const addRequest = (u, request) => {
   u('signer.minimized', _ => false)
   u('signer.view', _ => 'default')
   u('signer.requests', (requests, state) => {
-    if (state.frame.type === 'tray') ipcRenderer.send('frame:showTray')
-    let reqs = Object.keys(requests)
-    let reqIndex = reqs.map(id => requests[id].origin).indexOf(request.origin)
-    request.handlerId = reqIndex === -1 ? uuid() : requests[reqs[reqIndex]].handlerId
+    if (state.frame.type === 'tray' && state.signer.current !== '') ipcRenderer.send('frame:showTray')
+    if (!request.handlerId) {
+      let reqs = Object.keys(requests)
+      let reqIndex = reqs.map(id => requests[id].origin).indexOf(request.origin)
+      request.handlerId = reqIndex === -1 ? uuid() : requests[reqs[reqIndex]].handlerId
+    }
     requests[request.handlerId] = request
     return requests
   })
