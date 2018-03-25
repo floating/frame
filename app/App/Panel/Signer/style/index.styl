@@ -10,8 +10,34 @@
   100%
     opacity 0
 
+.signer:before
+    content ''
+    border-left 3000px solid transparent
+    border-right 0px solid transparent
+    border-top 1500px solid thin
+    display block
+    position absolute
+    top calc(100% - 40px)
+    right 8px
+    left 5px
+    z-index 3000
+
+.signer:after
+    content ''
+    border-left 300px solid thin
+    border-bottom 0px solid transparent
+    border-top 150px solid transparent
+    display block
+    position absolute
+    top 0
+    bottom 40px
+    left calc(100% - 5px)
+    z-index 3000
+
 .signer
-  padding 15px 15px 0px 15px
+  position relative
+  padding 0px 5px 40px 5px
+  z-index 3001
 
   .signerWrap:before
     content ''
@@ -20,24 +46,26 @@
     right 0
     left 0
     bottom 3px
-    background #fff
+    background light
     z-index 40
     border-radius 3px
-    z-index 2001
+    z-index 3003
 
   .signerWrap
     position relative
-    z-index 2000
+    z-index 3002
     border-radius 3px
-    box-shadow 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
-    background #f0f0ff
+    box-shadow 0px 1px 8px 1px rgba(6, 54, 52, 0.08), 0px 1px 2px 0px rgba(6, 54, 52, 0.2)
+    background lightShade
     overflow hidden
+    padding-bottom 3px
 
   .signerMid
     position relative
-    z-index 2002
+    z-index 3004
     overflow-x hidden
     overflow-y hidden
+    border-radius 3px
 
     .signerName
       display flex
@@ -56,22 +84,23 @@
       height 40px
       font-family FiraCode
       letter-spacing 0px
-      background #f1f4f7
+      // background #f1f4f7
+      border-top 1px solid lightShade
 
   .signerBot
     position absolute
-    bottom 0
+    bottom 3px
     left 0
     right 0
     height 0
     opacity 0
-    z-index 2002
+    z-index 3004
 
   .signerTop
     position relative
     opacity 1
     display flex
-    z-index 2002
+    z-index 3004
 
     .signerIndicator
       position absolute
@@ -84,6 +113,7 @@
       width 55px
       flex-direction column
       text-align center
+      -webkit-app-region no-drag
 
       .signerIndicatorIcon
         height 51px
@@ -94,14 +124,22 @@
         justify-content center
 
         svg
-          transition standard
-          fill #27eac6
+          fill outerspace
           opacity 0
 
     .signerIndicatorActive
       .signerIndicatorIcon
         svg
-          fill #27eac6
+          opacity 0.4
+
+    .signerIndicatorActive:hover
+      .signerIndicatorIcon
+        svg
+            opacity 0.5
+
+    .signerIndicatorActive.signerIndicatorOpen
+      .signerIndicatorIcon
+        svg
           opacity 1
 
     .signerSettingsMenu
@@ -114,6 +152,7 @@
       height 55px
       width 55px
       flex-direction column
+      -webkit-app-region no-drag
 
       .signerIndicatorIcon
         height 51px
@@ -130,12 +169,17 @@
     .signerSettingsActive
       .signerIndicatorIcon
         svg
-            opacity 0.6
+          opacity 0.4
 
     .signerSettingsActive:hover
       .signerIndicatorIcon
         svg
-            opacity 1
+            opacity 0.5
+
+    .signerSettingsActive.signerSettingsOpen
+      .signerIndicatorIcon
+        svg
+          opacity 1
 
     .signerType
       position relative
@@ -152,7 +196,7 @@
       border-bottom-right-radius 6px
       overflow hidden
       transition standard
-      -webkit-app-region: no-drag
+      -webkit-app-region no-drag
 
       .signerImage
         position absolute
@@ -341,7 +385,6 @@
   margin 0px
   width calc(100% - 10px)
   z-index 4000
-  background #f9f9fa
   padding 0px
 
   .signerTop
@@ -366,7 +409,7 @@
         top -70
 
   .signerWrap
-    height: 100%
+    height 100%
 
   .signerMid
     height 100%
@@ -383,25 +426,44 @@
 
   .signerSettingsTitle
     display flex
-    justify-content center
     align-items center
     height 40px
+    padding 0px 10px 0px 10px
+    border-top 1px solid lightShade
+
+.appInfo
+  display flex
+  justify-content center
+  padding 0px
+  flex-direction column
+  font-size 14px
+  font-weight 300
+  border-top 1px solid lightShade
+
+  .appInfoLine
+    padding 10px 20px 0px 20px
+    display flex
+    justify-content space-between
+
 
 .signerPermission
   display flex
   justify-content space-between
   align-items center
-  padding 20px
+  padding 10px 20px
+  border-top 1px solid lightShade
+  font-size 14px
+  font-weight 300
 
   .signerPermissionOrigin
     background transparent
 
   .signerPermissionToggle
     position relative
-    background rgb(244, 66, 131)
-    height 30px
-    width 50px
-    border-radius 20px
+    background bad
+    height 20px
+    width 40px
+    border-radius 10px
     transition standard
 
     .signerPermissionToggleSwitch
@@ -409,13 +471,13 @@
       top 2px
       left 2px
       bottom 2px
-      width 26px
-      border-radius 15px
+      width 16px
+      border-radius 10px
       background white
       transition standard
 
   .signerPermissionToggleOn
-    background #27eac6
+    background good
     .signerPermissionToggleSwitch
         position absolute
         left 22px

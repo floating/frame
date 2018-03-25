@@ -97,8 +97,8 @@ class Requests extends React.Component {
           <div className='unknownType'>{'Unknown: ' + req.type}</div>
         )}
         <div className='requestApprove'>
-          <div className='requestDecline' onClick={() => this.store.giveAccess(req.origin, false)}>{'Decline'}</div>
-          <div className='requestSign' onClick={() => this.store.giveAccess(req.origin, true)}>{'Approve'}</div>
+          <div className='requestDecline' onClick={() => this.store.giveAccess(req, false)}>{'Decline'}</div>
+          <div className='requestSign' onClick={() => this.store.giveAccess(req, true)}>{'Approve'}</div>
         </div>
       </div>
     )
@@ -119,10 +119,8 @@ class Requests extends React.Component {
             if (req.type === 'requestProvider') return this.providerRequest(req, i)
           })
         ) : (
-          <div className='signerRequests'>
-            <div className='noRequests'>
-              {'No Pending Requests'}
-            </div>
+          <div className='noRequests'>
+            {'No Pending Requests'}
           </div>
         )}
       </div>

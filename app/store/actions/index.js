@@ -6,11 +6,14 @@ export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)
 
-export const panelRequest = (u, request, cb) => {
+export const panelRequest = (u, request) => {
   request.host = request.host || (new URL(request.url)).host
   u('panel.request', v => request)
   u('panel.show', v => true)
 }
+
+export const setLaunch = (u, launch) => u('local.launch', _ => launch)
+export const toggleLaunch = u => u('local.launch', launch => !launch)
 
 export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
@@ -19,9 +22,7 @@ export const toggleSettings = u => {
 export const runLocalNode = u => u('local.node.run', run => !run)
 export const runOnStartup = u => u('local.startup', startup => !startup)
 
-export const toggelSignerSettings = u => {
-  u('signer.view', view => view === 'settings' ? 'default' : 'settings')
-}
+export const setSignerView = (u, view) => u('signer.view', _ => view)
 
 export const setPermissions = (u, permissions) => u('permissions', () => permissions)
 
@@ -33,26 +34,30 @@ export const addProviderEvent = (u, payload) => {
 }
 
 export const addRequest = (u, request) => {
+  u('signer.minimized', _ => false)
+  u('signer.view', _ => 'default')
   u('signer.requests', (requests, state) => {
-    if (state.frame.type === 'tray') ipcRenderer.send('frame:showTray')
-    if (request.type === 'approveTransaction') requests[request.handlerId] = request
-    if (request.type === 'requestProvider') requests[request.origin.replace('.', '')] = request
+    if (state.frame.type === 'tray' && state.signer.current !== '') ipcRenderer.send('frame:showTray')
+    if (!request.handlerId) {
+      let reqs = Object.keys(requests)
+      let reqIndex = reqs.map(id => requests[id].origin).indexOf(request.origin)
+      request.handlerId = reqIndex === -1 ? uuid() : requests[reqs[reqIndex]].handlerId
+    }
+    requests[request.handlerId] = request
     return requests
   })
 }
 
-export const giveAccess = (u, origin, access) => {
-  origin = origin.replace('.', '')
-  u('permissions', origin, 'provider', provider => access)
+export const giveAccess = (u, req, access) => {
+  u('permissions', req.handlerId, _ => ({handlerId: req.handlerId, origin: req.origin, provider: access}))
   u('signer.requests', (requests, state) => {
-    delete requests[origin]
+    delete requests[req.handlerId]
     return requests
   })
 }
 
-export const toggleAccess = (u, origin) => {
-  origin = origin.replace('.', '')
-  u('permissions', origin, 'provider', provider => !provider)
+export const toggleAccess = (u, handlerId) => {
+  u('permissions', handlerId, 'provider', provider => !provider)
 }
 
 export const requestPending = (u, id) => {
@@ -102,14 +107,6 @@ export const declineRequest = (u, id) => {
       return requests
     })
   }, 1800)
-}
-
-export const addHostPermission = (u, host, permission) => {
-  u('permissions', permissions => {
-    permissions[host] = permissions[host] || []
-    permissions[host].push(permission)
-    return permissions
-  })
 }
 
 export const updateSigners = (u, signers) => u('signers', _ => signers)

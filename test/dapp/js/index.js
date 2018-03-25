@@ -144,6 +144,7 @@ class App extends React.Component {
     } else {
       return (
         <div id='dapp'>
+          <Restore.DevTools />
           {this.store('ws') ? (
             this.state.accounts.length > 0 ? (
               this.state.txMessage ? (
