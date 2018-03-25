@@ -104,7 +104,7 @@ class Signer extends React.Component {
                 <div className='appInfo'>
                   <div className='appInfoLine'>
                     <div>{'Frame'}</div>
-                    <div>{'v0.0.0'}</div>
+                    <div>{'v' + process.env.npm_package_version}</div>
                   </div>
                   <div className='appInfoLine'>
                     <div>{'Chrome'}</div>

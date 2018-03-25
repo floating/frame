@@ -14,7 +14,6 @@ class Panel extends React.Component {
     let signers = this.store('signers')
     return (
       <div id='panel'>
-        <Restore.DevTools />
         <div className='panelMenu'>
           <div className='panelMenuItem' onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['three-bars'].toSVG({height: 20})}} />
         </div>
