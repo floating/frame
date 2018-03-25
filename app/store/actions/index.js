@@ -6,11 +6,14 @@ export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)
 
-export const panelRequest = (u, request, cb) => {
+export const panelRequest = (u, request) => {
   request.host = request.host || (new URL(request.url)).host
   u('panel.request', v => request)
   u('panel.show', v => true)
 }
+
+export const setLaunch = (u, launch) => u('local.launch', _ => launch)
+export const toggleLaunch = u => u('local.launch', launch => !launch)
 
 export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')

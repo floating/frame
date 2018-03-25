@@ -21,8 +21,9 @@ const api = {
     windows.tray.loadURL(url.format({pathname: path.join(__dirname, '../../app/tray.html'), protocol: 'file:', slashes: true}))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
-    // windows.tray.on('blur', _ => api.hideTray())
+    windows.tray.on('blur', _ => api.hideTray())
     windows.tray.positioner = new Positioner(windows.tray)
+    windows.tray.openDevTools()
   },
   trayClick: (e, newBounds) => {
     if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()

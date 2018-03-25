@@ -20,6 +20,11 @@ rpc('getSigners', (err, signers) => {
   store.updateSigners(signers)
 })
 
+rpc('launchStatus', (err, status) => {
+  if (err) return console.log(err) // launchStatusError
+  store.setLaunch(status)
+})
+
 ipcRenderer.on('main:addSigner', (e, signer) => store.addSigner(signer))
 ipcRenderer.on('main:removeSigner', (e, signer) => store.removeSigner(signer))
 ipcRenderer.on('main:updateSigner', (e, signer) => store.updateSigner(signer))
@@ -44,5 +49,17 @@ store.observer(() => {
 })
 
 store.observer(_ => persist.set('permissions', store('permissions')))
+
+let launch = store('local.launch')
+store.observer(() => {
+  if (launch !== store('local.launch')) {
+    launch = store('local.launch')
+    if (launch) {
+      rpc('launchEnable', err => console.log(err))
+    } else {
+      rpc('launchDisable', err => console.log(err))
+    }
+  }
+})
 
 module.exports = store

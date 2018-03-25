@@ -6,9 +6,9 @@ class Settings extends React.Component {
     return (
       <div className='signerSettings'>
         <div className='signerSettingsTitle'>{'Local Settings'}</div>
-        <div className='signerPermission' onClick={_ => this.store.runOnStartup()}>
+        <div className='signerPermission' onClick={_ => this.store.toggleLaunch()}>
           <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
-          <div className={this.store('local.startup') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
+          <div className={this.store('local.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
             <div className='signerPermissionToggleSwitch' />
           </div>
         </div>
