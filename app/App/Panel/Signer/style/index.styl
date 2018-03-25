@@ -12,32 +12,31 @@
 
 .signer:before
     content ''
-    border-top 2000px solid thin
+    border-left 3000px solid transparent
     border-right 0px solid transparent
-    border-left 4000px solid transparent
+    border-top 1500px solid thin
     display block
     position absolute
-    top 100%
+    top calc(100% - 40px)
     right 8px
-    left 7px
+    left 5px
     z-index 3000
 
 .signer:after
     content ''
-    border-left 15px solid thin
+    border-left 300px solid thin
     border-bottom 0px solid transparent
-    border-top 30px solid transparent
+    border-top 150px solid transparent
     display block
     position absolute
-    right 15px
-    top 47px
-    bottom 0px
-    left calc(100% - 15px)
+    top 0
+    bottom 40px
+    left calc(100% - 5px)
     z-index 3000
 
 .signer
   position relative
-  padding 45px 5px 0px 5px
+  padding 0px 5px 40px 5px
   z-index 3001
 
   .signerWrap:before
