@@ -2,12 +2,8 @@
 
 const EventEmitter = require('events')
 const uuid = require('uuid/v4')
-
 module.exports = (store, cb) => {
-  let called = false
-  if (window.requestProvider) {
-    window.requestProvider(cb)
-  } else {
+  let connect = () => {
     let handlers = {}
     let socket = new WebSocket('ws://localhost:1248')
     let provider = new EventEmitter()
@@ -31,11 +27,18 @@ module.exports = (store, cb) => {
       store.ws(false)
       if (!called) cb(e)
       called = true
+      setTimeout(connect, 500)
     })
     socket.addEventListener('error', e => {
       e.preventDefault()
       if (!called) cb(e, provider)
       called = true
     })
+  }
+  let called = false
+  if (window.requestProvider) {
+    window.requestProvider(cb)
+  } else {
+    connect()
   }
 }

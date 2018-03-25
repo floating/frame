@@ -1,5 +1,6 @@
 const { ipcMain } = require('electron')
 const signers = require('../signers')
+const launch = require('../launch')
 
 const rpc = {
   signTransaction: signers.signTransaction,
@@ -7,7 +8,10 @@ const rpc = {
   getCoinbase: signers.getCoinbase,
   getSigners: signers.getSigners,
   setSigner: signers.setSigner,
-  trezorPin: signers.trezorPin
+  trezorPin: signers.trezorPin,
+  launchEnable: launch.enable,
+  launchDisable: launch.disable,
+  launchStatus: launch.status
 }
 
 const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v

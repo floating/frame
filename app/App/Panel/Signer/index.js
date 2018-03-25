@@ -32,8 +32,13 @@ class Signer extends React.Component {
     this.selected = current && !minimized
     let type = this.props.type
     let signerClass = current ? 'signer current' : 'signer'
-    let signerIndicator = current ? 'signerIndicator signerIndicatorActive' : 'signerIndicator'
+    let signerIndicator = this.selected ? 'signerIndicator signerIndicatorActive' : 'signerIndicator'
     let signerSettings = this.selected ? 'signerSettingsMenu signerSettingsActive' : 'signerSettingsMenu'
+    if (this.store('signer.view') === 'settings') {
+      signerSettings += ' signerSettingsOpen'
+    } else {
+      signerIndicator += ' signerIndicatorOpen'
+    }
     if (this.selected) signerClass += ' selectedSigner'
     if (this.props.status === 'ok') signerClass += ' okSigner'
     if (this.props.status === 'loading') return null
@@ -43,12 +48,12 @@ class Signer extends React.Component {
           <div className='signerTop'>
             <div className={signerIndicator}>
               <div className='signerIndicatorIcon'>
-                <span dangerouslySetInnerHTML={{__html: octicons['pulse'].toSVG({height: 23})}} />
+                <span onClick={() => this.store.setSignerView('default')} dangerouslySetInnerHTML={{__html: octicons['pulse'].toSVG({height: 23})}} />
               </div>
             </div>
-            <div onClick={() => this.store.toggelSignerSettings()} className={signerSettings}>
+            <div onClick={() => this.store.setSignerView('settings')} className={signerSettings}>
               <div className='signerIndicatorIcon'>
-                <span dangerouslySetInnerHTML={{__html: octicons['gear'].toSVG({height: 21})}} />
+                <span dangerouslySetInnerHTML={{__html: octicons['settings'].toSVG({height: 23})}} />
               </div>
             </div>
             <div className='signerType' onClick={() => { if (this.props.status === 'ok') this.select() }}>
@@ -79,16 +84,41 @@ class Signer extends React.Component {
             {this.selected && this.store('signer.view') === 'settings' ? (
               <div className='signerSettings'>
                 <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
-                {Object.keys(this.store('permissions')).sort().map(o => {
-                  return (
-                    <div className='signerPermission' onClick={_ => this.store.toggleAccess(o)}>
-                      <div className='signerPermissionOrigin'>{o}</div>
-                      <div className={this.store('permissions', o).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
-                        <div className='signerPermissionToggleSwitch' />
+                {Object.keys(this.store('permissions')).length === 0 ? (
+                  <div className='signerPermission'>
+                    <div className='signerPermissionOrigin'>{'No Permissions Set'}</div>
+                  </div>
+                ) : (
+                  Object.keys(this.store('permissions')).map(id => this.store('permissions')[id]).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
+                    return (
+                      <div className='signerPermission' key={o.handlerId} onClick={_ => this.store.toggleAccess(o.handlerId)}>
+                        <div className='signerPermissionOrigin'>{this.store('permissions', o.handlerId).origin}</div>
+                        <div className={this.store('permissions', o.handlerId).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
+                          <div className='signerPermissionToggleSwitch' />
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })
+                )}
+                <div className='signerSettingsTitle'>{'App Info'}</div>
+                <div className='appInfo'>
+                  <div className='appInfoLine'>
+                    <div>{'Frame'}</div>
+                    <div>{'v' + process.env.npm_package_version}</div>
+                  </div>
+                  <div className='appInfoLine'>
+                    <div>{'Chrome'}</div>
+                    <div>{'v' + process.versions.chrome}</div>
+                  </div>
+                  <div className='appInfoLine'>
+                    <div>{'Electron'}</div>
+                    <div>{'v' + process.versions.electron}</div>
+                  </div>
+                  <div className='appInfoLine'>
+                    <div>{'Node'}</div>
+                    <div>{'v' + process.versions.node}</div>
+                  </div>
+                </div>
               </div>
             ) : (
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
