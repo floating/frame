@@ -7,6 +7,7 @@ const Positioner = require('electron-positioner')
 
 const store = require('../store')
 
+const dev = process.env.NODE_ENV === 'development'
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray, bounds
@@ -21,9 +22,9 @@ const api = {
     windows.tray.loadURL(url.format({pathname: path.join(__dirname, '../../app/tray.html'), protocol: 'file:', slashes: true}))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
-    windows.tray.on('blur', _ => api.hideTray())
+    if (!dev) windows.tray.on('blur', _ => api.hideTray())
     windows.tray.positioner = new Positioner(windows.tray)
-    // windows.tray.openDevTools()
+    if (dev) windows.tray.openDevTools()
   },
   trayClick: (e, newBounds) => {
     if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()

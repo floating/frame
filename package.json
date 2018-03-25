@@ -8,9 +8,11 @@
     "build": "npm install && electron-rebuild",
     "pack": "electron-packager ./ --overwrite",
     "build:extension": "copyfiles -f ./extension/* ./extension/build && parcel build ./extension/build/frame.js -d ./extension/build",
-    "dev": "npm-run-all --parallel test:rpc launch test:dapp",
+    "dev": "npm-run-all --parallel test:rpc launch:dev test:dapp",
+    "demo": "npm-run-all --parallel test:rpc launch test:dapp",
     "test": "standard",
-    "launch": "electron ./main",
+    "launch": "NODE_ENV=production electron ./main",
+    "launch:dev": "NODE_ENV=development electron ./main",
     "electron-rebuild": "electron-rebuild",
     "test:dapp": "parcel ./test/dapp/index.html --open",
     "test:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
