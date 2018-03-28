@@ -22,9 +22,12 @@ const api = {
     windows.tray.loadURL(url.format({pathname: path.join(__dirname, '../../app/tray.html'), protocol: 'file:', slashes: true}))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
-    if (!dev) windows.tray.on('blur', _ => api.hideTray())
     windows.tray.positioner = new Positioner(windows.tray)
-    if (dev) windows.tray.openDevTools()
+    if (dev) {
+      windows.tray.openDevTools()
+    } else {
+      windows.tray.on('blur', _ => api.hideTray())
+    }
   },
   trayClick: (e, newBounds) => {
     if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()

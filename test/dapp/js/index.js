@@ -156,15 +156,9 @@ class App extends React.Component {
                   <div className='account'>{'Current Account:'}</div>
                   <div className='address'>{this.state.accounts}</div>
                   <div className='button-wrap'>
-                    <div className='button' onClick={this.testTransaction}>
-                      {'Send Test Transaction'}
-                    </div>
-                    <div className='button' onClick={this.getBalance}>
-                      {'View Balance'}
-                    </div>
-                    <div className='button' onClick={this.getGasPrice}>
-                      {'View Gas Price'}
-                    </div>
+                    <div className='button' onClick={this.testTransaction}>{'Send Test Transaction'}</div>
+                    <div className='button' onClick={this.getBalance}>{'View Balance'}</div>
+                    <div className='button' onClick={this.getGasPrice}>{'View Gas Price'}</div>
                     <div className='button' onClick={this.toggleTransactions(false)}>
                       {`View Transactions (${Object.keys(this.store('transactions')).length})`}
                     </div>
@@ -173,11 +167,11 @@ class App extends React.Component {
               )
             ) : (
               <div className='errorMessage'>
-                {this.state.providerError || 'Loading'}
+                {this.state.providerError || 'Connecting to your provider...'}
                 {this.state.providerError === 'No Account Selected' ? (
                   <div className='providerErrorSub'>
                     <span>{svg.logo(20)}</span>
-                    <span>{'in menubar to view accounts'}</span>
+                    <span>{'in menu bar to view accounts'}</span>
                   </div>
                 ) : null}
               </div>
@@ -186,7 +180,7 @@ class App extends React.Component {
             <div className='errorMessage'>
               {'You were disconnected from the Frame provider'}
               <div className='providerErrorSub'>
-                <span>{'This demo does not currently include reconnection functionality'}</span>
+                <span>{'Trying to reconnect...'}</span>
               </div>
             </div>
           )}

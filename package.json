@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm run launch",
     "build": "npm install && electron-rebuild",
-    "pack": "electron-packager ./ --overwrite",
+    "pack:production": "mkdir -p ./build/production && electron-packager ./ --all --out=./build/production",
+    "pack": "mkdir -p ./build && electron-packager ./ --overwrite --out=./build",
     "build:extension": "copyfiles -f ./extension/* ./extension/build && parcel build ./extension/build/frame.js -d ./extension/build",
     "dev": "npm-run-all --parallel test:rpc launch:dev test:dapp",
     "demo": "npm-run-all --parallel test:rpc launch test:dapp",
