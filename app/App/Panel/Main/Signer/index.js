@@ -24,7 +24,7 @@ class Signer extends React.Component {
   select () {
     if (this.props.mode === 'scroll') {
       let bounds = this.signer.getBoundingClientRect()
-      this.store.initialSignerPos({top: bounds.top, bottom: bounds.top + this.signer.style.height})
+      this.store.initialSignerPos({top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight})
     }
     let current = this.store('signer.current') === this.props.id
     if (!current) {
@@ -63,23 +63,32 @@ class Signer extends React.Component {
         style.bottom = initial.bottom
         style.left = 0
         style.right = 0
+        style.transition = '0.48s cubic-bezier(.82,0,.12,1) all, 0s opacity linear, 0s transform linear'
         if (!minimized) {
           signerClass += ' selectedSigner'
           signerIndicator += ' signerSettingsActive'
           signerSettings += ' signerSettingsActive'
           style.top = 38
-          style.bottom = 0
+          style.bottom = 5
         }
       } else {
         style.display = 'none'
       }
     }
 
-    if (current && this.props.mode === 'scroll') style.opacity = 0
+    if (this.store('signer.current') && this.props.mode === 'scroll' && !minimized) {
+      style.transform = 'scale(0.5) translate(0px, -200px)'
+      style.opacity = 0
+      style.transition = '0.72s cubic-bezier(.82,0,.12,1) all'
+    }
+
+    if (current && this.props.mode === 'scroll' && !minimized) {
+      style.transition = '0.48s cubic-bezier(.82,0,.12,1) all, 0s opacity linear, 0s transform linear'
+    }
 
     return (
       <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
-        <div className='signerWrap'>
+        <div className='signerWrap' style={current && this.props.mode === 'slide' ? {height: '100%'} : {}}>
           <div className='signerTop'>
             <div className={signerIndicator}>
               <div className='signerIndicatorIcon'>
@@ -116,7 +125,7 @@ class Signer extends React.Component {
                 <div className='signerAddress'>{this.props.accounts}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}
-            {this.selected && this.store('signer.view') === 'settings' ? (
+            {this.props.mode === 'slide' && this.store('signer.view') === 'settings' ? (
               <div className='signerSettings'>
                 <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
                 <div className='appInfo'>

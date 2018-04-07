@@ -113,14 +113,12 @@ export const addSigner = (u, signer) => u('signers', signers => {
 
 export const setSigner = (u, signer) => {
   u('signer.current', _ => signer.id)
-  setTimeout(_ => {
-    u('signer.minimized', _ => false)
-  }, 50)
+  setTimeout(_ => u('signer.minimized', _ => false), 50)
 }
 
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
-  setTimeout(_ => u('signer.current', _ => ''), 240)
+  setTimeout(_ => u('signer.current', _ => ''), 480)
 }
 
 // export const toggleMinimized = (u, signer) => {
