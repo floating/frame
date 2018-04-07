@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import rpc from '../../../../rpc'
+import rpc from '../../../../../rpc'
 
 class Requests extends React.Component {
   constructor (...args) {

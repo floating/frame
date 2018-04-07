@@ -38,6 +38,10 @@
   position relative
   padding 0px 5px 40px 5px
   z-index 3001
+  transition standardSlow, 0s opacity linear
+
+  .signerRequests
+    display none
 
   .signerWrap:before
     content ''
@@ -87,6 +91,15 @@
       letter-spacing 0px
       background lightHigh
       border-top 1px solid lightShade
+
+    .signerNode
+      display flex
+      justify-content center
+      align-items center
+      font-size 12px
+      height 40px
+      border-top 1px solid lightShade
+
 
   .signerBot
     position absolute
@@ -377,16 +390,20 @@
       opacity 1
 
 .selectedSigner
-  z-index 2
-  position absolute
-  top 38px
-  right 5px
-  bottom 5px
-  left 5px
+  // z-index 2
+  // position absolute
+  // // top 38px !important
+  // // right 5px !important
+  // // bottom 5px !important
+  // // left 5px !important
   margin 0px
-  width calc(100% - 10px)
-  z-index 4000
+  // width calc(100% - 10px)
+  // z-index 4000
   padding 0px
+  transition standardSlow
+
+  .signerRequests
+    display block
 
   .signerTop
     .signerType

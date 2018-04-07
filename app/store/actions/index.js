@@ -13,6 +13,7 @@ export const panelRequest = (u, request) => {
 }
 
 export const setLaunch = (u, launch) => u('local.launch', _ => launch)
+
 export const toggleLaunch = u => u('local.launch', launch => !launch)
 
 export const toggleSettings = u => {
@@ -112,12 +113,19 @@ export const addSigner = (u, signer) => u('signers', signers => {
 
 export const setSigner = (u, signer) => {
   u('signer.current', _ => signer.id)
-  u('signer.minimized', _ => false)
+  setTimeout(_ => {
+    u('signer.minimized', _ => false)
+  }, 50)
 }
 
-export const toggleMinimized = (u, signer) => {
-  u('signer.minimized', minimized => !minimized)
+export const unsetSigner = u => {
+  u('signer.minimized', _ => true)
+  setTimeout(_ => u('signer.current', _ => ''), 240)
 }
+
+// export const toggleMinimized = (u, signer) => {
+//   u('signer.minimized', minimized => !minimized)
+// }
 
 export const removeSigner = (u, signer) => u('signers', signers => {
   let target = signers.map(sign => sign.id).indexOf(signer.id)
@@ -170,4 +178,8 @@ export const removeView = (u, id, isCurrent) => {
     delete view.data[id]
     return view
   })
+}
+
+export const initialSignerPos = (u, pos) => {
+  u('signer.position.initial', _ => pos)
 }

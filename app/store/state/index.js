@@ -2,7 +2,7 @@ import uuid from 'uuid/v4'
 
 const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
 const persist = new PersistStore()
-persist.clear()
+// persist.clear()
 
 let initial = {
   panel: {
@@ -13,10 +13,18 @@ let initial = {
   permissions: persist.get('permissions') || {},
   signers: [],
   signer: {
-    minimized: false,
+    minimized: true,
     current: '',
     requests: {},
-    view: 'default'
+    view: 'default',
+    position: {
+      initial: {
+        top: 5,
+        left: 5,
+        right: 5,
+        bottom: 5
+      }
+    }
   },
   frame: {
     type: process.env.FRAME_TYPE || 'window'

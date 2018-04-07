@@ -3,47 +3,82 @@ import React from 'react'
 import Restore from 'react-restore'
 import octicons from 'octicons'
 
-import rpc from '../../../rpc'
+import rpc from '../../../../rpc'
 
 import Requests from './Requests'
 
+// web3.eth.net.getNetworkType(cb)
+
 class Signer extends React.Component {
+  // constructor (...args) {
+  //   super(...args)
+  //   this.signer = React.createRef()
+  // }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
     if (this.tPin.length === 4) {
-      rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
-        if (err) throw new Error(err)
-      })
+      rpc('trezorPin', this.props.id, this.tPin, (err, status) => { if (err) throw new Error(err) })
       this.tPin = ''
     }
   }
   select () {
-    this.store.toggleMinimized()
+    if (this.props.mode === 'scroll') {
+      let bounds = this.signer.getBoundingClientRect()
+      this.store.initialSignerPos({top: bounds.top, bottom: bounds.top + this.signer.style.height})
+    }
     let current = this.store('signer.current') === this.props.id
     if (!current) {
       rpc('setSigner', this.props.id, (err, status) => {
         if (err) return console.log(err)
       })
+    } else {
+      this.store.unsetSigner()
     }
   }
   render () {
     let current = this.store('signer.current') === this.props.id
     let minimized = this.store('signer.minimized')
     this.selected = current && !minimized
+
     let type = this.props.type
-    let signerClass = current ? 'signer current' : 'signer'
-    let signerIndicator = this.selected ? 'signerIndicator signerIndicatorActive' : 'signerIndicator'
-    let signerSettings = this.selected ? 'signerSettingsMenu signerSettingsActive' : 'signerSettingsMenu'
+    let signerClass = 'signer'
+    let signerIndicator = 'signerIndicator'
+    let signerSettings = 'signerSettingsMenu'
     if (this.store('signer.view') === 'settings') {
       signerSettings += ' signerSettingsOpen'
     } else {
       signerIndicator += ' signerIndicatorOpen'
     }
-    if (this.selected) signerClass += ' selectedSigner'
+
     if (this.props.status === 'ok') signerClass += ' okSigner'
     if (this.props.status === 'loading') return null
+
+    let style = {}
+
+    if (this.props.mode === 'slide') {
+      let initial = this.store('signer.position.initial')
+      if (current) {
+        style.position = 'absolute'
+        style.top = initial.top
+        style.bottom = initial.bottom
+        style.left = 0
+        style.right = 0
+        if (!minimized) {
+          signerClass += ' selectedSigner'
+          signerIndicator += ' signerSettingsActive'
+          signerSettings += ' signerSettingsActive'
+          style.top = 38
+          style.bottom = 0
+        }
+      } else {
+        style.display = 'none'
+      }
+    }
+
+    if (current && this.props.mode === 'scroll') style.opacity = 0
+
     return (
-      <div className={signerClass}>
+      <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
         <div className='signerWrap'>
           <div className='signerTop'>
             <div className={signerIndicator}>
@@ -77,12 +112,19 @@ class Signer extends React.Component {
           <div className='signerMid'>
             {this.props.status === 'ok' ? (
               <div>
-                <div className='signerName'>{'Account Name'}</div>
+                <div className='signerName'>{'New Account ' + this.props.mode}</div>
                 <div className='signerAddress'>{this.props.accounts}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}
             {this.selected && this.store('signer.view') === 'settings' ? (
               <div className='signerSettings'>
+                <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
+                <div className='appInfo'>
+                  <div className='appInfoLine'>
+                    <div>{'Rinkby via Infura'}</div>
+                    <div>{'Connected'}</div>
+                  </div>
+                </div>
                 <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
                 {Object.keys(this.store('permissions')).length === 0 ? (
                   <div className='signerPermission'>
@@ -107,12 +149,12 @@ class Signer extends React.Component {
                     <div>{'v' + process.env.npm_package_version}</div>
                   </div>
                   <div className='appInfoLine'>
-                    <div>{'Chrome'}</div>
-                    <div>{'v' + process.versions.chrome}</div>
-                  </div>
-                  <div className='appInfoLine'>
                     <div>{'Electron'}</div>
                     <div>{'v' + process.versions.electron}</div>
+                  </div>
+                  <div className='appInfoLine'>
+                    <div>{'Chrome'}</div>
+                    <div>{'v' + process.versions.chrome}</div>
                   </div>
                   <div className='appInfoLine'>
                     <div>{'Node'}</div>
@@ -120,9 +162,7 @@ class Signer extends React.Component {
                   </div>
                 </div>
               </div>
-            ) : (
-              <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
-            )}
+            ) : <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />}
             {type === 'Trezor' && this.props.status === 'Need Pin' ? (
               <div className='trezorPinWrap'>
                 <div className='trezorPinInput'>
