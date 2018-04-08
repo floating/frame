@@ -118,7 +118,7 @@ export const setSigner = (u, signer) => {
 
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
-  setTimeout(_ => u('signer.current', _ => ''), 480)
+  setTimeout(_ => u('signer.current', _ => ''), 430)
 }
 
 // export const toggleMinimized = (u, signer) => {

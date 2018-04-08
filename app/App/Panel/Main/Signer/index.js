@@ -10,10 +10,6 @@ import Requests from './Requests'
 // web3.eth.net.getNetworkType(cb)
 
 class Signer extends React.Component {
-  // constructor (...args) {
-  //   super(...args)
-  //   this.signer = React.createRef()
-  // }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
     if (this.tPin.length === 4) {
@@ -36,6 +32,7 @@ class Signer extends React.Component {
     }
   }
   render () {
+    if (this.props.status === 'loading') return null
     let current = this.store('signer.current') === this.props.id
     let minimized = this.store('signer.minimized')
     this.selected = current && !minimized
@@ -44,6 +41,7 @@ class Signer extends React.Component {
     let signerClass = 'signer'
     let signerIndicator = 'signerIndicator'
     let signerSettings = 'signerSettingsMenu'
+
     if (this.store('signer.view') === 'settings') {
       signerSettings += ' signerSettingsOpen'
     } else {
@@ -51,13 +49,13 @@ class Signer extends React.Component {
     }
 
     if (this.props.status === 'ok') signerClass += ' okSigner'
-    if (this.props.status === 'loading') return null
 
     let style = {}
 
     if (this.props.mode === 'slide') {
       let initial = this.store('signer.position.initial')
       if (current) {
+        // Slide and current
         style.position = 'absolute'
         style.top = initial.top
         style.bottom = initial.bottom
@@ -65,6 +63,7 @@ class Signer extends React.Component {
         style.right = 0
         style.transition = '0.48s cubic-bezier(.82,0,.12,1) all, 0s opacity linear, 0s transform linear'
         if (!minimized) {
+          // Slide and current and open
           signerClass += ' selectedSigner'
           signerIndicator += ' signerSettingsActive'
           signerSettings += ' signerSettingsActive'
@@ -72,18 +71,23 @@ class Signer extends React.Component {
           style.bottom = 5
         }
       } else {
+        // Slide and before current
         style.display = 'none'
       }
     }
 
     if (this.store('signer.current') && this.props.mode === 'scroll' && !minimized) {
-      style.transform = 'scale(0.5) translate(0px, -200px)'
+      // Scroll and open
+      style.transform = 'translate(0px, 40px)'
       style.opacity = 0
-      style.transition = '0.72s cubic-bezier(.82,0,.12,1) all'
+      style.transitionDelay = '0.48s opacity'
+      style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
     }
 
     if (current && this.props.mode === 'scroll' && !minimized) {
-      style.transition = '0.48s cubic-bezier(.82,0,.12,1) all, 0s opacity linear, 0s transform linear'
+      // Scroll and open and current
+      style.opacity = 0
+      style.transition = '0s all linear'
     }
 
     return (
@@ -101,14 +105,6 @@ class Signer extends React.Component {
               </div>
             </div>
             <div className='signerType' onClick={() => { if (this.props.status === 'ok') this.select() }}>
-              <div className='signerImage'>
-                {(_ => {
-                  if (type === 'Nano S') return <img src={path.join(__dirname, './ledgerLogo.png')} />
-                  if (type === 'Trezor') return <img className='trezorImage' src={path.join(__dirname, './trezorLogo.png')} />
-                  return <div dangerouslySetInnerHTML={{__html: octicons['zap'].toSVG({height: 31})}} />
-                })()}
-              </div>
-              <div className='signerText'>{type}</div>
               <div className='signerSelect'>
                 <div className='signerSelectArrows'>
                   <div className='signerSelectArrow' dangerouslySetInnerHTML={{__html: octicons['chevron-up'].toSVG({height: 18})}} />
@@ -116,12 +112,29 @@ class Signer extends React.Component {
                   <div className='signerSelectArrow' dangerouslySetInnerHTML={{__html: octicons['chevron-up'].toSVG({height: 18})}} />
                 </div>
               </div>
+              <div className='signerSelect' style={{left: 'auto', right: '0'}}>
+                <div className='signerSelectArrows'>
+                  <div className='signerSelectArrow' dangerouslySetInnerHTML={{__html: octicons['chevron-up'].toSVG({height: 18})}} />
+                  <div className='signerSelectArrow' dangerouslySetInnerHTML={{__html: octicons['chevron-up'].toSVG({height: 18})}} />
+                  <div className='signerSelectArrow' dangerouslySetInnerHTML={{__html: octicons['chevron-up'].toSVG({height: 18})}} />
+                </div>
+              </div>
+              <div className='signerInner'>
+                <div className='signerImage'>
+                  {(_ => {
+                    if (type === 'Nano S') return <img src={path.join(__dirname, './ledgerLogo.png')} />
+                    if (type === 'Trezor') return <img className='trezorImage' src={path.join(__dirname, './trezorLogo.png')} />
+                    return <div dangerouslySetInnerHTML={{__html: octicons['zap'].toSVG({height: 31})}} />
+                  })()}
+                </div>
+                <div className='signerText'>{type}</div>
+              </div>
             </div>
           </div>
           <div className='signerMid'>
             {this.props.status === 'ok' ? (
               <div>
-                <div className='signerName'>{'New Account ' + this.props.mode}</div>
+                <div className='signerName'>{'New Account'}</div>
                 <div className='signerAddress'>{this.props.accounts}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}

@@ -48,7 +48,8 @@ store.observer(() => {
   }
 })
 
-store.observer(_ => persist.set('permissions', store('permissions')))
+// store.observer(_ => persist.set('permissions', store('permissions')))
+store.observer(_ => persist.set('accounts', store('local.accounts')))
 
 let launch = store('local.launch')
 store.observer(() => {

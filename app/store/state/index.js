@@ -14,6 +14,7 @@ let initial = {
   signers: [],
   signer: {
     minimized: true,
+    open: false,
     current: '',
     requests: {},
     view: 'default',
@@ -37,7 +38,8 @@ let initial = {
     node: {
       run: false,
       backup: 'http://rinkby.infura.com'
-    }
+    },
+    accounts: persist.get('accounts') || {}
   }
 }
 

@@ -10,35 +10,37 @@
   100%
     opacity 0
 
-.signer:before
-  content ''
-  border-left 355px solid transparent
-  border-right 0px solid transparent
-  border-top 160px solid thin
-  display block
-  position absolute
-  top calc(100% - 40px)
-  right 8px
-  left 5px
-  z-index 3000
-
-.signer:after
-  content ''
-  border-left 5px solid thin
-  border-bottom 0px solid transparent
-  border-top 5px solid transparent
-  display block
-  position absolute
-  top 0
-  bottom 40px
-  left calc(100% - 5px)
-  z-index 3000
+// .signer:before
+//   content ''
+//   border-left 355px solid transparent
+//   border-right 0px solid transparent
+//   border-top 160px solid thin
+//   display block
+//   position absolute
+//   top calc(100% - 40px)
+//   right 8px
+//   left 5px
+//   z-index 3000
+//
+// .signer:after
+//   content ''
+//   border-left 5px solid thin
+//   border-bottom 0px solid transparent
+//   border-top 5px solid transparent
+//   display block
+//   position absolute
+//   top 0
+//   bottom 40px
+//   left calc(100% - 5px)
+//   z-index 3000
 
 .signer
   position relative
-  padding 0px 5px 40px 5px
+  padding 0px 10px 10px 10px
   z-index 3001
   transition standardSlow
+  will-change transform
+  pointer-events auto
 
   .signerRequests
     display none
@@ -59,7 +61,7 @@
     position relative
     z-index 3002
     border-radius 3px
-    box-shadow 0px 1px 8px -1px rgba(6, 54, 52, 0.1), 0px 1px 2px 0px rgba(6, 54, 52, 0), 0 25px 100px -20px rgba(6, 24, 52, .3)
+    box-shadow 0px -1px 4px -1px rgba(6, 54, 52, 0.15), 0px 1px 0px 0px rgba(6, 54, 52, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4)
     background lightShade
     overflow hidden
     padding-bottom 3px
@@ -123,11 +125,12 @@
       display flex
       align-items center
       justify-content center
-      height 55px
-      width 55px
+      height 100px
+      width 90px
       flex-direction column
       text-align center
       -webkit-app-region no-drag
+      overflow hidden
 
       .signerIndicatorIcon
         height 51px
@@ -136,13 +139,18 @@
         display flex
         align-items center
         justify-content center
+        margin-right -150px
+        transition standard
+        opacity 0
 
         svg
           fill outerspace
-          opacity 0
+          opacity 1
 
-    .signerIndicatorActive
+    .signerSettingsActive
       .signerIndicatorIcon
+        margin-right 0px
+        opacity 1
         svg
           opacity 0.4
 
@@ -202,10 +210,10 @@
       display flex
       justify-content center
       align-items center
-      width 120px
-      height 100px
-      margin-left -60px
-      background outerspace
+      width 160px
+      height 105px
+      margin-left -80px
+      background linear-gradient(thin, thick)
       border-bottom-left-radius 6px
       border-bottom-right-radius 6px
       overflow hidden
@@ -252,6 +260,23 @@
         opacity 1
         transition standardSlow
 
+    .signerInner
+      position absolute
+      top 0px
+      left 25px
+      right 25px
+      bottom 0px
+      background outerspace
+      border-bottom-left-radius 6px
+      border-bottom-right-radius 6px
+      display flex
+      justify-content center
+      align-items center
+
+      overflow hidden
+      transition standard
+      -webkit-app-region no-drag
+
     .signerMin
       position absolute
       right 0
@@ -287,10 +312,10 @@
     font-weight 200
     text-transform capitalize
     text-align center
-    top 95px
+    top 0px
     left 0
-    right 0
-    height 50px
+    bottom 0px
+    width 25px
     z-index 100000
     color spacewhite
     flex-direction column
@@ -315,19 +340,20 @@
         animation-play-state running
 
         svg
-          fill spacewhite
+          fill outerspace
+          opacity 0.4
 
       .signerSelectArrow:first-child
         animation-delay 0s
-        margin-top 17px
+        margin-top 16px
 
       .signerSelectArrow:nth-child(2)
         animation-delay 0.09s
-        margin-top 23px
+        margin-top 24px
 
       .signerSelectArrow:nth-child(3)
         animation-delay 0.18s
-        margin-top 29px
+        margin-top 32px
 
   .signerReady
     font-size 12px
@@ -384,7 +410,7 @@
 .okSigner
   .signerTop
     .signerType
-      height 160px
+      height 100px
 
     .signerSelect
       opacity 1
@@ -400,23 +426,14 @@
   .signerTop
     .signerType
       height 100px
-
-    .signerSelectArrows
-      transform rotate(180deg)
-
-    .signerType:hover
-      .signerImage
-        top -40px
+      .signerSelect
+        display none
         opacity 0
 
-      .signerText
-        top 30px
-        opacity 0
-
-      .signerSelectArrows
-        transition-delay 0.48s
-        transition standardSlow
-        top -70
+      .signerInner
+        left 0px
+        right 0px
+        transition standardSlowq
 
   .signerWrap
     height 100%
