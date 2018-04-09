@@ -11,8 +11,6 @@ import store from './store'
 
 import './style'
 
-console.log(ws)
-
 let tray = process.env.FRAME_TYPE === 'tray'
 tray ? ws.start() : webview()
 let Frame = Restore.connect(tray ? Panel : App, store)

@@ -25,7 +25,12 @@ export const runOnStartup = u => u('local.startup', startup => !startup)
 
 export const setSignerView = (u, view) => u('signer.view', _ => view)
 
-export const setPermissions = (u, permissions) => u('permissions', () => permissions)
+export const setPermissions = (u, permissions) => {
+  u('local.accounts', (accounts, state) => {
+    accounts[state.signer.accounts[0]].permissions = permissions
+    return accounts
+  })
+}
 
 export const addProviderEvent = (u, payload) => {
   u('provider.events', events => {
@@ -50,7 +55,21 @@ export const addRequest = (u, request) => {
 }
 
 export const giveAccess = (u, req, access) => {
-  u('permissions', req.handlerId, _ => ({handlerId: req.handlerId, origin: req.origin, provider: access}))
+  u('local.accounts', (accounts, state) => {
+    let a = state.signer.accounts[0]
+    console.log(a)
+    console.log('access', access)
+    accounts[a] = accounts[a] || {permissions: {}}
+    accounts[a].permissions[req.handlerId] = {handlerId: req.handlerId, origin: req.origin, provider: access}
+    console.log(accounts)
+    // console.log(accounts)
+    console.log(state.signer.accounts[0])
+    console.log('hoOIFBNOSINOFIhohoh')
+    // accounts[state.signer.accounts[0]].permissions[req.handlerId] = {handlerId: req.handlerId, origin: req.origin, provider: access}
+    return accounts
+  })
+  // let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
+  // u('permissions', req.handlerId, _ => ({handlerId: req.handlerId, origin: req.origin, provider: access}))
   u('signer.requests', (requests, state) => {
     delete requests[req.handlerId]
     return requests
@@ -58,7 +77,11 @@ export const giveAccess = (u, req, access) => {
 }
 
 export const toggleAccess = (u, handlerId) => {
-  u('permissions', handlerId, 'provider', provider => !provider)
+  u('local.accounts', (accounts, state) => {
+    let a = state.signer.accounts[0]
+    accounts[a].permissions[handlerId].provider = !accounts[a].permissions[handlerId].provider
+    return accounts
+  })
 }
 
 export const requestPending = (u, id) => {
@@ -101,24 +124,40 @@ export const declineRequest = (u, id) => {
 
 export const updateSigners = (u, signers) => u('signers', _ => signers)
 
-export const addSigner = (u, signer) => u('signers', signers => {
-  signers.push(signer)
-  signers.sort((a, b) => {
-    if (a.id > b.id) return 1
-    if (a.id < b.id) return -1
-    return 0
-  })
-  return signers
-})
+export const addSigner = (u, signer) => {
+  console.log(signer)
+  // u('local.accounts', signer.accounts[0], account => {
+  //   let ok = Object.assign({permissions: {}}, account)
+  //   console.log('initial acct')
+  //   console.log(ok)
+  //   return ok
+  // })
+  // u('signers', signers => {
+  //   signers.push(signer)
+  //   signers.sort((a, b) => {
+  //     if (a.id > b.id) return 1
+  //     if (a.id < b.id) return -1
+  //     return 0
+  //   })
+  //   return signers
+  // })
+}
 
 export const setSigner = (u, signer) => {
   u('signer.current', _ => signer.id)
+  u('signer.accounts', _ => signer.accounts)
+  console.log(signer)
   setTimeout(_ => u('signer.minimized', _ => false), 50)
 }
 
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
-  setTimeout(_ => u('signer.current', _ => ''), 430)
+  setTimeout(_ => {
+    u('signer.current', _ => '')
+    u('signer.accounts', _ => [])
+    u('signer.requests', _ => { return {} })
+    u('signer.view', _ => 'default')
+  }, 430)
 }
 
 // export const toggleMinimized = (u, signer) => {
@@ -178,6 +217,4 @@ export const removeView = (u, id, isCurrent) => {
   })
 }
 
-export const initialSignerPos = (u, pos) => {
-  u('signer.position.initial', _ => pos)
-}
+export const initialSignerPos = (u, pos) => u('signer.position.initial', _ => pos)

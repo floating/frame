@@ -6,6 +6,7 @@ import octicons from 'octicons'
 import rpc from '../../../../rpc'
 
 import Requests from './Requests'
+import Settings from './Settings'
 
 // web3.eth.net.getNetworkType(cb)
 
@@ -28,7 +29,10 @@ class Signer extends React.Component {
         if (err) return console.log(err)
       })
     } else {
-      this.store.unsetSigner()
+      rpc('unsetSigner', (err, status) => {
+        if (err) return console.log(err)
+      })
+      // this.store.unsetSigner()
     }
   }
   render () {
@@ -72,7 +76,8 @@ class Signer extends React.Component {
         }
       } else {
         // Slide and before current
-        style.display = 'none'
+        style.visibility = 'hidden'
+        style.pointerEvents = 'none'
       }
     }
 
@@ -89,6 +94,10 @@ class Signer extends React.Component {
       style.opacity = 0
       style.transition = '0s all linear'
     }
+
+    // console.log(this.props)
+    // console.log(this.store('local.accounts'))
+    // console.log(this.store('signer.accounts', 0))
 
     return (
       <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
@@ -134,56 +143,17 @@ class Signer extends React.Component {
           <div className='signerMid'>
             {this.props.status === 'ok' ? (
               <div>
-                <div className='signerName'>{'New Account'}</div>
-                <div className='signerAddress'>{this.props.accounts}</div>
+                <div className='signerName'>
+                  <div className='signerNameText'>{'New Account'}</div>
+                  <div className='signerNameEdit'>
+                    <div dangerouslySetInnerHTML={{__html: octicons['pencil'].toSVG({height: 14})}} />
+                  </div>
+                </div>
+                <div className='signerAddress'>{this.props.accounts[0]}</div>
               </div>
             ) : <div className='signerStatus'>{this.props.status}</div>}
             {this.props.mode === 'slide' && this.store('signer.view') === 'settings' ? (
-              <div className='signerSettings'>
-                <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
-                <div className='appInfo'>
-                  <div className='appInfoLine'>
-                    <div>{'Rinkby via Infura'}</div>
-                    <div>{'Connected'}</div>
-                  </div>
-                </div>
-                <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
-                {Object.keys(this.store('permissions')).length === 0 ? (
-                  <div className='signerPermission'>
-                    <div className='signerPermissionOrigin'>{'No Permissions Set'}</div>
-                  </div>
-                ) : (
-                  Object.keys(this.store('permissions')).map(id => this.store('permissions')[id]).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
-                    return (
-                      <div className='signerPermission' key={o.handlerId} onClick={_ => this.store.toggleAccess(o.handlerId)}>
-                        <div className='signerPermissionOrigin'>{this.store('permissions', o.handlerId).origin}</div>
-                        <div className={this.store('permissions', o.handlerId).provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
-                          <div className='signerPermissionToggleSwitch' />
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
-                <div className='signerSettingsTitle'>{'App Info'}</div>
-                <div className='appInfo'>
-                  <div className='appInfoLine'>
-                    <div>{'Frame'}</div>
-                    <div>{'v' + process.env.npm_package_version}</div>
-                  </div>
-                  <div className='appInfoLine'>
-                    <div>{'Electron'}</div>
-                    <div>{'v' + process.versions.electron}</div>
-                  </div>
-                  <div className='appInfoLine'>
-                    <div>{'Chrome'}</div>
-                    <div>{'v' + process.versions.chrome}</div>
-                  </div>
-                  <div className='appInfoLine'>
-                    <div>{'Node'}</div>
-                    <div>{'v' + process.versions.node}</div>
-                  </div>
-                </div>
-              </div>
+              <Settings />
             ) : <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />}
             {type === 'Trezor' && this.props.status === 'Need Pin' ? (
               <div className='trezorPinWrap'>

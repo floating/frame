@@ -40,7 +40,7 @@
     "octicons": "^7.2.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-restore": "^0.1.1",
+    "react-restore": "^0.1.2",
     "stylus": "^0.54.5",
     "trezor.js": "^6.15.18",
     "usb-detection": "^2.1.0",
