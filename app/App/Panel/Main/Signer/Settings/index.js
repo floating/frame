@@ -32,7 +32,6 @@ class Settings extends React.Component {
   }
   render () {
     let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
-    console.log(permissions)
     return (
       <div className='signerSettings'>
         <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
@@ -49,10 +48,6 @@ class Settings extends React.Component {
           </div>
         ) : (
           Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
-            console.log('permissions')
-            console.log(permissions)
-            console.log(o)
-            console.log(permissions[o].origin)
             return (
               <div className='signerPermission' key={o.handlerId} onClick={_ => this.store.toggleAccess(o)}>
                 <div className='signerPermissionOrigin'>{permissions[o].origin}</div>

@@ -8,16 +8,9 @@ const allowed = (req, proceed) => {
     let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
     let perms = Object.keys(permissions).map(id => permissions[id])
     let permIndex = perms.map(p => p.origin).indexOf(req.origin)
-    console.log('permIndex: ' + permIndex)
-    if (!store('signer.current')) {
-      setTimeout(_ => obs.remove(), 0) // Add fix for this pattern in restore
-      return req.reject()
-    }
-
-    if (permIndex === -1) return store.addRequest({type: 'requestProvider', origin: req.origin, notice: `${req.origin} is requesting access to the provider.`})
-
+    if (permIndex === -1 && store('signer.current')) return store.addRequest({type: 'requestProvider', origin: req.origin, notice: `${req.origin} is requesting access to the provider.`})
     setTimeout(_ => obs.remove(), 0) // Add fix for this pattern in restore
-    perms[permIndex].provider ? proceed(req.accept(null, req.origin)) : req.reject()
+    store('signer.current') && perms[permIndex].provider ? proceed(req.accept(null, req.origin)) : req.reject()
   })
 }
 

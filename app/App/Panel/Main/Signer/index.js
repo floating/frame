@@ -95,10 +95,6 @@ class Signer extends React.Component {
       style.transition = '0s all linear'
     }
 
-    // console.log(this.props)
-    // console.log(this.store('local.accounts'))
-    // console.log(this.store('signer.accounts', 0))
-
     return (
       <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
         <div className='signerWrap' style={current && this.props.mode === 'slide' ? {height: '100%'} : {}}>
