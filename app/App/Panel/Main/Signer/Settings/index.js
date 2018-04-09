@@ -1,7 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-// import octicons from 'octicons'
-// import rpc from '../../../../../rpc'
 // web3.eth.net.getNetworkType(cb)
 
 class Settings extends React.Component {
@@ -49,7 +47,7 @@ class Settings extends React.Component {
         ) : (
           Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
             return (
-              <div className='signerPermission' key={o.handlerId} onClick={_ => this.store.toggleAccess(o)}>
+              <div className='signerPermission' key={o} onClick={_ => this.store.toggleAccess(o)}>
                 <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                 <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
                   <div className='signerPermissionToggleSwitch' />

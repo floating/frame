@@ -1,3 +1,3 @@
 import Provider from './Provider'
-
-export default new Provider('http://localhost:8545')
+// http://localhost:8545
+export default new Provider('https://rinkeby.infura.io')

@@ -25,19 +25,15 @@ class Signer extends React.Component {
     }
     let current = this.store('signer.current') === this.props.id
     if (!current) {
-      rpc('setSigner', this.props.id, (err, status) => {
-        if (err) return console.log(err)
-      })
+      rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     } else {
-      rpc('unsetSigner', (err, status) => {
-        if (err) return console.log(err)
-      })
-      // this.store.unsetSigner()
+      rpc('unsetSigner', (err, status) => { if (err) return console.log(err) })
     }
   }
   render () {
     if (this.props.status === 'loading') return null
     let current = this.store('signer.current') === this.props.id
+    let last = this.store('signer.last') === this.props.id
     let minimized = this.store('signer.minimized')
     this.selected = current && !minimized
 
@@ -81,18 +77,30 @@ class Signer extends React.Component {
       }
     }
 
-    if (this.store('signer.current') && this.props.mode === 'scroll' && !minimized) {
+    if (this.store('signer.current') && this.props.mode === 'scroll') {
       // Scroll and open
-      style.transform = 'translate(0px, 40px)'
-      style.opacity = 0
-      style.transitionDelay = '0.48s opacity'
       style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
+      if (minimized) {
+        style.transform = 'translate(0px, 0px)'
+        style.opacity = 1
+      } else {
+        style.transform = 'translate(0px, 40px)'
+        style.opacity = 0
+        style.pointerEvents = 'none'
+      }
     }
 
-    if (current && this.props.mode === 'scroll' && !minimized) {
+    if (current && this.props.mode === 'scroll') {
       // Scroll and open and current
       style.opacity = 0
       style.transition = '0s all linear'
+      style.pointerEvents = 'none'
+    }
+    if (minimized && !this.store('signer.current') && last && this.props.mode === 'scroll') {
+      // Scroll and closed and replace current
+      style.opacity = 1
+      style.transition = '0s all linear'
+      style.pointerEvents = 'auto'
     }
 
     return (

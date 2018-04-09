@@ -140,16 +140,16 @@ export const setSigner = (u, signer) => {
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
   setTimeout(_ => {
-    u('signer.current', _ => '')
-    u('signer.accounts', _ => [])
-    u('signer.requests', _ => { return {} })
-    u('signer.view', _ => 'default')
-  }, 430)
+    u('signer', signer => {
+      signer.last = signer.current
+      signer.current = ''
+      signer.accounts = []
+      signer.requests = {}
+      signer.view = 'default'
+      return signer
+    })
+  }, 480)
 }
-
-// export const toggleMinimized = (u, signer) => {
-//   u('signer.minimized', minimized => !minimized)
-// }
 
 export const removeSigner = (u, signer) => u('signers', signers => {
   let target = signers.map(sign => sign.id).indexOf(signer.id)

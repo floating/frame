@@ -63,8 +63,7 @@ class App extends React.Component {
       }, 10000)
       this.setState({txMessage: `Successful Transaction: ${res.transactionHash}`})
       this.startPoll(res.transactionHash)
-    }).catch(err => {
-      console.log('sendTranction err:', err)
+    }).catch((err, err2) => {
       this.setState({txMessage: 'Error: ' + err.message})
     }).finally(_ => {
       setTimeout(() => {
