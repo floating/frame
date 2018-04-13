@@ -60,11 +60,8 @@ export const giveAccess = (u, req, access) => {
     let a = state.signer.accounts[0]
     accounts[a] = accounts[a] || {permissions: {}}
     accounts[a].permissions[req.handlerId] = {handlerId: req.handlerId, origin: req.origin, provider: access}
-    // accounts[state.signer.accounts[0]].permissions[req.handlerId] = {handlerId: req.handlerId, origin: req.origin, provider: access}
     return accounts
   })
-  // let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
-  // u('permissions', req.handlerId, _ => ({handlerId: req.handlerId, origin: req.origin, provider: access}))
   u('signer.requests', (requests, state) => {
     delete requests[req.handlerId]
     return requests
@@ -210,3 +207,4 @@ export const removeView = (u, id, isCurrent) => {
 }
 
 export const initialSignerPos = (u, pos) => u('signer.position.initial', _ => pos)
+export const initialScrollPos = (u, pos) => u('signer.position.scrollTop', _ => pos)

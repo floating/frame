@@ -10,7 +10,6 @@ let initial = {
     view: 'default'
   },
   view: {current: '', list: [], data: {}},
-  // permissions: persist.get('permissions') || {},
   signers: [],
   signer: {
     minimized: true,
@@ -20,6 +19,7 @@ let initial = {
     view: 'default',
     accounts: [],
     position: {
+      scrollTop: 0,
       initial: {
         top: 5,
         left: 5,

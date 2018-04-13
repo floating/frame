@@ -23,6 +23,7 @@ class Signer extends React.Component {
       rpc('unsetSigner', (err, status) => { if (err) return console.log(err) })
     } else {
       let bounds = this.signer.getBoundingClientRect()
+      this.props.reportScroll()
       this.store.initialSignerPos({top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight, height: this.signer.clientHeight, index: this.props.index})
       rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
@@ -157,7 +158,7 @@ class Signer extends React.Component {
               {this.props.status !== 'ok' ? <div className='signerStatus'>{this.props.status}</div> : (
                 <div>
                   <div className='signerName'>
-                    <div className='signerNameText'>{'New Account'}</div>
+                    <div className='signerNameText'>{this.props.index + ' ' + this.props.index + ' ' + this.props.index + ' ' + this.props.index + ' ' + this.props.index}</div>
                     <div className='signerNameEdit'>{svg.octicon('pencil', {height: 14})}</div>
                   </div>
                   <div className='signerAddress'>{this.props.accounts[0]}</div>
