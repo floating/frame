@@ -253,9 +253,8 @@
     font-weight 200
     text-transform capitalize
     text-align center
-    top 0px
-    left 0
-    bottom 0px
+    top 0
+    bottom 0
     width 25px
     z-index 100000
     color spacewhite
@@ -282,7 +281,7 @@
 
         svg
           fill outerspace
-          opacity 0.4
+          opacity 1
 
       .signerSelectArrow:first-child
         animation-delay 0s
@@ -295,6 +294,25 @@
       .signerSelectArrow:nth-child(3)
         animation-delay 0.18s
         margin-top 32px
+
+  .signerSelectDown
+    transform rotate(180deg)
+    .signerSelectArrows
+      .signerSelectArrow
+        svg
+          fill spacewhite
+
+  .signerSelectLeft
+    left 0
+
+  .signerSelectRight
+    right 0
+
+  .signerSelectDown.signerSelectLeft
+    left -25px
+
+  .signerSelectDown.signerSelectRight
+    right -25px
 
   .signerReady
     font-size 12px
@@ -369,6 +387,15 @@
         left 0px
         right 0px
         transition standardSlow
+    .signerType:hover
+      .signerSelect
+        opacity 1
+
+  .signerSelectDown.signerSelectRight
+    right 0
+
+  .signerSelectDown.signerSelectLeft
+    left 0
 
 .signerSettings
   display flex

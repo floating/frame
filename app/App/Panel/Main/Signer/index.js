@@ -41,17 +41,19 @@ class Signer extends React.Component {
       </div>
     )
   }
-  renderArrows () {
+  renderArrows (direction) {
+    let selectClass = 'signerSelect'
+    if (direction === 'down') selectClass += ' signerSelectDown'
     return (
       <React.Fragment>
-        <div className='signerSelect'>
+        <div className={selectClass + ' signerSelectLeft'}>
           <div className='signerSelectArrows'>
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', {height: 18})}</div>
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', {height: 18})}</div>
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', {height: 18})}</div>
           </div>
         </div>
-        <div className='signerSelect' style={{left: 'auto', right: '0'}}>
+        <div className={selectClass + ' signerSelectRight'}>
           <div className='signerSelectArrows'>
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', {height: 18})}</div>
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', {height: 18})}</div>
@@ -64,8 +66,9 @@ class Signer extends React.Component {
   renderType () {
     return (
       <div className='signerType' onClick={() => { if (this.props.status === 'ok') this.select() }}>
-        {this.renderArrows()}
+        {this.renderArrows('up')}
         <div className='signerInner'>
+          {this.renderArrows('down')}
           <div className='signerImage'>
             {(_ => {
               if (this.props.type === 'Nano S') return <img src={path.join(__dirname, './ledgerLogo.png')} />
@@ -114,15 +117,12 @@ class Signer extends React.Component {
     let initial = this.store('signer.position.initial')
 
     if (current) {
-      // Slide and current
       style.position = 'absolute'
       style.top = open ? 38 : initial.top
       style.bottom = open ? 5 : initial.bottom
       style.left = 0
       style.right = 0
-      // style.transition = '0.48s cubic-bezier(.82,0,.12,1) all, 0s opacity linear, 0s transform linear'
       style.zIndex = '1000000'
-      // if (open) signerClass += ' selectedSigner'
     } else if (this.store('signer.current') !== '') {
       style.opacity = 0
       style.pointerEvents = 'none'
@@ -135,18 +135,6 @@ class Signer extends React.Component {
         style.transform = 'translate(0px, 0px)'
         style.opacity = 1
       }
-      // if (current) {
-      //   // Scroll and open and current
-      //   style.opacity = 0
-      //   style.transition = '0s all linear'
-      //   style.pointerEvents = 'none'
-      // }
-      // if (minimized && !this.store('signer.current') && last) {
-      //   // Scroll and closed and replace current
-      //   style.opacity = 1
-      //   style.transition = '0s all linear'
-      //   style.pointerEvents = 'auto'
-      // }
     }
 
     return (
