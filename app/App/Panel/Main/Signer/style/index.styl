@@ -40,12 +40,11 @@
   z-index 3001
   transition standardSlow
   will-change transform
+  transform translate3d(0, 0, 0)
   pointer-events auto
+  box-sizing border-box
 
-  .signerRequests
-    display none
-
-  .signerWrap:before
+  .signerContainer:before
     content ''
     position absolute
     top 0
@@ -57,7 +56,7 @@
     border-radius 3px
     z-index 3003
 
-  .signerWrap
+  .signerContainer
     position relative
     z-index 3002
     border-radius 3px
@@ -65,14 +64,102 @@
     background lightShade
     overflow hidden
     padding-bottom 3px
-    overflow-y hidden
 
-  .signerMid
+  .signerTop
     position relative
+    opacity 1
     z-index 3004
-    overflow-x hidden
-    overflow-y hidden
-    border-radius 3px
+
+    .signerNav
+      position relative
+      opacity 1
+      display flex
+      z-index 3004
+
+      @import './menu'
+
+      .signerType
+        position relative
+        top 0px
+        left 50%
+        display flex
+        justify-content center
+        align-items center
+        width 160px
+        height 105px
+        margin-left -80px
+        background linear-gradient(thin, thick)
+        border-bottom-left-radius 6px
+        border-bottom-right-radius 6px
+        overflow hidden
+        transition standard
+        -webkit-app-region no-drag
+
+        .signerImage
+          position absolute
+          top 22px
+          left 0
+          right 0
+          display flex
+          justify-content center
+          align-items center
+          opacity 1
+          transition standardSlow
+
+          img
+            height 31px
+
+          svg
+            fill #fff
+
+          .trezorImage
+            height 39px
+            margin-top -4px
+
+        .signerText
+          position absolute
+          top 63px
+          left 0
+          right 0
+          height 20px
+          display flex
+          flex-direction column
+          justify-content center
+          align-items center
+          text-transform uppercase
+          font-size 11px
+          line-height 10px
+          font-weight 300
+          letter-spacing 2px
+          color spacewhite
+          opacity 1
+          transition standardSlow
+
+      .signerInner
+        position absolute
+        top 0px
+        left 25px
+        right 25px
+        bottom 0px
+        background outerspace
+        border-bottom-left-radius 6px
+        border-bottom-right-radius 6px
+        display flex
+        justify-content center
+        align-items center
+        overflow hidden
+        transition standardSlow
+        -webkit-app-region no-drag
+
+      .signerMin
+        position absolute
+        right 0
+        top 0
+        bottom 0
+        width 40px
+        display flex
+        justify-content center
+        align-items center
 
     .signerName
       display flex
@@ -112,6 +199,18 @@
       background lightHigh
       border-top 1px solid lightShade
 
+  .signerMid
+    position relative
+    z-index 3004
+    overflow-x hidden
+    overflow-y hidden
+    border-top 1px solid lightShade
+    opacity 0
+    height 0%
+    transition standardSlow
+    will-change transform
+    transform translate3d(0, 0, 0)
+
     .signerNode
       display flex
       justify-content center
@@ -119,7 +218,6 @@
       font-size 12px
       height 40px
       border-top 1px solid lightShade
-
 
   .signerBot
     position absolute
@@ -129,187 +227,6 @@
     height 0
     opacity 0
     z-index 3004
-
-  .signerTop
-    position relative
-    opacity 1
-    display flex
-    z-index 3004
-
-    .signerIndicator
-      position absolute
-      left 0
-      top 0
-      display flex
-      align-items center
-      justify-content center
-      height 100px
-      width 90px
-      flex-direction column
-      text-align center
-      -webkit-app-region no-drag
-      overflow hidden
-
-      .signerIndicatorIcon
-        height 51px
-        width 51px
-        border-radius 26px
-        display flex
-        align-items center
-        justify-content center
-        margin-right -150px
-        transition standardSlow
-        opacity 0
-
-        svg
-          fill outerspace
-          opacity 1
-
-    .signerSettingsActive
-      .signerIndicatorIcon
-        margin-right 0px !important
-        margin-left 0px !important
-        opacity 1
-        transition standardSlow
-        svg
-          opacity 0.4
-
-    .signerIndicatorActive:hover
-      .signerIndicatorIcon
-        transition standardSlow
-        margin-left 0px
-        opacity 1
-        svg
-            opacity 0.5
-
-    .signerIndicatorActive.signerIndicatorOpen
-      .signerIndicatorIcon
-        transition standardSlow
-        svg
-          opacity 1
-
-    .signerSettingsMenu
-      position absolute
-      right 0
-      top 0
-      display flex
-      align-items center
-      justify-content center
-      height 100px
-      width 90px
-      flex-direction column
-      -webkit-app-region no-drag
-
-      .signerIndicatorIcon
-        height 51px
-        width 51px
-        border-radius 26px
-        display flex
-        align-items center
-        justify-content center
-        margin-left -150px
-
-        svg
-          fill outerspace
-          opacity 0
-
-    .signerSettingsActive
-      .signerIndicatorIcon
-        svg
-          opacity 0.4
-
-    .signerSettingsActive:hover
-      .signerIndicatorIcon
-        svg
-            opacity 0.5
-
-    .signerSettingsActive.signerSettingsOpen
-      .signerIndicatorIcon
-        svg
-          opacity 1
-
-    .signerType
-      position relative
-      top 0px
-      left 50%
-      display flex
-      justify-content center
-      align-items center
-      width 160px
-      height 105px
-      margin-left -80px
-      background linear-gradient(thin, thick)
-      border-bottom-left-radius 6px
-      border-bottom-right-radius 6px
-      overflow hidden
-      transition standard
-      -webkit-app-region no-drag
-
-      .signerImage
-        position absolute
-        top 22px
-        left 0
-        right 0
-        display flex
-        justify-content center
-        align-items center
-        opacity 1
-        transition standardSlow
-
-        img
-          height 31px
-
-        svg
-          fill #fff
-
-        .trezorImage
-          height 39px
-          margin-top -4px
-
-      .signerText
-        position absolute
-        top 63px
-        left 0
-        right 0
-        height 20px
-        display flex
-        flex-direction column
-        justify-content center
-        align-items center
-        text-transform uppercase
-        font-size 11px
-        line-height 10px
-        font-weight 300
-        letter-spacing 2px
-        color spacewhite
-        opacity 1
-        transition standardSlow
-
-    .signerInner
-      position absolute
-      top 0px
-      left 25px
-      right 25px
-      bottom 0px
-      background outerspace
-      border-bottom-left-radius 6px
-      border-bottom-right-radius 6px
-      display flex
-      justify-content center
-      align-items center
-      overflow hidden
-      transition standardSlow
-      -webkit-app-region no-drag
-
-    .signerMin
-      position absolute
-      right 0
-      top 0
-      bottom 0
-      width 40px
-      display flex
-      justify-content center
-      align-items center
 
   .signerEvents
     height 200px
@@ -351,6 +268,7 @@
       width 50px
       border-radius 25px
       position relative
+
       .signerSelectArrow
         position absolute
         top 0
@@ -394,7 +312,7 @@
 
   .trezorPinWrap
     width 100%
-    background black
+    background outerspace
     position relative
     display flex
     justify-content center
@@ -431,42 +349,41 @@
           transition none
 
 .okSigner
-  .signerTop
+  .signerNav
     .signerType
       height 100px
-
     .signerSelect
       opacity 1
 
-.selectedSigner
-  padding 0px 5px 5px 5px
-  transition standardSlow
-  transform translateZ(0)
+.openSigner
+  .signerMid
+    opacity 1
+    transition standardSlow
+    height 100%
 
-  .signerRequests
-    display block
-
-  .signerTop
+  .signerNav
     .signerType
       height 100px
       .signerSelect
-        display none
         opacity 0
-
       .signerInner
         left 0px
         right 0px
         transition standardSlow
 
-  .signerWrap
-    height 100%
 
-  .signerMid
-    height 100%
-    overflow-y scroll
-
-  .signerTop
-    opacity 1
+  //
+  //
+  //
+  // .signerContainer
+  //   height 100%
+  //
+  // .signerMid
+  //   height 100%
+  //   overflow-y scroll
+  //
+  // .signerNav
+  //   opacity 1
 
 .signerSettings
   display flex

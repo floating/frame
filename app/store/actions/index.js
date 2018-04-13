@@ -41,6 +41,7 @@ export const addProviderEvent = (u, payload) => {
 
 export const addRequest = (u, request) => {
   u('signer.minimized', _ => false)
+  u('signer.open', _ => true)
   u('signer.view', _ => 'default')
   u('signer.requests', (requests, state) => {
     if (state.frame.type === 'tray' && state.signer.current !== '') ipcRenderer.send('frame:showTray')
@@ -134,11 +135,15 @@ export const addSigner = (u, signer) => {
 export const setSigner = (u, signer) => {
   u('signer.current', _ => signer.id)
   u('signer.accounts', _ => signer.accounts)
-  setTimeout(_ => u('signer.minimized', _ => false), 50)
+  setTimeout(_ => {
+    u('signer.minimized', _ => false)
+    u('signer.open', _ => true)
+  }, 50)
 }
 
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
+  u('signer.open', _ => false)
   setTimeout(_ => {
     u('signer', signer => {
       signer.last = signer.current
@@ -148,7 +153,7 @@ export const unsetSigner = u => {
       signer.view = 'default'
       return signer
     })
-  }, 480)
+  }, 520)
 }
 
 export const removeSigner = (u, signer) => u('signers', signers => {

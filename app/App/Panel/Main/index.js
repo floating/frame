@@ -10,14 +10,11 @@ class Main extends React.Component {
     return (
       <div className='main'>
         <div id='panelScroll' style={current ? {overflow: 'hidden', pointerEvents: 'none'} : {}}>
-          <div id='panelSlide'>
+          <div id='panelSlide' style={current ? {overflow: 'visible'} : {}}>
             <div id='panelWrap'>
-              {signers.map((signer, i) => <Signer key={i} {...signer} index={i} mode={'scroll'} />)}
+              {signers.map((signer, i) => <Signer key={i} {...signer} index={i} />)}
             </div>
           </div>
-        </div>
-        <div className='signersSlide' style={{display: current ? 'block' : 'none'}}>
-          {signers.map((signer, i) => current === signer.id ? <Signer key={i} {...signer} index={i} mode={'slide'} /> : null)}
         </div>
       </div>
     )

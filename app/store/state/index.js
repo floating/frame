@@ -24,7 +24,9 @@ let initial = {
         top: 5,
         left: 5,
         right: 5,
-        bottom: 5
+        bottom: 5,
+        height: 5,
+        index: 0
       }
     }
   },
