@@ -98,9 +98,6 @@ class Signer extends React.Component {
           </div>
           <div className='signerText'>{this.props.type}</div>
         </div>
-        <div className='signerGlow'>
-          <div className={this.state.typeHover ? 'glow glowActive' : 'glow'} style={{left: this.state.glowLeft, top: this.state.glowTop}} />
-        </div>
       </div>
     )
   }
@@ -169,8 +166,10 @@ class Signer extends React.Component {
               {this.props.status !== 'ok' ? <div className='signerStatus'>{this.props.status}</div> : (
                 <div>
                   <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
-                    <div className='signerNameText'>{'Account Name ' + this.props.index}</div>
-                    <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
+                    <div className='signerNameText'>
+                      {'Account Name ' + this.props.index}
+                      <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
+                    </div>
                   </div>
                   <div className='signerAddress'>{this.props.accounts[0]}</div>
                 </div>

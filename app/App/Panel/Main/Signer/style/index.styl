@@ -187,39 +187,54 @@
         align-items center
 
     .signerName
-      position relative
+      overflow hidden
       display flex
       justify-content center
       align-items center
-      font-weight 200
-      height 60px
-      overflow hidden
 
       .signerNameText
-        transition standardSlow
+        position relative
+        font-weight 200
+        margin-top 20px
+        padding-left 5px
+        position relative
+        transition standard
         font-size 30px
-        margin-bottom 4px
+        height 45px
+        display flex
+        justify-content center
+        align-items center
+        z-index 10
 
       .signerNameEdit
         position absolute
-        right -100px
-        top 14px
-        bottom 14px
-        width 35px
+        right -10px
+        top 10px
+        bottom 7px
+        width 26px
+        border-radius 3px
         display flex
         justify-content center
         align-items center
         color white
-        transition standardSlow
+        transition standard
+        opacity 0
+        z-index 9
 
         svg
+          transition standard
           fill good
+
+      .signerNameEdit:hover
+        background good
+        svg
+          fill spacewhite
 
     .signerNameSettings
       .signerNameText
-        margin-left -35px
+        padding-right 25px
       .signerNameEdit
-        right 15px
+        opacity 1
 
     .signerAddress
       display flex
@@ -229,7 +244,6 @@
       font-family FiraCode
       letter-spacing 0px
       background lightHigh
-      padding-bottom 25px
 
   .signerMid
     position absolute
@@ -243,9 +257,8 @@
     border-top 1px solid lightShade
     border-bottom 1px solid lightShade
     opacity 0
-    transition standardSlow
+    transition standard
     will-change transform
-    // background blue
 
     .signerNode
       display flex
