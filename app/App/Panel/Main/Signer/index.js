@@ -30,7 +30,7 @@ class Signer extends React.Component {
     } else {
       let bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight, height: this.signer.clientHeight, index: this.props.index})
+      this.store.initialSignerPos({top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index})
       rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
