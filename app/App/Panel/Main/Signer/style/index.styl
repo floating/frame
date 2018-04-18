@@ -69,6 +69,7 @@
     opacity 1
     z-index 3004
     height 220px
+    margin-bottom 40px
 
     .signerNav
       position relative
@@ -220,15 +221,14 @@
         transition standard
         opacity 0
         z-index 9
+        background rgba(255, 255, 255, 0)
 
         svg
           transition standard
-          fill good
+          fill outerspace
 
       .signerNameEdit:hover
-        background good
-        svg
-          fill spacewhite
+        background rgba(255, 255, 255, 0.5)
 
     .signerNameSettings
       .signerNameText
@@ -249,16 +249,21 @@
     position absolute
     top 220px
     right 0px
-    bottom 40px
+    bottom 42px
     left 0px
     z-index 3004
     overflow-x hidden
     overflow-y hidden
-    border-top 1px solid lightShade
-    border-bottom 1px solid lightShade
-    opacity 0
+    // border-top 1px solid lightShade
+    // border-bottom 1px solid lightShade
+    opacity 1
     transition standard
     will-change transform
+    background rgba(35, 75, 165, 0.03)
+
+    div
+      transition standardSlow
+      opacity 0
 
     .signerNode
       display flex
@@ -427,8 +432,8 @@
 .openSigner
   padding 0px 5px 5px 5px
   .signerMid
-    opacity 1
-    transition standardSlow
+    div
+      opacity 1
   .signerNav
     .signerType
       height 100px
