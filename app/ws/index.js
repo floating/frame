@@ -22,7 +22,8 @@ let ws = {
     let ws = new WSServer({httpServer: http})
     ws.on('request', req => {
       allowed(req, socket => {
-        connections.push({origin: req.origin, socket})
+        let index = connections.map(conenction => conenction.origin).indexOf(req.origin)
+        if (index === -1) connections.push({origin: req.origin, socket})
         socket.on('message', data => {
           if (data.type !== 'utf8') return
           let payload = JSON.parse(data.utf8Data)

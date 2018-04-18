@@ -45,8 +45,7 @@ let initial = {
     accounts: persist.get('accounts') || {}
   }
 }
-
-if (initial.view.list.length === 0) {
+if (initial.frame.type !== 'tray' && initial.view.list.length === 0) {
   let id = uuid()
   initial.view.current = id
   initial.view.list = [id]
