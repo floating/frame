@@ -1,0 +1,74 @@
+
+.signerSettings
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  display flex
+  justify-content flex-start
+  padding 0px 0px 0px 0px
+  flex-direction column
+  transition standardSlow
+
+  .signerSettingsTitle
+    display flex
+    align-items center
+    height 40px
+    padding 0px 10px 0px 10px
+    border-bottom 1px solid lightShade
+
+.signerSettingsHidden
+  left 100%
+  right -100%
+
+.appInfo
+  display flex
+  justify-content center
+  padding 0px
+  flex-direction column
+  font-size 14px
+  font-weight 300
+  border-bottom 1px solid lightShade
+  padding 5px
+
+  .appInfoLine
+    padding 5px 15px 5px 15px
+    display flex
+    justify-content space-between
+
+.signerPermission
+  display flex
+  justify-content space-between
+  align-items center
+  padding 10px 20px
+  border-bottom 1px solid lightShade
+  font-size 14px
+  font-weight 300
+
+  .signerPermissionOrigin
+    background transparent
+
+  .signerPermissionToggle
+    position relative
+    background bad
+    height 20px
+    width 40px
+    border-radius 10px
+    transition standard
+
+    .signerPermissionToggleSwitch
+      position absolute
+      top 2px
+      left 2px
+      bottom 2px
+      width 16px
+      border-radius 10px
+      background white
+      transition standard
+
+  .signerPermissionToggleOn
+    background good
+    .signerPermissionToggleSwitch
+      position absolute
+      left 22px

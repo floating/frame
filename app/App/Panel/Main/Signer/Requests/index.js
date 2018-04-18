@@ -92,7 +92,7 @@ class Requests extends React.Component {
       return true
     })
     return (
-      <div className='signerRequests'>
+      <div className={this.store('signer.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
         {requests.length === 0 ? <div className='noRequests'>{'No Pending Requests'}</div> : requests.map((req, i) => {
           if (req.type === 'approveTransaction') return this.transactionRequest(req, i)
           if (req.type === 'requestProvider') return this.providerRequest(req, i)

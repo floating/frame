@@ -68,6 +68,7 @@
     position relative
     opacity 1
     z-index 3004
+    height 220px
 
     .signerNav
       position relative
@@ -186,31 +187,39 @@
         align-items center
 
     .signerName
+      position relative
       display flex
       justify-content center
       align-items center
       font-weight 200
-      padding-top 20px
-      padding-bottom 10px
+      height 60px
+      overflow hidden
 
       .signerNameText
+        transition standardSlow
         font-size 30px
+        margin-bottom 4px
 
       .signerNameEdit
-        font-size 14px
-        background good
-        height 25px
-        width 25px
-        border-radius 3px
-        margin-left 10px
-        margin-top 4px
+        position absolute
+        right -100px
+        top 14px
+        bottom 14px
+        width 35px
         display flex
         justify-content center
         align-items center
         color white
+        transition standardSlow
 
         svg
-          fill light
+          fill good
+
+    .signerNameSettings
+      .signerNameText
+        margin-left -35px
+      .signerNameEdit
+        right 15px
 
     .signerAddress
       display flex
@@ -223,16 +232,20 @@
       padding-bottom 25px
 
   .signerMid
-    position relative
+    position absolute
+    top 220px
+    right 0px
+    bottom 40px
+    left 0px
     z-index 3004
     overflow-x hidden
     overflow-y hidden
     border-top 1px solid lightShade
+    border-bottom 1px solid lightShade
     opacity 0
-    height 0%
     transition standardSlow
     will-change transform
-    transform translate3d(0, 0, 0)
+    // background blue
 
     .signerNode
       display flex
@@ -403,7 +416,6 @@
   .signerMid
     opacity 1
     transition standardSlow
-    height 100%
   .signerNav
     .signerType
       height 100px
@@ -422,69 +434,5 @@
   .signerSelectDown.signerSelectLeft
     left 0
 
-.signerSettings
-  height 100%
-  display flex
-  justify-content flex-start
-  padding 0px 0px 0px 0px
-  flex-direction column
-
-  .signerSettingsTitle
-    display flex
-    align-items center
-    height 40px
-    padding 0px 10px 0px 10px
-    border-bottom 1px solid lightShade
-
-.appInfo
-  display flex
-  justify-content center
-  padding 0px
-  flex-direction column
-  font-size 14px
-  font-weight 300
-  border-bottom 1px solid lightShade
-  padding 5px
-
-  .appInfoLine
-    padding 5px 15px 5px 15px
-    display flex
-    justify-content space-between
-
-.signerPermission
-  display flex
-  justify-content space-between
-  align-items center
-  padding 10px 20px
-  border-bottom 1px solid lightShade
-  font-size 14px
-  font-weight 300
-
-  .signerPermissionOrigin
-    background transparent
-
-  .signerPermissionToggle
-    position relative
-    background bad
-    height 20px
-    width 40px
-    border-radius 10px
-    transition standard
-
-    .signerPermissionToggleSwitch
-      position absolute
-      top 2px
-      left 2px
-      bottom 2px
-      width 16px
-      border-radius 10px
-      background white
-      transition standard
-
-  .signerPermissionToggleOn
-    background good
-    .signerPermissionToggleSwitch
-      position absolute
-      left 22px
-
+@import '../Settings/style'
 @import '../Requests/style'

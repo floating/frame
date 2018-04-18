@@ -32,7 +32,7 @@ class Settings extends React.Component {
   render () {
     let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
     return (
-      <div className='signerSettings'>
+      <div className={this.store('signer.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
         <div className='signerPermission'>
           <div>{provider.url}</div>

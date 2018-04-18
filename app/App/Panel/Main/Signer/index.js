@@ -168,9 +168,9 @@ class Signer extends React.Component {
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
               {this.props.status !== 'ok' ? <div className='signerStatus'>{this.props.status}</div> : (
                 <div>
-                  <div className='signerName'>
+                  <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
                     <div className='signerNameText'>{'Account Name ' + this.props.index}</div>
-                    {open && this.store('signer.view') === 'settings' ? <div className='signerNameEdit'>{svg.octicon('pencil', {height: 14})}</div> : null}
+                    <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
                   </div>
                   <div className='signerAddress'>{this.props.accounts[0]}</div>
                 </div>
@@ -178,7 +178,8 @@ class Signer extends React.Component {
               {this.props.type === 'Trezor' && this.props.status === 'Need Pin' ? this.renderTrezorPin() : null}
             </div>
             <div className='signerMid'>
-              {this.store('signer.view') === 'settings' ? <Settings /> : <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />}
+              <Settings />
+              <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
             </div>
           </div>
         </div>

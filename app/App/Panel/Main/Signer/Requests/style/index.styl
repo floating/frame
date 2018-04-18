@@ -1,17 +1,18 @@
 .signerRequests
-  position relative
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
   z-index 200
   display flex
   justify-content center
   align-items center
   flex-direction column
-  padding 20px 20px 0px 20px
-  font-weight 200
+  transition standardSlow
 
   .noRequests
-    font-weight 200
-    font-size 16px
-    margin-bottom 40px
+    margin-bottom 80px
 
   .signerRequestTitle
     height: 30px
@@ -121,3 +122,8 @@
       align-items center
       border-top-left-radius 6px
       -webkit-app-region no-drag
+
+.signerRequestsHidden
+  left -100%
+  right 100%
+  transition standardSlow
