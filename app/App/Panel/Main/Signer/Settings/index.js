@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
-// web3.eth.net.getNetworkType(cb)
+
+import provider from '../../../../../provider'
 
 class Settings extends React.Component {
   appInfo () {
@@ -33,11 +34,8 @@ class Settings extends React.Component {
     return (
       <div className='signerSettings'>
         <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
-        <div className='appInfo'>
-          <div className='appInfoLine'>
-            <div>{'Rinkby via Infura'}</div>
-            <div>{'Connected'}</div>
-          </div>
+        <div className='signerPermission'>
+          <div>{provider.url}</div>
         </div>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
         {Object.keys(permissions).length === 0 ? (
