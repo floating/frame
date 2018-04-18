@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 class Settings extends React.Component {
   render () {
     return (
-      <div className='localSettings'>
+      <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
         <div className='localSettingsTitle'>{'Local Settings'}</div>
         <div className='signerPermission' onClick={_ => this.store.toggleLaunch()}>
           <div className='signerPermissionOrigin'>{'Run on Startup'}</div>

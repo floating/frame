@@ -13,7 +13,7 @@ class Main extends React.Component {
     let current = this.store('signer.current')
     let scrollTop = this.store('signer.position.scrollTop')
     return (
-      <div className='main'>
+      <div className={this.store('panel.view') !== 'default' ? 'main mainHidden' : 'main'}>
         <div id='panelScroll' style={current ? {overflow: 'hidden', pointerEvents: 'none'} : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? {overflow: 'visible'} : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? {marginTop: '-' + scrollTop + 'px'} : {}}>

@@ -17,7 +17,8 @@ class Panel extends React.Component {
         <div className='panelMenu'>
           <div className='panelMenuItem' onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['three-bars'].toSVG({height: 20})}} />
         </div>
-        {this.store('panel.view') === 'settings' ? <Local /> : <Main />}
+        <Local />
+        <Main />
       </div>
     )
   }
