@@ -18,7 +18,6 @@ class Provider {
     this.signer = this.getSigner()
     this.accounts = []
     this.handlers = {}
-    this.network = 'Unknown'
     rpc('getAccounts', (err, accounts) => {
       if (err) return
       this.accounts = accounts
@@ -26,10 +25,6 @@ class Provider {
     ipcRenderer.on('main:accounts', (sender, accounts) => {
       this.accounts = JSON.parse(accounts)
     })
-    console.log(this.provider)
-    // this.provider.on('connect', () => {
-    //   console.log('provider connected')
-    // })
   }
   getCoinbase (payload, cb) {
     rpc('getAccounts', (err, accounts) => {
