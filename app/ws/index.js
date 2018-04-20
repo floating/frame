@@ -14,6 +14,16 @@ const allowed = (req, proceed) => {
   })
 }
 
+// let WebSocket = require('ws')
+// let ws = new WebSocket.Server({port: 1248})
+//
+// wss.on('connection', ws => {
+//   ws.on('message', message => {
+//     console.log('received: %s', message)
+//   })
+//   ws.send('something')
+// })
+
 let ws = {
   start: () => {
     let http = require('http').createServer()
