@@ -76,27 +76,35 @@ class Signer extends React.Component {
   typeMouseMove (e) {
     let bounds = e.currentTarget.getBoundingClientRect()
     let {clientX, clientY} = e
-    this.setState({glowLeft: clientX - bounds.left, glowTop: clientY - bounds.top})
+    let deg = 20
+    let tiltY = deg * ((((clientY - bounds.top) / (bounds.bottom - bounds.top)) * 2) - 1)
+    let tiltX = deg * ((((clientX - bounds.left) / (bounds.right - bounds.left)) * 2) - 1)
+    this.setState({tiltX, tiltY})
   }
   typeClick () {
-    if (this.props.status === 'ok' && this.state.typeHover) this.select()
+    if (this.props.status === 'ok') this.select()
   }
   renderType () {
-    let left = this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25
-    let right = this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25
     let typeClass = 'signerType'
+    let style = {
+      left: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25,
+      right: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25
+    }
+    // onMouseMove={::this.typeMouseMove} onMouseEnter={::this.typeMouseEnter} onMouseLeave={::this.typeMouseLeave}>
     return (
-      <div className={typeClass} onClick={::this.typeClick} onMouseMove={::this.typeMouseMove} onMouseEnter={::this.typeMouseEnter} onMouseLeave={::this.typeMouseLeave}>
+      <div className={typeClass} onClick={::this.typeClick}>
         {this.renderArrows('up')}
-        <div className='signerInner' style={{left, right}}>
-          <div className='signerImage'>
-            {(_ => {
-              if (this.props.type === 'Nano S') return <img src={path.join(__dirname, './ledgerLogo.png')} />
-              if (this.props.type === 'Trezor') return <img className='trezorImage' src={path.join(__dirname, './trezorLogo.png')} />
-              return svg.octicon('zap', {height: 31})
-            })()}
+        <div className='signerInner' style={style}>
+          <div className='signerInset'>
+            <div className='signerImage'>
+              {(_ => {
+                if (this.props.type === 'Nano S') return <img src={path.join(__dirname, './ledgerLogo.png')} />
+                if (this.props.type === 'Trezor') return <img className='trezorImage' src={path.join(__dirname, './trezorLogo.png')} />
+                return svg.octicon('zap', {height: 31})
+              })()}
+            </div>
+            <div className='signerText'>{this.props.type}</div>
           </div>
-          <div className='signerText'>{this.props.type}</div>
         </div>
       </div>
     )

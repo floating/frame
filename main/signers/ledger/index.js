@@ -23,6 +23,8 @@ module.exports = signers => {
         } catch (e) {
           return console.log(e)
         }
+        signers[device.path].deviceStatus()
+        if (this.status === 'loading' || this.status === 'Invalid sequence') return
         signers[device.path] = ledger
       }
     })

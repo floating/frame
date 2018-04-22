@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-const requestProvider = require('./requestProvider')
+const getProvider = require('./getProvider')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
@@ -8,7 +8,7 @@ const Restore = require('react-restore')
 const svg = require('../../../app/svg')
 const Transactions = require('./Transactions')
 
-let state = {ws: true, transactions: {}}
+let state = {ws: false, transactions: {}}
 let actions = {
   ws: (u, connected) => u('ws', ws => connected),
   insertTransaction: (u, tx) => u('transactions', transactions => {
@@ -31,20 +31,22 @@ class App extends React.Component {
     this.setupProvider()
   }
   setupProvider () {
-    requestProvider(store, (err, provider) => {
-      this.provider = provider
-      if (err || !provider) {
-        this.setState({providerError: 'No Frame Provider Found'})
-        setTimeout(this.setupProvider, 500)
-        return
-      }
-      this.web3 = new Web3(provider)
-      setInterval(() => { // Replace with provider broadcast
-        this.web3.eth.getAccounts((err, accounts) => {
-          if (err || accounts.length === 0) return this.setState({accounts: [], providerError: JSON.parse(err.message) || 'Frame Provier has No Accounts'})
-          if (accounts[0] !== this.state.accounts[0]) this.setState({accounts})
-        })
-      }, 500)
+    this.provider = getProvider()
+    this.web3 = new Web3(this.provider)
+    this.provider.on('connect', () => {
+      store.ws(true)
+      console.log('Connect in Dapp')
+    })
+    this.provider.on('accounts', accounts => {
+      this.setState({accounts})
+      console.log('Accounts in Dapp')
+    })
+    this.provider.on('disconnect', () => {
+      store.ws(false)
+      console.log('Disconnect in Dapp')
+    })
+    this.provider.on('error', err => {
+      console.log('Provider Error: ', err)
     })
   }
   testTransaction = () => {
@@ -166,20 +168,18 @@ class App extends React.Component {
               )
             ) : (
               <div className='errorMessage'>
-                {this.state.providerError || 'Connecting to your provider...'}
-                {this.state.providerError === 'No Account Selected' ? (
-                  <div className='providerErrorSub'>
-                    <span>{svg.logo(20)}</span>
-                    <span>{'in menu bar to view accounts'}</span>
-                  </div>
-                ) : null}
+                {this.state.providerError || 'No Account Selected'}
+                <div className='providerErrorSub'>
+                  <span>{svg.logo(20)}</span>
+                  <span>{'in menu bar to view accounts'}</span>
+                </div>
               </div>
             )
           ) : (
             <div className='errorMessage'>
-              {'You were disconnected from the Frame provider'}
+              {'Trying to connect to provider...'}
               <div className='providerErrorSub'>
-                <span>{'Trying to reconnect...'}</span>
+                <span>{'beep boop beep boop'}</span>
               </div>
             </div>
           )}

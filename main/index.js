@@ -18,7 +18,7 @@ ipcMain.on('removePermission', (e, host, permission) => store.removePermission(h
 app.on('ready', () => {
   windows.tray()
   if (app.dock) app.dock.hide()
-  opn('http://cjm.io:1234')
+  // opn('http://cjm.io:1234')
 })
 
 app.on('activate', () => {
