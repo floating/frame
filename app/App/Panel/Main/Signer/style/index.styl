@@ -164,12 +164,12 @@
       .signerInner:hover
         top -6px
         bottom 6px
-        box-shadow 0px 3px 10px rgba(0, 0, 0, 0.5)
+        box-shadow 0px 10px 10px -5px rgba(0, 0, 0, 0.7)
 
       .signerInner:active
-        top -3px
-        bottom 3px
-        box-shadow 0px 2px 10px rgba(0, 0, 0, 0.4)
+        top 0px
+        bottom 0px
+        box-shadow 0px 7px 10px -5px rgba(0, 0, 0, 0.7)
 
       .signerInner
         position absolute
@@ -179,14 +179,13 @@
         bottom 3px
         background black
         border-radius 6px
-        // border-bottom-right-radius 6px
         display flex
         justify-content center
         align-items center
         overflow hidden
-        transition standard
+        transition standard, 0.05s linear top, 0.05s linear bottom, 0.05s linear box-shadow
         -webkit-app-region no-drag
-        box-shadow 0px 0px 0px rgba(0, 0, 0, 0.5)
+        box-shadow 0px 7px 10px -5px rgba(0, 0, 0, 0.7)
 
         .signerInset
           position absolute
@@ -195,7 +194,10 @@
           right 0px
           bottom 3px
           background outerspace
-          border-radius 3px
+          border-top-left-radius 6px
+          border-top-right-radius 6px
+          border-bottom-left-radius 5px
+          border-bottom-right-radius 5px
 
       .signerMin
         position absolute
@@ -274,8 +276,6 @@
     z-index 3004
     overflow-x hidden
     overflow-y hidden
-    // border-top 1px solid lightShade
-    // border-bottom 1px solid lightShade
     opacity 1
     transition standard
     will-change transform

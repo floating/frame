@@ -29,7 +29,6 @@ module.exports = () => {
         socket.send(JSON.stringify({type: 'response', handlerId, err, res}))
       })
     })
-    socket.on('close', socket => console.log('Socket Disconnect'))
     socket.on('error', error => console.log('Socket Error', error))
   })
 

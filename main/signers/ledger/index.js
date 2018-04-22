@@ -7,8 +7,10 @@ const Ledger = require('./Ledger')
 
 module.exports = signers => {
   const remove = id => {
-    signers[id].close()
-    delete signers[id]
+    if (signers[id]) {
+      signers[id].close()
+      delete signers[id]
+    }
   }
   const scan = _ => {
     let current = HID.devices().filter(device => device.vendorId === 11415 && device.productId === 1)
@@ -16,15 +18,15 @@ module.exports = signers => {
       if (current.map(device => device.path).indexOf(id) === -1 && signers[id].type === 'Nano S') remove(id)
     })
     current.forEach(device => {
-      if (Object.keys(signers).indexOf(device.path) === -1 && device.product === 'Nano S') {
+      if (Object.keys(signers).indexOf(device.id) === -1 && device.product === 'Nano S') {
         let ledger
         try {
           ledger = new Ledger(device.path, new Eth(new TransportNodeHid(new HID.HID(device.path))), remove)
         } catch (e) {
           return console.log(e)
         }
-        signers[device.path].deviceStatus()
-        if (this.status === 'loading' || this.status === 'Invalid sequence') return
+        ledger.deviceStatus()
+        if (ledger.status === 'loading' || ledger.status === 'Invalid sequence' || ledger.status === 'Ledger Device is busy (lock getAddress)') return
         signers[device.path] = ledger
       }
     })
