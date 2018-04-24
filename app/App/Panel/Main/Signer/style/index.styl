@@ -161,16 +161,6 @@
           opacity 1
           transition standardSlow
 
-      .signerInner:hover
-        top -6px
-        bottom 6px
-        box-shadow 0px 14px 14px -8px rgba(0, 0, 20, 0.4)
-
-      .signerInner:active
-        top -2px
-        bottom 2px
-        box-shadow 0px 9px 14px -4px rgba(0, 0, 20, 0.4)
-
       .signerInner
         position absolute
         top -3px
@@ -198,6 +188,14 @@
           border-top-right-radius 6px
           border-bottom-left-radius 5px
           border-bottom-right-radius 5px
+
+      .signerInnerActive
+        top 2px
+        bottom -2px
+        box-shadow 0px 9px 14px -4px rgba(0, 0, 20, 0.4)
+
+      // .signerInnerHover
+      //   box-shadow 0px 14px 14px -8px rgba(0, 0, 20, 0.4)
 
       .signerMin
         position absolute

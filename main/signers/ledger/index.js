@@ -1,4 +1,3 @@
-const HID = require('node-hid')
 const usbDetect = require('usb-detection')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const Eth = require('@ledgerhq/hw-app-eth').default
@@ -6,32 +5,32 @@ const Eth = require('@ledgerhq/hw-app-eth').default
 const Ledger = require('./Ledger')
 
 module.exports = signers => {
-  const remove = id => {
-    if (signers[id]) {
-      signers[id].close()
-      delete signers[id]
+  let bounce
+  const remove = path => {
+    if (signers[path]) {
+      signers[path].close()
+      delete signers[path]
     }
   }
+  const add = path => {
+    TransportNodeHid.open(path).then(transport => {
+      signers[path] = new Ledger(path, new Eth(transport))
+    }).catch(e => remove(path))
+  }
   const scan = _ => {
-    let current = HID.devices().filter(device => device.vendorId === 11415 && device.productId === 1)
-    Object.keys(signers).forEach(id => {
-      if (current.map(device => device.path).indexOf(id) === -1 && signers[id].type === 'Nano S') remove(id)
-    })
-    current.forEach(device => {
-      if (Object.keys(signers).indexOf(device.id) === -1 && device.product === 'Nano S') {
-        let ledger
-        try {
-          ledger = new Ledger(device.path, new Eth(new TransportNodeHid(new HID.HID(device.path))), remove)
-        } catch (e) {
-          return console.log(e)
-        }
-        ledger.deviceStatus()
-        if (ledger.status === 'loading' || ledger.status === 'Invalid sequence' || ledger.status === 'Ledger Device is busy (lock getAddress)') return
-        signers[device.path] = ledger
-      }
+    TransportNodeHid.list().then(current => {
+      Object.keys(signers).forEach(path => { if (current.indexOf(path) === -1 && signers[path].type === 'Nano S') remove(path) })
+      current.forEach(add)
     })
   }
-  usbDetect.on('change', scan)
+  TransportNodeHid.listen({next: e => {
+    clearTimeout(bounce)
+    bounce = setTimeout(scan, 200)
+  }})
+  usbDetect.on('change', () => {
+    clearTimeout(bounce)
+    bounce = setTimeout(scan, 200)
+  })
   usbDetect.startMonitoring()
-  scan()
+  bounce = setTimeout(scan, 200)
 }

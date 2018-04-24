@@ -67,34 +67,38 @@ class Signer extends React.Component {
       </React.Fragment>
     )
   }
-  typeMouseEnter () {
-    this.setState({typeHover: true})
-  }
-  typeMouseLeave () {
-    this.setState({typeHover: false})
-  }
-  typeMouseMove (e) {
-    let bounds = e.currentTarget.getBoundingClientRect()
-    let {clientX, clientY} = e
-    let deg = 20
-    let tiltY = deg * ((((clientY - bounds.top) / (bounds.bottom - bounds.top)) * 2) - 1)
-    let tiltX = deg * ((((clientX - bounds.left) / (bounds.right - bounds.left)) * 2) - 1)
-    this.setState({tiltX, tiltY})
-  }
+  // typeMouseEnter () {
+  //   this.setState({typeHover: true})
+  // }
+  // typeMouseLeave () {
+  //   this.setState({typeHover: false})
+  // }
+  // typeMouseMove (e) {
+  //   let bounds = e.currentTarget.getBoundingClientRect()
+  //   let {clientX, clientY} = e
+  //   let deg = 20
+  //   let tiltY = deg * ((((clientY - bounds.top) / (bounds.bottom - bounds.top)) * 2) - 1)
+  //   let tiltX = deg * ((((clientX - bounds.left) / (bounds.right - bounds.left)) * 2) - 1)
+  //   this.setState({typeHover: true, tiltX, tiltY})
+  // }
   typeClick () {
+    this.setState({typeActive: true})
+    setTimeout(() => this.setState({typeActive: false}), 110)
     if (this.props.status === 'ok') this.select()
   }
+  // onMouseMove={::this.typeMouseMove} onMouseEnter={::this.typeMouseEnter} onMouseLeave={::this.typeMouseLeave}
   renderType () {
-    let typeClass = 'signerType'
+    let innerClass = 'signerInner'
+    // if (this.state.typeHover) innerClass += ' signerInnerHover'
+    if (this.state.typeActive) innerClass += ' signerInnerActive'
     let style = {
       left: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25,
       right: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25
     }
-    // onMouseMove={::this.typeMouseMove} onMouseEnter={::this.typeMouseEnter} onMouseLeave={::this.typeMouseLeave}>
     return (
-      <div className={typeClass} onClick={::this.typeClick}>
+      <div className='signerType' onMouseDown={::this.typeClick}>
         {this.renderArrows('up')}
-        <div className='signerInner' style={style}>
+        <div className={innerClass} style={style}>
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {

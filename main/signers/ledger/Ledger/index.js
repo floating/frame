@@ -2,10 +2,9 @@ const EthereumTx = require('ethereumjs-tx')
 const Signer = require('../../Signer')
 
 class Ledger extends Signer {
-  constructor (id, device, remove) {
+  constructor (id, device) {
     super()
     this.id = id
-    this.remove = remove
     this.device = device
     this.type = 'Nano S'
     this.status = 'loading'
@@ -20,9 +19,7 @@ class Ledger extends Signer {
       this.status = 'ok'
       this.update()
     }).catch(err => {
-      // console.log('Ledger Device Error: ', err)
       this.status = err.message
-      // if (this.status === 'loading' || this.status === 'Invalid sequence' || this.status === 'Ledger Device is busy (lock getAddress)') return this.remove(this.id)
       if (err.statusCode === 27904) this.status = 'Wrong Application, Select the Ethereum Application on Your Ledger'
       if (err.statusCode === 26368) this.status = 'Select the Ethereum Application on Your Ledger'
       if (err.statusCode === 26625) this.status = 'Device Is Asleep'
