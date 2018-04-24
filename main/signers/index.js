@@ -20,7 +20,10 @@ let current = null
 
 module.exports = {
   getSigners: (cb) => {
-    cb(null, Object.keys(signers).sort().map(path => signers[path].summary()))
+    let signerSummary = {}
+    Object.keys(signers).forEach(id => { signerSummary[id] = signers[id].summary() })
+    cb(null, signerSummary)
+    // cb(null, Object.keys(signers).sort().map(path => signers[path].summary()))
   },
   setSigner: (path, cb) => {
     current = path

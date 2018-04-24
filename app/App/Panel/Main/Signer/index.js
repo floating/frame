@@ -139,7 +139,6 @@ class Signer extends React.Component {
     )
   }
   render () {
-    if (this.props.status === 'loading') return null
     let current = this.store('signer.current') === this.props.id
     let open = current && this.store('signer.open')
     let minimized = this.store('signer.minimized')

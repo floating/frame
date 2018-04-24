@@ -17,12 +17,8 @@ class Main extends React.Component {
         <div id='panelScroll' style={current ? {overflow: 'hidden', pointerEvents: 'none'} : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? {overflow: 'visible'} : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? {marginTop: '-' + scrollTop + 'px'} : {}}>
-              {signers.map((signer, i) => <Signer key={i} {...signer} index={i} reportScroll={() => this.reportScroll()} />)}
-              {signers.length === 0 ? (
-                <div className='noSigners'>
-                  {'No Signers Connected'}
-                </div>
-              ) : null}
+              {Object.keys(signers).map((id, i) => <Signer key={id} {...signers[id]} index={i} reportScroll={() => this.reportScroll()} />)}
+              {Object.keys(signers).length === 0 ? <div className='noSigners'>{'No Signers Connected'}</div> : null}
             </div>
           </div>
         </div>
