@@ -1,36 +1,34 @@
+const HID = require('node-hid')
 const usbDetect = require('usb-detection')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const Eth = require('@ledgerhq/hw-app-eth').default
 
 const Ledger = require('./Ledger')
 
+const isLedger = d => (['win32', 'darwin'].includes(process.platform) ? d.usagePage === 0xffa0 : d.interface === 0) && ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
+
 module.exports = signers => {
-  let bounce
-  const remove = path => {
-    if (signers[path]) {
-      signers[path].close()
-      delete signers[path]
-    }
-  }
-  const add = path => {
-    TransportNodeHid.open(path).then(transport => {
-      signers[path] = new Ledger(path, new Eth(transport))
-    }).catch(e => remove(path))
-  }
   const scan = _ => {
-    TransportNodeHid.list().then(current => {
-      Object.keys(signers).forEach(path => { if (current.indexOf(path) === -1 && signers[path].type === 'Nano S') remove(path) })
-      current.forEach(add)
+    let current = HID.devices().filter(device => isLedger(device))
+    Object.keys(signers).forEach(path => {
+      if (current.map(device => device.path).indexOf(path) === -1 && signers[path].type === 'Nano S') {
+        signers[path].close()
+        delete signers[path]
+      }
+    })
+    current.forEach(device => {
+      if (Object.keys(signers).indexOf(device.path) === -1 && device.product === 'Nano S') {
+        let ledger
+        try {
+          ledger = new Ledger(device.path, new Eth(new TransportNodeHid(new HID.HID(device.path))))
+        } catch (e) {
+          return console.log(e)
+        }
+        signers[device.path] = ledger
+      }
     })
   }
-  TransportNodeHid.listen({next: e => {
-    clearTimeout(bounce)
-    bounce = setTimeout(scan, 200)
-  }})
-  usbDetect.on('change', () => {
-    clearTimeout(bounce)
-    bounce = setTimeout(scan, 200)
-  })
+  usbDetect.on('change', scan)
   usbDetect.startMonitoring()
-  bounce = setTimeout(scan, 200)
+  scan()
 }

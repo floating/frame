@@ -158,24 +158,25 @@ export const removeSigner = (u, signer) => {
 
   u('signers', signers => {
     let target = signers.map(sign => sign.id).indexOf(signer.id)
-    signers[target].removing = true
+    if (target !== -1) signers[target].removing = true
     return signers
   })
 
   setTimeout(_ => {
     u('signers', signers => {
       let target = signers.map(sign => sign.id).indexOf(signer.id)
-      if (signers[target].removing) signers[target].status = status
+      if (target !== -1 && signers[target].removing) signers[target].status = status
       return signers
     })
-    setTimeout(_ => {
-      u('signers', signers => {
-        let target = signers.map(sign => sign.id).indexOf(signer.id)
-        if (target !== -1 && signers[target].status === status) signers.splice(target, 1)
-        return signers
-      })
-    }, 3000)
-  }, 1000)
+  }, 2000)
+
+  setTimeout(_ => {
+    u('signers', signers => {
+      let target = signers.map(sign => sign.id).indexOf(signer.id)
+      if (target !== -1 && signers[target].status === status) signers.splice(target, 1)
+      return signers
+    })
+  }, 5000)
 }
 
 export const updateSigner = (u, signer) => u('signers', signers => {

@@ -82,15 +82,19 @@ class Signer extends React.Component {
   //   this.setState({typeHover: true, tiltX, tiltY})
   // }
   typeClick () {
-    this.setState({typeActive: true})
-    setTimeout(() => this.setState({typeActive: false}), 110)
-    if (this.props.status === 'ok') this.select()
+    if (this.props.status === 'ok') {
+      this.select()
+    } else {
+      this.setState({typeShake: true})
+      setTimeout(() => this.setState({typeShake: false}), 1010)
+    }
   }
   // onMouseMove={::this.typeMouseMove} onMouseEnter={::this.typeMouseEnter} onMouseLeave={::this.typeMouseLeave}
   renderType () {
     let innerClass = 'signerInner'
     // if (this.state.typeHover) innerClass += ' signerInnerHover'
     if (this.state.typeActive) innerClass += ' signerInnerActive'
+    if (this.state.typeShake) innerClass += ' headShake'
     let style = {
       left: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25,
       right: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25
