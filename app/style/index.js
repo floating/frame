@@ -20,9 +20,3 @@ const inject = () => {
 }
 
 inject()
-
-if (process.env.NODE_ENV !== 'production') { // Update to file watcher
-  setInterval(() => {
-    inject()
-  }, 500)
-}

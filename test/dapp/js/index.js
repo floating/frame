@@ -31,23 +31,17 @@ class App extends React.Component {
     this.setupProvider()
   }
   setupProvider () {
-    this.provider = getProvider()
-    this.web3 = new Web3(this.provider)
-    this.provider.on('connect', () => {
+    this.web3 = new Web3(getProvider())
+    this.provider = this.web3.currentProvider
+    this.provider.on('open', () => {
       store.ws(true)
       console.log('Connect in Dapp')
+      this.web3.eth.getAccounts((err, accounts) => {
+        if (err) return console.log('getAccounts Error ', err)
+        this.setState({accounts})
+      })
     })
-    this.provider.on('accounts', accounts => {
-      this.setState({accounts})
-      console.log('Accounts in Dapp')
-    })
-    this.provider.on('disconnect', () => {
-      store.ws(false)
-      console.log('Disconnect in Dapp')
-    })
-    this.provider.on('error', err => {
-      console.log('Provider Error: ', err)
-    })
+    this.provider.on('close', () => store.ws(false))
   }
   testTransaction = () => {
     let tx = {
@@ -58,26 +52,27 @@ class App extends React.Component {
       to: '0x030e6af4985f111c265ee3a279e5a9f6aa124fd5',
       from: this.state.accounts[0]
     }
-    this.web3.eth.sendTransaction(tx).then(res => {
-      this.store.insertTransaction({hash: res.transactionHash})
+    this.web3.eth.sendTransaction(tx).on('transactionHash', hash => {
+      this.store.insertTransaction({hash})
       setTimeout(() => {
-        this.store.updateTransaction(res.transactionHash, {status: 'verified'})
+        this.store.updateTransaction(hash, {status: 'verified'})
       }, 10000)
-      this.setState({txMessage: `Successful Transaction: ${res.transactionHash}`})
-      this.startPoll(res.transactionHash)
-    }).catch((err, err2) => {
-      this.setState({txMessage: 'Error: ' + err.message})
-    }).finally(_ => {
-      setTimeout(() => {
-        this.setState({txMessage: ''})
-      }, 3700)
+      this.setState({txMessage: `Successful Transaction: ${hash}`})
+      setTimeout(() => { this.setState({txMessage: ''}) }, 3700)
+    }).on('error', err => {
+      this.setState({txMessage: err.message})
+      setTimeout(() => { this.setState({txMessage: ''}) }, 3700)
     })
+    // .on('receipt', receipt => {
+    //   console.log('receipt', receipt)
+    // }).on('confirmation', (confirmationNumber, receipt) => {
+    //   console.log('confirmation', confirmationNumber, receipt)
+    // })
   }
   getBalance = () => {
     this.web3.eth.getBalance(this.state.accounts[0]).then(res => {
       this.setState({txMessage: `Balance: ${Web3.utils.fromWei(res)}`})
     }).catch(err => {
-      console.log('getBalance err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
     }).finally(_ => {
       setTimeout(() => {
@@ -89,7 +84,6 @@ class App extends React.Component {
     this.web3.eth.getGasPrice().then(res => {
       this.setState({txMessage: `Gas price: ${Web3.utils.fromWei(res)}`})
     }).catch(err => {
-      console.log('getGasPrice err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
     }).finally(_ => {
       setTimeout(() => {
@@ -113,7 +107,7 @@ class App extends React.Component {
           Promise.all(Object.keys(pendingMap).map(tHash => this.web3.eth.getTransaction(tHash))).then(res => {
             res.forEach(newTx => { this.store.updateTransaction(newTx.hash, {data: newTx}) })
           }).catch(err => {
-            console.log('polling getTransaction err:', err)
+            console.log('polling getTransaction err ', err)
             this.setState({txMessage: 'Error: ' + err.message})
           })
         } else if (this[txHash]) {
@@ -129,7 +123,7 @@ class App extends React.Component {
       this.setState({currentTransaction: ''})
     } else if (!this.state.showTransactions) { // about to view transactions
       this.setState({showTransactions: true, currentTransaction: ''})
-    } else { // going back to main view
+    } else {
       this.setState({showTransactions: false, currentTransaction: ''})
     }
   }
@@ -179,7 +173,7 @@ class App extends React.Component {
             <div className='errorMessage'>
               {'Trying to connect to provider...'}
               <div className='providerErrorSub'>
-                <span>{'beep boop beep boop'}</span>
+                <span>{''}</span>
               </div>
             </div>
           )}
