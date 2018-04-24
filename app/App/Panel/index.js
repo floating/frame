@@ -8,12 +8,13 @@ import Main from './Main'
 import Local from './Local'
 
 // <div className='panelMenuItem'>{svg.logo(19)}</div>
+// <Restore.DevTools />
 
 class Panel extends React.Component {
   render () {
     return (
       <div id='panel'>
-        <Restore.DevTools />
+
         <div className='panelMenu'>
           <div className='panelMenuItem' onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['three-bars'].toSVG({height: 20})}} />
         </div>
