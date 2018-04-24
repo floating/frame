@@ -2,19 +2,19 @@ const EthereumTx = require('ethereumjs-tx')
 const Signer = require('../../Signer')
 
 class Ledger extends Signer {
-  constructor (id, device, debug) {
+  constructor (id, device) {
     super()
-    this.debug = debug
     this.id = id
     this.device = device
     this.type = 'Nano S'
     this.status = 'loading'
+    this.path = `m/44'/60'/0'/0`
     this.handlers = {}
     this.deviceStatus()
     this.open()
   }
   deviceStatus () {
-    this.device.getAddress(`44'/60'/0'/0'/0`).then(result => {
+    this.device.getAddress(this.path).then(result => {
       this.accounts = [result.address]
       this.status = 'ok'
       this.update()
@@ -33,13 +33,23 @@ class Ledger extends Signer {
     return hex
   }
   // Standard Methods
+  signPersonal (payload, cb) {
+    this.device.signPersonalMessage(this.path, Buffer.from(payload).toString('hex')).then(result => {
+      let v = result['v'] - 27
+      v = v.toString(16)
+      if (v.length < 2) v = '0' + v
+      cb(null, result['r'] + result['s'] + v)
+    }).catch(err => {
+      cb(err)
+    })
+  }
   signTransaction (rawTx, cb) {
     const tx = new EthereumTx(rawTx)
     tx.raw[6] = Buffer.from([rawTx.chainId]) // v
     tx.raw[7] = Buffer.from([]) // r
     tx.raw[8] = Buffer.from([]) // s
     const rawTxHex = tx.serialize().toString('hex')
-    this.device.signTransaction(`44'/60'/0'/0'/0`, rawTxHex).then(result => {
+    this.device.signTransaction(this.path, rawTxHex).then(result => {
       let tx = new EthereumTx({
         nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
         gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),

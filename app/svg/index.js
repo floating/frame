@@ -1,4 +1,5 @@
 import React from 'react'
+import octicons from 'octicons'
 
 module.exports = {
   logo: size => {
@@ -16,5 +17,9 @@ module.exports = {
       </svg>
     `
     return <div style={{width: size + 'px', height: size + 'px'}} dangerouslySetInnerHTML={{__html: svg}} />
+  },
+  octicon: (name, settings) => {
+    return <span dangerouslySetInnerHTML={{__html: octicons[name].toSVG(settings)}} />
   }
+
 }

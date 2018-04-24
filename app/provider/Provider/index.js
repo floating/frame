@@ -80,15 +80,10 @@ class Provider {
       err = err || nonce.error
       if (err) return cb(new Error(`Frame Provider Error: while getting nonce: ${err}`))
       nonce = nonce.result
-      this.getGasPrice((err, gasPrice) => {
-        err = err || gasPrice.error
-        if (err) return cb(new Error(`Frame Provider: while getting gasPrice: ${err}`))
-        gasPrice = gasPrice.result
-        rawTx = Object.assign({nonce, gasPrice}, payload.params[0], {chainId: Web3.utils.toHex(4)})
-        let handlerId = uuid()
-        this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, id: payload.id, jsonrpc: payload.jsonrpc})
-        this.handlers[handlerId] = cb
-      })
+      rawTx = Object.assign({nonce}, payload.params[0], {chainId: Web3.utils.toHex(4)})
+      let handlerId = uuid()
+      this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, id: payload.id, jsonrpc: payload.jsonrpc})
+      this.handlers[handlerId] = cb
     })
   }
   sendAsync (payload, cb) {

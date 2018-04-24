@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-const requestProvider = require('./requestProvider')
+const getProvider = require('./getProvider')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
@@ -8,7 +8,7 @@ const Restore = require('react-restore')
 const svg = require('../../../app/svg')
 const Transactions = require('./Transactions')
 
-let state = {ws: true, transactions: {}}
+let state = {ws: false, transactions: {}}
 let actions = {
   ws: (u, connected) => u('ws', ws => connected),
   insertTransaction: (u, tx) => u('transactions', transactions => {
@@ -31,21 +31,17 @@ class App extends React.Component {
     this.setupProvider()
   }
   setupProvider () {
-    requestProvider(store, (err, provider) => {
-      this.provider = provider
-      if (err || !provider) {
-        this.setState({providerError: 'No Frame Provider Found'})
-        setTimeout(this.setupProvider, 500)
-        return
-      }
-      this.web3 = new Web3(provider)
-      setInterval(() => { // Replace with provider broadcast
-        this.web3.eth.getAccounts((err, accounts) => {
-          if (err || accounts.length === 0) return this.setState({accounts: [], providerError: JSON.parse(err.message) || 'Frame Provier has No Accounts'})
-          if (accounts[0] !== this.state.accounts[0]) this.setState({accounts})
-        })
-      }, 500)
+    this.web3 = new Web3(getProvider())
+    this.provider = this.web3.currentProvider
+    this.provider.on('open', () => {
+      store.ws(true)
+      console.log('Connect in Dapp')
+      this.web3.eth.getAccounts((err, accounts) => {
+        if (err) return console.log('getAccounts Error ', err)
+        this.setState({accounts})
+      })
     })
+    this.provider.on('close', () => store.ws(false))
   }
   testTransaction = () => {
     let tx = {
@@ -56,27 +52,27 @@ class App extends React.Component {
       to: '0x030e6af4985f111c265ee3a279e5a9f6aa124fd5',
       from: this.state.accounts[0]
     }
-    this.web3.eth.sendTransaction(tx).then(res => {
-      this.store.insertTransaction({hash: res.transactionHash})
+    this.web3.eth.sendTransaction(tx).on('transactionHash', hash => {
+      this.store.insertTransaction({hash})
       setTimeout(() => {
-        this.store.updateTransaction(res.transactionHash, {status: 'verified'})
+        this.store.updateTransaction(hash, {status: 'verified'})
       }, 10000)
-      this.setState({txMessage: `Successful Transaction: ${res.transactionHash}`})
-      this.startPoll(res.transactionHash)
-    }).catch(err => {
-      console.log('sendTranction err:', err)
-      this.setState({txMessage: 'Error: ' + err.message})
-    }).finally(_ => {
-      setTimeout(() => {
-        this.setState({txMessage: ''})
-      }, 3700)
+      this.setState({txMessage: `Successful Transaction: ${hash}`})
+      setTimeout(() => { this.setState({txMessage: ''}) }, 3700)
+    }).on('error', err => {
+      this.setState({txMessage: err.message})
+      setTimeout(() => { this.setState({txMessage: ''}) }, 3700)
     })
+    // .on('receipt', receipt => {
+    //   console.log('receipt', receipt)
+    // }).on('confirmation', (confirmationNumber, receipt) => {
+    //   console.log('confirmation', confirmationNumber, receipt)
+    // })
   }
   getBalance = () => {
     this.web3.eth.getBalance(this.state.accounts[0]).then(res => {
       this.setState({txMessage: `Balance: ${Web3.utils.fromWei(res)}`})
     }).catch(err => {
-      console.log('getBalance err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
     }).finally(_ => {
       setTimeout(() => {
@@ -88,7 +84,6 @@ class App extends React.Component {
     this.web3.eth.getGasPrice().then(res => {
       this.setState({txMessage: `Gas price: ${Web3.utils.fromWei(res)}`})
     }).catch(err => {
-      console.log('getGasPrice err:', err)
       this.setState({txMessage: 'Error: ' + err.message})
     }).finally(_ => {
       setTimeout(() => {
@@ -112,7 +107,7 @@ class App extends React.Component {
           Promise.all(Object.keys(pendingMap).map(tHash => this.web3.eth.getTransaction(tHash))).then(res => {
             res.forEach(newTx => { this.store.updateTransaction(newTx.hash, {data: newTx}) })
           }).catch(err => {
-            console.log('polling getTransaction err:', err)
+            console.log('polling getTransaction err ', err)
             this.setState({txMessage: 'Error: ' + err.message})
           })
         } else if (this[txHash]) {
@@ -128,7 +123,7 @@ class App extends React.Component {
       this.setState({currentTransaction: ''})
     } else if (!this.state.showTransactions) { // about to view transactions
       this.setState({showTransactions: true, currentTransaction: ''})
-    } else { // going back to main view
+    } else {
       this.setState({showTransactions: false, currentTransaction: ''})
     }
   }
@@ -156,15 +151,9 @@ class App extends React.Component {
                   <div className='account'>{'Current Account:'}</div>
                   <div className='address'>{this.state.accounts}</div>
                   <div className='button-wrap'>
-                    <div className='button' onClick={this.testTransaction}>
-                      {'Send Test Transaction'}
-                    </div>
-                    <div className='button' onClick={this.getBalance}>
-                      {'View Balance'}
-                    </div>
-                    <div className='button' onClick={this.getGasPrice}>
-                      {'View Gas Price'}
-                    </div>
+                    <div className='button' onClick={this.testTransaction}>{'Send Test Transaction'}</div>
+                    <div className='button' onClick={this.getBalance}>{'View Balance'}</div>
+                    <div className='button' onClick={this.getGasPrice}>{'View Gas Price'}</div>
                     <div className='button' onClick={this.toggleTransactions(false)}>
                       {`View Transactions (${Object.keys(this.store('transactions')).length})`}
                     </div>
@@ -173,20 +162,18 @@ class App extends React.Component {
               )
             ) : (
               <div className='errorMessage'>
-                {this.state.providerError || 'Loading'}
-                {this.state.providerError === 'No Account Selected' ? (
-                  <div className='providerErrorSub'>
-                    <span>{svg.logo(20)}</span>
-                    <span>{'in menubar to view accounts'}</span>
-                  </div>
-                ) : null}
+                {this.state.providerError || 'No Account Selected'}
+                <div className='providerErrorSub'>
+                  <span>{svg.logo(20)}</span>
+                  <span>{'in menu bar to view accounts'}</span>
+                </div>
               </div>
             )
           ) : (
             <div className='errorMessage'>
-              {'You were disconnected from the Frame provider'}
+              {'Trying to connect to provider...'}
               <div className='providerErrorSub'>
-                <span>{'This demo does not currently include reconnection functionality'}</span>
+                <span>{''}</span>
               </div>
             </div>
           )}

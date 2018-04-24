@@ -28,7 +28,13 @@ rpc('launchStatus', (err, status) => {
 ipcRenderer.on('main:addSigner', (e, signer) => store.addSigner(signer))
 ipcRenderer.on('main:removeSigner', (e, signer) => store.removeSigner(signer))
 ipcRenderer.on('main:updateSigner', (e, signer) => store.updateSigner(signer))
-ipcRenderer.on('main:setSigner', (e, signer) => store.setSigner(signer))
+ipcRenderer.on('main:setSigner', (e, signer) => {
+  if (signer.id) {
+    store.setSigner(signer)
+  } else {
+    store.unsetSigner()
+  }
+})
 
 // Replace events with observers
 store.events.on('approveRequest', (id, req) => {
@@ -48,7 +54,8 @@ store.observer(() => {
   }
 })
 
-store.observer(_ => persist.set('permissions', store('permissions')))
+// store.observer(_ => persist.set('permissions', store('permissions')))
+store.observer(_ => persist.set('accounts', store('local.accounts')))
 
 let launch = store('local.launch')
 store.observer(() => {
@@ -60,14 +67,6 @@ store.observer(() => {
       rpc('launchDisable', err => console.log(err))
     }
   }
-})
-
-store.observer(() => {
-  let ws = require('../ws')
-  let permissions = store('permissions')
-  Object.keys(permissions).forEach(id => {
-    if (permissions[id].provider === false) if (ws.close) ws.close(permissions[id].origin)
-  })
 })
 
 module.exports = store

@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import rpc from '../../../../rpc'
+import rpc from '../../../../../rpc'
 
 class Requests extends React.Component {
   constructor (...args) {
@@ -77,9 +77,7 @@ class Requests extends React.Component {
             <div className='approveTransactionTitle'>{'Request Provider Access'}</div>
             {req.notice ? <div className='requestNotice'>{req.notice}</div> : null}
           </div>
-        ) : (
-          <div className='unknownType'>{'Unknown: ' + req.type}</div>
-        )}
+        ) : <div className='unknownType'>{'Unknown: ' + req.type}</div>}
         <div className='requestApprove'>
           <div className='requestDecline' onClick={() => this.store.giveAccess(req, false)}>{'Decline'}</div>
           <div className='requestSign' onClick={() => this.store.giveAccess(req, true)}>{'Approve'}</div>
@@ -88,27 +86,19 @@ class Requests extends React.Component {
     )
   }
   render () {
-    let current = this.store('signer.current') === this.props.id
-    let selected = current && !this.props.minimized
     let requests = this.store('signer.requests')
     requests = Object.keys(requests).map(key => requests[key]).filter(req => {
       if (req.type === 'approveTransaction') return this.props.accounts.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
       return true
     })
-    return (selected ? (
-      <div className='signerRequests'>
-        {requests.length > 0 ? (
-          requests.map((req, i) => {
-            if (req.type === 'approveTransaction') return this.transactionRequest(req, i)
-            if (req.type === 'requestProvider') return this.providerRequest(req, i)
-          })
-        ) : (
-          <div className='noRequests'>
-            {'No Pending Requests'}
-          </div>
-        )}
+    return (
+      <div className={this.store('signer.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
+        {requests.length === 0 ? <div className='noRequests'>{'No Pending Requests'}</div> : requests.map((req, i) => {
+          if (req.type === 'approveTransaction') return this.transactionRequest(req, i)
+          if (req.type === 'requestProvider') return this.providerRequest(req, i)
+        })}
       </div>
-    ) : null)
+    )
   }
 }
 

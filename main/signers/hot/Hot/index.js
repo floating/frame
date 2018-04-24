@@ -6,13 +6,14 @@ class Hot extends Signer {
     super()
     this.id = id
     this.type = 'Hot'
-    this.accounts = ['0x0559fb375de2281b3c32020d26cc976c53527484']
+    this.accounts = [id === 1 ? '0x0559fb375de2281b3c32020d26cc976c53527484' : '0x030e6af4985f111c265ee3a279e5a9f6aa124fd5']
+    this.privateKey = id === 1 ? '2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00' : 'aef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae'
     this.status = 'ok'
     this.open()
   }
   signTransaction (rawTx, cb) {
     const tx = new EthereumTx(rawTx)
-    tx.sign(Buffer.from('2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00', 'hex'))
+    tx.sign(Buffer.from(this.privateKey, 'hex'))
     setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 1200) // Response delay for development
   }
 }

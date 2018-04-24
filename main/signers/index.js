@@ -28,6 +28,12 @@ module.exports = {
     cb(null, summary)
     windows.broadcast('main:setSigner', summary)
   },
+  unsetSigner: (cb) => {
+    current = null
+    let summary = {id: '', type: '', accounts: [], status: ''}
+    cb(null, summary)
+    windows.broadcast('main:setSigner', summary)
+  },
   getAccounts: (handler) => {
     if (!signers[current]) return handler('No Account Selected')
     signers[current].getAccounts(handler)

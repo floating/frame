@@ -5,9 +5,11 @@ const Eth = require('@ledgerhq/hw-app-eth').default
 
 const Ledger = require('./Ledger')
 
+const isLedger = d => (['win32', 'darwin'].includes(process.platform) ? d.usagePage === 0xffa0 : d.interface === 0) && ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
+
 module.exports = signers => {
   const scan = _ => {
-    let current = HID.devices().filter(device => device.vendorId === 11415 && device.productId === 1)
+    let current = HID.devices().filter(device => isLedger(device))
     Object.keys(signers).forEach(path => {
       if (current.map(device => device.path).indexOf(path) === -1 && signers[path].type === 'Nano S') {
         signers[path].close()
