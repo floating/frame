@@ -4,10 +4,16 @@ const Web3 = require('web3')
 const EventEmitter = require('events')
 const uuid = require('uuid/v4')
 
-const connect = (provider, url, reconnect = true) => {
+const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet = false) => {
+  window.frame = window.frame || {initialConnect: true, provider}
+  if (window.frame.initialConnect) {
+    window.frame.initialConnect = false
+    quiet = true
+    reconnect = false
+  }
   provider.handlers = {}
   if (!provider.socket || provider.socket.readyState > 1) {
-    provider.socket = new WebSocket(url || 'ws://localhost:1248?mode=normal')
+    provider.socket = new WebSocket(url + quiet ? '?mode=quiet' : '')
     provider.socket.addEventListener('open', () => {
       console.log('Frame Provider Connected!')
       reconnect = true
@@ -30,9 +36,9 @@ const connect = (provider, url, reconnect = true) => {
   }
 }
 
-const getProvider = (url, reconnect) => {
+const getProvider = (url) => {
   const provider = new EventEmitter()
-  connect(provider, url, reconnect)
+  connect(provider, url)
   provider.sendAsync = (payload, cb) => {
     if (!provider.socket || provider.socket.readyState > 1) return cb(new Error('Provider Disconnected'))
     payload.handlerId = uuid()
@@ -43,16 +49,7 @@ const getProvider = (url, reconnect) => {
 }
 
 try {
-  let url = 'ws://localhost:1248?mode=normal'
-  let reconnect = true
-  window.frame = window.frame || {initialConnect: true}
-  if (window.frame.initialConnect) {
-    window.frame.initialConnect = false
-    url = 'ws://localhost:1248?mode=quiet'
-    reconnect = false
-  }
-  window.frame.provider = getProvider(url, reconnect)
-  window.web3 = new Web3(window.frame.provider)
+  window.web3 = new Web3(getProvider())
 } catch (e) {
   console.error('Frame Error:', e)
 }

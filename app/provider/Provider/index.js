@@ -58,7 +58,7 @@ class Provider {
     this.provider.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, cb)
   }
   getNetVersion (payload, cb) {
-    cb(null, {id: payload.id, jsonrpc: payload.jsonrpc, result: this.netVersion})
+    cb(null, {id: payload.id, jsonrpc: payload.jsonrpc, result: this.netVersion.toString()})
   }
   approveRequest (req, cb) {
     let rawTx = req.data
