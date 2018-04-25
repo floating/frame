@@ -1,3 +1,5 @@
+import qs from 'querystring'
+import { URL } from 'url'
 import WebSocket from 'ws'
 
 import provider from '../provider'
@@ -10,9 +12,12 @@ module.exports = () => {
       let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
       let perms = Object.keys(permissions).map(id => permissions[id])
       let permIndex = perms.map(p => p.origin).indexOf(origin)
-      if (permIndex === -1 && store('signer.current')) return store.addRequest({type: 'requestProvider', origin, notice: `${origin} is requesting access to the provider.`})
+      let url = new URL('ws://' + info.req.headers.host + info.req.url)
+      let search = qs.parse(url.search.replace(/^\?+/g, ''))
+      let quiet = !search.mode ? false : search.mode === 'quiet'
+      if (permIndex === -1 && store('signer.current') && !quiet) return store.addRequest({type: 'requestProvider', origin, notice: `${origin} is requesting access to the provider.`})
       setTimeout(_ => obs.remove(), 0) // Add fix for this pattern in restore
-      next(store('signer.current') && perms[permIndex].provider, 401, 'Permission Denied')
+      next(store('signer.current') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
     })
   }
 
@@ -26,7 +31,7 @@ module.exports = () => {
       delete payload.handlerId
       provider.sendAsync(payload, (err, res) => socket.send(JSON.stringify({type: 'response', handlerId, err, res})))
     })
-    socket.on('error', error => console.log('Socket Error', error))
+    socket.on('error', err => err)
   })
 
   store.observer(() => {

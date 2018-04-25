@@ -10,12 +10,23 @@
   flex-direction column
   transition standard
 
+  .localSettingsTitle:before
+    content ''
+    position absolute
+    bottom -2px
+    right 10px
+    left 10px
+    height 4px
+    border-radius 2px
+    background thin
+
   .localSettingsTitle
+    position relative
     display flex
-    align-items center
-    height 40px
-    padding 0px 10px 0px 10px
-    border-bottom 1px solid lightShade
+    align-items flex-end
+    height 60px
+    font-size 20px
+    padding 0px 10px 10px 10px
 
 .localSettingsHidden
   right -100%
