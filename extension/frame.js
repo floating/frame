@@ -13,7 +13,7 @@ const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet 
   }
   provider.handlers = {}
   if (!provider.socket || provider.socket.readyState > 1) {
-    provider.socket = new WebSocket(url + quiet ? '?mode=quiet' : '')
+    provider.socket = new WebSocket(quiet ? 'ws://localhost:1248/?mode=quiet' : 'ws://localhost:1248')
     provider.socket.addEventListener('open', () => {
       console.log('Frame Provider Connected!')
       reconnect = true
