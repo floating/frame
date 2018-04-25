@@ -29,6 +29,7 @@ module.exports = () => {
       let payload = JSON.parse(data)
       let handlerId = payload.handlerId
       delete payload.handlerId
+      console.log(socket.origin, payload.method)
       provider.sendAsync(payload, (err, res) => socket.send(JSON.stringify({type: 'response', handlerId, err, res})))
     })
     socket.on('error', err => err)
