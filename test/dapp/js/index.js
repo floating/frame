@@ -40,6 +40,10 @@ class App extends React.Component {
         if (err) return console.log('getAccounts Error ', err)
         this.setState({accounts})
       })
+      this.web3.eth.net.getId((err, netId) => {
+        if (err) return console.log('getNetwork Error ', err)
+        this.setState({netId})
+      })
     })
     this.provider.on('close', () => store.ws(false))
   }
