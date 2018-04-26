@@ -84,6 +84,8 @@ class Signer extends React.Component {
   typeClick () {
     if (this.props.status === 'ok') {
       this.select()
+      this.setState({typeActive: true})
+      setTimeout(() => this.setState({typeActive: false}), 110)
     } else {
       this.setState({typeShake: true})
       setTimeout(() => this.setState({typeShake: false}), 1010)
@@ -139,7 +141,6 @@ class Signer extends React.Component {
     )
   }
   render () {
-    if (this.props.status === 'loading') return null
     let current = this.store('signer.current') === this.props.id
     let open = current && this.store('signer.open')
     let minimized = this.store('signer.minimized')
@@ -153,6 +154,7 @@ class Signer extends React.Component {
     let initial = this.store('signer.position.initial')
 
     if (current) {
+      // Currently selected
       style.position = 'absolute'
       style.top = open ? 40 : initial.top
       style.bottom = open ? 5 : initial.bottom
@@ -160,10 +162,12 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000'
     } else if (this.store('signer.current') !== '') {
+      // Not currently selected, but another signer is
       style.opacity = 0
       style.pointerEvents = 'none'
       style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
       if (this.store('signer.open')) {
+        // Not open, but another signer is
         style.transform = this.props.index > this.store('signer.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
         style.opacity = 0
         style.pointerEvents = 'none'

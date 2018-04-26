@@ -114,19 +114,13 @@ export const declineRequest = (u, id) => {
   }, 1800)
 }
 
-export const updateSigners = (u, signers) => u('signers', _ => signers)
+export const updateSigners = (u, signers) => {
+  u('signers', _ => signers)
+}
 
 export const addSigner = (u, signer) => {
   u('local.accounts', signer.accounts[0], account => Object.assign({permissions: {}}, account))
-  u('signers', signers => {
-    signers.push(signer)
-    signers.sort((a, b) => {
-      if (a.id > b.id) return 1
-      if (a.id < b.id) return -1
-      return 0
-    })
-    return signers
-  })
+  u('signers', signer.id, _ => signer)
 }
 
 export const setSigner = (u, signer) => {
@@ -154,34 +148,23 @@ export const unsetSigner = u => {
 }
 
 export const removeSigner = (u, signer) => {
-  let status = 'Removing'
-
   u('signers', signers => {
-    let target = signers.map(sign => sign.id).indexOf(signer.id)
-    if (target !== -1) signers[target].removing = true
+    if (signers[signer.id]) {
+      signers[signer.id].removing = true
+      signers[signer.id].status = 'Removing'
+    }
     return signers
   })
-
   setTimeout(_ => {
     u('signers', signers => {
-      let target = signers.map(sign => sign.id).indexOf(signer.id)
-      if (target !== -1 && signers[target].removing) signers[target].status = status
+      if (signers[signer.id] && signers[signer.id].removing) delete signers[signer.id]
       return signers
     })
-  }, 2000)
-
-  setTimeout(_ => {
-    u('signers', signers => {
-      let target = signers.map(sign => sign.id).indexOf(signer.id)
-      if (target !== -1 && signers[target].status === status) signers.splice(target, 1)
-      return signers
-    })
-  }, 5000)
+  }, 4000)
 }
 
 export const updateSigner = (u, signer) => u('signers', signers => {
-  let target = signers.map(sign => sign.id).indexOf(signer.id)
-  signers[target] = signer
+  signers[signer.id] = signer
   return signers
 })
 

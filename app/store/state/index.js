@@ -10,7 +10,7 @@ let initial = {
     view: 'default'
   },
   view: {current: '', list: [], data: {}},
-  signers: [],
+  signers: {},
   signer: {
     minimized: true,
     open: false,
