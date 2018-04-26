@@ -81,8 +81,7 @@ class Provider {
   sendTransaction (payload, cb) {
     let rawTx = payload.params[0]
     this.getNonce(rawTx.from, (err, nonce) => {
-      err = err || nonce.error
-      if (err) return cb(new Error(`Frame Provider Error: while getting nonce: ${err}`))
+      if (err || nonce.error) return cb(new Error(`Frame Provider Error while getting nonce: ${err || nonce.error}`))
       nonce = nonce.result
       rawTx = Object.assign({nonce}, payload.params[0], {chainId: Web3.utils.toHex(this.netVersion)})
       let handlerId = uuid()
@@ -99,10 +98,10 @@ class Provider {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, cb)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, cb)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, cb)
+    if (payload.method === 'net_version') return this.getNetVersion(payload, cb)
     if (payload.method === 'eth_sign') return warn('Need to handle eth_sign', cb)
     if (payload.method === 'personal_sign') return warn('Need to handle personal_sign', cb)
     if (payload.method === 'personal_ecRecover') return warn('Need to handle personal_ecRecover', cb)
-    if (payload.method === 'net_version') return this.getNetVersion(payload, cb)
     this.provider.send(payload, cb)
   }
 }
