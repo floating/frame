@@ -25,15 +25,16 @@
     overflow scroll
 
   .signerRequest
-    border-radius 3px
+    border-radius 6px
     display flex
     justify-content space-between
     align-items center
     position relative
     width 100%
-    background rgba(255, 255, 255, 0.5)
+    background #eff1f5
     overflow hidden
     margin-bottom 20px
+    box-shadow 0px 10px 14px -8px rgba(0,20,60,0.2), 0px 0px 4px 0px rgba(0,20,60,0.1)
 
   .signerRequestSuccess
     background good
@@ -57,6 +58,7 @@
     display flex
     justify-content center
     align-items center
+    padding 40px
 
   .approveTransaction
     display flex
@@ -66,7 +68,6 @@
 
     .approveTransactionTitle
       padding 10px
-      background #fdfdfe
       font-weight 400
       font-size 14px
 
@@ -74,6 +75,12 @@
       padding 6px
       font-size 11px
       font-weight 300
+      height 180px
+      width 100%
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
 
       div
         white-space nowrap
@@ -98,7 +105,6 @@
     font-size 12px
     text-transform uppercase
     letter-spacing 2px
-    background #fdfdfe
     -webkit-app-region no-drag
 
     .requestDecline
