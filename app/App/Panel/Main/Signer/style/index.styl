@@ -87,17 +87,14 @@
   .signerTop
     position relative
     opacity 1
-    z-index 3004
-    // height 171px
-    margin-bottom 40px
+    z-index 3006
+    margin-bottom 38px
 
     .signerNav
       position relative
       opacity 1
       display flex
       z-index 3004
-
-      @import './menu'
 
       .signerType
         position relative
@@ -106,9 +103,9 @@
         display flex
         justify-content center
         align-items center
-        width 160px
+        width 110px
         height 105px
-        margin-left -80px
+        margin-left -55px
         background linear-gradient(thin, bg)
         border-bottom-left-radius 6px
         border-bottom-right-radius 6px
@@ -184,8 +181,8 @@
       .signerInner
         position absolute
         top -3px
-        left 25px
-        right 25px
+        left 0px
+        right 0px
         bottom 3px
         background black
         border-radius 6px
@@ -214,8 +211,8 @@
         bottom -3px
         box-shadow 0px 6px 4px -2px rgba(0, 10, 35, 0.4)
 
-      // .signerInnerHover
-      //   box-shadow 0px 14px 14px -8px rgba(0, 0, 20, 0.4)
+      //  .signerInnerHover
+      //    box-shadow 0px 14px 14px -8px rgba(0, 0, 20, 0.4)
 
       .signerMin
         position absolute
@@ -227,6 +224,8 @@
         justify-content center
         align-items center
 
+      @import './menu'
+
     .signerName
       overflow hidden
       display flex
@@ -236,12 +235,10 @@
       .signerNameText
         position relative
         font-weight 200
-        margin-top 12px
         padding-left 5px
         position relative
         transition standard
         font-size 30px
-        height 45px
         display flex
         justify-content center
         align-items center
@@ -287,11 +284,11 @@
 
   .signerMid
     position absolute
-    top 197px
+    top 229px
     right 0px
     bottom 40px
     left 0px
-    z-index 3004
+    z-index 3005
     overflow-x hidden
     overflow-y hidden
     opacity 1
@@ -327,7 +324,6 @@
     width 100%
 
   .signerStatus
-    padding 40px 60px 40px 60px
     display flex
     justify-content center
     align-items center
@@ -335,6 +331,8 @@
     font-weight 300
     text-transform capitalize
     text-align center
+    flex-direction column
+    height 125px
 
   .signerSelect
     position absolute
@@ -348,7 +346,7 @@
     top 0
     bottom 0
     width 25px
-    z-index 100000
+    z-index 3000
     color spacewhite
     flex-direction column
     opacity 0
@@ -429,8 +427,6 @@
     display flex
     justify-content center
     padding 40px 0px 40px 0px
-    border-bottom-left-radius 3px
-    border-bottom-right-radius 3px
 
     .trezorPinInput
       display flex
@@ -461,28 +457,36 @@
           transition none
 
 .okSigner
-  .signerNav
-    .signerType
-      height 100px
-    .signerSelect
-      opacity 1
+  .signerTop
+    .signerNav
+      .signerType
+        width 160px
+        margin-left -80px
+        height 105px
+        .signerSelect
+          opacity 1
+        .signerInner
+          left 25px
+          right 25px
+          transition standard
 
 .openSigner
   padding 0px 5px 5px 5px
   .signerMid
     div
       opacity 1
-  .signerNav
-    .signerType
-      height 100px
-      .signerSelect
-        opacity 0
-      .signerInner
-        left 0px
-        right 0px
-        transition standard
-        .low
-          margin-left -20px
+  .signerTop
+    .signerNav
+      .signerType
+        height 105px
+        .signerSelect
+          opacity 0
+        .signerInner
+          left 0px
+          right 0px
+          transition standard
+          .low
+            margin-left -20px
 
   .signerSelectDown.signerSelectRight
     right 0

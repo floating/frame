@@ -97,14 +97,10 @@ class Signer extends React.Component {
     // if (this.state.typeHover) innerClass += ' signerInnerHover'
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
-    let style = {
-      left: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25,
-      right: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25
-    }
     return (
       <div className='signerType' onMouseDown={::this.typeClick}>
         {this.renderArrows('up')}
-        <div className={innerClass} style={style}>
+        <div className={innerClass}>
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
@@ -184,7 +180,7 @@ class Signer extends React.Component {
             <div className='signerTop'>
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
               {this.props.status !== 'ok' ? <div className='signerStatus'>{this.props.status}</div> : (
-                <div>
+                <div className='signerStatus'>
                   <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
                     <div className='signerNameText'>
                       {'Account Name ' + this.props.index}

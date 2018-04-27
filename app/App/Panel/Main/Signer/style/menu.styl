@@ -7,17 +7,16 @@
   align-items center
   justify-content center
   height 100px
+  z-index 3004
   pointer-events none
 
   .signerMenuItemRight
-    right 0
-    .signerMenuItemIcon
-      margin-left -120px
+    right 70px
+    transition standardSlow
 
   .signerMenuItemLeft
-    left 0
-    .signerMenuItemIcon
-      margin-right -120px
+    left 70px
+    transition standardSlow
 
   .signerMenuItem
     position absolute
@@ -31,8 +30,8 @@
     text-align center
     -webkit-app-region no-drag
     overflow hidden
-    will-change transform
-    transform translate3d()
+    pointer-events none
+    z-index 3010
 
     .signerMenuItemIcon
       height 47px
@@ -62,14 +61,17 @@
         margin-top 14px
 
 .signerMenuOpen
-  pointer-events auto
   .signerMenuItem
+    pointer-events auto
+
     .signerMenuItemIcon
-      margin-right 0px
-      margin-left 0px
       opacity 0.4
       .iconUnderline
         transition standard
+  .signerMenuItemRight
+    right 0px
+  .signerMenuItemLeft
+    left 0px
 
 .signerMenuOpen.signerMenuDefault
   .signerMenuItemLeft
