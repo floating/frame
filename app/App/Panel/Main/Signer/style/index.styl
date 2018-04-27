@@ -30,29 +30,34 @@
   animation-timing-function ease-in-out
   animation-name headShake
 
-// .signer:before
-//   content ''
-//   border-left 355px solid transparent
-//   border-right 0px solid transparent
-//   border-top 160px solid thin
-//   display block
-//   position absolute
-//   top calc(100% - 40px)
-//   right 8px
-//   left 5px
-//   z-index 3000
+.standardFade-enter
+  opacity 0
+
+.standardFade-enter.standardFade-enter-active
+  opacity 1
+  transition standard
+
+.standardFade-leave
+  opacity 1
+
+.standardFade-leave.standardFade-leave-active
+  opacity 0
+  transition standard
+
+// @keyframes sk-scaleout
+//   0%
+//     transform scale(0)
+//   100%
+//     transform scale(1.0)
+//     opacity 0
 //
-// .signer:after
-//   content ''
-//   border-left 5px solid thin
-//   border-bottom 0px solid transparent
-//   border-top 5px solid transparent
-//   display block
-//   position absolute
-//   top 0
-//   bottom 40px
-//   left calc(100% - 5px)
-//   z-index 3000
+// .spinner
+//   width 40px
+//   height 40px
+//   margin 100px auto
+//   background-color outerspace
+//   border-radius 100%
+//   animation sk-scaleout 640ms infinite cubic
 
 .signer
   position relative
@@ -180,11 +185,11 @@
 
       .signerInner
         position absolute
-        top -3px
+        top -5px
         left 0px
         right 0px
-        bottom 3px
-        background black
+        bottom 5px
+        background outerspaceDark
         border-radius 6px
         display flex
         justify-content center
@@ -192,14 +197,14 @@
         overflow hidden
         transition standard, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
         -webkit-app-region no-drag
-        box-shadow 0px 9px 6px -5px rgba(0, 10, 35, 0.4)
+        box-shadow 0px 2px 1px rgba(5, 5, 45, 0.4)
 
         .signerInset
           position absolute
           top 0px
           left 0px
           right 0px
-          bottom 3px
+          bottom 2px
           background outerspace
           border-top-left-radius 6px
           border-top-right-radius 6px
@@ -207,12 +212,9 @@
           border-bottom-right-radius 5px
 
       .signerInnerActive
-        top 3px
-        bottom -3px
-        box-shadow 0px 6px 4px -2px rgba(0, 10, 35, 0.4)
-
-      //  .signerInnerHover
-      //    box-shadow 0px 14px 14px -8px rgba(0, 0, 20, 0.4)
+        top -1px
+        bottom 1px
+        box-shadow 0px 1px 1px rgba(5, 5, 45, 0.4)
 
       .signerMin
         position absolute
@@ -323,16 +325,27 @@
     background rgba(0, 0, 50, 0.1)
     width 100%
 
-  .signerStatus
-    display flex
-    justify-content center
-    align-items center
+  .signerStatusWrap
     font-size 16px
-    font-weight 300
-    text-transform capitalize
-    text-align center
-    flex-direction column
     height 125px
+    position relative
+
+    .signerStatus
+      position absolute
+      top 0
+      bottom 0
+      right 0
+      left 0
+      display flex
+      justify-content center
+      align-items center
+      font-weight 300
+      text-transform capitalize
+      text-align center
+      flex-direction column
+
+    .signerStatusNotOk
+      padding 0px 60px 0px 60px
 
   .signerSelect
     position absolute
@@ -350,7 +363,8 @@
     color spacewhite
     flex-direction column
     opacity 0
-    transition standardSlow
+    transition standard
+    transition-delay 0.64s
 
     .signerSelectArrows
       height 50px
@@ -371,7 +385,7 @@
 
         svg
           fill outerspace
-          opacity 0.5
+          opacity 1
 
       .signerSelectArrow:first-child
         animation-delay 0s
@@ -468,7 +482,6 @@
         .signerInner
           left 25px
           right 25px
-          transition standard
 
 .openSigner
   padding 0px 5px 5px 5px
@@ -484,7 +497,6 @@
         .signerInner
           left 0px
           right 0px
-          transition standard
           .low
             margin-left -20px
 

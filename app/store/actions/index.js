@@ -119,6 +119,7 @@ export const updateSigners = (u, signers) => {
 }
 
 export const addSigner = (u, signer) => {
+  if (signer.status === 'loading') return
   u('local.accounts', signer.accounts[0], account => Object.assign({permissions: {}}, account))
   u('signers', signer.id, _ => signer)
 }
@@ -148,19 +149,25 @@ export const unsetSigner = u => {
 }
 
 export const removeSigner = (u, signer) => {
+  let status = 'Removing'
   u('signers', signers => {
-    if (signers[signer.id]) {
-      signers[signer.id].removing = true
-      signers[signer.id].status = 'Removing'
-    }
+    if (signers[signer.id]) signers[signer.id].removing = true
     return signers
   })
+
   setTimeout(_ => {
     u('signers', signers => {
-      if (signers[signer.id] && signers[signer.id].removing) delete signers[signer.id]
+      if (signers[signer.id].removing) signers[signer.id].status = status
       return signers
     })
-  }, 4000)
+  }, 1200)
+
+  setTimeout(_ => {
+    u('signers', signers => {
+      if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
+      return signers
+    })
+  }, 4200)
 }
 
 export const updateSigner = (u, signer) => u('signers', signers => {
