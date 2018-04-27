@@ -20,3 +20,5 @@ const inject = () => {
 }
 
 inject()
+
+// setInterval(inject, 2400)

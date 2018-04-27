@@ -35,9 +35,9 @@ class Signer extends React.Component {
       rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
-  renderTrezorPin () {
+  renderTrezorPin (active) {
     return (
-      <div className='trezorPinWrap'>
+      <div className='trezorPinWrap' style={active ? {} : {height: '0px', padding: '0px 0px 0px 0px'}}>
         <div className='trezorPinInput'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => (
             <div key={i} className='trezorPinInputButton' onClick={this.trezorPin.bind(this, i)}>
@@ -153,7 +153,7 @@ class Signer extends React.Component {
               <React.Fragment>
                 <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
                   <div className='signerNameText'>
-                    {'Account Name ' + this.props.index}
+                    {this.props.type + ' Account'}
                     <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
                   </div>
                 </div>
@@ -209,7 +209,7 @@ class Signer extends React.Component {
             <div className='signerTop'>
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
               {this.renderStatus()}
-              {this.props.type === 'Trezor' && this.props.status === 'Need Pin' ? this.renderTrezorPin() : null}
+              {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
             <div className='signerMid' style={open ? {} : {pointerEvents: 'none'}}>
               <Settings />
