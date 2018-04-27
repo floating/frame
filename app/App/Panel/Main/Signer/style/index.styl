@@ -93,7 +93,7 @@
     position relative
     opacity 1
     z-index 3006
-    margin-bottom 38px
+    margin-bottom 43px
 
     .signerNav
       position relative
@@ -109,7 +109,7 @@
         justify-content center
         align-items center
         width 110px
-        height 105px
+        height 100px
         margin-left -55px
         background linear-gradient(thin, bg)
         border-bottom-left-radius 6px
@@ -188,7 +188,7 @@
         top -5px
         left 0px
         right 0px
-        bottom 5px
+        bottom 2px
         background outerspaceDark
         border-radius 6px
         display flex
@@ -197,7 +197,7 @@
         overflow hidden
         transition standard, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
         -webkit-app-region no-drag
-        box-shadow 0px 2px 1px rgba(5, 5, 45, 0.4)
+        box-shadow 0px 2px 2px rgba(5, 5, 45, 0.4)
 
         .signerInset
           position absolute
@@ -212,8 +212,8 @@
           border-bottom-right-radius 5px
 
       .signerInnerActive
-        top -1px
-        bottom 1px
+        top 0px
+        bottom -2px
         box-shadow 0px 1px 1px rgba(5, 5, 45, 0.4)
 
       .signerMin
@@ -238,6 +238,7 @@
         position relative
         font-weight 200
         padding-left 5px
+        padding-bottom 5px
         position relative
         transition standard
         font-size 30px
@@ -248,7 +249,7 @@
 
       .signerNameEdit
         position absolute
-        right -10px
+        right 0px
         top 10px
         bottom 7px
         width 26px
@@ -261,18 +262,23 @@
         opacity 0
         z-index 9
         background rgba(255, 255, 255, 0)
+        box-shadow 0px 0px 0px rgba(5, 5, 45, 0)
 
         svg
           transition standard
           fill outerspace
 
       .signerNameEdit:hover
-        background rgba(255, 255, 255, 0.5)
+        transition standard
+        background rgba(255, 255, 255, 0.4)
+        box-shadow 0px 1px 1px rgba(5, 5, 45, 0.2)
 
     .signerNameSettings
+      transition standard
       .signerNameText
-        padding-right 25px
+        padding-right 35px
       .signerNameEdit
+        transition standard
         opacity 1
 
     .signerAddress
@@ -476,7 +482,6 @@
       .signerType
         width 160px
         margin-left -80px
-        height 105px
         .signerSelect
           opacity 1
         .signerInner
@@ -491,7 +496,6 @@
   .signerTop
     .signerNav
       .signerType
-        height 105px
         .signerSelect
           opacity 0
         .signerInner

@@ -122,6 +122,18 @@ export const addSigner = (u, signer) => {
   if (signer.status === 'loading') return
   u('local.accounts', signer.accounts[0], account => Object.assign({permissions: {}}, account))
   u('signers', signer.id, _ => signer)
+  u('signer', s => {
+    if (s.current === signer.id && signer.status !== 'ok') {
+      s.last = s.current
+      s.current = ''
+      s.accounts = []
+      s.requests = {}
+      s.view = 'default'
+      s.minimized = true
+      s.open = false
+    }
+    return s
+  })
 }
 
 export const setSigner = (u, signer) => {
@@ -170,10 +182,21 @@ export const removeSigner = (u, signer) => {
   }, 4200)
 }
 
-export const updateSigner = (u, signer) => u('signers', signers => {
-  signers[signer.id] = signer
-  return signers
-})
+export const updateSigner = (u, signer) => {
+  u('signers', signer.id, _ => signer)
+  u('signer', s => {
+    if (s.current === signer.id && signer.status !== 'ok') {
+      s.last = s.current
+      s.current = ''
+      s.accounts = []
+      s.requests = {}
+      s.view = 'default'
+      s.minimized = true
+      s.open = false
+    }
+    return s
+  })
+}
 
 export const setCurrent = (u, id) => u('view.current', _ => id)
 
