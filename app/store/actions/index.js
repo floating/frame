@@ -40,9 +40,6 @@ export const addProviderEvent = (u, payload) => {
 }
 
 export const addRequest = (u, request) => {
-  u('signer.minimized', _ => false)
-  u('signer.open', _ => true)
-  u('signer.view', _ => 'default')
   u('signer.requests', (requests, state) => {
     if (state.frame.type === 'tray' && state.signer.current !== '') ipcRenderer.send('frame:showTray')
     if (!request.handlerId) {
