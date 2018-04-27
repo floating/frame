@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import octicons from 'octicons'
 
@@ -9,10 +10,14 @@ import Local from './Local'
 // <Restore.DevTools />
 
 class Panel extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {scroll: 0}
+  }
   render () {
     return (
-      <div id='panel'>
-        <div className='panelMenu'>
+      <div id='panel' onScroll={e => this.setState({scroll: ReactDOM.findDOMNode(e.target).scrollTop})}>
+        <div className='panelMenu' style={{opacity: this.store('signer.current') || (this.state.scroll < 50) ? 1 : 0}}>
           <div className='panelMenuItem' onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['three-bars'].toSVG({height: 20})}} />
         </div>
         <Local />

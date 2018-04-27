@@ -50,8 +50,8 @@ const getProvider = (url) => {
 
 try {
   let provider = getProvider()
-  window.web3 = new Web3(provider)
   provider.socket.addEventListener('open', () => {
+    window.web3 = new Web3(provider)
     window.web3.eth.getAccounts((err, accounts) => {
       if (err) console.log(err)
       window.web3.eth.accounts = accounts

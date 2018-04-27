@@ -42,6 +42,7 @@
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-restore": "^0.1.2",
+    "react-transition-group": "^1.2.1",
     "stylus": "^0.54.5",
     "trezor.js": "^6.15.19",
     "usb-detection": "^2.1.0",

@@ -1,6 +1,7 @@
 import path from 'path'
 import React from 'react'
 import Restore from 'react-restore'
+import { CSSTransitionGroup } from 'react-transition-group'
 
 import svg from '../../../../svg'
 import rpc from '../../../../rpc'
@@ -97,14 +98,10 @@ class Signer extends React.Component {
     // if (this.state.typeHover) innerClass += ' signerInnerHover'
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
-    let style = {
-      left: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25,
-      right: this.store('signer.current') === this.props.id && this.store('signer.open') ? 0 : 25
-    }
     return (
       <div className='signerType' onMouseDown={::this.typeClick}>
         {this.renderArrows('up')}
-        <div className={innerClass} style={style}>
+        <div className={innerClass}>
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
@@ -140,8 +137,36 @@ class Signer extends React.Component {
       </div>
     )
   }
-  render () {
+  renderStatus () {
     let current = this.store('signer.current') === this.props.id
+    let open = current && this.store('signer.open')
+
+    return (
+      <div className='signerStatusWrap'>
+        <CSSTransitionGroup transitionName='standardFade' transitionEnterTimeout={320} transitionLeaveTimeout={320}>
+          <div className='signerStatus' key={this.props.status}>
+            {this.props.status !== 'ok' ? (
+              <div className='signerStatusNotOk'>
+                {this.props.status}
+              </div>
+            ) : (
+              <React.Fragment>
+                <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
+                  <div className='signerNameText'>
+                    {'Account Name ' + this.props.index}
+                    <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
+                  </div>
+                </div>
+                <div className='signerAddress'>{this.props.accounts[0]}</div>
+              </React.Fragment>
+            )}
+          </div>
+        </CSSTransitionGroup>
+      </div>
+    )
+  }
+  render () {
+    let current = (this.store('signer.current') === this.props.id) && this.props.status === 'ok'
     let open = current && this.store('signer.open')
     let minimized = this.store('signer.minimized')
     this.selected = current && !minimized
@@ -183,17 +208,7 @@ class Signer extends React.Component {
           <div className='signerContainer' style={current ? {height: '100%'} : {}}>
             <div className='signerTop'>
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
-              {this.props.status !== 'ok' ? <div className='signerStatus'>{this.props.status}</div> : (
-                <div>
-                  <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
-                    <div className='signerNameText'>
-                      {'Account Name ' + this.props.index}
-                      <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
-                    </div>
-                  </div>
-                  <div className='signerAddress'>{this.props.accounts[0]}</div>
-                </div>
-              )}
+              {this.renderStatus()}
               {this.props.type === 'Trezor' && this.props.status === 'Need Pin' ? this.renderTrezorPin() : null}
             </div>
             <div className='signerMid' style={open ? {} : {pointerEvents: 'none'}}>
