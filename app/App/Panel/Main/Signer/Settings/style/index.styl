@@ -63,6 +63,23 @@
   font-size 14px
   font-weight 300
 
+  .nodeProviderStatus
+    display flex
+    justify-content center
+    align-items center
+    height 20px
+    border-radius 10px
+    font-size 10px
+    text-transform uppercase
+    padding-left 8px
+    padding-right 8px
+    color bad
+    background #eff1f5
+    box-shadow 0px 8px 6px -6px rgba(0,20,60,0.1), 0px 0px 1px 0px rgba(0,20,60,0.05)
+
+  .nodeProviderConnected
+    color good
+
   .signerPermissionOrigin
     background transparent
 
@@ -81,8 +98,9 @@
       bottom 2px
       width 16px
       border-radius 10px
-      background white
       transition standard
+      background #eff1f5
+      box-shadow 0px 6px 6px -2px rgba(0,20,60,0.15), 0px 1px 2px 0px rgba(0,20,60,0.05)
 
   .signerPermissionToggleOn
     background good

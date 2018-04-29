@@ -2,6 +2,11 @@ import uuid from 'uuid/v4'
 import { URL } from 'url'
 import { ipcRenderer } from 'electron'
 
+const remove = (obj, id) => {
+  if (obj[id]) delete obj[id]
+  return obj
+}
+
 export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)
@@ -81,39 +86,22 @@ export const requestPending = (u, id) => {
 export const requestSuccess = (u, id, res) => {
   u('signer.requests', id, 'status', status => 'success')
   u('signer.requests', id, 'notice', notice => 'Signature Succesful')
-  setTimeout(() => {
-    u('signer.requests', requests => {
-      delete requests[id]
-      return requests
-    })
-  }, 1800)
+  setTimeout(() => u('signer.requests', requests => remove(requests, id)), 1800)
 }
 
 export const requestError = (u, id, err) => {
   u('signer.requests', id, 'status', status => 'error')
   u('signer.requests', id, 'notice', notice => err.message)
-  setTimeout(() => {
-    u('signer.requests', requests => {
-      delete requests[id]
-      return requests
-    })
-  }, 1800)
+  setTimeout(() => u('signer.requests', requests => remove(requests, id)), 1800)
 }
 
 export const declineRequest = (u, id) => {
   u('signer.requests', id, 'status', status => 'declined')
   u('signer.requests', id, 'notice', notice => 'Signature Declined')
-  setTimeout(() => {
-    u('signer.requests', requests => {
-      delete requests[id]
-      return requests
-    })
-  }, 1800)
+  setTimeout(() => u('signer.requests', requests => remove(requests, id)), 1800)
 }
 
-export const updateSigners = (u, signers) => {
-  u('signers', _ => signers)
-}
+export const updateSigners = (u, signers) => u('signers', _ => signers)
 
 export const addSigner = (u, signer) => {
   if (signer.status === 'loading') return
@@ -157,20 +145,20 @@ export const unsetSigner = u => {
   }, 520)
 }
 
+export const nodeProvider = (u, connected) => u('node.provider', _ => connected)
+
 export const removeSigner = (u, signer) => {
   let status = 'Removing'
   u('signers', signers => {
     if (signers[signer.id]) signers[signer.id].removing = true
     return signers
   })
-
   setTimeout(_ => {
     u('signers', signers => {
       if (signers[signer.id].removing) signers[signer.id].status = status
       return signers
     })
   }, 1200)
-
   setTimeout(_ => {
     u('signers', signers => {
       if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
@@ -196,11 +184,8 @@ export const updateSigner = (u, signer) => {
 }
 
 export const setCurrent = (u, id) => u('view.current', _ => id)
-
 export const updateUrl = (u, id, url) => u('view.data', id, 'url', () => url)
-
 export const updateTitle = (u, id, title) => u('view.data', id, 'title', _ => title)
-
 export const reorderTabs = (u, from, to) => {
   u('view.list', list => {
     let _from = list[from]
@@ -209,7 +194,6 @@ export const reorderTabs = (u, from, to) => {
     return list
   })
 }
-
 export const newView = (u) => {
   let id = uuid()
   u('view.current', _ => id)

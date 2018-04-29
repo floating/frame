@@ -98,30 +98,30 @@ class App extends React.Component {
   setCurrentTransaction = (tHash) => e => {
     this.setState({currentTransaction: this.store('transactions', tHash, 'data')})
   }
-  startPoll (txHash) {
-    this[txHash] = setInterval(() => {
-      if (Object.keys(this.store('transactions')).length > 0) {
-        let pendingMap = Object.keys(this.store('transactions')).reduce((acc, tHash) => {
-          if (this.store('transactions')[tHash].status === 'pending') {
-            acc[tHash] = this.store('transactions')[tHash]
-          }
-          return acc
-        }, {})
-        if (Object.keys(pendingMap).length > 0) {
-          Promise.all(Object.keys(pendingMap).map(tHash => this.web3.eth.getTransaction(tHash))).then(res => {
-            res.forEach(newTx => { this.store.updateTransaction(newTx.hash, {data: newTx}) })
-          }).catch(err => {
-            console.log('polling getTransaction err ', err)
-            this.setState({txMessage: 'Error: ' + err.message})
-          })
-        } else if (this[txHash]) {
-          clearInterval(this[txHash])
-        }
-      } else if (this[txHash]) {
-        clearInterval(this[txHash])
-      }
-    }, 2500)
-  }
+  // startPoll (txHash) {
+  //   this[txHash] = setInterval(() => {
+  //     if (Object.keys(this.store('transactions')).length > 0) {
+  //       let pendingMap = Object.keys(this.store('transactions')).reduce((acc, tHash) => {
+  //         if (this.store('transactions')[tHash].status === 'pending') {
+  //           acc[tHash] = this.store('transactions')[tHash]
+  //         }
+  //         return acc
+  //       }, {})
+  //       if (Object.keys(pendingMap).length > 0) {
+  //         Promise.all(Object.keys(pendingMap).map(tHash => this.web3.eth.getTransaction(tHash))).then(res => {
+  //           res.forEach(newTx => { this.store.updateTransaction(newTx.hash, {data: newTx}) })
+  //         }).catch(err => {
+  //           console.log('polling getTransaction err ', err)
+  //           this.setState({txMessage: 'Error: ' + err.message})
+  //         })
+  //       } else if (this[txHash]) {
+  //         clearInterval(this[txHash])
+  //       }
+  //     } else if (this[txHash]) {
+  //       clearInterval(this[txHash])
+  //     }
+  //   }, 2500)
+  // }
   toggleTransactions = (resetCurrent) => e => {
     if (resetCurrent) {
       this.setState({currentTransaction: ''})

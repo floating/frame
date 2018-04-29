@@ -33,6 +33,9 @@ let initial = {
   frame: {
     type: process.env.FRAME_TYPE || 'window'
   },
+  node: {
+    provider: false
+  },
   provider: {
     events: []
   },
