@@ -18,6 +18,8 @@ const connect = (provider, url) => {
       message = JSON.parse(message.data)
       if (message.type === 'response' && provider.handlers[message.handlerId]) {
         provider.handlers[message.handlerId](message.err, message.res)
+      } else if (message.type === 'subscription') {
+        provider.emit('data', message.payload)
       } else {
         console.log('No handler for socket message in provider: ', message)
       }

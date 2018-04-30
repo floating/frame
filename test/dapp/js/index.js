@@ -66,12 +66,11 @@ class App extends React.Component {
     }).on('error', err => {
       this.setState({txMessage: err.message})
       setTimeout(() => { this.setState({txMessage: ''}) }, 3700)
+    }).on('receipt', receipt => {
+      console.log('receipt', receipt)
+    }).on('confirmation', (confirmationNumber, receipt) => {
+      console.log('confirmation', confirmationNumber, receipt)
     })
-    // .on('receipt', receipt => {
-    //   console.log('receipt', receipt)
-    // }).on('confirmation', (confirmationNumber, receipt) => {
-    //   console.log('confirmation', confirmationNumber, receipt)
-    // })
   }
   getBalance = () => {
     this.web3.eth.getBalance(this.state.accounts[0]).then(res => {

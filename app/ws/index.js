@@ -1,6 +1,7 @@
 import qs from 'querystring'
 import { URL } from 'url'
 import WebSocket from 'ws'
+import uuid from 'uuid/v4'
 
 import provider from '../provider'
 import store from '../store'
@@ -20,19 +21,35 @@ module.exports = () => {
       next(store('signer.current') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
     })
   }
-
   const ws = new WebSocket.Server({port: 1248, verifyClient})
+  const subs = {}
 
   ws.on('connection', (socket, req) => {
+    socket.id = uuid()
     socket.origin = req.headers.origin
     socket.on('message', data => {
       let payload = JSON.parse(data)
       let handlerId = payload.handlerId
       delete payload.handlerId
-      console.log(socket.origin, payload.method)
-      provider.sendAsync(payload, (err, res) => socket.send(JSON.stringify({type: 'response', handlerId, err, res})))
+      provider.sendAsync(payload, (err, res) => {
+        if (!err && res && res.result) {
+          if (payload.method === 'eth_subscribe') {
+            subs[res.result] = socket
+          } else if (payload.method === 'eth_unsubscribe') {
+            payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
+          }
+        }
+        socket.send(JSON.stringify({type: 'response', handlerId, err, res}))
+      })
     })
     socket.on('error', err => err)
+    socket.on('close', _ => {
+      Object.keys(subs).forEach(sub => { if (subs[sub].id !== socket.id) delete subs[sub] })
+    })
+  })
+
+  provider.on('data', payload => {
+    subs[payload.params.subscription].send(JSON.stringify({type: 'subscription', payload}))
   })
 
   store.observer(() => {
