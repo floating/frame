@@ -34,7 +34,7 @@ class Provider extends EventEmitter {
           this.emit('data', message)
         } else {
           let requestId = message.id
-          if (this.nodeRequests[requestId]) {
+          if (this.nodeRequests[requestId] && this.nodeRequests[requestId].cb) {
             message.id = this.nodeRequests[requestId].originId
             this.nodeRequests[requestId].cb(message.error, message)
           }
@@ -58,9 +58,9 @@ class Provider extends EventEmitter {
         })
         this.connection.socket.addEventListener('close', () => {
           this.connection.socket = null
-          setTimeout(this.connect, 1000)
+          setTimeout(_ => this.connect(), 1000)
           this.store.nodeProvider(false)
-          console.log('Disconnected from provider connection, empty subscriptions -> tell dapps that connection was lost')
+          this.connection.emit('close')
         })
         // provider.socket.addEventListener('error', err => {})
         this.connection.socket.addEventListener('message', message => {
@@ -91,6 +91,9 @@ class Provider extends EventEmitter {
   }
   getNetVersion (payload, cb) {
     cb(null, {id: payload.id, jsonrpc: payload.jsonrpc, result: this.netVersion.toString()})
+  }
+  unsubscribe (params) {
+    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params})
   }
   approveRequest (req, cb) {
     let rawTx = req.data

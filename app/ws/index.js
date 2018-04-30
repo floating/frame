@@ -18,7 +18,7 @@ module.exports = () => {
       let quiet = !search.mode ? false : search.mode === 'quiet'
       if (permIndex === -1 && store('signer.current') && !quiet) return store.addRequest({type: 'requestProvider', origin, notice: `${origin} is requesting access to the provider.`})
       setTimeout(_ => obs.remove(), 0) // Add fix for this pattern in restore
-      next(store('signer.current') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
+      next(store('signer.current') && store('node.provider') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
     })
   }
   const ws = new WebSocket.Server({port: 1248, verifyClient})
@@ -34,8 +34,10 @@ module.exports = () => {
       provider.sendAsync(payload, (err, res) => {
         if (!err && res && res.result) {
           if (payload.method === 'eth_subscribe') {
+            console.log('Socket ' + socket.id + ' subscribed to ' + res.result)
             subs[res.result] = socket
           } else if (payload.method === 'eth_unsubscribe') {
+            console.log('Socket ' + socket.id + ' UNSUB to ' + payload.params)
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
@@ -44,12 +46,23 @@ module.exports = () => {
     })
     socket.on('error', err => err)
     socket.on('close', _ => {
-      Object.keys(subs).forEach(sub => { if (subs[sub].id !== socket.id) delete subs[sub] })
+      let unsub = []
+      Object.keys(subs).forEach(sub => {
+        if (subs[sub].id === socket.id) {
+          unsub.push(sub)
+          delete subs[sub]
+        }
+      })
+      if (unsub.length > 0) provider.unsubscribe(unsub)
     })
   })
 
+  provider.connection.on('close', _ => {
+    ws.clients.forEach(socket => socket.close())
+  })
+
   provider.on('data', payload => {
-    subs[payload.params.subscription].send(JSON.stringify({type: 'subscription', payload}))
+    if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify({type: 'subscription', payload}))
   })
 
   store.observer(() => {
