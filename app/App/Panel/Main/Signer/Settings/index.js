@@ -36,6 +36,9 @@ class Settings extends React.Component {
         <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
         <div className='signerPermission'>
           <div>{provider.url}</div>
+          <div className={this.store('node.provider') ? 'nodeProviderStatus nodeProviderConnected' : 'nodeProviderStatus'}>
+            {this.store('node.provider') ? 'connected' : 'disconnected'}
+          </div>
         </div>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
         {Object.keys(permissions).length === 0 ? (
