@@ -59,7 +59,7 @@ class Provider {
       nodeProvider.on('message', message => {
         if (message.jsonrpc && message.jsonrpc === '2.0') {
           if (!message.id && message.method.indexOf('_subscription') !== -1) {
-            // Handle subscriptions
+            nodeProvider.emit('data', message)
           } else {
             let requestId = message.id
             if (this.nodeRequests[requestId]) {
