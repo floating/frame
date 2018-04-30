@@ -37,12 +37,9 @@ module.exports = () => {
 
   store.observer(() => {
     let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
-    Object.keys(permissions).forEach(key => {
-      let permission = permissions[key]
-      let ok = []
-      if (permission.provider) ok.push(permission.origin)
-      ws.clients.forEach(socket => { if (ok.indexOf(socket.origin) < 0) socket.close() })
-    })
+    let ok = []
+    Object.keys(permissions).forEach(key => { if (permissions[key].provider) ok.push(permissions[key].origin) })
+    ws.clients.forEach(socket => { if (ok.indexOf(socket.origin) < 0) socket.close() })
   })
 
   store.observer(() => {
