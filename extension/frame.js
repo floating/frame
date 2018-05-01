@@ -29,6 +29,8 @@ const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet 
       message = JSON.parse(message.data)
       if (message.type === 'response' && provider.handlers[message.handlerId]) {
         provider.handlers[message.handlerId](message.err, message.res)
+      } else if (message.type === 'subscription') {
+        provider.emit('data', message.payload)
       } else {
         console.log('No handler for socket message in provider: ', message)
       }

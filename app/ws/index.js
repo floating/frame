@@ -34,10 +34,8 @@ module.exports = () => {
       provider.sendAsync(payload, (err, res) => {
         if (!err && res && res.result) {
           if (payload.method === 'eth_subscribe') {
-            console.log('Socket ' + socket.id + ' subscribed to ' + res.result)
             subs[res.result] = socket
           } else if (payload.method === 'eth_unsubscribe') {
-            console.log('Socket ' + socket.id + ' UNSUB to ' + payload.params)
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
