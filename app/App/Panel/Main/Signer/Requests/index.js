@@ -43,10 +43,13 @@ class Requests extends React.Component {
     if (req.status === 'success') requestClass += ' signerRequestSuccess'
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
+    if (req.status === 'error') requestClass += ' signerRequestError'
     let value = req.data.value
     let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
-    value = Web3.utils.padRight(Web3.utils.fromWei(value, 'ether'), 8)
-    fee = Web3.utils.padRight(Web3.utils.fromWei(fee, 'ether'), 8)
+    value = Web3.utils.fromWei(value, 'ether')
+    fee = Web3.utils.fromWei(fee, 'ether')
+    value = Math.round(value * 100000000) / 100000000
+    fee = Math.round(fee * 100000000) / 100000000
     return (
       <div key={req.id} className={requestClass} style={{top: (i * 10) + 'px'}}>
         {req.type === 'approveTransaction' ? (
@@ -54,17 +57,23 @@ class Requests extends React.Component {
             <div className='approveTransactionPayload'>
               {req.notice ? (
                 <div className='requestNotice'>
-                  <CSSTransitionGroup style={{width: '100%'}} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
-                    {(_ => {
-                      if (req.status === 'pending') {
-                        return <div className='spinner' />
-                      } else if (req.status === 'success') {
-                        return svg.octicon('check', {height: '80px'})
-                      } else {
-                        return <div>{req.notice}</div>
-                      }
-                    })()}
-                  </CSSTransitionGroup>
+                  {(_ => {
+                    if (req.status === 'pending') {
+                      return (
+                        <div key={req.status} className='requestNoticeInner bounceIn'>
+                          <div>
+                            <div className='loader' />
+                          </div>
+                        </div>
+                      )
+                    } else if (req.status === 'success') {
+                      return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: '80px'})}</div>
+                    } else if (req.status === 'error' || req.status === 'declined') {
+                      return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                    } else {
+                      return <div key={req.notice} className='requestNoticeInner bounceIn'>{req.notice}</div>
+                    }
+                  })()}
                 </div>
               ) : (
                 <React.Fragment>
@@ -79,14 +88,14 @@ class Requests extends React.Component {
                       <div className='transactionSubValue'>
                         <div className='transactionSubTotals'>
                           <div className='transactionSubTotalETH'>{'Ξ ' + value}</div>
-                          <div className='transactionSubTotalUSD'>{'$' + (value * 670).toFixed(2)}</div>
+                          <div className='transactionSubTotalUSD'>{'$ ' + (value * 670).toFixed(2)}</div>
                         </div>
                         <div className='transactionSubSubtitle'>{'Value'}</div>
                       </div>
                       <div className='transactionSubFee'>
                         <div className='transactionSubTotals'>
                           <div className='transactionSubTotalETH'>{'Ξ ' + fee}</div>
-                          <div className='transactionSubTotalUSD'>{'$' + (fee * 670).toFixed(2)}</div>
+                          <div className='transactionSubTotalUSD'>{'$ ' + (fee * 670).toFixed(2)}</div>
                         </div>
                         <div className='transactionSubSubtitle'>{'Max Fee'}</div>
                       </div>
@@ -117,6 +126,7 @@ class Requests extends React.Component {
     if (req.status === 'success') requestClass += ' signerRequestSuccess'
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
+    if (req.status === 'error') requestClass += ' signerRequestError'
     return (
       <div className={requestClass} style={{top: (i * 10) + 'px'}}>
         {req.type === 'requestProvider' ? (

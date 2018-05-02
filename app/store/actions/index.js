@@ -91,7 +91,7 @@ export const requestSuccess = (u, id, res) => {
 
 export const requestError = (u, id, err) => {
   u('signer.requests', id, 'status', status => 'error')
-  u('signer.requests', id, 'notice', notice => err.message)
+  u('signer.requests', id, 'notice', notice => err)
   setTimeout(() => u('signer.requests', requests => remove(requests, id)), 1800)
 }
 
