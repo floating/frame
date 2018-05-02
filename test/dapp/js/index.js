@@ -51,7 +51,7 @@ class App extends React.Component {
     let tx = {
       chainId: Web3.utils.toHex(4),
       gas: Web3.utils.toHex(110000), // gas === gasLimit
-      value: Web3.utils.toHex(10000),
+      value: Web3.utils.toHex(10000000000000000),
       data: '0x',
       to: '0x030e6af4985f111c265ee3a279e5a9f6aa124fd5',
       from: this.state.accounts[0]

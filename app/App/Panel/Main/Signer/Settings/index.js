@@ -4,31 +4,6 @@ import Restore from 'react-restore'
 import provider from '../../../../../provider'
 
 class Settings extends React.Component {
-  appInfo () {
-    return (
-      <React.Fragment>
-        <div className='signerSettingsTitle'>{'App Info'}</div>
-        <div className='appInfo'>
-          <div className='appInfoLine'>
-            <div>{'Frame'}</div>
-            <div>{'v' + process.env.npm_package_version}</div>
-          </div>
-          <div className='appInfoLine'>
-            <div>{'Electron'}</div>
-            <div>{'v' + process.versions.electron}</div>
-          </div>
-          <div className='appInfoLine'>
-            <div>{'Chrome'}</div>
-            <div>{'v' + process.versions.chrome}</div>
-          </div>
-          <div className='appInfoLine'>
-            <div>{'Node'}</div>
-            <div>{'v' + process.versions.node}</div>
-          </div>
-        </div>
-      </React.Fragment>
-    )
-  }
   render () {
     let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
     return (
@@ -57,7 +32,6 @@ class Settings extends React.Component {
             )
           })
         )}
-        {this.appInfo()}
       </div>
     )
   }

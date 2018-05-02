@@ -1,3 +1,19 @@
+// .signerRequests:before, .signerRequests:after
+//   content ''
+//   position absolute
+//   left 12px
+//   right 12px
+//   height 7px
+//   background rgba(0,40,150,0.11)
+//   filter blur(7px)
+//   border-radius 2px
+//
+// .signerRequests:before
+//   top -2px
+//
+// .signerRequests:after
+//   bottom -2px
+
 .signerRequests
   position absolute
   top 0
@@ -6,35 +22,166 @@
   left 0
   z-index 200
   display flex
-  justify-content center
-  align-items center
+  // justify-content center
+  // align-items center
   flex-direction column
   transition standard
-  padding 10px
+  // padding 10px
+  // background rgba(35, 25, 85, 0.02)
+  // background rgba(0,30,100,0.04)
+  overflow hidden
 
   .noRequests
-    margin-bottom 80px
+    font-size 12px
+    font-weight 400
+    letter-spacing 1px
+    text-transform uppercase
+    //opacity 0.5
 
-  .signerRequestTitle
-    height 30px
+  .requestTitle:before
+    content ''
+    position absolute
+    bottom -2px
+    right 10px
+    left 10px
+    height 4px
+    border-radius 2px
+    background thin
+
+  .requestTitle
+    position relative
+    display flex
+    align-items flex-end
+    justify-content:space-between;
+    height 60px
+    font-size 20px
+    padding 0px 10px 10px 10px
+
+    .requestCount
+      // background good
+      // color white
+      background thin
+      width 30px
+      height 30px
+      border-radius 2px
+      display flex
+      justify-content center
+      align-items center
+      // font-size 18px
+      font-weight 400
+
+  .requestBottom
+    position relative
+    display flex
+    align-items center
+    justify-content center
+    height 40px
+    /// border-bottom 1px solid pink
+    padding-left 10px
+    padding-right 10px
+
+    svg
+      fill outerspace
+
+  // .requestObsverver:before
+  //   content ''
+  //   position absolute
+  //   bottom -2px
+  //   right 10px
+  //   left 10px
+  //   height 4px
+  //   border-radius 2px
+  //   background thin
+
+  .requestObsverver
+    height 320px
     display flex
     justify-content center
     align-items center
+    flex-direction column
+    position relative
+    // background rgba(255, 255, 255, 0.1)
+    // background rgba(0,24,120,0.02)
+
+    // .requestDepth:before, .requestDepth:after
+    //   content ''
+    //   position absolute
+    //   left 10px
+    //   right 10px
+    //   height 16px
+    //   background rgba(0,24,120,0.03)
+    //   filter blur(6px)
+    //   // border-radius 2px
+    //
+    // .requestDepth:before
+    //   top -11px
+    //
+    // .requestDepth:after
+    //   bottom -11px
+    //
+    // .requestDepth
+    //   position absolute
+    //   top 0px
+    //   right 0px
+    //   bottom 0px
+    //   left 0px
+    //   overflow hidden
+    //
+    // .requestHighlighter:before, .requestHighlighter:after
+    //   content ''
+    //   position absolute
+    //   left 5px
+    //   right 5px
+    //   height 4px
+    //   border-radius 2px
+    //   background rgba(246,248,253,1)
+    //   background #73b3ff
+    //   box-shadow 0px 1px 0px rgba(205,220,235,1)
+    //
+    // .requestHighlighter:before
+    //   top -2px
+    //
+    //
+    // .requestHighlighter:after
+    //   bottom -2px
+    //
+    // .requestHighlighter
+    //   position absolute
+    //   top 0px
+    //   right 0px
+    //   bottom 0px
+    //   left 0px
+    //   // background orange
+
+   .requestContainer
+     position absolute
+     top 0px
+     right 0px
+     bottom 0px
+     left 0px
+     display flex
+     justify-content center
+     align-items center
+     flex-direction column
 
   .signerRequestItems
     overflow scroll
 
   .signerRequest
-    border-radius 6px
+    border-radius 2px
     display flex
     justify-content space-between
     align-items center
     position relative
-    width 100%
-    background #eff1f5
-    overflow hidden
-    margin-bottom 20px
-    box-shadow 0px 10px 14px -8px rgba(0,20,60,0.2), 0px 0px 4px 0px rgba(0,20,60,0.1)
+    width calc(100% - 10px)
+    // background #eff1f5
+    // overflow hidden
+    // // margin-bottom 20px
+    // box-shadow 0px 10px 14px -8px rgba(0,20,60,0.2), 0px 0px 4px 0px rgba(0,20,60,0.1)
+    border-radius 2px
+    background rgba(246,248,253,1)
+    box-shadow 0px 1px 0px rgba(205,220,235,1) // , 0px 1px 0px rgba(0,24,100,0.8)
+    margin 5px
 
   .signerRequestSuccess
     background good
@@ -63,7 +210,7 @@
   .approveTransaction
     display flex
     width 100%
-    margin-bottom 65px
+    height 300px
     flex-direction column
 
     .approveTransactionTitle

@@ -1,6 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
+import Web3 from 'web3'
 
+import svg from '../../../../../svg'
 import rpc from '../../../../../rpc'
 
 class Requests extends React.Component {
@@ -44,14 +46,23 @@ class Requests extends React.Component {
       <div key={i} className={requestClass}>
         {req.type === 'approveTransaction' ? (
           <div className='approveTransaction'>
-            <div className='approveTransactionTitle'>
-              {'Approve Transaction'}
-            </div>
             <div className='approveTransactionPayload'>
               {req.notice ? (
                 <div className='requestNotice'>{req.notice}</div>
               ) : (
-                Object.keys(req.data).map(p => <div key={p}>{p + ': ' + req.data[p]}</div>)
+                <React.Fragment>
+                  <div> {svg.octicon('radio-tower', {height: '40px'})} </div>
+                  <div className='approveTransactionTitle'>
+                    {'Approve Transaction'}
+                  </div>
+                  <div> {Web3.utils.fromWei(req.data.value, 'ether') + 'eth'} </div>
+                  {Web3.utils.toAscii(req.data.data) ? (
+                    <div>  {'data: ' + Web3.utils.toAscii(req.data.data)} </div>
+                  ) : (
+                    <div>  {' no data '} </div>
+                  )}
+                  <div>  {'to: ' + req.data.to} </div>
+                </React.Fragment>
               )}
             </div>
           </div>
@@ -93,10 +104,21 @@ class Requests extends React.Component {
     })
     return (
       <div className={this.store('signer.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
-        {requests.length === 0 ? <div className='noRequests'>{'No Pending Requests'}</div> : requests.map((req, i) => {
-          if (req.type === 'approveTransaction') return this.transactionRequest(req, i)
-          if (req.type === 'requestProvider') return this.providerRequest(req, i)
-        })}
+        <div className='requestTitle'>
+          <div>{'Requests'}</div>
+          <div className='requestCount'>{requests.length}</div>
+        </div>
+        <div className='requestObsverver'>
+          <div className='requestContainer'>
+            {requests.length === 0 ? (
+              <div key={'noReq'} className='noRequests'>{'No Pending Requests'}</div>
+            ) : (_ => {
+              let req = requests[0]
+              if (req.type === 'approveTransaction') return this.transactionRequest(req, 0)
+              if (req.type === 'requestProvider') return this.providerRequest(req, 0)
+            })()}
+          </div>
+        </div>
       </div>
     )
   }
