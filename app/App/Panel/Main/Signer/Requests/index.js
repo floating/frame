@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import Web3 from 'web3'
+import { CSSTransitionGroup } from 'react-transition-group'
 
 import svg from '../../../../../svg'
 import rpc from '../../../../../rpc'
@@ -42,6 +43,10 @@ class Requests extends React.Component {
     if (req.status === 'success') requestClass += ' signerRequestSuccess'
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
+    let value = req.data.value
+    let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
+    value = Web3.utils.padRight(Web3.utils.fromWei(value, 'ether'), 10)
+    fee = Web3.utils.padRight(Web3.utils.fromWei(fee, 'ether'), 10)
     return (
       <div key={i} className={requestClass}>
         {req.type === 'approveTransaction' ? (
@@ -51,17 +56,30 @@ class Requests extends React.Component {
                 <div className='requestNotice'>{req.notice}</div>
               ) : (
                 <React.Fragment>
-                  <div> {svg.octicon('radio-tower', {height: '40px'})} </div>
+                  <div className='approveTransactionIcon'>
+                    {svg.octicon('radio-tower', {height: '20px'})}
+                  </div>
                   <div className='approveTransactionTitle'>
                     {'Approve Transaction'}
                   </div>
-                  <div> {Web3.utils.fromWei(req.data.value, 'ether') + 'eth'} </div>
+                  <div className='transactionTotal'>
+                    <div className='transactionSub'>
+                      <div className='transactionSubValue'>
+                        <div>{value}</div>
+                        <div className='transactionSubSubtitle'>{'Value'}</div>
+                      </div>
+                      <div className='transactionSubFee'>
+                        <div>{fee}</div>
+                        <div className='transactionSubSubtitle'>{'Fee'}</div>
+                      </div>
+                    </div>
+                  </div>
                   {Web3.utils.toAscii(req.data.data) ? (
-                    <div>  {'data: ' + Web3.utils.toAscii(req.data.data)} </div>
+                    <div className='transactionData'>{'View Data'} </div>
                   ) : (
-                    <div>  {' no data '} </div>
+                    <div className='transactionData'>{'No Data'}</div>
                   )}
-                  <div>  {'to: ' + req.data.to} </div>
+                  <div className='transactionTo'>{req.data.to}</div>
                 </React.Fragment>
               )}
             </div>
@@ -110,13 +128,15 @@ class Requests extends React.Component {
         </div>
         <div className='requestObsverver'>
           <div className='requestContainer'>
-            {requests.length === 0 ? (
-              <div key={'noReq'} className='noRequests'>{'No Pending Requests'}</div>
-            ) : (_ => {
-              let req = requests[0]
-              if (req.type === 'approveTransaction') return this.transactionRequest(req, 0)
-              if (req.type === 'requestProvider') return this.providerRequest(req, 0)
-            })()}
+            <CSSTransitionGroup transitionName='standardFade' transitionEnterTimeout={320} transitionLeaveTimeout={320}>
+              {requests.length === 0 ? (
+                <div key={'noReq'} className='noRequests'>{'No Pending Requests'}</div>
+              ) : (_ => {
+                let req = requests[0]
+                if (req.type === 'approveTransaction') return this.transactionRequest(req, 0)
+                if (req.type === 'requestProvider') return this.providerRequest(req, 0)
+              })()}
+            </CSSTransitionGroup>
           </div>
         </div>
       </div>

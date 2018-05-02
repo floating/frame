@@ -14,6 +14,24 @@
 // .signerRequests:after
 //   bottom -2px
 
+.slideUp-enter
+  opacity 0
+  margin-top 30px
+
+.slideUp-enter.slideUp-enter-active
+  opacity 1
+  margin-top 0px
+  transition standard
+
+.slideUp-leave
+  opacity 1
+  margin-top 0px
+
+.slideUp-leave.slideUp-leave-active
+  opacity 0
+  margin-top -30px
+  transition standard
+
 .signerRequests
   position absolute
   top 0
@@ -22,21 +40,24 @@
   left 0
   z-index 200
   display flex
-  // justify-content center
-  // align-items center
   flex-direction column
   transition standard
-  // padding 10px
-  // background rgba(35, 25, 85, 0.02)
-  // background rgba(0,30,100,0.04)
   overflow hidden
 
   .noRequests
+    position absolute
+    top 0
+    right 0
+    left 0
+    padding-top 60px
     font-size 12px
     font-weight 400
     letter-spacing 1px
     text-transform uppercase
-    //opacity 0.5
+    display flex
+    justify-content center
+    align-items center
+    opacity 0.7
 
   .requestTitle:before
     content ''
@@ -58,8 +79,6 @@
     padding 0px 10px 10px 10px
 
     .requestCount
-      // background good
-      // color white
       background thin
       width 30px
       height 30px
@@ -67,7 +86,6 @@
       display flex
       justify-content center
       align-items center
-      // font-size 18px
       font-weight 400
 
   .requestBottom
@@ -76,7 +94,6 @@
     align-items center
     justify-content center
     height 40px
-    /// border-bottom 1px solid pink
     padding-left 10px
     padding-right 10px
 
@@ -94,7 +111,7 @@
   //   background thin
 
   .requestObsverver
-    height 320px
+    height 460px
     display flex
     justify-content center
     align-items center
@@ -167,70 +184,147 @@
   .signerRequestItems
     overflow scroll
 
+  default = 0px 3px 2px 1px thin, 0px 25px 20px -15px thick
+
   .signerRequest
     border-radius 2px
     display flex
     justify-content space-between
     align-items center
     position relative
-    width calc(100% - 10px)
-    // background #eff1f5
-    // overflow hidden
-    // // margin-bottom 20px
-    // box-shadow 0px 10px 14px -8px rgba(0,20,60,0.2), 0px 0px 4px 0px rgba(0,20,60,0.1)
+    width calc(100% - 20px)
+    box-shadow 0px 2px 0px lightShade, default
     border-radius 2px
-    background rgba(246,248,253,1)
-    box-shadow 0px 1px 0px rgba(205,220,235,1) // , 0px 1px 0px rgba(0,24,100,0.8)
+    background light
     margin 5px
 
   .signerRequestSuccess
     background good
+    box-shadow 0px 2px 0px good, default
 
     .approveTransactionPayload
       color #116338
 
   .signerRequestPending
     background #ffd7a5
+    box-shadow 0px 2px 0px #ffd7a5, default
     .approveTransactionPayload
       color #0d3a56
 
   .signerRequestDeclined
     background bad
+    box-shadow 0px 2px 0px bad, default
     .approveTransactionPayload
       color #491410
 
   .requestNotice
     height 120px
-    font-size 16px
     display flex
     justify-content center
     align-items center
-    padding 40px
 
   .approveTransaction
     display flex
     width 100%
-    height 300px
+    height 450px
     flex-direction column
 
-    .approveTransactionTitle
-      padding 10px
-      font-weight 400
-      font-size 14px
-
-    .approveTransactionPayload
-      padding 6px
-      font-size 11px
-      font-weight 300
-      height 180px
+    .approveTransactionIcon
       width 100%
+      padding-top 20px
+      padding-bottom 20px
       display flex
       justify-content center
+
+      svg
+        fill outerspace
+
+    .approveTransactionTitle
+      padding 0px 20px 2px 20px
+      height 30px
+      margin-bottom 25px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 15px
+      text-transform uppercase
+      letter-spacing 3px
+      font-weight 400
+      font-size 14px
+      background thin
+
+    .approveTransactionPayload
+      width 100%
+      display flex
       align-items center
       flex-direction column
 
       div
         white-space nowrap
+
+  .transactionTotal
+    width 100%
+    padding-bottom 0px
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+
+    .transactionSub
+      display flex
+      flex-direction column
+      font-size 20px
+      letter-spacing 1px
+
+      .transactionSubSubtitle
+        margin-top -5px
+        font-weight 400
+        text-transform uppercase
+        letter-spacing 1px
+
+      .transactionSubValue
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+        font-size 28px
+        letter-spacing 1px
+        padding-bottom 15px
+
+        .transactionSubSubtitle
+          font-size 12px
+          letter-spacing 1px
+
+      .transactionSubFee
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+        padding-bottom 15px
+
+        .transactionSubSubtitle
+          font-size 12px
+
+  .transactionData
+    padding 0px 20px 0px 20px
+    height 60px
+    width calc(100% - 40px)
+    margin-top 10px
+    display flex
+    justify-content center
+    align-items center
+    background thin
+
+  .transactionTo
+    height 80px
+    width 100%
+    font-size 12px
+    font-family firaCode
+    background outerspace
+    color spacewhite
+    display flex
+    justify-content center
+    align-items center
 
   .unknownType
     display flex
