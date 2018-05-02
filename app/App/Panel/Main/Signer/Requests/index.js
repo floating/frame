@@ -45,32 +45,50 @@ class Requests extends React.Component {
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     let value = req.data.value
     let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
-    value = Web3.utils.padRight(Web3.utils.fromWei(value, 'ether'), 10)
-    fee = Web3.utils.padRight(Web3.utils.fromWei(fee, 'ether'), 10)
+    value = Web3.utils.padRight(Web3.utils.fromWei(value, 'ether'), 8)
+    fee = Web3.utils.padRight(Web3.utils.fromWei(fee, 'ether'), 8)
     return (
-      <div key={i} className={requestClass}>
+      <div key={req.id} className={requestClass} style={{top: (i * 10) + 'px'}}>
         {req.type === 'approveTransaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
               {req.notice ? (
-                <div className='requestNotice'>{req.notice}</div>
+                <div className='requestNotice'>
+                  <CSSTransitionGroup style={{width: '100%'}} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
+                    {(_ => {
+                      if (req.status === 'pending') {
+                        return <div className='spinner' />
+                      } else if (req.status === 'success') {
+                        return svg.octicon('check', {height: '80px'})
+                      } else {
+                        return <div>{req.notice}</div>
+                      }
+                    })()}
+                  </CSSTransitionGroup>
+                </div>
               ) : (
                 <React.Fragment>
                   <div className='approveTransactionIcon'>
                     {svg.octicon('radio-tower', {height: '20px'})}
                   </div>
                   <div className='approveTransactionTitle'>
-                    {'Approve Transaction'}
+                    {'Transaction'}
                   </div>
                   <div className='transactionTotal'>
                     <div className='transactionSub'>
                       <div className='transactionSubValue'>
-                        <div>{value}</div>
+                        <div className='transactionSubTotals'>
+                          <div className='transactionSubTotalETH'>{'Ξ ' + value}</div>
+                          <div className='transactionSubTotalUSD'>{'$' + (value * 670).toFixed(2)}</div>
+                        </div>
                         <div className='transactionSubSubtitle'>{'Value'}</div>
                       </div>
                       <div className='transactionSubFee'>
-                        <div>{fee}</div>
-                        <div className='transactionSubSubtitle'>{'Fee'}</div>
+                        <div className='transactionSubTotals'>
+                          <div className='transactionSubTotalETH'>{'Ξ ' + fee}</div>
+                          <div className='transactionSubTotalUSD'>{'$' + (fee * 670).toFixed(2)}</div>
+                        </div>
+                        <div className='transactionSubSubtitle'>{'Max Fee'}</div>
                       </div>
                     </div>
                   </div>
@@ -100,7 +118,7 @@ class Requests extends React.Component {
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     return (
-      <div key={i} className={requestClass}>
+      <div className={requestClass} style={{top: (i * 10) + 'px'}}>
         {req.type === 'requestProvider' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionTitle'>{'Request Provider Access'}</div>
@@ -128,14 +146,13 @@ class Requests extends React.Component {
         </div>
         <div className='requestObsverver'>
           <div className='requestContainer'>
-            <CSSTransitionGroup transitionName='standardFade' transitionEnterTimeout={320} transitionLeaveTimeout={320}>
-              {requests.length === 0 ? (
-                <div key={'noReq'} className='noRequests'>{'No Pending Requests'}</div>
-              ) : (_ => {
-                let req = requests[0]
-                if (req.type === 'approveTransaction') return this.transactionRequest(req, 0)
-                if (req.type === 'requestProvider') return this.providerRequest(req, 0)
-              })()}
+            <div key={'noReq'} style={requests.length !== 0 ? {opacity: 0} : {transitionDelay: '0.32s'}} className='noRequests'>{'No Pending Requests'}</div>
+            <CSSTransitionGroup style={{width: '100%'}} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
+              {requests.map((req, i) => {
+                if (req.type === 'approveTransaction') return this.transactionRequest(req, i)
+                if (req.type === 'requestProvider') return this.providerRequest(req, i)
+                return null
+              }).reverse()}
             </CSSTransitionGroup>
           </div>
         </div>

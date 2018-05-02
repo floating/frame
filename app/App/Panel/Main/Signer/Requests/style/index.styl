@@ -14,23 +14,54 @@
 // .signerRequests:after
 //   bottom -2px
 
+
+@keyframes sk-scaleout
+  0%
+    transform scale(0)
+  100%
+    transform scale(1.0)
+    opacity 0
+
+.spinner
+  width 100px
+  height 100px
+  margin 100px auto
+  background-color outerspace
+  border-radius 100%
+  animation sk-scaleout 600ms infinite cubic
+
+.signSuccess
+    width 100px
+    height 100px
+    margin 100px auto
+    background-color outerspace
+    border-radius 100%
+    animation sk-scaleout 600ms infinite cubic
+
+
 .slideUp-enter
   opacity 0
-  margin-top 30px
+  transform scale(1) translateY(-20px)
+  transition standardSlow
+  perspective 100px
 
 .slideUp-enter.slideUp-enter-active
   opacity 1
-  margin-top 0px
-  transition standard
+  transform scale(1) translateY(0px)
+  transition standardSlow
+  transition-delay 0.32s
+  perspective 100px
 
 .slideUp-leave
   opacity 1
-  margin-top 0px
+  transition standardSlow
+  transform scale(1) translateY(0px)
+  perspective 100px
 
 .slideUp-leave.slideUp-leave-active
   opacity 0
-  margin-top -30px
-  transition standard
+  transform scale(1.4) translateY(0px)
+  perspective 100px
 
 .signerRequests
   position absolute
@@ -39,25 +70,7 @@
   bottom 0
   left 0
   z-index 200
-  display flex
-  flex-direction column
   transition standard
-  overflow hidden
-
-  .noRequests
-    position absolute
-    top 0
-    right 0
-    left 0
-    padding-top 60px
-    font-size 12px
-    font-weight 400
-    letter-spacing 1px
-    text-transform uppercase
-    display flex
-    justify-content center
-    align-items center
-    opacity 0.7
 
   .requestTitle:before
     content ''
@@ -177,9 +190,26 @@
      bottom 0px
      left 0px
      display flex
-     justify-content center
+     // justify-content center
      align-items center
      flex-direction column
+
+    .noRequests
+      position absolute
+      top 0px
+      left 0
+      right 0
+      bottom 0
+      // padding-top 60px
+      font-size 12px
+      font-weight 400
+      letter-spacing 1px
+      text-transform uppercase
+      display flex
+      justify-content center
+      align-items center
+      opacity 0.7
+      transition standard
 
   .signerRequestItems
     overflow scroll
@@ -187,35 +217,51 @@
   default = 0px 3px 2px 1px thin, 0px 25px 20px -15px thick
 
   .signerRequest
+    position absolute
+    top 0px
+    left 0px
+    right 0px
     border-radius 2px
-    display flex
     justify-content space-between
-    align-items center
-    position relative
     width calc(100% - 20px)
-    box-shadow 0px 2px 0px lightShade, default
-    border-radius 2px
+    box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin // , default
+    border-radius 6px
+    margin 15px 10px
+    height 460px
+    display flex
+    justify-content center
+    transition standard
     background light
-    margin 5px
 
   .signerRequestSuccess
-    background good
-    box-shadow 0px 2px 0px good, default
-
+    // background good
+    //box-shadow 0px 2px 0px good, default
+    align-items center
     .approveTransactionPayload
       color #116338
+    .requestApprove
+      opacity 0
+      pointer-events none
 
   .signerRequestPending
-    background #ffd7a5
-    box-shadow 0px 2px 0px #ffd7a5, default
-    .approveTransactionPayload
-      color #0d3a56
+    // background #ffd7a5
+    //box-shadow 0px 2px 0px #ffd7a5, default
+    // .approveTransactionPayload
+    //   color #0d3a56
+    align-items center
+    .requestApprove
+      opacity 0
+      pointer-events none
 
   .signerRequestDeclined
-    background bad
-    box-shadow 0px 2px 0px bad, default
-    .approveTransactionPayload
-      color #491410
+    // background bad
+    // box-shadow 0px 2px 0px bad, default
+    // .approveTransactionPayload
+    //   color #491410
+    align-items center
+    .requestApprove
+      opacity 0
+      pointer-events none
 
   .requestNotice
     height 120px
@@ -224,10 +270,7 @@
     align-items center
 
   .approveTransaction
-    display flex
     width 100%
-    height 450px
-    flex-direction column
 
     .approveTransactionIcon
       width 100%
@@ -235,12 +278,13 @@
       padding-bottom 20px
       display flex
       justify-content center
+      // background red
 
       svg
         fill outerspace
 
     .approveTransactionTitle
-      padding 0px 20px 2px 20px
+      padding 0px 30px 2px 30px
       height 30px
       margin-bottom 25px
       display flex
@@ -264,23 +308,23 @@
 
   .transactionTotal
     width 100%
-    padding-bottom 0px
     display flex
     justify-content center
     align-items center
     flex-direction column
+    // background blue
 
     .transactionSub
       display flex
       flex-direction column
       font-size 20px
-      letter-spacing 1px
+      letter-spacing 2px
 
       .transactionSubSubtitle
-        margin-top -5px
+        // margin-top -5px
         font-weight 400
         text-transform uppercase
-        letter-spacing 1px
+        letter-spacing 2px
 
       .transactionSubValue
         display flex
@@ -288,28 +332,59 @@
         align-items center
         flex-direction column
         font-size 28px
-        letter-spacing 1px
+        letter-spacing 2px
         padding-bottom 15px
+        font-weight 400
 
         .transactionSubSubtitle
           font-size 12px
           letter-spacing 1px
+
+        .transactionSubTotalUSD
+          margin-left 10px
+          padding 3px 10px
+          font-size 20px
+          font-weight 400
+          background thin
+          border-radius 4px
+
+        // .transactionSubTotalETH
+        //   background blue
 
       .transactionSubFee
         display flex
         justify-content center
         align-items center
         flex-direction column
-        padding-bottom 15px
+        padding-bottom 25px
+        font-weight 400
+        letter-spacing 1px
 
         .transactionSubSubtitle
           font-size 12px
+
+        .transactionSubTotalUSD
+          margin-left 10px
+          padding 2px 8px
+          font-size 15px
+          font-weight 400
+          background thin
+          border-radius 4px
+
+
+        // .transactionSubTotalETH
+        //   background blue
+
+      .transactionSubTotals
+        display flex
+        justify-content center
+        align-items center
+
 
   .transactionData
     padding 0px 20px 0px 20px
     height 60px
     width calc(100% - 40px)
-    margin-top 10px
     display flex
     justify-content center
     align-items center
