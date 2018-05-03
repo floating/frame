@@ -96,25 +96,21 @@
   opacity 0
   transform scale(1) translateY(-20px)
   transition standardSlow
-  perspective 100px
 
 .slideUp-enter.slideUp-enter-active
   opacity 1
   transform scale(1) translateY(0px)
   transition standardSlow
   transition-delay 0.32s
-  perspective 100px
 
 .slideUp-leave
   opacity 1
   transition standardSlow
   transform scale(1) translateY(0px)
-  perspective 100px
 
 .slideUp-leave.slideUp-leave-active
   opacity 0
   transform scale(1.4) translateY(0px)
-  perspective 100px
 
 .signerRequests
   position absolute
@@ -177,7 +173,7 @@
   //   background thin
 
   .requestObsverver
-    height 460px
+    height 440px
     display flex
     justify-content center
     align-items center
@@ -280,7 +276,7 @@
     box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin // , default
     border-radius 6px
     margin 10px 10px
-    height 460px
+    height 440px
     display flex
     justify-content center
     transition standard
@@ -370,7 +366,7 @@
     .requestProviderSub
       font-size 12px
       font-weight 400
-      letter-spacing 1px
+      letter-spacing 2px
       text-transform uppercase
       display flex
       justify-content center
@@ -502,15 +498,27 @@
     text-transform uppercase
 
   .transactionTo
-    height 80px
+    height 60px
     width 100%
-    font-size 12px
-    font-family firaCode
     background outerspace
     color spacewhite
     display flex
     justify-content center
     align-items center
+    flex-direction column
+
+    .transactionToAddress
+        font-size 12px
+        font-family firaCode
+
+
+    .transactionToSub
+      font-weight 300
+      text-transform uppercase
+      letter-spacing 2px
+      font-size 12px
+      margin-top 4px
+
 
   .unknownType
     display flex

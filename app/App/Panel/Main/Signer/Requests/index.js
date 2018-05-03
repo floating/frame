@@ -52,7 +52,7 @@ class Requests extends React.Component {
     fee = ((Math.round(fee * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
 
     return (
-      <div key={req.id} className={requestClass} style={{top: (i * 10) + 'px'}}>
+      <div key={req.id || req.handlerId} className={requestClass} style={{top: (i * 10) + 'px'}}>
         {req.type === 'approveTransaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
@@ -62,9 +62,7 @@ class Requests extends React.Component {
                     if (req.status === 'pending') {
                       return (
                         <div key={req.status} className='requestNoticeInner bounceIn'>
-                          <div>
-                            <div className='loader' />
-                          </div>
+                          <div><div className='loader' /></div>
                         </div>
                       )
                     } else if (req.status === 'success') {
@@ -81,9 +79,7 @@ class Requests extends React.Component {
                   <div className='approveTransactionIcon'>
                     {svg.octicon('radio-tower', {height: '20px'})}
                   </div>
-                  <div className='approveTransactionTitle'>
-                    {'Transaction'}
-                  </div>
+                  <div className='approveTransactionTitle'>{'Transaction'}</div>
                   <div className='transactionTotal'>
                     <div className='transactionSub'>
                       <div className='transactionSubValue'>
@@ -107,7 +103,10 @@ class Requests extends React.Component {
                   ) : (
                     <div className='transactionData'>{'No Data'}</div>
                   )}
-                  <div className='transactionTo'>{req.data.to}</div>
+                  <div className='transactionTo'>
+                    <div className='transactionToAddress'>{req.data.to}</div>
+                    <div className='transactionToSub'>{'Send To'}</div>
+                  </div>
                 </React.Fragment>
               )}
             </div>
@@ -129,21 +128,21 @@ class Requests extends React.Component {
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     if (req.status === 'error') requestClass += ' signerRequestError'
     return (
-      <div key={req.id} className={requestClass} style={{top: (i * 10) + 'px'}}>
+      <div key={req.id || req.handlerId} className={requestClass} style={{top: (i * 10) + 'px'}}>
         <div className='approveTransaction'>
           {req.notice ? (
             <div className='requestNotice'>
               {(_ => {
                 if (req.status === 'pending') {
                   return (
-                    <div key={req.status} className='requestNoticeInner bounceIn'>
+                    <div className='requestNoticeInner bounceIn'>
                       <div><div className='loader' /></div>
                     </div>
                   )
                 } else if (req.status === 'success') {
-                  return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: '80px'})}</div>
+                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: '80px'})}</div>
                 } else if (req.status === 'error' || req.status === 'declined') {
-                  return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: '80px'})}</div>
                 }
               })()}
             </div>
@@ -156,8 +155,8 @@ class Requests extends React.Component {
                 {'Provider Request'}
               </div>
               <div className='requestProvider bounceIn'>
-                <div key={req.origin} className='requestProviderOrigin'>{req.origin}</div>
-                <div key={req.origin} className='requestProviderSub'>{'wants to connect'}</div>
+                <div className='requestProviderOrigin'>{req.origin}</div>
+                <div className='requestProviderSub'>{'wants to connect'}</div>
               </div>
             </div>
           )}

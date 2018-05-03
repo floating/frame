@@ -1,6 +1,6 @@
 const { app, ipcMain } = require('electron')
 
-const opn = require('opn')
+// const opn = require('opn')
 const store = require('./store')
 const signers = require('./signers')
 const windows = require('./windows')
