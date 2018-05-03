@@ -48,8 +48,9 @@ class Requests extends React.Component {
     let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
     value = Web3.utils.fromWei(value, 'ether')
     fee = Web3.utils.fromWei(fee, 'ether')
-    value = Math.round(value * 100000000) / 100000000
-    fee = Math.round(fee * 100000000) / 100000000
+    value = ((Math.round(value * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
+    fee = ((Math.round(fee * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
+
     return (
       <div key={req.id} className={requestClass} style={{top: (i * 10) + 'px'}}>
         {req.type === 'approveTransaction' ? (
@@ -128,13 +129,39 @@ class Requests extends React.Component {
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     if (req.status === 'error') requestClass += ' signerRequestError'
     return (
-      <div className={requestClass} style={{top: (i * 10) + 'px'}}>
-        {req.type === 'requestProvider' ? (
-          <div className='approveTransaction'>
-            <div className='approveTransactionTitle'>{'Request Provider Access'}</div>
-            {req.notice ? <div className='requestNotice'>{req.notice}</div> : null}
-          </div>
-        ) : <div className='unknownType'>{'Unknown: ' + req.type}</div>}
+      <div key={req.id} className={requestClass} style={{top: (i * 10) + 'px'}}>
+        <div className='approveTransaction'>
+          {req.notice ? (
+            <div className='requestNotice'>
+              {(_ => {
+                if (req.status === 'pending') {
+                  return (
+                    <div key={req.status} className='requestNoticeInner bounceIn'>
+                      <div><div className='loader' /></div>
+                    </div>
+                  )
+                } else if (req.status === 'success') {
+                  return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: '80px'})}</div>
+                } else if (req.status === 'error' || req.status === 'declined') {
+                  return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                }
+              })()}
+            </div>
+          ) : (
+            <div className='approveTransactionPayload'>
+              <div className='approveTransactionIcon'>
+                {svg.octicon('link', {height: '20px'})}
+              </div>
+              <div className='approveTransactionTitle'>
+                {'Provider Request'}
+              </div>
+              <div className='requestProvider bounceIn'>
+                <div key={req.origin} className='requestProviderOrigin'>{req.origin}</div>
+                <div key={req.origin} className='requestProviderSub'>{'wants to connect'}</div>
+              </div>
+            </div>
+          )}
+        </div>
         <div className='requestApprove'>
           <div className='requestDecline' onClick={() => this.store.giveAccess(req, false)}>{'Decline'}</div>
           <div className='requestSign' onClick={() => this.store.giveAccess(req, true)}>{'Approve'}</div>
