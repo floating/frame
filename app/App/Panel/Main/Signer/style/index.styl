@@ -44,21 +44,6 @@
   opacity 0
   transition standard
 
-// @keyframes sk-scaleout
-//   0%
-//     transform scale(0)
-//   100%
-//     transform scale(1.0)
-//     opacity 0
-//
-// .spinner
-//   width 40px
-//   height 40px
-//   margin 100px auto
-//   background-color outerspace
-//   border-radius 100%
-//   animation sk-scaleout 640ms infinite cubic
-
 .signer
   position relative
   padding 0px 10px 10px 10px
@@ -302,9 +287,9 @@
     opacity 1
     transition standard, 0.1s linear background
     will-change transform
-    background rgba(35, 25, 85, 0.07)
+    background rgba(35, 25, 85, 0.05)
 
-    div
+    > div
       transition standard
       opacity 0
 
@@ -494,8 +479,8 @@
 .openSigner
   padding 0px 5px 5px 5px
   .signerMid
-    background rgba(35, 25, 85, 0.03)
-    div
+    background rgba(5, 25, 100, 0.01)
+    > div
       opacity 1
   .signerTop
     .signerNav

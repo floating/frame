@@ -16,7 +16,7 @@ module.exports = () => {
       let url = new URL('ws://' + info.req.headers.host + info.req.url)
       let search = qs.parse(url.search.replace(/^\?+/g, ''))
       let quiet = !search.mode ? false : search.mode === 'quiet'
-      if (permIndex === -1 && store('signer.current') && !quiet) return store.addRequest({type: 'requestProvider', origin, notice: `${origin} is requesting access to the provider.`})
+      if (permIndex === -1 && store('signer.current') && !quiet) return store.addRequest({type: 'requestProvider', origin})
       setTimeout(_ => obs.remove(), 0) // Add fix for this pattern in restore
       next(store('signer.current') && store('node.provider') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
     })
