@@ -46,7 +46,7 @@ Frame interfaces with the Ethereum network and signature providers (such as a Le
 › npm run build
 
 # Run Frame
-› npm run demo
+› npm run alpha
 ```
 
 **On Windows:** Run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.

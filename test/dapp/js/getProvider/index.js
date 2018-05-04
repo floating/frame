@@ -10,7 +10,7 @@ const connect = (provider, url) => {
     provider.socket.addEventListener('open', () => provider.emit('open'))
     provider.socket.addEventListener('close', () => {
       provider.socket = null
-      setTimeout(_ => connect(provider, url), 1000)
+      setTimeout(_ => connect(provider, url), 500)
       provider.emit('close')
     })
     // provider.socket.addEventListener('error', err => provider.emit('error', err))

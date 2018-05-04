@@ -95,6 +95,9 @@ class Provider extends EventEmitter {
   unsubscribe (params) {
     this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params})
   }
+  declineRequest (req) {
+    if (this.handlers[req.handlerId]) this.handlers[req.handlerId]('user declined transaction')
+  }
   approveRequest (req, cb) {
     let rawTx = req.data
     rpc('signTransaction', rawTx, (err, signedTx) => { // Sign Transaction

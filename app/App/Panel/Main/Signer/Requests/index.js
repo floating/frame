@@ -35,8 +35,8 @@ class Requests extends React.Component {
   approve (reqId, req) {
     this.store.events.emit('approveRequest', reqId, req)
   }
-  decline (reqId) {
-    this.store.declineRequest(reqId)
+  decline (reqId, req) {
+    this.store.events.emit('declineRequest', reqId, req)
   }
   transactionRequest (req, i) {
     let requestClass = 'signerRequest'
@@ -44,13 +44,13 @@ class Requests extends React.Component {
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     if (req.status === 'error') requestClass += ' signerRequestError'
-    let value = req.data.value
+    let etherUSD = 750
+    let value = req.data.value || '0x'
     let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
     value = Web3.utils.fromWei(value, 'ether')
     fee = Web3.utils.fromWei(fee, 'ether')
     value = ((Math.round(value * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
     fee = ((Math.round(fee * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
-
     return (
       <div key={req.id || req.handlerId} className={requestClass} style={{top: (i * 10) + 'px'}}>
         {req.type === 'approveTransaction' ? (
@@ -79,20 +79,20 @@ class Requests extends React.Component {
                   <div className='approveTransactionIcon'>
                     {svg.octicon('radio-tower', {height: '20px'})}
                   </div>
-                  <div className='approveTransactionTitle'>{'Transaction'}</div>
+                  <div className='approveRequestTitle approveTransactionTitle'>{'Transaction'}</div>
                   <div className='transactionTotal'>
                     <div className='transactionSub'>
                       <div className='transactionSubValue'>
                         <div className='transactionSubTotals'>
                           <div className='transactionSubTotalETH'>{'Ξ ' + value}</div>
-                          <div className='transactionSubTotalUSD'>{'$ ' + (value * 670).toFixed(2)}</div>
+                          <div className='transactionSubTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
                         </div>
                         <div className='transactionSubSubtitle'>{'Value'}</div>
                       </div>
                       <div className='transactionSubFee'>
                         <div className='transactionSubTotals'>
                           <div className='transactionSubTotalETH'>{'Ξ ' + fee}</div>
-                          <div className='transactionSubTotalUSD'>{'$ ' + (fee * 670).toFixed(2)}</div>
+                          <div className='transactionSubTotalUSD'>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
                         </div>
                         <div className='transactionSubSubtitle'>{'Max Fee'}</div>
                       </div>
@@ -104,7 +104,10 @@ class Requests extends React.Component {
                     <div className='transactionData'>{'No Data'}</div>
                   )}
                   <div className='transactionTo'>
-                    <div className='transactionToAddress'>{req.data.to}</div>
+                    <div className='transactionToAddress'>
+                      <div className='transactionToAddressLarge'>{req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', {height: '20px'})} {req.data.to.substr(req.data.to.length - 11)}</div>
+                      <div className='transactionToAddressFull'>{req.data.to}</div>
+                    </div>
                     <div className='transactionToSub'>{'Send To'}</div>
                   </div>
                 </React.Fragment>
@@ -115,7 +118,7 @@ class Requests extends React.Component {
           <div className='unknownType'>{'Unknown: ' + req.type}</div>
         )}
         <div className='requestApprove'>
-          <div className='requestDecline' onClick={() => this.decline(req.handlerId)}>{'Decline'}</div>
+          <div className='requestDecline' onClick={() => this.decline(req.handlerId, req)}>{'Decline'}</div>
           <div className='requestSign' onClick={() => this.approve(req.handlerId, req)}>{'Sign'}</div>
         </div>
       </div>
@@ -151,7 +154,7 @@ class Requests extends React.Component {
               <div className='approveTransactionIcon'>
                 {svg.octicon('link', {height: '20px'})}
               </div>
-              <div className='approveTransactionTitle'>
+              <div className='approveRequestTitle'>
                 {'Provider Request'}
               </div>
               <div className='requestProvider bounceIn'>

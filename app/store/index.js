@@ -45,6 +45,11 @@ store.events.on('approveRequest', (id, req) => {
   })
 })
 
+store.events.on('declineRequest', (id, req) => {
+  store.declineRequest(id)
+  provider.declineRequest(req)
+})
+
 // Store Observers
 store.observer(() => {
   if (store('panel.show')) {

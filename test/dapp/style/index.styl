@@ -20,11 +20,29 @@
   font-weight 600
   src url('../../../app/style/fonts/OpenSans/OpenSans-Bold.ttf')
 
+@font-face
+  font-family 'FiraCode'
+  font-weight 300
+  src url('../../../app/style/fonts/FiraCode/FiraCode-Retina.ttf')
+
+
 // Colors
-bg = #dce1e8
+// bg = #dce1e8
+bg = #dadfea // #dce1e8
 v = #4e5758
+outerspace01 = rgba(33, 45, 46, 0.1)
+outerspace03 = rgba(33, 45, 46, 0.3)
+outerspace05 = rgba(33, 45, 46, 0.5)
+outerspace08 = rgba(33, 45, 46, 0.8)
 outerspace = #212d2e
+outerspaceDark = #0b1819
 spacewhite = #f7fbff
+light = #eff2f7
+lightShade = #dfe6ef
+thin = rgba(6, 24, 132, .03)
+thick = rgba(6, 24, 132, .07)
+good = #47caab
+bad = rgb(244, 66, 131)
 
 // Shadows
 cardDrop = 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
@@ -33,13 +51,135 @@ cardDrop = 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
 standard = .24s cubic-bezier(.82,0,.12,1) all
 standardSlow = .48s cubic-bezier(.82,0,.12,1) all
 
+@keyframes bounceIn
+  from, 20%, 40%, 60%, 80%, to
+    animation-timing-function cubic-bezier(0.215, 0.61, 0.355, 1)
+  0%
+    opacity 0
+    transform scale3d(0.3, 0.3, 0.3)
+  20%
+    transform scale3d(1.1, 1.1, 1.1)
+  40%
+    transform scale3d(0.9, 0.9, 0.9)
+  60%
+    opacity 1
+    transform scale3d(1.03, 1.03, 1.03)
+  80%
+    transform scale3d(0.97, 0.97, 0.97)
+  to
+    opacity 1
+    transform scale3d(1, 1, 1)
+
+.bounceIn
+  animation-duration 0.75s
+  animation-name bounceIn
+
+@keyframes load
+  0%
+    transform rotate(0deg)
+  100%
+    transform rotate(360deg)
+
+.loader, .loader:after
+  border-radius 50%
+  width 7em
+  height 7em
+
+.loader
+  font-size 10px
+  position relative
+  text-indent -9999em
+  border-top 9px solid rgba(255, 255, 255, 0.05)
+  border-right 9px solid rgba(255, 255, 255, 0.05)
+  border-bottom 9px solid rgba(255, 255, 255, 0.05)
+  border-left 9px solid rgba(255, 255, 255, 1)
+  transform translateZ(0)
+  animation load 1.1s infinite linear !important
+
+@keyframes breathing
+  0%
+    transform scale(0.94)
+  50%
+    transform scale(1)
+  100%
+    transform scale(0.94)
+
+
+@keyframes breathing2
+
+  // 0%
+  //   transform translateY(-3px)
+  //   // opacity 0.1
+  //   // text-shadow 0px 5px 4px rgba(0, 0, 0, 0.6)
+  //
+  // 50%
+  //   transform translateY(3px)
+  //   //text-shadow 0px 2px 0px rgba(0, 0, 0, 0.6)
+  //
+  // 100%
+  //   transform translateY(-3px)
+  //   // opacity 0.1
+  //   //text-shadow 0px 5px 4px rgba(0, 0, 0, 0.6)
+
+
+.slideUp-enter
+  opacity 0
+  transform scale(0.6)
+  transition standard
+
+.slideUp-enter.slideUp-enter-active
+  opacity 1
+  transform scale(1)
+  transition standard
+  // transition-delay 0.32s
+
+.slideUp-leave
+  opacity 1
+  transition standard
+  transform scale(1)
+
+.slideUp-leave.slideUp-leave-active
+  opacity 0
+  transform scale(1.4)
+
+.slideDown-enter
+  opacity 0
+  transform scale(1.4)
+  transition standard
+
+.slideDown-enter.slideDown-enter-active
+  opacity 1
+  transform scale(1)
+  transition standard
+  // transition-delay 0.32s
+
+.slideDown-leave
+  opacity 1
+  transition standard
+  transform scale(1)
+
+.slideDown-leave.slideDown-leave-active
+  opacity 0
+  transform scale(0.6)
+
 body
-  background bg
+  background outerspace
   color spacewhite
-  font-family OpenSans
+  font-family OpenSans, sans-serif, FiraCode
+  // text-shadow 0px 2px 0px rgba(0, 0, 0, 0.6)
   font-weight 200
-  font-size 20px
-  color outerspace
+  font-size 25px
+  fill spacewhite
+  overflow hidden
+  margin 0
+  padding 0
+
+  .__restoreDevToolsExpand
+    bottom 10px !important
+    background rgba(255, 255, 255, 0.03) !important
+    .__restoreDevToolsIcon
+      background transparent !important
+      fill spacewhite !important
 
   #dapp
     height 100%
@@ -48,55 +188,228 @@ body
     justify-content center
     align-items center
     flex-direction column
+    position relative
+    overflow hidden
+    // animation breathing 7s ease-out infinite normal
+    // -webkit-font-smoothing antialiased
 
-    .current
-      display flex
-      justify-content center
-      align-items center
-      flex-direction column
+    #slide
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      overflow hidden
 
-      .account
-        padding-bottom 40px
-
-      .address
-        letter-spacing 3px
-        font-size 32px
-        padding-bottom 40px
-
-    .button-wrap
-      display flex
-      flex-direction row
-      flex-wrap wrap
-      width 48%
-
-      .button
-        width 150px
-        margin 10px
+      .slideWrap
+        position absolute
+        top 10%
+        right 10%
+        bottom 10%
+        left 10%
         display flex
         justify-content center
         align-items center
-        background spacewhite
-        border-radius 4px
-        padding 20px
-        box-shadow cardDrop
-        cursor pointer
-        font-size 14px
+        flex-direction column
+        animation breathing 7s ease-in-out infinite normal
+        will-change transform
 
-    .errorMessage
-      display flex
-      justify-content center
-      align-items center
-      flex-direction column
-      font-size 30px
+      .defaultSlide
+        display flex
+        justify-content center
+        // salign-items center
+        flex-direction column
+        // background blue
+        // width 100%
+        will-change transform
+        max-width 850px
 
-      .providerErrorSub
-        margin-top 10px
+      .defaultTitle
+        padding-bottom 20px
+        padding-left 0px
+        font-size 40px
+        font-weight 300
+
+      .defaultText
+        padding 0px
+        // font-weight 300
+        padding-bottom 30px
+
+      .titleSlide
         display flex
         justify-content center
         align-items center
-        font-size 16px
+        flex-direction column
+        // background blue
 
-        span
-          padding 4px
+      .logoTitle
+        font-size 34px
+        padding 50px 40px 30px 65px
+        text-transform uppercase
+        font-weight 300
+        letter-spacing 25px
+        font-family helvetica
 
-@import '../js/Transactions/style'
+      .connectionStatus
+        height 120px
+        width 120px
+        margin-bottom 20px
+        position relative
+
+        .connectionStatusInner
+          position absolute
+          top 0
+          right 0
+          bottom 0
+          left 0
+          display flex
+          justify-content center
+          align-items center
+
+          .check
+            height 100px
+            width 100px
+            background blue
+            display flex
+            justify-content center
+            align-items center
+            border-radius 50px
+            background rgba(255, 255, 255, 0.03)
+
+    #slideIndex
+      position absolute
+      width 40px
+      height 40px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 20px
+      background rgba(255, 255, 255, 0.03) !important
+      left 10px
+      top 13px
+      font-weight 300
+      font-size 20px
+
+    .list
+      padding-bottom 10px
+
+      .listHead
+        margin-left 25px
+
+      .listItem
+        margin-left 75px
+
+    .listHead
+      font-weight 300
+      margin-left 0px
+      margin-bottom 10px
+
+    .listItem:before
+      position absolute
+      left -25px
+      top 15px
+      content ''
+      height 4px
+      width 4px
+      border-radius 3px
+      background spacewhite
+
+    .listItem
+      position relative
+      margin-left 50px
+      font-size 23px
+      margin-bottom 20px
+
+
+    .highlight
+      font-weight 400
+      // animation-duration 0.75s
+      // animation-name bounceIn
+      position relative
+      display inline-block
+      animation breathing2 7s ease-in-out infinite normal
+      // padding 0px 5px 0px 5px
+
+    .codeBox
+      background rgba(255, 255, 255, 0.03)
+      padding 45px 60px 45px 45px
+      border-radius 6px
+      font-family FiraCode
+      font-weight 300
+      font-size 23px
+      will-change transform
+      width 640px
+
+      div
+        height 30px
+        display flex
+        align-items center
+        white-space nowrap
+
+    .buttonWrap
+      display flex
+      cursor pointer
+
+    .button
+      margin 30px 10px 5px 10px
+      display flex
+      justify-content center
+      align-items center
+      background spacewhite
+      color outerspace
+      cursor pointer
+      font-size 17px
+      // text-transform uppercase
+      font-weight 300
+      width 250px
+      height 44px
+      border-radius 22px
+      box-shadow 0px 10px 10px -10px rgba(0,0,0,0.8)
+      transition standard
+
+    .button:hover
+      transform translateY(3px)
+      box-shadow 0px 7px 7px -7px rgba(0,0,0,0.8)
+
+    .button:active
+      transform translateY(5px)
+      box-shadow 0px 5px 5px -5px rgba(0,0,0,0.8)
+
+
+
+//
+//
+//
+//     // .current
+//     //   display flex
+//     //   justify-content center
+//     //   align-items center
+//     //   flex-direction column
+//     //
+//     //   .account
+//     //     padding-bottom 40px
+//     //
+//     //   .address
+//     //     letter-spacing 3px
+//     //     font-size 32px
+//     //     padding-bottom 40px
+//     //
+//     //
+//     // .errorMessage
+//     //   display flex
+//     //   justify-content center
+//     //   align-items center
+//     //   flex-direction column
+//     //   font-size 30px
+//     //
+//     //   .providerErrorSub
+//     //     margin-top 10px
+//     //     display flex
+//     //     justify-content center
+//     //     align-items center
+//     //     font-size 16px
+//     //
+//     //     span
+//     //       padding 4px
+//
+// @import '../js/Transactions/style'

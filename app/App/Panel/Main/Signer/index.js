@@ -18,6 +18,13 @@ class Signer extends React.Component {
       typeHover: false
     }
   }
+  copyAddress (e) {
+    e.preventDefault()
+    e.target.select()
+    document.execCommand('Copy')
+    this.setState({copied: true})
+    setTimeout(_ => this.setState({copied: false}), 1000)
+  }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
     if (this.tPin.length === 4) {
@@ -157,7 +164,10 @@ class Signer extends React.Component {
                     <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
                   </div>
                 </div>
-                <div className='signerAddress'>{this.props.accounts[0]}</div>
+                <div className='signerAddress'>
+                  {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.accounts[0]}
+                  <input onClick={e => this.copyAddress(e)} defaultValue={this.props.accounts[0]} />
+                </div>
               </React.Fragment>
             )}
           </div>

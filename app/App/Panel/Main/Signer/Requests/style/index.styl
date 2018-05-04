@@ -173,7 +173,7 @@
   //   background thin
 
   .requestObsverver
-    height 440px
+    height 460px
     display flex
     justify-content center
     align-items center
@@ -276,7 +276,7 @@
     box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin // , default
     border-radius 6px
     margin 10px 10px
-    height 440px
+    height 460px
     display flex
     justify-content center
     transition standard
@@ -387,19 +387,25 @@
       svg
         fill outerspace
 
-    .approveTransactionTitle
-      padding 0px 30px 2px 30px
+    .approveRequestTitle
+      padding 0px 30px 1px 33px
       height 30px
       margin-bottom 25px
       display flex
       justify-content center
       align-items center
-      border-radius 15px
+      border-radius 16px
       text-transform uppercase
       letter-spacing 3px
       font-weight 400
       font-size 14px
-      background thin
+      background thick
+      color outerspace
+
+    .approveTransactionTitle
+      background good
+      color spacewhite
+      text-shadow 0px 1px 2px rgba(0, 50, 50, 0.2), 0px 1px 0px rgba(0, 50, 50, 0.2)
 
     .approveTransactionPayload
       width 100%
@@ -492,13 +498,13 @@
     justify-content center
     align-items center
     background thin
-    font-size 12px
+    font-size 15px
     font-weight 400
     letter-spacing 1px
     text-transform uppercase
 
   .transactionTo
-    height 60px
+    height 80px
     width 100%
     background outerspace
     color spacewhite
@@ -508,9 +514,48 @@
     flex-direction column
 
     .transactionToAddress
-        font-size 12px
-        font-family firaCode
+      font-size 12px
+      font-family firaCode
+      position relative
+      height 30px
+      width 100%
 
+      .transactionToAddressLarge
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display flex
+        justify-content center
+        align-items center
+        font-size 20px
+        opacity 1
+        transition standardSlow
+        svg
+          fill spacewhite
+          padding-top 5px
+          padding-left 5px
+          padding-right 5px
+
+      .transactionToAddressFull
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display flex
+        justify-content center
+        align-items center
+        font-size 12px
+        opacity 0
+        transition standardSlow
+
+    .transactionToAddress:hover
+        .transactionToAddressLarge
+          opacity 0
+        .transactionToAddressFull
+          opacity  1
 
     .transactionToSub
       font-weight 300
