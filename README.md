@@ -1,6 +1,6 @@
 <h2 align="center">
   <br>
-  <img src="https://record.nyc3.digitaloceanspaces.com/FrameLogo512.png" alt="Frame" width="150">
+  <img src="/test/FrameLogo512.png?raw=true" alt="Frame" width="150" />
   <br>
   <br>
   F R A M E
@@ -18,7 +18,7 @@
 </p>
 <br>
 
-<img src="/test/FrameDemo0-0-3.gif?raw=true" />
+<img src="/test/FrameDemo0-0-3v2.gif?raw=true" />
 
 Frame interfaces with the Ethereum network and signature providers (such as a Ledger or Trezor) to create an OS-level provider that can be used with any web, desktop or command-line dapp. Frame was created to be a user-friendly way to securely and transparently interact with dapps and the Ethereum network.
 
