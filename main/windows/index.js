@@ -8,6 +8,7 @@ const Positioner = require('electron-positioner')
 const store = require('../store')
 
 const dev = process.env.NODE_ENV === 'development'
+const demo = process.env.NODE_ENV === 'demo'
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray, bounds
@@ -25,7 +26,7 @@ const api = {
     windows.tray.positioner = new Positioner(windows.tray)
     if (dev) {
       windows.tray.openDevTools()
-    } else {
+    } else if (!demo) {
       windows.tray.on('blur', _ => api.hideTray())
     }
   },
