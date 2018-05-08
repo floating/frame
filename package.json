@@ -8,7 +8,7 @@
     "build": "npm install && electron-rebuild",
     "pack:production": "mkdir -p ./build/production && electron-packager ./ --all --out=./build/production",
     "pack": "mkdir -p ./build && electron-packager ./ --overwrite --out=./build",
-    "build:extension": "copyfiles -f ./extension/* ./extension/build && parcel build ./extension/build/frame.js -d ./extension/build && node ./extension/inline.js",
+    "build:extension": "copyfiles -f ./extension/* ./extension/build && parcel build ./extension/build/frame.js -d ./extension/build --no-source-maps && node ./extension/inline.js",
     "dev": "npm-run-all --parallel test:rpc launch:dev test:dapp",
     "demo": "npm-run-all --parallel launch:demo test:dapp",
     "alpha": "npm-run-all --parallel launch test:dapp",
