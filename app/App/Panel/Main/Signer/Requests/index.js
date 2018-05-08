@@ -98,7 +98,7 @@ class Requests extends React.Component {
                       </div>
                     </div>
                   </div>
-                  {Web3.utils.toAscii(req.data.data) ? (
+                  {Web3.utils.toAscii(req.data.data || '0x') ? (
                     <div className='transactionData'>{'View Data'} </div>
                   ) : (
                     <div className='transactionData'>{'No Data'}</div>
