@@ -43,14 +43,15 @@ const getProvider = (url) => {
   const provider = new EventEmitter()
   connect(provider, url)
   provider.send = (payload, cb) => {
-    if (provider.socket.readyState === provider.socket.CONNECTING) {
+    if (provider.socket && provider.socket.readyState === provider.socket.CONNECTING) {
       setTimeout(_ => provider.send(payload, cb), 10)
-      return
+    } else if (!provider.socket || provider.socket.readyState > 1) {
+      cb(new Error('Provider Disconnected'))
+    } else {
+      payload.handlerId = uuid()
+      provider.handlers[payload.handlerId] = cb
+      provider.socket.send(JSON.stringify(payload))
     }
-    if (!provider.socket || provider.socket.readyState > 1) return cb(new Error('Provider Disconnected'))
-    payload.handlerId = uuid()
-    provider.handlers[payload.handlerId] = cb
-    provider.socket.send(JSON.stringify(payload))
   }
   return provider
 }
