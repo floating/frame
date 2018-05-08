@@ -16,6 +16,7 @@ const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet 
     provider.socket = new WebSocket(quiet ? 'ws://localhost:1248/?mode=quiet' : 'ws://localhost:1248')
     provider.socket.addEventListener('open', () => {
       console.log('Frame Provider Connected!')
+      if (!quiet) window.location.reload()
       reconnect = true
       provider.emit('open')
     })
@@ -41,7 +42,11 @@ const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet 
 const getProvider = (url) => {
   const provider = new EventEmitter()
   connect(provider, url)
-  provider.sendAsync = (payload, cb) => {
+  provider.send = (payload, cb) => {
+    if (provider.socket.readyState === provider.socket.CONNECTING) {
+      setTimeout(_ => provider.send(payload, cb), 10)
+      return
+    }
     if (!provider.socket || provider.socket.readyState > 1) return cb(new Error('Provider Disconnected'))
     payload.handlerId = uuid()
     provider.handlers[payload.handlerId] = cb
@@ -52,8 +57,8 @@ const getProvider = (url) => {
 
 try {
   let provider = getProvider()
+  window.web3 = new Web3(provider)
   provider.socket.addEventListener('open', () => {
-    window.web3 = new Web3(provider)
     window.web3.eth.getAccounts((err, accounts) => {
       if (err) console.log(err)
       window.web3.eth.accounts = accounts

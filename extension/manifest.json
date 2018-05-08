@@ -15,9 +15,6 @@
     "js": ["inject.js"],
     "run_at": "document_start"
   }],
-  "web_accessible_resources": [
-    "frame.js"
-  ],
   "permissions": [
     "activeTab",
     "https://*/*",
