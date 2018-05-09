@@ -84,10 +84,13 @@ class Provider extends EventEmitter {
     })
   }
   getNonce (from, cb) {
-    this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'latest']}, cb)
+    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'latest']}, cb)
   }
   getGasPrice (cb) {
-    this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, cb)
+    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_gasPrice'}, cb)
+  }
+  getGasEstimate (tx, cb) {
+    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_estimateGas', params: [tx]}, cb)
   }
   getNetVersion (payload, cb) {
     cb(null, {id: payload.id, jsonrpc: payload.jsonrpc, result: this.netVersion.toString()})
@@ -119,15 +122,21 @@ class Provider extends EventEmitter {
   sendTransaction (payload, cb) {
     let rawTx = payload.params[0]
     this.getNonce(rawTx.from, (err, nonce) => {
-      if (err || nonce.error) return cb(new Error(`Frame Provider Error while getting nonce: ${err || nonce.error}`))
+      if (err) return cb(new Error(`Frame Provider Error while getting nonce: ${err}`))
       nonce = nonce.result
       this.getGasPrice((err, gasPrice) => {
-        if (err || gasPrice.error) return cb(new Error(`Frame Provider Error while getting nonce: ${err || gasPrice.error}`))
+        if (err) return cb(new Error(`Frame Provider Error while getting gasPrice: ${err}`))
         gasPrice = gasPrice.result
-        rawTx = Object.assign({nonce, gasPrice}, payload.params[0], {chainId: Web3.utils.toHex(this.netVersion)})
-        let handlerId = uuid()
-        this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, id: payload.id, jsonrpc: payload.jsonrpc})
-        this.handlers[handlerId] = cb
+        this.getGasEstimate(rawTx, (err, gas) => {
+          if (err) return cb(new Error(`Frame Provider Error while getting gasEstimate: ${err}`))
+          gas = gas.result
+          rawTx.gas = rawTx.gas || rawTx.gasLimit
+          delete rawTx.gasLimit
+          rawTx = Object.assign({nonce, gasPrice, gas}, rawTx, {chainId: Web3.utils.toHex(this.netVersion)})
+          let handlerId = uuid()
+          this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, id: payload.id, jsonrpc: payload.jsonrpc})
+          this.handlers[handlerId] = cb
+        })
       })
     })
   }
