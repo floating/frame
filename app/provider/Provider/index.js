@@ -130,9 +130,11 @@ class Provider extends EventEmitter {
         this.getGasEstimate(rawTx, (err, gas) => {
           if (err) return cb(new Error(`Frame Provider Error while getting gasEstimate: ${err}`))
           gas = gas.result
-          rawTx.gas = rawTx.gas || rawTx.gasLimit
+          rawTx.nonce = rawTx.nonce || nonce
+          rawTx.gasPrice = rawTx.gasPrice || gasPrice
+          rawTx.gas = rawTx.gas || rawTx.gasLimit || gas
           delete rawTx.gasLimit
-          rawTx = Object.assign({nonce, gasPrice, gas}, rawTx, {chainId: Web3.utils.toHex(this.netVersion)})
+          rawTx = Object.assign(rawTx, {chainId: Web3.utils.toHex(this.netVersion)})
           let handlerId = uuid()
           this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, id: payload.id, jsonrpc: payload.jsonrpc})
           this.handlers[handlerId] = cb
