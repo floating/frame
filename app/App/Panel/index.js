@@ -15,8 +15,9 @@ class Panel extends React.Component {
     this.state = {scroll: 0}
   }
   render () {
+    let open = this.store('tray.open')
     return (
-      <div id='panel' onScroll={e => this.setState({scroll: ReactDOM.findDOMNode(e.target).scrollTop})}>
+      <div id='panel' onScroll={e => this.setState({scroll: ReactDOM.findDOMNode(e.target).scrollTop})} style={{transform: open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'}}>
         <div className='panelMenu' style={{opacity: this.store('signer.current') || (this.state.scroll < 50) ? 1 : 0}}>
           <div className='panelMenuItem' onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['three-bars'].toSVG({height: 20})}} />
         </div>

@@ -11,6 +11,9 @@ let initial = {
   },
   view: {current: '', list: [], data: {}},
   signers: {},
+  tray: {
+    open: false
+  },
   signer: {
     minimized: true,
     open: false,
@@ -48,6 +51,7 @@ let initial = {
     accounts: persist.get('accounts') || {}
   }
 }
+
 if (initial.frame.type !== 'tray' && initial.view.list.length === 0) {
   let id = uuid()
   initial.view.current = id

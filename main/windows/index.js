@@ -19,16 +19,13 @@ const api = {
     tray.setHighlightMode('never')
     bounds = tray.getBounds()
     tray.on('click', api.trayClick)
-    windows.tray = new BrowserWindow({id: 'tray', width: 360, height: 800, frame: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
+    windows.tray = new BrowserWindow({id: 'tray', width: 360, height: 800, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
     windows.tray.loadURL(url.format({pathname: path.join(__dirname, '../../app/tray.html'), protocol: 'file:', slashes: true}))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
-    if (dev) {
-      windows.tray.openDevTools()
-    } else if (!demo) {
-      windows.tray.on('blur', _ => api.hideTray())
-    }
+    if (!dev && !demo) windows.tray.on('blur', _ => api.hideTray())
+    api.showTray()
   },
   trayClick: (e, newBounds) => {
     if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()
@@ -38,20 +35,26 @@ const api = {
     let pos = noBound ? win32 ? 'bottomRight' : 'topRight' : win32 ? 'trayBottomCenter' : 'trayCenter'
     api.showTray(pos, bounds)
   },
-  hideTray: () => windows.tray.hide(),
-  showTray: (pos, bounds, height) => {
+  hideTray: () => {
+    windows.tray.send('main:trayOpen', false)
+    setTimeout(_ => {
+      windows.tray.hide()
+    }, 700)
+  },
+  showTray: (pos, bounds) => {
     if (!windows.tray) return api.tray()
     if (windows.tray.isVisible()) return api.hideTray()
-    pos = windows.tray.positioner.calculate(pos, bounds)
+    pos = windows.tray.positioner.calculate('topRight')
     windows.tray.setVisibleOnAllWorkspaces(true)
     windows.tray.focus()
     windows.tray.setVisibleOnAllWorkspaces(false)
     windows.tray.setResizable(false)
-    if (process.platform === 'win32') pos.y = 50
     windows.tray.setPosition(pos.x, pos.y)
-    let activeScreen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
-    windows.tray.setSize(360, activeScreen.size.height - bounds.height - 50, false)
+    let screen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
+    windows.tray.setPosition(pos.x, pos.y)
+    windows.tray.setSize(370, screen.workArea.height)
     windows.tray.show()
+    windows.tray.send('main:trayOpen', true)
   },
   create: () => {
     let id = uuid()

@@ -18,7 +18,7 @@ class Provider extends EventEmitter {
     this.accounts = []
     this.handlers = {}
     this.nodeRequests = {}
-    this.count = 0
+    this.count = 1
     this.netVersion = 4
     this.connection = new EventEmitter()
     this.connection.send = (payload, cb) => {
@@ -30,7 +30,7 @@ class Provider extends EventEmitter {
     }
     this.connection.on('message', message => {
       if (message.jsonrpc && message.jsonrpc === '2.0') {
-        if (!message.id && message.method.indexOf('_subscription') !== -1) {
+        if (!message.id && message.method && message.method.indexOf('_subscription') !== -1) {
           this.emit('data', message)
         } else {
           let requestId = message.id
