@@ -29,20 +29,18 @@ module.exports = () => {
     socket.origin = req.headers.origin
     socket.on('message', data => {
       let payload = JSON.parse(data)
-      let handlerId = payload.handlerId
-      delete payload.handlerId
-      provider.sendAsync(payload, (err, res) => {
-        if (!err && res && res.result) {
+      provider.send(payload, res => {
+        if (res && res.result) {
           if (payload.method === 'eth_subscribe') {
             subs[res.result] = socket
           } else if (payload.method === 'eth_unsubscribe') {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        socket.send(JSON.stringify({type: 'response', handlerId, err, res}))
+        socket.send(JSON.stringify(res))
       })
     })
-    socket.on('error', err => err)
+    socket.on('error', err => err) // Handle Error
     socket.on('close', _ => {
       let unsub = []
       Object.keys(subs).forEach(sub => {
@@ -60,7 +58,7 @@ module.exports = () => {
   })
 
   provider.on('data', payload => {
-    if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify({type: 'subscription', payload}))
+    if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify(payload))
   })
 
   store.observer(() => {
