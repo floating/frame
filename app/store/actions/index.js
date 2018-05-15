@@ -25,6 +25,8 @@ export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
+export const trayOpen = (u, open) => u('tray.open', _ => open)
+
 export const runLocalNode = u => u('local.node.run', run => !run)
 export const runOnStartup = u => u('local.startup', startup => !startup)
 

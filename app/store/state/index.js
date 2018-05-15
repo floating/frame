@@ -2,7 +2,7 @@ import uuid from 'uuid/v4'
 
 const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
 const persist = new PersistStore()
-// persist.clear()
+persist.clear()
 
 let initial = {
   panel: {
@@ -11,6 +11,9 @@ let initial = {
   },
   view: {current: '', list: [], data: {}},
   signers: {},
+  tray: {
+    open: false
+  },
   signer: {
     minimized: true,
     open: false,
@@ -48,6 +51,7 @@ let initial = {
     accounts: persist.get('accounts') || {}
   }
 }
+
 if (initial.frame.type !== 'tray' && initial.view.list.length === 0) {
   let id = uuid()
   initial.view.current = id

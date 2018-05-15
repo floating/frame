@@ -38,7 +38,7 @@ class Signer extends React.Component {
     } else {
       let bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index})
+      this.store.initialSignerPos({top: bounds.top - 5, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3 - 5, height: this.signer.clientHeight, index: this.props.index})
       rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
@@ -192,7 +192,7 @@ class Signer extends React.Component {
       // Currently selected
       style.position = 'absolute'
       style.top = open ? 40 : initial.top
-      style.bottom = open ? 5 : initial.bottom
+      style.bottom = open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
       style.zIndex = '1000000'

@@ -2,7 +2,6 @@
 
 const Web3 = require('web3')
 const EventEmitter = require('events')
-const uuid = require('uuid/v4')
 
 const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet = false) => {
   window.frame = window.frame || {initialConnect: true, provider}
@@ -11,7 +10,7 @@ const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet 
     quiet = true
     reconnect = false
   }
-  provider.handlers = {}
+  provider.reqCalllbacks = {}
   if (!provider.socket || provider.socket.readyState > 1) {
     provider.socket = new WebSocket(quiet ? 'ws://localhost:1248/?mode=quiet' : 'ws://localhost:1248')
     provider.socket.addEventListener('open', () => {
@@ -27,19 +26,23 @@ const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet 
       provider.emit('close')
     })
     provider.socket.addEventListener('message', message => {
-      message = JSON.parse(message.data)
-      if (message.type === 'response' && provider.handlers[message.handlerId]) {
-        provider.handlers[message.handlerId](message.err, message.res)
-      } else if (message.type === 'subscription') {
-        provider.emit('data', message.payload)
+      try { message = JSON.parse(message.data) } catch (e) { return console.warn(e) }
+      if (!message.id && message.method && message.method.indexOf('_subscription') !== -1) {
+        provider.emit('data', message)
+      } else if (message.id) {
+        if (provider.reqCalllbacks[message.id]) {
+          provider.reqCalllbacks[message.id](message.error, message)
+        } else {
+          console.warn('No request callback for socket message in provider: ', message)
+        }
       } else {
-        console.log('No handler for socket message in provider: ', message)
+        console.warn('Unrecognized socket message in provider: ', message)
       }
     })
   }
 }
 
-const getProvider = (url) => {
+const getProvider = url => {
   const provider = new EventEmitter()
   connect(provider, url)
   provider.send = (payload, cb) => {
@@ -48,8 +51,7 @@ const getProvider = (url) => {
     } else if (!provider.socket || provider.socket.readyState > 1) {
       cb(new Error('Provider Disconnected'))
     } else {
-      payload.handlerId = uuid()
-      provider.handlers[payload.handlerId] = cb
+      provider.reqCalllbacks[payload.id] = cb
       provider.socket.send(JSON.stringify(payload))
     }
   }

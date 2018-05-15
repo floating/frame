@@ -43,7 +43,7 @@ good = #47caab
 bad = rgb(244, 66, 131)
 
 // Shadows
-cardDrop = box-shadow 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
+cardDrop = 0px 1px 1px 1px rgba(6, 54, 52, 0.2)
 
 // Transistions
 standard = .32s cubic-bezier(.82,0,.12,1) all
@@ -55,7 +55,6 @@ cubic = cubic-bezier(.82,0,.12,1)
 html, body
   margin 0
   border 0
-  background bg
   font-family OpenSans
   font-weight 200
   -webkit-app-region drag
@@ -66,7 +65,13 @@ div
   user-select none
   cursor default
 
-.panel
+#panel
+  background rgba(218, 223, 234, 0.95)
+  margin 5px
+  border-radius 3px
+  box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
+  overflow hidden
+
   #bar
     right 360px
 
