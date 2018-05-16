@@ -1,6 +1,6 @@
 <h2 align="center">
   <br>
-  <img src="/test/FrameLogo512.png?raw=true" alt="Frame" width="150" />
+  <img src="/asset/png/FrameLogo512.png?raw=true" alt="Frame" width="150" />
   <br>
   <br>
   F R A M E
@@ -18,15 +18,15 @@
 </p>
 <br>
 
-<img src="/test/FrameDemo0-0-3v2.gif?raw=true" />
+<img src="/asset/demo/Frame0-0-4.gif?raw=true" />
 
-Frame interfaces with the Ethereum network and signature providers (such as a Ledger or Trezor) to create an OS-level provider that can be used with any web, desktop or command-line dapp. Frame was created to be a user-friendly way to securely and transparently interact with dapps and the Ethereum network.
+Frame is an cross-platform Ethereum provider that lets you use standalone signers (such as a Ledger or Trezor) to securely and transparently interact with dapps and the Ethereum network.
 
 ### Features
 - **First-class Hardware Support**
   - Use your Ledger and Trezor devices with any dapp!
 - **Permissions**
-  - Control which dapps have permission to access your provider and monitor with full transparency what requests dapps are making.
+  - User controls which dapps have permission to access the provider and can monitor with full transparency what requests dapps are making.
 - **Node Management**
   - Frame simplifies running and syncing your local node and lets you seamlessly swap from local to remote nodes on the fly.
 - **Menu Bar Support**
@@ -35,7 +35,7 @@ Frame interfaces with the Ethereum network and signature providers (such as a Le
   - macOS, Windows and Linux!
 
 ### Demo
-  - **Frame demo from Web3 UX Unconf** https://www.youtube.com/watch?v=3ILPm8qpWfQ
+  - Frame demo from Web3 UX Unconf: https://www.youtube.com/watch?v=3ILPm8qpWfQ
 
 ### Downloads
   - **Frame is currently under development.** macOS, Windows and Linux distributions will be made available soon.
