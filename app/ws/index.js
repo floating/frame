@@ -53,14 +53,17 @@ module.exports = () => {
     })
   })
 
+  // If we lose connection to our node, close connected sockets
   provider.connection.on('close', _ => {
     ws.clients.forEach(socket => socket.close())
   })
 
+  // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
     if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify(payload))
   })
 
+  // When permission is revoked, close connected sockets
   store.observer(() => {
     let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
     let ok = []
@@ -68,6 +71,7 @@ module.exports = () => {
     ws.clients.forEach(socket => { if (ok.indexOf(socket.origin) < 0) socket.close() })
   })
 
+  // When the current accounts change, close connected sockets
   store.observer(() => {
     store('signer.accounts')
     ws.clients.forEach(socket => socket.close())

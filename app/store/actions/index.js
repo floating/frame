@@ -39,6 +39,13 @@ export const setPermissions = (u, permissions) => {
   })
 }
 
+export const setDefaultNode = (u, url) => {
+  u('local.accounts', (accounts, state) => {
+    accounts[state.signer.accounts[0]].node = url
+    return accounts
+  })
+}
+
 export const addProviderEvent = (u, payload) => {
   u('provider.events', events => {
     events.push(payload.method)

@@ -10,7 +10,10 @@ class Settings extends React.Component {
       <div className={this.store('signer.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
         <div className='signerPermission'>
-          <div>{provider.url}</div>
+          <div>
+            <div>{'System Default'}</div>
+            <div style={{fontSize: '10px', marginTop: '-2px', marginLeft: '2px'}}>{provider.url}</div>
+          </div>
           <div className={this.store('node.provider') ? 'nodeProviderStatus nodeProviderConnected' : 'nodeProviderStatus'}>
             {this.store('node.provider') ? 'connected' : 'disconnected'}
           </div>

@@ -165,8 +165,13 @@ class Signer extends React.Component {
                   </div>
                 </div>
                 <div className='signerAddress'>
-                  {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.accounts[0]}
-                  <input onClick={e => this.copyAddress(e)} defaultValue={this.props.accounts[0]} />
+                  <div className='transactionToAddress'>
+                    <div className='transactionToAddressLarge'>{this.props.accounts[0].substring(0, 11)} {svg.octicon('kebab-horizontal', {height: '14px'})} {this.props.accounts[0].substr(this.props.accounts[0].length - 13)}</div>
+                    <div className='transactionToAddressFull'>
+                      {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.accounts[0]}
+                      <input onClick={e => this.copyAddress(e)} defaultValue={this.props.accounts[0]} />
+                    </div>
+                  </div>
                 </div>
               </React.Fragment>
             )}

@@ -1,6 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import provider from '../../../provider'
+
 class Settings extends React.Component {
   appInfo () {
     return (
@@ -30,6 +32,13 @@ class Settings extends React.Component {
   render () {
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
+        <div className='localSettingsTitle'>{'Default Ethereum Node'}</div>
+        <div className='signerPermission'>
+          <div>{provider.url}</div>
+          <div className={this.store('node.provider') ? 'nodeProviderStatus nodeProviderConnected' : 'nodeProviderStatus'}>
+            {this.store('node.provider') ? 'connected' : 'disconnected'}
+          </div>
+        </div>
         <div className='localSettingsTitle'>{'Local Settings'}</div>
         <div className='signerPermission' onClick={_ => this.store.toggleLaunch()}>
           <div className='signerPermissionOrigin'>{'Run on Startup'}</div>

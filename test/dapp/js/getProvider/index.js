@@ -12,7 +12,6 @@ const connect = (provider, url) => {
       setTimeout(_ => connect(provider, url), 500)
       provider.emit('close')
     })
-    provider.socket.addEventListener('error', error => console.log('an error', error))
     provider.socket.addEventListener('message', message => {
       try { message = JSON.parse(message.data) } catch (e) { return console.warn(e) }
       if (!message.id && message.method && message.method.indexOf('_subscription') !== -1) {
