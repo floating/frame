@@ -1,6 +1,5 @@
 const { app, ipcMain } = require('electron')
 
-// const opn = require('opn')
 const store = require('./store')
 const signers = require('./signers')
 const windows = require('./windows')
@@ -16,9 +15,12 @@ ipcMain.on('addPermission', (e, host, permission) => store.addPermission(host, p
 ipcMain.on('removePermission', (e, host, permission) => store.removePermission(host, permission))
 
 app.on('ready', () => {
-  windows.tray()
+  if (process.platform === 'darwin' || process.platform === 'win32') {
+    windows.tray()
+  } else {
+    setTimeout(windows.tray, 100)
+  }
   if (app.dock) app.dock.hide()
-  // opn('http://cjm.io:1234')
 })
 
 app.on('activate', () => {

@@ -13,7 +13,7 @@ const store = require('../../store')
 class Provider extends EventEmitter {
   constructor (url) {
     super()
-    this.url = url
+    this.url = url || store('local.node.default')
     this.store = store
     this.accounts = []
     this.handlers = {}
