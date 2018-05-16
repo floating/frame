@@ -20,13 +20,13 @@
 
 <img src="/asset/demo/Frame0-0-4.gif?raw=true" />
 
-Frame interfaces with the Ethereum network and signature providers (such as a Ledger or Trezor) to create an OS-level provider that can be used with any web, desktop or command-line dapp. Frame was created to be a user-friendly way to securely and transparently interact with dapps and the Ethereum network.
+Frame is an cross-platform Ethereum provider that lets you use standalone signers (such as a Ledger or Trezor) to securely and transparently interact with dapps and the Ethereum network.
 
 ### Features
 - **First-class Hardware Support**
   - Use your Ledger and Trezor devices with any dapp!
 - **Permissions**
-  - Control which dapps have permission to access your provider and monitor with full transparency what requests dapps are making.
+  - User controls which dapps have permission to access the provider and can monitor with full transparency what requests dapps are making.
 - **Node Management**
   - Frame simplifies running and syncing your local node and lets you seamlessly swap from local to remote nodes on the fly.
 - **Menu Bar Support**
