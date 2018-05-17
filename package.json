@@ -5,7 +5,7 @@
   "main": "main",
   "scripts": {
     "start": "npm run launch",
-    "build": "npm install && electron-rebuild",
+    "build": "npm install && electron-rebuild && npm run build:extension",
     "pack:production": "mkdir -p ./build/production && electron-packager ./ --all --out=./build/production",
     "pack": "mkdir -p ./build && electron-packager ./ --overwrite --out=./build",
     "build:extension": "copyfiles -f ./extension/* ./extension/build && parcel build ./extension/build/frame.js -d ./extension/build --no-source-maps && node ./extension/inline.js",
