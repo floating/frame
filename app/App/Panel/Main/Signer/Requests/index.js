@@ -63,6 +63,7 @@ class Requests extends React.Component {
                       return (
                         <div key={req.status} className='requestNoticeInner bounceIn'>
                           <div><div className='loader' /></div>
+                          <div className='requestNoticeInnerText'>{'See Signer'}</div>
                         </div>
                       )
                     } else if (req.status === 'success') {

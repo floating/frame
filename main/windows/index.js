@@ -11,14 +11,13 @@ const dev = process.env.NODE_ENV === 'development'
 const demo = process.env.NODE_ENV === 'demo'
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
-let tray, bounds
+let tray
 let lock = 0
 
 const api = {
   tray: () => {
     tray = new Tray(path.join(__dirname, './IconTemplate.png'))
     tray.setHighlightMode('never')
-    bounds = tray.getBounds()
     tray.on('click', api.trayClick)
     windows.tray = new BrowserWindow({id: 'tray', width: 360, height: 800, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
     windows.tray.loadURL(url.format({pathname: path.join(__dirname, '../../app/tray.html'), protocol: 'file:', slashes: true}))
@@ -28,28 +27,21 @@ const api = {
     if (!dev && !demo) windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() })
     api.showTray()
   },
-  trayClick: (e, newBounds) => {
-    // if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()
-    bounds = newBounds && newBounds.x !== 0 ? newBounds : bounds
-    let noBound = bounds === undefined || bounds.x === 0
-    let win32 = process.platform === 'win32'
-    let pos = noBound ? win32 ? 'bottomRight' : 'topRight' : win32 ? 'trayBottomCenter' : 'trayCenter'
-    windows.tray.isVisible() ? api.hideTray() : api.showTray(pos, bounds)
+  trayClick: () => {
+    windows.tray.isVisible() ? api.hideTray() : api.showTray()
   },
   hideTray: () => {
     let now = Date.now()
     if (now - lock < 700) { return } else { lock = now }
     windows.tray.send('main:trayOpen', false)
-    setTimeout(_ => {
-      windows.tray.hide()
-    }, 700)
+    setTimeout(_ => windows.tray.hide(), 700)
   },
-  showTray: (pos, bounds) => {
+  showTray: (retry) => {
     let now = Date.now()
-    if (now - lock < 700) { return } else { lock = now }
+    if (now - lock < 700) { return setTimeout(() => { if (retry) api.showTray(true) }, 700) } else { lock = now }
     if (!windows.tray) return api.tray()
     if (windows.tray.isVisible()) return
-    pos = windows.tray.positioner.calculate('topRight')
+    let pos = windows.tray.positioner.calculate('topRight')
     windows.tray.setVisibleOnAllWorkspaces(true)
     windows.tray.focus()
     windows.tray.setVisibleOnAllWorkspaces(false)
@@ -102,7 +94,7 @@ ipcMain.on('frame:close', api.close)
 ipcMain.on('frame:minimize', api.minimize)
 ipcMain.on('frame:full', api.full)
 ipcMain.on('frame:devTools', api.devTools)
-ipcMain.on('frame:showTray', api.showTray)
+ipcMain.on('frame:showTray', () => api.showTray(true))
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
