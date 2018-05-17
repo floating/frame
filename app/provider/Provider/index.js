@@ -17,6 +17,7 @@ class Provider extends EventEmitter {
     this.store = store
     this.accounts = []
     this.handlers = {}
+    this.nonceTrack = {}
     this.nodeRequests = {}
     this.count = 1
     this.netVersion = 4
@@ -83,15 +84,6 @@ class Provider extends EventEmitter {
       res({id: payload.id, jsonrpc: payload.jsonrpc, result: accounts})
     })
   }
-  getNonce (from, res) {
-    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'latest']}, res)
-  }
-  getGasPrice (res) {
-    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_gasPrice'}, res)
-  }
-  getGasEstimate (tx, res) {
-    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_estimateGas', params: [tx]}, res)
-  }
   getNetVersion (payload, res) {
     res({id: payload.id, jsonrpc: payload.jsonrpc, result: this.netVersion.toString()})
   }
@@ -128,27 +120,52 @@ class Provider extends EventEmitter {
       })
     })
   }
-  sendTransaction (payload, res) {
+  getRawTx (payload) {
     let rawTx = payload.params[0] // Todo: Handle mutiple txs
-    this.getNonce(rawTx.from, response => { // Todo: Fill in parallel and only what's needed
-      if (response.error) return this.resError(`Frame Provider Error while getting nonce: ${response.error.message}`, payload, res)
-      let nonce = response.result
-      this.getGasPrice(response => {
-        if (response.error) return this.resError(`Frame Provider Error while getting gasPrice: ${response.error.message}`, payload, res)
-        let gasPrice = response.result
-        this.getGasEstimate(rawTx, response => {
-          if (response.error) return this.resError(`Frame Provider Error while getting gasEstimate: ${response.error.message}`, payload, res)
-          let gas = response.result
-          rawTx.nonce = rawTx.nonce || nonce
-          rawTx.gasPrice = rawTx.gasPrice || gasPrice
-          rawTx.gas = rawTx.gas || rawTx.gasLimit || gas
-          delete rawTx.gasLimit
-          rawTx = Object.assign(rawTx, {chainId: toHex(this.netVersion)})
-          let handlerId = uuid()
-          this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, payload})
-          this.handlers[handlerId] = res
+    rawTx.gas = rawTx.gas || rawTx.gasLimit
+    delete rawTx.gasLimit
+    return rawTx
+  }
+  getNonce = (rawTx, res) => {
+    if (this.nonceTrack[rawTx.from] && Date.now() - this.nonceTrack[rawTx.from].time < 30 * 1000) return res({id: 1, jsonrpc: '2.0', result: ++this.nonceTrack[rawTx.from].current})
+    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'latest']}, response => {
+      if (response.result) this.nonceTrack[rawTx.from] = {current: response.result, time: Date.now()}
+      res(response)
+    })
+  }
+  getGasPrice = (rawTx, res) => this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_gasPrice'}, res)
+  getGasEstimate = (rawTx, res) => this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx]}, res)
+  fillTx = (rawTx, cb) => {
+    let needs = {}
+    if (!rawTx.nonce) needs.nonce = this.getNonce
+    if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
+    if (!rawTx.gas) needs.gas = this.getGasEstimate
+    let count = 0
+    let list = Object.keys(needs)
+    let errors = []
+    if (list.length > 0) {
+      list.forEach(need => {
+        needs[need](rawTx, response => {
+          if (response.error) {
+            errors.push({need, message: response.error.message})
+          } else {
+            rawTx[need] = response.result
+          }
+          if (++count === list.length) errors.length > 0 ? cb(errors[0]) : cb(null, rawTx)
         })
       })
+    } else {
+      cb(null, rawTx)
+    }
+  }
+  sendTransaction (payload, res) {
+    let rawTx = this.getRawTx(payload)
+    this.fillTx(rawTx, (err, rawTx) => {
+      if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
+      rawTx = Object.assign(rawTx, {chainId: toHex(this.netVersion)}) // In the future, check for chainId mismatch instead of clobber
+      let handlerId = uuid()
+      this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, payload})
+      this.handlers[handlerId] = res
     })
   }
   send (payload, res) {
