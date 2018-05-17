@@ -24,7 +24,7 @@ const api = {
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
-    if (process.platfoirm === 'linux') {
+    if (process.platform === 'linux') {
       const menuShow = Menu.buildFromTemplate([{label: 'Show', click: () => api.showTray()}])
       const menuHide = Menu.buildFromTemplate([{label: 'Hide', click: () => api.hideTray()}])
       const onShow = _ => tray.setContextMenu(menuHide)
