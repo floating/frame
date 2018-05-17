@@ -23,6 +23,10 @@ class Main extends React.Component {
               {Object.keys(signers).length === 0 ? <div className='noSigners'>
                 {svg.logo(50)}
                 {'No Signers Connected'}
+                <span className='featureBox'>
+                  <span className='featureBoxText'>{`Frame Alpha (${process.env.npm_package_version})`}</span>
+                  <span className='featureBoxText'>{`Rinkeby Only`}</span>
+                </span>
               </div> : null}
             </div>
           </div>

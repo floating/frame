@@ -18,6 +18,9 @@ let Frame = Restore.connect(tray ? Panel : App, store)
 ReactDOM.render(<Frame />, document.getElementById('frame'))
 
 if (tray) {
-  ipcRenderer.on('main:trayOpen', (sender, open) => store.trayOpen(open))
+  ipcRenderer.on('main:trayOpen', (sender, open) => {
+    store.trayOpen(open)
+    if (open) store.setSignerView('default')
+  })
   setTimeout(() => store.trayOpen(true), 10)
 }

@@ -64,8 +64,6 @@ store.observer(() => {
 
 store.observer(_ => persist.set('local', store('local')))
 
-persist.get('accounts')
-
 let launch = store('local.launch')
 store.observer(() => {
   if (launch !== store('local.launch')) {

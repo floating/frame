@@ -66,9 +66,6 @@
   }
 }
 
-
-
-
 @keyframes sk-scaleout
   0%
     transform scale(0)
@@ -85,12 +82,12 @@
   animation sk-scaleout 600ms infinite cubic
 
 .signSuccess
-    width 100px
-    height 100px
-    margin 100px auto
-    background-color outerspace
-    border-radius 100%
-    animation sk-scaleout 600ms infinite cubic
+  width 100px
+  height 100px
+  margin 100px auto
+  background-color outerspace
+  border-radius 100%
+  animation sk-scaleout 600ms infinite cubic
 
 .slideUp-enter
   opacity 0
@@ -346,6 +343,14 @@
       display flex
       justify-content center
       align-items center
+      flex-direction column
+
+      .requestNoticeInnerText
+        padding-top 30px
+        font-size 12px
+        font-weight 400
+        text-transform uppercase
+        letter-spacing 2px
 
   .requestProvider
     position absolute
