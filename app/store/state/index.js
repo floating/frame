@@ -2,7 +2,7 @@ import uuid from 'uuid/v4'
 
 const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
 const persist = new PersistStore()
-// persist.clear()
+persist.clear()
 
 let initial = {
   panel: {
@@ -46,7 +46,7 @@ let initial = {
     launch: false,
     node: {
       run: false,
-      default: 'wss://rinkeby.infura.io/_ws'
+      default: 'wss://rinkeby.infura.io/ws'
     },
     accounts: {}
   }
