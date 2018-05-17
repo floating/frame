@@ -1,5 +1,5 @@
 const electron = require('electron')
-const { BrowserWindow, ipcMain, Tray } = electron
+const { BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
 const uuid = require('uuid/v4')
 const url = require('url')
@@ -16,7 +16,7 @@ let lock = 0
 
 const api = {
   tray: () => {
-    tray = new Tray(path.join(__dirname, './IconTemplate.png'))
+    tray = new Tray(path.join(__dirname, process.platfoirm === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
     windows.tray = new BrowserWindow({id: 'tray', width: 360, height: 800, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
@@ -24,6 +24,16 @@ const api = {
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
+    if (process.platform === 'linux') {
+      const menuShow = Menu.buildFromTemplate([{label: 'Show', click: () => api.showTray()}])
+      const menuHide = Menu.buildFromTemplate([{label: 'Hide', click: () => api.hideTray()}])
+      const onShow = _ => tray.setContextMenu(menuHide)
+      const onHide = _ => tray.setContextMenu(menuShow)
+      windows.tray.on('show', onShow)
+      windows.tray.on('restore', onShow)
+      windows.tray.on('hide', onHide)
+      windows.tray.on('minimize', onHide)
+    }
     if (!dev && !demo) windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() })
     api.showTray()
   },
