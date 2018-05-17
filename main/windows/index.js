@@ -12,6 +12,7 @@ const demo = process.env.NODE_ENV === 'demo'
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray, bounds
+let lock = 0
 
 const api = {
   tray: () => {
@@ -24,26 +25,30 @@ const api = {
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
-    if (!dev && !demo) windows.tray.on('blur', _ => api.hideTray())
+    if (!dev && !demo) windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() })
     api.showTray()
   },
   trayClick: (e, newBounds) => {
-    if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()
+    // if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return api.hideTray()
     bounds = newBounds && newBounds.x !== 0 ? newBounds : bounds
     let noBound = bounds === undefined || bounds.x === 0
     let win32 = process.platform === 'win32'
     let pos = noBound ? win32 ? 'bottomRight' : 'topRight' : win32 ? 'trayBottomCenter' : 'trayCenter'
-    api.showTray(pos, bounds)
+    windows.tray.isVisible() ? api.hideTray() : api.showTray(pos, bounds)
   },
   hideTray: () => {
+    let now = Date.now()
+    if (now - lock < 700) { return } else { lock = now }
     windows.tray.send('main:trayOpen', false)
     setTimeout(_ => {
       windows.tray.hide()
     }, 700)
   },
   showTray: (pos, bounds) => {
+    let now = Date.now()
+    if (now - lock < 700) { return } else { lock = now }
     if (!windows.tray) return api.tray()
-    if (windows.tray.isVisible()) return api.hideTray()
+    if (windows.tray.isVisible()) return
     pos = windows.tray.positioner.calculate('topRight')
     windows.tray.setVisibleOnAllWorkspaces(true)
     windows.tray.focus()
@@ -97,7 +102,7 @@ ipcMain.on('frame:close', api.close)
 ipcMain.on('frame:minimize', api.minimize)
 ipcMain.on('frame:full', api.full)
 ipcMain.on('frame:devTools', api.devTools)
-ipcMain.on('frame:showTray', () => { if (windows.tray) windows.tray.show() })
+ipcMain.on('frame:showTray', api.showTray)
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
