@@ -127,7 +127,7 @@ class Provider extends EventEmitter {
     return rawTx
   }
   getNonce = (rawTx, res) => {
-    if (this.nonceTrack[rawTx.from] && Date.now() - this.nonceTrack[rawTx.from].time < 30 * 1000) return res({id: 1, jsonrpc: '2.0', result: ++this.nonceTrack[rawTx.from].current})
+    if (this.nonceTrack[rawTx.from] && Date.now() - this.nonceTrack[rawTx.from].time < 30 * 1000) return res({id: 1, jsonrpc: '2.0', result: toHex(++this.nonceTrack[rawTx.from].current)})
     this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'latest']}, response => {
       if (response.result) this.nonceTrack[rawTx.from] = {current: response.result, time: Date.now()}
       res(response)
