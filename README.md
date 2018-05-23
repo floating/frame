@@ -39,9 +39,8 @@ Frame is an cross-platform Ethereum provider that lets you use standalone signer
 
 ### Downloads
   - **Prerelease versions of Frame** (Notice: testnet only, not for mainnet use)
-    - [macOS (Coming Soon)]()
-    - [Windows (Coming Soon)]()
-    - [Linux (Coming Soon)]()
+    - [macOS](https://github.com/floating/frame/releases/tag/prerelease)
+    - Windows & Linux coming soon!
     
 ### Try it!
 ```bash
