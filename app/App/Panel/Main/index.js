@@ -24,8 +24,7 @@ class Main extends React.Component {
                 {svg.logo(50)}
                 {'No Signers Connected'}
                 <span className='featureBox'>
-                  <span className='featureBoxText'>{`Frame Alpha (${process.env.npm_package_version})`}</span>
-                  <span className='featureBoxText'>{`Rinkeby Only`}</span>
+                  <span className='featureBoxText'>{`Frame Alpha - Rinkeby Only`}</span>
                 </span>
               </div> : null}
             </div>

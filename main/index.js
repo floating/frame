@@ -5,7 +5,7 @@ const signers = require('./signers')
 const windows = require('./windows')
 require('./rpc')
 
-let quit = false
+// let quit = false
 
 console.log('Chrome: v' + process.versions.chrome)
 console.log('Electron: v' + process.versions.electron)
@@ -24,17 +24,18 @@ app.on('ready', () => {
 })
 
 app.on('activate', () => {
-  quit = false
+  // quit = false
   windows.activate()
 })
 
 app.on('will-quit', e => {
-  if (!quit) e.preventDefault()
-  if (app.dock) app.dock.hide()
-  setTimeout(() => {
-    quit = true
-    app.quit()
-  }, 3000)
+  app.quit()
+  // if (!quit) e.preventDefault()
+  // if (app.dock) app.dock.hide()
+  // setTimeout(() => {
+  //   quit = true
+  //   app.quit()
+  // }, 3000)
 })
 
 app.on('quit', signers.close)
