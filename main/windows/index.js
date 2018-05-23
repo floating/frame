@@ -34,7 +34,7 @@ const api = {
       windows.tray.on('hide', onHide)
       windows.tray.on('minimize', onHide)
     }
-    if (!dev && !demo) setTimeout(() => windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() }), 1000)
+    if (!dev && !demo) setTimeout(() => windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() }), 3000)
     api.showTray()
   },
   trayClick: () => {
@@ -46,7 +46,7 @@ const api = {
     windows.tray.send('main:trayOpen', false)
     setTimeout(_ => windows.tray.hide(), 700)
   },
-  showTray: () => {
+  showTray: (retry) => {
     if (windows.tray.isVisible()) return
     let now = Date.now()
     if (now - lock < 700) return setTimeout(api.showTray, 700)
