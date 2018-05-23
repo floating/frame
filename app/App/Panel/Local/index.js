@@ -11,7 +11,7 @@ class Settings extends React.Component {
         <div className='appInfo'>
           <div className='appInfoLine'>
             <div>{'Frame'}</div>
-            <div>{'v' + process.env.npm_package_version}</div>
+            <div>{'v' + require('../../../../package.json').version}</div>
           </div>
           <div className='appInfoLine'>
             <div>{'Electron'}</div>

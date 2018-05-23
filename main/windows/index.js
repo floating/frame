@@ -19,7 +19,7 @@ const api = {
     tray = new Tray(path.join(__dirname, process.platfoirm === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
-    windows.tray = new BrowserWindow({id: 'tray', width: 360, height: 800, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
+    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
     windows.tray.loadURL(url.format({pathname: path.join(__dirname, '../../app/tray.html'), protocol: 'file:', slashes: true}))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
@@ -34,7 +34,7 @@ const api = {
       windows.tray.on('hide', onHide)
       windows.tray.on('minimize', onHide)
     }
-    if (!dev && !demo) windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() })
+    if (!dev && !demo) setTimeout(() => windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() }), 3000)
     api.showTray()
   },
   trayClick: () => {
@@ -47,10 +47,11 @@ const api = {
     setTimeout(_ => windows.tray.hide(), 700)
   },
   showTray: (retry) => {
-    let now = Date.now()
-    if (now - lock < 700) { return setTimeout(() => { if (retry) api.showTray(true) }, 700) } else { lock = now }
-    if (!windows.tray) return api.tray()
     if (windows.tray.isVisible()) return
+    let now = Date.now()
+    if (now - lock < 700) return setTimeout(api.showTray, 700)
+    lock = now
+    if (!windows.tray) return api.tray()
     let pos = windows.tray.positioner.calculate('topRight')
     windows.tray.setVisibleOnAllWorkspaces(true)
     windows.tray.focus()
@@ -95,7 +96,8 @@ const api = {
     if (windows[id]) windows[id].webContents.openDevTools()
   },
   activate: () => {
-    if (Object.keys(windows).length === 1) api.create()
+    api.showTray()
+    // if (Object.keys(windows).length === 1) api.create()
   }
 }
 
@@ -104,7 +106,7 @@ ipcMain.on('frame:close', api.close)
 ipcMain.on('frame:minimize', api.minimize)
 ipcMain.on('frame:full', api.full)
 ipcMain.on('frame:devTools', api.devTools)
-ipcMain.on('frame:showTray', () => api.showTray(true))
+ipcMain.on('frame:showTray', () => api.showTray())
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))

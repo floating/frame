@@ -38,8 +38,11 @@ Frame is an cross-platform Ethereum provider that lets you use standalone signer
   - Frame demo from Web3 UX Unconf: https://www.youtube.com/watch?v=3ILPm8qpWfQ
 
 ### Downloads
-  - **Frame is currently under development.** macOS, Windows and Linux distributions will be made available soon.
-
+  - **Prerelease versions of Frame** (Notice: testnet only, not for mainnet use)
+    - [macOS (Coming Soon)]()
+    - [Windows (Coming Soon)]()
+    - [Linux (Coming Soon)]()
+    
 ### Try it!
 ```bash
 # Clone Frame
