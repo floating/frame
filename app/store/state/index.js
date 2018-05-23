@@ -2,7 +2,7 @@ import uuid from 'uuid/v4'
 
 const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
 const persist = new PersistStore()
-persist.clear()
+// persist.clear()
 
 let initial = {
   panel: {
