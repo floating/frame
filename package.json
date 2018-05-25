@@ -5,7 +5,7 @@
   "main": "main",
   "scripts": {
     "start": "npm run launch",
-    "build": "npm run dev && mkdir -p ./build && npm run build:default && npm run build:extension",
+    "build": "npm run build:dev && mkdir -p ./build && npm run build:default && npm run build:extension",
     "build:dev": "npm install && electron-rebuild",
     "build:default": "electron-packager ./ --out=./build --overwrite",
     "build:mac": "electron-packager ./ --out=./build --overwrite",
@@ -52,7 +52,7 @@
     "react-transition-group": "^1.2.1",
     "stylus": "^0.54.5",
     "trezor.js": "^6.15.19",
-    "usb-detection": "^2.1.0",
+    "usb-detection": "^3.0.3",
     "uuid": "^3.2.1",
     "web3": "1.0.0-beta.34",
     "web3-providers-http": "1.0.0-beta.34",
@@ -62,12 +62,12 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "electron": "^1.8.4",
+    "copyfiles": "^2.0.0",
+    "electron": "^2.0.2",
     "electron-packager": "^12.0.1",
     "electron-rebuild": "^1.7.3",
     "ganache-cli": "^6.1.0",
     "mocha": "^5.1.1",
-    "copyfiles": "^2.0.0",
     "npm-run-all": "^4.1.2",
     "parcel-bundler": "^1.7.1",
     "standard": "^11.0.1"
