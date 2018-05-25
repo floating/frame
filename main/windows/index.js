@@ -19,7 +19,7 @@ const api = {
     tray = new Tray(path.join(__dirname, process.platfoirm === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
-    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
+    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {plugins: true}})
     windows.tray.loadURL(url.format({pathname: path.join(__dirname, '../../app/tray.html'), protocol: 'file:', slashes: true}))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
