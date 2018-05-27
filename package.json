@@ -6,10 +6,10 @@
   "scripts": {
     "start": "npm run launch",
     "build": "npm install && electron-rebuild",
-    "build:app": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite",
-    "build:app:mac": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite",
-    "build:app:linux": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/png/FrameAppIcon.png && electron-installer-debian --src build/Frame-linux-x64 --dest build --arch amd64",
-    "build:app:windows": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
+    "build:app": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
+    "build:app:mac": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
+    "build:app:linux": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/png/FrameAppIcon.png && electron-installer-debian --src build/Frame-linux-x64 --dest build --arch amd64",
+    "build:app:windows": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
     "build:extension": "copyfiles -f ./extension/* ./build/extension && parcel build ./build/extension/frame.js -d ./build/extension --no-source-maps && node ./extension/inline.js",
     "build:all": "build:app && build:extension",
     "dev": "npm-run-all --parallel launch:dev dapp:demo",
@@ -61,18 +61,19 @@
     "websocket": "^1.0.25"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
     "copyfiles": "^2.0.0",
     "electron": "^2.0.2",
-    "electron-installer-debian": "^0.8.1",
     "electron-packager": "^12.0.1",
     "electron-rebuild": "^1.7.3",
     "ganache-cli": "^6.1.0",
     "jest": "^23.0.0",
-    "mocha": "^5.1.1",
+    "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.2",
     "parcel-bundler": "^1.7.1",
     "standard": "^11.0.1"
+  },
+  "optionalDependencies": {
+    "electron-installer-debian": "^0.8.1"
   },
   "standard": {
     "parser": "babel-eslint"
