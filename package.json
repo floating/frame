@@ -6,22 +6,22 @@
   "scripts": {
     "start": "npm run launch",
     "build": "npm install && electron-rebuild",
-    "build:app": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite",
-    "build:app:mac": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite",
-    "build:app:linux": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/png/FrameAppIcon.png && electron-installer-debian --src build/Frame-linux-x64 --dest build --arch amd64",
-    "build:app:windows": "npm run build && mkdir -p ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
+    "build:app": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
+    "build:app:mac": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
+    "build:app:linux": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/png/FrameAppIcon.png && electron-installer-debian --src build/Frame-linux-x64 --dest build --arch amd64",
+    "build:app:windows": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
     "build:extension": "copyfiles -f ./extension/* ./build/extension && parcel build ./build/extension/frame.js -d ./build/extension --no-source-maps && node ./extension/inline.js",
     "build:all": "build:app && build:extension",
     "dev": "npm-run-all --parallel launch:dev dapp:demo",
     "demo": "npm-run-all --parallel launch:demo dapp:demo",
     "alpha": "npm run launch",
-    "test": "standard",
+    "test": "standard && jest",
     "launch": "cross-env NODE_ENV=production electron ./main",
     "launch:demo": "cross-env NODE_ENV=demo electron ./main",
     "launch:dev": "cross-env NODE_ENV=development electron ./main",
     "electron-rebuild": "electron-rebuild",
-    "dapp:demo": "parcel ./dapp/demo/index.html --open",
-    "dapp:presentation": "parcel ./dapp/presentation/index.html --open",
+    "dapp:demo": "parcel ./dapp/demo/index.html --open --out-dir ./build/dapp/demo",
+    "dapp:presentation": "parcel ./dapp/presentation/index.html --open --out-dir ./build/dapp/presentation",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "author": "Jordan Muir",
@@ -61,16 +61,19 @@
     "websocket": "^1.0.25"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
     "copyfiles": "^2.0.0",
     "electron": "^2.0.2",
     "electron-packager": "^12.0.1",
     "electron-rebuild": "^1.7.3",
     "ganache-cli": "^6.1.0",
-    "mocha": "^5.1.1",
+    "jest": "^23.0.0",
+    "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.2",
     "parcel-bundler": "^1.7.1",
     "standard": "^11.0.1"
+  },
+  "optionalDependencies": {
+    "electron-installer-debian": "^0.8.1"
   },
   "standard": {
     "parser": "babel-eslint"
