@@ -104,13 +104,19 @@ class Requests extends React.Component {
                   ) : (
                     <div className='transactionData'>{'No Data'}</div>
                   )}
-                  <div className='transactionTo'>
-                    <div className='transactionToAddress'>
-                      <div className='transactionToAddressLarge'>{req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', {height: '20px'})} {req.data.to.substr(req.data.to.length - 11)}</div>
-                      <div className='transactionToAddressFull'>{req.data.to}</div>
+                  {req.data.to ? (
+                    <div className='transactionTo'>
+                      <div className='transactionToAddress'>
+                        <div className='transactionToAddressLarge'>{req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', {height: '20px'})} {req.data.to.substr(req.data.to.length - 11)}</div>
+                        <div className='transactionToAddressFull'>{req.data.to}</div>
+                      </div>
+                      <div className='transactionToSub'>{'Send To'}</div>
                     </div>
-                    <div className='transactionToSub'>{'Send To'}</div>
-                  </div>
+                  ) : (
+                    <div className='transactionTo'>
+                      <div className='transactionToSub'>{'Deploying Contract'}</div>
+                    </div>
+                  )}
                 </React.Fragment>
               )}
             </div>

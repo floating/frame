@@ -55,6 +55,7 @@ const getProvider = url => {
       provider.socket.send(JSON.stringify(payload))
     }
   }
+  provider.sendAsync = provider.send
   return provider
 }
 

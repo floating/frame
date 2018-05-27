@@ -1,5 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
+import { ipcRenderer } from 'electron'
 
 import provider from '../../../provider'
 
@@ -29,6 +30,13 @@ class Settings extends React.Component {
       </React.Fragment>
     )
   }
+  quit () {
+    return (
+      <div className='quitFrame'>
+        <div onClick={() => ipcRenderer.send('tray:quit')} className='quitFrameButton'>{'Quit'}</div>
+      </div>
+    )
+  }
   render () {
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
@@ -47,6 +55,7 @@ class Settings extends React.Component {
           </div>
         </div>
         {this.appInfo()}
+        {this.quit()}
       </div>
     )
   }

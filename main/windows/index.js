@@ -1,5 +1,5 @@
 const electron = require('electron')
-const { BrowserWindow, ipcMain, Tray, Menu } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
 const uuid = require('uuid/v4')
 const url = require('url')
@@ -25,8 +25,8 @@ const api = {
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
     if (process.platform === 'linux') {
-      const menuShow = Menu.buildFromTemplate([{label: 'Show', click: () => api.showTray()}])
-      const menuHide = Menu.buildFromTemplate([{label: 'Hide', click: () => api.hideTray()}])
+      const menuShow = Menu.buildFromTemplate([{label: 'Show', click: () => api.showTray()}, {label: 'Quit', click: () => api.quit()}])
+      const menuHide = Menu.buildFromTemplate([{label: 'Hide', click: () => api.hideTray()}, {label: 'Quit', click: () => api.quit()}])
       const onShow = _ => tray.setContextMenu(menuHide)
       const onHide = _ => tray.setContextMenu(menuShow)
       windows.tray.on('show', onShow)
@@ -46,7 +46,7 @@ const api = {
     windows.tray.send('main:trayOpen', false)
     setTimeout(_ => windows.tray.hide(), 700)
   },
-  showTray: (retry) => {
+  showTray: () => {
     if (windows.tray.isVisible()) return
     let now = Date.now()
     if (now - lock < 700) return setTimeout(api.showTray, 700)
@@ -98,6 +98,9 @@ const api = {
   activate: () => {
     api.showTray()
     // if (Object.keys(windows).length === 1) api.create()
+  },
+  quit: () => {
+    app.quit()
   }
 }
 
@@ -106,7 +109,10 @@ ipcMain.on('frame:close', api.close)
 ipcMain.on('frame:minimize', api.minimize)
 ipcMain.on('frame:full', api.full)
 ipcMain.on('frame:devTools', api.devTools)
-ipcMain.on('frame:showTray', () => api.showTray())
+ipcMain.on('frame:showTray', api.showTray)
+
+// Tray Events
+ipcMain.on('tray:quit', api.quit)
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
