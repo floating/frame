@@ -10,6 +10,7 @@ module.exports = () => {
   const verifyClient = (info, next) => {
     let obs = store.observer(_ => {
       let origin = info.origin
+      if (!origin || origin === 'null') origin = 'Unknown'
       let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
       let perms = Object.keys(permissions).map(id => permissions[id])
       let permIndex = perms.map(p => p.origin).indexOf(origin)
