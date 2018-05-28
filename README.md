@@ -56,5 +56,21 @@ Frame is an cross-platform Ethereum provider that lets you use standalone signer
 
 **On Ubuntu:** Run `sudo apt-get install libappindicator1` **before** running the demo. You can find more info about this here: https://github.com/electron/electron/issues/1347.
 
+### Adding Hot Signers
+  - **For testing and development purposes** you can add non-hardware accounts to Frame
+  - After cloning the repo create **`hot.json`** in the root directory
+  ```json
+  {
+    "accounts": ["privateKey1", "privateKey2"]
+  } 
+  ```
+  - Run `npm run build` and `npm run alpha` as normal
+
+### Building The App
+  ```bash
+  # Build App (Output > ./build)
+  › npm run build:app
+  ```
+
 ### Related
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps.
