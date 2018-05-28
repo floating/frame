@@ -12,14 +12,14 @@ class Hot extends Signer {
     this.id = key
     this.type = 'Hot'
     this.accounts = [this.account.address]
-    this.privateKey = key
+    this.privateKey = key.startsWith('0x') ? key.substring(2) : key
     this.status = 'ok'
     this.open()
   }
   signTransaction (rawTx, cb) {
     const tx = new EthereumTx(rawTx)
     tx.sign(Buffer.from(this.privateKey, 'hex'))
-    setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 1200) // Response delay for development
+    setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 200) // Response delay for development
   }
 }
 

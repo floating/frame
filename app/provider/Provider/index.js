@@ -27,7 +27,7 @@ class Provider extends EventEmitter {
       let id = ++this.count
       this.nodeRequests[id] = {originId: payload.id, res}
       payload.id = id
-      this.connection.socket.send(JSON.stringify(payload))
+      this.connection.socket.send(JSON.stringify(payload), err => { if (err) console.log(err) })
     }
     this.connection.on('message', message => {
       if (message.jsonrpc && message.jsonrpc === '2.0') {
@@ -63,7 +63,7 @@ class Provider extends EventEmitter {
           this.store.nodeProvider(false)
           this.connection.emit('close')
         })
-        // provider.socket.addEventListener('error', err => {})
+        this.connection.socket.addEventListener('error', err => console.log('Provider Socket Error', err))
         this.connection.socket.addEventListener('message', message => {
           if (message.data) this.connection.emit('message', JSON.parse(message.data))
         })
@@ -87,8 +87,8 @@ class Provider extends EventEmitter {
   getNetVersion (payload, res) {
     res({id: payload.id, jsonrpc: payload.jsonrpc, result: this.netVersion.toString()})
   }
-  unsubscribe (params) {
-    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params})
+  unsubscribe (params, res) {
+    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params}, res)
   }
   declineRequest (req) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
@@ -128,8 +128,11 @@ class Provider extends EventEmitter {
   }
   getNonce = (rawTx, res) => {
     if (this.nonceTrack[rawTx.from] && Date.now() - this.nonceTrack[rawTx.from].time < 30 * 1000) return res({id: 1, jsonrpc: '2.0', result: toHex(++this.nonceTrack[rawTx.from].current)})
+    if (this.nonceLock) return setTimeout(() => this.getNonce(rawTx, res), 200)
+    this.nonceLock = true
     this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'latest']}, response => {
       if (response.result) this.nonceTrack[rawTx.from] = {current: response.result, time: Date.now()}
+      this.nonceLock = false
       res(response)
     })
   }

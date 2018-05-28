@@ -34,6 +34,7 @@ const api = {
       windows.tray.on('hide', onHide)
       windows.tray.on('minimize', onHide)
     }
+    if (dev) windows.tray.openDevTools()
     if (!dev && !demo) setTimeout(() => windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() }), 3000)
     api.showTray()
   },

@@ -38,7 +38,7 @@ module.exports = () => {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        socket.send(JSON.stringify(res))
+        socket.send(JSON.stringify(res), err => { if (err) console.log(err) })
       })
     })
     socket.on('error', err => err) // Handle Error
@@ -50,7 +50,7 @@ module.exports = () => {
           delete subs[sub]
         }
       })
-      if (unsub.length > 0) provider.unsubscribe(unsub)
+      if (unsub.length > 0) provider.unsubscribe(unsub, res => console.log('Provider Unsubscribe', res))
     })
   })
 
