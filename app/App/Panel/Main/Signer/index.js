@@ -158,7 +158,7 @@ class Signer extends React.Component {
               </div>
             ) : (
               <React.Fragment>
-                <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
+                <div className={false && open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
                   <div className='signerNameText'>
                     {this.props.type + ' Account'}
                     <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
