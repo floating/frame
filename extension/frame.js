@@ -3,20 +3,12 @@
 const Web3 = require('web3')
 const EventEmitter = require('events')
 
-const connect = (provider, url = 'ws://localhost:1248', reconnect = true, quiet = false) => {
-  window.frame = window.frame || {initialConnect: true, provider}
-  if (window.frame.initialConnect) {
-    window.frame.initialConnect = false
-    quiet = true
-    reconnect = false
-  }
+const connect = (provider, url = 'ws://localhost:1248', reconnect = true) => {
   provider.reqCalllbacks = {}
   if (!provider.socket || provider.socket.readyState > 1) {
-    provider.socket = new WebSocket(quiet ? 'ws://localhost:1248/?mode=quiet' : 'ws://localhost:1248')
+    provider.socket = new WebSocket(url)
     provider.socket.addEventListener('open', () => {
       console.log('Frame Provider Connected!')
-      if (!quiet) window.location.reload()
-      reconnect = true
       provider.emit('open')
     })
     provider.socket.addEventListener('close', () => {
@@ -59,16 +51,20 @@ const getProvider = url => {
   return provider
 }
 
-try {
-  let provider = getProvider()
-  window.web3 = new Web3(provider)
-  provider.socket.addEventListener('open', () => {
-    window.web3.eth.getAccounts((err, accounts) => {
-      if (err) console.log(err)
-      window.web3.eth.accounts = accounts
-      window.web3.eth.coinbase = accounts[0]
+let active = JSON.parse(localStorage.getItem('__frameActive'))
+
+if (active) {
+  try {
+    let provider = getProvider()
+    window.web3 = new Web3(provider)
+    provider.socket.addEventListener('open', () => {
+      window.web3.eth.getAccounts((err, accounts) => {
+        if (err) console.log(err)
+        window.web3.eth.accounts = accounts
+        window.web3.eth.coinbase = accounts[0]
+      })
     })
-  })
-} catch (e) {
-  console.error('Frame Error:', e)
+  } catch (e) {
+    console.error('Frame Error:', e)
+  }
 }

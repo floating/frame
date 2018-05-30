@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 let inject = `
+  chrome.runtime.sendMessage({method: 'setActive', active: JSON.parse(localStorage.getItem('__frameActive'))})
   var frame = unescape('${escape(fs.readFileSync(path.join(__dirname, '../build/extension/frame.js')).toString())}')
   try {
     let script = document.createElement('script')
