@@ -16,7 +16,7 @@ let lock = 0
 
 const api = {
   tray: () => {
-    tray = new Tray(path.join(__dirname, process.platfoirm === 'darwin' ? './IconTemplate.png' : './Icon.png'))
+    tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
     windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {plugins: true}})
