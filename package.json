@@ -10,8 +10,6 @@
     "build:app:mac": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
     "build:app:linux": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/png/FrameAppIcon.png && electron-installer-debian --src build/Frame-linux-x64 --dest build --arch amd64",
     "build:app:windows": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
-    "build:extension": "copyfiles -f ./extension/* ./build/extension && parcel build ./build/extension/frame.js -d ./build/extension --no-source-maps && node ./extension/inline.js",
-    "build:all": "build:app && build:extension",
     "dev": "npm run launch:dev",
     "alpha": "npm run launch",
     "test": "standard && jest",
@@ -63,7 +61,6 @@
     "websocket": "^1.0.25"
   },
   "devDependencies": {
-    "copyfiles": "^2.0.0",
     "electron": "^2.0.2",
     "electron-packager": "^12.0.1",
     "electron-rebuild": "^1.7.3",
