@@ -12,20 +12,19 @@
     "build:app:windows": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
     "build:extension": "copyfiles -f ./extension/* ./build/extension && parcel build ./build/extension/frame.js -d ./build/extension --no-source-maps && node ./extension/inline.js",
     "build:all": "build:app && build:extension",
-    "dev": "npm-run-all --parallel launch:dev dapp:demo",
-    "demo": "npm-run-all --parallel launch:demo dapp:demo",
+    "dev": "npm run launch:dev",
     "alpha": "npm run launch",
     "test": "standard && jest",
     "launch": "cross-env NODE_ENV=production electron ./main",
-    "launch:demo": "cross-env NODE_ENV=demo electron ./main",
     "launch:dev": "cross-env NODE_ENV=development electron ./main",
     "electron-rebuild": "electron-rebuild",
-    "dapp:demo": "parcel ./dapp/demo/index.html --open --out-dir ./build/dapp/demo",
-    "dapp:presentation": "parcel ./dapp/presentation/index.html --open --out-dir ./build/dapp/presentation",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "jest": {
-    "testPathIgnorePatterns": ["/node_modules/", "/build/"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/build/"
+    ]
   },
   "author": "Jordan Muir",
   "dependencies": {
