@@ -74,3 +74,4 @@ Frame is an cross-platform Ethereum provider that lets you use standalone signer
 
 ### Related
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps.
+  - [Frame Browser Extension](https://github.com/floating/frame-extension)
