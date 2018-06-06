@@ -8,7 +8,7 @@ import store from '../store'
 
 module.exports = () => {
   const verifyClient = (info, next) => {
-    let obs = store.observer(_ => {
+    store.observer(function () {
       let origin = info.origin
       if (!origin || origin === 'null') origin = 'Unknown'
       let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
@@ -18,7 +18,7 @@ module.exports = () => {
       let search = qs.parse(url.search.replace(/^\?+/g, ''))
       let quiet = !search.mode ? false : search.mode === 'quiet'
       if (permIndex === -1 && store('signer.current') && !quiet) return store.addRequest({type: 'requestProvider', origin})
-      setTimeout(_ => obs.remove(), 0) // Add fix for this pattern in restore
+      this.remove()
       next(store('signer.current') && store('node.provider') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
     })
   }
