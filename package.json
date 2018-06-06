@@ -47,7 +47,7 @@
     "opn": "^5.3.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
-    "react-restore": "^0.1.2",
+    "react-restore": "0.1.4",
     "react-transition-group": "^1.2.1",
     "stylus": "^0.54.5",
     "trezor.js": "^6.15.19",
