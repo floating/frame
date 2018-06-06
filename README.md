@@ -67,7 +67,7 @@ Frame is an cross-platform Ethereum provider that lets you use standalone signer
 
 ### Build The App
   ```bash
-  # Build App (Outputs to ./build)
+  # Build App
   › npm run build:app
   ```
 
