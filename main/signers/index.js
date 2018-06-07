@@ -4,7 +4,7 @@ const usbDetect = require('usb-detection')
 const windows = require('../windows')
 
 // Signer Modules
-const trezor = require('./trezor')
+// const trezor = require('./trezor')
 const ledger = require('./ledger')
 const hot = require('./hot')
 
@@ -12,7 +12,7 @@ const hot = require('./hot')
 const signers = {}
 
 // Add Signers
-trezor(signers)
+// trezor(signers)
 ledger(signers)
 hot(signers)
 
