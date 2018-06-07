@@ -17,9 +17,9 @@ module.exports = signers => {
       }
     })
     current.forEach(device => {
-      if (Object.keys(signers).indexOf(device.path) === -1 && device.product === 'Nano S') {
+      let id = uuid(device.path, ns)
+      if (Object.keys(signers).indexOf(id) === -1 && device.product === 'Nano S') {
         let ledger
-        let id = uuid(device.path, ns)
         try {
           ledger = new Ledger(id, new Eth(new TransportNodeHid(new HID.HID(device.path))))
         } catch (e) {

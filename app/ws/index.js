@@ -72,9 +72,10 @@ module.exports = () => {
     ws.clients.forEach(socket => { if (ok.indexOf(socket.origin) < 0) socket.close() })
   })
 
-  // When the current accounts change, close connected sockets
+  // When the current account changes, close connected sockets
+  let current = ''
   store.observer(() => {
-    store('signer.accounts')
-    ws.clients.forEach(socket => socket.close())
+    if (store('signer.current') !== current) ws.clients.forEach(socket => socket.close())
+    current = store('signer.current')
   })
 }
