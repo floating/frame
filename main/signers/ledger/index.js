@@ -8,8 +8,8 @@ const isLedger = d => (['win32', 'darwin'].includes(process.platform) ? d.usageP
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 module.exports = signers => {
-  const scan = _ => {
-    let current = HID.devices().filter(device => isLedger(device))
+  const scan = () => {
+    let current = HID.devices().filter(isLedger)
     Object.keys(signers).forEach(id => {
       if (current.map(device => uuid(device.path, ns)).indexOf(id) === -1 && signers[id].type === 'Nano S') {
         signers[id].close()
@@ -18,18 +18,16 @@ module.exports = signers => {
     })
     current.forEach(device => {
       let id = uuid(device.path, ns)
-      if (Object.keys(signers).indexOf(id) === -1 && device.product === 'Nano S') {
-        let ledger
-        try {
-          ledger = new Ledger(id, new Eth(new TransportNodeHid(new HID.HID(device.path))))
-        } catch (e) {
-          return console.log(e)
-        }
-        signers[id] = ledger
+      let ledger
+      try {
+        ledger = new Ledger(id, new Eth(new TransportNodeHid(new HID.HID(device.path))))
+      } catch (e) {
+        return
       }
+      signers[id] = ledger
     })
   }
-  usbDetect.on('change', scan)
+  usbDetect.on('change', () => setTimeout(scan, 10))
   usbDetect.startMonitoring()
   scan()
 }

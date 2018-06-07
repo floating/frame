@@ -25,8 +25,8 @@
   },
   "author": "Jordan Muir",
   "dependencies": {
-    "@ledgerhq/hw-app-eth": "^4.7.3",
-    "@ledgerhq/hw-transport-node-hid": "^4.7.6",
+    "@ledgerhq/hw-app-eth": "^4.13.0",
+    "@ledgerhq/hw-transport-node-hid": "^4.13.0",
     "auto-launch": "^5.0.5",
     "babel": "^6.23.0",
     "babel-eslint": "^8.2.3",
