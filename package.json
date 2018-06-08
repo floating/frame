@@ -1,7 +1,7 @@
 {
   "name": "Frame",
-  "version": "0.0.4",
-  "description": "A cross-platform Ethereum provider interface",
+  "version": "0.0.5-alpha.1",
+  "description": "A cross-platform Ethereum interface",
   "main": "main",
   "scripts": {
     "start": "npm run launch",
