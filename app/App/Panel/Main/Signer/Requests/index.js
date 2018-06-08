@@ -38,13 +38,13 @@ class Requests extends React.Component {
   decline (reqId, req) {
     this.store.events.emit('declineRequest', reqId, req)
   }
-  transactionRequest (req, i) {
+  transactionRequest (req, top) {
     let requestClass = 'signerRequest'
     if (req.status === 'success') requestClass += ' signerRequestSuccess'
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     if (req.status === 'error') requestClass += ' signerRequestError'
-    let etherUSD = 750
+    let etherUSD = 600
     let value = req.data.value || '0x'
     let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
     value = Web3.utils.fromWei(value, 'ether')
@@ -52,7 +52,7 @@ class Requests extends React.Component {
     value = ((Math.round(value * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
     fee = ((Math.round(fee * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
     return (
-      <div key={req.id || req.handlerId} className={requestClass} style={{top: (i * 10) + 'px'}}>
+      <div key={req.id || req.handlerId} className={requestClass} style={{top: (top * 10) + 'px'}}>
         {req.type === 'approveTransaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
@@ -131,14 +131,14 @@ class Requests extends React.Component {
       </div>
     )
   }
-  providerRequest (req, i) {
+  providerRequest (req, top) {
     let requestClass = 'signerRequest'
     if (req.status === 'success') requestClass += ' signerRequestSuccess'
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     if (req.status === 'error') requestClass += ' signerRequestError'
     return (
-      <div key={req.id || req.handlerId} className={requestClass} style={{top: (i * 10) + 'px'}}>
+      <div key={req.id || req.handlerId} className={requestClass} style={{top: (top * 10) + 'px'}}>
         <div className='approveTransaction'>
           {req.notice ? (
             <div className='requestNotice'>
@@ -194,11 +194,15 @@ class Requests extends React.Component {
           <div className='requestContainer'>
             <div key={'noReq'} style={requests.length !== 0 ? {opacity: 0} : {transitionDelay: '0.32s'}} className='noRequests'>{'No Pending Requests'}</div>
             <CSSTransitionGroup style={{width: '100%'}} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
-              {requests.map((req, i) => {
-                if (req.type === 'approveTransaction') return this.transactionRequest(req, i)
-                if (req.type === 'requestProvider') return this.providerRequest(req, i)
+              {requests.sort((a, b) => {
+                if (a.type === 'approveTransaction' && b.type !== 'approveTransaction') return 1
+                if (a.type !== 'approveTransaction' && b.type === 'approveTransaction') return -1
+                return 0
+              }).map((req, i) => {
+                if (req.type === 'approveTransaction') return this.transactionRequest(req, requests.length - i)
+                if (req.type === 'requestProvider') return this.providerRequest(req, requests.length - i)
                 return null
-              }).reverse()}
+              })}
             </CSSTransitionGroup>
           </div>
         </div>
