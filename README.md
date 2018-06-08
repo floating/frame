@@ -8,7 +8,7 @@
   <br>
 </h2>
 
-<h3 align="center">A cross-platform Ethereum provider interface :tada:</h3>
+<h3 align="center">A cross-platform Ethereum interface :tada:</h3>
 <br>
 <p align="center">
   <a href="#features">Features</a> ⁃
@@ -19,7 +19,7 @@
 
 <img src="/asset/demo/Frame0-0-4.gif?raw=true" />
 
-Frame is an cross-platform Ethereum provider that lets you use standalone signers (such as a Ledger or Trezor) to securely and transparently interact with dapps and the Ethereum network.
+Frame is an cross-platform Ethereum interface that lets you use standalone signers (such as a Ledger or Trezor) to securely and transparently interact with dapps and the Ethereum network.
 
 ### Features
 - **First-class Hardware Support**
@@ -61,14 +61,14 @@ Frame is an cross-platform Ethereum provider that lets you use standalone signer
   ```json
   {
     "accounts": ["privateKey1", "privateKey2"]
-  } 
+  }
   ```
   - Run `npm run build` and `npm run alpha` as normal
 
 ### Build App
   ```bash
   # Build app for current platform
-  › npm run build:app 
+  › npm run build:app
 
   # Build app for target platform with icons
   › npm run build:app:mac

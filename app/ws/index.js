@@ -8,23 +8,16 @@ import store from '../store'
 
 module.exports = () => {
   const verifyClient = (info, next) => {
-    store.observer(function () {
-      let origin = info.origin
-      if (!origin || origin === 'null') origin = 'Unknown'
-      let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
-      let perms = Object.keys(permissions).map(id => permissions[id])
-      let permIndex = perms.map(p => p.origin).indexOf(origin)
-      let url = new URL('ws://' + info.req.headers.host + info.req.url)
-      let search = qs.parse(url.search.replace(/^\?+/g, ''))
-      let quiet = !search.mode ? false : search.mode === 'quiet'
-      if (permIndex === -1 && store('signer.current') && !quiet) return store.addRequest({type: 'requestProvider', origin})
-      this.remove()
-      next(store('signer.current') && store('node.provider') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
-    })
+    let origin = info.origin
+    if (!origin || origin === 'null') origin = 'Unknown'
+    let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
+    let perms = Object.keys(permissions).map(id => permissions[id])
+    let permIndex = perms.map(p => p.origin).indexOf(origin)
+    if (permIndex === -1 && store('signer.current')) store.addRequest({type: 'requestProvider', origin})
+    next(store('signer.current') && store('node.provider') && perms[permIndex] && perms[permIndex].provider, 401, 'Permission Denied')
   }
   const ws = new WebSocket.Server({port: 1248, verifyClient})
   const subs = {}
-
   ws.on('connection', (socket, req) => {
     socket.id = uuid()
     socket.origin = req.headers.origin
