@@ -17,7 +17,7 @@ module.exports = signers => {
       }
     })
     current.forEach(device => {
-      let id = uuid(device.path, ns)
+      let id = uuid('Ledger Nano S' + device.usagePage, ns)
       let ledger
       try {
         ledger = new Ledger(id, new Eth(new TransportNodeHid(new HID.HID(device.path))))
