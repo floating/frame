@@ -25,8 +25,8 @@ module.exports = {
     cb(null, signerSummary)
     // cb(null, Object.keys(signers).sort().map(path => signers[path].summary()))
   },
-  setSigner: (path, cb) => {
-    current = path
+  setSigner: (id, cb) => {
+    current = id
     let summary = signers[current].summary()
     cb(null, summary)
     windows.broadcast('main:setSigner', summary)

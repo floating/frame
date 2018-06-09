@@ -11,7 +11,7 @@ module.exports = signers => {
   const scan = () => {
     let current = HID.devices().filter(isLedger)
     Object.keys(signers).forEach(id => {
-      if (current.map(device => uuid(device.path, ns)).indexOf(id) === -1 && signers[id].type === 'Nano S') {
+      if (current.map(device => uuid('Ledger Nano S' + device.usagePage, ns)).indexOf(id) === -1 && signers[id].type === 'Nano S') {
         signers[id].close()
         delete signers[id]
       }
