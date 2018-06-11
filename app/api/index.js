@@ -8,7 +8,7 @@ import provider from '../provider'
 import store from '../store'
 
 const trusted = origin => {
-  if (!origin || origin === 'null') origin = 'Unknown' // Probably block these for now.
+  if (!origin || origin === 'null') origin = 'Unknown'
   let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
   let perms = Object.keys(permissions).map(id => permissions[id])
   let permIndex = perms.map(p => p.origin).indexOf(origin)
@@ -16,22 +16,33 @@ const trusted = origin => {
   return store('signer.current') && store('node.provider') && perms[permIndex] && perms[permIndex].provider
 }
 
+const polls = {}
+const pollSubs = {}
+
 const httpHandler = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'POST' && trusted(req.headers.origin)) {
     let body = []
     req.on('data', chunk => body.push(chunk)).on('end', () => {
-      console.log('end', Buffer.concat(body).toString())
       res.on('error', err => console.error('res err', err))
       let payload = JSON.parse(Buffer.concat(body).toString())
+      if (payload.method === 'eth_pollSubscriptions') {
+        let id = payload.params[0]
+        let result = polls[id] || []
+        res.writeHead(200, {'Content-Type': 'application/json'})
+        res.end(JSON.stringify({id: payload.id, jsonrpc: payload.jsonrpc, result}))
+        return polls[id] = []
+      }
       provider.send(payload, response => {
-        // if (response && response.result) {
-        //   if (payload.method === 'eth_subscribe') {
-        //     subs[response.result] = socket
-        //   } else if (payload.method === 'eth_unsubscribe') {
-        //     payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
-        //   }
-        // }
+        if (response && response.result) {
+          if (payload.method === 'eth_subscribe') {
+            let id = payload.pollId
+            polls[id] = polls[id] || []
+            pollSubs[response.result] = id
+          } else if (payload.method === 'eth_unsubscribe') {
+            payload.params.forEach(sub => { if (pollSubs[sub]) delete pollSubs[sub] })
+          }
+        }
         res.writeHead(200, {'Content-Type': 'application/json'})
         res.end(JSON.stringify(response))
       })
@@ -88,6 +99,11 @@ module.exports = () => {
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
     if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify(payload))
+    if (pollSubs[payload.params.subscription]){
+      let id = pollSubs[payload.params.subscription]
+      polls[id] = polls[id] || []
+      polls[id].push(JSON.stringify(payload))
+    }
   })
 
   // When permission is revoked, close connected sockets
