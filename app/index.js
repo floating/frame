@@ -7,14 +7,14 @@ import opn from 'opn'
 import App from './App'
 import Panel from './App/Panel'
 
-import ws from './ws'
+import api from './api'
 import webview from './webview'
 import store from './store'
 
 import './style'
 
 let tray = process.env.FRAME_TYPE === 'tray'
-tray ? ws() : webview()
+tray ? api() : webview()
 let Frame = Restore.connect(tray ? Panel : App, store)
 ReactDOM.render(<Frame />, document.getElementById('frame'))
 
