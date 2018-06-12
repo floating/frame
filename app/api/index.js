@@ -1,5 +1,3 @@
-import qs from 'querystring'
-import { URL } from 'url'
 import WebSocket from 'ws'
 import uuid from 'uuid/v4'
 import http from 'http'
@@ -31,7 +29,8 @@ const httpHandler = (req, res) => {
         let result = polls[id] || []
         res.writeHead(200, {'Content-Type': 'application/json'})
         res.end(JSON.stringify({id: payload.id, jsonrpc: payload.jsonrpc, result}))
-        return polls[id] = []
+        polls[id] = []
+        return
       }
       provider.send(payload, response => {
         if (response && response.result) {
@@ -99,7 +98,7 @@ module.exports = () => {
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
     if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify(payload))
-    if (pollSubs[payload.params.subscription]){
+    if (pollSubs[payload.params.subscription]) {
       let id = pollSubs[payload.params.subscription]
       polls[id] = polls[id] || []
       polls[id].push(JSON.stringify(payload))

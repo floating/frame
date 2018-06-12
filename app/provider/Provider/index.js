@@ -180,7 +180,7 @@ class Provider extends EventEmitter {
   }
   ecRecover (payload, res) {
     const message = payload.params[0]
-    const signature = new Buffer(payload.params[1].replace('0x', ''), 'hex')
+    const signature = Buffer.from(payload.params[1].replace('0x', ''), 'hex')
     if (signature.length !== 65) this.resError(`Frame provider error during ecRecover: Signature has incorrect length`, payload, res)
     let v = signature[64]
     v = v === 0 || v === 1 ? v + 27 : v
