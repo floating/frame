@@ -33,7 +33,6 @@ test('Send Transaction', done => {
   })
 })
 
-
 test('Sign Personal and ecRecover', done => {
   let message = 'Frame Test'
   let signed = ''

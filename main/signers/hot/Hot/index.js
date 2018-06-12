@@ -1,5 +1,5 @@
 const EthTx = require('ethereumjs-tx')
-const { hashPersonalMessage, toBuffer, ecsign, privateToAddress, addHexPrefix, toChecksumAddress } = require('ethereumjs-util')
+const { hashPersonalMessage, toBuffer, ecsign, privateToAddress, addHexPrefix } = require('ethereumjs-util')
 const Signer = require('../../Signer')
 
 class Hot extends Signer {

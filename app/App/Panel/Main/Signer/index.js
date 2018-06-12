@@ -145,9 +145,10 @@ class Signer extends React.Component {
     )
   }
   renderStatus () {
-    let current = this.store('signer.current') === this.props.id
-    let open = current && this.store('signer.open')
-
+    // TODO: Set Signer Name
+    // let current = this.store('signer.current') === this.props.id
+    // let open = current && this.store('signer.open')
+    // <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
     return (
       <div className='signerStatusWrap'>
         <CSSTransitionGroup transitionName='standardFade' transitionEnterTimeout={320} transitionLeaveTimeout={320}>
@@ -158,7 +159,7 @@ class Signer extends React.Component {
               </div>
             ) : (
               <React.Fragment>
-                <div className={false && open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
+                <div className='signerName'>
                   <div className='signerNameText'>
                     {this.props.type + ' Account'}
                     <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
