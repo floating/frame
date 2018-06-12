@@ -4,6 +4,7 @@ const launch = require('../launch')
 
 const rpc = {
   signTransaction: signers.signTransaction,
+  signPersonal: signers.signPersonal,
   getAccounts: signers.getAccounts,
   getCoinbase: signers.getCoinbase,
   getSigners: signers.getSigners,

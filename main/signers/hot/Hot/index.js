@@ -1,25 +1,28 @@
-const Web3 = require('web3')
-const EthereumTx = require('ethereumjs-tx')
+const EthTx = require('ethereumjs-tx')
+const { hashPersonalMessage, toBuffer, ecsign, privateToAddress, addHexPrefix, toChecksumAddress } = require('ethereumjs-util')
 const Signer = require('../../Signer')
-
-let normalize = key => key == null ? '' : key.startsWith('0x') ? key : '0x' + key
 
 class Hot extends Signer {
   constructor (key) {
     super()
-    this.web3 = new Web3()
-    this.account = this.web3.eth.accounts.privateKeyToAccount(normalize(key))
+    this.privateKey = Buffer.from(key.replace('0x', ''), 'hex')
     this.id = key
     this.type = 'Hot'
-    this.accounts = [this.account.address]
-    this.privateKey = key.startsWith('0x') ? key.substring(2) : key
+    this.accounts = [addHexPrefix(privateToAddress(this.privateKey).toString('hex'))]
     this.status = 'ok'
     this.open()
   }
+  // Standard Methods
+  signPersonal (message, cb) {
+    const hash = hashPersonalMessage(toBuffer(message))
+    const signed = ecsign(hash, this.privateKey)
+    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
+    cb(null, addHexPrefix(hex))
+  }
   signTransaction (rawTx, cb) {
-    const tx = new EthereumTx(rawTx)
-    tx.sign(Buffer.from(this.privateKey, 'hex'))
-    setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 200) // Response delay for development
+    const tx = new EthTx(rawTx)
+    tx.sign(this.privateKey)
+    setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 500) // Response delay for development
   }
 }
 

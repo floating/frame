@@ -2,6 +2,7 @@
 
 const { ipcRenderer } = require('electron')
 const { toHex } = require('web3').utils
+const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
 
 const { URL } = require('url')
 const uuid = require('uuid/v4')
@@ -121,7 +122,7 @@ class Provider extends EventEmitter {
     })
   }
   getRawTx (payload) {
-    let rawTx = payload.params[0] // Todo: Handle mutiple txs
+    let rawTx = payload.params[0]
     rawTx.gas = rawTx.gas || rawTx.gasLimit
     delete rawTx.gasLimit
     return rawTx
@@ -171,14 +172,32 @@ class Provider extends EventEmitter {
       this.handlers[handlerId] = res
     })
   }
+  signPersonal (payload, res) {
+    rpc('signPersonal', payload.params[0], payload.params[1], (err, signed) => {
+      if (err) return this.resError(`Frame provider error during signPersonal: ${err.message}`, payload, res)
+      res({id: payload.id, jsonrpc: payload.jsonrpc, result: signed})
+    })
+  }
+  ecRecover (payload, res) {
+    const message = payload.params[0]
+    const signature = new Buffer(payload.params[1].replace('0x', ''), 'hex')
+    if (signature.length !== 65) this.resError(`Frame provider error during ecRecover: Signature has incorrect length`, payload, res)
+    let v = signature[64]
+    v = v === 0 || v === 1 ? v + 27 : v
+    let r = toBuffer(signature.slice(0, 32))
+    let s = toBuffer(signature.slice(32, 64))
+    const hash = hashPersonalMessage(toBuffer(message))
+    const address = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+    res({id: payload.id, jsonrpc: payload.jsonrpc, result: address})
+  }
   send (payload, res) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
-    if (payload.method === 'eth_sign') return this.resError('Need to handle eth_sign', payload, res)
-    if (payload.method === 'personal_sign') return this.resError('Need to handle personal_sign', payload, res)
-    if (payload.method === 'personal_ecRecover') return this.resError('Need to handle personal_ecRecover', payload, res)
+    if (payload.method === 'personal_sign') return this.signPersonal(payload, res)
+    if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
+    if (payload.method === 'eth_sign') return this.resError('No eth_sign', payload, res)
     this.connection.send(payload, res)
   }
 }

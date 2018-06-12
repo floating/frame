@@ -33,15 +33,12 @@ class Ledger extends Signer {
     return hex
   }
   // Standard Methods
-  signPersonal (payload, cb) {
-    this.device.signPersonalMessage(this.path, Buffer.from(payload).toString('hex')).then(result => {
-      let v = result['v'] - 27
-      v = v.toString(16)
+  signPersonal (message, cb) {
+    this.device.signPersonalMessage(this.path, message.replace('0x', '')).then(result => {
+      let v = (result['v'] - 27).toString(16)
       if (v.length < 2) v = '0' + v
       cb(null, result['r'] + result['s'] + v)
-    }).catch(err => {
-      cb(err)
-    })
+    }).catch(err => cb(err.message))
   }
   signTransaction (rawTx, cb) {
     const tx = new EthereumTx(rawTx)
@@ -62,9 +59,7 @@ class Ledger extends Signer {
         s: Buffer.from(this.normalize(result.s), 'hex')
       })
       cb(null, '0x' + tx.serialize().toString('hex'))
-    }).catch(err => {
-      cb(err)
-    })
+    }).catch(err => cb(err.message))
   }
 }
 

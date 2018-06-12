@@ -37,23 +37,28 @@ module.exports = {
     cb(null, summary)
     windows.broadcast('main:setSigner', summary)
   },
-  getAccounts: (handler) => {
-    if (!signers[current]) return handler('No Account Selected')
-    signers[current].getAccounts(handler)
+  getAccounts: (cb) => {
+    if (!signers[current]) return cb(new Error('No Account Selected'))
+    signers[current].getAccounts(cb)
   },
   getCoinbase: (cb) => {
-    if (!signers[current]) cb(new Error('No Account Selected'))
+    if (!signers[current]) return cb(new Error('No Account Selected'))
     signers[current].getCoinbase(cb)
   },
+  signPersonal: (message, address, cb) => {
+    if (!signers[current]) return cb(new Error('No Account Selected'))
+    if (address.toLowerCase() !== signers[current].accounts[0].toLowerCase()) return cb(new Error('signPersonal: Wrong Account Selected'))
+    signers[current].signPersonal(message, cb)
+  },
   signTransaction: (rawTx, cb) => {
-    if (!signers[current]) cb(new Error('No Account Selected'))
+    if (!signers[current]) return cb(new Error('No Account Selected'))
     signers[current].signTransaction(rawTx, cb)
   },
   close: () => {
     usbDetect.stopMonitoring()
   },
   trezorPin: (id, pin, cb) => {
-    if (!signers[id]) cb(new Error('No Account Selected'))
+    if (!signers[id]) return cb(new Error('No Account Selected'))
     if (signers[id].setPin) {
       signers[id].setPin(null, pin)
       cb(null, {status: 'ok'})
