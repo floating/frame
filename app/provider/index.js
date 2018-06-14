@@ -1,7 +1,6 @@
+import store from '../store'
 import Provider from './Provider'
-// wss://rinkeby.infura.io/_ws
-// ws://localhost:8546
-const provider = new Provider('wss://rinkeby.infura.io/ws')
+const provider = new Provider(store('local.node.default'))
 
 let checkSync = () => {
   provider.send({id: 1, jsonrpc: '2.0', method: 'eth_syncing', params: []}, res => {

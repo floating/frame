@@ -4,6 +4,13 @@ import Restore from 'react-restore'
 import provider from '../../../../../provider'
 
 class Settings extends React.Component {
+  clearPermissions () {
+    return (
+      <div className='quitFrame'>
+        <div onClick={() => this.store.clearPermissions()} className='quitFrameButton'>{'Clear All Permissions'}</div>
+      </div>
+    )
+  }
   render () {
     let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
     return (
@@ -35,6 +42,7 @@ class Settings extends React.Component {
             )
           })
         )}
+        {this.clearPermissions()}
       </div>
     )
   }

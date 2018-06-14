@@ -46,11 +46,14 @@ let initial = {
     launch: false,
     node: {
       run: false,
-      default: 'wss://rinkeby.infura.io/ws'
+      default: 'wss://rinkeby.infura.io/_ws'
     },
+    success: false,
     accounts: {}
   }
 }
+
+// ws://localhost:8546
 
 if (initial.frame.type !== 'tray' && initial.view.list.length === 0) {
   let id = uuid()
