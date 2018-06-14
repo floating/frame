@@ -122,7 +122,6 @@ export const requestError = (u, id, err) => {
   } else {
     u('signer.requests', id, 'notice', notice => 'Signature Error')
   }
-
   setTimeout(() => u('signer.requests', requests => remove(requests, id)), 3300)
 }
 
