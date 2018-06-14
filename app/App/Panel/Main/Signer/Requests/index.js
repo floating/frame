@@ -67,9 +67,19 @@ class Requests extends React.Component {
                         </div>
                       )
                     } else if (req.status === 'success') {
-                      return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: '80px'})}</div>
+                      return (
+                        <div key={req.status} className='requestNoticeInner bounceIn'>
+                          <div>{svg.octicon('check', {height: '80px'})}</div>
+                          <div className='requestNoticeInnerText'>{req.notice}</div>
+                        </div>
+                      )
                     } else if (req.status === 'error' || req.status === 'declined') {
-                      return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                      return (
+                        <div key={req.status} className='requestNoticeInner bounceIn'>
+                          <div>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                          <div className='requestNoticeInnerText'>{req.notice}</div>
+                        </div>
+                      )
                     } else {
                       return <div key={req.notice} className='requestNoticeInner bounceIn'>{req.notice}</div>
                     }
