@@ -283,10 +283,11 @@
     // background good
     //box-shadow 0px 2px 0px good, default
     align-items center
+    color good
     svg
       fill good
     .approveTransactionPayload
-      color #116338
+      color good
     .requestApprove
       opacity 0
       pointer-events none
@@ -309,8 +310,11 @@
     // .approveTransactionPayload
     //   color #0d3a56
     align-items center
+    color bad
     svg
       fill bad
+    .approveTransactionPayload
+      color bad
     .requestApprove
       opacity 0
       pointer-events none
@@ -323,6 +327,8 @@
     align-items center
     svg
       fill bad
+    .approveTransactionPayload
+      color bad
     .requestApprove
       opacity 0
       pointer-events none
@@ -592,6 +598,8 @@
     text-transform uppercase
     letter-spacing 2px
     -webkit-app-region no-drag
+    span
+      margin-right 8px
 
     .requestDecline
       position absolute
@@ -603,6 +611,15 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
+      svg
+        transition standard
+        fill bad
+
+    // .requestDecline:hover
+    //   span
+    //     background bad
+    //   svg
+    //     fill spacewhite
 
     .requestSign
       position absolute
@@ -615,6 +632,17 @@
       align-items center
       border-top-left-radius 6px
       -webkit-app-region no-drag
+      span
+        transition standard
+      svg
+        transition standard
+        fill good
+
+    // .requestSign:hover
+    //   span
+    //     background good
+    //   svg
+    //     fill spacewhite
 
 .signerRequestsHidden
   left -100%
