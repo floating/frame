@@ -1,4 +1,5 @@
-import uuid from 'uuid/v4'
+import uuidv4 from 'uuid/v4'
+import uuidv5 from 'uuid/v5'
 import { URL } from 'url'
 import { ipcRenderer } from 'electron'
 
@@ -19,6 +20,8 @@ export const panelRequest = (u, request) => {
 
 export const setLaunch = (u, launch) => u('local.launch', _ => launch)
 
+export const hadSuccess = u => u('local.success', _ => true)
+
 export const toggleLaunch = u => u('local.launch', launch => !launch)
 
 export const toggleSettings = u => {
@@ -35,6 +38,13 @@ export const setSignerView = (u, view) => u('signer.view', _ => view)
 export const setPermissions = (u, permissions) => {
   u('local.accounts', (accounts, state) => {
     accounts[state.signer.accounts[0]].permissions = permissions
+    return accounts
+  })
+}
+
+export const clearPermissions = (u, permissions) => {
+  u('local.accounts', (accounts, state) => {
+    accounts[state.signer.accounts[0]].permissions = {}
     return accounts
   })
 }
@@ -59,7 +69,7 @@ export const addRequest = (u, request) => {
       let reqs = Object.keys(requests)
       let reqIndex = reqs.filter(id => requests[id].type === 'requestProvider').map(id => requests[id].origin).indexOf(request.origin)
       if (reqIndex === -1) {
-        request.handlerId = uuid()
+        request.handlerId = uuidv5(request.origin, uuidv5.DNS)
         if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
       } else {
         request.handlerId = requests[reqs[reqIndex]].handlerId
@@ -126,6 +136,11 @@ export const addSigner = (u, signer) => {
 }
 
 export const setSigner = (u, signer) => {
+  u('local.accounts', (accounts, state) => {
+    let a = signer.accounts[0]
+    if (accounts[a] && accounts[a].permissions) delete accounts[a].permissions[uuidv5('Unknown', uuidv5.DNS)]
+    return accounts
+  })
   u('signer.current', _ => signer.id)
   u('signer.accounts', _ => signer.accounts)
   setTimeout(_ => {
@@ -199,7 +214,7 @@ export const reorderTabs = (u, from, to) => {
   })
 }
 export const newView = (u) => {
-  let id = uuid()
+  let id = uuidv4()
   u('view.current', _ => id)
   u('view.list', list => {
     list.push(id)

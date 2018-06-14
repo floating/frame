@@ -117,6 +117,7 @@ class Provider extends EventEmitter {
         } else {
           res(response)
           cb(null, response.result)
+          if (!store('local.success')) store.hadSuccess()
         }
       })
     })
