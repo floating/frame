@@ -201,7 +201,7 @@ class Signer extends React.Component {
       style.bottom = open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
-      style.zIndex = '1000000'
+      style.zIndex = '1000000000000'
     } else if (this.store('signer.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0

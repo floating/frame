@@ -62,14 +62,24 @@ class Requests extends React.Component {
                     if (req.status === 'pending') {
                       return (
                         <div key={req.status} className='requestNoticeInner bounceIn'>
-                          <div><div className='loader' /></div>
+                          <div style={{paddingBottom: '20px'}}><div className='loader' /></div>
                           <div className='requestNoticeInnerText'>{'See Signer'}</div>
                         </div>
                       )
                     } else if (req.status === 'success') {
-                      return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: '80px'})}</div>
+                      return (
+                        <div key={req.status} className='requestNoticeInner bounceIn'>
+                          <div>{svg.octicon('check', {height: '80px'})}</div>
+                          <div className='requestNoticeInnerText'>{req.notice}</div>
+                        </div>
+                      )
                     } else if (req.status === 'error' || req.status === 'declined') {
-                      return <div key={req.status} className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                      return (
+                        <div key={req.status} className='requestNoticeInner bounceIn'>
+                          <div>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                          <div className='requestNoticeInnerText'>{req.notice}</div>
+                        </div>
+                      )
                     } else {
                       return <div key={req.notice} className='requestNoticeInner bounceIn'>{req.notice}</div>
                     }
@@ -125,8 +135,12 @@ class Requests extends React.Component {
           <div className='unknownType'>{'Unknown: ' + req.type}</div>
         )}
         <div className='requestApprove'>
-          <div className='requestDecline' onClick={() => this.decline(req.handlerId, req)}>{'Decline'}</div>
-          <div className='requestSign' onClick={() => this.approve(req.handlerId, req)}>{'Sign'}</div>
+          <div className='requestDecline' onClick={() => this.decline(req.handlerId, req)}>
+            {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
+          </div>
+          <div className='requestSign' onClick={() => this.approve(req.handlerId, req)}>
+            {svg.octicon('check', {height: '22px'})}{'Sign'}
+          </div>
         </div>
       </div>
     )
@@ -172,8 +186,12 @@ class Requests extends React.Component {
           )}
         </div>
         <div className='requestApprove'>
-          <div className='requestDecline' onClick={() => this.store.giveAccess(req, false)}>{'Decline'}</div>
-          <div className='requestSign' onClick={() => this.store.giveAccess(req, true)}>{'Approve'}</div>
+          <div className='requestDecline' onClick={() => this.store.giveAccess(req, false)}>
+            {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
+          </div>
+          <div className='requestSign' onClick={() => this.store.giveAccess(req, true)}>
+            {svg.octicon('check', {height: '22px'})}{'Approve'}
+          </div>
         </div>
       </div>
     )
