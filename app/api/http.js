@@ -5,6 +5,19 @@ import trusted from './trusted'
 const polls = {}
 const pollSubs = {}
 
+const cleanupTimers = {}
+const cleanup = id => {
+  delete polls[id]
+  let unsub = []
+  Object.keys(pollSubs).forEach(sub => {
+    if (pollSubs[sub] === id) {
+      delete pollSubs[sub]
+      unsub.push(sub)
+    }
+  })
+  if (unsub.length > 0) provider.unsubscribe(unsub, res => console.log('Provider Unsubscribe', res))
+}
+
 const handler = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'POST' && trusted(req.headers.origin)) {
@@ -18,7 +31,9 @@ const handler = (req, res) => {
           let result = polls[id] || []
           res.writeHead(200, {'Content-Type': 'application/json'})
           res.end(JSON.stringify({id: payload.id, jsonrpc: payload.jsonrpc, result}))
-          polls[id] = []
+          delete polls[id]
+          clearTimeout(cleanupTimers[id])
+          cleanupTimers[id] = setTimeout(cleanup.bind(null, id), 120 * 1000)
           return
         } else {
           res.writeHead(401, {'Content-Type': 'application/json'})
@@ -28,9 +43,7 @@ const handler = (req, res) => {
       provider.send(payload, response => {
         if (response && response.result) {
           if (payload.method === 'eth_subscribe') {
-            let id = payload.pollId
-            polls[id] = polls[id] || []
-            pollSubs[response.result] = id
+            pollSubs[response.result] = payload.pollId
           } else if (payload.method === 'eth_unsubscribe') {
             payload.params.forEach(sub => { if (pollSubs[sub]) delete pollSubs[sub] })
           }
