@@ -1,6 +1,7 @@
 const Web3 = require('web3')
 const bip32Path = require('bip32-path')
 const EthereumTx = require('ethereumjs-tx')
+const { toChecksumAddress } = require('ethereumjs-util')
 const Signer = require('../../Signer')
 
 class Trezor extends Signer {
@@ -28,7 +29,7 @@ class Trezor extends Signer {
     this.device.waitForSessionAndRun(session => {
       return session.ethereumGetAddress(bip32Path.fromString(this.path).toPathArray())
     }).then(result => {
-      this.accounts = ['0x' + result.message.address]
+      this.accounts = [toChecksumAddress(result.message.address)]
       this.status = 'ok'
       this.update()
     }).catch(err => {
