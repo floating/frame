@@ -11,6 +11,8 @@ class Trezor extends Signer {
     this.id = device.originalDescriptor.path
     this.type = 'Trezor'
     this.status = 'loading'
+    this.index = 0
+    this.path = `m/44'/60'/0'/0` + `/${this.index}`
     this.handlers = {}
     device.on('button', code => this.button(code))
     device.on('passphrase', cb => this.passphrase(cb))
@@ -19,12 +21,12 @@ class Trezor extends Signer {
     this.deviceStatus()
     this.open()
   }
-  button (code) {
-    console.log('Need Device Input')
+  button (label) {
+    console.log(`Trezor button "${label}" was pressed`)
   }
   deviceStatus () {
     this.device.waitForSessionAndRun(session => {
-      return session.ethereumGetAddress(bip32Path.fromString(`m/44'/60'/0'/0`).toPathArray())
+      return session.ethereumGetAddress(bip32Path.fromString(this.path).toPathArray())
     }).then(result => {
       this.accounts = ['0x' + result.message.address]
       this.status = 'ok'
@@ -52,7 +54,7 @@ class Trezor extends Signer {
   // Standard Methods
   signTransaction (rawTx, cb) {
     const trezorTx = [
-      bip32Path.fromString(`m/44'/60'/0'/0`).toPathArray(),
+      bip32Path.fromString(this.path).toPathArray(),
       this.normalize(rawTx.nonce),
       this.normalize(rawTx.gasPrice),
       this.normalize(rawTx.gas),
