@@ -1,26 +1,46 @@
 {
   "name": "Frame",
-  "version": "0.0.5-alpha.2",
-  "description": "A cross-platform Ethereum interface",
+  "version": "0.0.5-alpha.3",
+  "description": "An Ethereum interface",
   "main": "main",
+  "build": {
+    "appId": "sh.frame.app",
+    "productName": "Frame",
+    "dmg": {
+      "title": "Frame"
+    },
+    "linux": {
+      "icon": "./asset/ico/FrameAppIcon.ico"
+    },
+    "deb": {
+      "depends": ["gconf2", "gconf-service", "libnotify4", "libappindicator1", "libxtst6", "libnss3", "libgconf"]
+    },
+    "snap": {
+      "stagePackages": ["default", "libappindicator1", "libgconf"]
+    },
+    "windows": {
+      "icon": "./asset/ico/FrameAppIcon.ico"
+    }
+  },
   "scripts": {
     "start": "npm run launch",
     "alpha": "npm run launch",
     "dev": "cross-env NODE_ENV=development electron ./main",
     "launch": "cross-env NODE_ENV=production electron ./main",
-    "build": "npm install && electron-rebuild",
+    "build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
     "build:app": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
     "build:app:mac": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
     "build:app:linux": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/png/FrameAppIcon.png && electron-installer-debian --src build/Frame-linux-x64 --dest build --arch amd64",
     "build:app:windows": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
-    "electron-rebuild": "electron-rebuild",
     "test": "standard && jest",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "jest": {
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/build/"
+      "/build/",
+      "/dist/"
     ]
   },
   "author": "Jordan Muir",
@@ -62,17 +82,12 @@
   },
   "devDependencies": {
     "electron": "^2.0.2",
-    "electron-packager": "^12.0.1",
-    "electron-rebuild": "^1.7.3",
+    "electron-builder": "^20.18.0",
     "ganache-cli": "^6.1.0",
     "jest": "^23.0.0",
     "mkdirp": "^0.5.1",
-    "npm-run-all": "^4.1.2",
     "parcel-bundler": "^1.7.1",
     "standard": "^11.0.1"
-  },
-  "optionalDependencies": {
-    "electron-installer-debian": "^0.8.1"
   },
   "standard": {
     "parser": "babel-eslint"
