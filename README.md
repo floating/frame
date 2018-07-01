@@ -41,13 +41,13 @@ Frame is an cross-platform Ethereum interface that lets you use standalone signe
 
 ### Run Source
 ```bash
-# Clone Frame
+# Clone
 › git clone https://github.com/floating/frame
 
-# Build Frame
-› npm run build
+# Install
+› npm install
 
-# Run Frame
+# Run
 › npm run alpha
 ```
 
@@ -65,15 +65,10 @@ Frame is an cross-platform Ethereum interface that lets you use standalone signe
   ```
   - Run `npm run build` and `npm run alpha` as normal
 
-### Build App
+### Build Apps
   ```bash
-  # Build app for current platform
-  › npm run build:app
-
-  # Build app for target platform with icons
-  › npm run build:app:mac
-  › npm run build:app:linux
-  › npm run build:app:windows
+  # Build apps for current platform
+  › npm run build
   ```
 
 ### Related

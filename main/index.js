@@ -1,4 +1,5 @@
 const { app, ipcMain } = require('electron')
+const log = require('electron-log')
 
 const store = require('./store')
 const signers = require('./signers')
@@ -41,3 +42,16 @@ app.on('will-quit', e => {
 app.on('quit', signers.close)
 
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+
+const autoUpdater = require('electron-updater').autoUpdater
+setTimeout(() => {
+  autoUpdater.checkForUpdatesAndNotify()
+  setInterval(() => {
+    autoUpdater.checkForUpdatesAndNotify()
+  }, 10 * 60 * 1000)
+}, 10000)
+
+autoUpdater.on('error', message => {
+  log.error('There was a problem updating the application')
+  log.error(message)
+})
