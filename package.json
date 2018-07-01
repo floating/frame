@@ -3,22 +3,17 @@
   "version": "0.0.5-alpha.3",
   "description": "An Ethereum interface",
   "main": "main",
-  "build": {
+    "build": {
     "appId": "sh.frame.app",
     "productName": "Frame",
     "dmg": {
       "title": "Frame"
     },
     "linux": {
-      "icon": "./asset/ico/FrameAppIcon.ico"
+      "icon": "./asset/png/FrameAppIcon.png",
+      "target": ["AppImage", "deb", "snap", "tar.gz"]
     },
-    "deb": {
-      "depends": ["gconf2", "gconf-service", "libnotify4", "libappindicator1", "libxtst6", "libnss3", "libgconf"]
-    },
-    "snap": {
-      "stagePackages": ["default", "libappindicator1", "libgconf"]
-    },
-    "windows": {
+    "win": {
       "icon": "./asset/ico/FrameAppIcon.ico"
     }
   },
@@ -43,7 +38,11 @@
       "/dist/"
     ]
   },
-  "author": "Jordan Muir",
+  "author": {
+    "name" : "Jordan Muir",
+    "email" : "jordan@frame.sh",
+    "url" : "https//frame.sh"
+  },
   "dependencies": {
     "@ledgerhq/hw-app-eth": "^4.13.0",
     "@ledgerhq/hw-transport-node-hid": "^4.13.0",

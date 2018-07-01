@@ -1,10 +1,9 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
+const { app, shell, BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
 const uuid = require('uuid/v4')
 const url = require('url')
 const Positioner = require('electron-positioner')
-const opn = require('opn')
 const PersistStore = require('electron-store')
 const persist = new PersistStore()
 
@@ -38,7 +37,7 @@ const api = {
     }
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() }), 3000)
-    if (!persist.get('local') || (persist.get('local') && !persist.get('local').success)) opn('https://welcome.frame.sh')
+    if (!persist.get('local') || (persist.get('local') && !persist.get('local').success)) shell.openExternal('https://welcome.frame.sh')
     api.showTray()
   },
   trayClick: () => {
