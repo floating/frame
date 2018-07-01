@@ -64,6 +64,7 @@
     "babel-register": "^6.26.0",
     "bip32-path": "^0.4.2",
     "cross-env": "^5.1.5",
+    "electron-log": "^2.2.16",
     "electron-positioner": "^3.0.0",
     "electron-store": "^2.0.0",
     "electron-updater": "^2.23.3",
