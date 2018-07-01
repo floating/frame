@@ -3,7 +3,7 @@
   "version": "0.0.5-alpha.3",
   "description": "An Ethereum interface",
   "main": "main",
-    "build": {
+  "build": {
     "appId": "sh.frame.app",
     "productName": "Frame",
     "dmg": {
@@ -11,7 +11,12 @@
     },
     "linux": {
       "icon": "./asset/png/FrameAppIcon.png",
-      "target": ["AppImage", "deb", "snap", "tar.gz"]
+      "target": [
+        "AppImage",
+        "deb",
+        "snap",
+        "tar.gz"
+      ]
     },
     "win": {
       "icon": "./asset/ico/FrameAppIcon.ico"
@@ -23,6 +28,7 @@
     "dev": "cross-env NODE_ENV=development electron ./main",
     "launch": "cross-env NODE_ENV=production electron ./main",
     "build": "electron-builder",
+    "release": "build",
     "postinstall": "electron-builder install-app-deps",
     "build:app": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
     "build:app:mac": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
@@ -39,9 +45,9 @@
     ]
   },
   "author": {
-    "name" : "Jordan Muir",
-    "email" : "jordan@frame.sh",
-    "url" : "https//frame.sh"
+    "name": "Jordan Muir",
+    "email": "jordan@frame.sh",
+    "url": "https//frame.sh"
   },
   "dependencies": {
     "@ledgerhq/hw-app-eth": "^4.13.0",
@@ -60,6 +66,7 @@
     "cross-env": "^5.1.5",
     "electron-positioner": "^3.0.0",
     "electron-store": "^2.0.0",
+    "electron-updater": "^2.23.3",
     "ethereumjs-tx": "^1.3.4",
     "ethereumjs-util": "^5.2.0",
     "node-hid": "^0.7.2",

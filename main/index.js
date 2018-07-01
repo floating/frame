@@ -1,4 +1,5 @@
 const { app, ipcMain } = require('electron')
+const autoUpdater = require('electron-updater').autoUpdater
 
 const store = require('./store')
 const signers = require('./signers')
@@ -41,3 +42,10 @@ app.on('will-quit', e => {
 app.on('quit', signers.close)
 
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+
+setTimeout(() => {
+  autoUpdater.checkForUpdatesAndNotify()
+  setInterval(() => {
+    autoUpdater.checkForUpdatesAndNotify()
+  }, 10 * 60 * 1000)
+}, 10000)
