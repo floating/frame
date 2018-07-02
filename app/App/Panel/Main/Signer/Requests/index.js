@@ -44,7 +44,8 @@ class Requests extends React.Component {
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (req.status === 'pending') requestClass += ' signerRequestPending'
     if (req.status === 'error') requestClass += ' signerRequestError'
-    let etherUSD = 600
+    let etherRates = this.store('external.rates')
+    let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     let value = req.data.value || '0x'
     let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
     value = Web3.utils.fromWei(value, 'ether')
