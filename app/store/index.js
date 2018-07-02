@@ -1,3 +1,5 @@
+/* globals fetch */
+
 import { ipcRenderer } from 'electron'
 
 import EventEmitter from 'events'
@@ -52,6 +54,14 @@ store.events.on('declineRequest', (id, req) => {
   store.declineRequest(id)
   provider.declineRequest(req)
 })
+
+const etherRates = () => {
+  fetch('https://api.coinbase.com/v2/exchange-rates?currency=ETH').then(res => res.json()).then(res => {
+    if (res && res.data && res.data.rates) store.updateExternalRates(res.data.rates)
+  })
+}
+etherRates()
+setInterval(etherRates, 10000)
 
 // Store Observers
 store.observer(() => {

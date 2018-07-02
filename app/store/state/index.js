@@ -50,6 +50,9 @@ let initial = {
     },
     success: false,
     accounts: {}
+  },
+  extenal: {
+    rates: {}
   }
 }
 

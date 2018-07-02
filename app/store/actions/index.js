@@ -155,6 +155,8 @@ export const setSigner = (u, signer) => {
   }, 50)
 }
 
+export const updateExternalRates = (u, rates) => u('external.rates', () => rates)
+
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
   u('signer.open', _ => false)
