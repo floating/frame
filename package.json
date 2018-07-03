@@ -25,6 +25,7 @@
   "scripts": {
     "start": "npm run launch",
     "bundle": "rm -rf bundle && parcel build app/tray.html --public-url ./ --out-dir bundle --target=electron",
+    "watch": "rm -rf bundle && parcel watch app/tray.html --public-url ./ --out-dir bundle --target=electron",
     "dev": "cross-env NODE_ENV=development electron ./main",
     "launch": "npm run bundle && cross-env NODE_ENV=production electron ./main",
     "alpha": "npm run launch",
@@ -59,9 +60,9 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
-    "babel-register": "^6.26.0",
     "bip32-path": "^0.4.2",
     "cross-env": "^5.1.5",
+    "electron-hot-loader": "^0.8.0",
     "electron-log": "^2.2.16",
     "electron-positioner": "^3.0.0",
     "electron-store": "^2.0.0",
