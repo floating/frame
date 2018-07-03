@@ -62,7 +62,6 @@
     "babel-preset-stage-0": "^6.24.1",
     "bip32-path": "^0.4.2",
     "cross-env": "^5.1.5",
-    "electron-hot-loader": "^0.8.0",
     "electron-log": "^2.2.16",
     "electron-positioner": "^3.0.0",
     "electron-store": "^2.0.0",
@@ -87,6 +86,7 @@
   "devDependencies": {
     "electron": "^2.0.2",
     "electron-builder": "^20.18.0",
+    "electron-hot-loader": "^0.8.0",
     "ganache-cli": "^6.1.0",
     "jest": "^23.0.0",
     "mkdirp": "^0.5.1",
