@@ -11,7 +11,6 @@ import webview from './webview'
 import store from './store'
 
 process.env.FRAME_TYPE = 'tray' // fix later
-
 let tray = process.env.FRAME_TYPE === 'tray'
 tray ? api() : webview()
 let Frame = Restore.connect(tray ? Panel : App, store)

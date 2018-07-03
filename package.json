@@ -24,18 +24,13 @@
   },
   "scripts": {
     "start": "npm run launch",
+    "bundle": "rm -rf bundle && parcel build app/tray.html --public-url ./ --out-dir bundle --target=electron",
+    "dev": "cross-env NODE_ENV=development electron ./main",
+    "launch": "npm run bundle && cross-env NODE_ENV=production electron ./main",
     "alpha": "npm run launch",
-    "clean": "rm -rf bundle && mkdirp bundle",
-    "bundle": "parcel build app/tray.html --public-url ./ --out-dir bundle --target=electron",
-    "dev": "npm run clean && npm run bundle && cross-env NODE_ENV=development electron ./main",
-    "launch": "cross-env NODE_ENV=production electron ./main",
-    "build": "npm run clean && npm run bundle && electron-builder --dir",
+    "build": "npm run bundle && electron-builder",
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
-    "build:app": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
-    "build:app:mac": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
-    "build:app:linux": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/png/FrameAppIcon.png && electron-installer-debian --src build/Frame-linux-x64 --dest build --arch amd64",
-    "build:app:windows": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite --icon=./asset/ico/FrameAppIcon.ico",
     "test": "standard && jest",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
@@ -43,6 +38,7 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/build/",
+      "/bundle/",
       "/dist/"
     ]
   },
