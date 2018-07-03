@@ -25,7 +25,7 @@
     display flex
     align-items flex-end
     height 60px
-    font-size 20px
+    font-size 24px
     padding 0px 10px 10px 10px
 
 .localSettingsHidden
@@ -79,3 +79,110 @@
     display flex
     justify-content center
     align-items center
+
+.connectionTitle
+  display flex
+  justify-content space-between
+  align-items center
+  height 25px
+  .connectionTitleSet
+    display flex
+    height 25px
+    border-radius 12.5px
+    letter-spacing 1px
+    padding 0px 15px
+    font-weight 400
+    justify-content center
+    align-items center
+    font-size 13px
+    text-transform uppercase
+    background rgba(245, 245, 255, 0.8)
+
+.connectionOption
+  // height 100px
+  width 100%
+  align-items space-between
+  // flex-direction column
+  transition standard
+  border-radius 3px
+  // margin 0px -15px
+  // padding 0px 15px
+  margin 0px -15px -15px -15px
+  padding 0px 15px 15px 15px
+  overflow hidden
+
+  .connectionOptionToggle
+    width 100%
+    display flex
+    justify-content space-between
+    // align-items center
+    height 25px
+
+  .connectionOptionDetails
+    height 0px
+    color outerspace08
+    transition standard
+    transition-delay 0ms, 0ms
+    transition-property height, opacity
+    display flex
+    justify-content space-between
+    text-transform uppercase
+    // padding-top 0px
+    opacity 0
+    font-size 12px
+    letter-spacing 1px
+    font-weight 400
+
+    .connectionOptionStatus
+      display flex
+      margin-top 6px
+      height 25px
+      .connectionOptionStatusIndicator
+        height 25px
+        margin-right 14px
+        display flex
+        align-items center
+        div
+          width 11px
+          height 11px
+          border-radius 5.5px
+      .connectionOptionStatusIndicatorGood
+        background good
+      .connectionOptionStatusIndicatorBad
+        background bad
+      .connectionOptionStatusIndicatorPending
+        background pending
+
+      .connectionOptionStatusText
+        // height 30px
+        display flex
+        align-items center
+
+    .signerOptionSet
+      display flex
+      margin-top 6px
+      height 21px
+      // background outerspace08
+      border-radius 10px
+      letter-spacing 1px
+      padding 0px 15px
+      // font-weight bold
+      justify-content center
+      align-items center
+
+      background rgba(245, 245, 255, 0.8)
+      // box-shadow 0px 8px 8px -6px rgba(0,20,60,0.1), 0px 1px 2px 0px rgba(0,20,60,0.05)
+
+.connectionOptionOn
+  background rgba(245, 245, 255, 0.4)
+  margin -5px -15px
+  padding 15px 15px
+  .connectionOptionDetails
+    height 25px
+    // background blue
+    // padding-top 0px
+    opacity 1
+    transition-delay 0ms, 30ms
+    transition-property height, opacity
+    margin 0px -15px -15px -15px
+    padding 0px 15px 15px 15px

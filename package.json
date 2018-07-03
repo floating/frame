@@ -25,9 +25,11 @@
   "scripts": {
     "start": "npm run launch",
     "alpha": "npm run launch",
-    "dev": "cross-env NODE_ENV=development electron ./main",
+    "clean": "rm -rf bundle && mkdirp bundle",
+    "bundle": "parcel build app/tray.html --public-url ./ --out-dir bundle --target=electron",
+    "dev": "npm run clean && npm run bundle && cross-env NODE_ENV=development electron ./main",
     "launch": "cross-env NODE_ENV=production electron ./main",
-    "build": "electron-builder",
+    "build": "npm run clean && npm run bundle && electron-builder --dir",
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
     "build:app": "npm run build && mkdirp ./build && electron-packager ./ --out=./build --overwrite",
@@ -72,12 +74,10 @@
     "ethereumjs-util": "^5.2.0",
     "node-hid": "^0.7.2",
     "octicons": "^7.2.0",
-    "opn": "^5.3.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-restore": "^0.2.1",
     "react-transition-group": "^1.2.1",
-    "stylus": "^0.54.5",
     "trezor.js": "^6.17.5",
     "usb-detection": "^3.0.3",
     "uuid": "^3.2.1",
@@ -85,7 +85,7 @@
     "web3-providers-http": "1.0.0-beta.34",
     "web3-providers-ipc": "1.0.0-beta.34",
     "web3-providers-ws": "1.0.0-beta.34",
-    "websocket": "^1.0.25"
+    "ws": "^5.2.1"
   },
   "devDependencies": {
     "electron": "^2.0.2",
@@ -93,8 +93,9 @@
     "ganache-cli": "^6.1.0",
     "jest": "^23.0.0",
     "mkdirp": "^0.5.1",
-    "parcel-bundler": "^1.7.1",
-    "standard": "^11.0.1"
+    "parcel-bundler": "^1.9.4",
+    "standard": "^11.0.1",
+    "stylus": "^0.54.5"
   },
   "standard": {
     "parser": "babel-eslint"

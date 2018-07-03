@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4'
 
-const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
-const persist = new PersistStore()
+// const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
+// const persist = new PersistStore()
 // persist.clear()
 
 let initial = {
@@ -42,11 +42,21 @@ let initial = {
   provider: {
     events: []
   },
-  local: persist.get('local') || {
+  local: {
     launch: false,
     node: {
-      run: false,
-      default: 'wss://rinkeby.infura.io/_ws'
+      default: 'wss://rinkeby.infura.io/_ws',
+      local: {
+        on: true,
+        run: false
+      },
+      secondary: {
+        on: true,
+        options: {
+          infura: 'wss://rinkeby.infura.io/_ws',
+          custom: ''
+        }
+      }
     },
     success: false,
     accounts: {}

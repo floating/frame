@@ -10,7 +10,7 @@ import api from './api'
 import webview from './webview'
 import store from './store'
 
-import './style'
+process.env.FRAME_TYPE = 'tray' // fix later
 
 let tray = process.env.FRAME_TYPE === 'tray'
 tray ? api() : webview()

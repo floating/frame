@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import provider from '../../../../../provider'
+// import provider from '../../../../../provider'
 
 class Settings extends React.Component {
   clearPermissions () {
@@ -15,16 +15,6 @@ class Settings extends React.Component {
     let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
     return (
       <div className={this.store('signer.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
-        <div className='signerSettingsTitle'>{'Ethereum Node'}</div>
-        <div className='signerPermission'>
-          <div>
-            <div>{'System Default'}</div>
-            <div style={{fontSize: '10px', marginTop: '-2px', marginLeft: '2px'}}>{provider.url}</div>
-          </div>
-          <div className={this.store('node.provider') ? 'nodeProviderStatus nodeProviderConnected' : 'nodeProviderStatus'}>
-            {this.store('node.provider') ? 'connected' : 'disconnected'}
-          </div>
-        </div>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
         {Object.keys(permissions).length === 0 ? (
           <div className='signerPermission'>

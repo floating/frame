@@ -28,6 +28,8 @@ export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
+export const toggleConnection = (u, node) => u('local.node', node, 'on', on => !on)
+
 export const trayOpen = (u, open) => u('tray.open', _ => open)
 
 export const runLocalNode = u => u('local.node.run', run => !run)
