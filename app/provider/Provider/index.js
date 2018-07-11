@@ -1,5 +1,8 @@
 /* global WebSocket */
 
+import rpc from '../../rpc'
+import store from '../../store'
+
 const { ipcRenderer } = require('electron')
 const { toHex } = require('web3').utils
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
@@ -8,13 +11,10 @@ const { URL } = require('url')
 const uuid = require('uuid/v4')
 const EventEmitter = require('events')
 
-const rpc = require('../../rpc')
-const store = require('../../store')
-
 class Provider extends EventEmitter {
   constructor (url) {
     super()
-    this.url = url || store('local.node.default')
+    this.url = url || 'wss://rinkeby.infura.io/_ws'
     this.store = store
     this.accounts = []
     this.handlers = {}
@@ -203,4 +203,4 @@ class Provider extends EventEmitter {
   }
 }
 
-module.exports = Provider
+export default Provider

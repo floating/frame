@@ -9,13 +9,7 @@ import Panel from './App/Panel'
 import api from './api'
 import webview from './webview'
 import store from './store'
-
-if (process.env.NODE_ENV === 'development') {
-  const electronHot = require('electron-hot-loader')
-  electronHot.install()
-  electronHot.watchJsx(['../bundle/*.js'])
-  electronHot.watchCss(['../bundle/*.css'])
-}
+import './nodes'
 
 process.env.FRAME_TYPE = 'tray' // fix later
 let tray = process.env.FRAME_TYPE === 'tray'

@@ -18,6 +18,28 @@ export const panelRequest = (u, request) => {
   u('panel.show', v => true)
 }
 
+export const selectNetwork = (u, direction) => {
+  if (direction === '->') {
+    u('local.connection', connection => {
+      let index = connection.options.indexOf(connection.network) + 1
+      if (index >= connection.options.length) index = 0
+      connection.network = connection.options[index]
+      return connection
+    })
+  } else if (direction === '<-') {
+    u('local.connection', connection => {
+      let index = connection.options.indexOf(connection.network) - 1
+      if (index < 0) index = connection.options.lenght - 1
+      connection.network = connection.options[index]
+      return connection
+    })
+  }
+}
+
+export const setLocal = (u, status) => u('local.connection.local', local => Object.assign({}, local, status))
+
+export const setSecondary = (u, status) => u('local.connection.secondary', secondary => Object.assign({}, secondary, status))
+
 export const setLaunch = (u, launch) => u('local.launch', _ => launch)
 
 export const hadSuccess = u => u('local.success', _ => true)
@@ -28,7 +50,7 @@ export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
-export const toggleConnection = (u, node) => u('local.node', node, 'on', on => !on)
+export const toggleConnection = (u, node) => u('local.connection', node, 'on', on => !on)
 
 export const trayOpen = (u, open) => u('tray.open', _ => open)
 

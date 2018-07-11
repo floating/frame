@@ -11,10 +11,11 @@ import state from './state'
 import rpc from '../rpc'
 import provider from '../provider'
 
-const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
+import PersistStore from 'electron-store'
+
 const persist = new PersistStore()
 
-const store = Restore.create(state(), actions)
+export const store = Restore.create(state(), actions)
 store.events = new EventEmitter()
 
 rpc('getSigners', (err, signers) => {
@@ -86,4 +87,4 @@ store.observer(() => {
   }
 })
 
-module.exports = store
+export default store

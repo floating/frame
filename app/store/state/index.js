@@ -2,7 +2,6 @@ import uuid from 'uuid/v4'
 
 // const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
 // const persist = new PersistStore()
-// persist.clear()
 
 let initial = {
   panel: {
@@ -44,22 +43,24 @@ let initial = {
   },
   local: {
     launch: false,
-    node: {
-      default: 'wss://rinkeby.infura.io/_ws',
+    success: false,
+    accounts: {},
+    connection: {
+      network: '4',
+      options: ['1', '4'],
       local: {
         on: true,
-        run: false
+        status: 'loading',
+        connected: false,
+        type: ''
       },
       secondary: {
         on: true,
-        options: {
-          infura: 'wss://rinkeby.infura.io/_ws',
-          custom: ''
-        }
+        status: 'loading',
+        connected: false,
+        type: ''
       }
-    },
-    success: false,
-    accounts: {}
+    }
   },
   extenal: {
     rates: {}

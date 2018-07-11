@@ -21,7 +21,7 @@ const api = {
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
     windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {plugins: true}})
-    windows.tray.loadURL(url.format({pathname: path.resolve(__dirname, '../../bundle/tray.html'), protocol: 'file:', slashes: true}))
+    windows.tray.loadURL(url.format({pathname: path.resolve(__dirname, '../../dist/tray.html'), protocol: 'file:', slashes: true}))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
@@ -35,7 +35,7 @@ const api = {
       windows.tray.on('hide', onHide)
       windows.tray.on('minimize', onHide)
     }
-    windows.tray.openDevTools()
+    if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() }), 3000)
     if (!persist.get('local') || (persist.get('local') && !persist.get('local').success)) shell.openExternal('https://welcome.frame.sh')
     api.showTray()

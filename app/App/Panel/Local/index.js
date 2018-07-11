@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import { ipcRenderer } from 'electron'
 
-// import provider from '../../../provider'
+const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
 
 class Settings extends React.Component {
   appInfo () {
@@ -42,22 +42,22 @@ class Settings extends React.Component {
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Connection'}</div>
-          <div className='connectionTitleSet'>
-            <div>{'Rinkeby'}</div>
+          <div className='connectionTitleSet' onClick={() => this.store.selectNetwork('->')}>
+            <div>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
           </div>
         </div>
         <div className='signerPermission'>
-          <div className={this.store('local.node.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+          <div className={this.store('local.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
               <div className='signerPermissionOrigin'>{'Local'}</div>
-              <div className={this.store('local.node.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('local')}>
+              <div className={this.store('local.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('local')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='connectionOptionDetails'>
               <div className='connectionOptionStatus'>
                 <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-                <div className='connectionOptionStatusText'>{'Connected'}</div>
+                <div className='connectionOptionStatusText'>{this.store('local.connection.local.status')}</div>
               </div>
               <div className='signerOptionSet'>
                 <div className='signerOptionSetBadge'>{'Geth'}</div>
@@ -66,17 +66,17 @@ class Settings extends React.Component {
           </div>
         </div>
         <div className='signerPermission'>
-          <div className={this.store('local.node.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+          <div className={this.store('local.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
               <div className='signerPermissionOrigin'>{'Secondary'}</div>
-              <div className={this.store('local.node.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('secondary')}>
+              <div className={this.store('local.connection.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('secondary')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='connectionOptionDetails'>
               <div className='connectionOptionStatus'>
                 <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-                <div className='connectionOptionStatusText'>{'Standby'}</div>
+                <div className='connectionOptionStatusText'>{this.store('local.connection.secondary.status')}</div>
               </div>
               <div className='signerOptionSet'>
                 <div className='signerOptionSetBadge'>{'Infura'}</div>
