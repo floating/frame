@@ -37,6 +37,15 @@ class Settings extends React.Component {
       </div>
     )
   }
+  indicator (status) {
+    if (status === 'connected') {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+    } else {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+    }
+  }
   render () {
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
@@ -56,7 +65,7 @@ class Settings extends React.Component {
             </div>
             <div className='connectionOptionDetails'>
               <div className='connectionOptionStatus'>
-                <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+                {this.indicator(this.store('local.connection.local.status'))}
                 <div className='connectionOptionStatusText'>{this.store('local.connection.local.status')}</div>
               </div>
               <div className='signerOptionSet'>
@@ -75,7 +84,7 @@ class Settings extends React.Component {
             </div>
             <div className='connectionOptionDetails'>
               <div className='connectionOptionStatus'>
-                <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+                {this.indicator(this.store('local.connection.secondary.status'))}
                 <div className='connectionOptionStatusText'>{this.store('local.connection.secondary.status')}</div>
               </div>
               <div className='signerOptionSet'>

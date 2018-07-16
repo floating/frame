@@ -9,7 +9,6 @@ import Panel from './App/Panel'
 import api from './api'
 import webview from './webview'
 import store from './store'
-import './nodes'
 
 process.env.FRAME_TYPE = 'tray' // fix later
 let tray = process.env.FRAME_TYPE === 'tray'
