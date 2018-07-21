@@ -33,7 +33,7 @@ let initial = {
     }
   },
   frame: {
-    type: process.env.FRAME_TYPE || 'window'
+    type: 'tray'
   },
   node: {
     provider: false
@@ -66,8 +66,6 @@ let initial = {
     rates: {}
   }
 }
-
-// ws://localhost:8546
 
 if (initial.frame.type !== 'tray' && initial.view.list.length === 0) {
   let id = uuid()

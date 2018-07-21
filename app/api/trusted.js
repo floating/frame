@@ -6,5 +6,6 @@ export default origin => {
   let perms = Object.keys(permissions).map(id => permissions[id])
   let permIndex = perms.map(p => p.origin).indexOf(origin)
   if (permIndex === -1 && store('signer.current')) store.addRequest({type: 'requestProvider', origin})
-  return store('signer.current') && store('node.provider') && perms[permIndex] && perms[permIndex].provider
+  let trusted = store('signer.current') && perms[permIndex] && perms[permIndex].provider
+  return trusted || false
 }

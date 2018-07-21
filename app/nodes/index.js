@@ -16,53 +16,67 @@ class Nodes extends EventEmitter {
     if (connection.local.on) {
       if (!this.local) {
         if (connection.local.status !== 'loading') store.setLocal({status: 'loading', connected: false, type: ''})
-        this.local = provider('rinkeby_infura', {name: 'local'})
+        this.local = provider('direct', {name: 'local'})
         this.local.on('connect', details => {
           this.emit('connect')
-          store.setLocal({status: 'connected', connected: true, type: ''})
+          store.setLocal({status: this.local.status, connected: true, type: ''})
         })
         this.local.on('close', details => {
           this.emit('close')
-          store.setLocal({status: 'disconnected', connected: false, type: ''})
+          store.setLocal({status: this.local.status, connected: false, type: ''})
         })
+        this.local.on('data', data => this.emit('data', data))
+        this.local.on('error', err => this.emit('error', err))
       }
     } else {
-      if (this.local) this.local.destroy()
+      if (this.local) this.local.close()
       this.local = null
       if (connection.local.status !== 'off') store.setLocal({status: 'off', connected: false, type: ''})
     }
     if (connection.secondary.on) {
-      if (!connection.local.on || connection.local.status === 'disconnected') {
+      if (!connection.local.on || (connection.local.status !== 'connected' && connection.local.status !== 'loading')) {
         if (!this.secondary) {
           if (connection.secondary.status !== 'loading') store.setSecondary({status: 'loading', connected: false, type: ''})
-          this.secondary = provider('rinkeby_infura', {name: 'secondary'})
+          this.secondary = provider('infuraRinkeby', {name: 'secondary'})
           this.secondary.on('connect', () => {
             this.emit('connect')
-            store.setSecondary({status: 'connected', connected: true, type: ''})
+            store.setSecondary({status: this.secondary.status, connected: true, type: ''})
           })
           this.secondary.on('close', () => {
             this.emit('close')
-            store.setSecondary({status: 'disconnected', connected: false, type: ''})
+            store.setSecondary({status: this.secondary.status, connected: false, type: ''})
           })
+          this.secondary.on('data', data => this.emit('data', data))
+          this.secondary.on('error', err => this.emit('error', err))
         }
       } else {
-        if (this.secondary) this.secondary.destroy()
+        if (this.secondary) this.secondary.close()
         this.secondary = null
         if (connection.secondary.status !== 'standby') store.setSecondary({status: 'standby', connected: false, type: ''})
       }
     } else {
-      if (this.secondary) this.secondary.destroy()
+      if (this.secondary) this.secondary.close()
       this.secondary = null
       if (connection.secondary.status !== 'off') store.setSecondary({status: 'off', connected: false, type: ''})
     }
   }
-  send (payload, cb) {
-    if (this.local.connected) {
-      this.local.send(payload, cb)
-    } else if (this.secondary.connected) {
-      this.secondary.send(payload, cb)
+  resError (error, payload, res) {
+    if (typeof error === 'string') error = {message: error, code: -1}
+    res({id: payload.id, jsonrpc: payload.jsonrpc, error})
+  }
+  send (payload, res) {
+    if (this.local && this.local.connected) {
+      this.local.sendAsync(payload, (err, result) => {
+        if (err) return this.resError(err, payload, res)
+        res(result)
+      })
+    } else if (this.secondary && this.secondary.connected) {
+      this.secondary.sendAsync(payload, (err, result) => {
+        if (err) return this.resError(err, payload, res)
+        res(result)
+      })
     } else {
-      cb(new Error('Not connected to any node'))
+      this.resError('Not connected to the Ethereum', payload, res)
     }
   }
 }

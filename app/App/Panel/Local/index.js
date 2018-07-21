@@ -95,7 +95,7 @@ class Settings extends React.Component {
         </div>
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
-          <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
+          <div className='signerPermissionOrigin'>{'Run Frame on Startup'}</div>
           <div className={this.store('local.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleLaunch()}>
             <div className='signerPermissionToggleSwitch' />
           </div>
