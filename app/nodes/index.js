@@ -33,7 +33,11 @@ class Nodes extends EventEmitter {
           this.emit('close')
           store.setLocal({status: this.local.status, connected: false, type: ''})
         })
-        this.local.on('status', status => store.setLocal({status}))
+        this.local.on('status', status => {
+          let current = store('local.connection.local.status')
+          if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
+          store.setLocal({status})
+        })
         this.local.on('data', data => this.emit('data', data))
         this.local.on('error', err => this.emit('error', err))
       }

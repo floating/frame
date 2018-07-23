@@ -58,7 +58,7 @@
     "electron-positioner": "3.0.1",
     "electron-store": "2.0.0",
     "electron-updater": "2.23.3",
-    "eth-provider": "0.0.2",
+    "eth-provider": "0.0.3",
     "ethereumjs-tx": "1.3.6",
     "ethereumjs-util": "5.2.0",
     "node-hid": "0.7.3",
