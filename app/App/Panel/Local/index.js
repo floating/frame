@@ -2,9 +2,15 @@ import React from 'react'
 import Restore from 'react-restore'
 import { ipcRenderer } from 'electron'
 
+import svg from '../../../svg'
+
 const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
 
 class Settings extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {localShake: false}
+  }
   appInfo () {
     return (
       <React.Fragment>
@@ -30,6 +36,21 @@ class Settings extends React.Component {
       </React.Fragment>
     )
   }
+  localShake () {
+    this.setState({localShake: true})
+    setTimeout(() => this.setState({localShake: false}), 1010)
+  }
+  status (connection) {
+    let status = connection.status
+    if (status === 'connected' && connection.network !== this.store('local.connection.network')) status = 'network mismatch'
+    if (status === 'unsuccessful') status = 'not found'
+    return (
+      <div className='connectionOptionStatus'>
+        {this.indicator(status)}
+        <div className='connectionOptionStatusText'>{status}</div>
+      </div>
+    )
+  }
   quit () {
     return (
       <div className='quitFrame'>
@@ -51,8 +72,14 @@ class Settings extends React.Component {
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Connection'}</div>
-          <div className='connectionTitleSet' onClick={() => this.store.selectNetwork('->')}>
-            <div>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
+          <div className='connectionTitleSet'>
+            <div className='connectionTitleSetButton' onClick={() => this.store.selectNetwork('<-')}>
+              {svg.octicon('chevron-left', {height: 17})}
+            </div>
+            <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
+            <div className='connectionTitleSetButton' onClick={() => this.store.selectNetwork('->')}>
+              {svg.octicon('chevron-right', {height: 17})}
+            </div>
           </div>
         </div>
         <div className='signerPermission'>
@@ -64,12 +91,21 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='connectionOptionDetails'>
-              <div className='connectionOptionStatus'>
-                {this.indicator(this.store('local.connection.local.status'))}
-                <div className='connectionOptionStatusText'>{this.store('local.connection.local.status')}</div>
-              </div>
-              <div className='signerOptionSet'>
-                <div className='signerOptionSetBadge'>{'Geth'}</div>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(this.store('local.connection.local'))}
+                <div className='signerOptionSetWrap'>
+                  <div className={this.state.localShake ? 'signerOptionSet headShake' : 'signerOptionSet'} onClick={() => this.localShake()}>
+                    <div className='signerOptionSetButton' />
+                    {this.store('local.connection.local.type') ? (
+                      <div className='signerOptionSetText'>{this.store('local.connection.local.type')}</div>
+                    ) : (_ => {
+                      if (this.store('local.connection.local.status') === 'unsuccessful') return <div>{'none'}</div>
+                      if (this.store('local.connection.local.status') === 'disconnected') return svg.octicon('search', {height: 14})
+                      return ''
+                    })()}
+                    <div className='signerOptionSetButton' />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -83,12 +119,13 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='connectionOptionDetails'>
-              <div className='connectionOptionStatus'>
-                {this.indicator(this.store('local.connection.secondary.status'))}
-                <div className='connectionOptionStatusText'>{this.store('local.connection.secondary.status')}</div>
-              </div>
-              <div className='signerOptionSet'>
-                <div className='signerOptionSetBadge'>{'Infura'}</div>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(this.store('local.connection.secondary'))}
+                <div className='signerOptionSet'>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectNetwork('<-')}>{svg.octicon('chevron-left', {height: 14})}</div>
+                  <div className='signerOptionSetText'>{'Infura'}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectNetwork('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
+                </div>
               </div>
             </div>
           </div>

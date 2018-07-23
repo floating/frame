@@ -52,13 +52,15 @@ let initial = {
         on: true,
         status: 'loading',
         connected: false,
-        type: ''
+        type: '',
+        network: ''
       },
       secondary: {
         on: true,
         status: 'loading',
         connected: false,
-        type: ''
+        type: '',
+        network: ''
       }
     }
   },

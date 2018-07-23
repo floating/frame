@@ -29,7 +29,7 @@ export const selectNetwork = (u, direction) => {
   } else if (direction === '<-') {
     u('local.connection', connection => {
       let index = connection.options.indexOf(connection.network) - 1
-      if (index < 0) index = connection.options.lenght - 1
+      if (index < 0) index = connection.options.length - 1
       connection.network = connection.options[index]
       return connection
     })
@@ -37,7 +37,6 @@ export const selectNetwork = (u, direction) => {
 }
 
 export const setLocal = (u, status) => u('local.connection.local', local => Object.assign({}, local, status))
-
 export const setSecondary = (u, status) => u('local.connection.secondary', secondary => Object.assign({}, secondary, status))
 
 export const setLaunch = (u, launch) => u('local.launch', _ => launch)
