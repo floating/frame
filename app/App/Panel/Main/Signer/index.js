@@ -9,8 +9,6 @@ import rpc from '../../../../rpc'
 import Requests from './Requests'
 import Settings from './Settings'
 
-// web3.eth.net.getNetworkType(cb)
-
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)

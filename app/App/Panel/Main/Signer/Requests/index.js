@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import Web3 from 'web3'
+import utils from 'web3-utils'
 import { CSSTransitionGroup } from 'react-transition-group'
 
 import svg from '../../../../../svg'
@@ -47,9 +47,9 @@ class Requests extends React.Component {
     let etherRates = this.store('external.rates')
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     let value = req.data.value || '0x'
-    let fee = Web3.utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
-    value = Web3.utils.fromWei(value, 'ether')
-    fee = Web3.utils.fromWei(fee, 'ether')
+    let fee = utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16))
+    value = utils.fromWei(value, 'ether')
+    fee = utils.fromWei(fee, 'ether')
     value = ((Math.round(value * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
     fee = ((Math.round(fee * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
     return (
@@ -110,7 +110,7 @@ class Requests extends React.Component {
                       </div>
                     </div>
                   </div>
-                  {Web3.utils.toAscii(req.data.data || '0x') ? (
+                  {utils.toAscii(req.data.data || '0x') ? (
                     <div className='transactionData'>{'View Data'} </div>
                   ) : (
                     <div className='transactionData transactionNoData'>{'No Data'}</div>

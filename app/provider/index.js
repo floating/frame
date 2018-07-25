@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4'
 import EventEmitter from 'events'
 import { ipcRenderer } from 'electron'
-import { utils } from 'web3'
+import utils from 'web3-utils'
 import { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } from 'ethereumjs-util'
 
 import rpc from '../rpc'
