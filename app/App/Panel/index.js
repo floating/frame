@@ -25,11 +25,9 @@ class Panel extends React.Component {
   status (connection) {
     let status = connection.status
     if (status === 'connected' && connection.network !== this.store('local.connection.network')) status = 'network mismatch'
-
-    let current = connection.current[this.store('local.connection.network')]
-
+    let current = connection.settings[this.store('local.connection.network')].current
     if (current === 'custom') {
-      let target = connection.options[this.store('local.connection.network')][current]
+      let target = connection.settings[this.store('local.connection.network')].options[current]
       if (this.state.customInput !== '' && this.state.customInput !== 'Custom' && target !== '' && !this.okProtocol(target)) status = 'invalid target'
     }
     return (

@@ -54,7 +54,21 @@ let initial = {
         status: 'loading',
         connected: false,
         type: '',
-        network: ''
+        network: '',
+        settings: {
+          '1': {
+            current: 'direct',
+            options: {
+              direct: 'direct'
+            }
+          },
+          '4': {
+            current: 'direct',
+            options: {
+              direct: 'direct'
+            }
+          }
+        }
       },
       secondary: {
         settings: {
