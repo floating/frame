@@ -48,7 +48,8 @@ class Nodes extends EventEmitter {
     }
     if (connection.secondary.on) {
       if (!connection.local.on || (connection.local.status !== 'connected' && connection.local.status !== 'loading')) {
-        let target = store('local.connection.secondary.options', store('local.connection.network'), store('local.connection.secondary.current'))
+        let settings = store('local.connection.secondary.settings', store('local.connection.network'))
+        let target = settings.options[settings.current]
         if (!this.secondary || this.secondary.currentTarget !== target) {
           if (this.secondary) this.secondary.close()
           if (connection.secondary.status !== 'loading') store.setSecondary({status: 'loading', connected: false, type: ''})
@@ -65,7 +66,11 @@ class Nodes extends EventEmitter {
             this.emit('close')
             store.setSecondary({status: this.secondary.status, connected: false, type: ''})
           })
-          this.secondary.on('status', status => store.setSecondary({status}))
+          this.secondary.on('status', status => {
+            let current = store('local.connection.local.status')
+            if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
+            store.setSecondary({status})
+          })
           this.secondary.on('data', data => this.emit('data', data))
           this.secondary.on('error', err => this.emit('error', err))
         }

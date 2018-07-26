@@ -57,15 +57,20 @@ let initial = {
         network: ''
       },
       secondary: {
-        current: 'infura',
-        options: {
+        settings: {
           '1': {
-            infura: 'infura',
-            custom: ''
+            current: 'infura',
+            options: {
+              infura: 'infura',
+              custom: ''
+            }
           },
           '4': {
-            infura: 'infuraRinkeby',
-            custom: ''
+            current: 'infura',
+            options: {
+              infura: 'infuraRinkeby',
+              custom: ''
+            }
           }
         },
         on: true,
