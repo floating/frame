@@ -48,6 +48,7 @@ let initial = {
     connection: {
       network: '4',
       options: ['1', '4'],
+      status: 'loading',
       local: {
         on: true,
         status: 'loading',
@@ -56,6 +57,17 @@ let initial = {
         network: ''
       },
       secondary: {
+        current: 'infura',
+        options: {
+          '1': {
+            infura: 'infura',
+            custom: ''
+          },
+          '4': {
+            infura: 'infuraRinkeby',
+            custom: ''
+          }
+        },
         on: true,
         status: 'loading',
         connected: false,

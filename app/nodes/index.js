@@ -48,9 +48,12 @@ class Nodes extends EventEmitter {
     }
     if (connection.secondary.on) {
       if (!connection.local.on || (connection.local.status !== 'connected' && connection.local.status !== 'loading')) {
-        if (!this.secondary) {
+        let target = store('local.connection.secondary.options', store('local.connection.network'), store('local.connection.secondary.current'))
+        if (!this.secondary || this.secondary.currentTarget !== target) {
+          if (this.secondary) this.secondary.close()
           if (connection.secondary.status !== 'loading') store.setSecondary({status: 'loading', connected: false, type: ''})
-          this.secondary = provider('infuraRinkeby', {name: 'secondary'})
+          this.secondary = provider(target, {name: 'secondary'})
+          this.secondary.currentTarget = target
           this.secondary.on('connect', () => {
             this.getNetwork(this.secondary, (err, response) => {
               this.secondary.network = !err && response && !response.error ? response.result : '?'

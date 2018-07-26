@@ -36,6 +36,26 @@ export const selectNetwork = (u, direction) => {
   }
 }
 
+export const selectSecondary = (u, direction) => {
+  if (direction === '->') {
+    u('local.connection', connection => {
+      let options = Object.keys(connection.secondary.options[connection.network])
+      let index = options.indexOf(connection.secondary.current) + 1
+      if (index >= options.length) index = 0
+      connection.secondary.current = options[index]
+      return connection
+    })
+  } else if (direction === '<-') {
+    u('local.connection', connection => {
+      let options = Object.keys(connection.secondary.options[connection.network])
+      let index = options.indexOf(connection.secondary.current) - 1
+      if (index < 0) index = options.length - 1
+      connection.secondary.current = options[index]
+      return connection
+    })
+  }
+}
+
 export const setLocal = (u, status) => u('local.connection.local', local => Object.assign({}, local, status))
 export const setSecondary = (u, status) => u('local.connection.secondary', secondary => Object.assign({}, secondary, status))
 

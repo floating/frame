@@ -99,7 +99,7 @@ class Settings extends React.Component {
                     {this.store('local.connection.local.type') ? (
                       <div className='signerOptionSetText'>{this.store('local.connection.local.type')}</div>
                     ) : (_ => {
-                      if (this.store('local.connection.local.status') === 'unsuccessful') return <div>{'none'}</div>
+                      if (this.store('local.connection.local.status') === 'not found') return <div>{'scanning...'}</div>
                       if (this.store('local.connection.local.status') === 'disconnected') return svg.octicon('search', {height: 14})
                       return ''
                     })()}
@@ -122,9 +122,9 @@ class Settings extends React.Component {
               <div className='connectionOptionDetailsInset'>
                 {this.status(this.store('local.connection.secondary'))}
                 <div className='signerOptionSet'>
-                  <div className='signerOptionSetButton' onClick={() => this.store.selectNetwork('<-')}>{svg.octicon('chevron-left', {height: 14})}</div>
-                  <div className='signerOptionSetText'>{'Infura'}</div>
-                  <div className='signerOptionSetButton' onClick={() => this.store.selectNetwork('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-left', {height: 14})}</div>
+                  <div className='signerOptionSetText'>{this.store('local.connection.secondary.current')}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
                 </div>
               </div>
             </div>
