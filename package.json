@@ -20,7 +20,8 @@
     },
     "win": {
       "icon": "./asset/ico/FrameAppIcon.ico"
-    }
+    },
+    "files": ["main", "bundle", "hot.json"]
   },
   "scripts": {
     "start": "npm run launch",
