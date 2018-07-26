@@ -36,6 +36,14 @@ class Settings extends React.Component {
       </React.Fragment>
     )
   }
+  inputCustom (e) {
+    e.preventDefault()
+    clearTimeout(this.customInputTimeout)
+    this.setState({customInput: e.target.value})
+    this.customInputTimeout = setTimeout(() => {
+      this.store.setSecondaryCustom(this.state.customInput)
+    }, 1500)
+  }
   localShake () {
     this.setState({localShake: true})
     setTimeout(() => this.setState({localShake: false}), 1010)
@@ -127,6 +135,9 @@ class Settings extends React.Component {
                   <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
                 </div>
               </div>
+            </div>
+            <div className={this.store('local.connection.secondary.current') === 'custom' && this.store('local.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <input onChange={e => this.inputCustom(e)} />
             </div>
           </div>
         </div>

@@ -56,6 +56,13 @@ export const selectSecondary = (u, direction) => {
   }
 }
 
+export const setSecondaryCustom = (u, target) => {
+  u('local.connection', connection => {
+    connection.secondary.options[connection.network].custom = target
+    return connection
+  })
+}
+
 export const setLocal = (u, status) => u('local.connection.local', local => Object.assign({}, local, status))
 export const setSecondary = (u, status) => u('local.connection.secondary', secondary => Object.assign({}, secondary, status))
 
