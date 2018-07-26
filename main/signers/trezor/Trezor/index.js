@@ -1,4 +1,4 @@
-const Web3 = require('web3')
+const utils = require('web3-utils')
 const bip32Path = require('bip32-path')
 const EthereumTx = require('ethereumjs-tx')
 const { toChecksumAddress } = require('ethereumjs-util')
@@ -62,7 +62,7 @@ class Trezor extends Signer {
       this.normalize(rawTx.to),
       this.normalize(rawTx.value),
       this.normalize(rawTx.data),
-      Web3.utils.hexToNumber(rawTx.chainId)
+      utils.hexToNumber(rawTx.chainId)
     ]
     this.device.waitForSessionAndRun(session => session.signEthTx(...trezorTx)).then(result => {
       const tx = new EthereumTx({

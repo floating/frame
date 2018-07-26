@@ -12,7 +12,7 @@ ipcRenderer.on('main:rpc', (sender, id, ...args) => {
   delete handlers[id]
 })
 
-const rpc = (...args) => {
+export default (...args) => {
   let cb = args.pop()
   if (typeof cb !== 'function') throw new Error('Main RPC requires a callback.')
   let id = uuid()
@@ -20,5 +20,3 @@ const rpc = (...args) => {
   args = args.map(arg => defined(arg) ? JSON.stringify(arg) : arg)
   ipcRenderer.send('main:rpc', JSON.stringify(id), ...args)
 }
-
-module.exports = rpc

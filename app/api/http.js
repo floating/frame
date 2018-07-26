@@ -20,7 +20,12 @@ const cleanup = id => {
 
 const handler = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  if (req.method === 'POST' && trusted(req.headers.origin)) {
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200)
+    res.end()
+  } else if (req.method === 'POST' && trusted(req.headers.origin)) {
     let body = []
     req.on('data', chunk => body.push(chunk)).on('end', () => {
       res.on('error', err => console.error('res err', err))

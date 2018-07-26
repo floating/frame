@@ -1,11 +1,11 @@
 <html>
   <head>
-    <meta charset='utf-8' http-equiv='Content-Security-Policy' content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src wss://rinkeby.infura.io/_ws https://api.coinbase.com/v2/exchange-rates"/>
+    <meta charset='utf-8' http-equiv='Content-Security-Policy' content="default-src 'self'; connect-src *; style-src 'self' 'unsafe-inline'"/>
     <title>Frame</title>
-    <link rel="stylesheet" href="./style/index.styl" type="text/css">
+    <link rel='stylesheet' href='./index.styl' type='text/css'>
   </head>
   <body>
     <div id='frame'></div>
-    <script src="./index.js"></script>
+    <script src='./index.js'></script>
   </body>
 </html>

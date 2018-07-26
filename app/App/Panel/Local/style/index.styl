@@ -84,13 +84,14 @@
   display flex
   justify-content space-between
   align-items center
-  height 25px
+  height 26px
+
   .connectionTitleSet
     display flex
-    height 25px
-    border-radius 12.5px
+    height 26px
+    border-radius 13px
     letter-spacing 1px
-    padding 0px 15px
+    padding 0px 2px
     font-weight 400
     justify-content center
     align-items center
@@ -98,15 +99,32 @@
     text-transform uppercase
     background rgba(245, 245, 255, 0.8)
 
+    .connectionTitleSetButton
+      display flex
+      justify-content center
+      align-items center
+      height 26px
+      width 32px
+      border-radius 18px
+
+      svg
+        fill outerspace
+        opacity 0
+        transition standardFast
+
+  .connectionTitleSet:hover
+    svg
+      opacity 0.5
+      transition standardFast
+
+    svg:hover
+      opacity 1
+
 .connectionOption
-  // height 100px
   width 100%
   align-items space-between
-  // flex-direction column
   transition standard
   border-radius 3px
-  // margin 0px -15px
-  // padding 0px 15px
   margin 0px -15px -15px -15px
   padding 0px 15px 15px 15px
   overflow hidden
@@ -115,63 +133,125 @@
     width 100%
     display flex
     justify-content space-between
-    // align-items center
+    align-items center
     height 25px
 
   .connectionOptionDetails
     height 0px
-    color outerspace08
     transition standard
     transition-delay 0ms, 0ms
     transition-property height, opacity
-    display flex
-    justify-content space-between
-    text-transform uppercase
-    // padding-top 0px
     opacity 0
-    font-size 12px
-    letter-spacing 1px
-    font-weight 400
 
-    .connectionOptionStatus
-      display flex
-      margin-top 6px
+    .connectionOptionDetailsInset
       height 25px
-      .connectionOptionStatusIndicator
-        height 25px
-        margin-right 14px
-        display flex
-        align-items center
-        div
-          width 11px
-          height 11px
-          border-radius 5.5px
-      .connectionOptionStatusIndicatorGood
-        background good
-      .connectionOptionStatusIndicatorBad
-        background bad
-      .connectionOptionStatusIndicatorPending
-        background pending
-
-      .connectionOptionStatusText
-        // height 30px
-        display flex
-        align-items center
-
-    .signerOptionSet
+      width 100%
+      color outerspace08
       display flex
-      margin-top 6px
-      height 21px
-      // background outerspace08
-      border-radius 10px
-      letter-spacing 1px
-      padding 0px 15px
-      // font-weight bold
-      justify-content center
+      justify-content space-between
       align-items center
+      text-transform uppercase
+      font-size 12px
+      letter-spacing 1px
+      font-weight 400
+      margin 0px -15px -15px -15px
+      padding 0px 15px 15px 15px
 
-      background rgba(245, 245, 255, 0.8)
-      // box-shadow 0px 8px 8px -6px rgba(0,20,60,0.1), 0px 1px 2px 0px rgba(0,20,60,0.05)
+      .connectionOptionStatus
+        display flex
+        height 25px
+        .connectionOptionStatusIndicator
+          height 20px
+          margin-top 5px
+          margin-right 14px
+          display flex
+          align-items center
+          div
+            width 11px
+            height 11px
+            border-radius 5.5px
+        .connectionOptionStatusIndicatorGood
+          background good
+        .connectionOptionStatusIndicatorBad
+          background bad
+        .connectionOptionStatusIndicatorPending
+          background pending
+
+        .connectionOptionStatusText
+          // height 30px
+          height 20px
+          margin-top 5px
+          display flex
+          align-items center
+
+      .signerOptionSetWrap
+        height 25px
+
+      .signerOptionSet
+        display flex
+        height 20px
+        margin-top 5px
+        border-radius 10px
+        letter-spacing 1px
+        padding 0px 0px
+        justify-content center
+        align-items center
+        padding 0px 3px 0px 3px
+        background rgba(245, 245, 255, 0.8)
+
+        .signerOptionSetButton
+          display flex
+          justify-content center
+          align-items center
+          height 20px
+          width 25px
+          border-radius 10px
+
+          svg
+            fill outerspace
+            opacity 0
+            transition standardFast
+
+      .signerOptionSet:hover
+        .signerOptionSetButton
+          svg
+            opacity 0.5
+            transition standardFast
+
+          svg:hover
+            opacity 1
+
+.connectionCustomInput
+  margin-top 0px
+  margin-bottom 0px
+  height 0px
+  opacity 0
+  position relative
+  padding-top 0px
+  transition standardFast
+  background thin
+  border-radius 3px
+
+  input
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0px
+    outline none
+    border none
+    width 100%
+    text-align center
+    font-family OpenSans, sans-serif
+    font-size 18px
+    font-weight 200
+    background transparent
+
+.connectionCustomInputOn
+  margin-top 10px
+  margin-bottom 2px
+  height 35px
+  opacity 1
 
 .connectionOptionOn
   background rgba(245, 245, 255, 0.4)
@@ -179,10 +259,6 @@
   padding 15px 15px
   .connectionOptionDetails
     height 25px
-    // background blue
-    // padding-top 0px
     opacity 1
     transition-delay 0ms, 30ms
     transition-property height, opacity
-    margin 0px -15px -15px -15px
-    padding 0px 15px 15px 15px

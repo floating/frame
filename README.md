@@ -72,5 +72,6 @@ Frame is an cross-platform Ethereum interface that lets you use standalone signe
   ```
 
 ### Related
+  - [Frame Browser Extension](https://github.com/floating/frame-extension) - Use Frame with any dapp!
+  - [eth-provider](https://github.com/floating/eth-provider) - A universal Ethereum provider.
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps.
-  - [Frame Browser Extension](https://github.com/floating/frame-extension)

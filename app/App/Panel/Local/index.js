@@ -2,9 +2,17 @@ import React from 'react'
 import Restore from 'react-restore'
 import { ipcRenderer } from 'electron'
 
-// import provider from '../../../provider'
+import svg from '../../../svg'
+
+const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
 
 class Settings extends React.Component {
+  constructor (props, context) {
+    super(props, context)
+    let network = context.store('local.connection.network')
+    let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
+    this.state = {localShake: false, secondaryCustom: customTarget || 'Custom'}
+  }
   appInfo () {
     return (
       <React.Fragment>
@@ -30,6 +38,47 @@ class Settings extends React.Component {
       </React.Fragment>
     )
   }
+  okProtocol (location) {
+    if (location === 'injected') return true
+    if (location.endsWith('.ipc')) return true
+    if (location.startsWith('wss://') || location.startsWith('ws://')) return true
+    if (location.startsWith('https://') || location.startsWith('http://')) return true
+    return false
+  }
+  customFocus () {
+    if (this.state.secondaryCustom === 'Custom') this.setState({secondaryCustom: ''})
+  }
+  customBlur () {
+    if (this.state.secondaryCustom === '') this.setState({secondaryCustom: 'Custom'})
+  }
+  inputCustom (e) {
+    e.preventDefault()
+    this.store.setSecondaryCustom('')
+    clearTimeout(this.customInputTimeout)
+    this.setState({secondaryCustom: e.target.value})
+    this.customInputTimeout = setTimeout(() => {
+      this.store.setSecondaryCustom(this.state.secondaryCustom)
+    }, 1500)
+  }
+  localShake () {
+    this.setState({localShake: true})
+    setTimeout(() => this.setState({localShake: false}), 1010)
+  }
+  status (connection) {
+    let status = connection.status
+    if (status === 'connected' && connection.network !== this.store('local.connection.network')) status = 'network mismatch'
+
+    if (connection.current === 'custom') {
+      let target = connection.options[this.store('local.connection.network')][connection.current]
+      if (this.state.customInput !== '' && this.state.customInput !== 'Custom' && target !== '' && !this.okProtocol(target)) status = 'invalid target'
+    }
+    return (
+      <div className='connectionOptionStatus'>
+        {this.indicator(status)}
+        <div className='connectionOptionStatusText'>{status}</div>
+      </div>
+    )
+  }
   quit () {
     return (
       <div className='quitFrame'>
@@ -37,56 +86,90 @@ class Settings extends React.Component {
       </div>
     )
   }
+  indicator (status) {
+    if (status === 'connected') {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+    } else {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+    }
+  }
+  selectNetwork (direction) {
+    this.store.selectNetwork(direction)
+    let target = this.store('local.connection.secondary.settings', this.store('local.connection.network'), 'options.custom')
+    this.setState({secondaryCustom: target || 'Custom'})
+  }
   render () {
+    let network = this.store('local.connection.network')
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Connection'}</div>
           <div className='connectionTitleSet'>
-            <div>{'Rinkeby'}</div>
+            <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('<-')}>
+              {svg.octicon('chevron-left', {height: 17})}
+            </div>
+            <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
+            <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('->')}>
+              {svg.octicon('chevron-right', {height: 17})}
+            </div>
           </div>
         </div>
         <div className='signerPermission'>
-          <div className={this.store('local.node.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+          <div className={this.store('local.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
               <div className='signerPermissionOrigin'>{'Local'}</div>
-              <div className={this.store('local.node.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('local')}>
+              <div className={this.store('local.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('local')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='connectionOptionDetails'>
-              <div className='connectionOptionStatus'>
-                <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-                <div className='connectionOptionStatusText'>{'Connected'}</div>
-              </div>
-              <div className='signerOptionSet'>
-                <div className='signerOptionSetBadge'>{'Geth'}</div>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(this.store('local.connection.local'))}
+                <div className='signerOptionSetWrap'>
+                  <div className={this.state.localShake ? 'signerOptionSet headShake' : 'signerOptionSet'} onClick={() => this.localShake()}>
+                    <div className='signerOptionSetButton' />
+                    {this.store('local.connection.local.type') ? (
+                      <div className='signerOptionSetText'>{this.store('local.connection.local.type')}</div>
+                    ) : (_ => {
+                      if (this.store('local.connection.local.status') === 'not found') return <div>{'scanning...'}</div>
+                      if (this.store('local.connection.local.status') === 'disconnected') return svg.octicon('search', {height: 14})
+                      return ''
+                    })()}
+                    <div className='signerOptionSetButton' />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div className='signerPermission'>
-          <div className={this.store('local.node.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+          <div className={this.store('local.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
               <div className='signerPermissionOrigin'>{'Secondary'}</div>
-              <div className={this.store('local.node.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('secondary')}>
+              <div className={this.store('local.connection.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('secondary')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='connectionOptionDetails'>
-              <div className='connectionOptionStatus'>
-                <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-                <div className='connectionOptionStatusText'>{'Standby'}</div>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(this.store('local.connection.secondary'))}
+                <div className='signerOptionSet'>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-left', {height: 14})}</div>
+                  <div className='signerOptionSetText'>{this.store('local.connection.secondary.settings', network, 'current')}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
+                </div>
               </div>
-              <div className='signerOptionSet'>
-                <div className='signerOptionSetBadge'>{'Infura'}</div>
-              </div>
+            </div>
+            <div className={this.store('local.connection.secondary.settings', network, 'current') === 'custom' && this.store('local.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <input value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
             </div>
           </div>
         </div>
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
-          <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
+          <div className='signerPermissionOrigin'>{'Run Frame on Startup'}</div>
           <div className={this.store('local.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleLaunch()}>
             <div className='signerPermissionToggleSwitch' />
           </div>

@@ -37,19 +37,15 @@ const handler = (socket, req) => {
   })
 }
 
-export default server => {
+export default (server) => {
   const ws = new WebSocket.Server({server, verifyClient: (info, next) => next(trusted(info.origin), 401, 'Permission Denied')})
-
   ws.on('connection', handler)
-
   // If we lose connection to our node, close connected sockets
-  provider.connection.on('close', _ => ws.clients.forEach(socket => socket.close()))
-
+  provider.on('close', _ => ws.clients.forEach(socket => socket.close()))
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
     if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify(payload))
   })
-
   // When permission is revoked, close connected sockets
   store.observer(() => {
     let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
@@ -57,13 +53,11 @@ export default server => {
     Object.keys(permissions).forEach(key => { if (permissions[key].provider) ok.push(permissions[key].origin) })
     ws.clients.forEach(socket => { if (ok.indexOf(socket.origin) < 0) socket.close() })
   })
-
   // When the current account changes, close connected sockets
   let current = ''
   store.observer(() => {
     if (store('signer.current') !== current) ws.clients.forEach(socket => socket.close())
     current = store('signer.current')
   })
-
   return server
 }

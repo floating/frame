@@ -2,7 +2,6 @@ import uuid from 'uuid/v4'
 
 // const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
 // const persist = new PersistStore()
-// persist.clear()
 
 let initial = {
   panel: {
@@ -34,7 +33,7 @@ let initial = {
     }
   },
   frame: {
-    type: process.env.FRAME_TYPE || 'window'
+    type: 'tray'
   },
   node: {
     provider: false
@@ -44,29 +43,62 @@ let initial = {
   },
   local: {
     launch: false,
-    node: {
-      default: 'wss://rinkeby.infura.io/_ws',
+    success: false,
+    accounts: {},
+    connection: {
+      network: '4',
+      options: ['1', '4'],
+      status: 'loading',
       local: {
         on: true,
-        run: false
+        status: 'loading',
+        connected: false,
+        type: '',
+        network: '',
+        settings: {
+          '1': {
+            current: 'direct',
+            options: {
+              direct: 'direct'
+            }
+          },
+          '4': {
+            current: 'direct',
+            options: {
+              direct: 'direct'
+            }
+          }
+        }
       },
       secondary: {
+        settings: {
+          '1': {
+            current: 'infura',
+            options: {
+              infura: 'infura',
+              custom: ''
+            }
+          },
+          '4': {
+            current: 'infura',
+            options: {
+              infura: 'infuraRinkeby',
+              custom: ''
+            }
+          }
+        },
         on: true,
-        options: {
-          infura: 'wss://rinkeby.infura.io/_ws',
-          custom: ''
-        }
+        status: 'loading',
+        connected: false,
+        type: '',
+        network: ''
       }
-    },
-    success: false,
-    accounts: {}
+    }
   },
   extenal: {
     rates: {}
   }
 }
-
-// ws://localhost:8546
 
 if (initial.frame.type !== 'tray' && initial.view.list.length === 0) {
   let id = uuid()
