@@ -19,11 +19,19 @@ export const panelRequest = (u, request) => {
 }
 
 export const selectNetwork = (u, direction) => {
+  let reset = {
+    status: 'loading',
+    connected: false,
+    type: '',
+    network: ''
+  }
   if (direction === '->') {
     u('local.connection', connection => {
       let index = connection.options.indexOf(connection.network) + 1
       if (index >= connection.options.length) index = 0
       connection.network = connection.options[index]
+      connection.local = Object.assign({}, connection.local, reset)
+      connection.secondary = Object.assign({}, connection.secondary, reset)
       return connection
     })
   } else if (direction === '<-') {
@@ -31,6 +39,8 @@ export const selectNetwork = (u, direction) => {
       let index = connection.options.indexOf(connection.network) - 1
       if (index < 0) index = connection.options.length - 1
       connection.network = connection.options[index]
+      connection.local = Object.assign({}, connection.local, reset)
+      connection.secondary = Object.assign({}, connection.secondary, reset)
       return connection
     })
   }

@@ -15,6 +15,11 @@ class Nodes extends EventEmitter {
   getNetwork (provider, cb) { provider.sendAsync({jsonrpc: '2.0', method: 'net_version', params: [], id: 1}, cb) }
   getNodeType (provider, cb) { provider.sendAsync({jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1}, cb) }
   connect (connection) {
+    if (this.network && this.network !== connection.network) {
+      if (this.local) this.local.close()
+      if (this.secondary) this.secondary.close()
+      this.network = connection.network
+    }
     if (connection.local.on) {
       if (!this.local) {
         if (connection.local.status !== 'loading') store.setLocal({status: 'loading', connected: false, type: ''})
