@@ -17,8 +17,6 @@ class Panel extends React.Component {
     let status = [connection.local.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
       return <div className='panelDetailIndicatorBase panelDetailIndicatorGood' />
-    } else if (status.indexOf('loading') > -1 || status.indexOf('syncing') > -1 || status.indexOf('pending') > -1 || status.indexOf('standby') > -1) {
-      return <div className='panelDetailIndicatorBase panelDetailIndicatorPending' />
     } else {
       return <div className='panelDetailIndicatorBase panelDetailIndicatorBad' />
     }

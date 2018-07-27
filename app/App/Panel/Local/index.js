@@ -11,7 +11,8 @@ class Settings extends React.Component {
     super(props, context)
     let network = context.store('local.connection.network')
     let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
-    this.state = {localShake: false, secondaryCustom: customTarget || 'Custom'}
+    this.customMessage = 'Custom Endpoint'
+    this.state = {localShake: false, secondaryCustom: customTarget || this.customMessage}
   }
   appInfo () {
     return (
@@ -34,10 +35,10 @@ class Settings extends React.Component {
     return false
   }
   customFocus () {
-    if (this.state.secondaryCustom === 'Custom') this.setState({secondaryCustom: ''})
+    if (this.state.secondaryCustom === this.customMessage) this.setState({secondaryCustom: ''})
   }
   customBlur () {
-    if (this.state.secondaryCustom === '') this.setState({secondaryCustom: 'Custom'})
+    if (this.state.secondaryCustom === '') this.setState({secondaryCustom: this.customMessage})
   }
   inputCustom (e) {
     e.preventDefault()
@@ -56,7 +57,7 @@ class Settings extends React.Component {
     let status = connection.status
     let network = this.store('local.connection.network')
     let current = connection.settings[network].current
-    if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== 'Custom' && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+    if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
     return (
       <div className='connectionOptionStatus'>
         {this.indicator(status)}
@@ -83,7 +84,7 @@ class Settings extends React.Component {
   selectNetwork (direction) {
     this.store.selectNetwork(direction)
     let target = this.store('local.connection.secondary.settings', this.store('local.connection.network'), 'options.custom')
-    this.setState({secondaryCustom: target || 'Custom'})
+    this.setState({secondaryCustom: target || this.customMessage})
   }
   render () {
     let network = this.store('local.connection.network')
