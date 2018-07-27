@@ -104,5 +104,49 @@
     svg
       opacity 1
 
+  .panelDetail
+    display flex
+    align-items center
+
+  .panelDetailText
+    text-transform uppercase
+    font-size 12px
+    letter-spacing 1px
+    font-weight 400
+    color outerspace
+    padding-left 10px
+    padding-right 15px
+
+  .panelDetailIndicator
+    height 20px
+    display flex
+    align-items center
+    margin 7px
+
+    .panelDetailIndicatorInner
+      height 20px
+      display flex
+      align-items center
+      justify-content center
+      border-radius 10px
+      background lightShade
+      box-shadow cardDrop
+
+      .panelDetailIndicatorBase
+        height 14px
+        width 14px
+        margin-top 0px
+        border-radius 100%
+        margin-left 3px
+
+      .panelDetailIndicatorGood
+        background good
+
+      .panelDetailIndicatorBad
+        background bad
+        
+      .panelDetailIndicatorPending
+        background pending
+
 @import '../Main/style'
 @import '../Local/style'

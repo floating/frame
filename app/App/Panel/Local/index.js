@@ -22,18 +22,6 @@ class Settings extends React.Component {
             <div>{'Frame'}</div>
             <div>{'v' + require('../../../../package.json').version}</div>
           </div>
-          <div className='appInfoLine'>
-            <div>{'Electron'}</div>
-            <div>{'v' + process.versions.electron}</div>
-          </div>
-          <div className='appInfoLine'>
-            <div>{'Chrome'}</div>
-            <div>{'v' + process.versions.chrome}</div>
-          </div>
-          <div className='appInfoLine'>
-            <div>{'Node'}</div>
-            <div>{'v' + process.versions.node}</div>
-          </div>
         </div>
       </React.Fragment>
     )
@@ -58,7 +46,7 @@ class Settings extends React.Component {
     this.setState({secondaryCustom: e.target.value})
     this.customInputTimeout = setTimeout(() => {
       this.store.setSecondaryCustom(this.state.secondaryCustom)
-    }, 1500)
+    }, 1000)
   }
   localShake () {
     this.setState({localShake: true})
@@ -66,12 +54,9 @@ class Settings extends React.Component {
   }
   status (connection) {
     let status = connection.status
-    if (status === 'connected' && connection.network !== this.store('local.connection.network')) status = 'network mismatch'
-
-    if (connection.current === 'custom') {
-      let target = connection.options[this.store('local.connection.network')][connection.current]
-      if (this.state.customInput !== '' && this.state.customInput !== 'Custom' && target !== '' && !this.okProtocol(target)) status = 'invalid target'
-    }
+    let network = this.store('local.connection.network')
+    let current = connection.settings[network].current
+    if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== 'Custom' && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
     return (
       <div className='connectionOptionStatus'>
         {this.indicator(status)}
@@ -133,8 +118,8 @@ class Settings extends React.Component {
                     {this.store('local.connection.local.type') ? (
                       <div className='signerOptionSetText'>{this.store('local.connection.local.type')}</div>
                     ) : (_ => {
-                      if (this.store('local.connection.local.status') === 'not found') return <div>{'scanning...'}</div>
-                      if (this.store('local.connection.local.status') === 'disconnected') return svg.octicon('search', {height: 14})
+                      let status = this.store('local.connection.local.status')
+                      if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>{'scanning...'}</div>
                       return ''
                     })()}
                     <div className='signerOptionSetButton' />
