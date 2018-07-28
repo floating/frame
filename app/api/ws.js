@@ -59,5 +59,18 @@ export default (server) => {
     if (store('signer.current') !== current) ws.clients.forEach(socket => socket.close())
     current = store('signer.current')
   })
+
+  let local
+  let secondary
+  store.observer(() => {
+    if (local === 'connected' && local !== store('local.connection.local.status')) {
+      ws.clients.forEach(socket => socket.close())
+    } else if (secondary === 'connected' && secondary !== store('local.connection.secondary.status')) {
+      ws.clients.forEach(socket => socket.close())
+    }
+    local = store('local.connection.local.status')
+    secondary = store('local.connection.secondary.status')
+  })
+
   return server
 }

@@ -16,15 +16,9 @@ class Settings extends React.Component {
   }
   appInfo () {
     return (
-      <React.Fragment>
-        <div className='localSettingsTitle'>{'Info'}</div>
-        <div className='appInfo'>
-          <div className='appInfoLine'>
-            <div>{'Frame'}</div>
-            <div>{'v' + require('../../../../package.json').version}</div>
-          </div>
-        </div>
-      </React.Fragment>
+      <div className='appInfo'>
+        <div className='appInfoLine'>{require('../../../../package.json').version}</div>
+      </div>
     )
   }
   okProtocol (location) {

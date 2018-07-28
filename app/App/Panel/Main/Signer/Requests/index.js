@@ -111,7 +111,11 @@ class Requests extends React.Component {
                     </div>
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
-                    <div className='transactionData'>{'View Data'} </div>
+                    <div className='transactionData'>
+                      <div clasName='transactionDataView'>
+                        {'View Data'}
+                      </div>
+                    </div>
                   ) : (
                     <div className='transactionData transactionNoData'>{'No Data'}</div>
                   )}

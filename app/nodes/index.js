@@ -28,7 +28,7 @@ class Nodes extends EventEmitter {
           this.getNetwork(this.local, (netErr, netResponse) => {
             this.getNodeType(this.local, (typeErr, typeResponse) => {
               this.local.network = !netErr && netResponse && !netResponse.error ? netResponse.result : ''
-              this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result : ''
+              this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : ''
               this.emit('connect')
               store.setLocal({status: this.local.status, connected: true, type: this.local.type, network: this.local.network})
             })

@@ -34,7 +34,7 @@ class Panel extends React.Component {
               </div>
             </div>
           </div>
-          <div className='panelMenuItem' onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['kebab-horizontal'].toSVG({height: 21})}} />
+          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? {transform: 'rotate(180deg)'} : {}} onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['kebab-horizontal'].toSVG({height: 21})}} />
         </div>
         <Local />
         <Main />
