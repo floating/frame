@@ -18,6 +18,8 @@ export const panelRequest = (u, request) => {
   u('panel.show', v => true)
 }
 
+export const enableMainnet = u => u('enableMainnet', () => true)
+
 export const selectNetwork = (u, direction) => {
   let reset = {
     status: 'loading',

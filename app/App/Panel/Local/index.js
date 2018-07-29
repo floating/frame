@@ -12,7 +12,7 @@ class Settings extends React.Component {
     let network = context.store('local.connection.network')
     let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
     this.customMessage = 'Custom Endpoint'
-    this.state = {localShake: false, secondaryCustom: customTarget || this.customMessage}
+    this.state = {localShake: {}, secondaryCustom: customTarget || this.customMessage}
   }
   appInfo () {
     return (
@@ -38,20 +38,33 @@ class Settings extends React.Component {
     e.preventDefault()
     this.store.setSecondaryCustom('')
     clearTimeout(this.customInputTimeout)
+    console.log(e.target.value.toLowerCase())
+    if (e.target.value.toLowerCase() === 'i understand the risks, unlock mainnet') {
+      this.setState({secondaryCustom: this.customMessage})
+      e.target.blur()
+      this.store.enableMainnet()
+      return
+    }
     this.setState({secondaryCustom: e.target.value})
-    this.customInputTimeout = setTimeout(() => {
-      this.store.setSecondaryCustom(this.state.secondaryCustom)
-    }, 1000)
+    this.customInputTimeout = setTimeout(() => this.store.setSecondaryCustom(this.state.secondaryCustom), 1000)
   }
-  localShake () {
-    this.setState({localShake: true})
-    setTimeout(() => this.setState({localShake: false}), 1010)
+  localShake (key) {
+    let localShake = Object.assign({}, this.state.localShake)
+    localShake[key] = true
+    this.setState({localShake})
+    setTimeout(() => {
+      let localShake = Object.assign({}, this.state.localShake)
+      localShake[key] = false
+      this.setState({localShake})
+    }, 1010)
   }
   status (connection) {
     let status = connection.status
     let network = this.store('local.connection.network')
     let current = connection.settings[network].current
     if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+    if (status === 'connected' && connection.network && connection.network !== network) status = 'network mismatch'
+    if (status === 'connected' && !connection.network) status = 'loading'
     return (
       <div className='connectionOptionStatus'>
         {this.indicator(status)}
@@ -86,15 +99,23 @@ class Settings extends React.Component {
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Connection'}</div>
-          <div className='connectionTitleSet'>
-            <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('<-')}>
-              {svg.octicon('chevron-left', {height: 17})}
+          {this.store('enableMainnet') ? (
+            <div className='connectionTitleSet'>
+              <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('<-')}>
+                {svg.octicon('chevron-left', {height: 17})}
+              </div>
+              <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
+              <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('->')}>
+                {svg.octicon('chevron-right', {height: 17})}
+              </div>
             </div>
-            <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
-            <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('->')}>
-              {svg.octicon('chevron-right', {height: 17})}
+          ) : (
+            <div className={this.state.localShake.network ? 'connectionTitleSet headShake' : 'connectionTitleSet'} onClick={() => this.localShake('network')}>
+              <div className='connectionTitleSetButton' />
+              <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
+              <div className='connectionTitleSetButton' />
             </div>
-          </div>
+          )}
         </div>
         <div className='signerPermission'>
           <div className={this.store('local.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
@@ -108,7 +129,7 @@ class Settings extends React.Component {
               <div className='connectionOptionDetailsInset'>
                 {this.status(this.store('local.connection.local'))}
                 <div className='signerOptionSetWrap'>
-                  <div className={this.state.localShake ? 'signerOptionSet headShake' : 'signerOptionSet'} onClick={() => this.localShake()}>
+                  <div className={this.state.localShake.custom ? 'signerOptionSet headShake' : 'signerOptionSet'} onClick={() => this.localShake('custom')}>
                     <div className='signerOptionSetButton' />
                     {this.store('local.connection.local.type') ? (
                       <div className='signerOptionSetText'>{this.store('local.connection.local.type')}</div>

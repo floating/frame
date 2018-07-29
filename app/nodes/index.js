@@ -36,7 +36,7 @@ class Nodes extends EventEmitter {
         })
         this.local.on('close', details => {
           this.emit('close')
-          store.setLocal({status: this.local.status, connected: false, type: ''})
+          store.setLocal({status: this.local.status, connected: false, type: '', network: ''})
         })
         this.local.on('status', status => {
           let current = store('local.connection.local.status')
@@ -69,7 +69,7 @@ class Nodes extends EventEmitter {
           })
           this.secondary.on('close', () => {
             this.emit('close')
-            store.setSecondary({status: this.secondary.status, connected: false, type: ''})
+            store.setSecondary({status: this.secondary.status, connected: false, type: '', network: ''})
           })
           this.secondary.on('status', status => {
             let current = store('local.connection.local.status')
