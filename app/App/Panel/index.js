@@ -16,9 +16,9 @@ class Panel extends React.Component {
   indicator (connection) {
     let status = [connection.local.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
-      return <div className='panelDetailIndicatorBase panelDetailIndicatorGood' />
+      return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
     } else {
-      return <div className='panelDetailIndicatorBase panelDetailIndicatorBad' />
+      return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
     }
   }
   render () {
@@ -28,11 +28,9 @@ class Panel extends React.Component {
         <div className='panelMenu' style={{opacity: this.store('signer.current') || (this.state.scroll < 50) ? 1 : 0}}>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
-              <div className='panelDetailIndicatorInner'>
-                {this.indicator(this.store('local.connection'))}
-                <div className='panelDetailText'>{networks[this.store('local.connection.network')]}</div>
-              </div>
+              {this.indicator(this.store('local.connection'))}
             </div>
+            <div className='panelDetailText'>{networks[this.store('local.connection.network')]}</div>
           </div>
           <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? {transform: 'rotate(180deg)'} : {}} onClick={() => this.store.toggleSettings()} dangerouslySetInnerHTML={{__html: octicons['kebab-horizontal'].toSVG({height: 21})}} />
         </div>

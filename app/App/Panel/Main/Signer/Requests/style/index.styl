@@ -406,7 +406,7 @@
       display flex
       justify-content center
       align-items center
-      border-radius 16px
+      border-radius 6px
       text-transform uppercase
       letter-spacing 3px
       font-weight 400
@@ -414,10 +414,15 @@
       background thick
       color outerspace
 
+    .providerRequestTitle
+      background pending
+      color spacewhite
+      text-shadow 0px 2px 4px rgba(0, 100, 50, 0.3), 0px 1px 0px rgba(0, 100, 50, 0.4)
+
     .approveTransactionTitle
       background good
       color spacewhite
-      text-shadow 0px 1px 2px rgba(0, 50, 50, 0.2), 0px 1px 0px rgba(0, 50, 50, 0.2)
+      text-shadow 0px 2px 4px rgba(0, 100, 50, 0.3), 0px 1px 0px rgba(0, 100, 50, 0.4)
 
     .approveTransactionPayload
       width 100%
@@ -470,9 +475,6 @@
           background thin
           border-radius 4px
 
-        // .transactionSubTotalETH
-        //   background blue
-
       .transactionSubFee
         display flex
         justify-content center
@@ -493,33 +495,164 @@
           background thin
           border-radius 4px
 
-
-        // .transactionSubTotalETH
-        //   background blue
-
       .transactionSubTotals
         display flex
         justify-content center
         align-items center
 
   .transactionData
+    position relative
     padding 0px 20px 0px 20px
     height 60px
     width calc(100% - 40px)
     display flex
     justify-content center
     align-items center
-    background pending
-    font-size 15px
+    background thin
+    font-size 12px
     font-weight 400
     letter-spacing 1px
     text-transform uppercase
 
     .transactionDataView
-      background white
+      position absolute
+      top 15px
+      bottom 15px
+      left 80px
+      right 80px
+      background light
+      color pending
+      border-radius 3px
+      box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin
+      z-index 20
+      display flex
+      justify-content center
+      align-items center
+      transition standard
+      overflow hidden
+
+      .transactionDataViewLabel
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display flex
+        justify-content center
+        align-items center
+        opacity 1
+        pointer-events auto
+        transition standard
+
+      .transactionDataViewData
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display flex
+        justify-content center
+        align-items center
+        pointer-events none
+        opacity 0
+        transition standard
+
+        .transactionDataViewDataInner
+          position relative
+          height 345px
+          width 330px
+          min-height 350px
+          min-width 330px
+
+          .transactionDataViewDataHeader
+            position absolute
+            top 0
+            left 0
+            right 0
+            height 40px
+            display flex
+            padding 2px 0px 0px 18px
+            justify-content space-between
+            align-items center
+            background pending
+            color spacewhite
+            fill spacewhite
+
+            .transactionDataViewDataClose
+              width 50px
+              height 40px
+              display flex
+              justify-content center
+              align-items center
+
+          .transactionDataViewDataBody
+            position absolute
+            top 41px
+            left 0
+            right 0
+            bottom 0
+            display flex
+            padding 18px
+            user-select all
+            // background green
+
+    .transactionDataViewSelected
+      position absolute
+      top -145px
+      bottom -145px
+      left 0px
+      right 0px
+      border-radius 6px
+      box-shadow 0px -2px 0px thin, 0px -8px 8px -2px thin, 0px 0px 10px -2px thin, default, 0px -13px 9px -6px rgba(94, 110, 255,0.1)
+
+      .transactionDataViewLabel
+        pointer-events none
+        opacity 0
+        // transition-delay 0s
+
+      .transactionDataViewData
+        pointer-events auto
+        opacity 1
+        // transition-delay 0.2s
+
+
+    .transactionDataNotice
+      position absolute
+      overflow hidden
+      top 0
+      left 0
+      right 0
+      bottom 0
+      background pending
+      // .transactionDataNoticeBackground
+      //   position absolute
+      //   background pending
+      //   width 260px
+      //   height 260px
+      //   transform rotate(45deg)
+      //   z-index 8
+      //   top -99px
+      //   left -192px
+
+      .transactionDataNoticeIcon
+        position absolute
+        top 0
+        left 0
+        display flex
+        justify-content center
+        align-items center
+        z-index 10
+        width 80px
+        height 60px
+        font-size 14px
+        font-family FiraCode, sans-serif
+        color spacewhite
+        fill spacewhite
+
 
   .transactionNoData
     background thin
+    color outerspace05
 
   .transactionTo
     height 80px
