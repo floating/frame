@@ -41,6 +41,7 @@ let initial = {
   provider: {
     events: []
   },
+  enableMainnet: false,
   local: {
     launch: false,
     success: false,

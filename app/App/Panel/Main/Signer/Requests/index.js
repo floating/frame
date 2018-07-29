@@ -9,7 +9,7 @@ import rpc from '../../../../../rpc'
 class Requests extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = {minimized: false}
+    this.state = {minimized: false, viewData: false}
   }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
@@ -19,6 +19,9 @@ class Requests extends React.Component {
       })
       this.tPin = ''
     }
+  }
+  toggleViewData () {
+    this.setState({viewData: !this.state.viewData})
   }
   minimize () {
     this.setState({minimized: true})
@@ -111,7 +114,26 @@ class Requests extends React.Component {
                     </div>
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
-                    <div className='transactionData'>{'View Data'} </div>
+                    <div className='transactionData'>
+                      <div className={this.state.viewData ? 'transactionDataView transactionDataViewSelected' : 'transactionDataView'}>
+                        <div className='transactionDataViewLabel' onClick={() => this.toggleViewData()}>{'View Data'}</div>
+                        <div className='transactionDataViewData'>
+                          <div className='transactionDataViewDataInner'>
+                            <div className='transactionDataViewDataHeader'>
+                              {'Transaction Data'}
+                              <div className='transactionDataViewDataClose' onClick={() => this.toggleViewData()}>{svg.octicon('chevron-down', {height: '20px'})}</div>
+                            </div>
+                            <div className='transactionDataViewDataBody'>
+                              {utils.toAscii(req.data.data)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className='transactionDataNotice'>
+                        <div className='transactionDataNoticeIcon'>{svg.octicon('issue-opened', {height: '20px'})}</div>
+                        <div className='transactionDataNoticeBackground' />
+                      </div>
+                    </div>
                   ) : (
                     <div className='transactionData transactionNoData'>{'No Data'}</div>
                   )}
@@ -176,7 +198,7 @@ class Requests extends React.Component {
               <div className='approveTransactionIcon'>
                 {svg.octicon('link', {height: '20px'})}
               </div>
-              <div className='approveRequestTitle'>
+              <div className='approveRequestTitle providerRequestTitle'>
                 {'Provider Request'}
               </div>
               <div className='requestProvider bounceIn'>

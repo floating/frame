@@ -28,7 +28,7 @@ class Nodes extends EventEmitter {
           this.getNetwork(this.local, (netErr, netResponse) => {
             this.getNodeType(this.local, (typeErr, typeResponse) => {
               this.local.network = !netErr && netResponse && !netResponse.error ? netResponse.result : ''
-              this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result : ''
+              this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : ''
               this.emit('connect')
               store.setLocal({status: this.local.status, connected: true, type: this.local.type, network: this.local.network})
             })
@@ -36,7 +36,7 @@ class Nodes extends EventEmitter {
         })
         this.local.on('close', details => {
           this.emit('close')
-          store.setLocal({status: this.local.status, connected: false, type: ''})
+          store.setLocal({status: this.local.status, connected: false, type: '', network: ''})
         })
         this.local.on('status', status => {
           let current = store('local.connection.local.status')
@@ -69,7 +69,7 @@ class Nodes extends EventEmitter {
           })
           this.secondary.on('close', () => {
             this.emit('close')
-            store.setSecondary({status: this.secondary.status, connected: false, type: ''})
+            store.setSecondary({status: this.secondary.status, connected: false, type: '', network: ''})
           })
           this.secondary.on('status', status => {
             let current = store('local.connection.local.status')

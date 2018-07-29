@@ -1,6 +1,7 @@
 import store from '../store'
 
 export default origin => {
+  if (!(store('local.connection.local.status') === 'connected' || store('local.connection.secondary.status') === 'connected')) return false
   if (!origin || origin === 'null') origin = 'Unknown'
   let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
   let perms = Object.keys(permissions).map(id => permissions[id])

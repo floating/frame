@@ -9,6 +9,7 @@
   padding 0px 0px 0px 0px
   flex-direction column
   transition standard
+  transform translateZ(0)
 
   .localSettingsTitle:before
     content ''
@@ -66,12 +67,14 @@
 .quitFrame
   width 100%
   padding 20px
+  margin-top 15px
 
   .quitFrameButton
     width calc(100% - 40px)
     border-radius 20px
     height 40px
-    background rgba(245, 245, 255, 0.2)
+    // background rgba(245, 245, 255, 0.2)
+    // background thick
     font-size 13px
     font-weight 400
     letter-spacing 2px
@@ -79,6 +82,9 @@
     display flex
     justify-content center
     align-items center
+    // background linear-gradient(45deg, bad 0%, pending 50%, good 100%) // outerspace
+    // color spacewhite
+    background thin
 
 .connectionTitle
   display flex
@@ -111,11 +117,13 @@
         fill outerspace
         opacity 0
         transition standardFast
+        transform translateZ(0)
 
   .connectionTitleSet:hover
     svg
       opacity 0.5
       transition standardFast
+      transform translateZ(0)
 
     svg:hover
       opacity 1
@@ -214,15 +222,43 @@
             fill outerspace
             opacity 0
             transition standardFast
+            transform translateZ(0)
 
       .signerOptionSet:hover
         .signerOptionSetButton
           svg
             opacity 0.5
-            transition standardFast
 
           svg:hover
             opacity 1
+
+.appInfo
+  position absolute
+  bottom 0
+  left 0
+  right 0
+  font-size 12px
+  font-weight 300
+  height 50px
+  font-family FiraCode, sans-serif
+
+  .appInfoLine
+    position absolute
+    top 50px
+    left 0
+    right 0
+    transition standard
+    height 50px
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    transform translateZ(0)
+
+.appInfo:hover
+  .appInfoLine
+    top 0
+
 
 .connectionCustomInput
   margin-top 0px
@@ -247,10 +283,11 @@
     width 100%
     text-align center
     font-family OpenSans, sans-serif
-    font-size 14px
+    font-size 16px
     background transparent
     padding 10px
-    font-weight 300
+    font-weight 200
+    color outerspace
 
 .connectionCustomInputOn
   margin-top 10px
