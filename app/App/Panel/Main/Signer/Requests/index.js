@@ -41,7 +41,7 @@ class Requests extends React.Component {
   decline (reqId, req) {
     this.store.events.emit('declineRequest', reqId, req)
   }
-  transactionRequest (req, top) {
+  transactionRequest (req, top) { // Todo: Make each type of request its own class
     let requestClass = 'signerRequest'
     if (req.status === 'success') requestClass += ' signerRequestSuccess'
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
@@ -157,7 +157,7 @@ class Requests extends React.Component {
         ) : (
           <div className='unknownType'>{'Unknown: ' + req.type}</div>
         )}
-        <div className='requestApprove'>
+        <div className={req.allowInput ? 'requestApprove' : 'requestApprove requestApproveDisabled'}>
           <div className='requestDecline' onClick={() => this.decline(req.handlerId, req)}>
             {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
           </div>
@@ -168,7 +168,7 @@ class Requests extends React.Component {
       </div>
     )
   }
-  providerRequest (req, top) {
+  providerRequest (req, top) { // Todo: Make each type of request its own class
     let requestClass = 'signerRequest'
     if (req.status === 'success') requestClass += ' signerRequestSuccess'
     if (req.status === 'declined') requestClass += ' signerRequestDeclined'
@@ -208,7 +208,7 @@ class Requests extends React.Component {
             </div>
           )}
         </div>
-        <div className='requestApprove'>
+        <div className={req.allowInput ? 'requestApprove' : 'requestApprove requestApproveDisabled'}>
           <div className='requestDecline' onClick={() => this.store.giveAccess(req, false)}>
             {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
           </div>

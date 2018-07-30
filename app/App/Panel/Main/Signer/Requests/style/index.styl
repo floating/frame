@@ -739,6 +739,9 @@
     text-transform uppercase
     letter-spacing 2px
     -webkit-app-region no-drag
+    pointer-events auto
+    opacity 1
+    transition standard
     span
       margin-right 8px
 
@@ -784,6 +787,11 @@
     //     background good
     //   svg
     //     fill spacewhite
+
+  .requestApproveDisabled
+    pointer-events none
+    opacity 0
+    bottom -20px
 
 .signerRequestsHidden
   left -100%

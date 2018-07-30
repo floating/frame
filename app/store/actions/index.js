@@ -142,9 +142,15 @@ export const addRequest = (u, request) => {
       if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
     }
     if (!request.handlerId) throw new Error('No handlerId for added request...', request)
-    requests[request.handlerId] = request
+    requests[request.handlerId] = requests[request.handlerId] || request
     return requests
   })
+  setTimeout(() => {
+    u('signer.requests', (requests) => {
+      if (requests[request.handlerId]) requests[request.handlerId].allowInput = true
+      return requests
+    })
+  }, 2000)
 }
 
 export const giveAccess = (u, req, access) => {
