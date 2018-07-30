@@ -73,18 +73,18 @@
     width calc(100% - 40px)
     border-radius 20px
     height 40px
-    // background rgba(245, 245, 255, 0.2)
-    // background thick
     font-size 13px
-    font-weight 400
-    letter-spacing 2px
     text-transform uppercase
+    font-weight 400
+    letter-spacing 1px
     display flex
     justify-content center
     align-items center
-    // background linear-gradient(45deg, bad 0%, pending 50%, good 100%) // outerspace
-    // color spacewhite
     background thin
+    transition standard
+
+  .quitFrameButton:hover
+    background thick
 
 .connectionTitle
   display flex
@@ -189,7 +189,6 @@
           background pending
 
         .connectionOptionStatusText
-          // height 30px
           height 20px
           margin-top 5px
           display flex
@@ -200,9 +199,9 @@
 
       .signerOptionSet
         display flex
-        height 20px
+        height 21px
         margin-top 5px
-        border-radius 10px
+        border-radius 10.5px
         letter-spacing 1px
         padding 0px 0px
         justify-content center
@@ -234,30 +233,56 @@
 
 .appInfo
   position absolute
-  bottom 0
+  bottom -40px
   left 0
   right 0
-  font-size 12px
+  font-size 14px
   font-weight 300
-  height 50px
+  height 100px
   font-family FiraCode, sans-serif
+  transition standard
+  transform translateZ(0)
 
-  .appInfoLine
+  .appInfoIcon
     position absolute
-    top 50px
+    top 0
     left 0
     right 0
     transition standard
-    height 50px
+    height 65px
     display flex
     justify-content center
     align-items center
     flex-direction column
     transform translateZ(0)
 
-.appInfo:hover
+    .appInfoHandle
+      width 30px
+      height 4px
+      border-radius 2px
+      background rgba(0, 0, 80, 0.2)
+      transition standard
+      transform translateZ(0)
+
+
   .appInfoLine
-    top 0
+    position absolute
+    top 60px
+    left 0
+    right 0
+    transition standard
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    transform translateZ(0)
+    color outerspace
+
+.appInfo:hover
+  bottom 0px
+  .appInfoIcon
+    .appInfoHandle
+      background pending
 
 
 .connectionCustomInput

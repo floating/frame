@@ -21,10 +21,18 @@ class Main extends React.Component {
             <div id='panelWrap' style={current && scrollTop > 0 ? {marginTop: '-' + scrollTop + 'px'} : {}}>
               {Object.keys(signers).sort().map((id, i) => <Signer key={id} {...signers[id]} index={i} reportScroll={() => this.reportScroll()} />)}
               {Object.keys(signers).length === 0 ? <div className='noSigners'>
-                {svg.logo(50)}
+                {svg.logo(70)}
                 {'No Signers Connected'}
                 <span className='featureBox'>
-                  <span className='featureBoxText'>{`Frame Alpha - Rinkeby Only`}</span>
+                  <span className='featureBoxText'>
+                    {`Frame Developer Release`}
+                  </span>
+                  <span className='featureBoxSubtext'>
+                    {`Alpha Software`}
+                  </span>
+                  <span className='featureBoxSubtext'>
+                    {`Not recommended for mainnet use`}
+                  </span>
                 </span>
               </div> : null}
             </div>

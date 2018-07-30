@@ -9,7 +9,7 @@ import rpc from '../../../../../rpc'
 class Requests extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = {minimized: false, viewData: false}
+    this.state = {minimized: false}
   }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
@@ -20,8 +20,8 @@ class Requests extends React.Component {
       this.tPin = ''
     }
   }
-  toggleViewData () {
-    this.setState({viewData: !this.state.viewData})
+  toggleDataView (id) {
+    this.store.toggleDataView(id)
   }
   minimize () {
     this.setState({minimized: true})
@@ -115,13 +115,13 @@ class Requests extends React.Component {
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
                     <div className='transactionData'>
-                      <div className={this.state.viewData ? 'transactionDataView transactionDataViewSelected' : 'transactionDataView'}>
-                        <div className='transactionDataViewLabel' onClick={() => this.toggleViewData()}>{'View Data'}</div>
+                      <div className={req.viewData ? 'transactionDataView transactionDataViewSelected' : 'transactionDataView'}>
+                        <div className='transactionDataViewLabel' onClick={() => this.toggleDataView(req.handlerId)}>{'View Data'}</div>
                         <div className='transactionDataViewData'>
                           <div className='transactionDataViewDataInner'>
                             <div className='transactionDataViewDataHeader'>
                               {'Transaction Data'}
-                              <div className='transactionDataViewDataClose' onClick={() => this.toggleViewData()}>{svg.octicon('chevron-down', {height: '20px'})}</div>
+                              <div className='transactionDataViewDataClose' onClick={() => this.toggleDataView(req.handlerId)}>{svg.octicon('chevron-down', {height: '20px'})}</div>
                             </div>
                             <div className='transactionDataViewDataBody'>
                               {utils.toAscii(req.data.data)}

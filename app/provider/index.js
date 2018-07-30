@@ -51,7 +51,7 @@ class Provider extends EventEmitter {
     console.warn(error)
     res({id: payload.id, jsonrpc: payload.jsonrpc, error})
   }
-  approveRequest (req, cb) {
+  signAndSend (req, cb) {
     let rawTx = req.data
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
@@ -72,6 +72,15 @@ class Provider extends EventEmitter {
       })
     })
   }
+  approveRequest (req, cb) {
+    if (req.data.nonce) return this.signAndSend(req, cb)
+    this.getNonce(req.data, response => {
+      if (response.error) return cb(response.error)
+      let updatedReq = Object.assign({}, req)
+      updatedReq.data = Object.assign({}, updatedReq.data, {nonce: response.result})
+      this.signAndSend(updatedReq, cb)
+    })
+  }
   getRawTx (payload) {
     let rawTx = payload.params[0]
     rawTx.gas = rawTx.gas || rawTx.gasLimit
@@ -83,7 +92,7 @@ class Provider extends EventEmitter {
   getNonce = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending']}, res)
   fillTx = (rawTx, cb) => {
     let needs = {}
-    if (!rawTx.nonce) needs.nonce = this.getNonce
+    // if (!rawTx.nonce) needs.nonce = this.getNonce
     if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
     if (!rawTx.gas) needs.gas = this.getGasEstimate
     let count = 0

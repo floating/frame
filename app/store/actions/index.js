@@ -126,6 +126,8 @@ export const addProviderEvent = (u, payload) => {
 }
 
 export const addRequest = (u, request) => {
+  u('panel.view', view => 'default')
+  u('signer.view', view => 'default')
   u('signer.requests', (requests, state) => {
     if (!request.handlerId && request.type === 'requestProvider') {
       let reqs = Object.keys(requests)
@@ -164,6 +166,10 @@ export const toggleAccess = (u, handlerId) => {
     accounts[a].permissions[handlerId].provider = !accounts[a].permissions[handlerId].provider
     return accounts
   })
+}
+
+export const toggleDataView = (u, id) => {
+  u('signer.requests', id, 'viewData', view => !view)
 }
 
 export const requestPending = (u, id) => {
