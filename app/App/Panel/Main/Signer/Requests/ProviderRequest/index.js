@@ -50,12 +50,12 @@ class ProviderRequest extends React.Component {
             </div>
           )}
         </div>
-        <div className={this.state.allowInput ? 'requestApprove bounceIn' : 'requestApprove requestApproveDisabled'}>
+        <div className='requestApprove'>
           <div className='requestDecline' onClick={() => this.store.giveAccess(this.props.req, false)}>
             {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
           </div>
           <div className='requestSign' onClick={() => this.store.giveAccess(this.props.req, true)}>
-            {svg.octicon('check', {height: '22px'})}{'Approve'}
+            {svg.octicon('check', {height: '22px'})}{'Sign'}
           </div>
         </div>
       </div>
