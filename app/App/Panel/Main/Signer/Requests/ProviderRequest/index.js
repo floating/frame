@@ -55,7 +55,7 @@ class ProviderRequest extends React.Component {
             {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
           </div>
           <div className='requestSign' onClick={() => this.store.giveAccess(this.props.req, true)}>
-            {svg.octicon('check', {height: '22px'})}{'Sign'}
+            {svg.octicon('check', {height: '22px'})}{'Approve'}
           </div>
         </div>
       </div>
