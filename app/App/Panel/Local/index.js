@@ -17,7 +17,8 @@ class Settings extends React.Component {
   appInfo () {
     return (
       <div className='appInfo'>
-        <div className='appInfoLine'>{require('../../../../package.json').version}</div>
+        <div className='appInfoIcon'><div className='appInfoHandle' /></div>
+        <div className='appInfoLine'>{'v' + require('../../../../package.json').version}</div>
       </div>
     )
   }

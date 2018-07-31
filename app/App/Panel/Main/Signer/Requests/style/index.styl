@@ -73,6 +73,15 @@
     transform scale(1.0)
     opacity 0
 
+@keyframes scalein
+  0%
+    transform scale(0.6)
+    opacity 0
+  100%
+    transform scale(1)
+    opacity 1
+
+
 .spinner
   width 100px
   height 100px
@@ -160,16 +169,6 @@
     svg
       fill outerspace
 
-  // .requestObsverver:before
-  //   content ''
-  //   position absolute
-  //   bottom -2px
-  //   right 10px
-  //   left 10px
-  //   height 4px
-  //   border-radius 2px
-  //   background thin
-
   .requestObsverver
     height 460px
     display flex
@@ -177,58 +176,6 @@
     align-items center
     flex-direction column
     position relative
-    // background rgba(255, 255, 255, 0.1)
-    // background rgba(0,24,120,0.02)
-
-    // .requestDepth:before, .requestDepth:after
-    //   content ''
-    //   position absolute
-    //   left 10px
-    //   right 10px
-    //   height 16px
-    //   background rgba(0,24,120,0.03)
-    //   filter blur(6px)
-    //   // border-radius 2px
-    //
-    // .requestDepth:before
-    //   top -11px
-    //
-    // .requestDepth:after
-    //   bottom -11px
-    //
-    // .requestDepth
-    //   position absolute
-    //   top 0px
-    //   right 0px
-    //   bottom 0px
-    //   left 0px
-    //   overflow hidden
-    //
-    // .requestHighlighter:before, .requestHighlighter:after
-    //   content ''
-    //   position absolute
-    //   left 5px
-    //   right 5px
-    //   height 4px
-    //   border-radius 2px
-    //   background rgba(246,248,253,1)
-    //   background #73b3ff
-    //   box-shadow 0px 1px 0px rgba(205,220,235,1)
-    //
-    // .requestHighlighter:before
-    //   top -2px
-    //
-    //
-    // .requestHighlighter:after
-    //   bottom -2px
-    //
-    // .requestHighlighter
-    //   position absolute
-    //   top 0px
-    //   right 0px
-    //   bottom 0px
-    //   left 0px
-    //   // background orange
 
    .requestContainer
      position absolute
@@ -237,7 +184,6 @@
      bottom 0px
      left 0px
      display flex
-     // justify-content center
      align-items center
      flex-direction column
 
@@ -247,7 +193,6 @@
       left 0
       right 0
       bottom 0
-      // padding-top 60px
       font-size 12px
       font-weight 400
       letter-spacing 1px
@@ -279,10 +224,9 @@
     justify-content center
     transition standard
     background light
+    z-index 2000
 
   .signerRequestSuccess
-    // background good
-    //box-shadow 0px 2px 0px good, default
     align-items center
     color good
     svg
@@ -294,10 +238,6 @@
       pointer-events none
 
   .signerRequestPending
-    // background #ffd7a5
-    //box-shadow 0px 2px 0px #ffd7a5, default
-    // .approveTransactionPayload
-    //   color #0d3a56
     align-items center
     svg
       fill outerspace
@@ -306,10 +246,6 @@
       pointer-events none
 
   .signerRequestError
-    // background #ffd7a5
-    //box-shadow 0px 2px 0px #ffd7a5, default
-    // .approveTransactionPayload
-    //   color #0d3a56
     align-items center
     color bad
     svg
@@ -321,10 +257,6 @@
       pointer-events none
 
   .signerRequestDeclined
-    // background bad
-    // box-shadow 0px 2px 0px bad, default
-    // .approveTransactionPayload
-    //   color #491410
     align-items center
     svg
       fill bad
@@ -594,7 +526,6 @@
             display flex
             padding 18px
             user-select all
-            // background green
 
     .transactionDataViewSelected
       position absolute
@@ -608,13 +539,10 @@
       .transactionDataViewLabel
         pointer-events none
         opacity 0
-        // transition-delay 0s
 
       .transactionDataViewData
         pointer-events auto
         opacity 1
-        // transition-delay 0.2s
-
 
     .transactionDataNotice
       position absolute
@@ -738,6 +666,9 @@
     text-transform uppercase
     letter-spacing 2px
     -webkit-app-region no-drag
+    pointer-events auto
+    opacity 1
+    transition standard
     span
       margin-right 8px
 
@@ -751,15 +682,11 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
+      animation scalein 2400ms cubic
+      transform translateZ(0px)
       svg
         transition standard
         fill bad
-
-    // .requestDecline:hover
-    //   span
-    //     background bad
-    //   svg
-    //     fill spacewhite
 
     .requestSign
       position absolute
@@ -772,17 +699,17 @@
       align-items center
       border-top-left-radius 6px
       -webkit-app-region no-drag
+      animation scalein 2400ms cubic
+      transform translateZ(0px)
       span
         transition standard
       svg
         transition standard
         fill good
 
-    // .requestSign:hover
-    //   span
-    //     background good
-    //   svg
-    //     fill spacewhite
+  .requestApproveDisabled
+    pointer-events none
+    opacity 0.2
 
 .signerRequestsHidden
   left -100%

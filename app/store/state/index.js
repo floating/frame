@@ -1,7 +1,8 @@
 import uuid from 'uuid/v4'
 
-// const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
-// const persist = new PersistStore()
+const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
+const persist = new PersistStore()
+let persistLocal = persist.get('local')
 
 let initial = {
   panel: {
@@ -43,15 +44,15 @@ let initial = {
   },
   enableMainnet: false,
   local: {
-    launch: false,
-    success: false,
-    accounts: {},
+    launch: persistLocal ? persistLocal.launch : false,
+    success: persistLocal ? persistLocal.success : false,
+    accounts: persistLocal ? persistLocal.accounts : {},
     connection: {
       network: '4',
       options: ['1', '4'],
       status: 'loading',
       local: {
-        on: true,
+        on: persistLocal ? persistLocal.connection.local.on : true,
         status: 'loading',
         connected: false,
         type: '',
@@ -74,21 +75,21 @@ let initial = {
       secondary: {
         settings: {
           '1': {
-            current: 'infura',
+            current: persistLocal ? persistLocal.connection.secondary.settings['1'].current : 'infura',
             options: {
               infura: 'infura',
-              custom: ''
+              custom: persistLocal ? persistLocal.connection.secondary.settings['1'].options.custom : ''
             }
           },
           '4': {
-            current: 'infura',
+            current: persistLocal ? persistLocal.connection.secondary.settings['4'].current : 'infura',
             options: {
               infura: 'infuraRinkeby',
-              custom: ''
+              custom: persistLocal ? persistLocal.connection.secondary.settings['4'].options.custom : ''
             }
           }
         },
-        on: true,
+        on: persistLocal ? persistLocal.connection.secondary.on : true,
         status: 'loading',
         connected: false,
         type: '',

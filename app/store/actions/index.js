@@ -126,20 +126,11 @@ export const addProviderEvent = (u, payload) => {
 }
 
 export const addRequest = (u, request) => {
+  u('panel.view', view => 'default')
+  u('signer.view', view => 'default')
   u('signer.requests', (requests, state) => {
-    if (!request.handlerId && request.type === 'requestProvider') {
-      let reqs = Object.keys(requests)
-      let reqIndex = reqs.filter(id => requests[id].type === 'requestProvider').map(id => requests[id].origin).indexOf(request.origin)
-      if (reqIndex === -1) {
-        request.handlerId = uuidv5(request.origin, uuidv5.DNS)
-        if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
-      } else {
-        request.handlerId = requests[reqs[reqIndex]].handlerId
-      }
-    } else {
-      if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
-    }
     if (!request.handlerId) throw new Error('No handlerId for added request...', request)
+    if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
     requests[request.handlerId] = request
     return requests
   })
@@ -164,6 +155,10 @@ export const toggleAccess = (u, handlerId) => {
     accounts[a].permissions[handlerId].provider = !accounts[a].permissions[handlerId].provider
     return accounts
   })
+}
+
+export const toggleDataView = (u, id) => {
+  u('signer.requests', id, 'viewData', view => !view)
 }
 
 export const requestPending = (u, id) => {

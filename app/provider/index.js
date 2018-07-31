@@ -1,14 +1,12 @@
 import uuid from 'uuid/v4'
 import EventEmitter from 'events'
-import { ipcRenderer } from 'electron'
 import utils from 'web3-utils'
+import { ipcRenderer } from 'electron'
 import { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } from 'ethereumjs-util'
 
 import rpc from '../rpc'
 import store from '../store'
 import nodes from '../nodes'
-
-const toHex = utils.toHex
 
 class Provider extends EventEmitter {
   constructor () {
@@ -16,6 +14,7 @@ class Provider extends EventEmitter {
     this.store = store
     this.accounts = []
     this.handlers = {}
+    this.nonce = {}
     this.connection = nodes
     this.connection.on('data', data => this.emit('data', data))
     rpc('getAccounts', (err, accounts) => { if (!err) this.accounts = accounts })
@@ -51,7 +50,7 @@ class Provider extends EventEmitter {
     console.warn(error)
     res({id: payload.id, jsonrpc: payload.jsonrpc, error})
   }
-  approveRequest (req, cb) {
+  signAndSend (req, cb) {
     let rawTx = req.data
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
@@ -72,6 +71,15 @@ class Provider extends EventEmitter {
       })
     })
   }
+  approveRequest (req, cb) {
+    if (req.data.nonce) return this.signAndSend(req, cb)
+    this.getNonce(req.data, response => {
+      if (response.error) return cb(response.error)
+      let updatedReq = Object.assign({}, req)
+      updatedReq.data = Object.assign({}, updatedReq.data, {nonce: response.result})
+      this.signAndSend(updatedReq, cb)
+    })
+  }
   getRawTx (payload) {
     let rawTx = payload.params[0]
     rawTx.gas = rawTx.gas || rawTx.gasLimit
@@ -80,10 +88,23 @@ class Provider extends EventEmitter {
   }
   getGasPrice = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, res)
   getGasEstimate = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx]}, res)
-  getNonce = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending']}, res)
+  getNonce = (rawTx, res) => {
+    if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.current) {
+      let newNonce = utils.hexToNumber(this.nonce.current)
+      newNonce++
+      newNonce = utils.numberToHex(newNonce)
+      this.nonce = {age: Date.now(), current: newNonce}
+      res({id: 1, jsonrpc: '2.0', result: this.nonce.current})
+    } else {
+      this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending']}, (response) => {
+        if (response.result) this.nonce = {age: Date.now(), current: response.result}
+        res(response)
+      })
+    }
+  }
   fillTx = (rawTx, cb) => {
     let needs = {}
-    if (!rawTx.nonce) needs.nonce = this.getNonce
+    // if (!rawTx.nonce) needs.nonce = this.getNonce
     if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
     if (!rawTx.gas) needs.gas = this.getGasEstimate
     let count = 0
@@ -108,7 +129,7 @@ class Provider extends EventEmitter {
     let rawTx = this.getRawTx(payload)
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-      rawTx = Object.assign(rawTx, {chainId: toHex(this.netVersion)}) // In the future, check for chainId mismatch instead of clobber
+      if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network'))
       let handlerId = uuid()
       this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, payload})
       this.handlers[handlerId] = res

@@ -1,4 +1,3 @@
-import path from 'path'
 import React from 'react'
 import Restore from 'react-restore'
 import { CSSTransitionGroup } from 'react-transition-group'
@@ -9,12 +8,13 @@ import rpc from '../../../../rpc'
 import Requests from './Requests'
 import Settings from './Settings'
 
+import ledgerLogo from './ledgerLogo.png'
+import trezorLogo from './trezorLogo.png'
+
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = {
-      typeHover: false
-    }
+    this.state = {typeHover: false}
   }
   copyAddress (e) {
     e.preventDefault()
@@ -73,20 +73,6 @@ class Signer extends React.Component {
       </React.Fragment>
     )
   }
-  // typeMouseEnter () {
-  //   this.setState({typeHover: true})
-  // }
-  // typeMouseLeave () {
-  //   this.setState({typeHover: false})
-  // }
-  // typeMouseMove (e) {
-  //   let bounds = e.currentTarget.getBoundingClientRect()
-  //   let {clientX, clientY} = e
-  //   let deg = 20
-  //   let tiltY = deg * ((((clientY - bounds.top) / (bounds.bottom - bounds.top)) * 2) - 1)
-  //   let tiltX = deg * ((((clientX - bounds.left) / (bounds.right - bounds.left)) * 2) - 1)
-  //   this.setState({typeHover: true, tiltX, tiltY})
-  // }
   typeClick () {
     if (this.props.status === 'ok') {
       this.select()
@@ -97,10 +83,8 @@ class Signer extends React.Component {
       setTimeout(() => this.setState({typeShake: false}), 1010)
     }
   }
-  // onMouseMove={::this.typeMouseMove} onMouseEnter={::this.typeMouseEnter} onMouseLeave={::this.typeMouseLeave}
   renderType () {
     let innerClass = 'signerInner'
-    // if (this.state.typeHover) innerClass += ' signerInnerHover'
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
     return (
@@ -110,8 +94,8 @@ class Signer extends React.Component {
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
-                if (this.props.type === 'Nano S') return <img src={path.join(__dirname, './ledgerLogo.png')} />
-                if (this.props.type === 'Trezor') return <img className='trezorImage' src={path.join(__dirname, './trezorLogo.png')} />
+                if (this.props.type === 'Nano S') return <img src={ledgerLogo} />
+                if (this.props.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
                 return svg.octicon('zap', {height: 31})
               })()}
             </div>
@@ -144,9 +128,6 @@ class Signer extends React.Component {
   }
   renderStatus () {
     // TODO: Set Signer Name
-    // let current = this.store('signer.current') === this.props.id
-    // let open = current && this.store('signer.open')
-    // <div className={open && this.store('signer.view') === 'settings' ? 'signerName signerNameSettings' : 'signerName'}>
     return (
       <div className='signerStatusWrap'>
         <CSSTransitionGroup transitionName='standardFade' transitionEnterTimeout={320} transitionLeaveTimeout={320}>
