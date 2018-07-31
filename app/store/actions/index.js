@@ -129,28 +129,11 @@ export const addRequest = (u, request) => {
   u('panel.view', view => 'default')
   u('signer.view', view => 'default')
   u('signer.requests', (requests, state) => {
-    if (!request.handlerId && request.type === 'requestProvider') {
-      let reqs = Object.keys(requests)
-      let reqIndex = reqs.filter(id => requests[id].type === 'requestProvider').map(id => requests[id].origin).indexOf(request.origin)
-      if (reqIndex === -1) {
-        request.handlerId = uuidv5(request.origin, uuidv5.DNS)
-        if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
-      } else {
-        request.handlerId = requests[reqs[reqIndex]].handlerId
-      }
-    } else {
-      if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
-    }
     if (!request.handlerId) throw new Error('No handlerId for added request...', request)
-    requests[request.handlerId] = requests[request.handlerId] || request
+    if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
+    requests[request.handlerId] = request
     return requests
   })
-  setTimeout(() => {
-    u('signer.requests', (requests) => {
-      if (requests[request.handlerId]) requests[request.handlerId].allowInput = true
-      return requests
-    })
-  }, 2000)
 }
 
 export const giveAccess = (u, req, access) => {

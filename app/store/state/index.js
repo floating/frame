@@ -46,7 +46,7 @@ let initial = {
   local: {
     launch: persistLocal ? persistLocal.launch : false,
     success: persistLocal ? persistLocal.success : false,
-    accounts: {},
+    accounts: persistLocal ? persistLocal.accounts : {},
     connection: {
       network: '4',
       options: ['1', '4'],

@@ -73,6 +73,15 @@
     transform scale(1.0)
     opacity 0
 
+@keyframes scalein
+  0%
+    transform scale(0.9)
+    opacity 0.5
+  100%
+    transform scale(1)
+    opacity 1
+
+
 .spinner
   width 100px
   height 100px
@@ -742,6 +751,8 @@
     pointer-events auto
     opacity 1
     transition standard
+    animation scalein 2000ms cubic
+    transform translateZ(0px)
     span
       margin-right 8px
 
@@ -790,8 +801,7 @@
 
   .requestApproveDisabled
     pointer-events none
-    opacity 0
-    bottom -20px
+    opacity 0.2
 
 .signerRequestsHidden
   left -100%
