@@ -129,7 +129,7 @@ class Provider extends EventEmitter {
     let rawTx = this.getRawTx(payload)
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-      if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network')) // Check for mismatch?
+      if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network'))
       let handlerId = uuid()
       this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, payload})
       this.handlers[handlerId] = res
