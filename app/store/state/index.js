@@ -1,8 +1,19 @@
 import uuid from 'uuid/v4'
 
-const PersistStore = require('electron-store') // Stored remotely in future on IPFS or something
+const PersistStore = require('electron-store')
 const persist = new PersistStore()
-let persistLocal = persist.get('local')
+const get = (path, obj = persist.get('local')) => {
+  path.split('.').some((key, i) => {
+    if (typeof obj !== 'object') { obj = undefined } else { obj = obj[key] }
+    return obj === undefined // Stop navigating the path if we get to undefined value
+  })
+  return obj
+}
+const local = (path, def) => {
+  let found = get(path)
+  if (found === undefined) return def
+  return found
+}
 
 let initial = {
   panel: {
@@ -44,15 +55,15 @@ let initial = {
   },
   enableMainnet: false,
   local: {
-    launch: persistLocal ? persistLocal.launch : false,
-    success: persistLocal ? persistLocal.success : false,
-    accounts: persistLocal ? persistLocal.accounts : {},
+    launch: local('launch', false),
+    success: local('success', false),
+    accounts: local('accounts', {}),
     connection: {
       network: '4',
       options: ['1', '4'],
       status: 'loading',
       local: {
-        on: persistLocal ? persistLocal.connection.local.on : true,
+        on: local('connection.local.on', true),
         status: 'loading',
         connected: false,
         type: '',
@@ -75,21 +86,21 @@ let initial = {
       secondary: {
         settings: {
           '1': {
-            current: persistLocal ? persistLocal.connection.secondary.settings['1'].current : 'infura',
+            current: local('local.connection.secondary.settings.1.current', 'infura'),
             options: {
               infura: 'infura',
-              custom: persistLocal ? persistLocal.connection.secondary.settings['1'].options.custom : ''
+              custom: local('connection.secondary.settings.1.options.custom', '')
             }
           },
           '4': {
-            current: persistLocal ? persistLocal.connection.secondary.settings['4'].current : 'infura',
+            current: local('connection.secondary.settings.4.current', 'infura'),
             options: {
               infura: 'infuraRinkeby',
-              custom: persistLocal ? persistLocal.connection.secondary.settings['4'].options.custom : ''
+              custom: local('connection.secondary.settings.4.options.custom', '')
             }
           }
         },
-        on: persistLocal ? persistLocal.connection.secondary.on : true,
+        on: local('connection.secondary.on', true),
         status: 'loading',
         connected: false,
         type: '',
