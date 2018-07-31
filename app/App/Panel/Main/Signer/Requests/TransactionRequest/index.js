@@ -9,7 +9,7 @@ class TransactionRequest extends React.Component {
     this.state = {allowInput: false, dataView: false}
     setTimeout(() => {
       this.setState({allowInput: true})
-    }, 2200)
+    }, 2000)
   }
   approve (reqId, req) {
     this.store.events.emit('approveRequest', reqId, req)

@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4'
 import EventEmitter from 'events'
+import utils from 'web3-utils'
 import { ipcRenderer } from 'electron'
 import { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } from 'ethereumjs-util'
 
@@ -89,7 +90,11 @@ class Provider extends EventEmitter {
   getGasEstimate = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx]}, res)
   getNonce = (rawTx, res) => {
     if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.current) {
-      res({id: 1, jsonrpc: '2.0', result: ++this.nonce.current})
+      let newNonce = utils.hexToNumber(this.nonce.current)
+      newNonce++
+      newNonce = utils.numberToHex(newNonce)
+      this.nonce = {age: Date.now(), current: newNonce}
+      res({id: 1, jsonrpc: '2.0', result: this.nonce.current})
     } else {
       this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending']}, (response) => {
         if (response.result) this.nonce = {age: Date.now(), current: response.result}
@@ -124,7 +129,7 @@ class Provider extends EventEmitter {
     let rawTx = this.getRawTx(payload)
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-      if (!rawTx.chainId) rawTx.chainId = parseInt(store('local.connection.network')) // Check for mismatch?
+      if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network')) // Check for mismatch?
       let handlerId = uuid()
       this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, payload})
       this.handlers[handlerId] = res
