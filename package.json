@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.0.5-alpha.3",
+  "version": "0.0.5-alpha.5",
   "description": "An Ethereum interface",
   "main": "main",
   "build": {
