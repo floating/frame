@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.0.5-alpha.3",
+  "version": "0.0.5-alpha.5",
   "description": "An Ethereum interface",
   "main": "main",
   "build": {
@@ -10,7 +10,6 @@
       "title": "Frame"
     },
     "linux": {
-      "icon": "./asset/png/FrameAppIcon.png",
       "target": [
         "AppImage",
         "deb",
@@ -18,9 +17,7 @@
         "tar.gz"
       ]
     },
-    "win": {
-      "icon": "./asset/ico/FrameAppIcon.ico"
-    },
+    "win": {},
     "files": [
       "main",
       "bundle",
