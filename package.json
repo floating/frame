@@ -26,8 +26,8 @@
   },
   "scripts": {
     "start": "npm run launch",
-    "bundle": "parcel build app/tray.html --public-url '.' --out-dir bundle --target electron",
-    "watch": "parcel app/tray.html --public-url '.' --out-dir bundle --target electron & cross-env NODE_ENV=development electron ./main",
+    "bundle": "parcel build app/tray.html --public-url . --out-dir bundle --target electron",
+    "watch": "parcel app/tray.html --public-url . --out-dir bundle --target electron & cross-env NODE_ENV=development electron ./main",
     "dev": "npm run bundle && cross-env NODE_ENV=development electron ./main",
     "launch": "cross-env NODE_ENV=production electron ./main",
     "alpha": "npm run bundle && npm run launch",

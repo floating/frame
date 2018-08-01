@@ -4,5 +4,6 @@ node_modules
 bundle
 .cache
 hot.json
+nohot.json
 dist
 release
