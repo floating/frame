@@ -10,7 +10,6 @@
       "title": "Frame"
     },
     "linux": {
-      "icon": "./asset/png/FrameAppIcon.png",
       "target": [
         "AppImage",
         "deb",
@@ -18,9 +17,7 @@
         "tar.gz"
       ]
     },
-    "win": {
-      "icon": "./asset/ico/FrameAppIcon.ico"
-    },
+    "win": {},
     "files": [
       "main",
       "bundle",
