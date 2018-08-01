@@ -1,5 +1,7 @@
+const utils = require('web3-utils')
 const EthereumTx = require('ethereumjs-tx')
 const Signer = require('../../Signer')
+const store = require('../../../store')
 
 class Ledger extends Signer {
   constructor (id, device) {
@@ -8,13 +10,21 @@ class Ledger extends Signer {
     this.device = device
     this.type = 'Nano S'
     this.status = 'loading'
-    this.path = `m/44'/60'/0'/0`
+    this.accounts = []
+    this.network = ''
+    this.getPath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
     this.handlers = {}
-    this.deviceStatus()
     this.open()
+    store.observer(() => {
+      this.network = store('network')
+      this.status = 'loading'
+      this.accounts = []
+      this.update()
+      if (this.network) this.deviceStatus()
+    })
   }
   deviceStatus () {
-    this.device.getAddress(this.path).then(result => {
+    this.device.getAddress(this.getPath()).then(result => {
       this.accounts = [result.address]
       this.status = 'ok'
       this.update()
@@ -34,19 +44,20 @@ class Ledger extends Signer {
   }
   // Standard Methods
   signPersonal (message, cb) {
-    this.device.signPersonalMessage(this.path, message.replace('0x', '')).then(result => {
+    this.device.signPersonalMessage(this.getPath(), message.replace('0x', '')).then(result => {
       let v = (result['v'] - 27).toString(16)
       if (v.length < 2) v = '0' + v
       cb(null, result['r'] + result['s'] + v)
     }).catch(err => cb(err.message))
   }
   signTransaction (rawTx, cb) {
+    if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
     const tx = new EthereumTx(rawTx)
     tx.raw[6] = Buffer.from([rawTx.chainId]) // v
     tx.raw[7] = Buffer.from([]) // r
     tx.raw[8] = Buffer.from([]) // s
     const rawTxHex = tx.serialize().toString('hex')
-    this.device.signTransaction(this.path, rawTxHex).then(result => {
+    this.device.signTransaction(this.getPath(), rawTxHex).then(result => {
       let tx = new EthereumTx({
         nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
         gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),

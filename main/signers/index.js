@@ -23,7 +23,6 @@ module.exports = {
     let signerSummary = {}
     Object.keys(signers).forEach(id => { signerSummary[id] = signers[id].summary() })
     cb(null, signerSummary)
-    // cb(null, Object.keys(signers).sort().map(path => signers[path].summary()))
   },
   setSigner: (id, cb) => {
     current = id
@@ -34,7 +33,7 @@ module.exports = {
   unsetSigner: (cb) => {
     current = null
     let summary = {id: '', type: '', accounts: [], status: ''}
-    cb(null, summary)
+    if (cb) cb(null, summary)
     windows.broadcast('main:setSigner', summary)
   },
   getAccounts: (cb) => {

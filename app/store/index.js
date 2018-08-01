@@ -73,6 +73,14 @@ store.observer(() => {
   }
 })
 
+let network = ''
+store.observer(() => {
+  if (network !== store('local.connection.network')) {
+    network = store('local.connection.network')
+    ipcRenderer.send('tray:setNetwork', network)
+  }
+})
+
 store.observer(_ => persist.set('local', store('local')))
 
 let launch = store('local.launch')
