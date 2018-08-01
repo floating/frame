@@ -5,7 +5,8 @@ const actions = require('./actions')
 
 const state = {
   user: {signer: {connected: false}},
-  permissions: persist.get('permissions') || {}
+  permissions: persist.get('permissions') || {},
+  network: ''
 }
 
 const store = Restore.create(state, actions)

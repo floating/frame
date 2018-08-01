@@ -23,5 +23,7 @@ ipcMain.on('main:rpc', (event, id, method, ...args) => {
   id = unwrap(id)
   method = unwrap(method)
   args = args.map(arg => unwrap(arg))
-  rpc[method](...args, (...args) => event.sender.send('main:rpc', id, ...args.map(arg => wrap(arg))))
+  rpc[method](...args, (...args) => {
+    event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+  })
 })

@@ -11,5 +11,8 @@ module.exports = {
       if (index > -1) permissions.splice(index, 1)
       return permissions
     })
+  },
+  setNetwork: (u, newNetwork) => {
+    u('network', () => newNetwork)
   }
 }

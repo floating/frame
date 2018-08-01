@@ -30,10 +30,8 @@ class TransactionRequest extends React.Component {
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     let value = this.props.req.data.value || '0x'
     let fee = utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16))
-    value = utils.fromWei(value, 'ether')
-    fee = utils.fromWei(fee, 'ether')
-    value = ((Math.round(value * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
-    fee = ((Math.round(fee * 100000000) / 100000000).toString() + '00000000').substring(0, 8)
+    value = parseFloat(utils.fromWei(value, 'ether')).toFixed(6)
+    fee = parseFloat(utils.fromWei(fee, 'ether')).toFixed(6)
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{top: (this.props.top * 10) + 'px'}}>
         {this.props.req.type === 'approveTransaction' ? (

@@ -37,7 +37,6 @@ class Settings extends React.Component {
   }
   inputCustom (e) {
     e.preventDefault()
-    this.store.setSecondaryCustom('')
     clearTimeout(this.customInputTimeout)
     if (e.target.value.toLowerCase() === 'i understand the risks, unlock mainnet') {
       this.setState({secondaryCustom: this.customMessage})
