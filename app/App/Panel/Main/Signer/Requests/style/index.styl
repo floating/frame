@@ -42,7 +42,7 @@
 
 .loader,
 .loader:after {
-  border-radius: 50%;
+  border-radius: 100%;
   width: 7em;
   height: 7em;
 }
@@ -53,7 +53,7 @@
   border-top 6px solid outerspace01
   border-right 6px solid outerspace01
   border-bottom 6px solid outerspace01
-  border-left 6px solid outerspace
+  border-left 6px solid outerspace08
   transform translateZ(0)
   animation load8 1.1s infinite linear !important
 }
@@ -81,12 +81,11 @@
     transform scale(1)
     opacity 1
 
-
 .spinner
   width 100px
   height 100px
   margin 100px auto
-  background-color outerspace
+  background-color outerspace08
   border-radius 100%
   animation sk-scaleout 600ms infinite cubic
 
@@ -94,7 +93,7 @@
   width 100px
   height 100px
   margin 100px auto
-  background-color outerspace
+  background-color outerspace08
   border-radius 100%
   animation sk-scaleout 600ms infinite cubic
 
@@ -143,7 +142,7 @@
     display flex
     align-items flex-end
     justify-content:space-between;
-    height 60px
+    height 40px
     font-size 20px
     padding 0px 10px 10px 10px
 
@@ -167,10 +166,10 @@
     padding-right 10px
 
     svg
-      fill outerspace
+      fill outerspace08
 
   .requestObsverver
-    height 460px
+    height 370px
     display flex
     justify-content center
     align-items center
@@ -216,10 +215,11 @@
     border-radius 2px
     justify-content space-between
     width calc(100% - 20px)
-    box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin // , default
+    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick // , default
     border-radius 6px
-    margin 10px 10px
-    height 460px
+    margin 0px 10px
+    height 370px
+    // overflow hidden
     display flex
     justify-content center
     transition standard
@@ -240,7 +240,7 @@
   .signerRequestPending
     align-items center
     svg
-      fill outerspace
+      fill outerspace08
     .requestApprove
       opacity 0
       pointer-events none
@@ -267,17 +267,11 @@
       pointer-events none
 
   .requestNotice
-    height 120px
-    display flex
-    justify-content center
-    align-items center
-    position relative
-
     .requestNoticeInner
       position absolute
-      top 0
+      top 50px
       right 0
-      bottom 0
+      bottom 50px
       left 0
       display flex
       justify-content center
@@ -293,7 +287,7 @@
 
   .requestProvider
     position absolute
-    top 120px
+    top 60px
     right 0
     bottom 60px
     left 0
@@ -322,281 +316,252 @@
 
     .approveTransactionIcon
       width 100%
-      padding-top 20px
-      padding-bottom 20px
+      padding-top 10px
+      padding-bottom 10px
       display flex
       justify-content center
-      // background red
+      display none
 
       svg
-        fill outerspace
+        fill outerspace08
 
-    .approveRequestTitle
-      padding 0px 30px 1px 33px
-      height 30px
-      margin-bottom 25px
-      display flex
-      justify-content center
-      align-items center
-      border-radius 6px
-      text-transform uppercase
-      letter-spacing 3px
-      font-weight 400
-      font-size 14px
-      background thick
-      color outerspace
-
-    .providerRequestTitle
-      background pending
-      color spacewhite
-      text-shadow 0px 2px 4px rgba(0, 100, 50, 0.3), 0px 1px 0px rgba(0, 100, 50, 0.4)
-
-    .approveTransactionTitle
-      background good
-      color spacewhite
-      text-shadow 0px 2px 4px rgba(0, 100, 50, 0.3), 0px 1px 0px rgba(0, 100, 50, 0.4)
-
-    .approveTransactionPayload
-      width 100%
-      display flex
-      align-items center
-      flex-direction column
-
-      div
-        white-space nowrap
-
-  .transactionTotal
-    width 100%
-    display flex
-    justify-content center
-    align-items center
-    flex-direction column
-    // background blue
-
-    .transactionSub
-      display flex
-      flex-direction column
-      font-size 20px
-      letter-spacing 2px
-
-      .transactionSubSubtitle
-        // margin-top -5px
-        font-weight 300
-        text-transform uppercase
-        letter-spacing 2px
-
-      .transactionSubValue
-        display flex
-        justify-content center
-        align-items center
-        flex-direction column
-        font-size 28px
-        letter-spacing 2px
-        padding-bottom 15px
-        font-weight 300
-
-        .transactionSubSubtitle
-          font-size 12px
-          letter-spacing 1px
-
-        .transactionSubTotalUSD
-          margin-left 10px
-          padding 3px 10px
-          font-size 20px
-          font-weight 300
-          background thin
-          border-radius 4px
-
-      .transactionSubFee
-        display flex
-        justify-content center
-        align-items center
-        flex-direction column
-        padding-bottom 25px
-        font-weight 300
-        letter-spacing 1px
-
-        .transactionSubSubtitle
-          font-size 12px
-
-        .transactionSubTotalUSD
-          margin-left 10px
-          padding 2px 8px
-          font-size 15px
-          font-weight 300
-          background thin
-          border-radius 4px
-
-      .transactionSubTotals
-        display flex
-        justify-content center
-        align-items center
-
-  .transactionData
-    position relative
-    padding 0px 20px 0px 20px
-    height 60px
-    width calc(100% - 40px)
-    display flex
-    justify-content center
-    align-items center
-    background thin
-    font-size 12px
-    font-weight 400
-    letter-spacing 1px
-    text-transform uppercase
-
-    .transactionDataView
+    .approveRequestHeader
       position absolute
-      top 15px
-      bottom 15px
-      left 80px
-      right 80px
-      background light
-      color pending
-      border-radius 3px
-      box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin
-      z-index 20
-      display flex
-      justify-content center
-      align-items center
-      transition standard
-      overflow hidden
-
-      .transactionDataViewLabel
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
-        display flex
-        justify-content center
-        align-items center
-        opacity 1
-        pointer-events auto
-        transition standard
-
-      .transactionDataViewData
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
-        display flex
-        justify-content center
-        align-items center
-        pointer-events none
-        opacity 0
-        transition standard
-
-        .transactionDataViewDataInner
-          position relative
-          height 345px
-          width 330px
-          min-height 350px
-          min-width 330px
-
-          .transactionDataViewDataHeader
-            position absolute
-            top 0
-            left 0
-            right 0
-            height 40px
-            display flex
-            padding 2px 0px 0px 18px
-            justify-content space-between
-            align-items center
-            background pending
-            color spacewhite
-            fill spacewhite
-
-            .transactionDataViewDataClose
-              width 50px
-              height 40px
-              display flex
-              justify-content center
-              align-items center
-
-          .transactionDataViewDataBody
-            position absolute
-            top 41px
-            left 0
-            right 0
-            bottom 0
-            display flex
-            padding 18px
-            user-select all
-
-    .transactionDataViewSelected
-      position absolute
-      top -145px
-      bottom -145px
-      left 0px
-      right 0px
-      border-radius 6px
-      box-shadow 0px -2px 0px thin, 0px -8px 8px -2px thin, 0px 0px 10px -2px thin, default, 0px -13px 9px -6px rgba(94, 110, 255,0.1)
-
-      .transactionDataViewLabel
-        pointer-events none
-        opacity 0
-
-      .transactionDataViewData
-        pointer-events auto
-        opacity 1
-
-    .transactionDataNotice
-      position absolute
-      overflow hidden
       top 0
       left 0
       right 0
-      bottom 0
-      background pending
-      // .transactionDataNoticeBackground
-      //   position absolute
-      //   background pending
-      //   width 260px
-      //   height 260px
-      //   transform rotate(45deg)
-      //   z-index 8
-      //   top -99px
-      //   left -192px
+      height 60px
+      display flex
+      justify-content center
+      align-items center
+      text-transform uppercase
+      letter-spacing 2px
+      font-weight 400
+      font-size 14px
+      background highlight
+      fill outerspace08
+      // border-bottom 1px solid thick
+      border-top-left-radius 6px
+      border-top-right-radius 6px
+      box-shadow 0px 1px 0px thick
 
-      .transactionDataNoticeIcon
-        position absolute
-        top 0
-        left 0
+      .approveRequestHeaderIcon
+        width 40px
+        height 60px
         display flex
         justify-content center
         align-items center
         z-index 10
-        width 80px
-        height 60px
-        font-size 14px
-        font-family FiraCode, sans-serif
-        color spacewhite
-        fill spacewhite
+        transition standard
+        position absolute
+        background highlightlight
+        // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick
+        border-radius 3px
+        left 5px
+        fill outerspace08
 
+      .approveRequestHeaderClose
+        width 60px
+        display flex
+        justify-content center
+        align-items center
+        z-index 10
+        transition standard
+        opacity 0
+
+    .approveTransactionPayload
+      position absolute
+      display flex
+      align-items center
+      flex-direction column
+      top 0
+      left 0
+      right 0
+      bottom 0
+
+      div
+        white-space nowrap
+
+  .transactionValue
+    position absolute
+    top 57px
+    left 0
+    right 0
+    height 55px
+    display flex
+    justify-content space-around
+    align-items center
+    flex-direction column
+    font-size 20px
+    letter-spacing 2px
+    padding 15px 10px 15px 10px
+    font-weight 300
+
+  .transactionSubtitle
+    text-transform uppercase
+    font-size 14px
+    letter-spacing 1px
+    font-weight 400
+    padding-top 2px
+
+  .transactionTotals
+    display flex
+    justify-content center
+    align-items center
+    font-size 28px
+    letter-spacing 2px
+
+  .transactionTotalUSD
+    margin-left 10px
+    padding 3px 10px
+    font-size 20px
+    border-radius 4px
+    background highlight
+    font-weight 300
+
+  .transactionFee
+    position absolute
+    top 120px
+    left 0
+    right 0
+    height 45px
+    display flex
+    justify-content space-around
+    align-items center
+    flex-direction column
+    letter-spacing 1px
+    padding 15px 10px 10px 10px
+    font-weight 300
+
+    .transactionTotals
+      font-size 20px
+
+    .transactionTotalUSD
+      font-size 15px
+      padding 2px 8px
+      font-weight 300
+
+    .transactionSubtitle
+      font-size 11px
+
+  .transactionData
+    position absolute
+    bottom 130px
+    left 5px
+    right 5px
+    top 190px
+    z-index 2000
+    display flex
+    justify-content center
+    align-items center
+    background highlight
+    fill outerspace08
+    font-size 14px
+    font-weight 400
+    letter-spacing 1px
+    text-transform uppercase
+    transition standard
+    overflow hidden
+    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+    border-radius 3px
+
+    .transactionDataHeader
+      position absolute
+      top 0
+      left 0
+      right 0
+      height 50px
+      border-bottom 1px solid thick
+      justify-content space-between
+      display flex
+      align-items center
+      text-transform uppercase
+      letter-spacing 1px
+      font-weight 400
+      z-index 10
+
+      .transactionDataLabel
+        display flex
+        justify-content center
+        align-items center
+        z-index 10
+        transition standard
+
+      .transactionDataNotice
+        width 40px
+        display flex
+        justify-content center
+        align-items center
+        z-index 10
+        transition standard
+        fill outerspace08
+
+      .transactionDataIndicator
+        width 40px
+        display flex
+        justify-content center
+        align-items center
+        z-index 10
+        transform rotate(-180deg)
+        transition standardSlow
+
+  .transactionDataBody
+    position absolute
+    color outerspace08
+    top 50px
+    left 0
+    right 0
+    bottom 0
+    display flex
+    padding 18px
+    user-select all
+    overflow hidden
+    z-index 9
+
+    .transactionDataBodyInner
+      opacity 0
+      top -100px
+      position relative
+      width 100%
+      height 100%
+      transition standardSlow
+
+  .transactionDataSelected
+    position absolute
+    bottom 5px
+    left 5px
+    right 5px
+    top 65px
+
+    .transactionDataHeader
+      .transactionDataIndicator
+        transform rotate(0deg)
+
+    .transactionDataBody
+      .transactionDataBodyInner
+        opacity 1
+        top 0px
 
   .transactionNoData
     background thin
-    color outerspace05
 
   .transactionTo
-    height 80px
+    height 70px
     width 100%
-    background outerspace
-    color spacewhite
     display flex
     justify-content center
     align-items center
     flex-direction column
+    position absolute
+    bottom 60px
+    right 0
+    left 0
 
     .transactionToAddress
       font-size 12px
       font-family firaCode
       position relative
-      height 30px
+      height 25px
       width 100%
       -webkit-app-region no-drag
 
@@ -613,7 +578,7 @@
         opacity 1
         transition standardSlow
         svg
-          fill spacewhite
+          fill outerspace08
           padding-top 5px
           padding-left 5px
           padding-right 5px
@@ -644,7 +609,6 @@
       font-size 12px
       margin-top 4px
 
-
   .unknownType
     display flex
     justify-content center
@@ -659,53 +623,79 @@
     right 0
     bottom 0
     height 60px
-    border-bottom-left-radius 3px
-    border-bottom-right-radius 3px
-    font-weight 400
-    font-size 12px
+    border-bottom-left-radius 6px
+    border-bottom-right-radius 6px
+    font-size 14px
     text-transform uppercase
-    letter-spacing 2px
     -webkit-app-region no-drag
     pointer-events auto
     opacity 1
     transition standard
-    span
-      margin-right 8px
+    display flex
+    justify-content space-around
+    align-items center
+    font-weight 400
+    border-top 1px solid thick
+    background highlight
 
     .requestDecline
-      position absolute
-      left 0
-      top 0
-      bottom 0
+      position relative
       width 50%
+      height calc(100% - 10px)
       display flex
       justify-content center
       align-items center
       -webkit-app-region no-drag
       animation scalein 2400ms cubic
       transform translateZ(0px)
-      svg
-        transition standard
-        fill bad
+      transition standard
+      letter-spacing 2px
+      padding-left 2px
+      overflow hidden
+      border-right 1px solid thick
+      position relative
+      padding-bottom 10px
+
+    .requestDecline:before
+      content ''
+      position absolute
+      margin-left -1px
+      height 4px
+      border-radius 2px
+      width 30px
+      background bad06
+      bottom 13px
+
+    .requestDecline:hover:before
+      background bad
 
     .requestSign
-      position absolute
-      right 0
-      top 0
-      bottom 0
       width 50%
+      height calc(100% - 10px)
       display flex
       justify-content center
       align-items center
-      border-top-left-radius 6px
       -webkit-app-region no-drag
       animation scalein 2400ms cubic
       transform translateZ(0px)
-      span
-        transition standard
-      svg
-        transition standard
-        fill good
+      transition standard
+      letter-spacing 2px
+      padding-left 2px
+      position relative
+      padding-bottom 10px
+
+    .requestSign:before
+      content ''
+      position absolute
+      margin-left -1px
+      height 4px
+      border-radius 2px
+      width 30px
+      background good06
+      bottom 13px
+
+    .requestSign:hover:before
+      background good
 
   .requestApproveDisabled
     pointer-events none

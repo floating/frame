@@ -37,11 +37,9 @@ class ProviderRequest extends React.Component {
             </div>
           ) : (
             <div className='approveTransactionPayload'>
-              <div className='approveTransactionIcon'>
-                {svg.octicon('link', {height: '20px'})}
-              </div>
-              <div className='approveRequestTitle providerRequestTitle'>
-                {'Provider Request'}
+              <div className='approveRequestHeader approveTransactionHeader'>
+                <div className='approveRequestHeaderIcon'> {svg.octicon('shield', {height: '20px'})}</div>
+                <div className='approveRequestHeaderLabel'> {'Connection'}</div>
               </div>
               <div className='requestProvider bounceIn'>
                 <div className='requestProviderOrigin'>{this.props.req.origin}</div>
@@ -52,10 +50,10 @@ class ProviderRequest extends React.Component {
         </div>
         <div className='requestApprove'>
           <div className='requestDecline' onClick={() => this.store.giveAccess(this.props.req, false)}>
-            {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
+            {'Decline'}
           </div>
           <div className='requestSign' onClick={() => this.store.giveAccess(this.props.req, true)}>
-            {svg.octicon('check', {height: '22px'})}{'Approve'}
+            {'Approve'}
           </div>
         </div>
       </div>
