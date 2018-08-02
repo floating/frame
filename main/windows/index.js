@@ -63,7 +63,7 @@ const api = {
     windows.tray.setPosition(pos.x, pos.y)
     let screen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
     windows.tray.setPosition(pos.x, pos.y)
-    windows.tray.setSize(370, screen.workArea.height)
+    windows.tray.setSize(370, dev ? 740 : screen.workArea.height)
     windows.tray.show()
     setTimeout(() => windows.tray.focus(), 700)
     windows.tray.send('main:trayOpen', true)

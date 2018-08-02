@@ -20,18 +20,20 @@ class TransactionRequest extends React.Component {
   toggleDataView (id) {
     this.setState({dataView: !this.state.dataView})
   }
+  hexToDisplayValue (hex) {
+    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
+  }
   render () {
+    let status = this.props.req.status
     let requestClass = 'signerRequest'
-    if (this.props.req.status === 'success') requestClass += ' signerRequestSuccess'
-    if (this.props.req.status === 'declined') requestClass += ' signerRequestDeclined'
-    if (this.props.req.status === 'pending') requestClass += ' signerRequestPending'
-    if (this.props.req.status === 'error') requestClass += ' signerRequestError'
+    if (status === 'success') requestClass += ' signerRequestSuccess'
+    if (status === 'declined') requestClass += ' signerRequestDeclined'
+    if (status === 'pending') requestClass += ' signerRequestPending'
+    if (status === 'error') requestClass += ' signerRequestError'
     let etherRates = this.store('external.rates')
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-    let value = this.props.req.data.value || '0x'
-    let fee = utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16))
-    value = parseFloat(utils.fromWei(value, 'ether')).toFixed(6)
-    fee = parseFloat(utils.fromWei(fee, 'ether')).toFixed(6)
+    let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
+    let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{top: (this.props.top * 10) + 'px'}}>
         {this.props.req.type === 'approveTransaction' ? (
@@ -40,23 +42,23 @@ class TransactionRequest extends React.Component {
               {this.props.req.notice ? (
                 <div className='requestNotice'>
                   {(_ => {
-                    if (this.props.req.status === 'pending') {
+                    if (status === 'pending') {
                       return (
-                        <div key={this.props.req.status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner bounceIn'>
                           <div style={{paddingBottom: '20px'}}><div className='loader' /></div>
                           <div className='requestNoticeInnerText'>{'See Signer'}</div>
                         </div>
                       )
-                    } else if (this.props.req.status === 'success') {
+                    } else if (status === 'success') {
                       return (
-                        <div key={this.props.req.status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner bounceIn'>
                           <div>{svg.octicon('check', {height: '80px'})}</div>
                           <div className='requestNoticeInnerText'>{this.props.req.notice}</div>
                         </div>
                       )
-                    } else if (this.props.req.status === 'error' || this.props.req.status === 'declined') {
+                    } else if (status === 'error' || status === 'declined') {
                       return (
-                        <div key={this.props.req.status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner bounceIn'>
                           <div>{svg.octicon('circle-slash', {height: '80px'})}</div>
                           <div className='requestNoticeInnerText'>{this.props.req.notice}</div>
                         </div>
@@ -68,47 +70,35 @@ class TransactionRequest extends React.Component {
                 </div>
               ) : (
                 <React.Fragment>
-                  <div className='approveTransactionIcon'>
-                    {svg.octicon('radio-tower', {height: '20px'})}
+                  <div className='approveRequestHeader approveTransactionHeader'>
+                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', {height: '22px'})}</div>
+                    <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
                   </div>
-                  <div className='approveRequestTitle approveTransactionTitle'>{'Transaction'}</div>
-                  <div className='transactionTotal'>
-                    <div className='transactionSub'>
-                      <div className='transactionSubValue'>
-                        <div className='transactionSubTotals'>
-                          <div className='transactionSubTotalETH'>{'Ξ ' + value}</div>
-                          <div className='transactionSubTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
-                        </div>
-                        <div className='transactionSubSubtitle'>{'Value'}</div>
-                      </div>
-                      <div className='transactionSubFee'>
-                        <div className='transactionSubTotals'>
-                          <div className='transactionSubTotalETH'>{'Ξ ' + fee}</div>
-                          <div className='transactionSubTotalUSD'>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
-                        </div>
-                        <div className='transactionSubSubtitle'>{'Max Fee'}</div>
-                      </div>
+                  <div className='transactionValue'>
+                    <div className='transactionTotals'>
+                      <div className='transactionTotalETH'>{'Ξ ' + value}</div>
+                      <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
                     </div>
+                    <div className='transactionSubtitle'>{'Value'}</div>
+                  </div>
+                  <div className='transactionFee'>
+                    <div className='transactionTotals'>
+                      <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
+                      <div className='transactionTotalUSD'>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
+                    </div>
+                    <div className='transactionSubtitle'>{'Max Fee'}</div>
                   </div>
                   {utils.toAscii(this.props.req.data.data || '0x') ? (
-                    <div className='transactionData'>
-                      <div className={this.state.dataView ? 'transactionDataView transactionDataViewSelected' : 'transactionDataView'}>
-                        <div className='transactionDataViewLabel' onClick={() => this.toggleDataView()}>{'View Data'}</div>
-                        <div className='transactionDataViewData'>
-                          <div className='transactionDataViewDataInner'>
-                            <div className='transactionDataViewDataHeader'>
-                              {'Transaction Data'}
-                              <div className='transactionDataViewDataClose' onClick={() => this.toggleDataView()}>{svg.octicon('chevron-down', {height: '20px'})}</div>
-                            </div>
-                            <div className='transactionDataViewDataBody'>
-                              {utils.toAscii(this.props.req.data.data)}
-                            </div>
-                          </div>
-                        </div>
+                    <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
+                      <div className='transactionDataHeader' onClick={() => this.toggleDataView()}>
+                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', {height: '22px'})}</div>
+                        <div className='transactionDataLabel'>{'View Data'}</div>
+                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', {height: '22px'})}</div>
                       </div>
-                      <div className='transactionDataNotice'>
-                        <div className='transactionDataNoticeIcon'>{svg.octicon('issue-opened', {height: '20px'})}</div>
-                        <div className='transactionDataNoticeBackground' />
+                      <div className='transactionDataBody'>
+                        <div className='transactionDataBodyInner'>
+                          {utils.toAscii(this.props.req.data.data)}
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -136,10 +126,13 @@ class TransactionRequest extends React.Component {
         )}
         <div className='requestApprove'>
           <div className='requestDecline' onClick={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
-            {svg.octicon('circle-slash', {height: '20px'})}{'Decline'}
+            <div className='requestDeclineButton'>
+              <div className='requestDeclineBadge' />
+              {'Decline'}
+            </div>
           </div>
           <div className='requestSign' onClick={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
-            {svg.octicon('check', {height: '22px'})}{'Sign'}
+            <div className='requestSignButton'> {'Sign'} </div>
           </div>
         </div>
       </div>
