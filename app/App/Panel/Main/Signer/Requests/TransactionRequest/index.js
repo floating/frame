@@ -36,6 +36,7 @@ class TransactionRequest extends React.Component {
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{top: (this.props.top * 10) + 'px'}}>
+        <div className='requestOverlay'><div className='requestOverlayInset' /></div>
         {this.props.req.type === 'approveTransaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
