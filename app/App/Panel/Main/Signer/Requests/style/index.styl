@@ -357,6 +357,7 @@
       align-items center
       margin-top 10px
       transform translateZ(0px)
+      letter-spacing 1px
 
   .approveTransaction
     width 100%
@@ -400,7 +401,6 @@
         z-index 10
         transition standard
         position absolute
-        background highlightlight
         border-radius 3px
         left 5px
         fill outerspace08
@@ -438,23 +438,21 @@
     align-items center
     flex-direction column
     font-size 20px
-    letter-spacing 2px
     padding 15px 10px 15px 10px
     font-weight 300
 
   .transactionSubtitle
     text-transform uppercase
-    font-size 14px
-    letter-spacing 1px
+    font-size 13px
     font-weight 400
     padding-top 2px
+    letter-spacing 1px
 
   .transactionTotals
     display flex
     justify-content center
     align-items center
     font-size 28px
-    letter-spacing 2px
 
   .transactionTotalUSD
     margin-left 10px
@@ -474,7 +472,6 @@
     justify-content space-around
     align-items center
     flex-direction column
-    letter-spacing 1px
     padding 15px 10px 10px 10px
     font-weight 300
 
@@ -485,9 +482,6 @@
       font-size 15px
       padding 2px 8px
       font-weight 300
-
-    .transactionSubtitle
-      font-size 11px
 
   .transactionData
     position absolute
@@ -588,7 +582,7 @@
         top 0px
 
   .transactionNoData
-    box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin
+    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
 
   .transactionTo
     height 70px
@@ -622,6 +616,7 @@
         font-size 20px
         opacity 1
         transition standardSlow
+
         svg
           fill outerspace08
           padding-top 5px
@@ -640,6 +635,7 @@
         font-size 12px
         opacity 0
         transition standardSlow
+        font-weight bold
 
     .transactionToAddress:hover
         .transactionToAddressLarge
@@ -648,11 +644,11 @@
           opacity  1
 
     .transactionToSub
-      font-weight 300
+      font-weight 400
       text-transform uppercase
-      letter-spacing 2px
-      font-size 12px
+      font-size 13px
       margin-top 4px
+      letter-spacing 1px
 
   .unknownType
     display flex
@@ -706,7 +702,7 @@
       transition standard
       letter-spacing 2px
       padding-left 2px
-      padding-bottom 6px
+      padding-bottom 10px
 
     .requestDeclineButton:before
       content ''
@@ -742,7 +738,7 @@
       transition standard
       letter-spacing 2px
       padding-left 2px
-      padding-bottom 6px
+      padding-bottom 10px
 
     .requestSignButton:before
       content ''
