@@ -50,6 +50,7 @@
     "email": "jordan@frame.sh",
     "url": "https//frame.sh"
   },
+  "license": "GPL-3.0",
   "dependencies": {
     "@ledgerhq/hw-app-eth": "4.19.0",
     "@ledgerhq/hw-transport-node-hid": "4.19.1",

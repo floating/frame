@@ -12,8 +12,6 @@ console.log('Chrome: v' + process.versions.chrome)
 console.log('Electron: v' + process.versions.electron)
 console.log('Node: v' + process.versions.node)
 
-ipcMain.on('addPermission', (e, host, permission) => store.addPermission(host, permission))
-ipcMain.on('removePermission', (e, host, permission) => store.removePermission(host, permission))
 ipcMain.on('tray:setNetwork', (e, network) => {
   signers.unsetSigner()
   store.setNetwork(network)
