@@ -45,21 +45,19 @@ class Requests extends React.Component {
           <div>{'Requests'}</div>
           <div className='requestCount'>{requests.length}</div>
         </div>
-        <div className='requestObsverver'>
-          <div className='requestContainer'>
+        <div className='requestContainerWrap'>
+          <CSSTransitionGroup className='requestContainer' style={{height: (350 + (requests.length * 10)) + 'px'}} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
             <div key={'noReq'} style={requests.length !== 0 ? {opacity: 0} : {transitionDelay: '0.32s'}} className='noRequests'>{'No Pending Requests'}</div>
-            <CSSTransitionGroup style={{width: '100%'}} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
-              {requests.sort((a, b) => {
-                if (a.type === 'approveTransaction' && b.type !== 'approveTransaction') return 1
-                if (a.type !== 'approveTransaction' && b.type === 'approveTransaction') return -1
-                return 0
-              }).map((req, i) => {
-                if (req.type === 'approveTransaction') return <TransactionRequest key={req.handlerId} req={req} top={requests.length - i} />
-                if (req.type === 'requestProvider') return <ProviderRequest key={req.handlerId} req={req} top={requests.length - i} />
-                return null
-              })}
-            </CSSTransitionGroup>
-          </div>
+            {requests.sort((a, b) => {
+              if (a.type === 'approveTransaction' && b.type !== 'approveTransaction') return 1
+              if (a.type !== 'approveTransaction' && b.type === 'approveTransaction') return -1
+              return 0
+            }).map((req, i) => {
+              if (req.type === 'approveTransaction') return <TransactionRequest key={req.handlerId} req={req} top={requests.length - i} />
+              if (req.type === 'requestProvider') return <ProviderRequest key={req.handlerId} req={req} top={requests.length - i} />
+              return null
+            })}
+          </CSSTransitionGroup>
         </div>
       </div>
     )

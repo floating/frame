@@ -1,7 +1,6 @@
 import uuid from 'uuid/v4'
 import EventEmitter from 'events'
 import utils from 'web3-utils'
-import { ipcRenderer } from 'electron'
 import { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } from 'ethereumjs-util'
 
 import rpc from '../rpc'
@@ -12,15 +11,10 @@ class Provider extends EventEmitter {
   constructor () {
     super()
     this.store = store
-    this.accounts = []
     this.handlers = {}
     this.nonce = {}
     this.connection = nodes
     this.connection.on('data', data => this.emit('data', data))
-    rpc('getAccounts', (err, accounts) => { if (!err) this.accounts = accounts })
-    ipcRenderer.on('main:accounts', (sender, accounts) => {
-      this.accounts = JSON.parse(accounts)
-    })
   }
   getCoinbase (payload, res) {
     rpc('getAccounts', (err, accounts) => {
@@ -89,7 +83,7 @@ class Provider extends EventEmitter {
   getGasPrice = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, res)
   getGasEstimate = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx]}, res)
   getNonce = (rawTx, res) => {
-    if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.current) {
+    if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.account === rawTx.from && this.nonce.current) {
       let newNonce = utils.hexToNumber(this.nonce.current)
       newNonce++
       newNonce = utils.numberToHex(newNonce)
@@ -97,7 +91,7 @@ class Provider extends EventEmitter {
       res({id: 1, jsonrpc: '2.0', result: this.nonce.current})
     } else {
       this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending']}, (response) => {
-        if (response.result) this.nonce = {age: Date.now(), current: response.result}
+        if (response.result) this.nonce = {age: Date.now(), current: response.result, account: rawTx.from}
         res(response)
       })
     }

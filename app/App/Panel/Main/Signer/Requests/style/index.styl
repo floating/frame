@@ -85,8 +85,8 @@
 
 @keyframes scalein
   0%
-    transform scale(0.6)
-    opacity 0
+    transform scale(0.8)
+    opacity 0.2
   100%
     transform scale(1)
     opacity 1
@@ -134,8 +134,11 @@
   bottom 0
   left 0
   z-index 200
+  padding 0px 0px 30px 0px
   transition standard
   overflow-y scroll
+  overflow-x hidden
+  transform translateZ(0)
 
   .requestTitle:before
     content ''
@@ -178,8 +181,7 @@
     svg
       fill outerspace08
 
-  .requestObsverver
-    height 370px
+  .requestContainerWrap
     display flex
     justify-content center
     align-items center
@@ -187,13 +189,9 @@
     position relative
 
    .requestContainer
-     position absolute
-     top 0px
-     right 0px
-     bottom 0px
-     left 0px
+     width calc(100% - 20px)
+     position relative
      display flex
-     align-items center
      flex-direction column
 
     .noRequests
@@ -224,12 +222,9 @@
     right 0px
     border-radius 2px
     justify-content space-between
-    width calc(100% - 20px)
-    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick // , default
+    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
     border-radius 6px
-    margin 0px 10px
     height 370px
-    // overflow hidden
     display flex
     justify-content center
     transition standard
@@ -335,11 +330,22 @@
     justify-content center
     align-items center
     flex-direction column
+    transform translateZ(0px)
 
     .requestProviderOrigin
       font-size 22px
       font-weight 200
-      letter-spacing 1px
+      width 300px
+      text-align center
+      transform translateZ(0px)
+
+    .requestProviderOrigin18
+      font-size 17
+      font-weight 300
+
+    .requestProviderOrigin12
+      font-weight 300
+      font-size 14
 
     .requestProviderSub
       font-size 12px
@@ -350,6 +356,7 @@
       justify-content center
       align-items center
       margin-top 10px
+      transform translateZ(0px)
 
   .approveTransaction
     width 100%
@@ -380,7 +387,6 @@
       font-size 14px
       background highlight
       fill outerspace08
-      // border-bottom 1px solid thick
       border-top-left-radius 6px
       border-top-right-radius 6px
       box-shadow 0px 1px 0px thick
@@ -395,7 +401,6 @@
         transition standard
         position absolute
         background highlightlight
-        // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick
         border-radius 3px
         left 5px
         fill outerspace08
@@ -583,7 +588,7 @@
         top 0px
 
   .transactionNoData
-    background thin
+    box-shadow 0px 2px 0px thin, 0px 8px 8px -2px thin, 0px 0px 10px -2px thin
 
   .transactionTo
     height 70px
@@ -681,22 +686,29 @@
     .requestDecline
       position relative
       width 50%
-      height calc(100% - 10px)
+      height 100%
+      border-right 1px solid thick
+      overflow hidden
+      position relative
+
+    .requestDeclineButton
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      animation scalein 3000ms cubic
+      transform translateZ(0px)
       display flex
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      animation scalein 2400ms cubic
-      transform translateZ(0px)
       transition standard
       letter-spacing 2px
       padding-left 2px
-      overflow hidden
-      border-right 1px solid thick
-      position relative
-      padding-bottom 10px
+      padding-bottom 6px
 
-    .requestDecline:before
+    .requestDeclineButton:before
       content ''
       position absolute
       margin-left -1px
@@ -704,27 +716,35 @@
       border-radius 2px
       width 30px
       background bad06
-      bottom 13px
+      bottom 14px
 
-    .requestDecline:hover:before
+    .requestDeclineButton:hover:before
       background bad
 
     .requestSign
+      position relative
       width 50%
-      height calc(100% - 10px)
+      height 100%
+      overflow hidden
+
+    .requestSignButton
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      animation scalein 3000ms cubic
+      transform translateZ(0px)
       display flex
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      animation scalein 2400ms cubic
-      transform translateZ(0px)
       transition standard
       letter-spacing 2px
       padding-left 2px
-      position relative
-      padding-bottom 10px
+      padding-bottom 6px
 
-    .requestSign:before
+    .requestSignButton:before
       content ''
       position absolute
       margin-left -1px
@@ -732,14 +752,18 @@
       border-radius 2px
       width 30px
       background good06
-      bottom 13px
+      bottom 14px
 
-    .requestSign:hover:before
+    .requestSignButton:hover:before
       background good
 
   .requestApproveDisabled
     pointer-events none
     opacity 0.2
+    .requestDecline
+      pointer-events none
+    .requestSign
+      pointer-events none
 
 .signerRequestsHidden
   left -100%
