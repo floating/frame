@@ -8,7 +8,7 @@ class ProviderRequest extends React.Component {
     this.state = {allowInput: false}
     setTimeout(() => {
       this.setState({allowInput: true})
-    }, 1200)
+    }, 2000)
   }
   render () {
     let requestClass = 'signerRequest'
@@ -50,10 +50,10 @@ class ProviderRequest extends React.Component {
         </div>
         <div className='requestApprove'>
           <div className='requestDecline' onClick={() => this.store.giveAccess(this.props.req, false)}>
-            {'Decline'}
+            <div className='requestDeclineButton'>{'Decline'}</div>
           </div>
           <div className='requestSign' onClick={() => this.store.giveAccess(this.props.req, true)}>
-            {'Approve'}
+            <div className='requestSignButton'>{'Approve'}</div>
           </div>
         </div>
       </div>

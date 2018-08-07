@@ -137,10 +137,7 @@ class TransactionRequest extends React.Component {
         )}
         <div className='requestApprove'>
           <div className='requestDecline' onClick={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestDeclineButton'>
-              <div className='requestDeclineBadge' />
-              {'Decline'}
-            </div>
+            <div className='requestDeclineButton'>{'Decline'}</div>
           </div>
           <div className='requestSign' onClick={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
             <div className='requestSignButton'> {'Sign'} </div>
