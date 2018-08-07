@@ -62,7 +62,6 @@ class Settings extends React.Component {
     let network = this.store('local.connection.network')
     let current = connection.settings[network].current
     if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
-    if (status === 'connected' && connection.network && connection.network !== network) status = 'network mismatch'
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
       <div className='connectionOptionStatus'>

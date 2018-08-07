@@ -8,13 +8,15 @@ const trezor = require('./trezor')
 const ledger = require('./ledger')
 const hot = require('./hot')
 
+const dev = process.env.NODE_ENV === 'development'
+
 // Connected Signers
 const signers = {}
 
 // Add Signers
 trezor(signers)
 ledger(signers)
-hot(signers)
+if (dev) hot(signers)
 
 let current = null
 
