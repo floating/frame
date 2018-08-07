@@ -16,6 +16,10 @@ class ProviderRequest extends React.Component {
     if (this.props.req.status === 'declined') requestClass += ' signerRequestDeclined'
     if (this.props.req.status === 'pending') requestClass += ' signerRequestPending'
     if (this.props.req.status === 'error') requestClass += ' signerRequestError'
+    let origin = this.props.req.origin
+    let originClass = 'requestProviderOrigin'
+    if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
+    if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{top: (this.props.top * 10) + 'px'}}>
         <div className='approveTransaction'>
@@ -42,7 +46,7 @@ class ProviderRequest extends React.Component {
                 <div className='approveRequestHeaderLabel'> {'Connection'}</div>
               </div>
               <div className='requestProvider bounceIn'>
-                <div className='requestProviderOrigin'>{this.props.req.origin}</div>
+                <div className={originClass}>{origin}</div>
                 <div className='requestProviderSub'>{'wants to connect'}</div>
               </div>
             </div>
