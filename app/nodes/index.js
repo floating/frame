@@ -63,8 +63,12 @@ class Nodes extends EventEmitter {
           this.secondary.on('connect', () => {
             this.getNetwork(this.secondary, (err, response) => {
               this.secondary.network = !err && response && !response.error ? response.result : '?'
-              this.emit('connect')
-              store.setSecondary({status: this.secondary.status, connected: true, type: '', network: this.secondary.network})
+              if (this.secondary.network !== store('local.connection.network')) {
+                store.setSecondary({status: 'network mismatch', connected: false, type: '', network: this.secondary.network})
+              } else {
+                this.emit('connect')
+                store.setSecondary({status: this.secondary.status, connected: true, type: '', network: this.secondary.network})
+              }
             })
           })
           this.secondary.on('close', () => {

@@ -179,7 +179,8 @@ export const requestError = (u, id, err) => {
   } else if (err.message === 'signTransaction Error: "Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)"') {
     u('signer.requests', id, 'notice', notice => 'Ledger Signature Declined')
   } else {
-    u('signer.requests', id, 'notice', notice => err)
+    let notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
+    u('signer.requests', id, 'notice', _ => notice)
   }
   setTimeout(() => u('signer.requests', requests => remove(requests, id)), 3300)
 }
