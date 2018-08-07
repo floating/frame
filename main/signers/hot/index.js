@@ -8,7 +8,5 @@ module.exports = signers => {
         if (key != null) signers[key] = new Hot(key)
       })
     }
-  } catch (e) {
-    console.log(e)
-  }
+  } catch (e) {}
 }

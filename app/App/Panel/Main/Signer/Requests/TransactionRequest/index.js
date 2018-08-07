@@ -11,6 +11,13 @@ class TransactionRequest extends React.Component {
       this.setState({allowInput: true})
     }, 2000)
   }
+  copyAddress (e) {
+    e.preventDefault()
+    e.target.select()
+    document.execCommand('Copy')
+    this.setState({copied: true})
+    setTimeout(_ => this.setState({copied: false}), 1000)
+  }
   approve (reqId, req) {
     this.store.events.emit('approveRequest', reqId, req)
   }
@@ -109,7 +116,10 @@ class TransactionRequest extends React.Component {
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>
                         <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', {height: '20px'})} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
-                        <div className='transactionToAddressFull'>{this.props.req.data.to}</div>
+                        <div className='transactionToAddressFull'>
+                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.req.data.to}
+                          <input onClick={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
+                        </div>
                       </div>
                       <div className='transactionToSub'>{'Send To'}</div>
                     </div>
