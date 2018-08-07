@@ -66,6 +66,16 @@
   }
 }
 
+@keyframes shine {
+  0% {
+    transform: translateY(-2000px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+
 @keyframes sk-scaleout
   0%
     transform scale(0)
@@ -226,6 +236,31 @@
     background light
     z-index 2000
 
+  // .requestOverlay
+  //   position absolute
+  //   top 0px
+  //   left 0px
+  //   right 0px
+  //   bottom 0px
+  //   z-index 9999999999999
+  //   border-radius 6px
+  //   opacity 0.05
+  //   pointer-events none
+  //   overflow hidden
+  //
+  //   .requestOverlayInset
+  //     position absolute
+  //     top 0px
+  //     left 0px
+  //     right 0px
+  //     bottom -2000px
+  //     // background linear-gradient(135deg, #AE60F2 0%,#73d6bb 100%)
+  //     // background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+  //
+  //     animation shine 1s infinite cubic-bezier(.82,0,.12,1) alternate !important
+  //     pointer-events none
+  //     background-image: linear-gradient(135deg, #bbc1bf 0%, #57c6e1 32%, #b49fda 69%, #7ac5d8 100%);
+
   .signerRequestSuccess
     align-items center
     color good
@@ -286,6 +321,9 @@
         font-weight 400
         text-transform uppercase
         letter-spacing 2px
+        white-space normal
+        width 280px
+        text-align center
 
   .requestProvider
     position absolute
