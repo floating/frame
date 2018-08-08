@@ -424,9 +424,6 @@
       right 0
       bottom 0
 
-      div
-        white-space nowrap
-
   .transactionValue
     position absolute
     top 57px
@@ -552,7 +549,7 @@
     right 0
     bottom 0
     display flex
-    padding 18px
+    padding 16px 14px
     user-select all
     overflow hidden
     z-index 9
@@ -561,9 +558,18 @@
       opacity 0
       top -100px
       position relative
+      max-width 100%
       width 100%
       height 100%
+      font-size 13px
+      text-transform none
       transition standardSlow
+      overflow-wrap break-word
+      word-wrap break-word
+      font-family FiraCode, sans-serif
+      overflow-x hidden
+      overlflow-y scroll
+
 
   .transactionDataSelected
     position absolute
