@@ -63,7 +63,7 @@ Frame is an cross-platform Ethereum interface that lets you use standalone signe
     "accounts": ["privateKey1", "privateKey2"]
   }
   ```
-  - Run `npm run build` and `npm run alpha` as normal
+  - Run `npm run alpha` as normal
 
 ### Build Apps
   ```bash
