@@ -105,7 +105,7 @@ class TransactionRequest extends React.Component {
                       </div>
                       <div className='transactionDataBody'>
                         <div className='transactionDataBodyInner'>
-                          {utils.toAscii(this.props.req.data.data)}
+                          {this.props.req.data.data}
                         </div>
                       </div>
                     </div>

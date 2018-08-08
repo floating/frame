@@ -26,7 +26,7 @@
     display flex
     align-items flex-end
     height 60px
-    font-size 24px
+    font-size 22px
     padding 0px 10px 10px 10px
 
 .localSettingsHidden
@@ -103,7 +103,8 @@
     align-items center
     font-size 13px
     text-transform uppercase
-    background highlight
+    background lowlight
+    border 1px solid outerspace01
 
     .connectionTitleSetButton
       display flex
@@ -207,7 +208,7 @@
         justify-content center
         align-items center
         padding 0px 3px 0px 3px
-        background highlight
+        border 1px solid outerspace01
 
         .signerOptionSetButton
           display flex
@@ -260,7 +261,7 @@
       width 30px
       height 4px
       border-radius 2px
-      background rgba(0, 0, 80, 0.2)
+      background outerspace03
       transition standard
       transform translateZ(0)
 
@@ -268,6 +269,7 @@
   .appInfoLine
     position absolute
     top 60px
+    margin-top -2px
     left 0
     right 0
     transition standard
@@ -276,13 +278,13 @@
     align-items center
     flex-direction column
     transform translateZ(0)
-    color outerspace
+    color outerspace08
 
 .appInfo:hover
   bottom 0px
   .appInfoIcon
     .appInfoHandle
-      background pending
+      background outerspace01
 
 
 .connectionCustomInput
@@ -321,7 +323,7 @@
   opacity 1
 
 .connectionOptionOn
-  background rgba(245, 245, 255, 0.4)
+  background lowlight
   margin -5px -15px
   padding 15px 15px
   .connectionOptionDetails
