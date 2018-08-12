@@ -24,13 +24,23 @@ class Main extends React.Component {
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
                   {'No Signers Connected'}
-                  <div className='introSubtitle'>{'Plug in your Ledger or Trezor!'}</div>
+                  <div className='introInstructions'>
+                    <div>{'Connect your Ledger/Trezor device'}</div>
+                    <div>{'Selected a connected device to use'}</div>
+                    <div>{'Confirm Frame is connected to Ethereum'}</div>
+                    <div>{'Now Frame is ready to use!'}</div>
+                    <div>{'Visit'} <a href='https://test.frame.sh'>{'test.frame.sh'}</a> {'to test it out'}</div>
+                    <div>{'You will need Frame\'s'} <a href='https://frame.sh'>{'browser extension'}</a> {'if a dapp you\'re using does not connect to Frame automatically '}</div>
+                  </div>
                   <span className='featureBox'>
                     <span className='featureBoxText'>
                       {`Frame Developer Release`}
                     </span>
                     <span className='featureBoxSubtext'>
                       {`Not recommended for mainnet use`}
+                    </span>
+                    <span className='featureBoxSubtext'>
+                      {`mainnet release coming soon`}
                     </span>
                   </span>
                 </div>

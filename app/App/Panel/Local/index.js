@@ -97,7 +97,7 @@ class Settings extends React.Component {
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Connection'}</div>
-          {this.store('enableMainnet') ? (
+          {this.store('local.enableMainnet') ? (
             <div className='connectionTitleSet'>
               <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('<-')}>
                 {svg.octicon('chevron-left', {height: 17})}
