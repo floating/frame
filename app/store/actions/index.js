@@ -80,8 +80,6 @@ export const setSecondary = (u, status) => u('local.connection.secondary', secon
 
 export const setLaunch = (u, launch) => u('local.launch', _ => launch)
 
-export const hadSuccess = u => u('local.success', _ => true)
-
 export const toggleLaunch = u => u('local.launch', launch => !launch)
 
 export const toggleSettings = u => {
