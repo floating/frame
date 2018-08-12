@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
+import { shell } from 'electron'
 
 import Signer from './Signer'
 
@@ -25,12 +26,22 @@ class Main extends React.Component {
                   <div className='introLogo'>{svg.logo(70)}</div>
                   {'No Signers Connected'}
                   <div className='introInstructions'>
-                    <div>{'Connect your Ledger/Trezor device'}</div>
-                    <div>{'Selected a connected device to use'}</div>
-                    <div>{'Confirm Frame is connected to Ethereum'}</div>
-                    <div>{'Now Frame is ready to use!'}</div>
-                    <div>{'Visit'} <a href='https://test.frame.sh'>{'test.frame.sh'}</a> {'to test it out'}</div>
-                    <div>{'You will need Frame\'s'} <a href='https://frame.sh'>{'browser extension'}</a> {'if a dapp you\'re using does not connect to Frame automatically '}</div>
+                    <div className='introInstructionList'>
+                      <div>{'1. Connect your Ledger or Trezor devices'}</div>
+                      <div>{'2. Selected a connected device to use'}</div>
+                      <div>{'3. Verify Frame is connected to Ethereum'}</div>
+                    </div>
+                    <div className='introInstructionItem' style={{textAlign: 'center'}}>
+                      <div style={{fontSize: '17px', marginBottom: '5px'}}>{'Now Frame is ready to use!'}</div>
+                      <div>{'Visit'} <span onClick={() => shell.openExternal('https://frame.sh')}>{'frame.sh'}</span> {'to try it out'}</div>
+                    </div>
+                    <div className='introInstructionItem' style={{textAlign: 'center'}}>
+                      <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onClick={() => shell.openExternal('https://frame.sh')}>{'browser extension'}</span></div>
+                    </div>
+                    <div className='introInstructionItem' style={{textAlign: 'center'}}>
+                      <div style={{fontSize: '15px', marginBottom: '5px'}}>{'Need help?'}</div>
+                      <div><span onClick={() => shell.openExternal('https://frame.sh')}>{'Open an issue'}</span> {'or'} <span onClick={() => shell.openExternal('https://frame.sh')}>{'come chat with us'}</span></div>
+                    </div>
                   </div>
                   <span className='featureBox'>
                     <span className='featureBoxText'>
