@@ -8,7 +8,7 @@ class Ledger extends Signer {
     super()
     this.id = id
     this.device = device
-    this.type = 'Nano S'
+    this.type = 'Ledger'
     this.status = 'loading'
     this.accounts = []
     this.network = ''
@@ -30,9 +30,9 @@ class Ledger extends Signer {
       this.update()
     }).catch(err => {
       this.status = err.message
-      if (err.statusCode === 27904) this.status = 'Wrong Application, Select the Ethereum Application on Your Ledger'
-      if (err.statusCode === 26368) this.status = 'Select the Ethereum Application on Your Ledger'
-      if (err.statusCode === 26625 || err.statusCode === 26628) this.status = 'Please make sure your device is awake and updated to firmware v1.4 or greater'
+      if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
+      if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
+      if (err.statusCode === 26625 || err.statusCode === 26628) this.status = 'Confirm your Ledger is not asleep and is running firmware is version 1.4.0 or newer'
       this.update()
     })
   }

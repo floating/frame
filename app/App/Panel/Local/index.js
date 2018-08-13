@@ -1,8 +1,15 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { ipcRenderer } from 'electron'
-
+import { ipcRenderer, remote } from 'electron'
+import PersistStore from 'electron-store'
 import svg from '../../../svg'
+
+const resetAllSettings = () => {
+  const persist = new PersistStore()
+  persist.clear()
+  remote.app.relaunch()
+  remote.app.exit(0)
+}
 
 const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
 
@@ -12,13 +19,22 @@ class Settings extends React.Component {
     let network = context.store('local.connection.network')
     let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
     this.customMessage = 'Custom Endpoint'
-    this.state = {localShake: {}, secondaryCustom: customTarget || this.customMessage}
+    this.state = {localShake: {}, secondaryCustom: customTarget || this.customMessage, resetConfirm: false}
   }
   appInfo () {
     return (
       <div className='appInfo'>
         <div className='appInfoIcon'><div className='appInfoHandle' /></div>
-        <div className='appInfoLine'>{'v' + require('../../../../package.json').version}</div>
+        <div className='appInfoLine appInfoLineReset'>
+          {this.state.resetConfirm ? (
+            <span className='appInfoLineResetConfirm'>
+              {'Are you sure?'} <span onClick={() => resetAllSettings()}>{'Yes'}</span> <span>{'/'}</span> <span onClick={() => this.setState({resetConfirm: false})}>{'No'}</span>
+            </span>
+          ) : (
+            <span onClick={() => this.setState({resetConfirm: true})}>{'Reset All Settings & Data'}</span>
+          )}
+        </div>
+        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../../package.json').version}</div>
       </div>
     )
   }

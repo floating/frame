@@ -94,7 +94,7 @@ class Signer extends React.Component {
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
-                if (this.props.type === 'Nano S') return <img src={ledgerLogo} />
+                if (this.props.type === 'Ledger') return <img src={ledgerLogo} />
                 if (this.props.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
                 return svg.octicon('zap', {height: 31})
               })()}
@@ -128,13 +128,14 @@ class Signer extends React.Component {
   }
   renderStatus () {
     // TODO: Set Signer Name
+    let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     return (
       <div className='signerStatusWrap'>
         <CSSTransitionGroup transitionName='standardFade' transitionEnterTimeout={320} transitionLeaveTimeout={320}>
           <div className='signerStatus' key={this.props.status}>
             {this.props.status !== 'ok' ? (
               <div className='signerStatusNotOk'>
-                {this.props.status}
+                {status}
               </div>
             ) : (
               <React.Fragment>
