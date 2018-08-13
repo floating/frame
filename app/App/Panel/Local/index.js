@@ -55,9 +55,11 @@ class Settings extends React.Component {
     e.preventDefault()
     clearTimeout(this.customInputTimeout)
     if (e.target.value.toLowerCase() === 'i understand the risks, unlock mainnet') {
-      this.setState({secondaryCustom: this.customMessage})
-      e.target.blur()
+      this.setState({secondaryCustom: ''})
+      this.store.setSecondaryCustom('')
       this.store.enableMainnet()
+      let target = e.target
+      setTimeout(() => target.blur(), 0)
       return
     }
     this.setState({secondaryCustom: e.target.value})
