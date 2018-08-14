@@ -28,7 +28,7 @@ class Main extends React.Component {
                   <div className='introInstructions'>
                     <div className='introInstructionList'>
                       <div>{'1. Connect your Ledger or Trezor'}</div>
-                      <div>{'2. Selected a connected device to use'}</div>
+                      <div>{'2. Select a connected device to use'}</div>
                       <div>{'3. Verify Frame is connected to Ethereum'}</div>
                     </div>
                     <div className='introInstructionItem' style={{textAlign: 'center'}}>
