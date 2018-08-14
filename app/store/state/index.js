@@ -63,7 +63,7 @@ let initial = {
       options: ['1', '4'],
       status: 'loading',
       local: {
-        on: local('connection.local.on', true),
+        on: local('connection.local.on', false),
         status: 'loading',
         connected: false,
         type: '',
