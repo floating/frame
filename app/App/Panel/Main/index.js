@@ -27,7 +27,7 @@ class Main extends React.Component {
                   {'No Signers Connected'}
                   <div className='introInstructions'>
                     <div className='introInstructionList'>
-                      <div>{'1. Connect your Ledger or Trezor devices'}</div>
+                      <div>{'1. Connect your Ledger or Trezor'}</div>
                       <div>{'2. Selected a connected device to use'}</div>
                       <div>{'3. Verify Frame is connected to Ethereum'}</div>
                     </div>
@@ -36,11 +36,11 @@ class Main extends React.Component {
                       <div>{'Visit'} <span onClick={() => shell.openExternal('https://frame.sh')}>{'frame.sh'}</span> {'to try it out'}</div>
                     </div>
                     <div className='introInstructionItem' style={{textAlign: 'center'}}>
-                      <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onClick={() => shell.openExternal('https://frame.sh')}>{'browser extension'}</span></div>
+                      <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onClick={() => shell.openExternal('https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf')}>{'browser extension'}</span></div>
                     </div>
                     <div className='introInstructionItem' style={{textAlign: 'center'}}>
                       <div style={{fontSize: '15px', marginBottom: '5px'}}>{'Need help?'}</div>
-                      <div><span onClick={() => shell.openExternal('https://frame.sh')}>{'Open an issue'}</span> {'or'} <span onClick={() => shell.openExternal('https://frame.sh')}>{'come chat with us'}</span></div>
+                      <div><span onClick={() => shell.openExternal('https://github.com/floating/frame/issues/new')}>{'Open an issue'}</span> {'or'} <span onClick={() => shell.openExternal('https://gitter.im/framehq/general')}>{'come chat with us'}</span></div>
                     </div>
                   </div>
                   <span className='featureBox'>

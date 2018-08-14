@@ -32,7 +32,7 @@ class Ledger extends Signer {
       this.status = err.message
       if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
       if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
-      if (err.statusCode === 26625 || err.statusCode === 26628) this.status = 'Confirm your Ledger is not asleep and is running firmware is version 1.4.0 or newer'
+      if (err.statusCode === 26625 || err.statusCode === 26628) this.status = 'Confirm your Ledger is not asleep and is running firmware version 1.4.0 or newer'
       this.update()
     })
   }
