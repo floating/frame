@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { CSSTransitionGroup } from 'react-transition-group'
 
 import svg from '../../../../svg'
 import rpc from '../../../../rpc'
@@ -94,7 +93,7 @@ class Signer extends React.Component {
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
-                if (this.props.type === 'Nano S') return <img src={ledgerLogo} />
+                if (this.props.type === 'Ledger') return <img src={ledgerLogo} />
                 if (this.props.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
                 return svg.octicon('zap', {height: 31})
               })()}
@@ -128,35 +127,34 @@ class Signer extends React.Component {
   }
   renderStatus () {
     // TODO: Set Signer Name
+    let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     return (
       <div className='signerStatusWrap'>
-        <CSSTransitionGroup transitionName='standardFade' transitionEnterTimeout={320} transitionLeaveTimeout={320}>
-          <div className='signerStatus' key={this.props.status}>
-            {this.props.status !== 'ok' ? (
-              <div className='signerStatusNotOk'>
-                {this.props.status}
+        <div className='signerStatus' key={this.props.status}>
+          {this.props.status !== 'ok' ? (
+            <div className='signerStatusNotOk'>
+              {status}
+            </div>
+          ) : (
+            <React.Fragment>
+              <div className='signerName'>
+                <div className='signerNameText'>
+                  {this.props.type + ' Account'}
+                  <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
+                </div>
               </div>
-            ) : (
-              <React.Fragment>
-                <div className='signerName'>
-                  <div className='signerNameText'>
-                    {this.props.type + ' Account'}
-                    <div className='signerNameEdit'>{svg.octicon('pencil', {height: 18})}</div>
+              <div className='signerAddress'>
+                <div className='transactionToAddress'>
+                  <div className='transactionToAddressLarge'>{this.props.accounts[0].substring(0, 13)} {svg.octicon('kebab-horizontal', {height: '20px'})} {this.props.accounts[0].substr(this.props.accounts[0].length - 13)}</div>
+                  <div className='transactionToAddressFull'>
+                    {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.accounts[0]}
+                    <input onClick={e => this.copyAddress(e)} value={this.props.accounts[0]} readOnly />
                   </div>
                 </div>
-                <div className='signerAddress'>
-                  <div className='transactionToAddress'>
-                    <div className='transactionToAddressLarge'>{this.props.accounts[0].substring(0, 13)} {svg.octicon('kebab-horizontal', {height: '20px'})} {this.props.accounts[0].substr(this.props.accounts[0].length - 13)}</div>
-                    <div className='transactionToAddressFull'>
-                      {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.accounts[0]}
-                      <input onClick={e => this.copyAddress(e)} value={this.props.accounts[0]} readOnly />
-                    </div>
-                  </div>
-                </div>
-              </React.Fragment>
-            )}
-          </div>
-        </CSSTransitionGroup>
+              </div>
+            </React.Fragment>
+          )}
+        </div>
       </div>
     )
   }

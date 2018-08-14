@@ -11,13 +11,13 @@ module.exports = signers => {
   const scan = () => {
     let current = HID.devices().filter(isLedger)
     Object.keys(signers).forEach(id => {
-      if (current.map(device => uuid('Ledger Nano S' + device.usagePage, ns)).indexOf(id) === -1 && signers[id].type === 'Nano S') {
+      if (current.map(device => uuid('Ledger' + device.usagePage, ns)).indexOf(id) === -1 && signers[id].type === 'Ledger') {
         signers[id].close()
         delete signers[id]
       }
     })
     current.forEach(device => {
-      let id = uuid('Ledger Nano S' + device.usagePage, ns)
+      let id = uuid('Ledger' + device.usagePage, ns)
       let ledger
       try {
         ledger = new Ledger(id, new Eth(new TransportNodeHid(new HID.HID(device.path))))

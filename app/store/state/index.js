@@ -53,17 +53,17 @@ let initial = {
   provider: {
     events: []
   },
-  enableMainnet: false,
   local: {
     launch: local('launch', false),
     success: local('success', false),
     accounts: local('accounts', {}),
+    enableMainnet: local('enableMainnet', false),
     connection: {
-      network: '4',
+      network: local('connection.network', '4'),
       options: ['1', '4'],
       status: 'loading',
       local: {
-        on: local('connection.local.on', true),
+        on: local('connection.local.on', false),
         status: 'loading',
         connected: false,
         type: '',

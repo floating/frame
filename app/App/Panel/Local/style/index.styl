@@ -103,8 +103,8 @@
     align-items center
     font-size 13px
     text-transform uppercase
-    background lowlight
-    border 1px solid outerspace01
+    background highlight
+    box-shadow cardDrop
 
     .connectionTitleSetButton
       display flex
@@ -208,7 +208,8 @@
         justify-content center
         align-items center
         padding 0px 3px 0px 3px
-        border 1px solid outerspace01
+        background highlight
+        box-shadow cardDrop
 
         .signerOptionSetButton
           display flex
@@ -234,23 +235,18 @@
 
 .appInfo
   position absolute
-  bottom -40px
+  bottom -68px
   left 0
   right 0
   font-size 14px
   font-weight 300
-  height 100px
-  font-family FiraCode, sans-serif
   transition standard
   transform translateZ(0)
+  padding 15px
 
   .appInfoIcon
-    position absolute
-    top 0
-    left 0
-    right 0
     transition standard
-    height 65px
+    height 30px
     display flex
     justify-content center
     align-items center
@@ -265,13 +261,11 @@
       transition standard
       transform translateZ(0)
 
-
   .appInfoLine
-    position absolute
-    top 60px
     margin-top -2px
     left 0
     right 0
+    height 30px
     transition standard
     display flex
     justify-content center
@@ -279,6 +273,17 @@
     flex-direction column
     transform translateZ(0)
     color outerspace08
+
+  .appInfoLineReset
+    font-size 12px
+    font-weight 600
+
+    .appInfoLineResetConfirm
+      span
+        margin-left 5px
+
+  .appInfoLineVersion
+    font-family FiraCode, sans-serif
 
 .appInfo:hover
   bottom 0px

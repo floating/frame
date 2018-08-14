@@ -18,7 +18,7 @@ export const panelRequest = (u, request) => {
   u('panel.show', v => true)
 }
 
-export const enableMainnet = u => u('enableMainnet', () => true)
+export const enableMainnet = u => u('local.enableMainnet', () => true)
 
 export const selectNetwork = (u, direction) => {
   let reset = {
@@ -79,8 +79,6 @@ export const setLocal = (u, status) => u('local.connection.local', local => Obje
 export const setSecondary = (u, status) => u('local.connection.secondary', secondary => Object.assign({}, secondary, status))
 
 export const setLaunch = (u, launch) => u('local.launch', _ => launch)
-
-export const hadSuccess = u => u('local.success', _ => true)
 
 export const toggleLaunch = u => u('local.launch', launch => !launch)
 

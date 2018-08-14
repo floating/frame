@@ -45,18 +45,45 @@
       flex-direction column
       font-weight 200
       font-size 22px
+      position relative
+      z-index 10000000
 
       .introLogo
-        padding-bottom 24px
+        padding-bottom 14px
 
       svg
         fill outerspace
 
-      .introSubtitle
+      .introInstructions
         margin-top 15px
-        font-size 15px
+        font-size 12px
         font-weight 300
-        padding-bottom 100px
+        padding 10px 10px 0px 10px
+        margin 30px 10px 30px 10px
+        border-radius 6px
+        background lowlight
+        box-shadow cardDrop
+        text-align cleft
+        line-height 18px
+        font-weight 300
+        color outerspace08
+        .introInstructionItem
+          margin-bottom 20px
+          padding 0px 20px
+          span
+            color good
+            text-decoration none
+
+        .introInstructionList
+          margin 8px 5px 20px 5px
+          border-radius 3px
+          padding 16px
+          background highlight
+          box-shadow cardDrop
+          font-weight 400
+          div
+            font-size 14px
+            line-height 26px
 
       .featureBox
         display flex
@@ -65,13 +92,13 @@
         flex-direction column
 
         .featureBoxText
-          padding-bottom 22px
           font-size 13px
           font-weight 400
           text-transform uppercase
           letter-spacing 4px
 
         .featureBoxSubtext
+          margin-top 8px
           font-size 10px
           font-weight 400
           text-transform uppercase
