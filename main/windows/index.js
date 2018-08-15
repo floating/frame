@@ -21,6 +21,7 @@ const api = {
     windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {plugins: true}})
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
+    windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
     if (process.platform === 'linux') {

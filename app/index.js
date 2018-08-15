@@ -7,6 +7,9 @@ import Panel from './App/Panel'
 import api from './api'
 import store from './store'
 
+document.addEventListener('dragover', e => e.preventDefault())
+document.addEventListener('drop', e => e.preventDefault())
+
 api()
 let Frame = Restore.connect(Panel, store)
 ReactDOM.render(<Frame />, document.getElementById('frame'))
