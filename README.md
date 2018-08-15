@@ -8,7 +8,7 @@
   <br>
 </h2>
 
-<h3 align="center">A cross-platform Ethereum interface :tada:</h3>
+<h3 align="center">An OS-level Ethereum interface :tada:</h3>
 <br>
 <p align="center">
   <a href="#features">Features</a> ⁃
@@ -17,9 +17,9 @@
 </p>
 <br>
 
-<img src="/asset/demo/Frame0-0-4.gif?raw=true" />
+<img src="/asset/demo/Frame0-0-5-RC1.gif?raw=true" />
 
-Frame is an cross-platform Ethereum interface that lets you use standalone signers (such as a Ledger or Trezor) to securely and transparently interact with dapps and the Ethereum network.
+Frame is an OS-level Ethereum interface that lets you use standalone signers, such as a Ledger or Trezor,  to securely and transparently interact with dapps and the Ethereum network.
 
 ### Features
 - **First-class Hardware Support**
@@ -72,6 +72,7 @@ Frame is an cross-platform Ethereum interface that lets you use standalone signe
   ```
 
 ### Related
+  - [Frame Chat](https://gitter.im/framehq/general) - Feel free to drop in and ask questions!
   - [Frame Browser Extension](https://github.com/floating/frame-extension) - Use Frame with any web dapp
   - [eth-provider](https://github.com/floating/eth-provider) - A universal Ethereum provider
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps
