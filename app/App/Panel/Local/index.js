@@ -54,7 +54,8 @@ class Settings extends React.Component {
   inputCustom (e) {
     e.preventDefault()
     clearTimeout(this.customInputTimeout)
-    if (e.target.value.toLowerCase() === 'i understand the risks, unlock mainnet') {
+    let value = e.target.value
+    if (value.toLowerCase() === 'i understand the risks, unlock mainnet') {
       this.setState({secondaryCustom: ''})
       this.store.setSecondaryCustom('')
       this.store.enableMainnet()
@@ -62,7 +63,7 @@ class Settings extends React.Component {
       setTimeout(() => target.blur(), 0)
       return
     }
-    this.setState({secondaryCustom: e.target.value})
+    this.setState({secondaryCustom: value})
     this.customInputTimeout = setTimeout(() => this.store.setSecondaryCustom(this.state.secondaryCustom), 1000)
   }
   localShake (key) {
