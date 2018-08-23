@@ -18,9 +18,12 @@ const api = {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
-    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences: {plugins: true}})
+    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false})
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
+    windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
+    windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
+    windows.tray.webContents.on('new-window', e => e.preventDefault()) // Prevent new windows
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
     if (process.platform === 'linux') {
@@ -65,14 +68,6 @@ const api = {
     setTimeout(() => windows.tray.focus(), 700)
     windows.tray.send('main:trayOpen', true)
   },
-  create: () => {
-    let id = uuid()
-    let win = new BrowserWindow({id, width: 1400, height: 800, frame: false, show: false, backgroundThrottling: false, webPreferences: {experimentalFeatures: true, plugins: true}})
-    windows[id] = win
-    win.loadURL(url.format({pathname: path.join(__dirname, '../../app/window.html'), protocol: 'file:', slashes: true}))
-    win.once('ready-to-show', () => win.show())
-    win.on('closed', () => delete windows[id])
-  },
   close: (e) => {
     let id = winId(e)
     if (windows[id]) windows[id].close()
@@ -104,6 +99,12 @@ const api = {
     app.quit()
   }
 }
+
+app.on('web-contents-created', (e, contents) => {
+  contents.on('will-navigate', e => e.preventDefault())
+  contents.on('will-attach-webview', e => e.preventDefault())
+  contents.on('new-window',  e => e.preventDefault())
+})
 
 // Frame Events
 ipcMain.on('frame:close', api.close)

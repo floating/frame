@@ -12,6 +12,8 @@ console.log('Chrome: v' + process.versions.chrome)
 console.log('Electron: v' + process.versions.electron)
 console.log('Node: v' + process.versions.node)
 
+global.eval = () => { throw new Error(`This app does not support global.eval()`) }
+
 ipcMain.on('tray:setNetwork', (e, network) => {
   signers.unsetSigner()
   store.setNetwork(network)
