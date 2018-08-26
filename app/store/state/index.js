@@ -113,11 +113,4 @@ let initial = {
   }
 }
 
-if (initial.frame.type !== 'tray' && initial.view.list.length === 0) {
-  let id = uuid()
-  initial.view.current = id
-  initial.view.list = [id]
-  initial.view.data[id] = {url: 'http://localhost:1234', title: ''}
-}
-
 export default () => initial

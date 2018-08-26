@@ -59,7 +59,7 @@ store.events.on('declineRequest', (id, req) => {
 const etherRates = () => {
   fetch('https://api.coinbase.com/v2/exchange-rates?currency=ETH').then(res => res.json()).then(res => {
     if (res && res.data && res.data.rates) store.updateExternalRates(res.data.rates)
-  })
+  }).catch(e => console.log('Unable to fetch exchange rate', e))
 }
 etherRates()
 setInterval(etherRates, 10000)

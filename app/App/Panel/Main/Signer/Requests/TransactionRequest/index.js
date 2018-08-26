@@ -32,6 +32,7 @@ class TransactionRequest extends React.Component {
   }
   render () {
     let status = this.props.req.status
+    let notice = this.props.req.notice
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -47,39 +48,39 @@ class TransactionRequest extends React.Component {
         {this.props.req.type === 'approveTransaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
-              {this.props.req.notice ? (
+              {notice ? (
                 <div className='requestNotice'>
                   {(_ => {
                     if (status === 'pending') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div style={{paddingBottom: '20px'}}><div className='loader' /></div>
+                          <div style={{paddingBottom: 20}}><div className='loader' /></div>
                           <div className='requestNoticeInnerText'>{'See Signer'}</div>
                         </div>
                       )
                     } else if (status === 'success') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div>{svg.octicon('check', {height: '80px'})}</div>
-                          <div className='requestNoticeInnerText'>{this.props.req.notice}</div>
+                          <div>{svg.octicon('check', {height: 80})}</div>
+                          <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else if (status === 'error' || status === 'declined') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div>{svg.octicon('circle-slash', {height: '80px'})}</div>
-                          <div className='requestNoticeInnerText'>{this.props.req.notice}</div>
+                          <div>{svg.octicon('circle-slash', {height: 80})}</div>
+                          <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else {
-                      return <div key={this.props.req.notice} className='requestNoticeInner bounceIn'>{this.props.req.notice}</div>
+                      return <div key={notice} className='requestNoticeInner bounceIn'>{notice}</div>
                     }
                   })()}
                 </div>
               ) : (
                 <React.Fragment>
                   <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', {height: '22px'})}</div>
+                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', {height: 22})}</div>
                     <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
                   </div>
                   <div className='transactionValue'>
@@ -99,9 +100,9 @@ class TransactionRequest extends React.Component {
                   {utils.toAscii(this.props.req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
                       <div className='transactionDataHeader' onClick={() => this.toggleDataView()}>
-                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', {height: '22px'})}</div>
+                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', {height: 22})}</div>
                         <div className='transactionDataLabel'>{'View Data'}</div>
-                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', {height: '22px'})}</div>
+                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', {height: 22})}</div>
                       </div>
                       <div className='transactionDataBody'>
                         <div className='transactionDataBodyInner'>
@@ -115,7 +116,7 @@ class TransactionRequest extends React.Component {
                   {this.props.req.data.to ? (
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>
-                        <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', {height: '20px'})} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
+                        <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', {height: 20})} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
                         <div className='transactionToAddressFull'>
                           {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.req.data.to}
                           <input onClick={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />

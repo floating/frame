@@ -11,11 +11,13 @@ class ProviderRequest extends React.Component {
     }, 2000)
   }
   render () {
+    let status = this.props.req.status
+    let notice = this.props.req.notice
     let requestClass = 'signerRequest'
-    if (this.props.req.status === 'success') requestClass += ' signerRequestSuccess'
-    if (this.props.req.status === 'declined') requestClass += ' signerRequestDeclined'
-    if (this.props.req.status === 'pending') requestClass += ' signerRequestPending'
-    if (this.props.req.status === 'error') requestClass += ' signerRequestError'
+    if (status === 'success') requestClass += ' signerRequestSuccess'
+    if (status === 'declined') requestClass += ' signerRequestDeclined'
+    if (status === 'pending') requestClass += ' signerRequestPending'
+    if (status === 'error') requestClass += ' signerRequestError'
     let origin = this.props.req.origin
     let originClass = 'requestProviderOrigin'
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
@@ -23,26 +25,26 @@ class ProviderRequest extends React.Component {
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{top: (this.props.top * 10) + 'px'}}>
         <div className='approveTransaction'>
-          {this.props.req.notice ? (
+          {notice ? (
             <div className='requestNotice'>
               {(_ => {
-                if (this.props.req.status === 'pending') {
+                if (status === 'pending') {
                   return (
                     <div className='requestNoticeInner bounceIn'>
                       <div><div className='loader' /></div>
                     </div>
                   )
-                } else if (this.props.req.status === 'success') {
-                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: '80px'})}</div>
-                } else if (this.props.req.status === 'error' || this.props.req.status === 'declined') {
-                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: '80px'})}</div>
+                } else if (status === 'success') {
+                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: 80})}</div>
+                } else if (status === 'error' || status === 'declined') {
+                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: 80})}</div>
                 }
               })()}
             </div>
           ) : (
             <div className='approveTransactionPayload'>
               <div className='approveRequestHeader approveTransactionHeader'>
-                <div className='approveRequestHeaderIcon'> {svg.octicon('shield', {height: '20px'})}</div>
+                <div className='approveRequestHeaderIcon'> {svg.octicon('shield', {height: 20})}</div>
                 <div className='approveRequestHeaderLabel'> {'Connection'}</div>
               </div>
               <div className='requestProvider bounceIn'>
