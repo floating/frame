@@ -1,8 +1,6 @@
 const electron = require('electron')
-const { app, shell, BrowserWindow, ipcMain, Tray, Menu } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
-const uuid = require('uuid/v4')
-const url = require('url')
 const Positioner = require('electron-positioner')
 
 const store = require('../store')
@@ -103,7 +101,7 @@ const api = {
 app.on('web-contents-created', (e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
   contents.on('will-attach-webview', e => e.preventDefault())
-  contents.on('new-window',  e => e.preventDefault())
+  contents.on('new-window', e => e.preventDefault())
 })
 
 // Frame Events

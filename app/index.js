@@ -9,7 +9,7 @@ import store from './store'
 
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
-window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) }
+window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 
 api()
 let Frame = Restore.connect(Panel, store)

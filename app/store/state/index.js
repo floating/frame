@@ -1,5 +1,3 @@
-import uuid from 'uuid/v4'
-
 const PersistStore = require('electron-store')
 const persist = new PersistStore()
 const get = (path, obj = persist.get('local')) => {
