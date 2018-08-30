@@ -55,10 +55,10 @@ class ProviderRequest extends React.Component {
           )}
         </div>
         <div className='requestApprove'>
-          <div className='requestDecline' onClick={() => this.store.giveAccess(this.props.req, false)}>
+          <div className='requestDecline' onClick={() => { if (this.state.allowInput) this.store.giveAccess(this.props.req, false) }}>
             <div className='requestDeclineButton'>{'Decline'}</div>
           </div>
-          <div className='requestSign' onClick={() => this.store.giveAccess(this.props.req, true)}>
+          <div className='requestSign' onClick={() => { if (this.state.allowInput) this.store.giveAccess(this.props.req, true) }}>
             <div className='requestSignButton'>{'Approve'}</div>
           </div>
         </div>
