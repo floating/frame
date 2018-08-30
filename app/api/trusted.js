@@ -1,7 +1,7 @@
 import store from '../store'
 import uuidv5 from 'uuid/v5'
 
-const invalidOrigin = o => o !== o.replace(/[^0-9a-z/:.]/gi, '')
+const invalidOrigin = o => o !== o.replace(/[^0-9a-z/:.[\]-]/gi, '')
 
 export default origin => {
   if (!(store('local.connection.local.status') === 'connected' || store('local.connection.secondary.status') === 'connected')) return false
