@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An Ethereum interface",
   "main": "main",
   "build": {
@@ -65,11 +65,13 @@
     "eth-provider": "0.0.10",
     "ethereumjs-tx": "1.3.7",
     "ethereumjs-util": "5.2.0",
+    "md5-file": "^4.0.0",
     "node-hid": "0.7.3",
     "react": "16.4.2",
     "react-dom": "16.4.2",
     "react-restore": "0.3.0",
     "react-transition-group": "1.2.1",
+    "tar": "^4.4.6",
     "trezor.js": "6.17.6",
     "usb-detection": "3.2.0",
     "uuid": "3.3.2",

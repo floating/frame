@@ -4,13 +4,15 @@ const log = require('electron-log')
 const store = require('./store')
 const signers = require('./signers')
 const windows = require('./windows')
+const services = require('./services')
 require('./rpc')
 
-// let quit = false
+const dev = process.env.NODE_ENV === 'development'
+log.transports.file.level = dev ? 'debug' : 'info'
 
-console.log('Chrome: v' + process.versions.chrome)
-console.log('Electron: v' + process.versions.electron)
-console.log('Node: v' + process.versions.node)
+log.debug('Chrome: v' + process.versions.chrome)
+log.debug('Electron: v' + process.versions.electron)
+log.debug('Node: v' + process.versions.node)
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
 
@@ -25,37 +27,35 @@ app.on('ready', () => {
   } else {
     setTimeout(windows.tray, 100)
   }
-  if (app.dock) app.dock.hide()
+  if (app.dock) app.dock.hide() // Hide dock icon
 })
 
 app.on('activate', () => {
-  // quit = false
   windows.activate()
 })
 
 app.on('will-quit', e => {
   app.quit()
-  // if (!quit) e.preventDefault()
-  // if (app.dock) app.dock.hide()
-  // setTimeout(() => {
-  //   quit = true
-  //   app.quit()
-  // }, 3000)
 })
 
-app.on('quit', signers.close)
+app.on('quit', () => {
+  signers.close()
+  services.stop()
+})
 
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
-const autoUpdater = require('electron-updater').autoUpdater
-setTimeout(() => {
-  autoUpdater.checkForUpdatesAndNotify()
-  setInterval(() => {
+if (!dev) {
+  const autoUpdater = require('electron-updater').autoUpdater
+  setTimeout(() => {
     autoUpdater.checkForUpdatesAndNotify()
-  }, 10 * 60 * 1000)
-}, 10000)
+    setInterval(() => {
+      autoUpdater.checkForUpdatesAndNotify()
+    }, 10 * 60 * 1000)
+  }, 10000)
 
-autoUpdater.on('error', message => {
-  log.error('There was a problem updating the application')
-  log.error(message)
-})
+  autoUpdater.on('error', message => {
+    log.error('There was a problem updating the application')
+    log.error(message)
+  })
+}

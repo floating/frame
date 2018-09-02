@@ -11,6 +11,56 @@ const resetAllSettings = () => {
   remote.app.exit(0)
 }
 
+// this.props.on
+// this.propa.title
+// this.props.status
+// this.props.onToggle
+// this.props.shake
+
+// this.props.options [name]
+
+// class Toggle extends React.Component {
+//   constructor (props, context) {
+//     super(props, context)
+//     let network = context.store('local.connection.network')
+//     let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
+//     this.customMessage = 'Custom Endpoint'
+//     this.state = {localShake: {}, secondaryCustom: customTarget || this.customMessage, resetConfirm: false}
+//   }
+//   render () {
+//     return (
+//       <div className='signerPermission'>
+//         <div className={this.props.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+//           <div className='connectionOptionToggle'>
+//             <div className='signerPermissionOrigin'>{this.props.title}</div>
+//             <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={this.props.onToggle}>
+//               <div className='signerPermissionToggleSwitch' />
+//             </div>
+//           </div>
+//           <div className='connectionOptionDetails'>
+//             <div className='connectionOptionDetailsInset'>
+//               {this.props.status}
+//               <div className='signerOptionSetWrap'>
+//                 <div className={this.state.localShake[this.props.shake] ? 'signerOptionSet headShake' : 'signerOptionSet'} onClick={() => this.localShake(this.props.shake)}>
+//                   <div className='signerOptionSetButton' />
+//                   {this.store('local.connection.local.type') ? (
+//                     <div className='signerOptionSetText'>{this.store('local.connection.local.type')}</div>
+//                   ) : (_ => {
+//                     let status = this.store('local.connection.local.status')
+//                     if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>{'scanning...'}</div>
+//                     return ''
+//                   })()}
+//                   <div className='signerOptionSetButton' />
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     )
+//   }
+// }
+
 const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
 
 class Settings extends React.Component {
@@ -185,9 +235,56 @@ class Settings extends React.Component {
             </div>
           </div>
         </div>
+        <div className='localSettingsTitle'>{'Local'}</div>
+        <div className='signerPermission'>
+          <div className={this.store('local.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+            <div className='connectionOptionToggle'>
+              <div className='signerPermissionOrigin'>{'Ethereum Node'}</div>
+              <div className={this.store('local.connection.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('secondary')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='connectionOptionDetails'>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(this.store('local.connection.secondary'))}
+                <div className='signerOptionSet'>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-left', {height: 14})}</div>
+                  <div className='signerOptionSetText'>{this.store('local.connection.secondary.settings', network, 'current')}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
+                </div>
+              </div>
+            </div>
+            <div className={this.store('local.connection.secondary.settings', network, 'current') === 'custom' && this.store('local.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <input value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
+            </div>
+          </div>
+        </div>
+        <div className='signerPermission'>
+          <div className={this.store('local.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+            <div className='connectionOptionToggle'>
+              <div className='signerPermissionOrigin'>{'IPFS Gateway'}</div>
+              <div className={this.store('local.connection.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleConnection('secondary')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='connectionOptionDetails'>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(this.store('local.connection.secondary'))}
+                <div className='signerOptionSet'>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-left', {height: 14})}</div>
+                  <div className='signerOptionSetText'>{this.store('local.connection.secondary.settings', network, 'current')}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
+                </div>
+              </div>
+            </div>
+            <div className={this.store('local.connection.secondary.settings', network, 'current') === 'custom' && this.store('local.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <input value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
+            </div>
+          </div>
+        </div>
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
-          <div className='signerPermissionOrigin'>{'Run Frame on Startup'}</div>
+          <div className='signerPermissionOrigin'>{'Open Frame on Startup'}</div>
           <div className={this.store('local.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => this.store.toggleLaunch()}>
             <div className='signerPermissionToggleSwitch' />
           </div>
