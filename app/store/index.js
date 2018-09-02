@@ -11,6 +11,7 @@ import state from './state'
 import rpc from '../rpc'
 import provider from '../provider'
 
+import log from 'electron-log'
 import PersistStore from 'electron-store'
 
 const persist = new PersistStore()
@@ -92,6 +93,22 @@ store.observer(() => {
     } else {
       rpc('launchDisable', err => console.log(err))
     }
+  }
+})
+
+let node
+store.observer(() => {
+  if (node !== store('local.node.on')) {
+    node = store('local.node.on')
+    rpc('servicesUpdate', 'node', node, err => log.error(err))
+  }
+})
+
+let ipfs
+store.observer(() => {
+  if (ipfs !== store('local.ipfs.on')) {
+    ipfs = store('local.ipfs.on')
+    rpc('servicesUpdate', 'ipfs', ipfs, err => log.error(err))
   }
 })
 

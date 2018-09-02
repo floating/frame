@@ -56,6 +56,14 @@ let initial = {
     success: local('success', false),
     accounts: local('accounts', {}),
     enableMainnet: local('enableMainnet', false),
+    ipfs: {
+      on: local('ipfs.on', true)
+    },
+    node: {
+      on: local('node.on', true),
+      type: local('node.type', 'geth'),
+      mode: local('node.mode', 'light')
+    },
     connection: {
       network: local('connection.network', '4'),
       options: ['1', '4'],

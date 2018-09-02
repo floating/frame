@@ -87,6 +87,8 @@ export const toggleSettings = u => {
 }
 
 export const toggleConnection = (u, node) => u('local.connection', node, 'on', on => !on)
+export const toggleNode = u => u('local.node.on', on => !on)
+export const toggleIPFS = u => u('local.ipfs.on', on => !on)
 
 export const trayOpen = (u, open) => u('tray.open', _ => open)
 
