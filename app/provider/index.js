@@ -25,7 +25,7 @@ class Provider extends EventEmitter {
   getAccounts (payload, res) {
     rpc('getAccounts', (err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
-      res({id: payload.id, jsonrpc: payload.jsonrpc, result: accounts})
+      res({id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.map(a => a.toLowerCase())})
     })
   }
   getNetVersion (payload, res) {
