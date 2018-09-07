@@ -9,13 +9,10 @@ import * as actions from './actions'
 import state from './state'
 
 import rpc from '../rpc'
-// import provider from '../../provider'
 
 import PersistStore from 'electron-store'
 
 const persist = new PersistStore()
-
-// const rpc = window.frame.rpc
 
 export const store = Restore.create(state(), actions)
 store.events = new EventEmitter()
