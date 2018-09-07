@@ -2,10 +2,10 @@ import React from 'react'
 import Restore from 'react-restore'
 import { CSSTransitionGroup } from 'react-transition-group'
 
-import rpc from '../../../../../rpc'
-
 import ProviderRequest from './ProviderRequest'
 import TransactionRequest from './TransactionRequest'
+
+const rpc = window.frame.rpc
 
 class Requests extends React.Component {
   constructor (...args) {

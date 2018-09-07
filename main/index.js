@@ -1,12 +1,11 @@
-const { app, ipcMain } = require('electron')
+const { app, ipcMain, protocol } = require('electron')
 const log = require('electron-log')
+const path = require('path')
 
 const store = require('./store')
 const signers = require('./signers')
 const windows = require('./windows')
 require('./rpc')
-
-// let quit = false
 
 console.log('Chrome: v' + process.versions.chrome)
 console.log('Electron: v' + process.versions.electron)
@@ -26,25 +25,16 @@ app.on('ready', () => {
     setTimeout(windows.tray, 100)
   }
   if (app.dock) app.dock.hide()
+  protocol.interceptFileProtocol('file', (req, cb) => {
+    let appOrigin = path.resolve(__dirname, '../')
+    let filePath = path.resolve(__dirname, req.url.replace('file://', ''))
+    if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
+  })
 })
 
-app.on('activate', () => {
-  // quit = false
-  windows.activate()
-})
-
-app.on('will-quit', e => {
-  app.quit()
-  // if (!quit) e.preventDefault()
-  // if (app.dock) app.dock.hide()
-  // setTimeout(() => {
-  //   quit = true
-  //   app.quit()
-  // }, 3000)
-})
-
+app.on('activate', () => windows.activate())
+app.on('will-quit', () => app.quit())
 app.on('quit', signers.close)
-
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 const autoUpdater = require('electron-updater').autoUpdater

@@ -16,7 +16,8 @@ const api = {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
-    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false})
+    const webPreferences = {nodeIntegration: false, contextIsolation: false, preload: path.resolve(__dirname, '../../bundle/preload.js')}
+    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences})
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -91,7 +92,6 @@ const api = {
   },
   activate: () => {
     api.showTray()
-    // if (Object.keys(windows).length === 1) api.create()
   },
   quit: () => {
     app.quit()

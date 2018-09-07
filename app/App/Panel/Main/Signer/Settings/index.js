@@ -1,8 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-// import provider from '../../../../../provider'
-
 class Settings extends React.Component {
   clearPermissions () {
     return (

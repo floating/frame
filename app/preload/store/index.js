@@ -9,11 +9,13 @@ import * as actions from './actions'
 import state from './state'
 
 import rpc from '../rpc'
-import provider from '../provider'
+// import provider from '../../provider'
 
 import PersistStore from 'electron-store'
 
 const persist = new PersistStore()
+
+// const rpc = window.frame.rpc
 
 export const store = Restore.create(state(), actions)
 store.events = new EventEmitter()
@@ -42,20 +44,6 @@ ipcRenderer.on('main:setSigner', (e, signer) => {
   }
 })
 
-// Replace events with observers
-store.events.on('approveRequest', (id, req) => {
-  store.requestPending(id)
-  provider.approveRequest(req, (err, res) => {
-    if (err) return store.requestError(id, err)
-    store.requestSuccess(id, res)
-  })
-})
-
-store.events.on('declineRequest', (id, req) => {
-  store.declineRequest(id)
-  provider.declineRequest(req)
-})
-
 const etherRates = () => {
   fetch('https://api.coinbase.com/v2/exchange-rates?currency=ETH').then(res => res.json()).then(res => {
     if (res && res.data && res.data.rates) store.updateExternalRates(res.data.rates)
@@ -65,14 +53,6 @@ etherRates()
 setInterval(etherRates, 10000)
 
 // Store Observers
-store.observer(() => {
-  if (store('panel.show')) {
-    document.body.className += ' panel'
-  } else {
-    document.body.className = document.body.className.replace(' panel', '')
-  }
-})
-
 let network = ''
 store.observer(() => {
   if (network !== store('local.connection.network')) {

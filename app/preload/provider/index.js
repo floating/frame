@@ -158,4 +158,20 @@ class Provider extends EventEmitter {
   }
 }
 
-export default new Provider()
+const provider = new Provider()
+
+// Replace events with observers
+store.events.on('approveRequest', (id, req) => {
+  store.requestPending(id)
+  provider.approveRequest(req, (err, res) => {
+    if (err) return store.requestError(id, err)
+    store.requestSuccess(id, res)
+  })
+})
+
+store.events.on('declineRequest', (id, req) => {
+  store.declineRequest(id)
+  provider.declineRequest(req)
+})
+
+export default provider

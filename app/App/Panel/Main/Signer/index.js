@@ -2,13 +2,14 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import svg from '../../../../svg'
-import rpc from '../../../../rpc'
 
 import Requests from './Requests'
 import Settings from './Settings'
 
 import ledgerLogo from './ledgerLogo.png'
 import trezorLogo from './trezorLogo.png'
+
+const rpc = window.frame.rpc
 
 class Signer extends React.Component {
   constructor (...args) {
