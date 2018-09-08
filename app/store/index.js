@@ -1,44 +1,39 @@
 /* globals fetch */
 
-import { ipcRenderer } from 'electron'
-
 import EventEmitter from 'events'
 import Restore from 'react-restore'
 
+import iso from '../iso'
 import * as actions from './actions'
-import state from './state'
 
-import rpc from '../rpc'
-
-import PersistStore from 'electron-store'
-
-const persist = new PersistStore()
-
-export const store = Restore.create(state(), actions)
+export const store = Restore.create(window.frameState, actions)
 store.events = new EventEmitter()
 
-rpc('getSigners', (err, signers) => {
+iso.rpc('getSigners', (err, signers) => {
   if (err) return store.signersError(err)
   store.updateSigners(signers)
 })
-
-rpc('launchStatus', (err, status) => {
+iso.rpc('launchStatus', (err, status) => {
   if (err) return console.log(err) // launchStatusError
   store.setLaunch(status)
 })
 
-ipcRenderer.on('main:addSigner', (e, signer) => store.addSigner(signer))
-ipcRenderer.on('main:removeSigner', (e, signer) => {
+iso.on('main:addSigner', (signer) => store.addSigner(signer))
+iso.on('main:removeSigner', (signer) => {
   if (store('signer.current') === signer.id) store.unsetSigner()
   store.removeSigner(signer)
 })
-ipcRenderer.on('main:updateSigner', (e, signer) => store.updateSigner(signer))
-ipcRenderer.on('main:setSigner', (e, signer) => {
+iso.on('main:updateSigner', (signer) => store.updateSigner(signer))
+iso.on('main:setSigner', (signer) => {
   if (signer.id) {
     store.setSigner(signer)
   } else {
     store.unsetSigner()
   }
+})
+
+iso.on('action', (action, ...args) => {
+  if (store[action]) store[action](...args)
 })
 
 const etherRates = () => {
@@ -54,20 +49,22 @@ let network = ''
 store.observer(() => {
   if (network !== store('local.connection.network')) {
     network = store('local.connection.network')
-    ipcRenderer.send('tray:setNetwork', network)
+    iso.send('tray:setNetwork', network)
   }
 })
 
-store.observer(_ => persist.set('local', store('local')))
+store.observer(_ => iso.send('tray:persistLocal', store('local')))
+store.observer(() => iso.sync('local', store('local')))
+store.observer(() => iso.sync('signer', store('signer')))
 
 let launch = store('local.launch')
 store.observer(() => {
   if (launch !== store('local.launch')) {
     launch = store('local.launch')
     if (launch) {
-      rpc('launchEnable', err => console.log(err))
+      iso.rpc('launchEnable', err => console.log(err))
     } else {
-      rpc('launchDisable', err => console.log(err))
+      iso.rpc('launchDisable', err => console.log(err))
     }
   }
 })

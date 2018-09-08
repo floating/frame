@@ -1,11 +1,14 @@
 import uuid from 'uuid/v4'
 import EventEmitter from 'events'
+import log from 'electron-log'
 import utils from 'web3-utils'
 import { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } from 'ethereumjs-util'
 
 import rpc from '../rpc'
 import store from '../store'
 import nodes from '../nodes'
+
+// import iso from '../iso'
 
 class Provider extends EventEmitter {
   constructor () {
@@ -15,6 +18,7 @@ class Provider extends EventEmitter {
     this.nonce = {}
     this.connection = nodes
     this.connection.on('data', data => this.emit('data', data))
+    this.connection.on('error', err => log.error(err))
   }
   getCoinbase (payload, res) {
     rpc('getAccounts', (err, accounts) => {
@@ -124,7 +128,7 @@ class Provider extends EventEmitter {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network'))
       let handlerId = uuid()
-      this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, payload})
+      this.iso.action('addRequest', {handlerId, type: 'approveTransaction', data: rawTx, payload})
       this.handlers[handlerId] = res
     })
   }
@@ -161,17 +165,17 @@ class Provider extends EventEmitter {
 const provider = new Provider()
 
 // Replace events with observers
-store.events.on('approveRequest', (id, req) => {
-  store.requestPending(id)
-  provider.approveRequest(req, (err, res) => {
-    if (err) return store.requestError(id, err)
-    store.requestSuccess(id, res)
-  })
-})
-
-store.events.on('declineRequest', (id, req) => {
-  store.declineRequest(id)
-  provider.declineRequest(req)
-})
+// store.events.on('approveRequest', (id, req) => {
+//   store.requestPending(id)
+//   provider.approveRequest(req, (err, res) => {
+//     if (err) return store.requestError(id, err)
+//     store.requestSuccess(id, res)
+//   })
+// })
+//
+// store.events.on('declineRequest', (id, req) => {
+//   store.declineRequest(id)
+//   provider.declineRequest(req)
+// })
 
 export default provider

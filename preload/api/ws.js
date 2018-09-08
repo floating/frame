@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 
 import provider from '../provider'
 import store from '../store'
-
+//
 import trusted from './trusted'
 
 const subs = {}

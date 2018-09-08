@@ -1,4 +1,5 @@
-const { app, ipcMain, protocol } = require('electron')
+const { app, ipcMain, protocol, shell } = require('electron')
+const PersistStore = require('electron-store')
 const log = require('electron-log')
 const path = require('path')
 
@@ -7,15 +8,41 @@ const signers = require('./signers')
 const windows = require('./windows')
 require('./rpc')
 
-console.log('Chrome: v' + process.versions.chrome)
-console.log('Electron: v' + process.versions.electron)
-console.log('Node: v' + process.versions.node)
+log.info('Chrome: v' + process.versions.chrome)
+log.info('Electron: v' + process.versions.electron)
+log.info('Node: v' + process.versions.node)
+
+const persist = new PersistStore()
+
+const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
+
+const externalWhitelist = [
+  'https://frame.sh',
+  'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
+  'https://github.com/floating/frame/issues/new',
+  'https://gitter.im/framehq/general'
+]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
 
 ipcMain.on('tray:setNetwork', (e, network) => {
   signers.unsetSigner()
-  store.setNetwork(network)
+  store.setNetwork(unwrap(network))
+})
+
+ipcMain.on('tray:resetAllSettings', () => {
+  persist.clear()
+  app.relaunch()
+  app.exit(0)
+})
+
+ipcMain.on('tray:openExternal', (e, url) => {
+  url = unwrap(url)
+  if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
+})
+
+ipcMain.on('tray:persistLocal', (e, local) => {
+  persist.set('local', local)
 })
 
 app.on('ready', () => {

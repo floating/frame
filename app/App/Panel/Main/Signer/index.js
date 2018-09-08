@@ -2,14 +2,13 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import svg from '../../../../svg'
+import iso from '../../../../iso'
 
 import Requests from './Requests'
 import Settings from './Settings'
 
 import ledgerLogo from './ledgerLogo.png'
 import trezorLogo from './trezorLogo.png'
-
-const rpc = window.frame.rpc
 
 class Signer extends React.Component {
   constructor (...args) {
@@ -26,18 +25,18 @@ class Signer extends React.Component {
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
     if (this.tPin.length === 4) {
-      rpc('trezorPin', this.props.id, this.tPin, (err, status) => { if (err) throw new Error(err) })
+      iso.rpc('trezorPin', this.props.id, this.tPin, (err, status) => { if (err) throw new Error(err) })
       this.tPin = ''
     }
   }
   select () {
     if (this.store('signer.current') === this.props.id) {
-      rpc('unsetSigner', (err, status) => { if (err) return console.log(err) })
+      iso.rpc('unsetSigner', (err, status) => { if (err) return console.log(err) })
     } else {
       let bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
       this.store.initialSignerPos({top: bounds.top - 5, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3 - 5, height: this.signer.clientHeight, index: this.props.index})
-      rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
+      iso.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
   renderTrezorPin (active) {

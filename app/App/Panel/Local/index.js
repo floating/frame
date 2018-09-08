@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../svg'
+import iso from '../../../iso'
 
 const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
 
@@ -19,7 +20,7 @@ class Settings extends React.Component {
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <span className='appInfoLineResetConfirm'>
-              {'Are you sure?'} <span onClick={() => window.frame.process.resetAllSettings()}>{'Yes'}</span> <span>{'/'}</span> <span onClick={() => this.setState({resetConfirm: false})}>{'No'}</span>
+              {'Are you sure?'} <span onClick={() => iso.send('tray:resetAllSettings')}>{'Yes'}</span> <span>{'/'}</span> <span onClick={() => this.setState({resetConfirm: false})}>{'No'}</span>
             </span>
           ) : (
             <span onClick={() => this.setState({resetConfirm: true})}>{'Reset All Settings & Data'}</span>
@@ -83,7 +84,7 @@ class Settings extends React.Component {
   quit () {
     return (
       <div className='quitFrame'>
-        <div onClick={() => window.frame.process.quit()} className='quitFrameButton'>{'Quit'}</div>
+        <div onClick={() => iso.send('tray:quit')} className='quitFrameButton'>{'Quit'}</div>
       </div>
     )
   }
