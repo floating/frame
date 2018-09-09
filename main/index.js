@@ -45,6 +45,12 @@ ipcMain.on('tray:persistLocal', (e, local) => {
   persist.set('local', local)
 })
 
+ipcMain.on('tray:setSync', (e, key, payload) => {
+  store.setSync(key, payload)
+})
+
+ipcMain.on('tray:api', () => require('./api'))
+
 app.on('ready', () => {
   if (process.platform === 'darwin' || process.platform === 'win32') {
     windows.tray()

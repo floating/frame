@@ -1,10 +1,10 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
 
-import EventEmitter from 'events'
-import provider from 'eth-provider'
+const EventEmitter = require('events')
+const provider = require('eth-provider')
 
-import store from '../store'
-import iso from '../iso'
+const store = require('../store')
+const windows = require('../windows')
 
 class Nodes extends EventEmitter {
   constructor () {
@@ -23,7 +23,7 @@ class Nodes extends EventEmitter {
     }
     if (connection.local.on) {
       if (!this.local) {
-        if (connection.local.status !== 'loading') iso.action('setLocal', {status: 'loading', connected: false, type: ''})
+        if (connection.local.status !== 'loading') windows.broadcast('main:action', 'setLocal', {status: 'loading', connected: false, type: ''})
         this.local = provider('direct', {name: 'local'})
         this.local.on('connect', details => {
           this.getNetwork(this.local, (netErr, netResponse) => {
@@ -31,18 +31,18 @@ class Nodes extends EventEmitter {
               this.local.network = !netErr && netResponse && !netResponse.error ? netResponse.result : ''
               this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : ''
               this.emit('connect')
-              iso.action('setLocal', {status: this.local.status, connected: true, type: this.local.type, network: this.local.network})
+              windows.broadcast('main:action', 'setLocal', {status: this.local.status, connected: true, type: this.local.type, network: this.local.network})
             })
           })
         })
         this.local.on('close', details => {
           this.emit('close')
-          iso.action('setLocal', {status: this.local.status, connected: false, type: '', network: ''})
+          windows.broadcast('main:action', 'setLocal', {status: this.local.status, connected: false, type: '', network: ''})
         })
         this.local.on('status', status => {
           let current = store('local.connection.local.status')
           if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
-          iso.action('setLocal', {status})
+          windows.broadcast('main:action', 'setLocal', {status})
         })
         this.local.on('data', data => this.emit('data', data))
         this.local.on('error', err => this.emit('error', err))
@@ -50,7 +50,7 @@ class Nodes extends EventEmitter {
     } else {
       if (this.local) this.local.close()
       this.local = null
-      if (connection.local.status !== 'off') iso.action('setLocal', {status: 'off', connected: false, type: ''})
+      if (connection.local.status !== 'off') windows.broadcast('main:action', 'setLocal', {status: 'off', connected: false, type: ''})
     }
     if (connection.secondary.on) {
       if (!connection.local.on || (connection.local.status !== 'connected' && connection.local.status !== 'loading')) {
@@ -58,28 +58,28 @@ class Nodes extends EventEmitter {
         let target = settings.options[settings.current]
         if (!this.secondary || this.secondary.currentTarget !== target) {
           if (this.secondary) this.secondary.close()
-          if (connection.secondary.status !== 'loading') iso.action('setSecondary', {status: 'loading', connected: false, type: ''})
+          if (connection.secondary.status !== 'loading') windows.broadcast('main:action', 'setSecondary', {status: 'loading', connected: false, type: ''})
           this.secondary = provider(target, {name: 'secondary'})
           this.secondary.currentTarget = target
           this.secondary.on('connect', () => {
             this.getNetwork(this.secondary, (err, response) => {
               this.secondary.network = !err && response && !response.error ? response.result : '?'
               if (this.secondary.network !== store('local.connection.network')) {
-                iso.action('setSecondary', {status: 'network mismatch', connected: false, type: '', network: this.secondary.network})
+                windows.broadcast('main:action', 'setSecondary', {status: 'network mismatch', connected: false, type: '', network: this.secondary.network})
               } else {
                 this.emit('connect')
-                iso.action('setSecondary', {status: this.secondary.status, connected: true, type: '', network: this.secondary.network})
+                windows.broadcast('main:action', 'setSecondary', {status: this.secondary.status, connected: true, type: '', network: this.secondary.network})
               }
             })
           })
           this.secondary.on('close', () => {
             this.emit('close')
-            iso.action('setSecondary', {status: this.secondary.status, connected: false, type: '', network: ''})
+            windows.broadcast('main:action', 'setSecondary', {status: this.secondary.status, connected: false, type: '', network: ''})
           })
           this.secondary.on('status', status => {
             let current = store('local.connection.local.status')
             if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
-            iso.action('setSecondary', {status})
+            windows.broadcast('main:action', 'setSecondary', {status})
           })
           this.secondary.on('data', data => this.emit('data', data))
           this.secondary.on('error', err => this.emit('error', err))
@@ -87,12 +87,12 @@ class Nodes extends EventEmitter {
       } else {
         if (this.secondary) this.secondary.close()
         this.secondary = null
-        if (connection.secondary.status !== 'standby') iso.action('setSecondary', {status: 'standby', connected: false, type: ''})
+        if (connection.secondary.status !== 'standby') windows.broadcast('main:action', 'setSecondary', {status: 'standby', connected: false, type: ''})
       }
     } else {
       if (this.secondary) this.secondary.close()
       this.secondary = null
-      if (connection.secondary.status !== 'off') iso.action('setSecondary', {status: 'off', connected: false, type: ''})
+      if (connection.secondary.status !== 'off') windows.broadcast('main:action', 'setSecondary', {status: 'off', connected: false, type: ''})
     }
   }
   resError (error, payload, res) {
@@ -116,4 +116,4 @@ class Nodes extends EventEmitter {
   }
 }
 
-export default new Nodes()
+module.exports = new Nodes()

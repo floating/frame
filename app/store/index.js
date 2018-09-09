@@ -3,28 +3,34 @@
 import EventEmitter from 'events'
 import Restore from 'react-restore'
 
-import iso from '../iso'
+import link from '../link'
 import * as actions from './actions'
 
-export const store = Restore.create(window.frameState, actions)
+export const store = Restore.create(window.__initialState, actions)
 store.events = new EventEmitter()
 
-iso.rpc('getSigners', (err, signers) => {
+link.rpc('getSigners', (err, signers) => {
   if (err) return store.signersError(err)
   store.updateSigners(signers)
 })
-iso.rpc('launchStatus', (err, status) => {
+link.rpc('launchStatus', (err, status) => {
   if (err) return console.log(err) // launchStatusError
   store.setLaunch(status)
 })
 
-iso.on('main:addSigner', (signer) => store.addSigner(signer))
-iso.on('main:removeSigner', (signer) => {
+link.on('main:trayOpen', (open) => {
+  store.trayOpen(open)
+  if (open) store.setSignerView('default')
+})
+link.on('main:addSigner', (signer) => store.addSigner(signer))
+link.on('main:removeSigner', (signer) => {
   if (store('signer.current') === signer.id) store.unsetSigner()
   store.removeSigner(signer)
 })
-iso.on('main:updateSigner', (signer) => store.updateSigner(signer))
-iso.on('main:setSigner', (signer) => {
+link.on('main:updateSigner', (signer) => {
+  store.updateSigner(signer)
+})
+link.on('main:setSigner', (signer) => {
   if (signer.id) {
     store.setSigner(signer)
   } else {
@@ -32,9 +38,8 @@ iso.on('main:setSigner', (signer) => {
   }
 })
 
-iso.on('action', (action, ...args) => {
-  if (store[action]) store[action](...args)
-})
+link.on('main:action', (action, ...args) => { if (store[action]) store[action](...args) })
+link.send('tray:api') // turn on api
 
 const etherRates = () => {
   fetch('https://api.coinbase.com/v2/exchange-rates?currency=ETH').then(res => res.json()).then(res => {
@@ -49,22 +54,22 @@ let network = ''
 store.observer(() => {
   if (network !== store('local.connection.network')) {
     network = store('local.connection.network')
-    iso.send('tray:setNetwork', network)
+    link.send('tray:setNetwork', network)
   }
 })
 
-store.observer(_ => iso.send('tray:persistLocal', store('local')))
-store.observer(() => iso.sync('local', store('local')))
-store.observer(() => iso.sync('signer', store('signer')))
+store.observer(_ => link.send('tray:persistLocal', store('local')))
+store.observer(() => link.send('tray:setSync', 'local', store('local')))
+store.observer(() => link.send('tray:setSync', 'signer', store('signer')))
 
 let launch = store('local.launch')
 store.observer(() => {
   if (launch !== store('local.launch')) {
     launch = store('local.launch')
     if (launch) {
-      iso.rpc('launchEnable', err => console.log(err))
+      link.rpc('launchEnable', err => console.log(err))
     } else {
-      iso.rpc('launchDisable', err => console.log(err))
+      link.rpc('launchDisable', err => console.log(err))
     }
   }
 })
