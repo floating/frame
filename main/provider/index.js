@@ -1,3 +1,4 @@
+const { ipcMain } = require('electron')
 const uuid = require('uuid/v4')
 const EventEmitter = require('events')
 const log = require('electron-log')
@@ -17,6 +18,10 @@ class Provider extends EventEmitter {
     this.connection = nodes
     this.connection.on('data', data => this.emit('data', data))
     this.connection.on('error', err => log.error(err))
+    this.getGasPrice = this.getGasPrice.bind(this)
+    this.getGasEstimate = this.getGasEstimate.bind(this)
+    this.getNonce = this.getNonce.bind(this)
+    this.fillTx = this.fillTx.bind(this)
   }
   getCoinbase (payload, res) {
     signers.getAccounts((err, accounts) => {
@@ -166,18 +171,17 @@ class Provider extends EventEmitter {
 
 const provider = new Provider()
 
-// Replace events with observers
-// store.events.on('approveRequest', (id, req) => {
-//   store.requestPending(id)
-//   provider.approveRequest(req, (err, res) => {
-//     if (err) return store.requestError(id, err)
-//     store.requestSuccess(id, res)
-//   })
-// })
-//
-// store.events.on('declineRequest', (id, req) => {
-//   store.declineRequest(id)
-//   provider.declineRequest(req)
-// })
+ipcMain.on('tray:approveRequest', (e, id, req) => {
+  windows.broadcast('main:action', 'requestPending', id)
+  provider.approveRequest(req, (err, res) => {
+    if (err) return windows.broadcast('main:action', 'requestError', id, err)
+    windows.broadcast('main:action', 'requestSuccess', id, res)
+  })
+})
+
+ipcMain.on('tray:declineRequest', (e, id, req) => {
+  windows.broadcast('main:action', 'declineRequest', id)
+  provider.declineRequest(req)
+})
 
 module.exports = provider

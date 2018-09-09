@@ -45,7 +45,7 @@ const api = {
   hideTray: () => {
     let now = Date.now()
     if (now - lock < 700) { return } else { lock = now }
-    windows.tray.send('main:trayOpen', false)
+    windows.tray.send('main:action', 'trayOpen', false)
     setTimeout(_ => windows.tray.hide(), 700)
   },
   showTray: () => {
@@ -65,7 +65,8 @@ const api = {
     windows.tray.setSize(370, dev ? 740 : screen.workArea.height)
     windows.tray.show()
     setTimeout(() => windows.tray.focus(), 700)
-    windows.tray.send('main:trayOpen', true)
+    windows.tray.send('main:action', 'trayOpen', true)
+    windows.tray.send('main:action', 'setSignerView', 'default')
   },
   close: (e) => {
     let id = winId(e)

@@ -18,27 +18,7 @@ link.rpc('launchStatus', (err, status) => {
   store.setLaunch(status)
 })
 
-link.on('main:trayOpen', (open) => {
-  store.trayOpen(open)
-  if (open) store.setSignerView('default')
-})
-link.on('main:addSigner', (signer) => store.addSigner(signer))
-link.on('main:removeSigner', (signer) => {
-  if (store('signer.current') === signer.id) store.unsetSigner()
-  store.removeSigner(signer)
-})
-link.on('main:updateSigner', (signer) => {
-  store.updateSigner(signer)
-})
-link.on('main:setSigner', (signer) => {
-  if (signer.id) {
-    store.setSigner(signer)
-  } else {
-    store.unsetSigner()
-  }
-})
-
-link.on('main:action', (action, ...args) => { if (store[action]) store[action](...args) })
+link.on('action', (action, ...args) => { if (store[action]) store[action](...args) })
 link.send('tray:api') // turn on api
 
 const etherRates = () => {

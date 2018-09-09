@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 import svg from '../../../../../../svg'
+import link from '../../../../../../link'
 
 class TransactionRequest extends React.Component {
   constructor (...args) {
@@ -19,10 +20,10 @@ class TransactionRequest extends React.Component {
     setTimeout(_ => this.setState({copied: false}), 1000)
   }
   approve (reqId, req) {
-    this.store.events.emit('approveRequest', reqId, req)
+    link.send('tray:approveRequest', reqId, req)
   }
   decline (reqId, req) {
-    this.store.events.emit('declineRequest', reqId, req)
+    link.send('tray:declineRequest', reqId, req)
   }
   toggleDataView (id) {
     this.setState({dataView: !this.state.dataView})

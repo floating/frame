@@ -30,13 +30,13 @@ module.exports = {
     current = id
     let summary = signers[current].summary()
     cb(null, summary)
-    windows.broadcast('main:setSigner', summary)
+    windows.broadcast('main:action', 'setSigner', summary)
   },
   unsetSigner: (cb) => {
     current = null
     let summary = {id: '', type: '', accounts: [], status: ''}
     if (cb) cb(null, summary)
-    windows.broadcast('main:setSigner', summary)
+    windows.broadcast('main:action', 'unsetSigner', summary)
   },
   getAccounts: (cb) => {
     if (!signers[current]) return cb(new Error('No Account Selected'))
