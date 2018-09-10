@@ -25,11 +25,6 @@ const externalWhitelist = [
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
 
-ipcMain.on('tray:setNetwork', (e, network) => {
-  signers.unsetSigner()
-  store.setNetwork(unwrap(network))
-})
-
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
   app.relaunch()
