@@ -1,6 +1,6 @@
-import http from 'http'
-import provider from '../provider'
-import trusted from './trusted'
+const http = require('http')
+const provider = require('../provider')
+const trusted = require('./trusted')
 
 const polls = {}
 const pollSubs = {}
@@ -72,4 +72,4 @@ provider.on('data', payload => {
   }
 })
 
-export default () => http.createServer(handler)
+module.exports = () => http.createServer(handler)

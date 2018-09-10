@@ -1,7 +1,8 @@
 import uuidv4 from 'uuid/v4'
 import uuidv5 from 'uuid/v5'
 import { URL } from 'url'
-import { ipcRenderer } from 'electron'
+
+import link from '../../link'
 
 const remove = (obj, id) => {
   if (obj[id]) delete obj[id]
@@ -128,7 +129,7 @@ export const addRequest = (u, request) => {
   u('signer.view', view => 'default')
   u('signer.requests', (requests, state) => {
     if (!request.handlerId) throw new Error('No handlerId for added request...', request)
-    if (state.frame.type === 'tray' && state.signer.current) ipcRenderer.send('frame:showTray')
+    if (state.frame.type === 'tray' && state.signer.current) link.send('frame:showTray')
     requests[request.handlerId] = request
     return requests
   })
@@ -230,7 +231,8 @@ export const unsetSigner = u => {
 
 export const nodeProvider = (u, connected) => u('node.provider', _ => connected)
 
-export const removeSigner = (u, signer) => {
+export const removeSigner = (u, signer, state) => {
+  if (state.signer.current === signer.id) unsetSigner(u)
   let status = 'Removing'
   u('signers', signers => {
     if (signers[signer.id]) signers[signer.id].removing = true

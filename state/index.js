@@ -111,4 +111,4 @@ let initial = {
   }
 }
 
-export default () => initial
+module.exports = () => initial

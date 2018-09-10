@@ -24,11 +24,13 @@ class Trezor extends Signer {
     device.on('disconnect', () => this.close())
     this.open()
     store.observer(() => {
-      this.network = store('network')
-      this.status = 'loading'
-      this.accounts = []
-      this.update()
-      if (this.network) this.deviceStatus()
+      if (this.network !== store('local.connection.network')) {
+        this.network = store('local.connection.network')
+        this.status = 'loading'
+        this.accounts = []
+        this.update()
+        if (this.network) this.deviceStatus()
+      }
     })
   }
   button (label) {

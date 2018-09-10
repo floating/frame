@@ -1,11 +1,13 @@
-import uuid from 'uuid/v4'
-import EventEmitter from 'events'
-import utils from 'web3-utils'
-import { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } from 'ethereumjs-util'
-
-import rpc from '../rpc'
-import store from '../store'
-import nodes from '../nodes'
+const { ipcMain } = require('electron')
+const uuid = require('uuid/v4')
+const EventEmitter = require('events')
+const log = require('electron-log')
+const utils = require('web3-utils')
+const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+const store = require('../store')
+const windows = require('../windows')
+const nodes = require('../nodes')
+const signers = require('../signers')
 
 class Provider extends EventEmitter {
   constructor () {
@@ -15,15 +17,20 @@ class Provider extends EventEmitter {
     this.nonce = {}
     this.connection = nodes
     this.connection.on('data', data => this.emit('data', data))
+    this.connection.on('error', err => log.error(err))
+    this.getGasPrice = this.getGasPrice.bind(this)
+    this.getGasEstimate = this.getGasEstimate.bind(this)
+    this.getNonce = this.getNonce.bind(this)
+    this.fillTx = this.fillTx.bind(this)
   }
   getCoinbase (payload, res) {
-    rpc('getAccounts', (err, accounts) => {
+    signers.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
       res({id: payload.id, jsonrpc: payload.jsonrpc, result: accounts[0]})
     })
   }
   getAccounts (payload, res) {
-    rpc('getAccounts', (err, accounts) => {
+    signers.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
       res({id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.map(a => a.toLowerCase())})
     })
@@ -48,7 +55,7 @@ class Provider extends EventEmitter {
     let rawTx = req.data
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
-    rpc('signTransaction', rawTx, (err, signedTx) => { // Sign Transaction
+    signers.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
       if (err) {
         this.resError(err, payload, res)
         return cb(new Error(`signTransaction Error: ${JSON.stringify(err)}`))
@@ -79,9 +86,13 @@ class Provider extends EventEmitter {
     delete rawTx.gasLimit
     return rawTx
   }
-  getGasPrice = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, res)
-  getGasEstimate = (rawTx, res) => this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx]}, res)
-  getNonce = (rawTx, res) => {
+  getGasPrice (rawTx, res) {
+    this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, res)
+  }
+  getGasEstimate (rawTx, res) {
+    this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx]}, res)
+  }
+  getNonce (rawTx, res) {
     if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.account === rawTx.from && this.nonce.current) {
       let newNonce = utils.hexToNumber(this.nonce.current)
       newNonce++
@@ -95,7 +106,7 @@ class Provider extends EventEmitter {
       })
     }
   }
-  fillTx = (rawTx, cb) => {
+  fillTx (rawTx, cb) {
     let needs = {}
     // if (!rawTx.nonce) needs.nonce = this.getNonce
     if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
@@ -124,12 +135,12 @@ class Provider extends EventEmitter {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network'))
       let handlerId = uuid()
-      this.store.addRequest({handlerId, type: 'approveTransaction', data: rawTx, payload})
+      windows.broadcast('main:action', 'addRequest', {handlerId, type: 'approveTransaction', data: rawTx, payload})
       this.handlers[handlerId] = res
     })
   }
   signPersonal (payload, res) {
-    rpc('signPersonal', payload.params[0], payload.params[1], (err, signed) => {
+    signers.signPersonal(payload.params[0], payload.params[1], (err, signed) => {
       if (err) return this.resError(`Frame provider error during signPersonal: ${err.message}`, payload, res)
       res({id: payload.id, jsonrpc: payload.jsonrpc, result: signed})
     })
@@ -158,4 +169,19 @@ class Provider extends EventEmitter {
   }
 }
 
-export default new Provider()
+const provider = new Provider()
+
+ipcMain.on('tray:approveRequest', (e, id, req) => {
+  windows.broadcast('main:action', 'requestPending', id)
+  provider.approveRequest(req, (err, res) => {
+    if (err) return windows.broadcast('main:action', 'requestError', id, err)
+    windows.broadcast('main:action', 'requestSuccess', id, res)
+  })
+})
+
+ipcMain.on('tray:declineRequest', (e, id, req) => {
+  windows.broadcast('main:action', 'declineRequest', id)
+  provider.declineRequest(req)
+})
+
+module.exports = provider

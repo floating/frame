@@ -16,11 +16,13 @@ class Ledger extends Signer {
     this.handlers = {}
     this.open()
     store.observer(() => {
-      this.network = store('network')
-      this.status = 'loading'
-      this.accounts = []
-      this.update()
-      if (this.network) this.deviceStatus()
+      if (this.network !== store('local.connection.network')) {
+        this.network = store('local.connection.network')
+        this.status = 'loading'
+        this.accounts = []
+        this.update()
+        if (this.network) this.deviceStatus()
+      }
     })
   }
   deviceStatus () {

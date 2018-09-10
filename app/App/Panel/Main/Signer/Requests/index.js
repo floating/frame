@@ -2,10 +2,10 @@ import React from 'react'
 import Restore from 'react-restore'
 import { CSSTransitionGroup } from 'react-transition-group'
 
-import rpc from '../../../../../rpc'
-
 import ProviderRequest from './ProviderRequest'
 import TransactionRequest from './TransactionRequest'
+
+import link from '../../../../../link'
 
 class Requests extends React.Component {
   constructor (...args) {
@@ -15,7 +15,7 @@ class Requests extends React.Component {
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
     if (this.tPin.length === 4) {
-      rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
+      link.rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
         if (err) throw new Error(err)
       })
       this.tPin = ''
@@ -28,7 +28,7 @@ class Requests extends React.Component {
     this.setState({minimized: false})
     let current = this.store('signer.current') === this.props.id
     if (!current) {
-      rpc('setSigner', this.props.id, (err, status) => {
+      link.rpc('setSigner', this.props.id, (err, status) => {
         if (err) throw new Error(err)
       })
     }

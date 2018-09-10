@@ -1,10 +1,9 @@
-import WebSocket from 'ws'
-import uuid from 'uuid/v4'
+const WebSocket = require('ws')
+const uuid = require('uuid/v4')
 
-import provider from '../provider'
-import store from '../store'
-
-import trusted from './trusted'
+const provider = require('../provider')
+const store = require('../store')
+const trusted = require('./trusted')
 
 const subs = {}
 
@@ -37,7 +36,7 @@ const handler = (socket, req) => {
   })
 }
 
-export default (server) => {
+module.exports = server => {
   const ws = new WebSocket.Server({server, verifyClient: (info, next) => next(trusted(info.origin), 401, 'Permission Denied')})
   ws.on('connection', handler)
   // If we lose connection to our node, close connected sockets

@@ -14,5 +14,6 @@ module.exports = {
   },
   setNetwork: (u, newNetwork) => {
     u('network', () => newNetwork)
-  }
+  },
+  setSync: (u, key, payload) => u(key, () => payload)
 }
