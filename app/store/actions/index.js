@@ -232,9 +232,9 @@ export const unsetSigner = u => {
 export const nodeProvider = (u, connected) => u('node.provider', _ => connected)
 
 export const removeSigner = (u, signer, state) => {
-  if (state.signer.current === signer.id) unsetSigner(u)
   let status = 'Removing'
-  u('signers', signers => {
+  u('signers', (signers, state) => {
+    if (state.signer.current === signer.id) unsetSigner(u)
     if (signers[signer.id]) signers[signer.id].removing = true
     return signers
   })
