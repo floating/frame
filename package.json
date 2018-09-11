@@ -54,7 +54,7 @@
   "dependencies": {
     "@githubprimer/octicons-react": "8.1.0",
     "@ledgerhq/hw-app-eth": "4.21.0",
-    "@ledgerhq/hw-transport-node-hid": "4.22.0",
+    "@ledgerhq/hw-transport-node-hid": "4.19.1",
     "auto-launch": "5.0.5",
     "babel-polyfill": "6.26.0",
     "bip32-path": "0.4.2",
