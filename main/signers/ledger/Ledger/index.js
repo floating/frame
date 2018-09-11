@@ -28,7 +28,12 @@ class Ledger extends Signer {
       }
     })
   }
+  pollStatus (interval = 21 * 1000) { // Detect sleep/wake
+    clearTimeout(this._pollStatus)
+    this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
+  }
   deviceStatus () {
+    this.pollStatus()
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
@@ -41,7 +46,10 @@ class Ledger extends Signer {
         this.status = err.message
         if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
         if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
-        if (err.statusCode === 26625 || err.statusCode === 26628) this.status = 'Confirm your Ledger is not asleep and is running firmware version 1.4.0 or newer'
+        if (err.statusCode === 26625 || err.statusCode === 26628) {
+          this.pollStatus(3000)
+          this.status = 'Confirm your Ledger is not asleep and is running firmware version 1.4.0 or newer'
+        }
         if (err.message === 'Cannot write to HID device') {
           this.status = 'loading'
           log.error('Device Status: Cannot write to HID device')
