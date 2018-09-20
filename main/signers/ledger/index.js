@@ -41,7 +41,10 @@ module.exports = signers => {
     })
     log.info(' ')
   }
-  usbDetect.on('change', scan)
+  usbDetect.on('change', () => {
+    scan()
+    setTimeout(scan, 200)
+  })
   usbDetect.startMonitoring()
   scan()
 }

@@ -28,6 +28,13 @@ class Ledger extends Signer {
       }
     })
   }
+  close () {
+    if (this._pollStatus) clearTimeout(this._pollStatus)
+    if (this._deviceStatus) clearTimeout(this._deviceStatus)
+    if (this._signPersonal) clearTimeout(this._signPersonal)
+    if (this._signTransaction) clearTimeout(this._signTransaction)
+    super.close()
+  }
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
     clearTimeout(this._pollStatus)
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
@@ -59,7 +66,7 @@ class Ledger extends Signer {
       })
     } catch (err) {
       if (err.message.startsWith('cannot open device with path')) {
-        setTimeout(() => this.deviceStatus(), 700)
+        this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
       }
       log.error(err)
@@ -87,7 +94,7 @@ class Ledger extends Signer {
       })
     } catch (err) {
       if (err.message.startsWith('cannot open device with path')) {
-        setTimeout(() => this.signTransaction(message, cb), 700)
+        this._signPersonal = setTimeout(() => this.signPersonal(message, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
       }
       log.error(err)
@@ -123,7 +130,7 @@ class Ledger extends Signer {
       })
     } catch (err) {
       if (err.message.startsWith('cannot open device with path')) {
-        setTimeout(() => this.signTransaction(rawTx, cb), 700)
+        this._signTransaction = setTimeout(() => this.signTransaction(rawTx, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
       }
       log.error(err)
