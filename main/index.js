@@ -55,7 +55,7 @@ app.on('ready', () => {
   if (app.dock) app.dock.hide()
   protocol.interceptFileProtocol('file', (req, cb) => {
     let appOrigin = path.resolve(__dirname, '../')
-    let filePath = path.resolve(__dirname, req.url.replace('file://', ''))
+    let filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
 })
