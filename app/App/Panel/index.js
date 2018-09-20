@@ -5,7 +5,7 @@ import svg from '../../svg'
 import Main from './Main'
 import Local from './Local'
 
-const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
+const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
 class Panel extends React.Component {
   indicator (connection) {
@@ -19,7 +19,7 @@ class Panel extends React.Component {
   render () {
     let open = this.store('tray.open')
     return (
-      <div id='panel' style={{transform: open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'}}>
+      <div id='panel' style={{ transform: open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' }}>
         <div className='panelMenu'>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
@@ -27,8 +27,8 @@ class Panel extends React.Component {
             </div>
             <div className='panelDetailText'>{networks[this.store('local.connection.network')]}</div>
           </div>
-          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? {transform: 'rotate(180deg)'} : {}} onClick={() => this.store.toggleSettings()}>
-            {svg.octicon('kebab-horizontal', {height: 21})}
+          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onClick={() => this.store.toggleSettings()}>
+            {svg.octicon('kebab-horizontal', { height: 21 })}
           </div>
         </div>
         <Local />

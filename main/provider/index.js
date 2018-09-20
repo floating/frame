@@ -26,20 +26,20 @@ class Provider extends EventEmitter {
   getCoinbase (payload, res) {
     signers.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
-      res({id: payload.id, jsonrpc: payload.jsonrpc, result: accounts[0]})
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts[0] })
     })
   }
   getAccounts (payload, res) {
     signers.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
-      res({id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.map(a => a.toLowerCase())})
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.map(a => a.toLowerCase()) })
     })
   }
   getNetVersion (payload, res) {
-    res({id: payload.id, jsonrpc: payload.jsonrpc, result: store('local.connection.network')})
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: store('local.connection.network') })
   }
   unsubscribe (params, res) {
-    this.connection.send({id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params}, res)
+    this.connection.send({ id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params }, res)
   }
   declineRequest (req) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
@@ -47,9 +47,9 @@ class Provider extends EventEmitter {
     this.resError(`user declined transaction`, payload, res)
   }
   resError (error, payload, res) {
-    if (typeof error === 'string') error = {message: error, code: -1}
+    if (typeof error === 'string') error = { message: error, code: -1 }
     console.warn(error)
-    res({id: payload.id, jsonrpc: payload.jsonrpc, error})
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
   signAndSend (req, cb) {
     let rawTx = req.data
@@ -60,7 +60,7 @@ class Provider extends EventEmitter {
         this.resError(err, payload, res)
         return cb(new Error(`signTransaction Error: ${JSON.stringify(err)}`))
       }
-      this.connection.send({id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx]}, (response) => {
+      this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, (response) => {
         if (response.error) {
           this.resError(response.error, payload, res)
           cb(response.error.message)
@@ -76,7 +76,7 @@ class Provider extends EventEmitter {
     this.getNonce(req.data, response => {
       if (response.error) return cb(response.error)
       let updatedReq = Object.assign({}, req)
-      updatedReq.data = Object.assign({}, updatedReq.data, {nonce: response.result})
+      updatedReq.data = Object.assign({}, updatedReq.data, { nonce: response.result })
       this.signAndSend(updatedReq, cb)
     })
   }
@@ -87,21 +87,21 @@ class Provider extends EventEmitter {
     return rawTx
   }
   getGasPrice (rawTx, res) {
-    this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_gasPrice'}, res)
+    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, res)
   }
   getGasEstimate (rawTx, res) {
-    this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx]}, res)
+    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, res)
   }
   getNonce (rawTx, res) {
     if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.account === rawTx.from && this.nonce.current) {
       let newNonce = utils.hexToNumber(this.nonce.current)
       newNonce++
       newNonce = utils.numberToHex(newNonce)
-      this.nonce = {age: Date.now(), current: newNonce}
-      res({id: 1, jsonrpc: '2.0', result: this.nonce.current})
+      this.nonce = { age: Date.now(), current: newNonce }
+      res({ id: 1, jsonrpc: '2.0', result: this.nonce.current })
     } else {
-      this.connection.send({id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending']}, (response) => {
-        if (response.result) this.nonce = {age: Date.now(), current: response.result, account: rawTx.from}
+      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
+        if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
         res(response)
       })
     }
@@ -118,7 +118,7 @@ class Provider extends EventEmitter {
       list.forEach(need => {
         needs[need](rawTx, response => {
           if (response.error) {
-            errors.push({need, message: response.error.message})
+            errors.push({ need, message: response.error.message })
           } else {
             rawTx[need] = response.result
           }
@@ -135,14 +135,14 @@ class Provider extends EventEmitter {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network'))
       let handlerId = uuid()
-      windows.broadcast('main:action', 'addRequest', {handlerId, type: 'approveTransaction', data: rawTx, payload})
+      windows.broadcast('main:action', 'addRequest', { handlerId, type: 'approveTransaction', data: rawTx, payload })
       this.handlers[handlerId] = res
     })
   }
   signPersonal (payload, res) {
     signers.signPersonal(payload.params[0], payload.params[1], (err, signed) => {
       if (err) return this.resError(`Frame provider error during signPersonal: ${err.message}`, payload, res)
-      res({id: payload.id, jsonrpc: payload.jsonrpc, result: signed})
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
     })
   }
   ecRecover (payload, res) {
@@ -155,7 +155,7 @@ class Provider extends EventEmitter {
     let s = toBuffer(signature.slice(32, 64))
     const hash = hashPersonalMessage(toBuffer(message))
     const address = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-    res({id: payload.id, jsonrpc: payload.jsonrpc, result: address})
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: address })
   }
   send (payload, res) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)

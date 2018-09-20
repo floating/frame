@@ -138,8 +138,8 @@ export const addRequest = (u, request) => {
 export const giveAccess = (u, req, access) => {
   u('local.accounts', (accounts, state) => {
     let a = state.signer.accounts[0]
-    accounts[a] = accounts[a] || {permissions: {}}
-    accounts[a].permissions[req.handlerId] = {handlerId: req.handlerId, origin: req.origin, provider: access}
+    accounts[a] = accounts[a] || { permissions: {} }
+    accounts[a].permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
     return accounts
   })
   u('signer.requests', (requests, state) => {
@@ -194,7 +194,7 @@ export const updateSigners = (u, signers) => u('signers', _ => signers)
 
 export const addSigner = (u, signer) => {
   if (signer.status === 'loading') return
-  u('local.accounts', signer.accounts[0], account => Object.assign({permissions: {}}, account))
+  u('local.accounts', signer.accounts[0], account => Object.assign({ permissions: {} }, account))
   u('signers', signer.id, _ => signer)
 }
 
@@ -286,7 +286,7 @@ export const newView = (u) => {
     list.push(id)
     return list
   })
-  u('view.data', id, view => ({url: 'https://www.google.com/', title: 'New Tab'}))
+  u('view.data', id, view => ({ url: 'https://www.google.com/', title: 'New Tab' }))
 }
 
 export const removeView = (u, id, isCurrent) => {

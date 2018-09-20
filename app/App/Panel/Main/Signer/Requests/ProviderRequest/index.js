@@ -5,9 +5,9 @@ import svg from '../../../../../../svg'
 class ProviderRequest extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = {allowInput: false}
+    this.state = { allowInput: false }
     setTimeout(() => {
-      this.setState({allowInput: true})
+      this.setState({ allowInput: true })
     }, 2000)
   }
   render () {
@@ -23,7 +23,7 @@ class ProviderRequest extends React.Component {
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{top: (this.props.top * 10) + 'px'}}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ top: (this.props.top * 10) + 'px' }}>
         <div className='approveTransaction'>
           {notice ? (
             <div className='requestNotice'>
@@ -35,16 +35,16 @@ class ProviderRequest extends React.Component {
                     </div>
                   )
                 } else if (status === 'success') {
-                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('check', {height: 80})}</div>
+                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('check', { height: 80 })}</div>
                 } else if (status === 'error' || status === 'declined') {
-                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', {height: 80})}</div>
+                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', { height: 80 })}</div>
                 }
               })()}
             </div>
           ) : (
             <div className='approveTransactionPayload'>
               <div className='approveRequestHeader approveTransactionHeader'>
-                <div className='approveRequestHeaderIcon'> {svg.octicon('shield', {height: 20})}</div>
+                <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
                 <div className='approveRequestHeaderLabel'> {'Connection'}</div>
               </div>
               <div className='requestProvider bounceIn'>

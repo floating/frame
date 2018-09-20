@@ -13,12 +13,12 @@ const source = 'bridge:link'
 window.addEventListener('message', e => {
   let data = unwrap(e.data)
   if (e.origin === 'file://' && data.source !== source) {
-    if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({id: data.id, args, source, method: 'rpc'}), e.origin))
+    if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({ id: data.id, args, source, method: 'rpc' }), e.origin))
     if (data.method === 'event') return ipcRenderer.send(...data.args)
   }
 }, false)
 
 ipcRenderer.on('main:action', (...args) => {
   args.shift()
-  window.postMessage(wrap({channel: 'action', args, source, method: 'event'}), '*')
+  window.postMessage(wrap({ channel: 'action', args, source, method: 'event' }), '*')
 })

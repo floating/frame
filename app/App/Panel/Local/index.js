@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import svg from '../../../svg'
 import link from '../../../link'
 
-const networks = {1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan'}
+const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
 class Settings extends React.Component {
   constructor (props, context) {
@@ -11,7 +11,7 @@ class Settings extends React.Component {
     let network = context.store('local.connection.network')
     let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
     this.customMessage = 'Custom Endpoint'
-    this.state = {localShake: {}, secondaryCustom: customTarget || this.customMessage, resetConfirm: false}
+    this.state = { localShake: {}, secondaryCustom: customTarget || this.customMessage, resetConfirm: false }
   }
   appInfo () {
     return (
@@ -20,10 +20,10 @@ class Settings extends React.Component {
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <span className='appInfoLineResetConfirm'>
-              {'Are you sure?'} <span onClick={() => link.send('tray:resetAllSettings')}>{'Yes'}</span> <span>{'/'}</span> <span onClick={() => this.setState({resetConfirm: false})}>{'No'}</span>
+              {'Are you sure?'} <span onClick={() => link.send('tray:resetAllSettings')}>{'Yes'}</span> <span>{'/'}</span> <span onClick={() => this.setState({ resetConfirm: false })}>{'No'}</span>
             </span>
           ) : (
-            <span onClick={() => this.setState({resetConfirm: true})}>{'Reset All Settings & Data'}</span>
+            <span onClick={() => this.setState({ resetConfirm: true })}>{'Reset All Settings & Data'}</span>
           )}
         </div>
         <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../../package.json').version}</div>
@@ -38,34 +38,34 @@ class Settings extends React.Component {
     return false
   }
   customFocus () {
-    if (this.state.secondaryCustom === this.customMessage) this.setState({secondaryCustom: ''})
+    if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
   }
   customBlur () {
-    if (this.state.secondaryCustom === '') this.setState({secondaryCustom: this.customMessage})
+    if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
   }
   inputCustom (e) {
     e.preventDefault()
     clearTimeout(this.customInputTimeout)
     let value = e.target.value
     if (value.toLowerCase() === 'i understand the risks, unlock mainnet') {
-      this.setState({secondaryCustom: ''})
+      this.setState({ secondaryCustom: '' })
       this.store.setSecondaryCustom('')
       this.store.enableMainnet()
       let target = e.target
       setTimeout(() => target.blur(), 0)
       return
     }
-    this.setState({secondaryCustom: value})
+    this.setState({ secondaryCustom: value })
     this.customInputTimeout = setTimeout(() => this.store.setSecondaryCustom(this.state.secondaryCustom), 1000)
   }
   localShake (key) {
     let localShake = Object.assign({}, this.state.localShake)
     localShake[key] = true
-    this.setState({localShake})
+    this.setState({ localShake })
     setTimeout(() => {
       let localShake = Object.assign({}, this.state.localShake)
       localShake[key] = false
-      this.setState({localShake})
+      this.setState({ localShake })
     }, 1010)
   }
   status (connection) {
@@ -100,7 +100,7 @@ class Settings extends React.Component {
   selectNetwork (direction) {
     this.store.selectNetwork(direction)
     let target = this.store('local.connection.secondary.settings', this.store('local.connection.network'), 'options.custom')
-    this.setState({secondaryCustom: target || this.customMessage})
+    this.setState({ secondaryCustom: target || this.customMessage })
   }
   render () {
     let network = this.store('local.connection.network')
@@ -111,11 +111,11 @@ class Settings extends React.Component {
           {this.store('local.enableMainnet') ? (
             <div className='connectionTitleSet'>
               <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('<-')}>
-                {svg.octicon('chevron-left', {height: 17})}
+                {svg.octicon('chevron-left', { height: 17 })}
               </div>
               <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
               <div className='connectionTitleSetButton' onClick={() => this.selectNetwork('->')}>
-                {svg.octicon('chevron-right', {height: 17})}
+                {svg.octicon('chevron-right', { height: 17 })}
               </div>
             </div>
           ) : (
@@ -166,9 +166,9 @@ class Settings extends React.Component {
               <div className='connectionOptionDetailsInset'>
                 {this.status(this.store('local.connection.secondary'))}
                 <div className='signerOptionSet'>
-                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-left', {height: 14})}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-left', { height: 14 })}</div>
                   <div className='signerOptionSetText'>{this.store('local.connection.secondary.settings', network, 'current')}</div>
-                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-right', {height: 14})}</div>
+                  <div className='signerOptionSetButton' onClick={() => this.store.selectSecondary('<-')}>{svg.octicon('chevron-right', { height: 14 })}</div>
                 </div>
               </div>
             </div>

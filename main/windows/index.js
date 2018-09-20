@@ -16,8 +16,8 @@ const api = {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
-    const webPreferences = {nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js')}
-    windows.tray = new BrowserWindow({id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences})
+    const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
+    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -26,8 +26,8 @@ const api = {
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
     if (process.platform === 'linux') {
-      const menuShow = Menu.buildFromTemplate([{label: 'Show', click: () => api.showTray()}, {label: 'Quit', click: () => api.quit()}])
-      const menuHide = Menu.buildFromTemplate([{label: 'Hide', click: () => api.hideTray()}, {label: 'Quit', click: () => api.quit()}])
+      const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => api.showTray() }, { label: 'Quit', click: () => api.quit() }])
+      const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => api.hideTray() }, { label: 'Quit', click: () => api.quit() }])
       const onShow = _ => tray.setContextMenu(menuHide)
       const onHide = _ => tray.setContextMenu(menuShow)
       windows.tray.on('show', onShow)

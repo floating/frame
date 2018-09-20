@@ -37,7 +37,7 @@ const handler = (socket, req) => {
 }
 
 module.exports = server => {
-  const ws = new WebSocket.Server({server, verifyClient: (info, next) => next(trusted(info.origin), 401, 'Permission Denied')})
+  const ws = new WebSocket.Server({ server, verifyClient: (info, next) => next(trusted(info.origin), 401, 'Permission Denied') })
   ws.on('connection', handler)
   // If we lose connection to our node, close connected sockets
   provider.on('close', _ => ws.clients.forEach(socket => socket.close()))
