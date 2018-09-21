@@ -2,30 +2,31 @@ import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 import svg from '../../../../../../svg'
+import link from '../../../../../../link'
 
 class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = {allowInput: false, dataView: false}
+    this.state = { allowInput: false, dataView: false }
     setTimeout(() => {
-      this.setState({allowInput: true})
+      this.setState({ allowInput: true })
     }, 2000)
   }
   copyAddress (e) {
     e.preventDefault()
     e.target.select()
     document.execCommand('Copy')
-    this.setState({copied: true})
-    setTimeout(_ => this.setState({copied: false}), 1000)
+    this.setState({ copied: true })
+    setTimeout(_ => this.setState({ copied: false }), 1000)
   }
   approve (reqId, req) {
-    this.store.events.emit('approveRequest', reqId, req)
+    link.send('tray:approveRequest', reqId, req)
   }
   decline (reqId, req) {
-    this.store.events.emit('declineRequest', reqId, req)
+    link.send('tray:declineRequest', reqId, req)
   }
   toggleDataView (id) {
-    this.setState({dataView: !this.state.dataView})
+    this.setState({ dataView: !this.state.dataView })
   }
   hexToDisplayValue (hex) {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
@@ -43,7 +44,7 @@ class TransactionRequest extends React.Component {
     let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{top: (this.props.top * 10) + 'px'}}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ top: (this.props.top * 10) + 'px' }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
         {this.props.req.type === 'approveTransaction' ? (
           <div className='approveTransaction'>
@@ -54,21 +55,21 @@ class TransactionRequest extends React.Component {
                     if (status === 'pending') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div style={{paddingBottom: 20}}><div className='loader' /></div>
+                          <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
                           <div className='requestNoticeInnerText'>{'See Signer'}</div>
                         </div>
                       )
                     } else if (status === 'success') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div>{svg.octicon('check', {height: 80})}</div>
+                          <div>{svg.octicon('check', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else if (status === 'error' || status === 'declined') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div>{svg.octicon('circle-slash', {height: 80})}</div>
+                          <div>{svg.octicon('circle-slash', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
@@ -80,7 +81,7 @@ class TransactionRequest extends React.Component {
               ) : (
                 <React.Fragment>
                   <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', {height: 22})}</div>
+                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
                     <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
                   </div>
                   <div className='transactionValue'>
@@ -100,9 +101,9 @@ class TransactionRequest extends React.Component {
                   {utils.toAscii(this.props.req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
                       <div className='transactionDataHeader' onClick={() => this.toggleDataView()}>
-                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', {height: 22})}</div>
+                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
                         <div className='transactionDataLabel'>{'View Data'}</div>
-                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', {height: 22})}</div>
+                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
                       </div>
                       <div className='transactionDataBody'>
                         <div className='transactionDataBodyInner'>
@@ -116,9 +117,9 @@ class TransactionRequest extends React.Component {
                   {this.props.req.data.to ? (
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>
-                        <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', {height: 20})} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
+                        <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
                         <div className='transactionToAddressFull'>
-                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', {height: 10})}</span> : this.props.req.data.to}
+                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
                           <input onClick={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
                         </div>
                       </div>

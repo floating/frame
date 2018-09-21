@@ -1,5 +1,3 @@
-import uuid from 'uuid/v4'
-
 const PersistStore = require('electron-store')
 const persist = new PersistStore()
 const get = (path, obj = persist.get('local')) => {
@@ -20,7 +18,7 @@ let initial = {
     show: false,
     view: 'default'
   },
-  view: {current: '', list: [], data: {}},
+  view: { current: '', list: [], data: {} },
   signers: {},
   tray: {
     open: false
@@ -113,4 +111,4 @@ let initial = {
   }
 }
 
-export default () => initial
+module.exports = () => initial

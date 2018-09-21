@@ -1,60 +1,25 @@
 /* globals fetch */
 
-import { ipcRenderer } from 'electron'
-
 import EventEmitter from 'events'
 import Restore from 'react-restore'
 
+import link from '../link'
 import * as actions from './actions'
-import state from './state'
 
-import rpc from '../rpc'
-import provider from '../provider'
-
-import PersistStore from 'electron-store'
-
-const persist = new PersistStore()
-
-export const store = Restore.create(state(), actions)
+export const store = Restore.create(window.__initialState, actions)
 store.events = new EventEmitter()
 
-rpc('getSigners', (err, signers) => {
+link.rpc('getSigners', (err, signers) => {
   if (err) return store.signersError(err)
   store.updateSigners(signers)
 })
-
-rpc('launchStatus', (err, status) => {
+link.rpc('launchStatus', (err, status) => {
   if (err) return console.log(err) // launchStatusError
   store.setLaunch(status)
 })
 
-ipcRenderer.on('main:addSigner', (e, signer) => store.addSigner(signer))
-ipcRenderer.on('main:removeSigner', (e, signer) => {
-  if (store('signer.current') === signer.id) store.unsetSigner()
-  store.removeSigner(signer)
-})
-ipcRenderer.on('main:updateSigner', (e, signer) => store.updateSigner(signer))
-ipcRenderer.on('main:setSigner', (e, signer) => {
-  if (signer.id) {
-    store.setSigner(signer)
-  } else {
-    store.unsetSigner()
-  }
-})
-
-// Replace events with observers
-store.events.on('approveRequest', (id, req) => {
-  store.requestPending(id)
-  provider.approveRequest(req, (err, res) => {
-    if (err) return store.requestError(id, err)
-    store.requestSuccess(id, res)
-  })
-})
-
-store.events.on('declineRequest', (id, req) => {
-  store.declineRequest(id)
-  provider.declineRequest(req)
-})
+link.on('action', (action, ...args) => { if (store[action]) store[action](...args) })
+link.send('tray:api') // turn on api
 
 const etherRates = () => {
   fetch('https://api.coinbase.com/v2/exchange-rates?currency=ETH').then(res => res.json()).then(res => {
@@ -65,32 +30,26 @@ etherRates()
 setInterval(etherRates, 10000)
 
 // Store Observers
-store.observer(() => {
-  if (store('panel.show')) {
-    document.body.className += ' panel'
-  } else {
-    document.body.className = document.body.className.replace(' panel', '')
-  }
-})
-
 let network = ''
 store.observer(() => {
   if (network !== store('local.connection.network')) {
     network = store('local.connection.network')
-    ipcRenderer.send('tray:setNetwork', network)
+    link.send('tray:setNetwork', network)
   }
 })
 
-store.observer(_ => persist.set('local', store('local')))
+store.observer(_ => link.send('tray:persistLocal', store('local')))
+store.observer(() => link.send('tray:setSync', 'local', store('local')))
+store.observer(() => link.send('tray:setSync', 'signer', store('signer')))
 
 let launch = store('local.launch')
 store.observer(() => {
   if (launch !== store('local.launch')) {
     launch = store('local.launch')
     if (launch) {
-      rpc('launchEnable', err => console.log(err))
+      link.rpc('launchEnable', err => console.log(err))
     } else {
-      rpc('launchDisable', err => console.log(err))
+      link.rpc('launchDisable', err => console.log(err))
     }
   }
 })

@@ -41,7 +41,7 @@ test('Sign Personal and ecRecover', done => {
       signed = result
       web3.eth.personal.ecRecover(message, signed).then(result => {
         expect(result.toLowerCase()).toBe(accounts[0].toLowerCase())
-        console.log(JSON.stringify({address: accounts[0], msg: message, sig: signed, version: '2'}))
+        console.log(JSON.stringify({ address: accounts[0], msg: message, sig: signed, version: '2' }))
         done()
       }).catch(err => {
         console.log(err)

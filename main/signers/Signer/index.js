@@ -21,13 +21,13 @@ class Signer extends EventEmitter {
     }
   }
   open () {
-    windows.broadcast('main:addSigner', this.summary())
+    windows.broadcast('main:action', 'addSigner', this.summary())
   }
   close () {
-    windows.broadcast('main:removeSigner', this.summary())
+    windows.broadcast('main:action', 'removeSigner', this.summary())
   }
   update () {
-    windows.broadcast('main:updateSigner', this.summary())
+    windows.broadcast('main:action', 'updateSigner', this.summary())
   }
   signTransaction (rawTx, cb) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method.')

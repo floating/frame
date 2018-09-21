@@ -1,6 +1,6 @@
-import http from 'http'
-import provider from '../provider'
-import trusted from './trusted'
+const http = require('http')
+const provider = require('../provider')
+const trusted = require('./trusted')
 
 const polls = {}
 const pollSubs = {}
@@ -34,15 +34,15 @@ const handler = (req, res) => {
         let id = payload.params[0]
         if (typeof id === 'string') {
           let result = polls[id] || []
-          res.writeHead(200, {'Content-Type': 'application/json'})
-          res.end(JSON.stringify({id: payload.id, jsonrpc: payload.jsonrpc, result}))
+          res.writeHead(200, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ id: payload.id, jsonrpc: payload.jsonrpc, result }))
           delete polls[id]
           clearTimeout(cleanupTimers[id])
           cleanupTimers[id] = setTimeout(cleanup.bind(null, id), 120 * 1000)
           return
         } else {
-          res.writeHead(401, {'Content-Type': 'application/json'})
-          res.end(JSON.stringify({error: 'Invalid Client ID'}))
+          res.writeHead(401, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ error: 'Invalid Client ID' }))
         }
       }
       provider.send(payload, response => {
@@ -53,13 +53,13 @@ const handler = (req, res) => {
             payload.params.forEach(sub => { if (pollSubs[sub]) delete pollSubs[sub] })
           }
         }
-        res.writeHead(200, {'Content-Type': 'application/json'})
+        res.writeHead(200, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify(response))
       })
     }).on('error', err => console.error('req err', err))
   } else {
-    res.writeHead(401, {'Content-Type': 'application/json'})
-    res.end(JSON.stringify({error: 'Permission Denied'}))
+    res.writeHead(401, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ error: 'Permission Denied' }))
   }
 }
 
@@ -72,4 +72,4 @@ provider.on('data', payload => {
   }
 })
 
-export default () => http.createServer(handler)
+module.exports = () => http.createServer(handler)
