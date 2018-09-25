@@ -255,7 +255,7 @@ export const removeSigner = (u, signer, state) => {
 export const updateSigner = (u, signer) => {
   u('signers', signer.id, _ => signer)
   u('signer', s => {
-    if (s.current === signer.id && signer.status !== 'ok') {
+    if (s.current === signer.id && (signer.status !== 'ok' || signer.accounts[0] !== s.accounts[0])) {
       s.last = s.current
       s.current = ''
       s.accounts = []
