@@ -14,19 +14,51 @@ class Ledger extends Signer {
     this.devicePath = devicePath
     this.type = 'Ledger'
     this.status = 'loading'
+    this.coinbase = '0x'
     this.accounts = []
     this.network = store('local.connection.network')
-    this.getPath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
+    this.index = 0
+    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/` : `m/44'/1'/0'/`
+    this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.deviceStatus()
     store.observer(() => {
       if (this.network !== store('local.connection.network')) {
-        this.network = store('local.connection.network')
-        this.status = 'loading'
-        this.accounts = []
+        this.reset()
         this.deviceStatus()
       }
     })
+  }
+  reset () {
+    this.network = store('local.connection.network')
+    this.status = 'loading'
+    this.accounts = []
+    this.index = 0
+    this.update()
+  }
+  lookupAccounts (limit, cb) {
+    try {
+      const addresses = []
+      const lookup = (i = 0) => {
+        let transport = new TransportNodeHid(new HID.HID(this.devicePath))
+        let eth = new Eth(transport)
+        eth.getAddress(this.getPath(i), false, false).then(result => {
+          transport.close()
+          addresses[i] = result.address
+          if (addresses.length === limit) {
+            cb(null, addresses)
+          } else {
+            lookup(++i)
+          }
+        }).catch(err => {
+          transport.close()
+          cb(err)
+        })
+      }
+      lookup()
+    } catch (err) {
+      cb(err)
+    }
   }
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
@@ -39,38 +71,44 @@ class Ledger extends Signer {
     clearTimeout(this._pollStatus)
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
-  deviceStatus () {
+  deviceStatus (deep, limit = 15) {
     this.pollStatus()
-    try {
-      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
-      let eth = new Eth(transport)
-      eth.getAddress(this.getPath()).then(result => {
-        this.accounts = [result.address]
+    this.lookupAccounts(deep ? limit : 1, (err, accounts) => {
+      if (err) {
+        if (err.message.startsWith('cannot open device with path')) { // Device is busy, try again
+          clearTimeout(this._deviceStatus)
+          this._deviceStatus = setTimeout(() => this.deviceStatus(deep), 700)
+          log.info('>>>>>>> Busy: cannot open device with path, will try again')
+        } else {
+          this.status = err.message
+          if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
+          if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
+          if (err.statusCode === 26625 || err.statusCode === 26628) {
+            this.pollStatus(3000)
+            this.status = 'Confirm your Ledger is not asleep and is running firmware version 1.4.0 or newer'
+          }
+          if (err.message === 'Cannot write to HID device') {
+            this.status = 'loading'
+            log.error('Device Status: Cannot write to HID device')
+          }
+          this.accounts = []
+          this.update()
+        }
+      } else if (accounts.length) {
+        if (accounts[0] !== this.coinbase) {
+          this.coinbase = accounts[0]
+          this.accounts = accounts
+          this.deviceStatus(true)
+        }
+        if (accounts.length > this.accounts.length) this.accounts = accounts
         this.status = 'ok'
         this.update()
-        transport.close()
-      }).catch(err => {
-        this.status = err.message
-        if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
-        if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
-        if (err.statusCode === 26625 || err.statusCode === 26628) {
-          this.pollStatus(3000)
-          this.status = 'Confirm your Ledger is not asleep and is running firmware version 1.4.0 or newer'
-        }
-        if (err.message === 'Cannot write to HID device') {
-          this.status = 'loading'
-          log.error('Device Status: Cannot write to HID device')
-        }
+      } else {
+        this.status = 'Unable to find accounts'
+        this.accounts = []
         this.update()
-        transport.close()
-      })
-    } catch (err) {
-      if (err.message.startsWith('cannot open device with path')) {
-        this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
-        return log.info('>>>>>>> Busy: cannot open device with path, will try again')
       }
-      log.error(err)
-    }
+    })
   }
   normalize (hex) {
     if (hex == null) return ''

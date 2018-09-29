@@ -29,6 +29,11 @@ window.addEventListener('message', e => {
     } else if (data.method === 'event') {
       if (!data.channel) return console.log('link.on event had no channel')
       link.emit(data.channel, ...args)
+    } else if (data.method === 'reload') {
+      let links = document.getElementsByTagName('link')
+      for (var i = 0; i < links.length; i++) {
+        if (links[i].href.indexOf('css') > -1) links[i].href = links[i].href + ''
+      }
     }
   }
 }, false)

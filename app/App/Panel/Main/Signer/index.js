@@ -136,23 +136,41 @@ class Signer extends React.Component {
               {status}
             </div>
           ) : (
-            <React.Fragment>
-              <div className='signerName'>
-                <div className='signerNameText'>
-                  {this.props.type + ' Account'}
-                  <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
-                </div>
-              </div>
-              <div className='signerAddress'>
-                <div className='transactionToAddress'>
-                  <div className='transactionToAddressLarge'>{this.props.accounts[0].substring(0, 13)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.accounts[0].substr(this.props.accounts[0].length - 13)}</div>
-                  <div className='transactionToAddressFull'>
-                    {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.accounts[0]}
-                    <input onClick={e => this.copyAddress(e)} value={this.props.accounts[0]} readOnly />
+            <div className='signerAccountWrap'>
+              <div className='signerAccount'>
+                <div className='signerName'>
+                  <div className='signerNameText'>
+                    {this.props.type + ' Account'}
+                    <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
                   </div>
                 </div>
+                <div className='signerAddress'>
+                  <div className='transactionToAddress'>
+                    <div className='transactionToAddressLarge'>{this.props.accounts[0].substring(0, 13)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.accounts[0].substr(this.props.accounts[0].length - 13)}</div>
+                    <div className='transactionToAddressFull'>
+                      {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.accounts[0]}
+                      <input onClick={e => this.copyAddress(e)} value={this.props.accounts[0]} readOnly />
+                    </div>
+                  </div>
+                </div>
+                <div className='addressList'>
+                  {this.store('signers', this.props.id, 'accounts').map((a, i) => {
+                    if (i === 0) return
+                    return (
+                      <div className='transactionToAddress'>
+                        <div className='transactionToAddressLarge'>{a.substring(0, 13)} {svg.octicon('kebab-horizontal', { height: 20 })} {a.substr(a.length - 13)}</div>
+                        <div className='transactionToAddressFull'>
+                          {this.state.copied ? <span>{'Selected'}{svg.octicon('clippy', { height: 10 })}</span> : a}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                <div className='moreAddress'>
+                  {'see more'}
+                </div>
               </div>
-            </React.Fragment>
+            </div>
           )}
         </div>
       </div>

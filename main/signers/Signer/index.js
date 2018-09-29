@@ -16,8 +16,10 @@ class Signer extends EventEmitter {
     return {
       id: this.id,
       type: this.type,
+      index: this.index,
       accounts: this.accounts,
-      status: this.status
+      status: this.status,
+      network: this.network
     }
   }
   open () {
