@@ -143,7 +143,7 @@
     position relative
     opacity 1
     z-index 3006
-    margin-bottom 38px
+    // margin-bottom 38px
     .transactionToAddress
       .transactionToAddressLarge
         svg
@@ -294,18 +294,20 @@
       top 5px
       // bottom 5px
       // height 112px
-      height 95px // 112px
+      height 105px // 112px
       // overflow hidden
       position absolute
       border-bottom-left-radius 12px
       border-bottom-right-radius 12px
       transition standard
       padding-top 2px
-      padding-bottom 10px
+      // box-shadow 0px 2px 3px thick, 0px 19px 9px -14px thin !important
+      // padding-bottom 10px
       transform translateZ(0)
-      box-shadow 0px 3px 9px thick0, 0px 8px 8px -2px thick0, 0px 0px 10px -2px thick0
+      // box-shadow 0px 3px 9px thick0, 0px 8px 8px -2px thick0, 0px 0px 10px -2px thick0
       background light
       overflow hidden
+      box-shadow 0px 2px 3px thick0, 0px 19px 9px -14px thick0 !important
       box-shadow 0px 2px 3px thick, 0px 19px 9px -14px thin !important
       // height 100px
       // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
@@ -316,71 +318,57 @@
         //background thin
         position absolute
         // right 50%
-        bottom -36px
+        top 102px
         height 20px
         width 100px
         left 50%
         background thin
-        // margin-left -15px
-        // width 30px
-        // right 0px
-        margin 10px 0px 7px -50px
-        padding-bottom 0px
-        // opacity 0
-        // margin-right -15px
+        margin 5px 0px 7px -50px
         display flex
         justify-content center
         align-items center
-        // background blue
         border-bottom-left-radius 6px
         border-bottom-right-radius 6px
         transition standard
         transition-delay 0s
         border-radius 20px
         transform rotate(0deg)
-        // background outerspace
-        // color spacewhite
-        // border-top 1px solid thick
-        //background blue // rgba(240, 245, 255, 1)
-        // height 100px
-        // box-shadow 0px 3px 9px thick, 0px 8px 8px -2px thick, 0px 10px 10px -2px thick , 0px -1px 9px thin
-        opacity 0
-        opacity 1 !important
-
-      // .addressSelect:hover
-      //   background spacewhite
+        text-transform uppercase
+        font-size 12px
+        font-weight bold
 
       .addressList
-        // margin-top 15px
         position absolute
-        top 97px
+        top 143px
         left 0
-        bottom 40px
+        bottom 0px
         right 0
         transition standard
-        // background thin
-        // height 0
-        // padding 0
-        // height 420px
-
-        //background thin
+        padding 0px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
         overflow hidden
-        // background rgba(235, 245, 255, 1) !important
-        // overflow-x hidden
+        border-top 1px solid thin
+        // background thin
+        // background blue
 
         .addressListItem
+          width calc(100% - 40px)
           height 40px
-          border-bottom 1px solid thick
+          min-height 40px
+          border-bottom 1px solid thin
           display flex
           justify-content space-between
           align-items center
           padding 0px 20px 0px 20px
 
-        // .addressListItem:first-child
-        //   background light
-
         .addressListItem:hover
-          background light
+          background highlight
+
+        .addressListItem:last-child
+          border-bottom none
 
     .signerName
       overflow hidden
@@ -463,15 +451,14 @@
       // background blue
 
   .signerAccountSettings
-    height 120px !important
-    .addressSelect
-      bottom 0px !important
+    height 140px !important
+    // .addressSelect
+    //   top 97px !important
   .signerAccountExapnded
-    height 365px !important
-    // .addressList
-    .addressSelect
-      bottom 0px !important
-      transform rotate(180deg) !important
+    height 350px !important
+    // .addressSelect
+    //   bottom 0px !important
+      // transform rotate(180deg) !important
 
       // height 420px
 
@@ -504,6 +491,7 @@
     opacity 1
     transition standard, 0.1s linear background
     will-change transform
+    background thin
     // border-bottom 1px solid thick
 
     > div
@@ -692,6 +680,9 @@
 
 .openSigner
   padding 0px 5px 5px 5px
+  // .signerTop
+  //   .signerAccount
+  //     box-shadow 0px 2px 3px thick, 0px 19px 9px -14px thin !important
   .signerMid
     background thin
     > div

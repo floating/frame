@@ -13,7 +13,7 @@ import trezorLogo from './trezorLogo.png'
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = { typeHover: false }
+    this.state = { typeHover: false, accountPage: 0 }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -131,6 +131,7 @@ class Signer extends React.Component {
     let signerClass = 'signerAccount'
     if (this.store('signer.view') === 'settings') signerClass += ' signerAccountSettings'
     if (this.store('signer.showAccounts')) signerClass += ' signerAccountExapnded'
+    let startIndex = this.state.accountPage * 5
     return (
       <div className='signerStatusWrap'>
         <div className='signerStatus' key={this.props.status}>
@@ -158,14 +159,14 @@ class Signer extends React.Component {
               <div className='signerInfo'>
                 {'Ξ ' + 0.0443433431}
               </div>
-              <div className='addressSelect' onClick={() => this.store.toggleShowAccounts()}>
-                {svg.octicon('chevron-down', { height: 23 })}
+              <div className='addressSelect' onClick={() => this.store.toggleShowAccounts()} style={this.store('signer.showAccounts') ? { color: 'white' , background: 'rgb(0, 210, 180)'} : {}}>
+                {svg.octicon('three-bars', { height: 16 })}
               </div>
               <div className='addressList'>
-                {this.store('signers', this.props.id, 'accounts').map((a, i) => {
+                {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
                   return (
                     <div key={i} className='addressListItem'>
-                      {svg.octicon('check', { height: 18 })}
+                      {svg.octicon('check', { height: 24 })}
                       <div className='addressListItemAddress'>{a.substring(0, 8)} {svg.octicon('kebab-horizontal', { height: 16 })} {a.substr(a.length - 6)}</div>
                       <div className='addressListItemBalance'>{'Ξ ' + 0.0441}</div>
                     </div>
@@ -224,7 +225,7 @@ class Signer extends React.Component {
               {this.renderStatus()}
               {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
-            <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '230px' : '200px' } : { pointerEvents: 'none' }}>
+            <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '235px' : '200px' } : { pointerEvents: 'none' }}>
               <Settings />
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
             </div>
