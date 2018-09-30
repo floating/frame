@@ -28,6 +28,6 @@ if (dev) {
   let path = require('path')
   let watch = require('node-watch')
   watch(path.resolve(__dirname, '..', 'bundle'), { recursive: true }, (evt, name) => {
-    if (name.indexOf('css') > -1) window.postMessage(wrap({ method: 'reload' }), '*')
+    if (name.indexOf('css') > -1) window.postMessage(wrap({ method: 'reload', type: 'css', target: name }), '*')
   })
 }

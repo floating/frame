@@ -93,7 +93,7 @@
       display flex
       justify-content center
       align-items center
-      font-size 18px
+      font-size 20px
       opacity 1
       transition standard
 
@@ -282,50 +282,114 @@
 
       @import './menu'
 
-    .signerAccountWrap
-      width 100%
-      position relative
-      height 70px
-      // padding-top 30px
+    // .signerAccountWrap
+    //   width 100%
+    //   position relative
+    //   height 70px
+    //   // padding-top 30px
 
     .signerAccount
-      left 10px
-      right 10px
-      top 0
-      height 70px
-      overflow hidden
+      left 0px
+      right 0px
+      top 5px
+      // bottom 5px
+      // height 112px
+      height 95px // 112px
+      // overflow hidden
       position absolute
-      border-radius 3px
+      border-bottom-left-radius 12px
+      border-bottom-right-radius 12px
       transition standard
-
-      // background rgba(240, 245, 255, 1)
+      padding-top 2px
+      padding-bottom 10px
+      transform translateZ(0)
+      box-shadow 0px 3px 9px thick0, 0px 8px 8px -2px thick0, 0px 0px 10px -2px thick0
+      background light
+      overflow hidden
+      box-shadow 0px 2px 3px thick, 0px 19px 9px -14px thin !important
       // height 100px
       // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
       //
       // height 540px
 
-    .addressList
-      height 0
-      // height 420px
-      padding 10px 0px 10px 0px
+      .addressSelect
+        //background thin
+        position absolute
+        // right 50%
+        bottom -36px
+        height 20px
+        width 100px
+        left 50%
+        background thin
+        // margin-left -15px
+        // width 30px
+        // right 0px
+        margin 10px 0px 7px -50px
+        padding-bottom 0px
+        // opacity 0
+        // margin-right -15px
+        display flex
+        justify-content center
+        align-items center
+        // background blue
+        border-bottom-left-radius 6px
+        border-bottom-right-radius 6px
+        transition standard
+        transition-delay 0s
+        border-radius 20px
+        transform rotate(0deg)
+        // background outerspace
+        // color spacewhite
+        // border-top 1px solid thick
+        //background blue // rgba(240, 245, 255, 1)
+        // height 100px
+        // box-shadow 0px 3px 9px thick, 0px 8px 8px -2px thick, 0px 10px 10px -2px thick , 0px -1px 9px thin
+        opacity 0
+        opacity 1 !important
 
-      background thin
-      overflow-y hidden
-      overflow-x hidden
+      // .addressSelect:hover
+      //   background spacewhite
 
-    .moreAddress
-      background thick
-      height 30px
-      display flex
-      justify-content center
-      align-items center
+      .addressList
+        // margin-top 15px
+        position absolute
+        top 97px
+        left 0
+        bottom 40px
+        right 0
+        transition standard
+        // background thin
+        // height 0
+        // padding 0
+        // height 420px
+
+        //background thin
+        overflow hidden
+        // background rgba(235, 245, 255, 1) !important
+        // overflow-x hidden
+
+        .addressListItem
+          height 40px
+          border-bottom 1px solid thick
+          display flex
+          justify-content space-between
+          align-items center
+          padding 0px 20px 0px 20px
+
+        // .addressListItem:first-child
+        //   background light
+
+        .addressListItem:hover
+          background light
 
     .signerName
       overflow hidden
       display flex
       justify-content center
       align-items center
-      height 40px
+      height 38px
+      transform translateZ(0)
+      // background yellow
 
       .signerNameText
         position relative
@@ -381,19 +445,66 @@
       background lightHigh
       position relative
       height 30px
+      transform translateZ(0)
+      // /background green
+
+    .signerInfo
+      font-size 16px
+      font-family FiraCode
+      letter-spacing 0px
+      background lightHigh
+      position relative
+      height 22px
+      display flex
+      justify-content center
+      align-items center
+      transform translateZ(0)
+      // background good
+      // background blue
+
+  .signerAccountSettings
+    height 120px !important
+    .addressSelect
+      bottom 0px !important
+  .signerAccountExapnded
+    height 365px !important
+    // .addressList
+    .addressSelect
+      bottom 0px !important
+      transform rotate(180deg) !important
+
+      // height 420px
+
+
+    // .addressSelect
+    //   box-shadow 0px 3px 9px thick0, 0px 8px 8px -2px thick0, 0px 0px 10px -2px thick0, 0px -1px 9px thick0 !important
+
+
+      // background rgba(240, 245, 255, 1)
+      // // height 100px
+      // box-shadow 0px 3px 9px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick, 0px -1px 9px thin !important
+    // height 540px
+    // //
+    // .addressList
+      // border-top 1px solid thick
+      // height 420px
+      // padding 10px 0px 10px 0px
+
 
   .signerMid
     position absolute
     top 200px
     right 0px
-    bottom 40px
+    bottom 3px
     left 0px
+    padding-top 20px
     z-index 3005
     overflow-x hidden
     overflow-y hidden
     opacity 1
     transition standard, 0.1s linear background
     will-change transform
+    // border-bottom 1px solid thick
 
     > div
       transition standard
@@ -424,7 +535,7 @@
 
   .signerStatusWrap
     font-size 16px
-    height 100px
+    height 130px
     position relative
 
     .signerStatus

@@ -19,8 +19,6 @@ export const panelRequest = (u, request) => {
   u('panel.show', v => true)
 }
 
-export const enableMainnet = u => u('local.enableMainnet', () => true)
-
 export const selectNetwork = (u, direction) => {
   let reset = {
     status: 'loading',
@@ -95,6 +93,7 @@ export const runLocalNode = u => u('local.node.run', run => !run)
 export const runOnStartup = u => u('local.startup', startup => !startup)
 
 export const setSignerView = (u, view) => u('signer.view', _ => view)
+export const toggleShowAccounts = u => u('signer.showAccounts', _ => !_)
 
 export const setPermissions = (u, permissions) => {
   u('local.accounts', (accounts, state) => {

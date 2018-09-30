@@ -27,9 +27,10 @@
   "scripts": {
     "start": "npm run launch",
     "bundle": "parcel build app/tray.html --public-url . -d bundle --target browser && parcel build app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
-    "watch": "parcel build app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron && parcel watch app/tray.html --public-url . -d bundle --target browser & cross-env NODE_ENV=development electron ./main",
-    "dev": "npm run bundle && cross-env NODE_ENV=development electron ./main",
+    "watch": "parcel watch app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron & parcel watch app/tray.html --public-url . -d bundle --target browser",
+    "dev": "npm run bundle && npm run launch:dev",
     "launch": "cross-env NODE_ENV=production electron ./main",
+    "launch:dev": "cross-env NODE_ENV=development electron ./main",
     "alpha": "npm run bundle && npm run launch",
     "build": "npm run bundle && electron-builder",
     "release": "build",

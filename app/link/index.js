@@ -30,24 +30,26 @@ window.addEventListener('message', e => {
       if (!data.channel) return console.log('link.on event had no channel')
       link.emit(data.channel, ...args)
     } else if (data.method === 'reload') {
-      document.querySelectorAll('link').forEach(sheet => {
-        if (sheet.visited !== true) {
-          if (sheet.isLoaded === false || !sheet.href || !(sheet.href.indexOf('.css') > -1)) return
-          sheet.visited = true
-          let clone = sheet.cloneNode()
-          clone.isLoaded = false
-          clone.addEventListener('load', () => {
-            clone.isLoaded = true
-            sheet.remove()
-          })
-          clone.addEventListener('error', () => {
-            clone.isLoaded = true
-            sheet.remove()
-          })
-          clone.href = sheet.href
-          sheet.parentNode.appendChild(clone)
-        }
-      })
+      if (data.type === 'css') {
+        document.querySelectorAll('link').forEach(sheet => {
+          if (sheet.visited !== true && sheet.href.indexOf(data.target) > -1) {
+            if (sheet.isLoaded === false || !sheet.href || !(sheet.href.indexOf('.css') > -1)) return
+            sheet.visited = true
+            let clone = sheet.cloneNode()
+            clone.isLoaded = false
+            clone.addEventListener('load', () => {
+              clone.isLoaded = true
+              sheet.remove()
+            })
+            clone.addEventListener('error', () => {
+              clone.isLoaded = true
+              sheet.remove()
+            })
+            clone.href = sheet.href
+            sheet.parentNode.appendChild(clone)
+          }
+        })
+      }
     }
   }
 }, false)
