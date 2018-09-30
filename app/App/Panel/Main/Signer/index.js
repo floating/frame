@@ -229,6 +229,7 @@ class Signer extends React.Component {
               <Settings />
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
             </div>
+            <div className='signerBot'></div>
           </div>
         </div>
       </div>
