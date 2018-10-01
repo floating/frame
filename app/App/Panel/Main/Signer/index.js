@@ -132,8 +132,8 @@ class Signer extends React.Component {
         {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
           return (
             <div key={i} className='accountListItem'>
-              {svg.octicon('check', { height: 24 })}
-              <div className='accountListItemAddress'>{a.substring(0, 8)} {svg.octicon('kebab-horizontal', { height: 16 })} {a.substr(a.length - 6)}</div>
+              <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
+              <div className='accountListItemAddress'>{a.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 6)}</div>
               <div className='accountListItemBalance'>{'Ξ ' + 0.0441}</div>
             </div>
           )

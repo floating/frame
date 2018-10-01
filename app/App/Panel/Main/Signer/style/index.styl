@@ -65,13 +65,13 @@
     bottom 3px
     background light
     z-index 40
-    border-radius 6px
+    border-radius 3 px
     z-index 3003
 
   .signerContainer
     position relative
     z-index 3002
-    border-radius 6px
+    border-radius 3px
     box-shadow 0px -1px 4px -1px rgba(6, 54, 52, 0.15), 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
     background lightShade
     padding-bottom 3px
@@ -143,10 +143,14 @@
     position relative
     opacity 1
     z-index 3030
-    border-radius 6px
-    box-shadow 0px 2px 3px thick0, 0px 19px 9px -14px thick0 !important
+    border-top-left-radius 3px
+    border-top-right-radius 3px
+    border-bottom-left-radius 9px
+    border-bottom-right-radius 9px
+    box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
     background light
     transition standard
+    margin-bottom 21px
     .transactionToAddress
       .transactionToAddressLarge
         svg
@@ -424,9 +428,22 @@
       align-items center
       padding 0px 20px 0px 20px
       transition standard
+      font-family FiraCode, sans-serif
+
+      .accountListItemCheck
+        color outerspace03
+        margin-bottom 1px
+
+      .accountListItemAddress
+        svg
+          margin 0px 4px 0px 4px
 
     .accountListItem:last-child
       border-bottom none
+
+    .accountListItem:hover
+      .accountListItemCheck
+        color outerspace
 
   .signerMid
     position absolute
@@ -441,7 +458,7 @@
     opacity 1
     transition standard, 0.1s linear background
     will-change transform
-    background thin
+    background lowlight
 
     > div
       transition standard
@@ -461,13 +478,16 @@
     left 0
     right 0
     opacity 1
-    z-index 3020
-    height 0px
-    border-top-left-radius 6px
-    border-top-right-radius 6px
+    z-index 3060
+    height 20px
+    border-top-left-radius 9px
+    border-top-right-radius 9px
+    border-bottom-left-radius 3px
+    border-bottom-right-radius 3px
     transition standard
     transform translateZ(0)
     background light
+    box-shadow 0px -2px 3px thin, 0px -19px 9px -14px thin !important
     overflow hidden
 
   .signerEvents
@@ -615,11 +635,9 @@
 .openSigner
   padding 0px 5px 5px 5px
   .signerMid
-    background thin
     > div
       opacity 1
   .signerTop
-    box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
     .signerStatus
       .signerInfo
         opacity 1
