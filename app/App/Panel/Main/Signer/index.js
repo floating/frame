@@ -135,8 +135,6 @@ class Signer extends React.Component {
       <div className='accountList'>
         {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
           i = startIndex + i
-          console.log(i)
-          console.log(this.props.accounts)
           return (
             <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
               <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
