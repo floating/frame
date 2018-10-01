@@ -13,7 +13,7 @@ import trezorLogo from './trezorLogo.png'
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = { typeHover: false, accountPage: 0 }
+    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0 }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -125,13 +125,20 @@ class Signer extends React.Component {
       </div>
     )
   }
+  setHighlight (mode, index) {
+    this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
+  }
   renderAccountList () {
     let startIndex = this.state.accountPage * 5
+    let highlight = (this.state.accountHighlight === 'inactive') ? this.store('signer.index') : this.state.highlightIndex
     return (
       <div className='accountList'>
         {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
+          i = startIndex + i
+          console.log(i)
+          console.log(this.props.accounts)
           return (
-            <div key={i} className='accountListItem'>
+            <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
               <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
               <div className='accountListItemAddress'>{a.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 6)}</div>
               <div className='accountListItemBalance'>{'Ξ ' + 0.0441}</div>
@@ -144,6 +151,8 @@ class Signer extends React.Component {
   renderStatus () {
     // TODO: Set Signer Name
     let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
+    let index = (this.state.accountHighlight === 'inactive') ? this.store('signer.index') : this.state.highlightIndex
+    let account = this.props.accounts[index]
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -160,10 +169,10 @@ class Signer extends React.Component {
             </div>
             <div className='signerAddress'>
               <div className='transactionToAddress'>
-                <div className='transactionToAddressLarge'>{this.props.accounts[0].substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.accounts[0].substr(this.props.accounts[0].length - 10)}</div>
+                <div className='transactionToAddressLarge'>{account.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {account.substr(account.length - 10)}</div>
                 <div className='transactionToAddressFull'>
-                  {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : this.props.accounts[0]}
-                  <input onClick={e => this.copyAddress(e)} value={this.props.accounts[0]} readOnly />
+                  {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : account}
+                  <input onClick={e => this.copyAddress(e)} value={account} readOnly />
                 </div>
               </div>
             </div>

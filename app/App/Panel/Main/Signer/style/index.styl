@@ -298,9 +298,10 @@
       text-align center
       flex-direction column
       overflow hidden
+      font-weight 300
 
       .signerStatusNotOk
-        padding 0px 40px 0px 40px
+        padding 20px 40px
 
     .signerAccount
       padding 10px 0px 18px 0px
@@ -313,7 +314,7 @@
         display flex
         justify-content center
         align-items center
-        height 38px
+        height 40px
         transform translateZ(0)
 
         .signerNameText
@@ -323,7 +324,7 @@
           padding-bottom 0px
           position relative
           transition standard
-          font-size 32px
+          font-size 30px
           display flex
           justify-content center
           align-items center
@@ -367,7 +368,6 @@
         font-size 12px
         font-family FiraCode
         letter-spacing 0px
-        background lightHigh
         position relative
         height 30px
         transform translateZ(0)
@@ -376,7 +376,6 @@
         font-size 16px
         font-family FiraCode
         letter-spacing 0px
-        background lightHigh
         position relative
         height 0px
         padding-top 0px
@@ -427,12 +426,12 @@
       justify-content space-between
       align-items center
       padding 0px 20px 0px 20px
-      transition standard
       font-family FiraCode, sans-serif
+      color outerspace08
 
       .accountListItemCheck
-        color outerspace03
-        margin-bottom 1px
+        color outerspace01
+        margin-bottom 3px
 
       .accountListItemAddress
         svg
@@ -441,7 +440,12 @@
     .accountListItem:last-child
       border-bottom none
 
-    .accountListItem:hover
+    .accountListItemSelected
+      background light
+      color outerspace
+      border-radius 6px
+      border-bottom 1px solid thick0
+      box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
       .accountListItemCheck
         color outerspace
 
@@ -672,7 +676,7 @@
   .accountList
     box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
     height 275px
-    padding 17px 0px 5px 0px
+    padding 22px 0px 10px 0px
 
 
 @import '../Settings/style'
