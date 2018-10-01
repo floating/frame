@@ -27,7 +27,7 @@ class Panel extends React.Component {
             </div>
             <div className='panelDetailText'>{networks[this.store('local.connection.network')]}</div>
           </div>
-          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onClick={() => this.store.toggleSettings()}>
+          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onMouseDown={() => this.store.toggleSettings()}>
             {svg.octicon('kebab-horizontal', { height: 21 })}
           </div>
         </div>

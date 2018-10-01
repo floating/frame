@@ -13,7 +13,8 @@ import trezorLogo from './trezorLogo.png'
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0, locked: false }
+    this.locked = false
+    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0 }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -44,7 +45,7 @@ class Signer extends React.Component {
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         <div className='trezorPinInput'>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => (
-            <div key={i} className='trezorPinInputButton' onClick={this.trezorPin.bind(this, i)}>
+            <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
               {svg.octicon('primitive-dot', { height: 20 })}
             </div>
           ))}
@@ -110,13 +111,13 @@ class Signer extends React.Component {
     if (this.store('signer.current') === this.props.id & this.store('signer.open')) menuClass += ' signerMenuOpen'
     return (
       <div className={menuClass}>
-        <div className='signerMenuItem signerMenuItemLeft' onClick={() => this.store.setSignerView('default')} >
+        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')} >
           <div className='signerMenuItemIcon'>
             {svg.octicon('pulse', { height: 23 })}
             <div className='iconUnderline' />
           </div>
         </div>
-        <div className='signerMenuItem signerMenuItemRight' onClick={() => this.store.setSignerView('settings')}>
+        <div className='signerMenuItem signerMenuItemRight' onMouseDown={() => this.store.setSignerView('settings')}>
           <div className='signerMenuItemIcon'>
             {svg.octicon('settings', { height: 23 })}
             <div className='iconUnderline' />
@@ -126,13 +127,16 @@ class Signer extends React.Component {
     )
   }
   setHighlight (mode, index) {
-    if (!this.state.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
+    if (!this.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
   }
   setSignerIndex (index) {
-    this.setState({ locked: true })
+    this.locked = true
     link.rpc('setSignerIndex', index, (err, summary) => {
-      this.setState({ locked: false, accountHighlight: 'inactive', highlightIndex: 0 })
+      this.setState({ accountHighlight: 'inactive', highlightIndex: 0 })
       this.store.toggleShowAccounts(false)
+      setTimeout(() => {
+        this.locked = false
+      }, 1000)
       if (err) return console.log(err)
     })
   }
@@ -145,7 +149,7 @@ class Signer extends React.Component {
         {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
           i = startIndex + i
           return (
-            <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onClick={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
+            <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
               <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
               <div className='accountListItemAddress'>{a.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 6)}</div>
               <div className='accountListItemBalance'>{'Ξ ' + 0.0441}</div>
@@ -180,7 +184,7 @@ class Signer extends React.Component {
                 <div className='transactionToAddressLarge'>{account.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {account.substr(account.length - 10)}</div>
                 <div className='transactionToAddressFull'>
                   {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : account}
-                  <input onClick={e => this.copyAddress(e)} value={account} readOnly />
+                  <input onMouseDown={e => this.copyAddress(e)} value={account} readOnly />
                 </div>
               </div>
             </div>
@@ -189,7 +193,7 @@ class Signer extends React.Component {
             </div>
           </div>
         )}
-        <div className='addressSelect' onClick={() => this.store.toggleShowAccounts()}>
+        <div className='addressSelect' onMouseDown={() => this.store.toggleShowAccounts()}>
           {svg.octicon('three-bars', { height: 16 })}
         </div>
       </div>
