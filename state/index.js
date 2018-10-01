@@ -30,7 +30,6 @@ let initial = {
     requests: {},
     view: 'default',
     accounts: [],
-    index: 0,
     showAccounts: false,
     position: {
       scrollTop: 0,

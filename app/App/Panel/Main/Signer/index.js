@@ -13,7 +13,7 @@ import trezorLogo from './trezorLogo.png'
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0 }
+    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0, locked: false }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -126,17 +126,26 @@ class Signer extends React.Component {
     )
   }
   setHighlight (mode, index) {
-    this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
+    if (!this.state.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
+  }
+  setSignerIndex (index) {
+    this.setState({ locked: true })
+    link.rpc('setSignerIndex', index, (err, summary) => {
+      this.setState({ locked: false, accountHighlight: 'inactive', highlightIndex: 0 })
+      this.store.toggleShowAccounts(false)
+      if (err) return console.log(err)
+    })
   }
   renderAccountList () {
+    let index = this.store('signers', this.props.id, 'index')
     let startIndex = this.state.accountPage * 5
-    let highlight = (this.state.accountHighlight === 'inactive') ? this.store('signer.index') : this.state.highlightIndex
+    let highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
     return (
       <div className='accountList'>
         {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
           i = startIndex + i
           return (
-            <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
+            <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onClick={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
               <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
               <div className='accountListItemAddress'>{a.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 6)}</div>
               <div className='accountListItemBalance'>{'Ξ ' + 0.0441}</div>
@@ -148,9 +157,10 @@ class Signer extends React.Component {
   }
   renderStatus () {
     // TODO: Set Signer Name
+    let index = this.store('signers', this.props.id, 'index')
     let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
-    let index = (this.state.accountHighlight === 'inactive') ? this.store('signer.index') : this.state.highlightIndex
-    let account = this.props.accounts[index]
+    if (this.state.accountHighlight === 'active') index = this.state.highlightIndex
+    let account = this.store('signers', this.props.id, 'accounts', index)
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (

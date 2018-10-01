@@ -5,6 +5,7 @@ class Signer extends EventEmitter {
   constructor () {
     super()
     this.accounts = []
+    this.index = 0
   }
   getCoinbase (cb) {
     cb(null, this.accounts[0])
@@ -21,6 +22,11 @@ class Signer extends EventEmitter {
       status: this.status,
       network: this.network
     }
+  }
+  setIndex (i, cb) {
+    this.index = i
+    windows.broadcast('main:action', 'updateSigner', this.summary())
+    cb(null, this.summary())
   }
   open () {
     windows.broadcast('main:action', 'addSigner', this.summary())

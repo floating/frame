@@ -69,7 +69,9 @@ class Ledger extends Signer {
   }
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
     clearTimeout(this._pollStatus)
-    this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
+    this._pollStatus = setTimeout(() => {
+      this.deviceStatus()
+    }, interval)
   }
   deviceStatus (deep, limit = 15) {
     this.pollStatus()
@@ -95,7 +97,7 @@ class Ledger extends Signer {
           this.update()
         }
       } else if (accounts.length) {
-        if (accounts[0] !== this.coinbase) {
+        if (accounts[0] !== this.coinbase || this.status !== 'ok') {
           this.coinbase = accounts[0]
           this.accounts = accounts
           this.deviceStatus(true)

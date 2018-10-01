@@ -58,6 +58,10 @@ module.exports = {
   close: () => {
     usbDetect.stopMonitoring()
   },
+  setSignerIndex: (index, cb) => {
+    if (!signers[current]) return cb(new Error('No Account Selected'))
+    signers[current].setIndex(index, cb)
+  },
   trezorPin: (id, pin, cb) => {
     if (!signers[id]) return cb(new Error('No Account Selected'))
     if (signers[id].setPin) {
