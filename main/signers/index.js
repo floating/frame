@@ -34,7 +34,7 @@ module.exports = {
   },
   unsetSigner: (cb) => {
     current = null
-    let summary = { id: '', type: '', accounts: [], status: '' }
+    let summary = { id: '', type: '', accounts: [], status: '', index: 0 }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
   },

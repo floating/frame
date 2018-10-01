@@ -94,12 +94,14 @@ class Ledger extends Signer {
             log.error('Device Status: Cannot write to HID device')
           }
           this.accounts = []
+          this.index = 0
           this.update()
         }
       } else if (accounts.length) {
         if (accounts[0] !== this.coinbase || this.status !== 'ok') {
           this.coinbase = accounts[0]
           this.accounts = accounts
+          if (this.index > accounts.length - 1) this.index = 0
           this.deviceStatus(true)
         }
         if (accounts.length > this.accounts.length) this.accounts = accounts
@@ -108,6 +110,7 @@ class Ledger extends Signer {
       } else {
         this.status = 'Unable to find accounts'
         this.accounts = []
+        this.index = 0
         this.update()
       }
     })
