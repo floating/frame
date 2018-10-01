@@ -92,7 +92,11 @@ export const trayOpen = (u, open) => u('tray.open', _ => open)
 export const runLocalNode = u => u('local.node.run', run => !run)
 export const runOnStartup = u => u('local.startup', startup => !startup)
 
-export const setSignerView = (u, view) => u('signer.view', _ => view)
+export const setSignerView = (u, view) => {
+  u('signer.showAccounts', _ => false)
+  u('signer.view', _ => view)
+}
+
 export const toggleShowAccounts = u => u('signer.showAccounts', _ => !_)
 
 export const setPermissions = (u, permissions) => {
@@ -216,6 +220,8 @@ export const updateExternalRates = (u, rates) => u('external.rates', () => rates
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
   u('signer.open', _ => false)
+  u('signer.view', _ => 'default')
+  u('signer.showAccounts', _ => false)
   setTimeout(_ => {
     u('signer', signer => {
       signer.last = signer.current
