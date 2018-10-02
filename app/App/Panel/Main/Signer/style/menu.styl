@@ -63,11 +63,14 @@
 .signerMenuOpen
   .signerMenuItem
     pointer-events auto
-
     .signerMenuItemIcon
-      opacity 0.4
+      opacity 0.6
+      transition none
       .iconUnderline
         transition standard
+  .signerMenuItem:hover
+    .signerMenuItemIcon
+      opacity 1
   .signerMenuItemRight
     right 0px
   .signerMenuItemLeft

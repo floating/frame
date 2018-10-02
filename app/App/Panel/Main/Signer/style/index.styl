@@ -409,7 +409,7 @@
     border-bottom-right-radius 6px
     transition standardSlower
     display flex
-    justify-content center
+    justify-content flex-end
     align-items center
     flex-direction column
     z-index 3018
@@ -448,6 +448,43 @@
       box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
       .accountListItemCheck
         color outerspace
+
+    .accountPageToggle
+      height 27px
+      min-height 27px
+      margin-top 14px
+      margin-bottom 4px
+      display flex
+      justify-content center
+      align-items center
+      font-family FiraCode, sans-serif
+
+      .accountPageCurrent
+        border-radius 3px
+        height 27px
+        width 27px
+        display flex
+        justify-content center
+        align-items center
+        font-size 18px
+
+      .accountPageButton
+        border-radius 3px
+        height 27px
+        width 27px
+        display flex
+        justify-content center
+        align-items center
+        box-sizing border-box
+
+      .accountPageButtonLeft
+        padding-right 1px
+
+      .accountPageButtonRight
+        padding-left 1px
+
+      .accountPageButton:hover
+        background highlight
 
   .signerMid
     position absolute
@@ -675,7 +712,7 @@
 .signerAccountExpand
   .accountList
     box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
-    height 275px
+    height 310px
     padding 22px 0px 10px 0px
 
 

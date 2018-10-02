@@ -8,7 +8,7 @@ class Hot extends Signer {
     this.privateKey = Buffer.from(key.replace('0x', ''), 'hex')
     this.id = key
     this.type = 'Hot'
-    this.accounts = (new Array(5)).fill(addHexPrefix(privateToAddress(this.privateKey).toString('hex')))
+    this.accounts = (new Array(6)).fill(addHexPrefix(privateToAddress(this.privateKey).toString('hex')))
     this.status = 'ok'
     this.open()
   }

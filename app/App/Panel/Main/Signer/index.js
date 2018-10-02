@@ -151,13 +151,25 @@ class Signer extends React.Component {
           return (
             <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
               <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
-              <div className='accountListItemAddress'>{a.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 6)}</div>
+              <div className='accountListItemAddress'>{a.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 4)}</div>
               <div className='accountListItemBalance'>{'Ξ ' + 0.0441}</div>
             </div>
           )
         })}
+        <div className='accountPageToggle'>
+          <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>{svg.octicon('chevron-left', { height: 18 })}</div>
+          <div className='accountPageCurrent'>{this.state.accountPage}</div>
+          <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
+        </div>
       </div>
     )
+  }
+  updateAccountPage (d) {
+    let accountPage = d === '<' ? this.state.accountPage - 1 : this.state.accountPage + 1
+    let max = Math.ceil((this.store('signers', this.props.id, 'accounts').length / 5) - 1)
+    if (accountPage < 0) accountPage = 0
+    if (accountPage > max) accountPage = max
+    this.setState({ accountPage })
   }
   renderStatus () {
     // TODO: Set Signer Name
@@ -246,7 +258,7 @@ class Signer extends React.Component {
               {this.renderStatus()}
               {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
-            <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '216px' : '199px' } : { pointerEvents: 'none' }}>
+            <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '230px' : '200px' } : { pointerEvents: 'none' }}>
               <Settings />
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
               {this.renderAccountList()}
