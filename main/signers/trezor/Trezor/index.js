@@ -15,8 +15,8 @@ class Trezor extends Signer {
     this.status = 'loading'
     this.accounts = []
     this.index = 0
-    this.network = ''
-    this.getPath = () => this.network === '1' ? `m/44'/60'/0'/0` + `/${this.index}` : `m/44'/1'/0'/0` + `/${this.index}`
+    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0/` : `m/44'/1'/0'/0/`
+    this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     device.on('button', code => this.button(code))
     device.on('passphrase', cb => this.passphrase(cb))
@@ -36,15 +36,41 @@ class Trezor extends Signer {
   button (label) {
     console.log(`Trezor button "${label}" was pressed`)
   }
-  deviceStatus () {
-    this.device.waitForSessionAndRun(session => {
-      return session.ethereumGetAddress(bip32Path.fromString(this.getPath()).toPathArray())
-    }).then(result => {
-      this.accounts = [toChecksumAddress(result.message.address)]
-      this.status = 'ok'
-      this.update()
-    }).catch(err => {
-      console.error('deviceStatus Error:', err)
+  lookupAccounts (limit, cb) {
+    const addresses = []
+    const lookup = (i = 0) => {
+      this.device.waitForSessionAndRun(session => {
+        return session.ethereumGetAddress(bip32Path.fromString(this.getPath(i)).toPathArray())
+      }).then(result => {
+        addresses[i] = toChecksumAddress(result.message.address)
+        if (addresses.length === limit) { cb(null, addresses) } else { lookup(++i) }
+      }).catch(cb)
+    }
+    lookup()
+  }
+  deviceStatus (deep, limit = 15) {
+    this.lookupAccounts(deep ? limit : 1, (err, accounts) => {
+      if (err) {
+        this.status = 'loading'
+        this.accounts = []
+        this.index = 0
+        this.update()
+      } else if (accounts.length) {
+        if (accounts[0] !== this.coinbase || this.status !== 'ok') {
+          this.coinbase = accounts[0]
+          this.accounts = accounts
+          if (this.index > accounts.length - 1) this.index = 0
+          this.deviceStatus(true)
+        }
+        if (accounts.length > this.accounts.length) this.accounts = accounts
+        this.status = 'ok'
+        this.update()
+      } else {
+        this.status = 'Unable to find accounts'
+        this.accounts = []
+        this.index = 0
+        this.update()
+      }
     })
   }
   needPassphras (cb) {
