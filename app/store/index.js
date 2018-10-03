@@ -54,4 +54,16 @@ store.observer(() => {
   }
 })
 
+store.observer(() => {
+  store('locas')
+  if (launch !== store('local.launch')) {
+    launch = store('local.launch')
+    if (launch) {
+      link.rpc('launchEnable', err => console.log(err))
+    } else {
+      link.rpc('launchDisable', err => console.log(err))
+    }
+  }
+})
+
 export default store

@@ -72,3 +72,11 @@ module.exports = {
     }
   }
 }
+let last = 0
+setInterval(() => {
+  if (Date.now() - last > 5 * 60 * 1000) {
+    Object.keys(signers).forEach(id => signers[id].refreshBalance(true))
+  } else if (current) {
+    signers[current].refreshBalance()
+  }
+}, 20 * 1000)
