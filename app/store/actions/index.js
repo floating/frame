@@ -19,6 +19,7 @@ export const panelRequest = (u, request) => {
   u('panel.show', v => true)
 }
 
+export const setBalance = (u, account, balance) => u('balances', account, b => balance)
 export const selectNetwork = (u, direction) => {
   let reset = {
     status: 'loading',

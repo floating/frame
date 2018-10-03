@@ -2,6 +2,7 @@
 
 import EventEmitter from 'events'
 import Restore from 'react-restore'
+import utils from 'web3-utils'
 
 import link from '../link'
 import * as actions from './actions'
@@ -53,5 +54,32 @@ store.observer(() => {
     }
   }
 })
+
+let monitor
+
+const refreshBalances = () => {
+  monitor.forEach(account => {
+    link.rpc('providerSend', { 'jsonrpc': '2.0', 'method': 'eth_getBalance', 'params': [account, 'latest'], 'id': 1 }, res => {
+      store.setBalance(account, utils.fromWei(utils.hexToNumberString(res.result)))
+    })
+  })
+}
+
+store.observer(() => {
+  monitor = []
+  Object.keys(store('signers')).forEach(id => {
+    if (store('signer.current') === id) { // Monitor all added account (15) balances for open signer
+      if (store('signers', id, 'accounts').length) {
+        monitor = monitor.concat(store('signers', id, 'accounts'))
+      }
+    } else { // Monitor index accounts of each signer
+      let account = store('signers', id, 'accounts', store('signers', id, 'index'))
+      if (account) monitor.push(account)
+    }
+  })
+  refreshBalances()
+})
+
+setInterval(refreshBalances, 15 * 1000)
 
 export default store

@@ -23,6 +23,7 @@ let initial = {
   tray: {
     open: false
   },
+  balances: {},
   signer: {
     minimized: true,
     open: false,

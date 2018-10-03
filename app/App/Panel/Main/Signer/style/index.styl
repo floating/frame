@@ -63,9 +63,9 @@
     right 0
     left 0
     bottom 3px
-    background light
+    background lowlight
     z-index 40
-    border-radius 3 px
+    border-radius  3px
     z-index 3003
 
   .signerContainer
@@ -384,19 +384,43 @@
         overflow hidden
         transition standard
         opacity 0
+        disply flex
+
+        .signerBalance
+          opacity 1
+
+          .signerBalanceCurrency
+            margin-right 4px
+            font-size 16px
+            font-weight 600
 
     .addressSelect
       height 0px
       width 100%
-      overflow hidden
       display flex
       justify-content center
-      transition standard
       border-radius 6px
       position relative
-      top -8px
-      opacity 0
+      top -25px
       transition standard
+      opacity 0
+
+      .addressSelectButton
+        // background highlighter
+        width 30px
+        min-width 30px
+        height 30px
+        min-height 30px
+        border-radius 6px
+        display flex
+        justify-content center
+        align-items center
+        box-sizing border-box
+        color outerspace08
+
+      .addressSelectButton:hover
+        // background highlightest
+        color outerspace
 
   .accountList
     position absolute
@@ -410,7 +434,7 @@
     transition standardSlower
     display flex
     justify-content flex-end
-    align-items center
+    align-items flex-end
     flex-direction column
     z-index 3018
     background lowlight
@@ -420,6 +444,7 @@
     .accountListItems
       background lowlight
       height 280px
+      min-height 280px
       width 100%
       display flex
       justify-content flex-start
@@ -719,9 +744,9 @@
 .signerInSettings
   .signerTop
     .addressSelect
-      height 20px
+      height 30px
       position relative
-      top -8px
+      top -10px
       opacity 1
 
 .signerAccountExpand

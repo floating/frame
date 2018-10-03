@@ -62,10 +62,7 @@ class Trezor extends Signer {
           if (this.index > accounts.length - 1) this.index = 0
           this.deviceStatus(true)
         }
-        if (accounts.length > this.accounts.length) {
-          this.accounts = accounts
-          this.refreshBalance(true)
-        }
+        if (accounts.length > this.accounts.length) this.accounts = accounts
         this.status = 'ok'
         this.update()
       } else {

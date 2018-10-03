@@ -149,7 +149,7 @@ class Signer extends React.Component {
         <div className='accountListItems'>
           {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
             i = startIndex + i
-            let balance = this.store('signers', this.props.id, 'balances', a)
+            let balance = this.store('balances', a)
             return (
               <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
                 <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
@@ -180,7 +180,7 @@ class Signer extends React.Component {
     let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     if (this.state.accountHighlight === 'active') index = this.state.highlightIndex
     let account = this.store('signers', this.props.id, 'accounts', index)
-    let balance = this.store('signers', this.props.id, 'balances', account)
+    let balance = this.store('balances', account)
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -205,12 +205,17 @@ class Signer extends React.Component {
               </div>
             </div>
             <div className='signerInfo'>
-              {'Ξ ' + (balance === undefined ? '-.------------------' : parseFloat(balance).toFixed(18))}
+              <div className='signerBalance'>
+                <span className='signerBalanceCurrency'>{'Ξ'}</span>
+                {(balance === undefined ? '-.------------------' : parseFloat(balance).toFixed(6))}
+              </div>
             </div>
           </div>
         )}
         <div className='addressSelect' onMouseDown={() => this.store.toggleShowAccounts()}>
-          {svg.octicon('three-bars', { height: 16 })}
+          <div className='addressSelectButton'>
+            {svg.octicon('key', { height: 18 })}
+          </div>
         </div>
       </div>
     )
