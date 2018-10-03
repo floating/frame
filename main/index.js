@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell } = require('electron')
+const { app, ipcMain, protocol, shell, dialog } = require('electron')
 const PersistStore = require('electron-store')
 const log = require('electron-log')
 const path = require('path')
@@ -11,6 +11,16 @@ require('./rpc')
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
+
+process.on('uncaughtException', (e) => {
+  if (e.code === 'EADDRINUSE') {
+    dialog.showErrorBox('Frame is already running', 'Frame is already running or another appication is using port 1248.')
+  } else {
+    dialog.showErrorBox('An error occured, Frame will quit', e.message)
+  }
+  log.error(e)
+  setTimeout(() => app.quit(), 50)
+})
 
 const persist = new PersistStore()
 

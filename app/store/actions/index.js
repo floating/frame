@@ -19,8 +19,6 @@ export const panelRequest = (u, request) => {
   u('panel.show', v => true)
 }
 
-export const enableMainnet = u => u('local.enableMainnet', () => true)
-
 export const selectNetwork = (u, direction) => {
   let reset = {
     status: 'loading',
@@ -94,7 +92,12 @@ export const trayOpen = (u, open) => u('tray.open', _ => open)
 export const runLocalNode = u => u('local.node.run', run => !run)
 export const runOnStartup = u => u('local.startup', startup => !startup)
 
-export const setSignerView = (u, view) => u('signer.view', _ => view)
+export const setSignerView = (u, view) => {
+  u('signer.showAccounts', _ => false)
+  u('signer.view', _ => view)
+}
+
+export const toggleShowAccounts = u => u('signer.showAccounts', _ => !_)
 
 export const setPermissions = (u, permissions) => {
   u('local.accounts', (accounts, state) => {
@@ -126,7 +129,7 @@ export const addProviderEvent = (u, payload) => {
 
 export const addRequest = (u, request) => {
   u('panel.view', view => 'default')
-  u('signer.view', view => 'default')
+  resetSigner(u)
   u('signer.requests', (requests, state) => {
     if (!request.handlerId) throw new Error('No handlerId for added request...', request)
     if (state.frame.type === 'tray' && state.signer.current) link.send('frame:showTray')
@@ -214,9 +217,15 @@ export const setSigner = (u, signer) => {
 
 export const updateExternalRates = (u, rates) => u('external.rates', () => rates)
 
+export const resetSigner = u => {
+  u('signer.view', _ => 'default')
+  u('signer.showAccounts', _ => false)
+}
+
 export const unsetSigner = u => {
   u('signer.minimized', _ => true)
   u('signer.open', _ => false)
+  resetSigner(u)
   setTimeout(_ => {
     u('signer', signer => {
       signer.last = signer.current

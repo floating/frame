@@ -34,7 +34,7 @@ module.exports = {
   },
   unsetSigner: (cb) => {
     current = null
-    let summary = { id: '', type: '', accounts: [], status: '' }
+    let summary = { id: '', type: '', accounts: [], status: '', index: 0 }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
   },
@@ -58,6 +58,10 @@ module.exports = {
   close: () => {
     usbDetect.stopMonitoring()
   },
+  setSignerIndex: (index, cb) => {
+    if (!signers[current]) return cb(new Error('No Account Selected'))
+    signers[current].setIndex(index, cb)
+  },
   trezorPin: (id, pin, cb) => {
     if (!signers[id]) return cb(new Error('No Account Selected'))
     if (signers[id].setPin) {
@@ -68,3 +72,11 @@ module.exports = {
     }
   }
 }
+let last = 0
+setInterval(() => {
+  if (Date.now() - last > 5 * 60 * 1000) {
+    Object.keys(signers).forEach(id => signers[id].refreshBalance(true))
+  } else if (current) {
+    signers[current].refreshBalance()
+  }
+}, 20 * 1000)

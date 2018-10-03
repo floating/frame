@@ -5,7 +5,7 @@ class Settings extends React.Component {
   clearPermissions () {
     return (
       <div className='quitFrame'>
-        <div onClick={() => this.store.clearPermissions()} className='quitFrameButton'>{'Clear All Permissions'}</div>
+        <div onMouseDown={() => this.store.clearPermissions()} className='quitFrameButton'>{'Clear All Permissions'}</div>
       </div>
     )
   }
@@ -21,7 +21,7 @@ class Settings extends React.Component {
         ) : (
           Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
             return (
-              <div className='signerPermission' key={o} onClick={_ => this.store.toggleAccess(o)}>
+              <div className='signerPermission' key={o} onMouseDown={_ => this.store.toggleAccess(o)}>
                 <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                 <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
                   <div className='signerPermissionToggleSwitch' />

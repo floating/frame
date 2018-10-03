@@ -9,6 +9,7 @@ const rpc = {
   getCoinbase: signers.getCoinbase,
   getSigners: signers.getSigners,
   setSigner: signers.setSigner,
+  setSignerIndex: signers.setSignerIndex,
   unsetSigner: signers.unsetSigner,
   trezorPin: signers.trezorPin,
   launchEnable: launch.enable,

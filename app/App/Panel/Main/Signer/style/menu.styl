@@ -6,7 +6,7 @@
   display flex
   align-items center
   justify-content center
-  height 100px
+  height 90px
   z-index 3004
   pointer-events none
 
@@ -22,7 +22,7 @@
     position absolute
     top -5px
     width 90px
-    height 100px
+    height 90px
     display flex
     align-items center
     justify-content center
@@ -63,11 +63,14 @@
 .signerMenuOpen
   .signerMenuItem
     pointer-events auto
-
     .signerMenuItemIcon
-      opacity 0.4
+      opacity 0.6
+      transition none
       .iconUnderline
         transition standard
+  .signerMenuItem:hover
+    .signerMenuItemIcon
+      opacity 1
   .signerMenuItemRight
     right 0px
   .signerMenuItemLeft
