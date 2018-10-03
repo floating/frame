@@ -57,7 +57,10 @@ class Signer extends EventEmitter {
     windows.broadcast('main:action', 'removeSigner', this.summary())
   }
   update () {
-    if (this.accounts.length && this.initial) this.refreshBalance()
+    if (this.accounts.length && this.initial) {
+      this.refreshBalance()
+      this.initial = false
+    }
     windows.broadcast('main:action', 'updateSigner', this.summary())
   }
   signTransaction (rawTx, cb) {
