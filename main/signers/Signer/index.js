@@ -9,7 +9,8 @@ class Signer {
     cb(null, this.accounts[0])
   }
   getAccounts (cb) {
-    cb(null, this.accounts)
+    let account = this.accounts[this.index]
+    cb(null, account ? [account] : [])
   }
   summary () {
     return {

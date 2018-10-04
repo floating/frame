@@ -16,11 +16,11 @@ const handler = (socket, req) => {
   socket.on('message', data => {
     let origin = socket.origin
     let payload = JSON.parse(data)
-    if (extOrigins.indexOf(origin) > -1) { // request from extension swap origin
+    if (extOrigins.indexOf(origin) > -1 && payload.__frameOrigin) { // Request from extension, swap origin
       origin = payload.__frameOrigin
       delete payload.__frameOrigin
     }
-    if (protectedMethods.indexOf(payload.method) > -1 && !trusted(socket.origin)) {
+    if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
       let response = { id: payload.id, jsonrpc: payload.jsonrpc, error: { message: 'Permission Denied', code: -1 } }
       socket.send(JSON.stringify(response), err => { if (err) console.log(err) })
     } else {
@@ -72,7 +72,6 @@ module.exports = server => {
     if (store('signer.current') !== current) ws.clients.forEach(socket => socket.close())
     current = store('signer.current')
   })
-
   let local
   let secondary
   store.observer(() => {
