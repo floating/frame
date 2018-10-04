@@ -16,7 +16,23 @@ const rpc = {
   launchEnable: launch.enable,
   launchDisable: launch.disable,
   launchStatus: launch.status,
-  providerSend: (payload, res) => provider.send(payload, res)
+  providerSend: (payload, cb) => provider.send(payload, cb),
+  connectionStatus: (cb) => {
+    cb(null, {
+      local: {
+        status: provider.connection.local.status,
+        network: provider.connection.local.network,
+        type: provider.connection.local.type,
+        connected: provider.connection.local.connected
+      },
+      secondary: {
+        status: provider.connection.secondary.status,
+        network: provider.connection.secondary.network,
+        type: provider.connection.secondary.type,
+        connected: provider.connection.secondary.connected
+      }
+    })
+  }
 }
 
 const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v

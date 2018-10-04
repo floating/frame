@@ -15,7 +15,10 @@ class Provider extends EventEmitter {
     this.store = store
     this.handlers = {}
     this.nonce = {}
+    this.connected = false
     this.connection = nodes
+    this.connection.on('connect', () => { this.connected = true })
+    this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
     this.connection.on('error', err => log.error(err))
     this.getGasPrice = this.getGasPrice.bind(this)

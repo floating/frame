@@ -13,6 +13,8 @@ export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)
 
+export const setConnection = (u, connection) => u('local.connection', c => connection)
+
 export const panelRequest = (u, request) => {
   request.host = request.host || (new URL(request.url)).host
   u('panel.request', v => request)

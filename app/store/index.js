@@ -55,11 +55,18 @@ store.observer(() => {
   }
 })
 
+link.rpc('connectionStatus', (err, connection) => {
+  if (err) return
+  store.setLocal(connection.local)
+  store.setSecondary(connection.secondary)
+})
+
 let monitor
 
 const refreshBalances = () => {
   monitor.forEach(account => {
     link.rpc('providerSend', { 'jsonrpc': '2.0', 'method': 'eth_getBalance', 'params': [account, 'latest'], 'id': 1 }, res => {
+      if (res.error) return
       store.setBalance(account, utils.fromWei(utils.hexToNumberString(res.result)))
     })
   })
@@ -68,10 +75,9 @@ const refreshBalances = () => {
 store.observer(() => {
   monitor = []
   Object.keys(store('signers')).forEach(id => {
-    if (store('signer.current') === id) { // Monitor all added account (15) balances for open signer
-      if (store('signers', id, 'accounts').length) {
-        monitor = monitor.concat(store('signers', id, 'accounts'))
-      }
+    if (store('signer.current') === id && store('signer.showAccounts')) { // When viewing accounts, refresh them all
+      let accounts = store('signers', id, 'accounts')
+      if (accounts.length) monitor = monitor.concat(accounts)
     } else { // Monitor index accounts of each signer
       let account = store('signers', id, 'accounts', store('signers', id, 'index'))
       if (account) monitor.push(account)
