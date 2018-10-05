@@ -76,6 +76,7 @@ class Ledger extends Signer {
   deviceStatus (deep, limit = 15) {
     this.pollStatus()
     this.lookupAccounts(deep ? limit : 1, (err, accounts) => {
+      let last = this.status
       if (err) {
         if (err.message.startsWith('cannot open device with path')) { // Device is busy, try again
           clearTimeout(this._deviceStatus)
@@ -95,7 +96,7 @@ class Ledger extends Signer {
           }
           this.accounts = []
           this.index = 0
-          this.update()
+          if (this.status !== last) this.update()
         }
       } else if (accounts.length) {
         if (accounts[0] !== this.coinbase || this.status !== 'ok') {

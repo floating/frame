@@ -4,13 +4,18 @@ class Signer {
   constructor () {
     this.accounts = []
     this.index = 0
+    this.requests = {}
   }
   getCoinbase (cb) {
     cb(null, this.accounts[0])
   }
   getAccounts (cb) {
     let account = this.accounts[this.index]
-    cb(null, account ? [account] : [])
+    if (cb) cb(null, account ? [account] : [])
+    return account ? [account] : []
+  }
+  getSelectedAccount () {
+    return this.accounts[this.index]
   }
   summary () {
     return {
@@ -19,11 +24,13 @@ class Signer {
       index: this.index,
       accounts: this.accounts,
       status: this.status,
-      network: this.network
+      network: this.network,
+      requests: this.requests
     }
   }
   setIndex (i, cb) {
     this.index = i
+    this.requests = {} // TODO Decline these requests before clobbering them
     windows.broadcast('main:action', 'updateSigner', this.summary())
     cb(null, this.summary())
   }
@@ -33,7 +40,8 @@ class Signer {
   close () {
     windows.broadcast('main:action', 'removeSigner', this.summary())
   }
-  update () {
+  update (options = {}) {
+    if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     windows.broadcast('main:action', 'updateSigner', this.summary())
   }
   signTransaction (rawTx, cb) {

@@ -4,11 +4,6 @@ import { URL } from 'url'
 
 import link from '../../link'
 
-const remove = (obj, id) => {
-  if (obj[id]) delete obj[id]
-  return obj
-}
-
 export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)
@@ -130,28 +125,15 @@ export const addProviderEvent = (u, payload) => {
   })
 }
 
-export const addRequest = (u, request) => {
-  u('panel.view', view => 'default')
-  resetSigner(u)
-  u('signer.requests', (requests, state) => {
-    if (!request.handlerId) throw new Error('No handlerId for added request...', request)
-    if (state.frame.type === 'tray' && state.signer.current) link.send('frame:showTray')
-    requests[request.handlerId] = request
-    return requests
-  })
-}
+export const setView = (u, view) => u('signer.view', _ => view)
 
 export const giveAccess = (u, req, access) => {
-  u('local.accounts', (accounts, state) => {
-    let a = state.signer.accounts[0]
-    accounts[a] = accounts[a] || { permissions: {} }
-    accounts[a].permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-    return accounts
+  u('local.accounts', req.account, (account) => {
+    account = account || { permissions: {} }
+    account.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
+    return account
   })
-  u('signer.requests', (requests, state) => {
-    delete requests[req.handlerId]
-    return requests
-  })
+  link.rpc('removeRequest', req, () => {}) // Move to link.send
 }
 
 export const toggleAccess = (u, handlerId) => {
@@ -164,36 +146,6 @@ export const toggleAccess = (u, handlerId) => {
 
 export const toggleDataView = (u, id) => {
   u('signer.requests', id, 'viewData', view => !view)
-}
-
-export const requestPending = (u, id) => {
-  u('signer.requests', id, 'status', status => 'pending')
-  u('signer.requests', id, 'notice', notice => 'Signature Pending')
-}
-
-export const requestSuccess = (u, id, res) => {
-  u('signer.requests', id, 'status', status => 'success')
-  u('signer.requests', id, 'notice', notice => 'Signature Succesful')
-  setTimeout(() => u('signer.requests', requests => remove(requests, id)), 1800)
-}
-
-export const requestError = (u, id, err) => {
-  u('signer.requests', id, 'status', status => 'error')
-  if (err.message === 'signTransaction Error: "Ledger device: Invalid data received (0x6a80)"') { // TODO: Error Codes
-    u('signer.requests', id, 'notice', notice => 'Ledger Contract Data = No')
-  } else if (err.message === 'signTransaction Error: "Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)"') {
-    u('signer.requests', id, 'notice', notice => 'Ledger Signature Declined')
-  } else {
-    let notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
-    u('signer.requests', id, 'notice', _ => notice)
-  }
-  setTimeout(() => u('signer.requests', requests => remove(requests, id)), 3300)
-}
-
-export const declineRequest = (u, id) => {
-  u('signer.requests', id, 'status', status => 'declined')
-  u('signer.requests', id, 'notice', notice => 'Signature Declined')
-  setTimeout(() => u('signer.requests', requests => remove(requests, id)), 1800)
 }
 
 export const updateSigners = (u, signers) => u('signers', _ => signers)

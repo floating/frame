@@ -20,10 +20,10 @@ class TransactionRequest extends React.Component {
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
   approve (reqId, req) {
-    link.send('tray:approveRequest', reqId, req)
+    link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
   decline (reqId, req) {
-    link.send('tray:declineRequest', reqId, req)
+    link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
   toggleDataView (id) {
     this.setState({ dataView: !this.state.dataView })

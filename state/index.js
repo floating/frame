@@ -28,7 +28,6 @@ let initial = {
     minimized: true,
     open: false,
     current: '',
-    requests: {},
     view: 'default',
     accounts: [],
     showAccounts: false,

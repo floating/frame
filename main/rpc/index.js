@@ -32,6 +32,24 @@ const rpc = {
         connected: provider.connection.secondary.connected
       }
     })
+  },
+  approveRequest (req, cb) {
+    console.log('approveRequest ', req.handlerId)
+    signers.setRequestPending(req)
+    provider.approveRequest(req, (err, res) => {
+      console.log('Request was approved...')
+      if (err) return signers.setRequestError(req.handlerId, err)
+      signers.setRequestSuccess(req.handlerId, res)
+    })
+  },
+  declineRequest (req, cb) {
+    console.log('declineRequest ', req.handlerId)
+    signers.declineRequest(req.handlerId)
+    provider.declineRequest(req)
+  },
+  removeRequest (req, cb) {
+    console.log('removeRequest', req.handlerId)
+    signers.removeRequest(req.handlerId)
   }
 }
 

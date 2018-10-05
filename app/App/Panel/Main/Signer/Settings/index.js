@@ -10,7 +10,9 @@ class Settings extends React.Component {
     )
   }
   render () {
-    let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
+    let index = this.store('signers', this.props.id, 'index')
+    let account = this.store('signers', this.props.id, 'accounts', index)
+    let permissions = this.store('local.accounts', account, 'permissions') || {}
     return (
       <div className={this.store('signer.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>

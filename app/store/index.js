@@ -67,7 +67,8 @@ const refreshBalances = () => {
   monitor.forEach(account => {
     link.rpc('providerSend', { 'jsonrpc': '2.0', 'method': 'eth_getBalance', 'params': [account, 'latest'], 'id': 1 }, res => {
       if (res.error) return
-      store.setBalance(account, utils.fromWei(utils.hexToNumberString(res.result)))
+      let balance = utils.fromWei(utils.hexToNumberString(res.result))
+      if (store('balances', account) !== balance) store.setBalance(account, balance)
     })
   })
 }

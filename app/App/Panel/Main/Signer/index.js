@@ -268,7 +268,7 @@ class Signer extends React.Component {
               {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
             <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '230px' : '200px' } : { pointerEvents: 'none' }}>
-              <Settings />
+              <Settings id={this.props.id} />
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
               {this.renderAccountList()}
             </div>
