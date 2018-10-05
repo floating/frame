@@ -37,7 +37,6 @@ const rpc = {
     console.log('approveRequest ', req.handlerId)
     signers.setRequestPending(req)
     provider.approveRequest(req, (err, res) => {
-      console.log('Request was approved...')
       if (err) return signers.setRequestError(req.handlerId, err)
       signers.setRequestSuccess(req.handlerId, res)
     })
