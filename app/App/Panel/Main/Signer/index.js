@@ -161,7 +161,7 @@ class Signer extends React.Component {
         </div>
         <div className='accountPageToggle'>
           <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>{svg.octicon('chevron-left', { height: 18 })}</div>
-          <div className='accountPageCurrent'>{this.state.accountPage}</div>
+          <div className='accountPageCurrent'>{this.state.accountPage + 1}</div>
           <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
         </div>
       </div>
@@ -176,11 +176,10 @@ class Signer extends React.Component {
   }
   renderStatus () {
     // TODO: Set Signer Name
-    let index = this.store('signers', this.props.id, 'index')
+    let currentIndex = this.store('signers', this.props.id, 'index')
     let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
-    if (this.state.accountHighlight === 'active') index = this.state.highlightIndex
-    let account = this.store('signers', this.props.id, 'accounts', index)
-    let balance = this.store('balances', account)
+    if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
+    let accounts = this.store('signers', this.props.id, 'accounts')
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -188,28 +187,35 @@ class Signer extends React.Component {
             {status}
           </div>
         ) : (
-          <div className='signerAccount'>
-            <div className='signerName'>
-              <div className='signerNameText'>
-                {this.props.type + ' Account'}
-                <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
-              </div>
-            </div>
-            <div className='signerAddress'>
-              <div className='transactionToAddress'>
-                <div className='transactionToAddressLarge'>{account.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {account.substr(account.length - 10)}</div>
-                <div className='transactionToAddressFull'>
-                  {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : account}
-                  <input onMouseDown={e => this.copyAddress(e)} value={account} readOnly />
+          <div className='signerAccounts' style={{ width: '1500%', left: '-' + (currentIndex * 100) + '%' }}>
+            {accounts.map((account, index) => {
+              let balance = this.store('balances', account)
+              return (
+                <div key={account} className='signerAccount' style={{ minWidth: `calc(100% / 15)` }}>
+                  <div className='signerName'>
+                    <div className='signerNameText'>
+                      {this.props.type + ' Account'}
+                      <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
+                    </div>
+                  </div>
+                  <div className='signerAddress'>
+                    <div className='transactionToAddress'>
+                      <div className='transactionToAddressLarge'>{account.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {account.substr(account.length - 10)}</div>
+                      <div className='transactionToAddressFull'>
+                        {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : account}
+                        <input onMouseDown={e => this.copyAddress(e)} value={account} readOnly />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='signerInfo'>
+                    <div className='signerBalance'>
+                      <span className='signerBalanceCurrency'>{'Ξ'}</span>
+                      {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className='signerInfo'>
-              <div className='signerBalance'>
-                <span className='signerBalanceCurrency'>{'Ξ'}</span>
-                {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
-              </div>
-            </div>
+              )
+            })}
           </div>
         )}
         <div className='addressSelect' onMouseDown={() => this.store.toggleShowAccounts()}>

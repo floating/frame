@@ -92,7 +92,7 @@ class Ledger extends Signer {
           if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
           if (err.statusCode === 26625 || err.statusCode === 26628) {
             this.pollStatus(3000)
-            this.status = 'Confirm your Ledger is not asleep and is running firmware version 1.4.0 or newer'
+            this.status = 'Confirm your Ledger is not asleep and is running firmware v1.4.0+'
           }
           if (err.message === 'Cannot write to HID device') {
             this.status = 'loading'
