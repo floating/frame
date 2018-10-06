@@ -44,6 +44,8 @@ class Trezor extends Signer {
         return session.ethereumGetAddress(bip32Path.fromString(this.getPath(i)).toPathArray())
       }).then(result => {
         addresses[i] = toChecksumAddress(result.message.address)
+        this.accounts[i] = addresses[i]
+        this.update()
         if (addresses.length === limit) { cb(null, addresses) } else { lookup(++i) }
       }).catch(cb)
     }

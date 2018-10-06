@@ -5,7 +5,7 @@ const store = require('../store')
 const signers = require('../signers')
 
 const invalidOrigin = o => o !== o.replace(/[^0-9a-z/:.[\]-]/gi, '')
-const extOrigins = ['chrome-extension://adpbaaddjmehiidelapmmnjpmehjiifg', 'moz-extension://fc369fbc-e505-e14f-a079-fe23932d9044']
+const extOrigins = ['chrome-extension://adpbaaddjmehiidelapmmnjpmehjiifg', 'moz-extension://7b2a0cf9-245a-874b-8f58-4a7e3d04c70f']
 
 module.exports = origin => {
   if (!origin || origin === 'null') origin = 'Unknown' // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent

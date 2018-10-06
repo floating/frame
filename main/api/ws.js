@@ -8,8 +8,8 @@ const provider = require('../provider')
 
 const subs = {}
 
-const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction', 'net_version', 'personal_sign', 'personal_ecRecover', 'eth_sign']
-const extOrigins = ['chrome-extension://adpbaaddjmehiidelapmmnjpmehjiifg', 'moz-extension://fc369fbc-e505-e14f-a079-fe23932d9044']
+const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
+const extOrigins = ['chrome-extension://adpbaaddjmehiidelapmmnjpmehjiifg', 'moz-extension://7b2a0cf9-245a-874b-8f58-4a7e3d04c70f']
 
 const handler = (socket, req) => {
   socket.id = uuid()

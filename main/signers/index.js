@@ -1,4 +1,5 @@
 const usbDetect = require('usb-detection')
+const log = require('electron-log')
 
 // App Window API
 const windows = require('../windows')
@@ -89,11 +90,12 @@ const api = {
     }
   },
   addRequest (req) {
-    console.log('addRequest', req.handlerId)
+    log.info('addRequest', req.handlerId)
     if (!signers[current] || signers[current].requests[req.handlerId]) return // If no current signer or the request already exists
     signers[current].requests[req.handlerId] = req
     signers[current].update({ setView: 'default' })
     windows.showTray()
+    windows.broadcast('main:action', 'setSignerView', 'default')
   },
   removeRequest (handlerId) {
     if (signers[current] && signers[current].requests[handlerId]) {
@@ -102,7 +104,7 @@ const api = {
     }
   },
   declineRequest (handlerId) {
-    console.log('declineRequest', handlerId)
+    log.info('declineRequest', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'declined'
@@ -113,7 +115,7 @@ const api = {
   },
   setRequestPending (req) {
     let handlerId = req.handlerId
-    console.log('setRequestPending', handlerId)
+    log.info('setRequestPending', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'pending'
@@ -122,7 +124,7 @@ const api = {
     }
   },
   setRequestError (handlerId, err) {
-    console.log('setRequestPending', handlerId)
+    log.info('setRequestPending', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'error'
@@ -139,7 +141,7 @@ const api = {
     }
   },
   setRequestSuccess (handlerId) {
-    console.log('setRequestSuccess', handlerId)
+    log.info('setRequestSuccess', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'success'

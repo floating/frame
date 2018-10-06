@@ -49,6 +49,8 @@ class Ledger extends Signer {
         eth.getAddress(this.getPath(i), false, false).then(result => {
           transport.close()
           addresses[i] = result.address
+          this.accounts[i] = result.address
+          this.update()
           if (addresses.length === limit) {
             cb(null, addresses)
           } else {

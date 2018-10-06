@@ -102,21 +102,27 @@ export const toggleShowAccounts = u => u('signer.showAccounts', _ => !_)
 
 export const setPermissions = (u, permissions) => {
   u('local.accounts', (accounts, state) => {
-    accounts[state.signer.accounts[0]].permissions = permissions
+    let currentSigner = state.signers[state.signer.current]
+    let currentAccount = currentSigner.accounts[currentSigner.index]
+    accounts[currentAccount].permissions = permissions
     return accounts
   })
 }
 
 export const clearPermissions = (u, permissions) => {
   u('local.accounts', (accounts, state) => {
-    accounts[state.signer.accounts[0]].permissions = {}
+    let currentSigner = state.signers[state.signer.current]
+    let currentAccount = currentSigner.accounts[currentSigner.index]
+    accounts[currentAccount].permissions = {}
     return accounts
   })
 }
 
 export const setDefaultNode = (u, url) => {
   u('local.accounts', (accounts, state) => {
-    accounts[state.signer.accounts[0]].node = url
+    let currentSigner = state.signers[state.signer.current]
+    let currentAccount = currentSigner.accounts[currentSigner.index]
+    accounts[currentAccount].node = url
     return accounts
   })
 }

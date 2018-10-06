@@ -34,7 +34,11 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: [signers.getSelectedAccount().toLowerCase()] })
   }
   getNetVersion (payload, res) {
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: store('local.connection.network') })
+    this.connection.send(payload, (response) => {
+      if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
+      if (response.result !== store('local.connection.network')) this.resError('Network mismatch', payload, res)
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
+    })
   }
   unsubscribe (params, res) {
     this.connection.send({ id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params }, res)
