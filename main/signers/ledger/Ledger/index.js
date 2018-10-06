@@ -30,7 +30,7 @@ class Ledger extends Signer {
     })
   }
   update () {
-    if (this.status === 'Invalid sequence' || this.status === 'initial') return
+    if (this.invalid || this.status === 'Invalid sequence' || this.status === 'initial') return
     super.update()
   }
   reset () {
@@ -102,6 +102,7 @@ class Ledger extends Signer {
             this.status = 'Set browser support to "NO"'
             log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
           }
+          if (err.message === 'Invalid sequence') this.invalid = true
           this.accounts = []
           this.index = 0
           if (this.status !== last) this.update()

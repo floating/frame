@@ -93,10 +93,13 @@ const api = {
     if (!signers[current] || signers[current].requests[req.handlerId]) return // If no current signer or the request already exists
     signers[current].requests[req.handlerId] = req
     signers[current].update({ setView: 'default' })
+    windows.showTray()
   },
   removeRequest (handlerId) {
-    delete signers[current].requests[handlerId]
-    signers[current].update()
+    if (signers[current] && signers[current].requests[handlerId]) {
+      delete signers[current].requests[handlerId]
+      signers[current].update()
+    }
   },
   declineRequest (handlerId) {
     console.log('declineRequest', handlerId)

@@ -56,11 +56,12 @@ ipcMain.on('tray:setSync', (e, key, payload) => {
 
 ipcMain.on('tray:api', () => require('./api'))
 
+if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
   if (process.platform === 'darwin' || process.platform === 'win32') {
     windows.tray()
   } else {
-    setTimeout(windows.tray, 100)
+    setTimeout(windows.tray, 20)
   }
   if (app.dock) app.dock.hide()
   protocol.interceptFileProtocol('file', (req, cb) => {

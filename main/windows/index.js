@@ -11,6 +11,8 @@ const windows = {}
 let tray
 let lock = 0
 
+let hideTimeout
+
 const api = {
   tray: () => {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
@@ -36,7 +38,11 @@ const api = {
       windows.tray.on('minimize', onHide)
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) setTimeout(() => windows.tray.on('blur', _ => { if (windows.tray.isVisible()) api.hideTray() }), 3000)
+    if (!dev) {
+      setTimeout(() => windows.tray.on('blur', _ => {
+        if (windows.tray.isVisible()) hideTimeout = setTimeout(() => api.hideTray(), 500)
+      }), 3000)
+    }
     api.showTray()
   },
   trayClick: () => {
@@ -49,6 +55,7 @@ const api = {
     setTimeout(_ => windows.tray.hide(), 700)
   },
   showTray: () => {
+    clearTimeout(hideTimeout)
     if (windows.tray.isVisible()) return
     let now = Date.now()
     if (now - lock < 700) return setTimeout(api.showTray, 700)
