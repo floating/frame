@@ -19,13 +19,13 @@ const handler = (socket, req) => {
     if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(payload), err => { if (err) console.log(err) })
   }
   socket.on('message', data => {
-    log.info('Socket message: ' + socket.id + ' ' + data.toString())
     let origin = socket.origin
     let payload = JSON.parse(data)
     if (extOrigins.indexOf(origin) > -1 && payload.__frameOrigin) { // Request from extension, swap origin
       origin = payload.__frameOrigin
       delete payload.__frameOrigin
     }
+    log.info('ws -> ' + socket.id.substr(0, 6) + ' ' + origin + ' ' + payload.method + ' ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error: { message: 'Permission Denied', code: -1 } })
     } else {

@@ -207,7 +207,7 @@ class Signer extends React.Component {
             <div className='signerInfo'>
               <div className='signerBalance'>
                 <span className='signerBalanceCurrency'>{'Ξ'}</span>
-                {(balance === undefined ? '-.------------------' : parseFloat(balance).toFixed(6))}
+                {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
               </div>
             </div>
           </div>

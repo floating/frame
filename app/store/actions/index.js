@@ -17,6 +17,9 @@ export const panelRequest = (u, request) => {
 }
 
 export const setBalance = (u, account, balance) => u('balances', account, b => balance)
+
+export const enableMainnet = u => u('local.enableMainnet', () => true)
+
 export const selectNetwork = (u, direction) => {
   let reset = {
     status: 'loading',
@@ -199,12 +202,12 @@ export const removeSigner = (u, signer, state) => {
   let status = 'Removing'
   u('signers', (signers, state) => {
     if (state.signer.current === signer.id) unsetSigner(u)
-    if (signers[signer.id]) signers[signer.id].removing = true
+    if (signers[signer.id] && signers[signer.id]) signers[signer.id].removing = true
     return signers
   })
   setTimeout(_ => {
     u('signers', signers => {
-      if (signers[signer.id].removing) signers[signer.id].status = status
+      if (signers[signer.id] && signers[signer.id].removing) signers[signer.id].status = status
       return signers
     })
   }, 1200)

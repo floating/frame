@@ -23,7 +23,11 @@ let current = null
 const api = {
   getSigners: (cb) => {
     let signerSummary = {}
-    Object.keys(signers).forEach(id => { signerSummary[id] = signers[id].summary() })
+    Object.keys(signers).forEach(id => {
+      let summary = signers[id].summary()
+      if (summary.status === 'Invalid sequence' || summary.status === 'initial') return
+      signerSummary[id] = summary
+    })
     cb(null, signerSummary)
   },
   setSigner: (id, cb) => {

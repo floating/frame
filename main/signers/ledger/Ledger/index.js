@@ -13,7 +13,7 @@ class Ledger extends Signer {
     this.id = id
     this.devicePath = devicePath
     this.type = 'Ledger'
-    this.status = 'loading'
+    this.status = 'initial'
     this.coinbase = '0x'
     this.accounts = []
     this.network = store('local.connection.network')
@@ -28,6 +28,10 @@ class Ledger extends Signer {
         this.deviceStatus()
       }
     })
+  }
+  update () {
+    if (this.status === 'Invalid sequence' || this.status === 'initial') return
+    super.update()
   }
   reset () {
     this.network = store('local.connection.network')
@@ -93,6 +97,10 @@ class Ledger extends Signer {
           if (err.message === 'Cannot write to HID device') {
             this.status = 'loading'
             log.error('Device Status: Cannot write to HID device')
+          }
+          if (err.message === 'Invalid channel') {
+            this.status = 'Set browser support to "NO"'
+            log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
           }
           this.accounts = []
           this.index = 0
