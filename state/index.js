@@ -23,11 +23,11 @@ let initial = {
   tray: {
     open: false
   },
+  balances: {},
   signer: {
     minimized: true,
     open: false,
     current: '',
-    requests: {},
     view: 'default',
     accounts: [],
     showAccounts: false,

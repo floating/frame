@@ -1,38 +1,21 @@
-const EventEmitter = require('events')
-const utils = require('web3-utils')
-
 const windows = require('../../windows')
-const provider = require('../../provider')
 
-class Signer extends EventEmitter {
+class Signer {
   constructor () {
-    super()
     this.accounts = []
     this.index = 0
-    this.balances = {}
-    this.initial = true
-  }
-  refreshBalance (all) {
-    let refresh = account => {
-      provider.send({ 'jsonrpc': '2.0', 'method': 'eth_getBalance', 'params': [account, 'latest'], 'id': 1 }, res => {
-        let balance = utils.fromWei(utils.hexToNumberString(res.result))
-        if (this.balances[account] !== balance) {
-          this.balances[account] = balance
-          this.update()
-        }
-      })
-    }
-    if (all) {
-      this.accounts.forEach(refresh)
-    } else {
-      refresh(this.accounts[this.index])
-    }
+    this.requests = {}
   }
   getCoinbase (cb) {
     cb(null, this.accounts[0])
   }
   getAccounts (cb) {
-    cb(null, this.accounts)
+    let account = this.accounts[this.index]
+    if (cb) cb(null, account ? [account] : [])
+    return account ? [account] : []
+  }
+  getSelectedAccount () {
+    return this.accounts[this.index]
   }
   summary () {
     return {
@@ -42,11 +25,12 @@ class Signer extends EventEmitter {
       accounts: this.accounts,
       status: this.status,
       network: this.network,
-      balances: this.balances
+      requests: this.requests
     }
   }
   setIndex (i, cb) {
     this.index = i
+    this.requests = {} // TODO Decline these requests before clobbering them
     windows.broadcast('main:action', 'updateSigner', this.summary())
     cb(null, this.summary())
   }
@@ -56,11 +40,8 @@ class Signer extends EventEmitter {
   close () {
     windows.broadcast('main:action', 'removeSigner', this.summary())
   }
-  update () {
-    if (this.accounts.length && this.initial) {
-      this.refreshBalance()
-      this.initial = false
-    }
+  update (options = {}) {
+    if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     windows.broadcast('main:action', 'updateSigner', this.summary())
   }
   signTransaction (rawTx, cb) {

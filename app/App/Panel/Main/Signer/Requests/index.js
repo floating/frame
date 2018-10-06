@@ -34,7 +34,7 @@ class Requests extends React.Component {
     }
   }
   render () {
-    let requests = this.store('signer.requests')
+    let requests = this.store('signers', this.store('signer.current'), 'requests') || {}
     requests = Object.keys(requests).map(key => requests[key]).filter(req => {
       if (req.type === 'approveTransaction') return this.props.accounts.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
       return true

@@ -1,11 +1,9 @@
-const { ipcMain } = require('electron')
 const uuid = require('uuid/v4')
 const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
 const store = require('../store')
-const windows = require('../windows')
 const nodes = require('../nodes')
 const signers = require('../signers')
 
@@ -15,7 +13,10 @@ class Provider extends EventEmitter {
     this.store = store
     this.handlers = {}
     this.nonce = {}
+    this.connected = false
     this.connection = nodes
+    this.connection.on('connect', () => { this.connected = true })
+    this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
     this.connection.on('error', err => log.error(err))
     this.getGasPrice = this.getGasPrice.bind(this)
@@ -30,10 +31,7 @@ class Provider extends EventEmitter {
     })
   }
   getAccounts (payload, res) {
-    signers.getAccounts((err, accounts) => {
-      if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.map(a => a.toLowerCase()) })
-    })
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: [signers.getSelectedAccount().toLowerCase()] })
   }
   getNetVersion (payload, res) {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: store('local.connection.network') })
@@ -135,8 +133,8 @@ class Provider extends EventEmitter {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network'))
       let handlerId = uuid()
-      windows.broadcast('main:action', 'addRequest', { handlerId, type: 'approveTransaction', data: rawTx, payload })
       this.handlers[handlerId] = res
+      signers.addRequest({ handlerId, type: 'approveTransaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)
     })
   }
   signPersonal (payload, res) {
@@ -169,19 +167,4 @@ class Provider extends EventEmitter {
   }
 }
 
-const provider = new Provider()
-
-ipcMain.on('tray:approveRequest', (e, id, req) => {
-  windows.broadcast('main:action', 'requestPending', id)
-  provider.approveRequest(req, (err, res) => {
-    if (err) return windows.broadcast('main:action', 'requestError', id, err)
-    windows.broadcast('main:action', 'requestSuccess', id, res)
-  })
-})
-
-ipcMain.on('tray:declineRequest', (e, id, req) => {
-  windows.broadcast('main:action', 'declineRequest', id)
-  provider.declineRequest(req)
-})
-
-module.exports = provider
+module.exports = new Provider()
