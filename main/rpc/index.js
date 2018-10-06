@@ -1,4 +1,6 @@
 const { ipcMain } = require('electron')
+const log = require('electron-log')
+
 const signers = require('../signers')
 const launch = require('../launch')
 const provider = require('../provider')
@@ -34,7 +36,7 @@ const rpc = {
     })
   },
   approveRequest (req, cb) {
-    console.log('approveRequest ', req.handlerId)
+    log.info('approveRequest ', req.handlerId)
     signers.setRequestPending(req)
     provider.approveRequest(req, (err, res) => {
       if (err) return signers.setRequestError(req.handlerId, err)
@@ -42,12 +44,12 @@ const rpc = {
     })
   },
   declineRequest (req, cb) {
-    console.log('declineRequest ', req.handlerId)
+    log.info('declineRequest ', req.handlerId)
     signers.declineRequest(req.handlerId)
     provider.declineRequest(req)
   },
   removeRequest (req, cb) {
-    console.log('removeRequest', req.handlerId)
+    log.info('removeRequest', req.handlerId)
     signers.removeRequest(req.handlerId)
   }
 }

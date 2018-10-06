@@ -40,8 +40,7 @@ class Nodes extends EventEmitter {
   getNetwork (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'net_version', params: [], id: 1 }, cb) }
   getNodeType (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) }
   connect (connection) {
-    log.info('  ')
-    log.info('  ')
+    log.info(' ')
     log.info('Connection has been updated')
     // Update the network if changed
     if (this.network && this.network !== connection.network) {
@@ -53,7 +52,7 @@ class Nodes extends EventEmitter {
 
     // Local connection is on
     if (connection.local.on) {
-      log.info('    Local connection is set to ON')
+      log.info('    Local connection: ON')
       if (!this.local.provider) {
         log.info('    Local connection doesn\'t exist, creating connection')
 
@@ -107,7 +106,7 @@ class Nodes extends EventEmitter {
       }
     // Local connection is set OFF by the user
     } else {
-      log.info('    Local connection is set to OFF')
+      log.info('    Local connection: OFF')
       if (this.local.provider) this.local.provider.close()
       this.local.provider = null
       if (this.local.status !== 'off') {
@@ -121,7 +120,7 @@ class Nodes extends EventEmitter {
 
     // Secondary connection is on
     if (connection.secondary.on) {
-      log.info('    Secondary connection is set to ON')
+      log.info('    Secondary connection: ON')
       if (connection.local.on && (connection.local.status === 'connected' || connection.local.status === 'loading')) {
         // Connection is on Standby
         log.info('    Secondary connection on STANDBY', connection.secondary.status === 'standby')
@@ -193,7 +192,7 @@ class Nodes extends EventEmitter {
       }
     // Secondary connection is set to OFF by the user
     } else {
-      log.info('    Secondary connection is set to OFF')
+      log.info('    Secondary connection: OFF')
       if (this.secondary.provider) this.secondary.provider.close()
       this.secondary.provider = null
       if (this.secondary.status !== 'off') {

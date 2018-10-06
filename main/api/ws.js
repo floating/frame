@@ -16,7 +16,7 @@ const handler = (socket, req) => {
   log.info('Socket connect: ' + socket.id)
   socket.origin = req.headers.origin
   const res = payload => {
-    if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(payload), err => { if (err) console.log(err) })
+    if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(payload), err => { if (err) log.info(err) })
   }
   socket.on('message', data => {
     let origin = socket.origin
@@ -51,7 +51,7 @@ const handler = (socket, req) => {
         delete subs[sub]
       }
     })
-    if (unsub.length > 0) provider.unsubscribe(unsub, res => console.log('Provider Unsubscribe', res))
+    if (unsub.length > 0) provider.unsubscribe(unsub, res => log.info('Provider Unsubscribe', res))
   })
 }
 
