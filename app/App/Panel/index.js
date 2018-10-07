@@ -4,6 +4,7 @@ import svg from '../../svg'
 
 import Main from './Main'
 import Local from './Local'
+import Notify from './Notify'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
@@ -33,6 +34,7 @@ class Panel extends React.Component {
         </div>
         <Local />
         <Main />
+        <Notify />
       </div>
     )
   }

@@ -1,0 +1,52 @@
+.notify
+  position fixed
+  top 0
+  right 0
+  left 0
+  bottom 0
+  background rgba(1, 0, 10, 0.6)
+  z-index 999999999
+  pointer-events none
+  transition standardSlow
+  display flex
+  justify-content center
+  align-items center
+  text-align center
+  opacity 0
+
+  .notifyBox
+    width 320px
+    background bad
+    border-radius 6px
+    color badDark
+    padding 20px 20px 20px 20px
+    box-sizing border-box
+    position relative
+    transition standardSlow
+    top -200px
+
+    .notifyTitle
+      font-size 26px
+
+    .notifyBody
+      font-weight 300
+      font-size 14px
+      margin-top 12px
+
+    .notifyInput
+      display flex
+      margin-top 20px
+
+      .notifyInputOption
+        width 50%
+        display flex
+        justify-content center
+        align-items center
+        box-sizing border-box
+        padding 10px
+
+.notifyOn
+  opacity 1
+  pointer-events auto
+  .notifyBox
+    top 0

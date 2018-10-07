@@ -11,7 +11,7 @@ class Settings extends React.Component {
     let network = context.store('local.connection.network')
     let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
     this.customMessage = 'Custom Endpoint'
-    this.state = { localShake: {}, secondaryCustom: customTarget || this.customMessage, resetConfirm: false }
+    this.state = { localShake: {}, secondaryCustom: customTarget || this.customMessage, resetConfirm: false, expandNetwork: false }
   }
   appInfo () {
     return (
@@ -47,14 +47,6 @@ class Settings extends React.Component {
     e.preventDefault()
     clearTimeout(this.customInputTimeout)
     let value = e.target.value
-    if (value.toLowerCase() === 'i understand the risks, unlock mainnet') {
-      this.setState({ secondaryCustom: '' })
-      this.store.setSecondaryCustom('')
-      this.store.enableMainnet()
-      let target = e.target
-      setTimeout(() => target.blur(), 0)
-      return
-    }
     this.setState({ secondaryCustom: value })
     this.customInputTimeout = setTimeout(() => this.store.setSecondaryCustom(this.state.secondaryCustom), 1000)
   }
@@ -97,34 +89,37 @@ class Settings extends React.Component {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
     }
   }
-  selectNetwork (direction) {
-    this.store.selectNetwork(direction)
-    let target = this.store('local.connection.secondary.settings', this.store('local.connection.network'), 'options.custom')
-    this.setState({ secondaryCustom: target || this.customMessage })
+  selectNetwork (net) {
+    if (net !== this.store('local.connection.network')) {
+      if (net === '1' && !this.store('local.enableMainnet')) return this.store.showMainnetWarning(true)
+      this.store.selectNetwork(net)
+      let target = this.store('local.connection.secondary.settings', this.store('local.connection.network'), 'options.custom')
+      this.setState({ secondaryCustom: target || this.customMessage })
+    }
+  }
+  expandNetwork (expand) {
+    this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
   render () {
     let network = this.store('local.connection.network')
+    let options = this.store('local.connection.options')
+    let index = options.indexOf(network)
+    let netSetStyle = { marginTop: this.state.expandNetwork ? '0px' : (-26 * index) + 'px' }
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Connection'}</div>
-          {this.store('local.enableMainnet') ? (
-            <div className='connectionTitleSet'>
-              <div className='connectionTitleSetButton' onMouseDown={() => this.selectNetwork('<-')}>
-                {svg.octicon('chevron-left', { height: 17 })}
-              </div>
-              <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
-              <div className='connectionTitleSetButton' onMouseDown={() => this.selectNetwork('->')}>
-                {svg.octicon('chevron-right', { height: 17 })}
-              </div>
+          <div className={this.state.expandNetwork ? 'connectionTitleSet connectionExpandNetwork' : 'connectionTitleSet'} onMouseDown={() => this.expandNetwork()}>
+            <div className='connectionTitleSetItems' style={netSetStyle}>
+              {options.map((option, index) => {
+                return (
+                  <div key={option + index} className='connectionTitleSetItem' onMouseDown={() => this.selectNetwork(option)}>
+                    <div className='connectionTitleSetText'>{networks[option]}</div>
+                  </div>
+                )
+              })}
             </div>
-          ) : (
-            <div className={this.state.localShake.network ? 'connectionTitleSet headShake' : 'connectionTitleSet'} onMouseDown={() => this.localShake('network')}>
-              <div className='connectionTitleSetButton' />
-              <div className='connectionTitleSetText'>{networks[this.store('local.connection.network')] || 'Unknown, ID: ' + this.store('local.connection.network')}</div>
-              <div className='connectionTitleSetButton' />
-            </div>
-          )}
+          </div>
         </div>
         <div className='signerPermission'>
           <div className={this.store('local.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>

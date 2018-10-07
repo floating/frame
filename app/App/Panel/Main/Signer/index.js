@@ -191,7 +191,7 @@ class Signer extends React.Component {
             {accounts.map((account, index) => {
               let balance = this.store('balances', account)
               return (
-                <div key={account} className='signerAccount' style={{ minWidth: `calc(100% / 15)` }}>
+                <div key={account + index} className='signerAccount' style={{ minWidth: `calc(100% / 15)` }}>
                   <div className='signerName'>
                     <div className='signerNameText'>
                       {this.props.type + ' Account'}

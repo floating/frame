@@ -18,34 +18,18 @@ export const panelRequest = (u, request) => {
 
 export const setBalance = (u, account, balance) => u('balances', account, b => balance)
 
+export const showMainnetWarning = (u, show) => u('view.showMainnetWarning', _ => show)
+
 export const enableMainnet = u => u('local.enableMainnet', () => true)
 
-export const selectNetwork = (u, direction) => {
-  let reset = {
-    status: 'loading',
-    connected: false,
-    type: '',
-    network: ''
-  }
-  if (direction === '->') {
-    u('local.connection', connection => {
-      let index = connection.options.indexOf(connection.network) + 1
-      if (index >= connection.options.length) index = 0
-      connection.network = connection.options[index]
-      connection.local = Object.assign({}, connection.local, reset)
-      connection.secondary = Object.assign({}, connection.secondary, reset)
-      return connection
-    })
-  } else if (direction === '<-') {
-    u('local.connection', connection => {
-      let index = connection.options.indexOf(connection.network) - 1
-      if (index < 0) index = connection.options.length - 1
-      connection.network = connection.options[index]
-      connection.local = Object.assign({}, connection.local, reset)
-      connection.secondary = Object.assign({}, connection.secondary, reset)
-      return connection
-    })
-  }
+export const selectNetwork = (u, net) => {
+  let reset = { status: 'loading', connected: false, type: '', network: '' }
+  u('local.connection', connection => {
+    connection.network = net
+    connection.local = Object.assign({}, connection.local, reset)
+    connection.secondary = Object.assign({}, connection.secondary, reset)
+    return connection
+  })
 }
 
 export const selectSecondary = (u, direction) => {
