@@ -11,7 +11,7 @@ module.exports = origin => {
   if (!origin || origin === 'null') origin = 'Unknown' // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
   if (invalidOrigin(origin)) return false
   if (isExtension(origin)) return true
-  let account = signers.getSelectedAccount()
+  let account = signers.getSelectedAccounts()[0]
   if (!account) return
   let permissions = store('local.accounts', account, 'permissions') || {}
   let perms = Object.keys(permissions).map(id => permissions[id])

@@ -14,8 +14,8 @@ class Signer {
     if (cb) cb(null, account ? [account] : [])
     return account ? [account] : []
   }
-  getSelectedAccount () {
-    return this.accounts[this.index]
+  getSelectedAccounts () {
+    return this.accounts[this.index] ? [this.accounts[this.index]] : []
   }
   summary () {
     return {

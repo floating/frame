@@ -42,7 +42,7 @@ class Ledger extends Signer {
     this.update()
   }
   lookupAccounts (limit, cb) {
-    console.log('Device Status: ' + this.status + ' (ID: ' + this.id + ')')
+    // console.log('Device Status: ' + this.status + ' (ID: ' + this.id + ')')
     try {
       const addresses = []
       const lookup = (i = 0) => {
