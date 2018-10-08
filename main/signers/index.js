@@ -50,8 +50,8 @@ const api = {
       }
     })
   },
-  getSelectedAccount: () => {
-    return signers[current] ? signers[current].getSelectedAccount() : ''
+  getSelectedAccounts: () => {
+    return signers[current] ? signers[current].getSelectedAccounts() : []
   },
   getAccounts: (cb) => {
     if (!signers[current]) {

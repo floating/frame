@@ -14,6 +14,7 @@ class Ledger extends Signer {
     this.devicePath = devicePath
     this.type = 'Ledger'
     this.status = 'initial'
+    this.pause = false
     this.coinbase = '0x'
     this.accounts = []
     this.network = store('local.connection.network')
@@ -41,6 +42,7 @@ class Ledger extends Signer {
     this.update()
   }
   lookupAccounts (limit, cb) {
+    // console.log('Device Status: ' + this.status + ' (ID: ' + this.id + ')')
     try {
       const addresses = []
       const lookup = (i = 0) => {
@@ -80,7 +82,9 @@ class Ledger extends Signer {
     }, interval)
   }
   deviceStatus (deep, limit = 15) {
+    if (this.status === 'Invalid sequence') return
     this.pollStatus()
+    if (this.pause) return
     this.lookupAccounts(deep ? limit : 1, (err, accounts) => {
       let last = this.status
       if (err) {
@@ -135,6 +139,7 @@ class Ledger extends Signer {
   }
   // Standard Methods
   signPersonal (message, cb) {
+    this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
@@ -143,11 +148,14 @@ class Ledger extends Signer {
         if (v.length < 2) v = '0' + v
         cb(null, result['r'] + result['s'] + v)
         transport.close()
+        this.pause = false
       }).catch(err => {
         cb(err.message)
         transport.close()
+        this.pause = false
       })
     } catch (err) {
+      this.pause = false
       if (err.message.startsWith('cannot open device with path')) {
         this._signPersonal = setTimeout(() => this.signPersonal(message, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
@@ -156,6 +164,7 @@ class Ledger extends Signer {
     }
   }
   signTransaction (rawTx, cb) {
+    this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
@@ -167,6 +176,7 @@ class Ledger extends Signer {
       const rawTxHex = tx.serialize().toString('hex')
       eth.signTransaction(this.getPath(), rawTxHex).then(result => {
         transport.close()
+        this.pause = false
         let tx = new EthereumTx({
           nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
           gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
@@ -181,9 +191,11 @@ class Ledger extends Signer {
         cb(null, '0x' + tx.serialize().toString('hex'))
       }).catch(err => {
         transport.close()
+        this.pause = false
         cb(err.message)
       })
     } catch (err) {
+      this.pause = false
       if (err.message.startsWith('cannot open device with path')) {
         this._signTransaction = setTimeout(() => this.signTransaction(rawTx, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')

@@ -31,7 +31,7 @@ class Provider extends EventEmitter {
     })
   }
   getAccounts (payload, res) {
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: [signers.getSelectedAccount().toLowerCase()] })
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signers.getSelectedAccounts().map(a => a.toLowerCase()) })
   }
   getNetVersion (payload, res) {
     this.connection.send(payload, (response) => {
