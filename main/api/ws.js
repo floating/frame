@@ -2,14 +2,14 @@ const WebSocket = require('ws')
 const uuid = require('uuid/v4')
 const log = require('electron-log')
 
-// const store = require('../store')
-const trusted = require('./trusted')
 const provider = require('../provider')
+
+const trusted = require('./trusted')
+const isExtension = require('./isExtension')
 
 const subs = {}
 
 const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
-const extOrigins = ['chrome-extension://adpbaaddjmehiidelapmmnjpmehjiifg', 'moz-extension://7b2a0cf9-245a-874b-8f58-4a7e3d04c70f']
 
 const handler = (socket, req) => {
   socket.id = uuid()
@@ -21,7 +21,7 @@ const handler = (socket, req) => {
   socket.on('message', data => {
     let origin = socket.origin
     let payload = JSON.parse(data)
-    if (extOrigins.indexOf(origin) > -1 && payload.__frameOrigin) { // Request from extension, swap origin
+    if (isExtension(origin) && payload.__frameOrigin) { // Request from extension, swap origin
       origin = payload.__frameOrigin
       delete payload.__frameOrigin
     }

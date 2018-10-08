@@ -1,16 +1,16 @@
 const uuidv5 = require('uuid/v5')
 
 const store = require('../store')
-// const windows = require('../windows')
 const signers = require('../signers')
 
+const isExtension = require('./isExtension')
+
 const invalidOrigin = o => o !== o.replace(/[^0-9a-z/:.[\]-]/gi, '')
-const extOrigins = ['chrome-extension://adpbaaddjmehiidelapmmnjpmehjiifg', 'moz-extension://7b2a0cf9-245a-874b-8f58-4a7e3d04c70f']
 
 module.exports = origin => {
   if (!origin || origin === 'null') origin = 'Unknown' // Permission granted to unknown origins only persist until the Frame is closed, they are not permanent
   if (invalidOrigin(origin)) return false
-  if (extOrigins.indexOf(origin) > -1) return true
+  if (isExtension(origin)) return true
   let account = signers.getSelectedAccount()
   if (!account) return
   let permissions = store('local.accounts', account, 'permissions') || {}
