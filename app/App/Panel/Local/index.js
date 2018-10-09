@@ -91,7 +91,7 @@ class Settings extends React.Component {
   }
   selectNetwork (net) {
     if (net !== this.store('local.connection.network')) {
-      if (net === '1' && !this.store('local.enableMainnet')) return this.store.showMainnetWarning(true)
+      if (net === '1' && !this.store('local.enableMainnet')) return this.store.notify('mainnet')
       this.store.selectNetwork(net)
       let target = this.store('local.connection.secondary.settings', this.store('local.connection.network'), 'options.custom')
       this.setState({ secondaryCustom: target || this.customMessage })

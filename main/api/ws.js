@@ -3,6 +3,7 @@ const uuid = require('uuid/v4')
 const log = require('electron-log')
 
 const provider = require('../provider')
+const signers = require('../signers')
 
 const trusted = require('./trusted')
 const isExtension = require('./isExtension')
@@ -27,7 +28,9 @@ const handler = (socket, req) => {
     }
     log.info('ws -> ' + socket.id.substr(0, 6) + ' ' + origin + ' ' + payload.method + ' ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, error: { message: 'Permission Denied', code: -1 } })
+      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: -1 }
+      if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: -1 }
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
       provider.send(payload, response => {
         if (response && response.result) {

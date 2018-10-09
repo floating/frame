@@ -40,9 +40,20 @@
     align-items center
     text-align center
 
+    .notifyClose
+      position absolute
+      top 0px
+      right 0px
+      color outerspace
+      z-index 3
+      height 40px
+      width 40px
+      display flex
+      justify-content center
+      align-items center
+
     .notifyBox
-      background blue
-      padding 55px 30px 60px 30px
+      padding 55px 20px 60px 20px
       border-top 1px solid lightShade
       border-bottom 1px solid lightShade
 
@@ -53,7 +64,7 @@
         margin-bottom 32px
 
       .notifyBody
-        font-size 18px
+        font-size 17px
         position relative
         z-index 3
         padding-bottom 10px
@@ -125,10 +136,34 @@
           border-top-right-radius 20px
           border-bottom-right-radius 20px
 
+    .introInstructions
+      position relative
+      z-index 3
+      margin -10px
+      font-size 12px
+      font-weight 300
+      border-radius 6px
+      text-align cleft
+      line-height 18px
+      font-weight 300
+      color outerspace08
+      .introInstructionItem
+        margin-bottom 20px
+        padding 0px 20px
+        span
+          color pending
+          text-decoration none
+
+      .introInstructionList
+        margin 18px 5px 30px 5px
+        border-radius 6px
+        padding 16px
+        font-weight 400
+        background pending
+        color spacewhite
+        div
+          font-size 14px
+          line-height 26px
+
 .notifyOn
   pointer-events auto
-  .notifyBoxWrap
-    right 5px
-    left 5px
-    .notifyBox
-      background green

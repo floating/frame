@@ -18,7 +18,7 @@ export const panelRequest = (u, request) => {
 
 export const setBalance = (u, account, balance) => u('balances', account, b => balance)
 
-export const showMainnetWarning = (u, show) => u('view.showMainnetWarning', _ => show)
+export const notify = (u, type) => u('view.notify', _ => type)
 
 export const enableMainnet = u => u('local.enableMainnet', () => true)
 

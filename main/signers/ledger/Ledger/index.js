@@ -77,9 +77,7 @@ class Ledger extends Signer {
   }
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
     clearTimeout(this._pollStatus)
-    this._pollStatus = setTimeout(() => {
-      this.deviceStatus()
-    }, interval)
+    this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
   deviceStatus (deep, limit = 15) {
     if (this.status === 'Invalid sequence') return

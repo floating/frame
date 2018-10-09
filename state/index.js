@@ -18,7 +18,7 @@ let initial = {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, showMainnetWarning: false },
+  view: { current: '', list: [], data: {}, notify: '' },
   signers: {},
   tray: {
     open: false

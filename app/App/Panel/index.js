@@ -29,7 +29,9 @@ class Panel extends React.Component {
             <div className='panelDetailText'>{networks[this.store('local.connection.network')]}</div>
           </div>
           <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onMouseDown={() => this.store.toggleSettings()}>
-            {svg.octicon('kebab-horizontal', { height: 21 })}
+            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
+            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
+            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
           </div>
         </div>
         <Local />
@@ -41,3 +43,6 @@ class Panel extends React.Component {
 }
 
 export default Restore.connect(Panel)
+
+// <span>{svg.octicon('kebab-horizontal', { height: 21 })}</span>
+// <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 16 })}</span>

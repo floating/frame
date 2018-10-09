@@ -24,8 +24,6 @@ process.on('uncaughtException', (e) => {
 
 const persist = new PersistStore()
 
-const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
-
 const externalWhitelist = [
   'https://frame.sh',
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
@@ -42,7 +40,6 @@ ipcMain.on('tray:resetAllSettings', () => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  url = unwrap(url)
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
