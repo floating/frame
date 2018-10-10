@@ -22,6 +22,8 @@ export const notify = (u, type) => u('view.notify', _ => type)
 
 export const enableMainnet = u => u('local.enableMainnet', () => true)
 
+export const updateAvailable = (u, res) => u('view.updateAvailable', () => res)
+
 export const selectNetwork = (u, net) => {
   let reset = { status: 'loading', connected: false, type: '', network: '' }
   u('local.connection', connection => {

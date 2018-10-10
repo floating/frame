@@ -24,6 +24,69 @@
   transition standard
   transition-delay 0.18s
 
+
+  .badge:before
+    content ''
+    position absolute
+    right 0px
+    top 0px
+    left 0px
+    bottom 3px
+    background pending
+    border-radius 3px
+    z-index 9
+
+  .badge
+    position absolute
+    right 10px
+    bottom -200px
+    left 10px
+    height 165px
+    background pendingShade
+    border-radius 3px
+    z-index 999999999999
+    box-shadow 0px 4px 10px thick, 0px 5px 14px -2px thick, 0px 27px 27px -10px thick, 0px 27px 27px -10px thick, 0px -27px 27px -10px thick
+    transition standard
+
+    .badgeMessage, .badgeInput
+      position relative
+      z-index 10
+      color spacewhite
+
+    .badgeMessage
+      height 100px
+      display flex
+      justify-content center
+      align-items center
+      text-align center
+      padding 0px 40px 0px 40px
+
+    .badgeInput
+      height 30px
+      display flex
+      justify-content center
+
+      .badgeInputButton
+        width 140px
+        display flex
+        justify-content center
+        align-items flex-start
+
+        .badgeInputButtonInner
+          background pendingShade
+          height 30px
+          width 120px
+          display flex
+          justify-content center
+          align-items center
+          border-radius 15px
+          text-transform uppercase
+          font-size 13px
+          font-weight 300
+          letter-spacing 1px
+          margin-left 1px
+
+
 .panelRequest
   width 100%
   padding 10px

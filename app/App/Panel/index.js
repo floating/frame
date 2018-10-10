@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../svg'
+import link from '../../link'
 
 import Main from './Main'
 import Local from './Local'
@@ -37,6 +38,22 @@ class Panel extends React.Component {
         <Local />
         <Main />
         <Notify />
+        <div className='badge' style={this.store('view.updateAvailable') ? { bottom: '13px' } : { bottom: '-200px' }}>
+          <div className='badgeMessage'>
+            {'An update is avaliable and will be installed on next restart'}
+          </div>
+          <div className='badgeInput'>
+            <div className='badgeInputButton'>
+              <div className='badgeInputButtonInner' onMouseDown={() => this.store.updateAvailable(false)}>{'Ok'}</div>
+            </div>
+            <div className='badgeInputButton'>
+              <div className='badgeInputButtonInner' onMouseDown={() => {
+                this.store.updateAvailable(false)
+                link.send('tray:updateRestart')
+              }}>{'Restart'}</div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
