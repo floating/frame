@@ -8,10 +8,12 @@ const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 class Settings extends React.Component {
   constructor (props, context) {
     super(props, context)
-    let network = context.store('local.connection.network')
-    let customTarget = context.store('local.connection.secondary.settings', network, 'options.custom')
     this.customMessage = 'Custom Endpoint'
-    this.state = { localShake: {}, secondaryCustom: customTarget || this.customMessage, resetConfirm: false, expandNetwork: false }
+    this.state = { localShake: {}, secondaryCustom: this.customMessage, resetConfirm: false, expandNetwork: false }
+    context.store.observer(() => {
+      let secondaryCustom = context.store('local.connection.secondary.settings', context.store('local.connection.network'), 'options.custom') || this.customMessage
+      this.setState({ secondaryCustom })
+    })
   }
   appInfo () {
     return (
@@ -91,10 +93,11 @@ class Settings extends React.Component {
   }
   selectNetwork (net) {
     if (net !== this.store('local.connection.network')) {
-      if (net === '1' && !this.store('local.enableMainnet')) return this.store.notify('mainnet')
-      this.store.selectNetwork(net)
-      let target = this.store('local.connection.secondary.settings', this.store('local.connection.network'), 'options.custom')
-      this.setState({ secondaryCustom: target || this.customMessage })
+      if (net === '1') {
+        this.store.notify('mainnet')
+      } else {
+        this.store.selectNetwork(net)
+      }
     }
   }
   expandNetwork (expand) {

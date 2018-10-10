@@ -24,7 +24,6 @@
   transition standard
   transition-delay 0.18s
 
-
   .badge:before
     content ''
     position absolute
@@ -109,7 +108,6 @@
   width 100%
 
 .panelRequestGrantOption
-  background green
   margin 15px
   padding 0px
   height 40px
@@ -153,6 +151,7 @@
   z-index 10000000
   opacity 1
   background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
+  pointer-events none
 
   .panelMenuItem
     width 40px
@@ -162,6 +161,7 @@
     align-items center
     -webkit-app-region no-drag
     transition standardSlow
+    pointer-events auto
     svg
       color outerspace
 
