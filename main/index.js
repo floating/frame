@@ -93,5 +93,5 @@ setTimeout(() => {
   autoUpdater.checkForUpdates()
   setInterval(() => {
     autoUpdater.checkForUpdates()
-  }, 5 * 1000)
-}, 10000)
+  }, 30 * 60 * 1000)
+}, 10 * 1000)
