@@ -85,13 +85,13 @@ module.exports = server => {
   // let local
   // let secondary
   // store.observer(() => {
-  //   if (local === 'connected' && local !== store('local.connection.local.status')) {
+  //   if (local === 'connected' && local !== store('main.connection.local.status')) {
   //     ws.clients.forEach(socket => socket.close())
-  //   } else if (secondary === 'connected' && secondary !== store('local.connection.secondary.status')) {
+  //   } else if (secondary === 'connected' && secondary !== store('main.connection.secondary.status')) {
   //     ws.clients.forEach(socket => socket.close())
   //   }
-  //   local = store('local.connection.local.status')
-  //   secondary = store('local.connection.secondary.status')
+  //   local = store('main.connection.local.status')
+  //   secondary = store('main.connection.secondary.status')
   // })
 
   return server

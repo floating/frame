@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.0.8-alpha.4",
+  "version": "0.0.8-alpha.5",
   "description": "An Ethereum interface",
   "main": "main",
   "build": {
@@ -67,6 +67,7 @@
     "eth-provider": "0.0.10",
     "ethereumjs-tx": "1.3.7",
     "ethereumjs-util": "5.2.0",
+    "hdkey": "^1.1.0",
     "node-hid": "0.7.3",
     "react": "16.5.2",
     "react-dom": "16.5.2",

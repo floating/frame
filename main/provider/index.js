@@ -36,7 +36,7 @@ class Provider extends EventEmitter {
   getNetVersion (payload, res) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      if (response.result !== store('local.connection.network')) this.resError('Network mismatch', payload, res)
+      if (response.result !== store('main.connection.network')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })
   }
@@ -135,7 +135,7 @@ class Provider extends EventEmitter {
     let rawTx = this.getRawTx(payload)
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-      if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('local.connection.network'))
+      if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
       let handlerId = uuid()
       this.handlers[handlerId] = res
       signers.addRequest({ handlerId, type: 'approveTransaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)

@@ -25,9 +25,9 @@ class Panel extends React.Component {
         <div className='panelMenu'>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
-              {this.indicator(this.store('local.connection'))}
+              {this.indicator(this.store('main.connection'))}
             </div>
-            <div className='panelDetailText'>{networks[this.store('local.connection.network')]}</div>
+            <div className='panelDetailText'>{networks[this.store('main.connection.network')]}</div>
           </div>
           <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onMouseDown={() => this.store.toggleSettings()}>
             <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>

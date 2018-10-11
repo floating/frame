@@ -5,7 +5,6 @@ const provider = require('eth-provider')
 const log = require('electron-log')
 
 const store = require('../store')
-const windows = require('../windows')
 
 class Nodes extends EventEmitter {
   constructor () {
@@ -22,19 +21,19 @@ class Nodes extends EventEmitter {
       type: '',
       connected: false
     }
-    this.observer = store.observer(() => this.connect(store('local.connection')))
+    this.observer = store.observer(() => this.connect(store('main.connection')))
   }
   update (priority) {
     if (priority === 'local') {
       let { status, connected, type, network } = this.local
       let details = { status, connected, type, network }
       log.info('    Updating local connection to status, ', details)
-      windows.broadcast('main:action', 'setLocal', details)
+      store.setLocal(details)
     } else if (priority === 'secondary') {
       let { status, connected, type, network } = this.secondary
       let details = { status, connected, type, network }
       log.info('    Updating secondary connection to status, ', details)
-      windows.broadcast('main:action', 'setSecondary', details)
+      store.setSecondary(details)
     }
   }
   getNetwork (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'net_version', params: [], id: 1 }, cb) }
@@ -93,7 +92,7 @@ class Nodes extends EventEmitter {
 
         // Local connection status
         this.local.provider.on('status', status => {
-          let current = store('local.connection.local.status')
+          let current = store('main.connection.local.status')
           if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
           this.local.status = status
           this.update('local')
@@ -133,7 +132,7 @@ class Nodes extends EventEmitter {
           this.update('secondary')
         }
       } else {
-        let settings = store('local.connection.secondary.settings', store('local.connection.network'))
+        let settings = store('main.connection.secondary.settings', store('main.connection.network'))
         let target = settings.options[settings.current]
         if (!this.secondary.provider || this.secondary.currentTarget !== target) {
           log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
@@ -154,7 +153,7 @@ class Nodes extends EventEmitter {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
               this.secondary.network = !err && response && !response.error ? response.result : '?'
-              if (this.secondary.network !== store('local.connection.network')) {
+              if (this.secondary.network !== store('main.connection.network')) {
                 this.secondary.connected = false
                 this.secondary.type = ''
                 this.secondary.status = 'network mismatch'
@@ -180,7 +179,7 @@ class Nodes extends EventEmitter {
           })
 
           this.secondary.provider.on('status', status => {
-            let current = store('local.connection.local.status')
+            let current = store('main.connection.local.status')
             if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
             this.local.status = status
             this.update('secondary')
@@ -209,12 +208,12 @@ class Nodes extends EventEmitter {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
   send (payload, res) {
-    if (this.local.provider && this.local.connected && this.local.network === store('local.connection.network')) {
+    if (this.local.provider && this.local.connected && this.local.network === store('main.connection.network')) {
       this.local.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
       })
-    } else if (this.secondary.provider && this.secondary.connected && this.secondary.network === store('local.connection.network')) {
+    } else if (this.secondary.provider && this.secondary.connected && this.secondary.network === store('main.connection.network')) {
       this.secondary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)

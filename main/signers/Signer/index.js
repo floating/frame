@@ -1,3 +1,6 @@
+const HDKey = require('hdkey')
+const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
+
 const windows = require('../../windows')
 
 class Signer {
@@ -5,6 +8,19 @@ class Signer {
     this.accounts = []
     this.index = 0
     this.requests = {}
+  }
+  deriveHDAccounts (publicKey, chainCode) {
+    let hdk = new HDKey()
+    hdk.publicKey = Buffer.from(publicKey, 'hex')
+    hdk.chainCode = Buffer.from(chainCode, 'hex')
+    let derive = index => {
+      let derivedKey = hdk.derive(`m/${index}`)
+      let address = publicToAddress(derivedKey.publicKey, true)
+      return toChecksumAddress(`0x${address.toString('hex')}`)
+    }
+    const accounts = []
+    for (let i = 0; i < 15; i++) { accounts[i] = derive(i) }
+    return accounts
   }
   getCoinbase (cb) {
     cb(null, this.accounts[0])

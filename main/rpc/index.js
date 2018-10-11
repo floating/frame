@@ -15,8 +15,6 @@ const rpc = {
   setSignerIndex: signers.setSignerIndex,
   unsetSigner: signers.unsetSigner,
   trezorPin: signers.trezorPin,
-  launchEnable: launch.enable,
-  launchDisable: launch.disable,
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),
   connectionStatus: (cb) => {
@@ -47,10 +45,6 @@ const rpc = {
     log.info('declineRequest ', req.handlerId)
     signers.declineRequest(req.handlerId)
     provider.declineRequest(req)
-  },
-  removeRequest (req, cb) {
-    log.info('removeRequest', req.handlerId)
-    signers.removeRequest(req.handlerId)
   }
 }
 

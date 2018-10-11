@@ -1,14 +1,20 @@
 import uuidv4 from 'uuid/v4'
-import uuidv5 from 'uuid/v5'
 import { URL } from 'url'
 
-import link from '../../link'
+export const syncMain = (u, main) => u('main', _ => main)
+
+export const setSigner = (u, signer) => {
+  u('signer.current', _ => signer.id)
+  u('signer.accounts', _ => signer.accounts)
+  setTimeout(_ => {
+    u('signer.minimized', _ => false)
+    u('signer.open', _ => true)
+  }, 50)
+}
 
 export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)
-
-export const setConnection = (u, connection) => u('local.connection', c => connection)
 
 export const panelRequest = (u, request) => {
   request.host = request.host || (new URL(request.url)).host
@@ -20,64 +26,13 @@ export const setBalance = (u, account, balance) => u('balances', account, b => b
 
 export const notify = (u, type) => u('view.notify', _ => type)
 
-export const enableMainnet = u => u('local.enableMainnet', () => true)
-
 export const updateAvailable = (u, res) => u('view.updateAvailable', () => res)
-
-export const selectNetwork = (u, net) => {
-  let reset = { status: 'loading', connected: false, type: '', network: '' }
-  u('local.connection', connection => {
-    connection.network = net
-    connection.local = Object.assign({}, connection.local, reset)
-    connection.secondary = Object.assign({}, connection.secondary, reset)
-    return connection
-  })
-}
-
-export const selectSecondary = (u, direction) => {
-  if (direction === '->') {
-    u('local.connection', connection => {
-      let options = Object.keys(connection.secondary.settings[connection.network].options)
-      let index = options.indexOf(connection.secondary.settings[connection.network].current) + 1
-      if (index >= options.length) index = 0
-      connection.secondary.settings[connection.network].current = options[index]
-      return connection
-    })
-  } else if (direction === '<-') {
-    u('local.connection', connection => {
-      let options = Object.keys(connection.secondary.settings[connection.network].options)
-      let index = options.indexOf(connection.secondary.settings[connection.network].current) - 1
-      if (index < 0) index = options.length - 1
-      connection.secondary.settings[connection.network].current = options[index]
-      return connection
-    })
-  }
-}
-
-export const setSecondaryCustom = (u, target) => {
-  u('local.connection', connection => {
-    connection.secondary.settings[connection.network].options.custom = target
-    return connection
-  })
-}
-
-export const setLocal = (u, status) => u('local.connection.local', local => Object.assign({}, local, status))
-export const setSecondary = (u, status) => u('local.connection.secondary', secondary => Object.assign({}, secondary, status))
-
-export const setLaunch = (u, launch) => u('local.launch', _ => launch)
-
-export const toggleLaunch = u => u('local.launch', launch => !launch)
 
 export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
-export const toggleConnection = (u, node) => u('local.connection', node, 'on', on => !on)
-
 export const trayOpen = (u, open) => u('tray.open', _ => open)
-
-export const runLocalNode = u => u('local.node.run', run => !run)
-export const runOnStartup = u => u('local.startup', startup => !startup)
 
 export const setSignerView = (u, view) => {
   u('signer.showAccounts', _ => false)
@@ -85,33 +40,6 @@ export const setSignerView = (u, view) => {
 }
 
 export const toggleShowAccounts = u => u('signer.showAccounts', _ => !_)
-
-export const setPermissions = (u, permissions) => {
-  u('local.accounts', (accounts, state) => {
-    let currentSigner = state.signers[state.signer.current]
-    let currentAccount = currentSigner.accounts[currentSigner.index]
-    accounts[currentAccount].permissions = permissions
-    return accounts
-  })
-}
-
-export const clearPermissions = (u, permissions) => {
-  u('local.accounts', (accounts, state) => {
-    let currentSigner = state.signers[state.signer.current]
-    let currentAccount = currentSigner.accounts[currentSigner.index]
-    accounts[currentAccount].permissions = {}
-    return accounts
-  })
-}
-
-export const setDefaultNode = (u, url) => {
-  u('local.accounts', (accounts, state) => {
-    let currentSigner = state.signers[state.signer.current]
-    let currentAccount = currentSigner.accounts[currentSigner.index]
-    accounts[currentAccount].node = url
-    return accounts
-  })
-}
 
 export const addProviderEvent = (u, payload) => {
   u('provider.events', events => {
@@ -122,24 +50,6 @@ export const addProviderEvent = (u, payload) => {
 
 export const setView = (u, view) => u('signer.view', _ => view)
 
-export const giveAccess = (u, req, access) => {
-  u('local.accounts', req.account, (account) => {
-    account = account || { permissions: {} }
-    account.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-    return account
-  })
-  link.rpc('removeRequest', req, () => {}) // Move to link.send
-}
-
-export const toggleAccess = (u, handlerId) => {
-  u('local.accounts', (accounts, state) => {
-    let currentSigner = state.signers[state.signer.current]
-    let currentAccount = currentSigner.accounts[currentSigner.index]
-    accounts[currentAccount].permissions[handlerId].provider = !accounts[currentAccount].permissions[handlerId].provider
-    return accounts
-  })
-}
-
 export const toggleDataView = (u, id) => {
   u('signer.requests', id, 'viewData', view => !view)
 }
@@ -149,20 +59,6 @@ export const updateSigners = (u, signers) => u('signers', _ => signers)
 export const addSigner = (u, signer) => {
   if (signer.status === 'loading') return
   u('signers', signer.id, _ => signer)
-}
-
-export const setSigner = (u, signer) => {
-  u('local.accounts', (accounts, state) => {
-    let currentAccount = signer.accounts[signer.index]
-    if (accounts[currentAccount] && accounts[currentAccount].permissions) delete accounts[currentAccount].permissions[uuidv5('Unknown', uuidv5.DNS)]
-    return accounts
-  })
-  u('signer.current', _ => signer.id)
-  u('signer.accounts', _ => signer.accounts)
-  setTimeout(_ => {
-    u('signer.minimized', _ => false)
-    u('signer.open', _ => true)
-  }, 50)
 }
 
 export const updateExternalRates = (u, rates) => u('external.rates', () => rates)
@@ -222,6 +118,7 @@ export const updateSigner = (u, signer) => {
       s.view = 'default'
       s.minimized = true
       s.open = false
+      s.showAccounts = false
     }
     return s
   })

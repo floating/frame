@@ -5,9 +5,12 @@ const path = require('path')
 const { autoUpdater } = require('electron-updater')
 
 const store = require('./store')
+const launch = require('./launch')
 const signers = require('./signers')
 const windows = require('./windows')
 require('./rpc')
+
+const dev = process.env.NODE_ENV === 'development'
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -47,12 +50,13 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
-ipcMain.on('tray:persistLocal', (e, local) => {
-  persist.set('local', local)
-})
-
 ipcMain.on('tray:setSync', (e, key, payload) => {
   store.setSync(key, payload)
+})
+
+ipcMain.on('tray:giveAccess', (e, req, access) => {
+  store.giveAccess(req, access)
+  signers.removeRequest(req.handlerId)
 })
 
 ipcMain.on('tray:api', () => require('./api'))
@@ -60,6 +64,8 @@ ipcMain.on('tray:api', () => require('./api'))
 ipcMain.on('tray:updateRestart', () => {
   autoUpdater.quitAndInstall(true, true)
 })
+
+ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
 if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
@@ -76,22 +82,36 @@ app.on('ready', () => {
   })
 })
 
+ipcMain.on('tray:action', (e, action, ...args) => {
+  if (store[action]) return store[action](...args)
+  log.info('Tray sent unrecognized action: ', action)
+})
+
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
 app.on('quit', signers.close)
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
-setTimeout(() => {
-  autoUpdater.on('error', err => {
-    log.error('Auto Update Error')
-    log.error(err)
-  })
-  autoUpdater.on('update-downloaded', res => {
-    if (!updatePending) windows.broadcast('main:action', 'updateAvailable', res)
-    updatePending = true
-  })
-  autoUpdater.checkForUpdates()
-  setInterval(() => {
+let launchStatus = store('main.launch')
+store.observer(() => {
+  if (launchStatus !== store('main.launch')) {
+    launchStatus = store('main.launch')
+    launchStatus ? launch.enable() : launch.disable()
+  }
+})
+
+store.observer(_ => persist.set('main', store('main')))
+
+if (!dev) { // Check for updates
+  setTimeout(() => {
+    autoUpdater.on('error', err => log.error('Auto Update Error: ' + err.message))
+    autoUpdater.on('update-downloaded', res => {
+      if (!updatePending) windows.broadcast('main:action', 'updateAvailable', res)
+      updatePending = true
+    })
     autoUpdater.checkForUpdates()
-  }, 30 * 60 * 1000)
-}, 10 * 1000)
+    setInterval(() => {
+      autoUpdater.checkForUpdates()
+    }, 30 * 60 * 1000)
+  }, 10 * 1000)
+}

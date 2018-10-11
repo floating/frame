@@ -16,7 +16,7 @@ link.rpc('getSigners', (err, signers) => {
 })
 link.rpc('launchStatus', (err, status) => {
   if (err) return console.log(err) // launchStatusError
-  store.setLaunch(status)
+  link.send('tray:action', 'setLaunch', status)
 })
 
 link.on('action', (action, ...args) => { if (store[action]) store[action](...args) })
@@ -33,33 +33,13 @@ setInterval(etherRates, 10000)
 // Store Observers
 let network = ''
 store.observer(() => {
-  if (network !== store('local.connection.network')) {
-    network = store('local.connection.network')
+  if (network !== store('main.connection.network')) {
+    network = store('main.connection.network')
     link.send('tray:setNetwork', network)
   }
 })
 
-store.observer(_ => link.send('tray:persistLocal', store('local')))
-store.observer(() => link.send('tray:setSync', 'local', store('local')))
-store.observer(() => link.send('tray:setSync', 'signer', store('signer')))
-
-let launch = store('local.launch')
-store.observer(() => {
-  if (launch !== store('local.launch')) {
-    launch = store('local.launch')
-    if (launch) {
-      link.rpc('launchEnable', err => console.log(err))
-    } else {
-      link.rpc('launchDisable', err => console.log(err))
-    }
-  }
-})
-
-link.rpc('connectionStatus', (err, connection) => {
-  if (err) return
-  store.setLocal(connection.local)
-  store.setSecondary(connection.secondary)
-})
+link.send('tray:refreshMain')
 
 let monitor
 

@@ -2,7 +2,6 @@ const log = require('electron-log')
 const utils = require('web3-utils')
 const bip32Path = require('bip32-path')
 const EthereumTx = require('ethereumjs-tx')
-const { toChecksumAddress } = require('ethereumjs-util')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 
@@ -16,8 +15,8 @@ class Trezor extends Signer {
     this.status = 'loading'
     this.accounts = []
     this.index = 0
-    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0/` : `m/44'/1'/0'/0/`
-    this.getPath = (i = this.index) => this.basePath() + i
+    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
+    this.getPath = (i = this.index) => this.basePath() + '/' + i
     this.handlers = {}
     device.on('button', code => this.button(code))
     device.on('passphrase', cb => this.passphrase(cb))
@@ -25,8 +24,8 @@ class Trezor extends Signer {
     device.on('disconnect', () => this.close())
     this.open()
     store.observer(() => {
-      if (this.network !== store('local.connection.network')) {
-        this.network = store('local.connection.network')
+      if (this.network !== store('main.connection.network')) {
+        this.network = store('main.connection.network')
         this.status = 'loading'
         this.accounts = []
         this.update()
@@ -37,28 +36,23 @@ class Trezor extends Signer {
   button (label) {
     log.info(`Trezor button "${label}" was pressed`)
   }
-  lookupAccounts (limit, cb) {
-    const addresses = []
-    const lookup = (i = 0) => {
-      this.device.waitForSessionAndRun(session => {
-        return session.ethereumGetAddress(bip32Path.fromString(this.getPath(i)).toPathArray())
-      }).then(result => {
-        addresses[i] = toChecksumAddress(result.message.address)
-        this.accounts[i] = addresses[i]
-        this.update()
-        if (addresses.length === limit) { cb(null, addresses) } else { lookup(++i) }
-      }).catch(cb)
-    }
-    lookup()
+  lookupAccounts (cb) {
+    this.device.waitForSessionAndRun(session => {
+      return session.getPublicKey(bip32Path.fromString(this.basePath()).toPathArray())
+    }).then(result => {
+      cb(null, this.deriveHDAccounts(result.message.node.public_key, result.message.node.chain_code))
+    }).catch(err => {
+      cb(err)
+    })
   }
   deviceStatus (deep, limit = 15) {
-    this.lookupAccounts(deep ? limit : 1, (err, accounts) => {
+    this.lookupAccounts((err, accounts) => {
       if (err) {
         this.status = 'loading'
         this.accounts = []
         this.index = 0
         this.update()
-      } else if (accounts.length) {
+      } else if (accounts && accounts.length) {
         if (accounts[0] !== this.coinbase || this.status !== 'ok') {
           this.coinbase = accounts[0]
           this.accounts = accounts

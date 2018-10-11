@@ -113,16 +113,17 @@ app.on('web-contents-created', (e, contents) => {
 })
 
 // Frame Events
-ipcMain.on('frame:close', api.close)
-ipcMain.on('frame:minimize', api.minimize)
-ipcMain.on('frame:full', api.full)
-ipcMain.on('frame:devTools', api.devTools)
-ipcMain.on('frame:showTray', api.showTray)
+// ipcMain.on('frame:close', api.close)
+// ipcMain.on('frame:minimize', api.minimize)
+// ipcMain.on('frame:full', api.full)
+// ipcMain.on('frame:devTools', api.devTools)
+// ipcMain.on('frame:showTray', api.showTray)
 
 // Tray Events
 ipcMain.on('tray:quit', api.quit)
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
+store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
 
 module.exports = api

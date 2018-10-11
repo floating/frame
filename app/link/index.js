@@ -16,7 +16,9 @@ link.rpc = (...args) => {
   handlers[id] = cb
   window.postMessage(wrap({ id, args, source, method: 'rpc' }), '*')
 }
-link.send = (...args) => window.postMessage(wrap({ args, source, method: 'event' }), '*')
+link.send = (...args) => {
+  window.postMessage(wrap({ args, source, method: 'event' }), '*')
+}
 
 window.addEventListener('message', e => {
   let data = unwrap(e.data)

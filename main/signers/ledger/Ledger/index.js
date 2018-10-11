@@ -17,14 +17,14 @@ class Ledger extends Signer {
     this.pause = false
     this.coinbase = '0x'
     this.accounts = []
-    this.network = store('local.connection.network')
+    this.network = store('main.connection.network')
     this.index = 0
-    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/` : `m/44'/1'/0'/`
+    this.basePath = () => this.network === '1' ? `44'/60'/0'/` : `44'/1'/0'/`
     this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.deviceStatus()
     store.observer(() => {
-      if (this.network !== store('local.connection.network')) {
+      if (this.network !== store('main.connection.network')) {
         this.reset()
         this.deviceStatus()
       }
@@ -35,35 +35,23 @@ class Ledger extends Signer {
     super.update()
   }
   reset () {
-    this.network = store('local.connection.network')
+    this.network = store('main.connection.network')
     this.status = 'loading'
     this.accounts = []
     this.index = 0
     this.update()
   }
-  lookupAccounts (limit, cb) {
-    // console.log('Device Status: ' + this.status + ' (ID: ' + this.id + ')')
+  lookupAccounts (cb) {
     try {
-      const addresses = []
-      const lookup = (i = 0) => {
-        let transport = new TransportNodeHid(new HID.HID(this.devicePath))
-        let eth = new Eth(transport)
-        eth.getAddress(this.getPath(i), false, false).then(result => {
-          transport.close()
-          addresses[i] = result.address
-          this.accounts[i] = result.address
-          this.update()
-          if (addresses.length === limit) {
-            cb(null, addresses)
-          } else {
-            lookup(++i)
-          }
-        }).catch(err => {
-          transport.close()
-          cb(err)
-        })
-      }
-      lookup()
+      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
+      let eth = new Eth(transport)
+      eth.getAddress(this.basePath(), false, true).then(result => {
+        transport.close()
+        cb(null, this.deriveHDAccounts(result.publicKey, result.chainCode))
+      }).catch(err => {
+        transport.close()
+        cb(err)
+      })
     } catch (err) {
       cb(err)
     }
@@ -83,7 +71,7 @@ class Ledger extends Signer {
     if (this.status === 'Invalid sequence') return
     this.pollStatus()
     if (this.pause) return
-    this.lookupAccounts(deep ? limit : 1, (err, accounts) => {
+    this.lookupAccounts((err, accounts) => {
       let last = this.status
       if (err) {
         if (err.message.startsWith('cannot open device with path')) { // Device is busy, try again
@@ -111,7 +99,7 @@ class Ledger extends Signer {
           this.index = 0
           if (this.status !== last) this.update()
         }
-      } else if (accounts.length) {
+      } else if (accounts && accounts.length) {
         if (accounts[0] !== this.coinbase || this.status !== 'ok') {
           this.coinbase = accounts[0]
           this.accounts = accounts

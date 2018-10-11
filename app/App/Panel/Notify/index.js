@@ -51,8 +51,8 @@ class Notify extends React.Component {
               <div className='notifyInputOptionText'>{'Go Back'}</div>
             </div>
             <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
-              this.store.notify().enableMainnet()
-              setTimeout(() => this.store.selectNetwork('1'), 700)
+              this.store.notify()
+              setTimeout(() => link.send('tray:action', 'selectNetwork', '1'), 200)
             }}>
               <div className='notifyInputOptionText'>{'Proceed'}</div>
             </div>
