@@ -133,8 +133,9 @@ export const giveAccess = (u, req, access) => {
 
 export const toggleAccess = (u, handlerId) => {
   u('local.accounts', (accounts, state) => {
-    let a = state.signer.accounts[0]
-    accounts[a].permissions[handlerId].provider = !accounts[a].permissions[handlerId].provider
+    let currentSigner = state.signers[state.signer.current]
+    let currentAccount = currentSigner.accounts[currentSigner.index]
+    accounts[currentAccount].permissions[handlerId].provider = !accounts[currentAccount].permissions[handlerId].provider
     return accounts
   })
 }
@@ -147,14 +148,13 @@ export const updateSigners = (u, signers) => u('signers', _ => signers)
 
 export const addSigner = (u, signer) => {
   if (signer.status === 'loading') return
-  u('local.accounts', signer.accounts[0], account => Object.assign({ permissions: {} }, account))
   u('signers', signer.id, _ => signer)
 }
 
 export const setSigner = (u, signer) => {
   u('local.accounts', (accounts, state) => {
-    let a = signer.accounts[0]
-    if (accounts[a] && accounts[a].permissions) delete accounts[a].permissions[uuidv5('Unknown', uuidv5.DNS)]
+    let currentAccount = signer.accounts[signer.index]
+    if (accounts[currentAccount] && accounts[currentAccount].permissions) delete accounts[currentAccount].permissions[uuidv5('Unknown', uuidv5.DNS)]
     return accounts
   })
   u('signer.current', _ => signer.id)
