@@ -105,7 +105,8 @@ class Settings extends React.Component {
       }
     }
   }
-  expandNetwork (expand) {
+  expandNetwork (e, expand) {
+    e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
   render () {
@@ -114,10 +115,10 @@ class Settings extends React.Component {
     let index = options.indexOf(network)
     let netSetStyle = { marginTop: this.state.expandNetwork ? '0px' : (-26 * index) + 'px' }
     return (
-      <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'}>
+      <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Connection'}</div>
-          <div className={this.state.expandNetwork ? 'connectionTitleSet connectionExpandNetwork' : 'connectionTitleSet'} onMouseDown={() => this.expandNetwork()}>
+          <div className={this.state.expandNetwork ? 'connectionTitleSet connectionExpandNetwork' : 'connectionTitleSet'} onMouseDown={e => this.expandNetwork(e)}>
             <div className='connectionTitleSetItems' style={netSetStyle}>
               {options.map((option, index) => {
                 return (
