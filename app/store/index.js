@@ -26,15 +26,6 @@ const etherRates = () => {
 etherRates()
 setInterval(etherRates, 10000)
 
-// Store Observers
-let network = ''
-store.observer(() => {
-  if (network !== store('main.connection.network')) {
-    network = store('main.connection.network')
-    link.send('tray:setNetwork', network)
-  }
-})
-
 link.send('tray:refreshMain')
 
 let monitor
