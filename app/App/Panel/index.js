@@ -1,9 +1,11 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../svg'
+import link from '../../link'
 
 import Main from './Main'
 import Local from './Local'
+import Notify from './Notify'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
@@ -23,19 +25,41 @@ class Panel extends React.Component {
         <div className='panelMenu'>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
-              {this.indicator(this.store('local.connection'))}
+              {this.indicator(this.store('main.connection'))}
             </div>
-            <div className='panelDetailText'>{networks[this.store('local.connection.network')]}</div>
+            <div className='panelDetailText'>{networks[this.store('main.connection.network')]}</div>
           </div>
-          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onClick={() => this.store.toggleSettings()}>
-            {svg.octicon('kebab-horizontal', { height: 21 })}
+          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onMouseDown={() => this.store.toggleSettings()}>
+            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
+            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
+            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
           </div>
         </div>
         <Local />
         <Main />
+        <Notify />
+        <div className='badge' style={this.store('view.updateAvailable') ? { bottom: '13px' } : { bottom: '-200px' }}>
+          <div className='badgeMessage'>
+            {'An update is avaliable and will be installed on next restart'}
+          </div>
+          <div className='badgeInput'>
+            <div className='badgeInputButton'>
+              <div className='badgeInputButtonInner' onMouseDown={() => this.store.updateAvailable(false)}>{'Ok'}</div>
+            </div>
+            <div className='badgeInputButton'>
+              <div className='badgeInputButtonInner' onMouseDown={() => {
+                this.store.updateAvailable(false)
+                link.send('tray:updateRestart')
+              }}>{'Restart'}</div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 }
 
 export default Restore.connect(Panel)
+
+// <span>{svg.octicon('kebab-horizontal', { height: 21 })}</span>
+// <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 16 })}</span>

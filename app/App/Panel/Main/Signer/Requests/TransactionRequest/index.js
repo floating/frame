@@ -20,10 +20,10 @@ class TransactionRequest extends React.Component {
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
   approve (reqId, req) {
-    link.send('tray:approveRequest', reqId, req)
+    link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
   decline (reqId, req) {
-    link.send('tray:declineRequest', reqId, req)
+    link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
   toggleDataView (id) {
     this.setState({ dataView: !this.state.dataView })
@@ -100,7 +100,7 @@ class TransactionRequest extends React.Component {
                   </div>
                   {utils.toAscii(this.props.req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
-                      <div className='transactionDataHeader' onClick={() => this.toggleDataView()}>
+                      <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
                         <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
                         <div className='transactionDataLabel'>{'View Data'}</div>
                         <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
@@ -120,7 +120,7 @@ class TransactionRequest extends React.Component {
                         <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
                         <div className='transactionToAddressFull'>
                           {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
-                          <input onClick={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
+                          <input onMouseDown={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
                         </div>
                       </div>
                       <div className='transactionToSub'>{'Send To'}</div>
@@ -138,10 +138,10 @@ class TransactionRequest extends React.Component {
           <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
         )}
         <div className='requestApprove'>
-          <div className='requestDecline' onClick={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
+          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
             <div className='requestDeclineButton'>{'Decline'}</div>
           </div>
-          <div className='requestSign' onClick={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
+          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
             <div className='requestSignButton'> {'Sign'} </div>
           </div>
         </div>

@@ -87,38 +87,45 @@
     background thick
 
 .connectionTitle
-  display flex
   justify-content space-between
-  align-items center
   height 26px
+  max-height 26px
 
   .connectionTitleSet
-    display flex
     height 26px
     border-radius 13px
     letter-spacing 1px
-    padding 0px 2px
     font-weight 400
-    justify-content center
-    align-items center
+    width 113px
+    padding 0px
     font-size 13px
     text-transform uppercase
     background highlight
+    flex-direction column
+    overflow hidden
+    transition standard
     box-shadow cardDrop
+    transform translateZ(0)
 
-    .connectionTitleSetButton
-      display flex
-      justify-content center
-      align-items center
-      height 26px
-      width 32px
-      border-radius 18px
+    .connectionTitleSetItems
+      position relative
+      transition standard
+      transform translateZ(0)
 
-      svg
-        color outerspace
-        opacity 0.3
-        transition standardFast
+      .connectionTitleSetItem
+        display flex
+        justify-content center
+        align-items center
+        height 26px
+        min-height 26px
+        width 100%
+        box-sizing border-box
+        padding 0px 15px 0px 15px
+        pointer-events none
         transform translateZ(0)
+
+        .connectionTitleSetText
+          transform translateZ(0)
 
   .connectionTitleSet:hover
     svg
@@ -128,6 +135,15 @@
 
     svg:hover
       opacity 1
+
+  .connectionExpandNetwork
+    height 52px
+    padding 11px 0px 11px 0px
+    box-shadow 0px 4px 10px thick, 0px 5px 14px -2px thick !important
+
+    .connectionTitleSetItems
+      .connectionTitleSetItem
+        pointer-events auto
 
 .connectionOption
   width 100%

@@ -2,97 +2,205 @@
 
 const EventEmitter = require('events')
 const provider = require('eth-provider')
+const log = require('electron-log')
 
 const store = require('../store')
-const windows = require('../windows')
 
 class Nodes extends EventEmitter {
   constructor () {
     super()
-    this.local = null
-    this.secondary = null
-    this.observer = store.observer(() => this.connect(store('local.connection')))
+    this.local = {
+      status: 'off',
+      network: '4',
+      type: '',
+      connected: false
+    }
+    this.secondary = {
+      status: 'off',
+      network: '4',
+      type: '',
+      connected: false
+    }
+    this.observer = store.observer(() => this.connect(store('main.connection')))
+  }
+  update (priority) {
+    if (priority === 'local') {
+      let { status, connected, type, network } = this.local
+      let details = { status, connected, type, network }
+      log.info('    Updating local connection to status, ', details)
+      store.setLocal(details)
+    } else if (priority === 'secondary') {
+      let { status, connected, type, network } = this.secondary
+      let details = { status, connected, type, network }
+      log.info('    Updating secondary connection to status, ', details)
+      store.setSecondary(details)
+    }
   }
   getNetwork (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'net_version', params: [], id: 1 }, cb) }
   getNodeType (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) }
   connect (connection) {
+    log.info(' ')
+    log.info('Connection has been updated')
+    // Update the network if changed
     if (this.network && this.network !== connection.network) {
-      if (this.local) this.local.close()
-      if (this.secondary) this.secondary.close()
+      if (this.local.provider) this.local.provider.close()
+      if (this.secondary.provider) this.secondary.provider.close()
+      log.info('    Network changed from ' + this.network + ' to ' + connection.network)
       this.network = connection.network
     }
+
+    // Local connection is on
     if (connection.local.on) {
-      if (!this.local) {
-        if (connection.local.status !== 'loading') windows.broadcast('main:action', 'setLocal', { status: 'loading', connected: false, type: '' })
-        this.local = provider('direct', { name: 'local' })
-        this.local.on('connect', details => {
-          this.getNetwork(this.local, (netErr, netResponse) => {
-            this.getNodeType(this.local, (typeErr, typeResponse) => {
+      log.info('    Local connection: ON')
+      if (!this.local.provider) {
+        log.info('    Local connection doesn\'t exist, creating connection')
+
+        // Set connection to loading
+        if (connection.local.status !== 'loading') {
+          this.local.status = 'loading'
+          this.local.connected = false
+          this.local.type = ''
+          this.update('local')
+        }
+
+        // Create local connection
+        this.local.provider = provider('direct', { name: 'local' })
+
+        // Local connection connected
+        this.local.provider.on('connect', details => {
+          log.info('    Local connection connected')
+          this.getNetwork(this.local.provider, (netErr, netResponse) => {
+            this.getNodeType(this.local.provider, (typeErr, typeResponse) => {
               this.local.network = !netErr && netResponse && !netResponse.error ? netResponse.result : ''
               this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : ''
+              this.local.connected = true
+              this.update('local')
               this.emit('connect')
-              windows.broadcast('main:action', 'setLocal', { status: this.local.status, connected: true, type: this.local.type, network: this.local.network })
             })
           })
         })
-        this.local.on('close', details => {
+
+        // Local connection close
+        this.local.provider.on('close', details => {
+          log.info('    Local connection closed')
+          this.local.connected = false
+          this.local.type = ''
+          this.local.network = ''
+          this.update('local')
           this.emit('close')
-          windows.broadcast('main:action', 'setLocal', { status: this.local.status, connected: false, type: '', network: '' })
         })
-        this.local.on('status', status => {
-          let current = store('local.connection.local.status')
+
+        // Local connection status
+        this.local.provider.on('status', status => {
+          let current = store('main.connection.local.status')
           if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
-          windows.broadcast('main:action', 'setLocal', { status })
+          this.local.status = status
+          this.update('local')
         })
-        this.local.on('data', data => this.emit('data', data))
-        this.local.on('error', err => this.emit('error', err))
+
+        this.local.provider.on('data', data => this.emit('data', data))
+        this.local.provider.on('error', err => this.emit('error', err))
+      } else {
+        log.info('    Local connection already exists')
       }
+    // Local connection is set OFF by the user
     } else {
-      if (this.local) this.local.close()
-      this.local = null
-      if (connection.local.status !== 'off') windows.broadcast('main:action', 'setLocal', { status: 'off', connected: false, type: '' })
+      log.info('    Local connection: OFF')
+      if (this.local.provider) this.local.provider.close()
+      this.local.provider = null
+      if (this.local.status !== 'off') {
+        this.local.status = 'off'
+        this.local.connected = false
+        this.local.type = ''
+        this.local.network = ''
+        this.update('local')
+      }
     }
+
+    // Secondary connection is on
     if (connection.secondary.on) {
-      if (!connection.local.on || (connection.local.status !== 'connected' && connection.local.status !== 'loading')) {
-        let settings = store('local.connection.secondary.settings', store('local.connection.network'))
+      log.info('    Secondary connection: ON')
+      if (connection.local.on && (connection.local.status === 'connected' || connection.local.status === 'loading')) {
+        // Connection is on Standby
+        log.info('    Secondary connection on STANDBY', connection.secondary.status === 'standby')
+        if (this.secondary.provider) this.secondary.provider.close()
+        this.secondary.provider = null
+        if (connection.secondary.status !== 'standby') {
+          this.secondary.connected = false
+          this.secondary.type = ''
+          this.secondary.status = 'standby'
+          this.update('secondary')
+        }
+      } else {
+        let settings = store('main.connection.secondary.settings', store('main.connection.network'))
         let target = settings.options[settings.current]
-        if (!this.secondary || this.secondary.currentTarget !== target) {
-          if (this.secondary) this.secondary.close()
-          if (connection.secondary.status !== 'loading') windows.broadcast('main:action', 'setSecondary', { status: 'loading', connected: false, type: '' })
-          this.secondary = provider(target, { name: 'secondary' })
+        if (!this.secondary.provider || this.secondary.currentTarget !== target) {
+          log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
+          if (this.secondary.provider) this.secondary.provider.close()
+          this.secondary.provider = null
+
+          if (connection.secondary.status !== 'loading') {
+            this.secondary.status = 'loading'
+            this.secondary.connected = false
+            this.secondary.type = ''
+            this.update('secondary')
+          }
+
+          this.secondary.provider = provider(target, { name: 'secondary' })
           this.secondary.currentTarget = target
-          this.secondary.on('connect', () => {
-            this.getNetwork(this.secondary, (err, response) => {
+
+          this.secondary.provider.on('connect', () => {
+            log.info('    Secondary connection connected')
+            this.getNetwork(this.secondary.provider, (err, response) => {
               this.secondary.network = !err && response && !response.error ? response.result : '?'
-              if (this.secondary.network !== store('local.connection.network')) {
-                windows.broadcast('main:action', 'setSecondary', { status: 'network mismatch', connected: false, type: '', network: this.secondary.network })
+              if (this.secondary.network !== store('main.connection.network')) {
+                this.secondary.connected = false
+                this.secondary.type = ''
+                this.secondary.status = 'network mismatch'
+                this.update('secondary')
               } else {
+                this.secondary.status = 'connected'
+                this.secondary.connected = true
+                this.secondary.type = ''
+                this.update('secondary')
                 this.emit('connect')
-                windows.broadcast('main:action', 'setSecondary', { status: this.secondary.status, connected: true, type: '', network: this.secondary.network })
               }
             })
           })
-          this.secondary.on('close', () => {
+
+          this.secondary.provider.on('close', () => {
+            log.info('    Secondary connection close')
+            this.secondary.status = 'off'
+            this.secondary.connected = false
+            this.secondary.type = ''
+            this.secondary.network = ''
+            this.update('secondary')
             this.emit('close')
-            windows.broadcast('main:action', 'setSecondary', { status: this.secondary.status, connected: false, type: '', network: '' })
           })
-          this.secondary.on('status', status => {
-            let current = store('local.connection.local.status')
+
+          this.secondary.provider.on('status', status => {
+            let current = store('main.connection.local.status')
             if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
-            windows.broadcast('main:action', 'setSecondary', { status })
+            this.local.status = status
+            this.update('secondary')
           })
-          this.secondary.on('data', data => this.emit('data', data))
-          this.secondary.on('error', err => this.emit('error', err))
+
+          this.secondary.provider.on('data', data => this.emit('data', data))
+          this.secondary.provider.on('error', err => this.emit('error', err))
         }
-      } else {
-        if (this.secondary) this.secondary.close()
-        this.secondary = null
-        if (connection.secondary.status !== 'standby') windows.broadcast('main:action', 'setSecondary', { status: 'standby', connected: false, type: '' })
       }
+    // Secondary connection is set to OFF by the user
     } else {
-      if (this.secondary) this.secondary.close()
-      this.secondary = null
-      if (connection.secondary.status !== 'off') windows.broadcast('main:action', 'setSecondary', { status: 'off', connected: false, type: '' })
+      log.info('    Secondary connection: OFF')
+      if (this.secondary.provider) this.secondary.provider.close()
+      this.secondary.provider = null
+      if (this.secondary.status !== 'off') {
+        this.secondary.status = 'off'
+        this.secondary.connected = false
+        this.secondary.type = ''
+        this.secondary.network = ''
+        this.update('secondary')
+      }
     }
   }
   resError (error, payload, res) {
@@ -100,13 +208,13 @@ class Nodes extends EventEmitter {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
   send (payload, res) {
-    if (this.local && this.local.connected && this.local.network === store('local.connection.network')) {
-      this.local.sendAsync(payload, (err, result) => {
+    if (this.local.provider && this.local.connected && this.local.network === store('main.connection.network')) {
+      this.local.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
       })
-    } else if (this.secondary && this.secondary.connected && this.secondary.network === store('local.connection.network')) {
-      this.secondary.sendAsync(payload, (err, result) => {
+    } else if (this.secondary.provider && this.secondary.connected && this.secondary.network === store('main.connection.network')) {
+      this.secondary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
       })

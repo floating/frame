@@ -1,16 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import link from '../../../../../link'
+
 class Settings extends React.Component {
-  clearPermissions () {
-    return (
-      <div className='quitFrame'>
-        <div onClick={() => this.store.clearPermissions()} className='quitFrameButton'>{'Clear All Permissions'}</div>
-      </div>
-    )
-  }
   render () {
-    let permissions = this.store('local.accounts', this.store('signer.accounts', 0), 'permissions') || {}
+    let index = this.store('signers', this.props.id, 'index')
+    let account = this.store('signers', this.props.id, 'accounts', index)
+    let permissions = this.store('main.accounts', account, 'permissions') || {}
     return (
       <div className={this.store('signer.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
@@ -21,7 +18,7 @@ class Settings extends React.Component {
         ) : (
           Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
             return (
-              <div className='signerPermission' key={o} onClick={_ => this.store.toggleAccess(o)}>
+              <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:action', 'toggleAccess', account, o)}>
                 <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                 <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
                   <div className='signerPermissionToggleSwitch' />
@@ -30,7 +27,9 @@ class Settings extends React.Component {
             )
           })
         )}
-        {this.clearPermissions()}
+        <div className='quitFrame'>
+          <div onMouseDown={() => link.send('tray:action', 'clearPermissions', account)} className='quitFrameButton'>{'Clear All Permissions'}</div>
+        </div>
       </div>
     )
   }

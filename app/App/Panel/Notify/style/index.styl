@@ -1,0 +1,169 @@
+.notify
+  position fixed
+  top 0px
+  right 0px
+  left 0px
+  bottom 0px
+  z-index 999999999
+  pointer-events none
+  transition standard
+  display flex
+  justify-content center
+  align-items center
+  text-align center
+  opacity 1
+
+  .notifyBox:before
+    content ''
+    top 0
+    right 0
+    bottom 3px
+    left 0
+    position absolute
+    border-radius 3px
+    background light
+    z-index 2
+
+  .notifyBoxWrap
+    border-radius 3px
+    box-sizing border-box
+    position absolute
+    top 5px
+    right -100%
+    bottom 5px
+    left 100%
+    transition standard
+    box-shadow 0px -1px 4px -1px rgba(6, 54, 52, 0.15), 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
+    background lightShade
+    display flex
+    justify-content center
+    align-items center
+    text-align center
+
+    .notifyClose
+      position absolute
+      top 0px
+      right 0px
+      color outerspace
+      z-index 3
+      height 40px
+      width 40px
+      display flex
+      justify-content center
+      align-items center
+
+    .notifyBox
+      padding 55px 20px 60px 20px
+      border-top 1px solid lightShade
+      border-bottom 1px solid lightShade
+
+      .notifyTitle
+        font-size 32px
+        position relative
+        z-index 3
+        margin-bottom 32px
+
+      .notifyBody
+        font-size 17px
+        position relative
+        z-index 3
+        padding-bottom 10px
+        padding-top 10px
+
+        .notifyBodyLine
+          margin-bottom 40px
+
+      .notifyInput
+        display flex
+        position relative
+        justify-content space-between
+        z-index 3
+
+        .notifyInputOption
+          position relative
+          width calc(50% - 1px)
+          display flex
+          justify-content center
+          align-items center
+          box-sizing border-box
+          background lightShade
+          height 40px
+          font-weight 300
+          padding-top 1px
+          box-shadow 0px 8px 30px -10px rgba(6, 54, 52, 0.25)
+          text-transform uppercase
+          font-size 14px
+          font-weight 400
+          letter-spacing 1px
+
+          .notifyInputOptionText
+            position relative
+            z-index 200
+            padding-bottom 2px
+
+        .notifyInputOption:hover:before
+          background highlighter
+
+        .notifyInputDeny:before
+          content ''
+          position absolute
+          top 0
+          left 0
+          right 0
+          bottom 2px
+          background highlight
+          z-index 2
+          border-top-left-radius 19px
+          border-bottom-left-radius 19px
+
+        .notifyInputDeny
+          border-top-left-radius 20px
+          border-bottom-left-radius 20px
+
+        .notifyInputProceed:before
+          content ''
+          position absolute
+          top 0
+          left 0
+          right 0
+          bottom 2px
+          background highlight
+          z-index 2
+          border-top-right-radius 19px
+          border-bottom-right-radius 19px
+
+        .notifyInputProceed
+          border-top-right-radius 20px
+          border-bottom-right-radius 20px
+
+    .introInstructions
+      position relative
+      z-index 3
+      margin -10px
+      font-size 12px
+      font-weight 300
+      border-radius 6px
+      text-align cleft
+      line-height 18px
+      font-weight 300
+      color outerspace08
+      .introInstructionItem
+        margin-bottom 20px
+        padding 0px 20px
+        span
+          color pending
+          text-decoration none
+
+      .introInstructionList
+        margin 18px 5px 30px 5px
+        border-radius 6px
+        padding 16px
+        font-weight 400
+        background pending
+        color spacewhite
+        div
+          font-size 14px
+          line-height 26px
+
+.notifyOn
+  pointer-events auto

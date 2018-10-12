@@ -1,7 +1,7 @@
+const log = require('electron-log')
 const utils = require('web3-utils')
 const bip32Path = require('bip32-path')
 const EthereumTx = require('ethereumjs-tx')
-const { toChecksumAddress } = require('ethereumjs-util')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 
@@ -15,8 +15,8 @@ class Trezor extends Signer {
     this.status = 'loading'
     this.accounts = []
     this.index = 0
-    this.network = ''
-    this.getPath = () => this.network === '1' ? `m/44'/60'/0'/0` + `/${this.index}` : `m/44'/1'/0'/0` + `/${this.index}`
+    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
+    this.getPath = (i = this.index) => this.basePath() + '/' + i
     this.handlers = {}
     device.on('button', code => this.button(code))
     device.on('passphrase', cb => this.passphrase(cb))
@@ -24,8 +24,8 @@ class Trezor extends Signer {
     device.on('disconnect', () => this.close())
     this.open()
     store.observer(() => {
-      if (this.network !== store('local.connection.network')) {
-        this.network = store('local.connection.network')
+      if (this.network !== store('main.connection.network')) {
+        this.network = store('main.connection.network')
         this.status = 'loading'
         this.accounts = []
         this.update()
@@ -34,17 +34,40 @@ class Trezor extends Signer {
     })
   }
   button (label) {
-    console.log(`Trezor button "${label}" was pressed`)
+    log.info(`Trezor button "${label}" was pressed`)
   }
-  deviceStatus () {
+  lookupAccounts (cb) {
     this.device.waitForSessionAndRun(session => {
-      return session.ethereumGetAddress(bip32Path.fromString(this.getPath()).toPathArray())
+      return session.getPublicKey(bip32Path.fromString(this.basePath()).toPathArray())
     }).then(result => {
-      this.accounts = [toChecksumAddress(result.message.address)]
-      this.status = 'ok'
-      this.update()
+      cb(null, this.deriveHDAccounts(result.message.node.public_key, result.message.node.chain_code))
     }).catch(err => {
-      console.error('deviceStatus Error:', err)
+      cb(err)
+    })
+  }
+  deviceStatus (deep, limit = 15) {
+    this.lookupAccounts((err, accounts) => {
+      if (err) {
+        this.status = 'loading'
+        this.accounts = []
+        this.index = 0
+        this.update()
+      } else if (accounts && accounts.length) {
+        if (accounts[0] !== this.coinbase || this.status !== 'ok') {
+          this.coinbase = accounts[0]
+          this.accounts = accounts
+          if (this.index > accounts.length - 1) this.index = 0
+          this.deviceStatus(true)
+        }
+        if (accounts.length > this.accounts.length) this.accounts = accounts
+        this.status = 'ok'
+        this.update()
+      } else {
+        this.status = 'Unable to find accounts'
+        this.accounts = []
+        this.index = 0
+        this.update()
+      }
     })
   }
   needPassphras (cb) {

@@ -2,6 +2,7 @@ import { ipcRenderer, webFrame } from 'electron'
 import state from '../../state'
 import rpc from './rpc'
 
+const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
 // process.once('loaded', () => { global.setImmediate = _setImmediate })
 webFrame.executeJavaScript(`window.__initialState = ${JSON.stringify(state())}`)
@@ -22,3 +23,11 @@ ipcRenderer.on('main:action', (...args) => {
   args.shift()
   window.postMessage(wrap({ channel: 'action', args, source, method: 'event' }), '*')
 })
+
+if (dev) {
+  let path = require('path')
+  let watch = require('node-watch')
+  watch(path.resolve(__dirname, '..', 'bundle'), { recursive: true }, (evt, name) => {
+    if (name.indexOf('css') > -1) window.postMessage(wrap({ method: 'reload', type: 'css', target: name }), '*')
+  })
+}

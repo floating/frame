@@ -13,20 +13,48 @@ class Ledger extends Signer {
     this.id = id
     this.devicePath = devicePath
     this.type = 'Ledger'
-    this.status = 'loading'
+    this.status = 'initial'
+    this.pause = false
+    this.coinbase = '0x'
     this.accounts = []
-    this.network = store('local.connection.network')
-    this.getPath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
+    this.network = store('main.connection.network')
+    this.index = 0
+    this.basePath = () => this.network === '1' ? `44'/60'/0'/` : `44'/1'/0'/`
+    this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.deviceStatus()
     store.observer(() => {
-      if (this.network !== store('local.connection.network')) {
-        this.network = store('local.connection.network')
-        this.status = 'loading'
-        this.accounts = []
+      if (this.network !== store('main.connection.network')) {
+        this.reset()
         this.deviceStatus()
       }
     })
+  }
+  update () {
+    if (this.invalid || this.status === 'Invalid sequence' || this.status === 'initial') return
+    super.update()
+  }
+  reset () {
+    this.network = store('main.connection.network')
+    this.status = 'loading'
+    this.accounts = []
+    this.index = 0
+    this.update()
+  }
+  lookupAccounts (cb) {
+    try {
+      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
+      let eth = new Eth(transport)
+      eth.getAddress(this.basePath(), false, true).then(result => {
+        transport.close()
+        cb(null, this.deriveHDAccounts(result.publicKey, result.chainCode))
+      }).catch(err => {
+        transport.close()
+        cb(err)
+      })
+    } catch (err) {
+      cb(err)
+    }
   }
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
@@ -39,38 +67,55 @@ class Ledger extends Signer {
     clearTimeout(this._pollStatus)
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
-  deviceStatus () {
+  deviceStatus (deep, limit = 15) {
+    if (this.status === 'Invalid sequence') return
     this.pollStatus()
-    try {
-      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
-      let eth = new Eth(transport)
-      eth.getAddress(this.getPath()).then(result => {
-        this.accounts = [result.address]
+    if (this.pause) return
+    this.lookupAccounts((err, accounts) => {
+      let last = this.status
+      if (err) {
+        if (err.message.startsWith('cannot open device with path')) { // Device is busy, try again
+          clearTimeout(this._deviceStatus)
+          this._deviceStatus = setTimeout(() => this.deviceStatus(deep), 700)
+          log.info('>>>>>>> Busy: cannot open device with path, will try again')
+        } else {
+          this.status = err.message
+          if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
+          if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
+          if (err.statusCode === 26625 || err.statusCode === 26628) {
+            this.pollStatus(3000)
+            this.status = 'Confirm your Ledger is not asleep and is running firmware v1.4.0+'
+          }
+          if (err.message === 'Cannot write to HID device') {
+            this.status = 'loading'
+            log.error('Device Status: Cannot write to HID device')
+          }
+          if (err.message === 'Invalid channel') {
+            this.status = 'Set browser support to "NO"'
+            log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
+          }
+          if (err.message === 'Invalid sequence') this.invalid = true
+          this.accounts = []
+          this.index = 0
+          if (this.status !== last) this.update()
+        }
+      } else if (accounts && accounts.length) {
+        if (accounts[0] !== this.coinbase || this.status !== 'ok') {
+          this.coinbase = accounts[0]
+          this.accounts = accounts
+          if (this.index > accounts.length - 1) this.index = 0
+          this.deviceStatus(true)
+        }
+        if (accounts.length > this.accounts.length) this.accounts = accounts
         this.status = 'ok'
         this.update()
-        transport.close()
-      }).catch(err => {
-        this.status = err.message
-        if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
-        if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
-        if (err.statusCode === 26625 || err.statusCode === 26628) {
-          this.pollStatus(3000)
-          this.status = 'Confirm your Ledger is not asleep and is running firmware version 1.4.0 or newer'
-        }
-        if (err.message === 'Cannot write to HID device') {
-          this.status = 'loading'
-          log.error('Device Status: Cannot write to HID device')
-        }
+      } else {
+        this.status = 'Unable to find accounts'
+        this.accounts = []
+        this.index = 0
         this.update()
-        transport.close()
-      })
-    } catch (err) {
-      if (err.message.startsWith('cannot open device with path')) {
-        this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
-        return log.info('>>>>>>> Busy: cannot open device with path, will try again')
       }
-      log.error(err)
-    }
+    })
   }
   normalize (hex) {
     if (hex == null) return ''
@@ -80,6 +125,7 @@ class Ledger extends Signer {
   }
   // Standard Methods
   signPersonal (message, cb) {
+    this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
@@ -88,11 +134,14 @@ class Ledger extends Signer {
         if (v.length < 2) v = '0' + v
         cb(null, result['r'] + result['s'] + v)
         transport.close()
+        this.pause = false
       }).catch(err => {
         cb(err.message)
         transport.close()
+        this.pause = false
       })
     } catch (err) {
+      this.pause = false
       if (err.message.startsWith('cannot open device with path')) {
         this._signPersonal = setTimeout(() => this.signPersonal(message, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
@@ -101,6 +150,7 @@ class Ledger extends Signer {
     }
   }
   signTransaction (rawTx, cb) {
+    this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
@@ -112,6 +162,7 @@ class Ledger extends Signer {
       const rawTxHex = tx.serialize().toString('hex')
       eth.signTransaction(this.getPath(), rawTxHex).then(result => {
         transport.close()
+        this.pause = false
         let tx = new EthereumTx({
           nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
           gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
@@ -126,9 +177,11 @@ class Ledger extends Signer {
         cb(null, '0x' + tx.serialize().toString('hex'))
       }).catch(err => {
         transport.close()
+        this.pause = false
         cb(err.message)
       })
     } catch (err) {
+      this.pause = false
       if (err.message.startsWith('cannot open device with path')) {
         this._signTransaction = setTimeout(() => this.signTransaction(rawTx, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
