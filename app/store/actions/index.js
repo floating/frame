@@ -90,7 +90,7 @@ export const removeSigner = (u, signer, state) => {
   let status = 'Removing'
   u('signers', (signers, state) => {
     if (state.signer.current === signer.id) unsetSigner(u)
-    if (signers[signer.id] && signers[signer.id]) signers[signer.id].removing = true
+    if (signers[signer.id]) signers[signer.id].removing = true
     return signers
   })
   setTimeout(_ => {
