@@ -9,10 +9,15 @@ class Settings extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
-    this.state = { localShake: {}, secondaryCustom: this.customMessage, resetConfirm: false, expandNetwork: false }
+    let secondaryCustom = context.store('main.connection.secondary.settings', context.store('main.connection.network'), 'options.custom') || this.customMessage
+    this.state = { localShake: {}, secondaryCustom, resetConfirm: false, expandNetwork: false }
+    this.network = context.store('main.connection.network')
     context.store.observer(() => {
-      let secondaryCustom = context.store('main.connection.secondary.settings', context.store('main.connection.network'), 'options.custom') || this.customMessage
-      this.setState({ secondaryCustom })
+      if (this.network !== context.store('main.connection.network')) {
+        this.network = context.store('main.connection.network')
+        let secondaryCustom = context.store('main.connection.secondary.settings', context.store('main.connection.network'), 'options.custom') || this.customMessage
+        this.setState({ secondaryCustom })
+      }
     })
   }
   appInfo () {
