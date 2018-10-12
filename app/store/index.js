@@ -14,10 +14,6 @@ link.rpc('getSigners', (err, signers) => {
   if (err) return store.signersError(err)
   store.updateSigners(signers)
 })
-link.rpc('launchStatus', (err, status) => {
-  if (err) return console.log(err) // launchStatusError
-  link.send('tray:action', 'setLaunch', status)
-})
 
 link.on('action', (action, ...args) => { if (store[action]) store[action](...args) })
 link.send('tray:api') // turn on api
