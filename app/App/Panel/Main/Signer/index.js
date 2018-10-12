@@ -129,14 +129,15 @@ class Signer extends React.Component {
   setHighlight (mode, index) {
     if (!this.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
   }
+  closeAccounts () {
+    if (this.store('signer.showAccounts')) this.store.toggleShowAccounts(false)
+  }
   setSignerIndex (index) {
     this.locked = true
     link.rpc('setSignerIndex', index, (err, summary) => {
       this.setState({ accountHighlight: 'inactive', highlightIndex: 0 })
       this.store.toggleShowAccounts(false)
-      setTimeout(() => {
-        this.locked = false
-      }, 1000)
+      setTimeout(() => { this.locked = false }, 1000)
       if (err) return console.log(err)
     })
   }
@@ -145,7 +146,7 @@ class Signer extends React.Component {
     let startIndex = this.state.accountPage * 5
     let highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
     return (
-      <div className='accountList'>
+      <div className='accountList' onMouseDown={e => e.stopPropagation()}>
         <div className='accountListItems'>
           {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
             i = startIndex + i
@@ -218,7 +219,10 @@ class Signer extends React.Component {
             })}
           </div>
         )}
-        <div className='addressSelect' onMouseDown={() => this.store.toggleShowAccounts()}>
+        <div className='addressSelect' onMouseDown={e => {
+          e.stopPropagation()
+          this.store.toggleShowAccounts()
+        }}>
           <div className='addressSelectButton'>
             {svg.octicon('key', { height: 18 })}
           </div>
@@ -265,7 +269,7 @@ class Signer extends React.Component {
     }
 
     return (
-      <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}}>
+      <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             <div className='signerTop'>
