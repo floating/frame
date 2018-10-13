@@ -103,6 +103,7 @@ store.observer(() => {
 store.observer(_ => persist.set('main', store('main')))
 
 if (!dev) { // Check for updates
+  autoUpdater.allowPrerelease = true
   setTimeout(() => {
     autoUpdater.on('error', err => log.error('Auto Update Error: ' + err.message))
     autoUpdater.on('update-downloaded', res => {
