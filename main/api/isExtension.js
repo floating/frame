@@ -1,6 +1,6 @@
 const dev = process.env.NODE_ENV === 'development'
 
-const extOrigins = ['chrome-extension://adpbaaddjmehiidelapmmnjpmehjiifg', 'moz-extension://6b58ce8e-d95d-2e43-8451-03a8970e6e78']
+const extOrigins = ['chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf', 'moz-extension://6b58ce8e-d95d-2e43-8451-03a8970e6e78']
 
 module.exports = origin => {
   if (!origin) return false
