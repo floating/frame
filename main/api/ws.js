@@ -6,7 +6,7 @@ const provider = require('../provider')
 const signers = require('../signers')
 
 const trusted = require('./trusted')
-const isExtension = require('./isExtension')
+const isFrameExtension = require('./isFrameExtension')
 
 const subs = {}
 
@@ -16,15 +16,18 @@ const handler = (socket, req) => {
   socket.id = uuid()
   log.info('Socket connect: ' + socket.id)
   socket.origin = req.headers.origin
-  const res = payload => {
-    if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(payload), err => { if (err) log.info(err) })
-  }
+  socket.isFrameExtension = isFrameExtension(req)
+  const res = payload => { if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(payload), err => { if (err) log.info(err) }) }
   socket.on('message', data => {
     let origin = socket.origin
     let payload = JSON.parse(data)
-    if (isExtension(origin) && payload.__frameOrigin) { // Request from extension, swap origin
-      origin = payload.__frameOrigin
-      delete payload.__frameOrigin
+    if (socket.isFrameExtension) { // Request from extension, swap origin
+      if (payload.__frameOrigin) {
+        origin = payload.__frameOrigin
+        delete payload.__frameOrigin
+      } else {
+        origin = 'frame-extension'
+      }
     }
     log.info('ws -> ' + socket.id.substr(0, 6) + ' ' + origin + ' ' + payload.method + ' ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
