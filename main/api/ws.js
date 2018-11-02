@@ -4,6 +4,7 @@ const log = require('electron-log')
 
 const provider = require('../provider')
 const signers = require('../signers')
+const store = require('../store')
 
 const trusted = require('./trusted')
 const isFrameExtension = require('./isFrameExtension')
@@ -14,13 +15,17 @@ const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction',
 
 const handler = (socket, req) => {
   socket.id = uuid()
-  log.info('Socket connect: ' + socket.id)
   socket.origin = req.headers.origin
   socket.isFrameExtension = isFrameExtension(req)
-  const res = payload => { if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(payload), err => { if (err) log.info(err) }) }
+  const res = payload => {
+    if (socket.readyState === socket.OPEN) {
+      socket.send(JSON.stringify(payload), err => { if (err) log.info(err) })
+    }
+  }
   socket.on('message', data => {
     let origin = socket.origin
-    let payload = JSON.parse(data)
+    let payload
+    try { payload = JSON.parse(data) } catch (e) { return log.info('Error parsing payload: ', data, e) }
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (payload.__frameOrigin) {
         origin = payload.__frameOrigin
@@ -29,7 +34,7 @@ const handler = (socket, req) => {
         origin = 'frame-extension'
       }
     }
-    log.info('ws -> ' + socket.id.substr(0, 6) + ' ' + origin + ' ' + payload.method + ' ' + payload.params)
+    log.info('| req -> | ' + (socket.isFrameExtension ? 'ext |  ' : 'ws | ') + origin + ' >>> ' + payload.method + ' --- ' + (payload.params || []))
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: -1 }
       if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: -1 }
@@ -38,26 +43,26 @@ const handler = (socket, req) => {
       provider.send(payload, response => {
         if (response && response.result) {
           if (payload.method === 'eth_subscribe') {
-            subs[response.result] = socket
+            subs[response.result] = { socket, origin }
           } else if (payload.method === 'eth_unsubscribe') {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
+        log.info('| <- res | ' + (socket.isFrameExtension ? 'ext |  ' : 'ws | ') + origin + ' <<< ' + payload.method + ' --- ' + response.result || response.error)
         res(response)
       })
     }
   })
   socket.on('error', err => err) // Handle Error
   socket.on('close', _ => {
-    log.info('Socket close: ' + socket.id)
     let unsub = []
     Object.keys(subs).forEach(sub => {
-      if (subs[sub].id === socket.id) {
+      if (subs[sub].socket.id === socket.id) {
         unsub.push(sub)
         delete subs[sub]
       }
     })
-    if (unsub.length > 0) provider.unsubscribe(unsub, res => log.info('Provider Unsubscribe', res))
+    // TODO: if (unsub.length > 0) provider.unsubscribe(unsub, res => log.info('Provider Unsubscribe', res))
   })
 }
 
@@ -66,7 +71,19 @@ module.exports = server => {
   ws.on('connection', handler)
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
-    if (subs[payload.params.subscription]) subs[payload.params.subscription].send(JSON.stringify(payload))
+    let subscription = subs[payload.params.subscription]
+    if (subscription) subscription.socket.send(JSON.stringify(payload))
+  })
+
+  provider.on('data:accounts', (account, payload) => { // Make sure the subscription has access based on current account
+    let subscription = subs[payload.params.subscription]
+    if (subscription) {
+      let permissions = store('main.accounts', account, 'permissions') || {}
+      let perms = Object.keys(permissions).map(id => permissions[id])
+      let allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
+      if (!allowed) payload.params.result = []
+      subscription.socket.send(JSON.stringify(payload))
+    }
   })
 
   // TODO: close -> notify

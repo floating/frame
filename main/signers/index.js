@@ -53,6 +53,9 @@ const api = {
   getSelectedAccounts: () => {
     return signers[current] ? signers[current].getSelectedAccounts() : []
   },
+  getSelectedAccount: () => {
+    return signers[current] ? signers[current].getSelectedAccount() : undefined
+  },
   getAccounts: (cb) => {
     if (!signers[current]) {
       if (cb) cb(new Error('No Account Selected'))
@@ -66,7 +69,7 @@ const api = {
   },
   signPersonal: (message, address, cb) => {
     if (!signers[current]) return cb(new Error('No Account Selected'))
-    if (address.toLowerCase() !== signers[current].accounts[0].toLowerCase()) return cb(new Error('signPersonal: Wrong Account Selected'))
+    if (address.toLowerCase() !== api.getSelectedAccounts()[0].toLowerCase()) return cb(new Error('signPersonal: Wrong Account Selected'))
     signers[current].signPersonal(message, cb)
   },
   signTransaction: (rawTx, cb) => {

@@ -15,6 +15,6 @@ module.exports = origin => {
   let perms = Object.keys(permissions).map(id => permissions[id])
   let permIndex = perms.map(p => p.origin).indexOf(origin)
   let handlerId = uuidv5(origin, uuidv5.DNS)
-  if (permIndex === -1) signers.addRequest({ handlerId, type: 'requestProvider', origin, account })
+  if (permIndex === -1) signers.addRequest({ handlerId, type: 'access', origin, account })
   return perms[permIndex] && perms[permIndex].provider
 }

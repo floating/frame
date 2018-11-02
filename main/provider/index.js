@@ -23,6 +23,26 @@ class Provider extends EventEmitter {
     this.getGasEstimate = this.getGasEstimate.bind(this)
     this.getNonce = this.getNonce.bind(this)
     this.fillTx = this.fillTx.bind(this)
+    this.subs = { accountsChanged: [], networkChanged: [] }
+  }
+  accountsChanged (accounts) {
+    this.subs.accountsChanged.forEach(subscription => {
+      this.emit('data:accounts', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
+    })
+  }
+  networkChanged (netId) {
+    this.subs.networkChanged.forEach(subscription => {
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
+    })
+  }
+  randHex (len) {
+    let maxlen = 8
+    let min = Math.pow(16, Math.min(len, maxlen) - 1)
+    let max = Math.pow(16, Math.min(len, maxlen)) - 1
+    let n = Math.floor(Math.random() * (max - min + 1)) + min
+    let r = n.toString(16)
+    while (r.length < len) r = r + this.randHex(len - maxlen)
+    return r
   }
   getCoinbase (payload, res) {
     signers.getAccounts((err, accounts) => {
@@ -40,9 +60,6 @@ class Provider extends EventEmitter {
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })
   }
-  unsubscribe (params, res) {
-    this.connection.send({ id: ++this.count, jsonrpc: '2.0', method: 'eth_unsubscribe', params }, res)
-  }
   declineRequest (req) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
@@ -52,6 +69,19 @@ class Provider extends EventEmitter {
     if (typeof error === 'string') error = { message: error, code: -1 }
     console.warn(error)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
+  }
+  approveSign (req, cb) {
+    let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    let payload = req.payload
+    signers.signPersonal(req.payload.params[0], req.payload.params[1], (err, signed) => {
+      if (err) {
+        this.resError(err.message, payload, res)
+        cb(err.message)
+      } else {
+        res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
+        cb(null, signed)
+      }
+    })
   }
   signAndSend (req, cb) {
     let rawTx = req.data
@@ -138,14 +168,13 @@ class Provider extends EventEmitter {
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
       let handlerId = uuid()
       this.handlers[handlerId] = res
-      signers.addRequest({ handlerId, type: 'approveTransaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)
+      signers.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)
     })
   }
   signPersonal (payload, res) {
-    signers.signPersonal(payload.params[0], payload.params[1], (err, signed) => {
-      if (err) return this.resError(`Frame provider error during signPersonal: ${err.message}`, payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
-    })
+    let handlerId = uuid()
+    this.handlers[handlerId] = res
+    signers.addRequest({ handlerId, type: 'sign', payload, account: signers.getAccounts()[0] })
   }
   ecRecover (payload, res) {
     const message = payload.params[0]
@@ -159,6 +188,25 @@ class Provider extends EventEmitter {
     const address = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: address })
   }
+  subscribe (payload, res) {
+    let subId = '0x' + this.randHex(32)
+    this.subs[payload.params[0]] = this.subs[payload.params[0]] || []
+    this.subs[payload.params[0]].push(subId)
+    res({ id: payload.id, jsonrpc: '2.0', result: subId })
+  }
+  unsubscribe (payload, res) {
+    // TODO: Unsubscribe
+  }
+  findSub (id) {
+    let sub = { type: '', index: -1 }
+    Object.keys(this.subs).some(type => {
+      let index = this.subs[type].indexOf(id)
+      let found = index > -1
+      if (found) sub = { type, index }
+      return found
+    })
+    return sub.index > -1
+  }
   send (payload, res) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
@@ -166,9 +214,48 @@ class Provider extends EventEmitter {
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
     if (payload.method === 'personal_sign') return this.signPersonal(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
-    if (payload.method === 'eth_sign') return this.resError('No eth_sign', payload, res)
+    if (payload.method === 'eth_sign') return this.resError('No eth_sign, please use personal_sign', payload, res)
+    if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
+    if (payload.method === 'eth_unsubscribe' && this.findSub(payload.params[0]).index > -1) return this.unsubscribe(payload, res)
     this.connection.send(payload, res)
   }
 }
 
-module.exports = new Provider()
+const provider = new Provider()
+
+let network = store('main.connection.network')
+store.observer(() => {
+  if (network !== store('main.connection.network')) {
+    network = store('main.connection.network')
+    signers.unsetSigner()
+    provider.networkChanged(network)
+    provider.accountsChanged([])
+  }
+})
+
+module.exports = provider
+
+// store.observer(() => provider.accountsChanged())
+
+// signers.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
+//   if (err) {
+//     this.resError(err, payload, res)
+//     return cb(new Error(`signTransaction Error: ${JSON.stringify(err)}`))
+//   }
+//   this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, (response) => {
+//     if (response.error) {
+//       this.resError(response.error, payload, res)
+//       cb(response.error.message)
+//     } else {
+//       res(response)
+//       cb(null, response.result)
+//     }
+//   })
+// })
+// if (req.data.nonce) return this.signAndSend(req, cb)
+// this.getNonce(req.data, response => {
+//   if (response.error) return cb(response.error)
+//   let updatedReq = Object.assign({}, req)
+//   updatedReq.data = Object.assign({}, updatedReq.data, { nonce: response.result })
+//   this.signAndSend(updatedReq, cb)
+// })

@@ -61,7 +61,7 @@ let initial = {
   },
   main: {
     launch: main('launch', false),
-    accounts: main('accounts', {}),
+    accounts: main('accounts', {}), // Persisted account settings and permissions
     connection: {
       network: main('connection.network', '4'),
       options: ['1', '4'],

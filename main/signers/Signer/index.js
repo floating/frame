@@ -33,6 +33,9 @@ class Signer {
   getSelectedAccounts () {
     return this.accounts[this.index] ? [this.accounts[this.index]] : []
   }
+  getSelectedAccount () {
+    return this.accounts[this.index]
+  }
   summary () {
     return {
       id: this.id,
