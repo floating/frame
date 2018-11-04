@@ -136,7 +136,7 @@ class Ledger extends Signer {
         transport.close()
         this.pause = false
       }).catch(err => {
-        cb(err.message)
+        cb(err)
         transport.close()
         this.pause = false
       })
@@ -146,6 +146,7 @@ class Ledger extends Signer {
         this._signPersonal = setTimeout(() => this.signPersonal(message, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
       }
+      cb(err)
       log.error(err)
     }
   }
@@ -186,6 +187,7 @@ class Ledger extends Signer {
         this._signTransaction = setTimeout(() => this.signTransaction(rawTx, cb), 700)
         return log.info('>>>>>>> Busy: cannot open device with path, will try again')
       }
+      cb(err)
       log.error(err)
     }
   }

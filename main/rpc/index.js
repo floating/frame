@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron')
-const log = require('electron-log')
+// const log = require('electron-log')
 
 const signers = require('../signers')
 const launch = require('../launch')
@@ -11,9 +11,20 @@ const rpc = {
   getAccounts: signers.getAccounts,
   getCoinbase: signers.getCoinbase,
   getSigners: signers.getSigners,
-  setSigner: signers.setSigner,
-  setSignerIndex: signers.setSignerIndex,
-  unsetSigner: signers.unsetSigner,
+  setSigner: (id, cb) => {
+    signers.setSigner(id, cb)
+    provider.accountsChanged(signers.getSelectedAccounts())
+  },
+  setSignerIndex: (index, cb) => {
+    signers.setSignerIndex(index, cb)
+    provider.accountsChanged(signers.getSelectedAccounts())
+  },
+  unsetSigner: (cb) => {
+    signers.unsetSigner(cb)
+    provider.accountsChanged(signers.getSelectedAccounts())
+  },
+  // setSignerIndex: signers.setSignerIndex,
+  // unsetSigner: signers.unsetSigner,
   trezorPin: signers.trezorPin,
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),
@@ -34,17 +45,24 @@ const rpc = {
     })
   },
   approveRequest (req, cb) {
-    log.info('approveRequest ', req.handlerId)
     signers.setRequestPending(req)
-    provider.approveRequest(req, (err, res) => {
-      if (err) return signers.setRequestError(req.handlerId, err)
-      signers.setRequestSuccess(req.handlerId, res)
-    })
+    if (req.type === 'transaction') {
+      provider.approveRequest(req, (err, res) => {
+        if (err) return signers.setRequestError(req.handlerId, err)
+        signers.setRequestSuccess(req.handlerId, res)
+      })
+    } else if (req.type === 'sign') {
+      provider.approveSign(req, (err, res) => {
+        if (err) return signers.setRequestError(req.handlerId, err)
+        signers.setRequestSuccess(req.handlerId, res)
+      })
+    }
   },
   declineRequest (req, cb) {
-    log.info('declineRequest ', req.handlerId)
-    signers.declineRequest(req.handlerId)
-    provider.declineRequest(req)
+    if (req.type === 'transaction' || req.type === 'sign') {
+      signers.declineRequest(req.handlerId)
+      provider.declineRequest(req)
+    }
   }
 }
 

@@ -50,10 +50,6 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
-ipcMain.on('tray:setSync', (e, key, payload) => {
-  store.setSync(key, payload)
-})
-
 ipcMain.on('tray:giveAccess', (e, req, access) => {
   store.giveAccess(req, access)
   signers.removeRequest(req.handlerId)

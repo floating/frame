@@ -1,5 +1,5 @@
 module.exports = {
-  setSync: (u, key, payload) => u(key, () => payload),
+  // setSync: (u, key, payload) => u(key, () => payload),
   selectNetwork: (u, net) => {
     let reset = { status: 'loading', connected: false, type: '', network: '' }
     u('main.connection', connection => {

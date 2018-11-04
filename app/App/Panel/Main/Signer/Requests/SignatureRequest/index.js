@@ -39,14 +39,14 @@ class TransactionRequest extends React.Component {
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    let etherRates = this.store('external.rates')
-    let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-    let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
-    let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
+    // let etherRates = this.store('external.rates')
+    // let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+    // let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
+    // let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ top: (this.props.top * 10) + 'px' }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
-        {this.props.req.type === 'transaction' ? (
+        {this.props.req.type === 'sign' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
               {notice ? (
@@ -81,55 +81,14 @@ class TransactionRequest extends React.Component {
               ) : (
                 <React.Fragment>
                   <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
-                    <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
+                    <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
+                    <div className='approveRequestHeaderLabel'> {'Sign Message'}</div>
                   </div>
-                  <div className='transactionValue'>
-                    <div className='transactionTotals'>
-                      <div className='transactionTotalETH'>{'Ξ ' + value}</div>
-                      <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
+                  <div className='signValue'>
+                    <div className='signValueInner'>
+                      {utils.toAscii(this.props.req.payload.params[0] || '0x')}
                     </div>
-                    <div className='transactionSubtitle'>{'Value'}</div>
                   </div>
-                  <div className='transactionFee'>
-                    <div className='transactionTotals'>
-                      <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
-                      <div className='transactionTotalUSD'>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
-                    </div>
-                    <div className='transactionSubtitle'>{'Max Fee'}</div>
-                  </div>
-                  {utils.toAscii(this.props.req.data.data || '0x') ? (
-                    <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
-                      <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
-                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
-                        <div className='transactionDataLabel'>{'View Data'}</div>
-                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
-                      </div>
-                      <div className='transactionDataBody'>
-                        <div className='transactionDataBodyInner'>
-                          {this.props.req.data.data}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className='transactionData transactionNoData'>{'No Data'}</div>
-                  )}
-                  {this.props.req.data.to ? (
-                    <div className='transactionTo'>
-                      <div className='transactionToAddress'>
-                        <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
-                        <div className='transactionToAddressFull'>
-                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
-                          <input onMouseDown={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
-                        </div>
-                      </div>
-                      <div className='transactionToSub'>{'Send To'}</div>
-                    </div>
-                  ) : (
-                    <div className='transactionTo'>
-                      <div className='transactionToSub'>{'Deploying Contract'}</div>
-                    </div>
-                  )}
                 </React.Fragment>
               )}
             </div>
@@ -151,3 +110,50 @@ class TransactionRequest extends React.Component {
 }
 
 export default Restore.connect(TransactionRequest)
+
+// <div className='transactionValue'>
+//   <div className='transactionTotals'>
+//     <div className='transactionTotalETH'>{'Ξ ' + value}</div>
+//     <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
+//   </div>
+//   <div className='transactionSubtitle'>{'Value'}</div>
+// </div>
+// <div className='transactionFee'>
+//   <div className='transactionTotals'>
+//     <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
+//     <div className='transactionTotalUSD'>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
+//   </div>
+//   <div className='transactionSubtitle'>{'Max Fee'}</div>
+// </div>
+// {utils.toAscii(this.props.req.data.data || '0x') ? (
+//   <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
+//     <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
+//       <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
+//       <div className='transactionDataLabel'>{'View Data'}</div>
+//       <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
+//     </div>
+//     <div className='transactionDataBody'>
+//       <div className='transactionDataBodyInner'>
+//         {this.props.req.data.data}
+//       </div>
+//     </div>
+//   </div>
+// ) : (
+//   <div className='transactionData transactionNoData'>{'No Data'}</div>
+// )}
+// {this.props.req.data.to ? (
+//   <div className='transactionTo'>
+//     <div className='transactionToAddress'>
+//       <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
+//       <div className='transactionToAddressFull'>
+//         {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
+//         <input onMouseDown={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
+//       </div>
+//     </div>
+//     <div className='transactionToSub'>{'Send To'}</div>
+//   </div>
+// ) : (
+//   <div className='transactionTo'>
+//     <div className='transactionToSub'>{'Deploying Contract'}</div>
+//   </div>
+// )}

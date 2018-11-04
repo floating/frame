@@ -54,16 +54,6 @@ class Nodes extends EventEmitter {
       log.info('    Local connection: ON')
       if (!this.local.provider) {
         log.info('    Local connection doesn\'t exist, creating connection')
-
-        // Set connection to loading
-        if (connection.local.status !== 'loading') {
-          this.local.status = 'loading'
-          this.local.connected = false
-          this.local.type = ''
-          this.update('local')
-        }
-
-        // Create local connection
         this.local.provider = provider('direct', { name: 'local' })
 
         // Local connection connected
@@ -92,8 +82,8 @@ class Nodes extends EventEmitter {
 
         // Local connection status
         this.local.provider.on('status', status => {
-          let current = store('main.connection.local.status')
-          if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
+          let current = this.local.status
+          if ((current === 'loading' || current === 'not found' || current === 'off') && status === 'disconnected') status = 'not found'
           this.local.status = status
           this.update('local')
         })
