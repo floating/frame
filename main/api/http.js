@@ -58,7 +58,7 @@ const handler = (req, res) => {
             } else {
               pending[id] = {}
               pending[id].send = () => {
-                clearTimeout(pending[id].timer)
+                if (pending[id]) clearTimeout(pending[id].timer)
                 delete pending[id]
                 send(true)
               }
