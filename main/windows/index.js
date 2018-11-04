@@ -37,7 +37,7 @@ const api = {
       windows.tray.on('minimize', onHide)
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 3000)
+    if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
     api.showTray()
   },
   trayClick: () => {
@@ -57,7 +57,7 @@ const api = {
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 320)
+      }, 420)
     }
   },
   showTray: () => {
@@ -85,7 +85,7 @@ const api = {
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 320)
+      }, 420)
     }
   },
   close: (e) => {
