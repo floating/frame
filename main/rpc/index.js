@@ -59,11 +59,9 @@ const rpc = {
     }
   },
   declineRequest (req, cb) {
-    if (req.type === 'transaction') {
+    if (req.type === 'transaction' || req.type === 'sign') {
       signers.declineRequest(req.handlerId)
       provider.declineRequest(req)
-    } else if (req.type === 'sign') {
-      // TODO: Got Decline
     }
   }
 }

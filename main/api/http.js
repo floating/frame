@@ -7,27 +7,17 @@ const store = require('../store')
 
 const polls = {}
 const pollSubs = {}
-
+const pending = {}
 const cleanupTimers = {}
 const cleanup = id => {
   delete polls[id]
-  let unsub = []
+  delete pending[id]
   Object.keys(pollSubs).forEach(sub => {
-    if (pollSubs[sub] === id) {
+    if (pollSubs[sub].id === id) {
+      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
       delete pollSubs[sub]
-      unsub.push(sub)
     }
   })
-  // TODO: if (unsub.length > 0) provider.unsubscribe(unsub, res => console.log('Provider Unsubscribe', res))
-}
-
-let flushTimer
-let pending = []
-let flush = () => {
-  clearTimeout(flushTimer)
-  flushTimer = false
-  pending.forEach(send => send(true))
-  pending = []
 }
 
 const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
@@ -46,7 +36,7 @@ const handler = (req, res) => {
       let origin = req.headers.origin || 'Unknown'
       let payload = JSON.parse(Buffer.concat(body).toString())
 
-      log.info('| req -> | http | ' + req.headers.origin + ' >>> ' + payload.method + ' --- ' + (payload.params || '[]'))
+      log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
       if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: -1 }
         if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: -1 }
@@ -60,14 +50,19 @@ const handler = (req, res) => {
             if (result.length || payload.params[1] === 'immediate' || force) {
               res.writeHead(200, { 'Content-Type': 'application/json' })
               let response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
-              log.info('| <- res | http | ' + origin + ' <<< ' + payload.method + ' --- ' + (response.result || response.error))
+              log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
               res.end(JSON.stringify(response))
               delete polls[id]
               clearTimeout(cleanupTimers[id])
-              cleanupTimers[id] = setTimeout(cleanup.bind(null, id), 120 * 1000)
+              cleanupTimers[id] = setTimeout(cleanup.bind(null, id), 20 * 1000)
             } else {
-              pending.push(send)
-              if (!flushTimer) flushTimer = setTimeout(flush, 15000)
+              pending[id] = {}
+              pending[id].send = () => {
+                clearTimeout(pending[id].timer)
+                delete pending[id]
+                send(true)
+              }
+              pending[id].timer = setTimeout(pending[id].send, 15 * 1000)
             }
           }
           if (typeof id === 'string') return send()
@@ -83,7 +78,7 @@ const handler = (req, res) => {
             }
           }
           res.writeHead(200, { 'Content-Type': 'application/json' })
-          log.info('| <- res | http | ' + req.headers.origin + ' <<< ' + payload.method + ' --- ' + (response.result || response.error))
+          log.info('<- res | http | ' + req.headers.origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
           res.end(JSON.stringify(response))
         })
       }
@@ -100,7 +95,7 @@ provider.on('data', payload => {
     let { id } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
     polls[id].push(JSON.stringify(payload))
-    flush()
+    if (pending[id]) pending[id].send()
   }
 })
 
@@ -113,7 +108,7 @@ provider.on('data:accounts', (account, payload) => { // Make sure the subscripti
     if (!allowed) payload.params.result = []
     polls[id] = polls[id] || []
     polls[id].push(JSON.stringify(payload))
-    flush()
+    if (pending[id]) pending[id].send()
   }
 })
 

@@ -34,7 +34,7 @@ const handler = (socket, req) => {
         origin = 'frame-extension'
       }
     }
-    log.info('| req -> | ' + (socket.isFrameExtension ? 'ext |  ' : 'ws | ') + origin + ' >>> ' + payload.method + ' --- ' + (payload.params || []))
+    log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: -1 }
       if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: -1 }
@@ -48,21 +48,19 @@ const handler = (socket, req) => {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        log.info('| <- res | ' + (socket.isFrameExtension ? 'ext |  ' : 'ws | ') + origin + ' <<< ' + payload.method + ' --- ' + response.result || response.error)
+        log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
         res(response)
       })
     }
   })
   socket.on('error', err => err) // Handle Error
   socket.on('close', _ => {
-    let unsub = []
     Object.keys(subs).forEach(sub => {
       if (subs[sub].socket.id === socket.id) {
-        unsub.push(sub)
+        provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
         delete subs[sub]
       }
     })
-    // TODO: if (unsub.length > 0) provider.unsubscribe(unsub, res => log.info('Provider Unsubscribe', res))
   })
 }
 

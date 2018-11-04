@@ -63,12 +63,12 @@ class Provider extends EventEmitter {
   declineRequest (req) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
-    this.resError(`user declined transaction`, payload, res)
+    this.resError(`User declined transaction`, payload, res)
   }
   resError (error, payload, res) {
     if (typeof error === 'string') error = { message: error, code: -1 }
-    console.warn(error)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
+    log.warn(error)
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, error: error.message })
   }
   approveSign (req, cb) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
@@ -194,20 +194,17 @@ class Provider extends EventEmitter {
     this.subs[payload.params[0]].push(subId)
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
-  unsubscribe (payload, res) {
-    // TODO: Unsubscribe
-  }
-  findSub (id) {
-    let sub = { type: '', index: -1 }
+  ifSubRemove (id) {
+    let found = false
     Object.keys(this.subs).some(type => {
       let index = this.subs[type].indexOf(id)
-      let found = index > -1
-      if (found) sub = { type, index }
+      found = index > -1
+      if (found) this.subs[type].splice(index, 1)
       return found
     })
-    return sub.index > -1
+    return found
   }
-  send (payload, res) {
+  send (payload, res = () => {}) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
@@ -216,7 +213,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (payload.method === 'eth_sign') return this.resError('No eth_sign, please use personal_sign', payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
-    if (payload.method === 'eth_unsubscribe' && this.findSub(payload.params[0]).index > -1) return this.unsubscribe(payload, res)
+    if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     this.connection.send(payload, res)
   }
 }
