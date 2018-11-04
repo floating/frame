@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.0.9-alpha.1",
+  "version": "0.0.9-alpha.2",
   "description": "An Ethereum interface",
   "main": "main",
   "build": {
@@ -34,6 +34,7 @@
     "launch:dev": "cross-env NODE_ENV=development electron ./main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./main",
     "alpha": "npm run bundle && npm run launch",
+    "clean": "rimraf dist bundle .cache node_modules && npm install",
     "build": "npm run bundle && electron-builder",
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
