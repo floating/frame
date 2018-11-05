@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.0.9-alpha.2",
+  "version": "0.0.9-alpha.1",
   "description": "An Ethereum interface",
   "main": "main",
   "build": {
@@ -35,7 +35,7 @@
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./main",
     "alpha": "npm run bundle && npm run launch",
     "clean": "rimraf dist bundle .cache node_modules && npm install",
-    "build": "npm run bundle && electron-builder",
+    "build": "electron-builder",
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
     "test": "standard && jest",
@@ -57,8 +57,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@githubprimer/octicons-react": "8.1.0",
-    "@ledgerhq/hw-app-eth": "4.23.0",
-    "@ledgerhq/hw-transport-node-hid": "4.23.0",
+    "@ledgerhq/hw-app-eth": "4.24.0",
+    "@ledgerhq/hw-transport-node-hid": "4.24.0",
     "auto-launch": "5.0.5",
     "babel-polyfill": "6.26.0",
     "bip32-path": "0.4.2",
@@ -90,7 +90,7 @@
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-0": "6.24.1",
-    "electron": "2.0.11",
+    "electron": "3.0.7",
     "electron-builder": "20.31.2",
     "ganache-cli": "6.1.8",
     "jest": "23.6.0",
