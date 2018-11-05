@@ -1,5 +1,5 @@
 {
-  "name": "Frame",
+  "name": "frame",
   "version": "0.0.9-alpha.1",
   "description": "An Ethereum interface",
   "main": "main",
@@ -34,7 +34,7 @@
     "launch:dev": "cross-env NODE_ENV=development electron ./main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./main",
     "alpha": "npm run bundle && npm run launch",
-    "clean": "rimraf dist bundle .cache node_modules && npm install",
+    "clean": "rimraf dist bundle .cache \"node_modules/!(rimraf|.bin)\" && npm install",
     "build": "electron-builder",
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
@@ -52,7 +52,7 @@
   "author": {
     "name": "Jordan Muir",
     "email": "jordan@frame.sh",
-    "url": "https//frame.sh"
+    "url": "https://frame.sh"
   },
   "license": "GPL-3.0",
   "dependencies": {
