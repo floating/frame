@@ -1,5 +1,5 @@
 {
-  "name": "Frame",
+  "name": "frame",
   "version": "0.0.9-alpha.1",
   "description": "An Ethereum interface",
   "main": "main",
@@ -34,7 +34,8 @@
     "launch:dev": "cross-env NODE_ENV=development electron ./main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./main",
     "alpha": "npm run bundle && npm run launch",
-    "build": "npm run bundle && electron-builder",
+    "clean": "rimraf dist bundle .cache \"node_modules/!(rimraf|.bin)\" && npm install",
+    "build": "electron-builder",
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
     "test": "standard && jest",
@@ -51,13 +52,13 @@
   "author": {
     "name": "Jordan Muir",
     "email": "jordan@frame.sh",
-    "url": "https//frame.sh"
+    "url": "https://frame.sh"
   },
   "license": "GPL-3.0",
   "dependencies": {
     "@githubprimer/octicons-react": "8.1.0",
-    "@ledgerhq/hw-app-eth": "4.23.0",
-    "@ledgerhq/hw-transport-node-hid": "4.23.0",
+    "@ledgerhq/hw-app-eth": "4.24.0",
+    "@ledgerhq/hw-transport-node-hid": "4.24.0",
     "auto-launch": "5.0.5",
     "babel-polyfill": "6.26.0",
     "bip32-path": "0.4.2",
