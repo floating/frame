@@ -18,7 +18,7 @@ const api = {
     tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
-    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences })
+    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -32,9 +32,13 @@ const api = {
       const onShow = _ => tray.setContextMenu(menuHide)
       const onHide = _ => tray.setContextMenu(menuShow)
       windows.tray.on('show', onShow)
-      windows.tray.on('restore', onShow)
       windows.tray.on('hide', onHide)
       windows.tray.on('minimize', onHide)
+      windows.tray.hide = windows.tray.minimize
+      windows.tray.on('restore', () => {
+        api.showTray()
+        onShow()
+      })
     }
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)

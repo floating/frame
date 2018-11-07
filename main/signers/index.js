@@ -131,9 +131,9 @@ const api = {
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'error'
-      if (err.message === 'signTransaction Error: "Ledger device: Invalid data received (0x6a80)"') { // TODO: Error Codes
+      if (err.message === 'Ledger device: Invalid data received (0x6a80)') {
         signers[current].requests[handlerId].notice = 'Ledger Contract Data = No'
-      } else if (err.message === 'signTransaction Error: "Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)"') {
+      } else if (err.message === 'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)') {
         signers[current].requests[handlerId].notice = 'Ledger Signature Declined'
       } else {
         let notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type

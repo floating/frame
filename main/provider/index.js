@@ -90,7 +90,7 @@ class Provider extends EventEmitter {
     signers.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
       if (err) {
         this.resError(err, payload, res)
-        return cb(new Error(`signTransaction Error: ${JSON.stringify(err)}`))
+        return cb(new Error(err))
       }
       this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, (response) => {
         if (response.error) {
