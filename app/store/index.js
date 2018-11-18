@@ -19,10 +19,14 @@ link.on('action', (action, ...args) => { if (store[action]) store[action](...arg
 link.send('tray:api') // turn on api
 
 const etherRates = () => {
-  fetch('https://api.coinbase.com/v2/exchange-rates?currency=ETH').then(res => res.json()).then(res => {
-    if (res && res.data && res.data.rates) store.updateExternalRates(res.data.rates)
+  fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD').then(res => res.json()).then(res => {
+    if (res) store.updateExternalRates(res)
   }).catch(e => console.log('Unable to fetch exchange rate', e))
+  // fetch('https://api.coinbase.com/v2/exchange-rates?currency=ETH').then(res => res.json()).then(res => {
+  //   if (res && res.data && res.data.rates) store.updateExternalRates(res.data.rates)
+  // }).catch(e => console.log('Unable to fetch exchange rate', e))
 }
+console.log('ETHERIEORINEOIRNEOINRO')
 etherRates()
 setInterval(etherRates, 10000)
 

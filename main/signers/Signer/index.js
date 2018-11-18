@@ -60,6 +60,10 @@ class Signer {
     windows.broadcast('main:action', 'removeSigner', this.summary())
   }
   update (options = {}) {
+    console.log(' ')
+    console.log('update is being called for ', this.id, 'summary below')
+    console.log(this.summary())
+    console.log(' ')
     if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     windows.broadcast('main:action', 'updateSigner', this.summary())
   }

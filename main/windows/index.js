@@ -13,10 +13,7 @@ let tray
 let hideShow = { current: false, running: false, next: false }
 
 const api = {
-  tray: () => {
-    tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
-    tray.setHighlightMode('never')
-    tray.on('click', api.trayClick)
+  create: (hide) => {
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
     windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
@@ -42,7 +39,26 @@ const api = {
     }
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
-    api.showTray()
+    if (!hide) api.showTray()
+    setTimeout(() => api.reset(), 20 * 60 * 1000)
+  },
+  reset: () => {
+    console.log('Resetting window')
+    if (hideShow.current === 'showing' || windows.tray.isVisible()) {
+      console.log('- > Window visiable, try again in 1min')
+      setTimeout(() => api.reset(), 60 * 1000)
+    } else {
+      console.log('- > Window hidden, reset taking place')
+      windows.tray.destroy()
+      delete windows.tray
+      api.create(true)
+    }
+  },
+  tray: () => {
+    tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
+    tray.setHighlightMode('never')
+    tray.on('click', api.trayClick)
+    api.create()
   },
   trayClick: () => {
     let showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()

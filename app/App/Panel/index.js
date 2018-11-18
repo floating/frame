@@ -7,6 +7,8 @@ import Main from './Main'
 import Local from './Local'
 import Notify from './Notify'
 
+import DevTools from 'restore-devtools'
+
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
 class Panel extends React.Component {
@@ -22,6 +24,7 @@ class Panel extends React.Component {
     let open = this.store('tray.open')
     return (
       <div id='panel' style={{ transform: open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' }}>
+        <DevTools />
         <div className='panelMenu'>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
