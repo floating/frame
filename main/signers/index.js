@@ -46,7 +46,6 @@ const api = {
     setTimeout(() => { // Clear signer requests when unset
       if (s) {
         s.requests = {}
-        console.log('update from unSetsigner')
         s.update()
       }
     })
@@ -97,7 +96,6 @@ const api = {
     log.info('addRequest', req.handlerId)
     if (!signers[current] || signers[current].requests[req.handlerId]) return // If no current signer or the request already exists
     signers[current].requests[req.handlerId] = req
-    console.log('update from addRequest')
     signers[current].update({ setView: 'default' })
     windows.showTray()
     windows.broadcast('main:action', 'setSignerView', 'default')
@@ -105,17 +103,14 @@ const api = {
   removeRequest (handlerId) {
     if (signers[current] && signers[current].requests[handlerId]) {
       delete signers[current].requests[handlerId]
-      console.log('update from removeRequest')
       signers[current].update()
     }
   },
   declineRequest (handlerId) {
-    log.info('declineRequest', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'declined'
       signers[current].requests[handlerId].notice = 'Signature Declined'
-      console.log('update from declineRequest')
       signers[current].update()
     }
     setTimeout(() => api.removeRequest(handlerId), 1800)
@@ -127,7 +122,6 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'pending'
       signers[current].requests[handlerId].notice = 'Signature Pending'
-      console.log('update from setRequestPending')
       signers[current].update()
     }
   },
@@ -144,7 +138,6 @@ const api = {
         let notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
         signers[current].requests[handlerId].notice = notice
       }
-      console.log('update from setRequestError')
       signers[current].update()
       setTimeout(() => api.removeRequest(handlerId), 3300)
     }
@@ -155,7 +148,6 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'success'
       signers[current].requests[handlerId].notice = 'Signature Succesful'
-      console.log('update from setRequestSuccess')
       signers[current].update()
       setTimeout(() => api.removeRequest(handlerId), 1800)
     }

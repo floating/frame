@@ -2,6 +2,7 @@ const electron = require('electron')
 const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
 const Positioner = require('electron-positioner')
+const log = require('electron-log')
 
 const store = require('../store')
 
@@ -11,6 +12,8 @@ const windows = {}
 let tray
 
 let hideShow = { current: false, running: false, next: false }
+
+let showOnReady = true
 
 const api = {
   create: (hide) => {
@@ -40,15 +43,16 @@ const api = {
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
     if (!hide) api.showTray()
-    setTimeout(() => api.reset(), 20 * 60 * 1000)
+    setTimeout(() => api.reset(), 25 * 60 * 1000)
   },
   reset: () => {
-    console.log('Resetting window')
+    log.info('Attempting Tray Reset...')
+    showOnReady = false
     if (hideShow.current === 'showing' || windows.tray.isVisible()) {
-      console.log('- > Window visiable, try again in 1min')
-      setTimeout(() => api.reset(), 60 * 1000)
+      log.info('Tray Reset: Window visiable/in-use, try again later')
+      setTimeout(() => api.reset(), 5 * 60 * 1000)
     } else {
-      console.log('- > Window hidden, reset taking place')
+      log.info('Tray Reset: Window hidden, resetting')
       windows.tray.destroy()
       delete windows.tray
       api.create(true)
@@ -154,6 +158,9 @@ app.on('web-contents-created', (e, contents) => {
 
 // Tray Events
 ipcMain.on('tray:quit', api.quit)
+ipcMain.on('tray:ready', () => {
+  if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
+})
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))

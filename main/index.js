@@ -55,7 +55,11 @@ ipcMain.on('tray:giveAccess', (e, req, access) => {
   signers.removeRequest(req.handlerId)
 })
 
-ipcMain.on('tray:api', () => require('./api'))
+ipcMain.on('tray:syncPath', (e, path, value) => {
+  store.syncPath(path, value)
+})
+
+ipcMain.on('tray:ready', () => require('./api'))
 
 ipcMain.on('tray:updateRestart', () => {
   autoUpdater.quitAndInstall(true, true)

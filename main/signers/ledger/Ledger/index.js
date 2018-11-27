@@ -32,7 +32,6 @@ class Ledger extends Signer {
   }
   update () {
     if (this.invalid || this.status === 'Invalid sequence' || this.status === 'initial') return
-    console.log('super update from ledger class')
     super.update()
   }
   reset () {
@@ -40,7 +39,6 @@ class Ledger extends Signer {
     this.status = 'loading'
     this.accounts = []
     this.index = 0
-    console.log('update from reset in ledger class')
     this.update()
   }
   lookupAccounts (cb) {
@@ -100,7 +98,6 @@ class Ledger extends Signer {
           this.accounts = []
           this.index = 0
           if (this.status !== last) {
-            console.log('update from deviceStatus (this.status !== last) in Ledger class')
             this.update()
           }
         }
@@ -113,13 +110,11 @@ class Ledger extends Signer {
         }
         if (accounts.length > this.accounts.length) this.accounts = accounts
         this.status = 'ok'
-        console.log('update from deviceStatus ("ok") in Ledger class')
         this.update()
       } else {
         this.status = 'Unable to find accounts'
         this.accounts = []
         this.index = 0
-        console.log('update from deviceStatus ("Unable to find accounts") in Ledger class')
         this.update()
       }
     })
