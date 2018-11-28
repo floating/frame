@@ -57,6 +57,7 @@ class TransactionRequest extends React.Component {
                         <div key={status} className='requestNoticeInner bounceIn'>
                           <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
                           <div className='requestNoticeInnerText'>{'See Signer'}</div>
+                          <div className='cancelRequest' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>{'Cancel'}</div>
                         </div>
                       )
                     } else if (status === 'success') {

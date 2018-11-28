@@ -97,7 +97,9 @@ class Ledger extends Signer {
           if (err.message === 'Invalid sequence') this.invalid = true
           this.accounts = []
           this.index = 0
-          if (this.status !== last) this.update()
+          if (this.status !== last) {
+            this.update()
+          }
         }
       } else if (accounts && accounts.length) {
         if (accounts[0] !== this.coinbase || this.status !== 'ok') {

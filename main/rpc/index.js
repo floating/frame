@@ -4,8 +4,12 @@ const { ipcMain } = require('electron')
 const signers = require('../signers')
 const launch = require('../launch')
 const provider = require('../provider')
+const store = require('../store')
 
 const rpc = {
+  getState: cb => {
+    cb(null, store())
+  },
   signTransaction: signers.signTransaction,
   signPersonal: signers.signPersonal,
   getAccounts: signers.getAccounts,

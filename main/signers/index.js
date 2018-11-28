@@ -107,7 +107,6 @@ const api = {
     }
   },
   declineRequest (handlerId) {
-    log.info('declineRequest', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'declined'
@@ -127,7 +126,7 @@ const api = {
     }
   },
   setRequestError (handlerId, err) {
-    log.info('setRequestPending', handlerId)
+    log.info('setRequestError', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'error'
