@@ -1,12 +1,12 @@
 @keyframes arrowSlide
   0%
     opacity 0
-    top 5px
+    transform translateY(5px)
   20%
     opacity 1
   40%
     opacity 0
-    top -15px
+    transform translateY(-15px)
   100%
     opacity 0
 
@@ -302,6 +302,56 @@
 
       .signerStatusNotOk
         padding 20px 40px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+
+        .signerPinDisplay
+          display flex
+          justify-content center
+          align-items center
+          transition standard
+          svg
+            margin 0px 5px
+
+        .signerPinMessage
+          height 30px
+          margin-top 15px
+          margin-bottom 15px
+          width 140px
+          display flex
+          justify-content center
+          align-items center
+          transition standard
+          overflow hidden
+          position relative
+          border-radius 3px
+          box-shadow 0px 2px 3px thick0, 0px 4px 9px thick0 !important
+
+          .signerPinDelete
+            position absolute
+            display flex
+            justify-content center
+            align-items center
+            top 0
+            bottom 0
+            width 39px
+            left -40px
+            transition standard
+            border-right 1px solid thick
+
+        .signerPinSubmit
+          margin-top 0px
+          margin-bottom 0px
+          background highlighter
+          box-shadow 0px 2px 3px thick, 0px 5px 9px thick !important
+          padding-left 40px
+          width 100px
+
+          .signerPinDelete
+            left 0px
+
 
     .signerAccounts
       position relative
@@ -702,12 +752,10 @@
 
         svg
           color spacewhite
-          transition standard
 
       .trezorPinInputButton:hover
         svg
           transform scale(1.7)
-          transition standard
 
       .trezorPinInputButton:active
         svg

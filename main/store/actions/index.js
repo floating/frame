@@ -57,5 +57,9 @@ module.exports = {
       account.permissions[handlerId].provider = !account.permissions[handlerId].provider
       return account
     })
+  },
+  syncPath: (u, path, value) => {
+    if (!path || path === '*' || path.startsWith('main')) return // Don't allow updates to main state
+    u(path, () => value)
   }
 }

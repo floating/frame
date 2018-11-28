@@ -2,6 +2,7 @@ const electron = require('electron')
 const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
 const Positioner = require('electron-positioner')
+const log = require('electron-log')
 
 const store = require('../store')
 
@@ -12,13 +13,12 @@ let tray
 
 let hideShow = { current: false, running: false, next: false }
 
+let showOnReady = true
+
 const api = {
-  tray: () => {
-    tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
-    tray.setHighlightMode('never')
-    tray.on('click', api.trayClick)
+  create: (hide) => {
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
-    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences })
+    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -32,13 +32,37 @@ const api = {
       const onShow = _ => tray.setContextMenu(menuHide)
       const onHide = _ => tray.setContextMenu(menuShow)
       windows.tray.on('show', onShow)
-      windows.tray.on('restore', onShow)
       windows.tray.on('hide', onHide)
       windows.tray.on('minimize', onHide)
+      windows.tray.hide = windows.tray.minimize
+      windows.tray.on('restore', () => {
+        api.showTray()
+        onShow()
+      })
     }
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
-    api.showTray()
+    if (!hide) api.showTray()
+    setTimeout(() => api.reset(), 25 * 60 * 1000)
+  },
+  reset: () => {
+    log.info('Attempting Tray Reset...')
+    showOnReady = false
+    if (hideShow.current === 'showing' || windows.tray.isVisible()) {
+      log.info('Tray Reset: Window visiable/in-use, try again later')
+      setTimeout(() => api.reset(), 5 * 60 * 1000)
+    } else {
+      log.info('Tray Reset: Window hidden, resetting')
+      windows.tray.destroy()
+      delete windows.tray
+      api.create(true)
+    }
+  },
+  tray: () => {
+    tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
+    tray.setHighlightMode('never')
+    tray.on('click', api.trayClick)
+    api.create()
   },
   trayClick: () => {
     let showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
@@ -134,6 +158,9 @@ app.on('web-contents-created', (e, contents) => {
 
 // Tray Events
 ipcMain.on('tray:quit', api.quit)
+ipcMain.on('tray:ready', () => {
+  if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
+})
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))

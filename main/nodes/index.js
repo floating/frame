@@ -209,7 +209,7 @@ class Nodes extends EventEmitter {
         res(result)
       })
     } else {
-      this.resError('Not connected to valid Ethereum connection', payload, res)
+      this.resError('Not connected to Ethereum network', payload, res)
     }
   }
 }

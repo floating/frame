@@ -68,6 +68,7 @@ Frame is an OS-level Ethereum interface that lets you use standalone signers, su
 ### Build Apps
   ```bash
   # Build apps for current platform
+  › npm run bundle
   › npm run build
   ```
 

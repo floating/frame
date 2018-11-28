@@ -14,7 +14,7 @@ class Signer extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
-    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0 }
+    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0, tPin: '' }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -24,11 +24,15 @@ class Signer extends React.Component {
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
   trezorPin (num) {
-    this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
-    if (this.tPin.length === 4) {
-      link.rpc('trezorPin', this.props.id, this.tPin, (err, status) => { if (err) throw new Error(err) })
-      this.tPin = ''
-    }
+    this.setState({ tPin: this.state.tPin + num.toString() })
+  }
+  submitPin () {
+    link.rpc('trezorPin', this.props.id, this.state.tPin, () => {})
+    this.setState({ tPin: '' })
+  }
+  backspacePin (e) {
+    e.stopPropagation()
+    this.setState({ tPin: this.state.tPin ? this.state.tPin.slice(0, -1) : '' })
   }
   select () {
     if (this.store('signer.current') === this.props.id) {
@@ -184,9 +188,29 @@ class Signer extends React.Component {
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
-          <div className='signerStatusNotOk'>
-            {status}
-          </div>
+          this.props.status === 'Need Pin' ? (
+            <div className='signerStatusNotOk'>
+              <div className='signerPinDisplay' style={!this.state.tPin ? { opacity: 0, height: '0px', paddingBottom: '0px' } : { opacity: 1, height: '13px', paddingBottom: '17px' }}>
+                {this.state.tPin.split('').map((n, i) => {
+                  return (
+                    <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
+                      {svg.octicon('primitive-dot', { height: 14 })}
+                    </div>
+                  )
+                })}
+              </div>
+              <div className={this.state.tPin ? 'signerPinMessage signerPinSubmit' : 'signerPinMessage'} onMouseDown={this.state.tPin ? () => this.submitPin() : null}>
+                {this.state.tPin ? 'Submit' : 'Enter Pin'}
+                <div className='signerPinDelete' onMouseDown={this.backspacePin.bind(this)}>
+                  {svg.octicon('arrow-left', { height: 24 })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className='signerStatusNotOk'>
+              {status}
+            </div>
+          )
         ) : (
           <div className='signerAccounts' style={{ width: '1500%', left: '-' + (currentIndex * 100) + '%' }}>
             {accounts.map((account, index) => {

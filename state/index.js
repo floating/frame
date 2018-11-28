@@ -56,7 +56,7 @@ let initial = {
   provider: {
     events: []
   },
-  extenal: {
+  external: {
     rates: {}
   },
   main: {

@@ -1,11 +1,11 @@
-import { ipcRenderer, webFrame } from 'electron'
-import state from '../../state'
+import { ipcRenderer } from 'electron'
+// import state from '../../state'
 import rpc from './rpc'
 
 const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
 // process.once('loaded', () => { global.setImmediate = _setImmediate })
-webFrame.executeJavaScript(`window.__initialState = ${JSON.stringify(state())}`)
+// webFrame.executeJavaScript(`window.__initialState = ${JSON.stringify(state())}`)
 
 const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
 const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v

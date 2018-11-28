@@ -78,7 +78,12 @@ class Trezor extends Signer {
   needPin (cb) {
     this.status = 'Need Pin'
     this.update()
-    this.setPin = cb
+    this.setPin = (err, pin) => {
+      this.status = 'loading'
+      this.update()
+      cb(err, pin)
+      setTimeout(() => this.deviceStatus(), 250)
+    }
   }
   normalize (hex) {
     if (hex == null) return ''
@@ -123,7 +128,7 @@ class Trezor extends Signer {
       })
       cb(null, '0x' + tx.serialize().toString('hex'))
     }).catch(err => {
-      cb(err)
+      cb(err.message)
     })
   }
 }
