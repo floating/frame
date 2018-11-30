@@ -14,9 +14,11 @@ let tray
 let hideShow = { current: false, running: false, next: false }
 
 let showOnReady = true
+let needReload = false
+let reloadTimeout, resetTimeout
 
 const api = {
-  create: (hide) => {
+  create: () => {
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
     windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
@@ -26,6 +28,9 @@ const api = {
     windows.tray.webContents.on('new-window', e => e.preventDefault()) // Prevent new windows
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
+    windows.tray.on('hide', () => {
+      if (needReload) api.reload()
+    })
     if (process.platform === 'linux') {
       const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => api.showTray() }, { label: 'Quit', click: () => api.quit() }])
       const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => api.hideTray() }, { label: 'Quit', click: () => api.quit() }])
@@ -33,7 +38,10 @@ const api = {
       const onHide = _ => tray.setContextMenu(menuShow)
       windows.tray.on('show', onShow)
       windows.tray.on('hide', onHide)
-      windows.tray.on('minimize', onHide)
+      windows.tray.on('minimize', () => {
+        onHide()
+        if (needReload) api.reload()
+      })
       windows.tray.hide = windows.tray.minimize
       windows.tray.on('restore', () => {
         api.showTray()
@@ -42,20 +50,27 @@ const api = {
     }
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
-    if (!hide) api.showTray()
-    setTimeout(() => api.reset(), 25 * 60 * 1000)
+    api.showTray()
+    resetTimeout = setTimeout(() => api.reset(), 30 * 60 * 1000)
+  },
+  reload: () => {
+    log.info('Tray Reset: Reloading')
+    needReload = false
+    clearTimeout(reloadTimeout)
+    clearTimeout(resetTimeout)
+    if (windows.tray && windows.tray.reload) windows.tray.reload()
+    resetTimeout = setTimeout(() => api.reset(), 30 * 60 * 1000)
   },
   reset: () => {
     log.info('Attempting Tray Reset...')
     showOnReady = false
     if (hideShow.current === 'showing' || windows.tray.isVisible()) {
-      log.info('Tray Reset: Window visiable/in-use, try again later')
-      setTimeout(() => api.reset(), 5 * 60 * 1000)
+      log.info('Tray Reset: Window visiable/in-use, try again on hide')
+      needReload = true
+      reloadTimeout = setTimeout(() => api.reload(), 60 * 60 * 1000) // When left open
     } else {
       log.info('Tray Reset: Window hidden, resetting')
-      windows.tray.destroy()
-      delete windows.tray
-      api.create(true)
+      api.reload()
     }
   },
   tray: () => {

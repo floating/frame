@@ -1,9 +1,12 @@
 const http = require('http')
 const log = require('electron-log')
+
 const provider = require('../provider')
-const trusted = require('./trusted')
 const signers = require('../signers')
 const store = require('../store')
+
+const trusted = require('./trusted')
+const validPayload = require('./validPayload')
 
 const polls = {}
 const pollSubs = {}
@@ -34,8 +37,8 @@ const handler = (req, res) => {
     req.on('data', chunk => body.push(chunk)).on('end', () => {
       res.on('error', err => console.error('res err', err))
       let origin = req.headers.origin || 'Unknown'
-      let payload = JSON.parse(Buffer.concat(body).toString())
-
+      let payload = validPayload(Buffer.concat(body).toString())
+      if (!payload) return
       log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
       if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: -1 }

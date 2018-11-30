@@ -7,6 +7,7 @@ const signers = require('../signers')
 const store = require('../store')
 
 const trusted = require('./trusted')
+const validPayload = require('./validPayload')
 const isFrameExtension = require('./isFrameExtension')
 
 const subs = {}
@@ -24,8 +25,8 @@ const handler = (socket, req) => {
   }
   socket.on('message', data => {
     let origin = socket.origin
-    let payload
-    try { payload = JSON.parse(data) } catch (e) { return log.info('Error parsing payload: ', data, e) }
+    let payload = validPayload(data)
+    if (!payload) return
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (payload.__frameOrigin) {
         origin = payload.__frameOrigin
