@@ -14,8 +14,8 @@ let tray
 let hideShow = { current: false, running: false, next: false }
 
 let showOnReady = true
-let needReset = false
-let hideTimeout
+let needReload = false
+let reloadTimeout, resetTimeout
 
 const api = {
   create: () => {
@@ -29,7 +29,7 @@ const api = {
     windows.tray.setMovable(false)
     windows.tray.positioner = new Positioner(windows.tray)
     windows.tray.on('hide', () => {
-      if (needReset) api.reset()
+      if (needReload) api.reload()
     })
     if (process.platform === 'linux') {
       const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => api.showTray() }, { label: 'Quit', click: () => api.quit() }])
@@ -38,7 +38,10 @@ const api = {
       const onHide = _ => tray.setContextMenu(menuShow)
       windows.tray.on('show', onShow)
       windows.tray.on('hide', onHide)
-      windows.tray.on('minimize', onHide)
+      windows.tray.on('minimize', () => {
+        onHide()
+        if (needReload) api.reload()
+      })
       windows.tray.hide = windows.tray.minimize
       windows.tray.on('restore', () => {
         api.showTray()
@@ -48,21 +51,23 @@ const api = {
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
     api.showTray()
-    setTimeout(() => api.reset(), 30 * 60 * 1000)
+    resetTimeout = setTimeout(() => api.reset(), 30 * 60 * 1000)
   },
   reload: () => {
-    needReset = false
-    clearTimeout(hideTimeout)
-    windows.tray.reload()
-    setTimeout(() => api.reset(), 30 * 60 * 1000)
+    log.info('Tray Reset: Reloading')
+    needReload = false
+    clearTimeout(reloadTimeout)
+    clearTimeout(resetTimeout)
+    if (windows.tray && windows.tray.reload) windows.tray.reload()
+    resetTimeout = setTimeout(() => api.reset(), 30 * 60 * 1000)
   },
   reset: () => {
     log.info('Attempting Tray Reset...')
     showOnReady = false
     if (hideShow.current === 'showing' || windows.tray.isVisible()) {
       log.info('Tray Reset: Window visiable/in-use, try again on hide')
-      needReset = true
-      hideTimeout = setTimeout(() => api.reload(), 30 * 60 * 1000)
+      needReload = true
+      reloadTimeout = setTimeout(() => api.reload(), 60 * 60 * 1000) // When left open
     } else {
       log.info('Tray Reset: Window hidden, resetting')
       api.reload()
