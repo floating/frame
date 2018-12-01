@@ -16,7 +16,7 @@ test('Deploy Contract', done => {
   }).catch(err => {
     console.log(err)
   })
-})
+}, 30 * 1000)
 
 test('Send Transaction', done => {
   web3.eth.getAccounts().then(accounts => {
@@ -31,7 +31,7 @@ test('Send Transaction', done => {
   }).catch(err => {
     console.log(err)
   })
-})
+}, 30 * 1000)
 
 test('Sign Personal and ecRecover', done => {
   let message = 'Frame Test'
@@ -50,4 +50,4 @@ test('Sign Personal and ecRecover', done => {
       console.log(err)
     })
   })
-})
+}, 30 * 1000)
