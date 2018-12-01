@@ -10,7 +10,7 @@ const signers = require('./signers')
 const windows = require('./windows')
 require('./rpc')
 
-const dev = process.env.NODE_ENV === 'development'
+// const dev = process.env.NODE_ENV === 'development'
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -102,7 +102,7 @@ store.observer(() => {
 
 store.observer(_ => persist.set('main', store('main')))
 
-if (!dev) { // Check for updates
+if (app.isPackaged) { // Check for updates
   autoUpdater.allowPrerelease = true
   setTimeout(() => {
     autoUpdater.on('error', err => log.error('Auto Update Error: ' + err.message))
