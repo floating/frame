@@ -90,7 +90,7 @@
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-0": "6.24.1",
-    "electron": "3.0.10",
+    "electron": "2.0.14",
     "electron-builder": "20.38.2",
     "ganache-cli": "6.2.3",
     "jest": "23.6.0",
