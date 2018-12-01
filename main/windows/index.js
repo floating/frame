@@ -51,7 +51,7 @@ const api = {
     if (dev) windows.tray.openDevTools()
     if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
     api.showTray()
-    resetTimeout = setTimeout(() => api.reset(), 30 * 60 * 1000)
+    resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
   reload: () => {
     log.info('Tray Reset: Reloading')
@@ -59,12 +59,12 @@ const api = {
     clearTimeout(reloadTimeout)
     clearTimeout(resetTimeout)
     if (windows.tray && windows.tray.reload) windows.tray.reload()
-    resetTimeout = setTimeout(() => api.reset(), 30 * 60 * 1000)
+    resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
   reset: () => {
     log.info('Attempting Tray Reset...')
     showOnReady = false
-    if (hideShow.current === 'showing' || windows.tray.isVisible()) {
+    if (hideShow.current === 'showing') {
       log.info('Tray Reset: Window visiable/in-use, try again on hide')
       needReload = true
       reloadTimeout = setTimeout(() => api.reload(), 60 * 60 * 1000) // When left open
