@@ -27,13 +27,10 @@ class Main extends React.Component {
                   <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>{'Need help getting started?'}</span>
                   <span className='featureBox'>
                     <span className='featureBoxText'>
-                      {`Frame Alpha Release`}
+                      {`FRAME ALPHA`}
                     </span>
                     <span className='featureBoxSubtext'>
-                      {`Not recommended for mainnet use`}
-                    </span>
-                    <span className='featureBoxSubtext'>
-                      {`mainnet release coming soon`}
+                      {'v' + require('../../../../package.json').version}
                     </span>
                   </span>
                 </div>
