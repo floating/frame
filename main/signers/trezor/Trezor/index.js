@@ -23,7 +23,7 @@ class Trezor extends Signer {
     device.on('pin', (type, cb) => this.needPin(cb))
     device.on('disconnect', () => this.close())
     this.open()
-    store.observer(() => {
+    this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.network = store('main.connection.network')
         this.status = 'loading'
@@ -32,6 +32,10 @@ class Trezor extends Signer {
         if (this.network) this.deviceStatus()
       }
     })
+  }
+  close () {
+    this.networkObserver.remove()
+    super.close()
   }
   button (label) {
     log.info(`Trezor button "${label}" was pressed`)

@@ -23,7 +23,7 @@ class Ledger extends Signer {
     this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.deviceStatus()
-    store.observer(() => {
+    this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.reset()
         this.deviceStatus()
@@ -61,6 +61,7 @@ class Ledger extends Signer {
     if (this._deviceStatus) clearTimeout(this._deviceStatus)
     if (this._signPersonal) clearTimeout(this._signPersonal)
     if (this._signTransaction) clearTimeout(this._signTransaction)
+    this.networkObserver.remove()
     super.close()
   }
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
