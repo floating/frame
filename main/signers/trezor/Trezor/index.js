@@ -4,6 +4,7 @@ const bip32Path = require('bip32-path')
 const EthereumTx = require('ethereumjs-tx')
 const store = require('../../../store')
 const Signer = require('../../Signer')
+const windows = require('../../../windows')
 
 class Trezor extends Signer {
   constructor (device, debug) {
@@ -39,6 +40,28 @@ class Trezor extends Signer {
   }
   button (label) {
     log.info(`Trezor button "${label}" was pressed`)
+  }
+  getDeviceAddress (i, cb) {
+    this.device.run(session => {
+      return session.ethereumGetAddress(bip32Path.fromString(this.getPath(i)).toPathArray(), true)
+    }).then(result => {
+      cb(null, '0x' + result.message.address)
+    }).catch(err => {
+      cb(err)
+    })
+  }
+  setIndex (i, cb) {
+    this.getDeviceAddress(i, (err, address) => {
+      if (err) return cb(err)
+      if (address.toLowerCase() === this.accounts[i].toLowerCase()) {
+        this.index = i
+        this.requests = {} // TODO Decline these requests before clobbering them
+        windows.broadcast('main:action', 'updateSigner', this.summary())
+        cb(null, this.summary())
+      } else {
+        cb(new Error('Selected address does not match device'))
+      }
+    })
   }
   lookupAccounts (cb) {
     this.device.waitForSessionAndRun(session => {

@@ -32,10 +32,13 @@ const api = {
     cb(null, signerSummary)
   },
   setSigner: (id, cb) => {
-    current = id
-    let summary = signers[current].summary()
-    cb(null, summary)
-    windows.broadcast('main:action', 'setSigner', summary)
+    signers[id].setIndex(signers[id].index, err => {
+      if (err) return cb(err)
+      current = id
+      let summary = signers[current].summary()
+      cb(null, summary)
+      windows.broadcast('main:action', 'setSigner', summary)
+    })
   },
   unsetSigner: (cb) => {
     let s = signers[current]
