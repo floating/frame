@@ -2,21 +2,17 @@ const { app, ipcMain, protocol, shell, dialog } = require('electron')
 const PersistStore = require('electron-store')
 const log = require('electron-log')
 const path = require('path')
-const { autoUpdater } = require('electron-updater')
 
 const store = require('./store')
 const launch = require('./launch')
 const signers = require('./signers')
 const windows = require('./windows')
+const updater = require('./updater')
 require('./rpc')
-
-const dev = process.env.NODE_ENV === 'development'
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
-
-let updatePending = false
 
 process.on('uncaughtException', (e) => {
   if (e.code === 'EADDRINUSE') {
@@ -41,9 +37,13 @@ global.eval = () => { throw new Error(`This app does not support global.eval()`)
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
-  if (updatePending) return autoUpdater.quitAndInstall(true, true)
+  if (updater.updatePending) return updater.quitAndInstall(true, true)
   app.relaunch()
   app.exit(0)
+})
+
+ipcMain.on('tray:installAvailableUpdate', install => {
+  updater.installAvailableUpdate(install)
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
@@ -62,7 +62,7 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
 ipcMain.on('tray:ready', () => require('./api'))
 
 ipcMain.on('tray:updateRestart', () => {
-  autoUpdater.quitAndInstall(true, true)
+  updater.quitAndInstall(true, true)
 })
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
@@ -101,18 +101,3 @@ store.observer(() => {
 })
 
 store.observer(_ => persist.set('main', store('main')))
-
-if (!dev) { // Check for updates
-  autoUpdater.allowPrerelease = true
-  setTimeout(() => {
-    autoUpdater.on('error', err => log.error('Auto Update Error: ' + err.message))
-    autoUpdater.on('update-downloaded', res => {
-      if (!updatePending) windows.broadcast('main:action', 'updateAvailable', res)
-      updatePending = true
-    })
-    autoUpdater.checkForUpdates()
-    setInterval(() => {
-      autoUpdater.checkForUpdates()
-    }, 30 * 60 * 1000)
-  }, 10 * 1000)
-}

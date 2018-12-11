@@ -6,9 +6,6 @@
   "build": {
     "appId": "sh.frame.app",
     "productName": "Frame",
-    "dmg": {
-      "title": "Frame"
-    },
     "linux": {
       "target": [
         "AppImage",

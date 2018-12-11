@@ -41,6 +41,21 @@ class Ledger extends Signer {
     this.index = 0
     this.update()
   }
+  getCurrentAddress (cb) {
+    try {
+      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
+      let eth = new Eth(transport)
+      eth.getAddress(this.getPath(), false, true).then(result => {
+        transport.close()
+        cb(null, result)
+      }).catch(err => {
+        transport.close()
+        cb(err)
+      })
+    } catch (err) {
+      cb(err)
+    }
+  }
   lookupAccounts (cb) {
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))

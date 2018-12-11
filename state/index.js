@@ -22,7 +22,7 @@ let initial = {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, notify: '', updateAvailable: false },
+  view: { current: '', list: [], data: {}, notify: '', badge: '' },
   signers: {},
   tray: {
     open: false
