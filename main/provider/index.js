@@ -166,6 +166,9 @@ class Provider extends EventEmitter {
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
+      let from = rawTx.from
+      let current = signers.getAccounts()[0]
+      if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       let handlerId = uuid()
       this.handlers[handlerId] = res
       signers.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)
