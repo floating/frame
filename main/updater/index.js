@@ -32,9 +32,9 @@ autoUpdater.on('error', err => {
   updater.checkManualUpdate()
 })
 
-autoUpdater.on('update-available', () => { //  Ask if they want to download it
+autoUpdater.on('update-available', (r) => { //  Ask if they want to download it
   log.info(' > autoUpdated found that an update is available...')
-  updater.updateAvailable('auto')
+  updater.updateAvailable(r.version, 'auto')
 })
 
 autoUpdater.on('update-not-available', () => {
@@ -50,9 +50,10 @@ autoUpdater.on('update-downloaded', res => {
 const updater = {
   updatePending: false,
   availableUpdate: '',
-  updateAvailable: location => { // An update is available
+  updateAvailable: (version, location) => { // An update is available
     this.availableUpdate = location
-    windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
+    if (!updater.notified[version]) windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
+    updater.notified[version] = true
   },
   updateReady: () => { // An update is ready
     windows.broadcast('main:action', 'updateBadge', 'updateReady')
@@ -81,10 +82,9 @@ const updater = {
           let releases = JSON.parse(rawData)
           if (!updater.notified[releases[0].tag_name]) {
             log.info(' > User has not been notified of this version yet')
-            if (compareVersions(releases[0].tag_name, version) === -1) {
+            if (compareVersions(releases[0].tag_name, version) === 1) {
               log.info(' > Current release is behind latest, notify user!')
-              updater.updateAvailable(releases[0].html_url)
-              updater.notified[releases[0].tag_name] = true
+              updater.updateAvailable(releases[0].tag_name, releases[0].html_url)
             }
           }
         } catch (err) { checkErr(err) }
@@ -97,7 +97,7 @@ if (!dev) {
   setTimeout(() => {
     autoUpdater.checkForUpdates()
     setInterval(() => autoUpdater.checkForUpdates(), 30 * 1000)
-  }, 5 * 1000)
+  }, 2000)
 }
 
 module.exports = updater

@@ -12,10 +12,10 @@ class Bridge extends React.Component {
           </div>
           <div className='badgeInput'>
             <div className='badgeInputButton'>
-              <div className='badgeInputButtonInner' onMouseDown={() => link.send('tray:updateRestart', false)}>{'Ok'}</div>
+              <div className='badgeInputButtonInner' onMouseDown={() => this.store.updateBadge()}>{'Ok'}</div>
             </div>
             <div className='badgeInputButton'>
-              <div className='badgeInputButtonInner' onMouseDown={() => link.send('tray:updateRestart', true)}>{'Restart'}</div>
+              <div className='badgeInputButtonInner' onMouseDown={() => link.send('tray:updateRestart')}>{'Restart'}</div>
             </div>
           </div>
         </div>

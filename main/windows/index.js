@@ -92,7 +92,7 @@ const api = {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
       setTimeout(() => {
-        windows.tray.hide()
+        if (windows && windows.tray && windows.tray.hide) windows.tray.hide()
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
