@@ -24,6 +24,7 @@ class Provider extends EventEmitter {
     this.getNonce = this.getNonce.bind(this)
     this.fillTx = this.fillTx.bind(this)
     this.subs = { accountsChanged: [], networkChanged: [] }
+    signers.setProvider(this)
   }
   accountsChanged (accounts) {
     this.subs.accountsChanged.forEach(subscription => {
