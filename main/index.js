@@ -42,8 +42,8 @@ ipcMain.on('tray:resetAllSettings', () => {
   app.exit(0)
 })
 
-ipcMain.on('tray:installAvailableUpdate', () => {
-  updater.installAvailableUpdate()
+ipcMain.on('tray:installAvailableUpdate', (e, install) => {
+  updater.installAvailableUpdate(install)
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
