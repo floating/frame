@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import link from '../../../../../link'
+import svg from '../../../../../svg'
 
 class Settings extends React.Component {
   render () {
@@ -10,6 +11,19 @@ class Settings extends React.Component {
     let permissions = this.store('main.accounts', account, 'permissions') || {}
     return (
       <div className={this.store('signer.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
+        <div className='signerMidMenu'>
+          <div className='signerMenuItems'>
+            <div className='signerMenuItem'>
+              {svg.octicon('link', { height: 20 })}
+            </div>
+            <div className='signerMenuItem'>
+              {svg.octicon('checklist', { height: 20 })}
+            </div>
+          </div>
+          <div className='signerMenuSelect'>
+            <div className='signerMenuSelectMarker' style={{ left: '0px' }} />
+          </div>
+        </div>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
         {Object.keys(permissions).length === 0 ? (
           <div className='signerPermission'>

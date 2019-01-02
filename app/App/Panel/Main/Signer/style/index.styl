@@ -259,6 +259,7 @@
         transition standard, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
         -webkit-app-region no-drag
         box-shadow 0px 2px 2px rgba(5, 5, 45, 0.4)
+        z-index 2000
 
         .signerInset
           position absolute
@@ -352,6 +353,13 @@
           .signerPinDelete
             left 0px
 
+      // .signerSettingsMenu
+      //   height 40px
+      //   // background blue
+      //   border-top 1px solid red
+      //   width 100%
+      //   display flex
+      //   justify-content center
 
     .signerAccounts
       position relative
@@ -452,19 +460,18 @@
             font-weight 600
 
     .addressSelect
-      height 0px
-      width 100%
+      height 31px
       display flex
       justify-content center
       border-radius 6px
-      position relative
-      top -25px
       transition standard
-      opacity 0
+      position absolute
+      bottom 0
+      transform translateY(-20px)
       pointer-events none
+      z-index 200
 
       .addressSelectButton
-        // background highlighter
         width 30px
         min-width 30px
         height 30px
@@ -480,113 +487,129 @@
         // background highlightest
         color outerspace
 
-  .accountList
+  .accountListWrap
     position absolute
-    top 0
+    top 100px
     left 0
     right 0
-    height 0
-    padding 0px 0px 0px 0px
+    height 0px
+    background lowlight
+    // height 40px
+    z-index 3015
+    transition standardSlow
     border-bottom-left-radius 6px
     border-bottom-right-radius 6px
-    transition standardSlower
-    display flex
-    justify-content flex-end
-    align-items flex-end
-    flex-direction column
-    z-index 3018
-    background lowlight
     overflow hidden
-    box-shadow 0px 2px 3px thick0, 0px 19px 9px -14px thick0 !important
+    box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
 
-    .accountListItems
-      background lowlight
-      height 280px
-      min-height 280px
-      width 100%
-      display flex
-      justify-content flex-start
-      align-items center
-      flex-direction column
-      position relative
-      z-index 3
+    .accountList
+      position absolute
+      left 0
+      right 0
+      height 0
+      bottom 0
+      height 330px
 
-      .accountListItem
+      // display flex
+      // justify-content flex-end
+      // align-items flex-end
+      // flex-direction column
+      z-index 3018
+      overflow hidden
+      // box-shadow 0px 2px 3px thick0, 0px 19px 9px -14px thick0 !important
+
+      padding 15px 0px 10px 0px
+      // transform translateY(0px)
+      // background blue
+
+      .accountListItems
         background lowlight
-        width calc(100% - 40px)
-        height 55px
-        min-height 55px
-        border-bottom 1px solid thin
+        height 280px
+        min-height 280px
+        width 100%
         display flex
-        justify-content space-between
+        justify-content flex-start
         align-items center
-        padding 0px 20px 0px 20px
-        font-family FiraCode, sans-serif
-        color outerspace08
+        flex-direction column
         position relative
-        z-index 4
+        z-index 3
 
-        .accountListItemCheck
-          color outerspace01
-          margin-bottom 3px
+        .accountListItem
+          background lowlight
+          width calc(100% - 40px)
+          height 55px
+          min-height 55px
+          border-bottom 1px solid thin
+          display flex
+          justify-content space-between
+          align-items center
+          padding 0px 20px 0px 20px
+          font-family FiraCode, sans-serif
+          color outerspace08
+          position relative
+          z-index 4
 
-        .accountListItemAddress
-          svg
-            margin 0px 4px 0px 4px
+          .accountListItemCheck
+            color outerspace01
+            margin-bottom 3px
 
-      .accountListItem:last-child
-        border-bottom none
+          .accountListItemAddress
+            svg
+              margin 0px 4px 0px 4px
 
-      .accountListItemSelected
-        background light
-        color outerspace
-        border-radius 6px
-        border-bottom 1px solid thick0
-        box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
-        position relative
-        z-index 10
-        .accountListItemCheck
+        .accountListItem:last-child
+          border-bottom none
+
+        .accountListItemSelected
+          background light
           color outerspace
+          border-radius 6px
+          border-bottom 1px solid thick0
+          box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
+          position relative
+          z-index 10
+          .accountListItemCheck
+            color outerspace
 
-    .accountPageToggle
-      padding-top 20px
-      height 20px
-      min-height 20px
-      padding-bottom 10px
-      width 100%
-      display flex
-      justify-content center
-      align-items center
-      font-family FiraCode, sans-serif
-      position relative
-      z-index 2
-
-      .accountPageCurrent
-        border-radius 3px
-        height 27px
-        width 27px
+      .accountPageToggle
+        padding-top 20px
+        height 20px
+        min-height 20px
+        padding-bottom 10px
+        width 100%
         display flex
         justify-content center
         align-items center
-        font-size 18px
+        font-family FiraCode, sans-serif
+        position relative
+        z-index 2
 
-      .accountPageButton
-        border-radius 3px
-        height 27px
-        width 27px
-        display flex
-        justify-content center
-        align-items center
-        box-sizing border-box
+        .accountPageCurrent
+          border-radius 3px
+          height 27px
+          width 27px
+          display flex
+          justify-content center
+          align-items center
+          font-size 18px
 
-      .accountPageButtonLeft
-        padding-right 1px
+        .accountPageButton
+          border-radius 3px
+          height 27px
+          width 27px
+          display flex
+          justify-content center
+          align-items center
+          box-sizing border-box
 
-      .accountPageButtonRight
-        padding-left 1px
+        .accountPageButtonLeft
+          padding-right 1px
 
-      .accountPageButton:hover
-        background highlight
+        .accountPageButtonRight
+          padding-left 1px
+
+        .accountPageButton:hover
+          background highlight
 
   .signerMid
     position absolute
@@ -607,6 +630,45 @@
     > div
       transition standard
       opacity 0
+
+    .signerMidMenu
+      background thin
+      height 40px
+      display flex
+      flex-direction column
+      justify-content center
+      align-items center
+
+      .signerMenuItems
+        // background blue
+        height 25px
+        display flex
+        justify-content center
+        align-items center
+        margin-top 5px
+
+        .signerMenuItem
+          height 30px
+          width 40px
+          // background yellow
+          display flex
+          justify-content center
+          align-items center
+
+      .signerMenuSelect
+        height 10px
+        width 80px
+        position relative
+        // background orange
+
+        .signerMenuSelectMarker
+          position absolute
+          left 0px
+          height 2px
+          width 20px
+          // margin 0px 4px
+          margin 0px 10px
+          background black
 
     .signerNode
       display flex
@@ -773,6 +835,8 @@
         .signerInner
           left 25px
           right 25px
+        .signerTypeSettings
+          transform translateY(-30px)
 
 .openSigner
   padding 0px 5px 5px 5px
@@ -805,17 +869,13 @@
 .signerInSettings
   .signerTop
     .addressSelect
-      height 30px
-      position relative
-      top -10px
-      opacity 1
+      transform translateY(0px)
       pointer-events auto
 
 .signerAccountExpand
-  .accountList
-    box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
-    height 330px
-    padding 12px 0px 10px 0px
+  .accountListWrap
+    height 455px
+
 
 @import '../Settings/style'
 @import '../Requests/style'

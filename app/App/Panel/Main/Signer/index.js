@@ -91,10 +91,11 @@ class Signer extends React.Component {
     let innerClass = 'signerInner'
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
+    if (this.store('signer.view') === 'settings') innerClass += ' signerTypeSettings'
     return (
-      <div className='signerType' onMouseDown={::this.typeClick}>
+      <div className='signerType'>
         {this.renderArrows('up')}
-        <div className={innerClass}>
+        <div className={innerClass} onMouseDown={::this.typeClick}>
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
@@ -104,6 +105,14 @@ class Signer extends React.Component {
               })()}
             </div>
             <div className='signerText'>{this.props.type}</div>
+          </div>
+        </div>
+        <div className='addressSelect' onMouseDown={e => {
+          e.stopPropagation()
+          this.store.toggleShowAccounts()
+        }}>
+          <div className='addressSelectButton'>
+            {svg.octicon('key', { height: 18 })}
           </div>
         </div>
       </div>
@@ -150,24 +159,26 @@ class Signer extends React.Component {
     let startIndex = this.state.accountPage * 5
     let highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
     return (
-      <div className='accountList' onMouseDown={e => e.stopPropagation()}>
-        <div className='accountListItems'>
-          {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
-            i = startIndex + i
-            let balance = this.store('balances', a)
-            return (
-              <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
-                <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
-                <div className='accountListItemAddress'>{a.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 4)}</div>
-                <div className='accountListItemBalance'>{'Ξ ' + (balance === undefined ? '-.----' : parseFloat(balance).toFixed(4))}</div>
-              </div>
-            )
-          })}
-        </div>
-        <div className='accountPageToggle'>
-          <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>{svg.octicon('chevron-left', { height: 18 })}</div>
-          <div className='accountPageCurrent'>{this.state.accountPage + 1}</div>
-          <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
+      <div className='accountListWrap'>
+        <div className='accountList' onMouseDown={e => e.stopPropagation()}>
+          <div className='accountListItems'>
+            {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
+              i = startIndex + i
+              let balance = this.store('balances', a)
+              return (
+                <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
+                  <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
+                  <div className='accountListItemAddress'>{a.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 16 })}{a.substr(a.length - 4)}</div>
+                  <div className='accountListItemBalance'>{'Ξ ' + (balance === undefined ? '-.----' : parseFloat(balance).toFixed(4))}</div>
+                </div>
+              )
+            })}
+          </div>
+          <div className='accountPageToggle'>
+            <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>{svg.octicon('chevron-left', { height: 18 })}</div>
+            <div className='accountPageCurrent'>{this.state.accountPage + 1}</div>
+            <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
+          </div>
         </div>
       </div>
     )
@@ -243,14 +254,6 @@ class Signer extends React.Component {
             })}
           </div>
         )}
-        <div className='addressSelect' onMouseDown={e => {
-          e.stopPropagation()
-          this.store.toggleShowAccounts()
-        }}>
-          <div className='addressSelectButton'>
-            {svg.octicon('key', { height: 18 })}
-          </div>
-        </div>
       </div>
     )
   }
@@ -301,10 +304,10 @@ class Signer extends React.Component {
               {this.renderStatus()}
               {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
-            <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '230px' : '200px' } : { pointerEvents: 'none' }}>
+            {this.renderAccountList()}
+            <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '200px' : '200px' } : { pointerEvents: 'none' }}>
               <Settings id={this.props.id} />
               <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
-              {this.renderAccountList()}
             </div>
             <div className='signerBot' />
           </div>
