@@ -20,7 +20,7 @@ let reloadTimeout, resetTimeout
 const api = {
   create: () => {
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
-    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: false, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
+    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -49,7 +49,7 @@ const api = {
       })
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 0)
+    if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 40)
 
     setTimeout(() => api.showTray(), 420)
     resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
@@ -97,7 +97,7 @@ const api = {
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 0)
+      }, 40)
     }
   },
   showTray: () => {
@@ -125,7 +125,7 @@ const api = {
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 0)
+      }, 40)
     }
   },
   close: (e) => {
