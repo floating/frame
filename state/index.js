@@ -33,6 +33,10 @@ let initial = {
     open: false,
     current: '',
     view: 'default',
+    settings: {
+      viewIndex: 0,
+      views: ['permissions', 'verify']
+    },
     accounts: [],
     showAccounts: false,
     position: {

@@ -12,6 +12,8 @@ export const setSigner = (u, signer) => {
   }, 50)
 }
 
+export const setSettingsView = (u, index) => u('signer.settings.viewIndex', () => index)
+
 export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)

@@ -112,7 +112,9 @@ class Signer extends React.Component {
           this.store.toggleShowAccounts()
         }}>
           <div className='addressSelectButton'>
-            {svg.octicon('key', { height: 18 })}
+            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
+            <div className='addressSelectText'>{'Accounts'}</div>
+            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
           </div>
         </div>
       </div>
@@ -154,6 +156,29 @@ class Signer extends React.Component {
       if (err) return console.log(err)
     })
   }
+  renderSettingsMenu () {
+    let viewIndex = this.store('signer.settings.viewIndex')
+    let views = this.store('signer.settings.views')
+    let markLeft = (38 * viewIndex) + 'px'
+    let markRight = (((views.length - viewIndex) - 1) * 38) + 'px'
+    return (
+      <div className='settingsMenu'>
+        <div className='settingsMenuItems'>
+          <div className='settingsMenuItem' onMouseDown={() => this.store.setSettingsView(0)}>
+            <div className='settingsMenuItemIcon' style={{ left: '2px', top: '2px' }}>{svg.octicon('key', { height: 19 })}</div>
+          </div>
+          <div className='settingsMenuItem' onMouseDown={() => this.store.setSettingsView(1)}>
+            <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
+          </div>
+        </div>
+        <div className='settingsMenuSelect'>
+          <div className='settingsMenuMark' style={{ left: markLeft, right: markRight }}>
+            <div className='settingsMenuMarkLine' />
+          </div>
+        </div>
+      </div>
+    )
+  }
   renderAccountList () {
     let index = this.store('signers', this.props.id, 'index')
     let startIndex = this.state.accountPage * 5
@@ -179,6 +204,7 @@ class Signer extends React.Component {
             <div className='accountPageCurrent'>{this.state.accountPage + 1}</div>
             <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
           </div>
+          {this.renderSettingsMenu()}
         </div>
       </div>
     )
