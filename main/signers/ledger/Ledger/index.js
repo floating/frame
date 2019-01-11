@@ -46,7 +46,7 @@ class Ledger extends Signer {
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
-      eth.getAddress(this.getPath(i), true, true).then(result => {
+      eth.getAddress(this.getPath(i), false, true).then(result => {
         transport.close()
         cb(null, result.address)
       }).catch(err => {
@@ -55,6 +55,21 @@ class Ledger extends Signer {
       })
     } catch (err) {
       cb(err)
+    }
+  }
+  verifyAddress () {
+    try {
+      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
+      let eth = new Eth(transport)
+      eth.getAddress(this.getPath(this.index), true, true).then(result => {
+        transport.close()
+        // cb(null, result.address)
+      }).catch(() => {
+        transport.close()
+        // cb(err)
+      })
+    } catch (err) {
+      // cb(err)
     }
   }
   setIndex (i, cb) {
