@@ -499,48 +499,36 @@
           will-change transform
           svg
             transition standardSlow
-            // transform translateZ(0)
-
-
-      // .addressSelectButton:hover
-      //   // background highlightest
-      //   color outerspace
 
   .accountListWrap
     position absolute
     top 100px
     left 0
     right 0
+    // height 0px
     height 0px
     background lowlight
     // height 40px
     z-index 3015
-    transition standardSlow
+    transition standardFast
     border-bottom-left-radius 6px
     border-bottom-right-radius 6px
     overflow hidden
     box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
+    transform translateZ(0)
 
     .accountList
       position absolute
       left 0
       right 0
-      // height 0
       bottom 0
       height 330px
-      // display flex
-      // justify-content flex-end
-      // align-items flex-end
-      // flex-direction column
       z-index 3018
       overflow hidden
-      // box-shadow 0px 2px 3px thick0, 0px 19px 9px -14px thick0 !important
       padding 15px 0px 10px 0px
-      // transform translateY(0px)
-      // background blue
 
       .settingsMenu
-        background linear-gradient(lowlight, highlightest)
+        background linear-gradient(lowlight, highlight)
         display flex
         justify-content center
         flex-direction column
@@ -958,6 +946,9 @@
   .signerSelectDown.signerSelectLeft
     left 0
 
+  .accountListWrap
+    height 100px
+
 .signerInSettings
   .signerTop
     .addressSelect
@@ -976,6 +967,7 @@
     svg
       transform rotate(180deg)
   .accountListWrap
+    transition standardSlow
     height 455px
     .accountList
       .accountListItems
