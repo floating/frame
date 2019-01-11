@@ -173,7 +173,8 @@
         height 90px
         margin-left -55px
         // background linear-gradient(lowlight, lowlight)
-        background lowerlight
+        background linear-gradient(lowlight, highlightest)
+        box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
         border-bottom-left-radius 6px
         border-bottom-right-radius 6px
         transition standard
@@ -471,7 +472,7 @@
       bottom 0
       transform translateY(-20px)
       pointer-events none
-      z-index 200
+      z-index 20000000
 
       .addressSelectButton
         width 100%
@@ -539,7 +540,7 @@
       // background blue
 
       .settingsMenu
-        background linear-gradient(lowlight, light)
+        background linear-gradient(lowlight, highlightest)
         display flex
         justify-content center
         flex-direction column
@@ -555,12 +556,12 @@
         .settingsMenuSelect
           // background red
           position relative
-          height 10px
-          width 80px
+          height 12px
+          width 70px
           box-sizing border-box
           // border 1px solid green
           .settingsMenuMark
-            height 10px
+            height 12px
             position absolute
             // background blue
             transition standard
@@ -569,14 +570,14 @@
               background outerspace
               height 2px
               top 0px
-              left 8px
-              right 8px
+              left 7px
+              right 7px
               border-radius 1px
         .settingsMenuItems
           // background red
           box-sizing border-box
-          height 40px
-          width 80px
+          height 33px
+          width 70px
           // border 1px solid red
           display flex
           .settingsMenuItem
@@ -585,8 +586,9 @@
             z-index 1230
             // background light
             // border 1px solid lightShade
-            width 40px
-            height 40px
+            width 35px
+            height 33px
+            color outerspace08
             // margin 0px 4px 0px 4px
             // border-radius 4px
             // margin-bottom 4px
@@ -595,11 +597,13 @@
             .settingsMenuItemIcon
               top 0
               right 0
-              bottom 10px
+              bottom 0px
               left 0
               position absolute
               z-index 1234
-              padding 12px 10px
+              padding 10px 10px
+          .settingsMenuItemSelected, .settingsMenuItem:hover
+            color outerspace
 
 
       .accountListItems

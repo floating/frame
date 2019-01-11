@@ -50,6 +50,16 @@ class Trezor extends Signer {
       cb(err)
     })
   }
+  verifyAddress () {
+    this.device.run(session => {
+      return session.ethereumGetAddress(bip32Path.fromString(this.getPath(this.index)).toPathArray(), true)
+    })
+    // .then(result => {
+    //   // cb(null, '0x' + result.message.address)
+    // }).catch(err => {
+    //   // cb(err)
+    // })
+  }
   setIndex (i, cb) {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them

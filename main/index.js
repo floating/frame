@@ -46,6 +46,10 @@ ipcMain.on('tray:installAvailableUpdate', (e, install) => {
   updater.installAvailableUpdate(install)
 })
 
+ipcMain.on('tray:verifyAddress', (e) => {
+  signers.verifyAddress()
+})
+
 ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })

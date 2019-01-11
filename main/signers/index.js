@@ -53,6 +53,9 @@ const api = {
       }
     })
   },
+  verifyAddress: (cb) => {
+    if (signers[current] && signers[current].verifyAddress) signers[current].verifyAddress()
+  },
   getSelectedAccounts: () => {
     return signers[current] ? signers[current].getSelectedAccounts() : []
   },

@@ -159,15 +159,16 @@ class Signer extends React.Component {
   renderSettingsMenu () {
     let viewIndex = this.store('signer.settings.viewIndex')
     let views = this.store('signer.settings.views')
-    let markLeft = (38 * viewIndex) + 'px'
-    let markRight = (((views.length - viewIndex) - 1) * 38) + 'px'
+    let itemWidth = 35
+    let markLeft = (itemWidth * viewIndex) + 'px'
+    let markRight = (((views.length - viewIndex) - 1) * itemWidth) + 'px'
     return (
       <div className='settingsMenu'>
         <div className='settingsMenuItems'>
-          <div className='settingsMenuItem' onMouseDown={() => this.store.setSettingsView(0)}>
-            <div className='settingsMenuItemIcon' style={{ left: '2px', top: '2px' }}>{svg.octicon('key', { height: 19 })}</div>
+          <div className={viewIndex === 0 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(0)}>
+            <div className='settingsMenuItemIcon' style={{ left: '2px', top: '2px' }}>{svg.octicon('key', { height: 18 })}</div>
           </div>
-          <div className='settingsMenuItem' onMouseDown={() => this.store.setSettingsView(1)}>
+          <div className={viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(1)}>
             <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
           </div>
         </div>
