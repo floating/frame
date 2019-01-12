@@ -30,7 +30,8 @@ const externalWhitelist = [
   'https://frame.sh',
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
   'https://github.com/floating/frame/issues/new',
-  'https://gitter.im/framehq/general'
+  'https://gitter.im/framehq/general',
+  'https://github.com/floating/frame/blob/master/LICENSE'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line

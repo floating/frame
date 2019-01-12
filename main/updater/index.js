@@ -2,22 +2,17 @@ const { shell } = require('electron')
 const { autoUpdater } = require('electron-updater')
 const https = require('https')
 const log = require('electron-log')
+const semver = require('semver')
 const version = require('../../package.json').version
 const windows = require('../windows')
+
+log.transports.file.level = 'info'
 
 const dev = process.env.NODE_ENV === 'development'
 
 const compareVersions = (a, b) => {
-  var pa = a.split('.')
-  var pb = b.split('.')
-  for (var i = 0; i < 3; i++) {
-    var na = Number(pa[i])
-    var nb = Number(pb[i])
-    if (na > nb) return 1
-    if (nb > na) return -1
-    if (!isNaN(na) && isNaN(nb)) return 1
-    if (isNaN(na) && !isNaN(nb)) return -1
-  }
+  if (semver.gt(a, b)) return 1
+  if (semver.lt(a, b)) return -1
   return 0
 }
 
@@ -28,6 +23,7 @@ autoUpdater.allowPrerelease = true
 autoUpdater.autoDownload = false
 
 autoUpdater.on('error', err => {
+  // TODO: Error Notification
   log.error(' > Auto Update Error: ' + err.message)
   updater.checkManualUpdate()
 })
@@ -82,6 +78,10 @@ const updater = {
           let releases = JSON.parse(rawData)
           if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
             log.info('Updater: User has not been notified of this version yet')
+            let newVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substr(1) : releases[0].tag_name
+            log.info('new: ' + newVersion)
+            log.info('current: ' + version)
+            log.info('compare? new newer? ' + (compareVersions(newVersion, version) === 1))
             if (compareVersions(releases[0].tag_name, version) === 1) {
               log.info('Updater: Current version is behind latest, notify user')
               updater.updateAvailable(releases[0].tag_name, releases[0].html_url)

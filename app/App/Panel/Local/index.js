@@ -190,6 +190,7 @@ class Settings extends React.Component {
         </div>
         {this.appInfo()}
         {this.quit()}
+        <div className='viewLicense' onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')}>{'View License'}</div>
       </div>
     )
   }

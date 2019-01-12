@@ -71,6 +71,7 @@ class Ledger extends Signer {
         let address = result.address.toLowerCase()
         let current = this.accounts[this.index].toLowerCase()
         if (address !== current) {
+          // TODO: Error Notification
           log.error(new Error('Address does not match device'))
           this.api.unsetSigner()
         } else {
@@ -78,6 +79,7 @@ class Ledger extends Signer {
         }
         verifyActive = false
       }).catch(err => {
+        // TODO: Error Notification
         log.error('Verify Address Error')
         log.error(err)
         transport.close()
@@ -85,6 +87,7 @@ class Ledger extends Signer {
         verifyActive = false
       })
     } catch (err) {
+      // TODO: Error Notification
       log.error('Verify Address Error')
       log.error(err)
       this.api.unsetSigner()

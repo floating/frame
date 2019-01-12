@@ -121,7 +121,7 @@ const api = {
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
-        windows.tray.focus()
+        if (windows && windows.tray && windows.tray.focus) windows.tray.focus()
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false

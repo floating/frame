@@ -57,12 +57,14 @@ class Trezor extends Signer {
       let address = '0x' + result.message.address.toLowerCase()
       let current = this.accounts[this.index].toLowerCase()
       if (address !== current) {
+        // TODO: Error Notification
         log.error(new Error('Address does not match device'))
         this.api.unsetSigner()
       } else {
         log.info('Address matches device')
       }
     }).catch((err) => {
+      // TODO: Error Notification
       log.error(err)
       this.api.unsetSigner()
     })
