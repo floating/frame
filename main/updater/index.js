@@ -80,7 +80,7 @@ const updater = {
       res.on('end', () => {
         try {
           let releases = JSON.parse(rawData)
-          if (!updater.notified[releases[0].tag_name]) {
+          if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
             log.info('Updater: User has not been notified of this version yet')
             if (compareVersions(releases[0].tag_name, version) === 1) {
               log.info('Updater: Current version is behind latest, notify user')
@@ -97,12 +97,12 @@ if (!dev) {
   if (process.platform === 'darwin' || process.platform === 'win32') {
     setTimeout(() => {
       autoUpdater.checkForUpdates()
-      setInterval(() => autoUpdater.checkForUpdates(), 30 * 1000)
+      setInterval(() => autoUpdater.checkForUpdates(), 60 * 1000)
     }, 2000)
   } else {
     setTimeout(() => {
       updater.checkManualUpdate()
-      setInterval(() => updater.checkManualUpdate(), 30 * 1000)
+      setInterval(() => updater.checkManualUpdate(), 60 * 1000)
     }, 2000)
   }
 }
