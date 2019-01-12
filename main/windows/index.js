@@ -20,7 +20,7 @@ let reloadTimeout, resetTimeout
 const api = {
   create: () => {
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
-    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
+    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: true, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png') })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation

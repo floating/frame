@@ -8,11 +8,14 @@ const store = require('../../../store')
 const windows = require('../../../windows')
 const Signer = require('../../Signer')
 
+let verifyActive
+
 class Ledger extends Signer {
-  constructor (id, devicePath) {
+  constructor (id, devicePath, api) {
     super()
     this.id = id
     this.devicePath = devicePath
+    this.api = api
     this.type = 'Ledger'
     this.status = 'initial'
     this.pause = false
@@ -57,33 +60,43 @@ class Ledger extends Signer {
       cb(err)
     }
   }
-  verifyAddress () {
+  verifyAddress (display) {
+    if (verifyActive) return
+    verifyActive = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
-      eth.getAddress(this.getPath(this.index), true, true).then(result => {
+      eth.getAddress(this.getPath(this.index), display, true).then(result => {
         transport.close()
-        // cb(null, result.address)
-      }).catch(() => {
+        let address = result.address.toLowerCase()
+        let current = this.accounts[this.index].toLowerCase()
+        if (address !== current) {
+          log.error(new Error('Address does not match device'))
+          this.api.unsetSigner()
+        } else {
+          log.info('Address matches device')
+        }
+        verifyActive = false
+      }).catch(err => {
+        log.error('Verify Address Error')
+        log.error(err)
         transport.close()
-        // cb(err)
+        this.api.unsetSigner()
+        verifyActive = false
       })
     } catch (err) {
-      // cb(err)
+      log.error('Verify Address Error')
+      log.error(err)
+      this.api.unsetSigner()
+      verifyActive = false
     }
   }
   setIndex (i, cb) {
-    this.getDeviceAddress(i, (err, address) => {
-      if (err) return cb(err)
-      if (address.toLowerCase() === this.accounts[i].toLowerCase()) {
-        this.index = i
-        this.requests = {} // TODO Decline these requests before clobbering them
-        windows.broadcast('main:action', 'updateSigner', this.summary())
-        cb(null, this.summary())
-      } else {
-        cb(new Error('Selected address does not match device'))
-      }
-    })
+    this.index = i
+    this.requests = {} // TODO Decline these requests before clobbering them
+    windows.broadcast('main:action', 'updateSigner', this.summary())
+    cb(null, this.summary())
+    this.verifyAddress()
   }
   lookupAccounts (cb) {
     try {

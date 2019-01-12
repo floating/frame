@@ -7,9 +7,9 @@ const Signer = require('../../Signer')
 const windows = require('../../../windows')
 
 class Trezor extends Signer {
-  constructor (device, debug) {
+  constructor (device, api) {
     super()
-    this.debug = debug
+    this.api = api
     this.device = device
     this.id = device.originalDescriptor.path
     this.type = 'Trezor'
@@ -50,32 +50,29 @@ class Trezor extends Signer {
       cb(err)
     })
   }
-  verifyAddress () {
-    this.device.run(session => {
-      return session.ethereumGetAddress(bip32Path.fromString(this.getPath(this.index)).toPathArray(), true)
+  verifyAddress (display) {
+    this.device.waitForSessionAndRun(session => {
+      return session.ethereumGetAddress(bip32Path.fromString(this.getPath(this.index)).toPathArray(), display)
+    }).then(result => {
+      let address = '0x' + result.message.address.toLowerCase()
+      let current = this.accounts[this.index].toLowerCase()
+      if (address !== current) {
+        log.error(new Error('Address does not match device'))
+        this.api.unsetSigner()
+      } else {
+        log.info('Address matches device')
+      }
+    }).catch((err) => {
+      log.error(err)
+      this.api.unsetSigner()
     })
-    // .then(result => {
-    //   // cb(null, '0x' + result.message.address)
-    // }).catch(err => {
-    //   // cb(err)
-    // })
   }
   setIndex (i, cb) {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them
     windows.broadcast('main:action', 'updateSigner', this.summary())
     cb(null, this.summary())
-    // this.getDeviceAddress(i, (err, address) => {
-    //   if (err) return cb(err)
-    //   if (address.toLowerCase() === this.accounts[i].toLowerCase()) {
-    //     this.index = i
-    //     this.requests = {} // TODO Decline these requests before clobbering them
-    //     windows.broadcast('main:action', 'updateSigner', this.summary())
-    //     cb(null, this.summary())
-    //   } else {
-    //     cb(new Error('Selected address does not match device'))
-    //   }
-    // })
+    this.verifyAddress()
   }
   lookupAccounts (cb) {
     this.device.waitForSessionAndRun(session => {

@@ -7,7 +7,7 @@ const Ledger = require('./Ledger')
 const isLedger = d => ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-module.exports = signers => {
+module.exports = (signers, api) => {
   log.info(' ')
   log.info('Ledger Scaner Started...')
   const scan = () => {
@@ -33,7 +33,7 @@ module.exports = signers => {
       let ledger
       log.info('Adding New Ledger: ', id)
       try {
-        ledger = new Ledger(id, device.path)
+        ledger = new Ledger(id, device.path, api)
       } catch (e) {
         return log.error(e)
       }

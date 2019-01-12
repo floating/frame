@@ -11,14 +11,6 @@ const hot = require('./hot')
 
 const dev = process.env.NODE_ENV === 'development'
 
-// Connected Signers
-const signers = {}
-
-// Add Signers
-trezor(signers)
-ledger(signers)
-if (dev) hot(signers)
-
 let current = null
 
 const api = {
@@ -53,8 +45,8 @@ const api = {
       }
     })
   },
-  verifyAddress: (cb) => {
-    if (signers[current] && signers[current].verifyAddress) signers[current].verifyAddress()
+  verifyAddress: (display) => {
+    if (signers[current] && signers[current].verifyAddress) signers[current].verifyAddress(display)
   },
   getSelectedAccounts: () => {
     return signers[current] ? signers[current].getSelectedAccounts() : []
@@ -159,5 +151,13 @@ const api = {
     }
   }
 }
+
+// Connected Signers
+const signers = {}
+
+// Add Signers
+trezor(signers, api)
+ledger(signers, api)
+if (dev) hot(signers, api)
 
 module.exports = api

@@ -47,7 +47,7 @@ ipcMain.on('tray:installAvailableUpdate', (e, install) => {
 })
 
 ipcMain.on('tray:verifyAddress', (e) => {
-  signers.verifyAddress()
+  signers.verifyAddress(true)
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
