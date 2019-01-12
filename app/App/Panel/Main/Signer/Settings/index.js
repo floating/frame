@@ -11,7 +11,7 @@ class Settings extends React.Component {
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Verify Address'}</div>
         <div className='signerPermission'>
-          <div className='signerVerifyText'>{'Verify that the address you see in Frame is the same on your device. This is useful to check before you send to this address to verify it matches the one your device controls.'}</div>
+          <div className='signerVerifyText'>{'Verify that the address displayed in Frame is the same on your device.'}</div>
         </div>
         <div className='quitFrame'>
           <div onMouseDown={() => link.send('tray:verifyAddress')} className='quitFrameButton'>{'Verify Address on Device'}</div>
