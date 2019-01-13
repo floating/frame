@@ -186,6 +186,7 @@ class Ledger extends Signer {
         this.status = 'ok'
         this.update()
       } else {
+        this.busyCount = 0
         this.status = 'Unable to find accounts'
         this.accounts = []
         this.index = 0

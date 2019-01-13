@@ -77,13 +77,11 @@ const updater = {
         try {
           let releases = JSON.parse(rawData)
           if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
-            log.info('Updater: User has not been notified of this version yet')
             let newVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substr(1) : releases[0].tag_name
-            log.info('new: ' + newVersion)
-            log.info('current: ' + version)
-            log.info('compare? new newer? ' + (compareVersions(newVersion, version) === 1))
-            if (compareVersions(releases[0].tag_name, version) === 1) {
-              log.info('Updater: Current version is behind latest, notify user')
+            if (compareVersions(newVersion, version) === 1) {
+              log.info('Updater: Current version is behind latest')
+              log.info('Updater: User has not been notified of this version yet')
+              log.info('Updater: Notify user')
               updater.updateAvailable(releases[0].tag_name, releases[0].html_url)
             }
           }
