@@ -49,7 +49,12 @@ const api = {
       })
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 260)
+    if (!dev) {
+      setTimeout(() => {
+        windows.tray.on('blur', _ => api.hideTray())
+        windows.tray.focus()
+      }, 1260)
+    }
     setTimeout(() => api.showTray(), 260)
     resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
