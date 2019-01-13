@@ -124,7 +124,7 @@ const api = {
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 320)
+      }, 260)
     }
   },
   close: (e) => {
