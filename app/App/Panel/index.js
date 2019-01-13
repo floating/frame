@@ -23,8 +23,10 @@ class Panel extends React.Component {
   }
   render () {
     let open = this.store('tray.open')
+    let transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    let opacity = open ? 1 : 0
     return (
-      <div id='panel' style={{ transform: open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' }}>
+      <div id='panel' style={{ transform, opacity }}>
         <div className='panelMenu'>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>

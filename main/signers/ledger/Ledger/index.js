@@ -135,7 +135,6 @@ class Ledger extends Signer {
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
   deviceStatus (deep, limit = 15) {
-    log.info('Busy Count (deviceStatus)', this.busyCount)
     if (this.status === 'Invalid sequence') return
     this.pollStatus()
     if (this.pause) return
@@ -202,7 +201,6 @@ class Ledger extends Signer {
   }
   // Standard Methods
   signPersonal (message, cb) {
-    log.info('Busy Count (signPersonal)', this.busyCount)
     this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
@@ -236,7 +234,6 @@ class Ledger extends Signer {
     }
   }
   signTransaction (rawTx, cb) {
-    log.info('Busy Count (signTransaction)', this.busyCount)
     this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
