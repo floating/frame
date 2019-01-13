@@ -34,7 +34,16 @@ export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
-export const trayOpen = (u, open) => u('tray.open', _ => open)
+let trayInitial = true
+export const trayOpen = (u, open) => {
+  u('tray.open', _ => open)
+  if (open && trayInitial) {
+    trayInitial = false
+    setTimeout(() => {
+      u('tray.initial', _ => false)
+    }, 30)
+  }
+}
 
 export const setSignerView = (u, view) => {
   u('signer.showAccounts', _ => false)

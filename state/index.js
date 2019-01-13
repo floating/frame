@@ -25,7 +25,8 @@ let initial = {
   view: { current: '', list: [], data: {}, notify: '', badge: '' },
   signers: {},
   tray: {
-    open: false
+    open: false,
+    initial: true
   },
   balances: {},
   signer: {
