@@ -95,12 +95,12 @@ if (!dev) {
   if (process.platform === 'darwin' || process.platform === 'win32') {
     setTimeout(() => {
       autoUpdater.checkForUpdates()
-      setInterval(() => autoUpdater.checkForUpdates(), 60 * 1000)
+      setInterval(() => autoUpdater.checkForUpdates(), 60 * 60 * 1000)
     }, 2000)
   } else {
     setTimeout(() => {
       updater.checkManualUpdate()
-      setInterval(() => updater.checkManualUpdate(), 60 * 1000)
+      setInterval(() => updater.checkManualUpdate(), 60 * 60 * 1000)
     }, 2000)
   }
 }
