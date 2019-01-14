@@ -6,8 +6,6 @@ const semver = require('semver')
 const version = require('../../package.json').version
 const windows = require('../windows')
 
-log.transports.file.level = 'info'
-
 const dev = process.env.NODE_ENV === 'development'
 
 const compareVersions = (a, b) => {
