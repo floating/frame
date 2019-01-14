@@ -53,7 +53,7 @@ Frame is an OS-level Ethereum interface that lets you use standalone signers, su
 
 **On Windows:** Run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.
 
-**On Ubuntu:** Run `sudo apt-get install libappindicator1` **before** running the demo. You can find more info about this here: https://github.com/electron/electron/issues/1347.
+**On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev` **before** running the demo.
 
 ### Add Hot Signers
   - **For testing and development purposes** you can add non-hardware accounts to Frame

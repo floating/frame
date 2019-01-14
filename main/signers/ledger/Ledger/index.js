@@ -4,16 +4,21 @@ const log = require('electron-log')
 const HID = require('node-hid')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
-const Signer = require('../../Signer')
 const store = require('../../../store')
+const windows = require('../../../windows')
+const Signer = require('../../Signer')
+
+let verifyActive
 
 class Ledger extends Signer {
-  constructor (id, devicePath) {
+  constructor (id, devicePath, api) {
     super()
     this.id = id
     this.devicePath = devicePath
+    this.api = api
     this.type = 'Ledger'
     this.status = 'initial'
+    this.busyCount = 0
     this.pause = false
     this.coinbase = '0x'
     this.accounts = []
@@ -23,7 +28,7 @@ class Ledger extends Signer {
     this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.deviceStatus()
-    store.observer(() => {
+    this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.reset()
         this.deviceStatus()
@@ -40,6 +45,67 @@ class Ledger extends Signer {
     this.accounts = []
     this.index = 0
     this.update()
+  }
+  getDeviceAddress (i, cb) {
+    try {
+      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
+      let eth = new Eth(transport)
+      eth.getAddress(this.getPath(i), false, true).then(result => {
+        transport.close()
+        cb(null, result.address)
+      }).catch(err => {
+        transport.close()
+        cb(err)
+      })
+    } catch (err) {
+      cb(err)
+    }
+  }
+  verifyAddress (display) {
+    console.log('verifyAddress Called but it\'s already active')
+    if (verifyActive) return
+    verifyActive = true
+    try {
+      let transport = new TransportNodeHid(new HID.HID(this.devicePath))
+      let eth = new Eth(transport)
+      eth.getAddress(this.getPath(this.index), display, true).then(result => {
+        transport.close()
+        let address = result.address.toLowerCase()
+        let current = this.accounts[this.index].toLowerCase()
+        if (address !== current) {
+          // TODO: Error Notification
+          log.error(new Error('Address does not match device'))
+          this.api.unsetSigner()
+        } else {
+          log.info('Address matches device')
+        }
+        verifyActive = false
+      }).catch(err => {
+        // TODO: Error Notification
+        log.error('Verify Address Error')
+        log.error(err)
+        transport.close()
+        this.api.unsetSigner()
+        verifyActive = false
+      })
+    } catch (err) {
+      // TODO: Error Notification
+      log.error('Verify Address Error')
+      log.error(err)
+      this.api.unsetSigner()
+      verifyActive = false
+    }
+  }
+  setIndex (i, cb) {
+    if (!verifyActive) {
+      this.index = i
+      this.requests = {} // TODO Decline these requests before clobbering them
+    }
+    windows.broadcast('main:action', 'updateSigner', this.summary())
+    cb(null, this.summary())
+    setTimeout(() => {
+      this.verifyAddress()
+    }, 300)
   }
   lookupAccounts (cb) {
     try {
@@ -61,6 +127,7 @@ class Ledger extends Signer {
     if (this._deviceStatus) clearTimeout(this._deviceStatus)
     if (this._signPersonal) clearTimeout(this._signPersonal)
     if (this._signTransaction) clearTimeout(this._signTransaction)
+    this.networkObserver.remove()
     super.close()
   }
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
@@ -76,8 +143,13 @@ class Ledger extends Signer {
       if (err) {
         if (err.message.startsWith('cannot open device with path')) { // Device is busy, try again
           clearTimeout(this._deviceStatus)
-          this._deviceStatus = setTimeout(() => this.deviceStatus(deep), 700)
-          log.info('>>>>>>> Busy: cannot open device with path, will try again')
+          if (++this.busyCount > 10) {
+            this.busyCount = 0
+            return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+          } else {
+            this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
+            log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
+          }
         } else {
           this.status = err.message
           if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
@@ -102,6 +174,7 @@ class Ledger extends Signer {
           }
         }
       } else if (accounts && accounts.length) {
+        this.busyCount = 0
         if (accounts[0] !== this.coinbase || this.status !== 'ok') {
           this.coinbase = accounts[0]
           this.accounts = accounts
@@ -112,6 +185,7 @@ class Ledger extends Signer {
         this.status = 'ok'
         this.update()
       } else {
+        this.busyCount = 0
         this.status = 'Unable to find accounts'
         this.accounts = []
         this.index = 0
@@ -136,6 +210,7 @@ class Ledger extends Signer {
         if (v.length < 2) v = '0' + v
         cb(null, result['r'] + result['s'] + v)
         transport.close()
+        this.busyCount = 0
         this.pause = false
       }).catch(err => {
         cb(err)
@@ -145,8 +220,14 @@ class Ledger extends Signer {
     } catch (err) {
       this.pause = false
       if (err.message.startsWith('cannot open device with path')) {
-        this._signPersonal = setTimeout(() => this.signPersonal(message, cb), 700)
-        return log.info('>>>>>>> Busy: cannot open device with path, will try again')
+        clearTimeout(this._signPersonal)
+        if (++this.busyCount > 10) {
+          this.busyCount = 0
+          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+        } else {
+          this._signPersonal = setTimeout(() => this.signPersonal(message, cb), 700)
+          return log.info('>>>>>>> Busy: cannot open device with path, will try again (signPersonal)')
+        }
       }
       cb(err)
       log.error(err)
@@ -165,6 +246,7 @@ class Ledger extends Signer {
       const rawTxHex = tx.serialize().toString('hex')
       eth.signTransaction(this.getPath(), rawTxHex).then(result => {
         transport.close()
+        this.busyCount = 0
         this.pause = false
         let tx = new EthereumTx({
           nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
@@ -186,8 +268,14 @@ class Ledger extends Signer {
     } catch (err) {
       this.pause = false
       if (err.message.startsWith('cannot open device with path')) {
-        this._signTransaction = setTimeout(() => this.signTransaction(rawTx, cb), 700)
-        return log.info('>>>>>>> Busy: cannot open device with path, will try again')
+        clearTimeout(this._signTransaction)
+        if (++this.busyCount > 10) {
+          this.busyCount = 0
+          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+        } else {
+          this._signTransaction = setTimeout(() => this.signTransaction(rawTx, cb), 700)
+          return log.info('>>>>>>> Busy: cannot open device with path, will try again (signTransaction)')
+        }
       }
       cb(err)
       log.error(err)

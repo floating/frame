@@ -12,6 +12,8 @@ export const setSigner = (u, signer) => {
   }, 50)
 }
 
+export const setSettingsView = (u, index) => u('signer.settings.viewIndex', () => index)
+
 export const setAddress = (u, address) => u('address', () => address)
 
 export const togglePanel = u => u('panel.show', show => !show)
@@ -26,13 +28,22 @@ export const setBalance = (u, account, balance) => u('balances', account, b => b
 
 export const notify = (u, type) => u('view.notify', _ => type)
 
-export const updateAvailable = (u, res) => u('view.updateAvailable', () => res)
+export const updateBadge = (u, type) => u('view.badge', _ => type)
 
 export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
-export const trayOpen = (u, open) => u('tray.open', _ => open)
+let trayInitial = true
+export const trayOpen = (u, open) => {
+  u('tray.open', _ => open)
+  if (open && trayInitial) {
+    trayInitial = false
+    setTimeout(() => {
+      u('tray.initial', _ => false)
+    }, 30)
+  }
+}
 
 export const setSignerView = (u, view) => {
   u('signer.showAccounts', _ => false)

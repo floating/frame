@@ -4,11 +4,12 @@ const bip32Path = require('bip32-path')
 const EthereumTx = require('ethereumjs-tx')
 const store = require('../../../store')
 const Signer = require('../../Signer')
+const windows = require('../../../windows')
 
 class Trezor extends Signer {
-  constructor (device, debug) {
+  constructor (device, api) {
     super()
-    this.debug = debug
+    this.api = api
     this.device = device
     this.id = device.originalDescriptor.path
     this.type = 'Trezor'
@@ -23,7 +24,7 @@ class Trezor extends Signer {
     device.on('pin', (type, cb) => this.needPin(cb))
     device.on('disconnect', () => this.close())
     this.open()
-    store.observer(() => {
+    this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.network = store('main.connection.network')
         this.status = 'loading'
@@ -33,8 +34,47 @@ class Trezor extends Signer {
       }
     })
   }
+  close () {
+    this.networkObserver.remove()
+    super.close()
+  }
   button (label) {
     log.info(`Trezor button "${label}" was pressed`)
+  }
+  getDeviceAddress (i, cb) {
+    this.device.run(session => {
+      return session.ethereumGetAddress(bip32Path.fromString(this.getPath(i)).toPathArray(), true)
+    }).then(result => {
+      cb(null, '0x' + result.message.address)
+    }).catch(err => {
+      cb(err)
+    })
+  }
+  verifyAddress (display) {
+    this.device.waitForSessionAndRun(session => {
+      return session.ethereumGetAddress(bip32Path.fromString(this.getPath(this.index)).toPathArray(), display)
+    }).then(result => {
+      let address = '0x' + result.message.address.toLowerCase()
+      let current = this.accounts[this.index].toLowerCase()
+      if (address !== current) {
+        // TODO: Error Notification
+        log.error(new Error('Address does not match device'))
+        this.api.unsetSigner()
+      } else {
+        log.info('Address matches device')
+      }
+    }).catch((err) => {
+      // TODO: Error Notification
+      log.error(err)
+      this.api.unsetSigner()
+    })
+  }
+  setIndex (i, cb) {
+    this.index = i
+    this.requests = {} // TODO Decline these requests before clobbering them
+    windows.broadcast('main:action', 'updateSigner', this.summary())
+    cb(null, this.summary())
+    this.verifyAddress()
   }
   lookupAccounts (cb) {
     this.device.waitForSessionAndRun(session => {

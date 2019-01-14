@@ -22,10 +22,11 @@ let initial = {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, notify: '', updateAvailable: false },
+  view: { current: '', list: [], data: {}, notify: '', badge: '' },
   signers: {},
   tray: {
-    open: false
+    open: false,
+    initial: true
   },
   balances: {},
   signer: {
@@ -33,6 +34,10 @@ let initial = {
     open: false,
     current: '',
     view: 'default',
+    settings: {
+      viewIndex: 0,
+      views: ['permissions', 'verify']
+    },
     accounts: [],
     showAccounts: false,
     position: {

@@ -43,7 +43,7 @@ class Notify extends React.Component {
             {'Mainnet Notice'}
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{'Frame is still in alpha and undergoing prerelease testing. Be cautious using alpha versions of Frame on the mainnet and verify all transactions on your signing device.'}</div>
+            <div className='notifyBodyLine'>{'Frame is still in alpha and undergoing prerelease testing. Be cautious using alpha versions of Frame on the mainnet and verify all transactions and account details on your signing device.'}</div>
             <div className='notifyBodyLine'>{'Proceeed only if you understand and accept these risks.'}</div>
           </div>
           <div className='notifyInput'>

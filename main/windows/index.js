@@ -49,8 +49,13 @@ const api = {
       })
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) setTimeout(() => windows.tray.on('blur', _ => api.hideTray()), 420)
-    api.showTray()
+    if (!dev) {
+      setTimeout(() => {
+        windows.tray.on('blur', _ => api.hideTray())
+        windows.tray.focus()
+      }, 1260)
+    }
+    setTimeout(() => api.showTray(), 260)
     resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
   reload: () => {
@@ -92,11 +97,11 @@ const api = {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
       setTimeout(() => {
-        windows.tray.hide()
+        if (windows && windows.tray && windows.tray.hide) windows.tray.hide()
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 420)
+      }, 260)
     }
   },
   showTray: () => {
@@ -120,11 +125,11 @@ const api = {
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
-        windows.tray.focus()
+        if (windows && windows.tray && windows.tray.focus) windows.tray.focus()
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 420)
+      }, 260)
     }
   },
   close: (e) => {

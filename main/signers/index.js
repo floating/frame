@@ -11,14 +11,6 @@ const hot = require('./hot')
 
 const dev = process.env.NODE_ENV === 'development'
 
-// Connected Signers
-const signers = {}
-
-// Add Signers
-trezor(signers)
-ledger(signers)
-if (dev) hot(signers)
-
 let current = null
 
 const api = {
@@ -32,10 +24,13 @@ const api = {
     cb(null, signerSummary)
   },
   setSigner: (id, cb) => {
-    current = id
-    let summary = signers[current].summary()
-    cb(null, summary)
-    windows.broadcast('main:action', 'setSigner', summary)
+    signers[id].setIndex(signers[id].index, err => {
+      if (err) return cb(err)
+      current = id
+      let summary = signers[current].summary()
+      cb(null, summary)
+      windows.broadcast('main:action', 'setSigner', summary)
+    })
   },
   unsetSigner: (cb) => {
     let s = signers[current]
@@ -49,6 +44,9 @@ const api = {
         s.update()
       }
     })
+  },
+  verifyAddress: (display) => {
+    if (signers[current] && signers[current].verifyAddress) signers[current].verifyAddress(display)
   },
   getSelectedAccounts: () => {
     return signers[current] ? signers[current].getSelectedAccounts() : []
@@ -153,5 +151,13 @@ const api = {
     }
   }
 }
+
+// Connected Signers
+const signers = {}
+
+// Add Signers
+trezor(signers, api)
+ledger(signers, api)
+if (dev) hot(signers, api)
 
 module.exports = api

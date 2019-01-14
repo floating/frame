@@ -1,11 +1,11 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../svg'
-import link from '../../link'
 
 import Main from './Main'
 import Local from './Local'
 import Notify from './Notify'
+import Badge from './Badge'
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
@@ -23,8 +23,11 @@ class Panel extends React.Component {
   }
   render () {
     let open = this.store('tray.open')
+    let transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    let opacity = open ? 1 : 0
+    let transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
     return (
-      <div id='panel' style={{ transform: open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' }}>
+      <div id='panel' style={{ transform, opacity, transition }}>
         <div className='panelMenu'>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
@@ -41,22 +44,7 @@ class Panel extends React.Component {
         <Local />
         <Main />
         <Notify />
-        <div className='badge' style={this.store('view.updateAvailable') ? { bottom: '13px' } : { bottom: '-200px' }}>
-          <div className='badgeMessage'>
-            {'An update is avaliable and will be installed on next restart'}
-          </div>
-          <div className='badgeInput'>
-            <div className='badgeInputButton'>
-              <div className='badgeInputButtonInner' onMouseDown={() => this.store.updateAvailable(false)}>{'Ok'}</div>
-            </div>
-            <div className='badgeInputButton'>
-              <div className='badgeInputButtonInner' onMouseDown={() => {
-                this.store.updateAvailable(false)
-                link.send('tray:updateRestart')
-              }}>{'Restart'}</div>
-            </div>
-          </div>
-        </div>
+        <Badge />
       </div>
     )
   }

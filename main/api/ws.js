@@ -37,8 +37,8 @@ const handler = (socket, req) => {
     }
     log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
-      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: -1 }
-      if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: -1 }
+      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
+      if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: 4100 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
       provider.send(payload, response => {
