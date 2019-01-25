@@ -1,7 +1,7 @@
 {
   "name": "frame",
-  "version": "0.0.10",
-  "description": "An Ethereum interface",
+  "version": "0.1.0",
+  "description": "An Ethereum Interface",
   "main": "main",
   "build": {
     "appId": "sh.frame.app",
