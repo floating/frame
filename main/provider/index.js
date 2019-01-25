@@ -212,9 +212,9 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
-    if (payload.method === 'personal_sign' || payload.method === 'eth_sign') return this.signPersonal(payload, res)
+    if (payload.method === 'personal_sign') return this.signPersonal(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
-    // if (payload.method === 'eth_sign') return this.resError('No eth_sign, please use personal_sign', payload, res)
+    if (payload.method === 'eth_sign') return this.resError('No eth_sign, please use personal_sign', payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     this.connection.send(payload, res)
