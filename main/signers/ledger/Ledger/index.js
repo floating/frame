@@ -208,7 +208,7 @@ class Ledger extends Signer {
       eth.signPersonalMessage(this.getPath(), message.replace('0x', '')).then(result => {
         let v = (result['v'] - 27).toString(16)
         if (v.length < 2) v = '0' + v
-        cb(null, result['r'] + result['s'] + v)
+        cb(null, '0x' + result['r'] + result['s'] + v)
         transport.close()
         this.busyCount = 0
         this.pause = false

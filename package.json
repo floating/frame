@@ -1,7 +1,7 @@
 {
   "name": "frame",
-  "version": "0.0.10",
-  "description": "An Ethereum interface",
+  "version": "0.1.0",
+  "description": "An Ethereum Interface",
   "main": "main",
   "build": {
     "appId": "sh.frame.app",
@@ -64,7 +64,7 @@
     "electron-positioner": "4.1.0",
     "electron-store": "2.0.0",
     "electron-updater": "3.1.6",
-    "eth-provider": "0.1.5",
+    "eth-provider": "0.2.0",
     "ethereumjs-tx": "1.3.7",
     "ethereumjs-util": "6.0.0",
     "hdkey": "1.1.0",
