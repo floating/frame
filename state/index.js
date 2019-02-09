@@ -5,7 +5,11 @@ const persist = new PersistStore()
 
 const get = (path, obj = persist.get('main')) => {
   path.split('.').some((key, i) => {
-    if (typeof obj !== 'object') { obj = undefined } else { obj = obj[key] }
+    if (typeof obj !== 'object') {
+      obj = undefined
+    } else {
+      obj = obj[key]
+    }
     return obj === undefined // Stop navigating the path if we get to undefined value
   })
   return obj
@@ -69,7 +73,7 @@ let initial = {
     accounts: main('accounts', {}), // Persisted account settings and permissions
     connection: {
       network: main('connection.network', '4'),
-      options: ['1', '4'],
+      options: ['1', '4', '42'],
       status: 'loading',
       local: {
         on: main('connection.local.on', false),
@@ -89,13 +93,22 @@ let initial = {
             options: {
               direct: 'direct'
             }
+          },
+          '42': {
+            current: 'direct',
+            options: {
+              direct: 'direct'
+            }
           }
         }
       },
       secondary: {
         settings: {
           '1': {
-            current: main('local.connection.secondary.settings.1.current', 'infura'),
+            current: main(
+              'local.connection.secondary.settings.1.current',
+              'infura'
+            ),
             options: {
               infura: 'infura',
               custom: main('connection.secondary.settings.1.options.custom', '')
@@ -106,6 +119,16 @@ let initial = {
             options: {
               infura: 'infuraRinkeby',
               custom: main('connection.secondary.settings.4.options.custom', '')
+            }
+          },
+          '42': {
+            current: main('connection.secondary.settings.42.current', 'infura'),
+            options: {
+              infura: 'infuraKovan',
+              custom: main(
+                'connection.secondary.settings.42.options.custom',
+                ''
+              )
             }
           }
         },
@@ -122,7 +145,7 @@ let initial = {
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.accounts).forEach(account => {
   account = initial.main.accounts[account]
-  if (account && account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
+  if (account && account.permissions) { delete account.permissions[uuidv5('Unknown', uuidv5.DNS)] }
 })
 
 module.exports = () => initial
