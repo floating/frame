@@ -88,6 +88,15 @@ const api = {
     let showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
     showing ? api.hideTray() : api.showTray()
   },
+  shrink : () =>{
+    if (windows && windows.tray) {
+      let screen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
+      windows.tray.setSize(1, dev ? 740 : screen.workArea.height)
+      let pos = windows.tray.positioner.calculate('topRight')
+      windows.tray.setVisibleOnAllWorkspaces(true)
+      windows.tray.setPosition(pos.x, pos.y)
+    }
+  },
   hideTray: () => {
     hideShow.current = 'hidden'
     if (hideShow.running) {
@@ -97,7 +106,7 @@ const api = {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
       setTimeout(() => {
-        if (windows && windows.tray && windows.tray.hide) windows.tray.hide()
+        api.shrink()
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
@@ -112,15 +121,13 @@ const api = {
     } else {
       if (!windows.tray) return api.tray()
       hideShow.running = 'show'
+      let screen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
+      windows.tray.setSize(360, dev ? 740 : screen.workArea.height)
       let pos = windows.tray.positioner.calculate('topRight')
-      windows.tray.setVisibleOnAllWorkspaces(true)
       windows.tray.focus()
-      windows.tray.setVisibleOnAllWorkspaces(false)
       windows.tray.setResizable(false)
       windows.tray.setPosition(pos.x, pos.y)
-      let screen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
-      windows.tray.setPosition(pos.x, pos.y)
-      windows.tray.setSize(370, dev ? 740 : screen.workArea.height)
+      windows.tray.setVisibleOnAllWorkspaces(false)
       windows.tray.show()
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
@@ -180,6 +187,28 @@ app.on('web-contents-created', (e, contents) => {
 ipcMain.on('tray:quit', api.quit)
 ipcMain.on('tray:ready', () => {
   if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
+})
+
+let hideOnMouseOut = false
+
+ipcMain.on('tray:mouseenter', () => {
+  if (hideShow.current === 'hidden' && store('main.reveal')) {
+    let m1 = electron.screen.getCursorScreenPoint()
+    setTimeout(() => {
+      let m2 = electron.screen.getCursorScreenPoint()
+      if (m2.x >= m1.x) {
+        hideOnMouseOut = true
+        api.showTray()
+      }
+    }, 100)
+  }
+})
+
+ipcMain.on('tray:mouseout', () => {
+  if (hideOnMouseOut) {
+    hideOnMouseOut = false
+    api.hideTray()
+  }
 })
 
 // Data Change Events

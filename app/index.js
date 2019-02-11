@@ -16,3 +16,6 @@ link.rpc('getState', (err, state) => {
   const Frame = Restore.connect(Panel, store(state))
   ReactDOM.render(<Frame />, document.getElementById('frame'))
 })
+
+document.addEventListener('mouseenter', () => link.send('tray:mouseenter'))
+document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })

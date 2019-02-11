@@ -39,6 +39,7 @@ module.exports = {
   setSecondary: (u, status) => u('main.connection.secondary', secondary => Object.assign({}, secondary, status)),
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
+  toggleReveal: u => u('main.reveal', reveal => !reveal),
   clearPermissions: (u, account) => {
     u('main.accounts', account, account => {
       account.permissions = {}

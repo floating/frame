@@ -66,6 +66,7 @@ let initial = {
   },
   main: {
     launch: main('launch', false),
+    reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
     connection: {
       network: main('connection.network', '4'),

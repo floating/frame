@@ -183,7 +183,13 @@ class Settings extends React.Component {
         </div>
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
-          <div className='signerPermissionOrigin'>{'Run Frame on Startup'}</div>
+          <div className='signerPermissionOrigin'>{'Snap Reveal'}</div>
+          <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
+            <div className='signerPermissionToggleSwitch' />
+          </div>
+        </div>
+        <div className='signerPermission'>
+          <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
           <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
             <div className='signerPermissionToggleSwitch' />
           </div>
