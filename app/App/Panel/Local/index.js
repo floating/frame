@@ -177,7 +177,7 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className={this.store('main.connection.secondary.settings', network, 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-              <input value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
+              <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
             </div>
           </div>
         </div>
