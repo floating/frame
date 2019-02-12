@@ -42,7 +42,7 @@ const detectMouse = () => {
 const api = {
   create: () => {
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
-    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, alwaysOnTop: true, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png'), skipTaskbar: process.platform !== 'linux' })
+    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png'), skipTaskbar: process.platform !== 'linux' })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -109,15 +109,6 @@ const api = {
     let showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
     showing ? api.hideTray() : api.showTray()
   },
-  shrink : () =>{
-    if (windows && windows.tray) {
-      if (store('main.reveal')) detectMouse()
-      windows.tray.setSize(0, 0)
-      let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setPosition(area.width + area.x, area.height + area.y)
-      windows.tray.emit('hide')
-    }
-  },
   hideTray: () => {
     hideShow.current = 'hidden'
     if (hideShow.running) {
@@ -127,7 +118,15 @@ const api = {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
       setTimeout(() => {
-        api.shrink()
+        if (windows && windows.tray) {
+          if (store('main.reveal')) detectMouse()
+          windows.tray.setAlwaysOnTop(false)
+          windows.tray.setResizable(true)
+          windows.tray.setSize(0, 0)
+          let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+          windows.tray.setPosition(area.width + area.x, area.height + area.y)
+          windows.tray.emit('hide')
+        }
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
@@ -142,7 +141,9 @@ const api = {
       if (hideShow.running !== 'show') hideShow.next = 'show'
     } else {
       if (!windows.tray) return api.tray()
+      windows.tray.setAlwaysOnTop(true)
       hideShow.running = 'show'
+      windows.tray.setResizable(false) // Makes no sense but keeps height consistant
       let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       windows.tray.setSize(360, dev ? 740 : area.height)
       let pos = windows.tray.positioner.calculate('topRight')
