@@ -148,7 +148,7 @@ export default Restore.connect(TransactionRequest)
 //       <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
 //       <div className='transactionToAddressFull'>
 //         {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
-//         <input onMouseDown={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
+//         <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
 //       </div>
 //     </div>
 //     <div className='transactionToSub'>{'Send To'}</div>
