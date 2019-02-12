@@ -17,6 +17,8 @@ let showOnReady = true
 let needReload = false
 let reloadTimeout, resetTimeout, mouseTimeout
 
+let hideOnMouseOut = false
+
 const detectMouse = () => {
   let m1 = electron.screen.getCursorScreenPoint()
   let area = electron.screen.getDisplayNearestPoint(m1).workArea
@@ -206,21 +208,6 @@ app.on('web-contents-created', (e, contents) => {
 ipcMain.on('tray:quit', api.quit)
 ipcMain.on('tray:ready', () => {
   if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
-})
-
-let hideOnMouseOut = false
-
-ipcMain.on('tray:mouseenter', () => {
-  if (hideShow.current === 'hidden' && store('main.reveal')) {
-    let m1 = electron.screen.getCursorScreenPoint()
-    setTimeout(() => {
-      let m2 = electron.screen.getCursorScreenPoint()
-      if (m2.x >= m1.x) {
-        hideOnMouseOut = true
-        api.showTray()
-      }
-    }, 100)
-  }
 })
 
 ipcMain.on('tray:mouseout', () => {
