@@ -107,7 +107,7 @@ let initial = {
       secondary: {
         settings: {
           '1': {
-            current: main('local.connection.secondary.settings.1.current', 'infura'),
+            current: main('connection.secondary.settings.1.current', 'infura'),
             options: {
               infura: 'infura',
               custom: main('connection.secondary.settings.1.options.custom', '')
