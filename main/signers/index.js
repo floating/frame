@@ -1,5 +1,6 @@
 const usbDetect = require('usb-detection')
 const log = require('electron-log')
+const uuid = require('uuid/v4')
 
 // App Window API
 const windows = require('../windows')
@@ -7,7 +8,7 @@ const windows = require('../windows')
 // Signer Modules
 const trezor = require('./trezor')
 const ledger = require('./ledger')
-const hot = require('./hot')
+const keyring = require('./keyring')
 
 const dev = process.env.NODE_ENV === 'development'
 
@@ -98,6 +99,12 @@ const api = {
     windows.showTray()
     windows.broadcast('main:action', 'setSignerView', 'default')
   },
+  addRequestForSigner (rawTx,address) {
+    this.setSigner(this.getSigner(address),() => {
+      let handlerId = uuid()
+      this.addRequest({ handlerId, type: 'transaction', data: rawTx, payload: rawTx, account: address },()=>{})
+    })
+  },
   removeRequest (handlerId) {
     if (signers[current] && signers[current].requests[handlerId]) {
       delete signers[current].requests[handlerId]
@@ -140,6 +147,12 @@ const api = {
       setTimeout(() => api.removeRequest(handlerId), 3300)
     }
   },
+  setProvider (provider) {
+    log.info('setProvider')
+    Object.keys(signers).forEach(id => {
+      if(signers[id].setProvider) signers[id].setProvider(provider,this.addRequestForSigner.bind(this))
+    })
+  },
   setRequestSuccess (handlerId) {
     log.info('setRequestSuccess', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
@@ -149,7 +162,16 @@ const api = {
       signers[current].update()
       setTimeout(() => api.removeRequest(handlerId), 1800)
     }
-  }
+  },
+  getSigner(address) {
+    let signerSummary = {}
+    Object.keys(signers).forEach(id => {
+      if(signers[id].getAccounts().includes(address)){
+        signerSummary = id
+      }
+    })
+    return signerSummary;
+  },
 }
 
 // Connected Signers
@@ -159,5 +181,6 @@ const signers = {}
 trezor(signers, api)
 ledger(signers, api)
 if (dev) hot(signers, api)
+if (dev) keyring(signers, api)
 
 module.exports = api

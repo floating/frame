@@ -1,0 +1,22 @@
+{
+  "accounts": [
+      {
+        "type": "HD Key Tree",
+        "opts": {
+          "numberOfAccounts": 1,
+          "mnemonic": "stumble story behind hurt patient ball whisper art swift tongue ice alien"
+        },
+        "id": 1
+      },
+      {
+        "type": "Aragon Key",
+        "opts": {
+          "ens": "0x98df287b6c145399aaa709692c8d308357bc085d",
+          "dao": "0x13B0E6814E5a0463f8d5DB2A0400BD4411E174a4",
+          "forwardingAddress": "0xaD352001812fB45e3212FCf1529395af13B7dEDd",
+          "parentAddress": "0x692c16ef3d640b8f5dcec895023b4fc294d85ab3"
+        },
+        "id": 2
+      }
+    ]
+}
