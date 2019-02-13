@@ -66,10 +66,11 @@ let initial = {
   },
   main: {
     launch: main('launch', false),
+    reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
     connection: {
       network: main('connection.network', '4'),
-      options: ['1', '4'],
+      options: ['1', '3', '4', '42'],
       status: 'loading',
       local: {
         on: main('connection.local.on', false),
@@ -84,7 +85,19 @@ let initial = {
               direct: 'direct'
             }
           },
+          '3': {
+            current: 'direct',
+            options: {
+              direct: 'direct'
+            }
+          },
           '4': {
+            current: 'direct',
+            options: {
+              direct: 'direct'
+            }
+          },
+          '42': {
             current: 'direct',
             options: {
               direct: 'direct'
@@ -95,10 +108,17 @@ let initial = {
       secondary: {
         settings: {
           '1': {
-            current: main('local.connection.secondary.settings.1.current', 'infura'),
+            current: main('connection.secondary.settings.1.current', 'infura'),
             options: {
               infura: 'infura',
               custom: main('connection.secondary.settings.1.options.custom', '')
+            }
+          },
+          '3': {
+            current: main('connection.secondary.settings.3.current', 'infura'),
+            options: {
+              infura: 'infuraRopsten',
+              custom: main('connection.secondary.settings.3.options.custom', '')
             }
           },
           '4': {
@@ -106,6 +126,13 @@ let initial = {
             options: {
               infura: 'infuraRinkeby',
               custom: main('connection.secondary.settings.4.options.custom', '')
+            }
+          },
+          '42': {
+            current: main('connection.secondary.settings.42.current', 'infura'),
+            options: {
+              infura: 'infuraKovan',
+              custom: main('connection.secondary.settings.42.options.custom', '')
             }
           }
         },
