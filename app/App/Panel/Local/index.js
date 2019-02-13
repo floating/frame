@@ -183,7 +183,7 @@ class Settings extends React.Component {
         </div>
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
-          <div className='signerPermissionOrigin'>{'Snap Reveal'}</div>
+          <div className='signerPermissionOrigin'>{'Boundary Summon'}</div>
           <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
             <div className='signerPermissionToggleSwitch' />
           </div>

@@ -22,11 +22,15 @@ let hideOnMouseOut = false
 const detectMouse = () => {
   let m1 = electron.screen.getCursorScreenPoint()
   let area = electron.screen.getDisplayNearestPoint(m1).workArea
-  let zone = area.width + area.x - 2
+  let minX = (area.width + area.x) - 2
+  let center = (area.height + area.y) / 2
+  let margin = (area.height + area.y) / 4
+  let minY = center - margin
+  let maxY = center + margin
   mouseTimeout = setTimeout(() => {
-    if (m1.x >= zone) {
+    if (m1.x >= minX && m1.y >= minY && m1.y <= maxY) {
       let m2 = electron.screen.getCursorScreenPoint()
-      if (m2.x >= zone && m2.y === m1.y) {
+      if (m2.x >= minX && m2.y === m1.y) {
         hideOnMouseOut = true
         api.showTray()
       } else {
@@ -37,7 +41,6 @@ const detectMouse = () => {
     }
   }, 200)
 }
-
 
 const api = {
   create: () => {
@@ -120,6 +123,7 @@ const api = {
       setTimeout(() => {
         if (windows && windows.tray) {
           if (store('main.reveal')) detectMouse()
+          windows.tray.setVisibleOnAllWorkspaces(true)
           windows.tray.setAlwaysOnTop(false)
           windows.tray.setResizable(true)
           windows.tray.setSize(0, 0)
@@ -143,13 +147,13 @@ const api = {
       if (!windows.tray) return api.tray()
       windows.tray.setAlwaysOnTop(true)
       hideShow.running = 'show'
+      windows.tray.setVisibleOnAllWorkspaces(true)
       windows.tray.setResizable(false) // Makes no sense but keeps height consistant
       let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       windows.tray.setSize(360, dev ? 740 : area.height)
       let pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       windows.tray.focus()
-      windows.tray.setVisibleOnAllWorkspaces(false)
       windows.tray.emit('show')
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
@@ -158,6 +162,7 @@ const api = {
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false
+        windows.tray.setVisibleOnAllWorkspaces(false)
       }, 260)
     }
   },
