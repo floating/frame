@@ -71,7 +71,6 @@ let initial = {
     connection: {
       network: main('connection.network', '4'),
       options: ['1', '3', '4', '42'],
-      status: 'loading',
       local: {
         on: main('connection.local.on', false),
         status: 'loading',

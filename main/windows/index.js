@@ -24,7 +24,7 @@ const detectMouse = () => {
   let area = electron.screen.getDisplayNearestPoint(m1).workArea
   let minX = (area.width + area.x) - 2
   let center = (area.height + area.y) / 2
-  let margin = (area.height + area.y) / 4
+  let margin = (area.height + area.y) / 8
   let minY = center - margin
   let maxY = center + margin
   mouseTimeout = setTimeout(() => {
