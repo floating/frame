@@ -65,13 +65,13 @@ let initial = {
     rates: {}
   },
   main: {
+    _tag: '0.0.0',
     launch: main('launch', false),
     reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
     connection: {
       network: main('connection.network', '4'),
       options: ['1', '3', '4', '42'],
-      status: 'loading',
       local: {
         on: main('connection.local.on', false),
         status: 'loading',

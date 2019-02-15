@@ -30,15 +30,19 @@ class Settings extends React.Component {
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
         {Object.keys(permissions).length === 0 ? (
           <div className='signerPermission'>
-            <div className='signerPermissionOrigin'>{'No Permissions Set'}</div>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>{'No Permissions Set'}</div>
+            </div>
           </div>
         ) : (
           Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
             return (
               <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:action', 'toggleAccess', account, o)}>
-                <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
-                <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
-                  <div className='signerPermissionToggleSwitch' />
+                <div className='signerPermissionControls'>
+                  <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
+                  <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
+                    <div className='signerPermissionToggleSwitch' />
+                  </div>
                 </div>
               </div>
             )

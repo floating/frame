@@ -11,13 +11,13 @@ class Nodes extends EventEmitter {
     super()
     this.local = {
       status: 'off',
-      network: '4',
+      network: '',
       type: '',
       connected: false
     }
     this.secondary = {
       status: 'off',
-      network: '4',
+      network: '',
       type: '',
       connected: false
     }
@@ -41,10 +41,13 @@ class Nodes extends EventEmitter {
   connect (connection) {
     log.info(' ')
     log.info('Connection has been updated')
-    // Update the network if changed
-    if (this.network && this.network !== connection.network) {
+    if (this.network !== connection.network) {
       if (this.local.provider) this.local.provider.close()
       if (this.secondary.provider) this.secondary.provider.close()
+      this.local = { status: 'loading', network: '', type: '', connected: false }
+      this.secondary = { status: 'loading', network: '', type: '', connected: false }
+      this.update('local')
+      this.update('secondary')
       log.info('    Network changed from ' + this.network + ' to ' + connection.network)
       this.network = connection.network
     }
@@ -62,10 +65,18 @@ class Nodes extends EventEmitter {
           this.getNetwork(this.local.provider, (netErr, netResponse) => {
             this.getNodeType(this.local.provider, (typeErr, typeResponse) => {
               this.local.network = !netErr && netResponse && !netResponse.error ? netResponse.result : ''
-              this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : ''
-              this.local.connected = true
-              this.update('local')
-              this.emit('connect')
+              this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : '?'
+              if (this.local.type === 'EthereumJS TestRPC') this.local.type = 'Ganache'
+              if (this.local.network && this.local.network !== store('main.connection.network')) {
+                this.local.connected = false
+                this.local.status = 'network mismatch'
+                this.update('local')
+              } else {
+                this.local.status = 'connected'
+                this.local.connected = true
+                this.update('local')
+                this.emit('connect')
+              }
             })
           })
         })
@@ -82,10 +93,16 @@ class Nodes extends EventEmitter {
 
         // Local connection status
         this.local.provider.on('status', status => {
-          let current = this.local.status
-          if ((current === 'loading' || current === 'not found' || current === 'off') && status === 'disconnected') status = 'not found'
-          this.local.status = status
-          this.update('local')
+          if (status === 'connected' && this.local.network && this.local.network !== store('main.connection.network')) {
+            this.local.connected = false
+            this.local.status = 'network mismatch'
+            this.update('local')
+          } else {
+            let current = this.local.status
+            if ((current === 'loading' || current === 'not found' || current === 'off' || current === 'network mismatch') && status === 'disconnected') status = 'not found'
+            this.local.status = status
+            this.update('local')
+          }
         })
 
         this.local.provider.on('data', data => this.emit('data', data))
@@ -142,8 +159,8 @@ class Nodes extends EventEmitter {
           this.secondary.provider.on('connect', () => {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
-              this.secondary.network = !err && response && !response.error ? response.result : '?'
-              if (this.secondary.network !== store('main.connection.network')) {
+              this.secondary.network = !err && response && !response.error ? response.result : ''
+              if (this.secondary.network && this.secondary.network !== store('main.connection.network')) {
                 this.secondary.connected = false
                 this.secondary.type = ''
                 this.secondary.status = 'network mismatch'
@@ -160,7 +177,6 @@ class Nodes extends EventEmitter {
 
           this.secondary.provider.on('close', () => {
             log.info('    Secondary connection close')
-            this.secondary.status = 'off'
             this.secondary.connected = false
             this.secondary.type = ''
             this.secondary.network = ''
@@ -169,10 +185,17 @@ class Nodes extends EventEmitter {
           })
 
           this.secondary.provider.on('status', status => {
-            let current = store('main.connection.local.status')
-            if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
-            this.local.status = status
-            this.update('secondary')
+            if (status === 'connected' && this.secondary.network && this.secondary.network !== store('main.connection.network')) {
+              this.secondary.connected = false
+              this.secondary.type = ''
+              this.secondary.status = 'network mismatch'
+              this.update('secondary')
+            } else {
+              let current = store('main.connection.local.status')
+              if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
+              this.local.status = status
+              this.update('secondary')
+            }
           })
 
           this.secondary.provider.on('data', data => this.emit('data', data))

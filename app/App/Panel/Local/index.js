@@ -133,7 +133,7 @@ class Settings extends React.Component {
         <div className='signerPermission'>
           <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>{'Primary'}</div>
+              <div className='signerPermissionOrigin'>{'Local'}</div>
               <div className={this.store('main.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'local')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -183,15 +183,25 @@ class Settings extends React.Component {
         </div>
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
-          <div className='signerPermissionOrigin'>{'Glimpse'}</div>
-          <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
-            <div className='signerPermissionToggleSwitch' />
+          <div className='signerPermissionControls'>
+            <div className='signerPermissionOrigin'>{'Glide'}</div>
+            <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
+              <div className='signerPermissionToggleSwitch' />
+            </div>
+          </div>
+          <div className='signerPermissionDetails'>
+            {'Hovering over the center right edge of your display will reveal Frame'}
           </div>
         </div>
         <div className='signerPermission'>
-          <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
-          <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
-            <div className='signerPermissionToggleSwitch' />
+          <div className='signerPermissionControls'>
+            <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
+            <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
+              <div className='signerPermissionToggleSwitch' />
+            </div>
+          </div>
+          <div className='signerPermissionDetails'>
+            {'Run Frame when your computer starts'}
           </div>
         </div>
         {this.appInfo()}
