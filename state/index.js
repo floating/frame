@@ -65,7 +65,6 @@ let initial = {
     rates: {}
   },
   main: {
-    _tag: '0.0.0',
     launch: main('launch', false),
     reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
