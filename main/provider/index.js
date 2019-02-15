@@ -6,6 +6,7 @@ const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethe
 const store = require('../store')
 const nodes = require('../nodes')
 const signers = require('../signers')
+const version = require('../../package.json').version
 
 class Provider extends EventEmitter {
   constructor () {
@@ -207,6 +208,9 @@ class Provider extends EventEmitter {
     })
     return found
   }
+  clientVersion (payload, res) {
+    res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${version}` })
+  }
   send (payload, res = () => {}) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
@@ -214,6 +218,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
     if (payload.method === 'personal_sign') return this.signPersonal(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
+    if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
     if (payload.method === 'eth_sign') return this.resError('No eth_sign, please use personal_sign', payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
@@ -234,28 +239,3 @@ store.observer(() => {
 })
 
 module.exports = provider
-
-// store.observer(() => provider.accountsChanged())
-
-// signers.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
-//   if (err) {
-//     this.resError(err, payload, res)
-//     return cb(new Error(`signTransaction Error: ${JSON.stringify(err)}`))
-//   }
-//   this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, (response) => {
-//     if (response.error) {
-//       this.resError(response.error, payload, res)
-//       cb(response.error.message)
-//     } else {
-//       res(response)
-//       cb(null, response.result)
-//     }
-//   })
-// })
-// if (req.data.nonce) return this.signAndSend(req, cb)
-// this.getNonce(req.data, response => {
-//   if (response.error) return cb(response.error)
-//   let updatedReq = Object.assign({}, req)
-//   updatedReq.data = Object.assign({}, updatedReq.data, { nonce: response.result })
-//   this.signAndSend(updatedReq, cb)
-// })
