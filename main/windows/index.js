@@ -61,10 +61,13 @@ const api = {
     if (process.platform === 'linux') {
       const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => api.showTray() }, { label: 'Quit', click: () => api.quit() }])
       const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => api.hideTray() }, { label: 'Quit', click: () => api.quit() }])
-      const onShow = _ => tray.setContextMenu(menuHide)
-      const onHide = _ => tray.setContextMenu(menuShow)
-      windows.tray.on('show', onShow)
-      windows.tray.on('hide', onHide)
+      windows.tray.on('show', () => {
+        tray.setContextMenu(menuHide)
+      })
+      windows.tray.on('hide', () => {
+        windows.tray.blur()
+        tray.setContextMenu(menuShow)
+      })
       setTimeout(() => {
         windows.tray.on('focus', () => { if (hideShow.current = 'hidden') api.showTray() })
       }, 2000)
@@ -125,10 +128,11 @@ const api = {
           if (store('main.reveal')) detectMouse()
           windows.tray.setVisibleOnAllWorkspaces(true)
           windows.tray.setAlwaysOnTop(false)
-          windows.tray.setResizable(true)
-          windows.tray.setSize(0, 0)
           let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-          windows.tray.setPosition(area.width + area.x, area.height + area.y)
+          windows.tray.setResizable(true)
+          windows.tray.setSize(0, dev ? 740 : area.height)
+          let pos = windows.tray.positioner.calculate('topRight')
+          windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
         }
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
