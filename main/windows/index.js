@@ -129,6 +129,8 @@ const api = {
           windows.tray.setVisibleOnAllWorkspaces(true)
           windows.tray.setAlwaysOnTop(false)
           let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+          windows.tray.setResizable(true)
+          windows.tray.setSize(0, dev ? 740 : area.height)
           let pos = windows.tray.positioner.calculate('topRight')
           windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
