@@ -24,7 +24,7 @@ class ProviderRequest extends React.Component {
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ top: (this.props.top * 10) + 'px' }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(-${this.props.bottom}px)`, height }}>
         <div className='approveTransaction'>
           {notice ? (
             <div className='requestNotice'>

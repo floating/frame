@@ -3,6 +3,9 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+
+const proxy = require('./proxy')
+
 const store = require('../store')
 const nodes = require('../nodes')
 const signers = require('../signers')
@@ -237,5 +240,8 @@ store.observer(() => {
     provider.accountsChanged([])
   }
 })
+
+proxy.on('send', (payload, cd) => provider.send(payload, cd))
+provider.on('data', data => proxy.emit('data', data))
 
 module.exports = provider

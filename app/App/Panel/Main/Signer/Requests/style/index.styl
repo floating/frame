@@ -192,13 +192,14 @@
      position relative
      display flex
      flex-direction column
+     transition standard
 
     .noRequests
       position absolute
       top 0px
       left 0
       right 0
-      bottom 0
+      height 120px
       font-size 12px
       font-weight 400
       letter-spacing 1px
@@ -216,7 +217,7 @@
 
   .signerRequest
     position absolute
-    top 0px
+    bottom 0px
     left 0px
     right 0px
     border-radius 2px
@@ -296,8 +297,20 @@
       opacity 0
       pointer-events none
 
+  .signerRequestMonitor
+    align-items center
+    color good
+    svg
+      color outerspace08
+    .approveTransactionPayload
+      color outerspace08
+    .requestApprove
+      opacity 0
+      pointer-events none
+
   .requestNotice
     height 100%
+    width 100%
     transform translateZ(0px)
     .requestNoticeInner
       position absolute
@@ -814,3 +827,78 @@
 .signerRequestsHidden
   left -100%
   right 100%
+
+.confirmBar
+  position absolute
+  background highlight
+  box-shadow cardDrop
+  height 30px
+  width 310px
+  bottom 10px
+  border-radius 4px
+  overflow hidden
+  font-size 12px
+  color white
+  font-weight bold
+  text-transform uppercase
+  .confirmBarStartText
+    position absolute
+    left 0
+    top 0
+    bottom 0
+    width 80px
+    display flex
+    justify-content flex-start
+    align-items center
+    z-index 1150
+    padding-left 9px
+  .confirmBarEndText
+    position absolute
+    right 0
+    top 0
+    bottom 0
+    width 80px
+    display flex
+    justify-content flex-end
+    align-items center
+    z-index 1150
+    padding-right 9px
+  .confirmBarStart
+    z-index 1100
+    position absolute
+    left -45px
+    width 120px
+    height 120px
+    background good
+    transform rotate(45deg)
+    top -45px
+    border-radius 6px
+  .confirmBarStep
+    z-index 1000
+    position absolute
+    right 0px
+    width 60px
+    height 60px
+    background good
+    box-shadow cardDrop
+    transform rotate(45deg)
+    top -15px
+    border-radius 6px
+  .confirmBarEnd
+    z-index 1000
+    position absolute
+    right 0px
+    width 120px
+    height 120px
+    background pending
+    transform rotate(45deg)
+    top -45px
+    border-radius 6px
+
+.txMonitorBar
+  position absolute
+  left 10px
+  right 10px
+  top 10px
+  height 30px
+  border-radius 4px

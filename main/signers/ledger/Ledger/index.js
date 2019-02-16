@@ -62,7 +62,7 @@ class Ledger extends Signer {
     }
   }
   verifyAddress (display) {
-    console.log('verifyAddress Called but it\'s already active')
+    log.info('verifyAddress Called but it\'s already active')
     if (verifyActive) return
     verifyActive = true
     try {

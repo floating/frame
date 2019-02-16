@@ -34,17 +34,27 @@ class TransactionRequest extends React.Component {
   render () {
     let status = this.props.req.status
     let notice = this.props.req.notice
+    let mode = this.props.req.mode
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
+    if (status === 'monitor') requestClass += ' signerRequestMonitor'
     let etherRates = this.store('external.rates')
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
+
+    let index = this.props.index
+    let total = this.props.total
+
+    let request = this.props.req
+
+    let height = mode === 'monitor' ? '80px' : '370px'
+
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ top: (this.props.top * 10) + 'px' }}>
+      <div key={this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(-${this.props.bottom}px)`, height }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
         {this.props.req.type === 'transaction' ? (
           <div className='approveTransaction'>
@@ -72,6 +82,24 @@ class TransactionRequest extends React.Component {
                         <div key={status} className='requestNoticeInner bounceIn'>
                           <div>{svg.octicon('circle-slash', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
+                        </div>
+                      )
+                    } else if (status === 'monitor') {
+                      return (
+                        <div key={status} className='requestNoticeInner'>
+                          <div className='txMonitorBar'>
+                            {' to: ' + this.props.req.data.to.substr(0, 8)}
+                            {' confirmations: ' + request.tx.confirmations}
+                          </div>
+                          <div className='confirmBar'>
+                            <div className='confirmBarStartText'>{'Sent'}</div>
+                            <div className='confirmBarEndText'>{'Confirmed'}</div>
+                            <div className='confirmBarStart' />
+                            {[1, 2, 3, 4, 5, 6, 7].map((i) => {
+                              return <div className='confirmBarStep' style={{left: 25 + (i * 20) + 'px', zIndex: 1100 - i, opacity: request.tx.confirmations >= i ? 1 : 0.5 * request.tx.confirmations / i }}/>
+                            })}
+                            <div className='confirmBarEnd' />
+                          </div>
                         </div>
                       )
                     } else {
