@@ -48,9 +48,7 @@ class TransactionRequest extends React.Component {
 
     let index = this.props.index
     let total = this.props.total
-
     let request = this.props.req
-
     let height = mode === 'monitor' ? '80px' : '370px'
 
     return (
@@ -96,9 +94,24 @@ class TransactionRequest extends React.Component {
                             <div className='confirmBarEndText'>{'Confirmed'}</div>
                             <div className='confirmBarStart' />
                             {[1, 2, 3, 4, 5, 6, 7].map((i) => {
-                              return <div className='confirmBarStep' style={{left: 10 + (i * 20) + 'px', zIndex: 1100 - i, opacity: request.tx.confirmations >= i ? 1 : 0.2 * ((request.tx.confirmations + 1) / i + 1) }}/>
+                              return <div className='confirmBarStep' style={{left: 10 + (i * 22) + 'px', zIndex: 1100 - i, opacity: request.tx.confirmations >= i ? 1 : 0.2 * ((request.tx.confirmations + 1) / i + 1) }}/>
                             })}
-                            <div className='confirmBarEnd' />
+                          </div>
+                          <div className='confirmBar confirmBarDrop' style={{bottom: '9px', zIndex: '999'}}>
+                            <div className='confirmBarStart' />
+                            {[1, 2, 3, 4, 5, 6, 7].map((i) => {
+                              return <div className='confirmBarStep' style={{left: 10 + (i * 22) + 'px', zIndex: 1100 - i, opacity: request.tx.confirmations >= i ? 1 : 0.2 * ((request.tx.confirmations + 1) / i + 1) }}/>
+                            })}
+                          </div>
+                          <div className='confirmBar confirmBarDrop confirmBarDropBottom' style={{bottom: '8px', zIndex: '998'}}>
+                            <div className='confirmBarStart' />
+                            {[1, 2, 3, 4, 5, 6, 7].map((i) => {
+                              return <div className='confirmBarStep' style={{left: 10 + (i * 22) + 'px', zIndex: 1100 - i, opacity: request.tx.confirmations >= i ? 1 : 0.2 * ((request.tx.confirmations + 1) / i + 1) }}/>
+                            })}
+                          </div>
+                          <div className='txMonitorBar'>
+                            {' to: ' + this.props.req.tx}
+                            {' confirmations: ' + request.tx.confirmations}
                           </div>
                         </div>
                       )

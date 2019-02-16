@@ -207,6 +207,6 @@ const api = {
 // Add Signers
 trezor(signers, api)
 ledger(signers, api)
-if (dev) hot(signers, api)
+if (dev || process.env.WITH_HOT === 'true') hot(signers, api)
 
 module.exports = api

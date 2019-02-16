@@ -190,7 +190,7 @@ class Settings extends React.Component {
             </div>
           </div>
           <div className='signerPermissionDetails'>
-            {'Mousing to the center right edge of your display will reveal Frame'}
+            {'Mousing to the middle of your display\'s right edge reveals Frame'}
           </div>
         </div>
         <div className='signerPermission'>
