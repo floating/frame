@@ -96,7 +96,7 @@ class TransactionRequest extends React.Component {
                             <div className='confirmBarEndText'>{'Confirmed'}</div>
                             <div className='confirmBarStart' />
                             {[1, 2, 3, 4, 5, 6, 7].map((i) => {
-                              return <div className='confirmBarStep' style={{left: 25 + (i * 20) + 'px', zIndex: 1100 - i, opacity: request.tx.confirmations >= i ? 1 : 0.5 * request.tx.confirmations / i }}/>
+                              return <div className='confirmBarStep' style={{left: 10 + (i * 20) + 'px', zIndex: 1100 - i, opacity: request.tx.confirmations >= i ? 1 : 0.2 * ((request.tx.confirmations + 1) / i + 1) }}/>
                             })}
                             <div className='confirmBarEnd' />
                           </div>

@@ -841,6 +841,7 @@
   color white
   font-weight bold
   text-transform uppercase
+  background pending
   .confirmBarStartText
     position absolute
     left 0
@@ -864,35 +865,23 @@
     z-index 1150
     padding-right 9px
   .confirmBarStart
-    z-index 1100
+    z-index 1200
     position absolute
-    left -45px
+    left -245px
     width 120px
     height 120px
-    background good
     transform rotate(45deg)
     top -45px
     border-radius 6px
   .confirmBarStep
     z-index 1000
     position absolute
-    right 0px
-    width 60px
-    height 60px
-    background good
-    box-shadow cardDrop
-    transform rotate(45deg)
-    top -15px
-    border-radius 6px
-  .confirmBarEnd
-    z-index 1000
-    position absolute
-    right 0px
     width 120px
     height 120px
-    background pending
+    background good
     transform rotate(45deg)
     top -45px
+    margin-left -90px
     border-radius 6px
 
 .txMonitorBar
