@@ -21,15 +21,20 @@ let hideOnMouseOut = false
 
 const detectMouse = () => {
   let m1 = electron.screen.getCursorScreenPoint()
-  let area = electron.screen.getDisplayNearestPoint(m1).workArea
-  let minX = (area.width + area.x) - 2
-  let center = (area.height + area.y) / 2
-  let margin = (area.height + area.y) / 8
+  let display = electron.screen.getDisplayNearestPoint(m1)
+  let area = display.workArea
+  let bounds = display.bounds
+  let minX = (area.width + area.x) - 2 // Possibly increase
+  let center = (area.height + (area.y - bounds.y)) / 2
+  let margin = (area.height + (area.y - bounds.y)) / 8
+  m1.y = m1.y - area.y
   let minY = center - margin
   let maxY = center + margin
   mouseTimeout = setTimeout(() => {
     if (m1.x >= minX && m1.y >= minY && m1.y <= maxY) {
       let m2 = electron.screen.getCursorScreenPoint()
+      let area = electron.screen.getDisplayNearestPoint(m2).workArea
+      m2.y = m2.y - area.y
       if (m2.x >= minX && m2.y === m1.y) {
         hideOnMouseOut = true
         api.showTray()
