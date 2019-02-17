@@ -50,8 +50,8 @@ class Requests extends React.Component {
       if (a.created < b.created) return 1
       return 0
     })
-    let containNormal = normal.length ? (350 + (normal.length * 10) + 20) : 100
-    let containMonitor = monitor.length * 90
+    let containNormal = normal.length ? (350 + (normal.length * 10) + 20) : 120
+    let containMonitor = monitor.length * 130
     let containHeight = containNormal + containMonitor
 
     return (
@@ -66,7 +66,7 @@ class Requests extends React.Component {
             {normal.concat(monitor).map((req, i) => {
               let bottom = 0
               if (req.mode === 'normal') bottom = containMonitor + (i * 10)
-              if (req.mode === 'monitor') bottom = (monitor.length - 1 - i - normal.length) * 90
+              if (req.mode === 'monitor') bottom = (monitor.length - 1 - i - normal.length) * 130
               if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} bottom={bottom} />
               if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} bottom={bottom} />
               if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} bottom={bottom} />

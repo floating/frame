@@ -21,9 +21,8 @@ const signers = {}
 
 const txMonitor = (id, hash) => {
   signers[current].requests[id].tx = { hash, confirmations: 0 }
-  signers[current].requests[id].status = 'monitor'
+  signers[current].requests[id].status = 'confirming'
   signers[current].requests[id].notice = 'Confirming Transaction'
-  signers[current].requests[id].mode = 'monitor'
   signers[current].update()
   proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads']}, newHeadRes => {
     if (newHeadRes.error) {
@@ -44,6 +43,9 @@ const txMonitor = (id, hash) => {
               signers[current].requests[id].tx.confirmations = confirmations
               signers[current].update()
               if (confirmations >= 6) {
+                signers[current].requests[id].status = 'confirmed'
+                signers[current].requests[id].notice = 'Transaction Confirmed'
+                signers[current].update()
                 proxyProvider.removeListener('data', handler)
                 proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub]}, unsubRes => {
                   // TODO: Handle Error
@@ -157,6 +159,7 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'declined'
       signers[current].requests[handlerId].notice = 'Signature Declined'
+      signers[current].requests[handlerId].mode = 'monitor'
       signers[current].update()
     }
     setTimeout(() => api.removeRequest(handlerId), 1800)
@@ -168,6 +171,7 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'pending'
       signers[current].requests[handlerId].notice = 'Signature Pending'
+      signers[current].requests[handlerId].mode = 'monitor'
       signers[current].update()
     }
   },
@@ -198,7 +202,7 @@ const api = {
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'success'
-      signers[current].requests[handlerId].notice = 'Signature Succesful'
+      signers[current].requests[handlerId].notice = 'Signature Succesful, Broadcasting'
       signers[current].update()
     }
   }

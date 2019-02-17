@@ -29,5 +29,15 @@ module.exports = {
       </div>
     )
   },
+  txSection: size => {
+    return (
+      <div style={{ width: '410px', height: '50px' }}>
+        <svg viewBox='0 0 445.47 54.55'>
+          <path class='a' d='M328.82,353.55H762.58a3.85,3.85,0,0,1,3.57,2.41l6.47,16.18a23.36,23.36,0,0,1,0,17.36l-6.47,16.18a3.86,3.86,0,0,1-3.57,2.41H328.82Z' transform='translate(-328.82 -353.55)' />
+        </svg>
+      </div>
+
+    )
+  },
   octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }
