@@ -43,7 +43,7 @@ const txMonitor = (id, hash) => {
               let confirmations = blockHeight - receiptBlock
               signers[current].requests[id].tx.confirmations = confirmations
               signers[current].update()
-              if (confirmations >=  7) {
+              if (confirmations >= 6) {
                 proxyProvider.removeListener('data', handler)
                 proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub]}, unsubRes => {
                   // TODO: Handle Error

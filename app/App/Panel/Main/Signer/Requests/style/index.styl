@@ -90,6 +90,28 @@
     transform scale(1)
     opacity 1
 
+@keyframes spin
+  0%
+    transform rotate(0deg)
+  100%
+    transform rotate(360deg)
+
+@keyframes sheen
+  0%
+    transform translateX(-300px)
+  50%
+    transform translateX(-300px)
+  100%
+    transform translateX(500px)
+
+@keyframes pulse
+  0%
+    background highlight
+  50%
+    background highlightest
+  100%
+    background highlight
+
 .spinner
   width 100px
   height 100px
@@ -193,7 +215,7 @@
      position relative
      display flex
      flex-direction column
-     transition standard
+     transition standardSlow
      tranform translateZ(0)
 
     .noRequests
@@ -832,11 +854,127 @@
   left -100%
   right 100%
 
+.txBar
+  position absolute
+  z-index 1001
+  height 50px
+  width 310px
+  bottom 10px
+  border-radius 4px
+  overflow hidden
+  background highlight
+  box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+
+  .txBarSheen
+    position absolute
+    z-index 3002
+    height 50px
+    width 200px
+    animation sheen 4s infinite linear
+    background linear-gradient(90deg, rgba(247, 251, 255, 0), rgba(247, 251, 255, 0.6), rgba(247, 251, 255, 0))
+
+  .txStep
+    position absolute
+    z-index 1002
+    height 100%
+    width 100%
+    right 90%
+
+    .txStepLayer
+      position absolute
+      z-index 1003
+      height 100%
+      width 100%
+      right 0
+      transition standardSlow
+
+      .txStepLayerStatus
+        z-index 1005
+        position absolute
+        height 100%
+        top 0
+        right 0
+        display flex
+        justify-content center
+        align-items center
+        padding-right 5px
+
+        .txStepLayerStatusIcon
+          position absolute
+          z-index 1012
+          height 30px
+          width 30px
+          display flex
+          justify-content center
+          align-items center
+
+        .txStepLayerStatusLoading
+          position absolute
+          z-index 1007
+          height 40px
+          width 40px
+          border-radius 20px
+          overflow hidden
+          animation spin 0.7s infinite linear
+          display flex
+          justify-content center
+          align-items center
+          background thin
+
+          .txStepLayerStatusLoadingBox
+            position absolute
+            z-index 1008
+            top 0
+            right 0
+            width 50%
+            height 50%
+            background outerspace08
+
+          .txStepLayerStatusLoadingCenter
+            position relative
+            z-index 1010
+            height calc(100% - 4px)
+            width calc(100% - 4px)
+            border-radius 18px
+            background highlight
+
+      .txStepLayerAngle
+        z-index 1004
+        position absolute
+        right 62px
+        top -130px
+        width 310px
+        height 310px
+        transform rotate(45deg)
+        border-radius 6px
+        // border 2px solid thin
+        box-shadow 1px -1px 4px thinner
+
+    // .txStepLayerPulse
+    //   .txStepLayerAngle
+    //     animation pulse 2s infinite linear
+
+        // box-sizing border-box
+        /// box-shadow 1px -1px 2px thin
+
+    .txStepLayer0
+      .txStepLayerAngle
+        background highlight
+
+    .txStepLayer1
+      .txStepLayerAngle
+        background highlightest
+        animation pulse 1s infinite linear
+
+    .txStepLayer2
+      .txStepLayerAngle
+        background highlightest
+
 .confirmBar
   position absolute
   z-index 1001
   background highlight
-  height 30px
+  height 60px
   width 310px
   bottom 10px
   border-radius 4px
@@ -844,19 +982,22 @@
   font-size 12px
   font-weight bold
   text-transform uppercase
-  background highlighter
+
   .confirmBarStartText
     position absolute
-    left 4px
+    left 0px
     top 0
     bottom 0
-    width 0px
+    width 60px
     display flex
     justify-content flex-start
     align-items center
-    z-index 1450
-    padding-left 9px
+    z-index 2450
+    padding-left 19px
     color white
+    svg
+      fill spacewhite
+      color spacewhite
   .confirmBarEndText
     position absolute
     right 0
@@ -868,33 +1009,36 @@
     align-items center
     z-index 1150
     padding-right 9px
+    svg
+      fill outerspace
+      color outerspace
   .confirmBarStart
-    z-index 1200
+    z-index 1204
     position absolute
-    left -80px
+    left -70px
     width 120px
     height 120px
     transform rotate(45deg)
-    top -44px
-    border-radius 6px
-    background pending
+    top -29px
+    border-radius 8px
+    background highlightest
+    border-radius 8px
+    box-shadow 5px -5px 40px thick
+  .confirmBarSent
+    z-index 1202
+    left 0px
+
   .confirmBarStep
     z-index 1000
     position absolute
     width 120px
     height 120px
-    background good
+    background highlight
+    box-shadow 5px -5px 40px thick
     transform rotate(45deg)
-    top -44px
-    margin-left -90px
-    border-radius 6px
-
-.confirmBarDrop
-  background lowlight
-  .confirmBarStart
-    background pendingShade
-  .confirmBarStep
-    background goodShade
+    top -29px
+    margin-left -60px
+    border-radius 8px
 
 .confirmBarDropBottom
   box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick

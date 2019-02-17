@@ -306,7 +306,7 @@ class Signer extends React.Component {
       style.left = 0
       style.right = 0
       style.zIndex = '1000000000000'
-      let panelHeight = document.getElementById('panel').offsetHeight
+      let panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 50 : initial.height - 3
       style.transform = open ? `translateY(-${initial.top - 44}px)` : `translateY(0px)`
     } else if (this.store('signer.current') !== '') {
