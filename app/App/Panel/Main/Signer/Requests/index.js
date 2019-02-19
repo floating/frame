@@ -40,20 +40,21 @@ class Requests extends React.Component {
       if (req.type === 'transaction') return this.props.accounts.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
       return true
     })
-    let normal = requests.filter(req => req.mode === 'normal').sort((a, b) => {
+    let normal = requests.filter(req => req.mode === 'normal')
+    normal.sort((a, b) => {
       if (a.created > b.created) return -1
       if (a.created < b.created) return 1
       return 0
     })
-    let monitor = requests.filter(req => req.mode === 'monitor').sort((a, b) => {
+    let monitor = requests.filter(req => req.mode === 'monitor')
+    monitor.sort((a, b) => {
       if (a.created > b.created) return -1
       if (a.created < b.created) return 1
       return 0
     })
-    let containNormal = normal.length ? (350 + (normal.length * 10) + 20) : 120
+    let containNormal = normal.length ? (350 + (normal.length * 10) + 40) : 160
     let containMonitor = monitor.length * 130
     let containHeight = containNormal + containMonitor
-
     return (
       <div className={this.store('signer.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
         <div className='requestTitle'>
@@ -63,13 +64,18 @@ class Requests extends React.Component {
         <div className='requestContainerWrap'>
           <CSSTransitionGroup className='requestContainer' style={{ height: containHeight + 'px' }} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
             <div key={'noReq'} style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>{'No Pending Requests'}</div>
+            <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal - 15}px)` }}>
+              <span>{'Recent Transactions'}</span>
+              <span>{monitor.length}</span>
+            </div>
             {normal.concat(monitor).map((req, i) => {
-              let bottom = 0
-              if (req.mode === 'normal') bottom = containMonitor + (i * 10)
-              if (req.mode === 'monitor') bottom = (monitor.length - 1 - i - normal.length) * 130
-              if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} bottom={bottom} />
-              if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} bottom={bottom} />
-              if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} bottom={bottom} />
+              let pos = 0
+              let z = 2000 + i
+              if (req.mode === 'normal') pos = ((normal.length - i) * 10)
+              if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * 130)
+              if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} />
+              if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} />
+              if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} />
               return null
             })}
           </CSSTransitionGroup>

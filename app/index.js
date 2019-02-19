@@ -18,3 +18,4 @@ link.rpc('getState', (err, state) => {
 })
 
 document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
+document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))

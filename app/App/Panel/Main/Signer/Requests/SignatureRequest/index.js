@@ -46,7 +46,7 @@ class TransactionRequest extends React.Component {
     let mode = this.props.req.mode
     let height = mode === 'monitor' ? '80px' : '370px'
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(-${this.props.bottom}px)`, height }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
         {this.props.req.type === 'sign' ? (
           <div className='approveTransaction'>

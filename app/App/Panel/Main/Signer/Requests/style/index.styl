@@ -136,23 +136,25 @@
 
 .slideUp-enter
   opacity 0
-  transform scale(1) translateY(-20px)
+  transform scale(1)
+  margin-top -200px
   transition standardSlow
 
 .slideUp-enter.slideUp-enter-active
   opacity 1
-  transform scale(1) translateY(0px)
+  transform scale(1)
+  margin-top 0px
   transition standardSlow
   transition-delay 0.32s
 
 .slideUp-leave
   opacity 1
   transition standardSlow
-  transform scale(1) translateY(0px)
+  transform scale(1)
 
 .slideUp-leave.slideUp-leave-active
   opacity 0
-  transform scale(1.4) translateY(400px)
+  transform scale(1.4)
 
 .signerRequests
   position absolute
@@ -162,7 +164,7 @@
   left 0
   z-index 200
   padding 0px 0px 30px 0px
-  transition standard
+  transition standardSlow
   overflow-y scroll
   overflow-x hidden
   transform translateZ(0)
@@ -229,7 +231,7 @@
       top 0px
       left 0
       right 0
-      height 130px
+      height 155px
       font-size 12px
       font-weight 400
       letter-spacing 1px
@@ -237,9 +239,28 @@
       display flex
       justify-content center
       align-items center
-      opacity 0.7
+      opacity 0.3
       transition standard
       tranform translateZ(0)
+
+    .recentRequests
+      position absolute
+      top 1px
+      left 10px
+      right 10px
+      height 20px
+      pointer-events none
+      justify-content space-between
+      align-items center
+      display flex
+      text-transform uppercase
+      font-size 11px
+      line-height 10px
+      font-weight 600
+      letter-spacing 2px
+      margin-left -2px
+      transition standardSlow
+      color outerspace08
 
   .signerRequestItems
     overflow scroll
@@ -248,7 +269,7 @@
 
   .signerRequest
     position absolute
-    bottom 0px
+    top 0px
     left 0px
     right 0px
     border-radius 2px
@@ -258,7 +279,7 @@
     height 370px
     display flex
     justify-content center
-    transition standard
+    transition standardSlow
     background lowlight
     z-index 2000
     color outerspace08
@@ -860,11 +881,50 @@
   left -100%
   right 100%
 
-.monitorBot
+.monitorConfirms
+  position absolute
+  z-index 1000
+  height 40px
+  top 50px
+  left 15px
+  right 15px
+  color outerspace08
+  display flex
+  justify-content space-between
+  align-items center
+  padding-top 11px
+  box-sizing border-box
+  transition standardFast
+
+  .monitorConfirmsItem
+    font-size 11px
+    font-weight bold
+    color outerspace01
+    svg
+      min-width 5px
+      max-width 5px
+      color outerspace03
+      transition standardFast
+      // background blue
+
+  .monitorConfirmsItemActive
+    color outerspace08
+    svg
+      min-width 5px
+      max-width 5px
+      color outerspace
+      // filter drop-shadow(0px 0px 2px good)
+
+  .monitorConfirmsItemGood
+    color outerspace
+    svg
+      color outerspace
+
+.monitorTop
   position absolute
   z-index 1001
   height 30px
-  bottom 1px
+  top 1px
   left 15px
   right 16px
   // background blue
@@ -887,16 +947,16 @@
     align-items center
 
   span
-    padding 0px 7px 0px 0px
+    padding 0px 3px 0px 0px
 
   svg
     padding 0px 2px 0px 2px
 
-.monitorTop
+.monitorBot
   position absolute
   z-index 1001
   height 35px
-  top 1px
+  bottom 1px
   left 10px
   right 12px
   font-size 12px
@@ -932,7 +992,9 @@
   border-radius 4px
   overflow hidden
   background highlight
+  transition standard
   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+  // transform translateY(-25px)
 
   .txBarSheen
     position absolute
@@ -941,6 +1003,7 @@
     width 200px
     animation sheen 12s infinite ease
     background linear-gradient(90deg, rgba(247, 251, 255, 0), rgba(237, 241, 255, 0.5), rgba(247, 251, 255, 0))
+    background-blend-mode multiply
 
   .txStep
     position absolute
@@ -954,7 +1017,8 @@
       height 100%
       width 100%
       right 0
-      transition standardSlower
+      transition standardSlowest
+      transition-delay 0
 
       .txStepLayerStatus
         z-index 1005
@@ -1024,13 +1088,16 @@
           right 2px
           padding-right 2px
 
+    .txStepLayerActive
+      transition-delay 1s
+
     .txStepLayer0
       .txStepLayerStatus
         svg
           fill blue
       .txStepLayerAngle
         fill highlight
-        filter drop-shadow(5px 0px 0px thinner)
+        filter drop-shadow(3px 0px 7px thin)
         right 7px
 
     .txStepLayer1
@@ -1044,11 +1111,12 @@
         right 7px
 
     .txStepLayer2
+      opacity 1
       .txStepLayerStatus
         svg
-          color outerspace
+          color outerspace08
       .txStepLayerAngle
-        fill highlighter
+        fill highlight
 
       // .txStepLayerAngleDone
       //   fill outerspace

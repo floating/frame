@@ -19,11 +19,30 @@ let current = null
 // Connected Signers
 const signers = {}
 
+let confirmProgressTimer
+
+const confirmProgress = (id, lastConfirm) => {
+  clearTimeout(confirmProgressTimer)
+  let currentProgress = (Date.now() - lastConfirm) / 150
+  if (currentProgress < 100) confirmProgressTimer = setTimeout(() => confirmProgress(id, lastConfirm), 3000)
+  signers[current].requests[id].tx.currentProgress = currentProgress
+  signers[current].update()
+}
+
 const txMonitor = (id, hash) => {
-  signers[current].requests[id].tx = { hash, confirmations: 0 }
+  signers[current].requests[id].tx = { hash, confirmations: 0, currentProgress: 0 }
   signers[current].requests[id].status = 'confirming'
   signers[current].requests[id].notice = 'Confirming Transaction'
   signers[current].update()
+
+  proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash]}, receiptRes => {
+    if (receiptRes.error) {
+      // TODO: Handle Error
+    } else if (receiptRes.result && signers[current].requests[id]) {
+      signers[current].requests[id].tx.receipt = receiptRes.result
+      signers[current].update()
+    }
+  })
   proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads']}, newHeadRes => {
     if (newHeadRes.error) {
       // TODO: Handle Error
@@ -40,19 +59,21 @@ const txMonitor = (id, hash) => {
               let blockHeight = parseInt(newHead.number, 16)
               let receiptBlock = parseInt(signers[current].requests[id].tx.receipt.blockNumber, 16)
               let confirmations = blockHeight - receiptBlock
+              let lastConfirmation = signers[current].requests[id].tx.confirmations
               signers[current].requests[id].tx.confirmations = confirmations
               signers[current].update()
-              if (confirmations >= 6) {
+              if (lastConfirmation!== confirmations) confirmProgress(id, Date.now())
+              if (confirmations > 12) {
                 signers[current].requests[id].status = 'confirmed'
                 signers[current].requests[id].notice = 'Transaction Confirmed'
                 signers[current].update()
+                clearTimeout(confirmProgressTimer)
                 proxyProvider.removeListener('data', handler)
                 proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub]}, unsubRes => {
                   // TODO: Handle Error
                 })
               }
             }
-
           })
         }
       }
@@ -171,7 +192,6 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'pending'
       signers[current].requests[handlerId].notice = 'Signature Pending'
-      signers[current].requests[handlerId].mode = 'monitor'
       signers[current].update()
     }
   },
@@ -202,7 +222,8 @@ const api = {
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'success'
-      signers[current].requests[handlerId].notice = 'Signature Succesful, Broadcasting'
+      signers[current].requests[handlerId].notice = 'Signature Succesful'
+      signers[current].requests[handlerId].mode = 'monitor'
       signers[current].update()
     }
   }

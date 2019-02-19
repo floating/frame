@@ -30,6 +30,14 @@ class TransactionBar extends React.Component {
         </div>
       )
     }
+    if (type === 'success') {
+      return (
+        <div className='txStepLayerStatus' style={{ width, paddingRight: '20px', opacity: mode === 'dim' ? 0.3 : 1 }}>
+          {mode === 'loading' ? this.loading() : null}
+          <div className='txStepLayerStatusIcon'>{svg.include(18)}</div>
+        </div>
+      )
+    }
     if (type === 'confirmed') {
       return (
         <div className='txStepLayerStatus' style={{ width, paddingRight: '20px', opacity: mode === 'dim' ? 0.3 : 1 }}>
@@ -56,7 +64,7 @@ class TransactionBar extends React.Component {
           {this.icon(type, width, 'dim')}
           <div className='txStepLayerAngle'>{svg.txSection()}</div>
         </div>
-        <div className={phase === 1 ? 'txStepLayer txStepLayer1 txStepLayerActive' : 'txStepLayer txStepLayer1'} style={{ zIndex: 2, transform: `translateX(-${phase >= 1 ? 0 : width}px)` }}>
+        <div className={phase === 1 ? 'txStepLayer txStepLayer1 txStepLayerActive' : 'txStepLayer txStepLayer1'} style={{ zIndex: 2, transform: `translateX(-${phase === 1 ? 0 : phase < 1 ? width : 500}px)` }}>
           {this.icon(type, width, 'loading')}
           <div className='txStepLayerAngle'>{svg.txSection()}</div>
         </div>
@@ -72,21 +80,37 @@ class TransactionBar extends React.Component {
     let mode = req.mode
     let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let hash = req.tx && req.tx.hash ? req.tx.hash : null
-    let pending = this.props.req.status === 'pending'
+    let pending = req.status === 'pending'
+    let txStatus = req.tx && req.tx.receipt ? req.tx.receipt.status : false
     return (
       <div className='txBar'>
-        { confirmations < 6 ? <div className='txBarSheen' /> : null }
-        {this.step(0, 75, 0, 'signed', pending ? 1 : 2)}
-        {this.step(75, 60, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
-        {this.step(135, 24, 2, 'confirm', confirmations >= 1 ? 2 : !pending && hash && confirmations === 0 ? 1 : 0)}
-        {this.step(159, 24, 3, 'confirm', confirmations >= 2 ? 2 : confirmations === 1 ? 1 : 0)}
-        {this.step(183, 24, 4, 'confirm', confirmations >= 3 ? 2 : confirmations === 2 ? 1 : 0)}
-        {this.step(207, 24, 5, 'confirm', confirmations >= 4 ? 2 : confirmations === 3 ? 1 : 0)}
-        {this.step(231, 24, 6, 'confirm', confirmations >= 5 ? 2 : confirmations === 4 ? 1 : 0)}
-        {this.step(255, 80, 7, 'confirmed', confirmations >= 6 ? 2 : confirmations === 5 ? 1 : 0)}
+        {this.step(0, 90, 0, 'signed', pending ? 1 : 2)}
+        {this.step(90, 90, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
+        {this.step(180, 90, 2, 'success', !hash ? 0 : txStatus === '0x1' ? 2 : txStatus === '0x0' ? -1 : 1)}
+        {this.step(240, 105, 3, 'confirmed', confirmations >= 1 ? 2 : txStatus && confirmations === 0 ? 1 : 0)}
       </div>
     )
   }
+  // render () {
+  //   let req = this.props.req
+  //   let mode = req.mode
+  //   let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
+  //   let hash = req.tx && req.tx.hash ? req.tx.hash : null
+  //   let pending = this.props.req.status === 'pending'
+  //   return (
+  //     <div className='txBar'>
+  //       { confirmations < 6 ? <div className='txBarSheen' /> : null }
+  //       {this.step(0, 75, 0, 'signed', pending ? 1 : 2)}
+  //       {this.step(75, 60, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
+  //       {this.step(135, 24, 2, 'confirm', confirmations >= 1 ? 2 : !pending && hash && confirmations === 0 ? 1 : 0)}
+  //       {this.step(159, 24, 3, 'confirm', confirmations >= 2 ? 2 : confirmations === 1 ? 1 : 0)}
+  //       {this.step(183, 24, 4, 'confirm', confirmations >= 3 ? 2 : confirmations === 2 ? 1 : 0)}
+  //       {this.step(207, 24, 5, 'confirm', confirmations >= 4 ? 2 : confirmations === 3 ? 1 : 0)}
+  //       {this.step(231, 24, 6, 'confirm', confirmations >= 5 ? 2 : confirmations === 4 ? 1 : 0)}
+  //       {this.step(255, 80, 7, 'confirmed', confirmations >= 6 ? 2 : confirmations === 5 ? 1 : 0)}
+  //     </div>
+  //   )
+  // }
 }
 
 class TransactionRequest extends React.Component {
@@ -132,13 +156,28 @@ class TransactionRequest extends React.Component {
     let request = this.props.req
     let height = mode === 'monitor' ? '120px' : '370px'
 
+    let confirmations = request.tx && request.tx.confirmations ? request.tx.confirmations : 0
+    let currentProgress = request.tx && request.tx.currentProgress ? request.tx.currentProgress : 0
+
     // <div className='transactionToAddressFull'>
     //   {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
     //   <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
     // </div>
 
+    // {[...Array(5).keys()].map(i => {
+    //   return (
+    //     <React.Fragment>
+    //       <div className={confirmations > i + 1 || confirmations === i + 1 && currentProgress > 20 ? 'monitorConfirmsItem monitorConfirmsItemActive' : 'monitorConfirmsItem'}>{svg.octicon('primitive-dot', { height: 6 })}</div>
+    //       <div className={confirmations > i + 1 || confirmations === i + 1 && currentProgress > 40 ? 'monitorConfirmsItem monitorConfirmsItemActive' : 'monitorConfirmsItem'}>{svg.octicon('primitive-dot', { height: 6 })}</div>
+    //       <div className={confirmations > i + 1 || confirmations === i + 1 && currentProgress > 60 ? 'monitorConfirmsItem monitorConfirmsItemActive' : 'monitorConfirmsItem'}>{svg.octicon('primitive-dot', { height: 6 })}</div>
+    //       <div className={confirmations > i + 1 || confirmations === i + 1 && currentProgress > 80 ? 'monitorConfirmsItem monitorConfirmsItemActive' : 'monitorConfirmsItem'}>{svg.octicon('primitive-dot', { height: 6 })}</div>
+    //       <div className={confirmations > i + 1 ? 'monitorConfirmsItem monitorConfirmsItemGood' : 'monitorConfirmsItem'}>{svg.octicon('chevron-right', { height: 11 })}</div>
+    //     </React.Fragment>
+    //   )
+    // })}
+
     return (
-      <div key={this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(-${this.props.bottom}px)`, height }}>
+      <div key={this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: this.props.z }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
         {this.props.req.type === 'transaction' ? (
           <div className='approveTransaction'>
@@ -146,18 +185,19 @@ class TransactionRequest extends React.Component {
               {notice ? (
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
-                    <div className='monitorTop'>
+                    <div className='monitorBot'>
                       <div>{notice}</div>
                     </div>
                     <TransactionBar req={this.props.req} />
-                    <div className='monitorBot'>
+                    <div className='monitorConfirms'>
+                    {[...Array(12).keys()].map(i => {
+                      return (
+                        <div className={confirmations > i ? 'monitorConfirmsItem monitorConfirmsItemGood' : 'monitorConfirmsItem'}>{svg.octicon('chevron-right', { height: 12 })}</div>
+                      )
+                    })}
+                    </div>
+                    <div className='monitorTop'>
                       <div className='monitorBotValue'><span>{'Ξ'}</span>{value}</div>
-                      <div>{svg.octicon('chevron-right', { height: 10 })}</div>
-                      <div>{svg.octicon('chevron-right', { height: 10 })}</div>
-                      <div>{svg.octicon('chevron-right', { height: 10 })}</div>
-                      <div>{svg.octicon('chevron-right', { height: 10 })}</div>
-                      <div>{svg.octicon('chevron-right', { height: 10 })}</div>
-                      <div>{svg.octicon('chevron-right', { height: 10 })}</div>
                       <div className='monitorBotTo'>
                         {this.props.req.data.to.substring(0, 5)}
                         {svg.octicon('primitive-dot', { height: 6 })}
