@@ -68,9 +68,10 @@ class Ledger extends Signer {
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
-      eth.getAddress(this.getPath(this.index), display, true).then(result => {
+      eth.getAddress(this.basePath(), display, true).then(result => {
         transport.close()
-        let address = result.address.toLowerCase()
+        let all = this.deriveHDAccounts(result.publicKey, result.chainCode)
+        let address = all[this.index].toLowerCase()
         let current = this.accounts[this.index].toLowerCase()
         if (address !== current) {
           // TODO: Error Notification
