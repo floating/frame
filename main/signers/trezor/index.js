@@ -1,4 +1,4 @@
-require('babel-polyfill')
+require('@babel/polyfill')
 
 const TrezorJS = require('trezor.js')
 const Trezor = require('./Trezor')

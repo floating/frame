@@ -13,7 +13,7 @@ class Hot extends Signer {
     this.open()
   }
   // Standard Methods
-  signPersonal (message, cb) {
+  signMessage (message, cb) {
     const hash = hashPersonalMessage(toBuffer(message))
     const signed = ecsign(hash, this.privateKey)
     const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')

@@ -74,7 +74,9 @@ class Provider extends EventEmitter {
   approveSign (req, cb) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
-    signers.signPersonal(req.payload.params[0], req.payload.params[1], (err, signed) => {
+    let address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
+    let message = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
+    signers.signMessage(address, message, (err, signed) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
@@ -175,7 +177,7 @@ class Provider extends EventEmitter {
       signers.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)
     })
   }
-  signPersonal (payload, res) {
+  ethSign (payload, res) {
     let handlerId = uuid()
     this.handlers[handlerId] = res
     signers.addRequest({ handlerId, type: 'sign', payload, account: signers.getAccounts()[0] })
@@ -216,10 +218,9 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
-    if (payload.method === 'personal_sign') return this.signPersonal(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
-    if (payload.method === 'eth_sign') return this.resError('No eth_sign, please use personal_sign', payload, res)
+    if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     this.connection.send(payload, res)
