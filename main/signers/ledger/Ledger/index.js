@@ -125,7 +125,7 @@ class Ledger extends Signer {
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
     if (this._deviceStatus) clearTimeout(this._deviceStatus)
-    if (this._signPersonal) clearTimeout(this._signPersonal)
+    if (this._signMessage) clearTimeout(this._signMessage)
     if (this._signTransaction) clearTimeout(this._signTransaction)
     this.networkObserver.remove()
     super.close()
@@ -200,7 +200,7 @@ class Ledger extends Signer {
     return hex
   }
   // Standard Methods
-  signPersonal (message, cb) {
+  signMessage (message, cb) {
     this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
@@ -220,13 +220,13 @@ class Ledger extends Signer {
     } catch (err) {
       this.pause = false
       if (err.message.startsWith('cannot open device with path')) {
-        clearTimeout(this._signPersonal)
+        clearTimeout(this._signMessage)
         if (++this.busyCount > 10) {
           this.busyCount = 0
           return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
-          this._signPersonal = setTimeout(() => this.signPersonal(message, cb), 700)
-          return log.info('>>>>>>> Busy: cannot open device with path, will try again (signPersonal)')
+          this._signMessage = setTimeout(() => this.signMessage(message, cb), 700)
+          return log.info('>>>>>>> Busy: cannot open device with path, will try again (signMessage)')
         }
       }
       cb(err)

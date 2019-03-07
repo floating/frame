@@ -63,6 +63,9 @@ class Signer {
     if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     windows.broadcast('main:action', 'updateSigner', this.summary())
   }
+  signMessage (message, cb) {
+    console.warn('Signer:' + this.type + ' did not implement a signMessage method.')
+  }
   signTransaction (rawTx, cb) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method.')
   }

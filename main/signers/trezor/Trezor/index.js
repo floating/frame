@@ -132,11 +132,11 @@ class Trezor extends Signer {
     return hex
   }
   // Standard Methods
-  signPersonal (message, cb) {
+  signMessage (message, cb) {
     this.device.waitForSessionAndRun(session => session.signEthMessage(bip32Path.fromString(this.getPath()).toPathArray(), this.normalize(message))).then(result => {
       cb(null, '0x' + result.message.signature)
     }).catch(err => {
-      log.error('signPersonal Error')
+      log.error('signMessage Error')
       log.error(err)
       if (err.message === 'Unexpected message') err = new Error('Update Trezor Firmware')
       cb(err)

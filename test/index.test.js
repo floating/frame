@@ -33,12 +33,27 @@ test('Send Transaction', done => {
   })
 }, 30 * 1000)
 
-test('Sign Personal and ecRecover', done => {
+test('sign_personal and ecRecover', done => {
   let message = 'Frame Test'
-  let signed = ''
   web3.eth.getAccounts().then(accounts => {
-    web3.eth.personal.sign(message, accounts[0]).then(result => {
-      signed = result
+    web3.eth.personal.sign(message, accounts[0]).then(signed => {
+      web3.eth.personal.ecRecover(message, signed).then(result => {
+        expect(result.toLowerCase()).toBe(accounts[0].toLowerCase())
+        console.log(JSON.stringify({ address: accounts[0], msg: message, sig: signed, version: '2' }))
+        done()
+      }).catch(err => {
+        console.log(err)
+      })
+    }).catch(err => {
+      console.log(err)
+    })
+  })
+}, 30 * 1000)
+
+test('eth_sign and ecRecover', done => {
+  let message = 'Frame Test'
+  web3.eth.getAccounts().then(accounts => {
+    web3.eth.sign(message, accounts[0]).then(signed => {
       web3.eth.personal.ecRecover(message, signed).then(result => {
         expect(result.toLowerCase()).toBe(accounts[0].toLowerCase())
         console.log(JSON.stringify({ address: accounts[0], msg: message, sig: signed, version: '2' }))
