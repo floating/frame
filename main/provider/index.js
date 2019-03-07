@@ -71,7 +71,7 @@ class Provider extends EventEmitter {
     log.warn(error)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error: error.message })
   }
-  verifySignature (signed, message, address, cb) {
+  getSignedAddress (signed, message, cb) {
     const signature = Buffer.from(signed.replace('0x', ''), 'hex')
     if (signature.length !== 65) cb(new Error(`Frame verifySignature: Signature has incorrect length`))
     let v = signature[64]
@@ -80,8 +80,22 @@ class Provider extends EventEmitter {
     let s = toBuffer(signature.slice(32, 64))
     const hash = hashPersonalMessage(toBuffer(message))
     const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-    if (verifiedAddress !== address) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
-    cb(null, true)
+    cb(null, verifiedAddress)
+  }
+  ecRecover (payload, res) {
+    const message = payload.params[0]
+    const signed = payload.params[1]
+    this.getSignedAddress(signed, message, (err, verifiedAddress) => {
+      if (err) return this.resError(err.message, payload, res)
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: verifiedAddress })
+    })
+  }
+  verifySignature (signed, message, address, cb) {
+    this.getSignedAddress(signed, message, (err, verifiedAddress) => {
+      if (err) return cb(err)
+      if (verifiedAddress !== address) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
+      cb(null, true)
+    })
   }
   approveSign (req, cb) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
@@ -200,18 +214,6 @@ class Provider extends EventEmitter {
     let handlerId = uuid()
     this.handlers[handlerId] = res
     signers.addRequest({ handlerId, type: 'sign', payload, account: signers.getAccounts()[0] })
-  }
-  ecRecover (payload, res) {
-    const message = payload.params[0]
-    const signature = Buffer.from(payload.params[1].replace('0x', ''), 'hex')
-    if (signature.length !== 65) this.resError(`Frame ecRecover: Signature has incorrect length`, payload, res)
-    let v = signature[64]
-    v = v === 0 || v === 1 ? v + 27 : v
-    let r = toBuffer(signature.slice(0, 32))
-    let s = toBuffer(signature.slice(32, 64))
-    const hash = hashPersonalMessage(toBuffer(message))
-    const address = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: address })
   }
   subscribe (payload, res) {
     let subId = '0x' + this.randHex(32)
