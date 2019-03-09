@@ -44,7 +44,7 @@ class TransactionBar extends React.Component {
       return (
         <div className='txStepLayerStatus' style={{ right: '45px' }}>
           {this.status(mode)}
-          <div className='txStepLayerStatusIcon' style={{ top: '2px', right: '11px' }}>{svg.octicon('check', { height: 24})}</div>
+          <div className='txStepLayerStatusIcon' style={{ top: '2px', right: '11px' }}>{svg.octicon('check', { height: 24 })}</div>
         </div>
       )
     }
