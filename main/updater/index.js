@@ -5,6 +5,7 @@ const log = require('electron-log')
 const semver = require('semver')
 const version = require('../../package.json').version
 const windows = require('../windows')
+const store = require('../store')
 
 const dev = process.env.NODE_ENV === 'development'
 
@@ -44,15 +45,19 @@ autoUpdater.on('update-downloaded', res => {
 const updater = {
   updatePending: false,
   availableUpdate: '',
+  availableVersion: '',
   updateAvailable: (version, location) => { // An update is available
+    this.availableVersion = version
     this.availableUpdate = location
-    if (!updater.notified[version]) windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
+    let remindOk = store('main.updater.dontRemind').indexOf(version) === -1
+    if (!updater.notified[version] && remindOk) windows.broadcast('main:action', 'updateBadge', 'updateAvailable')
     updater.notified[version] = true
   },
   updateReady: () => { // An update is ready
     windows.broadcast('main:action', 'updateBadge', 'updateReady')
   },
-  installAvailableUpdate: (install) => {
+  installAvailableUpdate: (install, dontRemind) => {
+    if (dontRemind) store.dontRemind(this.availableVersion)
     if (install) {
       if (this.availableUpdate === 'auto') {
         autoUpdater.downloadUpdate()

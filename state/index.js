@@ -68,6 +68,9 @@ let initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
+    updater: {
+      dontRemind: main('updater.dontRemind', [])
+    },
     connection: {
       network: main('connection.network', '4'),
       options: ['1', '3', '4', '42'],
