@@ -11,7 +11,7 @@ const rpc = {
     cb(null, store())
   },
   signTransaction: signers.signTransaction,
-  signPersonal: signers.signPersonal,
+  signMessage: signers.signMessage,
   getAccounts: signers.getAccounts,
   getCoinbase: signers.getCoinbase,
   getSigners: signers.getSigners,

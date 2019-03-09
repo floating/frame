@@ -121,10 +121,10 @@ const api = {
     if (!signers[current]) return cb(new Error('No Account Selected'))
     signers[current].getCoinbase(cb)
   },
-  signPersonal (message, address, cb) {
+  signMessage (address, message, cb) {
     if (!signers[current]) return cb(new Error('No Account Selected'))
-    if (address.toLowerCase() !== api.getSelectedAccounts()[0].toLowerCase()) return cb(new Error('signPersonal: Wrong Account Selected'))
-    signers[current].signPersonal(message, cb)
+    if (address.toLowerCase() !== api.getSelectedAccounts()[0].toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
+    signers[current].signMessage(message, cb)
   },
   signTransaction (rawTx, cb) {
     if (!signers[current]) return cb(new Error('No Account Selected'))

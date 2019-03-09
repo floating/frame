@@ -43,8 +43,8 @@ ipcMain.on('tray:resetAllSettings', () => {
   app.exit(0)
 })
 
-ipcMain.on('tray:installAvailableUpdate', (e, install) => {
-  updater.installAvailableUpdate(install)
+ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
+  updater.installAvailableUpdate(install, dontRemind)
 })
 
 ipcMain.on('tray:verifyAddress', (e) => {
