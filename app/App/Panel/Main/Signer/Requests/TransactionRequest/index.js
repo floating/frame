@@ -4,55 +4,65 @@ import utils from 'web3-utils'
 import svg from '../../../../../../svg'
 import link from '../../../../../../link'
 
+// <div className='txStepLayerStatusLoadingLineCenter' />
+// <div className='txStepLayerStatusLoadingLine' />
+
 class TransactionBar extends React.Component {
-  loading () {
+  status (mode) {
     return (
       <div className='txStepLayerStatusLoading'>
-        <div className='txStepLayerStatusLoadingCenter' />
+        <div className='txStepLayerStatusLoadingCenter'>
+          <div className='txStepLayerStatusLoadingDot' />
+        </div>
         <div className='txStepLayerStatusLoadingBox' />
       </div>
     )
+    // if (mode === 'loading') {
+    //
+    // } else {
+    //   return null
+    // }
   }
   icon (type, width, mode) {
     if (type === 'signed') {
       return (
-        <div className='txStepLayerStatus' style={{ width, paddingRight: '5px', opacity: mode === 'dim' ? 0.3 : 1 }}>
-          {mode === 'loading' ? this.loading() : null}
-          <div className='txStepLayerStatusIcon' style={{ width, paddingTop: '5px' }}>{svg.sign(24)}</div>
+        <div className='txStepLayerStatus'>
+          {this.status(mode)}
+          <div className='txStepLayerStatusIcon' style={{ top: '7px', right: '7px' }}>{svg.sign(22)}</div>
         </div>
       )
     }
     if (type === 'sent') {
       return (
-        <div className='txStepLayerStatus' style={{ width, paddingRight: '13px', opacity: mode === 'dim' ? 0.3 : 1 }}>
-          {mode === 'loading' ? this.loading() : null}
-          <div className='txStepLayerStatusIcon'>{svg.send(18)}</div>
+        <div className='txStepLayerStatus'>
+          {this.status(mode)}
+          <div className='txStepLayerStatusIcon' style={{ top: '6px', right: '13px' }}>{svg.send(16)}</div>
         </div>
       )
     }
     if (type === 'success') {
       return (
-        <div className='txStepLayerStatus' style={{ width, paddingRight: '20px', opacity: mode === 'dim' ? 0.3 : 1 }}>
-          {mode === 'loading' ? this.loading() : null}
-          <div className='txStepLayerStatusIcon'>{svg.include(18)}</div>
+        <div className='txStepLayerStatus' style={{ right: '45px' }}>
+          {this.status(mode)}
+          <div className='txStepLayerStatusIcon' style={{ top: '2px', right: '11px' }}>{svg.octicon('check', { height: 24})}</div>
         </div>
       )
     }
-    if (type === 'confirmed') {
-      return (
-        <div className='txStepLayerStatus' style={{ width, paddingRight: '20px', opacity: mode === 'dim' ? 0.3 : 1 }}>
-          {mode === 'loading' ? this.loading() : null}
-          <div className='txStepLayerStatusIcon'>{svg.octicon('check', { height: 24 })}</div>
-        </div>
-      )
-    }
-    if (type === 'confirm') {
-      return (
-        <div className='txStepLayerStatus' style={{ width, paddingRight: '12px', opacity: mode === 'dim' ? 0.3 : 1 }}>
-          <div className='txStepLayerStatusIcon'>{svg.octicon('primitive-dot', { height: 6 })}</div>
-        </div>
-      )
-    }
+    // if (type === 'confirmed') {
+    //   return (
+    //     <div className='txStepLayerStatus' style={{ width, paddingRight: '20px', opacity: mode === 'dim' ? 0.3 : 1 }}>
+    //       {mode === 'loading' ? this.loading() : null}
+    //       <div className='txStepLayerStatusIcon'>{svg.octicon('check', { height: 24 })}</div>
+    //     </div>
+    //   )
+    // }
+    // if (type === 'confirm') {
+    //   return (
+    //     <div className='txStepLayerStatus' style={{ width, paddingRight: '12px', opacity: mode === 'dim' ? 0.3 : 1 }}>
+    //       <div className='txStepLayerStatusIcon'>{svg.octicon('primitive-dot', { height: 6 })}</div>
+    //     </div>
+    //   )
+    // }
     return null
   }
   step (left, width, index, type, phase) {
@@ -64,12 +74,12 @@ class TransactionBar extends React.Component {
           {this.icon(type, width, 'dim')}
           <div className='txStepLayerAngle'>{svg.txSection()}</div>
         </div>
-        <div className={phase === 1 ? 'txStepLayer txStepLayer1 txStepLayerActive' : 'txStepLayer txStepLayer1'} style={{ zIndex: 2, transform: `translateX(-${phase === 1 ? 0 : phase < 1 ? width : 500}px)` }}>
+        <div className={phase === 1 ? 'txStepLayer txStepLayer1 txStepLayerActive' : 'txStepLayer txStepLayer1'} style={{ zIndex: 2, transform: `translateX(-${phase >= 1 ? 0 : width}px)`, opacity: phase < 1 ? 0 : 1, marginRight: '-1px' }}>
           {this.icon(type, width, 'loading')}
           <div className='txStepLayerAngle'>{svg.txSection()}</div>
         </div>
-        <div className={phase === 2 ? 'txStepLayer txStepLayer2 txStepLayerActive' : 'txStepLayer txStepLayer2'} style={{ zIndex: 3, transform: `translateX(-${phase >= 2 ? 0 : width}px)` }}>
-          {this.icon(type, width, 'complete')}
+        <div className={phase === 2 ? 'txStepLayer txStepLayer2 txStepLayerActive' : 'txStepLayer txStepLayer2'} style={{ zIndex: 3, transform: `translateX(-${phase >= 2 ? 0 : width}px)`, opacity: phase < 2 ? 0 : 1, marginRight: '-2px' }}>
+          {this.icon(type, width, 'success')}
           <div className={type === 'confirmed' ? 'txStepLayerAngle txStepLayerAngleDone' : 'txStepLayerAngle'}>{svg.txSection()}</div>
         </div>
       </div>
@@ -77,17 +87,27 @@ class TransactionBar extends React.Component {
   }
   render () {
     let req = this.props.req
-    let mode = req.mode
-    let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
+    // let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let hash = req.tx && req.tx.hash ? req.tx.hash : null
     let pending = req.status === 'pending'
     let txStatus = req.tx && req.tx.receipt ? req.tx.receipt.status : false
+    // {this.step(0, 120, 0, 'signed', pending ? 1 : 2)}
+    // {this.step(120, 110, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
+    // {this.step(220, 120, 2, 'success', !hash ? 0 : txStatus ? 2 : 1)}
+    // {this.step(0, 120, 0, 'signed', 1)}
+    // {this.step(120, 110, 1, 'sent', 1)}
+    // {this.step(220, 120, 2, 'success', 1)}
+    // {this.step(0, 120, 0, 'signed', pending ? 1 : 2)}
+    // {this.step(120, 110, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
+    // {this.step(220, 120, 2, 'success', !hash ? 0 : txStatus ? 2 : 1)}
+    // {this.step(0, 120, 0, 'signed', pending ? 1 : 2)}
+    // {this.step(120, 110, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
+    // {this.step(220, 120, 2, 'success', !hash ? 0 : txStatus ? 2 : 1)}
     return (
       <div className='txBar'>
-        {this.step(0, 90, 0, 'signed', pending ? 1 : 2)}
-        {this.step(90, 90, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
-        {this.step(180, 90, 2, 'success', !hash ? 0 : txStatus === '0x1' ? 2 : txStatus === '0x0' ? -1 : 1)}
-        {this.step(240, 105, 3, 'confirmed', confirmations >= 1 ? 2 : txStatus && confirmations === 0 ? 1 : 0)}
+        {this.step(0, 120, 0, 'signed', pending ? 1 : 2)}
+        {this.step(120, 110, 1, 'sent', pending ? 0 : hash ? 2 : 1)}
+        {this.step(220, 120, 2, 'success', !hash ? 0 : txStatus ? 2 : 1)}
       </div>
     )
   }
@@ -117,8 +137,10 @@ class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = { allowInput: false, dataView: false }
+    this.myRef = React.createRef()
     setTimeout(() => {
       this.setState({ allowInput: true })
+      this.myRef.current.scrollIntoView({ behavior: 'smooth' })
     }, 2000)
   }
   copyAddress (e) {
@@ -141,7 +163,7 @@ class TransactionRequest extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
   render () {
-    let status = this.props.req.status
+    // let status = this.props.req.status
     let notice = this.props.req.notice
     let mode = this.props.req.mode
     let requestClass = 'signerRequest'
@@ -151,13 +173,13 @@ class TransactionRequest extends React.Component {
     let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
 
-    let index = this.props.index
-    let total = this.props.total
+    // let index = this.props.index
+    // let total = this.props.total
     let request = this.props.req
-    let height = mode === 'monitor' ? '120px' : '370px'
+    let height = mode === 'monitor' ? '140px' : '370px'
 
     let confirmations = request.tx && request.tx.confirmations ? request.tx.confirmations : 0
-    let currentProgress = request.tx && request.tx.currentProgress ? request.tx.currentProgress : 0
+    // let currentProgress = request.tx && request.tx.currentProgress ? request.tx.currentProgress : 0
 
     // <div className='transactionToAddressFull'>
     //   {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
@@ -176,6 +198,8 @@ class TransactionRequest extends React.Component {
     //   )
     // })}
 
+    console.log(this.props.req)
+
     return (
       <div key={this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: this.props.z }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
@@ -190,18 +214,20 @@ class TransactionRequest extends React.Component {
                     </div>
                     <TransactionBar req={this.props.req} />
                     <div className='monitorConfirms'>
-                    {[...Array(12).keys()].map(i => {
-                      return (
-                        <div className={confirmations > i ? 'monitorConfirmsItem monitorConfirmsItemGood' : 'monitorConfirmsItem'}>{svg.octicon('chevron-right', { height: 12 })}</div>
-                      )
-                    })}
+                      {[...Array(12).keys()].map(i => {
+                        let monitorConfirmsItem = confirmations > i ? 'monitorConfirmsItem monitorConfirmsItemGood' : 'monitorConfirmsItem'
+                        return (
+                          <div className={monitorConfirmsItem}>{svg.octicon('chevron-right', { height: 13 })}</div>
+                        )
+                      })}
                     </div>
                     <div className='monitorTop'>
                       <div className='monitorBotValue'><span>{'Ξ'}</span>{value}</div>
+                      <div className='monitorBotArrow'><span>{'>'}</span></div>
                       <div className='monitorBotTo'>
-                        {this.props.req.data.to.substring(0, 5)}
-                        {svg.octicon('primitive-dot', { height: 6 })}
-                        {this.props.req.data.to.substr(this.props.req.data.to.length - 3)}
+                        {this.props.req.data.to.substring(0, 6)}
+                        {svg.octicon('kebab-horizontal', { height: 14 })}
+                        {this.props.req.data.to.substr(this.props.req.data.to.length - 4)}
                       </div>
                     </div>
                   </div>
@@ -265,14 +291,16 @@ class TransactionRequest extends React.Component {
         ) : (
           <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
         )}
-        <div className='requestApprove'>
-          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestDeclineButton'>{'Decline'}</div>
+        {!notice ? (
+          <div className='requestApprove'>
+            <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
+              <div className='requestDeclineButton'>{'Decline'}</div>
+            </div>
+            <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
+              <div className='requestSignButton'> {'Sign'} </div>
+            </div>
           </div>
-          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestSignButton'> {'Sign'} </div>
-          </div>
-        </div>
+        ) : null}
       </div>
     )
   }

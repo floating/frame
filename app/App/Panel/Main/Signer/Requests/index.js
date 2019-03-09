@@ -52,8 +52,9 @@ class Requests extends React.Component {
       if (a.created < b.created) return 1
       return 0
     })
-    let containNormal = normal.length ? (350 + (normal.length * 10) + 40) : 160
-    let containMonitor = monitor.length * 130
+    let monitorHeight = 150
+    let containNormal = normal.length ? (350 + (normal.length * 10) + 60) : 160
+    let containMonitor = monitor.length * monitorHeight
     let containHeight = containNormal + containMonitor
     return (
       <div className={this.store('signer.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
@@ -72,7 +73,7 @@ class Requests extends React.Component {
               let pos = 0
               let z = 2000 + i
               if (req.mode === 'normal') pos = ((normal.length - i) * 10)
-              if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * 130)
+              if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight)
               if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} />
               if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} />
               if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} />

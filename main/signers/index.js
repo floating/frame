@@ -19,31 +19,21 @@ let current = null
 // Connected Signers
 const signers = {}
 
-let confirmProgressTimer
-
-const confirmProgress = (id, lastConfirm) => {
-  clearTimeout(confirmProgressTimer)
-  let currentProgress = (Date.now() - lastConfirm) / 150
-  if (currentProgress < 100) confirmProgressTimer = setTimeout(() => confirmProgress(id, lastConfirm), 3000)
-  signers[current].requests[id].tx.currentProgress = currentProgress
-  signers[current].update()
-}
+// let confirmProgressTimer
+// const confirmProgress = (id, lastConfirm) => {
+//   clearTimeout(confirmProgressTimer)
+//   let currentProgress = (Date.now() - lastConfirm) / 150
+//   if (currentProgress < 100) confirmProgressTimer = setTimeout(() => confirmProgress(id, lastConfirm), 3000)
+//   signers[current].requests[id].tx.currentProgress = currentProgress
+//   signers[current].update()
+// }
 
 const txMonitor = (id, hash) => {
-  signers[current].requests[id].tx = { hash, confirmations: 0, currentProgress: 0 }
+  signers[current].requests[id].tx = { hash, confirmations: 0 }
   signers[current].requests[id].status = 'confirming'
   signers[current].requests[id].notice = 'Confirming Transaction'
   signers[current].update()
-
-  proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash]}, receiptRes => {
-    if (receiptRes.error) {
-      // TODO: Handle Error
-    } else if (receiptRes.result && signers[current].requests[id]) {
-      signers[current].requests[id].tx.receipt = receiptRes.result
-      signers[current].update()
-    }
-  })
-  proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads']}, newHeadRes => {
+  proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
     if (newHeadRes.error) {
       // TODO: Handle Error
     } else if (newHeadRes.result) {
@@ -51,7 +41,7 @@ const txMonitor = (id, hash) => {
       const handler = payload => {
         if (payload.method === 'eth_subscription' && payload.params.subscription === headSub) {
           const newHead = payload.params.result
-          proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash]}, receiptRes => {
+          proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
             if (receiptRes.error) {
               // TODO: Handle Error
             } else if (receiptRes.result && signers[current].requests[id]) {
@@ -59,17 +49,14 @@ const txMonitor = (id, hash) => {
               let blockHeight = parseInt(newHead.number, 16)
               let receiptBlock = parseInt(signers[current].requests[id].tx.receipt.blockNumber, 16)
               let confirmations = blockHeight - receiptBlock
-              let lastConfirmation = signers[current].requests[id].tx.confirmations
               signers[current].requests[id].tx.confirmations = confirmations
               signers[current].update()
-              if (lastConfirmation!== confirmations) confirmProgress(id, Date.now())
               if (confirmations > 12) {
                 signers[current].requests[id].status = 'confirmed'
                 signers[current].requests[id].notice = 'Transaction Confirmed'
                 signers[current].update()
-                clearTimeout(confirmProgressTimer)
                 proxyProvider.removeListener('data', handler)
-                proxyProvider.emit('send', {id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub]}, unsubRes => {
+                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, unsubRes => {
                   // TODO: Handle Error
                 })
               }
@@ -83,7 +70,7 @@ const txMonitor = (id, hash) => {
 }
 
 const api = {
-  getSigners (cb){
+  getSigners (cb) {
     let signerSummary = {}
     Object.keys(signers).forEach(id => {
       let summary = signers[id].summary()
@@ -183,7 +170,7 @@ const api = {
       signers[current].requests[handlerId].mode = 'monitor'
       signers[current].update()
     }
-    setTimeout(() => api.removeRequest(handlerId), 1800)
+    // setTimeout(() => api.removeRequest(handlerId), 1800)
   },
   setRequestPending (req) {
     let handlerId = req.handlerId
@@ -209,7 +196,7 @@ const api = {
         signers[current].requests[handlerId].notice = notice
       }
       signers[current].update()
-      setTimeout(() => api.removeRequest(handlerId), 3300)
+      // setTimeout(() => api.removeRequest(handlerId), 3300)
     }
   },
   setTxHash (handlerId, hash) {

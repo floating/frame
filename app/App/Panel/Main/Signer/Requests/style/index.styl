@@ -223,7 +223,8 @@
      position relative
      display flex
      flex-direction column
-     transition standardSlow
+     transition standard
+     transition-delay 1s
      tranform translateZ(0)
 
     .noRequests
@@ -239,9 +240,9 @@
       display flex
       justify-content center
       align-items center
-      opacity 0.3
       transition standard
       tranform translateZ(0)
+      color doubleThick
 
     .recentRequests
       position absolute
@@ -365,6 +366,7 @@
     height 100%
     width 100%
     transform translateZ(0px)
+    // background highlight
     .requestNoticeInner
       position absolute
       top 0px
@@ -885,7 +887,7 @@
   position absolute
   z-index 1000
   height 40px
-  top 50px
+  top 65px
   left 15px
   right 15px
   color outerspace08
@@ -901,8 +903,10 @@
     font-weight bold
     color outerspace01
     svg
-      min-width 5px
-      max-width 5px
+      // min-width 5px
+      // max-width 5px
+      max-width 13px
+      min-width 13px
       color outerspace03
       transition standardFast
       // background blue
@@ -910,8 +914,8 @@
   .monitorConfirmsItemActive
     color outerspace08
     svg
-      min-width 5px
-      max-width 5px
+      // min-width 5px
+      // max-width 5px
       color outerspace
       // filter drop-shadow(0px 0px 2px good)
 
@@ -947,11 +951,10 @@
     align-items center
 
   span
-    padding 0px 3px 0px 0px
+    padding 0px 4px 0px 0px
 
   svg
-    padding 0px 2px 0px 2px
-
+    padding 0px 3px 0px 4px
 .monitorBot
   position absolute
   z-index 1001
@@ -981,10 +984,12 @@
   svg
     padding 0px 3px 0px 3px
 
+
+
 .txBar
   position absolute
   z-index 1001
-  height 50px
+  height 30px
   top 50%
   width 310px
   margin-top -25px
@@ -992,14 +997,14 @@
   border-radius 4px
   overflow hidden
   background highlight
-  transition standard
+  transition standardSlow
   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
   // transform translateY(-25px)
 
   .txBarSheen
     position absolute
     z-index 3002
-    height 50px
+    height 30px
     width 200px
     animation sheen 12s infinite ease
     background linear-gradient(90deg, rgba(247, 251, 255, 0), rgba(237, 241, 255, 0.5), rgba(247, 251, 255, 0))
@@ -1010,6 +1015,7 @@
     z-index 1002
     height 100%
     width 100%
+    overflow hidden
 
     .txStepLayer
       position absolute
@@ -1017,41 +1023,48 @@
       height 100%
       width 100%
       right 0
-      transition standardSlowest
-      transition-delay 0
+      transition 1.6s cubic-bezier(.82,0,.12,1) transform
+      // background yellow
 
       .txStepLayerStatus
         z-index 1005
         position absolute
         height 100%
-        top 0
-        right 0
-        display flex
-        justify-content center
-        align-items center
-        padding-right 5px
+        top 0px
+        right 37px
+        bottom 0
+        // background blue
+        width 53px
 
-        .txStepLayerStatusIcon
-          position absolute
-          z-index 1012
-          height 30px
-          width 30px
-          display flex
-          justify-content center
-          align-items center
+        // .txStepLayerStatusIcon
+        //   // background blue
+        //   // border 1px solid black
+        //   position absolute
+        //   right 0
+        //   top 0
+        //   z-index 1012
+        //   // margin-left -20px
+        //   // margin-top -20px
+
+
 
         .txStepLayerStatusLoading
           position absolute
           z-index 1007
-          height 40px
-          width 40px
-          border-radius 20px
+          height 16px
+          width 16px
+          border-radius 10px
           overflow hidden
           animation spin 0.7s infinite linear
-          display flex
-          justify-content center
-          align-items center
-          background goodDark
+          position absolute
+          z-index 1012
+          top 50%
+          right 0px
+          margin-top -8px
+          // display flex
+          // justify-content center
+          // align-items center
+          // background good
 
           .txStepLayerStatusLoadingBox
             position absolute
@@ -1060,7 +1073,7 @@
             right 0
             width 50%
             height 50%
-            background spacewhite
+            background good
 
           .txStepLayerStatusLoadingCenter
             position relative
@@ -1068,7 +1081,51 @@
             height calc(100% - 4px)
             width calc(100% - 4px)
             border-radius 18px
-            background good
+            background highlight // radial-gradient(ellipse at center, rgba(94,110,255,1) 25%,rgba(94,110,255,0) 100%)
+            top 2px
+            left 2px
+
+          .txStepLayerStatusLoadingDot
+            position relative
+            z-index 1010
+            height calc(100% - 4px)
+            width calc(100% - 4px)
+            border-radius 18px
+            background highlight // radial-gradient(ellipse at center, rgba(94,110,255,1) 25%,rgba(94,110,255,0) 100%)
+            top 2px
+            left 2px
+            background doubleThick
+
+
+        //   // border-radius 20px
+        //   // overflow hidden
+        //   right 90px
+        //   z-index 1200
+        //   top 10px
+        //   background blue
+        //   // display flex
+        //   // justify-content center
+        //   // align-items center
+        //   // background goodDark
+        //
+        //   .txStepLayerStatusLoadingLine
+        //     position absolute
+        //     z-index 1004
+        //     top 13px
+        //     right 0px
+        //     height 2px
+        //     width 100%
+        //     background red
+        //
+        //   .txStepLayerStatusLoadingLineCenter
+        //     position absolute
+        //     z-index 1005
+        //     top -5px
+        //     right 0px
+        //     height 40px
+        //     width 40px
+        //     border-radius 18px
+        //     background yellow
 
       .txStepLayerAngle
         z-index 1004
@@ -1077,8 +1134,9 @@
         //stroke lightShade
         // stroke-width 1
         // overflow hidden
+        top -10px
         right 7px
-        height calc(100% + 4px)
+        // height calc(100% + 4px)
         width 100%
 
         svg
@@ -1088,35 +1146,62 @@
           right 2px
           padding-right 2px
 
-    .txStepLayerActive
-      transition-delay 1s
-
     .txStepLayer0
-      .txStepLayerStatus
+      .txStepLayerStatusLoading
+        .txStepLayerStatusLoadingBox
+          display none
+        .txStepLayerStatusLoadingDot
+          background doubleThick !important
+      .txStepLayerStatusIcon
+        z-index 1030
+        position absolute
+        top 0px
+        left 0px
         svg
-          fill blue
+          color doubleThick
       .txStepLayerAngle
         fill highlight
         filter drop-shadow(3px 0px 7px thin)
-        right 7px
 
     .txStepLayer1
-      .txStepLayerStatus
-        svg
-          color white
-      .txStepLayerAngle
-        color good
-        fill good
-        // animation pulse 1s infinite linear
-        right 7px
-
-    .txStepLayer2
-      opacity 1
-      .txStepLayerStatus
+      .txStepLayerStatusIcon
+        z-index 1030
+        position absolute
+        top 0px
+        left 0px
         svg
           color outerspace08
       .txStepLayerAngle
         fill highlight
+        // filter drop-shadow(3px 0px 7px thin)
+
+    .txStepLayer2
+      .txStepLayerStatusLoading
+        .txStepLayerStatusLoadingBox
+          display none
+        .txStepLayerStatusLoadingDot
+          background good !important
+          box-shadow 0px 0px 2px good
+      .txStepLayerStatusIcon
+        z-index 1030
+        position absolute
+        top 0px
+        left 0px
+        svg
+          color outerspace08
+
+
+
+
+      .txStepLayerAngle
+        fill highlight
+
+    // .txStepLayerActive
+    //   .txStepLayerAngle
+    //     margin-right 1px
+
+
+        // filter drop-shadow(3px 0px 7px thin)
 
       // .txStepLayerAngleDone
       //   fill outerspace
@@ -1124,9 +1209,11 @@
       //     color spacewhite
 
 
-
-
-
+.txBarCondensed
+  height 50px
+  .txStep
+    transform translateY(0px)
+    transition standard
 
 .confirmBar
   position absolute

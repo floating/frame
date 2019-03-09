@@ -24,7 +24,8 @@
   .localSettingsTitle
     position relative
     display flex
-    align-items flex-end
+    align-items flex-start
+    z-index 9999999
     height 60px
     font-size 22px
     padding 0px 10px 10px 10px
@@ -109,7 +110,7 @@
     letter-spacing 1px
     font-weight 400
     width 113px
-    padding 0px
+    padding 0px 0px 0px 0px
     font-size 13px
     text-transform uppercase
     background highlight
@@ -150,7 +151,8 @@
 
   .connectionExpandNetwork
     height 101px
-    padding 11px 0px 11px 0px
+    transition standard
+    padding 31px 0px 31px 0px
     box-shadow 0px 4px 10px thick, 0px 5px 14px -2px thick !important
 
     .connectionTitleSetItems
