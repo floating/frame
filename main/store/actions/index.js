@@ -62,5 +62,11 @@ module.exports = {
   syncPath: (u, path, value) => {
     if (!path || path === '*' || path.startsWith('main')) return // Don't allow updates to main state
     u(path, () => value)
+  },
+  dontRemind: (u, version) => {
+    u('main.updater.dontRemind', dontRemind => {
+      if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
+      return dontRemind
+    })
   }
 }
