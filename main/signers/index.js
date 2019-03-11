@@ -44,10 +44,15 @@ const txMonitor = (id, hash) => {
               // TODO: Handle Error
             } else if (receiptRes.result && signers[current].requests[id]) {
               signers[current].requests[id].tx.receipt = receiptRes.result
-              if (receiptRes.result.status === '0x1') {
-                signers[current].requests[id].status = 'included'
-                signers[current].requests[id].notice = 'Transaction Included'
+              if (receiptRes.result.status === '0x1' && signers[current].requests[id].status === 'verifying') {
+                signers[current].requests[id].status = 'verified'
+                signers[current].requests[id].notice = 'Verified'
                 signers[current].update()
+                setTimeout(() => {
+                  signers[current].requests[id].status = 'confirming'
+                  signers[current].requests[id].notice = 'Confirming'
+                  signers[current].update()
+                }, 1000)
               }
               let blockHeight = parseInt(newHead.number, 16)
               let receiptBlock = parseInt(signers[current].requests[id].tx.receipt.blockNumber, 16)
@@ -56,7 +61,7 @@ const txMonitor = (id, hash) => {
               signers[current].update()
               if (confirmations > 12) {
                 signers[current].requests[id].status = 'confirmed'
-                signers[current].requests[id].notice = 'Transaction Confirmed'
+                signers[current].requests[id].notice = 'Confirmed'
                 signers[current].update()
                 proxyProvider.removeListener('data', handler)
                 proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, unsubRes => {
@@ -177,11 +182,12 @@ const api = {
   },
   setRequestPending (req) {
     let handlerId = req.handlerId
+    // let tx = signers[current].requests[handlerId] === 'transaction'
     log.info('setRequestPending', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'pending'
-      signers[current].requests[handlerId].notice = 'Signature Pending'
+      signers[current].requests[handlerId].notice = 'Signing'
       signers[current].update()
     }
   },
@@ -198,16 +204,20 @@ const api = {
         let notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
         signers[current].requests[handlerId].notice = notice
       }
+      if (signers[current].requests[handlerId].type === 'transaction') {
+        signers[current].requests[handlerId].mode = 'monitor'
+      } else {
+        setTimeout(() => api.removeRequest(handlerId), 3300)
+      }
       signers[current].update()
-      // setTimeout(() => api.removeRequest(handlerId), 3300)
     }
   },
   setTxSigned (handlerId) {
     log.info('setTxSigned', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
-      signers[current].requests[handlerId].status = 'signed'
-      signers[current].requests[handlerId].notice = 'Transaction Signed'
+      signers[current].requests[handlerId].status = 'sending'
+      signers[current].requests[handlerId].notice = 'Sending'
       signers[current].update()
     }
   },
@@ -215,8 +225,8 @@ const api = {
     log.info('setTxSent', handlerId, 'Hash', hash)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
-      signers[current].requests[handlerId].status = 'sent'
-      signers[current].requests[handlerId].notice = 'Transaction Sent'
+      signers[current].requests[handlerId].status = 'verifying'
+      signers[current].requests[handlerId].notice = 'Verifying'
       signers[current].requests[handlerId].mode = 'monitor'
       signers[current].update()
       txMonitor(handlerId, hash)
@@ -227,7 +237,7 @@ const api = {
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'success'
-      signers[current].requests[handlerId].notice = 'Signature Succesful'
+      signers[current].requests[handlerId].notice = 'Succesful'
       signers[current].requests[handlerId].mode = 'monitor'
       signers[current].update()
     }

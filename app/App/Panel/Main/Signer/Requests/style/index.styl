@@ -367,8 +367,10 @@
     height 100%
     width 100%
     transform translateZ(0px)
-    background highlight
+    background linear-gradient(highlight, lowlight, highlight)
     border-radius 6px
+    overflow hidden
+
     .requestNoticeInner
       position absolute
       top 0px
@@ -885,16 +887,77 @@
   left -100%
   right 100%
 
+.monitorConfirms
+  position absolute
+  top 35px
+  left 51px
+  right 0
+  padding 3px 15px 3px 0px
+  display flex
+  justify-content space-between
+  z-index 1002
+  box-sizing border-box
+
+  .txProgressConfirmsItem
+    font-size 12px
+    font-weight bold
+    color thick
+    svg
+      max-width 14px
+      min-width 14px
+      color doubleThick
+      transition standardFast
+
+  .txProgressConfirmsItemActive
+    svg
+      color good
+
+  .txProgressConfirmsItemGood
+    svg
+      color outerspace08
+
+.monitorIcon
+  position absolute
+  width 50px
+  height 40px
+  top 0
+  left 0
+  box-sizing border-box
+  padding 14px 17px
+
+.monitorIconIndicator
+  position absolute
+  height 4px
+  border-radius 2px
+  width 100%
+  background outerspace08
+  top 43px
+  left 14px
+  width 24px
+
+.monitorTo
+  svg
+    position relative
+    padding 0px 3px
+    top -1px
+
+.monitorArrow
+  padding-top 2px
+
+span
+  padding 0px 3px 0px 0px
+
 .monitorTop
   position absolute
   z-index 1001
-  height 30px
   top 0px
-  left 0px
+  left 53px
   right 0px
-  height 50px
-  padding 16px
-  border-bottom 1px solid thick
+  height 40px
+  padding 13px 16px 3px 0px
+  // background red
+  // background linear-gradient(highlight, lowlight)
+  // border-bottom 1px solid thick
   font-size 16px
   text-transform none
   transition standardSlow
@@ -907,19 +970,8 @@
   font-weight 400
   color outerspace08
   box-sizing border-box
-
-  .monitorTo
-    svg
-      padding 3px 2px 0px 2px
-
-  .monitorArrow
-    position absolute
-    left 50%
-    width 14px
-    margin-left -7px
-
-  span
-    padding 0px 3px 0px 0px
+  // border-top-left-radius 6px
+  // border-top-right-radius 6px
 
 .monitorBot
   position absolute
@@ -948,18 +1000,44 @@
   svg
     padding 0px 3px 0px 3px
 
+.txProgressDetailExpand
+  backgound blue
+
+.txStatus
+  position absolute
+  top 0
+  left 5px
+  right 5px
+  height 52px
+  border-radius 6px
+  transform translateY(65px)
+  box-shadow 0px 2px 0px thick, 0px 8px 5px -5px thick
+  text-align center
+  padding-top 7px
+  box-sizing border-box
+  background rgba(255, 255, 255, 0.05)
+  background highlight
+  z-index 100000
+  font-size 12px
+  font-weight 400
+  text-transform uppercase
+  letter-spacing 1px
+  overflow hidden
+  transition standardSlow
+
+.txStatusCompact
+  height 30px
+
 .txBar
   position absolute
   z-index 1001
-  height 90px
+  height 58px
   bottom 0px
-  width 328px
+  width 330px
   border-bottom-left-radius 6px
   border-bottom-right-radius 6px
   overflow hidden
-  background highlight
   transition standardSlow
-  border-top 1px solid thick
 
   .txProgress
     .txProgressBack
@@ -972,7 +1050,7 @@
 
       .txProgressLine
         position absolute
-        top 47px
+        top 40px
         left 0
         right 0
         height 2px
@@ -1000,14 +1078,22 @@
             top 0
             margin-left -20px
             width 40px
-            height 45px
+            height 40px
             box-sizing border-box
+            // background blue
+            transition standardSlow
+            // transform translateY(-10px)
+          .txProgressStepIconHidden
+            transform translateY(-10px)
+            opacity 0
+            transition-delay 500
+            transition-property opacity
 
           .txProgressStepMarker
             position absolute
             z-index 996
             left 50%
-            top 47px
+            top 40px
             height 12px
             width 12px
             background red
@@ -1020,7 +1106,7 @@
             position absolute
             z-index 997
             left 50%
-            top 47px
+            top 40px
             height 6px
             width 6px
             margin-top -3px
@@ -1039,72 +1125,11 @@
       left 0
       z-index 1001
       transition standardSlow
-      .txProgressDetails
-        position absolute
-        left 0
-        right 0
-        bottom 0
-        height 42px
-        overflow hidden
-
-        .txProgressNotice
-          position absolute
-          left 0
-          right 0
-          top 50%
-          margin-top -8px
-          text-transform none
-          transition standardSlow
-          overflow-wrap break-word
-          word-wrap break-word
-          text-transform uppercase
-          overflow-x hidden
-          text-align center
-          font-weight 400
-          letter-spacing 1px
-          font-size 12px
-          color outerspace08
-
-        .txProgressConfirms
-          position absolute
-          z-index 1000
-          height 44px
-          bottom 0px
-          left 16px
-          right 16px
-          color pending
-          transition standardSlow
-          transition-delay 1s
-          display flex
-          justify-content space-between
-          align-items center
-          padding-top 4px
-          box-sizing border-box
-
-          .txProgressConfirmsItem
-            font-size 12px
-            font-weight bold
-            color good03
-            svg
-              max-width 14px
-              min-width 14px
-              color good02
-              transition standardFast
-
-          .txProgressConfirmsItemActive
-            color good
-            svg
-              color good
-
-          .txProgressConfirmsItemGood
-            color good
-            svg
-              color good
 
       .txProgressSlide
         position absolute
         top 0
-        right 61px // 165px // 268px // 61px
+        right 61px
         bottom 0
         left 0
         z-index 1001
@@ -1113,7 +1138,7 @@
 
         .txProgressTail
           position absolute
-          top 47px
+          top 40px
           left 0
           right 0
           height 2px
@@ -1130,7 +1155,7 @@
           animation spin 0.7s infinite linear
           position absolute
           z-index 1012
-          top 47px
+          top 40px
           right -8px
           margin-top -8px
 
@@ -1175,29 +1200,29 @@
 .txBarSuccess
   .txProgressTail
     transition standardSlow
-    transition-delay 1s
     background good !important
   .txProgressLoadingBox
     transition standardSlow
-    transition-delay 1s
     background good !important
   .txProgressLoadingDot
     transition standardSlow
-    transition-delay 1s
     background good !important
   .txProgressStepCenterOn
     transition standardSlow
-    transition-delay 1s
     background good !important
 
 .txBarError
   .txProgressTail
     transition standardSlow
-    transition-delay 1s
     background bad !important
   .txProgressLoadingBox
     transition standardSlow
-    transition-delay 1s
+    background bad !important
+  .txProgressLoadingDot
+    transition standardSlow
+    background bad !important
+  .txProgressStepCenterOn
+    transition standardSlow
     background bad !important
 
 
@@ -1287,3 +1312,11 @@
   top 10px
   height 30px
   border-radius 4px
+
+.signerRequestSuccess
+  .monitorIconIndicator
+    background good !important
+
+.signerRequestError
+  .monitorIconIndicator
+    background bad !important

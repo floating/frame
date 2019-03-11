@@ -5,27 +5,27 @@ import svg from '../../../../../../../svg'
 class TxBar extends React.Component {
   render () {
     let req = this.props.req
-    let txStatus = req.tx && req.tx.receipt ? req.tx.receipt.status : false
+    // let txStatus = req.tx && req.tx.receipt ? req.tx.receipt.status : false
     let position = 0
     let txBarClass = 'txBar'
-    if (req.status === 'pending') {
-      position = 1
-    } else if (req.status === 'signed') {
-      position = 2
-    } else if (req.status === 'sent') {
-      position = 3
-    } else if (req.status === 'included' || req.status === 'confirmed') {
+    let progressIconClass = 'txProgressStepIcon'
+    if (req.status === 'pending') position = 1
+    else if (req.status === 'sending') position = 2
+    else if (req.status === 'verifying') position = 3
+    else if (req.status === 'verified') position = 4
+    else if (req.status === 'confirming' || req.status === 'confirmed') {
       position = 4
+      progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarSuccess'
     } else if (req.status === 'error') {
-      position = 0
+      position = 4
+      progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarError'
     }
     let slideMap = ['370px', '255px', '165px', '75px', '-40px']
     let slide = slideMap[position]
-    let notice = this.props.req.notice
-    let request = this.props.req
-    let confirmations = request.tx && request.tx.confirmations ? request.tx.confirmations : 0
+    // let notice = this.props.req.notice
+
     return (
       <div className={txBarClass}>
         <div className='txProgress'>
@@ -33,23 +33,17 @@ class TxBar extends React.Component {
             <div className='txProgressLine' />
             <div className='txProgressSteps'>
               <div className='txProgressStep'>
-                <div className='txProgressStepIcon' style={{ padding: '14px 10px' }}>
-                  {svg.sign(22)}
-                </div>
+                <div className={progressIconClass} style={{ padding: '10px 10px' }}>{svg.sign(22)}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 1 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
               <div className='txProgressStep'>
-                <div className='txProgressStepIcon' style={{ padding: '15px 11px' }}>
-                  {svg.send(15)}
-                </div>
+                <div className={progressIconClass} style={{ padding: '11px 11px' }}>{svg.send(15)}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
               <div className='txProgressStep'>
-                <div className='txProgressStepIcon' style={{ padding: '11px 11px' }}>
-                  {svg.octicon('check', { height: 24 })}
-                </div>
+                <div className={progressIconClass} style={{ padding: '7px 11px' }}>{svg.octicon('check', { height: 24 })}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
@@ -62,17 +56,6 @@ class TxBar extends React.Component {
                 <div className='txProgressLoadingDot' />
                 <div className='txProgressLoadingCenter' />
                 <div className='txProgressLoadingBox' />
-              </div>
-            </div>
-            <div className='txProgressDetails'>
-              <div className='txProgressNotice' style={{ transform: `translateY(-${txStatus ? 50 : 0}px)` }}>{notice}</div>
-              <div className='txProgressConfirms' style={{ transform: `translateY(-${txStatus ? 0 : 50}px)` }}>
-                {[...Array(12).keys()].map(i => {
-                  let monitorConfirmsItem = confirmations > i ? 'txProgressConfirmsItem txProgressConfirmsItemGood' : 'txProgressConfirmsItem'
-                  return (
-                    <div className={monitorConfirmsItem}>{svg.octicon('chevron-right', { height: 14 })}</div>
-                  )
-                })}
               </div>
             </div>
           </div>

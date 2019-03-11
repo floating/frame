@@ -10,11 +10,9 @@ class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = { allowInput: false, dataView: false }
-    this.myRef = React.createRef()
     setTimeout(() => {
       this.setState({ allowInput: true })
-      this.myRef.current.scrollIntoView({ behavior: 'smooth' })
-    }, 2000)
+    }, 1500)
   }
   copyAddress (e) {
     e.preventDefault()
@@ -36,33 +34,58 @@ class TransactionRequest extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
   render () {
-    let notice = this.props.req.notice
-    let mode = this.props.req.mode
+    let req = this.props.req
+    let notice = req.notice
+    let mode = req.mode
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
+    if (req.status === 'confirming' || req.status === 'confirmed') requestClass += ' signerRequestSuccess'
+    if (req.status === 'error') requestClass += ' signerRequestError'
     let etherRates = this.store('external.rates')
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-    let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
-    let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
-    let height = mode === 'monitor' ? '180px' : '370px'
+    let value = this.hexToDisplayValue(req.data.value || '0x')
+    let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
+    let height = mode === 'monitor' ? '145px' : '370px'
+    let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
+    // let txStatus = req.tx && req.tx.receipt ? req.tx.receipt.status : false
+    let statusClass = 'txStatus'
+    let success = req.status === 'confirming' || req.status === 'confirmed'
+    let error = req.status === 'error'
+    if (!success && !error) statusClass += ' txStatusCompact'
     return (
-      <div key={this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: this.props.z }}>
+      <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: this.props.z }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
-        {this.props.req.type === 'transaction' ? (
+        {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
               {notice ? (
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
-                    <TxBar req={this.props.req} />
+                    <div className={statusClass}>
+                      <div className='txProgressNotice'>
+                        <div>{success ? 'Success' : notice}</div>
+                        <div className='txProgressDetailExpand'>
+                          <div>{svg.octicon('chevron-down', { height: 12 })}{'View Details'}{svg.octicon('chevron-down', { height: 12 })}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <TxBar req={req} />
+                    <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
+                    <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
                       <div className='monitorValue'><span>{'Ξ'}</span>{value}</div>
                       <div className='monitorArrow'>{svg.longArrow(14)}</div>
                       <div className='monitorTo'>
-                        {this.props.req.data.to.substring(0, 5)}
+                        {req.data.to.substring(0, 6)}
                         {svg.octicon('kebab-horizontal', { height: 14 })}
-                        {this.props.req.data.to.substr(this.props.req.data.to.length - 3)}
+                        {req.data.to.substr(req.data.to.length - 4)}
                       </div>
+                    </div>
+                    <div className='monitorConfirms'>
+                      {[...Array(12).keys()].map(i => {
+                        let monitorConfirmsItem = confirmations > i ? 'txProgressConfirmsItem txProgressConfirmsItemGood' : 'txProgressConfirmsItem'
+                        return <div key={i} className={monitorConfirmsItem}>{svg.octicon('chevron-right', { height: 14 })}</div>
+                      })}
                     </div>
                   </div>
                 </div>
@@ -86,7 +109,7 @@ class TransactionRequest extends React.Component {
                     </div>
                     <div className='transactionSubtitle'>{'Max Fee'}</div>
                   </div>
-                  {utils.toAscii(this.props.req.data.data || '0x') ? (
+                  {utils.toAscii(req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
                       <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
                         <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
@@ -95,20 +118,20 @@ class TransactionRequest extends React.Component {
                       </div>
                       <div className='transactionDataBody'>
                         <div className='transactionDataBodyInner'>
-                          {this.props.req.data.data}
+                          {req.data.data}
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div className='transactionData transactionNoData'>{'No Data'}</div>
                   )}
-                  {this.props.req.data.to ? (
+                  {req.data.to ? (
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>
-                        <div className='transactionToAddressLarge'>{this.props.req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {this.props.req.data.to.substr(this.props.req.data.to.length - 11)}</div>
+                        <div className='transactionToAddressLarge'>{req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {req.data.to.substr(req.data.to.length - 11)}</div>
                         <div className='transactionToAddressFull'>
-                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : this.props.req.data.to}
-                          <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={this.props.req.data.to} readOnly />
+                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : req.data.to}
+                          <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={req.data.to} readOnly />
                         </div>
                       </div>
                       <div className='transactionToSub'>{'Send To'}</div>
@@ -123,14 +146,14 @@ class TransactionRequest extends React.Component {
             </div>
           </div>
         ) : (
-          <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
+          <div className='unknownType'>{'Unknown: ' + req.type}</div>
         )}
         {!notice ? (
           <div className='requestApprove'>
-            <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
+            <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(req.handlerId, req) }}>
               <div className='requestDeclineButton'>{'Decline'}</div>
             </div>
-            <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
+            <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(req.handlerId, req) }}>
               <div className='requestSignButton'> {'Sign'} </div>
             </div>
           </div>
