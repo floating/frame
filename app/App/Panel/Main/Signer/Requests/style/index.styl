@@ -273,11 +273,12 @@
     top 0px
     left 0px
     right 0px
+    padding-bottom 10px
     border-radius 2px
     justify-content space-between
     box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
     border-radius 6px
-    height 370px
+    height 380px
     display flex
     justify-content center
     transition standardSlow
@@ -366,7 +367,8 @@
     height 100%
     width 100%
     transform translateZ(0px)
-    // background highlight
+    background highlight
+    border-radius 6px
     .requestNoticeInner
       position absolute
       top 0px
@@ -883,56 +885,17 @@
   left -100%
   right 100%
 
-.monitorConfirms
-  position absolute
-  z-index 1000
-  height 40px
-  top 65px
-  left 15px
-  right 15px
-  color outerspace08
-  display flex
-  justify-content space-between
-  align-items center
-  padding-top 11px
-  box-sizing border-box
-  transition standardFast
-
-  .monitorConfirmsItem
-    font-size 11px
-    font-weight bold
-    color outerspace01
-    svg
-      // min-width 5px
-      // max-width 5px
-      max-width 13px
-      min-width 13px
-      color outerspace03
-      transition standardFast
-      // background blue
-
-  .monitorConfirmsItemActive
-    color outerspace08
-    svg
-      // min-width 5px
-      // max-width 5px
-      color outerspace
-      // filter drop-shadow(0px 0px 2px good)
-
-  .monitorConfirmsItemGood
-    color outerspace
-    svg
-      color outerspace
-
 .monitorTop
   position absolute
   z-index 1001
   height 30px
-  top 1px
-  left 15px
-  right 16px
-  // background blue
-  font-size 14px
+  top 0px
+  left 0px
+  right 0px
+  height 50px
+  padding 16px
+  border-bottom 1px solid thick
+  font-size 16px
   text-transform none
   transition standardSlow
   overflow-wrap break-word
@@ -941,20 +904,23 @@
   overflow-x hidden
   display flex
   justify-content space-between
-  align-items center
   font-weight 400
   color outerspace08
+  box-sizing border-box
 
-  .monitorBotTo
-    display flex
-    justify-content center
-    align-items center
+  .monitorTo
+    svg
+      padding 3px 2px 0px 2px
+
+  .monitorArrow
+    position absolute
+    left 50%
+    width 14px
+    margin-left -7px
 
   span
-    padding 0px 4px 0px 0px
+    padding 0px 3px 0px 0px
 
-  svg
-    padding 0px 3px 0px 4px
 .monitorBot
   position absolute
   z-index 1001
@@ -968,13 +934,11 @@
   overflow-wrap break-word
   word-wrap break-word
   text-transform uppercase
-  // font-family FiraCode, sans-serif
   overflow-x hidden
   display flex
   justify-content center
   align-items center
-  // font-weight bold
-  font-weight 400
+  font-weight 00
   letter-spacing 1px
   color outerspace08
 
@@ -984,22 +948,220 @@
   svg
     padding 0px 3px 0px 3px
 
-
-
 .txBar
   position absolute
   z-index 1001
-  height 30px
-  top 50%
-  width 310px
-  margin-top -25px
-  // bottom 10px
-  border-radius 4px
+  height 90px
+  bottom 0px
+  width 328px
+  border-bottom-left-radius 6px
+  border-bottom-right-radius 6px
   overflow hidden
   background highlight
   transition standardSlow
-  box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-  // transform translateY(-25px)
+  border-top 1px solid thick
+
+  .txProgress
+    .txProgressBack
+      position absolute
+      top 0
+      right -20px
+      bottom 0
+      left -20px
+      z-index 1001
+
+      .txProgressLine
+        position absolute
+        top 47px
+        left 0
+        right 0
+        height 2px
+        margin-top -1px
+        background thick
+        z-index 982
+
+      .txProgressSteps
+        position absolute
+        top 0
+        right 50px
+        bottom 0
+        left 48px
+        z-index 994
+        display flex
+        .txProgressStep
+          position relative
+          width calc(100% / 3)
+          height 100%
+
+          .txProgressStepIcon
+            position absolute
+            z-index 996
+            left 50%
+            top 0
+            margin-left -20px
+            width 40px
+            height 45px
+            box-sizing border-box
+
+          .txProgressStepMarker
+            position absolute
+            z-index 996
+            left 50%
+            top 47px
+            height 12px
+            width 12px
+            background red
+            margin-top -6px
+            margin-left -6px
+            border-radius 6px
+            background highlight
+
+          .txProgressStepCenter
+            position absolute
+            z-index 997
+            left 50%
+            top 47px
+            height 6px
+            width 6px
+            margin-top -3px
+            margin-left -3px
+            border-radius 3px
+            background thick
+
+          .txProgressStepCenterOn
+            background nebula
+
+    .txProgressFront
+      position absolute
+      top 0
+      right 0px
+      bottom 0
+      left 0
+      z-index 1001
+      transition standardSlow
+      .txProgressDetails
+        position absolute
+        left 0
+        right 0
+        bottom 0
+        height 42px
+        overflow hidden
+
+        .txProgressNotice
+          position absolute
+          left 0
+          right 0
+          top 50%
+          margin-top -8px
+          text-transform none
+          transition standardSlow
+          overflow-wrap break-word
+          word-wrap break-word
+          text-transform uppercase
+          overflow-x hidden
+          text-align center
+          font-weight 400
+          letter-spacing 1px
+          font-size 12px
+          color outerspace08
+
+        .txProgressConfirms
+          position absolute
+          z-index 1000
+          height 44px
+          bottom 0px
+          left 16px
+          right 16px
+          color pending
+          transition standardSlow
+          transition-delay 1s
+          display flex
+          justify-content space-between
+          align-items center
+          padding-top 4px
+          box-sizing border-box
+
+          .txProgressConfirmsItem
+            font-size 12px
+            font-weight bold
+            color good03
+            svg
+              max-width 14px
+              min-width 14px
+              color good02
+              transition standardFast
+
+          .txProgressConfirmsItemActive
+            color good
+            svg
+              color good
+
+          .txProgressConfirmsItemGood
+            color good
+            svg
+              color good
+
+      .txProgressSlide
+        position absolute
+        top 0
+        right 61px // 165px // 268px // 61px
+        bottom 0
+        left 0
+        z-index 1001
+        transition standardSlow
+        pointer-events none
+
+        .txProgressTail
+          position absolute
+          top 47px
+          left 0
+          right 0
+          height 2px
+          margin-top -1px
+          background nebula
+
+        .txProgressLoading
+          position absolute
+          z-index 1007
+          height 16px
+          width 16px
+          border-radius 10px
+          overflow hidden
+          animation spin 0.7s infinite linear
+          position absolute
+          z-index 1012
+          top 47px
+          right -8px
+          margin-top -8px
+
+          .txProgressLoadingBox
+            position absolute
+            z-index 1008
+            top 0
+            right 0
+            width 50%
+            height 50%
+            background nebula
+
+          .txProgressLoadingCenter
+            position absolute
+            z-index 1010
+            height calc(100% - 4px)
+            width calc(100% - 4px)
+            border-radius 18px
+            background highlight // radial-gradient(ellipse at center, rgba(94,110,255,1) 25%,rgba(94,110,255,0) 100%)
+            top 2px
+            left 2px
+
+          .txProgressLoadingDot
+            position absolute
+            z-index 1011
+            height calc(100% - 8px)
+            width calc(100% - 8px)
+            border-radius 18px
+            top 4px
+            left 4px
+            background nebula
 
   .txBarSheen
     position absolute
@@ -1010,203 +1172,33 @@
     background linear-gradient(90deg, rgba(247, 251, 255, 0), rgba(237, 241, 255, 0.5), rgba(247, 251, 255, 0))
     background-blend-mode multiply
 
-  .txStep
-    position absolute
-    z-index 1002
-    height 100%
-    width 100%
-    overflow hidden
+.txBarSuccess
+  .txProgressTail
+    transition standardSlow
+    transition-delay 1s
+    background good !important
+  .txProgressLoadingBox
+    transition standardSlow
+    transition-delay 1s
+    background good !important
+  .txProgressLoadingDot
+    transition standardSlow
+    transition-delay 1s
+    background good !important
+  .txProgressStepCenterOn
+    transition standardSlow
+    transition-delay 1s
+    background good !important
 
-    .txStepLayer
-      position absolute
-      z-index 1003
-      height 100%
-      width 100%
-      right 0
-      transition 1.6s cubic-bezier(.82,0,.12,1) transform
-      // background yellow
-
-      .txStepLayerStatus
-        z-index 1005
-        position absolute
-        height 100%
-        top 0px
-        right 37px
-        bottom 0
-        // background blue
-        width 53px
-
-        // .txStepLayerStatusIcon
-        //   // background blue
-        //   // border 1px solid black
-        //   position absolute
-        //   right 0
-        //   top 0
-        //   z-index 1012
-        //   // margin-left -20px
-        //   // margin-top -20px
-
-
-
-        .txStepLayerStatusLoading
-          position absolute
-          z-index 1007
-          height 16px
-          width 16px
-          border-radius 10px
-          overflow hidden
-          animation spin 0.7s infinite linear
-          position absolute
-          z-index 1012
-          top 50%
-          right 0px
-          margin-top -8px
-          // display flex
-          // justify-content center
-          // align-items center
-          // background good
-
-          .txStepLayerStatusLoadingBox
-            position absolute
-            z-index 1008
-            top 0
-            right 0
-            width 50%
-            height 50%
-            background good
-
-          .txStepLayerStatusLoadingCenter
-            position relative
-            z-index 1010
-            height calc(100% - 4px)
-            width calc(100% - 4px)
-            border-radius 18px
-            background highlight // radial-gradient(ellipse at center, rgba(94,110,255,1) 25%,rgba(94,110,255,0) 100%)
-            top 2px
-            left 2px
-
-          .txStepLayerStatusLoadingDot
-            position relative
-            z-index 1010
-            height calc(100% - 4px)
-            width calc(100% - 4px)
-            border-radius 18px
-            background highlight // radial-gradient(ellipse at center, rgba(94,110,255,1) 25%,rgba(94,110,255,0) 100%)
-            top 2px
-            left 2px
-            background doubleThick
-
-
-        //   // border-radius 20px
-        //   // overflow hidden
-        //   right 90px
-        //   z-index 1200
-        //   top 10px
-        //   background blue
-        //   // display flex
-        //   // justify-content center
-        //   // align-items center
-        //   // background goodDark
-        //
-        //   .txStepLayerStatusLoadingLine
-        //     position absolute
-        //     z-index 1004
-        //     top 13px
-        //     right 0px
-        //     height 2px
-        //     width 100%
-        //     background red
-        //
-        //   .txStepLayerStatusLoadingLineCenter
-        //     position absolute
-        //     z-index 1005
-        //     top -5px
-        //     right 0px
-        //     height 40px
-        //     width 40px
-        //     border-radius 18px
-        //     background yellow
-
-      .txStepLayerAngle
-        z-index 1004
-        position absolute
-        // fill yellow
-        //stroke lightShade
-        // stroke-width 1
-        // overflow hidden
-        top -10px
-        right 7px
-        // height calc(100% + 4px)
-        width 100%
-
-        svg
-          height 50px
-          // width 400px
-          position absolute
-          right 2px
-          padding-right 2px
-
-    .txStepLayer0
-      .txStepLayerStatusLoading
-        .txStepLayerStatusLoadingBox
-          display none
-        .txStepLayerStatusLoadingDot
-          background doubleThick !important
-      .txStepLayerStatusIcon
-        z-index 1030
-        position absolute
-        top 0px
-        left 0px
-        svg
-          color doubleThick
-      .txStepLayerAngle
-        fill highlight
-        filter drop-shadow(3px 0px 7px thin)
-
-    .txStepLayer1
-      .txStepLayerStatusIcon
-        z-index 1030
-        position absolute
-        top 0px
-        left 0px
-        svg
-          color outerspace08
-      .txStepLayerAngle
-        fill highlight
-        // filter drop-shadow(3px 0px 7px thin)
-
-    .txStepLayer2
-      .txStepLayerStatusLoading
-        .txStepLayerStatusLoadingBox
-          display none
-        .txStepLayerStatusLoadingDot
-          background good !important
-          box-shadow 0px 0px 2px good
-      .txStepLayerStatusIcon
-        z-index 1030
-        position absolute
-        top 0px
-        left 0px
-        svg
-          color outerspace08
-
-
-
-
-      .txStepLayerAngle
-        fill highlight
-
-    // .txStepLayerActive
-    //   .txStepLayerAngle
-    //     margin-right 1px
-
-
-        // filter drop-shadow(3px 0px 7px thin)
-
-      // .txStepLayerAngleDone
-      //   fill outerspace
-      //   svg
-      //     color spacewhite
+.txBarError
+  .txProgressTail
+    transition standardSlow
+    transition-delay 1s
+    background bad !important
+  .txProgressLoadingBox
+    transition standardSlow
+    transition-delay 1s
+    background bad !important
 
 
 .txBarCondensed

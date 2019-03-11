@@ -30,8 +30,6 @@ const signers = {}
 
 const txMonitor = (id, hash) => {
   signers[current].requests[id].tx = { hash, confirmations: 0 }
-  signers[current].requests[id].status = 'confirming'
-  signers[current].requests[id].notice = 'Confirming Transaction'
   signers[current].update()
   proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
     if (newHeadRes.error) {
@@ -46,6 +44,11 @@ const txMonitor = (id, hash) => {
               // TODO: Handle Error
             } else if (receiptRes.result && signers[current].requests[id]) {
               signers[current].requests[id].tx.receipt = receiptRes.result
+              if (receiptRes.result.status === '0x1') {
+                signers[current].requests[id].status = 'included'
+                signers[current].requests[id].notice = 'Transaction Included'
+                signers[current].update()
+              }
               let blockHeight = parseInt(newHead.number, 16)
               let receiptBlock = parseInt(signers[current].requests[id].tx.receipt.blockNumber, 16)
               let confirmations = blockHeight - receiptBlock
@@ -199,10 +202,25 @@ const api = {
       // setTimeout(() => api.removeRequest(handlerId), 3300)
     }
   },
-  setTxHash (handlerId, hash) {
-    log.info('setTxHash', handlerId)
+  setTxSigned (handlerId) {
+    log.info('setTxSigned', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
-    if (signers[current].requests[handlerId]) txMonitor(handlerId, hash)
+    if (signers[current].requests[handlerId]) {
+      signers[current].requests[handlerId].status = 'signed'
+      signers[current].requests[handlerId].notice = 'Transaction Signed'
+      signers[current].update()
+    }
+  },
+  setTxSent (handlerId, hash) {
+    log.info('setTxSent', handlerId, 'Hash', hash)
+    if (!signers[current]) return // cb(new Error('No Account Selected'))
+    if (signers[current].requests[handlerId]) {
+      signers[current].requests[handlerId].status = 'sent'
+      signers[current].requests[handlerId].notice = 'Transaction Sent'
+      signers[current].requests[handlerId].mode = 'monitor'
+      signers[current].update()
+      txMonitor(handlerId, hash)
+    }
   },
   setRequestSuccess (handlerId) {
     log.info('setRequestSuccess', handlerId)
