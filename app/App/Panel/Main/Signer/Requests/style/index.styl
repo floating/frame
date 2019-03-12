@@ -132,13 +132,13 @@
 
 .slideUp-enter
   opacity 0
-  transform scale(1)
+  // transform scale(1.4)
   margin-top -200px
   transition standardSlow
 
 .slideUp-enter.slideUp-enter-active
   opacity 1
-  transform scale(1)
+  // transform scale(1)
   margin-top 0px
   transition standardSlow
   transition-delay 0.32s
@@ -146,11 +146,12 @@
 .slideUp-leave
   opacity 1
   transition standardSlow
-  transform scale(1)
+  // transform scale(1)
 
 .slideUp-leave.slideUp-leave-active
   opacity 0
-  transform scale(1.4)
+  margin-top -200px
+  // transform scale(4)
 
 .signerRequests
   position absolute
@@ -255,7 +256,7 @@
       line-height 10px
       font-weight 600
       letter-spacing 2px
-      transition standardSlow
+      transition standard
       color outerspace08
 
   .signerRequestItems
@@ -276,7 +277,7 @@
     height 380px
     display flex
     justify-content center
-    transition standardSlow
+    transition standard
     background lowlight
     z-index 2000
     color outerspace08

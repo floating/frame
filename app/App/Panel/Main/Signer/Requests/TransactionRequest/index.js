@@ -49,11 +49,12 @@ class TransactionRequest extends React.Component {
     let value = this.hexToDisplayValue(req.data.value || '0x')
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     let height = mode === 'monitor' ? '145px' : '370px'
+    let z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let statusClass = 'txStatus'
     if (!success && !error) statusClass += ' txStatusCompact'
     return (
-      <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: this.props.z }}>
+      <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <div className='requestOverlay'><div className='requestSheen' /></div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
@@ -71,7 +72,7 @@ class TransactionRequest extends React.Component {
                               {req.tx.hash.substr(req.tx.hash.length - 12)}
                             </div>
                           </div>
-                          <div className='txProgressDetailExpand' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>{'View on Etherscan'}</div>
+                          <div className='txProgressDetailExpand' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>{'View Details'}</div>
                         </div>
                       ) : (
                         <div className='txProgressNotice'>
