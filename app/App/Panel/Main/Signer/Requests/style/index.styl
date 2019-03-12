@@ -257,7 +257,6 @@
       letter-spacing 2px
       transition standardSlow
       color outerspace08
-      // background blue
 
   .signerRequestItems
     overflow scroll
@@ -292,7 +291,6 @@
     bottom 0px
     z-index 9999999999999
     border-radius 6px
-    // opacity 0.05
     pointer-events none
     overflow hidden
     .requestSheen
@@ -303,21 +301,7 @@
       width 90px
       animation sheen 12s infinite ease
       background linear-gradient(90deg, rgba(247, 251, 255, 0), rgba(237, 241, 255, 0.7), rgba(247, 251, 255, 0))
-      // background blue
       background-blend-mode multiply
-  //
-  //   .requestOverlayInset
-  //     position absolute
-  //     top 0px
-  //     left 0px
-  //     right 0px
-  //     bottom -2000px
-  //     // background linear-gradient(135deg, #AE60F2 0%,#73d6bb 100%)
-  //     // background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
-  //
-  //     animation shine 1s infinite cubic-bezier(.82,0,.12,1) alternate !important
-  //     pointer-events none
-  //     background-image: linear-gradient(135deg, #bbc1bf 0%, #57c6e1 32%, #b49fda 69%, #7ac5d8 100%);
 
   .signerRequestSuccess
     align-items center
@@ -962,9 +946,6 @@ span
   right 0px
   height 40px
   padding 13px 16px 3px 0px
-  // background red
-  // background linear-gradient(highlight, lowlight)
-  // border-bottom 1px solid thick
   font-size 16px
   text-transform none
   transition standardSlow
@@ -977,8 +958,6 @@ span
   font-weight 400
   color outerspace08
   box-sizing border-box
-  // border-top-left-radius 6px
-  // border-top-right-radius 6px
 
 .monitorBot
   position absolute
@@ -1012,9 +991,8 @@ span
   top 65px
   left 5px
   right 5px
-  height 52px
+  bottom 40px
   border-radius 6px
-  transform translateY(220px) 
   box-shadow 0px 2px 0px thick, 0px 8px 5px -5px thick
   text-align center
   box-sizing border-box
@@ -1027,9 +1005,13 @@ span
   letter-spacing 1px
   overflow hidden
   transition standardSlow
+  display flex
+  justify-content center
+  align-items center
 
 .txProgressDetailText
-  padding 8px
+  padding 2px 10px 0px 10px
+  line-height 14px
   .txProgressDetailHash
     font-size 16px
     font-weight 400
@@ -1037,16 +1019,13 @@ span
     font-family FiraCode, sans-serif
     text-transform none
     svg
-      padding 3px 4px 2px 4px
+      padding 0px 2px 1px 2px
 
 .txProgressDetailExpand
-  margin-top -6px
   color outerspace05
-// .txProgressDetailExpand:hover
-//   color outerspace08
 
 .txStatusCompact
-  height 30px
+  bottom 60px
 
 .txBar
   position absolute

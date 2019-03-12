@@ -12,7 +12,7 @@ class TransactionRequest extends React.Component {
     this.state = { allowInput: false, dataView: false }
     setTimeout(() => {
       this.setState({ allowInput: true })
-    }, 1500)
+    }, 1700)
   }
   copyAddress (e) {
     e.preventDefault()
@@ -50,7 +50,6 @@ class TransactionRequest extends React.Component {
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     let height = mode === 'monitor' ? '145px' : '370px'
     let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
-    // let txStatus = req.tx && req.tx.receipt ? req.tx.receipt.status : false
     let statusClass = 'txStatus'
     if (!success && !error) statusClass += ' txStatusCompact'
     return (
@@ -63,20 +62,24 @@ class TransactionRequest extends React.Component {
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
                     <div className={statusClass}>
-                      <div className='txProgressNotice'>
-                        <div className='txProgressDetailText'>
-                          {success ? (
+                      {success ? (
+                        <div className='txProgressNotice'>
+                          <div className='txProgressDetailText'>
                             <div className='txProgressDetailHash' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>
                               {req.tx.hash.substring(0, 14)}
                               {svg.octicon('kebab-horizontal', { height: 14 })}
                               {req.tx.hash.substr(req.tx.hash.length - 12)}
                             </div>
-                          ) : (
-                            <div>{notice}</div>
-                          )}
+                          </div>
+                          <div className='txProgressDetailExpand' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>{'View on Etherscan'}</div>
                         </div>
-                        <div className='txProgressDetailExpand' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>{'View on Etherscan '}</div>
-                      </div>
+                      ) : (
+                        <div className='txProgressNotice'>
+                          <div className='txProgressDetailText'>
+                            <div>{notice}</div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <TxBar req={req} />
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
