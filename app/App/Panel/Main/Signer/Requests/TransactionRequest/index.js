@@ -39,8 +39,11 @@ class TransactionRequest extends React.Component {
     let mode = req.mode
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
-    if (req.status === 'confirming' || req.status === 'confirmed') requestClass += ' signerRequestSuccess'
-    if (req.status === 'error') requestClass += ' signerRequestError'
+    let success = req.status === 'confirming' || req.status === 'confirmed'
+    let error = req.status === 'error' || req.status === 'declined'
+    if (success) requestClass += ' signerRequestSuccess'
+    if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
+    else if (error) requestClass += ' signerRequestError'
     let etherRates = this.store('external.rates')
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     let value = this.hexToDisplayValue(req.data.value || '0x')
@@ -49,12 +52,10 @@ class TransactionRequest extends React.Component {
     let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     // let txStatus = req.tx && req.tx.receipt ? req.tx.receipt.status : false
     let statusClass = 'txStatus'
-    let success = req.status === 'confirming' || req.status === 'confirmed'
-    let error = req.status === 'error'
     if (!success && !error) statusClass += ' txStatusCompact'
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: this.props.z }}>
-        <div className='requestOverlay'><div className='requestOverlayInset' /></div>
+        <div className='requestOverlay'><div className='requestSheen' /></div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
@@ -63,10 +64,18 @@ class TransactionRequest extends React.Component {
                   <div className='requestNoticeInner'>
                     <div className={statusClass}>
                       <div className='txProgressNotice'>
-                        <div>{success ? 'Success' : notice}</div>
-                        <div className='txProgressDetailExpand'>
-                          <div>{svg.octicon('chevron-down', { height: 12 })}{'View Details'}{svg.octicon('chevron-down', { height: 12 })}</div>
+                        <div className='txProgressDetailText'>
+                          {success ? (
+                            <div className='txProgressDetailHash' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>
+                              {req.tx.hash.substring(0, 14)}
+                              {svg.octicon('kebab-horizontal', { height: 14 })}
+                              {req.tx.hash.substr(req.tx.hash.length - 12)}
+                            </div>
+                          ) : (
+                            <div>{notice}</div>
+                          )}
                         </div>
+                        <div className='txProgressDetailExpand' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>{'View on Etherscan '}</div>
                       </div>
                     </div>
                     <TxBar req={req} />

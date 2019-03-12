@@ -17,7 +17,7 @@ class TxBar extends React.Component {
       position = 4
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarSuccess'
-    } else if (req.status === 'error') {
+    } else if (req.status === 'error' || req.status === 'declined') {
       position = 4
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarError'
@@ -33,17 +33,17 @@ class TxBar extends React.Component {
             <div className='txProgressLine' />
             <div className='txProgressSteps'>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '10px 10px' }}>{svg.sign(22)}</div>
+                <div className={progressIconClass} style={{ padding: '10px 11px' }}>{svg.sign(22)}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 1 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '11px 11px' }}>{svg.send(15)}</div>
+                <div className={progressIconClass} style={{ padding: '11px 12px' }}>{svg.send(15)}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 2 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>
               <div className='txProgressStep'>
-                <div className={progressIconClass} style={{ padding: '7px 11px' }}>{svg.octicon('check', { height: 24 })}</div>
+                <div className={progressIconClass} style={{ padding: '7px 12px' }}>{svg.octicon('check', { height: 24 })}</div>
                 <div className='txProgressStepMarker' />
                 <div className={position > 3 ? 'txProgressStepCenter txProgressStepCenterOn' : 'txProgressStepCenter'} />
               </div>

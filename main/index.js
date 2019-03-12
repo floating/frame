@@ -55,6 +55,12 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
+const networks = { 1: '', 3: 'ropsten.', 4: 'rinkeby.', 42: 'kovan.' }
+ipcMain.on('tray:openEtherscan', (e, hash) => {
+  let network = networks[store('main.connection.network')]
+  shell.openExternal('https://' + network + 'etherscan.io/tx/' + hash)
+})
+
 ipcMain.on('tray:giveAccess', (e, req, access) => {
   store.giveAccess(req, access)
   signers.removeRequest(req.handlerId)

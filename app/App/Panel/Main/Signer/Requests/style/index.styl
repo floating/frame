@@ -98,17 +98,13 @@
 
 @keyframes sheen
   0%
-    transform translateX(-300px)
-  50%
-    transform translateX(-300px)
-  60%
-    transform translateX(300px)
-  73%
-    transform translateX(0px)
-  88%
-    transform translateX(300px)
+    transform translateX(-300px) rotate(-30deg)
+  80%
+    transform translateX(-300px) rotate(-30deg)
+  95%
+    transform translateX(300px) rotate(30deg)
   100%
-    transform translateX(-300px)
+    transform translateX(-300px) rotate(60deg)
 
 @keyframes pulse
   0%
@@ -247,8 +243,8 @@
     .recentRequests
       position absolute
       top 1px
-      left 10px
-      right 10px
+      left 3px
+      right 0px
       height 20px
       pointer-events none
       justify-content space-between
@@ -259,9 +255,9 @@
       line-height 10px
       font-weight 600
       letter-spacing 2px
-      margin-left -2px
       transition standardSlow
       color outerspace08
+      // background blue
 
   .signerRequestItems
     overflow scroll
@@ -287,17 +283,28 @@
     color outerspace08
     tranform translateZ(0)
 
-  // .requestOverlay
-  //   position absolute
-  //   top 0px
-  //   left 0px
-  //   right 0px
-  //   bottom 0px
-  //   z-index 9999999999999
-  //   border-radius 6px
-  //   opacity 0.05
-  //   pointer-events none
-  //   overflow hidden
+  .requestOverlay
+    display none
+    position absolute
+    top 0px
+    left 0px
+    right 0px
+    bottom 0px
+    z-index 9999999999999
+    border-radius 6px
+    // opacity 0.05
+    pointer-events none
+    overflow hidden
+    .requestSheen
+      position absolute
+      z-index 30000002
+      top -400%
+      height 1000%
+      width 90px
+      animation sheen 12s infinite ease
+      background linear-gradient(90deg, rgba(247, 251, 255, 0), rgba(237, 241, 255, 0.7), rgba(247, 251, 255, 0))
+      // background blue
+      background-blend-mode multiply
   //
   //   .requestOverlayInset
   //     position absolute
@@ -1000,20 +1007,16 @@ span
   svg
     padding 0px 3px 0px 3px
 
-.txProgressDetailExpand
-  backgound blue
-
 .txStatus
   position absolute
-  top 0
+  top 65px
   left 5px
   right 5px
   height 52px
   border-radius 6px
-  transform translateY(65px)
+  transform translateY(220px) 
   box-shadow 0px 2px 0px thick, 0px 8px 5px -5px thick
   text-align center
-  padding-top 7px
   box-sizing border-box
   background rgba(255, 255, 255, 0.05)
   background highlight
@@ -1025,6 +1028,23 @@ span
   overflow hidden
   transition standardSlow
 
+.txProgressDetailText
+  padding 8px
+  .txProgressDetailHash
+    font-size 16px
+    font-weight 400
+    letter-spacing 0px
+    font-family FiraCode, sans-serif
+    text-transform none
+    svg
+      padding 3px 4px 2px 4px
+
+.txProgressDetailExpand
+  margin-top -6px
+  color outerspace05
+// .txProgressDetailExpand:hover
+//   color outerspace08
+
 .txStatusCompact
   height 30px
 
@@ -1033,7 +1053,7 @@ span
   z-index 1001
   height 58px
   bottom 0px
-  width 330px
+  width 331px
   border-bottom-left-radius 6px
   border-bottom-right-radius 6px
   overflow hidden
@@ -1087,7 +1107,8 @@ span
             transform translateY(-10px)
             opacity 0
             transition-delay 500
-            transition-property opacity
+            transition standardSlow
+
 
           .txProgressStepMarker
             position absolute
@@ -1317,6 +1338,13 @@ span
   .monitorIconIndicator
     background good !important
 
+.signerRequestMonitor
+  .txStatus
+    transform translateY(0px)
+
 .signerRequestError
   .monitorIconIndicator
     background bad !important
+  .txProgressConfirmsItem
+    svg
+      color bad !important

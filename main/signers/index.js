@@ -45,14 +45,8 @@ const txMonitor = (id, hash) => {
             } else if (receiptRes.result && signers[current].requests[id]) {
               signers[current].requests[id].tx.receipt = receiptRes.result
               if (receiptRes.result.status === '0x1' && signers[current].requests[id].status === 'verifying') {
-                signers[current].requests[id].status = 'verified'
-                signers[current].requests[id].notice = 'Verified'
-                signers[current].update()
-                setTimeout(() => {
-                  signers[current].requests[id].status = 'confirming'
-                  signers[current].requests[id].notice = 'Confirming'
-                  signers[current].update()
-                }, 1000)
+                signers[current].requests[id].status = 'confirming'
+                signers[current].requests[id].notice = 'Confirming'
               }
               let blockHeight = parseInt(newHead.number, 16)
               let receiptBlock = parseInt(signers[current].requests[id].tx.receipt.blockNumber, 16)
@@ -238,7 +232,11 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'success'
       signers[current].requests[handlerId].notice = 'Succesful'
-      signers[current].requests[handlerId].mode = 'monitor'
+      if (signers[current].requests[handlerId].type === 'transaction') {
+        signers[current].requests[handlerId].mode = 'monitor'
+      } else {
+        setTimeout(() => api.removeRequest(handlerId), 3300)
+      }
       signers[current].update()
     }
   }
