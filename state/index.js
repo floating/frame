@@ -73,7 +73,7 @@ let initial = {
       dontRemind: main('updater.dontRemind', [])
     },
     connection: {
-      network: main('connection.network', '1'),
+      network: main('connection.network', '4'),
       options: ['1', '3', '4', '42'],
       local: {
         on: main('connection.local.on', false),
