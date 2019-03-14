@@ -3,6 +3,9 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+
+const proxy = require('./proxy')
+
 const store = require('../store')
 const nodes = require('../nodes')
 const signers = require('../signers')
@@ -128,6 +131,7 @@ class Provider extends EventEmitter {
         this.resError(err, payload, res)
         return cb(new Error(err))
       }
+      signers.setTxSigned(req.handlerId)
       this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, (response) => {
         if (response.error) {
           this.resError(response.error, payload, res)
@@ -259,5 +263,8 @@ store.observer(() => {
     provider.accountsChanged([])
   }
 })
+
+proxy.on('send', (payload, cd) => provider.send(payload, cd))
+provider.on('data', data => proxy.emit('data', data))
 
 module.exports = provider

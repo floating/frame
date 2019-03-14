@@ -53,7 +53,7 @@ const rpc = {
     if (req.type === 'transaction') {
       provider.approveRequest(req, (err, res) => {
         if (err) return signers.setRequestError(req.handlerId, err)
-        signers.setRequestSuccess(req.handlerId, res)
+        setTimeout(() => signers.setTxSent(req.handlerId, res), 1800)
       })
     } else if (req.type === 'sign') {
       provider.approveSign(req, (err, res) => {

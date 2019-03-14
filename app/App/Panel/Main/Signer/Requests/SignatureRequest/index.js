@@ -46,8 +46,10 @@ class TransactionRequest extends React.Component {
     // let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     // let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
     // let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
+    let mode = this.props.req.mode
+    let height = mode === 'monitor' ? '80px' : '370px'
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ top: (this.props.top * 10) + 'px' }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
         {type === 'sign' ? (
           <div className='approveTransaction'>

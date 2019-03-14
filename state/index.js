@@ -65,6 +65,7 @@ let initial = {
     rates: {}
   },
   main: {
+    alphaNotice: main('alphaNotice', false), // Notice that needs to be accepted at least once
     launch: main('launch', false),
     reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
