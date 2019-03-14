@@ -92,9 +92,9 @@
 
 @keyframes spin
   0%
-    transform rotate(0deg)
+    transform rotate(45deg)
   100%
-    transform rotate(360deg)
+    transform rotate(405deg)
 
 @keyframes sheen
   0%
@@ -114,6 +114,37 @@
   100%
     fill outerspace
 
+@keyframes bars
+  0%
+    opacity 0
+  30%
+    opacity 1
+  60%
+    opacity 0
+
+.txProgressNoticeBar-10
+  animation bars 3000ms infinite linear 0s
+.txProgressNoticeBar-9
+  animation bars 3000ms infinite linear 0.1s
+.txProgressNoticeBar-8
+  animation bars 3000ms infinite linear 0.2s
+.txProgressNoticeBar-7
+  animation bars 3000ms infinite linear 0.3s
+.txProgressNoticeBar-6
+  animation bars 3000ms infinite linear 0.4s
+.txProgressNoticeBar-5
+  animation bars 3000ms infinite linear 0.5s
+.txProgressNoticeBar-4
+  animation bars 3000ms infinite linear 0.6s
+.txProgressNoticeBar-3
+  animation bars 3000ms infinite linear 0.7s
+.txProgressNoticeBar-2
+  animation bars 3000ms infinite linear 0.8s
+.txProgressNoticeBar-1
+  animation bars 3000ms infinite linear 0.9s
+.txProgressNoticeBar-0
+  animation bars 3000ms infinite linear 1s
+
 .spinner
   width 100px
   height 100px
@@ -132,13 +163,11 @@
 
 .slideUp-enter
   opacity 0
-  // transform scale(1.4)
   margin-top -200px
   transition standardSlow
 
 .slideUp-enter.slideUp-enter-active
   opacity 1
-  // transform scale(1)
   margin-top 0px
   transition standardSlow
   transition-delay 0.32s
@@ -146,12 +175,89 @@
 .slideUp-leave
   opacity 1
   transition standardSlow
-  // transform scale(1)
 
 .slideUp-leave.slideUp-leave-active
   opacity 0
   margin-top -200px
-  // transform scale(4)
+
+.txProgressNotice
+  position absolute
+  width 100%
+  top 50%
+  height 1000px
+  margin-top -500px
+
+  .txProgressNoticeBars
+    position absolute
+    top 50%
+    margin-top -8px
+    left 8px
+    right 8px
+    height 16px
+    display flex
+    justify-content space-between
+    align-items center
+    transition standard
+
+    .txProgressNoticeBarDeadzone
+      width 17px
+      height 19px
+
+    .txProgressNoticeBar
+      opacity 0
+      width 4px
+      border-radius 2px
+      height 15px
+      background thick
+
+  .txProgressNoticeIcon
+    position absolute
+    top 50%
+    left 0
+    right 0
+    margin-top -80px
+    height 160px
+    width 100%
+    display flex
+    justify-content center
+    align-items center
+    z-index 1000
+
+  .txProgressNoticeText
+    position absolute
+    top 50%
+    left 0
+    right 0
+    margin-top 20px
+    height 20px
+    width 100%
+    display flex
+    justify-content center
+    align-items center
+    z-index 1001
+    font-weight 500
+
+  .txProgressNoticeLoader
+    height 100px
+    width 100px
+    margin-bottom 20px
+    position relative
+
+    .txProgressNoticeLoaderIcon
+      position absolute
+      top 0
+      left 0
+      height 100px
+      width 100px
+      z-index 1000004
+
+    .txProgressNoticeLoaderBars
+      position absolute
+      background blue
+      top 0
+      right 0
+      height 50px
+      width 50px
 
 .signerRequests
   position absolute
@@ -306,11 +412,6 @@
 
   .signerRequestSuccess
     align-items center
-    color good
-    svg
-      color good
-    .approveTransactionPayload
-      color good
     .requestApprove
       opacity 0
       pointer-events none
@@ -325,21 +426,12 @@
 
   .signerRequestError
     align-items center
-    color bad
-    svg
-      color bad
-    .approveTransactionPayload
-      color bad
     .requestApprove
       opacity 0
       pointer-events none
 
   .signerRequestDeclined
     align-items center
-    svg
-      color bad
-    .approveTransactionPayload
-      color bad
     .requestApprove
       opacity 0
       pointer-events none
@@ -1005,25 +1097,47 @@ span
   text-transform uppercase
   letter-spacing 1px
   overflow hidden
-  transition standardSlow
+  transition standard
   display flex
   justify-content center
   align-items center
 
-.txProgressDetailText
-  padding 2px 10px 0px 10px
-  line-height 14px
-  .txProgressDetailHash
-    font-size 16px
-    font-weight 400
-    letter-spacing 0px
-    font-family FiraCode, sans-serif
-    text-transform none
-    svg
-      padding 0px 2px 1px 2px
+  .txProgressNoticeHidden
+    transition standard
+    transform translateY(-25px)
+    opacity 0
+    pointer-events none
+
+  .txProgressNoticeSuccess
+    position absolute
+    top 50%
+    height 50px
+    left 0
+    right 0
+    z-index 1000005
+    margin-top -24px
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    transition standard
+
+    .txProgressDetailHash
+      font-size 16px
+      font-weight 400
+      letter-spacing 0px
+      font-family FiraCode, sans-serif
+      text-transform none
+
+      svg
+        padding 0px 2px 1px 2px
 
 .txProgressDetailExpand
   color outerspace05
+
+.txProgressDetailError
+  padding 0px 10px
+  font-size 12px
 
 .txStatusCompact
   bottom 60px
@@ -1080,14 +1194,13 @@ span
             width 40px
             height 40px
             box-sizing border-box
-            // background blue
-            transition standardSlow
-            // transform translateY(-10px)
+            transition standard
+            transform translateZ(0px)
           .txProgressStepIconHidden
-            transform translateY(-10px)
+            transform translateY(-50px)
             opacity 0
             transition-delay 500
-            transition standardSlow
+            transition standardFast
 
 
           .txProgressStepMarker
@@ -1175,7 +1288,7 @@ span
             height calc(100% - 4px)
             width calc(100% - 4px)
             border-radius 18px
-            background highlight // radial-gradient(ellipse at center, rgba(94,110,255,1) 25%,rgba(94,110,255,0) 100%)
+            background highlight
             top 2px
             left 2px
 

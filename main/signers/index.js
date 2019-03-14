@@ -199,7 +199,10 @@ const api = {
         signers[current].requests[handlerId].notice = notice
       }
       if (signers[current].requests[handlerId].type === 'transaction') {
-        signers[current].requests[handlerId].mode = 'monitor'
+        setTimeout(() => {
+          signers[current].requests[handlerId].mode = 'monitor'
+          signers[current].update()
+        }, 1500)
       } else {
         setTimeout(() => api.removeRequest(handlerId), 3300)
       }

@@ -36,6 +36,7 @@ class TransactionRequest extends React.Component {
   render () {
     let req = this.props.req
     let notice = req.notice
+    let status = req.status
     let mode = req.mode
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
@@ -53,6 +54,7 @@ class TransactionRequest extends React.Component {
     let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let statusClass = 'txStatus'
     if (!success && !error) statusClass += ' txStatusCompact'
+    if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <div className='requestOverlay'><div className='requestSheen' /></div>
@@ -63,24 +65,34 @@ class TransactionRequest extends React.Component {
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
                     <div className={statusClass}>
-                      {success ? (
-                        <div className='txProgressNotice'>
-                          <div className='txProgressDetailText'>
-                            <div className='txProgressDetailHash' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>
-                              {req.tx.hash.substring(0, 14)}
-                              {svg.octicon('kebab-horizontal', { height: 14 })}
-                              {req.tx.hash.substr(req.tx.hash.length - 12)}
-                            </div>
+                      <div className='txProgressNotice'>
+                        <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'} onMouseDown={() => { if (req && req.tx && req.tx.hash) link.send('tray:openEtherscan', req.tx.hash) }}>
+                          <div className={'txProgressDetailHash'}>
+                            {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 14) : ''}
+                            {svg.octicon('kebab-horizontal', { height: 14 })}
+                            {req && req.tx && req.tx.hash ? req.tx.hash.substr(req.tx.hash.length - 12) : ''}
                           </div>
-                          <div className='txProgressDetailExpand' onMouseDown={() => link.send('tray:openEtherscan', req.tx.hash)}>{'View Details'}</div>
+                          <div className='txProgressDetailExpand'>{'View Details'}</div>
                         </div>
-                      ) : (
-                        <div className='txProgressNotice'>
-                          <div className='txProgressDetailText'>
-                            <div>{notice}</div>
-                          </div>
+                        <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
+                          {[...Array(10).keys()].map(i => {
+                            return <div key={'f' + i} className={`txProgressNoticeBar txProgressNoticeBar-${i}`} />
+                          })}
+                          <div className='txProgressNoticeBarDeadzone' />
+                          {[...Array(10).keys()].reverse().map(i => {
+                            return <div key={'r' + i} className={`txProgressNoticeBar txProgressNoticeBar-${i}`} />
+                          })}
                         </div>
-                      )}
+                        <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeIcon txProgressNoticeHidden' : 'txProgressNoticeIcon'}>
+                          {status === 'pending' ? svg.sign(23) : null}
+                          {status === 'sending' ? svg.send(19) : null}
+                          {status === 'verifying' ? svg.octicon('check', { height: 26 }) : null}
+                          {status === 'error' ? svg.octicon('circle-slash', { height: 22 }) : null}
+                        </div>
+                        <div className={success ? 'txProgressNoticeText txProgressNoticeHidden' : mode === 'monitor' ? 'txProgressNoticeText txProgressNoticeSuccess' : 'txProgressNoticeText'}>
+                          <div className='txProgressDetailError'>{status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}</div>
+                        </div>
+                      </div>
                     </div>
                     <TxBar req={req} />
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>

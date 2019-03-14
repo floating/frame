@@ -65,6 +65,7 @@ let initial = {
     rates: {}
   },
   main: {
+    alphaNotice: main('alphaNotice', false), // Notice that needs to be accepted at least once
     launch: main('launch', false),
     reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
@@ -72,7 +73,7 @@ let initial = {
       dontRemind: main('updater.dontRemind', [])
     },
     connection: {
-      network: main('connection.network', '4'),
+      network: main('connection.network', '1'),
       options: ['1', '3', '4', '42'],
       local: {
         on: main('connection.local.on', false),
