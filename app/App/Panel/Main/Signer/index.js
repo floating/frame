@@ -301,11 +301,14 @@ class Signer extends React.Component {
     if (current) {
       // Currently selected
       style.position = 'absolute'
-      style.top = open ? 40 : initial.top
-      style.bottom = open ? 3 : initial.bottom
+      style.top = initial.top // open ? 40 : initial.top
+      style.bottom = initial.bottom // open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
       style.zIndex = '1000000000000'
+      let panelHeight = document.body.offsetHeight
+      style.height = open ? panelHeight - 50 : initial.height - 3
+      style.transform = open ? `translateY(-${initial.top - 44}px)` : `translateY(0px)`
     } else if (this.store('signer.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0
@@ -331,10 +334,12 @@ class Signer extends React.Component {
               {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
             {this.renderAccountList()}
-            <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '200px' : '200px' } : { pointerEvents: 'none' }}>
-              <Settings id={this.props.id} />
-              <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
-            </div>
+            {this.store('signer.current') === this.props.id ? (
+              <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '200px' : '200px' } : { pointerEvents: 'none' }}>
+                <Settings id={this.props.id} />
+                <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
+              </div>
+            ) : null}
             <div className='signerBot' />
           </div>
         </div>

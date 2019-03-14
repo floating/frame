@@ -17,21 +17,26 @@ let showOnReady = true
 let needReload = false
 let reloadTimeout, resetTimeout, mouseTimeout
 
-let hideOnMouseOut = false
+let glide = false
 
 const detectMouse = () => {
   let m1 = electron.screen.getCursorScreenPoint()
-  let area = electron.screen.getDisplayNearestPoint(m1).workArea
-  let minX = (area.width + area.x) - 2
-  let center = (area.height + area.y) / 2
-  let margin = (area.height + area.y) / 8
+  let display = electron.screen.getDisplayNearestPoint(m1)
+  let area = display.workArea
+  let bounds = display.bounds
+  let minX = (area.width + area.x) - 2 // Possibly increase
+  let center = (area.height + (area.y - bounds.y)) / 2
+  let margin = (area.height + (area.y - bounds.y)) / 8
+  m1.y = m1.y - area.y
   let minY = center - margin
   let maxY = center + margin
   mouseTimeout = setTimeout(() => {
     if (m1.x >= minX && m1.y >= minY && m1.y <= maxY) {
       let m2 = electron.screen.getCursorScreenPoint()
+      let area = electron.screen.getDisplayNearestPoint(m2).workArea
+      m2.y = m2.y - area.y
       if (m2.x >= minX && m2.y === m1.y) {
-        hideOnMouseOut = true
+        glide = true
         api.showTray()
       } else {
         detectMouse()
@@ -46,6 +51,9 @@ const api = {
   create: () => {
     const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
     windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png'), skipTaskbar: process.platform !== 'linux' })
+    electron.screen.on('display-added', () => api.hideTray())
+    electron.screen.on('display-removed', () => api.hideTray())
+    electron.screen.on('display-metrics-changed', () => api.hideTray())
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -69,7 +77,7 @@ const api = {
         tray.setContextMenu(menuShow)
       })
       setTimeout(() => {
-        windows.tray.on('focus', () => { if (hideShow.current = 'hidden') api.showTray() })
+        windows.tray.on('focus', () => { if (hideShow.current === 'hidden') api.showTray() })
       }, 2000)
     }
     if (dev) windows.tray.openDevTools()
@@ -157,12 +165,12 @@ const api = {
       windows.tray.setSize(360, dev ? 740 : area.height)
       let pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
-      windows.tray.focus()
+      if (!glide) windows.tray.focus()
       windows.tray.emit('show')
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
-        if (windows && windows.tray && windows.tray.focus) windows.tray.focus()
+        if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false
@@ -221,11 +229,13 @@ ipcMain.on('tray:ready', () => {
 })
 
 ipcMain.on('tray:mouseout', () => {
-  if (hideOnMouseOut) {
-    hideOnMouseOut = false
+  if (glide) {
+    glide = false
     api.hideTray()
   }
 })
+
+ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))

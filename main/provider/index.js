@@ -3,6 +3,9 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+
+const proxy = require('./proxy')
+
 const store = require('../store')
 const nodes = require('../nodes')
 const signers = require('../signers')
@@ -71,16 +74,51 @@ class Provider extends EventEmitter {
     log.warn(error)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error: error.message })
   }
+  getSignedAddress (signed, message, cb) {
+    const signature = Buffer.from(signed.replace('0x', ''), 'hex')
+    if (signature.length !== 65) cb(new Error(`Frame verifySignature: Signature has incorrect length`))
+    let v = signature[64]
+    v = v === 0 || v === 1 ? v + 27 : v
+    let r = toBuffer(signature.slice(0, 32))
+    let s = toBuffer(signature.slice(32, 64))
+    const hash = hashPersonalMessage(toBuffer(message))
+    const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+    cb(null, verifiedAddress)
+  }
+  ecRecover (payload, res) {
+    const message = payload.params[0]
+    const signed = payload.params[1]
+    this.getSignedAddress(signed, message, (err, verifiedAddress) => {
+      if (err) return this.resError(err.message, payload, res)
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: verifiedAddress })
+    })
+  }
+  verifySignature (signed, message, address, cb) {
+    this.getSignedAddress(signed, message, (err, verifiedAddress) => {
+      if (err) return cb(err)
+      if (verifiedAddress !== address) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
+      cb(null, true)
+    })
+  }
   approveSign (req, cb) {
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
-    signers.signPersonal(req.payload.params[0], req.payload.params[1], (err, signed) => {
+    let address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
+    let message = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
+    signers.signMessage(address, message, (err, signed) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
       } else {
-        res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
-        cb(null, signed)
+        this.verifySignature(signed, message, address, (err, success) => {
+          if (err) {
+            this.resError(err.message, payload, res)
+            cb(err.message)
+          } else {
+            res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
+            cb(null, signed)
+          }
+        })
       }
     })
   }
@@ -93,6 +131,7 @@ class Provider extends EventEmitter {
         this.resError(err, payload, res)
         return cb(new Error(err))
       }
+      signers.setTxSigned(req.handlerId)
       this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, (response) => {
         if (response.error) {
           this.resError(response.error, payload, res)
@@ -175,22 +214,10 @@ class Provider extends EventEmitter {
       signers.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)
     })
   }
-  signPersonal (payload, res) {
+  ethSign (payload, res) {
     let handlerId = uuid()
     this.handlers[handlerId] = res
     signers.addRequest({ handlerId, type: 'sign', payload, account: signers.getAccounts()[0] })
-  }
-  ecRecover (payload, res) {
-    const message = payload.params[0]
-    const signature = Buffer.from(payload.params[1].replace('0x', ''), 'hex')
-    if (signature.length !== 65) this.resError(`Frame provider error during ecRecover: Signature has incorrect length`, payload, res)
-    let v = signature[64]
-    v = v === 0 || v === 1 ? v + 27 : v
-    let r = toBuffer(signature.slice(0, 32))
-    let s = toBuffer(signature.slice(32, 64))
-    const hash = hashPersonalMessage(toBuffer(message))
-    const address = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: address })
   }
   subscribe (payload, res) {
     let subId = '0x' + this.randHex(32)
@@ -216,10 +243,9 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
-    if (payload.method === 'personal_sign') return this.signPersonal(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
-    if (payload.method === 'eth_sign') return this.resError('No eth_sign, please use personal_sign', payload, res)
+    if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     this.connection.send(payload, res)
@@ -237,5 +263,8 @@ store.observer(() => {
     provider.accountsChanged([])
   }
 })
+
+proxy.on('send', (payload, cd) => provider.send(payload, cd))
+provider.on('data', data => proxy.emit('data', data))
 
 module.exports = provider

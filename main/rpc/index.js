@@ -11,7 +11,7 @@ const rpc = {
     cb(null, store())
   },
   signTransaction: signers.signTransaction,
-  signPersonal: signers.signPersonal,
+  signMessage: signers.signMessage,
   getAccounts: signers.getAccounts,
   getCoinbase: signers.getCoinbase,
   getSigners: signers.getSigners,
@@ -53,7 +53,7 @@ const rpc = {
     if (req.type === 'transaction') {
       provider.approveRequest(req, (err, res) => {
         if (err) return signers.setRequestError(req.handlerId, err)
-        signers.setRequestSuccess(req.handlerId, res)
+        setTimeout(() => signers.setTxSent(req.handlerId, res), 1800)
       })
     } else if (req.type === 'sign') {
       provider.approveSign(req, (err, res) => {

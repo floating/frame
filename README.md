@@ -63,7 +63,8 @@ Frame is an OS-level Ethereum interface that lets you use standalone signers, su
     "accounts": ["privateKey1", "privateKey2"]
   }
   ```
-  - Run `npm run dev` (hot signers will only be added in dev mode)
+  - Run `npm run hot` (production env + hot signers) or `npm run dev` (development env)
+  - Hot signers will not be added when running `npm run alpha` (production env)
 
 ### Build Apps
   ```bash

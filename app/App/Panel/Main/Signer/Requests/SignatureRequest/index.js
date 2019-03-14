@@ -32,8 +32,11 @@ class TransactionRequest extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
   render () {
+    let type = this.props.req.type
     let status = this.props.req.status
     let notice = this.props.req.notice
+    let payload = this.props.req.payload
+    let message = utils.toAscii(payload.method === 'eth_sign' ? payload.params[1] : payload.params[0] || '0x')
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -43,10 +46,12 @@ class TransactionRequest extends React.Component {
     // let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     // let value = this.hexToDisplayValue(this.props.req.data.value || '0x')
     // let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(this.props.req.data.gas, 16) * parseInt(this.props.req.data.gasPrice, 16)))
+    let mode = this.props.req.mode
+    let height = mode === 'monitor' ? '80px' : '370px'
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ top: (this.props.top * 10) + 'px' }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         <div className='requestOverlay'><div className='requestOverlayInset' /></div>
-        {this.props.req.type === 'sign' ? (
+        {type === 'sign' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
               {notice ? (
@@ -86,9 +91,7 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderLabel'> {'Sign Message'}</div>
                   </div>
                   <div className='signValue'>
-                    <div className='signValueInner'>
-                      {utils.toAscii(this.props.req.payload.params[0] || '0x')}
-                    </div>
+                    <div className='signValueInner'>{message}</div>
                   </div>
                 </React.Fragment>
               )}
@@ -102,7 +105,7 @@ class TransactionRequest extends React.Component {
             <div className='requestDeclineButton'>{'Decline'}</div>
           </div>
           <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestSignButton'> {'Sign'} </div>
+            <div className='requestSignButton'>{'Sign'}</div>
           </div>
         </div>
       </div>
