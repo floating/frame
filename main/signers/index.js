@@ -200,8 +200,10 @@ const api = {
       }
       if (signers[current].requests[handlerId].type === 'transaction') {
         setTimeout(() => {
-          signers[current].requests[handlerId].mode = 'monitor'
-          signers[current].update()
+          if (signers[current] && signers[current].requests[handlerId]) {
+            signers[current].requests[handlerId].mode = 'monitor'
+            signers[current].update()
+          }
         }, 1500)
       } else {
         setTimeout(() => api.removeRequest(handlerId), 3300)

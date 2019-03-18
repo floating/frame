@@ -29,27 +29,27 @@ class Bridge extends React.Component {
         <div className='badge' style={{ transform: 'translateY(0px)', height: '224px' }}>
           <div className='badgeInner'>
             <div className='badgeMessage'>
-              {'An update is available, would you like to install it?'}
+              {'A new update is available, would you like to install it?'}
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>
                 <div className='badgeInputInner' onMouseDown={() => {
                   link.send('tray:installAvailableUpdate', true, false)
-                }}>{'Yes'}</div>
+                }}>{'Install Update'}</div>
               </div>
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>
                 <div className='badgeInputInner' onMouseDown={() => {
                   link.send('tray:installAvailableUpdate', false, false)
-                }}>{'No'}</div>
+                }}>{'Remind Me Later'}</div>
               </div>
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>
                 <div className='badgeInputInner badgeInputSmall' onMouseDown={() => {
                   link.send('tray:installAvailableUpdate', false, true)
-                }}>{'No & Don\'t remind me'}</div>
+                }}>{'Skip This Version'}</div>
               </div>
             </div>
           </div>
