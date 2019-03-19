@@ -38,6 +38,7 @@ class TransactionRequest extends React.Component {
     let notice = req.notice
     let status = req.status
     let mode = req.mode
+    let toAddress = req.data && req.data.to ? req.data.to : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
     let success = req.status === 'confirming' || req.status === 'confirmed'
@@ -100,11 +101,15 @@ class TransactionRequest extends React.Component {
                     <div className='monitorTop'>
                       <div className='monitorValue'><span>{'Ξ'}</span>{value}</div>
                       <div className='monitorArrow'>{svg.longArrow(14)}</div>
-                      <div className='monitorTo'>
-                        {req.data.to.substring(0, 6)}
-                        {svg.octicon('kebab-horizontal', { height: 14 })}
-                        {req.data.to.substr(req.data.to.length - 4)}
-                      </div>
+                      {toAddress ? (
+                        <div className='monitorTo'>
+                          {toAddress.substring(0, 6)}
+                          {svg.octicon('kebab-horizontal', { height: 14 })}
+                          {toAddress.substr(toAddress.length - 4)}
+                        </div>
+                      ) : (
+                        <div className='monitorDeploy'>{'deploy'}</div>
+                      )}
                     </div>
                     <div className='monitorConfirms'>
                       {[...Array(12).keys()].map(i => {

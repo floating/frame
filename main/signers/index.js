@@ -169,14 +169,16 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'declined'
       signers[current].requests[handlerId].notice = 'Signature Declined'
-      signers[current].requests[handlerId].mode = 'monitor'
+      if (signers[current].requests[handlerId].type === 'transaction') {
+        signers[current].requests[handlerId].mode = 'monitor'
+      } else {
+        setTimeout(() => api.removeRequest(handlerId), 3300)
+      }
       signers[current].update()
     }
-    // setTimeout(() => api.removeRequest(handlerId), 1800)
   },
   setRequestPending (req) {
     let handlerId = req.handlerId
-    // let tx = signers[current].requests[handlerId] === 'transaction'
     log.info('setRequestPending', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
