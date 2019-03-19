@@ -49,7 +49,7 @@ class TransactionRequest extends React.Component {
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     let value = this.hexToDisplayValue(req.data.value || '0x')
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
-    let height = mode === 'monitor' ? '145px' : '370px'
+    let height = mode === 'monitor' ? '145px' : '360px'
     let z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let statusClass = 'txStatus'
