@@ -1,4 +1,5 @@
 const { app, ipcMain, protocol, shell, dialog } = require('electron')
+app.commandLine.appendSwitch('force-gpu-rasterization', true)
 const PersistStore = require('electron-store')
 const log = require('electron-log')
 const path = require('path')
