@@ -93,6 +93,7 @@ class TransactionRequest extends React.Component {
                         <div className={success ? 'txProgressNoticeText txProgressNoticeHidden' : mode === 'monitor' ? 'txProgressNoticeText txProgressNoticeSuccess' : 'txProgressNoticeText'}>
                           <div className='txProgressDetailError'>{status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}</div>
                         </div>
+                        {status === 'pending' ? <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>{'Cancel'}</div> : null}
                       </div>
                     </div>
                     <TxBar req={req} />
