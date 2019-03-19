@@ -181,7 +181,7 @@ const api = {
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'pending'
-      signers[current].requests[handlerId].notice = 'Signing'
+      signers[current].requests[handlerId].notice = 'See Signer'
       signers[current].update()
     }
   },
