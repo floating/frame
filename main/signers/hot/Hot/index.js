@@ -22,7 +22,7 @@ class Hot extends Signer {
   signTransaction (rawTx, cb) {
     const tx = new EthTx(rawTx)
     tx.sign(this.privateKey)
-    setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 3500) // Response delay for development
+    setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 1000) // Response delay for development
   }
 }
 

@@ -58,7 +58,6 @@ class TransactionRequest extends React.Component {
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
-        <div className='requestOverlay'><div className='requestSheen' /></div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
