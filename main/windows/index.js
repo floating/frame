@@ -24,7 +24,7 @@ const detectMouse = () => {
   let display = electron.screen.getDisplayNearestPoint(m1)
   let area = display.workArea
   let bounds = display.bounds
-  let minX = (area.width + area.x) - 2 // Possibly increase
+  let minX = (area.width + area.x) - 2
   let center = (area.height + (area.y - bounds.y)) / 2
   let margin = (area.height + (area.y - bounds.y)) / 8
   m1.y = m1.y - area.y
@@ -160,7 +160,7 @@ const api = {
       windows.tray.setAlwaysOnTop(true)
       hideShow.running = 'show'
       windows.tray.setVisibleOnAllWorkspaces(true)
-      windows.tray.setResizable(false) // Makes no sense but keeps height consistant
+      windows.tray.setResizable(false) // Keeps height consistant
       let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       windows.tray.setSize(360, dev ? 740 : area.height)
       let pos = windows.tray.positioner.calculate('topRight')
