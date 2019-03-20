@@ -213,13 +213,20 @@ const api = {
       signers[current].update()
     }
   },
-  setTxSigned (handlerId) {
+  setTxSigned (handlerId, cb) {
     log.info('setTxSigned', handlerId)
-    if (!signers[current]) return // cb(new Error('No Account Selected'))
+    if (!signers[current]) return cb(new Error('No account selected'))
     if (signers[current].requests[handlerId]) {
-      signers[current].requests[handlerId].status = 'sending'
-      signers[current].requests[handlerId].notice = 'Sending'
-      signers[current].update()
+      if (signers[current].requests[handlerId].status === 'declined') {
+        cb(new Error('Request already declined'))
+      } else {
+        signers[current].requests[handlerId].status = 'sending'
+        signers[current].requests[handlerId].notice = 'Sending'
+        signers[current].update()
+        cb()
+      }
+    } else {
+      cb(new Error('No valid request for ' + handlerId))
     }
   },
   setTxSent (handlerId, hash) {
