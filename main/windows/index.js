@@ -88,7 +88,7 @@ const api = {
       }, 1260)
     }
     setTimeout(() => {
-      windows.tray.show()
+      if (windows && windows.tray) windows.tray.show()
       setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
     }, 50)
     resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)

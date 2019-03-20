@@ -38,6 +38,7 @@ class TransactionRequest extends React.Component {
     let notice = req.notice
     let status = req.status
     let mode = req.mode
+    let toAddress = req.data && req.data.to ? req.data.to : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
     let success = req.status === 'confirming' || req.status === 'confirmed'
@@ -49,7 +50,7 @@ class TransactionRequest extends React.Component {
     let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     let value = this.hexToDisplayValue(req.data.value || '0x')
     let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
-    let height = mode === 'monitor' ? '145px' : '370px'
+    let height = mode === 'monitor' ? '145px' : '360px'
     let z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let statusClass = 'txStatus'
@@ -92,6 +93,7 @@ class TransactionRequest extends React.Component {
                         <div className={success ? 'txProgressNoticeText txProgressNoticeHidden' : mode === 'monitor' ? 'txProgressNoticeText txProgressNoticeSuccess' : 'txProgressNoticeText'}>
                           <div className='txProgressDetailError'>{status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}</div>
                         </div>
+                        {status === 'pending' ? <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>{'Cancel'}</div> : null}
                       </div>
                     </div>
                     <TxBar req={req} />
@@ -100,11 +102,15 @@ class TransactionRequest extends React.Component {
                     <div className='monitorTop'>
                       <div className='monitorValue'><span>{'Ξ'}</span>{value}</div>
                       <div className='monitorArrow'>{svg.longArrow(14)}</div>
-                      <div className='monitorTo'>
-                        {req.data.to.substring(0, 6)}
-                        {svg.octicon('kebab-horizontal', { height: 14 })}
-                        {req.data.to.substr(req.data.to.length - 4)}
-                      </div>
+                      {toAddress ? (
+                        <div className='monitorTo'>
+                          {toAddress.substring(0, 6)}
+                          {svg.octicon('kebab-horizontal', { height: 14 })}
+                          {toAddress.substr(toAddress.length - 4)}
+                        </div>
+                      ) : (
+                        <div className='monitorDeploy'>{'deploy'}</div>
+                      )}
                     </div>
                     <div className='monitorConfirms'>
                       {[...Array(12).keys()].map(i => {

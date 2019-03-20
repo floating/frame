@@ -129,18 +129,21 @@ class Provider extends EventEmitter {
     signers.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
       if (err) {
         this.resError(err, payload, res)
-        return cb(new Error(err))
+        cb(new Error(err))
+      } else {
+        signers.setTxSigned(req.handlerId, err => {
+          if (err) return cb(err)
+          this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, response => {
+            if (response.error) {
+              this.resError(response.error, payload, res)
+              cb(response.error.message)
+            } else {
+              res(response)
+              cb(null, response.result)
+            }
+          })
+        })
       }
-      signers.setTxSigned(req.handlerId)
-      this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, (response) => {
-        if (response.error) {
-          this.resError(response.error, payload, res)
-          cb(response.error.message)
-        } else {
-          res(response)
-          cb(null, response.result)
-        }
-      })
     })
   }
   approveRequest (req, cb) {

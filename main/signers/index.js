@@ -169,19 +169,21 @@ const api = {
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'declined'
       signers[current].requests[handlerId].notice = 'Signature Declined'
-      signers[current].requests[handlerId].mode = 'monitor'
+      if (signers[current].requests[handlerId].type === 'transaction') {
+        signers[current].requests[handlerId].mode = 'monitor'
+      } else {
+        setTimeout(() => api.removeRequest(handlerId), 3300)
+      }
       signers[current].update()
     }
-    // setTimeout(() => api.removeRequest(handlerId), 1800)
   },
   setRequestPending (req) {
     let handlerId = req.handlerId
-    // let tx = signers[current].requests[handlerId] === 'transaction'
     log.info('setRequestPending', handlerId)
     if (!signers[current]) return // cb(new Error('No Account Selected'))
     if (signers[current].requests[handlerId]) {
       signers[current].requests[handlerId].status = 'pending'
-      signers[current].requests[handlerId].notice = 'Signing'
+      signers[current].requests[handlerId].notice = 'See Signer'
       signers[current].update()
     }
   },
@@ -200,8 +202,10 @@ const api = {
       }
       if (signers[current].requests[handlerId].type === 'transaction') {
         setTimeout(() => {
-          signers[current].requests[handlerId].mode = 'monitor'
-          signers[current].update()
+          if (signers[current] && signers[current].requests[handlerId]) {
+            signers[current].requests[handlerId].mode = 'monitor'
+            signers[current].update()
+          }
         }, 1500)
       } else {
         setTimeout(() => api.removeRequest(handlerId), 3300)
@@ -209,13 +213,20 @@ const api = {
       signers[current].update()
     }
   },
-  setTxSigned (handlerId) {
+  setTxSigned (handlerId, cb) {
     log.info('setTxSigned', handlerId)
-    if (!signers[current]) return // cb(new Error('No Account Selected'))
+    if (!signers[current]) return cb(new Error('No account selected'))
     if (signers[current].requests[handlerId]) {
-      signers[current].requests[handlerId].status = 'sending'
-      signers[current].requests[handlerId].notice = 'Sending'
-      signers[current].update()
+      if (signers[current].requests[handlerId].status === 'declined') {
+        cb(new Error('Request already declined'))
+      } else {
+        signers[current].requests[handlerId].status = 'sending'
+        signers[current].requests[handlerId].notice = 'Sending'
+        signers[current].update()
+        cb()
+      }
+    } else {
+      cb(new Error('No valid request for ' + handlerId))
     }
   },
   setTxSent (handlerId, hash) {

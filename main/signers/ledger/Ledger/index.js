@@ -47,29 +47,36 @@ class Ledger extends Signer {
     this.update()
   }
   getDeviceAddress (i, cb) {
+    if (this.pause) return cb(new Error('Ledger: Device access is paused'))
+    this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
       eth.getAddress(this.getPath(i), false, true).then(result => {
         transport.close()
+        this.pause = false
         cb(null, result.address)
       }).catch(err => {
         transport.close()
+        this.pause = false
         cb(err)
       })
     } catch (err) {
+      this.pause = false
       cb(err)
     }
   }
   verifyAddress (display) {
-    log.info('verifyAddress Called but it\'s already active')
-    if (verifyActive) return
+    if (verifyActive) return log.info('verifyAddress Called but it\'s already active')
+    if (this.pause) return log.info('Ledger: Device access is paused')
     verifyActive = true
+    this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
       eth.getAddress(this.getPath(this.index), display, true).then(result => {
         transport.close()
+        this.pause = false
         let address = result.address.toLowerCase()
         let current = this.accounts[this.index].toLowerCase()
         if (address !== current) {
@@ -85,6 +92,7 @@ class Ledger extends Signer {
         log.error('Verify Address Error')
         log.error(err)
         transport.close()
+        this.pause = false
         this.api.unsetSigner()
         verifyActive = false
       })
@@ -94,6 +102,7 @@ class Ledger extends Signer {
       log.error(err)
       this.api.unsetSigner()
       verifyActive = false
+      this.pause = false
     }
   }
   setIndex (i, cb) {
@@ -108,17 +117,22 @@ class Ledger extends Signer {
     }, 300)
   }
   lookupAccounts (cb) {
+    if (this.pause) cb(new Error('Ledger: Device access is paused'))
+    this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
       let eth = new Eth(transport)
       eth.getAddress(this.basePath(), false, true).then(result => {
         transport.close()
+        this.pause = false
         cb(null, this.deriveHDAccounts(result.publicKey, result.chainCode))
       }).catch(err => {
         transport.close()
+        this.pause = false
         cb(err)
       })
     } catch (err) {
+      this.pause = false
       cb(err)
     }
   }
@@ -201,6 +215,7 @@ class Ledger extends Signer {
   }
   // Standard Methods
   signMessage (message, cb) {
+    if (this.pause) return cb(new Error('Ledger: Device access is paused'))
     this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))
@@ -234,6 +249,7 @@ class Ledger extends Signer {
     }
   }
   signTransaction (rawTx, cb) {
+    if (this.pause) return cb(new Error('Ledger: Device access is paused'))
     this.pause = true
     try {
       let transport = new TransportNodeHid(new HID.HID(this.devicePath))

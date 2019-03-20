@@ -223,6 +223,24 @@
     align-items center
     z-index 1000
 
+  .txProgressCancel
+    position absolute
+    top 50%
+    left 100px
+    right 100px
+    margin-top 50px
+    height 20px
+    border-radius 10px
+    display flex
+    justify-content center
+    align-items center
+    z-index 1001
+    font-weight 500
+    background thinner
+
+  .txProgressCancel:hover
+    background thin
+
   .txProgressNoticeText
     position absolute
     top 50%
@@ -1020,13 +1038,23 @@
   width 24px
 
 .monitorTo
+  font-family FiraCode, sans-serif
   svg
     position relative
     padding 0px 3px
     top -1px
 
+.monitorValue
+  font-family FiraCode, sans-serif
+
 .monitorArrow
   padding-top 2px
+
+.monitorDeploy
+  text-transform uppercase
+  font-size 13px
+  letter-spacing 1px
+  font-weight 500
 
 span
   padding 0px 3px 0px 0px
@@ -1044,7 +1072,6 @@ span
   transition standardSlow
   overflow-wrap break-word
   word-wrap break-word
-  font-family FiraCode, sans-serif
   overflow-x hidden
   display flex
   justify-content space-between
@@ -1134,6 +1161,7 @@ span
 
 .txProgressDetailExpand
   color outerspace05
+  font-size 11px
 
 .txProgressDetailError
   padding 0px 10px
