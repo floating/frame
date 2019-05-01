@@ -3,7 +3,6 @@ const codec = require('abi-codec')
 const namehash = require('eth-ens-namehash')
 
 // Frame
-const store = require('../store')
 const provider = require('../provider')
 
 // Local
@@ -59,7 +58,7 @@ const getResolverAddress = async (name) => {
   const hash = namehash.hash(name)
 
   // Get registry contract address for selected network
-  const networkId = store('main.connection.network')
+  const networkId = provider.connection.network
   const registryAddress = registryAddresses[networkId]
 
   // Encode function input
