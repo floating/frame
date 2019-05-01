@@ -7,30 +7,47 @@ const store = require('../store')
 const provider = require('../provider')
 
 // Local
-const interface = require('./interface.js')
-const registryAddresses = require('./addresses')
+const interfaces = require('./artifacts/interfaces')
+const registryAddresses = require('./artifacts/addresses')
 
 /*** PUBLIC ***/
 exports.resolveName = async (name) => {
 
-  // Hash name
-  const hash = namehash.hash(name)
-  
-  // Encode function input
-  const input = codec.encodeInput(interface.resolver, 'addr', [hash])
-  
   // Get resolver address
   const resolverAddress = await getResolverAddress(name)
+
+  // Encode function input
+  const node = namehash.hash(name)
+  const input = codec.encodeInput(interfaces.resolver, 'addr', [node])
   
   // Make JSON RPC call
   const params = { to: resolverAddress, data: input }
-
-  // Make JSON RPC call
   const output = await makeCall('eth_call', params)
 
   // Decode output and return value
-  const decodedOutput = codec.decodeOutput(interface.resolver, 'addr', output)
+  const decodedOutput = codec.decodeOutput(interfaces.resolver, 'addr', output)
+  return decodedOutput[0]
 
+}
+
+exports.resolveAddress = async (address) => {
+
+  // Construct name
+  const name = `${address.slice(2)}.addr.reverse`
+
+  // Get resolver address
+  const resolverAddress = await getResolverAddress(name)
+
+  // Encode function input
+  const node = namehash.hash(name)
+  const input = codec.encodeInput(interfaces.resolver, 'name', [node])
+  
+  // Make JSON RPC call
+  const params = { to: resolverAddress, data: input }
+  const output = await makeCall('eth_call', params)
+
+  // Decode output and return value
+  const decodedOutput = codec.decodeOutput(interfaces.resolver, 'name', output)
   return decodedOutput[0]
 
 }
@@ -41,21 +58,19 @@ const getResolverAddress = async (name) => {
   // Hash name
   const hash = namehash.hash(name)
 
-  // Encode function input
-  const input = codec.encodeInput(interface.registry, 'resolver', [hash])
-  
   // Get registry contract address for selected network
   const networkId = store('main.connection.network')
   const registryAddress = registryAddresses[networkId]
-  
+
+  // Encode function input
+  const input = codec.encodeInput(interfaces.registry, 'resolver', [hash])
+    
   // Make JSON RPC call
   const params = { to: registryAddress, data: input }
-
-  // Make JSON RPC call
   const output = await makeCall('eth_call', params)
 
   // Decode output and return value
-  const decodedOutput = codec.decodeOutput(interface.registry, 'resolver', output)
+  const decodedOutput = codec.decodeOutput(interfaces.registry, 'resolver', output)
   return decodedOutput[0]
 
 }
@@ -73,21 +88,3 @@ const makeCall = (method, params) => {
   })
 
 }
-
-
-// console.log(hash)
-// const abi = contract.methods.resolver(hash).encodeABI()
-// const params = {
-//   to: address.mainnet,
-//   data: abi
-// }
-
-// setTimeout( () => {
-//   console.log("Sending")
-//   const payload = { jsonrpc: '2.0', id: 1, method: 'eth_call', params: [params, "latest"] }
-//   provider.send(payload, ({ result }) => {
-//     console.log(result)
-//     console.log(coder.decodeParameter('address', result))
-//   })
-// }, 100)
-

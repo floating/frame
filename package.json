@@ -58,7 +58,7 @@
     "@githubprimer/octicons-react": "8.1.3",
     "@ledgerhq/hw-app-eth": "4.24.0",
     "@ledgerhq/hw-transport-node-hid": "4.24.0",
-    "abi-codec": "0.0.4",
+    "abi-codec": "0.0.5",
     "auto-launch": "5.0.5",
     "babel-polyfill": "6.26.0",
     "bip32-path": "0.4.2",

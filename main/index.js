@@ -9,7 +9,7 @@ const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 require('./ens')
-require('./ens/debug')
+require('./ens/demo')
 const signers = require('./signers')
 
 log.info('Chrome: v' + process.versions.chrome)
