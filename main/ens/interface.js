@@ -1,5 +1,5 @@
 module.exports = {
-  registryInterface: [
+  registry: [
     {
       "constant": true,
       "inputs": [
@@ -87,7 +87,7 @@ module.exports = {
       "type": "function"
     }
   ],
-  resolverInterface: [
+  resolver: [
     {
       "constant": true,
       "inputs": [
