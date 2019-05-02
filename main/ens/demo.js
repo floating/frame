@@ -1,7 +1,7 @@
 const ens = require('./index')
 const provider = require('../provider')
 
-const NAME = 'ethereumfoundation.eth'
+const NAME = 'monkybrain.eth'
 
 provider.connection.on('connect', async () => {
 
@@ -18,6 +18,11 @@ provider.connection.on('connect', async () => {
     console.log("\nResolving address:", address)
     const name = await ens.resolveAddress(address)
     console.log("Name:", name)
+
+    // Resolve content
+    console.log("\nResolving content:", address)
+    const content = await ens.resolveContent(name)
+    console.log("Content:", content)
   
   } catch(err) { console.error(err) }
   

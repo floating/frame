@@ -1,6 +1,7 @@
 // NPM
 const codec = require('abi-codec')
 const namehash = require('eth-ens-namehash')
+const contentHash = require('content-hash')
 
 // Frame
 const provider = require('../provider')
@@ -48,6 +49,27 @@ exports.resolveAddress = async (address) => {
   // Decode output and return value
   const decodedOutput = codec.decodeOutput(interfaces.resolver, 'name', output)
   return decodedOutput[0]
+
+}
+
+exports.resolveContent = async (name) => {
+
+  // Get resolver address
+  const resolverAddress = await getResolverAddress(name)
+
+  // Encode function input
+  const node = namehash.hash(name)
+  const input = codec.encodeInput(interfaces.resolver, 'contenthash', [node])
+  
+  // Make JSON RPC call
+  const params = { to: resolverAddress, data: input }
+  const output = await makeCall('eth_call', params)
+
+  // Decode output and return content hash and type
+  const decodedOutput = codec.decodeOutput(interfaces.resolver, 'contenthash', output)
+  const hash = contentHash.decode(decodedOutput[0])
+  const type = contentHash.getCodec(decodedOutput[0])
+  return { hash, type }
 
 }
 
