@@ -83,12 +83,13 @@ exports.resolveContent = async (name) => {
   // If output empty -> return null
   if (output == '0x') return null
 
-  // Decode output and return content hash and type
+  // Decode output and return the content hash in text format
   const decodedOutput = codec.decodeOutput(interfaces.resolver, 'contenthash', output)
   const hash = contentHash.decode(decodedOutput[0])
   const type = contentHash.getCodec(decodedOutput[0])
-  return { hash, type }
-
+  if (type == 'ipfs-ns') return `ipfs://${hash}`
+  if (type == 'swarm-ns') return `bzz://${hash}`
+  return null
 }
 
 /*** PRIVATE ***/
