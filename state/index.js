@@ -71,6 +71,16 @@ let initial = {
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },
+    clients: {
+      ipfs: {
+        on: main('clients.ipfs.on', true)
+      },
+      eth: {
+        on: main('clients.eth.on', true),
+        type: main('clients.eth.type', 'geth'),
+        mode: main('clients.eth.mode', 'light')
+      }
+    },
     connection: {
       network: main('connection.network', '4'),
       options: ['1', '3', '4', '42'],
