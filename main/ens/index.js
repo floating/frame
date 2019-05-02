@@ -1,12 +1,12 @@
-// NPM
+// NPM modules
 const codec = require('abi-codec')
 const namehash = require('eth-ens-namehash')
 const contentHash = require('content-hash')
 
-// Frame
+// Frame modules
 const provider = require('../provider')
 
-// Local
+// Local modules
 const interfaces = require('./artifacts/interfaces')
 const registryAddresses = require('./artifacts/addresses')
 
