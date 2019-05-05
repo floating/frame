@@ -1,0 +1,84 @@
+{
+  "geth": {
+    "version": "1.8.16",
+    "platform": {
+      "linux": {
+        "x64": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-darwin-amd64-1.8.16-unstable-62e94895.tar.gz",
+          "type": "tar",
+          "checksum": "8c2c902ab081c0159b6d3a7cb92e9961",
+          "bin": "geth"
+        },
+        "ia32": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-darwin-amd64-1.8.16-unstable-62e94895.tar.gz",
+          "type": "tar",
+          "sha256": "073eb412c775d838f0f65d3a27368296",
+          "bin": "geth"
+        }
+      },
+      "darwin": {
+        "x64": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-darwin-amd64-1.8.16-unstable-62e94895.tar.gz",
+          "type": "tar",
+          "checksum": "dc4e28fd63307ced6fed813300f7505a",
+          "bin": "geth"
+        }
+      },
+      "win32": {
+        "x64": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-1.8.16-unstable-62e94895.zip",
+          "type": "zip",
+          "checksum": "c6dad4b6bf2d7c5744c719077facd880",
+          "bin": "geth.exe"
+        },
+        "ia32": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-windows-386-1.8.16-unstable-62e94895.zip",
+          "type": "zip",
+          "checksum": "7d0b543fb9c38f6b5c80e45e97b5e008",
+          "bin": "geth.exe"
+        }
+      }
+    }
+  },
+  "ipfs": {
+    "version": "0.4.17",
+    "platform": {
+      "linux": {
+        "x64": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-amd64.tar.gz",
+          "type": "tar",
+          "checksum": "",
+          "bin": "ipfs"
+        },
+        "ia32": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-386.tar.gz",
+          "type": "tar",
+          "sha256": "",
+          "bin": "ipfs"
+        }
+      },
+      "darwin": {
+        "x64": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_darwin-amd64.tar.gz",
+          "type": "tar",
+          "checksum": "",
+          "bin": "ipfs"
+        }
+      },
+      "win32": {
+        "x64": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_windows-amd64.zip",
+          "type": "zip",
+          "checksum": "",
+          "bin": "ipfs.exe"
+        },
+        "ia32": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_windows-386.zip",
+          "type": "zip",
+          "checksum": "",
+          "bin": "ipfs.exe"
+        }
+      }
+    }
+  }
+}

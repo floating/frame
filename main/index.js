@@ -9,6 +9,7 @@ const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 const signers = require('./signers')
+const services = require('./services')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -100,7 +101,10 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
-app.on('quit', signers.close)
+app.on('quit', () => {
+  signers.close()
+  services.stop()
+})
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 let launchStatus = store('main.launch')
