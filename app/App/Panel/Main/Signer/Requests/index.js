@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { CSSTransitionGroup } from 'react-transition-group'
+// import { CSSTransitionGroup } from 'react-transition-group'
 
 import ProviderRequest from './ProviderRequest'
 import TransactionRequest from './TransactionRequest'
@@ -64,7 +64,7 @@ class Requests extends React.Component {
           <div className='requestCount'>{normal.length}</div>
         </div>
         <div className='requestContainerWrap'>
-          <CSSTransitionGroup className='requestContainer' style={{ height: containHeight + 'px' }} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
+          <div className='requestContainer' style={{ height: containHeight + 'px' }} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
             <div key={'noReq'} style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>{'No Pending Requests'}</div>
             <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal - 15}px)` }}>
               <span>{'Recent Transactions'}</span>
@@ -80,7 +80,7 @@ class Requests extends React.Component {
               if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} />
               return null
             })}
-          </CSSTransitionGroup>
+          </div>
         </div>
       </div>
     )
