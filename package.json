@@ -55,11 +55,11 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "babel-polyfill": "6.26.0",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "4.55.0",
     "@ledgerhq/hw-transport-node-hid": "4.55.0",
     "auto-launch": "5.0.5",
+    "babel-polyfill": "6.26.0",
     "bip32-path": "0.4.2",
     "cross-env": "5.2.0",
     "electron-log": "3.0.5",
@@ -78,7 +78,7 @@
     "react-transition-group": "4.0.0",
     "semver": "6.0.0",
     "trezor.js": "8.1.0",
-    "usb-detection": "4.1.0",
+    "usb": "^1.5.0",
     "uuid": "3.3.2",
     "web3-utils": "1.0.0-beta.37",
     "ws": "7.0.0"
