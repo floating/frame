@@ -1,10 +1,11 @@
 const { ipcMain } = require('electron')
-// const log = require('electron-log')
+const log = require('electron-log')
 
 const signers = require('../signers')
 const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
+const { launchBrowser } = require('../browser')
 
 const rpc = {
   getState: cb => {
@@ -67,6 +68,10 @@ const rpc = {
       signers.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
+  },
+  launchBrowser (address, cb) {
+    log.info(`Launching ${address} in browser`)
+    launchBrowser(address)
   }
 }
 

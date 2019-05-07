@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
 import Signer from './Signer'
+import Launcher from '../Launcher'
 
 import svg from '../../../svg'
 
@@ -35,6 +36,7 @@ class Main extends React.Component {
                   </span>
                 </div>
               ) : null}
+              <Launcher />
             </div>
           </div>
         </div>
