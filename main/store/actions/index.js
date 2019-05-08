@@ -68,5 +68,6 @@ module.exports = {
       if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
       return dontRemind
     })
-  }
+  },
+  setBrowserBounds: (u, bounds) => u('browser.bounds', () => bounds)
 }

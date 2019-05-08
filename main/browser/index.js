@@ -1,15 +1,21 @@
 // NPM modules
 const { BrowserWindow } = require('electron')
+const PersistStore = require('electron-store')
 
 // Frame modules
 const ipfs = require('../services/ipfs')
 const ens = require('../ens')
+const store = require('../store')
 
 // TODO: Move to better place
 ipfs.start()
 
+const persist = new PersistStore()
+store.observer(_ => persist.set('browser', store('browser')))
+
 let win = null
 
+/* PUBLIC */
 exports.launchBrowser = async (address) => {
   // Parse address
   const url = await parseAddress(address)
@@ -17,15 +23,20 @@ exports.launchBrowser = async (address) => {
   if (url) {
     // If no browser window open -> open new window
     if (!win) {
-      win = new BrowserWindow({ width: 800, height: 600 })
-      win.on('closed', () => {
-        win = null
-      })
+      // Open window with stored/default bounds
+      const bounds = store('browser.bounds')
+      win = new BrowserWindow({ ...bounds })
+      // On close -> store bounds
+      win.on('close', () => { store.setBrowserBounds(win.getBounds()) })
+      // On closed -> delete instance
+      win.on('closed', () => { win = null })
     }
+    // Load URL
     win.loadURL(url)
   }
 }
 
+/* PRIVATE */
 const parseAddress = async (address) => {
   // Handle ENS address
   if (address.match(/.eth$/i)) {

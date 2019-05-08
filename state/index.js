@@ -17,6 +17,8 @@ const main = (path, def) => {
   return found
 }
 
+const browser = (defaults) => persist.get('browser') || defaults
+
 let initial = {
   panel: {
     show: false,
@@ -64,6 +66,14 @@ let initial = {
   external: {
     rates: {}
   },
+  browser: browser({
+    bounds: {
+      x: 200,
+      y: 200,
+      width: 800,
+      height: 600
+    }
+  }),
   main: {
     launch: main('launch', false),
     reveal: main('reveal', false),
