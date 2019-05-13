@@ -1,5 +1,5 @@
 const HID = require('node-hid')
-const usbDetect = require('usb-detection')
+const usb = require('usb')
 const log = require('electron-log')
 const uuid = require('uuid/v5')
 const Ledger = require('./Ledger')
@@ -42,10 +42,12 @@ module.exports = (signers, api) => {
     })
     log.info(' ')
   }
-  usbDetect.on('change', () => {
+
+  const listenScan = () => {
     scan()
     setTimeout(scan, 200)
-  })
-  usbDetect.startMonitoring()
+  }
+  usb.on('attach', listenScan)
+  usb.on('detach', listenScan)
   scan()
 }

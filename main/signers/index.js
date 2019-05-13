@@ -1,4 +1,4 @@
-const usbDetect = require('usb-detection')
+// const usbDetect = require('usb-detection')
 const log = require('electron-log')
 
 // App Window API
@@ -133,7 +133,7 @@ const api = {
     signers[current].signTransaction(rawTx, cb)
   },
   close () {
-    usbDetect.stopMonitoring()
+    // usbDetect.stopMonitoring()
   },
   setSignerIndex (index, cb) {
     if (!signers[current]) return cb(new Error('No Account Selected'))
