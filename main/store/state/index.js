@@ -1,7 +1,6 @@
 const uuidv5 = require('uuid/v5')
 
-const PersistStore = require('electron-store')
-const persist = new PersistStore()
+const persist = require('../persist')
 
 const get = (path, obj = persist.get('main')) => {
   path.split('.').some((key, i) => {
@@ -68,6 +67,8 @@ let initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
+    _accounts: main('_accounts', {}), // Translate 'accounts' if it exists
+    _signers: main('_signers', {}),
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },

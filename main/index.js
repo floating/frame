@@ -1,6 +1,6 @@
 const { app, ipcMain, protocol, shell, dialog } = require('electron')
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
-const PersistStore = require('electron-store')
+
 const log = require('electron-log')
 const path = require('path')
 const windows = require('./windows')
@@ -9,6 +9,7 @@ const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 const signers = require('./signers')
+const persist = require('./store/persist')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -20,11 +21,11 @@ process.on('uncaughtException', (e) => {
   } else {
     dialog.showErrorBox('An error occured, Frame will quit', e.message)
   }
+  log.error('uncaughtException')
   log.error(e)
-  setTimeout(() => app.quit(), 50)
+  throw e
+  // setTimeout(() => app.quit(), 50)
 })
-
-const persist = new PersistStore()
 
 const externalWhitelist = [
   'https://frame.sh',
@@ -110,5 +111,3 @@ store.observer(() => {
     launchStatus ? launch.enable() : launch.disable()
   }
 })
-
-store.observer(_ => persist.set('main', store('main')))

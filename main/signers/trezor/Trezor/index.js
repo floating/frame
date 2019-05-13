@@ -51,11 +51,14 @@ class Trezor extends Signer {
     })
   }
   verifyAddress (display) {
+    log.info('Verify Address')
     this.device.waitForSessionAndRun(session => {
       return session.ethereumGetAddress(bip32Path.fromString(this.getPath(this.index)).toPathArray(), display)
     }).then(result => {
       let address = '0x' + result.message.address.toLowerCase()
       let current = this.accounts[this.index].toLowerCase()
+      log.info('Frame has the current address as: ' + current)
+      log.info('Trezor is reporting: ' + address)
       if (address !== current) {
         // TODO: Error Notification
         log.error(new Error('Address does not match device'))
@@ -64,6 +67,7 @@ class Trezor extends Signer {
         log.info('Address matches device')
       }
     }).catch((err) => {
+      log.info('Verify Address Error: ')
       // TODO: Error Notification
       log.error(err)
       this.api.unsetSigner()

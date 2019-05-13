@@ -68,5 +68,17 @@ module.exports = {
       if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
       return dontRemind
     })
+  },
+  newAccount: (u, account) => {
+    u('main._accounts', accounts => {
+      accounts[account.id] = account
+      return accounts
+    })
+  },
+  newSigner: (u, signer) => {
+    u('main._signers', signers => {
+      signers[signer.id] = signer
+      return signers
+    })
   }
 }
