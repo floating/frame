@@ -6,7 +6,7 @@ import link from '../../../link'
 class Launcher extends React.Component {
   handleKeyPress (e) {
     if (e.key === 'Enter') {
-      link.rpc('launchBrowser', e.target.value, (err, res) => console.log(err, res))
+      link.rpc('launchBrowser', e.target.value, () => {})
     }
   }
 

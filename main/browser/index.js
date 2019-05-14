@@ -1,8 +1,7 @@
-// NPM modules
 const { BrowserWindow } = require('electron')
 const PersistStore = require('electron-store')
+const path = require('path')
 
-// Frame modules
 const ipfs = require('../services/ipfs')
 const ens = require('../ens')
 const store = require('../store')
@@ -19,18 +18,33 @@ let win = null
 exports.launchBrowser = async (address) => {
   // Parse address
   const url = await parseAddress(address)
+
   // If valid address -> Launch URL in browser
   if (url) {
     // If no browser window open -> open new window
     if (!win) {
       // Open window with stored/default bounds
       const bounds = store('browser.bounds')
-      win = new BrowserWindow({ ...bounds })
+      const options = {
+        ...bounds,
+        webPreferences: {
+          preload: path.join(__dirname, 'inject.js')
+        }
+      }
+      win = new BrowserWindow(options)
+
+      // Launch dev tools
+      let devTools = new BrowserWindow()
+      win.webContents.setDevToolsWebContents(devTools.webContents)
+      win.webContents.openDevTools({ mode: 'detach' })
+
       // On close -> store bounds
       win.on('close', () => { store.setBrowserBounds(win.getBounds()) })
+
       // On closed -> delete instance
       win.on('closed', () => { win = null })
     }
+
     // Load URL
     win.loadURL(url)
   }
@@ -40,10 +54,13 @@ exports.launchBrowser = async (address) => {
 const parseAddress = async (address) => {
   // Handle ENS address
   if (address.match(/.eth$/i)) {
+
     // Resolve ENS name
     const contentLink = await ens.resolveContent(address)
+
     // Remove protocol prefix ('ipfs://')
     const hash = contentLink.slice(7)
+
     // Construct and return IPFS URL
     return constructIpfsURL(hash)
   }
@@ -61,7 +78,7 @@ const parseAddress = async (address) => {
     }
   }
 
-  return null
+  return address
 }
 
 const constructIpfsURL = (hash) => `http://localhost:8421/ipfs/${hash}`
@@ -69,7 +86,8 @@ const constructIpfsURL = (hash) => `http://localhost:8421/ipfs/${hash}`
 const validateIpfsHash = (hash) => hash.slice(0, 2) === 'Qm' && hash.length === 46
 
 // DEBUG
-// setTimeout(async () => {
-//   const address = parseAddress('monkybrain.eth')
-//   console.log(address)
-// }, 1000)
+setTimeout(() => {
+  // exports.launchBrowser('https://manager.ens.domains')
+  // exports.launchBrowser('https://www.myetherwallet.com')
+  exports.launchBrowser('https://3box.io/')
+}, 1000)
