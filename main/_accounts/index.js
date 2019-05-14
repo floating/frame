@@ -1,14 +1,14 @@
 const EventEmitter = require('events')
 const hdKey = require('ethereumjs-wallet/hdkey')
-const bip39 = require('bip39')
+const log = require('electron-log')
+// const bip39 = require('bip39')
 
 const crypt = require('../crypt')
 const store = require('../store')
-const signers = require('../_signers')
+const _signers = require('../_signers')
 
-class Account extends EventEmitter {
+class Account {
   constructor (account, accounts) {
-    super()
     this.id = account.id
     this.type = account.type
     this.name = account.name
@@ -18,15 +18,16 @@ class Account extends EventEmitter {
     this.permissions = account.permissions
     this.signer = { status: 'none' } // For external accounts
     this.forwarder = { id: '', address: '', status: 'none' } // For smart accounts
-    signers.on('update', signer => {
+    _signers.on('update', signer => {
       if (signer.id === this.id) {
-        this.signer = signers[this.id].summary()
+        this.signer = _signers[this.id].summary()
         this.update()
       }
     })
     accounts.on('update', account => {
       if (account.id === this.forwarder.id) {
         // this account is a forwarder, for this account
+        this.update()
       }
     })
   }
@@ -40,7 +41,6 @@ class Account extends EventEmitter {
     return {
       id: this.id,
       type: this.type,
-      // index: this.index,
       addresses: this.addresses,
       status: this.status,
       network: this.network,
@@ -85,12 +85,33 @@ class Account extends EventEmitter {
 // Green - Signer Ready
 //
 // Note: removing accounts removes matching underlying signer if it exists
+
+// Create hot Account
+
+// Monitor Signers
+//   Get all accounts...
+//   Get all signers...
+//   Render all accounts, look up matching signer status
+//   Look for signers that aren't accounts yet, create accounts for each
+//   On new signer, automatically make account
+
 class Accounts extends EventEmitter {
   constructor () {
     super()
-    let accounts = Object.keys(store('main._accounts')).map(id => store('main._accounts', id))
-    accounts.sort((a, b) => a.created - b.created)
-    this.accounts = accounts.map(account => new Account(account, this))
+    this.accounts = {}
+    let stored = store('main._accounts')
+    Object.keys(stored).forEach(id => {
+      this.accounts[id] = new Account(stored[id], this)
+    })
+    _signers.on('add', signer => {
+      log.info('[Accounts] Signer added')
+      if (!this.accounts[signer.id]) {
+        log.info('[Accounts] No account matched this new signer, creating account')
+        this.add(signer.addresses)
+      } else {
+        log.info('[Accounts] An existing account matched the added signer')
+      }
+    })
   }
   list () {
     return this.accounts.map(account => account.summary())
@@ -105,43 +126,25 @@ class Accounts extends EventEmitter {
     return crypt.stringToKey(addresses.join()).toString('hex')
   }
   // Public
-  addLocalAccount (phrase, password, cb) {
-    if (!bip39.validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
-    bip39.mnemonicToSeed(phrase).then(seed => {
-      signers.newLocal(seed, password, err => {
-        if (err) return cb(err)
-        crypt.encrypt(phrase, password, (err, encryptedPhrase) => {
-          if (err) return cb(err)
-          const addresses = this.seedToAddresses(seed)
-          const id = this.addressesToId(addresses)
-          // if (store('main', '_accounts', id)) return cb(new Error('Account already exists'))
-          const account = {
-            id,
-            addresses,
-            type: 'hot',
-            aliases: addresses.map(() => ''),
-            // phrase: encryptedPhrase, // Only hot
-            created: Date.now()
-          }
-          store.newAccount(account)
-          cb(null, account)
-        })
-      })
-    }).catch(err => cb(err))
+  add (addresses, cb = () => {}) {
+    log.info('accounts.add')
+    const accounts = store('main._accounts')
+    const id = this.addressesToId(addresses)
+    if (accounts[id]) {
+      log.info('Account already exists')
+      cb(null, accounts[id])
+    } else {
+      log.info('Account not found, creating account')
+      const account = { id, addresses, permissions: {}, created: Date.now() }
+      store.newAccount(account)
+      this.accounts[id] = new Account(store('main._accounts', id), this)
+      this.emit('add', this.accounts[id].summary())
+    }
   }
-  removeAccount (id) {
-
+  update (account) {
+    log.info('Account update called')
+    this.emit('update', account)
   }
 }
 
-const accounts = new Accounts()
-
-const mnemonic = 'duck daring trouble employ million bamboo stock seed refuse example glimpse flame'
-const password = 'frame'
-
-console.log(accounts.list())
-accounts.addLocalAccount(mnemonic, password, (err, account) => {
-  if (err) return console.log(err)
-  // console.log(account)
-  // console.log(account.id)
-})
+module.exports = new Accounts()

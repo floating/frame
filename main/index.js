@@ -3,6 +3,8 @@ app.commandLine.appendSwitch('force-gpu-rasterization', true)
 
 const log = require('electron-log')
 const path = require('path')
+const bip39 = require('bip39')
+
 const windows = require('./windows')
 const store = require('./store')
 const launch = require('./launch')
@@ -111,3 +113,33 @@ store.observer(() => {
     launchStatus ? launch.enable() : launch.disable()
   }
 })
+
+const _accounts = require('./_accounts')
+const _signers = require('./_signers')
+
+const mnemonic = 'duck daring trouble employ million bamboo stock seed refuse example glimpse flame'
+// const mnemonic = bip39.generateMnemonic()
+console.log(mnemonic)
+const password = 'frame'
+
+_accounts.on('add', account => {
+  log.info('New account added')
+  log.info(account)
+})
+
+_accounts.on('update', account => {
+  log.info('Account updated')
+  log.info(account)
+})
+
+_accounts.on('remove', account => {
+  log.info('Account removed')
+  log.info(account)
+})
+
+setTimeout(() => {
+  _signers.createFromPhrase(mnemonic, password, (err, signer) => {
+    if (err) return console.log(err)
+    console.log('Created Signer....')
+  })
+}, 6000)

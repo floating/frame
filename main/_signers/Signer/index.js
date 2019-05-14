@@ -39,10 +39,8 @@ class Signer {
       id: this.id,
       type: this.type,
       index: this.index,
-      accounts: this.accounts,
-      status: this.status,
-      network: this.network,
-      requests: this.requests
+      addresses: this.addresses,
+      status: this.status
     }
   }
   setIndex (i, cb) {

@@ -68,7 +68,7 @@ let initial = {
     reveal: main('reveal', false),
     accounts: main('accounts', {}), // Persisted account settings and permissions
     _accounts: main('_accounts', {}), // Translate 'accounts' if it exists
-    _signers: main('_signers', {}),
+    _signers: {}, // main('_signers', {}),
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },
