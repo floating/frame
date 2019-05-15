@@ -13,7 +13,7 @@ const store = require('../../store')
 
 class Service extends EventEmitter { 
 
-  constructor (name, options) {
+  constructor (name, options = { log: false }) {
     super()
         
     // Set instance variables
@@ -25,7 +25,7 @@ class Service extends EventEmitter {
     this.bin = path.resolve(this.workdir, this.release.bin)
     this.process = null
     
-    // Update client store with 'isLatest', 'isInstalled' and 'version'
+    // Update client store with 'Latest', 'installed' and 'version'
     this._updateClientStore()
 
     // Log (if log flag set)
@@ -40,21 +40,6 @@ class Service extends EventEmitter {
   get isInstalled () { return fs.existsSync(this.versionFile) }
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
-  async init () {
-    // If working directory doesn't exist -> create it
-    if (!fs.existsSync(this.workdir)) {
-      fs.mkdirSync(this.workdir)
-    }
-
-    // If client isn't installed or version out of date -> update
-    if (!this.isInstalled || !this.isLatest) {
-      this.on('updated', () => this.emit('ready'))
-      this.update()
-    } else {
-      this.emit('ready')
-    }
-  }
-
   update () {
     // Emit status
     this.emit('updating')
@@ -65,6 +50,11 @@ class Service extends EventEmitter {
     // Get release metadata by device platform and architecture
     if (!release) cb(new Error('Could not find release matching platform and architecture'))
     const fileName = path.resolve(this.workdir, this.release.location.split('/').pop())
+    
+    // If working directory doesn't exist -> create it
+    if (!fs.existsSync(this.workdir)) {
+      fs.mkdirSync(this.workdir)
+    }
 
     // Get archive from release store
     https.get(release.location, (res) => {
@@ -90,6 +80,16 @@ class Service extends EventEmitter {
         this.emit('updated')
       })
     })
+  }
+
+  async _init () {
+    // If client isn't installed or version out of date -> update
+    if (!this.isInstalled || !this.isLatest) {
+      this.on('updated', () => this.emit('ready'))
+      this.update()
+    } else {
+      this.emit('ready')
+    }
   }
 
   async _extract (fileName, typ) {
@@ -123,8 +123,8 @@ class Service extends EventEmitter {
   }
 
   _updateClientStore () {
-    store.setClientData(this.name, 'isInstalled', this.isInstalled)
-    store.setClientData(this.name, 'isLatest', this.isLatest)
+    store.setClientData(this.name, 'installed', this.isInstalled)
+    store.setClientData(this.name, 'latest', this.isLatest)
     store.setClientData(this.name, 'version', this.version)
   }
 

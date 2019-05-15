@@ -79,8 +79,8 @@ let initial = {
         on: main('clients.geth.on', true),
         mode: main('clients.geth.mode', 'light'),
         networkId: main('clients.geth.networkId', '4'),
-        isInstalled: false,
-        isLatest: false,
+        installed: false,
+        latest: false,
         state: 'off',
         version: ''
       }

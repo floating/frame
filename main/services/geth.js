@@ -20,16 +20,20 @@ class Geth extends Service {
       // Check if syncing every <INTERVAL>
       this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL);
     })
-    this.init()
+    this._init()
   }
 
   stop () {
+    // Make sure client is running
+    if (!this.process) throw Error('Geth client not running')
     // Clear sync check interval
     clearInterval(this.syncCheckInterval)
     // Update state on close
     this.once('close', (code) => store.setClientState('geth', 'off'))
     // Send 'SIGTERM' to client process
     this.process.kill()
+    // Update client state
+    store.setClientState('geth', 'terminating')
   }
 
   _startClient () {

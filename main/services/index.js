@@ -11,6 +11,9 @@ module.exports = {
 
 // DEBUG
 geth.start()
+setTimeout(() => {
+  geth.stop()
+}, 10000);
 store.observer( () => {
   console.log(
     store('main.clients')
