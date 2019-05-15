@@ -9,27 +9,32 @@ const { execFile } = require('child_process')
 const tar = require('tar')
 const unzip = require('extract-zip')
 const latest = require('../latest.json')
+const store = require('../../store')
 
 class Service extends EventEmitter { 
 
   constructor (name) {
     super()
     this.name = name
-    this.workdir = path.resolve('./', name) // path.resolve(app.getPath('userData'), name)
+    this.workdir = path.resolve(app.getPath('userData'), name) // path.resolve(name)
     this.versionFile = path.resolve(this.workdir, '.version')
     this.latest = latest[this.name]
     this.release = this.latest.platform[process.platform][process.arch]
     this.bin = path.resolve(this.workdir, this.release.bin)
+    this.process = null
+    this._updateClientStore()
   }
 
   // Getters
-  get version () { return fs.existsSync(this.versionFile) && fs.readFileSync(this.versionFile, 'utf8') }
+  get version () { return fs.existsSync(this.versionFile) ? fs.readFileSync(this.versionFile, 'utf8') : null }
   get isInstalled () { return fs.existsSync(this.versionFile) }
-  get isLatest () { return !(semver.gt(this.latest.version, this.version || '0.0.0')) }
+  get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
   async init () {
     // If working directory doesn't exist -> create it
-    if (!fs.existsSync(this.workdir)) fs.mkdirSync(this.workdir)
+    if (!fs.existsSync(this.workdir)) {
+      fs.mkdirSync(this.workdir)
+    }
 
     // If client isn't installed or version out of date -> update
     if (!this.isInstalled || !this.isLatest) {
@@ -37,36 +42,39 @@ class Service extends EventEmitter {
       this.update()
     } else {
       this.emit('ready')
-    }  
+    }
   }
 
   update () {
     // Emit status
     this.emit('updating')
+
+    // Set client state
+    store.setClientState(this.name, 'updating')
     
     // Get release metadata by device platform and architecture
-    const release = this.latest.platform[process.platform][process.arch]
     if (!release) cb(new Error('Could not find release matching platform and architecture'))
-    const fileName = path.resolve(this.workdir, release.location.split('/').pop())
+    const fileName = path.resolve(this.workdir, this.release.location.split('/').pop())
 
     // Get archive from release store
     https.get(release.location, (res) => {
+      // Stream response into file
       let stream = fs.createWriteStream(fileName)
       let file = res.pipe(stream)
-      console.log(`Downloading ${this.name} client`)
       
+      // On download complete ->
       file.on('finish', async () => {
-        // Extract archive in working directory
+        // Extract archive
         await this._extract(fileName)
         
-        // Remove archive
+        // Delete archive
         fs.unlinkSync(fileName)
 
         // Update version file
         fs.writeFileSync(this.versionFile, this.latest.version)
 
-        // Update install status
-        this.isInstalled = true
+        // Update store
+        this._updateClientStore()
 
         // Emit event
         this.emit('updated')
@@ -91,18 +99,23 @@ class Service extends EventEmitter {
   }
 
   _run (args) {
-    let proc = execFile(this.bin, args, (err, stdout, stderr) => {
+    this.process = execFile(this.bin, args, (err, stdout, stderr) => {
       if (err) this.emit('error', err)
       if (stdout) this.emit('stdout', stdout)
       if (stderr) this.emit('stderr', stderr)
     })
-    proc.stdout.on('data', (data) => this.emit('stdout', data))
-    proc.stderr.on('data', (data) => this.emit('stderr', data))
-    proc.on('close', (code) => this.emit('close', code))
+    this.process.stdout.on('data', (data) => this.emit('stdout', data))
+    this.process.stderr.on('data', (data) => this.emit('stderr', data))
+    this.process.on('close', (code) => {
+      this.emit('close', code)
+      this.process = null
+    })
   }
 
-  _runOnce (args, cb) {
-    execFile(this.bin, args, cb).stdout.on('data', console.log)
+  _updateClientStore () {
+    store.setClientData(this.name, 'isInstalled', this.isInstalled)
+    store.setClientData(this.name, 'isLatest', this.isLatest)
+    store.setClientData(this.name, 'version', this.version)
   }
 
 }

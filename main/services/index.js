@@ -1,25 +1,17 @@
-const geth = require('./geth')
-const ipfs = require('./ipfs')
+const geth = require('./Service/geth')
+// const ipfs = require('./ipfs')
 
 module.exports = {
   stop: () => {
     geth.stop()
-    ipfs.stop()
-  },
-  update: (name, on) => {
-    console.log('services update ' + name + ' ' + on)
-    if (name === 'eth') {
-      if (on) {
-        geth.start()
-      } else {
-        geth.stop()
-      }
-    } else if (name === 'ipfs') {
-      if (on) {
-        ipfs.start()
-      } else {
-        ipfs.stop()
-      }
-    }
+    // ipfs.stop()
   }
 }
+
+// DEBUG
+geth.start()
+store.observer( () => {
+  console.log(
+    store('main.clients')
+  )
+})
