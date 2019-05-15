@@ -75,10 +75,11 @@ let initial = {
       ipfs: {
         on: main('clients.ipfs.on', true)
       },
-      eth: {
-        on: main('clients.eth.on', true),
-        type: main('clients.eth.type', 'geth'),
-        mode: main('clients.eth.mode', 'light')
+      geth: {
+        on: main('clients.geth.on', true),
+        mode: main('clients.geth.mode', 'light'),
+        networkId: main('clients.geth.networkId', '3'),
+        state: 'off'
       }
     },
     connection: {

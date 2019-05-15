@@ -68,5 +68,8 @@ module.exports = {
       if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
       return dontRemind
     })
+  },
+  setClientState: (u, client, state) => {
+    u(`main.clients.${client}.state`, () => state)
   }
 }
