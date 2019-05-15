@@ -13,8 +13,10 @@ const store = require('../../store')
 
 class Service extends EventEmitter { 
 
-  constructor (name) {
+  constructor (name, options) {
     super()
+        
+    // Set instance variables
     this.name = name
     this.workdir = path.resolve(app.getPath('userData'), name) // path.resolve(name)
     this.versionFile = path.resolve(this.workdir, '.version')
@@ -22,10 +24,18 @@ class Service extends EventEmitter {
     this.release = this.latest.platform[process.platform][process.arch]
     this.bin = path.resolve(this.workdir, this.release.bin)
     this.process = null
+    
+    // Update client store with 'isLatest', 'isInstalled' and 'version'
     this._updateClientStore()
+
+    // Log (if log flag set)
+    if (options.log) {
+      this.on('stdout', console.log)
+      this.on('stderr', console.error)
+      this.on('error', console.error)
+    }
   }
 
-  // Getters
   get version () { return fs.existsSync(this.versionFile) ? fs.readFileSync(this.versionFile, 'utf8') : null }
   get isInstalled () { return fs.existsSync(this.versionFile) }
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }

@@ -1,4 +1,5 @@
-const geth = require('./Service/geth')
+const geth = require('./geth')
+const store = require('../store')
 // const ipfs = require('./ipfs')
 
 module.exports = {

@@ -1,17 +1,14 @@
-const Service = require('./index')
+const Service = require('./Service/index')
 const { execFile } = require('child_process')
 const axios = require('axios')
-const store = require('../../store')
+const store = require('../store')
 const { hexToNumber } = require('web3-utils')
 
 const SYNC_CHECK_INTERVAL = 3000
 
 class Geth extends Service {
-  constructor() {
-    super('geth')
-    // this.on('stdout', console.log)
-    // this.on('stderr', console.error)
-    // this.on('serror', console.error)
+  constructor(options) {
+    super('geth', options)
     this.ws = null
     this.syncCheckInterval = null
   }
