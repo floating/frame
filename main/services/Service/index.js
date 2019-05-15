@@ -17,16 +17,22 @@ class Service extends EventEmitter {
     this.name = name
     this.workdir = path.resolve('./', name) // path.resolve(app.getPath('userData'), name)
     this.versionFile = path.resolve(this.workdir, '.version')
-    this.version = fs.existsSync(this.versionFile) && fs.readFileSync(this.versionFile, 'utf8')
     this.latest = latest[this.name]
+    this.release = this.latest.platform[process.platform][process.arch]
+    this.bin = path.resolve(this.workdir, this.release.bin)
   }
+
+  // Getters
+  get version () { return fs.existsSync(this.versionFile) && fs.readFileSync(this.versionFile, 'utf8') }
+  get isInstalled () { return fs.existsSync(this.versionFile) }
+  get isLatest () { return !(semver.gt(this.latest.version, this.version || '0.0.0')) }
 
   async init () {
     // If working directory doesn't exist -> create it
     if (!fs.existsSync(this.workdir)) fs.mkdirSync(this.workdir)
 
-    // If current version doesn't exist or is out of date -> update
-    if (!this.version || semver.gt(this.latest.version, this.version)) {
+    // If client isn't installed or version out of date -> update
+    if (!this.isInstalled || !this.isLatest) {
       this.on('updated', () => this.emit('ready'))
       this.update()
     } else {
@@ -59,7 +65,10 @@ class Service extends EventEmitter {
         // Update version file
         fs.writeFileSync(this.versionFile, this.latest.version)
 
-        // Emit status
+        // Update install status
+        this.isInstalled = true
+
+        // Emit event
         this.emit('updated')
       })
     })
@@ -80,8 +89,27 @@ class Service extends EventEmitter {
       // TODO: Implement unzip
     }
   }
+
+  _run (args) {
+    let proc = execFile(this.bin, args, (err, stdout, stderr) => {
+      if (err) this.emit('error', err)
+      if (stdout) this.emit('stdout', stdout)
+      if (stderr) this.emit('stderr', stderr)
+    })
+    proc.stdout.on('data', (data) => this.emit('stdout', data))
+    proc.stderr.on('data', (data) => this.emit('stderr', data))
+    proc.on('close', (code) => this.emit('close', code))
+  }
+
+  _runOnce (args, cb) {
+    execFile(this.bin, args, cb).stdout.on('data', console.log)
+  }
+
 }
 
-const s = new Service('ipfs')
-s.on('status', console.log)
-s.init().then(console.log)
+module.exports = Service
+
+// DEBUG
+// const s = new Service('ipfs')
+// s.on('status', console.log)
+// s.init().then(console.log)
