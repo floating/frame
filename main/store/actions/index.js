@@ -69,10 +69,19 @@ module.exports = {
       return dontRemind
     })
   },
-  setClientState: (u, client, state) => {
-    u(`main.clients.${client}.state`, () => state)
+  newAccount: (u, account) => {
+    u('main._accounts', accounts => {
+      accounts[account.id] = account
+      return accounts
+    })
   },
-  updateClient: (u, client, key, value) => {
-    u(`main.clients.${client}.${key}`, () => value)
-  }
+  newSigner: (u, signer) => {
+    u('main._signers', signers => {
+      signers[signer.id] = signer
+      return signers
+    })
+  },
+  // Ethereum and IPFS clients
+  setClientState: (u, client, state) => u(`main.clients.${client}.state`, () => state),
+  updateClient: (u, client, key, value) => u(`main.clients.${client}.${key}`, () => value)
 }

@@ -4,5 +4,6 @@ bundle
 .cache
 hot.json
 nohot.json
+config.json
 dist
 release
