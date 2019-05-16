@@ -10,13 +10,11 @@ exports.rmRF = (dir) => {
   if (fs.existsSync(dir)) {
     // Get files from directory
     fs.readdirSync(dir)
-    
-    // Add absolute path
-    .map((file) => path.resolve(dir, file))
-    
-    // Unlink each file
-    .forEach((file) => fs.unlinkSync(file))
-    
+      // Add absolute path
+      .map((file) => path.resolve(dir, file))
+      // Unlink each file
+      .forEach((file) => fs.unlinkSync(file))
+
     // Remove directory
     fs.rmdirSync(dir)
   }

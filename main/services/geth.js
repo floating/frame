@@ -1,5 +1,4 @@
 const Service = require('./Service/index')
-const { execFile } = require('child_process')
 const axios = require('axios')
 const store = require('../store')
 const { hexToNumber } = require('web3-utils')
@@ -7,7 +6,7 @@ const { hexToNumber } = require('web3-utils')
 const SYNC_CHECK_INTERVAL = 3000
 
 class Geth extends Service {
-  constructor(options) {
+  constructor (options) {
     super('geth', options)
     this.syncCheckInterval = null
   }
@@ -17,7 +16,7 @@ class Geth extends Service {
       // Get config values
       const { mode, networkId } = store('main.clients.geth')
       const networkFlag = this._getNetworkFlag(networkId)
-          
+
       // Prepare client arguments
       let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc']
       if (networkFlag) args.push(networkFlag)
@@ -26,7 +25,7 @@ class Geth extends Service {
       this._run(args)
 
       // Check if syncing every <INTERVAL>
-      this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL);
+      this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL)
     })
     this._start()
   }
@@ -43,16 +42,14 @@ class Geth extends Service {
 
     // Check using JSON RPC method 'eth_blockNumber'
     if (await this._getBlockNumber() === 0) state = 'syncing'
-    
+
     // Check using JSON RPC method 'eth_syncing'
     else state = await this._isSyncing() ? 'syncing' : 'ready'
-    
+
     // If state has changed -> update client state
     if (state !== store('main.clients.geth.state')) {
       store.setClientState('geth', state)
     }
-
-    console.log("sync check:", state)
   }
 
   async _isSyncing () {
@@ -72,7 +69,7 @@ class Geth extends Service {
 
     // Make HTTP request
     const res = await axios.post('http://127.0.0.1:8545', message)
-    
+
     // Return block number as integer
     return hexToNumber(res.data.result)
   }
@@ -82,7 +79,6 @@ class Geth extends Service {
     if (id === '3') return '--testnet'
     if (id === '4') return '--rinkeby'
   }
-
 }
 
 module.exports = new Geth()

@@ -1,31 +1,31 @@
 const EventEmitter = require('events')
 const fs = require('fs')
 const https = require('https')
-const url = require('url')
 const path = require('path')
 const { app } = require('electron')
 const semver = require('semver')
 const { execFile } = require('child_process')
 const tar = require('tar')
-const unzip = require('extract-zip')
+// const unzip = require('extract-zip')
 const latest = require('../latest.json')
 const store = require('../../store')
 const { mkdirP, rmRF } = require('./util')
 
-class Service extends EventEmitter { 
+const userData = app ? app.getPath('userData') : './tmp/'
 
+class Service extends EventEmitter {
   constructor (name, options = { log: false }) {
     super()
-        
+
     // Set instance variables
     this.name = name
-    this.workdir = path.resolve(app.getPath('userData'), name) // path.resolve(name)
+    this.workdir = path.resolve(userData, name) // path.resolve(name)
     this.versionFile = path.resolve(this.workdir, '.version')
     this.latest = latest[this.name]
     this.release = this.latest.platform[process.platform][process.arch]
     this.bin = path.resolve(this.workdir, this.release.bin)
     this.process = null
-    
+
     // Update client store with 'latest', 'installed' and 'version'
     this._updateStore()
 
@@ -53,11 +53,11 @@ class Service extends EventEmitter {
   install () {
     // Emit status
     this.emit('installing')
-    
+
     // Get release metadata by device platform and architecture
-    if (!this.release) new Error('Could not find release matching platform and architecture')
+    if (!this.release) throw Error('Could not find release matching platform and architecture')
     const fileName = path.resolve(this.workdir, this.release.location.split('/').pop())
-    
+
     // If working directory doesn't exist -> create it
     mkdirP(this.workdir)
 
@@ -66,12 +66,12 @@ class Service extends EventEmitter {
       // Stream response into file
       let stream = fs.createWriteStream(fileName)
       let file = res.pipe(stream)
-      
+
       // On download complete ->
       file.on('finish', async () => {
         // Extract archive
         await this._extract(fileName)
-        
+
         // Delete archive
         fs.unlinkSync(fileName)
 
@@ -85,14 +85,15 @@ class Service extends EventEmitter {
   }
 
   uninstall () {
-    return rmRF(this.workdir)
+    // Remove client dir and files wihtin
+    rmRF(this.workdir)
     this._updateStore()
   }
 
   _stop () {
     // Make sure client is running
     if (!this.process) return
-    
+
     // Send 'SIGTERM' to client process
     this.process.kill()
 
@@ -119,7 +120,7 @@ class Service extends EventEmitter {
         strip: 1
       })
     }
-    
+
     // Handle zip
     if (fileName.includes('.zip')) {
       // TODO: Implement unzip
@@ -145,9 +146,7 @@ class Service extends EventEmitter {
     store.updateClient(this.name, 'latest', this.isLatest)
     store.updateClient(this.name, 'version', this.version)
   }
-
 }
-
 module.exports = Service
 
 // DEBUG
