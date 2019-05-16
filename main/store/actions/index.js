@@ -72,7 +72,7 @@ module.exports = {
   setClientState: (u, client, state) => {
     u(`main.clients.${client}.state`, () => state)
   },
-  setClientData: (u, client, key, value) => {
+  updateClient: (u, client, key, value) => {
     u(`main.clients.${client}.${key}`, () => value)
   }
 }

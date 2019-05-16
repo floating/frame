@@ -9,44 +9,33 @@ const SYNC_CHECK_INTERVAL = 3000
 class Geth extends Service {
   constructor(options) {
     super('geth', options)
-    this.ws = null
     this.syncCheckInterval = null
   }
 
   start () {
     this.on('ready', () => {
+      // Get config values
+      const { mode, networkId } = store('main.clients.geth')
+      const networkFlag = this._getNetworkFlag(networkId)
+          
+      // Prepare client arguments
+      let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc']
+      if (networkFlag) args.push(networkFlag)
+
       // Start client
-      this._startClient()
+      this._run(args)
+
       // Check if syncing every <INTERVAL>
       this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL);
     })
-    this._init()
+    this._start()
   }
 
   stop () {
-    // Make sure client is running
-    if (!this.process) throw Error('Geth client not running')
+    // Terminate service
+    this._stop()
     // Clear sync check interval
     clearInterval(this.syncCheckInterval)
-    // Update state on close
-    this.once('close', (code) => store.setClientState('geth', 'off'))
-    // Send 'SIGTERM' to client process
-    this.process.kill()
-    // Update client state
-    store.setClientState('geth', 'terminating')
-  }
-
-  _startClient () {
-    // Get config values
-    const { mode, networkId } = store('main.clients.geth')
-    const networkFlag = this._getNetworkFlag(networkId)
-        
-    // Prepare client arguments
-    let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc']
-    if (networkFlag) args.push(networkFlag)
-
-    // Start client
-    this._run(args)
   }
 
   async _syncCheck () {

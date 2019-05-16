@@ -10,6 +10,7 @@ const tar = require('tar')
 const unzip = require('extract-zip')
 const latest = require('../latest.json')
 const store = require('../../store')
+const { mkdirP, rmRF } = require('./util')
 
 class Service extends EventEmitter { 
 
@@ -25,8 +26,17 @@ class Service extends EventEmitter {
     this.bin = path.resolve(this.workdir, this.release.bin)
     this.process = null
     
-    // Update client store with 'Latest', 'installed' and 'version'
-    this._updateClientStore()
+    // Update client store with 'latest', 'installed' and 'version'
+    this._updateStore()
+
+    // Sync local state with store
+    this.on('installing', () => store.setClientState(this.name, 'installing'))
+    this.on('installed', () => {
+      store.setClientState(this.name, 'off')
+      this._updateStore()
+    })
+    this.on('terminating', () => store.setClientState(this.name, 'terminating'))
+    this.on('close', (code) => store.setClientState(this.name, 'off'))
 
     // Log (if log flag set)
     if (options.log) {
@@ -40,24 +50,19 @@ class Service extends EventEmitter {
   get isInstalled () { return fs.existsSync(this.versionFile) }
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
-  update () {
+  install () {
     // Emit status
-    this.emit('updating')
-
-    // Set client state
-    store.setClientState(this.name, 'updating')
+    this.emit('installing')
     
     // Get release metadata by device platform and architecture
-    if (!release) cb(new Error('Could not find release matching platform and architecture'))
+    if (!this.release) new Error('Could not find release matching platform and architecture')
     const fileName = path.resolve(this.workdir, this.release.location.split('/').pop())
     
     // If working directory doesn't exist -> create it
-    if (!fs.existsSync(this.workdir)) {
-      fs.mkdirSync(this.workdir)
-    }
+    mkdirP(this.workdir)
 
     // Get archive from release store
-    https.get(release.location, (res) => {
+    https.get(this.release.location, (res) => {
       // Stream response into file
       let stream = fs.createWriteStream(fileName)
       let file = res.pipe(stream)
@@ -73,20 +78,33 @@ class Service extends EventEmitter {
         // Update version file
         fs.writeFileSync(this.versionFile, this.latest.version)
 
-        // Update store
-        this._updateClientStore()
-
         // Emit event
-        this.emit('updated')
+        this.emit('installed')
       })
     })
   }
 
-  async _init () {
+  uninstall () {
+    return rmRF(this.workdir)
+    this._updateStore()
+  }
+
+  _stop () {
+    // Make sure client is running
+    if (!this.process) return
+    
+    // Send 'SIGTERM' to client process
+    this.process.kill()
+
+    // Emit event
+    this.emit('terminating')
+  }
+
+  _start () {
     // If client isn't installed or version out of date -> update
     if (!this.isInstalled || !this.isLatest) {
-      this.on('updated', () => this.emit('ready'))
-      this.update()
+      this.on('installed', () => this.emit('ready'))
+      this.install()
     } else {
       this.emit('ready')
     }
@@ -122,10 +140,10 @@ class Service extends EventEmitter {
     })
   }
 
-  _updateClientStore () {
-    store.setClientData(this.name, 'installed', this.isInstalled)
-    store.setClientData(this.name, 'latest', this.isLatest)
-    store.setClientData(this.name, 'version', this.version)
+  _updateStore () {
+    store.updateClient(this.name, 'installed', this.isInstalled)
+    store.updateClient(this.name, 'latest', this.isLatest)
+    store.updateClient(this.name, 'version', this.version)
   }
 
 }
