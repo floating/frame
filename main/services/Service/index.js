@@ -11,7 +11,7 @@ const latest = require('../latest.json')
 const store = require('../../store')
 const { mkdirP, rmRF } = require('./util')
 
-const userData = app ? app.getPath('userData') : './tmp/'
+const userData = app ? app.getPath('userData') : './test/clients/userData'
 
 class Service extends EventEmitter {
   constructor (name, options = { log: false }) {
@@ -26,17 +26,8 @@ class Service extends EventEmitter {
     this.bin = path.resolve(this.workdir, this.release.bin)
     this.process = null
 
-    // Update client store with 'latest', 'installed' and 'version'
+    // Update store
     this._updateStore()
-
-    // Sync local state with store
-    this.on('installing', () => store.setClientState(this.name, 'installing'))
-    this.on('installed', () => {
-      store.setClientState(this.name, 'off')
-      this._updateStore()
-    })
-    this.on('terminating', () => store.setClientState(this.name, 'terminating'))
-    this.on('close', (code) => store.setClientState(this.name, 'off'))
 
     // Log (if log flag set)
     if (options.log) {
@@ -51,8 +42,8 @@ class Service extends EventEmitter {
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
   install () {
-    // Emit status
-    this.emit('installing')
+    // Set state to 'installing'
+    store.setClientState(this.name, 'installing')
 
     // Get release metadata by device platform and architecture
     if (!this.release) throw Error('Could not find release matching platform and architecture')
@@ -78,8 +69,9 @@ class Service extends EventEmitter {
         // Update version file
         fs.writeFileSync(this.versionFile, this.latest.version)
 
-        // Emit event
-        this.emit('installed')
+        // Update store
+        store.setClientState(this.name, 'off')
+        this._updateStore()
       })
     })
   }
@@ -87,6 +79,7 @@ class Service extends EventEmitter {
   uninstall () {
     // Remove client dir and files wihtin
     rmRF(this.workdir)
+    // Update store
     this._updateStore()
   }
 
@@ -94,11 +87,14 @@ class Service extends EventEmitter {
     // Make sure client is running
     if (!this.process) return
 
+    // On close -> set state to 'off'
+    this.once('close', (code) => store.setClientState(this.name, 'off'))
+
     // Send 'SIGTERM' to client process
     this.process.kill()
 
-    // Emit event
-    this.emit('terminating')
+    // Set state to 'terminating'
+    store.setClientState(this.name, 'terminating')
   }
 
   _start () {
