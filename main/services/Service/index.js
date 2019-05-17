@@ -9,7 +9,7 @@ const tar = require('tar')
 // const unzip = require('extract-zip')
 const latest = require('../latest.json')
 const store = require('../../store')
-const { mkdirP, rmRF } = require('./util')
+const { mkdirp, remove } = require('fs-extra')
 
 const userData = app ? app.getPath('userData') : './test/clients/userData'
 
@@ -41,7 +41,7 @@ class Service extends EventEmitter {
   get isInstalled () { return fs.existsSync(this.versionFile) }
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
-  install () {
+  async install () {
     // Set state to 'installing'
     store.setClientState(this.name, 'installing')
 
@@ -50,7 +50,7 @@ class Service extends EventEmitter {
     const fileName = path.resolve(this.workdir, this.release.location.split('/').pop())
 
     // If working directory doesn't exist -> create it
-    mkdirP(this.workdir)
+    await mkdirp(this.workdir)
 
     // Get archive from release store
     https.get(this.release.location, (res) => {
@@ -64,10 +64,10 @@ class Service extends EventEmitter {
         await this._extract(fileName)
 
         // Delete archive
-        fs.unlinkSync(fileName)
+        await remove(fileName)
 
         // Update version file
-        fs.writeFileSync(this.versionFile, this.latest.version)
+        await fs.writeFile(this.versionFile, this.latest.version)
 
         // Update store
         store.setClientState(this.name, 'off')
@@ -76,9 +76,9 @@ class Service extends EventEmitter {
     })
   }
 
-  uninstall () {
+  async uninstall () {
     // Remove client dir and files wihtin
-    rmRF(this.workdir)
+    await remove(this.workdir)
     // Update store
     this._updateStore()
   }

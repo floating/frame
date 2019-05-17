@@ -38,6 +38,7 @@
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
     "test": "standard && jest",
+    "test:clients": "mocha test/clients/*.test.js",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "jest": {
@@ -71,6 +72,7 @@
     "ethereumjs-tx": "1.3.7",
     "ethereumjs-util": "6.0.0",
     "extract-zip": "^1.6.7",
+    "fs-extra": "^8.0.1",
     "hdkey": "1.1.0",
     "md5-file": "4.0.0",
     "node-hid": "0.7.4",
