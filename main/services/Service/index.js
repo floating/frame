@@ -11,7 +11,7 @@ const latest = require('../latest.json')
 const store = require('../../store')
 const { mkdirp, remove } = require('fs-extra')
 
-const userData = app ? app.getPath('userData') : './test/clients/userData'
+const userData = app ? app.getPath('userData') : './test/.userData'
 
 class Service extends EventEmitter {
   constructor (name, options = { log: false }) {
