@@ -115,7 +115,6 @@
     "electron-builder": "20.31.2",
     "ganache-cli": "6.3.0",
     "jest": "24.1.0",
-    "mocha": "^6.1.4",
     "node-watch": "0.5.9",
     "parcel-bundler": "1.11.0",
     "restore-devtools": "0.0.1",
