@@ -74,7 +74,11 @@ let initial = {
     },
     clients: {
       ipfs: {
-        on: main('clients.ipfs.on', true)
+        on: main('clients.ipfs.on', true),
+        installed: false,
+        latest: false,
+        version: null,
+        state: null
       },
       geth: {
         on: main('clients.geth.on', true),
@@ -82,8 +86,8 @@ let initial = {
         networkId: main('clients.geth.networkId', '4'),
         installed: false,
         latest: false,
-        state: null,
-        version: ''
+        version: null,
+        state: null
       }
     },
     connection: {

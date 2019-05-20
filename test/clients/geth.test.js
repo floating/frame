@@ -62,10 +62,8 @@ const makeRPCCall = async () => {
 }
 
 describe('Geth', () => {
-
+  // Setup test suite
   jest.setTimeout(30000)
-
-  // BEFORE: Make sure test user data directory is empty
   beforeAll(clean)
   afterAll(clean)
 
@@ -96,8 +94,6 @@ describe('Geth', () => {
       observer.once('version', (version) => counter.expect(typeof(version)).toBe('string'))
       observer.once('state', (state) => counter.expect(state).toBe('off'))
     })
-
-    // observer.state.on('change', console.log)
     // Run install process
     geth.install()
   })
@@ -140,7 +136,6 @@ describe('Geth', () => {
         
       })
     })
-    
     // Start client
     geth.start()
   })
@@ -159,6 +154,7 @@ describe('Geth', () => {
 
         // 3) Expect process to have terminated
         counter.expect(geth.process).toBe(null)
+        
         // 4) Expect JSON RPC call to fail
         counter.expect(makeRPCCall()).rejects.toThrow()
         

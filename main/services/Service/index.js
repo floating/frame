@@ -3,6 +3,7 @@ const fs = require('fs')
 const https = require('https')
 const path = require('path')
 const { app } = require('electron')
+const log = require('electron-log')
 const semver = require('semver')
 const { execFile } = require('child_process')
 const tar = require('tar')
@@ -67,7 +68,7 @@ class Service extends EventEmitter {
         await remove(fileName)
 
         // Update version file
-        await fs.writeFile(this.versionFile, this.latest.version)
+        fs.writeFileSync(this.versionFile, this.latest.version)
 
         // Update store
         store.setClientState(this.name, 'off')
@@ -99,9 +100,15 @@ class Service extends EventEmitter {
 
     // Set state to 'terminating'
     store.setClientState(this.name, 'terminating')
+
+    // Log
+    log.info(`${this.name}: terminating`)
   }
 
   _start () {
+    // Log
+    log.info(`${this.name}: starting`)
+
     // If client isn't installed or version out of date -> update
     if (!this.isInstalled || !this.isLatest) {
       this.on('installed', () => this.emit('ready'))
@@ -141,11 +148,21 @@ class Service extends EventEmitter {
     })
   }
 
+  _runOnce (args) {
+    return new Promise((resolve, reject) => {
+      execFile(this.bin, args, (err, stdout, stderr) => {
+        if (!err) return resolve(stdout)
+        reject(err)
+      })
+    })
+  }
+
   _updateStore () {
     store.updateClient(this.name, 'installed', this.isInstalled)
     store.updateClient(this.name, 'latest', this.isLatest)
     store.updateClient(this.name, 'version', this.version)
   }
+
 }
 module.exports = Service
 
