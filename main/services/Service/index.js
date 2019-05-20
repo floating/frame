@@ -72,6 +72,9 @@ class Service extends EventEmitter {
         // Update store
         store.setClientState(this.name, 'off')
         this._updateStore()
+
+        // Emit event
+        this.emit('installed')
       })
     })
   }
@@ -81,6 +84,7 @@ class Service extends EventEmitter {
     await remove(this.workdir)
     // Update store
     this._updateStore()
+    store.setClientState(this.name, null)
   }
 
   _stop () {

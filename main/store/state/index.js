@@ -82,7 +82,7 @@ let initial = {
         networkId: main('clients.geth.networkId', '4'),
         installed: false,
         latest: false,
-        state: 'off',
+        state: null,
         version: ''
       }
     },
