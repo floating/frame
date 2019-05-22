@@ -12,7 +12,7 @@ const { emptyDir } = require('fs-extra')
 const axios = require('axios')
 
 // Frame
-const geth = require('../../main/services/geth')
+const ipfs = require('../../main/services/ipfs')
 const store = require('../../main/store')
 
 // Local
@@ -20,29 +20,28 @@ const { Counter, Observer } = require('./util')
 
 // Helper functions
 const clean = async () => await emptyDir(userData)
-const makeRPCCall = async () => {
-  const message = { jsonrpc: '2.0', id: 1, method: 'net_listening', params: [] }
-  const res = await axios.post('http://127.0.0.1:8545', message)
-  return res.data.result
+const getVersion = async () => {
+  const res = await axios.get('http://127.0.01:5001/api/v0/version')
+  return res.data.Version
 }
 
 // Global setup
-const observer = new Observer('main.clients.geth', ['state', 'installed', 'latest', 'version'])
+const observer = new Observer('main.clients.ipfs', ['state', 'installed', 'latest', 'version'])
 const userData = path.resolve('./test/.userData')
 
-describe('Ethereum go client', () => {
+describe('IPFS go client', () => {
   // Setup test suite
   jest.setTimeout(30000)
   beforeAll(clean)
   afterAll(clean)
 
   test('Client directory should not exist', () => {
-    const gethDir = path.resolve(userData, 'geth')
-    expect(fs.existsSync(gethDir)).toEqual(false)
+    const ipfsDir = path.resolve(userData, 'ipfs')
+    expect(fs.existsSync(ipfsDir)).toEqual(false)
   })
 
   test('Application state should reflect client not being installed', () => {
-    const { latest, installed, state } = store('main.clients.geth')
+    const { latest, installed, state } = store('main.clients.ipfs')
     expect(latest).toBe(false)
     expect(installed).toBe(false)
     expect(state).toBe(null)
@@ -64,7 +63,7 @@ describe('Ethereum go client', () => {
       observer.once('state', (state) => counter.expect(state).toBe('off'))
     })
     // Run install process
-    geth.install()
+    ipfs.install()
   })
 
   test('Client should uninstall', (done) => {
@@ -82,31 +81,33 @@ describe('Ethereum go client', () => {
     })
 
     // Run uninstall process
-    geth.uninstall()
+    ipfs.uninstall()
   })
 
-  test('On start -> client should install and run', (done) => {
+  test('Client should install and run', (done) => {
     // SETUP: Expect 3 assertions
-    const counter = new Counter(3, done)
+    const counter = new Counter(4, done)
 
     // 1) Expect state to change to 'installing'
     observer.once('state', (state) => {
       counter.expect(state).toBe('installing')
 
       // 2) Expect state to change to 'off'
-      observer.once('state', async (state) => {
+      observer.once('state', (state) => {
         counter.expect(state).toBe('off')
 
-        // 3) Expect client to respond to JSON RPC call
-        setTimeout(async () => {
-          const isListening = await makeRPCCall()
-          counter.expect(isListening).toBe(true)
-        }, 1000);
+        // 3) Expect state to change to 'ready'
+        observer.once('state', async (state) => {
+          counter.expect(state).toBe('ready')
 
+          // 4) Expect client to return version and version to match
+          const version = await getVersion()
+          counter.expect(version).toBe(store('main.clients.ipfs.version'))
+        })
       })
     })
     // Start client
-    geth.start()
+    ipfs.start()
   })
 
   test('On stop -> client should stop', (done) => {
@@ -122,15 +123,14 @@ describe('Ethereum go client', () => {
         counter.expect(state).toBe('off')
 
         // 3) Expect process to have terminated
-        counter.expect(geth.process).toBe(null)
+        counter.expect(ipfs.process).toBe(null)
 
-        // 4) Expect JSON RPC call to fail
-        counter.expect(makeRPCCall()).rejects.toThrow()
-
+        // 4) Expect API call to fail
+        counter.expect(getVersion()).rejects.toThrow()
       })
     })
     // Stop client
-    geth.stop()
+    ipfs.stop()
   })
 
 })
