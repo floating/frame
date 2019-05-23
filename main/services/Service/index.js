@@ -43,6 +43,9 @@ class Service extends EventEmitter {
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
   async install () {
+    // Log
+    log.info(`${this.name}: installing...`)
+
     // Set state to 'installing'
     store.setClientState(this.name, 'installing')
 
@@ -76,6 +79,9 @@ class Service extends EventEmitter {
 
         // Emit event
         this.emit('installed')
+
+        // Log
+        log.info(`${this.name}: installed`)
       })
     })
   }
@@ -86,6 +92,8 @@ class Service extends EventEmitter {
     // Update store
     this._updateStore()
     store.setClientState(this.name, null)
+    // Log
+    log.info(`${this.name}: uninstalled`)
   }
 
   _stop () {
@@ -93,7 +101,10 @@ class Service extends EventEmitter {
     if (!this.process) return
 
     // On close -> set state to 'off'
-    this.once('close', (code) => store.setClientState(this.name, 'off'))
+    this.once('close', (code) => {
+      log.info(`${this.name}: terminated`)
+      store.setClientState(this.name, 'off')
+    })
 
     // Send 'SIGTERM' to client process
     this.process.kill()
@@ -102,7 +113,7 @@ class Service extends EventEmitter {
     store.setClientState(this.name, 'terminating')
 
     // Log
-    log.info(`${this.name}: terminating`)
+    log.info(`${this.name}: terminating...`)
   }
 
   _start () {

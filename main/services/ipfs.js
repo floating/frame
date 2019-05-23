@@ -34,11 +34,11 @@ class IPFS extends Service {
 
   async init () {
     try {
-      log.info('IPFS initiated')
+      log.info('ipfs: repo initiated')
       await this._runOnce(['init'])
     }
     catch (err) {
-      log.info('ipfs: already initiated')
+      log.info('ipfs: repo already initiated')
     }
   }
 }
