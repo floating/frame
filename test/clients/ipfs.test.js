@@ -3,7 +3,6 @@
  */
 
 // Node
-const EventEmitter = require('events')
 const fs = require('fs')
 const path = require('path')
 
@@ -19,7 +18,7 @@ const store = require('../../main/store')
 const { Counter, Observer } = require('./util')
 
 // Helper functions
-const clean = async () => await emptyDir(userData)
+const clean = () => emptyDir(userData)
 const getVersion = async () => {
   const res = await axios.get('http://127.0.01:5001/api/v0/version')
   return res.data.Version
@@ -29,25 +28,24 @@ const getVersion = async () => {
 const observer = new Observer('main.clients.ipfs', ['state', 'installed', 'latest', 'version'])
 const userData = path.resolve('./test/.userData')
 
-describe('IPFS go client', () => {
+describe('IPFS client', () => {
   // Setup test suite
   jest.setTimeout(30000)
   beforeAll(clean)
   afterAll(clean)
 
-  test('Client directory should not exist', () => {
+  test('Client should not be installed', () => {
+    // 1) Check for that client directory doesn't exist
     const ipfsDir = path.resolve(userData, 'ipfs')
     expect(fs.existsSync(ipfsDir)).toEqual(false)
-  })
-
-  test('Application state should reflect client not being installed', () => {
+    // 2) Check that state reflects that client is not installed
     const { latest, installed, state } = store('main.clients.ipfs')
     expect(latest).toBe(false)
     expect(installed).toBe(false)
     expect(state).toBe(null)
   })
 
-  test('Client should install', (done) => {
+  test('Install client', (done) => {
     // SETUP: Expect 5 assertions
     const counter = new Counter(5, done)
 
@@ -59,14 +57,14 @@ describe('IPFS go client', () => {
       // 2) On install done -> assert state change
       observer.once('installed', (installed) => counter.expect(installed).toBe(true))
       observer.once('latest', (latest) => counter.expect(latest).toBe(true))
-      observer.once('version', (version) => counter.expect(typeof(version)).toBe('string'))
+      observer.once('version', (version) => counter.expect(typeof version).toBe('string'))
       observer.once('state', (state) => counter.expect(state).toBe('off'))
     })
     // Run install process
     ipfs.install()
   })
 
-  test('Client should uninstall', (done) => {
+  test('Uninstall client', (done) => {
     // SETUP: Expect 5 assertions
     const counter = new Counter(5, done)
 
@@ -84,7 +82,7 @@ describe('IPFS go client', () => {
     ipfs.uninstall()
   })
 
-  test('Client should install and run', (done) => {
+  test('Start and automatically install client', (done) => {
     // SETUP: Expect 3 assertions
     const counter = new Counter(4, done)
 
@@ -110,7 +108,7 @@ describe('IPFS go client', () => {
     ipfs.start()
   })
 
-  test('On stop -> client should stop', (done) => {
+  test('Stop client', (done) => {
     // SETUP: Expect 3 assertions
     const counter = new Counter(4, done)
 
@@ -132,5 +130,4 @@ describe('IPFS go client', () => {
     // Stop client
     ipfs.stop()
   })
-
 })

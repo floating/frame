@@ -3,7 +3,6 @@
  */
 
 // Node
-const EventEmitter = require('events')
 const fs = require('fs')
 const path = require('path')
 
@@ -19,7 +18,7 @@ const store = require('../../main/store')
 const { Counter, Observer } = require('./util')
 
 // Helper functions
-const clean = async () => await emptyDir(userData)
+const clean = () => emptyDir(userData)
 const makeRPCCall = async () => {
   const message = { jsonrpc: '2.0', id: 1, method: 'net_listening', params: [] }
   const res = await axios.post('http://127.0.0.1:8545', message)
@@ -30,25 +29,25 @@ const makeRPCCall = async () => {
 const observer = new Observer('main.clients.geth', ['state', 'installed', 'latest', 'version'])
 const userData = path.resolve('./test/.userData')
 
-describe('Ethereum go client', () => {
+describe('Geth', () => {
   // Setup test suite
   jest.setTimeout(30000)
   beforeAll(clean)
   afterAll(clean)
 
-  test('Client directory should not exist', () => {
+  test('Client should not be installed', () => {
+    // 1) Check for that client directory doesn't exist
     const gethDir = path.resolve(userData, 'geth')
     expect(fs.existsSync(gethDir)).toEqual(false)
-  })
 
-  test('Application state should reflect client not being installed', () => {
+    // 2) Check that state reflects that client is not installed
     const { latest, installed, state } = store('main.clients.geth')
     expect(latest).toBe(false)
     expect(installed).toBe(false)
     expect(state).toBe(null)
   })
 
-  test('Client should install', (done) => {
+  test('Install client', (done) => {
     // SETUP: Expect 5 assertions
     const counter = new Counter(5, done)
 
@@ -60,14 +59,14 @@ describe('Ethereum go client', () => {
       // 2) On install done -> assert state change
       observer.once('installed', (installed) => counter.expect(installed).toBe(true))
       observer.once('latest', (latest) => counter.expect(latest).toBe(true))
-      observer.once('version', (version) => counter.expect(typeof(version)).toBe('string'))
+      observer.once('version', (version) => counter.expect(typeof version).toBe('string'))
       observer.once('state', (state) => counter.expect(state).toBe('off'))
     })
     // Run install process
     geth.install()
   })
 
-  test('Client should uninstall', (done) => {
+  test('Uninstall client', (done) => {
     // SETUP: Expect 5 assertions
     const counter = new Counter(5, done)
 
@@ -85,7 +84,7 @@ describe('Ethereum go client', () => {
     geth.uninstall()
   })
 
-  test('On start -> client should install and run', (done) => {
+  test('Start and automatically install client', (done) => {
     // SETUP: Expect 3 assertions
     const counter = new Counter(3, done)
 
@@ -101,15 +100,14 @@ describe('Ethereum go client', () => {
         setTimeout(async () => {
           const isListening = await makeRPCCall()
           counter.expect(isListening).toBe(true)
-        }, 1000);
-
+        }, 1000)
       })
     })
     // Start client
     geth.start()
   })
 
-  test('On stop -> client should stop', (done) => {
+  test('Stop client', (done) => {
     // SETUP: Expect 3 assertions
     const counter = new Counter(4, done)
 
@@ -126,11 +124,9 @@ describe('Ethereum go client', () => {
 
         // 4) Expect JSON RPC call to fail
         counter.expect(makeRPCCall()).rejects.toThrow()
-
       })
     })
     // Stop client
     geth.stop()
   })
-
 })
