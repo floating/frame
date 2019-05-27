@@ -48,7 +48,6 @@ describe('Geth', () => {
   })
 
   test('Install client', (done) => {
-    // SETUP: Expect 5 assertions
     const counter = new Counter(5, done)
 
     // 1) On installing
@@ -67,7 +66,6 @@ describe('Geth', () => {
   })
 
   test('Uninstall client', (done) => {
-    // SETUP: Expect 5 assertions
     const counter = new Counter(5, done)
 
     // Setup observers
@@ -85,8 +83,7 @@ describe('Geth', () => {
   })
 
   test('Start and automatically install client', (done) => {
-    // SETUP: Expect 3 assertions
-    const counter = new Counter(3, done)
+    const counter = new Counter(4, done)
 
     // 1) Expect state to change to 'installing'
     observer.once('state', (state) => {
@@ -96,11 +93,14 @@ describe('Geth', () => {
       observer.once('state', async (state) => {
         counter.expect(state).toBe('off')
 
-        // 3) Expect client to respond to JSON RPC call
-        setTimeout(async () => {
+        // 3) Expect state to change to 'ready' or 'syncing'
+        observer.once('state', async (state) => {
+          counter.expect(['syncing', 'ready'].includes(state)).toBe(true)
+
+          // 4) Expect client to respond to JSON RPC call
           const isListening = await makeRPCCall()
           counter.expect(isListening).toBe(true)
-        }, 1000)
+        })
       })
     })
     // Start client
@@ -108,7 +108,6 @@ describe('Geth', () => {
   })
 
   test('Stop client', (done) => {
-    // SETUP: Expect 3 assertions
     const counter = new Counter(4, done)
 
     // 1) Expect state to change to 'terminating'
@@ -128,5 +127,30 @@ describe('Geth', () => {
     })
     // Stop client
     geth.stop()
+  })
+
+  test('Start client again', (done) => {
+    const counter = new Counter(3, done)
+
+    // 1) Expect state to change to 'starting'
+    observer.once('state', async (state) => {
+      counter.expect(state).toBe('starting')
+
+      // 2) Expect state to change to 'ready' or 'syncing'
+      observer.once('state', async (state) => {
+        counter.expect(['syncing', 'ready'].includes(state)).toBe(true)
+
+        // 3) Expect client to respond to JSON RPC call
+        const isListening = await makeRPCCall()
+        counter.expect(isListening).toBe(true)
+
+      })
+    })
+
+    // Start client
+    setTimeout(() => {
+      geth.start()
+    }, 1000);
+
   })
 })

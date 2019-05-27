@@ -181,6 +181,19 @@ class Settings extends React.Component {
             </div>
           </div>
         </div>
+
+        {/* Ethereum Client */}
+        <div className='signerPermission'>
+        <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+          <div className='signerPermissionControls'>
+            <div className='signerPermissionOrigin'>{'Ethereum Client'}</div>
+            <div className={this.store('main.clients.geth.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleClient', 'geth')}>
+              <div className='signerPermissionToggleSwitch' />
+            </div>
+          </div>
+
+        </div>
+
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
           <div className='signerPermissionControls'>

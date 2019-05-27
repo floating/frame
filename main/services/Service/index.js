@@ -91,18 +91,33 @@ class Service extends EventEmitter {
     await remove(this.workdir)
     // Update store
     this._updateStore()
-    store.setClientState(this.name, null)
+    store.setClientState(this.name, 'off')
     // Log
     log.info(`${this.name}: uninstalled`)
+  }
+
+  _start () {
+    // Log
+    log.info(`${this.name}: starting`)
+    store.setClientState(this.name, 'starting')
+
+    // If client isn't installed or version out of date -> update
+    if (!this.isInstalled || !this.isLatest) {
+      this.on('installed', () => this.emit('ready'))
+      this.install()
+    } else {
+      this.emit('ready')
+    }
   }
 
   _stop () {
     // Make sure client is running
     if (!this.process) return
 
-    // On close -> set state to 'off'
-    this.once('close', (code) => {
-      log.info(`${this.name}: terminated`)
+    // On exit -> set state to 'off'
+    this.once('exit', (code) => {
+      log.info(`${this.name}: off`)
+      log.info(`${this.name}: exit code ${code}`)
       store.setClientState(this.name, 'off')
     })
 
@@ -113,21 +128,9 @@ class Service extends EventEmitter {
     store.setClientState(this.name, 'terminating')
 
     // Log
-    log.info(`${this.name}: terminating...`)
+    log.info(`${this.name}: terminating`)
   }
 
-  _start () {
-    // Log
-    log.info(`${this.name}: starting`)
-
-    // If client isn't installed or version out of date -> update
-    if (!this.isInstalled || !this.isLatest) {
-      this.on('installed', () => this.emit('ready'))
-      this.install()
-    } else {
-      this.emit('ready')
-    }
-  }
 
   async _extract (fileName, typ) {
     // Handle tar
@@ -153,8 +156,8 @@ class Service extends EventEmitter {
     })
     this.process.stdout.on('data', (data) => this.emit('stdout', data))
     this.process.stderr.on('data', (data) => this.emit('stderr', data))
-    this.process.on('close', (code) => {
-      this.emit('close', code)
+    this.process.on('exit', (code) => {
+      this.emit('exit', code)
       this.process = null
     })
   }

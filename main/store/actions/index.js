@@ -83,5 +83,6 @@ module.exports = {
   },
   // Ethereum and IPFS clients
   setClientState: (u, client, state) => u(`main.clients.${client}.state`, () => state),
-  updateClient: (u, client, key, value) => u(`main.clients.${client}.${key}`, () => value)
+  updateClient: (u, client, key, value) => u(`main.clients.${client}.${key}`, () => value),
+  toggleClient: (u, client) => u(`main.clients.${client}.on`, v => !v)
 }

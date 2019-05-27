@@ -1,5 +1,6 @@
 const Service = require('./Service/index')
 const axios = require('axios')
+const log = require('electron-log')
 const store = require('../store')
 const { hexToNumber } = require('web3-utils')
 
@@ -12,7 +13,10 @@ class Geth extends Service {
   }
 
   start () {
-    this.on('ready', () => {
+    // Ensure client isn't already running
+    if (store('main.clients.geth.state') != 'off') return
+
+    this.once('ready', () => {
       // Get config values
       const { mode, networkId } = store('main.clients.geth')
       const networkFlag = this._getNetworkFlag(networkId)
@@ -27,12 +31,19 @@ class Geth extends Service {
       // Check if syncing every <INTERVAL>
       this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL)
     })
+
+    // Start client
     this._start()
   }
 
   stop () {
+    // Ensure state is 'ready' or 'syncing'
+    const state = store('main.clients.geth.state')
+    if (!(state === 'ready' || state === 'syncing')) return
+
     // Terminate service
     this._stop()
+
     // Clear sync check interval
     clearInterval(this.syncCheckInterval)
   }
@@ -49,6 +60,7 @@ class Geth extends Service {
     // If state has changed -> update client state
     if (state !== store('main.clients.geth.state')) {
       store.setClientState('geth', state)
+      log.info('geth:', state)
     }
   }
 
