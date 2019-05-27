@@ -13,6 +13,16 @@ app.on('ready', () => {
   })
 })
 
+app.on('ready', () => {
+  let on = null
+  store.observer(_ => {
+    if (on !== store('main.clients.ipfs.on')) {
+      on = store('main.clients.ipfs.on')
+      on ? ipfs.start() : ipfs.stop()
+    }
+  })
+})
+
 module.exports = {
   stop: () => {
     geth.stop()

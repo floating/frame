@@ -10,13 +10,9 @@ class Geth extends Service {
   constructor (options) {
     super('geth', options)
     this.syncCheckInterval = null
-  }
 
-  start () {
-    // Ensure client isn't already running
-    if (store('main.clients.geth.state') != 'off') return
-
-    this.once('ready', () => {
+    // On ready -> start client
+    this.on('ready', () => {
       // Get config values
       const { mode, networkId } = store('main.clients.geth')
       const networkFlag = this._getNetworkFlag(networkId)
@@ -32,6 +28,11 @@ class Geth extends Service {
       this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL)
     })
 
+  }
+
+  start () {
+    // Ensure client isn't already running
+    if (store('main.clients.geth.state') != 'off') return
     // Start client
     this._start()
   }
