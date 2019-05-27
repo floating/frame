@@ -44,7 +44,7 @@ class Service extends EventEmitter {
 
   async install () {
     // Log
-    log.info(`${this.name}: installing...`)
+    log.info(`${this.name}: installing`)
 
     // Set state to 'installing'
     store.setClientState(this.name, 'installing')

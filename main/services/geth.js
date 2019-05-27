@@ -25,6 +25,7 @@ class Geth extends Service {
       this._run(args)
 
       // Check if syncing every <INTERVAL>
+      setTimeout(() => this._syncCheck(), 500)
       this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL)
     })
 
