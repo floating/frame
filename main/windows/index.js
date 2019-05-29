@@ -183,7 +183,11 @@ const api = {
     if (windows[id]) windows[id].close()
     delete windows[id]
   },
+  getTray: () => {
+    return windows.tray
+  },
   send: (id, channel, ...args) => {
+    if (!windows[id]) return log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
     windows[id].send(channel, ...args)
   },
   broadcast: (channel, ...args) => {

@@ -3,7 +3,7 @@ app.commandLine.appendSwitch('force-gpu-rasterization', true)
 
 const log = require('electron-log')
 const path = require('path')
-const bip39 = require('bip39')
+// const bip39 = require('bip39')
 
 const windows = require('./windows')
 const store = require('./store')

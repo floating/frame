@@ -24,6 +24,11 @@ ipcRenderer.on('main:action', (...args) => {
   window.postMessage(wrap({ channel: 'action', args, source, method: 'event' }), '*')
 })
 
+ipcRenderer.on('main:flex', (...args) => {
+  args.shift()
+  window.postMessage(wrap({ channel: 'flex', args, source, method: 'event' }), '*')
+})
+
 if (dev) {
   let path = require('path')
   let watch = require('node-watch')
