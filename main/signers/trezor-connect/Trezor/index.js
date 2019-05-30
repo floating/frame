@@ -1,6 +1,5 @@
 const log = require('electron-log')
 const utils = require('web3-utils')
-const bip32Path = require('bip32-path')
 const EthereumTx = require('ethereumjs-tx')
 const store = require('../../../store')
 const Signer = require('../../Signer')
@@ -50,7 +49,6 @@ class Trezor extends Signer {
   }
   verifyAddress (display = false) {
     log.info('Verify Address')
-    // getDeviceAddress(this.index, )
     flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(), display, (err, result) => {
       if (err) {
         log.info('Verify Address Error: ')
@@ -90,6 +88,8 @@ class Trezor extends Signer {
     this.lookupAccounts((err, accounts) => {
       if (err) {
         this.status = 'loading'
+        if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.version.join('.')})`
+        if (err === 'ui-device_bootloader_mode') this.status = `Device in Bootloader Mode`
         this.accounts = []
         this.index = 0
         this.update()
@@ -116,13 +116,15 @@ class Trezor extends Signer {
     this.update()
     this.setPin = cb
   }
-  needPin (cb) {
+  needPin () {
     this.status = 'Need Pin'
     this.update()
-    this.setPin = (err, pin) => {
+    this.setPin = (pin) => {
       this.status = 'loading'
       this.update()
-      cb(err, pin)
+      flex.rpc('trezor.inputPin', this.device.path, pin, err => {
+        if (err) log.error(err)
+      })
       setTimeout(() => this.deviceStatus(), 250)
     }
   }
@@ -132,62 +134,48 @@ class Trezor extends Signer {
     if (hex.length % 2 !== 0) hex = '0' + hex
     return hex
   }
+  hexToBuffer (hex) {
+    return Buffer.from(this.normalize(hex), 'hex')
+  }
   // Standard Methods
   signMessage (message, cb) {
-    flex.rpc('trezor.signEthMessage', this.device.path, this.getPath(), this.normalize(message), (err, result) => {
+    flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(), this.normalize(message), (err, result) => {
       if (err) {
         log.error('signMessage Error')
         log.error(err)
         if (err.message === 'Unexpected message') err = new Error('Update Trezor Firmware')
         cb(err)
       } else {
-        cb(null, '0x' + result.message.signature)
+        cb(null, '0x' + result.signature)
       }
     })
   }
   signTransaction (rawTx, cb) {
     if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
-    const trezorTx = [
-      bip32Path.fromString(this.getPath()).toPathArray(),
-      this.normalize(rawTx.nonce),
-      this.normalize(rawTx.gasPrice),
-      this.normalize(rawTx.gas),
-      this.normalize(rawTx.to),
-      this.normalize(rawTx.value),
-      this.normalize(rawTx.data),
-      utils.hexToNumber(rawTx.chainId)
-    ]
-    flex.rpc('trezor.signEthTx', this.device.path, trezorTx, (err, result) => {
+    const trezorTx = {
+      nonce: this.normalize(rawTx.nonce),
+      gasPrice: this.normalize(rawTx.gasPrice),
+      gasLimit: this.normalize(rawTx.gas),
+      to: this.normalize(rawTx.to),
+      value: this.normalize(rawTx.value),
+      data: this.normalize(rawTx.data),
+      chainId: utils.hexToNumber(rawTx.chainId)
+    }
+    flex.rpc('trezor.ethereumSignTransaction', this.device.path, this.getPath(), trezorTx, (err, result) => {
       if (err) return cb(err.message)
       const tx = new EthereumTx({
-        nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
-        gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
-        gasLimit: Buffer.from(this.normalize(rawTx.gas), 'hex'),
-        to: Buffer.from(this.normalize(rawTx.to), 'hex'),
-        value: Buffer.from(this.normalize(rawTx.value), 'hex'),
-        data: Buffer.from(this.normalize(rawTx.data), 'hex'),
-        v: result.v,
-        r: Buffer.from(this.normalize(result.r), 'hex'),
-        s: Buffer.from(this.normalize(result.s), 'hex')
+        nonce: this.hexToBuffer(rawTx.nonce),
+        gasPrice: this.hexToBuffer(rawTx.gasPrice),
+        gasLimit: this.hexToBuffer(rawTx.gas),
+        to: this.hexToBuffer(rawTx.to),
+        value: this.hexToBuffer(rawTx.value),
+        data: this.hexToBuffer(rawTx.data),
+        v: this.hexToBuffer(result.v),
+        r: this.hexToBuffer(result.r),
+        s: this.hexToBuffer(result.s)
       })
       cb(null, '0x' + tx.serialize().toString('hex'))
     })
-    // this.device.waitForSessionAndRun(session => session.signEthTx(...trezorTx)).then(result => {
-    //   const tx = new EthereumTx({
-    //     nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
-    //     gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
-    //     gasLimit: Buffer.from(this.normalize(rawTx.gas), 'hex'),
-    //     to: Buffer.from(this.normalize(rawTx.to), 'hex'),
-    //     value: Buffer.from(this.normalize(rawTx.value), 'hex'),
-    //     data: Buffer.from(this.normalize(rawTx.data), 'hex'),
-    //     v: result.v,
-    //     r: Buffer.from(this.normalize(result.r), 'hex'),
-    //     s: Buffer.from(this.normalize(result.s), 'hex')
-    //   })
-    //   cb(null, '0x' + tx.serialize().toString('hex'))
-    // }).catch(err => {
-    //   cb(err.message)
-    // })
   }
 }
 

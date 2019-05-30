@@ -43,7 +43,6 @@ ipcMain.on('tray:flex:res', (sender, id, ...args) => {
 })
 
 ipcMain.on('tray:flex:event', (sender, eventName, ...args) => {
-  console.log(eventName, ...args)
   args = args.map(arg => defined(arg) ? JSON.parse(arg) : arg)
   flex.emit(eventName, ...args)
 })

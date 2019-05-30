@@ -144,7 +144,7 @@ const api = {
   trezorPin (id, pin, cb) {
     if (!signers[id]) return cb(new Error('No Account Selected'))
     if (signers[id].setPin) {
-      signers[id].setPin(null, pin)
+      signers[id].setPin(pin)
       cb(null, { status: 'ok' })
     } else {
       cb(new Error('Set pin not avaliable...'))
