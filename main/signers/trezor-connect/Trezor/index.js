@@ -19,10 +19,6 @@ class Trezor extends Signer {
     this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
     this.getPath = (i = this.index) => this.basePath() + '/' + i
     this.handlers = {}
-    // device.on('button', code => this.button(code))
-    // device.on('passphrase', cb => this.passphrase(cb))
-    // device.on('pin', (type, cb) => this.needPin(cb))
-    // device.on('disconnect', () => this.close())
     this.open()
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
@@ -36,6 +32,7 @@ class Trezor extends Signer {
   }
   close () {
     this.networkObserver.remove()
+    this.closed = true
     super.close()
   }
   button (label) {
@@ -84,6 +81,9 @@ class Trezor extends Signer {
       cb(null, this.deriveHDAccounts(result.publicKey, result.chainCode))
     })
   }
+  update () {
+    if (!this.closed) super.update()
+  }
   deviceStatus () {
     this.lookupAccounts((err, accounts) => {
       if (err) {
@@ -98,7 +98,7 @@ class Trezor extends Signer {
           this.coinbase = accounts[0]
           this.accounts = accounts
           if (this.index > accounts.length - 1) this.index = 0
-          this.deviceStatus(true)
+          this.deviceStatus()
         }
         if (accounts.length > this.accounts.length) this.accounts = accounts
         this.status = 'ok'
@@ -124,8 +124,8 @@ class Trezor extends Signer {
       this.update()
       flex.rpc('trezor.inputPin', this.device.path, pin, err => {
         if (err) log.error(err)
+        setTimeout(() => this.deviceStatus(), 250)
       })
-      setTimeout(() => this.deviceStatus(), 250)
     }
   }
   normalize (hex) {

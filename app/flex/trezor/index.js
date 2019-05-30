@@ -31,11 +31,11 @@ class Device {
     this.emit('trezor:needPhrase', this.device)
   }
   inputPin (pin, cb) {
-    TrezorConnect.uiResponse({ type: 'ui-receive_pin', payload: pin })
+    TrezorConnect.uiResponse({ device: this.device, type: 'ui-receive_pin', payload: pin })
     cb()
   }
   inputPhrase (phrase, cb) {
-    TrezorConnect.uiResponse({ type: 'ui-receive_passphrase', payload: { value: phrase } })
+    TrezorConnect.uiResponse({ device: this.device, type: 'ui-receive_passphrase', payload: { value: phrase } })
     cb()
   }
   getPublicKey (path, cb) {
