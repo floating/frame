@@ -1,3 +1,5 @@
+require('babel-polyfill')
+
 const HID = require('node-hid')
 const usb = require('usb')
 const log = require('electron-log')

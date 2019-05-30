@@ -9,7 +9,7 @@ class Signer {
     this.index = 0
     this.requests = {}
   }
-  deriveHDAccounts (publicKey, chainCode) {
+  deriveHDAccounts (publicKey, chainCode, count = 100) {
     let hdk = new HDKey()
     hdk.publicKey = Buffer.from(publicKey, 'hex')
     hdk.chainCode = Buffer.from(chainCode, 'hex')
@@ -19,7 +19,7 @@ class Signer {
       return toChecksumAddress(`0x${address.toString('hex')}`)
     }
     const accounts = []
-    for (let i = 0; i < 15; i++) { accounts[i] = derive(i) }
+    for (let i = 0; i < count; i++) { accounts[i] = derive(i) }
     return accounts
   }
   getCoinbase (cb) {

@@ -1,53 +1,63 @@
-const HID = require('node-hid')
-const usb = require('usb')
 const log = require('electron-log')
-const uuid = require('uuid/v5')
+
+const flex = require('../../flex')
+
 const Ledger = require('./Ledger')
-// const isLedger = d => (['win32', 'darwin'].includes(process.platform) ? d.usagePage === 0xffa0 : d.interface === 0) && ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
-const isLedger = d => ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
-const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 module.exports = (signers, api) => {
   log.info(' ')
-  log.info('Ledger Scaner Started...')
+  log.info('Ledger BLE Scaner Started...')
+  flex.on('ledger:scan:failed', err => {
+    if (err) log.error(err)
+    setTimeout(() => {
+      flex.synthetic('ledger.scan', (err, res) => console.log(err, res))
+    }, 5000)
+  })
+  // ipcMain.on('bluetooth-select-device', (devices) => {
+  //   console.log('bluetooth-select-device')
+  //   console.log(devices)
+  // })
   const scan = () => {
-    log.info(' ')
-    log.info('Ledger Scan Triggered:')
-    let current = HID.devices().filter(isLedger)
-    log.info('  > Currently Connected Ledgers: ', current.map(device => uuid('Ledger' + device.path, ns)))
-    log.info('  > Already Created Ledgers: ', Object.keys(signers).filter(id => signers[id].type === 'Ledger'))
-    log.info(' ')
-    Object.keys(signers).forEach(id => {
-      if (current.map(device => uuid('Ledger' + device.path, ns)).indexOf(id) === -1 && signers[id].type === 'Ledger') {
-        log.info('Removing Ledger: ', id)
-        signers[id].close()
-        delete signers[id]
-      }
+    log.info('Ledger BLE Scan Started')
+    flex.rpc('ledger.current', (err, current) => {
+      if (err) return log.error(err)
+      console.log('ledger.current')
+      log.info('We found some BLE signers...', current)
+
+      // Remove all signers no longer connected
+      Object.keys(signers).forEach(id => {
+        if (signers.type === 'LedgerBLE' && !current[id]) {
+          log.info('Removing BLE Ledger: ', id)
+          signers[id].close()
+          delete signers[id]
+        }
+      })
+      // Add all newly added signers
+      Object.keys(current).forEach(id => {
+        if (signers[id]) {
+          signers[id].deviceStatus()
+          return log.info('Updating Ledger: ', id)
+        }
+        let ledger
+        log.info('Adding New Ledger: ', id)
+        try {
+          ledger = new Ledger(current[id], api)
+        } catch (e) {
+          return log.error(e)
+        }
+        log.info('  > Ledger Created: ', id)
+        signers[id] = ledger
+      })
+      log.info(' ')
     })
-    current.forEach(device => {
-      let id = uuid('Ledger' + device.path, ns)
-      if (signers[id]) {
-        signers[id].deviceStatus()
-        return log.info('Updating Ledger: ', id)
-      }
-      let ledger
-      log.info('Adding New Ledger: ', id)
-      try {
-        ledger = new Ledger(id, device.path, api)
-      } catch (e) {
-        return log.error(e)
-      }
-      log.info('  > Ledger Created: ', id)
-      signers[id] = ledger
-    })
-    log.info(' ')
   }
 
-  const listenScan = () => {
+  // Do initial pair in chome and then use noble?
+
+  flex.on('ready', () => {
+    flex.synthetic('ledger.scan', (err, res) => console.log(err, res))
+    flex.on('ledger:device:added', scan)
+    flex.on('ledger:device:removed', scan)
     scan()
-    setTimeout(scan, 200)
-  }
-  usb.on('attach', listenScan)
-  usb.on('detach', listenScan)
-  scan()
+  })
 }
