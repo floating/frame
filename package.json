@@ -83,7 +83,7 @@
     "react-restore": "0.3.0",
     "react-transition-group": "4.0.1",
     "semver": "6.1.1",
-    "trezor-connect": "7.0.2-electron.2",
+    "trezor-connect": "7.0.2-electron.4",
     "trezor-link": "1.6.1",
     "trezor.js": "8.1.0",
     "usb": "1.6.0",

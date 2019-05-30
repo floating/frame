@@ -44,17 +44,22 @@ class Trezor extends Signer {
       cb(null, '0x' + result.message.address)
     })
   }
-  verifyAddress (display = false) {
-    log.info('Verify Address')
+  verifyAddress (display = false, attempt = 0) {
+    log.info('Verify Address, attempt: ' + attempt)
     flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(), display, (err, result) => {
       if (err) {
-        log.info('Verify Address Error: ')
-        // TODO: Error Notification
-        log.error(err)
-        this.api.unsetSigner()
+        if (err === 'Device call in progress' && attempt < 5) {
+          setTimeout(() => {
+            this.verifyAddress(display, ++attempt)
+          }, 500)
+        } else {
+          log.info('Verify Address Error: ')
+          // TODO: Error Notification
+          log.error(err)
+          this.api.unsetSigner()
+        }
       } else {
-        console.log(result)
-        let address = result.address.toLowerCase()
+        let address = result.address ? result.address.toLowerCase() : ''
         let current = this.accounts[this.index].toLowerCase()
         log.info('Frame has the current address as: ' + current)
         log.info('Trezor is reporting: ' + address)
