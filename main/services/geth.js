@@ -59,9 +59,9 @@ class Geth extends Service {
     // Check using JSON RPC method 'eth_syncing'
     else state = await this._isSyncing() ? 'syncing' : 'ready'
 
-    // If state has changed -> update client state
+    // If state has changed -> emit state change
     if (state !== store('main.clients.geth.state')) {
-      store.setClientState('geth', state)
+      this.emit('state', state)
       log.info('geth:', state)
     }
   }

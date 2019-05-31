@@ -30,12 +30,15 @@ class Service extends EventEmitter {
     // Update store
     this._updateStore()
 
+    this.on('state', state => store.setClientState(this.name, state))
+
     // Log (if log flag set)
     if (options.log) {
       this.on('stdout', console.log)
       this.on('stderr', console.error)
       this.on('error', console.error)
     }
+
   }
 
   get version () { return fs.existsSync(this.versionFile) ? fs.readFileSync(this.versionFile, 'utf8') : null }
@@ -47,7 +50,7 @@ class Service extends EventEmitter {
     log.info(`${this.name}: installing`)
 
     // Set state to 'installing'
-    store.setClientState(this.name, 'installing')
+    this.emit('state', 'installing')
 
     // Get release metadata by device platform and architecture
     if (!this.release) throw Error('Could not find release matching platform and architecture')
@@ -73,8 +76,8 @@ class Service extends EventEmitter {
         // Update version file
         fs.writeFileSync(this.versionFile, this.latest.version)
 
-        // Update store
-        store.setClientState(this.name, 'off')
+        // Emit state and update store
+        this.emit('state', 'off')
         this._updateStore()
 
         // Emit event
@@ -91,7 +94,8 @@ class Service extends EventEmitter {
     await remove(this.workdir)
     // Update store
     this._updateStore()
-    store.setClientState(this.name, 'off')
+    // Emit state
+    this.emit('state', 'off')
     // Log
     log.info(`${this.name}: uninstalled`)
   }
@@ -99,7 +103,8 @@ class Service extends EventEmitter {
   _start () {
     // Log
     log.info(`${this.name}: starting`)
-    store.setClientState(this.name, 'starting')
+    // Emit state
+    this.emit('state', 'starting')
 
     // If client isn't installed or version out of date -> update
     if (!this.isInstalled || !this.isLatest) {
@@ -125,12 +130,11 @@ class Service extends EventEmitter {
     this.process.kill()
 
     // Set state to 'terminating'
-    store.setClientState(this.name, 'terminating')
+    this.emit('state', 'terminating')
 
     // Log
     log.info(`${this.name}: terminating`)
   }
-
 
   async _extract (fileName, typ) {
     // Handle tar

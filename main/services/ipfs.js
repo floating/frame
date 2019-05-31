@@ -18,7 +18,7 @@ class IPFS extends Service {
     this.on('stdout', (stdout) => {
       if (stdout.match(/Daemon is ready\n$/i)) {
         log.info('ipfs: ready')
-        store.setClientState('ipfs', 'ready')
+        this.emit('state', 'ready')
       }
     })
 
