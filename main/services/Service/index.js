@@ -7,7 +7,7 @@ const log = require('electron-log')
 const semver = require('semver')
 const { execFile } = require('child_process')
 const tar = require('tar')
-// const unzip = require('extract-zip')
+const extractZip = require('extract-zip')
 const latest = require('../latest.json')
 const store = require('../../store')
 const { mkdirp, remove } = require('fs-extra')
@@ -148,7 +148,16 @@ class Service extends EventEmitter {
 
     // Handle zip
     if (fileName.includes('.zip')) {
-      // TODO: Implement unzip
+      // Unzip downloaded zip 
+      await this._unzip(fileName, this.workdir)          
+      // Get paths of extracted directory and binary
+      const extractedDir = path.resolve(this.workdir, fs.readdirSync(this.workdir)[0])
+      const extractedBin = path.resolve(extractedDir, 'geth.exe')
+      // Move geth binary from extracted directory to client's root working directory
+      const movedBin = path.resolve(this.workdir, 'geth.exe')
+      fs.renameSync(extractedBin, movedBin)
+      // Remove extracted directory
+      return remove(extractedDir)
     }
   }
 
@@ -179,6 +188,15 @@ class Service extends EventEmitter {
     store.updateClient(this.name, 'installed', this.isInstalled)
     store.updateClient(this.name, 'latest', this.isLatest)
     store.updateClient(this.name, 'version', this.version)
+  }
+
+  _unzip (source, target) {
+    return new Promise((resolve, reject) => {
+      extractZip(source, { dir: target }, async (err) => {
+        if (!err) resolve()
+        else throw err
+      })
+    })
   }
 
 }
