@@ -6,20 +6,24 @@ const Signer = require('../../Signer')
 const windows = require('../../../windows')
 const flex = require('../../../flex')
 
-class Trezor extends Signer {
+class LedgerBLE extends Signer {
   constructor (device, api) {
     super()
+    console.log('setting up LedgerBLE device')
     this.api = api
     this.device = device
-    this.id = device.path
-    this.type = 'Trezor'
+    this.id = device.id
+    this.type = 'LedgerBLE'
     this.status = 'loading'
     this.accounts = []
     this.index = 0
-    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
-    this.getPath = (i = this.index) => this.basePath() + '/' + i
+    this.basePath = () => this.network === '1' ? `44'/60'/0'/` : `44'/1'/0'/`
+    this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.open()
+    this.interval = setInterval(() => {
+      this.deviceStatus()
+    }, 4000)
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.network = store('main.connection.network')
@@ -31,25 +35,23 @@ class Trezor extends Signer {
     })
   }
   close () {
+    clearTimeout(this.interval)
     this.networkObserver.remove()
     this.closed = true
     super.close()
   }
-  button (label) {
-    log.info(`Trezor button "${label}" was pressed`)
-  }
   getDeviceAddress (i, cb) {
-    flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(i), true, (err, result) => {
+    flex.rpc('ledger.ethereumGetAddress', this.id, this.getPath(i), true, (err, result) => {
       if (err) return cb(err)
       cb(null, '0x' + result.message.address)
     })
   }
   verifyAddress (display = false, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
-    flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(), display, (err, result) => {
+    flex.rpc('ledger.ethereumGetAddress', this.id, this.getPath(), display, (err, result) => {
       if (err) {
-        if (err === 'Device call in progress' && attempt < 5) {
-          setTimeout(() => this.verifyAddress(display, ++attempt), 500)
+        if (err === 'Ledger Device is busy (lock getAddress)' && attempt < 15) {
+          setTimeout(() => this.verifyAddress(display, ++attempt), 1000)
         } else {
           log.info('Verify Address Error: ')
           // TODO: Error Notification
@@ -79,7 +81,9 @@ class Trezor extends Signer {
     this.verifyAddress()
   }
   lookupAccounts (cb) {
-    flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), (err, result) => {
+    flex.rpc('ledger.ethereumGetAddress', this.id, this.basePath(), false, (err, result) => {
+      console.log('got result for lookupAccounts')
+      console.log(err, result)
       if (err) return cb(err)
       cb(null, this.deriveHDAccounts(result.publicKey, result.chainCode))
     })
@@ -90,12 +94,14 @@ class Trezor extends Signer {
   deviceStatus () {
     this.lookupAccounts((err, accounts) => {
       if (err) {
-        this.status = 'loading'
-        if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.version.join('.')})`
-        if (err === 'ui-device_bootloader_mode') this.status = `Device in Bootloader Mode`
-        this.accounts = []
-        this.index = 0
-        this.update()
+        if (err === 'Ledger Device is busy (lock getAddress)') {
+          this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
+        } else {
+          this.status = 'loading'
+          this.accounts = []
+          this.index = 0
+          this.update()
+        }
       } else if (accounts && accounts.length) {
         if (accounts[0] !== this.coinbase || this.status !== 'ok') {
           this.coinbase = accounts[0]
@@ -114,23 +120,65 @@ class Trezor extends Signer {
       }
     })
   }
-  needPassphras (cb) {
-    this.status = 'Need Passphrase'
-    this.update()
-    this.setPin = cb
-  }
-  needPin () {
-    this.status = 'Need Pin'
-    this.update()
-    this.setPin = (pin) => {
-      this.status = 'loading'
-      this.update()
-      flex.rpc('trezor.inputPin', this.device.path, pin, err => {
-        if (err) log.error(err)
-        setTimeout(() => this.deviceStatus(), 250)
-      })
-    }
-  }
+  // deviceStatus (deep, limit = 15) {
+  //   if (this.status === 'Invalid sequence') return
+  //   this.pollStatus()
+  //   if (this.pause) return
+  //   this.lookupAccounts((err, accounts) => {
+  //     let last = this.status
+  //     if (err) {
+  //       if (err.message.startsWith('cannot open device with path')) { // Device is busy, try again
+  //         clearTimeout(this._deviceStatus)
+  //         if (++this.busyCount > 10) {
+  //           this.busyCount = 0
+  //           return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+  //         } else {
+  //           this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
+  //           log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
+  //         }
+  //       } else {
+  //         this.status = err.message
+  //         if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
+  //         if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
+  //         if (err.statusCode === 26625 || err.statusCode === 26628) {
+  //           this.pollStatus(3000)
+  //           this.status = 'Confirm your Ledger is not asleep and is running firmware v1.4.0+'
+  //         }
+  //         if (err.message === 'Cannot write to HID device') {
+  //           this.status = 'loading'
+  //           log.error('Device Status: Cannot write to HID device')
+  //         }
+  //         if (err.message === 'Invalid channel') {
+  //           this.status = 'Set browser support to "NO"'
+  //           log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
+  //         }
+  //         if (err.message === 'Invalid sequence') this.invalid = true
+  //         this.accounts = []
+  //         this.index = 0
+  //         if (this.status !== last) {
+  //           this.update()
+  //         }
+  //       }
+  //     } else if (accounts && accounts.length) {
+  //       this.busyCount = 0
+  //       if (accounts[0] !== this.coinbase || this.status !== 'ok') {
+  //         this.coinbase = accounts[0]
+  //         this.accounts = accounts
+  //         if (this.index > accounts.length - 1) this.index = 0
+  //         this.deviceStatus(true)
+  //       }
+  //       if (accounts.length > this.accounts.length) this.accounts = accounts
+  //       this.status = 'ok'
+  //       this.update()
+  //     } else {
+  //       this.busyCount = 0
+  //       this.status = 'Unable to find accounts'
+  //       this.accounts = []
+  //       this.index = 0
+  //       this.update()
+  //     }
+  //   })
+  // }
   normalize (hex) {
     if (hex == null) return ''
     if (hex.startsWith('0x')) hex = hex.substring(2)
@@ -142,7 +190,7 @@ class Trezor extends Signer {
   }
   // Standard Methods
   signMessage (message, cb) {
-    flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(), this.normalize(message), (err, result) => {
+    flex.rpc('ledger.ethereumSignMessage', this.id, this.getPath(), this.normalize(message), (err, result) => {
       if (err) {
         log.error('signMessage Error')
         log.error(err)
@@ -164,7 +212,7 @@ class Trezor extends Signer {
       data: this.normalize(rawTx.data),
       chainId: utils.hexToNumber(rawTx.chainId)
     }
-    flex.rpc('trezor.ethereumSignTransaction', this.device.path, this.getPath(), trezorTx, (err, result) => {
+    flex.rpc('ledger.ethereumSignTransaction', this.id, this.getPath(), trezorTx, (err, result) => {
       if (err) return cb(err.message)
       const tx = new EthereumTx({
         nonce: this.hexToBuffer(rawTx.nonce),
@@ -182,4 +230,4 @@ class Trezor extends Signer {
   }
 }
 
-module.exports = Trezor
+module.exports = LedgerBLE

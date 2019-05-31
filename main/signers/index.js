@@ -8,7 +8,7 @@ const windows = require('../windows')
 const proxyProvider = require('../provider/proxy')
 
 // Signer Modules
-//  const trezor = require('./trezor')
+// const trezor = require('./trezor')
 const ledger = require('./ledger')
 const trezorConnect = require('./trezor-connect')
 // const ledgerBLE = require('./ledger-ble')
@@ -262,8 +262,8 @@ const api = {
 // trezor(signers, api)
 ledger(signers, api)
 trezorConnect(signers, api)
-
 // ledgerBLE(signers, api)
+
 if (dev || process.env.WITH_HOT === 'true') hot(signers, api)
 
 module.exports = api

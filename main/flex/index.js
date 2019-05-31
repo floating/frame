@@ -21,14 +21,6 @@ class Flex extends EventEmitter {
     args = args.map(arg => defined(arg) ? JSON.stringify(arg) : arg)
     windows.send('tray', 'main:flex', JSON.stringify(id), ...args)
   }
-  synthetic (...args) {
-    let cb = args.pop()
-    if (typeof cb !== 'function') throw new Error('Flex methods require a callback')
-    let id = uuid()
-    handlers[id] = cb
-    args = args.map(arg => defined(arg) ? JSON.stringify(arg) : arg)
-    windows.send('tray', 'main:flex', JSON.stringify(id), JSON.stringify('synthetic'), ...args)
-  }
 }
 
 const flex = new Flex()
@@ -45,14 +37,6 @@ ipcMain.on('tray:flex:res', (sender, id, ...args) => {
 ipcMain.on('tray:flex:event', (sender, eventName, ...args) => {
   args = args.map(arg => defined(arg) ? JSON.parse(arg) : arg)
   flex.emit(eventName, ...args)
-})
-
-ipcMain.on('tray:flex:needSynthetic', (sender, eventName, ...args) => {
-  console.log('needSynthetic')
-  // windows.getTray().webContents.sendInputEvent({ type: 'mouseDown', x: -124816, y: -124816 })
-  // console.log(eventName, ...args)
-  // args = args.map(arg => defined(arg) ? JSON.parse(arg) : arg)
-  // flex.emit(eventName, ...args)
 })
 
 ipcMain.on('tray:ready', () => flex.setReady())

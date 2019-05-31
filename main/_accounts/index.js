@@ -20,22 +20,17 @@ class Account {
     this.forwarder = { id: '', address: '', status: 'none' } // For smart accounts
     _signers.on('update', signer => {
       if (signer.id === this.id) {
-        this.signer = _signers[this.id].summary()
+        this.signer = signer // _signers[this.id].summary()
         this.update()
       }
     })
     accounts.on('update', account => {
       if (account.id === this.forwarder.id) {
         // this account is a forwarder, for this account
+        this.forwarder = account
         this.update()
       }
     })
-  }
-  signerUpdate () {
-
-  }
-  forwaderUpdate () {
-
   }
   summary () {
     return {
@@ -45,11 +40,9 @@ class Account {
       status: this.status,
       network: this.network,
       requests: this.requests,
-      signer: this.signer
+      signer: this.signer,
+      forwarder: this.forwarder
     }
-  }
-  id () {
-    return this.id
   }
   delete () {
     // let id = this.id()
