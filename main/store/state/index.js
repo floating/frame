@@ -83,7 +83,6 @@ let initial = {
       geth: {
         on: main('clients.geth.on', false),
         mode: main('clients.geth.mode', 'light'),
-        networkId: main('clients.geth.networkId', '4'),
         installed: false,
         latest: false,
         version: null,

@@ -14,18 +14,17 @@ class Geth extends Service {
     // On ready -> start client
     this.on('ready', () => {
       // Get config values
-      const { mode, networkId } = store('main.clients.geth')
+      const mode = store('main.clients.geth.mode')
+      const networkId = store('main.connection.network')
       const networkFlag = this._getNetworkFlag(networkId)
 
       // Prepare client arguments
       let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc']
       if (networkFlag) args.push(networkFlag)
-
       // Start client
       this._run(args)
 
       // Check if syncing every <INTERVAL>
-      setTimeout(() => this._syncCheck(), 500)
       this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL)
     })
 
@@ -89,10 +88,11 @@ class Geth extends Service {
   }
 
   _getNetworkFlag (id) {
-    if (id === '1') return null
     if (id === '3') return '--testnet'
     if (id === '4') return '--rinkeby'
+    else return null
   }
 }
 
+//module.exports = new Geth({ log: true })
 module.exports = new Geth()
