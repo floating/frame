@@ -59,6 +59,11 @@ const api = {
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
     windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
     windows.tray.webContents.on('new-window', e => e.preventDefault()) // Prevent new windows
+    windows.tray.webContents.session.webRequest.onHeadersReceived({}, (details, res) => {
+      const trezor = details.url.startsWith('https://connect.trezor.io')
+      if (trezor && details.responseHeaders['x-frame-options']) delete details.responseHeaders['x-frame-options'] // remove 'x-frame-options' header to allow embedding https://connect.trezor.io into an 'iframe' for Tezor flex work around
+      res({ cancel: false, responseHeaders: details.responseHeaders })
+    })
     windows.tray.positioner = new Positioner(windows.tray)
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
@@ -183,7 +188,11 @@ const api = {
     if (windows[id]) windows[id].close()
     delete windows[id]
   },
+  getTray: () => {
+    return windows.tray
+  },
   send: (id, channel, ...args) => {
+    if (!windows[id]) return log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
     windows[id].send(channel, ...args)
   },
   broadcast: (channel, ...args) => {
