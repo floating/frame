@@ -1,19 +1,19 @@
-const Service = require('./Service/index')
+const Client = require('../Client')
 const axios = require('axios')
 const log = require('electron-log')
-const store = require('../store')
+const store = require('../../store')
 const { hexToNumber } = require('web3-utils')
 
 const SYNC_CHECK_INTERVAL = 3000
 
-class Geth extends Service {
+class Geth extends Client {
   constructor (options) {
     super('geth', options)
     this.syncCheckInterval = null
 
     // On ready -> start client
     this.on('ready', () => {
-      // Get config values
+      // Get client mode and current network id
       const mode = store('main.clients.geth.mode')
       const networkId = store('main.connection.network')
       const networkFlag = this._getNetworkFlag(networkId)
@@ -21,18 +21,19 @@ class Geth extends Service {
       // Prepare client arguments
       let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc']
       if (networkFlag) args.push(networkFlag)
+
       // Start client
       this._run(args)
 
       // Check if syncing every <INTERVAL>
       this.syncCheckInterval = setInterval(() => this._syncCheck(), SYNC_CHECK_INTERVAL)
     })
-
   }
 
   start () {
     // Ensure client isn't already running
-    if (store('main.clients.geth.state') != 'off') return
+    if (store('main.clients.geth.state') !== 'off') return
+
     // Start client
     this._start()
   }
@@ -58,10 +59,10 @@ class Geth extends Service {
     // Check using JSON RPC method 'eth_syncing'
     else state = await this._isSyncing() ? 'syncing' : 'ready'
 
-    // If state has changed -> emit state change
+    // If state has changed -> log and emit new state
     if (state !== store('main.clients.geth.state')) {
-      this.emit('state', state)
       log.info('geth:', state)
+      this.emit('state', state)
     }
   }
 
@@ -94,5 +95,4 @@ class Geth extends Service {
   }
 }
 
-//module.exports = new Geth({ log: true })
 module.exports = new Geth()

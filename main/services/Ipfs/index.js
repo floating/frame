@@ -1,8 +1,8 @@
-const Service = require('./Service/index')
-const store = require('../store')
+const Client = require('../Client')
+const store = require('../../store')
 const log = require('electron-log')
 
-class IPFS extends Service {
+class IPFS extends Client {
   constructor (options) {
     super('ipfs', options)
 
@@ -10,6 +10,7 @@ class IPFS extends Service {
     this.on('ready', async () => {
       // Run 'ipfs init'
       this.init()
+
       // Run 'ipfs daemon'
       this._run(['daemon'])
     })
@@ -21,12 +22,11 @@ class IPFS extends Service {
         this.emit('state', 'ready')
       }
     })
-
   }
 
   start () {
     // Ensure client isn't already running
-    if (store('main.clients.ipfs.state') != 'off') return
+    if (store('main.clients.ipfs.state') !== 'off') return
 
     // Run start sequence
     this._start()
@@ -44,12 +44,10 @@ class IPFS extends Service {
     try {
       await this._runOnce(['init'])
       log.info('ipfs: repo initiated')
-    }
-    catch (err) {
+    } catch (err) {
       log.info('ipfs: repo already initiated')
     }
   }
 }
 
-const ipfs = new IPFS()
-module.exports = ipfs
+module.exports = new IPFS()

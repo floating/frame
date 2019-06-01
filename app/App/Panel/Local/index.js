@@ -107,7 +107,7 @@ class Settings extends React.Component {
   indicatorClient (state) {
     if (state === 'ready') {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-    } else if (state == 'off') {
+    } else if (state === 'off') {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
     } else {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
@@ -198,8 +198,6 @@ class Settings extends React.Component {
             </div>
           </div>
         </div>
-
-
         {/* Local clients */}
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Local Clients'}</div>

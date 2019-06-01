@@ -1,35 +1,48 @@
-const geth = require('./geth')
-const ipfs = require('./ipfs')
+const geth = require('./Geth')
+const ipfs = require('./Ipfs')
 const store = require('../store')
 const { app } = require('electron')
 
+const TOGGLE_TIMEOUT = 1000
+
 // Ethereum
 app.on('ready', () => {
+  // Init
   let on = null
   let network = store('main.connection.network')
-  store.observer(_ => {
 
+  // Observe changes to geth client
+  store.observer(_ => {
     // If client toggled ->
     if (on !== store('main.clients.geth.on')) {
       // Update holder variable
       on = store('main.clients.geth.on')
-      // If toggled on -> start geth and toggle on local connection
+
+      // If toggled on ->
       if (on) {
+        // Start geth client
         geth.start()
-        if (!store('main.connection.local.on')) setTimeout(() => store.toggleConnection('local'), 1000)
-      // Else -> stop geth and toggle off local connection
+
+        // Toggle on local connection after <TOGGLE_TIMEOUT> milliseconds
+        if (!store('main.connection.local.on')) setTimeout(() => store.toggleConnection('local'), TOGGLE_TIMEOUT)
+
+      // Else ->
       } else {
+        // Toggle off local connection
         if (store('main.connection.local.on')) store.toggleConnection('local')
-        setTimeout(() => geth.stop(), 1000)
+
+        // Stop geth after <TOGGLE_TIMEOUT> milliseconds
+        setTimeout(() => geth.stop(), TOGGLE_TIMEOUT)
       }
     }
 
+    // If network changed and geth client is running ->
     if (network !== store('main.connection.network') && store('main.clients.geth.on')) {
       network = store('main.connection.network')
+      // Restart client (with updated network args)
       store.toggleClient('geth')
       geth.once('exit', () => store.toggleClient('geth'))
     }
-
   })
 })
 

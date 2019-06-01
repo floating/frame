@@ -14,7 +14,7 @@ const { mkdirp, remove } = require('fs-extra')
 
 const userData = app ? app.getPath('userData') : './test/.userData'
 
-class Service extends EventEmitter {
+class Client extends EventEmitter {
   constructor (name, options = { log: false }) {
     super()
 
@@ -30,6 +30,7 @@ class Service extends EventEmitter {
     // Update store
     this._updateStore()
 
+    // On new state -> update store
     this.on('state', state => store.setClientState(this.name, state))
 
     // Log (if log flag set)
@@ -38,7 +39,6 @@ class Service extends EventEmitter {
       this.on('stderr', console.error)
       this.on('error', console.error)
     }
-
   }
 
   get version () { return fs.existsSync(this.versionFile) ? fs.readFileSync(this.versionFile, 'utf8') : null }
@@ -46,10 +46,8 @@ class Service extends EventEmitter {
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
   async install () {
-    // Log
+    // Log and emit state
     log.info(`${this.name}: installing`)
-
-    // Set state to 'installing'
     this.emit('state', 'installing')
 
     // Get release metadata by device platform and architecture
@@ -76,15 +74,13 @@ class Service extends EventEmitter {
         // Update version file
         fs.writeFileSync(this.versionFile, this.latest.version)
 
-        // Emit state and update store
+        // Log and emit state
+        log.info(`${this.name}: installed`)
         this.emit('state', 'off')
-        this._updateStore()
-
-        // Emit event
         this.emit('installed')
 
-        // Log
-        log.info(`${this.name}: installed`)
+        // Update store
+        this._updateStore()
       })
     })
   }
@@ -92,18 +88,18 @@ class Service extends EventEmitter {
   async uninstall () {
     // Remove client dir and files wihtin
     await remove(this.workdir)
+
     // Update store
     this._updateStore()
-    // Emit state
-    this.emit('state', 'off')
-    // Log
+
+    // Log and emit state
     log.info(`${this.name}: uninstalled`)
+    this.emit('state', 'off')
   }
 
   _start () {
-    // Log
+    // Log and emit state
     log.info(`${this.name}: starting`)
-    // Emit state
     this.emit('state', 'starting')
 
     // If client isn't installed or version out of date -> update
@@ -123,16 +119,14 @@ class Service extends EventEmitter {
     this.once('exit', (code) => {
       log.info(`${this.name}: off`)
       log.info(`${this.name}: exit code ${code}`)
-      store.setClientState(this.name, 'off')
+      this.emit('state', 'off')
     })
 
     // Send 'SIGTERM' to client process
     this.process.kill()
 
-    // Set state to 'terminating'
+    // Log and emit state
     this.emit('state', 'terminating')
-
-    // Log
     log.info(`${this.name}: terminating`)
   }
 
@@ -148,27 +142,37 @@ class Service extends EventEmitter {
 
     // Handle zip
     if (fileName.includes('.zip')) {
-      // Unzip downloaded zip 
-      await this._unzip(fileName, this.workdir)          
+      // Unzip downloaded archive
+      await this._unzip(fileName, this.workdir)
+
       // Get paths of extracted directory and binary
       const extractedDir = path.resolve(this.workdir, fs.readdirSync(this.workdir)[0])
-      const extractedBin = path.resolve(extractedDir, 'geth.exe')
+      const extractedBin = path.resolve(extractedDir, this.bin)
+
       // Move geth binary from extracted directory to client's root working directory
-      const movedBin = path.resolve(this.workdir, 'geth.exe')
+      const movedBin = path.resolve(this.workdir, this.bin)
       fs.renameSync(extractedBin, movedBin)
+
       // Remove extracted directory
       return remove(extractedDir)
     }
   }
 
   _run (args) {
+    // Spawn child process
     this.process = execFile(this.bin, args, (err, stdout, stderr) => {
+      // Handle stdout/stderr on launch of application
+      // TODO: Find better way of dealing with this, especially errors
       if (err) this.emit('error', err)
       if (stdout) this.emit('stdout', stdout)
       if (stderr) this.emit('stderr', stderr)
     })
+
+    // Handle stdout/stderr
     this.process.stdout.on('data', (data) => this.emit('stdout', data))
     this.process.stderr.on('data', (data) => this.emit('stderr', data))
+
+    // Handle process termination
     this.process.on('exit', (code) => {
       this.emit('exit', code)
       this.process = null
@@ -198,9 +202,9 @@ class Service extends EventEmitter {
       })
     })
   }
-
 }
-module.exports = Service
+
+module.exports = Client
 
 // DEBUG
 // const s = new Service('ipfs')
