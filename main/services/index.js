@@ -3,45 +3,46 @@ const ipfs = require('./Ipfs')
 const store = require('../store')
 const { app } = require('electron')
 
-const TOGGLE_TIMEOUT = 1000
-
 // Ethereum
 app.on('ready', () => {
-  // Init
+  // On geth toggle
   let on = null
-  let network = store('main.connection.network')
-
-  // Observe changes to geth client
   store.observer(_ => {
     // If client toggled ->
     if (on !== store('main.clients.geth.on')) {
-      // Update holder variable
       on = store('main.clients.geth.on')
-
-      // If toggled on ->
-      if (on) {
-        // Start geth client
-        geth.start()
-
-        // Toggle on local connection after <TOGGLE_TIMEOUT> milliseconds
-        if (!store('main.connection.local.on')) setTimeout(() => store.toggleConnection('local'), TOGGLE_TIMEOUT)
-
-      // Else ->
-      } else {
-        // Toggle off local connection
-        if (store('main.connection.local.on')) store.toggleConnection('local')
-
-        // Stop geth after <TOGGLE_TIMEOUT> milliseconds
-        setTimeout(() => geth.stop(), TOGGLE_TIMEOUT)
-      }
+      on ? geth.start() : geth.stop()
     }
+  })
 
-    // If network changed and geth client is running ->
+  // On switched network
+  let network = store('main.connection.network')
+  store.observer(_ => {
+    // If new network and client is running ->
     if (network !== store('main.connection.network') && store('main.clients.geth.on')) {
-      network = store('main.connection.network')
+      // If local connection on -> toggle it off
+      if (store('main.connection.local.on')) store.toggleConnection('local')
+
       // Restart client (with updated network args)
-      store.toggleClient('geth')
-      geth.once('exit', () => store.toggleClient('geth'))
+      setTimeout(() => {
+        store.toggleClient('geth')
+        geth.once('exit', () => store.toggleClient('geth'))
+      }, 500)
+
+      // Update holder variable
+      network = store('main.connection.network')
+    }
+  })
+
+  // Link geth state with local connection
+  let state = store('main.clients.geth.state')
+  store.observer(_ => {
+    let newState = store('main.clients.geth.state')
+    let localOn = store('main.connection.local.on')
+    if (state !== newState) {
+      if (newState === 'ready' && !localOn) store.toggleConnection('local')
+      if (newState === 'off' && localOn) setTimeout(() => store.toggleConnection('local'), 500)
+      state = newState
     }
   })
 })
