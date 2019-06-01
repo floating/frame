@@ -10,6 +10,7 @@ class Geth extends Client {
   constructor (options) {
     super('geth', options)
     this.syncCheckInterval = null
+    this.initialBlockNumber = store('main.clients.geth.blockNumber')
 
     // On ready -> start client
     this.on('ready', () => {
@@ -19,7 +20,7 @@ class Geth extends Client {
       const networkFlag = this._getNetworkFlag(networkId)
 
       // Prepare client arguments
-      let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc']
+      let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc', '--rpcapi', 'admin,eth,net']
       if (networkFlag) args.push(networkFlag)
 
       // Start client
@@ -53,8 +54,18 @@ class Geth extends Client {
   async _syncCheck () {
     let state
 
+    // Get blocknumber and update store
+    let blockNumber = await this._getBlockNumber()
+    store.updateClient('geth', 'blockNumber', blockNumber)
+
     // Check using JSON RPC method 'eth_blockNumber'
-    if (await this._getBlockNumber() === 0) state = 'syncing'
+    if (blockNumber === 0) state = 'syncing'
+
+    // Check if block number has changed since last time Frame was running
+    else if (blockNumber === this.initialBlockNumber) state = 'syncing'
+
+    // Check using JSON RPC method 'net_peerCount'
+    else if (await this._getPeerCount() === 0) state = 'syncing'
 
     // Check using JSON RPC method 'eth_syncing'
     else state = await this._isSyncing() ? 'syncing' : 'ready'
@@ -88,9 +99,20 @@ class Geth extends Client {
     return hexToNumber(res.data.result)
   }
 
-  _getNetworkFlag (id) {
-    if (id === '3') return '--testnet'
-    if (id === '4') return '--rinkeby'
+  async _getPeerCount () {
+    // RPC message
+    const message = { jsonrpc: '2.0', id: 1, method: 'net_peerCount', params: [] }
+
+    // Make HTTP request
+    const res = await axios.post('http://127.0.0.1:8545', message)
+
+    // Return block number as integer
+    return hexToNumber(res.data.result)
+  }
+
+  _getNetworkFlag (networkId) {
+    if (networkId === '3') return '--testnet'
+    if (networkId === '4') return '--rinkeby'
     else return null
   }
 }
