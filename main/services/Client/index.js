@@ -14,6 +14,8 @@ const { mkdirp, remove } = require('fs-extra')
 
 const userData = app ? app.getPath('userData') : './test/.userData'
 
+const SIGTERM_TIMEOUT = 3000
+
 class Client extends EventEmitter {
   constructor (name, options = { log: false }) {
     super()
@@ -109,22 +111,30 @@ class Client extends EventEmitter {
   }
 
   _stop () {
-    // Make sure client is running
-    if (!this.process) return
+    return new Promise((resolve, reject) => {
+      // Make sure client is running
+      if (!this.process) resolve()
 
-    // On exit -> set state to 'off'
-    this.once('exit', (code) => {
-      log.info(`${this.name}: off`)
-      log.info(`${this.name}: exit code ${code}`)
-      this.emit('state', 'off')
+      // On exit -> set state to 'off'
+      this.once('exit', (code) => {
+        log.info(`${this.name}: off`)
+        log.info(`${this.name}: exit code ${code}`)
+        this.emit('state', 'off')
+        resolve()
+      })
+
+      // Send 'SIGTERM' to client process
+      this.process.kill('SIGTERM')
+
+      // If alive after <INTERVAL> ms, send 'SIGKILL'
+      setTimeout(() => {
+        if (this.process) this.process.kill('SIGKILL')
+      }, SIGTERM_TIMEOUT)
+
+      // Log and emit state
+      this.emit('state', 'terminating')
+      log.info(`${this.name}: terminating`)
     })
-
-    // Send 'SIGTERM' to client process
-    this.process.kill()
-
-    // Log and emit state
-    this.emit('state', 'terminating')
-    log.info(`${this.name}: terminating`)
   }
 
   async _extract (fileName) {
@@ -162,11 +172,11 @@ class Client extends EventEmitter {
   _run (args) {
     // Spawn child process
     this.process = execFile(this.bin, args, (err, stdout, stderr) => {
-      // Handle stdout/stderr on launch of application
-      // TODO: Find better way of dealing with this, especially errors
-      if (err) this.emit('error', err)
-      if (stdout) this.emit('stdout', stdout)
-      if (stderr) this.emit('stderr', stderr)
+      // No errors
+      if (!err) return
+
+      // Handle 'SIGKILL'
+      if (err.signal === 'SIGKILL') log.info(`${this.name}: killed`)
     })
 
     // Handle stdout/stderr
