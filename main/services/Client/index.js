@@ -65,11 +65,8 @@ class Client extends EventEmitter {
 
       // On download complete ->
       file.on('finish', async () => {
-        // Extract archive
+        // Extract (and delete) archive
         await this._extract(fileName)
-
-        // Delete archive
-        await remove(fileName)
 
         // Update version file
         fs.writeFileSync(this.versionFile, this.latest.version)
@@ -130,14 +127,17 @@ class Client extends EventEmitter {
     log.info(`${this.name}: terminating`)
   }
 
-  async _extract (fileName, typ) {
+  async _extract (fileName) {
     // Handle tar
     if (fileName.includes('.tar')) {
-      return tar.x({
+      // Extract archive
+      await tar.x({
         file: fileName,
         cwd: this.workdir,
         strip: 1
       })
+      // Delete archive
+      return remove(fileName)
     }
 
     // Handle zip
@@ -153,7 +153,8 @@ class Client extends EventEmitter {
       const movedBin = path.resolve(this.workdir, this.bin)
       fs.renameSync(extractedBin, movedBin)
 
-      // Remove extracted directory
+      // Remove archive and extracted directory
+      await remove(fileName)
       return remove(extractedDir)
     }
   }

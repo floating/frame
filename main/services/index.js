@@ -1,9 +1,10 @@
 const geth = require('./Geth')
+const parity = require('./Parity')
 const ipfs = require('./Ipfs')
 const store = require('../store')
 const { app } = require('electron')
 
-// Ethereum
+// Geth
 app.on('ready', () => {
   // On geth toggle
   let on = null
@@ -47,6 +48,30 @@ app.on('ready', () => {
   })
 })
 
+// Parity
+app.on('ready', () => {
+  let on = null
+  store.observer(_ => {
+    // If client toggled ->
+    if (on !== store('main.clients.parity.on')) {
+      on = store('main.clients.parity.on')
+      on ? parity.start() : parity.stop()
+    }
+  })
+
+  // Link parity state with local connection
+  let state = store('main.clients.parity.state')
+  store.observer(_ => {
+    let newState = store('main.clients.parity.state')
+    let localOn = store('main.connection.local.on')
+    if (state !== newState) {
+      if (newState === 'ready' && !localOn) store.toggleConnection('local')
+      if (newState === 'off' && localOn) setTimeout(() => store.toggleConnection('local'), 500)
+      state = newState
+    }
+  })
+})
+
 // IPFS
 app.on('ready', () => {
   let on = null
@@ -62,5 +87,6 @@ module.exports = {
   stop: () => {
     geth.stop()
     ipfs.stop()
+    parity.stop()
   }
 }

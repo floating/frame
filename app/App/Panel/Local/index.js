@@ -202,11 +202,11 @@ class Settings extends React.Component {
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Local Clients'}</div>
         </div>
-        {/* Ethereum */}
+        {/* Ethereum - Geth */}
         <div className='signerPermission'>
           <div className={this.store('main.clients.geth.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>{'Ethereum'}</div>
+              <div className='signerPermissionOrigin'>{'Geth'}</div>
               <div className={this.store('main.clients.geth.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleClient', 'geth')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -218,8 +218,24 @@ class Settings extends React.Component {
             </div>
           </div>
         </div>
-        {/* IPFS */}
+        {/* Ethereum - Parity */}
         <div className='signerPermission'>
+          <div className={this.store('main.clients.parity.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+            <div className='connectionOptionToggle'>
+              <div className='signerPermissionOrigin'>{'Parity'}</div>
+              <div className={this.store('main.clients.parity.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleClient', 'parity')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='connectionOptionDetails'>
+              <div className='connectionOptionDetailsInset'>
+                {this.statusClient(this.store('main.clients.parity.state'))}
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* IPFS */}
+        {/* <div className='signerPermission'>
           <div className={this.store('main.clients.ipfs.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
               <div className='signerPermissionOrigin'>{'IPFS'}</div>
@@ -233,7 +249,7 @@ class Settings extends React.Component {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>

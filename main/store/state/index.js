@@ -88,6 +88,14 @@ let initial = {
         latest: false,
         version: null,
         state: 'off'
+      },
+      parity: {
+        on: main('clients.parity.on', false),
+        blockNumber: 0,
+        installed: false,
+        latest: false,
+        version: null,
+        state: 'off'
       }
     },
     connection: {
