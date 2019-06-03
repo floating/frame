@@ -2,8 +2,8 @@ const EthereumClient = require('../EthereumClient')
 const store = require('../../store')
 
 class Geth extends EthereumClient {
-  constructor (name, options) {
-    super(name, options)
+  constructor (options) {
+    super('geth', options)
 
     // On ready -> start client
     this.on('ready', () => {
