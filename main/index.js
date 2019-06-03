@@ -101,11 +101,11 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
-app.on('quit', () => {
-  signers.close()
-  services.stop()
+app.on('quit', () => signers.close())
+app.on('window-all-closed', async () => {
+  await services.stop()
+  if (process.platform !== 'darwin') app.quit()
 })
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 let launchStatus = store('main.launch')
 store.observer(() => {

@@ -84,9 +84,11 @@ app.on('ready', () => {
 })
 
 module.exports = {
-  stop: () => {
-    geth.stop()
-    ipfs.stop()
-    parity.stop()
+  stop: async () => {
+    return Promise.all([
+      geth.stop(),
+      ipfs.stop(),
+      parity.stop()
+    ])
   }
 }
