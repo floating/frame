@@ -4,15 +4,15 @@ import { URL } from 'url'
 export const syncMain = (u, main) => u('main', _ => main)
 
 export const setSigner = (u, signer) => {
-  u('signer.current', _ => signer.id)
-  u('signer.accounts', _ => signer.accounts)
+  u('selected.current', _ => signer.id)
+  u('selected.accounts', _ => signer.accounts)
   setTimeout(_ => {
-    u('signer.minimized', _ => false)
-    u('signer.open', _ => true)
+    u('selected.minimized', _ => false)
+    u('selected.open', _ => true)
   }, 50)
 }
 
-export const setSettingsView = (u, index) => u('signer.settings.viewIndex', () => index)
+export const setSettingsView = (u, index) => u('selected.settings.viewIndex', () => index)
 
 export const setAddress = (u, address) => u('address', () => address)
 
@@ -46,11 +46,15 @@ export const trayOpen = (u, open) => {
 }
 
 export const setSignerView = (u, view) => {
-  u('signer.showAccounts', _ => false)
-  u('signer.view', _ => view)
+  u('selected.showAccounts', _ => false)
+  u('selected.view', _ => view)
 }
 
-export const toggleShowAccounts = u => u('signer.showAccounts', _ => !_)
+export const accountPage = (u, page) => {
+  u('selected.accountPage', () => page)
+}
+
+export const toggleShowAccounts = u => u('selected.showAccounts', _ => !_)
 
 export const addProviderEvent = (u, payload) => {
   u('provider.events', events => {
@@ -59,32 +63,25 @@ export const addProviderEvent = (u, payload) => {
   })
 }
 
-export const setView = (u, view) => u('signer.view', _ => view)
+export const setView = (u, view) => u('selected.view', _ => view)
 
 export const toggleDataView = (u, id) => {
-  u('signer.requests', id, 'viewData', view => !view)
-}
-
-export const updateSigners = (u, signers) => u('signers', _ => signers)
-
-export const addSigner = (u, signer) => {
-  if (signer.status === 'loading') return
-  u('signers', signer.id, _ => signer)
+  u('selected.requests', id, 'viewData', view => !view)
 }
 
 export const updateExternalRates = (u, rates) => u('external.rates', () => rates)
 
 export const resetSigner = u => {
-  u('signer.view', _ => 'default')
-  u('signer.showAccounts', _ => false)
+  u('selected.view', _ => 'default')
+  u('selected.showAccounts', _ => false)
 }
 
 export const unsetSigner = u => {
-  u('signer.minimized', _ => true)
-  u('signer.open', _ => false)
+  u('selected.minimized', _ => true)
+  u('selected.open', _ => false)
   resetSigner(u)
   setTimeout(_ => {
-    u('signer', signer => {
+    u('selected', signer => {
       signer.last = signer.current
       signer.current = ''
       signer.accounts = []
@@ -99,19 +96,19 @@ export const nodeProvider = (u, connected) => u('node.provider', _ => connected)
 
 export const removeSigner = (u, signer, state) => {
   let status = 'Removing'
-  u('signers', (signers, state) => {
+  u('selecteds', (signers, state) => {
     if (state.signer.current === signer.id) unsetSigner(u)
     if (signers[signer.id]) signers[signer.id].removing = true
     return signers
   })
   setTimeout(_ => {
-    u('signers', signers => {
+    u('selecteds', signers => {
       if (signers[signer.id] && signers[signer.id].removing) signers[signer.id].status = status
       return signers
     })
   }, 1200)
   setTimeout(_ => {
-    u('signers', signers => {
+    u('selecteds', signers => {
       if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
       return signers
     })
@@ -119,8 +116,8 @@ export const removeSigner = (u, signer, state) => {
 }
 
 export const updateSigner = (u, signer) => {
-  u('signers', signer.id, _ => signer)
-  u('signer', s => {
+  u('selecteds', signer.id, _ => signer)
+  u('selected', s => {
     if (s.current === signer.id && (signer.status !== 'ok' || signer.accounts[0] !== s.accounts[0])) {
       s.last = s.current
       s.current = ''
@@ -172,5 +169,5 @@ export const removeView = (u, id, isCurrent) => {
   })
 }
 
-export const initialSignerPos = (u, pos) => u('signer.position.initial', _ => pos)
-export const initialScrollPos = (u, pos) => u('signer.position.scrollTop', _ => pos)
+export const initialSignerPos = (u, pos) => u('selected.position.initial', _ => pos)
+export const initialScrollPos = (u, pos) => u('selected.position.scrollTop', _ => pos)

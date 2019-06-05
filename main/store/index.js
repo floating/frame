@@ -4,6 +4,8 @@ const actions = require('./actions')
 const persist = require('./persist')
 const store = Restore.create(state(), actions)
 
+store.moveOldAccountsToNewAddresses()
+
 store.observer(() => persist.set('main', store('main')))
 
 module.exports = store

@@ -28,7 +28,7 @@ let initial = {
     initial: true
   },
   balances: {},
-  signer: {
+  selected: {
     minimized: true,
     open: false,
     current: '',
@@ -39,6 +39,7 @@ let initial = {
     },
     accounts: [],
     showAccounts: false,
+    accountPage: 0,
     position: {
       scrollTop: 0,
       initial: {
@@ -66,9 +67,9 @@ let initial = {
   main: {
     launch: main('launch', false),
     reveal: main('reveal', false),
-    accounts: main('accounts', {}), // Persisted account settings and permissions
-    _accounts: main('_accounts', {}), // Translate 'accounts' if it exists
-    _signers: {}, // main('_signers', {}),
+    accounts: {}, // main('accounts', {}),
+    addresses: main('addresses', {}), // New persisted address permissions
+    signers: {}, // main('signers', {}),
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },

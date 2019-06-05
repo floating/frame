@@ -22,8 +22,8 @@ class Settings extends React.Component {
   renderPermissions (viewIndex) {
     let i = 0
     let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
-    let index = this.store('signers', this.props.id, 'index')
-    let account = this.store('signers', this.props.id, 'accounts', index)
+    let index = this.store('selecteds', this.props.id, 'index')
+    let account = this.store('selecteds', this.props.id, 'accounts', index)
     let permissions = this.store('main.accounts', account, 'permissions') || {}
     return (
       <div className='signerSlide' style={{ transform }}>
@@ -55,9 +55,9 @@ class Settings extends React.Component {
     )
   }
   render () {
-    let viewIndex = this.store('signer.settings.viewIndex')
+    let viewIndex = this.store('selected.settings.viewIndex')
     return (
-      <div className={this.store('signer.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
+      <div className={this.store('selected.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         {this.renderPermissions(viewIndex)}
         {this.renderVerify(viewIndex)}
       </div>

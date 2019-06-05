@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "An Ethereum Interface",
   "main": "main",
   "build": {
@@ -113,7 +113,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.1",
     "babel-jest": "24.8.0",
-    "electron": "5.0.2",
+    "electron": "4.0.8",
     "electron-builder": "20.41.0",
     "ganache-cli": "6.4.3",
     "jest": "24.8.0",

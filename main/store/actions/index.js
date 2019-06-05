@@ -47,10 +47,10 @@ module.exports = {
     })
   },
   giveAccess: (u, req, access) => {
-    u('main.accounts', req.account, account => {
-      account = account || { permissions: {} }
-      account.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-      return account
+    u('main.addresses', req.address, address => {
+      address = address || { permissions: {} }
+      address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
+      return address
     })
   },
   toggleAccess: (u, account, handlerId) => {
@@ -69,16 +69,31 @@ module.exports = {
       return dontRemind
     })
   },
-  newAccount: (u, account) => {
-    u('main._accounts', accounts => {
-      accounts[account.id] = account
-      return accounts
-    })
+  updateAccount: (u, account) => {
+    u('main.accounts', account.id, () => account)
   },
   newSigner: (u, signer) => {
-    u('main._signers', signers => {
+    u('main.signers', signers => {
       signers[signer.id] = signer
       return signers
+    })
+  },
+  moveOldAccountsToNewAddresses: (u, signer) => {
+    const addressesToMove = {}
+    u('main.accounts', accounts => {
+      Object.keys(accounts).forEach(id => {
+        if (id.startsWith('0x')) {
+          addressesToMove[id] = accounts[id]
+          delete accounts[id]
+        }
+      })
+      return accounts
+    })
+    u('main.addresses', addresses => {
+      Object.keys(addressesToMove).forEach(id => {
+        addresses[id] = addressesToMove[id]
+      })
+      return addresses
     })
   }
 }

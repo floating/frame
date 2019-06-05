@@ -27,7 +27,7 @@ class Requests extends React.Component {
   }
   setSigner () {
     this.setState({ minimized: false })
-    let current = this.store('signer.current') === this.props.id
+    let current = this.store('selected.current') === this.props.id
     if (!current) {
       link.rpc('setSigner', this.props.id, (err, status) => {
         if (err) throw new Error(err)
@@ -35,9 +35,9 @@ class Requests extends React.Component {
     }
   }
   render () {
-    let requests = this.store('signers', this.props.id, 'requests') || {}
+    let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).map(key => requests[key]).filter(req => {
-      if (req.type === 'transaction') return this.props.accounts.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
+      if (req.type === 'transaction') return this.props.addresses.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
       return true
     })
     let normal = requests.filter(req => req.mode === 'normal')
@@ -58,7 +58,7 @@ class Requests extends React.Component {
     let containMonitor = monitor.length * monitorHeight
     let containHeight = containNormal + containMonitor
     return (
-      <div className={this.store('signer.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
+      <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
         <div className='requestTitle'>
           <div>{'Requests'}</div>
           <div className='requestCount'>{normal.length}</div>
