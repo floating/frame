@@ -80,11 +80,17 @@ class Settings extends React.Component {
       </div>
     )
   }
-  statusClient (state) {
+  statusClient (client) {
+    const { state, currentBlock, highestBlock } = client
+    let syncPercentage = Math.round((currentBlock / highestBlock) * 100)
     return (
       <div className='connectionOptionStatus'>
         {this.indicatorClient(state)}
-        <div className='connectionOptionStatusText'>{state}</div>
+        { state === 'syncing' && !isNaN(syncPercentage) ? (
+          <div className='connectionOptionStatusText'>{state} ({syncPercentage} %)</div>
+        ) : (
+          <div className='connectionOptionStatusText'>{state}</div>
+        )}
       </div>
     )
   }
@@ -126,7 +132,7 @@ class Settings extends React.Component {
     e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
-  handleEthereumClientToggle (client) {
+  toggleEthereumClient (client) {
     const networkId = this.store('main.connection.network')
     const { on, state } = this.store(`main.clients.${client}`)
     if (!on && client === 'parity' && networkId === '4') return this.store.notify('rinkeby')
@@ -215,13 +221,13 @@ class Settings extends React.Component {
           <div className={this.store('main.clients.parity.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
               <div className='signerPermissionOrigin'>{'Parity'}</div>
-              <div className={this.store('main.clients.parity.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => this.handleEthereumClientToggle('parity')}>
+              <div className={this.store('main.clients.parity.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => this.toggleEthereumClient('parity')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
             <div className='connectionOptionDetails'>
               <div className='connectionOptionDetailsInset'>
-                {this.statusClient(this.store('main.clients.parity.state'))}
+                {this.statusClient(this.store('main.clients.parity'))}
               </div>
             </div>
           </div>

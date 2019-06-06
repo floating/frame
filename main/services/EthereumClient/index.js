@@ -56,7 +56,16 @@ class EthereumClient extends Client {
     else if (await this._getPeerCount() === 0) state = 'syncing'
 
     // Check using JSON RPC method 'eth_syncing'
-    else state = await this._isSyncing() ? 'syncing' : 'ready'
+    else {
+      const result = await this._isSyncing()
+      if (!result) {
+        state = 'ready'
+      } else {
+        store.updateClient(this.name, 'currentBlock', hexToNumber(result.currentBlock))
+        store.updateClient(this.name, 'highestBlock', hexToNumber(result.highestBlock))
+        state = 'syncing'
+      }
+    }
 
     // If state has changed -> log and emit new state
     if (state !== store(`main.clients.${this.name}.state`)) {
@@ -73,7 +82,7 @@ class EthereumClient extends Client {
     const res = await axios.post('http://127.0.0.1:8545', message)
 
     // Get sync status
-    return res.data.result !== false
+    return res.data.result
   }
 
   async _getBlockNumber () {

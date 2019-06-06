@@ -11,7 +11,6 @@ app.on('ready', () => {
     // On client toggled ->
     if (on !== store('main.clients.parity.on')) {
       on = store('main.clients.parity.on')
-      console.log('Toggling parity', on)
       on ? parity.start() : parity.stop()
     }
   })

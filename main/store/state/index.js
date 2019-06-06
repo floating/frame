@@ -84,6 +84,8 @@ let initial = {
         on: main('clients.geth.on', false),
         mode: main('clients.geth.mode', 'light'),
         blockNumber: 0,
+        currentBlock: 0,
+        highestBlock: 0,
         installed: false,
         latest: false,
         version: null,
@@ -92,6 +94,8 @@ let initial = {
       parity: {
         on: main('clients.parity.on', false),
         blockNumber: 0,
+        currentBlock: 0,
+        highestBlock: 0,
         installed: false,
         latest: false,
         version: null,
