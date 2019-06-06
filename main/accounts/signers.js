@@ -1,15 +1,13 @@
 const HDKey = require('hdkey')
 const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
 
-const windows = require('../../windows')
-
-class Signer {
+class Signer extends EventEmitter  {
   constructor () {
-    this.accounts = []
-    this.index = 0
-    this.requests = {}
+    super()
+    this.addresses = []
+    this.status = ''
   }
-  deriveHDAccounts (publicKey, chainCode, count = 100) {
+  deriveHDAccounts (publicKey, chainCode) {
     let hdk = new HDKey()
     hdk.publicKey = Buffer.from(publicKey, 'hex')
     hdk.chainCode = Buffer.from(chainCode, 'hex')
@@ -19,22 +17,8 @@ class Signer {
       return toChecksumAddress(`0x${address.toString('hex')}`)
     }
     const accounts = []
-    for (let i = 0; i < count; i++) { accounts[i] = derive(i) }
+    for (let i = 0; i < 15; i++) { accounts[i] = derive(i) }
     return accounts
-  }
-  getCoinbase (cb) {
-    cb(null, this.accounts[0])
-  }
-  getAccounts (cb) {
-    let account = this.accounts[this.index]
-    if (cb) cb(null, account ? [account] : [])
-    return account ? [account] : []
-  }
-  getSelectedAccounts () {
-    return this.accounts[this.index] ? [this.accounts[this.index]] : []
-  }
-  getSelectedAccount () {
-    return this.accounts[this.index]
   }
   summary () {
     return {
@@ -47,18 +31,6 @@ class Signer {
       requests: this.requests
     }
   }
-  setIndex (i, cb) {
-    this.index = i
-    this.requests = {} // TODO Decline these requests before clobbering them
-    windows.broadcast('main:action', 'updateSigner', this.summary())
-    cb(null, this.summary())
-  }
-  open () {
-    windows.broadcast('main:action', 'addSigner', this.summary())
-  }
-  close () {
-    windows.broadcast('main:action', 'removeSigner', this.summary())
-  }
   update (options = {}) {
     if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     windows.broadcast('main:action', 'updateSigner', this.summary())
@@ -70,5 +42,3 @@ class Signer {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method.')
   }
 }
-
-module.exports = Signer

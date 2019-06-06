@@ -21,6 +21,7 @@ link.send = (...args) => {
 }
 
 window.addEventListener('message', e => {
+  if (e.origin !== 'file://') return
   let data = unwrap(e.data)
   let args = data.args || []
   if (e.origin === 'file://' && data.source !== source) {

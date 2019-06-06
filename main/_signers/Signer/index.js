@@ -1,15 +1,13 @@
 const HDKey = require('hdkey')
 const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
 
-const windows = require('../../windows')
-
 class Signer {
   constructor () {
     this.accounts = []
     this.index = 0
     this.requests = {}
   }
-  deriveHDAccounts (publicKey, chainCode, count = 100) {
+  deriveHDAccounts (publicKey, chainCode) {
     let hdk = new HDKey()
     hdk.publicKey = Buffer.from(publicKey, 'hex')
     hdk.chainCode = Buffer.from(chainCode, 'hex')
@@ -19,7 +17,7 @@ class Signer {
       return toChecksumAddress(`0x${address.toString('hex')}`)
     }
     const accounts = []
-    for (let i = 0; i < count; i++) { accounts[i] = derive(i) }
+    for (let i = 0; i < 15; i++) { accounts[i] = derive(i) }
     return accounts
   }
   getCoinbase (cb) {
@@ -41,27 +39,25 @@ class Signer {
       id: this.id,
       type: this.type,
       index: this.index,
-      accounts: this.accounts,
-      status: this.status,
-      network: this.network,
-      requests: this.requests
+      addresses: this.addresses,
+      status: this.status
     }
   }
   setIndex (i, cb) {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them
-    windows.broadcast('main:action', 'updateSigner', this.summary())
+    // windows.broadcast('main:action', 'updateSigner', this.summary())
     cb(null, this.summary())
   }
   open () {
-    windows.broadcast('main:action', 'addSigner', this.summary())
+    // windows.broadcast('main:action', 'addSigner', this.summary())
   }
   close () {
-    windows.broadcast('main:action', 'removeSigner', this.summary())
+    // windows.broadcast('main:action', 'removeSigner', this.summary())
   }
   update (options = {}) {
-    if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
-    windows.broadcast('main:action', 'updateSigner', this.summary())
+    // if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
+    // windows.broadcast('main:action', 'updateSigner', this.summary())
   }
   signMessage (message, cb) {
     console.warn('Signer:' + this.type + ' did not implement a signMessage method.')

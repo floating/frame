@@ -1,4 +1,4 @@
-const usbDetect = require('usb-detection')
+// const usbDetect = require('usb-detection')
 const log = require('electron-log')
 
 // App Window API
@@ -8,8 +8,10 @@ const windows = require('../windows')
 const proxyProvider = require('../provider/proxy')
 
 // Signer Modules
-const trezor = require('./trezor')
+// const trezor = require('./trezor')
 const ledger = require('./ledger')
+const trezorConnect = require('./trezor-connect')
+// const ledgerBLE = require('./ledger-ble')
 const hot = require('./hot')
 
 const dev = process.env.NODE_ENV === 'development'
@@ -133,7 +135,7 @@ const api = {
     signers[current].signTransaction(rawTx, cb)
   },
   close () {
-    usbDetect.stopMonitoring()
+    // usbDetect.stopMonitoring()
   },
   setSignerIndex (index, cb) {
     if (!signers[current]) return cb(new Error('No Account Selected'))
@@ -142,7 +144,7 @@ const api = {
   trezorPin (id, pin, cb) {
     if (!signers[id]) return cb(new Error('No Account Selected'))
     if (signers[id].setPin) {
-      signers[id].setPin(null, pin)
+      signers[id].setPin(pin)
       cb(null, { status: 'ok' })
     } else {
       cb(new Error('Set pin not avaliable...'))
@@ -257,8 +259,11 @@ const api = {
 }
 
 // Add Signers
-trezor(signers, api)
+// trezor(signers, api)
 ledger(signers, api)
+trezorConnect(signers, api)
+// ledgerBLE(signers, api)
+
 if (dev || process.env.WITH_HOT === 'true') hot(signers, api)
 
 module.exports = api
