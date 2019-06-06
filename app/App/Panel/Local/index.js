@@ -126,6 +126,14 @@ class Settings extends React.Component {
     e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
+  handleEthereumClientToggle (client) {
+    const networkId = this.store('main.connection.network')
+    const { on, state } = this.store(`main.clients.${client}`)
+    if (!on && client === 'parity' && networkId === '4') return this.store.notify('rinkeby')
+    if (state === 'off' || state === 'ready' || state === 'syncing') {
+      link.send('tray:action', 'toggleClient', client)
+    }
+  }
   render () {
     let network = this.store('main.connection.network')
     let options = this.store('main.connection.options')
@@ -202,28 +210,12 @@ class Settings extends React.Component {
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Local Clients'}</div>
         </div>
-        {/* Ethereum - Geth */}
-        <div className='signerPermission'>
-          <div className={this.store('main.clients.geth.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>{'Geth'}</div>
-              <div className={this.store('main.clients.geth.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleClient', 'geth')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.statusClient(this.store('main.clients.geth.state'))}
-              </div>
-            </div>
-          </div>
-        </div>
         {/* Ethereum - Parity */}
         <div className='signerPermission'>
           <div className={this.store('main.clients.parity.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
               <div className='signerPermissionOrigin'>{'Parity'}</div>
-              <div className={this.store('main.clients.parity.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleClient', 'parity')}>
+              <div className={this.store('main.clients.parity.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => this.handleEthereumClientToggle('parity')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
@@ -234,22 +226,6 @@ class Settings extends React.Component {
             </div>
           </div>
         </div>
-        {/* IPFS */}
-        {/* <div className='signerPermission'>
-          <div className={this.store('main.clients.ipfs.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>{'IPFS'}</div>
-              <div className={this.store('main.clients.ipfs.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleClient', 'ipfs')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.statusClient(this.store('main.clients.ipfs.state'))}
-              </div>
-            </div>
-          </div>
-        </div> */}
 
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
