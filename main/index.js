@@ -26,6 +26,8 @@ process.on('uncaughtException', (e) => {
   }
   log.error('uncaughtException')
   log.error(e)
+  // Kill all clients running as child processes
+  services.stop()
   throw e
   // setTimeout(() => app.quit(), 50)
 })
