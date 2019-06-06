@@ -26,7 +26,7 @@ class Parity extends EthereumClient {
   _getChain (networkId) {
     if (networkId === '1') return 'mainnet'
     if (networkId === '3') return 'ropsten'
-    if (networkId === '4') return 'rinkeby'
+    if (networkId === '42') return 'kovan'
   }
 }
 
