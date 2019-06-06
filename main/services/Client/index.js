@@ -115,21 +115,22 @@ class Client extends EventEmitter {
       // Make sure client is running
       if (!this.process) resolve()
 
+      // If still alive after <INTERVAL> ms, send 'SIGKILL'
+      const timeout = setTimeout(() => {
+        if (this.process) this.process.kill('SIGKILL')
+      }, SIGTERM_TIMEOUT)
+
       // On exit -> set state to 'off'
       this.once('exit', (code) => {
         log.info(`${this.name}: off`)
         log.info(`${this.name}: exit code ${code}`)
         this.emit('state', 'off')
         resolve()
+        clearTimeout(timeout)
       })
 
       // Send 'SIGTERM' to client process
       this.process.kill('SIGTERM')
-
-      // If alive after <INTERVAL> ms, send 'SIGKILL'
-      setTimeout(() => {
-        if (this.process) this.process.kill('SIGKILL')
-      }, SIGTERM_TIMEOUT)
 
       // Log and emit state
       this.emit('state', 'terminating')
