@@ -19,19 +19,15 @@ app.on('ready', () => {
   // On network switched
   let previousNetworkId = store('main.connection.network')
   store.observer(_ => {
-    // If new network and client is running ->
     const networkId = store('main.connection.network')
-    if (networkId !== previousNetworkId && store('main.clients.parity.on')) {
-      // If local connection on -> toggle it off
-      if (store('main.connection.local.on')) store.toggleConnection('local')
 
+    // If new network and client is running ->
+    if (networkId !== previousNetworkId && store('main.clients.parity.on')) {
       // Restart client with updated network args (unless network swwitched to Rinkeby)
-      setTimeout(() => {
-        store.toggleClient('parity')
-        geth.once('exit', () => {
-          if (networkId !== '4') store.toggleClient('parity')
-        })
-      }, 500)
+      store.toggleClient('parity')
+      parity.once('exit', () => {
+        if (networkId !== '4') store.toggleClient('parity')
+      })
 
       // Update holder variable
       previousNetworkId = store('main.connection.network')
