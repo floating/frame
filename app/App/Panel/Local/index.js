@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../svg'
 import link from '../../../link'
+import EthereumClient from '../EthereumClient'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
@@ -80,20 +81,6 @@ class Settings extends React.Component {
       </div>
     )
   }
-  statusClient (client) {
-    const { state, currentBlock, highestBlock } = client
-    let syncPercentage = Math.round((currentBlock / highestBlock) * 100)
-    return (
-      <div className='connectionOptionStatus'>
-        {this.indicatorClient(state)}
-        { state === 'syncing' && !isNaN(syncPercentage) ? (
-          <div className='connectionOptionStatusText'>{state} ({syncPercentage} %)</div>
-        ) : (
-          <div className='connectionOptionStatusText'>{state}</div>
-        )}
-      </div>
-    )
-  }
   quit () {
     return (
       <div className='quitFrame'>
@@ -110,15 +97,6 @@ class Settings extends React.Component {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
     }
   }
-  indicatorClient (state) {
-    if (state === 'ready') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-    } else if (state === 'off') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
-    } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-    }
-  }
   selectNetwork (net) {
     if (net !== this.store('main.connection.network')) {
       if (net === '1') {
@@ -131,14 +109,6 @@ class Settings extends React.Component {
   expandNetwork (e, expand) {
     e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
-  }
-  toggleEthereumClient (client) {
-    const networkId = this.store('main.connection.network')
-    const { on, state } = this.store(`main.clients.${client}`)
-    if (!on && client === 'parity' && networkId === '4') return this.store.notify('rinkeby')
-    if (state === 'off' || state === 'ready' || state === 'syncing') {
-      link.send('tray:action', 'toggleClient', client)
-    }
   }
   render () {
     let network = this.store('main.connection.network')
@@ -216,22 +186,7 @@ class Settings extends React.Component {
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Local Clients'}</div>
         </div>
-        {/* Ethereum - Parity */}
-        <div className='signerPermission'>
-          <div className={this.store('main.clients.parity.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>{'Parity'}</div>
-              <div className={this.store('main.clients.parity.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => this.toggleEthereumClient('parity')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.statusClient(this.store('main.clients.parity'))}
-              </div>
-            </div>
-          </div>
-        </div>
+        <EthereumClient client='parity' />
 
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>
