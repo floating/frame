@@ -94,43 +94,43 @@ export const unsetSigner = u => {
 
 export const nodeProvider = (u, connected) => u('node.provider', _ => connected)
 
-export const removeSigner = (u, signer, state) => {
-  let status = 'Removing'
-  u('selecteds', (signers, state) => {
-    if (state.signer.current === signer.id) unsetSigner(u)
-    if (signers[signer.id]) signers[signer.id].removing = true
-    return signers
-  })
-  setTimeout(_ => {
-    u('selecteds', signers => {
-      if (signers[signer.id] && signers[signer.id].removing) signers[signer.id].status = status
-      return signers
-    })
-  }, 1200)
-  setTimeout(_ => {
-    u('selecteds', signers => {
-      if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
-      return signers
-    })
-  }, 4200)
-}
+// export const removeSigner = (u, signer, state) => {
+//   let status = 'Removing'
+//   u('signers', (signers, state) => {
+//     if (state.signer.current === signer.id) unsetSigner(u)
+//     if (signers[signer.id]) signers[signer.id].removing = true
+//     return signers
+//   })
+//   setTimeout(_ => {
+//     u('signers', signers => {
+//       if (signers[signer.id] && signers[signer.id].removing) signers[signer.id].status = status
+//       return signers
+//     })
+//   }, 1200)
+//   setTimeout(_ => {
+//     u('signers', signers => {
+//       if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
+//       return signers
+//     })
+//   }, 4200)
+// }
 
-export const updateSigner = (u, signer) => {
-  u('selecteds', signer.id, _ => signer)
-  u('selected', s => {
-    if (s.current === signer.id && (signer.status !== 'ok' || signer.accounts[0] !== s.accounts[0])) {
-      s.last = s.current
-      s.current = ''
-      s.accounts = []
-      s.requests = {}
-      s.view = 'default'
-      s.minimized = true
-      s.open = false
-      s.showAccounts = false
-    }
-    return s
-  })
-}
+// export const updateSigner = (u, signer) => {
+//   u('signers', signer.id, _ => signer)
+//   u('selected', s => {
+//     if (s.current === signer.id && (signer.status !== 'ok' || signer.accounts[0] !== s.accounts[0])) {
+//       s.last = s.current
+//       s.current = ''
+//       s.accounts = []
+//       s.requests = {}
+//       s.view = 'default'
+//       s.minimized = true
+//       s.open = false
+//       s.showAccounts = false
+//     }
+//     return s
+//   })
+// }
 
 export const setCurrent = (u, id) => u('view.current', _ => id)
 export const updateUrl = (u, id, url) => u('view.data', id, 'url', () => url)

@@ -72,6 +72,16 @@ module.exports = {
   updateAccount: (u, account) => {
     u('main.accounts', account.id, () => account)
   },
+  removeSigner: (u, id) => {
+    u('main.signers', signers => {
+      delete signers[id]
+      return signers
+    })
+  },
+  updateSigner: (u, signer) => {
+    if (!signer.id) return
+    u('main.signers', signer.id, () => signer)
+  },
   newSigner: (u, signer) => {
     u('main.signers', signers => {
       signers[signer.id] = signer

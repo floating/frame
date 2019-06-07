@@ -5,7 +5,6 @@ const log = require('electron-log')
 
 const crypt = require('../crypt')
 const store = require('../store')
-const signers = require('../signers')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')
@@ -70,18 +69,15 @@ class Accounts extends EventEmitter {
     this._current = ''
     this.accounts = {}
     let stored = store('main.accounts')
-    Object.keys(stored).forEach(id => { this.accounts[id] = new Account(stored[id], this) })
-    signers.list().forEach(this.sigerUpdate.bind(this))
-    signers.on('update', this.sigerUpdate.bind(this))
-  }
-  sigerUpdate (signer) {
-    log.info('[Accounts] Signer update')
-    if (!this.accounts[signer.id]) {
-      log.info('[Accounts] No account matched this new signer, creating account')
-      this.add(signer.addresses)
-    } else {
-      log.info('[Accounts] An existing account matched the updated signer')
-    }
+    Object.keys(stored).forEach(id => {
+      this.accounts[id] = new Account(stored[id], this)
+    })
+    store.observer(() => {
+      let signers = store('main.signers')
+      Object.keys(signers).forEach(id => {
+        if (!this.accounts[id]) this.add(signers[id].addresses)
+      })
+    })
   }
   list () {
     return Object.keys(this.accounts).map(id => this.accounts[id].summary())
@@ -106,16 +102,12 @@ class Accounts extends EventEmitter {
   }
   // Public
   add (addresses, cb = () => {}) {
-    const accounts = store('main.accounts')
+    if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
     const id = this.addressesToId(addresses)
-    if (accounts[id]) {
-      log.info('Account already exists')
-      cb(null, accounts[id])
-    } else {
-      log.info('Account not found, creating account')
-      const account = { id, addresses, index: 0, created: Date.now() }
-      this.accounts[id] = new Account(account, this)
-    }
+    const account = store('main.accounts', id)
+    if (account) return cb(null, account) // Account already exists...
+    log.info('Account not found, creating account')
+    this.accounts[id] = new Account({ id, addresses, index: 0, created: Date.now() }, this)
   }
   update (account) {
     log.info('Account update called')

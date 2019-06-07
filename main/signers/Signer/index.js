@@ -1,5 +1,9 @@
-const HDKey = require('hdkey')
-const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
+// const HDKey = require('hdkey')
+// const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
+
+const deriveHDAccounts = require('worker-farm')(require.resolve('./derive'))
+
+const crypt = require('../../crypt')
 
 class Signer {
   constructor () {
@@ -7,18 +11,11 @@ class Signer {
     this.index = 0
     this.requests = {}
   }
-  deriveHDAccounts (publicKey, chainCode) {
-    let hdk = new HDKey()
-    hdk.publicKey = Buffer.from(publicKey, 'hex')
-    hdk.chainCode = Buffer.from(chainCode, 'hex')
-    let derive = index => {
-      let derivedKey = hdk.derive(`m/${index}`)
-      let address = publicToAddress(derivedKey.publicKey, true)
-      return toChecksumAddress(`0x${address.toString('hex')}`)
-    }
-    const accounts = []
-    for (let i = 0; i < 15; i++) { accounts[i] = derive(i) }
-    return accounts
+  deriveHDAccounts (publicKey, chainCode, cb) {
+    deriveHDAccounts(publicKey, chainCode, cb)
+  }
+  addressesId () {
+    if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
   }
   getCoinbase (cb) {
     cb(null, this.addresses[0])
@@ -38,7 +35,6 @@ class Signer {
     return {
       id: this.id,
       type: this.type,
-      index: this.index,
       addresses: this.addresses,
       status: this.status
     }

@@ -3,19 +3,18 @@ const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix } = require('ethereu
 const log = require('electron-log')
 
 const crypt = require('../../../crypt')
+const store = require('../../../store')
 const Signer = require('../../Signer')
 const hdKey = require('ethereumjs-wallet/hdkey')
 
-const addressSigner = (seed, index) => {
-  return hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0').deriveChild(index).getWallet().getPrivateKey()
-}
+// const addressSigner = (seed, index) => {
+//   return hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0').deriveChild(index).getWallet().getPrivateKey()
+// }
 
 class Seed extends Signer {
-  constructor (signer, signers) {
+  constructor (signer) {
     super()
-    this.signers = signers
     log.info('Creating seed signer instance')
-    this.id = signer.id
     this.type = signer.type
     this.addresses = signer.addresses
     this.seed = signer.seed
@@ -48,9 +47,12 @@ class Seed extends Signer {
     setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 1000) // Response delay for development
   }
   update () {
-    setTimeout(() => {
-      this.signers.update(this.summary())
-    }, 0)
+    let id = this.addressesId()
+    if (this.id !== id) { // Singer address representation changed
+      store.removeSigner(this.id)
+      this.id = id
+    }
+    store.updateSigner(this.summary())
   }
 }
 

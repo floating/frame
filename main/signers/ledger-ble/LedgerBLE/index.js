@@ -85,7 +85,7 @@ class LedgerBLE extends Signer {
       console.log('got result for lookupAccounts')
       console.log(err, result)
       if (err) return cb(err)
-      cb(null, this.deriveHDAccounts(result.publicKey, result.chainCode))
+      this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
     })
   }
   update () {

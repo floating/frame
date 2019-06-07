@@ -69,7 +69,8 @@ let initial = {
     reveal: main('reveal', false),
     accounts: {}, // main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions
-    signers: {}, // main('signers', {}),
+    signers: {},
+    savedSigners: {},
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },
@@ -153,7 +154,10 @@ let initial = {
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.accounts).forEach(account => {
   account = initial.main.accounts[account]
-  if (account && account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
+  if (account) {
+    if (account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
+    delete account.signer
+  }
 })
 
 module.exports = () => initial

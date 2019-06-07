@@ -2,9 +2,6 @@ const signers = require('../../signers')
 const windows = require('../../windows')
 const store = require('../../store')
 
-const HDKey = require('hdkey')
-const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
-
 class Account {
   constructor (account, accounts) {
     this.accounts = accounts
@@ -15,27 +12,18 @@ class Account {
     this.type = 'Regular'
     this.created = account.created
     this.addresses = account.addresses
-    this.signer = account.signer
+    this.signer = false
     this.agent = account.agent
     this.requests = {}
-
-    // Look for matching signers for account, if account has an agent look for matching agent account
-    let signer = signers.get(this.id)
-    if (signer) {
-      this.updateSigner(signer.summary())
-    } else if (this.agent) {
-      let agentAccount = accounts.get(this.agent.id)
-      if (agentAccount) this.updateAgent(agentAccount.summary())
-    }
-
-    // Subscribe to updates to both signers and accounts
-    signers.on('update', signer => {
-      if (signer.id === this.id) this.updateSigner(signer)
+    store.observer(() => {
+      if (this.agent) {
+        this.agent.account = store('main.accounts', this.agent.id)
+        this.signer = false
+      }
+      this.signer = store('main.signers', this.id)
+      this.agent = this.signer ? false : this.agent
+      this.update()
     })
-    accounts.on('update', account => {
-      if (account.id === this.agent.id) this.updateAgent(account)
-    })
-    store.updateAccount(this.summary())
   }
   getSelectedAddresses () {
     return [this.addresses[this.index]]
@@ -46,7 +34,7 @@ class Account {
   setIndex (i, cb) {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them
-    store.updateAccount(this.summary())
+    this.update()
     cb(null, this.summary())
   }
   updateAgent (agent) {
@@ -81,19 +69,6 @@ class Account {
   }
   delete () {
 
-  }
-  deriveHDAccounts (publicKey, chainCode, count = 100) {
-    let hdk = new HDKey()
-    hdk.publicKey = Buffer.from(publicKey, 'hex')
-    hdk.chainCode = Buffer.from(chainCode, 'hex')
-    let derive = index => {
-      let derivedKey = hdk.derive(`m/${index}`)
-      let address = publicToAddress(derivedKey.publicKey, true)
-      return toChecksumAddress(`0x${address.toString('hex')}`)
-    }
-    const accounts = []
-    for (let i = 0; i < count; i++) { accounts[i] = derive(i) }
-    return accounts
   }
   getCoinbase (cb) {
     cb(null, this.addresses[0])

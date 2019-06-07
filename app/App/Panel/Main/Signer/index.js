@@ -231,8 +231,9 @@ class Signer extends React.Component {
     let currentIndex = this.store('main.accounts', this.props.id, 'index')
     let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-    let account = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    let balance = this.store('balances', account)
+    let address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    let balance = this.store('balances', address)
+    if (!address) return null
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -261,7 +262,7 @@ class Signer extends React.Component {
           )
         ) : (
           <div className='signerAccounts' style={{ width: '100%' }}>
-            <div key={account + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
+            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
               <div className='signerName'>
                 <div className='signerNameText'>
                   {this.props.type + ' Account'}
@@ -270,10 +271,10 @@ class Signer extends React.Component {
               </div>
               <div className='signerAddress'>
                 <div className='transactionToAddress'>
-                  <div className='transactionToAddressLarge'>{account.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {account.substr(account.length - 10)}</div>
+                  <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
                   <div className='transactionToAddressFull'>
-                    {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : account}
-                    <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={account} readOnly />
+                    {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+                    <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />
                   </div>
                 </div>
               </div>
