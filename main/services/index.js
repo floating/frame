@@ -1,3 +1,4 @@
+const windows = require('../windows')
 const geth = require('./Geth')
 const parity = require('./Parity')
 const ipfs = require('./Ipfs')
@@ -24,9 +25,15 @@ app.on('ready', () => {
     if (networkId !== previousNetworkId && store('main.clients.parity.on')) {
       // Restart client with updated network args (unless network swwitched to Rinkeby)
       store.toggleClient('parity')
-      parity.once('exit', () => {
-        if (networkId !== '4') store.toggleClient('parity')
-      })
+
+      if (networkId === '4') {
+        windows.broadcast('main:action', 'notify', 'rinkeby')
+      } else {
+        parity.once('exit', () => {
+          if (networkId !== '4') store.toggleClient('parity')
+        })
+      }
+
 
       // Update holder variable
       previousNetworkId = store('main.connection.network')
