@@ -24,16 +24,15 @@ app.on('ready', () => {
     // If new network and client is running ->
     if (networkId !== previousNetworkId && store('main.clients.parity.on')) {
       // Restart client with updated network args (unless network swwitched to Rinkeby)
-      store.toggleClient('parity')
+      store.toggleClient('parity', false)
 
       if (networkId === '4') {
         windows.broadcast('main:action', 'notify', 'rinkeby')
       } else {
         parity.once('exit', () => {
-          if (networkId !== '4') store.toggleClient('parity')
+          if (networkId !== '4') store.toggleClient('parity', true)
         })
       }
-
 
       // Update holder variable
       previousNetworkId = store('main.connection.network')
