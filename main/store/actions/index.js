@@ -34,7 +34,7 @@ module.exports = {
       return connection
     })
   },
-  toggleConnection: (u, node) => u('main.connection', node, 'on', on => !on),
+  toggleConnection: (u, node, on) => u('main.connection', node, 'on', (value) => on !== undefined ? on : !value),
   setLocal: (u, status) => u('main.connection.local', local => Object.assign({}, local, status)),
   setSecondary: (u, status) => u('main.connection.secondary', secondary => Object.assign({}, secondary, status)),
   setLaunch: (u, launch) => u('main.launch', _ => launch),
