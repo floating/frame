@@ -164,11 +164,10 @@ class Client extends EventEmitter {
 
       // Get paths of extracted directory and binary
       const extractedDir = path.resolve(this.workdir, fs.readdirSync(this.workdir)[0])
-      const extractedBin = path.resolve(extractedDir, this.bin)
+      const extractedBin = path.resolve(extractedDir, this.release.bin)
 
-      // Move geth binary from extracted directory to client's root working directory
-      const movedBin = path.resolve(this.workdir, this.bin)
-      fs.renameSync(extractedBin, movedBin)
+      // Move binary from extracted directory to client's root working directory
+      fs.renameSync(extractedBin, this.bin)
 
       // Remove archive and extracted directory
       await remove(fileName)
