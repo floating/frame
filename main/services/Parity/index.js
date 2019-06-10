@@ -1,6 +1,7 @@
-const EthereumClient = require('../EthereumClient')
-const store = require('../../store')
 const fs = require('fs')
+const windows = require('../../windows')
+const store = require('../../store')
+const EthereumClient = require('../EthereumClient')
 
 class Parity extends EthereumClient {
   constructor (options) {
@@ -18,8 +19,15 @@ class Parity extends EthereumClient {
       // Prepare client arguments
       let args = ['--chain', chain, '--light']
 
+      // Define error handler
+      const errorHandler = (err) => {
+        if (err.message.includes('Failed to open database')) {
+          windows.broadcast('main:action', 'notify', 'parityAlreadyRunning')
+        }
+      }
+
       // Start client
-      this.run(args)
+      this.run(args, errorHandler)
     })
   }
 

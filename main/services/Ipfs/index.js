@@ -1,6 +1,6 @@
-const Client = require('../Client')
-const windows = require('../../windows')
 const log = require('electron-log')
+const windows = require('../../windows')
+const Client = require('../Client')
 
 class IPFS extends Client {
   constructor (options) {
@@ -11,12 +11,13 @@ class IPFS extends Client {
       // Run 'ipfs init'
       this.init()
 
-      // Define error handlers
+      // Define error handler
       const errorHandler = (err) => {
         if (err.message.includes('ipfs daemon is running')) {
-          windows.broadcast('main:action', 'notify', 'ipfs')
+          windows.broadcast('main:action', 'notify', 'ipfsAlreadyRunning')
         }
       }
+
       // Run 'ipfs daemon'
       this.run(['daemon'], errorHandler)
     })
