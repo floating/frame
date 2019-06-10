@@ -10,58 +10,25 @@ const store = require('../store')
 const proxyProvider = require('../provider/proxy')
 
 const Account = require('./Account')
-
-// newAccount = {
-//   id: '',
-//   type: '',
-//   name: '',
-//   addresses: [],
-//   aliases: [],
-//   requests: {},
-//   permissions: {},
-//   signer: false,
-//   agent: {
-//     id: account.agent.id, // Account Id
-//     address: account.agent.address, // Address Index
-//     account: false
-//   }
-// }
-
-// const HDKey = require('hdkey')
-// const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
-//
 const windows = require('../windows')
 
-// module.exports = Signer
-
-// Accounts
-//
-//   Events
-//    'added' - Emits account object when added
-//    'updated' - Emits account object when updated
-//    'removed - Emits account ID when account is removed
-//
-//   Methods
-//    'list' - Returns list of accounts
-//    'add' - Adds account by list of addresses
-//    'remove' - Removes an account by ID
-//
-// Accounts look for matching signers
-//
-// Red - Signer Not Found
-// Orange - Signer Locked, Signer Asleep, etc
-// Green - Signer Ready
-//
-// Note: removing accounts removes matching underlying signer if it exists
-
-// Create hot Account
-
-// Monitor Signers
-//   Get all accounts...
-//   Get all signers...
-//   Render all accounts, look up matching signer status
-//   Look for signers that aren't accounts yet, create accounts for each
-//   On new signer, automatically make account
+let aragonTestAccount = {
+  id: 'test',
+  index: 0,
+  addresses: ['0x0F89F8ceCd4530cB9c4182FA8ce2f184Ba0A7792'], // DAO Address
+  type: 'Aragon',
+  smart: {
+    type: 'aragon',
+    actor: { // Reference to Frame account that will act on behalf of the agent
+      id: '3932643439326431633163373864326336383761633466366662366261363337',
+      index: 0,
+      address: '0xf4Ed810dEF41F31141B652e49fe847e6D7455BfD' // External Signer
+    },
+    dao: '0x51a264C85496241EB12D681Fe4095560D7A2aFA9', // DAO Address
+    agent: '0x0F89F8ceCd4530cB9c4182FA8ce2f184Ba0A7792', // Agent Address
+    vault: '0xDE7f2fE40b860a394f27834c5c5FA6618E1E1BaE' // Vault Address
+  }
+}
 
 class Accounts extends EventEmitter {
   constructor () {
@@ -72,6 +39,8 @@ class Accounts extends EventEmitter {
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(stored[id], this)
     })
+    // Aragon Testing
+    this.accounts[aragonTestAccount.id] = new Account(aragonTestAccount, this)
     store.observer(() => {
       let signers = store('main.signers')
       Object.keys(signers).forEach(id => {

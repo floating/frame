@@ -22,9 +22,10 @@ class Settings extends React.Component {
   renderPermissions (viewIndex) {
     let i = 0
     let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
-    let index = this.store('selecteds', this.props.id, 'index')
-    let account = this.store('selecteds', this.props.id, 'accounts', index)
-    let permissions = this.store('main.accounts', account, 'permissions') || {}
+    let id = this.store('selected.id')
+    let currentIndex = this.store('main.accounts', id, 'index')
+    let address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    let permissions = this.store('main.addresses', address, 'permissions') || {}
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
@@ -37,7 +38,7 @@ class Settings extends React.Component {
         ) : (
           Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
             return (
-              <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:action', 'toggleAccess', account, o)}>
+              <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:action', 'toggleAccess', address, o)}>
                 <div className='signerPermissionControls'>
                   <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                   <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
@@ -49,7 +50,7 @@ class Settings extends React.Component {
           })
         )}
         <div className='quitFrame'>
-          <div onMouseDown={() => link.send('tray:action', 'clearPermissions', account)} className='quitFrameButton'>{'Clear All Permissions'}</div>
+          <div onMouseDown={() => link.send('tray:action', 'clearPermissions', address)} className='quitFrameButton'>{'Clear All Permissions'}</div>
         </div>
       </div>
     )

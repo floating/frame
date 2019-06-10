@@ -115,41 +115,13 @@ store.observer(() => {
   }
 })
 
-// const accounts = require('./accounts')
-// const signers = require('./signers')
-//
-// // const mnemonic = 'duck daring trouble employ million bamboo stock seed refuse example glimpse flame'
-// const mnemonic = bip39.generateMnemonic()
-// // const mnemonic = 'tell napkin industry lobster maximum because police siege armed excite dream kiwi'
-// console.log(mnemonic)
-// // bip39.generateMnemonic()
-// const password = 'frame'
-//
-// accounts.on('add', account => {
-//   log.info('New account added')
-//   log.info(account)
-// })
-//
-// accounts.on('update', account => {
-//   log.info('Account updated')
-//   log.info(account)
-// })
-//
-// accounts.on('remove', account => {
-//   log.info('Account removed')
-//   log.info(account)
-// })
-
-// const mnemonic = 'duck daring trouble employ million bamboo stock seed refuse example glimpse flame'
-// const mnemonic = 'tell napkin industry lobster maximum because police siege armed excite dream kiwi'
-
+// Dev Testing
 // const mnemonic = bip39.generateMnemonic()
 const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
-console.log(mnemonic)
 const password = 'frame'
 setTimeout(() => {
   signers.createFromPhrase(mnemonic, password, (err, signer) => {
     if (err) return console.log(err)
     console.log('Created Signer....')
   })
-}, 8000)
+}, 5000)

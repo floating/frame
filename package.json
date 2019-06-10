@@ -55,6 +55,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@aragon/wrapper": "5.0.0-rc.10",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "4.60.3",
     "@ledgerhq/hw-transport-node-hid": "4.60.3",

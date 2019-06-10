@@ -37,7 +37,7 @@ let initial = {
       viewIndex: 0,
       views: ['permissions', 'verify']
     },
-    accounts: [],
+    addresses: [],
     showAccounts: false,
     accountPage: 0,
     position: {

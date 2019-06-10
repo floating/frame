@@ -40,10 +40,10 @@ module.exports = {
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
-  clearPermissions: (u, account) => {
-    u('main.accounts', account, account => {
-      account.permissions = {}
-      return account
+  clearPermissions: (u, address) => {
+    u('main.addresses', address, address => {
+      address.permissions = {}
+      return address
     })
   },
   giveAccess: (u, req, access) => {
@@ -53,10 +53,10 @@ module.exports = {
       return address
     })
   },
-  toggleAccess: (u, account, handlerId) => {
-    u('main.accounts', account, account => {
-      account.permissions[handlerId].provider = !account.permissions[handlerId].provider
-      return account
+  toggleAccess: (u, address, handlerId) => {
+    u('main.addresses', address, address => {
+      address.permissions[handlerId].provider = !address.permissions[handlerId].provider
+      return address
     })
   },
   syncPath: (u, path, value) => {

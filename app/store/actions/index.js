@@ -5,7 +5,6 @@ export const syncMain = (u, main) => u('main', _ => main)
 
 export const setSigner = (u, signer) => {
   u('selected.current', _ => signer.id)
-  u('selected.accounts', _ => signer.accounts)
   setTimeout(_ => {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
@@ -84,7 +83,6 @@ export const unsetSigner = u => {
     u('selected', signer => {
       signer.last = signer.current
       signer.current = ''
-      signer.accounts = []
       signer.requests = {}
       signer.view = 'default'
       return signer

@@ -22,6 +22,7 @@ module.exports = {
         let signer = signers.find(signer => signer.devicePath === device.path)
         if (!signer) {
           log.info('Creating Ledger Signer: ...', device.path.substr(device.path.length - 5))
+          if (device.path.endsWith('1')) return console.log('Shadow device')
           signer = new Ledger(device.path, api)
           signers.add(signer)
         } else {
