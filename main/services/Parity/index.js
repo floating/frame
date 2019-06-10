@@ -19,7 +19,7 @@ class Parity extends EthereumClient {
       let args = ['--chain', chain, '--light']
 
       // Start client
-      this._run(args)
+      this.run(args)
     })
   }
 

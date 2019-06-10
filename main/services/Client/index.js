@@ -96,7 +96,10 @@ class Client extends EventEmitter {
     this.emit('state', 'off')
   }
 
-  _start () {
+  start () {
+    // Ensure client isn't already running
+    if (this.process) return
+
     // Log and emit state
     log.info(`${this.name}: starting`)
     this.emit('state', 'starting')
@@ -110,7 +113,7 @@ class Client extends EventEmitter {
     }
   }
 
-  _stop () {
+  stop () {
     return new Promise((resolve, reject) => {
       // Make sure client is running
       if (!this.process) resolve()
@@ -170,7 +173,7 @@ class Client extends EventEmitter {
     }
   }
 
-  _run (args) {
+  run (args) {
     // Spawn child process
     this.process = execFile(this.bin, args, (err, stdout, stderr) => {
       // No errors
@@ -191,7 +194,7 @@ class Client extends EventEmitter {
     })
   }
 
-  _runOnce (args) {
+  runOnce (args) {
     return new Promise((resolve, reject) => {
       execFile(this.bin, args, (err, stdout, stderr) => {
         if (!err) return resolve(stdout)

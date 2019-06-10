@@ -17,7 +17,7 @@ class Geth extends EthereumClient {
       if (networkFlag) args.push(networkFlag)
 
       // Start client
-      this._run(args)
+      this.run(args)
     })
   }
 

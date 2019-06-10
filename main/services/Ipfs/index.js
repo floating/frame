@@ -29,7 +29,7 @@ class IPFS extends Client {
     if (store('main.clients.ipfs.state') !== 'off') return
 
     // Run start sequence
-    this._start()
+    super.start()
   }
 
   stop () {
@@ -37,12 +37,12 @@ class IPFS extends Client {
     if (store('main.clients.ipfs.state') !== 'ready') return
 
     // Stop client
-    this._stop()
+    super.stop()
   }
 
   async init () {
     try {
-      await this._runOnce(['init'])
+      await this.runOnce(['init'])
       log.info('ipfs: repo initiated')
     } catch (err) {
       log.info('ipfs: repo already initiated')

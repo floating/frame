@@ -19,21 +19,9 @@ class EthereumClient extends Client {
     })
   }
 
-  start () {
-    // Ensure client isn't already running
-    if (store(`main.clients.${this.name}.state`) !== 'off') return
-
-    // Start client
-    this._start()
-  }
-
   stop () {
-    // Ensure state is 'ready' or 'syncing'
-    const state = store(`main.clients.${this.name}.state`)
-    if (!(state === 'ready' || state === 'syncing')) return
-
     // Terminate service
-    this._stop()
+    super.stop()
 
     // Clear sync check interval
     clearInterval(this.syncCheckInterval)
