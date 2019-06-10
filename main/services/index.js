@@ -6,14 +6,14 @@ const store = require('../store')
 const { app } = require('electron')
 
 // Parity
-// TODO: Refactor to handle Parity and Geth
 app.on('ready', () => {
-  let on = false
+  let previousOn = false
   store.observer(_ => {
     // On client toggled ->
-    if (on !== store('main.clients.parity.on')) {
-      on = store('main.clients.parity.on')
+    let on = store('main.clients.parity.on')
+    if (on !== previousOn) {
       on ? parity.start() : parity.stop()
+      previousOn = on
     }
   })
 
@@ -41,15 +41,11 @@ app.on('ready', () => {
   })
 
   // Link parity on/off with local connection
-  let state = store('main.clients.parity.state')
   store.observer(_ => {
-    let newState = store('main.clients.parity.state')
-    let localOn = store('main.connection.local.on')
-    if (state !== newState) {
-      if (newState === 'ready' && !localOn) store.toggleConnection('local')
-      if (newState === 'off' && localOn) store.toggleConnection('local')
-      state = newState
-    }
+    let state = store('main.clients.parity.state')
+    console.log("Observed state", state)
+    if (state === 'ready') store.toggleConnection('local', true)
+    if (state === 'off') store.toggleConnection('local', false)
   })
 })
 
