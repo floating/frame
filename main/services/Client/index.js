@@ -130,6 +130,7 @@ class Client extends EventEmitter {
       this.once('exit', (code) => {
         log.info(`${this.name}: off`)
         log.info(`${this.name}: exit code ${code}`)
+        this.emit('on', false)
         this.emit('state', 'off')
         resolve()
         clearTimeout(timeout)
@@ -226,7 +227,6 @@ class Client extends EventEmitter {
       })
     })
   }
-
 }
 
 module.exports = Client

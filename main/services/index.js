@@ -6,6 +6,7 @@ const store = require('../store')
 const { app } = require('electron')
 
 // Parity
+// TODO: Refactor to handle Parity and Geth
 app.on('ready', () => {
   let on = false
   store.observer(_ => {
