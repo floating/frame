@@ -126,14 +126,21 @@ class Client extends EventEmitter {
         if (this.process) this.process.kill('SIGKILL')
       }, SIGTERM_TIMEOUT)
 
-      // On exit -> set state to 'off'
+      // On exit -> reset client
       this.once('exit', (code) => {
+        // Log
         log.info(`${this.name}: off`)
         log.info(`${this.name}: exit code ${code}`)
+
+        // Reset client
         this.emit('on', false)
         this.emit('state', 'off')
-        resolve()
+
+        // Clear 'SIGKILL' timeout
         clearTimeout(timeout)
+
+        // Resolve promise
+        resolve()
       })
 
       // Send 'SIGTERM' to client process
@@ -188,9 +195,9 @@ class Client extends EventEmitter {
       // Apply client specific error handler
       if (errorHandler) errorHandler(err)
 
-      // Reset client
-      this.emit('state', 'off')
+      // Stop client
       this.emit('on', false)
+      this.emit('state', 'off')
     })
 
     // Handle stdout/stderr
@@ -199,8 +206,8 @@ class Client extends EventEmitter {
 
     // Handle process termination
     this.process.on('exit', (code) => {
-      this.emit('exit', code)
       this.process = null
+      this.emit('exit', code)
     })
   }
 
