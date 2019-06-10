@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../svg'
 import link from '../../../link'
-import EthereumClient from '../EthereumClient'
+import Client from '../Client'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
@@ -186,7 +186,8 @@ class Settings extends React.Component {
         <div className='localSettingsTitle connectionTitle'>
           <div>{'Local Clients'}</div>
         </div>
-        <EthereumClient client='parity' />
+        <Client client='parity' />
+        <Client client='ipfs' />
 
         <div className='localSettingsTitle'>{'Settings'}</div>
         <div className='signerPermission'>

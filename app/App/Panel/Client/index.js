@@ -4,8 +4,7 @@ import link from '../../../link'
 
 import Status from './Status'
 
-class EthereumClient extends React.Component {
-
+class Client extends React.Component {
   toggle = () => {
     const client = this.props.client
     const networkId = this.store('main.connection.network')
@@ -22,13 +21,18 @@ class EthereumClient extends React.Component {
 
   capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1)
 
+  fullName = (client) => {
+    if (client === 'parity') return 'Parity Ethereum'
+    if (client === 'ipfs') return 'IPFS'
+  }
+
   render () {
     const { client } = this.props
     return (
       <div className='signerPermission'>
         <div className={this.store(`main.clients.${client}.on`) ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
           <div className='connectionOptionToggle'>
-            <div className='signerPermissionOrigin'>{this.capitalize(client)}</div>
+            <div className='signerPermissionOrigin'>{this.fullName(client)}</div>
             <div
               className={this.store(`main.clients.${client}.on`) ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
               onMouseDown={_ => this.toggle()}>
@@ -46,4 +50,4 @@ class EthereumClient extends React.Component {
   }
 }
 
-export default Restore.connect(EthereumClient)
+export default Restore.connect(Client)
