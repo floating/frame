@@ -34,6 +34,9 @@ class Client extends EventEmitter {
 
     // On new state -> update store
     this.on('state', state => store.setClientState(this.name, state))
+    this.on('on', on => store.toggleClient(this.name, on))
+    this.on('state', state => console.log(this.name, 'state', state))
+    this.on('on', on => console.log(this.name, 'on', on))
 
     // Log (if log flag set)
     if (options.log) {
@@ -173,7 +176,7 @@ class Client extends EventEmitter {
     }
   }
 
-  run (args) {
+  run (args, errorHandler) {
     // Spawn child process
     this.process = execFile(this.bin, args, (err, stdout, stderr) => {
       // No errors
@@ -181,6 +184,13 @@ class Client extends EventEmitter {
 
       // Handle 'SIGKILL'
       if (err.signal === 'SIGKILL') log.info(`${this.name}: killed`)
+
+      // Apply client specific error handler
+      if (errorHandler) errorHandler(err)
+
+      // Reset client
+      this.emit('state', 'off')
+      this.emit('on', false)
     })
 
     // Handle stdout/stderr
@@ -217,6 +227,7 @@ class Client extends EventEmitter {
       })
     })
   }
+
 }
 
 module.exports = Client

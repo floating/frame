@@ -82,12 +82,33 @@ class Notify extends React.Component {
       </div>
     )
   }
+  ipfs () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfs' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          {/* <div className='notifyTitle'>
+            {'Could not start IPFS'}
+          </div> */}
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{'IPFS daemon is already running on this machine.'}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>{'Go Back'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
   render () {
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
         {this.mainnet()}
         {this.intro()}
         {this.rinkeby()}
+        {this.ipfs()}
       </div>
     )
   }

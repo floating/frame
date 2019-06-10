@@ -1,5 +1,5 @@
 const Client = require('../Client')
-const store = require('../../store')
+const windows = require('../../windows')
 const log = require('electron-log')
 
 class IPFS extends Client {
@@ -11,8 +11,14 @@ class IPFS extends Client {
       // Run 'ipfs init'
       this.init()
 
+      // Define error handlers
+      const errorHandler = (err) => {
+        if (err.message.includes('ipfs daemon is running')) {
+          windows.broadcast('main:action', 'notify', 'ipfs')
+        }
+      }
       // Run 'ipfs daemon'
-      this._run(['daemon'])
+      this.run(['daemon'], errorHandler)
     })
 
     // On 'daemon ready' -> switch client state
@@ -22,22 +28,6 @@ class IPFS extends Client {
         this.emit('state', 'ready')
       }
     })
-  }
-
-  start () {
-    // Ensure client isn't already running
-    if (store('main.clients.ipfs.state') !== 'off') return
-
-    // Run start sequence
-    super.start()
-  }
-
-  stop () {
-    // Ensure state is 'ready'
-    if (store('main.clients.ipfs.state') !== 'ready') return
-
-    // Stop client
-    super.stop()
   }
 
   async init () {
