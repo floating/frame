@@ -22,11 +22,17 @@ class IPFS extends Client {
       this.run(['daemon'], errorHandler)
     })
 
-    // On 'daemon ready' -> switch client state
+    // Handle stdout
     this.on('stdout', (stdout) => {
+      // On 'daemon ready' -> client state 'ready'
       if (stdout.match(/Daemon is ready\n$/i)) {
         log.info('ipfs: ready')
         this.emit('state', 'ready')
+      }
+      // On 'repo migration required' -> run migration
+      if (stdout.match(/Run migrations now/i)) {
+        log.info('ipfs: clint asking to run repo migration')
+        this.process.stdin.write('y\n')
       }
     })
   }
