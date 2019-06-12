@@ -1,7 +1,6 @@
 const utils = require('web3-utils')
 const EthereumTx = require('ethereumjs-tx')
 const log = require('electron-log')
-const HID = require('node-hid')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const store = require('../../../store')
@@ -25,8 +24,8 @@ class Ledger extends Signer {
     this.pause = false
     this.coinbase = '0x'
     this.network = store('main.connection.network')
-    this.basePath = () => this.network === '1' ? `44'/60'/0` : `44'/1'/0`
-    this.getPath = (i = 0) => this.basePath() + `'/` + i
+    this.basePath = () => this.network === '1' ? `44'/60'/0'/` : `44'/1'/0'/`
+    this.getPath = (i = 0) => this.basePath() + i
     this.handlers = {}
     this.deviceStatus()
     this.networkObserver = store.observer(() => {

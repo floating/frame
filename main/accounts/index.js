@@ -15,7 +15,7 @@ const windows = require('../windows')
 let aragonTestAccount = {
   id: 'test',
   index: 0,
-  addresses: ['0x0F89F8ceCd4530cB9c4182FA8ce2f184Ba0A7792'], // DAO Address
+  addresses: ['0x4f4e43c7a6310a0cd716bbba563b901fac07d085'], // Agent Address
   type: 'Aragon',
   smart: {
     type: 'aragon',
@@ -24,9 +24,9 @@ let aragonTestAccount = {
       index: 0,
       address: '0xf4Ed810dEF41F31141B652e49fe847e6D7455BfD' // External Signer
     },
-    dao: '0x51a264C85496241EB12D681Fe4095560D7A2aFA9', // DAO Address
-    agent: '0x0F89F8ceCd4530cB9c4182FA8ce2f184Ba0A7792', // Agent Address
-    vault: '0xDE7f2fE40b860a394f27834c5c5FA6618E1E1BaE' // Vault Address
+    dao: '0xd237ea861d39bf43aeed507c53f3826f5eabcafd', // DAO Address
+    agent: '0x4f4e43c7a6310a0cd716bbba563b901fac07d085', // Agent Address
+    vault: '0x98e8e0381abe2c4b8a07000e8a913566fa641005' // Vault Address
   }
 }
 
@@ -181,12 +181,18 @@ class Accounts extends EventEmitter {
   }
   signMessage (address, message, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
-    if (address.toLowerCase() !== this.getSelectedAccounts()[0].toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
+    if (address.toLowerCase() !== this.getSelectedAddress().toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
     this.current().signMessage(message, cb)
   }
   signTransaction (rawTx, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
-    this.current().signTransaction(rawTx, cb)
+    let matchSelected = rawTx.from.toLowerCase() === this.getSelectedAddress().toLowerCase()
+    let matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.address.toLowerCase() : false)
+    if (matchSelected || matchActor) {
+      this.current().signTransaction(rawTx, cb)
+    } else {
+      cb(new Error('signMessage: Account does not match currently selected'))
+    }
   }
   close () {
     // usbDetect.stopMonitoring()
@@ -207,12 +213,7 @@ class Accounts extends EventEmitter {
   addRequest (req) {
     log.info('addRequest', req)
     if (!this.current() || this.current().requests[req.handlerId]) return // If no current signer or the request already exists
-    this.current().requests[req.handlerId] = req
-    this.current().requests[req.handlerId].mode = 'normal'
-    this.current().requests[req.handlerId].created = Date.now()
-    this.current().update()
-    windows.showTray()
-    windows.broadcast('main:action', 'setSignerView', 'default')
+    this.current().addRequest(req)
   }
   removeRequest (handlerId) {
     if (this.current() && this.current().requests[handlerId]) {

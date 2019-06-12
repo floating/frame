@@ -36,10 +36,11 @@ class Requests extends React.Component {
   }
   render () {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
-    requests = Object.keys(requests).map(key => requests[key]).filter(req => {
-      if (req.type === 'transaction') return this.props.addresses.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
-      return true
-    })
+    requests = Object.keys(requests).map(key => requests[key])
+    // .filter(req => {
+    //   if (req.type === 'transaction') return this.props.addresses.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
+    //   return true
+    // })
     let normal = requests.filter(req => req.mode === 'normal')
     normal.sort((a, b) => {
       if (a.created > b.created) return -1

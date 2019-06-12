@@ -1,9 +1,10 @@
-const utils = require('ethereumjs-util')
-const Aragon = require('@aragon/wrapper').default
+const log = require('electron-log')
 
 const signers = require('../../signers')
 const windows = require('../../windows')
 const store = require('../../store')
+
+const Aragon = require('./aragon')
 
 class Account {
   constructor ({ id, type, index, name, created, addresses, smart }, accounts) {
@@ -17,6 +18,7 @@ class Account {
     this.addresses = addresses || ['0x']
     this.smart = smart
     this.requests = {}
+    if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
     store.observer(() => {
       if (this.smart && this.smart.actor && this.smart.actor.id && this.smart.actor.id !== this.id) {
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
@@ -26,6 +28,33 @@ class Account {
       this.smart = this.signer ? undefined : this.smart
       this.update()
     })
+  }
+  addRequest (req) {
+    // Add a filter to make sure we're adding the request to an account that controls the outcome
+    if (this.smart) {
+      if (this.smart.type === 'aragon') {
+        if (req.type === 'transaction') {
+          if (!this.aragon) return log.error('Aragon account could not resolve this.aragon')
+          this.aragon.pathTransaction(req.data, (err, tx) => {
+            if (err) return log.error(err)
+            req.data = tx
+            this.requests[req.handlerId] = req
+            this.requests[req.handlerId].mode = 'normal'
+            this.requests[req.handlerId].created = Date.now()
+            this.update()
+            windows.showTray()
+            windows.broadcast('main:action', 'setSignerView', 'default')
+          })
+        }
+      }
+    } else {
+      this.requests[req.handlerId] = req
+      this.requests[req.handlerId].mode = 'normal'
+      this.requests[req.handlerId].created = Date.now()
+      this.update()
+      windows.showTray()
+      windows.broadcast('main:action', 'setSignerView', 'default')
+    }
   }
   getSelectedAddresses () {
     return [this.addresses[this.index]]
@@ -77,18 +106,11 @@ class Account {
     windows.broadcast('main:action', 'removeSigner', this.summary())
   }
   signMessage (message, cb) {
-    console.warn('Signer:' + this.type + ' did not implement a signMessage method.')
-  }
-  signTransaction (rawTx, cb) {
     if (this.signer) {
-      signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
+      signers.get(this.signer.id).signMessage(this.index, message, cb)
     } else if (this.smart) {
       if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-        if (this.smart.type === 'aragon') {
-          this.aragonSignTransaction(rawTx, cb)
-        } else {
-          cb(new Error(`No valid handler for smart account transaction...`))
-        }
+        signers.get(this.smart.actor.account.id).signMessage(this.index, message, cb)
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
@@ -96,38 +118,18 @@ class Account {
       cb(new Error(`No signer forund for this account`))
     }
   }
-  bufferToHex (value) {
-    return utils.bufferToHex(value)
-  }
-  aragon (cb) {
-    if (this.aragonWrapper) return cb(null, this.aragonWrapper)
-    const aragonWrapper = new Aragon(this.smart.dao) //  { apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' } } })
-    aragonWrapper.init().then(() => cb(null, this.aragonWrapper)).catch(cb)
-  }
-  aragonSignTransaction (rawTx, cb) {
-    this.aragon((err, wrap) => {
-      if (err) return cb(err)
-      const tx = {
-        from: this.smart.agent, // Agent address
-        to: this.bufferToHex(rawTx.to),
-        gasPrice: this.bufferToHex(rawTx.gasPrice),
-        gasLimit: this.bufferToHex(rawTx.gasLimit),
-        value: this.bufferToHex(rawTx.value) || '0x',
-        data: this.bufferToHex(rawTx.data)
+  signTransaction (rawTx, cb) {
+    if (this.signer) {
+      signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
+    } else if (this.smart) {
+      if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
+        signers.get(this.smart.actor.account.id).signTransaction(this.index, rawTx, cb)
+      } else {
+        cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
-      wrap.calculateTransactionPath(this.smart.actor.address, this.smart.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
-        console.log(result)
-      }).catch(cb)
-    })
-  }
-  aragonSignMessage (message, cb) {
-    this.aragon((err, wrap) => {
-      if (err) return cb(err)
-      const params = ['0x' + utils.keccak(message).toString('hex')]
-      wrap.calculateTransactionPath(this.smart.actor.address, this.smart.agent, 'presignHash', params).then(result => {
-        console.log(result)
-      }).catch(cb)
-    })
+    } else {
+      cb(new Error(`No signer forund for this account`))
+    }
   }
 }
 

@@ -22,7 +22,7 @@ class Settings extends React.Component {
   renderPermissions (viewIndex) {
     let i = 0
     let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
-    let id = this.store('selected.id')
+    let id = this.store('selected.current')
     let currentIndex = this.store('main.accounts', id, 'index')
     let address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     let permissions = this.store('main.addresses', address, 'permissions') || {}
