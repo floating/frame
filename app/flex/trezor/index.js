@@ -52,7 +52,6 @@ class Device {
   }
   ethereumSignTransaction (path, transaction, cb) {
     TrezorConnect.ethereumSignTransaction({ device: this.device, path, transaction }).then(res => {
-      console.log('res', res)
       if (!res.success) return cb(new Error(res.payload.error))
       cb(null, res.payload)
     }).catch(err => cb(err))

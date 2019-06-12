@@ -11,6 +11,7 @@ const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 const signers = require('./signers')
+const accounts = require('./accounts')
 const persist = require('./store/persist')
 
 log.info('Chrome: v' + process.versions.chrome)
@@ -51,7 +52,7 @@ ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
 })
 
 ipcMain.on('tray:verifyAddress', (e) => {
-  signers.verifyAddress(true)
+  accounts.verifyAddress(true)
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
@@ -66,7 +67,7 @@ ipcMain.on('tray:openEtherscan', (e, hash) => {
 
 ipcMain.on('tray:giveAccess', (e, req, access) => {
   store.giveAccess(req, access)
-  signers.removeRequest(req.handlerId)
+  accounts.removeRequest(req.handlerId)
 })
 
 ipcMain.on('tray:syncPath', (e, path, value) => {
@@ -103,7 +104,7 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
-app.on('quit', signers.close)
+app.on('quit', () => accounts.close())
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 let launchStatus = store('main.launch')
@@ -114,32 +115,13 @@ store.observer(() => {
   }
 })
 
-const _accounts = require('./_accounts')
-const _signers = require('./_signers')
-
-const mnemonic = 'duck daring trouble employ million bamboo stock seed refuse example glimpse flame'
+// Dev Testing
 // const mnemonic = bip39.generateMnemonic()
-console.log(mnemonic)
+const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
 const password = 'frame'
-
-_accounts.on('add', account => {
-  log.info('New account added')
-  log.info(account)
-})
-
-_accounts.on('update', account => {
-  log.info('Account updated')
-  log.info(account)
-})
-
-_accounts.on('remove', account => {
-  log.info('Account removed')
-  log.info(account)
-})
-
 setTimeout(() => {
-  _signers.createFromPhrase(mnemonic, password, (err, signer) => {
+  signers.createFromPhrase(mnemonic, password, (err, signer) => {
     if (err) return console.log(err)
     console.log('Created Signer....')
   })
-}, 6000)
+}, 1000)

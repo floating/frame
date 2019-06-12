@@ -11,9 +11,9 @@ class Main extends React.Component {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
   render () {
-    let signers = this.store('signers')
-    let current = this.store('signer.current')
-    let scrollTop = this.store('signer.position.scrollTop')
+    let signers = this.store('main.accounts')
+    let current = this.store('selected.current')
+    let scrollTop = this.store('selected.position.scrollTop')
     return (
       <div className={this.store('panel.view') !== 'default' ? 'main mainHidden' : 'main'}>
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>

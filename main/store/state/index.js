@@ -28,7 +28,7 @@ let initial = {
     initial: true
   },
   balances: {},
-  signer: {
+  selected: {
     minimized: true,
     open: false,
     current: '',
@@ -37,8 +37,9 @@ let initial = {
       viewIndex: 0,
       views: ['permissions', 'verify']
     },
-    accounts: [],
+    addresses: [],
     showAccounts: false,
+    accountPage: 0,
     position: {
       scrollTop: 0,
       initial: {
@@ -66,9 +67,10 @@ let initial = {
   main: {
     launch: main('launch', false),
     reveal: main('reveal', false),
-    accounts: main('accounts', {}), // Persisted account settings and permissions
-    _accounts: main('_accounts', {}), // Translate 'accounts' if it exists
-    _signers: {}, // main('_signers', {}),
+    accounts: {}, // main('accounts', {}),
+    addresses: main('addresses', {}), // New persisted address permissions
+    signers: {},
+    savedSigners: {},
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },
@@ -152,7 +154,10 @@ let initial = {
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.accounts).forEach(account => {
   account = initial.main.accounts[account]
-  if (account && account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
+  if (account) {
+    if (account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
+    delete account.signer
+  }
 })
 
 module.exports = () => initial

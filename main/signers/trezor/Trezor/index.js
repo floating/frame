@@ -84,7 +84,7 @@ class Trezor extends Signer {
     this.device.waitForSessionAndRun(session => {
       return session.getPublicKey(bip32Path.fromString(this.basePath()).toPathArray())
     }).then(result => {
-      cb(null, this.deriveHDAccounts(result.message.node.public_key, result.message.node.chain_code))
+      this.deriveHDAccounts(result.message.node.public_key, result.message.node.chain_code, cb)
     }).catch(err => {
       cb(err)
     })

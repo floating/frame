@@ -2,7 +2,7 @@ const http = require('http')
 const log = require('electron-log')
 
 const provider = require('../provider')
-const signers = require('../signers')
+const accounts = require('../accounts')
 const store = require('../store')
 
 const trusted = require('./trusted')
@@ -42,7 +42,8 @@ const handler = (req, res) => {
       log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
       if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
-        if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: 4100 }
+        // Review
+        if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
         res.writeHead(401, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ id: payload.id, jsonrpc: payload.jsonrpc, error }))
       } else {

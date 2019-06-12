@@ -1,7 +1,7 @@
 const { ipcMain } = require('electron')
 // const log = require('electron-log')
 
-const signers = require('../signers')
+const signers = require('../accounts')
 const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
@@ -17,15 +17,15 @@ const rpc = {
   getSigners: signers.getSigners,
   setSigner: (id, cb) => {
     signers.setSigner(id, cb)
-    provider.accountsChanged(signers.getSelectedAccounts())
+    provider.accountsChanged(signers.getSelectedAddresses())
   },
   setSignerIndex: (index, cb) => {
     signers.setSignerIndex(index, cb)
-    provider.accountsChanged(signers.getSelectedAccounts())
+    provider.accountsChanged(signers.getSelectedAddresses())
   },
   unsetSigner: (cb) => {
     signers.unsetSigner(cb)
-    provider.accountsChanged(signers.getSelectedAccounts())
+    provider.accountsChanged(signers.getSelectedAddresses())
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,

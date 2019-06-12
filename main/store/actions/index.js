@@ -40,23 +40,23 @@ module.exports = {
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
-  clearPermissions: (u, account) => {
-    u('main.accounts', account, account => {
-      account.permissions = {}
-      return account
+  clearPermissions: (u, address) => {
+    u('main.addresses', address, address => {
+      address.permissions = {}
+      return address
     })
   },
   giveAccess: (u, req, access) => {
-    u('main.accounts', req.account, account => {
-      account = account || { permissions: {} }
-      account.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-      return account
+    u('main.addresses', req.address, address => {
+      address = address || { permissions: {} }
+      address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
+      return address
     })
   },
-  toggleAccess: (u, account, handlerId) => {
-    u('main.accounts', account, account => {
-      account.permissions[handlerId].provider = !account.permissions[handlerId].provider
-      return account
+  toggleAccess: (u, address, handlerId) => {
+    u('main.addresses', address, address => {
+      address.permissions[handlerId].provider = !address.permissions[handlerId].provider
+      return address
     })
   },
   syncPath: (u, path, value) => {
@@ -69,16 +69,41 @@ module.exports = {
       return dontRemind
     })
   },
-  newAccount: (u, account) => {
-    u('main._accounts', accounts => {
-      accounts[account.id] = account
-      return accounts
+  updateAccount: (u, account) => {
+    u('main.accounts', account.id, () => account)
+  },
+  removeSigner: (u, id) => {
+    u('main.signers', signers => {
+      delete signers[id]
+      return signers
     })
   },
+  updateSigner: (u, signer) => {
+    if (!signer.id) return
+    u('main.signers', signer.id, () => signer)
+  },
   newSigner: (u, signer) => {
-    u('main._signers', signers => {
+    u('main.signers', signers => {
       signers[signer.id] = signer
       return signers
+    })
+  },
+  moveOldAccountsToNewAddresses: (u, signer) => {
+    const addressesToMove = {}
+    u('main.accounts', accounts => {
+      Object.keys(accounts).forEach(id => {
+        if (id.startsWith('0x')) {
+          addressesToMove[id] = accounts[id]
+          delete accounts[id]
+        }
+      })
+      return accounts
+    })
+    u('main.addresses', addresses => {
+      Object.keys(addressesToMove).forEach(id => {
+        addresses[id] = addressesToMove[id]
+      })
+      return addresses
     })
   }
 }

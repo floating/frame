@@ -8,7 +8,8 @@ const proxy = require('./proxy')
 
 const store = require('../store')
 const nodes = require('../nodes')
-const signers = require('../signers')
+const accounts = require('../accounts')
+
 const version = require('../../package.json').version
 
 class Provider extends EventEmitter {
@@ -49,13 +50,13 @@ class Provider extends EventEmitter {
     return r
   }
   getCoinbase (payload, res) {
-    signers.getAccounts((err, accounts) => {
+    accounts.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts[0] })
     })
   }
   getAccounts (payload, res) {
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signers.getSelectedAccounts().map(a => a.toLowerCase()) })
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
   }
   getNetVersion (payload, res) {
     this.connection.send(payload, (response) => {
@@ -105,7 +106,7 @@ class Provider extends EventEmitter {
     let payload = req.payload
     let address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
     let message = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
-    signers.signMessage(address, message, (err, signed) => {
+    accounts.signMessage(address, message, (err, signed) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
@@ -126,12 +127,12 @@ class Provider extends EventEmitter {
     let rawTx = req.data
     let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
     let payload = req.payload
-    signers.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
+    accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
       if (err) {
         this.resError(err, payload, res)
         cb(new Error(err))
       } else {
-        signers.setTxSigned(req.handlerId, err => {
+        accounts.setTxSigned(req.handlerId, err => {
           if (err) return cb(err)
           this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, response => {
             if (response.error) {
@@ -210,17 +211,17 @@ class Provider extends EventEmitter {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
       let from = rawTx.from
-      let current = signers.getAccounts()[0]
+      let current = accounts.getAccounts()[0]
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       let handlerId = uuid()
       this.handlers[handlerId] = res
-      signers.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: signers.getAccounts()[0] }, res)
+      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0] }, res)
     })
   }
   ethSign (payload, res) {
     let handlerId = uuid()
     this.handlers[handlerId] = res
-    signers.addRequest({ handlerId, type: 'sign', payload, account: signers.getAccounts()[0] })
+    accounts.addRequest({ handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] })
   }
   subscribe (payload, res) {
     let subId = '0x' + this.randHex(32)
@@ -261,7 +262,7 @@ let network = store('main.connection.network')
 store.observer(() => {
   if (network !== store('main.connection.network')) {
     network = store('main.connection.network')
-    signers.unsetSigner()
+    accounts.unsetSigner()
     provider.networkChanged(network)
     provider.accountsChanged([])
   }

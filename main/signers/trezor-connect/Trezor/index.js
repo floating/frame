@@ -81,7 +81,7 @@ class Trezor extends Signer {
   lookupAccounts (cb) {
     flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), (err, result) => {
       if (err) return cb(err)
-      cb(null, this.deriveHDAccounts(result.publicKey, result.chainCode))
+      this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
     })
   }
   update () {

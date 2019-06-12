@@ -14,7 +14,7 @@ class Signer extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
-    this.state = { typeHover: false, accountPage: 0, accountHighlight: 'default', highlightIndex: 0, tPin: '' }
+    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '' }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -35,7 +35,7 @@ class Signer extends React.Component {
     this.setState({ tPin: this.state.tPin ? this.state.tPin.slice(0, -1) : '' })
   }
   select () {
-    if (this.store('signer.current') === this.props.id) {
+    if (this.store('selected.current') === this.props.id) {
       link.rpc('unsetSigner', (err, status) => { if (err) return console.log(err) })
     } else {
       let bounds = this.signer.getBoundingClientRect()
@@ -91,7 +91,7 @@ class Signer extends React.Component {
     let innerClass = 'signerInner'
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
-    if (this.store('signer.view') === 'settings') innerClass += ' signerTypeSettings'
+    if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
     return (
       <div className='signerType'>
         {this.renderArrows('up')}
@@ -99,12 +99,19 @@ class Signer extends React.Component {
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
-                if (this.props.type === 'Ledger') return <img src={ledgerLogo} />
-                if (this.props.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
-                return svg.octicon('zap', { height: 31 })
+                if (this.props.signer) {
+                  if (this.props.signer.type === 'Ledger') return <img src={ledgerLogo} />
+                  if (this.props.signer.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
+                  if (this.props.signer.type === 'Hot') return svg.octicon('zap', { height: 31 })
+                  if (this.props.signer.type === 'seed') return svg.seedling(31)
+                  if (this.props.signer.type === 'ring') return svg.octicon('plus', { height: 31 })
+                  return svg.octicon('plus', { height: 31 })
+                } else {
+                  return svg.octicon('plug', { height: 31 })
+                }
               })()}
             </div>
-            <div className='signerText'>{this.props.type}</div>
+            <div className='signerText'>{this.props.signer ? this.props.signer.type : 'Disconnected'}</div>
           </div>
         </div>
         <div className='addressSelect' onMouseDown={e => {
@@ -122,8 +129,8 @@ class Signer extends React.Component {
   }
   renderMenu () {
     let menuClass = 'signerMenu'
-    menuClass += this.store('signer.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
-    if (this.store('signer.current') === this.props.id & this.store('signer.open')) menuClass += ' signerMenuOpen'
+    menuClass += this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
+    if (this.store('selected.current') === this.props.id & this.store('selected.open')) menuClass += ' signerMenuOpen'
     return (
       <div className={menuClass}>
         <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')} >
@@ -145,7 +152,7 @@ class Signer extends React.Component {
     if (!this.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
   }
   closeAccounts () {
-    if (this.store('signer.showAccounts')) this.store.toggleShowAccounts(false)
+    if (this.store('selected.showAccounts')) this.store.toggleShowAccounts(false)
   }
   setSignerIndex (index) {
     this.locked = true
@@ -157,8 +164,8 @@ class Signer extends React.Component {
     })
   }
   renderSettingsMenu () {
-    let viewIndex = this.store('signer.settings.viewIndex')
-    let views = this.store('signer.settings.views')
+    let viewIndex = this.store('selected.settings.viewIndex')
+    let views = this.store('selected.settings.views')
     let itemWidth = 35
     let markLeft = (itemWidth * viewIndex) + 'px'
     let markRight = (((views.length - viewIndex) - 1) * itemWidth) + 'px'
@@ -181,14 +188,14 @@ class Signer extends React.Component {
     )
   }
   renderAccountList () {
-    let index = this.store('signers', this.props.id, 'index')
-    let startIndex = this.state.accountPage * 5
+    let index = this.store('main.accounts', this.props.id, 'index')
+    let startIndex = this.store('selected.accountPage') * 5
     let highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
     return (
       <div className='accountListWrap'>
         <div className='accountList' onMouseDown={e => e.stopPropagation()}>
           <div className='accountListItems'>
-            {this.store('signers', this.props.id, 'accounts').slice(startIndex, startIndex + 5).map((a, i) => {
+            {this.store('main.accounts', this.props.id, 'addresses').slice(startIndex, startIndex + 5).map((a, i) => {
               i = startIndex + i
               let balance = this.store('balances', a)
               return (
@@ -202,7 +209,7 @@ class Signer extends React.Component {
           </div>
           <div className='accountPageToggle'>
             <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>{svg.octicon('chevron-left', { height: 18 })}</div>
-            <div className='accountPageCurrent'>{this.state.accountPage + 1}</div>
+            <div className='accountPageCurrent'>{this.store('selected.accountPage') + 1}</div>
             <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
           </div>
           {this.renderSettingsMenu()}
@@ -211,18 +218,22 @@ class Signer extends React.Component {
     )
   }
   updateAccountPage (d) {
-    let accountPage = d === '<' ? this.state.accountPage - 1 : this.state.accountPage + 1
-    let max = Math.ceil((this.store('signers', this.props.id, 'accounts').length / 5) - 1)
+    let accountPage = this.store('selected.accountPage')
+    accountPage = d === '<' ? accountPage - 1 : accountPage + 1
+    let max = Math.ceil((this.store('main.accounts', this.props.id, 'addresses').length / 5) - 1)
     if (accountPage < 0) accountPage = 0
     if (accountPage > max) accountPage = max
-    this.setState({ accountPage })
+    this.store.accountPage(accountPage)
   }
   renderStatus () {
+    // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
-    let currentIndex = this.store('signers', this.props.id, 'index')
+    let currentIndex = this.store('main.accounts', this.props.id, 'index')
     let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-    let accounts = this.store('signers', this.props.id, 'accounts')
+    let address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    let balance = this.store('balances', address)
+    if (!address) return null
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -250,53 +261,48 @@ class Signer extends React.Component {
             </div>
           )
         ) : (
-          <div className='signerAccounts' style={{ width: '1500%', left: '-' + (currentIndex * 100) + '%' }}>
-            {accounts.map((account, index) => {
-              let balance = this.store('balances', account)
-              return (
-                <div key={account + index} className='signerAccount' style={{ minWidth: `calc(100% / 15)` }}>
-                  <div className='signerName'>
-                    <div className='signerNameText'>
-                      {this.props.type + ' Account'}
-                      <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
-                    </div>
-                  </div>
-                  <div className='signerAddress'>
-                    <div className='transactionToAddress'>
-                      <div className='transactionToAddressLarge'>{account.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {account.substr(account.length - 10)}</div>
-                      <div className='transactionToAddressFull'>
-                        {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : account}
-                        <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={account} readOnly />
-                      </div>
-                    </div>
-                  </div>
-                  <div className='signerInfo'>
-                    <div className='signerBalance'>
-                      <span className='signerBalanceCurrency'>{'Ξ'}</span>
-                      {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
-                    </div>
+          <div className='signerAccounts' style={{ width: '100%' }}>
+            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
+              <div className='signerName'>
+                <div className='signerNameText'>
+                  {this.props.type + ' Account'}
+                  <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
+                </div>
+              </div>
+              <div className='signerAddress'>
+                <div className='transactionToAddress'>
+                  <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+                  <div className='transactionToAddressFull'>
+                    {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+                    <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />
                   </div>
                 </div>
-              )
-            })}
+              </div>
+              <div className='signerInfo'>
+                <div className='signerBalance'>
+                  <span className='signerBalanceCurrency'>{'Ξ'}</span>
+                  {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
     )
   }
   render () {
-    let current = (this.store('signer.current') === this.props.id) && this.props.status === 'ok'
-    let open = current && this.store('signer.open')
-    let minimized = this.store('signer.minimized')
+    let current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    let open = current && this.store('selected.open')
+    let minimized = this.store('selected.minimized')
     this.selected = current && !minimized
     let signerClass = 'signer'
     if (this.props.status === 'ok') signerClass += ' okSigner'
     if (open) signerClass += ' openSigner'
-    if (this.store('signer.view') === 'settings') signerClass += ' signerInSettings'
-    if (this.store('signer.showAccounts')) signerClass += ' signerAccountExpand'
+    if (this.store('selected.view') === 'settings') signerClass += ' signerInSettings'
+    if (this.store('selected.showAccounts')) signerClass += ' signerAccountExpand'
 
     let style = {}
-    let initial = this.store('signer.position.initial')
+    let initial = this.store('selected.position.initial')
 
     if (current) {
       // Currently selected
@@ -309,14 +315,14 @@ class Signer extends React.Component {
       let panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 50 : initial.height - 3
       style.transform = open ? `translateY(-${initial.top - 44}px)` : `translateY(0px)`
-    } else if (this.store('signer.current') !== '') {
+    } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0
       style.pointerEvents = 'none'
       style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
-      if (this.store('signer.open')) {
+      if (this.store('selected.open')) {
         // Not open, but another signer is
-        style.transform = this.props.index > this.store('signer.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
+        style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
         style.opacity = 0
         style.pointerEvents = 'none'
       } else {
@@ -333,11 +339,11 @@ class Signer extends React.Component {
               {this.renderStatus()}
               {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
-            {this.renderAccountList()}
-            {this.store('signer.current') === this.props.id ? (
-              <div className='signerMid' style={open ? { top: this.store('signer.view') === 'settings' ? '200px' : '200px' } : { pointerEvents: 'none' }}>
+            {current ? this.renderAccountList() : null}
+            {current ? (
+              <div className='signerMid' style={open ? { top: this.store('selected.view') === 'settings' ? '200px' : '200px' } : { pointerEvents: 'none' }}>
                 <Settings id={this.props.id} />
-                <Requests id={this.props.id} accounts={this.props.accounts} minimized={minimized} />
+                <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} />
               </div>
             ) : null}
             <div className='signerBot' />

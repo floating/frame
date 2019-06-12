@@ -1,16 +1,13 @@
 const EthTx = require('ethereumjs-tx')
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix } = require('ethereumjs-util')
-const log = require('electron-log')
+const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix } = require('ethereumjs-util') // privateToAddress
 const Signer = require('../../Signer')
 
-class Seed extends Signer {
-  constructor (signer, signers) {
+class Ring extends Signer {
+  constructor (signer) {
     super()
-    log.info('Creating seed signer instance')
     this.id = signer.id
     this.type = signer.type
-    this.addresses = signer.addresses
-    this.seed = signer.seed
+    this.accounts = signer.accounts
   }
   // Standard Methods
   signMessage (message, cb) {
@@ -26,4 +23,4 @@ class Seed extends Signer {
   }
 }
 
-module.exports = Seed
+module.exports = Ring
