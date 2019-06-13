@@ -8,9 +8,10 @@ class Client extends React.Component {
   toggle = () => {
     const client = this.props.client
     const networkId = this.store('main.connection.network')
-    const { on, state } = this.store(`main.clients.${client}`)
+    const on = this.store(`main.clients.${client}.on`)
+    const state = this.store(`main.clients.${client}.state`)
 
-    // Block toggling of Parity if Rinkeby selected and notify user
+    // Block Parity if Rinkeby selected
     if (!on && client === 'parity' && networkId === '4') return this.store.notify('rinkeby')
 
     // Block toggling in transient states

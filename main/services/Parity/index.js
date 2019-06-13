@@ -23,6 +23,9 @@ class Parity extends EthereumClient {
       const errorHandler = (err) => {
         if (err.message.includes('Failed to open database')) {
           windows.broadcast('main:action', 'notify', 'parityAlreadyRunning')
+        } else {
+          console.log('\nUnhandled Parity error')
+          console.error(err)
         }
       }
 

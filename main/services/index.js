@@ -7,9 +7,10 @@ const { app } = require('electron')
 
 // Parity
 app.on('ready', () => {
+
+  // On client toggled ->
   let previousOn = false
   store.observer(_ => {
-    // On client toggled ->
     let on = store('main.clients.parity.on')
     if (on !== previousOn) {
       on ? parity.start() : parity.stop()
@@ -21,19 +22,21 @@ app.on('ready', () => {
   let previousNetworkId = store('main.connection.network')
   store.observer(_ => {
     const networkId = store('main.connection.network')
+    const on = store('main.clients.parity.on')
+    const state = store('main.clients.parity.state')
 
     // If new network and client is running ->
-    if (networkId !== previousNetworkId && store('main.clients.parity.on')) {
+    if (networkId !== previousNetworkId && on) {
       // Restart client with updated network args (unless network swwitched to Rinkeby)
-      store.toggleClient('parity', false)
+      if (state === 'ready' || state === 'syncing') store.toggleClient('parity', false)
 
-      if (networkId === '4') {
-        windows.broadcast('main:action', 'notify', 'rinkeby')
-      } else {
-        parity.once('exit', () => {
-          if (networkId !== '4') store.toggleClient('parity', true)
-        })
-      }
+      setTimeout(() => {
+        if (networkId === '4') {
+          windows.broadcast('main:action', 'notify', 'rinkeby')
+        } else {
+          parity.once('exit', () => store.toggleClient('parity', true))
+        }
+      }, 500)
 
       // Update holder variable
       previousNetworkId = store('main.connection.network')
@@ -43,7 +46,6 @@ app.on('ready', () => {
   // Link parity on/off with local connection
   store.observer(_ => {
     let state = store('main.clients.parity.state')
-    console.log("Observed state", state)
     if (state === 'ready') store.toggleConnection('local', true)
     if (state === 'off') store.toggleConnection('local', false)
   })
