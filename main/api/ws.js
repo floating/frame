@@ -3,7 +3,7 @@ const uuid = require('uuid/v4')
 const log = require('electron-log')
 
 const provider = require('../provider')
-const signers = require('../signers')
+const accounts = require('../accounts')
 const store = require('../store')
 
 const trusted = require('./trusted')
@@ -38,7 +38,8 @@ const handler = (socket, req) => {
     log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
-      if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: 4100 }
+      // review
+      if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
       provider.send(payload, response => {
@@ -90,7 +91,7 @@ module.exports = server => {
   // provider.on('close', _ => ws.clients.forEach(socket => socket.close()))
   // When permission is revoked, close connected sockets
   // store.observer(() => {
-  //   let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
+  //   let permissions = store('local.accounts', store('selected.accounts', 0), 'permissions') || {}
   //   let ok = []
   //   Object.keys(permissions).forEach(key => { if (permissions[key].provider) ok.push(permissions[key].origin) })
   //   ws.clients.forEach(socket => { if (ok.indexOf(socket.origin) < 0) socket.close() })
@@ -98,8 +99,8 @@ module.exports = server => {
   // When the current account changes, close connected sockets
   // let current = ''
   // store.observer(() => {
-  //   if (store('signer.current') !== current) ws.clients.forEach(socket => socket.close())
-  //   current = store('signer.current')
+  //   if (store('selected.current') !== current) ws.clients.forEach(socket => socket.close())
+  //   current = store('selected.current')
   // })
   // let local
   // let secondary
