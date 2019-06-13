@@ -106,9 +106,11 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
-app.on('quit', () => signers.close())
-app.on('window-all-closed', async () => {
+app.on('quit', async () => {
   await clients.stop()
+  signers.close()
+})
+app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
