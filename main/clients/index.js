@@ -29,15 +29,14 @@ app.on('ready', () => {
     if (networkId !== previousNetworkId && on) {
       // Restart client with updated network args (unless network swwitched to Rinkeby)
       if (state === 'ready' || state === 'syncing') store.toggleClient('parity', false)
-      
+
       if (networkId === '4') {
         windows.broadcast('main:action', 'notify', 'rinkeby')
       } else {
         parity.once('exit', () => {
-          setTimeout(() => store.toggleClient('parity', true), 500)
+          setTimeout(() => store.toggleClient('parity', true), 250)
         })
       }
-      
 
       // Update holder variable
       previousNetworkId = store('main.connection.network')
@@ -45,10 +44,14 @@ app.on('ready', () => {
   })
 
   // Link parity on/off with local connection
+  let previousState = store('main.clients.parity.state')
   store.observer(_ => {
     let state = store('main.clients.parity.state')
-    if (state === 'ready') store.toggleConnection('local', true)
-    if (state === 'off') store.toggleConnection('local', false)
+    if (state !== previousState) {
+      if (state === 'ready') store.toggleConnection('local', true)
+      if (state === 'off') store.toggleConnection('local', false)
+      previousState = state
+    }
   })
 })
 
