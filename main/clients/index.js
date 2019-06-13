@@ -27,17 +27,17 @@ app.on('ready', () => {
 
     // If new network and client is running ->
     if (networkId !== previousNetworkId && on) {
-      console.log("GOT EHRE!")
       // Restart client with updated network args (unless network swwitched to Rinkeby)
       if (state === 'ready' || state === 'syncing') store.toggleClient('parity', false)
-
-      setTimeout(() => {
-        if (networkId === '4') {
-          windows.broadcast('main:action', 'notify', 'rinkeby')
-        } else {
-          parity.once('exit', () => store.toggleClient('parity', true))
-        }
-      }, 500)
+      
+      if (networkId === '4') {
+        windows.broadcast('main:action', 'notify', 'rinkeby')
+      } else {
+        parity.once('exit', () => {
+          setTimeout(() => store.toggleClient('parity', true), 500)
+        })
+      }
+      
 
       // Update holder variable
       previousNetworkId = store('main.connection.network')
