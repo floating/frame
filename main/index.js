@@ -11,7 +11,7 @@ const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 const signers = require('./signers')
-const services = require('./services')
+const clients = require('./clients')
 const persist = require('./store/persist')
 
 log.info('Chrome: v' + process.versions.chrome)
@@ -27,7 +27,7 @@ process.on('uncaughtException', (e) => {
   log.error('uncaughtException')
   log.error(e)
   // Kill all clients running as child processes
-  services.stop()
+  clients.stop()
   throw e
   // setTimeout(() => app.quit(), 50)
 })
@@ -108,7 +108,7 @@ app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
 app.on('quit', () => signers.close())
 app.on('window-all-closed', async () => {
-  await services.stop()
+  await clients.stop()
   if (process.platform !== 'darwin') app.quit()
 })
 

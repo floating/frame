@@ -27,6 +27,7 @@ app.on('ready', () => {
 
     // If new network and client is running ->
     if (networkId !== previousNetworkId && on) {
+      console.log("GOT EHRE!")
       // Restart client with updated network args (unless network swwitched to Rinkeby)
       if (state === 'ready' || state === 'syncing') store.toggleClient('parity', false)
 

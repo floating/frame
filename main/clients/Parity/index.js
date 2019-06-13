@@ -1,6 +1,9 @@
 const fs = require('fs')
+const log = require('electron-log')
+
 const windows = require('../../windows')
 const store = require('../../store')
+
 const EthereumClient = require('../EthereumClient')
 
 class Parity extends EthereumClient {
@@ -24,8 +27,8 @@ class Parity extends EthereumClient {
         if (err.message.includes('Failed to open database')) {
           windows.broadcast('main:action', 'notify', 'parityAlreadyRunning')
         } else {
-          console.log('\nUnhandled Parity error')
-          console.error(err)
+          log.error('\nUnhandled Parity error')
+          log.error(err)
         }
       }
 

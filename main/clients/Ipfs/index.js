@@ -1,5 +1,7 @@
 const log = require('electron-log')
+
 const windows = require('../../windows')
+
 const Client = require('../Client')
 
 class IPFS extends Client {

@@ -20,8 +20,6 @@ class Client extends React.Component {
     }
   }
 
-  capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1)
-
   fullName = (client) => {
     if (client === 'parity') return 'Parity Ethereum'
     if (client === 'ipfs') return 'IPFS'
