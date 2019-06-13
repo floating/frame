@@ -82,7 +82,6 @@ let initial = {
       },
       geth: {
         on: main('clients.geth.on', false),
-        mode: main('clients.geth.mode', 'light'),
         blockNumber: 0,
         currentBlock: 0,
         highestBlock: 0,
