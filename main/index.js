@@ -11,6 +11,7 @@ const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 const signers = require('./signers')
+const clients = require('./clients')
 const accounts = require('./accounts')
 const persist = require('./store/persist')
 
@@ -26,6 +27,8 @@ process.on('uncaughtException', (e) => {
   }
   log.error('uncaughtException')
   log.error(e)
+  // Kill all clients running as child processes
+  clients.stop()
   throw e
   // setTimeout(() => app.quit(), 50)
 })
@@ -104,7 +107,10 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
-app.on('quit', () => accounts.close())
+app.on('quit', async () => {
+  await clients.stop()
+  accounts.close()
+})
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 let launchStatus = store('main.launch')

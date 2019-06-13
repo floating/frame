@@ -38,6 +38,7 @@
     "release": "build",
     "postinstall": "electron-builder install-app-deps",
     "test": "standard && jest",
+    "test:clients": "mocha test/clients/*.test.js",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
   "jest": {
@@ -62,6 +63,7 @@
     "@ledgerhq/hw-transport-web-ble": "4.61.0",
     "abi-codec": "0.0.6",
     "auto-launch": "5.0.5",
+    "axios": "^0.19.0",
     "babel-polyfill": "6.26.0",
     "bip32-path": "0.4.2",
     "bip39": "3.0.2",
@@ -76,6 +78,8 @@
     "ethereumjs-tx": "1.3.7",
     "ethereumjs-util": "6.1.0",
     "ethereumjs-wallet": "0.6.3",
+    "extract-zip": "^1.6.7",
+    "fs-extra": "^8.0.1",
     "hdkey": "1.1.1",
     "node-hid": "0.7.9",
     "query-string": "6.7.0",
@@ -84,6 +88,7 @@
     "react-restore": "0.3.0",
     "react-transition-group": "4.1.1",
     "semver": "6.1.1",
+    "tar": "^4.4.10",
     "trezor-connect": "7.0.2-electron.4",
     "trezor-link": "1.6.1",
     "trezor.js": "8.1.0",

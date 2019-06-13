@@ -61,11 +61,75 @@ class Notify extends React.Component {
       </div>
     )
   }
+  rinkeby () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            {'Parity 💔 Rinkeby'}
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{'Unfortunately, Parity does not support the Rinkeby testnet.'}</div>
+            <div className='notifyBodyLine'>{'Please select another Ethereum client or use the secondary connection.'}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>{'Go Back'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  ipfsAlreadyRunning () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          {/* <div className='notifyTitle'>
+            {'Could not start IPFS'}
+          </div> */}
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{'IPFS daemon is already running on this machine.'}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>{'Go Back'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  parityAlreadyRunning () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          {/* <div className='notifyTitle'>
+            {'Could not start IPFS'}
+          </div> */}
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{'Parity is already running on this machine.'}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>{'Go Back'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
   render () {
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
         {this.mainnet()}
         {this.intro()}
+        {this.rinkeby()}
+        {this.ipfsAlreadyRunning()}
+        {this.parityAlreadyRunning()}
       </div>
     )
   }
