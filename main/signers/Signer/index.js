@@ -1,7 +1,8 @@
 // const HDKey = require('hdkey')
 // const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
 
-const deriveHDAccounts = require('worker-farm')(require.resolve('./derive'))
+// const deriveHDAccounts = require('worker-farm')(require.resolve('./derive'))
+const deriveHDAccounts = require('./derive')
 
 const crypt = require('../../crypt')
 

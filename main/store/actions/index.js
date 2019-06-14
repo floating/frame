@@ -91,7 +91,7 @@ module.exports = {
   // Ethereum and IPFS clients
   setClientState: (u, client, state) => u(`main.clients.${client}.state`, () => state),
   updateClient: (u, client, key, value) => u(`main.clients.${client}.${key}`, () => value),
-  toggleClient: (u, client, on) => u(`main.clients.${client}.on`, (value) => on !== undefined ? on : !value)
+  toggleClient: (u, client, on) => u(`main.clients.${client}.on`, (value) => on !== undefined ? on : !value),
   moveOldAccountsToNewAddresses: (u, signer) => {
     const addressesToMove = {}
     u('main.accounts', accounts => {

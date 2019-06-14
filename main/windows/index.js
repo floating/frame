@@ -143,10 +143,11 @@ const api = {
           windows.tray.setAlwaysOnTop(false)
           let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
           windows.tray.setResizable(true)
-          windows.tray.setSize(0, dev ? 740 : area.height)
+          windows.tray.setSize(1, dev ? 740 : area.height)
           let pos = windows.tray.positioner.calculate('topRight')
           windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
+          windows.tray.hide()
         }
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
@@ -172,6 +173,7 @@ const api = {
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')
+      windows.tray.show()
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
