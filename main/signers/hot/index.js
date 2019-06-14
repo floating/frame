@@ -3,8 +3,8 @@ const store = require('../../store')
 const Seed = require('./Seed')
 const Ring = require('./Ring')
 
-const create = require('worker-farm')(require.resolve('./create'), [ 'newPhrase', 'fromSeed', 'fromPhrase' ])
-
+// const create = require('worker-farm')(require.resolve('./create'), [ 'newPhrase', 'fromSeed', 'fromPhrase' ])
+const create = require('./create')
 // const signersPath = path.resolve(app.getPath('userData') + '/signers')
 const api = {
   newPhrase: (cb) => {

@@ -21,7 +21,7 @@ let initial = {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, notify: '', badge: '' },
+  view: { current: '', list: [], data: {}, notify: '', badge: '', addAccount: '' },
   signers: {},
   tray: {
     open: false,

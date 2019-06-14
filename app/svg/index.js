@@ -65,5 +65,14 @@ module.exports = {
       </div>
     )
   },
+  swoop: size => {
+    return (
+      <div style={{ width: '120%', height: '1200px' }}>
+        <svg viewBox='0 0 121.89 524.31'>
+          <path fill='currentColor' d='M75.82,460C56.2,465.69,13.16,478.35.5,522.65V.5H121.39V411.09C121.39,449.87,97.11,453.81,75.82,460Z' />
+        </svg>
+      </div>
+    )
+  },
   octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }

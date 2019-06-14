@@ -27,6 +27,8 @@ class Panel extends React.Component {
     let transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
     return (
       <div id='panel' style={{ transform, transition }}>
+        <div className='panelSwoop'>{svg.swoop()}</div>
+        <div className='panelSwoopBottom'>{svg.swoop()}</div>
         <div className='panelMenu'>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>

@@ -101,3 +101,160 @@
   left 0
   z-index 6000
   pointer-events none
+
+.panelBottomMenu
+  position absolute
+  left 0
+  right 0px
+  bottom 0
+  height 80px
+  // padding 0px 5px 100px 5px
+  display flex
+  justify-content center
+  align-items center
+
+  -webkit-app-region no-drag
+  z-index 10000000
+  opacity 1
+  // background linear-gradient(rgba(240, 240, 255, 0), rgba(240, 240, 255, 0.5))
+
+.addAccountShade
+  opacity 0
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 9000000000
+  // background linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+  pointer-events none
+  transition standardSlow
+  background: linear-gradient(to right, #ffc3a0, #FFAFBD); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+  // background: linear-gradient(to right, #89fffd, #ef32d9); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+  // background: linear-gradient(to left, #89fffd, #ef32d9); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+.addAccountShadeActive
+  opacity 0.5
+
+.addAccountInterface
+  position absolute
+  // background rgba(0,0,50,0)
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 9000000004
+  pointer-events none
+  transition standardSlow
+  // display flex
+  // justify-content center
+  // align-items center
+
+  .addAccountTrigger
+    position relative
+    height 40px
+    width 40px
+    border-radius 20px
+    // background red
+    display flex
+    justify-content center
+    align-items center
+    // background rgba(240, 240, 255, 0.3)
+    background light
+    // box-shadow light
+    pointer-events auto
+    transition standardSlow
+    z-index 4
+    color outerspace08
+    box-shadow 0px 8px 7px -5px rgba(6, 54, 52, 0.15)
+    transform rotate(-1deg)
+
+    .addAccountTriggerIcon
+      z-index 3
+      transition standardSlow
+      font-size 30px
+      // width 16px
+      // height 16px
+      margin 0px 0px 2px 1px
+      color outerspace08
+      transform rotate(1deg)
+
+  .addAccountTriggerActive
+    background phase
+    box-shadow 0px 8px 7px -5px rgba(252, 70, 107, 0.4)
+    .addAccountTriggerIcon
+      color rgba(252, 70, 107, 0.7)
+      transform rotate(45deg)
+
+  // .addAccountTrigger:before
+  //   content ''
+  //   display flex
+  //   justify-content center
+  //   align-items center
+  //   text-transform uppercase
+  //   font-size 10px
+  //   letter-spacing 1px
+  //   font-weight bold
+  //   position absolute
+  //   left 0px
+  //   right 0px
+  //   bottom 3px
+  //   top 0px
+  //   border-radius 19px
+  //   background light
+  //   opacity 0.8
+  //   transition standard
+  //   z-index 1
+
+.addAccountMain
+  pointer-events none
+  opacity 0
+  transform translateY(calc(150px))
+  position absolute
+  background phase
+  color rgba(252, 70, 107, 0.8)
+  top 60px
+  right 10px
+  bottom 90px
+  left 10px
+  border-radius 5px
+  transition standardSlow
+  z-index 5
+  z-index 9000000002
+  box-shadow 0px 30px 70px -20px rgba(252, 70, 107, 0.7)
+  padding-bottom 200px
+  overflow-y scroll
+  overflow-x hidden
+
+  .addAccountTitle
+    height 60px
+    width 100%
+    margin 20px 0px 0px 0px
+
+  .addAccountHeader
+    height 20px
+    width 100%
+    margin 20px 0px 0px 0px
+
+  .addAccountItem
+    height 60px
+    width calc(100% - 40px)
+    margin 20px 20px 0px 20px
+    border-radius 5px
+    box-shadow 0px 30px 70px -20px rgba(252, 70, 107, 0.7)
+
+  .addAccountItemHardware
+    background linear-gradient(to right, #2c3e50, #bdc3c7)
+
+  .addAccountItemSmart
+    background linear-gradient(to right, #3F5EFB, #FC466B)
+
+  .addAccountItemHot
+    background linear-gradient(to right, #b91d73, #f953c6)
+
+.addAccountMainActive
+  pointer-events auto
+  opacity 1
+  transform translateY(0px)

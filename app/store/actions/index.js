@@ -27,6 +27,8 @@ export const setBalance = (u, account, balance) => u('balances', account, b => b
 
 export const notify = (u, type) => u('view.notify', _ => type)
 
+export const toggleAddAccount = (u) => u('view.addAccount', show => !show)
+
 export const updateBadge = (u, type) => u('view.badge', _ => type)
 
 export const toggleSettings = u => {
