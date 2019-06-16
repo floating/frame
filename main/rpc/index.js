@@ -67,6 +67,10 @@ const rpc = {
       signers.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
+  },
+  addAragon (account, cb) {
+    signers.addAragon(account)
+    cb(null)
   }
 }
 

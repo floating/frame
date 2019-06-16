@@ -117,104 +117,108 @@ class Settings extends React.Component {
     let netSetStyle = { marginTop: this.state.expandNetwork ? '0px' : (-26 * index) + 'px' }
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
-        <div className='localSettingsTitle connectionTitle'>
-          <div>{'Connection'}</div>
-          <div className={this.state.expandNetwork ? 'connectionTitleSet connectionExpandNetwork' : 'connectionTitleSet'} onMouseDown={e => this.expandNetwork(e)}>
-            <div className='connectionTitleSetItems' style={netSetStyle}>
-              {options.map((option, index) => {
-                return (
-                  <div key={option + index} className='connectionTitleSetItem' onMouseDown={() => this.selectNetwork(option)}>
-                    <div className='connectionTitleSetText'>{networks[option]}</div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-        <div className='signerPermission'>
-          <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>{'Local'}</div>
-              <div className={this.store('main.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'local')}>
-                <div className='signerPermissionToggleSwitch' />
+        <div className='localSettingsWrapFadeTop' />
+        <div className='localSettingsWrapFadeBot' />
+        <div className='localSettingsWrap'>
+          <div className='localSettingsTitle connectionTitle'>
+            <div>{'Connection'}</div>
+            <div className={this.state.expandNetwork ? 'connectionTitleSet connectionExpandNetwork' : 'connectionTitleSet'} onMouseDown={e => this.expandNetwork(e)}>
+              <div className='connectionTitleSetItems' style={netSetStyle}>
+                {options.map((option, index) => {
+                  return (
+                    <div key={option + index} className='connectionTitleSetItem' onMouseDown={() => this.selectNetwork(option)}>
+                      <div className='connectionTitleSetText'>{networks[option]}</div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.status(this.store('main.connection.local'))}
-                <div className='signerOptionSetWrap'>
-                  <div className={this.state.localShake.custom ? 'signerOptionSet headShake' : 'signerOptionSet'} onMouseDown={() => this.localShake('custom')}>
-                    <div className='signerOptionSetButton' />
-                    {this.store('main.connection.local.type') ? (
-                      <div className='signerOptionSetText'>{this.store('main.connection.local.type')}</div>
-                    ) : (_ => {
-                      let status = this.store('main.connection.local.status')
-                      if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>{'scanning...'}</div>
-                      return ''
-                    })()}
-                    <div className='signerOptionSetButton' />
+          </div>
+          <div className='signerPermission'>
+            <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+              <div className='connectionOptionToggle'>
+                <div className='signerPermissionOrigin'>{'Local'}</div>
+                <div className={this.store('main.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'local')}>
+                  <div className='signerPermissionToggleSwitch' />
+                </div>
+              </div>
+              <div className='connectionOptionDetails'>
+                <div className='connectionOptionDetailsInset'>
+                  {this.status(this.store('main.connection.local'))}
+                  <div className='signerOptionSetWrap'>
+                    <div className={this.state.localShake.custom ? 'signerOptionSet headShake' : 'signerOptionSet'} onMouseDown={() => this.localShake('custom')}>
+                      <div className='signerOptionSetButton' />
+                      {this.store('main.connection.local.type') ? (
+                        <div className='signerOptionSetText'>{this.store('main.connection.local.type')}</div>
+                      ) : (_ => {
+                        let status = this.store('main.connection.local.status')
+                        if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>{'scanning...'}</div>
+                        return ''
+                      })()}
+                      <div className='signerOptionSetButton' />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className='signerPermission'>
-          <div className={this.store('main.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>{'Secondary'}</div>
-              <div className={this.store('main.connection.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'secondary')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.status(this.store('main.connection.secondary'))}
-                <div className='signerOptionSet'>
-                  <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-left', { height: 14 })}</div>
-                  <div className='signerOptionSetText'>{this.store('main.connection.secondary.settings', network, 'current')}</div>
-                  <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-right', { height: 14 })}</div>
+          <div className='signerPermission'>
+            <div className={this.store('main.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+              <div className='connectionOptionToggle'>
+                <div className='signerPermissionOrigin'>{'Secondary'}</div>
+                <div className={this.store('main.connection.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'secondary')}>
+                  <div className='signerPermissionToggleSwitch' />
                 </div>
               </div>
-            </div>
-            <div className={this.store('main.connection.secondary.settings', network, 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-              <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
+              <div className='connectionOptionDetails'>
+                <div className='connectionOptionDetailsInset'>
+                  {this.status(this.store('main.connection.secondary'))}
+                  <div className='signerOptionSet'>
+                    <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-left', { height: 14 })}</div>
+                    <div className='signerOptionSetText'>{this.store('main.connection.secondary.settings', network, 'current')}</div>
+                    <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-right', { height: 14 })}</div>
+                  </div>
+                </div>
+              </div>
+              <div className={this.store('main.connection.secondary.settings', network, 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+                <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
+              </div>
             </div>
           </div>
-        </div>
-        {/* Local clients */}
-        <div className='localSettingsTitle connectionTitle'>
-          <div>{'Local Clients'}</div>
-        </div>
-        <Client client='parity' />
-        <Client client='ipfs' />
+          {/* Local clients */}
+          <div className='localSettingsTitle connectionTitle'>
+            <div>{'Local Clients'}</div>
+          </div>
+          <Client client='parity' />
+          <Client client='ipfs' />
 
-        <div className='localSettingsTitle'>{'Settings'}</div>
-        <div className='signerPermission'>
-          <div className='signerPermissionControls'>
-            <div className='signerPermissionOrigin'>{'Glide'}</div>
-            <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
-              <div className='signerPermissionToggleSwitch' />
+          <div className='localSettingsTitle'>{'Settings'}</div>
+          <div className='signerPermission'>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>{'Glide'}</div>
+              <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Mouse to the middle of your display\'s right edge to reveal Frame'}
             </div>
           </div>
-          <div className='signerPermissionDetails'>
-            {'Mouse to the middle of your display\'s right edge to reveal Frame'}
-          </div>
-        </div>
-        <div className='signerPermission'>
-          <div className='signerPermissionControls'>
-            <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
-            <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
-              <div className='signerPermissionToggleSwitch' />
+          <div className='signerPermission'>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
+              <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Run Frame when your computer starts'}
             </div>
           </div>
-          <div className='signerPermissionDetails'>
-            {'Run Frame when your computer starts'}
-          </div>
+          {this.quit()}
+          <div className='viewLicense' onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')}>{'View License'}</div>
         </div>
         {this.appInfo()}
-        {this.quit()}
-        <div className='viewLicense' onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')}>{'View License'}</div>
       </div>
     )
   }

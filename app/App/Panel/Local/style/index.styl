@@ -6,10 +6,38 @@
   left 0px
   display flex
   justify-content center
-  padding 0px 0px 0px 0px
   flex-direction column
   transition standard
   transform translateZ(0)
+  
+  .localSettingsWrapFadeTop
+    position absolute
+    background red
+    top 0
+    left 0
+    right 0
+    height 140px
+    pointer-events none
+    z-index 5
+    background linear-gradient(0deg, rgba(255,255,255,0) 0%, lightShade 70%)
+
+  .localSettingsWrapFadeBot
+    position absolute
+    background red
+    bottom 0
+    left 0
+    right 0
+    height 140px
+    pointer-events none
+    z-index 5
+    background linear-gradient(-180deg, rgba(255,255,255,0) 0%, lightShade 70%)
+
+  .localSettingsWrap
+    padding 100px 0px 100px 0px
+    overflow-x hidden
+    overflow-y scroll
+    position relative
+    z-index 2
 
   .localSettingsTitle:before
     content ''
@@ -28,7 +56,9 @@
     z-index 9999999
     height 26px
     font-size 22px
-    padding 0px 10px 10px 10px
+    font-weight 200
+    padding 0px 10px 15px 10px
+    margin 50px 0px 0px 0px
 
 .localSettingsHidden
   right -100%
@@ -273,6 +303,7 @@
   transition standard
   transform translateZ(0)
   padding 15px
+  z-index 20
 
   .appInfoIcon
     transition standard
@@ -313,14 +344,13 @@
         margin-left 5px
 
   .appInfoLineVersion
-    font-family FiraCode, sans-serif
+    font-family FiraCode, monospace
 
 .appInfo:hover
   bottom 0px
   .appInfoIcon
     .appInfoHandle
-      background outerspace01
-
+      background outerspace08
 
 .connectionCustomInput
   margin-top 0px

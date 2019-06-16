@@ -14,8 +14,9 @@ let tray
 let hideShow = { current: false, running: false, next: false }
 
 let showOnReady = true
-let needReload = false
-let reloadTimeout, resetTimeout, mouseTimeout
+// let needReload = false
+// let reloadTimeout, resetTimeout
+let mouseTimeout
 
 let glide = false
 
@@ -70,7 +71,7 @@ const api = {
     windows.tray.setSize(0, 0)
     let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows.tray.setPosition(area.width + area.x, area.height + area.y)
-    windows.tray.on('hide', () => { if (needReload) api.reload() })
+    // windows.tray.on('hide', () => { if (needReload) api.reload() })
     if (process.platform === 'linux') {
       const menuShow = Menu.buildFromTemplate([{ label: 'Show', click: () => api.showTray() }, { label: 'Quit', click: () => api.quit() }])
       const menuHide = Menu.buildFromTemplate([{ label: 'Hide', click: () => api.hideTray() }, { label: 'Quit', click: () => api.quit() }])
@@ -96,28 +97,28 @@ const api = {
       if (windows && windows.tray) windows.tray.show()
       setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
     }, 50)
-    resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
+    // resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
-  reload: () => {
-    log.info('Tray Reset: Reloading')
-    needReload = false
-    clearTimeout(reloadTimeout)
-    clearTimeout(resetTimeout)
-    if (windows.tray && windows.tray.reload) windows.tray.reload()
-    resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
-  },
-  reset: () => {
-    log.info('Attempting Tray Reset...')
-    showOnReady = false
-    if (hideShow.current === 'showing') {
-      log.info('Tray Reset: Window visiable/in-use, try again on hide')
-      needReload = true
-      reloadTimeout = setTimeout(() => api.reload(), 60 * 60 * 1000) // When left open
-    } else {
-      log.info('Tray Reset: Window hidden, resetting')
-      api.reload()
-    }
-  },
+  // reload: () => {
+  //   log.info('Tray Reset: Reloading')
+  //   needReload = false
+  //   clearTimeout(reloadTimeout)
+  //   clearTimeout(resetTimeout)
+  //   if (windows.tray && windows.tray.reload) windows.tray.reload()
+  //   resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
+  // },
+  // reset: () => {
+  //   log.info('Attempting Tray Reset...')
+  //   showOnReady = false
+  //   if (hideShow.current === 'showing') {
+  //     log.info('Tray Reset: Window visiable/in-use, try again on hide')
+  //     needReload = true
+  //     reloadTimeout = setTimeout(() => api.reload(), 60 * 60 * 1000) // When left open
+  //   } else {
+  //     log.info('Tray Reset: Window hidden, resetting')
+  //     api.reload()
+  //   }
+  // },
   tray: () => {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     tray.setHighlightMode('never')
