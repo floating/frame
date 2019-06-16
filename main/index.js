@@ -122,12 +122,22 @@ store.observer(() => {
 })
 
 // Dev Testing
-// const mnemonic = bip39.generateMnemonic()
 const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
 const password = 'frame'
 setTimeout(() => {
   signers.createFromPhrase(mnemonic, password, (err, signer) => {
     if (err) return console.log(err)
-    console.log('Created Signer....')
+    console.log('Created Signer....', mnemonic)
   })
 }, 1000)
+
+// const newmnemonic = bip39.generateMnemonic()
+// const newpassword = 'frame'
+// setTimeout(() => {
+//   signers.createFromPhrase(newmnemonic, newpassword, (err, signer) => {
+//     if (err) return console.log(err)
+//     console.log('Created Signer....', newmnemonic)
+//   })
+// }, 1000)
+
+// const mnemonic = bip39.generateMnemonic()

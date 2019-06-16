@@ -17,6 +17,5 @@ link.rpc('getState', (err, state) => {
   const Frame = Restore.connect(Panel, store(state))
   ReactDOM.render(<Frame />, document.getElementById('frame'))
 })
-
 document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
 document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))
