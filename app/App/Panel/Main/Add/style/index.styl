@@ -172,20 +172,28 @@
     text-align-last justify
 
   .addAccountHeader
-    height 20px
+    // height 20px
     width 100%
     margin 40px 0px 0px 10px
     font-size 12px
     text-transform uppercase
     letter-spacing 1px
+    margin-left -3px
+    // display flex
+    // justify-content center
+    // align-items center
+    // flex-direction column
+    svg
+      padding 0px 10px 0px 10px
+      margin-top -3px
 
   .addAccountItem
-    padding 4px 0px 10px 0px
+    padding 3px 0px 3px 0px
     width calc(100%)
     margin 10px 0px 0px 0px
-    border-radius 4px
-    background outerspaceLight
-    box-shadow 0px 40px 40px -20px rgba(5, 25, 35, 0.6)
+    border-radius 6px
+    background outerspaceShader
+    box-shadow 0px 35px 40px -20px rgba(5, 25, 35, 1)
     display flex
     justify-content center
     align-items center
@@ -197,6 +205,29 @@
     position relative
     overflow hidden
     position relative
+
+    .addAccountItemBar
+      content ''
+      position absolute
+      top 0
+      left 0
+      right 0
+      height 12px
+      background hardware
+      // border-top-left-radius 6px
+      z-index 1
+
+    .addAccountItemWrap
+      width 100%
+      background outerspaceLight
+      border-radius 6px
+      padding 0px 0px 10px 0px
+      z-index 2
+      box-shadow 0px 0px 40px -20px rgba(5, 25, 35, 0.6)
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
 
     .addAccountItemTop
       width 100%
@@ -281,7 +312,7 @@
 
     .addAccountItemOption
       width calc(100% - 20px)
-      height 60px
+      height 40px
       line-height 22px
       font-size 13px
       text-transform uppercase
@@ -289,7 +320,7 @@
       display flex
       align-items center
       justify-content center
-      margin-top 10px
+      margin-top 12px
       border-radius 4px
       transition standardSlow
       position relative
@@ -376,15 +407,17 @@
     .fira
       font-family FiraCode, monospace
       font-weight 600
+      text-transform none
 
     .addAccountItemOptionListItem
       width 100%
       text-align center
-      padding 5px 7px 5px 5px
+      padding 4px 7px 4px 5px
+      margin-left -3px
 
       svg
-        padding 0px 10px 0px 10px
-        margin-bottom -1px
+        padding 0px 9px 0px 6px
+        margin-bottom -2
 
     .addAccountItemOptionListItem:hover
       background rgba(5, 25, 35, 0.2)

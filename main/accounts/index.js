@@ -15,7 +15,7 @@ const windows = require('../windows')
 // let aragonTestAccount = {
 //   id: 'test',
 //   index: 0,
-//   addresses: ['0x4f4e43c7a6310a0cd716bbba563b901fac07d085'], // Agent Address
+//   addresses: ['0x4F4E43C7a6310a0cD716bbba563B901FAc07D085'], // Agent Address
 //   type: 'Aragon',
 //   smart: {
 //     type: 'aragon',
@@ -25,7 +25,7 @@ const windows = require('../windows')
 //       address: '0xf4Ed810dEF41F31141B652e49fe847e6D7455BfD' // External Signer
 //     },
 //     dao: '0xd237ea861d39bf43aeed507c53f3826f5eabcafd', // DAO Address
-//     agent: '0x4f4e43c7a6310a0cd716bbba563b901fac07d085', // Agent Address
+//     agent: '0x4F4E43C7a6310a0cD716bbba563B901FAc07D085', // Agent Address
 //     vault: '0x98e8e0381abe2c4b8a07000e8a913566fa641005' // Vault Address
 //   }
 // }

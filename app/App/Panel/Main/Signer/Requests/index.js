@@ -41,6 +41,7 @@ class Requests extends React.Component {
     //   if (req.type === 'transaction') return this.props.addresses.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
     //   return true
     // })
+    // transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}
     let normal = requests.filter(req => req.mode === 'normal')
     normal.sort((a, b) => {
       if (a.created > b.created) return -1
@@ -65,7 +66,7 @@ class Requests extends React.Component {
           <div className='requestCount'>{normal.length}</div>
         </div>
         <div className='requestContainerWrap'>
-          <div className='requestContainer' style={{ height: containHeight + 'px' }} transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}>
+          <div className='requestContainer' style={{ height: containHeight + 'px' }}>
             <div key={'noReq'} style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>{'No Pending Requests'}</div>
             <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal - 15}px)` }}>
               <span>{'Recent Transactions'}</span>
