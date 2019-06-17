@@ -80,7 +80,7 @@ class _AddAragon extends React.Component {
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
             <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconSmart'>{svg.octicon('light-bulb', { height: 22 })}</div>
+              <div className='addAccountItemIconType addAccountItemIconSmart'>{svg.aragon(30)}</div>
               <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
             </div>
             <div className='addAccountItemTopTitle'>{'Aragon'}</div>
@@ -246,19 +246,18 @@ class Add extends React.Component {
                           <div className='addAccountItemSummary'>{'Need a signer? Get a Trezor'}</div>
                         </div>
                       </div>
-                      <div className='addAccountHeader'>{svg.octicon('flame', { height: 19 })}{'Hot Accounts'}</div>
+                      <div className='addAccountHeader'><div>{svg.flame(20)}</div><div>{'Hot Accounts'}</div></div>
                       <div className='addAccountItem' style={{ transitionDelay: (0.64 * 2) + 's' }}>
                         <div className='addAccountItemBar addAccountItemHot' />
                         <div className='addAccountItemWrap'>
                           <div className='addAccountItemTop'>
                             <div className='addAccountItemIcon'>
-                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.octicon('flame', { height: 22 })}</div>
+                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.flame(15)}</div>
                               <div className='addAccountItemIconHex addAccountItemIconHexHot' />
                             </div>
                             <div className='addAccountItemTopTitle'>{'Phrase'}</div>
                             <div className='addAccountItemTopTitle'>{''}</div>
                           </div>
-                          <div className='addAccountItemColorBar addAccountItemHot' />
                           <div className='addAccountItemSummary'>{'A phrase account uses a list of 12 or 24 words to backup and restore your account'}</div>
                           <div className='addAccountItemOption'>
                             <div className='addAccountItemOptionIntro'>
@@ -273,13 +272,12 @@ class Add extends React.Component {
                         <div className='addAccountItemWrap'>
                           <div className='addAccountItemTop'>
                             <div className='addAccountItemIcon'>
-                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.octicon('flame', { height: 22 })}</div>
+                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.flame(15)}</div>
                               <div className='addAccountItemIconHex addAccountItemIconHexHot' />
                             </div>
                             <div className='addAccountItemTopTitle'>{'Keyring'}</div>
                             <div className='addAccountItemTopTitle'>{''}</div>
                           </div>
-                          <div className='addAccountItemColorBar addAccountItemHot' />
                           <div className='addAccountItemSummary'>{'A keyring account uses a list of private keys  to backup and restore your account '}</div>
                           <div className='addAccountItemOption'>
                             <div className='addAccountItemOptionIntro'>
@@ -289,7 +287,7 @@ class Add extends React.Component {
                           <div className='addAccountItemSummary'>{'Need a  private key? Generate one'}</div>
                         </div>
                       </div>
-                      <div className='addAccountHeader'>{svg.octicon('light-bulb', { height: 19 })}{'Smart Accounts'}</div>
+                      <div className='addAccountHeader'><div>{svg.lightbulb(20)}</div><div>{'Smart Accounts'}</div></div>
                       <AddAragon index={4} />
                       <div className='addAccountBreak' style={{ margin: '40px 0px 0px 0px' }} />
                       <div className='addAccountFooter'>
