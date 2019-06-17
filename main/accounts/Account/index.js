@@ -30,6 +30,16 @@ class Account {
     })
   }
   addRequest (req) {
+    // console.log(req)
+
+    let add = r => {
+      this.requests[r.handlerId] = req
+      this.requests[r.handlerId].mode = 'normal'
+      this.requests[r.handlerId].created = Date.now()
+      this.update()
+      windows.showTray()
+      windows.broadcast('main:action', 'setSignerView', 'default')
+    }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {
       if (this.smart.type === 'aragon') {
@@ -38,22 +48,16 @@ class Account {
           this.aragon.pathTransaction(req.data, (err, tx) => {
             if (err) return log.error(err)
             req.data = tx
-            this.requests[req.handlerId] = req
-            this.requests[req.handlerId].mode = 'normal'
-            this.requests[req.handlerId].created = Date.now()
-            this.update()
-            windows.showTray()
-            windows.broadcast('main:action', 'setSignerView', 'default')
+            add(req)
           })
+        } else {
+          add(req)
         }
+      } else {
+        add(req)
       }
     } else {
-      this.requests[req.handlerId] = req
-      this.requests[req.handlerId].mode = 'normal'
-      this.requests[req.handlerId].created = Date.now()
-      this.update()
-      windows.showTray()
-      windows.broadcast('main:action', 'setSignerView', 'default')
+      add(req)
     }
   }
   getSelectedAddresses () {
