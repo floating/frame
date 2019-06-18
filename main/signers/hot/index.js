@@ -1,11 +1,13 @@
-const store = require('../../store')
+const path = require('path')
+const fs = require('fs')
+const { app } = require('electron')
 
 const Seed = require('./Seed')
 const Ring = require('./Ring')
 
 // const create = require('worker-farm')(require.resolve('./create'), [ 'newPhrase', 'fromSeed', 'fromPhrase' ])
 const create = require('./create')
-// const signersPath = path.resolve(app.getPath('userData') + '/signers')
+
 const api = {
   newPhrase: (cb) => {
     create.newPhrase(cb)
@@ -24,24 +26,31 @@ const api = {
       if (err) return cb(err)
       let { addresses, type, seed } = signer
       let newSigner = new Seed({ addresses, type, seed })
+      newSigner.save()
       signers.add(newSigner)
       cb(null, newSigner)
     })
   },
   scan: (signers) => {
+    let storedSigners = {}
+
+    // Try to read stored signers from disk
     try {
-      const stored = store('main.savedSigners')
-      Object.keys(stored).forEach(id => {
-        const signer = stored[id]
-        if (signer.type === 'seed') {
-          signers.add(new Seed(signer))
-        } else if (signer.type === 'ring') {
-          signers.add(new Ring(signer))
-        }
-      })
+      const signersPath = path.resolve(app.getPath('userData'), 'signers.json')
+      storedSigners = JSON.parse(fs.readFileSync(signersPath, 'utf8'))
     } catch (e) {
-      console.log(e)
+      return console.error(e)
     }
+
+    // Add stored signers to store
+    Object.keys(storedSigners).forEach(id => {
+      const signer = storedSigners[id]
+      if (signer.type === 'seed') {
+        signers.add(new Seed(signer))
+      } else if (signer.type === 'ring') {
+        signers.add(new Ring(signer))
+      }
+    })
   }
 }
 

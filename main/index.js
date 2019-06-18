@@ -141,3 +141,8 @@ setTimeout(() => {
 // }, 1000)
 
 // const mnemonic = bip39.generateMnemonic()
+
+// setTimeout(() => {
+//   const signers = store('main.signers')
+//   console.log(signers)
+// }, 3000)

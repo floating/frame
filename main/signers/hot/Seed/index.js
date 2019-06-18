@@ -1,3 +1,6 @@
+const path = require('path')
+const fs = require('fs')
+const { app } = require('electron')
 const EthTx = require('ethereumjs-tx')
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const log = require('electron-log')
@@ -28,7 +31,19 @@ class Seed extends Signer {
     })
   }
   save () {
+    const signersPath = path.resolve(app.getPath('userData'), 'signers.json')
+    let storedSigners = {}
 
+    // Try to read stored signers from disk
+    try { storedSigners = JSON.parse(fs.readFileSync(signersPath, 'utf8')) }
+    catch (e) { console.error(e) }
+
+    // Add this signer to stored signers
+    const { id, addresses, seed, type } = this
+    storedSigners[id] = { addresses, seed, type }
+
+    // Write to disk
+    fs.writeFileSync(signersPath, JSON.stringify(storedSigners))
   }
   unlock (password) {
     crypt.decrypt(this.seed, password, (err, seed) => {
