@@ -4,6 +4,20 @@ import Restore from 'react-restore'
 import link from '../../../../../link'
 
 class Settings extends React.Component {
+  renderControl (viewIndex) {
+    let i = 2
+    let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
+    return (
+      <div className='signerSlide' style={{ transform }}>
+        <div className='signerSettingsTitle'>{'Account Control'}</div>
+        <div className='quitFrame'>
+          <div onMouseDown={() => link.send('tray:removeAccount', id)} className='quitFrameButton'>{'Remove Account and Signer'}</div>
+          <br />
+          <div onMouseDown={() => link.send('tray:removeSigner', id)} className='quitFrameButton'>{'Remove Signer Only'}</div>
+        </div>
+      </div>
+    )
+  }
   renderVerify (viewIndex) {
     let i = 1
     let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
@@ -61,6 +75,7 @@ class Settings extends React.Component {
       <div className={this.store('selected.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         {this.renderPermissions(viewIndex)}
         {this.renderVerify(viewIndex)}
+        {this.renderControl(viewIndex)}
       </div>
     )
   }

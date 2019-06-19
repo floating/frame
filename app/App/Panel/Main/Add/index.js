@@ -60,12 +60,6 @@ class _AddAragon extends React.Component {
         agent: this.state.agent // Agent Address
       }
     }
-    console.log(' ')
-    console.log(' ')
-    console.log('Make Aragon Account')
-    console.log(aragonAccount)
-    console.log(' ')
-    console.log(' ')
     link.rpc('addAragon', aragonAccount, () => {
       console.log('addAragon cb called')
     })
@@ -75,7 +69,7 @@ class _AddAragon extends React.Component {
     let itemClass = 'addAccountItem addAccountItemSmart'
     if (this.state.adding) itemClass += ' addAccountItemAdding'
     return (
-      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index) + 's' }}>
+      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemSmart' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
@@ -94,16 +88,16 @@ class _AddAragon extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'Enter dao address'}</div>
+                  <div className='addAccountItemOptionTitle'>{'dao address'}</div>
                   <div className='addAccountItemOptionInput'>
-                    <textarea maxLength='42' value={this.state.dao} onChange={e => this.onChange('dao', e)} onFocus={e => this.onFocus('dao', e)} onBlur={e => this.onBlur('dao', e)} />
+                    <textarea tabIndex={'-1'} maxLength='42' value={this.state.dao} onChange={e => this.onChange('dao', e)} onFocus={e => this.onFocus('dao', e)} onBlur={e => this.onBlur('dao', e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'Enter dao\'s agent address'}</div>
+                  <div className='addAccountItemOptionTitle'>{'dao\'s agent address'}</div>
                   <div className='addAccountItemOptionInput'>
-                    <textarea maxLength='42' value={this.state.agent} onChange={e => this.onChange('agent', e)} onFocus={e => this.onFocus('agent', e)} onBlur={e => this.onBlur('agent', e)} />
+                    <textarea tabIndex={'-1'}maxLength='42' value={this.state.agent} onChange={e => this.onChange('agent', e)} onFocus={e => this.onFocus('agent', e)} onBlur={e => this.onBlur('agent', e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                 </div>
@@ -122,7 +116,7 @@ class _AddAragon extends React.Component {
                     {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map((a, i) => {
                       return (
                         <div key={a + i} className='addAccountItemOptionListItem fira' onMouseDown={e => this.actorAddress(a, i)}>
-                          {a ? a.substring(0, 11) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 11) : ''}
+                          {a ? a.substring(0, 10) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 10) : ''}
                         </div>
                       )
                     })}
@@ -139,6 +133,84 @@ class _AddAragon extends React.Component {
 }
 
 const AddAragon = Restore.connect(_AddAragon)
+
+class _AddPhrase extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      adding: false,
+      phrase: ''
+    }
+  }
+  onChange (key, e) {
+    e.preventDefault()
+    let update = {}
+    let value = (e.target.value || '')
+    value = value === ' ' ? '' : value
+    value = value.replace(/[ \t]+/g, '_')
+    value = value.replace(/\W/g, '')
+    value = value.replace(/_/g, ' ')
+    value = value.split(' ').length > 24 ? value.substring(0, value.lastIndexOf(' ') + 1) : value // Limit to 24 words max
+    update[key] = value
+    this.setState(update)
+  }
+  onBlur (key, e) {
+    e.preventDefault()
+    let update = {}
+    update[key] = this.state[key] || ''
+    this.setState(update)
+  }
+  onFocus (key, e) {
+    e.preventDefault()
+    if (this.state[key] === '') {
+      let update = {}
+      update[key] = ''
+      this.setState(update)
+    }
+  }
+  next () {
+    console.log('New Seed Signer: ', this.state.phrase)
+  }
+  render () {
+    let itemClass = 'addAccountItem addAccountItemSmart'
+    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    return (
+      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
+        <div className='addAccountItemBar addAccountItemHot' />
+        <div className='addAccountItemWrap'>
+          <div className='addAccountItemTop'>
+            <div className='addAccountItemIcon'>
+              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.flame(15)}</div>
+              <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+            </div>
+            <div className='addAccountItemTopTitle'>{'Phrase'}</div>
+            <div className='addAccountItemTopTitle'>{''}</div>
+          </div>
+          <div className='addAccountItemSummary'>{'A phrase account uses a list of 12 or 24 words to backup and restore your account'}</div>
+          <div className='addAccountItemOption'>
+            <div className='addAccountItemOptionIntro' onMouseDown={() => { this.setState({ adding: true }) }}>
+              {'Add Phrase Account'}
+            </div>
+            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className='addAccountItemOptionSetupFrames'>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>{'Enter seed phrase'}</div>
+                  <div className='addAccountItemOptionInputPhrase'>
+                    <textarea tabIndex={'-1'} value={this.state.phrase} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} />
+                  </div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Create'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='addAccountItemSummary'>{'Need a seed phrase? Generate onee'}</div>
+        </div>
+      </div>
+    )
+  }
+}
+
+const AddPhrase = Restore.connect(_AddPhrase)
 
 class Add extends React.Component {
   constructor (...args) {
@@ -168,7 +240,7 @@ class Add extends React.Component {
             this.y += this.vy
             if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx
             if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy
-            ctx.fillStyle = 'rgba(0, 210, 180, 0.85)'
+            ctx.fillStyle = 'rgba(0, 210, 180, 0.9)'
             ctx.fillRect(this.x, this.y, 2, 2)
           }
         }
@@ -206,12 +278,12 @@ class Add extends React.Component {
                       <div className='addAccountSubtitle'>{'Add or create a decentralized account to use with any dapp'}</div>
                       <div className='addAccountBreak' />
                       <div className='addAccountHeader'>{svg.octicon('server', { height: 17 })}{'Hardware Accounts'}</div>
-                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 0) + 's' }}>
+                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 0 / 4) + 's' }}>
                         <div className='addAccountItemBar addAccountItemHardware' />
                         <div className='addAccountItemWrap'>
                           <div className='addAccountItemTop'>
                             <div className='addAccountItemIcon'>
-                              <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.octicon('ellipsis', { height: 22 })}</div>
+                              <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.ledger(20)}</div>
                               <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
                             </div>
                             <div className='addAccountItemTopTitle'>{'Ledger'}</div>
@@ -226,12 +298,12 @@ class Add extends React.Component {
                           <div className='addAccountItemSummary'>{'Need a signer? Get a Ledger'}</div>
                         </div>
                       </div>
-                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 1) + 's' }}>
+                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 1 / 4) + 's' }}>
                         <div className='addAccountItemBar addAccountItemHardware' />
                         <div className='addAccountItemWrap'>
                           <div className='addAccountItemTop'>
                             <div className='addAccountItemIcon addAccountItemIconHardware'>
-                              <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.octicon('ellipsis', { height: 22 })}</div>
+                              <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.trezor(17)}</div>
                               <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
                             </div>
                             <div className='addAccountItemTopTitle'>{'Trezor'}</div>
@@ -246,28 +318,11 @@ class Add extends React.Component {
                           <div className='addAccountItemSummary'>{'Need a signer? Get a Trezor'}</div>
                         </div>
                       </div>
+                      <div className='addAccountHeader'><div>{svg.lightbulb(20)}</div><div>{'Smart Accounts'}</div></div>
+                      <AddAragon index={2} />
                       <div className='addAccountHeader'><div>{svg.flame(20)}</div><div>{'Hot Accounts'}</div></div>
-                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 2) + 's' }}>
-                        <div className='addAccountItemBar addAccountItemHot' />
-                        <div className='addAccountItemWrap'>
-                          <div className='addAccountItemTop'>
-                            <div className='addAccountItemIcon'>
-                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.flame(15)}</div>
-                              <div className='addAccountItemIconHex addAccountItemIconHexHot' />
-                            </div>
-                            <div className='addAccountItemTopTitle'>{'Phrase'}</div>
-                            <div className='addAccountItemTopTitle'>{''}</div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'A phrase account uses a list of 12 or 24 words to backup and restore your account'}</div>
-                          <div className='addAccountItemOption'>
-                            <div className='addAccountItemOptionIntro'>
-                              {'No Device Found'}
-                            </div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'Need a seed phrase? Generate one'}</div>
-                        </div>
-                      </div>
-                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 3) + 's' }}>
+                      <AddPhrase index={3} />
+                      <div className='addAccountItem' style={{ opacity: 0.3, transitionDelay: (0.64 * 4 / 4) + 's' }}>
                         <div className='addAccountItemBar addAccountItemHot' />
                         <div className='addAccountItemWrap'>
                           <div className='addAccountItemTop'>
@@ -281,17 +336,15 @@ class Add extends React.Component {
                           <div className='addAccountItemSummary'>{'A keyring account uses a list of private keys  to backup and restore your account '}</div>
                           <div className='addAccountItemOption'>
                             <div className='addAccountItemOptionIntro'>
-                              {'Add Keyring Account'}
+                              {'Coming Soon'}
                             </div>
                           </div>
                           <div className='addAccountItemSummary'>{'Need a  private key? Generate one'}</div>
                         </div>
                       </div>
-                      <div className='addAccountHeader'><div>{svg.lightbulb(20)}</div><div>{'Smart Accounts'}</div></div>
-                      <AddAragon index={4} />
                       <div className='addAccountBreak' style={{ margin: '40px 0px 0px 0px' }} />
                       <div className='addAccountFooter'>
-                        {'more account types soon'}
+                        {svg.logo(32)}
                       </div>
                     </div>
                   </div>

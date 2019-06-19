@@ -129,7 +129,7 @@ setTimeout(() => {
     if (err) return console.log(err)
     console.log('Created Signer....', mnemonic)
   })
-}, 1000)
+}, 6000)
 
 // const newmnemonic = bip39.generateMnemonic()
 // const newpassword = 'frame'

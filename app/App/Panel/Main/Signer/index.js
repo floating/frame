@@ -92,6 +92,7 @@ class Signer extends React.Component {
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
+    if (!this.props.signer) innerClass += ' signerInnerDisconnected'
     return (
       <div className='signerType'>
         {this.renderArrows('up')}
@@ -103,15 +104,15 @@ class Signer extends React.Component {
                   if (this.props.signer.type === 'Ledger') return <img src={ledgerLogo} />
                   if (this.props.signer.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
                   if (this.props.signer.type === 'Hot') return svg.octicon('zap', { height: 31 })
-                  if (this.props.signer.type === 'seed') return svg.seedling(31)
-                  if (this.props.signer.type === 'ring') return svg.octicon('plus', { height: 31 })
+                  if (this.props.signer.type === 'hot') return svg.flame(21)
+                  if (this.props.signer.type === 'ring') return svg.octicon('ring', { height: 31 })
                   return svg.octicon('plus', { height: 31 })
                 } else {
-                  return svg.octicon('plug', { height: 31 })
+                  return svg.fingerprint(31)
                 }
               })()}
             </div>
-            <div className='signerText'>{this.props.signer ? this.props.signer.type : 'Disconnected'}</div>
+            <div className='signerText'>{this.props.signer ? this.props.signer.type : 'no signer'}</div>
           </div>
         </div>
         <div className='addressSelect' onMouseDown={e => {
@@ -177,6 +178,9 @@ class Signer extends React.Component {
           </div>
           <div className={viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(1)}>
             <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
+          </div>
+          <div className={viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(2)}>
+            <div className='settingsMenuItemIcon' style={{ left: '-1px', top: '0px' }}>{svg.octicon('gear', { height: 20 })}</div>
           </div>
         </div>
         <div className='settingsMenuSelect'>

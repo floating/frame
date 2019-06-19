@@ -85,7 +85,7 @@ class Account {
     }))
     if (update.smart && update.smart.actor && update.smart.actor.account) {
       update.signer = update.smart.actor.account.signer
-      update.signer.type = 'Agent'
+      if (update.signer) update.signer.type = 'Agent'
     }
     return update
   }

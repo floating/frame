@@ -216,6 +216,7 @@
           align-items center
           opacity 1
           transition standardSlow
+          padding-right 6px
 
           img
             height 31px
@@ -279,6 +280,34 @@
         top 0px
         bottom -2px
         box-shadow 0px 1px 1px rgba(5, 5, 45, 0.4)
+
+      .signerInnerDisconnected
+        // position absolute
+        // top -5px
+        // left 0px
+        // right 0px
+        // bottom 2px
+        background lowerlight
+        color outerspace
+
+        .signerText
+          color outerspace05
+        .signerImage
+          svg
+            color outerspace05
+
+        .signerInset
+          background lowlight
+          color outerspace
+        //border-radius 6px
+        // display flex
+        // justify-content center
+        // align-items center
+        // overflow hidden
+        // transition standard, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
+        // -webkit-app-region no-drag
+        // box-shadow 0px 2px 2px rgba(5, 5, 45, 0.4)
+        // z-index 2000000000
 
       .signerMin
         position absolute
@@ -545,7 +574,7 @@
           // background red
           position relative
           height 12px
-          width 70px
+          width 105px
           box-sizing border-box
           // border 1px solid green
           .settingsMenuMark
@@ -565,7 +594,7 @@
           // background red
           box-sizing border-box
           height 33px
-          width 70px
+          width 105px
           // border 1px solid red
           display flex
           .settingsMenuItem
