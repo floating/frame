@@ -32,6 +32,14 @@ class Signers extends EventEmitter {
   createFromPhrase (mnemonic, password, cb) {
     hot.createFromPhrase(this, mnemonic, password, cb)
   }
+  unlock (id, password) {
+    let signer = this.signers.find(s => s.id === id)
+    if (signer && signer.unlock) {
+      signer.unlock(password)
+    } else {
+      console.error('Signer not unlockable via password')
+    }
+  }
   unsetSigner () {
     console.log('unsetSigner')
   }

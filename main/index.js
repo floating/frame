@@ -3,14 +3,12 @@ app.commandLine.appendSwitch('force-gpu-rasterization', true)
 
 const log = require('electron-log')
 const path = require('path')
-const bip39 = require('bip39')
 
 const windows = require('./windows')
 const store = require('./store')
 const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
-// const signers = require('./signers')
 const clients = require('./clients')
 const accounts = require('./accounts')
 const persist = require('./store/persist')
@@ -139,7 +137,7 @@ store.observer(() => {
 //     console.log('Created Signer....', newmnemonic)
 //   })
 // }, 1000)
-
+// const bip39 = require('bip39')
 // console.log(bip39.generateMnemonic())
 
 // const mnemonic = bip39.generateMnemonic()

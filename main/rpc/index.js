@@ -75,10 +75,10 @@ const rpc = {
     cb(null)
   },
   addPhrase (pharse, password, cb) {
-    // Dev Testing
-    // const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
-    // const password = 'frame'
     signers.createFromPhrase(pharse, password, cb)
+  },
+  unlockSigner (id, unlock, cb) {
+    signers.unlock(id, unlock, cb)
   }
 }
 

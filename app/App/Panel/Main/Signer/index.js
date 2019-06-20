@@ -14,7 +14,7 @@ class Signer extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
-    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '' }
+    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '', unlockInput: '' }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -22,6 +22,12 @@ class Signer extends React.Component {
     document.execCommand('Copy')
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
+  }
+  unlockChange (e) {
+    this.setState({ unlockInput: e.target.value })
+  }
+  unlockSubmit (e) {
+    link.rpc('unlockSigner', this.props.id, this.state.unlockInput, () => {})
   }
   trezorPin (num) {
     this.setState({ tPin: this.state.tPin + num.toString() })
@@ -350,12 +356,19 @@ class Signer extends React.Component {
             </div>
             {current ? this.renderAccountList() : null}
             {current ? (
-              <div className='signerMid' style={open ? { top: this.store('selected.view') === 'settings' ? '200px' : '200px' } : { pointerEvents: 'none' }}>
+              <div className='signerMid' style={open ? { top: '200px' } : { pointerEvents: 'none' }}>
                 <Settings id={this.props.id} />
                 <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} />
               </div>
             ) : null}
-            <div className='signerBot' />
+            <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
+              {current ? (
+                <div className='signerUnlock' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { pointerEvents: 'none' }}>
+                  <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
+                  <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

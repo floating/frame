@@ -35,8 +35,9 @@ class Seed extends Signer {
     crypt.decrypt(this.seed, password, (err, seed) => {
       if (err) return console.log(err)
       this.unlockedSeed = seed
+      this.status = 'ok'
+      this.update()
       // this.verifyAddress(0, this.addresses[0], (err, verified) => {
-      //
       //   if (err || !verified) return log.error(err || new Error(`Constructor of ${this.type} signer could not verify current index...`))
       //   log.info('Successfully verified address for initial index...')
       // })
