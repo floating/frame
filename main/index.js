@@ -11,6 +11,7 @@ const updater = require('./updater')
 require('./rpc')
 const clients = require('./clients')
 const accounts = require('./accounts')
+const signers = require('./signers')
 const persist = require('./store/persist')
 
 log.info('Chrome: v' + process.versions.chrome)
@@ -54,6 +55,15 @@ ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
 
 ipcMain.on('tray:verifyAddress', (e) => {
   accounts.verifyAddress(true)
+})
+
+ipcMain.on('tray:removeAccount', (e, id) => {
+  signers.remove(id)
+  accounts.remove(id)
+})
+
+ipcMain.on('tray:removeSigner', (e, id) => {
+  signers.remove(id)
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {

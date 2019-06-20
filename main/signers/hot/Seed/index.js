@@ -76,6 +76,10 @@ class Seed extends Signer {
       cb(null, verifiedAddress.toLowerCase() === address.toLowerCase())
     })
   }
+  close () {
+    store.removeSigner(this.id)
+    super.close()
+  }
   update () {
     let id = this.addressesId()
     if (this.id !== id) { // Singer address representation changed

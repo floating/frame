@@ -15,7 +15,7 @@ module.exports = {
       signers.list().forEach((signer, i) => {
         if (current.map(device => device.path).indexOf(signer.devicePath) === -1 && signer.type === 'Ledger') {
           log.info('Removing Ledger: ', signer.id)
-          signers.remove(signer)
+          signers.remove(signer.id)
         }
       })
       current.forEach(device => {

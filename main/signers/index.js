@@ -12,10 +12,12 @@ class Signers extends EventEmitter {
   add (signer) {
     if (!this.signers.find(s => s.id === signer.id)) this.signers.push(signer)
   }
-  remove (signer) {
-    let index = this.signers.map(s => s.id).indexOf(signer.id)
-    if (index > -1) this.signers.splice(index, 1)
-    signer.close()
+  remove (id) {
+    let index = this.signers.map(s => s.id).indexOf(id)
+    if (index > -1) {
+      this.signers[index].close()
+      this.signers.splice(index, 1)
+    }
   }
   find (f) {
     return this.signers.find(f)

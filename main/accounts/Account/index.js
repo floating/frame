@@ -19,6 +19,7 @@ class Account {
     this.smart = smart
     this.requests = {}
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
+    this.update(true)
     store.observer(() => {
       if (this.smart && this.smart.actor && this.smart.actor.id && this.smart.actor.id !== this.id) {
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
@@ -89,8 +90,8 @@ class Account {
     }
     return update
   }
-  update () {
-    this.accounts.update(this.summary())
+  update (add) {
+    this.accounts.update(this.summary(), add)
   }
   delete () {
 
@@ -107,7 +108,7 @@ class Account {
     windows.broadcast('main:action', 'addSigner', this.summary())
   }
   close () {
-    windows.broadcast('main:action', 'removeSigner', this.summary())
+    console.log('Account close needs to remove observers')
   }
   signMessage (message, cb) {
     if (this.signer) {
