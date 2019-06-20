@@ -14,7 +14,7 @@ class Signer extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
-    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '' }
+    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '', unlockInput: '' }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -22,6 +22,12 @@ class Signer extends React.Component {
     document.execCommand('Copy')
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
+  }
+  unlockChange (e) {
+    this.setState({ unlockInput: e.target.value })
+  }
+  unlockSubmit (e) {
+    link.rpc('unlockSigner', this.props.id, this.state.unlockInput, () => {})
   }
   trezorPin (num) {
     this.setState({ tPin: this.state.tPin + num.toString() })
@@ -36,7 +42,7 @@ class Signer extends React.Component {
   }
   select () {
     if (this.store('selected.current') === this.props.id) {
-      link.rpc('unsetSigner', (err, status) => { if (err) return console.log(err) })
+      link.rpc('unsetSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     } else {
       let bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
@@ -92,9 +98,15 @@ class Signer extends React.Component {
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
+    if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     return (
       <div className='signerType'>
         {this.renderArrows('up')}
+        {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
+          <div className='signerTypeDisconnected' onMouseDown={::this.typeClick}>
+            <div className='signerTypeDisconnectedImage'>{svg.logo(42)}</div>
+          </div>
+        ) : null }
         <div className={innerClass} onMouseDown={::this.typeClick}>
           <div className='signerInset'>
             <div className='signerImage'>
@@ -103,22 +115,22 @@ class Signer extends React.Component {
                   if (this.props.signer.type === 'Ledger') return <img src={ledgerLogo} />
                   if (this.props.signer.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
                   if (this.props.signer.type === 'Hot') return svg.octicon('zap', { height: 31 })
-                  if (this.props.signer.type === 'seed') return svg.seedling(31)
-                  if (this.props.signer.type === 'ring') return svg.octicon('plus', { height: 31 })
+                  if (this.props.signer.type === 'hot') return svg.flame(21)
+                  if (this.props.signer.type === 'ring') return svg.octicon('ring', { height: 31 })
                   return svg.octicon('plus', { height: 31 })
                 } else {
-                  return svg.octicon('plug', { height: 31 })
+                  return svg.fingerprint(31)
                 }
               })()}
             </div>
-            <div className='signerText'>{this.props.signer ? this.props.signer.type : 'Disconnected'}</div>
+            <div className='signerText'>{this.props.signer ? this.props.signer.status === 'locked' ? 'locked' : this.props.signer.type : 'no signer'}</div>
           </div>
         </div>
         <div className='addressSelect' onMouseDown={e => {
           e.stopPropagation()
           this.store.toggleShowAccounts()
         }}>
-          <div className='addressSelectButton'>
+          <div className={this.props.signer ? 'addressSelectButton' : 'addressSelectButton signerInnerDisconnected'}>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
             <div className='addressSelectText'>{'Accounts'}</div>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
@@ -177,6 +189,9 @@ class Signer extends React.Component {
           </div>
           <div className={viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(1)}>
             <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
+          </div>
+          <div className={viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(2)}>
+            <div className='settingsMenuItemIcon' style={{ left: '-1px', top: '0px' }}>{svg.octicon('gear', { height: 20 })}</div>
           </div>
         </div>
         <div className='settingsMenuSelect'>
@@ -341,9 +356,9 @@ class Signer extends React.Component {
             </div>
             {current ? this.renderAccountList() : null}
             {current ? (
-              <div className='signerMid' style={open ? { top: this.store('selected.view') === 'settings' ? '200px' : '200px' } : { pointerEvents: 'none' }}>
+              <div className='signerMid' style={open ? { top: '200px' } : { pointerEvents: 'none' }}>
                 <Settings id={this.props.id} />
-                <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} />
+                <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
               </div>
             ) : null}
             <div className='signerBot' />
@@ -353,5 +368,14 @@ class Signer extends React.Component {
     )
   }
 }
+
+// <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
+//   {current ? (
+//     <div className='signerUnlock' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { pointerEvents: 'none' }}>
+//       <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
+//       <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+//     </div>
+//   ) : null}
+// </div>
 
 export default Restore.connect(Signer)

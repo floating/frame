@@ -23,12 +23,13 @@ class Seed extends Signer {
     this.addresses = signer.addresses
     this.seed = signer.seed
     this.unlockedSeed = ''
-    this.unlock('frame')
-    this.verifyAddress(0, this.addresses[0], (err, verified) => {
-      if (err || !verified) return log.error(err || new Error(`Constructor of ${this.type} signer could not verify current index...`))
-      log.info('Successfully verified address for initial index...')
+    this.status = 'initial'
+    // this.unlock('frame')
+    setTimeout(() => {
+      this.status = 'locked'
       this.update()
-    })
+    }, 3000)
+    this.update()
   }
   save () {
     const signersPath = path.resolve(app.getPath('userData'), 'signers.json')
@@ -45,10 +46,21 @@ class Seed extends Signer {
     // Write to disk
     fs.writeFileSync(signersPath, JSON.stringify(storedSigners))
   }
+  lock () {
+    delete this.unlockedSeed
+    this.status = 'locked'
+    this.update()
+  }
   unlock (password) {
     crypt.decrypt(this.seed, password, (err, seed) => {
       if (err) return console.log(err)
       this.unlockedSeed = seed
+      this.status = 'ok'
+      this.update()
+      // this.verifyAddress(0, this.addresses[0], (err, verified) => {
+      //   if (err || !verified) return log.error(err || new Error(`Constructor of ${this.type} signer could not verify current index...`))
+      //   log.info('Successfully verified address for initial index...')
+      // })
     })
   }
   // Standard Methods
@@ -83,6 +95,10 @@ class Seed extends Signer {
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
       cb(null, verifiedAddress.toLowerCase() === address.toLowerCase())
     })
+  }
+  close () {
+    store.removeSigner(this.id)
+    super.close()
   }
   update () {
     let id = this.addressesId()
