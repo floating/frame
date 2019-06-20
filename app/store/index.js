@@ -50,11 +50,19 @@ export default (state, cb) => {
     monitor = []
     if (store('selected.current')) {
       let account = store('main.accounts', store('selected.current'))
-      if (store('selected.showAccounts')) { // When viewing accounts, refresh them all
-        let startIndex = store('selected.accountPage') * 5
-        if (account.addresses.length) monitor = account.addresses.slice(startIndex, startIndex + 10)
+      if (account) {
+        if (store('selected.showAccounts')) { // When viewing accounts, refresh them all
+          let startIndex = store('selected.accountPage') * 5
+          if (account.addresses.length) monitor = account.addresses.slice(startIndex, startIndex + 10)
+        } else {
+          monitor = [account.addresses[account.index]]
+        }
       } else {
-        monitor = [account.addresses[account.index]]
+        let accounts = store('main.accounts')
+        monitor = Object.keys(accounts).map(id => {
+          let account = accounts[id]
+          return account.addresses[account.index]
+        })
       }
     }
     refreshBalances()

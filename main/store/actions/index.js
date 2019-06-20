@@ -69,8 +69,18 @@ module.exports = {
       return dontRemind
     })
   },
-  updateAccount: (u, account) => {
-    u('main.accounts', account.id, () => account)
+  updateAccount: (u, updatedAccount, add) => {
+    u('main.accounts', updatedAccount.id, account => {
+      if (account) return updatedAccount // Account exists
+      if (add) return updatedAccount // Account is new and should be added
+      return account
+    })
+  },
+  removeAccount: (u, id) => {
+    u('main.accounts', accounts => {
+      delete accounts[id]
+      return accounts
+    })
   },
   removeSigner: (u, id) => {
     u('main.signers', signers => {

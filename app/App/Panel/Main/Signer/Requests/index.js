@@ -11,7 +11,7 @@ import link from '../../../../../link'
 class Requests extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = { minimized: false }
+    this.state = { minimized: false, unlockInput: '' }
   }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
@@ -33,6 +33,12 @@ class Requests extends React.Component {
         if (err) throw new Error(err)
       })
     }
+  }
+  unlockChange (e) {
+    this.setState({ unlockInput: e.target.value })
+  }
+  unlockSubmit (e) {
+    link.rpc('unlockSigner', this.props.id, this.state.unlockInput, () => {})
   }
   render () {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
@@ -59,8 +65,17 @@ class Requests extends React.Component {
     if (normal.length && monitor.length > 0) containNormal += 70
     let containMonitor = monitor.length * monitorHeight
     let containHeight = containNormal + containMonitor
+
+    let current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    let open = current && this.store('selected.open')
+    // let minimized = this.store('selected.minimized')
+
     return (
       <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
+        <div className='signerUnlockRequest' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '100px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(-200px)', opacity: 0 }}>
+          <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
+          <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+        </div>
         <div className='requestTitle'>
           <div>{'Requests'}</div>
           <div className='requestCount'>{normal.length}</div>

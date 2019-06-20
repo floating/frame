@@ -19,7 +19,7 @@ const api = {
     const addresses = api.seedToAddresses(seed)
     crypt.encrypt(seed.toString('hex'), password, (err, encryptedSeed) => {
       if (err) return cb(err)
-      cb(null, { addresses, type: 'seed', seed: encryptedSeed })
+      cb(null, { addresses, type: 'hot', seed: encryptedSeed })
     })
   },
   fromPhrase: (phrase, password, cb) => {

@@ -118,10 +118,8 @@ class Accounts extends EventEmitter {
     log.info('Account not found, creating account')
     this.accounts[id] = new Account({ id, addresses, index: 0, created: Date.now() }, this)
   }
-  update (account) {
-    log.info('Account update called')
-    store.updateAccount(account)
-    this.emit('update', account)
+  update (account, add) {
+    store.updateAccount(account, add)
   }
   current () {
     return this.accounts[this._current]
@@ -350,6 +348,14 @@ class Accounts extends EventEmitter {
       }
       this.current().update()
     }
+  }
+  remove (id) {
+    windows.broadcast('main:action', 'unsetSigner')
+    setTimeout(() => {
+      if (this.accounts[id]) this.accounts[id].close()
+      store.removeAccount(id)
+      delete this.accounts[id]
+    }, 1000)
   }
 }
 

@@ -50,8 +50,26 @@ const detectMouse = () => {
 
 const api = {
   create: () => {
-    const webPreferences = { nodeIntegration: false, contextIsolation: true, preload: path.resolve(__dirname, '../../bundle/bridge.js') }
-    windows.tray = new BrowserWindow({ id: 'tray', width: 360, frame: false, transparent: true, hasShadow: false, show: false, backgroundThrottling: false, webPreferences, icon: path.join(__dirname, './AppIcon.png'), skipTaskbar: process.platform !== 'linux' })
+    windows.tray = new BrowserWindow({
+      id: 'tray',
+      contextIsolation: true,
+      nodeIntegration: false,
+      width: 360,
+      frame: false,
+      transparent: true,
+      hasShadow: false,
+      show: false,
+      backgroundThrottling: false,
+      icon: path.join(__dirname, './AppIcon.png'),
+      skipTaskbar: process.platform !== 'linux',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        disableBlinkFeatures: 'Auxclick',
+        enableRemoteModule: false,
+        preload: path.resolve(__dirname, '../../bundle/bridge.js')
+      }
+    })
     electron.screen.on('display-added', () => api.hideTray())
     electron.screen.on('display-removed', () => api.hideTray())
     electron.screen.on('display-metrics-changed', () => api.hideTray())
