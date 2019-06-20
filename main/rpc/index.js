@@ -1,7 +1,8 @@
 const { ipcMain } = require('electron')
 // const log = require('electron-log')
 
-const signers = require('../accounts')
+const accounts = require('../accounts')
+const signers = require('../signers')
 const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
@@ -10,26 +11,27 @@ const rpc = {
   getState: cb => {
     cb(null, store())
   },
-  signTransaction: signers.signTransaction,
-  signMessage: signers.signMessage,
-  getAccounts: signers.getAccounts,
-  getCoinbase: signers.getCoinbase,
-  getSigners: signers.getSigners,
+  signTransaction: accounts.signTransaction,
+  signMessage: accounts.signMessage,
+  getAccounts: accounts.getAccounts,
+  getCoinbase: accounts.getCoinbase,
+  // Review
+  // getSigners: signers.getSigners,
   setSigner: (id, cb) => {
-    signers.setSigner(id, cb)
-    provider.accountsChanged(signers.getSelectedAddresses())
+    accounts.setSigner(id, cb)
+    provider.accountsChanged(accounts.getSelectedAddresses())
   },
   setSignerIndex: (index, cb) => {
-    signers.setSignerIndex(index, cb)
-    provider.accountsChanged(signers.getSelectedAddresses())
+    accounts.setSignerIndex(index, cb)
+    provider.accountsChanged(accounts.getSelectedAddresses())
   },
   unsetSigner: (cb) => {
-    signers.unsetSigner(cb)
-    provider.accountsChanged(signers.getSelectedAddresses())
+    accounts.unsetSigner(cb)
+    provider.accountsChanged(accounts.getSelectedAddresses())
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
-  trezorPin: signers.trezorPin,
+  trezorPin: accounts.trezorPin,
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),
   connectionStatus: (cb) => {
@@ -49,28 +51,34 @@ const rpc = {
     })
   },
   approveRequest (req, cb) {
-    signers.setRequestPending(req)
+    accounts.setRequestPending(req)
     if (req.type === 'transaction') {
       provider.approveRequest(req, (err, res) => {
-        if (err) return signers.setRequestError(req.handlerId, err)
-        setTimeout(() => signers.setTxSent(req.handlerId, res), 1800)
+        if (err) return accounts.setRequestError(req.handlerId, err)
+        setTimeout(() => accounts.setTxSent(req.handlerId, res), 1800)
       })
     } else if (req.type === 'sign') {
       provider.approveSign(req, (err, res) => {
-        if (err) return signers.setRequestError(req.handlerId, err)
-        signers.setRequestSuccess(req.handlerId, res)
+        if (err) return accounts.setRequestError(req.handlerId, err)
+        accounts.setRequestSuccess(req.handlerId, res)
       })
     }
   },
   declineRequest (req, cb) {
     if (req.type === 'transaction' || req.type === 'sign') {
-      signers.declineRequest(req.handlerId)
+      accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
   },
   addAragon (account, cb) {
-    signers.addAragon(account)
+    accounts.addAragon(account)
     cb(null)
+  },
+  addPhrase (pharse, password, cb) {
+    // Dev Testing
+    // const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
+    // const password = 'frame'
+    signers.createFromPhrase(pharse, password, cb)
   }
 }
 

@@ -3,14 +3,14 @@ app.commandLine.appendSwitch('force-gpu-rasterization', true)
 
 const log = require('electron-log')
 const path = require('path')
-// const bip39 = require('bip39')
+const bip39 = require('bip39')
 
 const windows = require('./windows')
 const store = require('./store')
 const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
-const signers = require('./signers')
+// const signers = require('./signers')
 const clients = require('./clients')
 const accounts = require('./accounts')
 const persist = require('./store/persist')
@@ -121,15 +121,15 @@ store.observer(() => {
   }
 })
 
-// Dev Testing
-const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
-const password = 'frame'
-setTimeout(() => {
-  signers.createFromPhrase(mnemonic, password, (err, signer) => {
-    if (err) return console.log(err)
-    console.log('Created Signer....', mnemonic)
-  })
-}, 6000)
+// // Dev Testing
+// const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
+// const password = 'frame'
+// setTimeout(() => {
+//   signers.createFromPhrase(mnemonic, password, (err, signer) => {
+//     if (err) return console.log(err)
+//     console.log('Created Signer....', mnemonic)
+//   })
+// }, 6000)
 
 // const newmnemonic = bip39.generateMnemonic()
 // const newpassword = 'frame'
@@ -139,5 +139,7 @@ setTimeout(() => {
 //     console.log('Created Signer....', newmnemonic)
 //   })
 // }, 1000)
+
+// console.log(bip39.generateMnemonic())
 
 // const mnemonic = bip39.generateMnemonic()

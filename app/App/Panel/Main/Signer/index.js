@@ -92,10 +92,15 @@ class Signer extends React.Component {
     if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
-    if (!this.props.signer) innerClass += ' signerInnerDisconnected'
+    if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     return (
       <div className='signerType'>
         {this.renderArrows('up')}
+        {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
+          <div className='signerTypeDisconnected' onMouseDown={::this.typeClick}>
+            <div className='signerTypeDisconnectedImage'>{svg.logo(42)}</div>
+          </div>
+        ) : null }
         <div className={innerClass} onMouseDown={::this.typeClick}>
           <div className='signerInset'>
             <div className='signerImage'>
@@ -112,14 +117,14 @@ class Signer extends React.Component {
                 }
               })()}
             </div>
-            <div className='signerText'>{this.props.signer ? this.props.signer.type : 'no signer'}</div>
+            <div className='signerText'>{this.props.signer ? this.props.signer.status === 'locked' ? 'locked' : this.props.signer.type : 'no signer'}</div>
           </div>
         </div>
         <div className='addressSelect' onMouseDown={e => {
           e.stopPropagation()
           this.store.toggleShowAccounts()
         }}>
-          <div className='addressSelectButton'>
+          <div className={this.props.signer ? 'addressSelectButton' : 'addressSelectButton signerInnerDisconnected'}>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
             <div className='addressSelectText'>{'Accounts'}</div>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>

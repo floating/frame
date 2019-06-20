@@ -61,9 +61,8 @@ class _AddAragon extends React.Component {
       }
     }
     link.rpc('addAragon', aragonAccount, () => {
-      console.log('addAragon cb called')
+      this.store.toggleAddAccount()
     })
-    this.store.toggleAddAccount()
   }
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
@@ -138,8 +137,12 @@ class _AddPhrase extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
+      index: 0,
       adding: false,
-      phrase: ''
+      phrase: '',
+      password: '',
+      status: '',
+      error: false
     }
   }
   onChange (key, e) {
@@ -169,7 +172,23 @@ class _AddPhrase extends React.Component {
     }
   }
   next () {
-    console.log('New Seed Signer: ', this.state.phrase)
+    this.setState({ index: ++this.state.index })
+  }
+  create () {
+    this.setState({ index: ++this.state.index })
+    link.rpc('addPhrase', this.state.phrase, this.state.password, (err, signer) => {
+      if (err) {
+        this.setState({ status: err, error: true })
+      } else {
+        this.setState({ status: 'Successful', error: false })
+        setTimeout(() => {
+          this.store.toggleAddAccount()
+        }, 2000)
+      }
+    })
+  }
+  restart () {
+    this.setState({ index: 0, adding: true, phrase: '', password: '', status: 'creating signers', success: false })
   }
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
@@ -180,7 +199,7 @@ class _AddPhrase extends React.Component {
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
             <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.flame(15)}</div>
+              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
               <div className='addAccountItemIconHex addAccountItemIconHexHot' />
             </div>
             <div className='addAccountItemTopTitle'>{'Phrase'}</div>
@@ -194,11 +213,22 @@ class _AddPhrase extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'Enter seed phrase'}</div>
+                  <div className='addAccountItemOptionTitle'>{'seed phrase'}</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <textarea tabIndex={'-1'} value={this.state.phrase} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Create'}</div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
+                </div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>{'create password'}</div>
+                  <div className='addAccountItemOptionInputPhrase'>
+                    <input type='password' tabIndex={'-1'} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} />
+                  </div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>{'Create'}</div>
+                </div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
+                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>{'try again'}</div> : null}
                 </div>
               </div>
             </div>
@@ -327,7 +357,7 @@ class Add extends React.Component {
                         <div className='addAccountItemWrap'>
                           <div className='addAccountItemTop'>
                             <div className='addAccountItemIcon'>
-                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.flame(15)}</div>
+                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.ring(21)}</div>
                               <div className='addAccountItemIconHex addAccountItemIconHexHot' />
                             </div>
                             <div className='addAccountItemTopTitle'>{'Keyring'}</div>
