@@ -147,7 +147,7 @@ store.observer(() => {
 //     console.log('Created Signer....', newmnemonic)
 //   })
 // }, 1000)
-// const bip39 = require('bip39')
-// console.log(bip39.generateMnemonic())
+const bip39 = require('bip39')
+console.log(bip39.generateMnemonic(256))
 
-// const mnemonic = bip39.generateMnemonic()
+// const mnemonic = bip39.generateMnemonic(256)

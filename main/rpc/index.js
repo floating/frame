@@ -25,7 +25,8 @@ const rpc = {
     accounts.setSignerIndex(index, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
   },
-  unsetSigner: (cb) => {
+  unsetSigner: (id, cb) => {
+    signers.lock(id)
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
   },

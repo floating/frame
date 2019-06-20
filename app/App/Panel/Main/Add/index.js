@@ -233,7 +233,7 @@ class _AddPhrase extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary'>{'Need a seed phrase? Generate onee'}</div>
+          <div className='addAccountItemSummary'>{'Need a seed phrase? Generate one'}</div>
         </div>
       </div>
     )

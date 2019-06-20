@@ -67,7 +67,7 @@ let initial = {
   main: {
     launch: main('launch', false),
     reveal: main('reveal', false),
-    accounts: {}, // main('accounts', {}),
+    accounts: main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions
     signers: {},
     savedSigners: {},

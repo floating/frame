@@ -45,6 +45,10 @@ class Signers extends EventEmitter {
   unsetSigner () {
     console.log('unsetSigner')
   }
+  lock (id) {
+    let signer = this.get(id)
+    if (signer && signer.lock) signer.lock()
+  }
 }
 
 module.exports = new Signers()

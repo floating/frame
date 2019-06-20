@@ -31,6 +31,11 @@ class Seed extends Signer {
   save () {
 
   }
+  lock () {
+    delete this.unlockedSeed
+    this.status = 'locked'
+    this.update()
+  }
   unlock (password) {
     crypt.decrypt(this.seed, password, (err, seed) => {
       if (err) return console.log(err)

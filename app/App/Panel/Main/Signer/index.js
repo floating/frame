@@ -42,7 +42,7 @@ class Signer extends React.Component {
   }
   select () {
     if (this.store('selected.current') === this.props.id) {
-      link.rpc('unsetSigner', (err, status) => { if (err) return console.log(err) })
+      link.rpc('unsetSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     } else {
       let bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
@@ -358,22 +358,24 @@ class Signer extends React.Component {
             {current ? (
               <div className='signerMid' style={open ? { top: '200px' } : { pointerEvents: 'none' }}>
                 <Settings id={this.props.id} />
-                <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} />
+                <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
               </div>
             ) : null}
-            <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
-              {current ? (
-                <div className='signerUnlock' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { pointerEvents: 'none' }}>
-                  <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
-                  <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
-                </div>
-              ) : null}
-            </div>
+            <div className='signerBot' />
           </div>
         </div>
       </div>
     )
   }
 }
+
+// <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
+//   {current ? (
+//     <div className='signerUnlock' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { pointerEvents: 'none' }}>
+//       <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
+//       <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+//     </div>
+//   ) : null}
+// </div>
 
 export default Restore.connect(Signer)
