@@ -1,15 +1,14 @@
 const path = require('path')
 const fs = require('fs')
+const { fork } = require('child_process')
 const { app } = require('electron')
-const EthTx = require('ethereumjs-tx')
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const log = require('electron-log')
+const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
+const uuid = require('uuid/v4')
 
 const crypt = require('../../../crypt')
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const hdKey = require('ethereumjs-wallet/hdkey')
-const uuid = require('uuid/v4')
 
 // const addressSigner = (seed, index) => {
 //   return hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0').deriveChild(index).getWallet().getPrivateKey()
@@ -24,6 +23,11 @@ class Seed extends Signer {
     this.seed = signer.seed
     this.unlockedSeed = ''
     this.status = 'initial'
+
+    // Spawn worker process
+    this.worker = fork(path.resolve(__dirname, 'worker.js'))
+    this._debug()
+
     // this.unlock('frame')
     setTimeout(() => {
       this.status = 'locked'
@@ -65,20 +69,18 @@ class Seed extends Signer {
   }
   // Standard Methods
   signMessage (index, message, cb) {
-    if (!this.unlockedSeed) return cb(new Error('Account locked'))
-    const hash = hashPersonalMessage(toBuffer(message))
-    const pk = hdKey.fromMasterSeed(Buffer.from(this.unlockedSeed, 'hex')).derivePath('m/44\'/60\'/0\'/0').deriveChild(index).getWallet().getPrivateKey()
-    const signed = ecsign(hash, pk)
-    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
-    cb(null, addHexPrefix(hex))
+    const payload = {
+      method: 'signMessage',
+      params: { index, message, encryptedSeed: this.seed, password: 'frame' }
+    }
+    this._callWorker(payload, cb)
   }
   signTransaction (index, rawTx, cb) {
-    if (!this.unlockedSeed) return cb(new Error('Account locked'))
-    const tx = new EthTx(rawTx)
-    // const addy = hdKey.fromMasterSeed(Buffer.from(this.unlockedSeed, 'hex')).derivePath('m/44\'/60\'/0\'/0').deriveChild(index).getWallet().getChecksumAddressString()
-    const pk = hdKey.fromMasterSeed(Buffer.from(this.unlockedSeed, 'hex')).derivePath('m/44\'/60\'/0\'/0').deriveChild(index).getWallet().getPrivateKey()
-    tx.sign(pk)
-    setTimeout(() => cb(null, '0x' + tx.serialize().toString('hex')), 1000) // Response delay for development
+    const payload = {
+      method: 'signTransaction',
+      params: { index, rawTx, encryptedSeed: this.seed, password: 'frame' }
+    }
+    this._callWorker(payload, console.log)
   }
   verifyAddress (index, address, cb) {
     const message = uuid()
@@ -107,6 +109,33 @@ class Seed extends Signer {
       this.id = id
     }
     store.updateSigner(this.summary())
+  }
+  _callWorker (payload, cb) {
+    if (!this.worker) throw Error('Worker not running')
+    const id = uuid()
+    const listener = (message) => {
+      if (message.id === id) {
+        cb(null, message.result)
+        this.worker.removeListener('message', listener)
+      }
+    }
+    this.worker.addListener('message', listener)
+    this.worker.send({ id, ...payload })
+  }
+  _debug () {
+    // Sign message
+    const message = 'test'
+    this.signMessage(0, message, console.log)
+
+    // Sign tx
+    let rawTx = {
+      nonce: '0x6',
+      gasPrice: '0x09184e72a000',
+      gasLimit: '0x30000',
+      to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
+      value: '0x00'
+    }
+    this.signTransaction(0, rawTx, console.log)
   }
 }
 
