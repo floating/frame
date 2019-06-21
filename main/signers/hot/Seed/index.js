@@ -21,7 +21,6 @@ class Seed extends Signer {
     this.type = signer.type
     this.addresses = signer.addresses
     this.seed = signer.seed
-    this.unlockedSeed = ''
     this.status = 'initial'
 
     // Spawn worker process
@@ -49,23 +48,6 @@ class Seed extends Signer {
 
     // Write to disk
     fs.writeFileSync(signersPath, JSON.stringify(storedSigners))
-  }
-  lock () {
-    delete this.unlockedSeed
-    this.status = 'locked'
-    this.update()
-  }
-  unlock (password) {
-    crypt.decrypt(this.seed, password, (err, seed) => {
-      if (err) return console.log(err)
-      this.unlockedSeed = seed
-      this.status = 'ok'
-      this.update()
-      // this.verifyAddress(0, this.addresses[0], (err, verified) => {
-      //   if (err || !verified) return log.error(err || new Error(`Constructor of ${this.type} signer could not verify current index...`))
-      //   log.info('Successfully verified address for initial index...')
-      // })
-    })
   }
   // Standard Methods
   signMessage (index, message, cb) {
