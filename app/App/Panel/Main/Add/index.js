@@ -82,7 +82,7 @@ class _AddAragon extends React.Component {
           <div className='addAccountItemSummary'>{'An Aragon smart account allows you to use your Aragon DAO with any dapp'}</div>
           <div className='addAccountItemOption'>
             <div className='addAccountItemOptionIntro' onMouseDown={() => { this.setState({ adding: true }) }}>
-              {'Add Aragon Account'}
+              <div className='addAccountItemDeviceTitle'>{'Add Aragon Account'}</div>
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
@@ -205,7 +205,7 @@ class _AddPhrase extends React.Component {
             <div className='addAccountItemTopTitle'>{'Phrase'}</div>
             <div className='addAccountItemTopTitle'>{''}</div>
           </div>
-          <div className='addAccountItemSummary'>{'A phrase account uses a list of 12 or 24 words to backup and restore your account'}</div>
+          <div className='addAccountItemSummary'>{'A phrase account uses a list of words to backup and restore your account'}</div>
           <div className='addAccountItemOption'>
             <div className='addAccountItemOptionIntro' onMouseDown={() => { this.setState({ adding: true }) }}>
               {'Add Phrase Account'}
@@ -241,6 +241,119 @@ class _AddPhrase extends React.Component {
 }
 
 const AddPhrase = Restore.connect(_AddPhrase)
+
+class _AddHardware extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {}
+    this.deviceName = this.props.type // .replace(/\b\w/g, l => l.toUpperCase())
+  }
+  render () {
+    let accounts = this.store('main.accounts')
+    let signers = this.store('main.signers')
+    let tethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) > -1)
+    let untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
+    let isType = id => this.store('main.signers', id, 'type') === this.props.type
+    let toDevice = id => this.store('main.signers', id)
+    tethered = tethered.filter(isType.bind(this)).map(toDevice.bind(this))
+    untethered = untethered.filter(isType.bind(this)).map(toDevice.bind(this))
+    return (
+      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 0 / 4) + 's' }}>
+        <div className='addAccountItemBar addAccountItemHardware' />
+        <div className='addAccountItemWrap'>
+          <div className='addAccountItemTop'>
+            <div className='addAccountItemIcon'>
+              <div className='addAccountItemIconType addAccountItemIconHardware'>{this.props.type === 'ledger' ? svg.ledger(20) : svg.trezor(16)}</div>
+              <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
+            </div>
+            <div className='addAccountItemTopTitle'>{this.deviceName}</div>
+            <div className='addAccountItemTopTitle'>{''}</div>
+          </div>
+          <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
+          <div className='addAccountItemDevices'>
+            {untethered.length || tethered.length ? (
+              untethered.map((signer, i) => {
+                return (
+                  <div className='addAccountItemDevice' key={signer.id}>
+                    <div className='addAccountItemDeviceTitle'>{'Device Found'}</div>
+                    <div className='addAccountItemDeviceStatus'>{signer.status}</div>
+                  </div>
+                )
+              }).concat(tethered.map((signer, i) => {
+                return (
+                  <div className='addAccountItemDevice' key={signer.id} onMouseDown={() => this.store.toggleAddAccount()}>
+                    <div className='addAccountItemDeviceTitle'>{'Device Found'}</div>
+                    <div className='addAccountItemDeviceStatus'>{'Account Created'}</div>
+                  </div>
+                )
+              }))
+            ) : (
+              <div className='addAccountItemDevice'>
+                <div className='addAccountItemDeviceTitle'>
+                  {'No Devices Found'}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className='addAccountItemSummary'>{`Need a signer? Get a ${this.deviceName}`}</div>
+        </div>
+      </div>
+    )
+  }
+}
+
+// <div className='addAccountItem' style={{ transitionDelay: (0.64 * 1 / 4) + 's' }}>
+//   <div className='addAccountItemBar addAccountItemHardware' />
+//   <div className='addAccountItemWrap'>
+//     <div className='addAccountItemTop'>
+//       <div className='addAccountItemIcon addAccountItemIconHardware'>
+//         <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.trezor(17)}</div>
+//         <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
+//       </div>
+//       <div className='addAccountItemTopTitle'>{'Trezor'}</div>
+//       <div className='addAccountItemTopTitle'>{''}</div>
+//     </div>
+//     <div className='addAccountItemSummary'>{'Unlock your Trezor to get started'}</div>
+//     <div className='addAccountItemDevices'>
+//       {untethered.length || tethered.length ? (
+//         untethered.map(id => {
+//           let signer = this.store('main.signers', id)
+//           if (signer.type === 'trezor') {
+//             return (
+//               <div className='addAccountItemDevice' style={{ height: '70px' }}>
+//                 <div className='addAccountItemDeviceTitle'>{'Device Found'}</div>
+//                 <div className='addAccountItemDeviceStatus'>{signer.status}</div>
+//               </div>
+//             )
+//           } else {
+//             return null
+//           }
+//         }).concat(tethered.map(id => {
+//           let signer = this.store('main.signers', id)
+//           if (signer.type === 'trezor') {
+//             return (
+//               <div className='addAccountItemDevice'>
+//                 <div className='addAccountItemDeviceTitle'>{'Device Found'}</div>
+//                 <div className='addAccountItemDeviceStatus'>{'Account Created'}</div>
+//               </div>
+//             )
+//           } else {
+//             return null
+//           }
+//         }))
+//       ) : (
+//         <div className='addAccountItemDevice'>
+//           <div className='addAccountItemDeviceTitle'>
+//             {'No Devices Found'}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//     <div className='addAccountItemSummary'>{'Need a signer? Get a Trezor'}</div>
+//   </div>
+// </div>
+
+const AddHardware = Restore.connect(_AddHardware)
 
 class Add extends React.Component {
   constructor (...args) {
@@ -307,71 +420,13 @@ class Add extends React.Component {
                       <div className='addAccountBreak' />
                       <div className='addAccountSubtitle'>{'Add or create a decentralized account to use with any dapp'}</div>
                       <div className='addAccountBreak' />
-                      <div className='addAccountHeader'>{svg.octicon('server', { height: 17 })}{'Hardware Accounts'}</div>
-                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 0 / 4) + 's' }}>
-                        <div className='addAccountItemBar addAccountItemHardware' />
-                        <div className='addAccountItemWrap'>
-                          <div className='addAccountItemTop'>
-                            <div className='addAccountItemIcon'>
-                              <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.ledger(20)}</div>
-                              <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
-                            </div>
-                            <div className='addAccountItemTopTitle'>{'Ledger'}</div>
-                            <div className='addAccountItemTopTitle'>{''}</div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'Unlock your Ledger to get started'}</div>
-                          <div className='addAccountItemOption'>
-                            <div className='addAccountItemOptionIntro'>
-                              {'No Device Found'}
-                            </div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'Need a signer? Get a Ledger'}</div>
-                        </div>
-                      </div>
-                      <div className='addAccountItem' style={{ transitionDelay: (0.64 * 1 / 4) + 's' }}>
-                        <div className='addAccountItemBar addAccountItemHardware' />
-                        <div className='addAccountItemWrap'>
-                          <div className='addAccountItemTop'>
-                            <div className='addAccountItemIcon addAccountItemIconHardware'>
-                              <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.trezor(17)}</div>
-                              <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
-                            </div>
-                            <div className='addAccountItemTopTitle'>{'Trezor'}</div>
-                            <div className='addAccountItemTopTitle'>{''}</div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'Unlock your Trezor to get started'}</div>
-                          <div className='addAccountItemOption'>
-                            <div className='addAccountItemOptionIntro'>
-                              {'No Device Found'}
-                            </div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'Need a signer? Get a Trezor'}</div>
-                        </div>
-                      </div>
+                      <div className='addAccountHeader'><div style={{ marginRight: '10px' }}>{svg.octicon('server', { height: 17 })}</div><div>{'Hardware Accounts'}</div></div>
+                      <AddHardware index={1} type={'ledger'} />
+                      <AddHardware index={2} type={'trezor'} />
                       <div className='addAccountHeader'><div>{svg.lightbulb(20)}</div><div>{'Smart Accounts'}</div></div>
                       <AddAragon index={2} />
                       <div className='addAccountHeader'><div>{svg.flame(20)}</div><div>{'Hot Accounts'}</div></div>
                       <AddPhrase index={3} />
-                      <div className='addAccountItem' style={{ opacity: 0.3, transitionDelay: (0.64 * 4 / 4) + 's' }}>
-                        <div className='addAccountItemBar addAccountItemHot' />
-                        <div className='addAccountItemWrap'>
-                          <div className='addAccountItemTop'>
-                            <div className='addAccountItemIcon'>
-                              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.ring(21)}</div>
-                              <div className='addAccountItemIconHex addAccountItemIconHexHot' />
-                            </div>
-                            <div className='addAccountItemTopTitle'>{'Keyring'}</div>
-                            <div className='addAccountItemTopTitle'>{''}</div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'A keyring account uses a list of private keys  to backup and restore your account '}</div>
-                          <div className='addAccountItemOption'>
-                            <div className='addAccountItemOptionIntro'>
-                              {'Coming Soon'}
-                            </div>
-                          </div>
-                          <div className='addAccountItemSummary'>{'Need a  private key? Generate one'}</div>
-                        </div>
-                      </div>
                       <div className='addAccountBreak' style={{ margin: '40px 0px 0px 0px' }} />
                       <div className='addAccountFooter'>
                         {svg.logo(32)}
@@ -401,3 +456,24 @@ class Add extends React.Component {
 }
 
 export default Restore.connect(Add)
+
+// <div className='addAccountItem' style={{ opacity: 0.3, transitionDelay: (0.64 * 4 / 4) + 's' }}>
+//   <div className='addAccountItemBar addAccountItemHot' />
+//   <div className='addAccountItemWrap'>
+//     <div className='addAccountItemTop'>
+//       <div className='addAccountItemIcon'>
+//         <div className='addAccountItemIconType addAccountItemIconHot'>{svg.ring(21)}</div>
+//         <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+//       </div>
+//       <div className='addAccountItemTopTitle'>{'Keyring'}</div>
+//       <div className='addAccountItemTopTitle'>{''}</div>
+//     </div>
+//     <div className='addAccountItemSummary'>{'A keyring account uses a list of private keys  to backup and restore your account '}</div>
+//     <div className='addAccountItemOption'>
+//       <div className='addAccountItemOptionIntro'>
+//         {'Coming Soon'}
+//       </div>
+//     </div>
+//     <div className='addAccountItemSummary'>{'Need a  private key? Generate one'}</div>
+//   </div>
+// </div>

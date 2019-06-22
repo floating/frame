@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
 import Signer from './Signer'
+import PendingSigner from './PendingSigner'
 import Add from './Add'
 
 import svg from '../../../svg'
@@ -12,7 +13,9 @@ class Main extends React.Component {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
   render () {
-    let signers = this.store('main.accounts')
+    let accounts = this.store('main.accounts')
+    let signers = this.store('main.signers')
+    let untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     let current = this.store('selected.current')
     let scrollTop = this.store('selected.position.scrollTop')
     return (
@@ -21,8 +24,9 @@ class Main extends React.Component {
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
-              {Object.keys(signers).sort().map((id, i) => <Signer key={id} {...signers[id]} index={i} reportScroll={() => this.reportScroll()} />)}
-              {Object.keys(signers).length === 0 ? (
+              {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
+              {Object.keys(accounts).sort().map((id, i) => <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} />)}
+              {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
                   {'No Accounts Found'}

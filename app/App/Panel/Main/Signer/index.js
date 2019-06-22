@@ -104,7 +104,8 @@ class Signer extends React.Component {
         {this.renderArrows('up')}
         {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
           <div className='signerTypeDisconnected' onMouseDown={::this.typeClick}>
-            <div className='signerTypeDisconnectedImage'>{svg.logo(42)}</div>
+            <div className='signerTypeDisconnectedImageBack'>{svg.logo(42)}</div>
+            <div className='signerTypeDisconnectedImageFront'>{svg.logo(42)}</div>
           </div>
         ) : null }
         <div className={innerClass} onMouseDown={::this.typeClick}>
@@ -112,21 +113,20 @@ class Signer extends React.Component {
             <div className='signerImage'>
               {(_ => {
                 if (this.props.signer) {
-                  if (this.props.signer.type === 'Ledger') return <img src={ledgerLogo} />
-                  if (this.props.signer.type === 'Trezor') return <img className='trezorImage' src={trezorLogo} />
-                  if (this.props.signer.type === 'Hot') return svg.octicon('zap', { height: 31 })
+                  if (this.props.signer.type === 'ledger') return <img src={ledgerLogo} />
+                  if (this.props.signer.type === 'trezor') return <img className='trezorImage' src={trezorLogo} />
                   if (this.props.signer.type === 'hot') return svg.flame(21)
                   if (this.props.signer.type === 'ring') return svg.octicon('ring', { height: 31 })
                   return svg.octicon('plus', { height: 31 })
                 } else {
-                  return svg.fingerprint(31)
+                  return null
                 }
               })()}
             </div>
-            <div className='signerText'>{this.props.signer ? this.props.signer.status === 'locked' ? 'locked' : this.props.signer.type : 'no signer'}</div>
+            <div className='signerText'>{this.props.signer ? this.props.signer.type : 'no signer'}</div>
           </div>
         </div>
-        <div className='addressSelect' onMouseDown={e => {
+        <div className='addressSelect' style={this.store('selected.view') === 'settings' ? { opacity: 1, transitionDelay: '0s' } : { opacity: 0, transitionDelay: '0.2s' }} onMouseDown={e => {
           e.stopPropagation()
           this.store.toggleShowAccounts()
         }}>
