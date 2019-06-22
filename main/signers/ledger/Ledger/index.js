@@ -18,7 +18,7 @@ class Ledger extends Signer {
     this.addresses = []
     this.id = this.getId()
     this.signers = signers
-    this.type = 'Ledger'
+    this.type = 'ledger'
     this.status = 'initial'
     this.busyCount = 0
     this.pause = false
@@ -54,7 +54,7 @@ class Ledger extends Signer {
     this.update()
   }
   async getDeviceAddress (i, cb) {
-    if (this.pause) return cb(new Error('Ledger: Device access is paused'))
+    if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
       let transport = await TransportNodeHid.open(this.devicePath)
@@ -75,7 +75,7 @@ class Ledger extends Signer {
   }
   async verifyAddress (display, index = 0) {
     if (verifyActive) return log.info('verifyAddress Called but it\'s already active')
-    if (this.pause) return log.info('Ledger: Device access is paused')
+    if (this.pause) return log.info('Device access is paused')
     verifyActive = true
     this.pause = true
     try {
@@ -125,35 +125,28 @@ class Ledger extends Signer {
   //   }, 300)
   // }
   async lookupAddresses (cb) {
-    if (this.pause) cb(new Error('Ledger: Device access is paused'))
+    if (this.pause) cb(new Error('Device access is paused'))
     this.pause = true
     try {
       let transport = await TransportNodeHid.open(this.devicePath)
       transport.setDebugMode(true)
-      console.log('HERERE', this.id, this.devicePath.substr(this.devicePath.length - 5))
       let eth = new Eth(transport)
-      console.log('HERERE 33', this.id, this.devicePath.substr(this.devicePath.length - 5))
-
       let timeout = setTimeout(() => {
-        console.log('timeouttt')
         transport.close()
         this.lookupAddresses(cb)
       }, 5000)
       eth.getAddress(this.basePath(), false, true).then(result => {
         clearTimeout(timeout)
-        console.log('HERERE RES', this.id, this.devicePath.substr(this.devicePath.length - 5))
         transport.close()
         this.pause = false
         this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
       }).catch(err => {
         clearTimeout(timeout)
-        console.log('HERERE ERRR', this.id, this.devicePath.substr(this.devicePath.length - 5))
         transport.close()
         this.pause = false
         cb(err)
       })
     } catch (err) {
-      console.log('HERERE outer err', this.id, this.devicePath.substr(this.devicePath.length - 5))
       this.pause = false
       cb(err)
     }
@@ -237,8 +230,8 @@ class Ledger extends Signer {
     return hex
   }
   // Standard Methods
-  async signMessage (message, index, cb) {
-    if (this.pause) return cb(new Error('Ledger: Device access is paused'))
+  async signMessage (index, message, cb) {
+    if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
       let transport = await TransportNodeHid.open(this.devicePath)
@@ -271,8 +264,8 @@ class Ledger extends Signer {
       log.error(err)
     }
   }
-  async signTransaction (rawTx, index, cb) {
-    if (this.pause) return cb(new Error('Ledger: Device access is paused'))
+  async signTransaction (index, rawTx, cb) {
+    if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
       let transport = await TransportNodeHid.open(this.devicePath)
