@@ -36,8 +36,6 @@ class Account {
     })
   }
   addRequest (req) {
-    // console.log(req)
-
     let add = r => {
       this.requests[r.handlerId] = req
       this.requests[r.handlerId].mode = 'normal'
@@ -51,7 +49,8 @@ class Account {
       if (this.smart.type === 'aragon') {
         if (req.type === 'transaction') {
           if (!this.aragon) return log.error('Aragon account could not resolve this.aragon')
-          this.aragon.pathTransaction(req.data, (err, tx) => {
+          let tx = this.validateTransaction(req.data)
+          this.aragon.pathTransaction(tx, (err, tx) => {
             if (err) return log.error(err)
             req.data = tx
             add(req)
@@ -129,7 +128,12 @@ class Account {
       cb(new Error(`No signer forund for this account`))
     }
   }
+  validateTransaction (rawTx) {
+    rawTx.data = rawTx.data || '0x'
+    return rawTx
+  }
   signTransaction (rawTx, cb) {
+    rawTx = this.validateTransaction(rawTx)
     if (this.signer) {
       signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
     } else if (this.smart) {

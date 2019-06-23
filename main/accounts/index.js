@@ -72,7 +72,7 @@ class Accounts extends EventEmitter {
     this.accounts = {}
     let stored = store('main.accounts')
     Object.keys(stored).forEach(id => {
-      this.accounts[id] = new Account(stored[id], this)
+      this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
     // Aragon Testing
     // this.accounts[aragonTestAccount.id] = new Account(aragonTestAccount, this)
@@ -108,7 +108,11 @@ class Accounts extends EventEmitter {
     return crypt.stringToKey(addresses.join()).toString('hex')
   }
   // Public
-  addAragon (account) {
+  addAragon (account, cb = () => {}) {
+    if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
+    account.id = this.addressesToId(account.addresses)
+    account.options = account.options || {}
+    account.options.type = 'aragon'
     this.accounts[account.id] = new Account(account, this)
   }
   add (addresses, options = {}, cb = () => {}) {
