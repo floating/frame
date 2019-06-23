@@ -6,14 +6,19 @@ const store = require('../../store')
 
 const Aragon = require('./aragon')
 
+const capitalize = (s) => {
+  if (typeof s !== 'string') return ''
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
 class Account {
-  constructor ({ id, type, index, name, created, addresses, smart }, accounts) {
+  constructor ({ id, type, index, name, created, addresses, smart, options = {} }, accounts) {
     this.accounts = accounts
     this.id = id
     this.index = index || 0
     this.status = 'ok'
-    this.name = name || ''
-    this.type = type || 'Default'
+    this.name = name || capitalize(options.type) + ' Account'
+    this.type = type || options.type
     this.created = created
     this.addresses = addresses || ['0x']
     this.smart = smart
@@ -77,6 +82,7 @@ class Account {
     const update = JSON.parse(JSON.stringify({
       id: this.id,
       index: this.index,
+      name: this.name,
       type: this.type,
       addresses: this.addresses,
       status: this.status,

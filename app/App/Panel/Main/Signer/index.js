@@ -280,7 +280,7 @@ class Signer extends React.Component {
             <div key={address + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
               <div className='signerName'>
                 <div className='signerNameText'>
-                  {this.props.type + ' Account'}
+                  {this.props.name}
                   <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
                 </div>
               </div>

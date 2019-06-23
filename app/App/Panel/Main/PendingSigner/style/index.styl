@@ -7,6 +7,10 @@
   margin 10px 10px 10px 10px
   border-radius 4px
   z-index 99999999
+  transition standard
+  will-change transform
+  transform translate(0px, 0px)
+  opacity 1
 
   .pendingSignerInset
     position absolute
@@ -23,7 +27,7 @@
 
     .pendingSignerLogo
       height 63px
-      margin 0px 13px 0px 18px
+      margin 0px 15px 0px 18px
       display flex
       justify-content center
       align-items center
@@ -47,5 +51,5 @@
       .pendingSignerStatus
         text-transform none
         font-size 11px
-        line-height 12px
+        line-height 14px
         font-weight 400
