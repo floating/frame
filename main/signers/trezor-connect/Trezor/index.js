@@ -7,9 +7,9 @@ const windows = require('../../../windows')
 const flex = require('../../../flex')
 
 class Trezor extends Signer {
-  constructor (device, api) {
+  constructor (device, signers) {
     super()
-    this.api = api
+    this.signers = signers
     this.device = device
     this.id = device.path
     this.type = 'Trezor'
@@ -64,7 +64,7 @@ class Trezor extends Signer {
         if (address !== current) {
           // TODO: Error Notification
           log.error(new Error('Address does not match device'))
-          this.api.unsetSigner()
+          this.signers.unsetSigner()
         } else {
           log.info('Address matches device')
         }

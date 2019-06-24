@@ -182,7 +182,7 @@
     svg
       width 13px
       height 16px
-      margin 0px 15px 0px 0px
+      // margin 0px 15px 0px 0px
 
   .addAccountItem
     padding 3px 0px 3px 0px
@@ -253,7 +253,7 @@
         display flex
         justify-content center
         align-items center
-        margin-right 18px
+        margin-right 10px
 
       .addAccountItemIconHex
         margin-left -1px
@@ -307,6 +307,43 @@
       padding 24px 20px 0px 20px
       text-align justify
       text-align-last center-justify
+
+    .addAccountItemDevices
+      width calc(100% - 20px)
+      font-size 12px
+      text-transform uppercase
+      letter-spacing 2px
+      margin-top 12px
+      border-radius 4px
+      transition standardSlow
+      position relative
+      overflow hidden
+      font-weight 400
+      flex-direction column
+      background rgba(5, 25, 35, 0.2)
+      padding-bottom 10px
+
+      .addAccountItemDevice
+        margin-top 10px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+        padding 0px 7px
+
+      .addAccountItemDevice:hover
+        background rgba(5, 25, 35, 0.1)
+
+      .addAccountItemDeviceTitle
+        font-weight 600
+        padding-bottom 4px
+
+      .addAccountItemDeviceStatus
+        font-size 10px
+        display flex
+        justify-content center
+        align-items center
+        text-align center
 
     .addAccountItemOption
       width calc(100% - 20px)
@@ -522,7 +559,7 @@
       border-radius 6px
 
     .addAccountItemHardware
-      background rgb(180, 220, 255)
+      background hardware
 
     .addAccountItemSmart
       background rgb(150, 255, 210)

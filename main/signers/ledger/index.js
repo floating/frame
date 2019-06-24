@@ -13,7 +13,7 @@ module.exports = {
       log.info('Ledger Scan Triggered:')
       let current = HID.devices().filter(isLedger)
       signers.list().forEach((signer, i) => {
-        if (current.map(device => device.path).indexOf(signer.devicePath) === -1 && signer.type === 'Ledger') {
+        if (current.map(device => device.path).indexOf(signer.devicePath) === -1 && signer.type === 'ledger') {
           log.info('Removing Ledger: ', signer.id)
           signers.remove(signer.id)
         }

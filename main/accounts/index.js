@@ -72,7 +72,7 @@ class Accounts extends EventEmitter {
     this.accounts = {}
     let stored = store('main.accounts')
     Object.keys(stored).forEach(id => {
-      this.accounts[id] = new Account(stored[id], this)
+      this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
     // Aragon Testing
     // this.accounts[aragonTestAccount.id] = new Account(aragonTestAccount, this)
@@ -81,7 +81,8 @@ class Accounts extends EventEmitter {
     store.observer(() => {
       let signers = store('main.signers')
       Object.keys(signers).forEach(id => {
-        if (!this.accounts[id]) this.add(signers[id].addresses)
+        let type = store('main.signers', id, 'type')
+        if (!this.accounts[id]) this.add(signers[id].addresses, { type })
       })
     })
   }
@@ -107,16 +108,20 @@ class Accounts extends EventEmitter {
     return crypt.stringToKey(addresses.join()).toString('hex')
   }
   // Public
-  addAragon (account) {
+  addAragon (account, cb = () => {}) {
+    if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
+    account.id = this.addressesToId(account.addresses)
+    account.options = account.options || {}
+    account.options.type = 'aragon'
     this.accounts[account.id] = new Account(account, this)
   }
-  add (addresses, cb = () => {}) {
+  add (addresses, options = {}, cb = () => {}) {
     if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
     const id = this.addressesToId(addresses)
     const account = store('main.accounts', id)
     if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
-    this.accounts[id] = new Account({ id, addresses, index: 0, created: Date.now() }, this)
+    this.accounts[id] = new Account({ id, addresses, index: 0, created: Date.now(), options }, this)
   }
   update (account, add) {
     store.updateAccount(account, add)

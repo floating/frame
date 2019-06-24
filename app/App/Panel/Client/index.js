@@ -21,7 +21,7 @@ class Client extends React.Component {
   }
 
   fullName = (client) => {
-    if (client === 'parity') return 'Parity Ethereum'
+    if (client === 'parity') return 'Ethereum (Light)'
     if (client === 'ipfs') return 'IPFS'
   }
 
@@ -31,7 +31,7 @@ class Client extends React.Component {
       <div className='signerPermission'>
         <div className={this.store(`main.clients.${client}.on`) ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
           <div className='connectionOptionToggle'>
-            <div className='signerPermissionOrigin'>{this.fullName(client)}</div>
+            <div className='signerPermissionOrigin' style={{ direction: 'initial' }}>{this.fullName(client)}</div>
             <div
               className={this.store(`main.clients.${client}.on`) ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
               onMouseDown={_ => this.toggle()}>

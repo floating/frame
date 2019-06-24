@@ -6,11 +6,17 @@ const path = require('path')
 
 const windows = require('./windows')
 const store = require('./store')
+
+// Action Monitor
+// store.api.feed((state, actions, obscount) => {
+//   console.log(actions)
+// })
+
+const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 const clients = require('./clients')
-const accounts = require('./accounts')
 const signers = require('./signers')
 const persist = require('./store/persist')
 
@@ -147,8 +153,8 @@ store.observer(() => {
 //     console.log('Created Signer....', newmnemonic)
 //   })
 // }, 1000)
-const bip39 = require('bip39')
-console.log(bip39.generateMnemonic(256))
+// const bip39 = require('bip39')
+// console.log(bip39.generateMnemonic(256))
 
 // const mnemonic = bip39.generateMnemonic()
 

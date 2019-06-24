@@ -6,14 +6,19 @@ const store = require('../../store')
 
 const Aragon = require('./aragon')
 
+const capitalize = (s) => {
+  if (typeof s !== 'string') return ''
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
 class Account {
-  constructor ({ id, type, index, name, created, addresses, smart }, accounts) {
+  constructor ({ id, type, index, name, created, addresses, smart, options = {} }, accounts) {
     this.accounts = accounts
     this.id = id
     this.index = index || 0
     this.status = 'ok'
-    this.name = name || ''
-    this.type = type || 'Default'
+    this.name = name || capitalize(options.type) + ' Account'
+    this.type = type || options.type
     this.created = created
     this.addresses = addresses || ['0x']
     this.smart = smart
@@ -31,8 +36,6 @@ class Account {
     })
   }
   addRequest (req) {
-    // console.log(req)
-
     let add = r => {
       this.requests[r.handlerId] = req
       this.requests[r.handlerId].mode = 'normal'
@@ -46,7 +49,8 @@ class Account {
       if (this.smart.type === 'aragon') {
         if (req.type === 'transaction') {
           if (!this.aragon) return log.error('Aragon account could not resolve this.aragon')
-          this.aragon.pathTransaction(req.data, (err, tx) => {
+          let tx = this.validateTransaction(req.data)
+          this.aragon.pathTransaction(tx, (err, tx) => {
             if (err) return log.error(err)
             req.data = tx
             add(req)
@@ -77,6 +81,7 @@ class Account {
     const update = JSON.parse(JSON.stringify({
       id: this.id,
       index: this.index,
+      name: this.name,
       type: this.type,
       addresses: this.addresses,
       status: this.status,
@@ -123,7 +128,12 @@ class Account {
       cb(new Error(`No signer forund for this account`))
     }
   }
+  validateTransaction (rawTx) {
+    rawTx.data = rawTx.data || '0x'
+    return rawTx
+  }
   signTransaction (rawTx, cb) {
+    rawTx = this.validateTransaction(rawTx)
     if (this.signer) {
       signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
     } else if (this.smart) {
