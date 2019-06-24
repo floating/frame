@@ -5,9 +5,9 @@ const uuid = require('uuid/v4')
 
 const crypt = require('../../../crypt')
 
-let seed = ''
+let seed = null
 
-const unlockSigner = async ({ encryptedSeed, password }, cb) => {
+const unlockAccount = async ({ encryptedSeed, password }, cb) => {
   crypt.decrypt(encryptedSeed, password, (err, decryptedSeed) => {
     if (err) cb('Invalid password')
     else {
@@ -17,8 +17,14 @@ const unlockSigner = async ({ encryptedSeed, password }, cb) => {
   })
 }
 
+const lockAccount = async (cb) => {
+  seed = null
+  cb()
+}
+
 const signMessage = async ({ index, message }, cb) => {
-  console.log('seed:', seed)
+  // Make sure account is unlocked
+  if (!seed) return cb('Account locked')
   // Hash message
   const hash = hashPersonalMessage(toBuffer(message))
   // Derive private key
@@ -31,6 +37,8 @@ const signMessage = async ({ index, message }, cb) => {
 }
 
 const signTransaction = async ({ index, rawTx }, cb) => {
+  // Make sure account is unlocked
+  if (!seed) return cb('Account locked')
   // Create tranasction
   const tx = new EthTx(rawTx)
   // Derive private key
@@ -42,6 +50,8 @@ const signTransaction = async ({ index, rawTx }, cb) => {
 }
 
 const verifyAddress = async ({ index, address }, cb) => {
+  // Make sure account is unlocked
+  if (!seed) return cb('Account locked')
   // Construct message
   const message = uuid()
   // Sign message
@@ -69,8 +79,10 @@ process.on('message', async ({ id, method, params }) => {
     // Send response to parent process
     process.send(response)
   }
-  // Handle method 'unlockSigner'
-  if (method === 'unlockSigner') return unlockSigner(params, cb)
+  // Handle method 'unlockAccount'
+  if (method === 'unlockAccount') return unlockAccount(params, cb)
+  // Handle method 'unlockAccount'
+  if (method === 'lockAccount') return lockAccount(cb)
   // Handle method 'signMessage'
   if (method === 'signMessage') return signMessage(params, cb)
   // Handle method 'signTransaction'
@@ -78,5 +90,5 @@ process.on('message', async ({ id, method, params }) => {
   // Handle method 'verifyAddress'
   if (method === 'verifyAddress') return verifyAddress(params, cb)
   // Handle invalid method
-  else cb('Invalid method: ' + method)
+  else cb(`Invalid method: '${method}'`)
 })

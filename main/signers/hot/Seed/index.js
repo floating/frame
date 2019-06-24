@@ -19,7 +19,6 @@ class Seed extends Signer {
     this.type = signer.type
     this.addresses = signer.addresses
     this.seed = signer.seed
-    // this.status = 'initial'
     this.status = 'locked'
     this.update()
 
@@ -44,7 +43,7 @@ class Seed extends Signer {
   }
   unlock (password) {
     const payload = {
-      method: 'unlockSigner',
+      method: 'unlockAccount',
       params: { encryptedSeed: this.seed, password }
     }
     this._callWorker(payload, (err, result) => {
@@ -52,6 +51,12 @@ class Seed extends Signer {
         this.status = 'ok'
         this.update()
       }
+    })
+  }
+  lock () {
+    this._callWorker({ method: 'lockAccount' }, () => {
+      this.status = 'locked'
+      this.update()
     })
   }
   signMessage (index, message, cb) {
@@ -76,6 +81,7 @@ class Seed extends Signer {
     this._callWorker(payload, cb)
   }
   close () {
+    this.worker.disconnect()
     store.removeSigner(this.id)
     super.close()
   }
@@ -104,6 +110,10 @@ class Seed extends Signer {
 
     // setTimeout(() => {
     //   this.unlock('frame', console.log)
+    // }, 2000)
+    // setTimeout(() => {
+    //   this.signMessage(0, 'fisk', console.log)
+    //   this.lock()
     // }, 3000)
     // setTimeout(() => {
     //   this.signMessage(0, 'fisk', console.log)
