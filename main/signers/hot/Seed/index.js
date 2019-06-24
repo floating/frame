@@ -3,10 +3,8 @@ const fs = require('fs')
 const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const uuid = require('uuid/v4')
 
-const crypt = require('../../../crypt')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 
@@ -21,18 +19,13 @@ class Seed extends Signer {
     this.type = signer.type
     this.addresses = signer.addresses
     this.seed = signer.seed
-    this.status = 'initial'
+    // this.status = 'initial'
+    this.status = 'locked'
+    this.update()
 
     // Spawn worker process
     this.worker = fork(path.resolve(__dirname, 'worker.js'))
     this._debug()
-
-    // this.unlock('frame')
-    setTimeout(() => {
-      this.status = 'locked'
-      this.update()
-    }, 3000)
-    this.update()
   }
   save () {
     const signersPath = path.resolve(app.getPath('userData'), 'signers.json')
@@ -49,36 +42,38 @@ class Seed extends Signer {
     // Write to disk
     fs.writeFileSync(signersPath, JSON.stringify(storedSigners))
   }
-  // Standard Methods
+  unlock (password) {
+    const payload = {
+      method: 'unlockSigner',
+      params: { encryptedSeed: this.seed, password }
+    }
+    this._callWorker(payload, (err, result) => {
+      if (!err) {
+        this.status = 'ok'
+        this.update()
+      }
+    })
+  }
   signMessage (index, message, cb) {
     const payload = {
       method: 'signMessage',
-      params: { index, message, encryptedSeed: this.seed, password: 'frame' }
+      params: { index, message }
     }
     this._callWorker(payload, cb)
   }
   signTransaction (index, rawTx, cb) {
     const payload = {
       method: 'signTransaction',
-      params: { index, rawTx, encryptedSeed: this.seed, password: 'frame' }
+      params: { index, rawTx }
     }
-    this._callWorker(payload, console.log)
+    this._callWorker(payload, cb)
   }
   verifyAddress (index, address, cb) {
-    const message = uuid()
-    this.signMessage(index, message, (err, signed) => {
-      if (err) return cb(err)
-      // Verify
-      const signature = Buffer.from(signed.replace('0x', ''), 'hex')
-      if (signature.length !== 65) cb(new Error(`Frame verifyAddress signature has incorrect length`))
-      let v = signature[64]
-      v = v === 0 || v === 1 ? v + 27 : v
-      let r = toBuffer(signature.slice(0, 32))
-      let s = toBuffer(signature.slice(32, 64))
-      const hash = hashPersonalMessage(toBuffer(message))
-      const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-      cb(null, verifiedAddress.toLowerCase() === address.toLowerCase())
-    })
+    const payload = {
+      method: 'verifyAddress',
+      params: { index, address }
+    }
+    this._callWorker(payload, cb)
   }
   close () {
     store.removeSigner(this.id)
@@ -97,7 +92,8 @@ class Seed extends Signer {
     const id = uuid()
     const listener = (message) => {
       if (message.id === id) {
-        cb(null, message.result)
+        let error = message.error ? new Error(message.error) : null
+        cb(error, message.result)
         this.worker.removeListener('message', listener)
       }
     }
@@ -105,19 +101,29 @@ class Seed extends Signer {
     this.worker.send({ id, ...payload })
   }
   _debug () {
-    // Sign message
-    const message = 'test'
-    this.signMessage(0, message, console.log)
 
-    // Sign tx
-    let rawTx = {
-      nonce: '0x6',
-      gasPrice: '0x09184e72a000',
-      gasLimit: '0x30000',
-      to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x00'
-    }
-    this.signTransaction(0, rawTx, console.log)
+    // setTimeout(() => {
+    //   this.unlock('frame', console.log)
+    // }, 3000)
+    // setTimeout(() => {
+    //   this.signMessage(0, 'fisk', console.log)
+    // }, 4000)
+
+    // // Sign message
+    // const message = 'test'
+    // this.signMessage(0, message, console.log)
+
+    // // Sign tx
+    // let rawTx = {
+    //   nonce: '0x6',
+    //   gasPrice: '0x09184e72a000',
+    //   gasLimit: '0x30000',
+    //   to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
+    //   value: '0x00'
+    // }
+    // this.signTransaction(0, rawTx, console.log)
+
+    // this.verifyAddress(0, this.addresses[0], console.log)
   }
 }
 
