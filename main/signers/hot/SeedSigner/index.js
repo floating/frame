@@ -6,38 +6,17 @@ const log = require('electron-log')
 const uuid = require('uuid/v4')
 
 const store = require('../../../store')
-const Signer = require('../../Signer')
+const HotSigner = require('../HotSigner')
 
-const FILE_PATH = path.resolve(app.getPath('userData'), 'signers.json')
-
-class SeedSigner extends Signer {
+class SeedSigner extends HotSigner {
   constructor (signer) {
-    super()
+    super(signer)
     log.info('Creating seed signer instance')
-    this.type = signer.type
-    this.addresses = signer.addresses
     this.seed = signer.seed
-    this.status = 'locked'
-    this.update()
-
-    // Spawn worker process
-    this.worker = fork(path.resolve(__dirname, 'worker.js'))
-    this._debug()
   }
 
   save () {
-    let storedSigners = {}
-
-    // Try to read stored signers from disk
-    try { storedSigners = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8')) }
-    catch (e) { console.error(e) }
-
-    // Add this signer to stored signers
-    const { id, addresses, seed, type } = this
-    storedSigners[id] = { addresses, seed, type }
-
-    // Write to disk
-    fs.writeFileSync(FILE_PATH, JSON.stringify(storedSigners))
+    super.save({ seed: this.seed })
   }
 
   unlock (password) {
@@ -53,65 +32,6 @@ class SeedSigner extends Signer {
     })
   }
 
-  lock () {
-    this._callWorker({ method: 'lockAccount' }, () => {
-      this.status = 'locked'
-      this.update()
-    })
-  }
-
-  signMessage (index, message, cb) {
-    const payload = {
-      method: 'signMessage',
-      params: { index, message }
-    }
-    this._callWorker(payload, cb)
-  }
-
-  signTransaction (index, rawTx, cb) {
-    const payload = {
-      method: 'signTransaction',
-      params: { index, rawTx }
-    }
-    this._callWorker(payload, cb)
-  }
-
-  verifyAddress (index, address, cb) {
-    const payload = {
-      method: 'verifyAddress',
-      params: { index, address }
-    }
-    this._callWorker(payload, cb)
-  }
-
-  close () {
-    this.worker.disconnect()
-    store.removeSigner(this.id)
-    super.close()
-  }
-
-  update () {
-    let id = this.addressesId()
-    if (this.id !== id) { // Singer address representation changed
-      store.removeSigner(this.id)
-      this.id = id
-    }
-    store.updateSigner(this.summary())
-  }
-
-  _callWorker (payload, cb) {
-    if (!this.worker) throw Error('Worker not running')
-    const id = uuid()
-    const listener = (message) => {
-      if (message.id === id) {
-        let error = message.error ? new Error(message.error) : null
-        cb(error, message.result)
-        this.worker.removeListener('message', listener)
-      }
-    }
-    this.worker.addListener('message', listener)
-    this.worker.send({ id, ...payload })
-  }
   _debug () {
 
     // setTimeout(() => {

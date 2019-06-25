@@ -13,13 +13,13 @@ const api = {
   createFromSeed: (signers, seed, password, cb) => {
     create.fromSeed(seed, password, (err, signer) => {
       if (err) return cb(err)
-      this.addSeedSigner(signer, cb)
+      api.addSeedSigner(signer, cb)
     })
   },
   createFromPhrase: (signers, phrase, password, cb) => {
     create.fromPhrase(phrase, password, (err, signer) => {
       if (err) return cb(err)
-      this.addSeedSigner(signers, signer, cb)
+      api.addSeedSigner(signers, signer, cb)
     })
   },
   addSeedSigner: (signers, { addresses, type, seed }, cb) => {
@@ -43,9 +43,9 @@ const api = {
     Object.keys(storedSigners).forEach(id => {
       const signer = storedSigners[id]
       if (signer.type === 'seed') {
-        signers.add(new Seed(signer))
+        signers.add(new SeedSigner(signer))
       } else if (signer.type === 'ring') {
-        signers.add(new Ring(signer))
+        signers.add(new RingSigner(signer))
       }
     })
   }
