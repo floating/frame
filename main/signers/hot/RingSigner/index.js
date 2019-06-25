@@ -2,7 +2,7 @@ const EthTx = require('ethereumjs-tx')
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix } = require('ethereumjs-util') // privateToAddress
 const Signer = require('../../Signer')
 
-class Ring extends Signer {
+class RingSigner extends Signer {
   constructor (signer) {
     super()
     this.id = signer.id
@@ -23,4 +23,4 @@ class Ring extends Signer {
   }
 }
 
-module.exports = Ring
+module.exports = RingSigner

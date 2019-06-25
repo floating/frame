@@ -8,11 +8,9 @@ const uuid = require('uuid/v4')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 
-// const addressSigner = (seed, index) => {
-//   return hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0').deriveChild(index).getWallet().getPrivateKey()
-// }
+const FILE_PATH = path.resolve(app.getPath('userData'), 'signers.json')
 
-class Seed extends Signer {
+class SeedSigner extends Signer {
   constructor (signer) {
     super()
     log.info('Creating seed signer instance')
@@ -26,12 +24,12 @@ class Seed extends Signer {
     this.worker = fork(path.resolve(__dirname, 'worker.js'))
     this._debug()
   }
+
   save () {
-    const signersPath = path.resolve(app.getPath('userData'), 'signers.json')
     let storedSigners = {}
 
     // Try to read stored signers from disk
-    try { storedSigners = JSON.parse(fs.readFileSync(signersPath, 'utf8')) }
+    try { storedSigners = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8')) }
     catch (e) { console.error(e) }
 
     // Add this signer to stored signers
@@ -39,8 +37,9 @@ class Seed extends Signer {
     storedSigners[id] = { addresses, seed, type }
 
     // Write to disk
-    fs.writeFileSync(signersPath, JSON.stringify(storedSigners))
+    fs.writeFileSync(FILE_PATH, JSON.stringify(storedSigners))
   }
+
   unlock (password) {
     const payload = {
       method: 'unlockAccount',
@@ -53,12 +52,14 @@ class Seed extends Signer {
       }
     })
   }
+
   lock () {
     this._callWorker({ method: 'lockAccount' }, () => {
       this.status = 'locked'
       this.update()
     })
   }
+
   signMessage (index, message, cb) {
     const payload = {
       method: 'signMessage',
@@ -66,6 +67,7 @@ class Seed extends Signer {
     }
     this._callWorker(payload, cb)
   }
+
   signTransaction (index, rawTx, cb) {
     const payload = {
       method: 'signTransaction',
@@ -73,6 +75,7 @@ class Seed extends Signer {
     }
     this._callWorker(payload, cb)
   }
+
   verifyAddress (index, address, cb) {
     const payload = {
       method: 'verifyAddress',
@@ -80,11 +83,13 @@ class Seed extends Signer {
     }
     this._callWorker(payload, cb)
   }
+
   close () {
     this.worker.disconnect()
     store.removeSigner(this.id)
     super.close()
   }
+
   update () {
     let id = this.addressesId()
     if (this.id !== id) { // Singer address representation changed
@@ -93,6 +98,7 @@ class Seed extends Signer {
     }
     store.updateSigner(this.summary())
   }
+
   _callWorker (payload, cb) {
     if (!this.worker) throw Error('Worker not running')
     const id = uuid()
@@ -137,4 +143,4 @@ class Seed extends Signer {
   }
 }
 
-module.exports = Seed
+module.exports = SeedSigner

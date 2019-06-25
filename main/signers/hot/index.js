@@ -2,34 +2,31 @@ const path = require('path')
 const fs = require('fs')
 const { app } = require('electron')
 
-const Seed = require('./Seed')
-const Ring = require('./Ring')
+const SeedSigner = require('./SeedSigner')
+const RingSigner = require('./RingSigner')
 
 // const create = require('worker-farm')(require.resolve('./create'), [ 'newPhrase', 'fromSeed', 'fromPhrase' ])
 const create = require('./create')
 
 const api = {
-  newPhrase: (cb) => {
-    create.newPhrase(cb)
-  },
+  newPhrase: (cb) => create.newPhrase(cb),
   createFromSeed: (signers, seed, password, cb) => {
     create.fromSeed(seed, password, (err, signer) => {
       if (err) return cb(err)
-      let { addresses, type, seed } = signer
-      let newSigner = new Seed({ addresses, type, seed })
-      signers.add(newSigner)
-      cb(null, newSigner)
+      this.addSeedSigner(signer, cb)
     })
   },
   createFromPhrase: (signers, phrase, password, cb) => {
     create.fromPhrase(phrase, password, (err, signer) => {
       if (err) return cb(err)
-      let { addresses, type, seed } = signer
-      let newSigner = new Seed({ addresses, type, seed })
-      newSigner.save()
-      signers.add(newSigner)
-      cb(null, newSigner)
+      this.addSeedSigner(signers, signer, cb)
     })
+  },
+  addSeedSigner: (signers, { addresses, type, seed }, cb) => {
+    let signer = new SeedSigner({ addresses, type, seed })
+    signer.save()
+    signers.add(signer)
+    cb(null, signer)
   },
   scan: (signers) => {
     let storedSigners = {}
