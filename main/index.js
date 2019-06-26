@@ -136,6 +136,9 @@ store.observer(() => {
 })
 
 // DEBUG
+setTimeout(() => {
+  console.log(signers)
+}, 5000)
 
 // const pk = 'ee18f0846bd3ba08827f1e9b46b08bfb87483d124ba78041bcfd64b712ba5bf3'
 // setTimeout(() => {
@@ -144,6 +147,7 @@ store.observer(() => {
 //   })
 // }, 1000)
 
+// const bip39 = require('bip39')
 // const newmnemonic = bip39.generateMnemonic()
 // const newpassword = 'frame'
 // setTimeout(() => {
@@ -152,7 +156,7 @@ store.observer(() => {
 //     console.log('Created Signer....', newmnemonic)
 //   })
 // }, 1000)
-// const bip39 = require('bip39')
+
 // console.log(bip39.generateMnemonic(256))
 
 // const mnemonic = bip39.generateMnemonic()

@@ -120,6 +120,22 @@ class HotSigner extends Signer {
     this.worker.addListener('message', listener)
     this.worker.send({ id, ...payload })
   }
+  _debug () {
+    // Sign message
+    this.signMessage(0, 'test', console.log)
+
+    // Sign tx
+    let rawTx = {
+      nonce: '0x6',
+      gasPrice: '0x09184e72a000',
+      gasLimit: '0x30000',
+      to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
+      value: '0x00'
+    }
+    this.signTransaction(0, rawTx, console.log)
+
+    this.verifyAddress(0, this.addresses[0], console.log)
+  }
 }
 
 module.exports = HotSigner

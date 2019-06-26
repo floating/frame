@@ -28,10 +28,10 @@ const api = {
       api.addSigner(signers, signer, cb)
     })
   },
-  addSigner: (signers, { addresses, type, seed, keys }, cb) => {
+  addSigner: (signers, { addresses, type, encryptedSeed, encryptedKeys }, cb) => {
     let signer
-    if (type === 'seed') signer = new SeedSigner({ addresses, type, seed })
-    else if (type === 'ring') signer = new RingSigner({ addresses, type, keys })
+    if (type === 'seed') signer = new SeedSigner({ addresses, type, encryptedSeed })
+    else if (type === 'ring') signer = new RingSigner({ addresses, type, encryptedKeys })
     signer.save()
     signers.add(signer)
     cb(null, signer)
@@ -52,10 +52,9 @@ const api = {
       const signer = storedSigners[id]
       if (signer.type === 'seed') {
         signers.add(new SeedSigner(signer))
+      } else if (signer.type === 'ring') {
+        signers.add(new RingSigner(signer))
       }
-      // } else if (signer.type === 'ring') {
-      //   signers.add(new RingSigner(signer))
-      // }
     })
   }
 }

@@ -26,7 +26,7 @@ const api = {
     const addresses = api.seedToAddresses(seed)
     crypt.encrypt(seed.toString('hex'), password, (err, encryptedSeed) => {
       if (err) return cb(err)
-      cb(null, { addresses, type: 'seed', seed: encryptedSeed })
+      cb(null, { addresses, type: 'seed', encryptedSeed: encryptedSeed })
     })
   },
   fromPhrase: (phrase, password, cb) => {
@@ -41,7 +41,7 @@ const api = {
     const address = api.keyToAddress(privateKey)
     crypt.encrypt(privateKey, password, (err, encryptedKey) => {
       if (err) return cb(err)
-      cb(null, { addresses: [address], type: 'ring', keys: [encryptedKey] })
+      cb(null, { addresses: [address], type: 'ring', encryptedKeys: [encryptedKey] })
     })
   }
 }

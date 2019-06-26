@@ -8,12 +8,18 @@ const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 class SeedSigner extends HotSigner {
   constructor (signer) {
     super(signer)
-    this.seed = signer.seed
+    this.encryptedSeed = signer.encryptedSeed
     this.worker = fork(WORKER_PATH)
+    setTimeout(() => {
+      this.unlock('frame')
+      setTimeout(() => {
+        this._debug()
+      }, 1000)
+    }, 1000)
   }
 
-  save () { super.save({ seed: this.seed }) }
-  unlock (password) { super.unlock(password, { encryptedSeed: this.seed }) }
+  save () { super.save({ encryptedSeed: this.encryptedSeed }) }
+  unlock (password) { super.unlock(password, { encryptedSeed: this.encryptedSeed }) }
 }
 
 module.exports = SeedSigner
