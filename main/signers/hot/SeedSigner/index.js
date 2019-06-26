@@ -1,18 +1,18 @@
 const path = require('path')
-const fs = require('fs')
 const { fork } = require('child_process')
-const { app } = require('electron')
 const log = require('electron-log')
-const uuid = require('uuid/v4')
 
 const store = require('../../../store')
 const HotSigner = require('../HotSigner')
+
+const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
 class SeedSigner extends HotSigner {
   constructor (signer) {
     super(signer)
     log.info('Creating seed signer instance')
     this.seed = signer.seed
+    this.worker = fork(WORKER_PATH)
   }
 
   save () {
@@ -30,6 +30,21 @@ class SeedSigner extends HotSigner {
         this.update()
       }
     })
+  }
+
+  signMessage (index, message, cb) {
+    const payload = { method: 'signMessage', params: { index, message } }
+    this._callWorker(payload, cb)
+  }
+
+  signTransaction (index, rawTx, cb) {
+    const payload = { method: 'signTransaction', params: { index, rawTx } }
+    this._callWorker(payload, cb)
+  }
+
+  verifyAddress (index, address, cb) {
+    const payload = { method: 'verifyAddress', params: { index, address } }
+    this._callWorker(payload, cb)
   }
 
   _debug () {

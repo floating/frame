@@ -135,15 +135,25 @@ store.observer(() => {
   }
 })
 
-// // Dev Testing
+// DEBUG
 // const mnemonic = 'mesh good thunder immune liberty craft equip size scrub measure tube quiz'
-// const password = 'frame'
-// setTimeout(() => {
-//   signers.createFromPhrase(mnemonic, password, (err, signer) => {
-//     if (err) return console.log(err)
-//     console.log('Created Signer....', mnemonic)
-//   })
-// }, 6000)
+const mnemonic = 'major tobacco bomb quarter core stereo jaguar civil afford leisure chest occur inflict vivid silent'
+
+const password = 'frame'
+setTimeout(() => {
+  signers.createFromPhrase(mnemonic, password, (err, signer) => {
+    if (err) return console.log(err)
+    console.log('Created Signer....', mnemonic)
+  })
+}, 6000)
+
+const pk = 'cba101f305c0215ca38dddedfe1b943f4574499d7e35772ae312a3941269408f'
+setTimeout(() => {
+  signers.createFromPrivateKey(pk, 'frame', (err, result) => {
+    console.log(err, result)
+    console.log(signers)
+  })
+}, 5000)
 
 // const newmnemonic = bip39.generateMnemonic()
 // const newpassword = 'frame'

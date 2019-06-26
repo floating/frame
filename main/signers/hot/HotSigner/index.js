@@ -17,9 +17,6 @@ class HotSigner extends Signer {
     this.addresses = signer.addresses
     this.status = 'locked'
     this.update()
-
-    // Spawn worker process
-    this.worker = fork(path.resolve(__dirname, 'worker.js'))
   }
 
   save (data) {
@@ -62,21 +59,6 @@ class HotSigner extends Signer {
       log.info('Signer locked')
       cb(null, 'ok')
     })
-  }
-
-  signMessage (index, message, cb) {
-    const payload = { method: 'signMessage', params: { index, message } }
-    this._callWorker(payload, cb)
-  }
-
-  signTransaction (index, rawTx, cb) {
-    const payload = { method: 'signTransaction', params: { index, rawTx } }
-    this._callWorker(payload, cb)
-  }
-
-  verifyAddress (index, address, cb) {
-    const payload = { method: 'verifyAddress', params: { index, address } }
-    this._callWorker(payload, cb)
   }
 
   close () {

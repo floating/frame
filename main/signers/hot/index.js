@@ -3,7 +3,7 @@ const fs = require('fs')
 const { app } = require('electron')
 
 const SeedSigner = require('./SeedSigner')
-const RingSigner = require('./RingSigner')
+const PrivateKeySigner = require('./PrivateKeySigner')
 
 // const create = require('worker-farm')(require.resolve('./create'), [ 'newPhrase', 'fromSeed', 'fromPhrase' ])
 const create = require('./create')
@@ -20,6 +20,12 @@ const api = {
     create.fromPhrase(phrase, password, (err, signer) => {
       if (err) return cb(err)
       api.addSeedSigner(signers, signer, cb)
+    })
+  },
+  createFromPrivateKey: (signers, privateKey, password, cb) => {
+    create.fromPrivateKey(privateKey, password, (err, signer) => {
+      if (err) return cb(err)
+      console.log('\n\nNEW SIGNER!', signer)
     })
   },
   addSeedSigner: (signers, { addresses, type, seed }, cb) => {
@@ -44,9 +50,10 @@ const api = {
       const signer = storedSigners[id]
       if (signer.type === 'seed') {
         signers.add(new SeedSigner(signer))
-      } else if (signer.type === 'ring') {
-        signers.add(new RingSigner(signer))
       }
+      // } else if (signer.type === 'ring') {
+      //   signers.add(new RingSigner(signer))
+      // }
     })
   }
 }

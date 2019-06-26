@@ -19,7 +19,7 @@ const api = {
     const addresses = api.seedToAddresses(seed)
     crypt.encrypt(seed.toString('hex'), password, (err, encryptedSeed) => {
       if (err) return cb(err)
-      cb(null, { addresses, type: 'hot', seed: encryptedSeed })
+      cb(null, { addresses, type: 'seed', seed: encryptedSeed })
     })
   },
   fromPhrase: (phrase, password, cb) => {
@@ -27,6 +27,14 @@ const api = {
     bip39.mnemonicToSeed(phrase).then(seed => {
       api.fromSeed(seed, password, cb)
     }).catch(err => cb(err))
+  },
+  fromPrivateKey: (privateKey, password, cb) => {
+    if (!privateKey) return cb(new Error('Private key required to create local signer'))
+    if (!password) return cb(new Error('Password required to create local signer'))
+    crypt.encrypt(privateKey, password, (err, encryptedKey) => {
+      if (err) return cb(err)
+      cb(null, { type: 'privateKey', key: encryptedKey })
+    })
   }
 }
 

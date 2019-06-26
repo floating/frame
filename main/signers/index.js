@@ -36,6 +36,9 @@ class Signers extends EventEmitter {
   createFromPhrase (mnemonic, password, cb) {
     hot.createFromPhrase(this, mnemonic, password, cb)
   }
+  createFromPrivateKey (privateKey, password, cb) {
+    hot.createFromPrivateKey(this, privateKey, password, cb)
+  }
   unlock (id, password) {
     let signer = this.signers.find(s => s.id === id)
     if (signer && signer.unlock) {
