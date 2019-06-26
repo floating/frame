@@ -136,16 +136,16 @@ store.observer(() => {
 })
 
 // DEBUG
-setTimeout(() => {
-  console.log(signers)
-}, 5000)
-
-// const pk = 'ee18f0846bd3ba08827f1e9b46b08bfb87483d124ba78041bcfd64b712ba5bf3'
 // setTimeout(() => {
-//   signers.createFromPrivateKey(pk, 'frame', (err, result) => {
-//     console.log(err, result)
-//   })
-// }, 1000)
+//   console.log(signers)
+// }, 5000)
+
+const pk = 'ee18f0846bd3ba08827f1e9b46b08bfb87483d124ba78041bcfd64b712ba5bf3'
+setTimeout(() => {
+  signers.createFromPrivateKey(pk, 'frame', (err, result) => {
+    console.log(err, result)
+  })
+}, 1000)
 
 // const bip39 = require('bip39')
 // const newmnemonic = bip39.generateMnemonic()
