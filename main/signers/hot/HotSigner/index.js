@@ -1,6 +1,5 @@
 const path = require('path')
 const fs = require('fs')
-const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
 const uuid = require('uuid/v4')
@@ -56,25 +55,56 @@ class HotSigner extends Signer {
     this._callWorker({ method: 'lockAccount' }, () => {
       this.status = 'locked'
       this.update()
-      log.info('Signer locked')
       cb(null, 'ok')
+      log.info('Signer locked')
+    })
+  }
+
+  unlock (password, data) {
+    const payload = {
+      method: 'unlockAccount',
+      params: { password, ...data }
+    }
+    this._callWorker(payload, (err, result) => {
+      if (!err) {
+        this.status = 'ok'
+        this.update()
+        log.info('Signer unlocked')
+      }
     })
   }
 
   close () {
     this.worker.disconnect()
     store.removeSigner(this.id)
-    log.info('Signer closed')
     super.close()
+    log.info('Signer closed')
   }
 
   update () {
     let id = this.addressesId()
+    console.log(id)
     if (this.id !== id) { // Singer address representation changed
       store.removeSigner(this.id)
       this.id = id
     }
+    log.info('Signer updated')
     store.updateSigner(this.summary())
+  }
+
+  signMessage (index, message, cb) {
+    const payload = { method: 'signMessage', params: { index, message } }
+    this._callWorker(payload, cb)
+  }
+
+  signTransaction (index, rawTx, cb) {
+    const payload = { method: 'signTransaction', params: { index, rawTx } }
+    this._callWorker(payload, cb)
+  }
+
+  verifyAddress (index, address, cb) {
+    const payload = { method: 'verifyAddress', params: { index, address } }
+    this._callWorker(payload, cb)
   }
 
   _callWorker (payload, cb) {

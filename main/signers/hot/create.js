@@ -1,4 +1,6 @@
 const hdKey = require('ethereumjs-wallet/hdkey')
+const { fromPrivateKey } = require('ethereumjs-wallet')
+const { addHexPrefix } = require('ethereumjs-util')
 const bip39 = require('bip39')
 
 const crypt = require('../../crypt')
@@ -12,6 +14,11 @@ const api = {
     const addresses = []
     for (var i = 0; i < 100; i++) { addresses.push(wallet.deriveChild(i).getWallet().getChecksumAddressString()) }
     return addresses
+  },
+  keyToAddress: (key) => {
+    const wallet = fromPrivateKey(Buffer.from(key, 'hex'))
+    const address = wallet.getAddress().toString('hex')
+    return addHexPrefix(address)
   },
   fromSeed: (seed, password, cb) => {
     if (!seed) return cb(new Error('Seed required to create local signer'))
@@ -31,9 +38,10 @@ const api = {
   fromPrivateKey: (privateKey, password, cb) => {
     if (!privateKey) return cb(new Error('Private key required to create local signer'))
     if (!password) return cb(new Error('Password required to create local signer'))
+    const address = api.keyToAddress(privateKey)
     crypt.encrypt(privateKey, password, (err, encryptedKey) => {
       if (err) return cb(err)
-      cb(null, { type: 'privateKey', key: encryptedKey })
+      cb(null, { addresses: [address], type: 'ring', keys: [encryptedKey] })
     })
   }
 }
