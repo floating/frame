@@ -3,6 +3,7 @@ const { fork } = require('child_process')
 const log = require('electron-log')
 const { fromPrivateKey } = require('ethereumjs-wallet')
 const crypt = require('../../../crypt')
+const crypto = require('crypto')
 
 const HotSigner = require('../HotSigner')
 
@@ -11,7 +12,7 @@ const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 class RingSigner extends HotSigner {
   constructor (signer) {
     super(signer)
-    this.encryptedKeys = signer.encryptedKeys
+    this.encryptedKeys = signer.encryptedKeys || []
     this.worker = fork(WORKER_PATH)
     setTimeout(() => {
       this.unlock('frame', () => {})
@@ -46,8 +47,7 @@ class RingSigner extends HotSigner {
       // Update worker key store
       this.unlock(password, (err, result) => {
         this.update()
-        this.save()
-        log.info('Added private key to account', this.id)
+        log.info('Private key added to signer', this.id)
         cb(null)
       })
     })
@@ -64,14 +64,9 @@ class RingSigner extends HotSigner {
     this._callWorker({ method: 'removeKey', params: { index } }, (err, result) => {
       if (err) return cb(err)
       this.update()
-      this.save()
-      log.info('Private key removed from signer')
+      log.info('Private key removed from signer', this.id)
       cb(null)
     })
-  }
-
-  _updateKeys () {
-
   }
 
   _debug () {
@@ -92,12 +87,12 @@ class RingSigner extends HotSigner {
 
     // this.verifyAddress(0, this.addresses[0], console.log)
 
-    const pk = '920f92dbe7ecb5d0a21a46bcda44c5bb566c0e807f8051cc2f0b4e601656f5b2'
-    this.addPrivateKey(pk, 'frame', console.log)
+    // const pk = crypto.randomBytes(32).toString('hex')
+    // this.addPrivateKey(pk, 'frame', console.log)
 
-    setTimeout(() => {
-      this.removePrivateKey(1, console.log)
-    }, 1000);
+    // setTimeout(() => {
+    //   this.removePrivateKey(1, console.log)
+    // }, 1000);
   }
 }
 

@@ -13,7 +13,7 @@ class HotSigner extends Signer {
   constructor (signer) {
     super()
     this.type = signer.type
-    this.addresses = signer.addresses
+    this.addresses = signer.addresses || []
     this.status = 'locked'
     this.update()
   }

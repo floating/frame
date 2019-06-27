@@ -15,11 +15,6 @@ const api = {
     for (var i = 0; i < 100; i++) { addresses.push(wallet.deriveChild(i).getWallet().getChecksumAddressString()) }
     return addresses
   },
-  keyToAddress: (key) => {
-    const wallet = fromPrivateKey(Buffer.from(key, 'hex'))
-    const address = wallet.getAddress().toString('hex')
-    return addHexPrefix(address)
-  },
   fromSeed: (seed, password, cb) => {
     if (!seed) return cb(new Error('Seed required to create local signer'))
     if (!password) return cb(new Error('Password required to create local signer'))
@@ -34,15 +29,6 @@ const api = {
     bip39.mnemonicToSeed(phrase).then(seed => {
       api.fromSeed(seed, password, cb)
     }).catch(err => cb(err))
-  },
-  fromPrivateKey: (privateKey, password, cb) => {
-    if (!privateKey) return cb(new Error('Private key required to create local signer'))
-    if (!password) return cb(new Error('Password required to create local signer'))
-    const address = api.keyToAddress(privateKey)
-    crypt.encrypt(privateKey, password, (err, encryptedKey) => {
-      if (err) return cb(err)
-      cb(null, { addresses: [address], type: 'ring', encryptedKeys: [encryptedKey] })
-    })
   }
 }
 

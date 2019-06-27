@@ -23,9 +23,14 @@ const api = {
     })
   },
   createFromPrivateKey: (signers, privateKey, password, cb) => {
-    create.fromPrivateKey(privateKey, password, (err, signer) => {
+    if (!privateKey) return cb(new Error('Private key required to create local signer'))
+    if (!password) return cb(new Error('Password required to create local signer'))
+    const signer = new RingSigner({ type: 'ring' })
+    signer.addPrivateKey(privateKey, password, (err, result) => {
       if (err) return cb(err)
-      api.addSigner(signers, signer, cb)
+      signer.save()
+      signers.add(signer)
+      cb(null, signer)
     })
   },
   addSigner: (signers, { addresses, type, encryptedSeed, encryptedKeys }, cb) => {
