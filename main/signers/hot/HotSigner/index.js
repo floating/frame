@@ -85,20 +85,26 @@ class HotSigner extends Signer {
     // Get derived ID
     let id = this.addressesId()
 
+    // On new ID ->
+    if (!this.id) {
+      this.id = id
+    }
+
     // On changed ID ->
-    if (this.id !== id) {
+    else if (this.id !== id) {
+      // Update id
+      this.id = id
       // Remove from store
       store.removeSigner(this.id)
       // Erase from disk
       this.delete(this.id)
-      // Update id
-      this.id = id
       // Write to disk
       this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
     }
 
-    log.info('Signer updated')
     store.updateSigner(this.summary())
+    // console.log(this)
+    log.info('Signer updated')
   }
 
   signMessage (index, message, cb) {
