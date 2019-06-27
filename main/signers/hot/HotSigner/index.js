@@ -60,17 +60,17 @@ class HotSigner extends Signer {
     })
   }
 
-  unlock (password, data) {
+  unlock (password, data, cb) {
     const payload = {
       method: 'unlockAccount',
       params: { password, ...data }
     }
     this._callWorker(payload, (err, result) => {
-      if (!err) {
-        this.status = 'ok'
-        this.update()
-        log.info('Signer unlocked')
-      }
+      if (err) return cb(err)
+      this.status = 'ok'
+      this.update()
+      log.info('Signer unlocked')
+      cb(null)
     })
   }
 

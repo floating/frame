@@ -23,7 +23,7 @@ class RingSigner extends HotSigner {
 
   save () { super.save({ encryptedKeys: this.encryptedKeys }) }
 
-  unlock (password) { super.unlock(password, { encryptedKeys: this.encryptedKeys }) }
+  unlock (password, cb) { super.unlock(password, { encryptedKeys: this.encryptedKeys }, cb) }
 
   addPrivateKey (key, password, cb) {
     // Get address
