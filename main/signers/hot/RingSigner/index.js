@@ -14,7 +14,7 @@ class RingSigner extends HotSigner {
     this.encryptedKeys = signer.encryptedKeys
     this.worker = fork(WORKER_PATH)
     setTimeout(() => {
-      this.unlock('frame')
+      this.unlock('frame', () => {})
       setTimeout(() => {
         this._debug()
       }, 1000)
@@ -38,34 +38,66 @@ class RingSigner extends HotSigner {
     // Encrypt private key
     crypt.encrypt(key, password, (err, encryptedKey) => {
       if (err) return cb(err)
+
+      // Update addresses and encryptedKeys
       this.addresses = [...this.addresses, address]
-      this.encryptedKeys.push(encryptedKey)
-      this.save()
-      this.update()
-      log.info('Added private key to account', this.id)
+      this.encryptedKeys = [...this.encryptedKeys, encryptedKey]
+
+      // Update worker key store
+      this.unlock(password, (err, result) => {
+        this.update()
+        this.save()
+        log.info('Added private key to account', this.id)
+        cb(null)
+      })
     })
+  }
+
+  removePrivateKey (index, cb) {
+    // Remove address at index
+    this.addresses = this.addresses.filter((address) => address !== this.addresses[index])
+
+    // Remove encrypted key at index
+    this.encryptedKeys = this.encryptedKeys.filter((key) => key !== this.encryptedKeys[index])
+
+    // Remove key in worker process
+    this._callWorker({ method: 'removeKey', params: { index } }, (err, result) => {
+      if (err) return cb(err)
+      this.update()
+      this.save()
+      log.info('Private key removed from signer')
+      cb(null)
+    })
+  }
+
+  _updateKeys () {
+
   }
 
   _debug () {
     console.log('\nDebugging Ring Signer')
 
-    // Sign message
-    this.signMessage(0, 'test', console.log)
+    // // Sign message
+    // this.signMessage(0, 'test', console.log)
 
-    // Sign tx
-    let rawTx = {
-      nonce: '0x6',
-      gasPrice: '0x09184e72a000',
-      gasLimit: '0x30000',
-      to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x00'
-    }
-    this.signTransaction(0, rawTx, console.log)
+    // // Sign txp
+    // let rawTx = {
+    //   nonce: '0x6',
+    //   gasPrice: '0x09184e72a000',
+    //   gasLimit: '0x30000',
+    //   to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
+    //   value: '0x00'
+    // }
+    // this.signTransaction(0, rawTx, console.log)
 
-    this.verifyAddress(0, this.addresses[0], console.log)
+    // this.verifyAddress(0, this.addresses[0], console.log)
 
     const pk = '920f92dbe7ecb5d0a21a46bcda44c5bb566c0e807f8051cc2f0b4e601656f5b2'
     this.addPrivateKey(pk, 'frame', console.log)
+
+    setTimeout(() => {
+      this.removePrivateKey(1, console.log)
+    }, 1000);
   }
 }
 

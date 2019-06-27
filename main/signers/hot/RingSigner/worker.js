@@ -35,6 +35,11 @@ const lockAccount = (pseudoCallback) => {
   pseudoCallback(null)
 }
 
+const removeKey = ({ index }, pseudoCallback) => {
+  keys = keys.filter((key) => key !== keys[index])
+  pseudoCallback(null)
+}
+
 const signMessage = ({ index, message }, pseudoCallback) => {
   // Make sure account is unlocked
   if (!keys) return pseudoCallback('Account locked')
@@ -100,6 +105,8 @@ process.on('message', ({ id, method, params }) => {
   if (method === 'signTransaction') return signTransaction(params, pseudoCallback)
   // Handle method 'verifyAddress'
   if (method === 'verifyAddress') return verifyAddress(params, pseudoCallback)
+  // Handle method 'removeKey'
+  if (method === 'removeKey') return removeKey(params, pseudoCallback)
   // Handle invalid method
   else pseudoCallback(`Invalid method: '${method}'`)
 })
