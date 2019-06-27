@@ -33,6 +33,20 @@ const api = {
       cb(null, signer)
     })
   },
+  createFromKeystore: (signers, file, keystorePassword, signerPassword, cb) => {
+    if (!file) return cb(new Error('Keystore file required'))
+    if (!keystorePassword) return cb(new Error('Keystore password required'))
+    if (!signerPassword) return cb(new Error('Password required'))
+    const signer = new RingSigner({ type: 'ring' })
+    signer.addFromKeystore(file, keystorePassword, signerPassword, (err, result) => {
+      if (err) return cb(err)
+      console.log(result)
+      cb(null, result)
+      // signer.save()
+      // signers.add(signer)
+      // cb(null, signer)
+    })
+  },
   addSigner: (signers, { addresses, type, encryptedSeed, encryptedKeys }, cb) => {
     let signer
     if (type === 'seed') signer = new SeedSigner({ addresses, type, encryptedSeed })

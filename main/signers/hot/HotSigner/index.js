@@ -103,7 +103,7 @@ class HotSigner extends Signer {
     }
 
     store.updateSigner(this.summary())
-    // console.log(this)
+    console.log(this)
     log.info('Signer updated')
   }
 

@@ -39,6 +39,9 @@ class Signers extends EventEmitter {
   createFromPrivateKey (privateKey, password, cb) {
     hot.createFromPrivateKey(this, privateKey, password, cb)
   }
+  createFromKeystore (file, keystorePassword, signerPassword, cb) {
+    hot.createFromKeystore(this, file, keystorePassword, signerPassword, cb)
+  }
   unlock (id, password) {
     let signer = this.signers.find(s => s.id === id)
     if (signer && signer.unlock) {

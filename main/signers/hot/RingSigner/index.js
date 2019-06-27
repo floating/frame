@@ -1,7 +1,7 @@
 const path = require('path')
 const { fork } = require('child_process')
 const log = require('electron-log')
-const { fromPrivateKey } = require('ethereumjs-wallet')
+const { fromPrivateKey, fromV1, fromV3 } = require('ethereumjs-wallet')
 const crypt = require('../../../crypt')
 const crypto = require('crypto')
 
@@ -67,6 +67,26 @@ class RingSigner extends HotSigner {
       log.info('Private key removed from signer', this.id)
       cb(null)
     })
+  }
+
+  // TODO: Encrypt all keys together so that they all get the same password
+  addFromKeystore (file, keystorePassword, signerPassword, cb) {
+    let keystore, wallet, address
+
+    // Parse json
+    try { keystore = JSON.parse(file) }
+    catch(e) { return cb(e) }
+
+    // Try to generate wallet from keystore
+    try {
+      if (keystore.version === 1) wallet = fromV1(keystore, keystorePassword)
+      else if (keystore.version === 3) wallet = fromV3(keystore, keystorePassword)
+    } catch (e) {
+      return cb(e)
+    }
+
+    // Add private key with local method
+    this.addPrivateKey(wallet._privKey, signerPassword, cb)
   }
 
   _debug () {

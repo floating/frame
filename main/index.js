@@ -147,6 +147,13 @@ store.observer(() => {
 //   })
 // }, 1000)
 
+const file = require('fs').readFileSync('keystore.json', 'utf8')
+setTimeout(() => {
+  signers.createFromKeystore(file, 'test', 'frame', (err, result) => {
+    console.log(err, result)
+  })
+}, 1000);
+
 // const bip39 = require('bip39')
 // const newmnemonic = bip39.generateMnemonic()
 // const newpassword = 'frame'
