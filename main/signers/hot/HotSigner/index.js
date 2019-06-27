@@ -55,7 +55,7 @@ class HotSigner extends Signer {
     this._callWorker({ method: 'lockAccount' }, () => {
       this.status = 'locked'
       this.update()
-      cb(null, 'ok')
+      cb(null)
       log.info('Signer locked')
     })
   }
@@ -82,11 +82,21 @@ class HotSigner extends Signer {
   }
 
   update () {
+    // Get derived ID
     let id = this.addressesId()
-    if (this.id !== id) { // Singer address representation changed
+
+    // On changed ID ->
+    if (this.id !== id) {
+      // Remove from store
       store.removeSigner(this.id)
+      // Erase from disk
+      this.delete(this.id)
+      // Update id
       this.id = id
+      // Write to disk
+      this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
     }
+
     log.info('Signer updated')
     store.updateSigner(this.summary())
   }
