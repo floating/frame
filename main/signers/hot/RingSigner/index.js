@@ -60,12 +60,14 @@ class RingSigner extends HotSigner {
     this.encryptedKeys = this.encryptedKeys.filter((key) => key !== this.encryptedKeys[index])
 
     // Remove key in worker process
-    this._callWorker({ method: 'removeKey', params: { index } }, (err, result) => {
-      if (err) return cb(err)
-      this.update()
-      log.info('Private key removed from signer', this.id)
-      cb(null)
-    })
+    if (this.status === 'ok') {
+      this._callWorker({ method: 'removeKey', params: { index } }, (err, result) => {
+        if (err) return cb(err)
+        this.update()
+        log.info('Private key removed from signer', this.id)
+        cb(null)
+      })
+    } else { cb(null) }
   }
 
   // TODO: Encrypt all keys together so that they all get the same password
