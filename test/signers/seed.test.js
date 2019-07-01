@@ -7,7 +7,7 @@ const PASSWORD = 'frame'
 const signers = {
   add: (signer) => console.log('Signer added')
 }
-
+// TODO: Add hot.scan() to test
 describe('Seed signer', () => {
   let signer
 
