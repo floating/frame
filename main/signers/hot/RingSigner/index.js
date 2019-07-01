@@ -29,27 +29,33 @@ class RingSigner extends HotSigner {
       return cb(new Error('Private key already added'))
     }
 
-    // Encrypt private key
-    crypt.encrypt(key, password, (err, encryptedKey) => {
+    const params = { encryptedKey: this.encryptedKeys, key, password }
+    this._callWorker({ method: 'addKey', params }, (err, result) => {
       if (err) return cb(err)
-
-      // Update addresses and encryptedKeys
-      this.addresses = [...this.addresses, address]
-      this.encryptedKeys = [...this.encryptedKeys, encryptedKey]
-
-      this.update()
-      log.info('Private key added to signer', this.id)
-
-      // Update worker key store
-      if (this.status === 'ok') {
-        this.unlock(password, (err, result) => {
-          if (err) return cb(err)
-          cb(null)
-        })
-      } else {
-        cb(null)
-      }
+      console.log(result)
     })
+
+    // // Encrypt private key
+    // crypt.encrypt(key, password, (err, encryptedKey) => {
+    //   if (err) return cb(err)
+
+    //   // Update addresses and encryptedKeys
+    //   this.addresses = [...this.addresses, address]
+    //   this.encryptedKeys = [...this.encryptedKeys, encryptedKey]
+
+    //   this.update()
+    //   log.info('Private key added to signer', this.id)
+
+    //   // Update worker key store
+    //   if (this.status === 'ok') {
+    //     this.unlock(password, (err, result) => {
+    //       if (err) return cb(err)
+    //       cb(null)
+    //     })
+    //   } else {
+    //     cb(null)
+    //   }
+    // })
   }
 
   removePrivateKey (index, cb) {
