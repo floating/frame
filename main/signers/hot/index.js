@@ -13,13 +13,15 @@ const api = {
   createFromSeed: (signers, seed, password, cb) => {
     create.fromSeed(seed, password, (err, signer) => {
       if (err) return cb(err)
-      api.addSigner(signers, signer, cb)
+      signers.add(signer)
+      cb(null, signer)
     })
   },
   createFromPhrase: (signers, phrase, password, cb) => {
     create.fromPhrase(phrase, password, (err, signer) => {
       if (err) return cb(err)
-      api.addSigner(signers, signer, cb)
+      signers.add(signer)
+      cb(null, signer)
     })
   },
   createFromPrivateKey: (signers, privateKey, password, cb) => {
@@ -39,19 +41,9 @@ const api = {
     const signer = new RingSigner({ type: 'ring' })
     signer.addFromKeystore(file, keystorePassword, signerPassword, (err, result) => {
       if (err) return cb(err)
-      console.log(result)
-      cb(null, result)
-      // signer.save()
-      // signers.add(signer)
-      // cb(null, signer)
+      signers.add(signer)
+      cb(null, signer)
     })
-  },
-  addSigner: (signers, { addresses, type, encryptedSeed, encryptedKeys }, cb) => {
-    let signer
-    if (type === 'seed') signer = new SeedSigner({ addresses, type, encryptedSeed })
-    else if (type === 'ring') signer = new RingSigner({ addresses, type, encryptedKeys })
-    signers.add(signer)
-    cb(null, signer)
   },
   scan: (signers) => {
     let storedSigners = {}

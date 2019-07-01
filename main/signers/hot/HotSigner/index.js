@@ -42,7 +42,7 @@ class HotSigner extends Signer {
 
     // Try to read stored signers from disk
     try { storedSigners = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8')) }
-    catch (e) { console.error(e) }
+    catch (e) { }
 
     // Remove signer from stored signers
     delete storedSigners[this.id]

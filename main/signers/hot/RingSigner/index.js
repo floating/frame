@@ -13,7 +13,6 @@ class RingSigner extends HotSigner {
     super(signer)
     this.encryptedKeys = signer.encryptedKeys || []
     this.worker = fork(WORKER_PATH)
-    this.update()
   }
 
   save () { super.save({ encryptedKeys: this.encryptedKeys }) }
@@ -38,13 +37,18 @@ class RingSigner extends HotSigner {
       this.addresses = [...this.addresses, address]
       this.encryptedKeys = [...this.encryptedKeys, encryptedKey]
 
+      this.update()
+      log.info('Private key added to signer', this.id)
+
       // Update worker key store
-      this.unlock(password, (err, result) => {
-        if (err) return cb(err)
-        this.update()
-        log.info('Private key added to signer', this.id)
+      if (this.status === 'ok') {
+        this.unlock(password, (err, result) => {
+          if (err) return cb(err)
+          cb(null)
+        })
+      } else {
         cb(null)
-      })
+      }
     })
   }
 
@@ -78,17 +82,6 @@ class RingSigner extends HotSigner {
     // Add private key
     this.addPrivateKey(wallet._privKey, signerPassword, cb)
   }
-
-
-
-    // this.verifyAddress(0, this.addresses[0], console.log)
-
-    // const pk = crypto.randomBytes(32).toString('hex')
-    // this.addPrivateKey(pk, 'frame', console.log)
-
-    // setTimeout(() => {
-    //   this.removePrivateKey(1, console.log)
-    // }, 1000);
 }
 
 module.exports = RingSigner
