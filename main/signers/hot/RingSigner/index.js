@@ -3,7 +3,6 @@ const { fork } = require('child_process')
 const log = require('electron-log')
 const { fromPrivateKey, fromV1, fromV3 } = require('ethereumjs-wallet')
 const crypt = require('../../../crypt')
-const crypto = require('crypto')
 
 const HotSigner = require('../HotSigner')
 
@@ -14,12 +13,7 @@ class RingSigner extends HotSigner {
     super(signer)
     this.encryptedKeys = signer.encryptedKeys || []
     this.worker = fork(WORKER_PATH)
-    setTimeout(() => {
-      this.unlock('frame', () => {})
-      setTimeout(() => {
-        this._debug()
-      }, 1000)
-    }, 1000)
+    this.update()
   }
 
   save () { super.save({ encryptedKeys: this.encryptedKeys }) }
@@ -46,6 +40,7 @@ class RingSigner extends HotSigner {
 
       // Update worker key store
       this.unlock(password, (err, result) => {
+        if (err) return cb(err)
         this.update()
         log.info('Private key added to signer', this.id)
         cb(null)
@@ -70,22 +65,17 @@ class RingSigner extends HotSigner {
   }
 
   // TODO: Encrypt all keys together so that they all get the same password
-  addFromKeystore (file, keystorePassword, signerPassword, cb) {
-    let keystore, wallet, address
-
-    // Parse json
-    try { keystore = JSON.parse(file) }
-    catch(e) { return cb(e) }
+  addFromKeystore (keystore, keystorePassword, signerPassword, cb) {
+    let wallet
 
     // Try to generate wallet from keystore
     try {
       if (keystore.version === 1) wallet = fromV1(keystore, keystorePassword)
       else if (keystore.version === 3) wallet = fromV3(keystore, keystorePassword)
-    } catch (e) {
-      return cb(e)
-    }
+      else cb(new Error('Invalid keystore version'))
+    } catch (e) { return cb(e) }
 
-    // Add private key with local method
+    // Add private key
     this.addPrivateKey(wallet._privKey, signerPassword, cb)
   }
 
@@ -95,7 +85,7 @@ class RingSigner extends HotSigner {
     // // Sign message
     // this.signMessage(0, 'test', console.log)
 
-    // // Sign txp
+    // // Sign tx
     // let rawTx = {
     //   nonce: '0x6',
     //   gasPrice: '0x09184e72a000',

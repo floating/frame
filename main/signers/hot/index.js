@@ -28,7 +28,6 @@ const api = {
     const signer = new RingSigner({ type: 'ring' })
     signer.addPrivateKey(privateKey, password, (err, result) => {
       if (err) return cb(err)
-      signer.save()
       signers.add(signer)
       cb(null, signer)
     })
@@ -51,7 +50,6 @@ const api = {
     let signer
     if (type === 'seed') signer = new SeedSigner({ addresses, type, encryptedSeed })
     else if (type === 'ring') signer = new RingSigner({ addresses, type, encryptedKeys })
-    signer.save()
     signers.add(signer)
     cb(null, signer)
   },

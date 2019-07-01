@@ -10,6 +10,7 @@ class SeedSigner extends HotSigner {
     super(signer)
     this.encryptedSeed = signer.encryptedSeed
     this.worker = fork(WORKER_PATH)
+    this.update()
   }
 
   save () { super.save({ encryptedSeed: this.encryptedSeed }) }

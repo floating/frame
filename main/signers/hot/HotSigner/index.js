@@ -83,17 +83,18 @@ class HotSigner extends Signer {
 
   update () {
     // Get derived ID
-    let id = this.addressesId()
+    let derivedId = this.addressesId()
 
     // On new ID ->
     if (!this.id) {
-      this.id = id
+      // Update id
+      this.id = derivedId
     }
 
     // On changed ID ->
-    else if (this.id !== id) {
+    else if (this.id !== derivedId) {
       // Update id
-      this.id = id
+      this.id = derivedId
       // Remove from store
       store.removeSigner(this.id)
       // Erase from disk
@@ -103,7 +104,7 @@ class HotSigner extends Signer {
     }
 
     store.updateSigner(this.summary())
-    console.log(this)
+    // console.log(this)
     log.info('Signer updated')
   }
 
