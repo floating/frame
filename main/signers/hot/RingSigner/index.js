@@ -79,21 +79,7 @@ class RingSigner extends HotSigner {
     this.addPrivateKey(wallet._privKey, signerPassword, cb)
   }
 
-  _debug () {
-    console.log('\nDebugging Ring Signer')
 
-    // // Sign message
-    // this.signMessage(0, 'test', console.log)
-
-    // // Sign tx
-    // let rawTx = {
-    //   nonce: '0x6',
-    //   gasPrice: '0x09184e72a000',
-    //   gasLimit: '0x30000',
-    //   to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-    //   value: '0x00'
-    // }
-    // this.signTransaction(0, rawTx, console.log)
 
     // this.verifyAddress(0, this.addresses[0], console.log)
 
@@ -103,7 +89,6 @@ class RingSigner extends HotSigner {
     // setTimeout(() => {
     //   this.removePrivateKey(1, console.log)
     // }, 1000);
-  }
 }
 
 module.exports = RingSigner

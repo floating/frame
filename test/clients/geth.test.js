@@ -15,7 +15,7 @@ const geth = require('../../main/services/geth')
 const store = require('../../main/store')
 
 // Local
-const { Counter, Observer } = require('./util')
+const { Counter, Observer } = require('../util')
 
 // Helper functions
 const clean = () => emptyDir(userData)

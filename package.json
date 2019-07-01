@@ -131,7 +131,8 @@
     "stylus": "0.54.5"
   },
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "babel-eslint",
+    "env": ["jest"]
   },
   "repository": "github:floating/frame"
 }

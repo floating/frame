@@ -24,7 +24,7 @@ const lockAccount = (pseudoCallback) => {
 
 const signMessage = ({ index, message }, pseudoCallback) => {
   // Make sure account is unlocked
-  if (!seed) return pseudoCallback('Account locked')
+  if (!seed) return pseudoCallback('Signer locked')
   // Hash message
   const hash = hashPersonalMessage(toBuffer(message))
   // Derive private key
@@ -38,7 +38,7 @@ const signMessage = ({ index, message }, pseudoCallback) => {
 
 const signTransaction = ({ index, rawTx }, pseudoCallback) => {
   // Make sure account is unlocked
-  if (!seed) return pseudoCallback('Account locked')
+  if (!seed) return pseudoCallback('Signer locked')
   // Create tranasction
   const tx = new EthTx(rawTx)
   // Derive private key
@@ -51,7 +51,7 @@ const signTransaction = ({ index, rawTx }, pseudoCallback) => {
 
 const verifyAddress = ({ index, address }, pseudoCallback) => {
   // Make sure account is unlocked
-  if (!seed) return pseudoCallback('Account locked')
+  if (!seed) return pseudoCallback('Signer locked')
   // Construct message
   const message = uuid()
   // Sign message

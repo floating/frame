@@ -42,7 +42,7 @@ const removeKey = ({ index }, pseudoCallback) => {
 
 const signMessage = ({ index, message }, pseudoCallback) => {
   // Make sure account is unlocked
-  if (!keys) return pseudoCallback('Account locked')
+  if (!keys) return pseudoCallback('Signer locked')
   // Hash message
   const hash = hashPersonalMessage(toBuffer(message))
   // Sign message
@@ -54,7 +54,7 @@ const signMessage = ({ index, message }, pseudoCallback) => {
 
 const signTransaction = ({ index, rawTx }, pseudoCallback) => {
   // Make sure account is unlocked
-  if (!keys) return pseudoCallback('Account locked')
+  if (!keys) return pseudoCallback('Signer locked')
   // Create tranasction
   const tx = new EthTx(rawTx)
   // Sign transaction
@@ -65,7 +65,7 @@ const signTransaction = ({ index, rawTx }, pseudoCallback) => {
 
 const verifyAddress = ({ index, address }, pseudoCallback) => {
   // Make sure account is unlocked
-  if (!keys) return pseudoCallback('Account locked')
+  if (!keys) return pseudoCallback('Signer locked')
   // Construct message
   const message = uuid()
   // Sign message

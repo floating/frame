@@ -7,7 +7,8 @@ const uuid = require('uuid/v4')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 
-const FILE_PATH = path.resolve(app.getPath('userData'), 'signers.json')
+const USER_DATA = app ? app.getPath('userData') : './test/.userData'
+const FILE_PATH = path.resolve(USER_DATA, 'signers.json')
 
 class HotSigner extends Signer {
   constructor (signer) {

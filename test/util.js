@@ -1,4 +1,4 @@
-const store = require('../../main/store')
+const store = require('../main/store')
 const EventEmitter = require('events')
 
 class Observer extends EventEmitter {
