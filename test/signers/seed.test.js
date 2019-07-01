@@ -1,24 +1,41 @@
 const bip39 = require('bip39')
 const hot = require('../../main/signers/hot')
+const { clean } = require('../util')
 
 const PASSWORD = 'frame'
 
 // Stubs
-const signers = {
-  add: (signer) => console.log('Signer added')
-}
-// TODO: Add hot.scan() to test
+const signers = { add: (signer) => {} }
+
 describe('Seed signer', () => {
   let signer
+
+  beforeAll(clean)
+  afterAll(clean)
 
   test('Create from phrase', (done) => {
     const mnemonic = bip39.generateMnemonic()
     hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
       signer = result
       expect(err).toBe(null)
-      expect(signer.id).not.toBe(undefined)
       expect(signer.status).toBe('locked')
       expect(signer.addresses.length).toBe(100)
+      done()
+    })
+  })
+
+  test('Scan for signers', (done) => {
+    let count = 0
+    const signers = { add: (signer) => { signer.close(() => {}); count++ } }
+    hot.scan(signers)
+    expect(count).toBe(1)
+    done()
+  })
+
+  test('Unlock with wrong password', (done) => {
+    signer.unlock('Wrong password', (err, result) => {
+      expect(err).not.toBe(null)
+      expect(signer.status).toBe('locked')
       done()
     })
   })
@@ -73,6 +90,13 @@ describe('Seed signer', () => {
   test('Sign message when locked', (done) => {
     signer.signMessage(0, 'test', (err, result) => {
       expect(err.message).toBe('Signer locked')
+      done()
+    })
+  })
+
+  test('Close signer', (done) => {
+    signer.close((err, result) => {
+      expect(err).toBe(null)
       done()
     })
   })

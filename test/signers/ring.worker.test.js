@@ -46,7 +46,6 @@ describe('Ring Signer worker', () => {
   test('Unlock with wrong password', (done) => {
     worker.unlock({ encryptedKeys, password: 'wrong password' }, async (err, result) => {
       expect(err).not.toBe(null)
-      console.log(err)
       done()
     })
   })

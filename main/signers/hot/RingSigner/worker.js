@@ -29,7 +29,8 @@ const encrypt = (keys, password) => {
 
 const unlock = async ({ encryptedKeys, password }, pseudoCallback) => {
   try {
-    unlockedKeys = await decrypt(encryptedKeys, password)
+    const decryptedKeys = await decrypt(encryptedKeys, password)
+    unlockedKeys = decryptedKeys.map((key) => Buffer.from(key, 'hex'))
     pseudoCallback(null, 'ok')
   } catch (err) {
     pseudoCallback('Invalid password')
@@ -122,9 +123,9 @@ process.on('message', ({ id, method, params }) => {
     // Send response to parent process
     process.send(response)
   }
-  // Handle method 'unlockAccount'
+  // Handle method 'unlock'
   if (method === 'unlock') return unlock(params, pseudoCallback)
-  // Handle method 'unlockAccount'
+  // Handle method 'lock'
   if (method === 'lock') return lock(pseudoCallback)
   // Handle method 'signMessage'
   if (method === 'signMessage') return signMessage(params, pseudoCallback)
@@ -140,4 +141,5 @@ process.on('message', ({ id, method, params }) => {
   else pseudoCallback(`Invalid method: '${method}'`)
 })
 
+// Exported for testing purposes
 module.exports = { encrypt, decrypt, addKey, removeKey, unlock }

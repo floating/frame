@@ -24,7 +24,7 @@ class HotSigner extends Signer {
 
     // Try to read stored signers from disk
     try { storedSigners = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8')) }
-    catch (e) { console.error(e) }
+    catch (e) { }
 
     // Add signer to stored signers
     const { id, addresses, type } = this
@@ -53,20 +53,17 @@ class HotSigner extends Signer {
   }
 
   lock (cb) {
-    this._callWorker({ method: 'lockAccount' }, () => {
+    this._callWorker({ method: 'lock' }, () => {
       this.status = 'locked'
       this.update()
-      cb(null)
       log.info('Signer locked')
+      cb(null)
     })
   }
 
   unlock (password, data, cb) {
-    const payload = {
-      method: 'unlockAccount',
-      params: { password, ...data }
-    }
-    this._callWorker(payload, (err, result) => {
+    const params = { password, ...data }
+    this._callWorker({ method: 'unlock', params }, (err, result) => {
       if (err) return cb(err)
       this.status = 'ok'
       this.update()
@@ -75,11 +72,12 @@ class HotSigner extends Signer {
     })
   }
 
-  close () {
+  close (cb) {
     this.worker.disconnect()
     store.removeSigner(this.id)
     super.close()
     log.info('Signer closed')
+    cb(null)
   }
 
   update () {
@@ -90,16 +88,18 @@ class HotSigner extends Signer {
     if (!this.id) {
       // Update id
       this.id = derivedId
+      // Write to disk
+      this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
     }
 
     // On changed ID ->
     else if (this.id !== derivedId) {
+      // Erase from disk
+      this.delete(this.id)
       // Update id
       this.id = derivedId
       // Remove from store
       store.removeSigner(this.id)
-      // Erase from disk
-      this.delete(this.id)
       // Write to disk
       this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
     }

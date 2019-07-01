@@ -13,8 +13,13 @@ class SeedSigner extends HotSigner {
     this.update()
   }
 
-  save () { super.save({ encryptedSeed: this.encryptedSeed }) }
-  unlock (password, cb) { super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb) }
+  save () {
+    super.save({ encryptedSeed: this.encryptedSeed })
+  }
+
+  unlock (password, cb) {
+    super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb)
+  }
 }
 
 module.exports = SeedSigner

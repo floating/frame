@@ -4,22 +4,24 @@ const { app } = require('electron')
 
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
-
-// const create = require('worker-farm')(require.resolve('./create'), [ 'newPhrase', 'fromSeed', 'fromPhrase' ])
 const create = require('./create')
+
+const USER_DATA = app ? app.getPath('userData') : './test/.userData'
 
 const api = {
   newPhrase: (cb) => create.newPhrase(cb),
   createFromSeed: (signers, seed, password, cb) => {
-    create.fromSeed(seed, password, (err, signer) => {
+    create.fromSeed(seed, password, (err, { addresses, type, encryptedSeed }) => {
       if (err) return cb(err)
+      const signer = new SeedSigner({ addresses, type, encryptedSeed })
       signers.add(signer)
       cb(null, signer)
     })
   },
   createFromPhrase: (signers, phrase, password, cb) => {
-    create.fromPhrase(phrase, password, (err, signer) => {
+    create.fromPhrase(phrase, password, (err, { addresses, type, encryptedSeed }) => {
       if (err) return cb(err)
+      const signer = new SeedSigner({ addresses, type, encryptedSeed })
       signers.add(signer)
       cb(null, signer)
     })
@@ -50,7 +52,8 @@ const api = {
 
     // Try to read stored signers from disk
     try {
-      const signersPath = path.resolve(app.getPath('userData'), 'signers.json')
+      const signersPath = path.resolve(USER_DATA, 'signers.json')
+      console.log(signersPath)
       storedSigners = JSON.parse(fs.readFileSync(signersPath, 'utf8'))
     } catch (e) {
       return console.error(e)

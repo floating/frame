@@ -7,7 +7,7 @@ const crypt = require('../../../crypt')
 
 let seed = null
 
-const unlockAccount = ({ encryptedSeed, password }, pseudoCallback) => {
+const unlock = ({ encryptedSeed, password }, pseudoCallback) => {
   crypt.decrypt(encryptedSeed, password, (err, decryptedSeed) => {
     if (err) pseudoCallback('Invalid password')
     else {
@@ -17,7 +17,7 @@ const unlockAccount = ({ encryptedSeed, password }, pseudoCallback) => {
   })
 }
 
-const lockAccount = (pseudoCallback) => {
+const lock = (pseudoCallback) => {
   seed = null
   pseudoCallback(null)
 }
@@ -81,10 +81,10 @@ process.on('message', ({ id, method, params }) => {
     // Send response to parent process
     process.send(response)
   }
-  // Handle method 'unlockAccount'
-  if (method === 'unlockAccount') return unlockAccount(params, pseudoCallback)
-  // Handle method 'unlockAccount'
-  if (method === 'lockAccount') return lockAccount(pseudoCallback)
+  // Handle method 'unlock'
+  if (method === 'unlock') return unlock(params, pseudoCallback)
+  // Handle method 'lock'
+  if (method === 'lock') return lock(pseudoCallback)
   // Handle method 'signMessage'
   if (method === 'signMessage') return signMessage(params, pseudoCallback)
   // Handle method 'signTransaction'

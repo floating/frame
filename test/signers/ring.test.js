@@ -3,12 +3,13 @@ const fs = require('fs')
 const path = require('path')
 const hot = require('../../main/signers/hot')
 const { clean } = require('../util')
+
 const PASSWORD = 'frame'
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
 
 // Stubs
 const signers = {
-  add: (signer) => console.log('Signer added')
+  add: (signer) => {}
 }
 
 describe('Ring signer', () => {
@@ -26,6 +27,14 @@ describe('Ring signer', () => {
       expect(signer.id).not.toBe(undefined)
       done()
     })
+  })
+
+  test('Scan for signers', (done) => {
+    let count = 0
+    const signers = { add: (signer) => { signer.close(() => {}); count++ } }
+    hot.scan(signers)
+    expect(count).toBe(1)
+    done()
   })
 
   test('Create from keystore', (done) => {
@@ -51,10 +60,27 @@ describe('Ring signer', () => {
 
   test('Remove private key', (done) => {
     const secondAddress = signer.addresses[1]
-    signer.removePrivateKey(0, (err, result) => {
+    signer.removePrivateKey(0, PASSWORD, (err, result) => {
       expect(err).toBe(null)
       expect(signer.addresses.length).toBe(1)
       expect(signer.addresses[0]).toEqual(secondAddress)
+      done()
+    })
+  })
+
+  test('Add private key from keystore', (done) => {
+    const file = fs.readFileSync(FILE_PATH, 'utf8')
+    const keystore = JSON.parse(file)
+    signer.addFromKeystore(keystore, 'test', PASSWORD, (err, result) => {
+      expect(err).toBe(null)
+      expect(signer.addresses.length).toBe(2)
+      done()
+    })
+  })
+
+  test('Unlock with wrong password', (done) => {
+    signer.unlock('Wrong password', (err, result) => {
+      expect(err).not.toBe(null)
       done()
     })
   })
@@ -109,6 +135,13 @@ describe('Ring signer', () => {
   test('Sign message when locked', (done) => {
     signer.signMessage(0, 'test', (err, result) => {
       expect(err.message).toBe('Signer locked')
+      done()
+    })
+  })
+
+  test('Close signer', (done) => {
+    signer.close((err, result) => {
+      expect(err).toBe(null)
       done()
     })
   })

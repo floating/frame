@@ -1,6 +1,4 @@
 const hdKey = require('ethereumjs-wallet/hdkey')
-const { fromPrivateKey } = require('ethereumjs-wallet')
-const { addHexPrefix } = require('ethereumjs-util')
 const bip39 = require('bip39')
 
 const crypt = require('../../crypt')

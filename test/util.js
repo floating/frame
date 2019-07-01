@@ -1,5 +1,5 @@
 const EventEmitter = require('events')
-const { emptyDir } = require('fs-extra')
+const { emptyDirSync } = require('fs-extra')
 const path = require('path')
 const store = require('../main/store')
 
@@ -41,7 +41,7 @@ class Counter {
 
 const clean = () => {
   const userData = path.resolve('./test/.userData')
-  emptyDir(userData)
+  emptyDirSync(userData)
 }
 
 module.exports = { Counter, Observer, clean }
