@@ -42,10 +42,10 @@ class Signers extends EventEmitter {
   createFromKeystore (file, keystorePassword, signerPassword, cb) {
     hot.createFromKeystore(this, file, keystorePassword, signerPassword, cb)
   }
-  unlock (id, password) {
+  unlock (id, password, cb) {
     let signer = this.signers.find(s => s.id === id)
     if (signer && signer.unlock) {
-      signer.unlock(password)
+      signer.unlock(password, cb)
     } else {
       console.error('Signer not unlockable via password')
     }
@@ -53,9 +53,9 @@ class Signers extends EventEmitter {
   unsetSigner () {
     console.log('unsetSigner')
   }
-  lock (id) {
+  lock (id, cb) {
     let signer = this.get(id)
-    if (signer && signer.lock) signer.lock()
+    if (signer && signer.lock) signer.lock(cb)
   }
 }
 

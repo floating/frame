@@ -26,7 +26,7 @@ const rpc = {
     provider.accountsChanged(accounts.getSelectedAddresses())
   },
   unsetSigner: (id, cb) => {
-    signers.lock(id)
+    signers.lock(id, cb)
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
   },
@@ -78,8 +78,8 @@ const rpc = {
   addPhrase (pharse, password, cb) {
     signers.createFromPhrase(pharse, password, cb)
   },
-  unlockSigner (id, unlock, cb) {
-    signers.unlock(id, unlock, cb)
+  unlockSigner (id, password, cb) {
+    signers.unlock(id, password, cb)
   }
 }
 
