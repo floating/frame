@@ -10,6 +10,7 @@ let unlockedKeys = null
 
 const decrypt = (encryptedKeys, password) => {
   return new Promise((resolve, reject) => {
+    if (!encryptedKeys) return resolve(null)
     crypt.decrypt(encryptedKeys, password, (err, keyString) => {
       if (err) return reject(err)
       else resolve(keyString.split(':'))
@@ -64,8 +65,9 @@ const removeKey = async ({ encryptedKeys, index, password }, pseudoCallback) => 
   let keys = await decrypt(encryptedKeys, password)
   // Remove key from list
   keys = keys.filter((key) => key !== keys[index])
-  // Return encrypted list
-  pseudoCallback(null, await encrypt(keys, password))
+  // Return encrypted list (or null if empty)
+  const result = keys.length > 0 ? await encrypt(keys, password) : null
+  pseudoCallback(null, result)
 }
 
 const signMessage = ({ index, message }, pseudoCallback) => {

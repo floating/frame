@@ -68,12 +68,20 @@ describe('Ring signer', () => {
     })
   })
 
+  test('Remove last private key', (done) => {
+    signer.removePrivateKey(0, PASSWORD, (err, result) => {
+      expect(err).toBe(null)
+      done()
+    })
+  })
+
   test('Add private key from keystore', (done) => {
     const file = fs.readFileSync(FILE_PATH, 'utf8')
     const keystore = JSON.parse(file)
+    const previousLength = signer.addresses.length
     signer.addFromKeystore(keystore, 'test', PASSWORD, (err, result) => {
       expect(err).toBe(null)
-      expect(signer.addresses.length).toBe(2)
+      expect(signer.addresses.length).toBe(previousLength + 1)
       done()
     })
   })

@@ -36,6 +36,18 @@ describe('Ring Signer worker', () => {
     })
   })
 
+  test('Remove last key', (done) => {
+    worker.addKey({ encryptedKeys: undefined, password: PASSWORD }, (err, encryptedKeys) => {
+      expect(err).toBe(null)
+      worker.removeKey({ encryptedKeys: encryptedKeys, index: 0, password: PASSWORD }, async (err, result) => {
+        expect(err).toBe(null)
+        let keys = await worker.decrypt(result, PASSWORD)
+        expect(keys).toEqual(null)
+        done()
+      })
+    })
+  })
+
   test('Unlock', (done) => {
     worker.unlock({ encryptedKeys, password: PASSWORD }, async (err, result) => {
       expect(err).toBe(null)
