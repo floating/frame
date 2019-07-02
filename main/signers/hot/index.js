@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const { ensureDirSync } = require('fs-extra')
 const { app } = require('electron')
+const log = require('electron-log')
 
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
@@ -58,8 +59,10 @@ const api = {
 
     // For each stored json file -> add signer to storedSigners
     files.forEach((file) => {
-      const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
-      storedSigners[signer.id] = signer
+      try {
+        const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
+        storedSigners[signer.id] = signer
+      } catch (e) { log.error(`Corrupt signer file: ${file}`) }
     })
 
     // Add stored signers to store
