@@ -1,15 +1,12 @@
 const path = require('path')
-const { fork } = require('child_process')
-
 const HotSigner = require('../HotSigner')
 
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
 class SeedSigner extends HotSigner {
   constructor (signer) {
-    super(signer)
+    super(signer, WORKER_PATH)
     this.encryptedSeed = signer.encryptedSeed
-    this.worker = fork(WORKER_PATH)
     this.update()
   }
 

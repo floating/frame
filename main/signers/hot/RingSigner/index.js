@@ -1,5 +1,4 @@
 const path = require('path')
-const { fork } = require('child_process')
 const log = require('electron-log')
 const { fromPrivateKey, fromV1, fromV3 } = require('ethereumjs-wallet')
 
@@ -9,9 +8,8 @@ const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
 class RingSigner extends HotSigner {
   constructor (signer) {
-    super(signer)
+    super(signer, WORKER_PATH)
     this.encryptedKeys = signer.encryptedKeys
-    this.worker = fork(WORKER_PATH)
     this.update()
   }
 

@@ -1,8 +1,10 @@
 const path = require('path')
 const fs = require('fs')
+const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
 const uuid = require('uuid/v4')
+const crypto = require('crypto')
 
 const store = require('../../../store')
 const Signer = require('../../Signer')
@@ -11,11 +13,14 @@ const USER_DATA = app ? app.getPath('userData') : './test/.userData'
 const FILE_PATH = path.resolve(USER_DATA, 'signers.json')
 
 class HotSigner extends Signer {
-  constructor (signer) {
+  constructor (signer, workerPath) {
     super()
     this.type = signer.type
     this.addresses = signer.addresses || []
     this.status = 'locked'
+    this._workerToken = uuid()
+    this._workerTokenHash = crypto.createHash('sha256').update(this._workerToken).digest('hex')
+    this._worker = fork(workerPath, [this._workerTokenHash])
     this.update()
   }
 
@@ -73,7 +78,7 @@ class HotSigner extends Signer {
   }
 
   close (cb) {
-    this.worker.disconnect()
+    this._worker.disconnect()
     store.removeSigner(this.id)
     super.close()
     log.info('Signer closed')
@@ -125,17 +130,17 @@ class HotSigner extends Signer {
   }
 
   _callWorker (payload, cb) {
-    if (!this.worker) throw Error('Worker not running')
+    if (!this._worker) throw Error('Worker not running')
     const id = uuid()
     const listener = (message) => {
       if (message.id === id) {
         let error = message.error ? new Error(message.error) : null
         cb(error, message.result)
-        this.worker.removeListener('message', listener)
+        this._worker.removeListener('message', listener)
       }
     }
-    this.worker.addListener('message', listener)
-    this.worker.send({ id, ...payload })
+    this._worker.addListener('message', listener)
+    this._worker.send({ id, token: this._workerToken, ...payload })
   }
 }
 

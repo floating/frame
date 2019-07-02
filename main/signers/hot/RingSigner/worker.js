@@ -1,10 +1,43 @@
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const EthTx = require('ethereumjs-tx')
 const uuid = require('uuid/v4')
+const { createHash } = require('crypto')
 
 const crypt = require('../../../crypt')
 
+// "Globals"
 let unlockedKeys = null
+const TOKEN_HASH = process.argv[2]
+
+process.on('message', ({ id, method, params, token }) => {
+  // Define (pseudo) callback
+  const pseudoCallback = (error, result) => {
+    // Add correlation id to response
+    let response = { id, error, result }
+    // Send response to parent process
+    process.send(response)
+  }
+  // Check token
+  if (createHash('sha256').update(token).digest('hex') !== TOKEN_HASH) {
+    return pseudoCallback('Invalid token')
+  }
+  // Handle method 'unlock'
+  if (method === 'unlock') return unlock(params, pseudoCallback)
+  // Handle method 'lock'
+  if (method === 'lock') return lock(pseudoCallback)
+  // Handle method 'signMessage'
+  if (method === 'signMessage') return signMessage(params, pseudoCallback)
+  // Handle method 'signTransaction'
+  if (method === 'signTransaction') return signTransaction(params, pseudoCallback)
+  // Handle method 'verifyAddress'
+  if (method === 'verifyAddress') return verifyAddress(params, pseudoCallback)
+  // Handle method 'addKey'
+  if (method === 'addKey') return addKey(params, pseudoCallback)
+  // Handle method 'removeKey'
+  if (method === 'removeKey') return removeKey(params, pseudoCallback)
+  // Handle invalid method
+  else pseudoCallback(`Invalid method: '${method}'`)
+})
 
 // TODO: Refactor logic common for all hot signer workers into one module
 
@@ -116,32 +149,6 @@ const verifyAddress = ({ index, address }, pseudoCallback) => {
     pseudoCallback(null, verifiedAddress.toLowerCase() === address.toLowerCase())
   })
 }
-
-process.on('message', ({ id, method, params }) => {
-  // Define (pseudo) callback
-  const pseudoCallback = (error, result) => {
-    // Add correlation id to response
-    let response = { id, error, result }
-    // Send response to parent process
-    process.send(response)
-  }
-  // Handle method 'unlock'
-  if (method === 'unlock') return unlock(params, pseudoCallback)
-  // Handle method 'lock'
-  if (method === 'lock') return lock(pseudoCallback)
-  // Handle method 'signMessage'
-  if (method === 'signMessage') return signMessage(params, pseudoCallback)
-  // Handle method 'signTransaction'
-  if (method === 'signTransaction') return signTransaction(params, pseudoCallback)
-  // Handle method 'verifyAddress'
-  if (method === 'verifyAddress') return verifyAddress(params, pseudoCallback)
-  // Handle method 'addKey'
-  if (method === 'addKey') return addKey(params, pseudoCallback)
-  // Handle method 'removeKey'
-  if (method === 'removeKey') return removeKey(params, pseudoCallback)
-  // Handle invalid method
-  else pseudoCallback(`Invalid method: '${method}'`)
-})
 
 // Exported for testing purposes
 module.exports = { encrypt, decrypt, addKey, removeKey, unlock }

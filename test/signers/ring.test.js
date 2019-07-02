@@ -37,6 +37,13 @@ describe('Ring signer', () => {
     done()
   })
 
+  test('Close signer', (done) => {
+    signer.close((err, result) => {
+      expect(err).toBe(null)
+      done()
+    })
+  })
+
   test('Create from keystore', (done) => {
     const file = fs.readFileSync(FILE_PATH, 'utf8')
     const keystore = JSON.parse(file)
