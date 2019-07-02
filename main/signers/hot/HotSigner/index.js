@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const { ensureDirSync, removeSync } = require('fs-extra')
 const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
@@ -10,7 +11,7 @@ const store = require('../../../store')
 const Signer = require('../../Signer')
 
 const USER_DATA = app ? app.getPath('userData') : './test/.userData'
-const FILE_PATH = path.resolve(USER_DATA, 'signers.json')
+const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 class HotSigner extends Signer {
   constructor (signer, workerPath) {
@@ -21,37 +22,26 @@ class HotSigner extends Signer {
     this._workerToken = uuid()
     this._workerTokenHash = crypto.createHash('sha256').update(this._workerToken).digest('hex')
     this._worker = fork(workerPath, [this._workerTokenHash])
-    this.update()
   }
 
   save (data) {
-    let storedSigners = {}
-
-    // Try to read stored signers from disk
-    try { storedSigners = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8')) }
-    catch (e) { }
-
-    // Add signer to stored signers
+    // Construct signer
     const { id, addresses, type } = this
-    storedSigners[id] = { id, addresses, type, ...data }
+    const signer = { id, addresses, type, ...data }
 
-    // Write to disk
-    fs.writeFileSync(FILE_PATH, JSON.stringify(storedSigners))
+    // Ensure signers directory exists
+    ensureDirSync(SIGNERS_PATH)
+
+    // Write signer to disk
+    fs.writeFileSync(path.resolve(SIGNERS_PATH, `${id}.json`), JSON.stringify(signer))
 
     // Log
     log.info('Signer saved to disk')
   }
 
   delete () {
-    let storedSigners = {}
-
-    // Try to read stored signers from disk
-    try { storedSigners = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8')) }
-    catch (e) { }
-
-    // Remove signer from stored signers
-    delete storedSigners[this.id]
-    fs.writeFileSync(FILE_PATH, JSON.stringify(storedSigners))
+    // Remove file
+    removeSync(path.resolve(SIGNERS_PATH, `${this.id}.json`))
 
     // Log
     log.info('Signer erased from disk')

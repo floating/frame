@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const { ensureDirSync } = require('fs-extra')
 const { app } = require('electron')
 
 const SeedSigner = require('./SeedSigner')
@@ -7,6 +8,7 @@ const RingSigner = require('./RingSigner')
 const create = require('./create')
 
 const USER_DATA = app ? app.getPath('userData') : './test/.userData'
+const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 const api = {
   newPhrase: (cb) => create.newPhrase(cb),
@@ -50,14 +52,15 @@ const api = {
   scan: (signers) => {
     let storedSigners = {}
 
-    // Try to read stored signers from disk
-    try {
-      const signersPath = path.resolve(USER_DATA, 'signers.json')
-      console.log(signersPath)
-      storedSigners = JSON.parse(fs.readFileSync(signersPath, 'utf8'))
-    } catch (e) {
-      return console.error(e)
-    }
+    // Find stored signers
+    ensureDirSync(SIGNERS_PATH)
+    const files = fs.readdirSync(SIGNERS_PATH)
+
+    // For each stored json file -> add signer to storedSigners
+    files.forEach((file) => {
+      const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
+      storedSigners[signer.id] = signer
+    })
 
     // Add stored signers to store
     Object.keys(storedSigners).forEach(id => {
