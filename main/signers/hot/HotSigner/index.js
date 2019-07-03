@@ -5,7 +5,6 @@ const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
 const uuid = require('uuid/v4')
-const crypto = require('crypto')
 
 const store = require('../../../store')
 const Signer = require('../../Signer')
@@ -19,9 +18,8 @@ class HotSigner extends Signer {
     this.type = signer.type
     this.addresses = signer.addresses || []
     this.status = 'locked'
-    this._workerToken = uuid()
-    this._workerTokenHash = crypto.createHash('sha256').update(this._workerToken).digest('hex')
-    this._worker = fork(workerPath, [this._workerTokenHash])
+    this._worker = fork(workerPath)
+    this._getToken()
   }
 
   save (data) {
@@ -119,18 +117,33 @@ class HotSigner extends Signer {
     this._callWorker(payload, cb)
   }
 
-  _callWorker (payload, cb) {
-    if (!this._worker) throw Error('Worker not running')
-    const id = uuid()
-    const listener = (message) => {
-      if (message.id === id) {
-        let error = message.error ? new Error(message.error) : null
-        cb(error, message.result)
+  _getToken () {
+    const listener = ({ type, token }) => {
+      if (type === 'token') {
+        this._token = token
         this._worker.removeListener('message', listener)
       }
     }
     this._worker.addListener('message', listener)
-    this._worker.send({ id, token: this._workerToken, ...payload })
+  }
+
+  _callWorker (payload, cb) {
+    if (!this._worker) throw Error('Worker not running')
+    // If token not yet received -> retry in 100 ms
+    if (!this._token) return setTimeout(() => this._callWorker(payload, cb), 100)
+    // Generate message id
+    const id = uuid()
+    // Handle response
+    const listener = (response) => {
+      if (response.type === 'rpc' && response.id === id) {
+        let error = response.error ? new Error(response.error) : null
+        cb(error, response.result)
+        this._worker.removeListener('message', listener)
+      }
+    }
+    this._worker.addListener('message', listener)
+    // Make RPC call
+    this._worker.send({ id, token: this._token, ...payload })
   }
 }
 
