@@ -1,5 +1,7 @@
-const store = require('../../main/store')
 const EventEmitter = require('events')
+const { emptyDirSync } = require('fs-extra')
+const path = require('path')
+const store = require('../main/store')
 
 class Observer extends EventEmitter {
   constructor (root, keys) {
@@ -37,4 +39,9 @@ class Counter {
   }
 }
 
-module.exports = { Counter, Observer }
+const clean = () => {
+  const userData = path.resolve('./test/.userData')
+  emptyDirSync(userData)
+}
+
+module.exports = { Counter, Observer, clean }

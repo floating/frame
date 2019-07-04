@@ -38,7 +38,10 @@ class Requests extends React.Component {
     this.setState({ unlockInput: e.target.value })
   }
   unlockSubmit (e) {
-    link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, () => {})
+    link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
+      // TODO: Handle invalid passwords
+      console.log(err, result)
+    })
   }
   render () {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}

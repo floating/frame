@@ -15,7 +15,7 @@ const ipfs = require('../../main/services/ipfs')
 const store = require('../../main/store')
 
 // Local
-const { Counter, Observer } = require('./util')
+const { Counter, Observer } = require('../util')
 
 // Helper functions
 const clean = () => emptyDir(userData)
