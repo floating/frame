@@ -35,7 +35,7 @@ class SeedSigner extends HotSigner {
   async addPhrase (phrase, password, cb) {
     // Validate phrase
     if (!bip39.validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
-    // Generate seed
+    // Get seed
     const seed = await bip39.mnemonicToSeed(phrase)
     // Add seed to signer
     this.addSeed(seed.toString('hex'), password, cb)
