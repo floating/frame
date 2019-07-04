@@ -1,8 +1,10 @@
 const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
+
 const hot = require('../../main/signers/hot')
 const { clean } = require('../util')
+const store = require('../../main/store')
 
 const PASSWORD = 'frame'
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
@@ -25,6 +27,7 @@ describe('Ring signer', () => {
       expect(err).toBe(null)
       expect(signer.status).toBe('locked')
       expect(signer.id).not.toBe(undefined)
+      expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
       done()
     })
   })
@@ -38,10 +41,9 @@ describe('Ring signer', () => {
   })
 
   test('Close signer', (done) => {
-    signer.close((err, result) => {
-      expect(err).toBe(null)
-      done()
-    })
+    signer.close()
+    expect(store(`main.signers.${signer.id}`)).toBe(undefined)
+    done()
   })
 
   test('Create from keystore', (done) => {
@@ -86,7 +88,7 @@ describe('Ring signer', () => {
     const file = fs.readFileSync(FILE_PATH, 'utf8')
     const keystore = JSON.parse(file)
     const previousLength = signer.addresses.length
-    signer.addFromKeystore(keystore, 'test', PASSWORD, (err, result) => {
+    signer.addKeystore(keystore, 'test', PASSWORD, (err, result) => {
       expect(err).toBe(null)
       expect(signer.addresses.length).toBe(previousLength + 1)
       done()
@@ -139,6 +141,14 @@ describe('Ring signer', () => {
     })
   })
 
+  test('Verify wrong address', (done) => {
+    signer.verifyAddress(0, '0xabcdef', (err, result) => {
+      expect(err).toBe(null)
+      expect(result).toBe(false)
+      done()
+    })
+  })
+
   test('Lock', (done) => {
     signer.lock((err, result) => {
       expect(err).toBe(null)
@@ -155,9 +165,7 @@ describe('Ring signer', () => {
   })
 
   test('Close signer', (done) => {
-    signer.close((err, result) => {
-      expect(err).toBe(null)
-      done()
-    })
+    signer.close()
+    done()
   })
 })
