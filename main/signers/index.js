@@ -17,7 +17,11 @@ class Signers extends EventEmitter {
   remove (id) {
     let index = this.signers.map(s => s.id).indexOf(id)
     if (index > -1) {
-      this.signers[index].close()
+      let signer = this.signers[index]
+      signer.close()
+      // TODO: Ask Jordan if 'remove signer' means 'erase from disk'
+      if (signer.delete) signer.delete()
+      this.signers[index].delete()
       this.signers.splice(index, 1)
     }
   }
@@ -39,8 +43,36 @@ class Signers extends EventEmitter {
   createFromPrivateKey (privateKey, password, cb) {
     hot.createFromPrivateKey(this, privateKey, password, cb)
   }
-  createFromKeystore (file, keystorePassword, signerPassword, cb) {
-    hot.createFromKeystore(this, file, keystorePassword, signerPassword, cb)
+  createFromKeystore (keystore, keystorePassword, password, cb) {
+    hot.createFromKeystore(this, keystore, keystorePassword, password, cb)
+  }
+  addPrivateKey (id, privateKey, password, cb) {
+    // Get signer
+    const signer = this.get(id)
+    // Make sure signer is of type 'ring'
+    if (!signer.type === 'ring') return cb(new Error('Private keys can only be added to ring signers'))
+    // Add private key
+    signer.addPrivateKey(privateKey, password, cb)
+  }
+  removePrivateKey (id, index, password, cb) {
+    // Get signer
+    const signer = this.get(id)
+    // Make sure signer is of type 'ring'
+    if (!signer.type === 'ring') return cb(new Error('Private keys can only be removed from ring signers'))
+    // Add keystore
+    signer.removePrivateKey(index, password, cb)
+  }
+  addKeystore (id, keystore, keystorePassword, password, cb) {
+    // Get signer
+    const signer = this.get(id)
+    // Make sure signer is of type 'ring'
+    if (!signer.type === 'ring') return cb(new Error('Keystores can only be used with ring signers'))
+    // Add keystore
+    signer.addKeystore(keystore, keystorePassword, password, cb)
+  }
+  lock (id, cb) {
+    let signer = this.get(id)
+    if (signer && signer.lock) signer.lock(cb)
   }
   unlock (id, password, cb) {
     let signer = this.signers.find(s => s.id === id)
@@ -52,10 +84,6 @@ class Signers extends EventEmitter {
   }
   unsetSigner () {
     console.log('unsetSigner')
-  }
-  lock (id, cb) {
-    let signer = this.get(id)
-    if (signer && signer.lock) signer.lock(cb)
   }
 }
 

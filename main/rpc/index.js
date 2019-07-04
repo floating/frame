@@ -75,11 +75,29 @@ const rpc = {
     accounts.addAragon(account)
     cb(null)
   },
-  addPhrase (pharse, password, cb) {
-    signers.createFromPhrase(pharse, password, cb)
+  createFromPhrase (phrase, password, cb) {
+    signers.createFromPhrase(phrase, password, cb)
+  },
+  createFromKeystore (keystore, keystorePassword, password, cb) {
+    signers.createFromKeystore(keystore, keystorePassword, password, cb)
+  },
+  createFromPrivateKey (privateKey, password, cb) {
+    signers.createFromPrivateKey(privateKey, password, cb)
+  },
+  addPrivateKey (id, privateKey, password, cb) {
+    signers.addPrivateKey(id, privateKey, password, cb)
+  },
+  removePrivateKey (id, index, password, cb) {
+    signers.removePrivateKey(id, index, password, cb)
+  },
+  addKeystore (id, keystore, keystorePassword, password, cb) {
+    signers.addKeystore(id, keystore, keystorePassword, password, cb)
   },
   unlockSigner (id, password, cb) {
     signers.unlock(id, password, cb)
+  },
+  remove (id, cb) {
+    signers.remove(id, cb)
   }
 }
 
