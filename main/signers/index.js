@@ -19,7 +19,7 @@ class Signers extends EventEmitter {
     if (index > -1) {
       let signer = this.signers[index]
       signer.close()
-      // TODO: Ask Jordan if 'remove signer' means 'erase from disk'
+      // If hot signer -> erase from disk
       if (signer.delete) signer.delete()
       this.signers[index].delete()
       this.signers.splice(index, 1)
