@@ -1,6 +1,7 @@
 const bip39 = require('bip39')
 const hot = require('../../main/signers/hot')
 const { clean } = require('../util')
+const store = require('../../main/store')
 
 const PASSWORD = 'frame'
 
@@ -20,6 +21,7 @@ describe('Seed signer', () => {
       expect(err).toBe(null)
       expect(signer.status).toBe('locked')
       expect(signer.addresses.length).toBe(100)
+      expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
       done()
     })
   })
@@ -79,6 +81,14 @@ describe('Seed signer', () => {
     })
   })
 
+  test('Verify wrong address', (done) => {
+    signer.verifyAddress(0, '0xabcdef', (err, result) => {
+      expect(err).toBe(null)
+      expect(result).toBe(false)
+      done()
+    })
+  })
+
   test('Lock', (done) => {
     signer.lock((err, result) => {
       expect(err).toBe(null)
@@ -95,9 +105,8 @@ describe('Seed signer', () => {
   })
 
   test('Close signer', (done) => {
-    signer.close((err, result) => {
-      expect(err).toBe(null)
-      done()
-    })
+    signer.close()
+    expect(store(`main.signers.${signer.id}`)).toBe(undefined)
+    done()
   })
 })

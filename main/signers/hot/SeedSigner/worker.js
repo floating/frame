@@ -22,6 +22,10 @@ class SeedSignerWorker extends HotSignerWorker {
     pseudoCallback(null)
   }
 
+  encryptSeed ({ seed, password }, pseudoCallback) {
+    pseudoCallback(null, this._encrypt(seed.toString('hex'), password))
+  }
+
   signMessage ({ index, message }, pseudoCallback) {
     // Make sure signer is unlocked
     if (!this.seed) return pseudoCallback('Signer locked')

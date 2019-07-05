@@ -15,9 +15,8 @@ const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 class HotSigner extends Signer {
   constructor (signer, workerPath) {
     super()
-    this.type = signer.type
-    this.addresses = signer.addresses || []
     this.status = 'locked'
+    this.addresses = (signer && signer.addresses) || []
     this._worker = fork(workerPath)
     this._getToken()
   }
@@ -65,12 +64,10 @@ class HotSigner extends Signer {
     })
   }
 
-  close (cb) {
+  close () {
     this._worker.disconnect()
     store.removeSigner(this.id)
-    super.close()
     log.info('Signer closed')
-    cb(null)
   }
 
   update () {
@@ -89,10 +86,10 @@ class HotSigner extends Signer {
     else if (this.id !== derivedId) {
       // Erase from disk
       this.delete(this.id)
-      // Update id
-      this.id = derivedId
       // Remove from store
       store.removeSigner(this.id)
+      // Update id
+      this.id = derivedId
       // Write to disk
       this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
     }

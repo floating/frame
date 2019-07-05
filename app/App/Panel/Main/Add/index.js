@@ -176,7 +176,7 @@ class _AddPhrase extends React.Component {
   }
   create () {
     this.setState({ index: ++this.state.index })
-    link.rpc('addPhrase', this.state.phrase, this.state.password, (err, signer) => {
+    link.rpc('createFromPhrase', this.state.phrase, this.state.password, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
       } else {

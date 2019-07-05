@@ -3,28 +3,30 @@ const fs = require('fs')
 const { ensureDirSync } = require('fs-extra')
 const { app } = require('electron')
 const log = require('electron-log')
+const bip39 = require('bip39')
 
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
-const create = require('./create')
 
 const USER_DATA = app ? app.getPath('userData') : './test/.userData'
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-const api = {
-  newPhrase: (cb) => create.newPhrase(cb),
+module.exports = {
+  newPhrase: (cb) => {
+    cb(null, bip39.generateMnemonic())
+  },
   createFromSeed: (signers, seed, password, cb) => {
-    create.fromSeed(seed, password, (err, { addresses, type, encryptedSeed }) => {
+    const signer = new SeedSigner()
+    signer.addSeed(seed, password, (err, result) => {
       if (err) return cb(err)
-      const signer = new SeedSigner({ addresses, type, encryptedSeed })
       signers.add(signer)
       cb(null, signer)
     })
   },
   createFromPhrase: (signers, phrase, password, cb) => {
-    create.fromPhrase(phrase, password, (err, { addresses, type, encryptedSeed }) => {
+    const signer = new SeedSigner()
+    signer.addPhrase(phrase, password, (err, result) => {
       if (err) return cb(err)
-      const signer = new SeedSigner({ addresses, type, encryptedSeed })
       signers.add(signer)
       cb(null, signer)
     })
@@ -32,19 +34,19 @@ const api = {
   createFromPrivateKey: (signers, privateKey, password, cb) => {
     if (!privateKey) return cb(new Error('Private key required to create local signer'))
     if (!password) return cb(new Error('Password required to create local signer'))
-    const signer = new RingSigner({ type: 'ring' })
+    const signer = new RingSigner()
     signer.addPrivateKey(privateKey, password, (err, result) => {
       if (err) return cb(err)
       signers.add(signer)
       cb(null, signer)
     })
   },
-  createFromKeystore: (signers, file, keystorePassword, signerPassword, cb) => {
-    if (!file) return cb(new Error('Keystore file required'))
+  createFromKeystore: (signers, keystore, keystorePassword, password, cb) => {
+    if (!keystore) return cb(new Error('Keystore required'))
     if (!keystorePassword) return cb(new Error('Keystore password required'))
-    if (!signerPassword) return cb(new Error('Password required'))
+    if (!password) return cb(new Error('Signer password required'))
     const signer = new RingSigner({ type: 'ring' })
-    signer.addFromKeystore(file, keystorePassword, signerPassword, (err, result) => {
+    signer.addKeystore(keystore, keystorePassword, password, (err, result) => {
       if (err) return cb(err)
       signers.add(signer)
       cb(null, signer)
@@ -53,12 +55,11 @@ const api = {
   scan: (signers) => {
     let storedSigners = {}
 
-    // Find stored signers
+    // Ensure signer directory exists
     ensureDirSync(SIGNERS_PATH)
-    const files = fs.readdirSync(SIGNERS_PATH)
 
-    // For each stored json file -> add signer to storedSigners
-    files.forEach((file) => {
+    // Find stored signers, read them from disk and add them to storedSigners
+    fs.readdirSync(SIGNERS_PATH).forEach((file) => {
       try {
         const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
         storedSigners[signer.id] = signer
@@ -67,32 +68,12 @@ const api = {
 
     // Add stored signers to store
     Object.keys(storedSigners).forEach(id => {
-      const signer = storedSigners[id]
-      if (signer.type === 'seed') {
-        signers.add(new SeedSigner(signer))
-      } else if (signer.type === 'ring') {
-        signers.add(new RingSigner(signer))
+      const { addresses, encryptedKeys, encryptedSeed, type } = storedSigners[id]
+      if (type === 'seed') {
+        signers.add(new SeedSigner({ addresses, encryptedSeed }))
+      } else if (type === 'ring') {
+        signers.add(new RingSigner({ addresses, encryptedKeys }))
       }
     })
   }
 }
-
-module.exports = api
-
-// require('fs').readFile('emails.json', 'utf8', (err, data) => {
-//               if (err || !data) {
-//                 console.log('error reading file', err)
-//                 // data = {emails: []}
-//                 return cb(new Error('Email Signup Failed'))
-//               } else {
-//                 data = JSON.parse(data)
-//               }
-//               data.emails.push(email)
-//               fs.writeFile('emails.json', JSON.stringify(data), 'utf8', (err, result) => {
-//                 if (err) {
-//                   console.log(err)
-//                   cb(new Error('Email Signup Failed'))
-//                 } else {
-//                   cb()
-//                 }
-//               })

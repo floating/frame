@@ -5,8 +5,8 @@ const EthTx = require('ethereumjs-tx')
 
 class HotSignerWorker {
   constructor () {
-    this._token = crypto.randomBytes(32).toString('hex')
-    process.send({ type: 'token', token: this._token })
+    this.token = crypto.randomBytes(32).toString('hex')
+    process.send({ type: 'token', token: this.token })
   }
 
   handleMessage ({ id, method, params, token }) {
@@ -18,7 +18,7 @@ class HotSignerWorker {
       process.send(response)
     }
     // Verify token
-    if (token !== this._token) return pseudoCallback('Invalid token')
+    if (token !== this.token) return pseudoCallback('Invalid token')
     // If method exists -> execute
     if (this[method]) return this[method](params, pseudoCallback)
     // Else return error

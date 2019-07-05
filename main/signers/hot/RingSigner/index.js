@@ -9,7 +9,8 @@ const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 class RingSigner extends HotSigner {
   constructor (signer) {
     super(signer, WORKER_PATH)
-    this.encryptedKeys = signer.encryptedKeys
+    this.encryptedKeys = (signer && signer.encryptedKeys)
+    this.type = 'ring'
     this.update()
   }
 
@@ -77,7 +78,7 @@ class RingSigner extends HotSigner {
   }
 
   // TODO: Encrypt all keys together so that they all get the same password
-  addFromKeystore (keystore, keystorePassword, signerPassword, cb) {
+  addKeystore (keystore, keystorePassword, password, cb) {
     let wallet
 
     // Try to generate wallet from keystore
@@ -88,7 +89,7 @@ class RingSigner extends HotSigner {
     } catch (e) { return cb(e) }
 
     // Add private key
-    this.addPrivateKey(wallet._privKey.toString('hex'), signerPassword, cb)
+    this.addPrivateKey(wallet._privKey.toString('hex'), password, cb)
   }
 }
 
