@@ -20,6 +20,24 @@ describe('Ring signer', () => {
   beforeAll(clean)
   afterAll(clean)
 
+  test('Create from invalid private key', (done) => {
+    const privateKey = 'invalid key'
+    hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
+      expect(err).not.toBe(null)
+      expect(store(`main.signers`)).toEqual({})
+      done()
+    })
+  })
+
+  test('Create from invalid keystore key', (done) => {
+    const keystore = { invalid: 'keystore' }
+    hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err, result) => {
+      expect(err).not.toBe(null)
+      expect(store(`main.signers`)).toEqual({})
+      done()
+    })
+  })
+
   test('Create from private key', (done) => {
     const privateKey = crypto.randomBytes(32).toString('hex')
     hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
@@ -123,12 +141,13 @@ describe('Ring signer', () => {
       gasPrice: '0x09184e72a000',
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x00'
+      value: '0x0'
     }
 
     signer.signTransaction(0, rawTx, (err, result) => {
       expect(err).toBe(null)
       expect(result.length).not.toBe(0)
+      expect(result.slice(0, 2)).toBe('0x')
       done()
     })
   })

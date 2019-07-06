@@ -10,7 +10,7 @@ class SeedSigner extends HotSigner {
     super(signer, WORKER_PATH)
     this.encryptedSeed = (signer && signer.encryptedSeed)
     this.type = 'seed'
-    this.update()
+    if (this.encryptedSeed) this.update()
   }
 
   addSeed (seed, password, cb) {
@@ -27,6 +27,7 @@ class SeedSigner extends HotSigner {
       // Update signer
       this.encryptedSeed = encryptedSeed
       this.addresses = addresses
+      this.update()
 
       cb(null)
     })
@@ -48,7 +49,6 @@ class SeedSigner extends HotSigner {
   unlock (password, cb) {
     super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb)
   }
-
 }
 
 module.exports = SeedSigner

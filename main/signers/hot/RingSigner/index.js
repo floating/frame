@@ -1,6 +1,7 @@
 const path = require('path')
 const log = require('electron-log')
 const { fromPrivateKey, fromV1, fromV3 } = require('ethereumjs-wallet')
+const { isValidPrivate } = require('ethereumjs-util')
 
 const HotSigner = require('../HotSigner')
 
@@ -9,9 +10,9 @@ const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 class RingSigner extends HotSigner {
   constructor (signer) {
     super(signer, WORKER_PATH)
-    this.encryptedKeys = (signer && signer.encryptedKeys)
     this.type = 'ring'
-    this.update()
+    this.encryptedKeys = (signer && signer.encryptedKeys)
+    if (this.encryptedKeys) this.update()
   }
 
   save () {
@@ -23,8 +24,11 @@ class RingSigner extends HotSigner {
   }
 
   addPrivateKey (key, password, cb) {
+    // Validate private key
+    if (!isValidPrivate(this._keyToBuffer(key))) return cb(new Error('Invalid private key'))
+
     // Get address
-    const wallet = fromPrivateKey(Buffer.from(key, 'hex'))
+    const wallet = fromPrivateKey(this._keyToBuffer(key))
     const address = '0x' + wallet.getAddress().toString('hex')
 
     // Ensure private key hasn't already been added
@@ -85,11 +89,15 @@ class RingSigner extends HotSigner {
     try {
       if (keystore.version === 1) wallet = fromV1(keystore, keystorePassword)
       else if (keystore.version === 3) wallet = fromV3(keystore, keystorePassword)
-      else cb(new Error('Invalid keystore version'))
+      else return cb(new Error('Invalid keystore version'))
     } catch (e) { return cb(e) }
 
     // Add private key
     this.addPrivateKey(wallet._privKey.toString('hex'), password, cb)
+  }
+
+  _keyToBuffer (key) {
+    return Buffer.from(key, 'hex')
   }
 }
 

@@ -21,7 +21,6 @@ class Signers extends EventEmitter {
       signer.close()
       // If hot signer -> erase from disk
       if (signer.delete) signer.delete()
-      this.signers[index].delete()
       this.signers.splice(index, 1)
     }
   }

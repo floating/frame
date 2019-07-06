@@ -14,6 +14,15 @@ describe('Seed signer', () => {
   beforeAll(clean)
   afterAll(clean)
 
+  test('Create from invalid phrase', (done) => {
+    const mnemonic = 'invalid mnemonic'
+    hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
+      expect(err).not.toBe(null)
+      expect(store(`main.signers`)).toEqual({})
+      done()
+    })
+  })
+
   test('Create from phrase', (done) => {
     const mnemonic = bip39.generateMnemonic()
     hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
@@ -63,12 +72,13 @@ describe('Seed signer', () => {
       gasPrice: '0x09184e72a000',
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x00'
+      value: '0x0'
     }
 
     signer.signTransaction(0, rawTx, (err, result) => {
       expect(err).toBe(null)
       expect(result.length).not.toBe(0)
+      expect(result.slice(0, 2)).toBe('0x')
       done()
     })
   })
