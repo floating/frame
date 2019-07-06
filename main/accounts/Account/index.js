@@ -1,4 +1,5 @@
 const log = require('electron-log')
+const { addHexPrefix, isValidAddress } = require('ethereumjs-util')
 
 const signers = require('../../signers')
 const windows = require('../../windows')
@@ -128,23 +129,43 @@ class Account {
       cb(new Error(`No signer forund for this account`))
     }
   }
-  validateTransaction (rawTx) {
-    rawTx.data = rawTx.data || '0x'
-    return rawTx
-  }
   signTransaction (rawTx, cb) {
-    rawTx = this.validateTransaction(rawTx)
-    if (this.signer) {
-      signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
-    } else if (this.smart) {
-      if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-        signers.get(this.smart.actor.account.id).signTransaction(this.index, rawTx, cb)
+    this._validateTransaction(rawTx, (err) => {
+      if (err) return cb(err)
+
+      if (this.signer) {
+        signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
+      } else if (this.smart) {
+        if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
+          signers.get(this.smart.actor.account.id).signTransaction(this.index, rawTx, cb)
+        } else {
+          cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
+        }
       } else {
-        cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
+        cb(new Error(`No signer forund for this account`))
       }
-    } else {
-      cb(new Error(`No signer forund for this account`))
+    })
+  }
+  _validateTransaction (rawTx, cb) {
+    // Validate 'from' address
+    if (!rawTx.from) return new Error(`Missing 'from' address`)
+    if (!isValidAddress(rawTx.from)) return cb(new Error(`Invalid 'from' address`))
+
+    // Ensure that transaction params are valid hex strings
+    let keys = Object.keys(rawTx)
+    for (let i = 0; i < keys.length; i++) {
+      let key = keys[i]
+      if (!this._isValidHexString(rawTx[key])) {
+        // Break on first error
+        cb(new Error(`Transaction parameter '${key}' is not a invalid hex string`))
+        break
+      }
     }
+    return cb(null)
+  }
+  _isValidHexString (string) {
+    const pattern = /^0x[0-9a-fA-F]*$/
+    return pattern.test(string)
   }
 }
 
