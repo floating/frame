@@ -244,15 +244,6 @@ class Accounts extends EventEmitter {
     if (!this.current()) return cb(new Error('No Account Selected'))
     this.current().setIndex(index, cb)
   }
-  trezorPin (id, pin, cb) {
-    if (!this.accounts[id]) return cb(new Error('No Account Selected'))
-    if (this.accounts[id].setPin) {
-      this.accounts[id].setPin(pin)
-      cb(null, { status: 'ok' })
-    } else {
-      cb(new Error('Set pin not avaliable...'))
-    }
-  }
   addRequest (req) {
     log.info('addRequest', req)
     if (!this.current() || this.current().requests[req.handlerId]) return // If no current signer or the request already exists

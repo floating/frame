@@ -75,6 +75,7 @@ class Trezor {
     this.emit = emit
     this.devices = {}
     TrezorConnect.on('DEVICE_EVENT', e => {
+      console.log('DEVICE EVENT')
       if (e.type === 'device-connect' || e.type === 'device-changed') {
         if (!this.devices[e.payload.path]) {
           this.devices[e.payload.path] = new Device(e.payload, this.emit)
@@ -95,7 +96,7 @@ class Trezor {
       }
     })
     const manifest = { email: 'j@j.com', appUrl: 'electron-app-boilerplate' }
-    const connectSrc = 'https://sisyfos.trezor.io/connect-electron/'
+    const connectSrc = 'http://127.0.0.1:3333/trezor-connect/' // 'https://sisyfos.trezor.io/connect-electron/'
     const config = { connectSrc, manifest, popup: false, webusb: false, debug: false, lazyLoad: false }
     try {
       TrezorConnect.init(config).then(() => {

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TrezorConnect | Trezor</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Trezor info@trezor.io" />
+    <meta name="robots" content="index, follow" />
+    <meta name="title" content="TrezorConnect | Trezor" />
+    <meta http-equiv="Cache-control" content="no-cache" />
+    <meta http-equiv="pragma" content="no-cache" />
+</head>
+<body>
+
+    <script type="text/javascript">
+        window.parent.postMessage({
+            event: 'UI_EVENT',
+            type: 'iframe-bootstrap',
+        }, '*');
+
+        const iframeScript = document.createElement('script');
+        iframeScript.setAttribute('type', 'text/javascript');
+        iframeScript.setAttribute('src', './js/iframe.4da4e38936bbabc923c4.js');
+        iframeScript.setAttribute('async', 'false');
+        document.body.appendChild(iframeScript);
+    </script>
+</body>
+</html>

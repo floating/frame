@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <title>TrezorConnect | Trezor</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Trezor info@trezor.io" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="title" content="Trezor Connect" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+    <link href="./css/popup.4da4e38936bbabc923c4.css" rel="stylesheet">
+</head>
+<body>
+    <main>
+        <aside>
+            <div class="notification"></div>
+            <div class="wrapper">
+                <div class="header">
+                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 163.7 41.9" width="94.5px" height="24px" preserveAspectRatio="xMinYMin meet">
+                        <polygon points="101.1,12.8 118.2,12.8 118.2,17.3 108.9,29.9 118.2,29.9 118.2,35.2 101.1,35.2 101.1,30.7 110.4,18.1 101.1,18.1"/>
+                        <path d="M158.8,26.9c2.1-0.8,4.3-2.9,4.3-6.6c0-4.5-3.1-7.4-7.7-7.4h-10.5v22.3h5.8v-7.5h2.2l4.1,7.5h6.7L158.8,26.9z M154.7,22.5 h-4V18h4c1.5,0,2.5,0.9,2.5,2.2C157.2,21.6,156.2,22.5,154.7,22.5z"/>
+                        <path d="M130.8,12.5c-6.8,0-11.6,4.9-11.6,11.5s4.9,11.5,11.6,11.5s11.7-4.9,11.7-11.5S137.6,12.5,130.8,12.5z M130.8,30.3 c-3.4,0-5.7-2.6-5.7-6.3c0-3.8,2.3-6.3,5.7-6.3c3.4,0,5.8,2.6,5.8,6.3C136.6,27.7,134.2,30.3,130.8,30.3z"/>
+                        <polygon points="82.1,12.8 98.3,12.8 98.3,18 87.9,18 87.9,21.3 98,21.3 98,26.4 87.9,26.4 87.9,30 98.3,30 98.3,35.2 82.1,35.2 "/>
+                        <path d="M24.6,9.7C24.6,4.4,20,0,14.4,0S4.2,4.4,4.2,9.7v3.1H0v22.3h0l14.4,6.7l14.4-6.7h0V12.9h-4.2V9.7z M9.4,9.7 c0-2.5,2.2-4.5,5-4.5s5,2,5,4.5v3.1H9.4V9.7z M23,31.5l-8.6,4l-8.6-4V18.1H23V31.5z"/>
+                        <path d="M79.4,20.3c0-4.5-3.1-7.4-7.7-7.4H61.2v22.3H67v-7.5h2.2l4.1,7.5H80l-4.9-8.3C77.2,26.1,79.4,24,79.4,20.3z M71,22.5h-4V18 h4c1.5,0,2.5,0.9,2.5,2.2C73.5,21.6,72.5,22.5,71,22.5z"/>
+                        <polygon points="40.5,12.8 58.6,12.8 58.6,18.1 52.4,18.1 52.4,35.2 46.6,35.2 46.6,18.1 40.5,18.1 "/>
+                    </svg>
+                    <div class="service-info mobile">
+                        <!-- <img src="" alt="Service logo"/> -->
+                    </div>
+                </div>
+                <div class="info-panel">
+                    <div class="service-info desktop">
+                        <!-- <img src="" alt="Service logo"/> -->
+                    </div>
+                    <h2 class="operation"></h2>
+                    <p class="origin"></p>
+                </div>
+            </div>
+        </aside>
+        <section id="container">
+            <div class="loader">
+                <p>Loading...</p>
+                <svg class="circular" viewBox="25 25 50 50" preserveAspectRatio="xMidYMid">
+                    <circle class="route" cx="50" cy="50" r="20" fill="none" stroke="" stroke-width="1" stroke-miterlimit="10" />
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10" />
+                </svg>
+            </div>
+        </section>
+        <button style="position: absolute; z-index: 1000; top: 0; right: 0" onclick="window.closeWindow();">X</button>
+    </main>
+
+    <!-- Views -->
+    <div id="views" style="display: none;">
+
+        <div class="unknown">
+            <h3>Unknown view</h3>
+            <p>view_name</p>
+        </div>
+
+        <!-- Loader -->
+        <div class="loader">
+            <p>Loading...</p>
+            <svg class="circular" viewBox="25 25 50 50" preserveAspectRatio="xMidYMid">
+                <circle class="route" cx="50" cy="50" r="20" fill="none" stroke="" stroke-width="1" stroke-miterlimit="10" />
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10" />
+            </svg>
+        </div>
+        <!-- Loader: END -->
+
+        <!-- Connect -->
+        <div class="connect">
+            <svg width="12px" height="35px" viewBox="0 0 20 57">
+                <g stroke="none" stroke-width="1" fill="none" transform="translate(1, 1)">
+                    <rect class="connect-usb-pin" fill="#01B757" x="6" y="39" width="6" height="5"></rect>
+                    <rect class="connect-usb-cable" stroke="#01B757" stroke-width="1" x="8.5" y="44.5" width="1" height="11"></rect>
+                    <path stroke="#01B757" d="M8.90856859,33.9811778 L6.43814432,33.9811778 C5.45301486,34.0503113 4.69477081,33.6889084 4.1634122,32.8969691 C3.36637428,31.7090602 -0.000402169348,26.3761977 0.0748097911,23.2982514 C0.124878873,21.2492429 0.0999525141,14.5598149 3.07156595e-05,3.22996744 C-0.000274213164,3.1963928 0.00243636275,3.162859 0.00812115776,3.12976773 C0.28477346,1.51937083 1.22672004,0.617538852 2.8339609,0.424271782 C4.45813658,0.228968338 6.54411954,0.0875444105 9.09190977,0 L9.09190977,0.0169167084 C11.5566027,0.104886477 13.5814718,0.244169993 15.1665175,0.434768145 C16.7530267,0.625542287 17.6912941,1.50671985 17.9813196,3.07830083 C17.9943481,3.14889902 18.0005888,3.22058224 17.9999563,3.29236974 L17.9999901,3.29237004 C17.9004498,14.5907444 17.875676,21.2628703 17.9256686,23.3087478 C18.0008805,26.3866941 14.6341041,31.7195566 13.8370662,32.9074655 C13.3057075,33.6994047 12.5474635,34.0608076 11.562334,33.9916742 L8.90856859,33.9916742 L8.90856859,33.9811778 Z"></path>
+                    <rect fill="#01B757" x="2" y="7" width="14" height="7" rx="0.5625"></rect>
+                </g>
+            </svg>
+            <p>Connect Trezor to continue</p>
+            <div class="webusb">
+                <div class="divider">
+                    <span>And</span>
+                </div>
+                <button class="check-devices">
+                    <span class="plus"></span>
+                    <span class="text">Check for devices</span>
+                </button>
+            </div>
+        </div>
+        <!-- Connect: END -->
+
+        <!-- Device selection -->
+        <div class="select-device">
+            <h3>Choose from devices</h3>
+
+            <div class="wrapper">
+                <div class="select-device-list">
+                    <!-- <button class="list device-explain">
+                        <div class="wrapper">
+                            <span class="icon"></span>
+                            <span class="device-name">#DEVICE NAME</span>
+                        </div>
+                        <div class="explain">
+                            Please install <a href="wallet.trezor.io">Bridge</a> to use Trezor
+                        </div>
+                    </button> -->
+                </div>
+
+                <div class="remember-check-device">
+                    <label class="custom-checkbox">
+                    <input class="remember-device" type="checkbox"/>
+                    <span class="indicator"></span>Remember device</label>
+                    <div class="webusb">
+                        <button class="check-devices">
+                            <span class="plus"></span>
+                            <span class="text">Check for devices</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Device selection: END -->
+
+        <!-- Pin -->
+        <div class="pin">
+            <div class="wrapper">
+                <h3>Enter PIN for <span class="device-name"></span></h3>
+                <p>The PIN layout is displayed on your Trezor.</p>
+
+                <div class="pin-input-row">
+                    <input class="pin-input" type="password" autocomplete="off" max-length="9" disabled/>
+                    <button type="button" class="pin-backspace transparent"></button>
+                </div>
+
+                <div class="pin-row">
+                    <button type="button" data-value="7">&#8226;</button><button type="button" data-value="8">&#8226;</button><button type="button" data-value="9">&#8226;</button>
+                </div>
+                <div class="pin-row">
+                    <button type="button" data-value="4">&#8226;</button><button type="button" data-value="5">&#8226;</button><button type="button" data-value="6">&#8226;</button>
+                </div>
+                <div class="pin-row">
+                    <button type="button" data-value="1">&#8226;</button><button type="button" data-value="2">&#8226;</button><button type="button" data-value="3">&#8226;</button>
+                </div>
+            </div>
+
+            <button class="confirm submit" type="button" disabled>Confirm</button>
+        </div>
+        <!-- Pin: END -->
+
+        <!-- Pin invalid -->
+        <div class="invalid-pin">
+            <h3>Incorrect PIN</h3>
+            <div class="loader">
+                <p>Retrying...</p>
+                <svg class="circular" viewBox="25 25 50 50" preserveAspectRatio="xMidYMid">
+                    <circle class="route" cx="50" cy="50" r="20" fill="none" stroke="" stroke-width="1" stroke-miterlimit="10" />
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10" />
+                </svg>
+            </div>
+        </div>
+        <!-- Pin invalid: END -->
+
+        <!-- Passphrase -->
+        <div class="passphrase">
+            <div class="inputs">
+                <div class="title">
+                    <h3>Enter<span class="device-name"></span> passphrase</h3>
+                    <p>Note: Passphrase is case-sensitive.</p>
+                </div>
+                <div class="row">
+                    <label>Passphrase</label>
+                    <div>
+                        <input class="pass" type="password" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true"
+                        tabindex="1" maxlength="50"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <label>Confirm passphrase</label>
+                    <div>
+                        <input class="pass-check" type="password" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true"
+                            tabindex="2" maxlength="50"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="custom-checkbox">
+                    <input class="show-passphrase" type="checkbox" tabindex="3" />
+                    <span class="indicator"></span>Show passphrase</label>
+                </div>
+            </div>
+            <div>
+                <button class="confirm submit" tabindex="4">Enter</button>
+                <div class="error-container">
+                    <p class="error">Passphrases do not match!</p>
+                </div>
+                <p>Leave passphrase blank to access your default wallet</p>
+            </div>
+        </div>
+        <!-- Passphrase: END -->
+
+        <!-- invalid passphrase -->
+        <div class="invalid-passphrase">
+            <div>
+                <h3>Passphrase doesn't match</h3>
+                <p>Looks like You have set a different passphrase</p>
+            </div>
+
+            <div>
+                <svg width="176px" height="125px" viewBox="0 0 176 125" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <title>Man</title>
+                    <defs>
+                        <linearGradient x1="28.5130671%" y1="41.7585686%" x2="113.067177%" y2="72.5739019%" id="linearGradient-1">
+                            <stop stop-color="#10D40A" stop-opacity="0" offset="0%"></stop>
+                            <stop stop-color="#0AD44C" stop-opacity="0.597061821" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M22.1783062,0.143577212 C7.48593939,8.62442793 0.139755967,20.9009801 0.139755967,36.9732338 C0.139755967,53.0454874 3.28603422,69.619039 9.57859073,86.6938883 L29.0980092,71.0741019 C34.2618128,50.1003522 36.8437146,36.057185 36.8437146,28.9446002 C36.8437146,21.8320154 31.9552452,12.2316744 22.1783062,0.143577212 Z"
+                            id="path-2"></path>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-450.000000, -3429.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-7">
+                                        <g id="Group-2" transform="translate(395.000000, 215.000000)">
+                                            <g id="Group-Copy-2" transform="translate(0.000000, 3.800984)">
+                                                <path d="M8.70774923,51.4695158 C21.94204,86.5168608 26.3855154,89.1010941 31.4040197,88.5847134 C36.422524,88.0683326 50.8406488,83.5485745 74.658394,75.0254389 L78.3157638,71.6813882 L79.2306484,69.4838485 C79.6411999,68.4977099 79.3895379,67.3600274 78.6013632,66.639054 L78.2594824,66.3263225 C77.3261247,65.4725445 75.8922004,65.4833218 74.9717812,66.3510328 L69.3176393,71.6813882 L40.1823116,78.2870802 C36.934235,79.0234987 33.670332,77.1201444 32.7117061,73.9305755 L23.7461588,44.100138 L8.70774923,51.4695158 Z"
+                                                    id="Path-5" fill="#DFDFDF" transform="translate(44.066587, 66.369100) rotate(14.000000) translate(-44.066587, -66.369100) "></path>
+                                                <g id="Group-5" transform="translate(66.792244, 67.222713)">
+                                                    <path d="M6.64660515,11.9644624 C2.848044,16.9002849 0.948763427,22.3905958 0.948763427,28.4353949" id="Path" stroke="#000000"
+                                                        stroke-width="0.63375"></path>
+                                                    <g id="Page-1" transform="translate(8.659662, 8.673503) rotate(29.000000) translate(-8.659662, -8.673503) translate(2.961820, 2.021781)">
+                                                        <path d="M5.13498546,1.76166665 L2.36314591,7.11193256 L1.99155812,10.016396 L3.62168432,11.4978377 L6.39842103,10.016396 L9.47416387,4.34741614 C8.75241839,3.5054367 8.15943999,2.94613344 7.69522867,2.66950638 C7.23101736,2.39287932 6.37760295,2.09026608 5.13498546,1.76166665 Z"
+                                                            id="Path-3" fill="#231F20" transform="translate(5.732861, 6.629752) rotate(-29.000000) translate(-5.732861, -6.629752) "></path>
+                                                        <g id="Group-3" transform="translate(2.532374, 1.268579)" fill="#231F20">
+                                                            <path d="M5.17851511,6.71507249 C5.17851511,7.38024477 5.00188201,8.04541704 4.66570935,8.62823466 L3.9566446,9.8635546 C3.81799712,10.1042836 3.56412662,10.256323 3.28619856,10.256323 L2.4118964,10.256323 C2.13333525,10.256323 1.87376691,10.1106186 1.73511942,9.86925607 L1.04504748,8.68524942 C0.703176978,8.09609684 0.519579856,7.42458959 0.519579856,6.74041239 L0.519579856,2.09054144 C0.519579856,1.72311294 0.779148201,1.40636424 1.13937842,1.33034455 L1.27232806,1.30500465 C1.79779568,1.20364507 2.32326331,1.1466303 2.84873094,1.1466303 C3.37419856,1.1466303 3.89966619,1.20364507 4.42576691,1.30500465 L4.55871655,1.33034455 C4.91894676,1.40636424 5.17851511,1.72311294 5.17851511,2.09054144 L5.17851511,6.71507249 Z M4.65304748,0.823546627 L4.52706187,0.79820673 C3.41218417,0.576482639 2.28591079,0.576482639 1.17103309,0.79820673 L1.03808345,0.823546627 C0.437277698,0.943911133 -0.000189928058,1.47541546 -0.000189928058,2.09054144 L-0.000189928058,6.74041239 C-0.000189928058,7.51327922 0.208730935,8.27347611 0.595551079,8.93864838 L1.29132086,10.1296235 C1.51986763,10.5223919 1.94973813,10.7694559 2.4118964,10.7694559 L3.28619856,10.7694559 C3.74772374,10.7694559 4.17822734,10.5223919 4.40614101,10.1232885 L5.12153669,8.88163362 C5.49506187,8.22279632 5.6976518,7.47526938 5.6976518,6.71507249 L5.6976518,2.09054144 C5.6976518,1.47541546 5.26081727,0.943911133 4.65304748,0.823546627 Z"
+                                                                id="Fill-1"></path>
+                                                        </g>
+                                                        <path d="M7.28057554,3.9674042 L7.28057554,5.93124615 C7.28057554,6.00093087 7.22359712,6.05794563 7.15395683,6.05794563 L3.60863309,6.05794563 C3.53899281,6.05794563 3.48201439,6.00093087 3.48201439,5.93124615 L3.48201439,3.9674042 C3.48201439,3.89771948 3.53899281,3.84070472 3.60863309,3.84070472 L7.15395683,3.84070472 C7.22359712,3.84070472 7.28057554,3.89771948 7.28057554,3.9674042"
+                                                            id="Fill-4" fill="#17D87A"></path>
+                                                    </g>
+                                                </g>
+                                                <g id="Group" transform="translate(88.386237, 69.386552) rotate(-350.000000) translate(-88.386237, -69.386552) translate(61.742314, 40.380704)">
+                                                    <path d="M13.1056399,55.1817442 L41.1294816,53.1884707 L50.0977164,20.1649558 C50.281177,19.4894031 50.9775449,19.0904836 51.6530977,19.2739443 C51.6865836,19.2830381 51.719682,19.2935031 51.7523092,19.3053129 L52.3832726,19.5336978 C53.0053984,19.7588837 53.3496641,20.4247025 53.1737574,21.062516 L43.8655327,54.8128567 C43.5731997,55.8728161 42.6308902,56.6234735 41.532405,56.6714603 L14.3718269,57.8579563 L13.1056399,55.1817442 Z"
+                                                        id="Path-10" fill="#000000"></path>
+                                                    <polygon id="Path-14" fill-opacity="0.400000006" fill="url(#linearGradient-1)" points="50.4923801 19.9058464 42.0301758 52.3453642 0.1116829 57.1199145 17.2954546 0.201820009"></polygon>
+                                                </g>
+                                                <g id="Path-11" transform="translate(0.000000, 23.926525)">
+                                                    <mask id="mask-3" fill="white">
+                                                        <use xlink:href="#path-2"></use>
+                                                    </mask>
+                                                    <use id="Mask" fill="#000000" xlink:href="#path-2"></use>
+                                                </g>
+                                                <g id="Group-4" transform="translate(154.474820, 88.689637)">
+                                                    <path d="M0.00574724086,17.3299975 L9.04673754,17.3299975 C10.0158486,18.2741463 10.459983,19.2222126 10.3791408,20.1741966 C10.2982986,21.1261805 10.0243155,21.8150593 9.55719145,22.240833 L0.00574724086,22.240833 L0.00574724086,17.3299975 Z"
+                                                        id="Path-8" fill="#DFDFDF"></path>
+                                                    <path d="M7.57063371,16.7975611 L8.18463445,11.6320512 C10.9552017,4.37868028 12.7928817,0.670540365 13.6976744,0.507631457 C13.6976744,0.507631457 13.6976744,9.25048956 13.6976744,26.7362058 L7.57063371,22.9984315 L7.57063371,16.7975611 Z"
+                                                        id="Path-9" fill="#000000"></path>
+                                                </g>
+                                                <path d="M22.6894516,24.0882141 L25.3134496,17.1584865 L34.3377378,0.00607653863 L49.5924407,8.83643203 C48.1205738,12.1693448 47.3846403,13.8358012 47.3846403,13.8358012 C47.3846403,13.8358012 47.610066,15.3996869 48.0609173,18.5274582 L44.9421905,17.5087135 L42.326569,23.1446523 C41.7194433,26.4336556 40.4013924,27.6015792 38.3724165,26.6484231 C36.3434406,25.6952669 34.9985477,24.8418639 34.3377378,24.0882141 L32.877652,40.0685859 L22.6894516,24.0882141 Z"
+                                                    id="Path-2" fill="#DFDFDF"></path>
+                                                <polygon id="Path-7" fill="#000000" points="24.0981993 94.4135486 66.3077999 94.8146924 155.917441 103.947374 155.573512 113.777236 69.893811 118.737282 47.9810207 112.979679 19.7062153 101.412265"></polygon>
+                                                <path d="M162.07769,114.2551 L171.11868,114.2551 C172.087791,115.199249 172.531925,116.147316 172.451083,117.0993 C172.370241,118.051283 172.096258,118.740162 171.629134,119.165936 L162.07769,119.165936 L162.07769,114.2551 Z"
+                                                    id="Path-8" fill="#DFDFDF"></path>
+                                                <path d="M11.2917923,34.4242047 L20.0616815,57.0038295 L2.37956842,65.7761306 C-0.436910629,58.3265042 0.144620994,50.9569755 4.12416329,43.6675446 C8.10370558,36.3781138 10.4929153,33.2970005 11.2917923,34.4242047 Z"
+                                                    id="Path-4" fill="#2B2B2B"></path>
+                                                <path d="M3.59809657,65.3416932 C15.3007955,94.24224 19.7442709,96.8264733 24.7627752,96.3100926 C29.7812795,95.7937118 45.2204655,95.3718191 71.0803332,95.0444146 L74.737703,91.7003638 L79.9106348,96.1713282 C82.3120205,96.8736837 83.5127134,96.4980458 83.5127134,95.0444146 C83.5127134,93.5907833 81.1109396,91.3693754 76.3073921,88.3801909 C75.3521148,87.5986311 74.1267833,87.245318 72.6313979,87.3202514 C71.1360124,87.3951848 68.8387393,88.8552223 65.7395784,91.7003638 L31.8713016,87.7930762 C29.3797273,87.5056303 27.2920746,85.7758418 26.5465635,83.3811015 L18.6365061,57.9723154 L3.59809657,65.3416932 Z"
+                                                    id="Path-5" fill="#DFDFDF"></path>
+                                                <polygon id="Path-6" fill="#2B2B2B" points="9.99535878 110.148126 25.8406633 120.933884 162.497321 120.933884 162.497321 112.526001 23.903142 98.2971878"></polygon>
+                                                <path d="M169.642576,113.722664 L170.256577,108.557154 C173.027144,101.303783 174.864824,97.5956433 175.769617,97.4327344 C175.769617,97.4327344 175.769617,106.175593 175.769617,123.661309 L169.642576,119.923534 L169.642576,113.722664 Z"
+                                                    id="Path-9" fill="#000000"></path>
+                                            </g>
+                                            <path d="M35.2854234,6.8694459 C34.6664041,5.89851658 33.4668569,5.41305192 31.6867819,5.41305192 C29.9067068,5.41305192 28.7892279,6.79872411 28.3343452,9.57006848 C28.0648175,13.1670282 27.7736329,15.3791075 27.4607914,16.2063062 C26.9915292,17.4471042 25.3563438,21.1320264 28.3343452,21.573246 C30.3196794,21.8673923 31.3123465,20.8886344 31.3123465,18.636972 C31.062566,17.3263155 30.9376757,16.1455958 30.9376757,15.0948129 C30.9376757,13.5186385 31.8730137,12.4757315 33.4233678,12.4757315 C34.9737218,12.4757315 35.2854234,13.211977 35.2854234,15.0948129 C35.2854234,16.9776487 34.3303275,19.9545613 33.8768476,20.7639036 C33.4233678,21.573246 32.2851964,23.0259455 35.2854234,26.7272287 C38.2856504,30.4285119 37.7001248,31.0752997 38.5962999,32.2949868 C39.4924751,33.5146739 41.2569431,35.1634417 44.7501059,33.5146739 C48.2432687,31.865906 46.3236074,28.5871064 45.7651748,27.8315971 C45.2067422,27.0760877 43.915219,24.5340614 46.2415391,23.5772061 C48.5678593,22.6203508 47.0177683,19.3528983 45.3082754,19.2790098 C43.5987826,19.2051214 39.605582,19.2790098 39.298089,19.2790098 C38.9905959,19.2790098 38.2167341,19.6803824 38.1601807,18.636972 C38.1224784,17.9413651 38.5017811,15.3082097 39.298089,10.7375059 C39.3563083,10.2132498 39.66801,9.95112173 40.2331939,9.95112173 C41.0809698,9.95112173 46.5411409,10.7966166 47.584092,10.3738692 C48.6270431,9.95112173 49.8843713,8.6037132 49.1733759,6.2566996 C48.4623805,3.909686 45.8054198,2.67152681 44.7501059,2.56465246 C43.694792,2.4577781 41.8700879,2.5865551 40.2331939,3.66189583 C39.1419313,4.37878965 37.4926744,5.447973 35.2854234,6.8694459 Z"
+                                                id="Path-12" fill="#000000" transform="translate(37.985612, 18.371425) rotate(-345.000000) translate(-37.985612, -18.371425) "></path>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <div class="buttons">
+                <button class="confirm submit" tabindex="4">Yes, use this passphrase</button>
+                <button class="cancel">No, Try again</button>
+            </div>
+        </div>
+        <!-- invalid passphrase: END -->
+
+        <!-- Permissions -->
+        <div class="permissions">
+            <h3>Allow<span class="host-name"></span>permissions to:</h3>
+
+            <div class="list-wrapper">
+                <div class="permissions-list">
+                    <!-- <div class="permission-item">
+                        <div class="tooltip">
+                            <span tooltip="This is a tooltip 2" tooltip-position="bottom"></span>
+                        </div>
+                        <div class="content">
+                            <span class="info-icon"></span>
+                            <span>Permission 1</span>
+                        </div>
+                    </div> -->
+                </div>
+                <label class="custom-checkbox">
+                <input class="remember-permissions" type="checkbox" />
+                <span class="indicator"></span>Don't ask me again</label>
+            </div>
+            <div class="buttons">
+                <button class="confirm">Allow once for this session</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+        <!-- Permissions: END -->
+
+        <!-- Export xpub confirmation -->
+        <div class="export-xpub">
+            <div>
+                <h3></h3>
+            </div>
+
+            <svg width="118px" height="171px" viewBox="0 0 118 171" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <title>Keys</title>
+                <defs>
+                    <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-1">
+                        <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+                    </filter>
+                    <path d="M34.5189273,48.3003746 L43.3762951,48.3003746 L49.549111,52.7294656 L56.2049704,48.3003746 L62.0048248,52.7294656 L67.5435866,48.3003746 L73.1447043,52.7294656 L79.0654724,48.3003746 L87.5321191,55.0194749 L82.5498944,61.5876474 L34.5189273,61.5876474 C31.6903281,71.4582698 22.7185888,78.6712837 12.0883356,78.6712837 C-0.812269398,78.6712837 -11.2702761,68.0482219 -11.2702761,54.944011 C-11.2702761,41.8398001 -0.812269398,31.2167383 12.0883356,31.2167383 C22.7185888,31.2167383 31.6903281,38.4297522 34.5189273,48.3003746 Z M3.49236651,60.6385565 C6.58851172,60.6385565 9.09843332,58.0890216 9.09843332,54.944011 C9.09843332,51.7990004 6.58851172,49.2494656 3.49236651,49.2494656 C0.39622131,49.2494656 -2.11370029,51.7990004 -2.11370029,54.944011 C-2.11370029,58.0890216 0.39622131,60.6385565 3.49236651,60.6385565 Z"
+                        id="path-2"></path>
+                    <linearGradient x1="9.06529325%" y1="91.2834041%" x2="50%" y2="-5.55111512e-15%" id="linearGradient-4">
+                        <stop stop-color="#FFFFFF" offset="0%"></stop>
+                        <stop stop-color="#DDDDDD" offset="100%"></stop>
+                    </linearGradient>
+                    <linearGradient x1="50%" y1="-2.48949813e-15%" x2="50%" y2="100%" id="linearGradient-5">
+                        <stop stop-color="#33EE93" offset="0%"></stop>
+                        <stop stop-color="#01B757" offset="100%"></stop>
+                    </linearGradient>
+                    <path d="M49.0347124,45.707013 L57.8920801,45.707013 L64.064896,50.1361039 L70.7207555,45.707013 L76.5206099,50.1361039 L82.0593717,45.707013 L87.6604894,50.1361039 L93.5812575,45.707013 L102.047904,52.4261133 L97.0656795,58.9942857 L49.0347124,58.9942857 C46.2061132,68.8649081 37.2343739,76.0779221 26.6041207,76.0779221 C13.7035157,76.0779221 3.24550898,65.4548602 3.24550898,52.3506494 C3.24550898,39.2464385 13.7035157,28.6233766 26.6041207,28.6233766 C37.2343739,28.6233766 46.2061132,35.8363906 49.0347124,45.707013 Z M18.0081516,58.0451948 C21.1042968,58.0451948 23.6142184,55.49566 23.6142184,52.3506494 C23.6142184,49.2056387 21.1042968,46.6561039 18.0081516,46.6561039 C14.9120064,46.6561039 12.4020848,49.2056387 12.4020848,52.3506494 C12.4020848,55.49566 14.9120064,58.0451948 18.0081516,58.0451948 Z"
+                        id="path-6"></path>
+                    <linearGradient x1="89.2175546%" y1="43.0313268%" x2="37.6096275%" y2="0%" id="linearGradient-8">
+                        <stop stop-color="#33EE93" offset="0%"></stop>
+                        <stop stop-color="#01B757" offset="100%"></stop>
+                    </linearGradient>
+                </defs>
+                <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="08-Connect-modals" transform="translate(-482.000000, -6928.000000)">
+                        <g id="Window-Copy-3" transform="translate(55.000000, 6756.000000)">
+                            <g id="window" transform="translate(0.500000, 0.000000)">
+                                <g id="Group" transform="translate(410.000000, 164.000000)">
+                                    <g id="Keys" transform="translate(17.000000, 166.000000)" fill="#F9F9F9">
+                                        <ellipse id="shadow" filter="url(#filter-1)" cx="58.5" cy="6.5" rx="58.5" ry="6.5"></ellipse>
+                                    </g>
+                                    <g id="Keys">
+                                        <g id="whitekey" transform="translate(0.000000, 39.025974)">
+                                            <mask id="mask-3" fill="white">
+                                                <use xlink:href="#path-2"></use>
+                                            </mask>
+                                            <use id="Mask" fill="#EDEEEE" transform="translate(38.130922, 54.944011) rotate(-252.000000) translate(-38.130922, -54.944011) "
+                                                xlink:href="#path-2"></use>
+                                            <polygon id="Path-2" fill="url(#linearGradient-4)" points="38.3144983 49.7102052 21.6394801 100.240721 22.7897036 101.964667 31.8702907 95.8547017 29.458248 88.841262 35.217709 84.9396244 32.758543 78.417434 38.9467004 74.1559083 36.8661884 66.5990917 42.8116403 62.1032008 45.6778177 53.5788982"></polygon>
+                                        </g>
+                                        <g id="green-key" transform="translate(45.706587, 17.000000)">
+                                            <mask id="mask-7" fill="white">
+                                                <use xlink:href="#path-6"></use>
+                                            </mask>
+                                            <use id="Mask" fill="url(#linearGradient-5)" transform="translate(52.646707, 52.350649) rotate(-315.000000) translate(-52.646707, -52.350649) "
+                                                xlink:href="#path-6"></use>
+                                            <polygon id="Path-3" fill="url(#linearGradient-8)" points="49.4837436 50.244698 45.5326983 54.3794157 79.3100656 88.4873935 87.3641034 87.2325765"></polygon>
+                                        </g>
+                                        <path d="M34.4039055,55.4924531 C38.1833236,60.1696699 44.2730081,62.3577614 52.672959,62.0567275 C65.2728854,61.6051766 76.3136143,50.4729145 76.3136143,36.113511 C76.3136143,21.7541076 64.6730178,10.113511 50.3136143,10.113511 C35.9542108,10.113511 16.7283189,24.0852022 26.7482069,44.7276567"
+                                            id="Oval-3" stroke="#EDEEEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            transform="translate(50.141600, 36.098772) rotate(-150.000000) translate(-50.141600, -36.098772) "></path>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+
+            <div class="buttons">
+                <button class="confirm">Export</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+        <!-- Export xpub confirmation: END -->
+
+        <!-- Account selection -->
+        <div class="select-account normal">
+            <div>
+                <div class="tabs">
+                    <div data-tab="normal" class="tab-selection normal">
+                        Accounts
+                    </div>
+                    <div data-tab="legacy" class="tab-selection legacy">
+                        Legacy accounts
+                    </div>
+                </div>
+                <h3>Select <span>#COIN</span> account</h3>
+            </div>
+            <div class="wrapper">
+                <div class="select-account-list normal">
+                    <button class="account-default list" disabled="disabled">
+                        <span class="account-title">Account #1</span>
+                        <span class="account-status">Loading...</span>
+                    </button>
+                </div>
+                <div class="select-account-list legacy">
+                    <button class="account-default list" disabled="disabled">
+                        <span class="account-title">Account #1</span>
+                        <span class="account-status">Loading...</span>
+                    </button>
+                </div>
+                <!-- <div class="enable-labeling">
+
+                    <svg width="26px" height="24px" viewBox="0 0 26 24" version="1.1">
+                        <g stroke="none">
+                            <path d="M12.7999848,13.8843933 L20.39264,9.15845812 L25.59984,13.3619678 L18.06944,18.3178032 L12.79984,13.8844834 L7.5304,18.3177226 L0,13.3618871 L5.2072,9.15918384 L12.7999848,13.8843933 Z M7.53056,0 L12.80016,4.43331978 L5.20736,9.15853876 L0.00016,4.95583546 L7.53056,0 Z M12.81544,14.8382358 L18.10024,19.258654 L20.36184,17.7701294 L20.36184,19.4384704 L12.81544,24 L5.26904,19.4384704 L5.26904,17.7701294 L7.53064,19.258654 L12.81544,14.8382358 Z M25.6,4.9559161 L18.0696,8.06351361e-05 L12.8,4.43340042 L20.3928,9.15861939 L25.6,4.9559161 Z"></path>
+                        </g>
+                    </svg>
+                    <p>Enable labeling</p>
+                </div> -->
+            </div>
+        </div>
+        <!-- Account selection: END -->
+
+        <!-- Fee selection -->
+        <div class="select-fee">
+            <div class="back-button">
+                <span class="arrow"></span>
+                <span class="text">Accounts</span>
+            </div>
+            <div class="content">
+                <h3>Select Fee</h3>
+
+                <div class="wrapper">
+                    <div class="select-fee-list">
+                        <div class="list custom-fee opener">
+                            <div class="fee-data">
+                                <span class="fee-title">Custom</span>
+                                <div class="fee-info"></div>
+                            </div>
+                            <div class="bottom">
+                                <input class="fee-input" type="number" autocomplete="off" />
+                                <p class="note">Setting a custom fee is not recommended. If you select an insufficient fee, your transaction will not be confirmed.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="send-button" disabled="disabled">Send
+                        <span>#AMOUNT</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Fee selection: END -->
+
+        <!-- Insufficient funds -->
+        <div class="insufficient-funds">
+            <h3>Not enough funds</h3>
+            <div class="loader">
+                <p>Retrying...</p>
+                <svg class="circular" viewBox="25 25 50 50" preserveAspectRatio="xMidYMid">
+                    <circle class="route" cx="50" cy="50" r="20" fill="none" stroke="" stroke-width="1" stroke-miterlimit="10" />
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10" />
+                </svg>
+            </div>
+        </div>
+        <!-- Insufficient funds -->
+
+        <!-- Amount too low -->
+        <div class="amount-too-low">
+            <h3>Amount too low</h3>
+            <div class="loader">
+                <p>Retrying...</p>
+                <svg class="circular" viewBox="25 25 50 50" preserveAspectRatio="xMidYMid">
+                    <circle class="route" cx="50" cy="50" r="20" fill="none" stroke="" stroke-width="1" stroke-miterlimit="10" />
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10" />
+                </svg>
+            </div>
+        </div>
+        <!-- Amount too low: END -->
+
+        <!-- TODO: No designed view for this -->
+        <!-- Simple message -->
+        <div class="simple-message">
+            <h3>Header</h3>
+            <div class="message">Message</div>
+        </div>
+        <!-- Simple message: END -->
+
+        <!-- Device in bootloader mode -->
+        <div class="bootloader">
+            <h3>Device in bootloader mode</h3>
+            <div class="wrapper">
+                <svg width="15px" height="35px" viewBox="0 0 20 57">
+                    <g stroke="none" stroke-width="1" fill="none" transform="translate(1, 1)">
+                        <rect class="connect-usb-pin" fill="#01B757" x="6" y="39" width="6" height="5"></rect>
+                        <rect class="connect-usb-cable" stroke="#01B757" stroke-width="1" x="8.5" y="44.5" width="1" height="11"></rect>
+                        <path stroke="#01B757" d="M8.90856859,33.9811778 L6.43814432,33.9811778 C5.45301486,34.0503113 4.69477081,33.6889084 4.1634122,32.8969691 C3.36637428,31.7090602 -0.000402169348,26.3761977 0.0748097911,23.2982514 C0.124878873,21.2492429 0.0999525141,14.5598149 3.07156595e-05,3.22996744 C-0.000274213164,3.1963928 0.00243636275,3.162859 0.00812115776,3.12976773 C0.28477346,1.51937083 1.22672004,0.617538852 2.8339609,0.424271782 C4.45813658,0.228968338 6.54411954,0.0875444105 9.09190977,0 L9.09190977,0.0169167084 C11.5566027,0.104886477 13.5814718,0.244169993 15.1665175,0.434768145 C16.7530267,0.625542287 17.6912941,1.50671985 17.9813196,3.07830083 C17.9943481,3.14889902 18.0005888,3.22058224 17.9999563,3.29236974 L17.9999901,3.29237004 C17.9004498,14.5907444 17.875676,21.2628703 17.9256686,23.3087478 C18.0008805,26.3866941 14.6341041,31.7195566 13.8370662,32.9074655 C13.3057075,33.6994047 12.5474635,34.0608076 11.562334,33.9916742 L8.90856859,33.9916742 L8.90856859,33.9811778 Z"></path>
+                        <rect fill="#01B757" x="2" y="7" width="14" height="7" rx="0.5625"></rect>
+                    </g>
+                </svg>
+                <p>Please reconnect device</p>
+            </div>
+        </div>
+        <!-- Device in bootloader mode: END -->
+
+        <!-- Follow instructions on device -->
+        <div class="follow-device">
+            <svg width="12px" height="35px" viewBox="0 0 20 57">
+                <g stroke="none" stroke-width="1" fill="none" transform="translate(1, 1)">
+                    <path stroke="#01B757" d="M8.90856859,33.9811778 L6.43814432,33.9811778 C5.45301486,34.0503113 4.69477081,33.6889084 4.1634122,32.8969691 C3.36637428,31.7090602 -0.000402169348,26.3761977 0.0748097911,23.2982514 C0.124878873,21.2492429 0.0999525141,14.5598149 3.07156595e-05,3.22996744 C-0.000274213164,3.1963928 0.00243636275,3.162859 0.00812115776,3.12976773 C0.28477346,1.51937083 1.22672004,0.617538852 2.8339609,0.424271782 C4.45813658,0.228968338 6.54411954,0.0875444105 9.09190977,0 L9.09190977,0.0169167084 C11.5566027,0.104886477 13.5814718,0.244169993 15.1665175,0.434768145 C16.7530267,0.625542287 17.6912941,1.50671985 17.9813196,3.07830083 C17.9943481,3.14889902 18.0005888,3.22058224 17.9999563,3.29236974 L17.9999901,3.29237004 C17.9004498,14.5907444 17.875676,21.2628703 17.9256686,23.3087478 C18.0008805,26.3866941 14.6341041,31.7195566 13.8370662,32.9074655 C13.3057075,33.6994047 12.5474635,34.0608076 11.562334,33.9916742 L8.90856859,33.9916742 L8.90856859,33.9811778 Z"></path>
+                    <rect fill="#01B757" x="2" y="7" width="14" height="7" rx="0.5625"></rect>
+                </g>
+            </svg>
+            <p>Follow instructions on your device</p>
+        </div>
+        <!-- Follow instructions on device: END -->
+
+        <!-- Export account info -->
+        <div class="export-account-info">
+            <div>
+                <h3>Export account info for<span>Bitcoin Account #1</span>?</h3>
+            </div>
+
+
+            <!-- SVG -->
+            <svg width="146px" height="202px" viewBox="0 0 146 202" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <title>Group 24</title>
+                <desc>Created with Sketch.</desc>
+                <defs>
+                    <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-1">
+                        <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+                    </filter>
+                    <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-2">
+                        <stop stop-color="#141313" offset="0%"></stop>
+                        <stop stop-color="#373737" offset="100%"></stop>
+                    </linearGradient>
+                    <path d="M4.5174393,1.03760942e-13 L111.736647,-1.95399252e-14 C113.945786,-2.77941758e-14 115.736647,1.790861 115.736647,4 C115.736647,4.36200917 115.687505,4.72234289 115.590565,5.07113122 L95.6340363,76.8744796 C94.7921057,79.9037356 92.0337611,82 88.8896811,82 L16.1982017,82 C12.6599271,82 9.67800419,79.3596343 9.24968056,75.8473806 L0.546855793,4.4842175 C0.279429851,2.29132478 1.84032908,0.296842431 4.0332218,0.0294164898 C4.19388385,0.00982355753 4.35558698,9.96494685e-14 4.5174393,9.9475983e-14 Z"
+                        id="path-3"></path>
+                    <linearGradient x1="100%" y1="-66.6602471%" x2="51.5557262%" y2="94.8144459%" id="linearGradient-5">
+                        <stop stop-color="#323232" offset="0%"></stop>
+                        <stop stop-color="#101010" offset="100%"></stop>
+                    </linearGradient>
+                    <path d="M34.5189273,48.3003746 L43.3762951,48.3003746 L49.549111,52.7294656 L56.2049704,48.3003746 L62.0048248,52.7294656 L67.5435866,48.3003746 L73.1447043,52.7294656 L79.0654724,48.3003746 L87.5321191,55.0194749 L82.5498944,61.5876474 L34.5189273,61.5876474 C31.6903281,71.4582698 22.7185888,78.6712837 12.0883356,78.6712837 C-0.812269398,78.6712837 -11.2702761,68.0482219 -11.2702761,54.944011 C-11.2702761,41.8398001 -0.812269398,31.2167383 12.0883356,31.2167383 C22.7185888,31.2167383 31.6903281,38.4297522 34.5189273,48.3003746 Z M3.49236651,60.6385565 C6.58851172,60.6385565 9.09843332,58.0890216 9.09843332,54.944011 C9.09843332,51.7990004 6.58851172,49.2494656 3.49236651,49.2494656 C0.39622131,49.2494656 -2.11370029,51.7990004 -2.11370029,54.944011 C-2.11370029,58.0890216 0.39622131,60.6385565 3.49236651,60.6385565 Z"
+                        id="path-6"></path>
+                    <linearGradient x1="-23.707368%" y1="73.3863768%" x2="50%" y2="0%" id="linearGradient-8">
+                        <stop stop-color="#FFFFFF" offset="0%"></stop>
+                        <stop stop-color="#DDDDDD" offset="100%"></stop>
+                    </linearGradient>
+                    <linearGradient x1="50%" y1="-2.48949813e-15%" x2="50%" y2="100%" id="linearGradient-9">
+                        <stop stop-color="#33EE93" offset="0%"></stop>
+                        <stop stop-color="#01B757" offset="100%"></stop>
+                    </linearGradient>
+                    <path d="M49.0347124,45.707013 L57.8920801,45.707013 L64.064896,50.1361039 L70.7207555,45.707013 L76.5206099,50.1361039 L82.0593717,45.707013 L87.6604894,50.1361039 L93.5812575,45.707013 L102.047904,52.4261133 L97.0656795,58.9942857 L49.0347124,58.9942857 C46.2061132,68.8649081 37.2343739,76.0779221 26.6041207,76.0779221 C13.7035157,76.0779221 3.24550898,65.4548602 3.24550898,52.3506494 C3.24550898,39.2464385 13.7035157,28.6233766 26.6041207,28.6233766 C37.2343739,28.6233766 46.2061132,35.8363906 49.0347124,45.707013 Z M18.0081516,58.0451948 C21.1042968,58.0451948 23.6142184,55.49566 23.6142184,52.3506494 C23.6142184,49.2056387 21.1042968,46.6561039 18.0081516,46.6561039 C14.9120064,46.6561039 12.4020848,49.2056387 12.4020848,52.3506494 C12.4020848,55.49566 14.9120064,58.0451948 18.0081516,58.0451948 Z"
+                        id="path-10"></path>
+                    <linearGradient x1="89.2175546%" y1="43.0313268%" x2="37.6096275%" y2="0%" id="linearGradient-12">
+                        <stop stop-color="#33EE93" offset="0%"></stop>
+                        <stop stop-color="#01B757" offset="100%"></stop>
+                    </linearGradient>
+                    <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-13">
+                        <stop stop-color="#141313" offset="0%"></stop>
+                        <stop stop-color="#5B5B5B" offset="100%"></stop>
+                    </linearGradient>
+                    <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-14">
+                        <stop stop-color="#F7F8F8" offset="0%"></stop>
+                        <stop stop-color="#EDEEEE" offset="100%"></stop>
+                    </linearGradient>
+                    <path d="M5.49315281,0 L43.387846,-1.63067577e-05 C45.0447093,-1.63067577e-05 46.3878623,1.34313674 46.3878623,3 C46.3878623,3.1736217 46.3727902,3.34691568 46.3428157,3.51793037 C44.7809386,12.4289731 44,21.3410423 44,30.2541378 C44,39.3314024 44.7846763,48.4096984 46.354029,57.4890256 L46.3540332,57.4890249 C46.6362346,59.1216719 45.5414821,60.6739632 43.9088351,60.9561646 C43.740075,60.9853346 43.5691269,61 43.3978643,61 L5.47986026,61.0000061 C4.03167667,61.0000061 2.79021562,59.965473 2.52904371,58.5410345 C0.843014571,49.3453872 4.34032133e-16,40.1477205 0,30.9480345 C0,21.4584687 0.846585361,11.966875 2.53975608,2.47325352 L2.53976924,2.47325586 C2.79499876,1.04218195 4.03949719,2.67032206e-16 5.49315281,0 Z"
+                        id="path-15"></path>
+                    <filter x="-1.1%" y="-0.8%" width="104.3%" height="103.3%" filterUnits="objectBoundingBox" id="filter-16">
+                        <feOffset dx="1" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                        <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.178781703 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                    </filter>
+                    <linearGradient x1="113.421418%" y1="3.06161713e-15%" x2="0%" y2="3.06161713e-15%" id="linearGradient-17">
+                        <stop stop-color="#141313" offset="0%"></stop>
+                        <stop stop-color="#5B5B5B" offset="100%"></stop>
+                    </linearGradient>
+                </defs>
+                <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="08-Connect-modals" transform="translate(-463.000000, -4547.000000)">
+                        <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                            <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                <g id="window-copy-12" transform="translate(0.000000, 1178.000000)">
+                                    <g id="Group-24" transform="translate(397.000000, 134.000000)">
+                                        <ellipse id="shadow" fill="#F9F9F9" filter="url(#filter-1)" cx="84" cy="214" rx="73" ry="12"></ellipse>
+                                        <g id="Folder">
+                                            <g id="Group">
+                                                <g id="Path-44" transform="translate(36.000000, 88.000000)">
+                                                    <mask id="mask-4" fill="white">
+                                                        <use xlink:href="#path-3"></use>
+                                                    </mask>
+                                                    <use id="Mask" fill="url(#linearGradient-2)" xlink:href="#path-3"></use>
+                                                    <polygon fill="url(#linearGradient-5)" mask="url(#mask-4)" points="111.254841 -2.99107388 95.1682076 78.0995856 71.7466515 76.0677185 91.6166992 -4.46304641"></polygon>
+                                                </g>
+                                                <g id="whitekey" transform="translate(63.447976, 81.793924) rotate(143.000000) translate(-63.447976, -81.793924) translate(25.447976, 26.793924)">
+                                                    <mask id="mask-7" fill="white">
+                                                        <use xlink:href="#path-6"></use>
+                                                    </mask>
+                                                    <use id="Mask" fill="#EDEEEE" transform="translate(38.130922, 54.944011) rotate(-252.000000) translate(-38.130922, -54.944011) "
+                                                        xlink:href="#path-6"></use>
+                                                    <polygon id="Path-39" fill="url(#linearGradient-8)" mask="url(#mask-7)" points="20.0914743 105.621252 38.2981464 49.4428235 64.5133726 61.6666187 37.1482204 112.749539"></polygon>
+                                                </g>
+                                                <g id="green-key" transform="translate(100.289920, 72.289920) rotate(241.000000) translate(-100.289920, -72.289920) translate(47.789920, 19.789920)">
+                                                    <mask id="mask-11" fill="white">
+                                                        <use xlink:href="#path-10"></use>
+                                                    </mask>
+                                                    <use id="Mask" fill="url(#linearGradient-9)" transform="translate(52.646707, 52.350649) rotate(-315.000000) translate(-52.646707, -52.350649) "
+                                                        xlink:href="#path-10"></use>
+                                                    <polygon id="Path-38" fill="url(#linearGradient-12)" mask="url(#mask-11)" points="88.5060631 89.2613208 48.9110322 49.7103086 24.8428523 84.4646702 63.9377132 111.668755"></polygon>
+                                                </g>
+                                                <path d="M28.5455596,92 L71.9500074,92 C74.3350216,92 76.6415041,91.1475763 78.4532884,89.5965346 L84.519354,84.4034654 C86.3311383,82.8524237 88.6376207,82 91.022635,82 L136.519711,82 C138.72885,82 140.519711,83.790861 140.519711,86 C140.519711,86.1509082 140.511171,86.3016955 140.494132,86.4516388 L131.70564,163.790368 C131.303661,167.327779 128.310581,170 124.750403,170 L40.1598576,170 C36.6380059,170 33.6645398,167.38341 33.2166859,163.89015 L24.578033,96.5086573 C24.2971093,94.3174528 25.8456979,92.313397 28.0369024,92.0324733 C28.205592,92.0108465 28.3754893,92 28.5455596,92 Z"
+                                                    id="Rectangle-10" fill="url(#linearGradient-13)"></path>
+                                                <g id="Group-2" transform="translate(81.987762, 150.333249) rotate(-11.000000) translate(-81.987762, -150.333249) translate(58.487762, 119.833249)">
+                                                    <g id="Rectangle-11">
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-16)" xlink:href="#path-15"></use>
+                                                        <use fill="url(#linearGradient-14)" fill-rule="evenodd" xlink:href="#path-15"></use>
+                                                    </g>
+                                                    <rect id="Rectangle-2" fill="url(#linearGradient-17)" x="9" y="11" width="28" height="4" rx="2"></rect>
+                                                    <rect id="Rectangle-2-Copy" fill="url(#linearGradient-17)" x="9" y="22" width="23" height="4" rx="2"></rect>
+                                                    <rect id="Rectangle-2-Copy-2" fill="url(#linearGradient-17)" x="9" y="31" width="18" height="4" rx="2"></rect>
+                                                    <rect id="Rectangle-2-Copy-3" fill="url(#linearGradient-17)" x="9" y="42" width="25" height="4" rx="2"></rect>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+
+            <div class="buttons">
+                <button class="confirm">Export</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+        <!-- Export account info: END -->
+
+        <!-- Initialization -->
+        <div class="initialize">
+            <div>
+                <h3>Trezor not initialized</h3>
+                <p>
+                    Please set up your device before using this service.
+                </p>
+            </div>
+
+            <div>
+                <svg width="147px" height="172px" viewBox="0 0 147 172" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <title>Trezor</title>
+                    <defs>
+                        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-1">
+                            <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+                        </filter>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="104.434112%" y2="84.5976591%" id="linearGradient-2">
+                            <stop stop-color="#858585" offset="0%"></stop>
+                            <stop stop-color="#7A7A7A" offset="14.6846623%"></stop>
+                            <stop stop-color="#2C2C2C" offset="18.3358096%"></stop>
+                            <stop stop-color="#2D2D2D" offset="23.8668806%"></stop>
+                            <stop stop-color="#393939" offset="28.2081478%"></stop>
+                            <stop stop-color="#252525" offset="31.1691751%"></stop>
+                            <stop stop-color="#323232" offset="61.9928462%"></stop>
+                            <stop stop-color="#404040" offset="66.7596452%"></stop>
+                            <stop stop-color="#2A2A2A" offset="72.7735474%"></stop>
+                            <stop stop-color="#232323" offset="93.1813793%"></stop>
+                            <stop stop-color="#4D4D4D" offset="97.5824737%"></stop>
+                            <stop stop-color="#202020" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M5.71681055,91.2094918 L5.71681055,91.2094918 C5.71681055,92.2902209 6.21483455,93.3106537 7.06680364,93.9755777 L13.5929267,99.0689273 C13.9433105,99.3423863 14.4490351,99.2800265 14.7224942,98.9296426 C14.8477461,98.769157 14.9075223,98.5671661 14.8897801,98.3643635 L14.8897801,98.3643635 C14.7869814,97.1893181 14.2001635,96.1099435 13.2698813,95.3847716 L7.06741752,90.5498383 C6.70310093,90.2658469 6.17754347,90.3309633 5.89355207,90.6952799 C5.77901286,90.8422158 5.71681055,91.0231872 5.71681055,91.2094918 Z"
+                            id="path-3"></path>
+                        <filter x="-5.4%" y="-4.7%" width="110.7%" height="118.7%" filterUnits="objectBoundingBox" id="filter-4">
+                            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                            <feColorMatrix values="0 0 0 0 0.371386054   0 0 0 0 0.371386054   0 0 0 0 0.371386054  0 0 0 0.5 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="-2.48949813e-15%" id="linearGradient-5">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-6">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M35.9287708,33.4633892 L69.2743462,10.5379678 C70.6248607,9.60947539 72.4051338,9.59874877 73.7667387,10.5109 L126.120308,45.5830199 C127.955671,46.8125463 128.446799,49.2971306 127.217273,51.1324943 C126.938147,51.5491564 126.583156,51.9096116 126.170806,52.1950687 L93.7071097,74.6686683 C92.3720837,75.592865 90.6108267,75.6183303 89.2496391,74.7331171 L36.0141913,40.1128189 C34.1622272,38.9084419 33.6372541,36.4307879 34.8416312,34.5788237 C35.1274199,34.139368 35.4968015,33.7603724 35.9287708,33.4633892 Z"
+                            id="path-7"></path>
+                        <filter x="-1.1%" y="-1.5%" width="102.1%" height="103.1%" filterUnits="objectBoundingBox" id="filter-8">
+                            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+                            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+                            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+                        </filter>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-1157.000000, -5191.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-13" transform="translate(693.000000, 1767.000000)">
+                                        <g id="Group-3-Copy-2" transform="translate(409.000000, 213.000000)">
+                                            <g id="Group">
+                                                <g id="Group-2" transform="translate(0.000000, 2.000000)">
+                                                    <ellipse id="shadow" fill="#F9F9F9" filter="url(#filter-1)" cx="74" cy="146" rx="73" ry="24"></ellipse>
+                                                    <path d="M2.27683401,78.6877159 L25.2385437,32.8480419 L65.5219584,3.57492614 C71.7550532,-0.954533597 80.1798121,-1.01443947 86.4766885,3.4259235 L140.845641,41.7652311 C147.164548,46.2211294 148.674815,54.9558349 144.218917,61.2747419 C143.154845,62.7837017 141.802795,64.0672729 140.240615,65.0515502 L100.48904,90.0976871 C94.5683944,93.8280874 87.9306291,96.2741409 81.0051009,97.2776271 L27.2706902,105.063565 C22.6025431,105.739965 17.8554118,104.556944 14.0505994,101.769021 L6.51953329,96.2507376 C1.01122543,92.2146019 -0.781537454,84.7933044 2.27683401,78.6877159 Z"
+                                                        id="Path-29" fill="url(#linearGradient-2)"></path>
+                                                    <g id="Path-41">
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                                                        <use fill="#050505" fill-rule="evenodd" xlink:href="#path-3"></use>
+                                                    </g>
+                                                </g>
+                                                <g id="Group-2" transform="translate(3.000000, 0.000000)">
+                                                    <path d="M0.840070749,77.9067339 L13.3222807,47.8921826 C17.0821075,38.8513544 23.4136949,31.1134281 31.5314487,25.6384902 L65.4936527,2.73302081 C69.7377354,-0.129358356 75.291772,-0.139469605 79.5462485,2.70743774 L137.598074,41.5531495 C142.096281,44.5631505 143.302711,50.6497556 140.29271,55.1479625 C139.547793,56.2611812 138.582577,57.2098768 137.456665,57.9354657 L98.4180265,83.0937432 C92.7100922,86.7721961 86.3126918,89.2494236 79.6159712,90.3743517 L24.2953562,99.6672159 C20.9379191,100.231205 17.495142,99.4125562 14.7509278,97.3976726 L4.08880802,89.5692273 C0.447058797,86.8953468 -0.894781451,82.0783358 0.840070749,77.9067339 Z"
+                                                        id="Path-29" fill="url(#linearGradient-5)"></path>
+                                                    <g id="Path-29">
+                                                        <use fill="url(#linearGradient-6)" fill-rule="evenodd" xlink:href="#path-7"></use>
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <a class="confirm button" href="https://www.trezor.io/start" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">
+                <span class="text">Initialize device</span>
+                <span class="exit"></span>
+            </a>
+        </div>
+        <!-- Initialization: END -->
+
+        <!-- Seedless -->
+        <div class="seedless">
+            <div>
+                <h3>Trezor is in seedless mode</h3>
+                <p>
+                    It is not suitable for this service.
+                </p>
+                <p>
+                    Please contact your Trezor provider or <br/><a href="https://trezor.io/support/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">Trezor Support</a> in case of further questions.
+                </p>
+            </div>
+
+            <div>
+                <svg width="147px" height="172px" viewBox="0 0 147 172" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs>
+                        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-1">
+                            <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+                        </filter>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="104.434112%" y2="84.5976591%" id="linearGradient-2">
+                            <stop stop-color="#858585" offset="0%"></stop>
+                            <stop stop-color="#7A7A7A" offset="14.6846623%"></stop>
+                            <stop stop-color="#2C2C2C" offset="18.3358096%"></stop>
+                            <stop stop-color="#2D2D2D" offset="23.8668806%"></stop>
+                            <stop stop-color="#393939" offset="28.2081478%"></stop>
+                            <stop stop-color="#252525" offset="31.1691751%"></stop>
+                            <stop stop-color="#323232" offset="61.9928462%"></stop>
+                            <stop stop-color="#404040" offset="66.7596452%"></stop>
+                            <stop stop-color="#2A2A2A" offset="72.7735474%"></stop>
+                            <stop stop-color="#232323" offset="93.1813793%"></stop>
+                            <stop stop-color="#4D4D4D" offset="97.5824737%"></stop>
+                            <stop stop-color="#202020" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M5.71681055,91.2094918 L5.71681055,91.2094918 C5.71681055,92.2902209 6.21483455,93.3106537 7.06680364,93.9755777 L13.5929267,99.0689273 C13.9433105,99.3423863 14.4490351,99.2800265 14.7224942,98.9296426 C14.8477461,98.769157 14.9075223,98.5671661 14.8897801,98.3643635 L14.8897801,98.3643635 C14.7869814,97.1893181 14.2001635,96.1099435 13.2698813,95.3847716 L7.06741752,90.5498383 C6.70310093,90.2658469 6.17754347,90.3309633 5.89355207,90.6952799 C5.77901286,90.8422158 5.71681055,91.0231872 5.71681055,91.2094918 Z"
+                            id="path-3"></path>
+                        <filter x="-5.4%" y="-4.7%" width="110.7%" height="118.7%" filterUnits="objectBoundingBox" id="filter-4">
+                            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                            <feColorMatrix values="0 0 0 0 0.371386054   0 0 0 0 0.371386054   0 0 0 0 0.371386054  0 0 0 0.5 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="-2.48949813e-15%" id="linearGradient-5">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-6">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M35.9287708,33.4633892 L69.2743462,10.5379678 C70.6248607,9.60947539 72.4051338,9.59874877 73.7667387,10.5109 L126.120308,45.5830199 C127.955671,46.8125463 128.446799,49.2971306 127.217273,51.1324943 C126.938147,51.5491564 126.583156,51.9096116 126.170806,52.1950687 L93.7071097,74.6686683 C92.3720837,75.592865 90.6108267,75.6183303 89.2496391,74.7331171 L36.0141913,40.1128189 C34.1622272,38.9084419 33.6372541,36.4307879 34.8416312,34.5788237 C35.1274199,34.139368 35.4968015,33.7603724 35.9287708,33.4633892 Z"
+                            id="path-7"></path>
+                        <filter x="-1.1%" y="-1.5%" width="102.1%" height="103.1%" filterUnits="objectBoundingBox" id="filter-8">
+                            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+                            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+                            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+                        </filter>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-1157.000000, -5191.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-13" transform="translate(693.000000, 1767.000000)">
+                                        <g id="Group-3-Copy-2" transform="translate(409.000000, 213.000000)">
+                                            <g id="Group">
+                                                <g id="Group-2" transform="translate(0.000000, 2.000000)">
+                                                    <ellipse id="shadow" fill="#F9F9F9" filter="url(#filter-1)" cx="74" cy="146" rx="73" ry="24"></ellipse>
+                                                    <path d="M2.27683401,78.6877159 L25.2385437,32.8480419 L65.5219584,3.57492614 C71.7550532,-0.954533597 80.1798121,-1.01443947 86.4766885,3.4259235 L140.845641,41.7652311 C147.164548,46.2211294 148.674815,54.9558349 144.218917,61.2747419 C143.154845,62.7837017 141.802795,64.0672729 140.240615,65.0515502 L100.48904,90.0976871 C94.5683944,93.8280874 87.9306291,96.2741409 81.0051009,97.2776271 L27.2706902,105.063565 C22.6025431,105.739965 17.8554118,104.556944 14.0505994,101.769021 L6.51953329,96.2507376 C1.01122543,92.2146019 -0.781537454,84.7933044 2.27683401,78.6877159 Z"
+                                                        id="Path-29" fill="url(#linearGradient-2)"></path>
+                                                    <g id="Path-41">
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                                                        <use fill="#050505" fill-rule="evenodd" xlink:href="#path-3"></use>
+                                                    </g>
+                                                </g>
+                                                <g id="Group-2" transform="translate(3.000000, 0.000000)">
+                                                    <path d="M0.840070749,77.9067339 L13.3222807,47.8921826 C17.0821075,38.8513544 23.4136949,31.1134281 31.5314487,25.6384902 L65.4936527,2.73302081 C69.7377354,-0.129358356 75.291772,-0.139469605 79.5462485,2.70743774 L137.598074,41.5531495 C142.096281,44.5631505 143.302711,50.6497556 140.29271,55.1479625 C139.547793,56.2611812 138.582577,57.2098768 137.456665,57.9354657 L98.4180265,83.0937432 C92.7100922,86.7721961 86.3126918,89.2494236 79.6159712,90.3743517 L24.2953562,99.6672159 C20.9379191,100.231205 17.495142,99.4125562 14.7509278,97.3976726 L4.08880802,89.5692273 C0.447058797,86.8953468 -0.894781451,82.0783358 0.840070749,77.9067339 Z"
+                                                        id="Path-29" fill="url(#linearGradient-5)"></path>
+                                                    <g id="Path-29">
+                                                        <use fill="url(#linearGradient-6)" fill-rule="evenodd" xlink:href="#path-7"></use>
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <button class="confirm submit" tabindex="4" onclick="window.closeWindow();">Close</button>
+        </div>
+        <!-- Seedless: END -->
+
+        <!-- Firmware upgrade -->
+        <div class="firmware-update">
+            <div>
+                <h3>New firmware update available</h3>
+                <p>A new firmware update is available for your Trezor device. Update now for the latest features.</p>
+            </div>
+            <div>
+                <svg width="181px" height="134px" viewBox="0 0 181 134" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <title>Chip</title>
+                    <defs>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="72.6763662%" y2="84.5976587%" id="linearGradient-1">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#E8E8E8" offset="71.3377225%"></stop>
+                            <stop stop-color="#F5F5F5" offset="75.783547%"></stop>
+                            <stop stop-color="#EDEEEE" offset="80.9337916%"></stop>
+                            <stop stop-color="#DDDDDD" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-2">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#EDEEEE" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="72.6763662%" y2="84.5976587%" id="linearGradient-3">
+                            <stop stop-color="#858585" offset="0%"></stop>
+                            <stop stop-color="#505050" offset="71.3377225%"></stop>
+                            <stop stop-color="#606060" offset="75.783547%"></stop>
+                            <stop stop-color="#2A2A2A" offset="80.9337916%"></stop>
+                            <stop stop-color="#202020" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-4">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="0%" x2="50%" y2="97.3898121%" id="linearGradient-5">
+                            <stop stop-color="#FFDA7F" offset="0%"></stop>
+                            <stop stop-color="#FF8007" offset="100%"></stop>
+                        </linearGradient>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-1141.000000, -3424.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-14" transform="translate(693.000000, 0.000000)">
+                                        <g id="CPU" transform="translate(379.000000, 209.000000)">
+                                            <g id="Group">
+                                                <g id="Group-2">
+                                                    <path d="M21.8335471,60.1448964 L93.8285497,13.6856547 C101.059567,9.01939202 110.370641,9.09079236 117.529248,13.8673994 L186.744363,60.051444 C194.462353,65.2013017 196.544236,75.6327535 191.394378,83.3507436 C190.123073,85.2560229 188.475594,86.8812158 186.553178,88.1264547 L115.743016,133.993501 C108.5983,138.621466 99.4016995,138.621466 92.2569841,133.993501 L21.8093241,88.361264 C14.021914,83.3169951 11.7981586,72.9148639 16.8424276,65.1274538 C18.1348647,63.1321721 19.8360493,61.4339058 21.8335471,60.1448964 Z"
+                                                        id="Path-29" fill="url(#linearGradient-1)"></path>
+                                                    <path d="M21.8335471,54.1448964 L93.8285497,7.68565469 C101.059567,3.01939202 110.370641,3.09079236 117.529248,7.86739936 L186.744363,54.051444 C194.462353,59.2013017 196.544236,69.6327535 191.394378,77.3507436 C190.123073,79.2560229 188.475594,80.8812158 186.553178,82.1264547 L115.743016,127.993501 C108.5983,132.621466 99.4016995,132.621466 92.2569841,127.993501 L21.8093241,82.361264 C14.021914,77.3169951 11.7981586,66.9148639 16.8424276,59.1274538 C18.1348647,57.1321721 19.8360493,55.4339058 21.8335471,54.1448964 Z"
+                                                        id="Path-29" fill="url(#linearGradient-2)"></path>
+                                                </g>
+                                                <g id="Group-2" transform="translate(31.260116, 16.800000)">
+                                                    <path d="M15.2430528,41.4528673 L65.6068201,8.88594655 C70.6741421,5.6092442 77.2046046,5.65936263 82.2210382,9.01345336 L130.640608,41.3877741 C136.039791,44.9977792 137.490207,52.3011696 133.880202,57.700353 C132.993166,59.027019 131.845386,60.1592599 130.506752,61.0281312 L80.9718465,93.1799281 C75.9649846,96.4297497 69.5147842,96.4297497 64.5079223,93.1799281 L15.2260928,61.1923964 C9.77820645,57.6563175 8.22838031,50.3733748 11.7644592,44.9254885 C12.6664405,43.5358442 13.8518606,42.3524594 15.2430528,41.4528673 Z"
+                                                        id="Path-29" fill="url(#linearGradient-3)"></path>
+                                                    <path d="M15.2430528,37.9656878 L65.6068201,5.39876706 C70.6741421,2.12206472 77.2046046,2.17218314 82.2210382,5.52627387 L130.640608,37.9005946 C136.039791,41.5105997 137.490207,48.8139901 133.880202,54.2131735 C132.993166,55.5398395 131.845386,56.6720804 130.506752,57.5409517 L80.9718465,89.6927487 C75.9649846,92.9425702 69.5147842,92.9425702 64.5079223,89.6927487 L15.2260928,57.7052169 C9.77820645,54.1691381 8.22838031,46.8861953 11.7644592,41.438309 C12.6664405,40.0486647 13.8518606,38.8652799 15.2430528,37.9656878 Z"
+                                                        id="Path-29" fill="url(#linearGradient-4)"></path>
+                                                </g>
+                                                <path d="M121.606605,64.9975648 L125.626327,67.5589431 L103.910719,82.8 L86.0383539,77.3254798 L79.3526012,62.5099845 L98.1471069,50.0491032 L102.168735,52.6116966 L105.034567,51.1344005 C109.861921,48.0738333 118.623742,46.4622394 123.729362,50.0491032 C128.834982,53.6359669 128.283618,59.272519 124.472437,62.6880754 L121.606605,64.9975648 Z M102.97286,76.2495098 L114.957457,67.2042987 L98.0545701,56.0419014 L86.6587496,64.0099213 L91.3919047,73.0510939 L102.97286,76.2495098 Z M110.020127,54.3112144 L107.154296,55.7885105 L117.139544,62.0684197 L119.486876,60.3434548 C121.761419,59.1709601 122.964194,55.7885105 119.486876,53.4790211 C116.009558,51.1695317 112.294669,53.1387197 110.020127,54.3112144 Z"
+                                                    id="Logotype" fill="url(#linearGradient-5)"></path>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <a class="button confirm" href="https://wallet.trezor.io/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">
+                <span class="text">Update firmware</span>
+                <span class="exit"></span>
+            </a>
+        </div>
+        <!-- Firmware upgrade: END -->
+
+        <!-- Firmware not supported -->
+        <div class="firmware-not-supported">
+            <div>
+                <h3>Trezor One is not supported</h3>
+                <p>Find more information about coins support.</p>
+            </div>
+            <div class="svg-icon">
+                <svg width="181px" height="134px" viewBox="0 0 181 134" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="72.6763662%" y2="84.5976587%" id="linearGradient-1">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#E8E8E8" offset="71.3377225%"></stop>
+                            <stop stop-color="#F5F5F5" offset="75.783547%"></stop>
+                            <stop stop-color="#EDEEEE" offset="80.9337916%"></stop>
+                            <stop stop-color="#DDDDDD" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-2">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#EDEEEE" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="72.6763662%" y2="84.5976587%" id="linearGradient-3">
+                            <stop stop-color="#858585" offset="0%"></stop>
+                            <stop stop-color="#505050" offset="71.3377225%"></stop>
+                            <stop stop-color="#606060" offset="75.783547%"></stop>
+                            <stop stop-color="#2A2A2A" offset="80.9337916%"></stop>
+                            <stop stop-color="#202020" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-4">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="0%" x2="50%" y2="97.3898121%" id="linearGradient-5">
+                            <stop stop-color="#FFDA7F" offset="0%"></stop>
+                            <stop stop-color="#FF8007" offset="100%"></stop>
+                        </linearGradient>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-1141.000000, -3424.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-14" transform="translate(693.000000, 0.000000)">
+                                        <g id="CPU" transform="translate(379.000000, 209.000000)">
+                                            <g id="Group">
+                                                <g id="Group-2">
+                                                    <path d="M21.8335471,60.1448964 L93.8285497,13.6856547 C101.059567,9.01939202 110.370641,9.09079236 117.529248,13.8673994 L186.744363,60.051444 C194.462353,65.2013017 196.544236,75.6327535 191.394378,83.3507436 C190.123073,85.2560229 188.475594,86.8812158 186.553178,88.1264547 L115.743016,133.993501 C108.5983,138.621466 99.4016995,138.621466 92.2569841,133.993501 L21.8093241,88.361264 C14.021914,83.3169951 11.7981586,72.9148639 16.8424276,65.1274538 C18.1348647,63.1321721 19.8360493,61.4339058 21.8335471,60.1448964 Z"
+                                                        id="Path-29" fill="url(#linearGradient-1)"></path>
+                                                    <path d="M21.8335471,54.1448964 L93.8285497,7.68565469 C101.059567,3.01939202 110.370641,3.09079236 117.529248,7.86739936 L186.744363,54.051444 C194.462353,59.2013017 196.544236,69.6327535 191.394378,77.3507436 C190.123073,79.2560229 188.475594,80.8812158 186.553178,82.1264547 L115.743016,127.993501 C108.5983,132.621466 99.4016995,132.621466 92.2569841,127.993501 L21.8093241,82.361264 C14.021914,77.3169951 11.7981586,66.9148639 16.8424276,59.1274538 C18.1348647,57.1321721 19.8360493,55.4339058 21.8335471,54.1448964 Z"
+                                                        id="Path-29" fill="url(#linearGradient-2)"></path>
+                                                </g>
+                                                <g id="Group-2" transform="translate(31.260116, 16.800000)">
+                                                    <path d="M15.2430528,41.4528673 L65.6068201,8.88594655 C70.6741421,5.6092442 77.2046046,5.65936263 82.2210382,9.01345336 L130.640608,41.3877741 C136.039791,44.9977792 137.490207,52.3011696 133.880202,57.700353 C132.993166,59.027019 131.845386,60.1592599 130.506752,61.0281312 L80.9718465,93.1799281 C75.9649846,96.4297497 69.5147842,96.4297497 64.5079223,93.1799281 L15.2260928,61.1923964 C9.77820645,57.6563175 8.22838031,50.3733748 11.7644592,44.9254885 C12.6664405,43.5358442 13.8518606,42.3524594 15.2430528,41.4528673 Z"
+                                                        id="Path-29" fill="url(#linearGradient-3)"></path>
+                                                    <path d="M15.2430528,37.9656878 L65.6068201,5.39876706 C70.6741421,2.12206472 77.2046046,2.17218314 82.2210382,5.52627387 L130.640608,37.9005946 C136.039791,41.5105997 137.490207,48.8139901 133.880202,54.2131735 C132.993166,55.5398395 131.845386,56.6720804 130.506752,57.5409517 L80.9718465,89.6927487 C75.9649846,92.9425702 69.5147842,92.9425702 64.5079223,89.6927487 L15.2260928,57.7052169 C9.77820645,54.1691381 8.22838031,46.8861953 11.7644592,41.438309 C12.6664405,40.0486647 13.8518606,38.8652799 15.2430528,37.9656878 Z"
+                                                        id="Path-29" fill="url(#linearGradient-4)"></path>
+                                                </g>
+                                                <path d="M121.606605,64.9975648 L125.626327,67.5589431 L103.910719,82.8 L86.0383539,77.3254798 L79.3526012,62.5099845 L98.1471069,50.0491032 L102.168735,52.6116966 L105.034567,51.1344005 C109.861921,48.0738333 118.623742,46.4622394 123.729362,50.0491032 C128.834982,53.6359669 128.283618,59.272519 124.472437,62.6880754 L121.606605,64.9975648 Z M102.97286,76.2495098 L114.957457,67.2042987 L98.0545701,56.0419014 L86.6587496,64.0099213 L91.3919047,73.0510939 L102.97286,76.2495098 Z M110.020127,54.3112144 L107.154296,55.7885105 L117.139544,62.0684197 L119.486876,60.3434548 C121.761419,59.1709601 122.964194,55.7885105 119.486876,53.4790211 C116.009558,51.1695317 112.294669,53.1387197 110.020127,54.3112144 Z"
+                                                    id="Logotype" fill="url(#linearGradient-5)"></path>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <a class="button confirm" href="https://trezor.io/coins/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">
+                <span class="text">Read more</span>
+                <span class="exit"></span>
+            </a>
+        </div>
+        <!-- Firmware not supported: END -->
+
+        <!-- Firmware not compatible -->
+        <div class="firmware-not-compatible">
+            <p>
+                The current version of firmware (<span class="fw-version"></span>) may be not compatible with the running version of Trezor Connect.<br/>
+                The current version of firmware contains major changes that could affect the efficient functionality of Trezor Connect.
+            </p>
+            <p>
+                If you’re experiencing any issue as a user, please contact the owner of <strong class="fw-identity"></strong>.<br/>
+                If you are a developer of <strong class="fw-identity"></strong> please, update Trezor Connect to the newest version.
+            </p>
+            <div class="buttons">
+                <button class="confirm">Proceed</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+        <!-- Firmware not compatible: END -->
+
+        <!-- Browser not supported -->
+        <div class="browser">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+
+            <div class="wrapper">
+                <a href="https://www.google.com/chrome/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">
+                    <div class="icon">
+                        <svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <title>Chrome</title>
+                            <defs>
+                                <path d="M18.0935073,41.2980057 C7.88534838,39.979161 0,31.2757197 0,20.7354476 C0,16.5738044 1.22926896,12.69851 3.345424,9.45103782 L12.1228849,24.6540461 C13.6185445,27.9396056 16.9370531,30.2245507 20.7906603,30.2245507 C22.3303089,30.2245507 23.7845408,29.8598101 25.0712277,29.2122395 L18.0935073,41.2980057 Z M19.6351374,41.4394102 L28.0406785,26.8805858 C29.452872,25.2249418 30.3050303,23.0794465 30.3050303,20.7354476 C30.3050303,17.3181925 28.4938559,14.3228365 25.7766688,12.6521375 L39.9423353,12.6521375 C40.9976526,15.1361324 41.5813207,17.8678095 41.5813207,20.7354476 C41.5813207,32.1873191 32.273025,41.4708952 20.7906603,41.4708952 C20.4029153,41.4708952 20.0176494,41.4603088 19.6351374,41.4394102 Z M4.23845803,8.18623351 C8.03623185,3.21125967 14.0374326,0 20.7906603,0 C28.8444148,0 35.8286037,4.56719338 39.2814537,11.2463444 L20.4382763,11.2463444 L20.4382763,11.2527322 C15.4628168,11.4334027 11.4621873,15.4243778 11.2825853,20.3870184 L4.23845892,8.18623355 Z M20.7906603,28.1158611 C16.703717,28.1158611 13.3905948,24.8115374 13.3905948,20.7354476 C13.3905948,16.6593577 16.703717,13.355034 20.7906603,13.355034 C24.8776037,13.355034 28.1907259,16.6593577 28.1907259,20.7354476 C28.1907259,24.8115374 24.8776037,28.1158611 20.7906603,28.1158611 Z"
+                                    id="path-1"></path>
+                                <linearGradient x1="6.37394733%" y1="78.584631%" x2="41.1451478%" y2="38.8105855%" id="linearGradient-3">
+                                    <stop stop-color="#D24E40" offset="0%"></stop>
+                                    <stop stop-color="#F16054" offset="100%"></stop>
+                                </linearGradient>
+                                <linearGradient x1="50%" y1="0%" x2="50%" y2="50%" id="linearGradient-4">
+                                    <stop stop-color="#FAB821" offset="0%"></stop>
+                                    <stop stop-color="#FFD662" offset="100%"></stop>
+                                </linearGradient>
+                                <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-5">
+                                    <stop stop-color="#33CF98" offset="0%"></stop>
+                                    <stop stop-color="#17A15F" offset="100%"></stop>
+                                </linearGradient>
+                            </defs>
+                            <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <g id="08-Connect-modals" transform="translate(-1173.000000, -7006.000000)">
+                                    <g id="window-copy-4" transform="translate(750.000000, 6756.000000)">
+                                        <g id="Group-21" transform="translate(423.000000, 250.000000)">
+                                            <g id="Group-3">
+                                                <g id="chrome">
+                                                    <g id="img">
+                                                        <mask id="mask-2" fill="white">
+                                                            <use xlink:href="#path-1"></use>
+                                                        </mask>
+                                                        <use id="Oval-1" fill="#4A8AF4" xlink:href="#path-1"></use>
+                                                        <polygon id="Path-14" fill="url(#linearGradient-3)" mask="url(#mask-2)" points="3.1322264 6.25330798 11.4573001 22.2613646 12.5495531 17.5978108 15.6046955 13.72227 20.8897684 12.3267733 26.2601842 12.0206289 45.9806156 11.7494921 25.5203153 -2.52191586 11.4277054 0.0377532315"></polygon>
+                                                        <polygon id="Path-15" fill="url(#linearGradient-4)" mask="url(#mask-2)" points="23.9118747 11.9615966 27.1032907 15.2296536 29.1563408 18.4977106 29.1563408 21.2434001 27.621543 25.4655843 18.6371256 42.3474565 23.3984401 42.6082971 33.7366455 39.1295084 41.0252146 30.1236466 43.4664378 21.0731674 42.4189211 13.9796784 41.1057398 12.1023132"></polygon>
+                                                        <polygon id="Path-16" fill="url(#linearGradient-5)" mask="url(#mask-2)" points="3.23271092 8.25079714 6.81161167 14.2549338 12.0058355 22.1364357 14.6232508 26.4883536 16.8930998 28.1899947 19.8222924 29.0185066 23.7990017 28.9278988 26.0791744 28.0094657 17.9605757 42.808046 3.69108552 37.2809729 -2.24300722 24.3597578 -1.58848133 14.6516859"></polygon>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <p>Chrome</p>
+                    </div>
+                </a>
+
+                <a href="https://www.mozilla.org/firefox/new/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">
+                    <div class="icon">
+                        <svg width="43px" height="43px" viewBox="0 0 43 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <title>Firefox</title>
+                            <defs>
+                                <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+                                    <stop stop-color="#FACC31" offset="0%"></stop>
+                                    <stop stop-color="#F5A623" offset="100%"></stop>
+                                </linearGradient>
+                            </defs>
+                            <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <g id="08-Connect-modals" transform="translate(-1255.000000, -7006.000000)" fill="url(#linearGradient-1)">
+                                    <g id="window-copy-4" transform="translate(750.000000, 6756.000000)">
+                                        <g id="Group-22" transform="translate(505.000000, 250.000000)">
+                                            <g id="Group">
+                                                <g id="Browser-Icons---Color">
+                                                    <g id="firefox" transform="translate(0.070811, 0.859521)">
+                                                        <g id="img">
+                                                            <path d="M21.0931699,41.4708952 C9.44373386,41.4708952 0,32.1873191 0,20.7354476 C0,9.2835761 9.44373386,0 21.0931699,0 C32.742606,0 42.1863399,9.2835761 42.1863399,20.7354476 C42.1863399,32.1873191 32.742606,41.4708952 21.0931699,41.4708952 Z M21.6901682,37.7600957 C32.5886838,37.7600957 38.6108343,31.410921 38.6108343,20.7354476 C38.6108343,14.1826686 36.2001585,9.01829072 31.3666601,5.52261134 C31.0298164,5.27899947 31.7380757,4.41969805 31.3666599,4.19890243 C28.3849548,2.42636802 24.8856737,1.40579306 21.1430444,1.40579306 C13.1043736,1.40579306 6.18834956,6.11404578 3.11224729,12.8688862 C2.01789036,15.2719944 2.73372957,17.9341306 2.73372957,20.7354476 C2.73372957,31.410921 10.7916526,37.7600957 21.6901682,37.7600957 Z"
+                                                                id="Oval-1"></path>
+                                                            <path d="M3.82357367,4.3594686 L6.65985251,8.38293345 L11.5244045,8.81709561 L16.2406386,6.15926811 L14.755739,9.25125777 C14.755739,9.25125777 15.4780575,10.2956494 15.4780575,11.2796359 C15.4780575,11.2796359 20.1745487,11.2796359 20.1745487,11.2796359 C20.1745487,11.2796359 21.1179233,11.8867765 20.3050999,12.8282048 C19.4922764,13.7696332 16.1525426,16.3196923 16.1525426,16.3196923 L16.1298304,19.0231669 L13.0495668,19.0883771 C13.0495668,19.0883771 12.956309,22.7627961 15.4302241,23.4406382 C17.9041392,24.1184803 21.155777,22.4617999 21.155777,22.4617999 C21.155777,22.4617999 23.6400159,22.0852972 24.5836069,23.1822002 C25.5271978,24.2791032 25.4215514,24.6250601 24.2160813,25.0194097 C23.0106112,25.4137594 20.2930555,27.6950842 18.2114429,27.6950842 C16.1298304,27.6950842 15.4756486,27.6072221 15.4756486,27.6072221 C15.4756486,27.6072221 16.3239169,28.8901456 18.0528013,29.4372242 C19.7816856,29.9843029 27.7874113,31.9395771 31.7785739,24.9569453 C32.5924297,23.1822002 32.5697174,19.8190737 32.5697174,19.8190737 L34.2758895,20.9533867 C34.2758895,20.9533867 35.3905106,16.61657 34.2758895,13.948103 C34.2758895,13.948103 35.6272687,13.7672307 35.6272687,13.7672307 C35.6272687,13.7672307 33.2689796,8.80062147 27.8383418,7.47994479 C27.8383418,7.47994479 30.9815802,6.65692434 30.9815802,6.65692434 C30.9815802,6.65692434 28.8603933,4.67899823 25.4652553,4.04645999 L31.4347929,4.19953219 L37.6909867,9.98504331 L40.3534824,18.383078 L39.4577249,26.8669156 L35.3354506,33.6563194 L30.0328274,38.0284869 L23.290729,39.9010471 L12.6452199,38.4653947 L3.00421188,29.8061763 L1.0815851,16.7064914 L2.60915629,11.048998 L3.82357367,4.3594686 Z"
+                                                                id="Path-17"></path>
+                                                        </g>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <p>Firefox</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <!-- Browser not supported: END -->
+
+        <!-- Smartphones not supported -->
+        <div class="smartphones-not-supported">
+            <div>
+                <h3>Smartphones not supported yet</h3>
+                <p>
+                    We are sorry, mobile devices are not supported yet. Please try again on your computer.
+                </p>
+            </div>
+
+            <div>
+                <svg width="226px" height="189px" viewBox="0 0 226 189" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <title>Smartphone</title>
+                    <defs>
+                        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-1">
+                            <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+                        </filter>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="107.938939%" y2="84.5976591%" id="linearGradient-2">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#E8E8E8" offset="37.0990443%"></stop>
+                            <stop stop-color="#F5F5F5" offset="40.6475237%"></stop>
+                            <stop stop-color="#EDEEEE" offset="45.1464687%"></stop>
+                            <stop stop-color="#E1E1E1" offset="90.4546015%"></stop>
+                            <stop stop-color="#F4F4F4" offset="93.2680467%"></stop>
+                            <stop stop-color="#DFDFDF" offset="97.5415143%"></stop>
+                            <stop stop-color="#DDDDDD" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M203.705801,75.4351041 L182.560375,89.3658671 C181.896324,89.8033488 181.496631,90.5453065 181.496631,91.3405134 L181.496631,91.3405134 C181.496631,91.7189941 181.80345,92.0258133 182.181931,92.0258133 C182.316213,92.0258133 182.447537,91.9863626 182.559589,91.9123616 L203.706576,77.9465366 C204.360492,77.5146794 204.753917,76.7833758 204.753917,75.9997259 L204.753917,75.9997259 C204.753917,75.6263044 204.451199,75.3235864 204.077778,75.3235864 C203.945548,75.3235864 203.816221,75.3623584 203.705801,75.4351041 Z"
+                            id="path-3"></path>
+                        <filter x="-2.1%" y="-8.4%" width="104.3%" height="111.2%" filterUnits="objectBoundingBox" id="filter-4">
+                            <feOffset dx="0" dy="-1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                            <feColorMatrix values="0 0 0 0 0.998910502   0 0 0 0 0.998910502   0 0 0 0 0.998910502  0 0 0 0.5 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-5">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#EDEEEE" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-6">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="-2.48949813e-15%" x2="31.4709562%" y2="82.5186025%" id="linearGradient-7">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="-2.48949813e-15%" x2="50%" y2="178.677391%" id="linearGradient-8">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="92.5937389%" y1="-14.2237708%" x2="9.46763547%" y2="165.930338%" id="linearGradient-9">
+                            <stop stop-color="#F5515F" offset="0%"></stop>
+                            <stop stop-color="#CE1733" offset="100%"></stop>
+                        </linearGradient>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-427.000000, -5182.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-15" transform="translate(2.000000, 1767.000000)">
+                                        <g id="Group-3-Copy" transform="translate(370.000000, 204.000000)">
+                                            <g id="Group">
+                                                <ellipse id="shadow" fill="#F9F9F9" filter="url(#filter-1)" cx="113" cy="159.5" rx="89" ry="29.5"></ellipse>
+                                                <g id="Group-2">
+                                                    <path d="M7.35514406,94.1623666 L142.036389,8.31639079 C148.057955,4.47823793 155.779002,4.5625191 161.71535,8.5312018 L219.189764,46.9551115 C225.617604,51.2523761 227.344777,59.9467915 223.047513,66.3746319 C221.9721,67.9832323 220.574909,69.3514407 218.944122,70.3929028 L85.2666366,155.762775 C79.3185807,159.561356 71.6993985,159.53343 65.779348,155.691348 L7.25858085,117.711679 C0.772768488,113.502421 -1.07274343,104.832353 3.1365146,98.3465407 C4.22715082,96.6660398 5.6657556,95.2391847 7.35514406,94.1623666 Z"
+                                                        id="Path-29" fill="url(#linearGradient-2)"></path>
+                                                    <g id="Path-40">
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                                                        <use fill="#C3C3C3" fill-rule="evenodd" xlink:href="#path-3"></use>
+                                                    </g>
+                                                    <path d="M7.27701685,87.1489666 L138.025373,3.35771616 C144.051,-0.503860846 151.791888,-0.428865963 157.741568,3.54872962 L215.238224,41.9875093 C221.666065,46.2847739 223.393238,54.9791893 219.095973,61.4070298 C218.027105,63.0058404 216.640291,64.3672827 215.022019,65.4064502 L85.2777999,148.721222 C79.3255487,152.543438 71.6863706,152.524975 65.752665,148.674031 L7.2094137,110.679769 C0.723601339,106.470511 -1.12191058,97.8004438 3.08734745,91.3146315 C4.17167534,89.6438507 5.60003328,88.2236765 7.27701685,87.1489666 Z"
+                                                        id="Path-29" fill="url(#linearGradient-5)"></path>
+                                                </g>
+                                                <g id="Group-2" transform="translate(5.000000, 4.000000)">
+                                                    <path d="M4.72413142,87.5796278 L135.543486,2.53002301 C139.770385,-0.218011508 145.228465,-0.181831763 149.418563,2.62199615 L207.598074,41.5531495 C212.096281,44.5631505 213.302711,50.6497556 210.29271,55.1479625 C209.547793,56.2611812 208.582577,57.2098768 207.456665,57.9354657 L77.3089487,141.808584 C73.1612448,144.481554 67.8349842,144.48742 63.6814029,141.823592 L4.77524615,104.045151 C0.219303024,101.123276 -1.10537091,95.0613071 1.81650412,90.5053639 C2.56717217,89.3348823 3.558333,88.3375485 4.72413142,87.5796278 Z"
+                                                        id="Path-29" fill="url(#linearGradient-6)"></path>
+                                                    <path d="M154.838968,16.7589278 L155.509225,16.6147587 C156.568523,16.3869091 157.674938,16.5985466 158.575364,17.2012566 L184.895665,34.8190337 C185.441261,35.1842337 185.5875,35.9225791 185.2223,36.4681742 C185.094194,36.65956 184.913253,36.8096136 184.701469,36.9000977 L184.696081,36.9024 C183.443009,37.4377719 182.00359,37.2984097 180.876497,36.532594 L154.480635,18.5976328 C154.015233,18.2814104 153.8943,17.6477787 154.210522,17.1823769 C154.357764,16.9656723 154.582831,16.8140214 154.838968,16.7589278 Z"
+                                                        id="Path-29" fill="url(#linearGradient-7)"></path>
+                                                    <ellipse id="Oval" fill="url(#linearGradient-8)" cx="49.5" cy="107.5" rx="10.5" ry="8.5"></ellipse>
+                                                </g>
+                                                <path d="M128.143956,72.1646373 L131.487282,74.2991192 L113.425742,87 L98.5607462,82.4378998 L93,70.0916538 L108.631969,59.707586 L111.976881,61.8430805 L114.360481,60.6120004 C118.37554,58.0615278 125.663017,56.7185329 129.909518,59.707586 C134.156019,62.6966391 133.697433,67.3937658 130.527556,70.2400628 L128.143956,72.1646373 Z M112.645696,81.5412582 L122.613654,74.0035823 L108.555003,64.7015845 L99.0767485,71.3416011 L103.013459,78.8759116 L112.645696,81.5412582 Z M118.507125,63.2593453 L116.123525,64.4904254 L124.428563,69.7236831 L126.380912,68.2862123 C128.272718,67.3091334 129.273104,64.4904254 126.380912,62.5658509 C123.488719,60.6412764 120.398932,62.2822664 118.507125,63.2593453 Z"
+                                                    id="Logotype" fill="url(#linearGradient-9)"></path>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <button class="cancel">Close</button>
+        </div>
+        <!-- Smartphones not supported: END -->
+
+        <!-- Install bridge -->
+        <div class="transport">
+            <div>
+                <h3>Install Bridge</h3>
+                <p>The Bridge is a communication tool, which facilitates the connection between your Trezor device and your internet browser.</p>
+            </div>
+
+            <div>
+                <svg width="176px" height="125px" viewBox="0 0 176 125" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <title>Man</title>
+                    <defs>
+                        <linearGradient x1="28.5130671%" y1="41.7585686%" x2="113.067177%" y2="72.5739019%" id="linearGradient-1">
+                            <stop stop-color="#10D40A" stop-opacity="0" offset="0%"></stop>
+                            <stop stop-color="#0AD44C" stop-opacity="0.597061821" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M22.1783062,0.143577212 C7.48593939,8.62442793 0.139755967,20.9009801 0.139755967,36.9732338 C0.139755967,53.0454874 3.28603422,69.619039 9.57859073,86.6938883 L29.0980092,71.0741019 C34.2618128,50.1003522 36.8437146,36.057185 36.8437146,28.9446002 C36.8437146,21.8320154 31.9552452,12.2316744 22.1783062,0.143577212 Z"
+                            id="path-2"></path>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-450.000000, -3429.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-7">
+                                        <g id="Group-2" transform="translate(395.000000, 215.000000)">
+                                            <g id="Group-Copy-2" transform="translate(0.000000, 3.800984)">
+                                                <path d="M8.70774923,51.4695158 C21.94204,86.5168608 26.3855154,89.1010941 31.4040197,88.5847134 C36.422524,88.0683326 50.8406488,83.5485745 74.658394,75.0254389 L78.3157638,71.6813882 L79.2306484,69.4838485 C79.6411999,68.4977099 79.3895379,67.3600274 78.6013632,66.639054 L78.2594824,66.3263225 C77.3261247,65.4725445 75.8922004,65.4833218 74.9717812,66.3510328 L69.3176393,71.6813882 L40.1823116,78.2870802 C36.934235,79.0234987 33.670332,77.1201444 32.7117061,73.9305755 L23.7461588,44.100138 L8.70774923,51.4695158 Z"
+                                                    id="Path-5" fill="#DFDFDF" transform="translate(44.066587, 66.369100) rotate(14.000000) translate(-44.066587, -66.369100) "></path>
+                                                <g id="Group-5" transform="translate(66.792244, 67.222713)">
+                                                    <path d="M6.64660515,11.9644624 C2.848044,16.9002849 0.948763427,22.3905958 0.948763427,28.4353949" id="Path" stroke="#000000"
+                                                        stroke-width="0.63375"></path>
+                                                    <g id="Page-1" transform="translate(8.659662, 8.673503) rotate(29.000000) translate(-8.659662, -8.673503) translate(2.961820, 2.021781)">
+                                                        <path d="M5.13498546,1.76166665 L2.36314591,7.11193256 L1.99155812,10.016396 L3.62168432,11.4978377 L6.39842103,10.016396 L9.47416387,4.34741614 C8.75241839,3.5054367 8.15943999,2.94613344 7.69522867,2.66950638 C7.23101736,2.39287932 6.37760295,2.09026608 5.13498546,1.76166665 Z"
+                                                            id="Path-3" fill="#231F20" transform="translate(5.732861, 6.629752) rotate(-29.000000) translate(-5.732861, -6.629752) "></path>
+                                                        <g id="Group-3" transform="translate(2.532374, 1.268579)" fill="#231F20">
+                                                            <path d="M5.17851511,6.71507249 C5.17851511,7.38024477 5.00188201,8.04541704 4.66570935,8.62823466 L3.9566446,9.8635546 C3.81799712,10.1042836 3.56412662,10.256323 3.28619856,10.256323 L2.4118964,10.256323 C2.13333525,10.256323 1.87376691,10.1106186 1.73511942,9.86925607 L1.04504748,8.68524942 C0.703176978,8.09609684 0.519579856,7.42458959 0.519579856,6.74041239 L0.519579856,2.09054144 C0.519579856,1.72311294 0.779148201,1.40636424 1.13937842,1.33034455 L1.27232806,1.30500465 C1.79779568,1.20364507 2.32326331,1.1466303 2.84873094,1.1466303 C3.37419856,1.1466303 3.89966619,1.20364507 4.42576691,1.30500465 L4.55871655,1.33034455 C4.91894676,1.40636424 5.17851511,1.72311294 5.17851511,2.09054144 L5.17851511,6.71507249 Z M4.65304748,0.823546627 L4.52706187,0.79820673 C3.41218417,0.576482639 2.28591079,0.576482639 1.17103309,0.79820673 L1.03808345,0.823546627 C0.437277698,0.943911133 -0.000189928058,1.47541546 -0.000189928058,2.09054144 L-0.000189928058,6.74041239 C-0.000189928058,7.51327922 0.208730935,8.27347611 0.595551079,8.93864838 L1.29132086,10.1296235 C1.51986763,10.5223919 1.94973813,10.7694559 2.4118964,10.7694559 L3.28619856,10.7694559 C3.74772374,10.7694559 4.17822734,10.5223919 4.40614101,10.1232885 L5.12153669,8.88163362 C5.49506187,8.22279632 5.6976518,7.47526938 5.6976518,6.71507249 L5.6976518,2.09054144 C5.6976518,1.47541546 5.26081727,0.943911133 4.65304748,0.823546627 Z"
+                                                                id="Fill-1"></path>
+                                                        </g>
+                                                        <path d="M7.28057554,3.9674042 L7.28057554,5.93124615 C7.28057554,6.00093087 7.22359712,6.05794563 7.15395683,6.05794563 L3.60863309,6.05794563 C3.53899281,6.05794563 3.48201439,6.00093087 3.48201439,5.93124615 L3.48201439,3.9674042 C3.48201439,3.89771948 3.53899281,3.84070472 3.60863309,3.84070472 L7.15395683,3.84070472 C7.22359712,3.84070472 7.28057554,3.89771948 7.28057554,3.9674042"
+                                                            id="Fill-4" fill="#17D87A"></path>
+                                                    </g>
+                                                </g>
+                                                <g id="Group" transform="translate(88.386237, 69.386552) rotate(-350.000000) translate(-88.386237, -69.386552) translate(61.742314, 40.380704)">
+                                                    <path d="M13.1056399,55.1817442 L41.1294816,53.1884707 L50.0977164,20.1649558 C50.281177,19.4894031 50.9775449,19.0904836 51.6530977,19.2739443 C51.6865836,19.2830381 51.719682,19.2935031 51.7523092,19.3053129 L52.3832726,19.5336978 C53.0053984,19.7588837 53.3496641,20.4247025 53.1737574,21.062516 L43.8655327,54.8128567 C43.5731997,55.8728161 42.6308902,56.6234735 41.532405,56.6714603 L14.3718269,57.8579563 L13.1056399,55.1817442 Z"
+                                                        id="Path-10" fill="#000000"></path>
+                                                    <polygon id="Path-14" fill-opacity="0.400000006" fill="url(#linearGradient-1)" points="50.4923801 19.9058464 42.0301758 52.3453642 0.1116829 57.1199145 17.2954546 0.201820009"></polygon>
+                                                </g>
+                                                <g id="Path-11" transform="translate(0.000000, 23.926525)">
+                                                    <mask id="mask-3" fill="white">
+                                                        <use xlink:href="#path-2"></use>
+                                                    </mask>
+                                                    <use id="Mask" fill="#000000" xlink:href="#path-2"></use>
+                                                </g>
+                                                <g id="Group-4" transform="translate(154.474820, 88.689637)">
+                                                    <path d="M0.00574724086,17.3299975 L9.04673754,17.3299975 C10.0158486,18.2741463 10.459983,19.2222126 10.3791408,20.1741966 C10.2982986,21.1261805 10.0243155,21.8150593 9.55719145,22.240833 L0.00574724086,22.240833 L0.00574724086,17.3299975 Z"
+                                                        id="Path-8" fill="#DFDFDF"></path>
+                                                    <path d="M7.57063371,16.7975611 L8.18463445,11.6320512 C10.9552017,4.37868028 12.7928817,0.670540365 13.6976744,0.507631457 C13.6976744,0.507631457 13.6976744,9.25048956 13.6976744,26.7362058 L7.57063371,22.9984315 L7.57063371,16.7975611 Z"
+                                                        id="Path-9" fill="#000000"></path>
+                                                </g>
+                                                <path d="M22.6894516,24.0882141 L25.3134496,17.1584865 L34.3377378,0.00607653863 L49.5924407,8.83643203 C48.1205738,12.1693448 47.3846403,13.8358012 47.3846403,13.8358012 C47.3846403,13.8358012 47.610066,15.3996869 48.0609173,18.5274582 L44.9421905,17.5087135 L42.326569,23.1446523 C41.7194433,26.4336556 40.4013924,27.6015792 38.3724165,26.6484231 C36.3434406,25.6952669 34.9985477,24.8418639 34.3377378,24.0882141 L32.877652,40.0685859 L22.6894516,24.0882141 Z"
+                                                    id="Path-2" fill="#DFDFDF"></path>
+                                                <polygon id="Path-7" fill="#000000" points="24.0981993 94.4135486 66.3077999 94.8146924 155.917441 103.947374 155.573512 113.777236 69.893811 118.737282 47.9810207 112.979679 19.7062153 101.412265"></polygon>
+                                                <path d="M162.07769,114.2551 L171.11868,114.2551 C172.087791,115.199249 172.531925,116.147316 172.451083,117.0993 C172.370241,118.051283 172.096258,118.740162 171.629134,119.165936 L162.07769,119.165936 L162.07769,114.2551 Z"
+                                                    id="Path-8" fill="#DFDFDF"></path>
+                                                <path d="M11.2917923,34.4242047 L20.0616815,57.0038295 L2.37956842,65.7761306 C-0.436910629,58.3265042 0.144620994,50.9569755 4.12416329,43.6675446 C8.10370558,36.3781138 10.4929153,33.2970005 11.2917923,34.4242047 Z"
+                                                    id="Path-4" fill="#2B2B2B"></path>
+                                                <path d="M3.59809657,65.3416932 C15.3007955,94.24224 19.7442709,96.8264733 24.7627752,96.3100926 C29.7812795,95.7937118 45.2204655,95.3718191 71.0803332,95.0444146 L74.737703,91.7003638 L79.9106348,96.1713282 C82.3120205,96.8736837 83.5127134,96.4980458 83.5127134,95.0444146 C83.5127134,93.5907833 81.1109396,91.3693754 76.3073921,88.3801909 C75.3521148,87.5986311 74.1267833,87.245318 72.6313979,87.3202514 C71.1360124,87.3951848 68.8387393,88.8552223 65.7395784,91.7003638 L31.8713016,87.7930762 C29.3797273,87.5056303 27.2920746,85.7758418 26.5465635,83.3811015 L18.6365061,57.9723154 L3.59809657,65.3416932 Z"
+                                                    id="Path-5" fill="#DFDFDF"></path>
+                                                <polygon id="Path-6" fill="#2B2B2B" points="9.99535878 110.148126 25.8406633 120.933884 162.497321 120.933884 162.497321 112.526001 23.903142 98.2971878"></polygon>
+                                                <path d="M169.642576,113.722664 L170.256577,108.557154 C173.027144,101.303783 174.864824,97.5956433 175.769617,97.4327344 C175.769617,97.4327344 175.769617,106.175593 175.769617,123.661309 L169.642576,119.923534 L169.642576,113.722664 Z"
+                                                    id="Path-9" fill="#000000"></path>
+                                            </g>
+                                            <path d="M35.2854234,6.8694459 C34.6664041,5.89851658 33.4668569,5.41305192 31.6867819,5.41305192 C29.9067068,5.41305192 28.7892279,6.79872411 28.3343452,9.57006848 C28.0648175,13.1670282 27.7736329,15.3791075 27.4607914,16.2063062 C26.9915292,17.4471042 25.3563438,21.1320264 28.3343452,21.573246 C30.3196794,21.8673923 31.3123465,20.8886344 31.3123465,18.636972 C31.062566,17.3263155 30.9376757,16.1455958 30.9376757,15.0948129 C30.9376757,13.5186385 31.8730137,12.4757315 33.4233678,12.4757315 C34.9737218,12.4757315 35.2854234,13.211977 35.2854234,15.0948129 C35.2854234,16.9776487 34.3303275,19.9545613 33.8768476,20.7639036 C33.4233678,21.573246 32.2851964,23.0259455 35.2854234,26.7272287 C38.2856504,30.4285119 37.7001248,31.0752997 38.5962999,32.2949868 C39.4924751,33.5146739 41.2569431,35.1634417 44.7501059,33.5146739 C48.2432687,31.865906 46.3236074,28.5871064 45.7651748,27.8315971 C45.2067422,27.0760877 43.915219,24.5340614 46.2415391,23.5772061 C48.5678593,22.6203508 47.0177683,19.3528983 45.3082754,19.2790098 C43.5987826,19.2051214 39.605582,19.2790098 39.298089,19.2790098 C38.9905959,19.2790098 38.2167341,19.6803824 38.1601807,18.636972 C38.1224784,17.9413651 38.5017811,15.3082097 39.298089,10.7375059 C39.3563083,10.2132498 39.66801,9.95112173 40.2331939,9.95112173 C41.0809698,9.95112173 46.5411409,10.7966166 47.584092,10.3738692 C48.6270431,9.95112173 49.8843713,8.6037132 49.1733759,6.2566996 C48.4623805,3.909686 45.8054198,2.67152681 44.7501059,2.56465246 C43.694792,2.4577781 41.8700879,2.5865551 40.2331939,3.66189583 C39.1419313,4.37878965 37.4926744,5.447973 35.2854234,6.8694459 Z"
+                                                id="Path-12" fill="#000000" transform="translate(37.985612, 18.371425) rotate(-345.000000) translate(-37.985612, -18.371425) "></path>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <a class="button confirm" href="https://wallet.trezor.io/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">
+                <span class="text">Install Bridge</span>
+                <span class="exit"></span>
+            </a>
+        </div>
+        <!-- Install bridge: END -->
+
+        <!-- Device management confirmation -->
+        <div class="device-management">
+            <div>
+                <h3></h3>
+            </div>
+
+            <div>
+                <svg width="147px" height="172px" viewBox="0 0 147 172" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs>
+                        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-1">
+                            <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+                        </filter>
+                        <linearGradient x1="-18.9038234%" y1="84.5976591%" x2="104.434112%" y2="84.5976591%" id="linearGradient-2">
+                            <stop stop-color="#858585" offset="0%"></stop>
+                            <stop stop-color="#7A7A7A" offset="14.6846623%"></stop>
+                            <stop stop-color="#2C2C2C" offset="18.3358096%"></stop>
+                            <stop stop-color="#2D2D2D" offset="23.8668806%"></stop>
+                            <stop stop-color="#393939" offset="28.2081478%"></stop>
+                            <stop stop-color="#252525" offset="31.1691751%"></stop>
+                            <stop stop-color="#323232" offset="61.9928462%"></stop>
+                            <stop stop-color="#404040" offset="66.7596452%"></stop>
+                            <stop stop-color="#2A2A2A" offset="72.7735474%"></stop>
+                            <stop stop-color="#232323" offset="93.1813793%"></stop>
+                            <stop stop-color="#4D4D4D" offset="97.5824737%"></stop>
+                            <stop stop-color="#202020" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M5.71681055,91.2094918 L5.71681055,91.2094918 C5.71681055,92.2902209 6.21483455,93.3106537 7.06680364,93.9755777 L13.5929267,99.0689273 C13.9433105,99.3423863 14.4490351,99.2800265 14.7224942,98.9296426 C14.8477461,98.769157 14.9075223,98.5671661 14.8897801,98.3643635 L14.8897801,98.3643635 C14.7869814,97.1893181 14.2001635,96.1099435 13.2698813,95.3847716 L7.06741752,90.5498383 C6.70310093,90.2658469 6.17754347,90.3309633 5.89355207,90.6952799 C5.77901286,90.8422158 5.71681055,91.0231872 5.71681055,91.2094918 Z"
+                            id="path-3"></path>
+                        <filter x="-5.4%" y="-4.7%" width="110.7%" height="118.7%" filterUnits="objectBoundingBox" id="filter-4">
+                            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                            <feColorMatrix values="0 0 0 0 0.371386054   0 0 0 0 0.371386054   0 0 0 0 0.371386054  0 0 0 0.5 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="-2.48949813e-15%" id="linearGradient-5">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-6">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M35.9287708,33.4633892 L69.2743462,10.5379678 C70.6248607,9.60947539 72.4051338,9.59874877 73.7667387,10.5109 L126.120308,45.5830199 C127.955671,46.8125463 128.446799,49.2971306 127.217273,51.1324943 C126.938147,51.5491564 126.583156,51.9096116 126.170806,52.1950687 L93.7071097,74.6686683 C92.3720837,75.592865 90.6108267,75.6183303 89.2496391,74.7331171 L36.0141913,40.1128189 C34.1622272,38.9084419 33.6372541,36.4307879 34.8416312,34.5788237 C35.1274199,34.139368 35.4968015,33.7603724 35.9287708,33.4633892 Z"
+                            id="path-7"></path>
+                        <filter x="-1.1%" y="-1.5%" width="102.1%" height="103.1%" filterUnits="objectBoundingBox" id="filter-8">
+                            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+                            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+                            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+                        </filter>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-1157.000000, -5191.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-13" transform="translate(693.000000, 1767.000000)">
+                                        <g id="Group-3-Copy-2" transform="translate(409.000000, 213.000000)">
+                                            <g id="Group">
+                                                <g id="Group-2" transform="translate(0.000000, 2.000000)">
+                                                    <ellipse id="shadow" fill="#F9F9F9" filter="url(#filter-1)" cx="74" cy="146" rx="73" ry="24"></ellipse>
+                                                    <path d="M2.27683401,78.6877159 L25.2385437,32.8480419 L65.5219584,3.57492614 C71.7550532,-0.954533597 80.1798121,-1.01443947 86.4766885,3.4259235 L140.845641,41.7652311 C147.164548,46.2211294 148.674815,54.9558349 144.218917,61.2747419 C143.154845,62.7837017 141.802795,64.0672729 140.240615,65.0515502 L100.48904,90.0976871 C94.5683944,93.8280874 87.9306291,96.2741409 81.0051009,97.2776271 L27.2706902,105.063565 C22.6025431,105.739965 17.8554118,104.556944 14.0505994,101.769021 L6.51953329,96.2507376 C1.01122543,92.2146019 -0.781537454,84.7933044 2.27683401,78.6877159 Z"
+                                                        id="Path-29" fill="url(#linearGradient-2)"></path>
+                                                    <g id="Path-41">
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                                                        <use fill="#050505" fill-rule="evenodd" xlink:href="#path-3"></use>
+                                                    </g>
+                                                </g>
+                                                <g id="Group-2" transform="translate(3.000000, 0.000000)">
+                                                    <path d="M0.840070749,77.9067339 L13.3222807,47.8921826 C17.0821075,38.8513544 23.4136949,31.1134281 31.5314487,25.6384902 L65.4936527,2.73302081 C69.7377354,-0.129358356 75.291772,-0.139469605 79.5462485,2.70743774 L137.598074,41.5531495 C142.096281,44.5631505 143.302711,50.6497556 140.29271,55.1479625 C139.547793,56.2611812 138.582577,57.2098768 137.456665,57.9354657 L98.4180265,83.0937432 C92.7100922,86.7721961 86.3126918,89.2494236 79.6159712,90.3743517 L24.2953562,99.6672159 C20.9379191,100.231205 17.495142,99.4125562 14.7509278,97.3976726 L4.08880802,89.5692273 C0.447058797,86.8953468 -0.894781451,82.0783358 0.840070749,77.9067339 Z"
+                                                        id="Path-29" fill="url(#linearGradient-5)"></path>
+                                                    <g id="Path-29">
+                                                        <use fill="url(#linearGradient-6)" fill-rule="evenodd" xlink:href="#path-7"></use>
+                                                        <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <div class="buttons">
+                <button class="confirm">Proceed</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </div>
+        <!-- Device management confirmation: END -->
+
+        <!-- No backup confirmation -->
+        <div class="no-backup">
+            <div class="wrapper">
+                <h3>Your Trezor is not backed up!</h3>
+                <p>If your device is ever lost or damaged, your funds will be lost. Backup your device first, to protect your coins against such events.</p>
+            </div>
+            <div class="buttons">
+                <a class="button cancel" href="https://wallet.trezor.io/?backup=1" target="_blank" rel="noreferrer noopener">
+                    <span class="text">Create a backup in 3 minutes.</span>
+                    <span class="exit"></span>
+                </a>
+                <button class="confirm">Proceed, I will take the risk</button>
+            </div>
+        </div>
+        <!-- No backup confirmation: END -->
+
+        <!-- Export address -->
+        <div class="export-address">
+            <div>
+                <h3></h3>
+            </div>
+
+            <div>
+                <svg width="237px" height="171px" viewBox="0 0 237 171" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+                    <title>Address</title>
+                    <defs>
+                        <linearGradient x1="98.3922388%" y1="4.67074249%" x2="50%" y2="78.7374061%" id="linearGradient-1">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#D7D7D7" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="-14.5736146%" y1="100%" x2="59.9908825%" y2="60.4688809%" id="linearGradient-2">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#E6E6E6" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="10.4674355%" y1="78.7374079%" x2="50%" y2="78.7374061%" id="linearGradient-3">
+                            <stop stop-color="#FFFFFF" offset="0%"></stop>
+                            <stop stop-color="#E6E6E6" offset="100%"></stop>
+                        </linearGradient>
+                        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-4">
+                            <stop stop-color="#141313" offset="0%"></stop>
+                            <stop stop-color="#5B5B5B" offset="100%"></stop>
+                        </linearGradient>
+                        <path d="M45.4867612,18.3544252 L69.2218134,3.1949524 C75.9610502,-1.10936834 84.6164351,-0.98569565 91.229941,3.5094161 L214.346236,87.1899199 C218.913891,90.2944937 220.099952,96.5140634 216.995378,101.081718 C216.421836,101.925551 215.722532,102.67664 214.921751,103.308902 L190.767412,122.380114 C183.746555,127.923476 173.898455,128.130543 166.650796,122.887191 L45.0080315,34.8841774 C40.5333926,31.6469794 39.5302485,25.3953004 42.7674464,20.9206614 C43.5044808,19.9018907 44.4270423,19.031263 45.4867612,18.3544252 Z"
+                            id="path-5"></path>
+                        <filter x="-0.8%" y="-1.2%" width="101.7%" height="104.7%" filterUnits="objectBoundingBox" id="filter-6">
+                            <feOffset dx="0" dy="3" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.688405797 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                        <path d="M93.0320199,15.4656522 L121.113696,34.7723136 C122.0239,35.3980952 122.25447,36.6432575 121.628688,37.5534614 C121.491805,37.7525583 121.319979,37.9252049 121.121537,38.0630348 L111.151754,44.9876429 C110.467083,45.4631875 109.559255,45.4641878 108.873538,44.9901532 L75.9308333,22.2169418 C75.27341,21.7624667 74.4085357,21.7430172 73.7313467,22.1674792 L62.2206431,29.3823862 C61.2847279,29.9690177 61.0015775,31.2032857 61.588209,32.1392009 C61.7318956,32.3684392 61.9205985,32.5661419 62.1428986,32.7203452 L77.7724092,43.5620945 C78.4790471,44.0522692 79.4199284,44.0358254 80.1090063,43.5212576 L97.5797461,30.4750134 C98.2772421,29.9541595 99.2315338,29.9442858 99.9396574,30.4505963 L136.509354,56.5980387 C137.407874,57.2404834 137.615465,58.4896822 136.97302,59.3882025 C136.862211,59.5431796 136.729826,59.6815289 136.57988,59.7990563 L119.644821,73.0726825 C118.944019,73.621968 117.964489,73.6418074 117.242021,73.1213487 L102.499122,62.5007199 C101.602891,61.8550848 101.399743,60.6051558 102.045378,59.7089253 C102.160174,59.549573 102.297815,59.4079982 102.45387,59.2887589 L104.937654,57.3909383 C105.643813,56.8513726 106.621313,56.8424977 107.337153,57.3691528 L115.86068,63.6400489 C116.589385,64.1761688 117.587237,64.1563682 118.2941,63.591762 L137.503182,48.2485231 C138.20091,47.6912137 139.183554,47.6639729 139.911086,48.1817714 L164.154237,65.4360936 C165.054153,66.0765814 165.264461,67.3253256 164.623974,68.2252418 C164.513894,68.3799096 164.382353,68.5181168 164.233311,68.6357027 L148.221322,81.2683333 C147.500731,81.8368424 146.48567,81.8418952 145.759454,81.2805879 L137.067816,74.5626349 C136.362064,74.0171437 135.380389,74.0049545 134.66131,74.5327539 L127.941825,79.4648104 C127.051375,80.1183948 126.859358,81.370082 127.512942,82.260532 C127.621321,82.4081889 127.74947,82.5402579 127.893795,82.6530357 L134.118953,87.5174651"
+                            id="path-7"></path>
+                        <filter x="-1.0%" y="-2.9%" width="101.9%" height="108.6%" filterUnits="objectBoundingBox" id="filter-8">
+                            <feMorphology radius="0.5" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+                            <feOffset dx="0" dy="-1" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+                            <feMorphology radius="1" operator="erode" in="SourceAlpha" result="shadowInner"></feMorphology>
+                            <feOffset dx="0" dy="-1" in="shadowInner" result="shadowInner"></feOffset>
+                            <feComposite in="shadowOffsetOuter1" in2="shadowInner" operator="out" result="shadowOffsetOuter1"></feComposite>
+                            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.316123188 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                        <path d="M147.05057,97.2775093 L153.375472,101.959927 C154.125109,102.514894 155.158826,102.478018 155.867013,101.871045 L170.178932,89.6045781 C171.017609,88.885764 171.114778,87.6231675 170.395964,86.78449 C170.298799,86.6711233 170.189246,86.5689935 170.06935,86.4800098 L150.67367,72.0849291 C149.786696,71.426635 149.601314,70.1739478 150.259608,69.2869739 C150.381264,69.1230565 150.527298,68.9787297 150.692635,68.8590092 L154.091392,66.3979607 C154.79117,65.8912496 155.737216,65.8911692 156.43708,66.3977613 L189.409773,90.2648234 C190.304535,90.9124912 190.504845,92.1628782 189.857177,93.0576408 C189.793296,93.145894 189.72231,93.22878 189.644928,93.3054712 L179.294496,103.563549 C178.509956,104.341089 178.504281,105.607406 179.281821,106.391947 C179.371472,106.482405 179.469558,106.564093 179.574744,106.635898 L184.399305,109.929399"
+                            id="path-9"></path>
+                        <filter x="-2.3%" y="-4.6%" width="104.6%" height="106.8%" filterUnits="objectBoundingBox" id="filter-10">
+                            <feMorphology radius="0.5" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+                            <feOffset dx="0" dy="-1" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+                            <feMorphology radius="1" operator="erode" in="SourceAlpha" result="shadowInner"></feMorphology>
+                            <feOffset dx="0" dy="-1" in="shadowInner" result="shadowInner"></feOffset>
+                            <feComposite in="shadowOffsetOuter1" in2="shadowInner" operator="out" result="shadowOffsetOuter1"></feComposite>
+                            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.316123188 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+                        </filter>
+                    </defs>
+                    <g id="Styles" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="08-Connect-modals" transform="translate(-1103.000000, -6361.000000)">
+                            <g id="Group-7-Copy-6" transform="translate(55.000000, 166.000000)">
+                                <g id="Window-Copy-4" transform="translate(0.000000, 3045.000000)">
+                                    <g id="window-copy-20" transform="translate(693.000000, 2953.000000)">
+                                        <g id="Group-3" transform="translate(355.000000, 197.000000)">
+                                            <polyline id="Path-42" stroke="url(#linearGradient-1)" stroke-linecap="round" stroke-linejoin="round" points="38.5905719 121.653674 123.592941 59.7937096 154.018825 81.3026959 235.671301 24.5413971"></polyline>
+                                            <path d="M72.4410882,170.133724 L132.713584,124.109897 C134.46937,122.769185 134.805856,120.258977 133.465144,118.503191 C133.224842,118.188492 132.939145,117.911218 132.6174,117.680437 L111.679136,102.661872"
+                                                id="Path-45" stroke="url(#linearGradient-2)" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <ellipse id="Oval-2" fill="#D7D7D7" cx="111" cy="101.5" rx="5" ry="3.5"></ellipse>
+                                            <ellipse id="Oval-2-Copy" fill="#D7D7D7" cx="38" cy="121.5" rx="5" ry="3.5"></ellipse>
+                                            <ellipse id="Oval-2-Copy-2" fill="#D7D7D7" cx="146" cy="7.5" rx="5" ry="3.5"></ellipse>
+                                            <path d="M0.871981714,43.8355783 L45.3588878,73.5440291 C46.715767,74.4501559 48.4870045,74.441324 49.8347801,73.5217108 L146.603842,7.49432001"
+                                                id="Path-46" stroke="url(#linearGradient-3)" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <g id="Path-29">
+                                                <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+                                                <use fill="url(#linearGradient-4)" fill-rule="evenodd" xlink:href="#path-5"></use>
+                                            </g>
+                                            <g id="Path-43">
+                                                <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+                                                <use stroke="#1DD678" stroke-width="1" xlink:href="#path-7"></use>
+                                            </g>
+                                            <g id="Path-47">
+                                                <use fill="black" fill-opacity="1" filter="url(#filter-10)" xlink:href="#path-9"></use>
+                                                <use stroke="#1DD678" stroke-width="1" xlink:href="#path-9"></use>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <div class="buttons">
+                <button class="confirm">Export</button>
+                <button class="cancel">Cancel</button>
+            </div>
+
+        </div>
+        <!-- Export address: END -->
+
+        <!-- Check address on device -->
+        <div class="check-address">
+            <svg width="12px" height="35px" viewBox="0 0 20 57">
+                <g stroke="none" stroke-width="1" fill="none" transform="translate(1, 1)">
+                    <path stroke="#01B757" d="M8.90856859,33.9811778 L6.43814432,33.9811778 C5.45301486,34.0503113 4.69477081,33.6889084 4.1634122,32.8969691 C3.36637428,31.7090602 -0.000402169348,26.3761977 0.0748097911,23.2982514 C0.124878873,21.2492429 0.0999525141,14.5598149 3.07156595e-05,3.22996744 C-0.000274213164,3.1963928 0.00243636275,3.162859 0.00812115776,3.12976773 C0.28477346,1.51937083 1.22672004,0.617538852 2.8339609,0.424271782 C4.45813658,0.228968338 6.54411954,0.0875444105 9.09190977,0 L9.09190977,0.0169167084 C11.5566027,0.104886477 13.5814718,0.244169993 15.1665175,0.434768145 C16.7530267,0.625542287 17.6912941,1.50671985 17.9813196,3.07830083 C17.9943481,3.14889902 18.0005888,3.22058224 17.9999563,3.29236974 L17.9999901,3.29237004 C17.9004498,14.5907444 17.875676,21.2628703 17.9256686,23.3087478 C18.0008805,26.3866941 14.6341041,31.7195566 13.8370662,32.9074655 C13.3057075,33.6994047 12.5474635,34.0608076 11.562334,33.9916742 L8.90856859,33.9916742 L8.90856859,33.9811778 Z"></path>
+                    <rect fill="#01B757" x="2" y="7" width="14" height="7" rx="0.5625"></rect>
+                </g>
+            </svg>
+            <div class="button-request-data">
+                <p class="path-value"></p>
+                <div class="address-value-container">
+                    <p class="toast">Address copied to clipboard</p>
+                    <p class="address-value"></p>
+                    <div class="clipboard-button" title="Copy address to clipboard">
+                        <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid">
+                            <path d="M 5 2 C 3.9 2 3 2.9 3 4 L 3 17 L 5 17 L 5 4 L 15 4 L 15 2 L 5 2 z M 9 6 C 7.9 6 7 6.9 7 8 L 7 20 C 7 21.1 7.9 22 9 22 L 18 22 C 19.1 22 20 21.1 20 20 L 20 8 C 20 6.9 19.1 6 18 6 L 9 6 z M 9 8 L 18 8 L 18 20 L 9 20 L 9 8 z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <p>Check recipient address on your device and follow further instructions.</p>
+        </div>
+        <!-- Check address on device: END -->
+
+        <!-- Confirm output on device -->
+        <div class="confirm-output">
+            <svg width="12px" height="35px" viewBox="0 0 20 57">
+                <g stroke="none" stroke-width="1" fill="none" transform="translate(1, 1)">
+                    <path stroke="#01B757" d="M8.90856859,33.9811778 L6.43814432,33.9811778 C5.45301486,34.0503113 4.69477081,33.6889084 4.1634122,32.8969691 C3.36637428,31.7090602 -0.000402169348,26.3761977 0.0748097911,23.2982514 C0.124878873,21.2492429 0.0999525141,14.5598149 3.07156595e-05,3.22996744 C-0.000274213164,3.1963928 0.00243636275,3.162859 0.00812115776,3.12976773 C0.28477346,1.51937083 1.22672004,0.617538852 2.8339609,0.424271782 C4.45813658,0.228968338 6.54411954,0.0875444105 9.09190977,0 L9.09190977,0.0169167084 C11.5566027,0.104886477 13.5814718,0.244169993 15.1665175,0.434768145 C16.7530267,0.625542287 17.6912941,1.50671985 17.9813196,3.07830083 C17.9943481,3.14889902 18.0005888,3.22058224 17.9999563,3.29236974 L17.9999901,3.29237004 C17.9004498,14.5907444 17.875676,21.2628703 17.9256686,23.3087478 C18.0008805,26.3866941 14.6341041,31.7195566 13.8370662,32.9074655 C13.3057075,33.6994047 12.5474635,34.0608076 11.562334,33.9916742 L8.90856859,33.9916742 L8.90856859,33.9811778 Z"></path>
+                    <rect fill="#01B757" x="2" y="7" width="14" height="7" rx="0.5625"></rect>
+                </g>
+            </svg>
+            <p>Check recipient address on your device and follow further instructions.</p>
+        </div>
+        <!-- Check address on device: END -->
+
+        <!-- Passphrase on device -->
+        <div class="passphrase-on-device">
+            <div>
+                <h3>Enter your passphrase on <span class="device-name"></span></h3>
+            </div>
+            <div class="loader">
+                <p>Waiting...</p>
+                <svg class="circular" viewBox="25 25 50 50" preserveAspectRatio="xMidYMid">
+                    <circle class="route" cx="50" cy="50" r="20" fill="none" stroke="" stroke-width="1" stroke-miterlimit="10" />
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10" />
+                </svg>
+            </div>
+        </div>
+        <!-- Passphrase on device: END -->
+
+        <div class="firmware-update-notification">
+            <div class="header">
+                <div class="left">
+                    <span class="warning-icon"></span>
+                    <h3>New firmware update available</h3>
+                </div>
+                <span class="close-icon"></span>
+            </div>
+            <p>A new firmware update is available for your Trezor device. Update now for the latest features.</p>
+            <a class="button notification-button" href="https://wallet.trezor.io/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">Update my firmware</a>
+        </div>
+
+        <div class="bridge-update-notification">
+            <div class="header">
+                <div class="left">
+                    <span class="warning-icon"></span>
+                    <h3>New bridge is available</h3>
+                </div>
+                <span class="close-icon"></span>
+            </div>
+            <a class="button notification-button" href="https://wallet.trezor.io/" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">Update bridge</a>
+        </div>
+
+        <div class="backup-notification">
+            <div class="header">
+                <div class="left">
+                    <span class="warning-icon"></span>
+                    <h3>Your Trezor is not backed up.</h3>
+                </div>
+                <span class="close-icon"></span>
+            </div>
+            <a class="button notification-button" href="https://wallet.trezor.io/?backup=1" target="_blank" rel="noreferrer noopener" onclick="window.closeWindow();">Create a backup in 3 minutes.</a>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" async="false">
+        if (window.opener) {
+            window.opener.postMessage({ type: 'popup-bootstrap' }, '*');
+        } else {
+            window.postMessage({ type: 'popup-bootstrap' }, '*');
+        }
+
+        const popupScript = document.createElement('script');
+        popupScript.setAttribute('type', 'text/javascript');
+        popupScript.setAttribute('src', './js/popup.4da4e38936bbabc923c4.js');
+        popupScript.setAttribute('async', 'false');
+        document.body.appendChild(popupScript);
+    </script>
+</body>
+</html>

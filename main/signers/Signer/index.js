@@ -18,7 +18,7 @@ class Signer {
   addressesId () {
     // TODO: Make sure it was okay to remove the second condition below
     // if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
-    if (this.addresses) return crypt.stringToKey(this.addresses.join()).toString('hex')
+    if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
   }
   getCoinbase (cb) {
     cb(null, this.addresses[0])

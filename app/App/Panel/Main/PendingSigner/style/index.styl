@@ -19,37 +19,162 @@
     bottom 3px
     left 0px
     background outerspaceLight // light
-    display flex
-    justify-content flex-start
-    align-items flex-start
     border-radius 4px
     color spacewhite
+    overflow hidden
 
-    .pendingSignerLogo
-      height 63px
-      margin 0px 15px 0px 18px
+    .pendingSignerTop
       display flex
-      justify-content center
-      align-items center
-
-    .pendingSignerText
+      justify-content flex-start
+      align-items flex-start
       height 70px
-      width calc(100% - 60px)
+      width 100%
+
+      .pendingSignerLogo
+        height 63px
+        margin 0px 15px 0px 18px
+        display flex
+        justify-content center
+        align-items center
+
+      .pendingSignerText
+        height 70px
+        width calc(100% - 60px)
+        display flex
+        justify-content center
+        flex-direction column
+        padding-right 13px
+
+        .pendingSignerType
+          text-transform uppercase
+          line-height 15px
+          font-size 14px
+          font-weight 600
+          letter-spacing 1px
+          margin-bottom 4px
+
+        .pendingSignerStatus
+          text-transform none
+          font-size 11px
+          line-height 14px
+          font-weight 400
+
+    .signerInterface
+      font-size 16px
+      width 100%
+      // height 100px
+      transition standard
+      position relative
       display flex
-      justify-content center
+      text-align center
       flex-direction column
-      padding-right 13px
+      overflow hidden
+      font-weight 300
 
-      .pendingSignerType
-        text-transform uppercase
-        line-height 15px
-        font-size 14px
-        font-weight 600
-        letter-spacing 1px
-        margin-bottom 4px
+      // .trezorPinWrap:before
+      //   content ''
+      //   position absolute
+      //   top 0
+      //   right 0
+      //   bottom 3px
+      //   left 0
+      //   background #212d2e
+      //   border-radius 3px
 
-      .pendingSignerStatus
-        text-transform none
-        font-size 11px
-        line-height 14px
-        font-weight 400
+      .trezorPinWrap
+        width 100%
+        background outerspace
+        position relative
+        display flex
+        justify-content center
+        transition standard
+        padding 20px 0px 20px 0px
+        // height 120px
+        overflow hidden
+        padding 20px 0px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+
+        .signerPinDisplay
+          display flex
+          justify-content center
+          align-items center
+          transition standard
+          height 100px
+          svg
+            margin 0px 5px
+
+        .signerPinMessage
+          height 30px
+          margin-top 15px
+          margin-bottom 15px
+          width 140px
+          display flex
+          justify-content center
+          align-items center
+          transition standard
+          overflow hidden
+          position relative
+          border-radius 3px
+          box-shadow 0px 2px 3px thick0, 0px 4px 9px thick0 !important
+
+          .signerPinDelete
+            position absolute
+            display flex
+            justify-content center
+            align-items center
+            top 0
+            bottom 0
+            width 39px
+            left -40px
+            transition standard
+            border-right 1px solid thick
+
+        .signerPinSubmit
+          margin-top 0px
+          margin-bottom 0px
+          // background highlighter
+          box-shadow 0px 2px 3px thick, 0px 5px 9px thick !important
+          padding-left 40px
+          width 100px
+
+          .signerPinDelete
+            left 0px
+
+        .trezorPinInputWrap
+          width 100%
+          background blue //outerspace
+          position relative
+          display flex
+          justify-content center
+          transition standard
+          padding 20px 0px 20px 0px
+          height 120px
+
+          .trezorPinInput
+            display flex
+            width 120px
+            height 120px
+            flex-wrap wrap-reverse
+            z-index 1000
+
+            .trezorPinInputButton
+              min-width 40px
+              min-height 40px
+              display flex
+              justify-content center
+              align-items center
+
+              // svg
+              //   color spacewhite
+
+            .trezorPinInputButton:hover
+              svg
+                transform scale(1.7)
+
+            .trezorPinInputButton:active
+              svg
+                transform scale(2.1)
+                transition none

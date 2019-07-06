@@ -89,7 +89,7 @@
     "react-transition-group": "4.1.1",
     "semver": "6.1.1",
     "tar": "^4.4.10",
-    "trezor-connect": "7.0.3",
+    "trezor-connect": "7.0.2-electron.4",
     "trezor-link": "1.6.1",
     "trezor.js": "8.1.0",
     "usb": "1.6.0",
@@ -132,7 +132,9 @@
   },
   "standard": {
     "parser": "babel-eslint",
-    "env": ["jest"]
+    "env": [
+      "jest"
+    ]
   },
   "repository": "github:floating/frame"
 }

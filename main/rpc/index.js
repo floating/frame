@@ -32,7 +32,7 @@ const rpc = {
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
-  trezorPin: accounts.trezorPin,
+  trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),
   connectionStatus: (cb) => {

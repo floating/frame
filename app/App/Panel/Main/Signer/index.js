@@ -14,7 +14,7 @@ class Signer extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
-    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '', unlockInput: '' }
+    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, unlockInput: '' }
   }
   copyAddress (e) {
     e.preventDefault()
@@ -28,17 +28,6 @@ class Signer extends React.Component {
   }
   unlockSubmit (e) {
     link.rpc('unlockSigner', this.props.id, this.state.unlockInput, () => {})
-  }
-  trezorPin (num) {
-    this.setState({ tPin: this.state.tPin + num.toString() })
-  }
-  submitPin () {
-    link.rpc('trezorPin', this.props.id, this.state.tPin, () => {})
-    this.setState({ tPin: '' })
-  }
-  backspacePin (e) {
-    e.stopPropagation()
-    this.setState({ tPin: this.state.tPin ? this.state.tPin.slice(0, -1) : '' })
   }
   select () {
     if (this.store('selected.current') === this.props.id) {
@@ -252,29 +241,9 @@ class Signer extends React.Component {
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
-          this.props.status === 'Need Pin' ? (
-            <div className='signerStatusNotOk'>
-              <div className='signerPinDisplay' style={!this.state.tPin ? { opacity: 0, height: '0px', paddingBottom: '0px' } : { opacity: 1, height: '13px', paddingBottom: '17px' }}>
-                {this.state.tPin.split('').map((n, i) => {
-                  return (
-                    <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
-                      {svg.octicon('primitive-dot', { height: 14 })}
-                    </div>
-                  )
-                })}
-              </div>
-              <div className={this.state.tPin ? 'signerPinMessage signerPinSubmit' : 'signerPinMessage'} onMouseDown={this.state.tPin ? () => this.submitPin() : null}>
-                {this.state.tPin ? 'Submit' : 'Enter Pin'}
-                <div className='signerPinDelete' onMouseDown={this.backspacePin.bind(this)}>
-                  {svg.octicon('arrow-left', { height: 24 })}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className='signerStatusNotOk'>
-              {status}
-            </div>
-          )
+          <div className='signerStatusNotOk'>
+            {status}
+          </div>
         ) : (
           <div className='signerAccounts' style={{ width: '100%' }}>
             <div key={address + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
@@ -352,7 +321,6 @@ class Signer extends React.Component {
             <div className='signerTop'>
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
               {this.renderStatus()}
-              {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
             {current ? this.renderAccountList() : null}
             {current ? (

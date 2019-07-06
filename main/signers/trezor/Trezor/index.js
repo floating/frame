@@ -5,14 +5,16 @@ const EthereumTx = require('ethereumjs-tx')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const windows = require('../../../windows')
+const uuid = require('uuid/v5')
+const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 class Trezor extends Signer {
   constructor (device, api) {
     super()
     this.api = api
     this.device = device
-    this.id = device.originalDescriptor.path
-    this.type = 'Trezor'
+    this.id =
+    this.type = 'trezor'
     this.status = 'loading'
     this.accounts = []
     this.index = 0
@@ -23,7 +25,7 @@ class Trezor extends Signer {
     device.on('passphrase', cb => this.passphrase(cb))
     device.on('pin', (type, cb) => this.needPin(cb))
     device.on('disconnect', () => this.close())
-    this.open()
+    this.update()
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.network = store('main.connection.network')
@@ -34,8 +36,21 @@ class Trezor extends Signer {
       }
     })
   }
+  update () {
+    // if (this.invalid || this.status === 'Invalid sequence' || this.status === 'initial') return
+    let id = this.getId()
+    if (this.id !== id) { // Singer address representation changed
+      store.removeSigner(this.id)
+      this.id = id
+    }
+    store.updateSigner(this.summary())
+  }
+  getId () {
+    return this.addressesId() || uuid('Trezor' + this.device.originalDescriptor.path, ns)
+  }
   close () {
     this.networkObserver.remove()
+    store.removeSigner(this.id)
     super.close()
   }
   button (label) {
@@ -90,7 +105,10 @@ class Trezor extends Signer {
     })
   }
   deviceStatus (deep, limit = 15) {
+    console.log('deviceStatus')
     this.lookupAccounts((err, accounts) => {
+      console.log('err, accounts')
+      console.log(err, accounts)
       if (err) {
         this.status = 'loading'
         this.accounts = []
@@ -114,7 +132,7 @@ class Trezor extends Signer {
       }
     })
   }
-  needPassphras (cb) {
+  needPassphrase (cb) {
     this.status = 'Need Passphrase'
     this.update()
     this.setPin = cb
@@ -122,11 +140,13 @@ class Trezor extends Signer {
   needPin (cb) {
     this.status = 'Need Pin'
     this.update()
-    this.setPin = (err, pin) => {
+    this.setPin = (pin) => {
+      console.log('ssetting pin', pin)
       this.status = 'loading'
       this.update()
-      cb(err, pin)
+      cb(null, pin)
       setTimeout(() => this.deviceStatus(), 250)
+      setTimeout(() => this.deviceStatus(), 1250)
     }
   }
   normalize (hex) {
