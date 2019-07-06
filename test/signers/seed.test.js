@@ -14,6 +14,15 @@ describe('Seed signer', () => {
   beforeAll(clean)
   afterAll(clean)
 
+  test('Create from invalid phrase', (done) => {
+    const mnemonic = 'invalid mnemonic'
+    hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
+      expect(err).not.toBe(null)
+      expect(store(`main.signers`)).toEqual({})
+      done()
+    })
+  })
+
   test('Create from phrase', (done) => {
     const mnemonic = bip39.generateMnemonic()
     hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
