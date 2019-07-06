@@ -16,6 +16,8 @@ module.exports = {
     cb(null, bip39.generateMnemonic())
   },
   createFromSeed: (signers, seed, password, cb) => {
+    if (!seed) return cb(new Error('Seed required to create hot signer'))
+    if (!password) return cb(new Error('Password required to create hot signer'))
     const signer = new SeedSigner()
     signer.addSeed(seed, password, (err, result) => {
       if (err) return cb(err)
@@ -24,6 +26,8 @@ module.exports = {
     })
   },
   createFromPhrase: (signers, phrase, password, cb) => {
+    if (!phrase) return cb(new Error('Phrase required to create hot signer'))
+    if (!password) return cb(new Error('Password required to create hot signer'))
     const signer = new SeedSigner()
     signer.addPhrase(phrase, password, (err, result) => {
       if (err) return cb(err)
@@ -32,8 +36,8 @@ module.exports = {
     })
   },
   createFromPrivateKey: (signers, privateKey, password, cb) => {
-    if (!privateKey) return cb(new Error('Private key required to create local signer'))
-    if (!password) return cb(new Error('Password required to create local signer'))
+    if (!privateKey) return cb(new Error('Private key required to create hot signer'))
+    if (!password) return cb(new Error('Password required to create hot signer'))
     const signer = new RingSigner()
     signer.addPrivateKey(privateKey, password, (err, result) => {
       if (err) return cb(err)
