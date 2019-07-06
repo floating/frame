@@ -10,7 +10,7 @@ class SeedSigner extends HotSigner {
     super(signer, WORKER_PATH)
     this.encryptedSeed = (signer && signer.encryptedSeed)
     this.type = 'seed'
-    this.update()
+    if (this.encryptedSeed) this.update()
   }
 
   addSeed (seed, password, cb) {
