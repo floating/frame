@@ -20,7 +20,10 @@ module.exports = {
     if (!password) return cb(new Error('Password required to create hot signer'))
     const signer = new SeedSigner()
     signer.addSeed(seed, password, (err, result) => {
-      if (err) return cb(err)
+      if (err) {
+        signer.close()
+        return cb(err)
+      }
       signers.add(signer)
       cb(null, signer)
     })
@@ -30,7 +33,10 @@ module.exports = {
     if (!password) return cb(new Error('Password required to create hot signer'))
     const signer = new SeedSigner()
     signer.addPhrase(phrase, password, (err, result) => {
-      if (err) return cb(err)
+      if (err) {
+        signer.close()
+        return cb(err)
+      }
       signers.add(signer)
       cb(null, signer)
     })
@@ -40,7 +46,10 @@ module.exports = {
     if (!password) return cb(new Error('Password required to create hot signer'))
     const signer = new RingSigner()
     signer.addPrivateKey(privateKey, password, (err, result) => {
-      if (err) return cb(err)
+      if (err) {
+        signer.close()
+        return cb(err)
+      }
       signers.add(signer)
       cb(null, signer)
     })
@@ -49,9 +58,12 @@ module.exports = {
     if (!keystore) return cb(new Error('Keystore required'))
     if (!keystorePassword) return cb(new Error('Keystore password required'))
     if (!password) return cb(new Error('Signer password required'))
-    const signer = new RingSigner({ type: 'ring' })
+    const signer = new RingSigner()
     signer.addKeystore(keystore, keystorePassword, password, (err, result) => {
-      if (err) return cb(err)
+      if (err) {
+        signer.close()
+        return cb(err)
+      }
       signers.add(signer)
       cb(null, signer)
     })
