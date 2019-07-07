@@ -84,7 +84,6 @@ class RingSigner extends HotSigner {
   // TODO: Encrypt all keys together so that they all get the same password
   addKeystore (keystore, keystorePassword, password, cb) {
     let wallet
-
     // Try to generate wallet from keystore
     try {
       if (keystore.version === 1) wallet = fromV1(keystore, keystorePassword)

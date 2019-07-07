@@ -6,7 +6,7 @@ import Panel from './App/Panel'
 
 import link from './link'
 import store from './store'
-import './flex'
+// import './flex'
 
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())

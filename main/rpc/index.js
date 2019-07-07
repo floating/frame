@@ -1,4 +1,5 @@
-const { ipcMain } = require('electron')
+const { ipcMain, dialog } = require('electron')
+const fs = require('fs')
 // const log = require('electron-log')
 
 const accounts = require('../accounts')
@@ -77,6 +78,17 @@ const rpc = {
   },
   createFromPhrase (phrase, password, cb) {
     signers.createFromPhrase(phrase, password, cb)
+  },
+  locateKeystore (cb) {
+    let keystore = dialog.showOpenDialog({ properties: ['openFile'] })
+    if (keystore && keystore.length) {
+      fs.readFile(keystore[0], 'utf8', (err, data) => {
+        if (err) return cb(err)
+        try { cb(null, JSON.parse(data)) } catch (err) { cb(err) }
+      })
+    } else {
+      cb(new Error('No Keystore Found'))
+    }
   },
   createFromKeystore (keystore, keystorePassword, password, cb) {
     signers.createFromKeystore(keystore, keystorePassword, password, cb)

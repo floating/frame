@@ -11,7 +11,11 @@ import link from '../../../../../link'
 class Requests extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = { minimized: false, unlockInput: '' }
+    this.state = {
+      minimized: false,
+      unlockInput: '',
+      unlockHeadShake: false
+    }
   }
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
@@ -39,8 +43,10 @@ class Requests extends React.Component {
   }
   unlockSubmit (e) {
     link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
-      // TODO: Handle invalid passwords
-      console.log(err, result)
+      if (err) {
+        this.setState({ unlockHeadShake: true })
+        setTimeout(() => this.setState({ unlockHeadShake: false }), 1010)
+      }
     })
   }
   render () {
@@ -73,9 +79,13 @@ class Requests extends React.Component {
     let open = current && this.store('selected.open')
     // let minimized = this.store('selected.minimized')
 
+    let unlockClass = 'signerUnlockRequest'
+    if (this.state.unlockHeadShake) unlockClass += ' headShake'
+    let unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '100px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(-200px)', opacity: 0 }
+
     return (
       <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
-        <div className='signerUnlockRequest' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '100px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(-200px)', opacity: 0 }}>
+        <div className={unlockClass} style={unlockStyle}>
           <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
           <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
         </div>
