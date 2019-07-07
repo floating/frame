@@ -132,7 +132,9 @@
   },
   "standard": {
     "parser": "babel-eslint",
-    "env": ["jest"]
+    "env": [
+      "jest"
+    ]
   },
   "repository": "github:floating/frame"
 }
