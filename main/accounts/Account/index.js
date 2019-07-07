@@ -117,6 +117,7 @@ class Account {
     console.log('Account close needs to remove observers')
   }
   signMessage (message, cb) {
+    if (!message) return cb(new Error('No message to sign'))
     if (this.signer) {
       signers.get(this.signer.id).signMessage(this.index, message, cb)
     } else if (this.smart) {
