@@ -52,8 +52,6 @@ const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      contextIsolation: true,
-      nodeIntegration: false,
       width: 360,
       frame: false,
       transparent: true,
