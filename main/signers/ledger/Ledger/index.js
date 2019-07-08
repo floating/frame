@@ -185,7 +185,7 @@ class Ledger extends Signer {
     this.lookupAddresses((err, addresses) => {
       // let last = this.status
       if (err) {
-        if (err.message.startsWith('cannot open device with path') || err.message === 'Device access is paused') { // Device is busy, try again
+        if (err.message.startsWith('cannot open device with path') || err.message === 'Device access is paused' || err.message === 'Invalid channel') { // Device is busy, try again
           clearTimeout(this._deviceStatus)
           if (++this.busyCount > 10) {
             this.busyCount = 0
@@ -206,10 +206,10 @@ class Ledger extends Signer {
             this.status = 'loading'
             log.error('Device Status: Cannot write to HID device')
           }
-          if (err.message === 'Invalid channel') {
-            this.status = 'Set browser support to "NO"'
-            log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
-          }
+          // if (err.message === 'Invalid channel') {
+          //   this.status = 'Set browser support to "NO"'
+          //   log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
+          // }
           if (err.message === 'Invalid sequence') this.invalid = true
           this.addresses = []
           this.update()
