@@ -133,7 +133,7 @@ class Signer extends React.Component {
         }}>
           <div className={this.props.signer ? 'addressSelectButton' : 'addressSelectButton signerInnerDisconnected'}>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-            <div className='addressSelectText'>{'Accounts'}</div>
+            <div className='addressSelectText'>{'Addresses'}</div>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
           </div>
         </div>
