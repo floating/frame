@@ -7,7 +7,7 @@ const Ledger = require('./Ledger')
 const isLedger = d => ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
 
 module.exports = {
-  scan: (signers, api) => {
+  scan: (signers) => {
     log.info('Ledger Scaner Started...')
     const scan = () => {
       log.info('Ledger Scan Triggered:')
@@ -23,7 +23,7 @@ module.exports = {
         if (!signer) {
           log.info('Creating Ledger Signer: ...', device.path.substr(device.path.length - 5))
           if (device.path.endsWith('1')) return console.log('Shadow device')
-          signer = new Ledger(device.path, api)
+          signer = new Ledger(device.path, signers)
           signers.add(signer)
         } else {
           signer.deviceStatus()

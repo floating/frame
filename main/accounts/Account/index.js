@@ -1,5 +1,5 @@
 const log = require('electron-log')
-const { addHexPrefix, isValidAddress } = require('ethereumjs-util')
+const { isValidAddress } = require('ethereumjs-util')
 
 const signers = require('../../signers')
 const windows = require('../../windows')
@@ -65,6 +65,9 @@ class Account {
     } else {
       add(req)
     }
+  }
+  verifyAddress (display) {
+    signers.get(this.signer.id).verifyAddress(display, this.index, this.addresses[this.index])
   }
   getSelectedAddresses () {
     return [this.addresses[this.index]]
