@@ -52,9 +52,13 @@ class Account {
       if (this.smart.type === 'aragon') {
         if (req.type === 'transaction') {
           if (!this.aragon) return log.error('Aragon account could not resolve this.aragon')
-          let tx = this.validateTransaction(req.data)
-          this.aragon.pathTransaction(tx, (err, tx) => {
+          let rawTx = req.data
+          rawTx.data = rawTx.data || '0x'
+          this.aragon.pathTransaction(rawTx, (err, tx) => {
             if (err) return log.error(err)
+            Object.keys(tx).forEach(key => { // Number to hex conversion
+              if (typeof tx[key] === 'number') tx[key] = '0x' + tx[key].toString(16)
+            })
             req.data = tx
             add(req)
           })
