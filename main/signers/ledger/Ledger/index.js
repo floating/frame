@@ -2,6 +2,7 @@ const utils = require('web3-utils')
 const EthereumTx = require('ethereumjs-tx')
 const log = require('electron-log')
 const Eth = require('@ledgerhq/hw-app-eth').default
+const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const store = require('../../../store')
 // const windows = require('../../../windows')
@@ -57,14 +58,18 @@ class Ledger extends Signer {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
-      let transport = await TransportNodeHid.open(this.devicePath)
+      // let transport = await TransportNodeHid.open(this.devicePath)
+      let device = new HID.HID(this.devicePath)
+      let transport = new TransportNodeHid(device)
       let eth = new Eth(transport)
       eth.getAddress(this.getPath(i), false, true).then(result => {
         transport.close()
+        device.close()
         this.pause = false
         cb(null, result.address)
       }).catch(err => {
         transport.close()
+        device.close()
         this.pause = false
         cb(err)
       })
@@ -73,23 +78,25 @@ class Ledger extends Signer {
       cb(err)
     }
   }
-  async verifyAddress (display, index = 0) {
+  async verifyAddress (index, current, display) {
     if (verifyActive) return log.info('verifyAddress Called but it\'s already active')
     if (this.pause) return log.info('Device access is paused')
     verifyActive = true
     this.pause = true
     try {
-      let transport = await TransportNodeHid.open(this.devicePath)
+      let device = new HID.HID(this.devicePath)
+      let transport = new TransportNodeHid(device)
       let eth = new Eth(transport)
       eth.getAddress(this.getPath(index), display, true).then(result => {
         transport.close()
+        device.close()
         this.pause = false
         let address = result.address.toLowerCase()
-        let current = this.addresses[index].toLowerCase()
+        current = current.toLowerCase()
         if (address !== current) {
           // TODO: Error Notification
           log.error(new Error('Address does not match device'))
-          this.signers.unsetSigner()
+          this.signers.remove(this.id)
         } else {
           log.info('Address matches device')
         }
@@ -99,15 +106,16 @@ class Ledger extends Signer {
         log.error('Verify Address Error')
         log.error(err)
         transport.close()
+        device.close()
         this.pause = false
-        this.signers.unsetSigner()
+        this.signers.remove(this.id)
         verifyActive = false
       })
     } catch (err) {
       // TODO: Error Notification
       log.error('Verify Address Error')
       log.error(err)
-      this.signers.unsetSigner()
+      this.signers.remove(this.id)
       verifyActive = false
       this.pause = false
     }
@@ -125,31 +133,37 @@ class Ledger extends Signer {
   //   }, 300)
   // }
   async lookupAddresses (cb) {
-    if (this.pause) cb(new Error('Device access is paused'))
-    this.pause = true
-    try {
-      let transport = await TransportNodeHid.open(this.devicePath)
-      transport.setDebugMode(true)
-      let eth = new Eth(transport)
-      let timeout = setTimeout(() => {
-        transport.close()
-        this.lookupAddresses(cb)
-      }, 5000)
-      eth.getAddress(this.basePath(), false, true).then(result => {
-        clearTimeout(timeout)
-        transport.close()
-        this.pause = false
-        this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
-      }).catch(err => {
-        clearTimeout(timeout)
-        transport.close()
+    setTimeout(() => {
+      if (this.pause) cb(new Error('Device access is paused'))
+      this.pause = true
+      try {
+        let device = new HID.HID(this.devicePath)
+        let transport = new TransportNodeHid(device)
+        let eth = new Eth(transport)
+        let timeout = setTimeout(() => {
+          transport.close()
+          device.close()
+          this.pause = false
+          this.lookupAddresses(cb)
+        }, 4000)
+        eth.getAddress(this.basePath(), false, true).then(result => {
+          clearTimeout(timeout)
+          transport.close()
+          device.close()
+          this.pause = false
+          this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
+        }).catch(err => {
+          clearTimeout(timeout)
+          transport.close()
+          device.close()
+          this.pause = false
+          cb(err)
+        })
+      } catch (err) {
         this.pause = false
         cb(err)
-      })
-    } catch (err) {
-      this.pause = false
-      cb(err)
-    }
+      }
+    }, 500)
   }
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
@@ -165,14 +179,13 @@ class Ledger extends Signer {
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
   deviceStatus (deep, limit = 100) {
-    console.log('deviceStatus || status, paused', this.status, this.pause)
     if (this.status === 'Invalid sequence') return console.log('INVALID SEQUENCE')
     this.pollStatus()
     if (this.pause) return
     this.lookupAddresses((err, addresses) => {
       // let last = this.status
       if (err) {
-        if (err.message.startsWith('cannot open device with path')) { // Device is busy, try again
+        if (err.message.startsWith('cannot open device with path') || err.message === 'Device access is paused' || err.message === 'Invalid channel') { // Device is busy, try again
           clearTimeout(this._deviceStatus)
           if (++this.busyCount > 10) {
             this.busyCount = 0
@@ -193,10 +206,10 @@ class Ledger extends Signer {
             this.status = 'loading'
             log.error('Device Status: Cannot write to HID device')
           }
-          if (err.message === 'Invalid channel') {
-            this.status = 'Set browser support to "NO"'
-            log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
-          }
+          // if (err.message === 'Invalid channel') {
+          //   this.status = 'Set browser support to "NO"'
+          //   log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
+          // }
           if (err.message === 'Invalid sequence') this.invalid = true
           this.addresses = []
           this.update()
@@ -234,18 +247,22 @@ class Ledger extends Signer {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
-      let transport = await TransportNodeHid.open(this.devicePath)
+      let device = new HID.HID(this.devicePath)
+      let transport = new TransportNodeHid(device)
+      // let transport = await TransportNodeHid.open(this.devicePath)
       let eth = new Eth(transport)
       eth.signPersonalMessage(this.getPath(index), message.replace('0x', '')).then(result => {
         let v = (result['v'] - 27).toString(16)
         if (v.length < 2) v = '0' + v
         cb(null, '0x' + result['r'] + result['s'] + v)
         transport.close()
+        device.close()
         this.busyCount = 0
         this.pause = false
       }).catch(err => {
         cb(err)
         transport.close()
+        device.close()
         this.pause = false
       })
     } catch (err) {
@@ -268,7 +285,9 @@ class Ledger extends Signer {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
-      let transport = await TransportNodeHid.open(this.devicePath)
+      // let transport = await TransportNodeHid.open(this.devicePath)
+      let device = new HID.HID(this.devicePath)
+      let transport = new TransportNodeHid(device)
       let eth = new Eth(transport)
       if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
       const tx = new EthereumTx(rawTx)
@@ -278,6 +297,7 @@ class Ledger extends Signer {
       const rawTxHex = tx.serialize().toString('hex')
       eth.signTransaction(this.getPath(index), rawTxHex).then(result => {
         transport.close()
+        device.close()
         this.busyCount = 0
         this.pause = false
         let tx = new EthereumTx({
@@ -294,6 +314,7 @@ class Ledger extends Signer {
         cb(null, '0x' + tx.serialize().toString('hex'))
       }).catch(err => {
         transport.close()
+        device.close()
         this.pause = false
         cb(err.message)
       })
