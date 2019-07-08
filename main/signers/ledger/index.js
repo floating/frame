@@ -21,14 +21,16 @@ module.exports = {
       current.forEach(device => {
         let signer = signers.find(signer => signer.devicePath === device.path)
         const validInterface = d => ['win32', 'darwin'].includes(process.platform) ? d.usagePage === 0xffa0 : d.interface === 0
-        if (!signer && validInterface(device)) {
-          log.info('Creating Ledger Signer: ...', device.path.substr(device.path.length - 5))
-          signer = new Ledger(device.path, signers)
-          signers.add(signer)
-        } else {
-          signer.deviceStatus()
+        if (validInterface(device)) {
+          if (!signer) {
+            log.info('Creating Ledger Signer: ...', device.path.substr(device.path.length - 5))
+            signer = new Ledger(device.path, signers)
+            signers.add(signer)
+          } else {
+            signer.deviceStatus()
+          }
+          log.info('Updating Ledger: ', JSON.stringify(signer.summary()))
         }
-        log.info('Updating Ledger: ', JSON.stringify(signer.summary()))
       })
     }
     const listenScan = () => {
