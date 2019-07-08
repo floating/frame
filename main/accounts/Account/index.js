@@ -31,7 +31,9 @@ class Account {
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
         this.signer = undefined
       }
-      this.signer = store('main.signers', this.id)
+      let updatedSigner = store('main.signers', this.id)
+      if (this.signer && this.signer.status === 'locked' && updatedSigner && updatedSigner.status === 'ok') this.verifyAddress()
+      this.signer = updatedSigner
       this.smart = this.signer ? undefined : this.smart
       this.update()
     })
@@ -67,7 +69,13 @@ class Account {
     }
   }
   verifyAddress (display) {
-    signers.get(this.signer.id).verifyAddress(display, this.index, this.addresses[this.index])
+    if (this.smart && this.smart.actor && this.smart.actor.signer) {
+      signers.get(this.smart.actor.signer.id).verifyAddress(this.index, this.smart.actor.addresses[this.index], display)
+    } else if (this.signer) {
+      signers.get(this.signer.id).verifyAddress(this.index, this.addresses[this.index], display)
+    } else {
+      log.info('No signer active to verify address')
+    }
   }
   getSelectedAddresses () {
     return [this.addresses[this.index]]
@@ -80,6 +88,7 @@ class Account {
     this.requests = {} // TODO Decline these requests before clobbering them
     this.update()
     cb(null, this.summary())
+    this.verifyAddress()
   }
   summary () {
     const update = JSON.parse(JSON.stringify({

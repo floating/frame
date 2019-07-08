@@ -80,10 +80,7 @@ class HotSigner extends Signer {
       this.id = derivedId
       // Write to disk
       this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
-    }
-
-    // On changed ID ->
-    else if (this.id !== derivedId) {
+    } else if (this.id !== derivedId) { // On changed ID
       // Erase from disk
       this.delete(this.id)
       // Remove from store
@@ -109,9 +106,15 @@ class HotSigner extends Signer {
     this._callWorker(payload, cb)
   }
 
-  verifyAddress (index, address, cb) {
+  verifyAddress (index, address) {
     const payload = { method: 'verifyAddress', params: { index, address } }
-    this._callWorker(payload, cb)
+    this._callWorker(payload, (err, verified) => {
+      if (err || !verified) {
+        this.lock(() => log.warn('Unable to verify address, signer locked'))
+      } else {
+        log.info('Hot signer verify address matched')
+      }
+    })
   }
 
   _getToken () {

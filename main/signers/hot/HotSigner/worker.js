@@ -49,7 +49,7 @@ class HotSignerWorker {
     const message = crypto.randomBytes(32).toString('hex')
     this.signMessage({ index, message }, (err, signedMessage) => {
       // Handle signing errors
-      if (err) pseudoCallback(err)
+      if (err) return pseudoCallback(err)
       // Signature -> buffer
       const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
       // Ensure correct length

@@ -78,7 +78,7 @@ class Ledger extends Signer {
       cb(err)
     }
   }
-  async verifyAddress (display, index, current) {
+  async verifyAddress (index, current, display) {
     if (verifyActive) return log.info('verifyAddress Called but it\'s already active')
     if (this.pause) return log.info('Device access is paused')
     verifyActive = true

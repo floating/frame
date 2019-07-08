@@ -27,7 +27,6 @@ const rpc = {
     provider.accountsChanged(accounts.getSelectedAddresses())
   },
   unsetSigner: (id, cb) => {
-    signers.lock(id, cb)
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
   },
@@ -107,6 +106,9 @@ const rpc = {
   },
   unlockSigner (id, password, cb) {
     signers.unlock(id, password, cb)
+  },
+  lockSigner (id, cb) {
+    signers.lock(id, cb)
   },
   remove (id, cb) {
     signers.remove(id, cb)
