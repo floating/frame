@@ -4,6 +4,7 @@ const { ensureDirSync } = require('fs-extra')
 const { app } = require('electron')
 const log = require('electron-log')
 const bip39 = require('bip39')
+const zxcvbn = require('zxcvbn')
 
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
@@ -18,6 +19,8 @@ module.exports = {
   createFromSeed: (signers, seed, password, cb) => {
     if (!seed) return cb(new Error('Seed required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
+    if (password.length < 12) return cb(new Error('Hot account password is too short'))
+    if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new SeedSigner()
     signer.addSeed(seed, password, (err, result) => {
       if (err) {
@@ -31,6 +34,8 @@ module.exports = {
   createFromPhrase: (signers, phrase, password, cb) => {
     if (!phrase) return cb(new Error('Phrase required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
+    if (password.length < 12) return cb(new Error('Hot account password is too short'))
+    if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new SeedSigner()
     signer.addPhrase(phrase, password, (err, result) => {
       if (err) {
@@ -44,6 +49,8 @@ module.exports = {
   createFromPrivateKey: (signers, privateKey, password, cb) => {
     if (!privateKey) return cb(new Error('Private key required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
+    if (password.length < 12) return cb(new Error('Hot account password is too short'))
+    if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
     signer.addPrivateKey(privateKey, password, (err, result) => {
       if (err) {
@@ -57,7 +64,9 @@ module.exports = {
   createFromKeystore: (signers, keystore, keystorePassword, password, cb) => {
     if (!keystore) return cb(new Error('Keystore required'))
     if (!keystorePassword) return cb(new Error('Keystore password required'))
-    if (!password) return cb(new Error('Signer password required'))
+    if (!password) return cb(new Error('Password required to create hot signer'))
+    if (password.length < 12) return cb(new Error('Hot account password is too short'))
+    if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
     signer.addKeystore(keystore, keystorePassword, password, (err, result) => {
       if (err) {

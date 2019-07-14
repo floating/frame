@@ -1,5 +1,5 @@
 const crypto = require('crypto')
-
+const bcrypt = require('bcrypt')
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const EthTx = require('ethereumjs-tx')
 
@@ -67,23 +67,25 @@ class HotSignerWorker {
   }
 
   _encrypt (string, password) {
+    const salt = bcrypt.genSaltSync(10)
     const iv = crypto.randomBytes(16)
-    const cipher = crypto.createCipheriv('aes-256-cbc', this._hash(password), iv)
+    const cipher = crypto.createCipheriv('aes-256-cbc', this._hashPassword(password, salt), iv)
     const encrypted = Buffer.concat([cipher.update(string), cipher.final()])
-    return iv.toString('hex') + ':' + encrypted.toString('hex')
+    return salt + ':' + iv.toString('hex') + ':' + encrypted.toString('hex')
   }
 
   _decrypt (string, password) {
     const parts = string.split(':')
+    const salt = parts.shift()
     const iv = Buffer.from(parts.shift(), 'hex')
-    const decipher = crypto.createDecipheriv('aes-256-cbc', this._hash(password), iv)
+    const decipher = crypto.createDecipheriv('aes-256-cbc', this._hashPassword(password, salt), iv)
     const encryptedString = Buffer.from(parts.join(':'), 'hex')
     const decrypted = Buffer.concat([decipher.update(encryptedString), decipher.final()])
     return decrypted.toString()
   }
 
-  _hash (string) {
-    const hash = crypto.createHash('sha256').update(string)
+  _hashPassword (password, salt) {
+    const hash = crypto.createHash('sha512').update(bcrypt.hashSync(password, salt))
     return Buffer.from(hash.digest('hex').substring(0, 32))
   }
 }
