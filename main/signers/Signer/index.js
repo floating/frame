@@ -80,6 +80,9 @@ class Signer {
   signTransaction (rawTx, cb) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
+  signTypedData (typedData, cb) {
+    console.warn('Signer:' + this.type + ' did not implement a signTypedData method')
+  }
 }
 
 module.exports = Signer
