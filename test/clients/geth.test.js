@@ -143,14 +143,12 @@ describe('Geth', () => {
         // 3) Expect client to respond to JSON RPC call
         const isListening = await makeRPCCall()
         counter.expect(isListening).toBe(true)
-
       })
     })
 
     // Start client
     setTimeout(() => {
       geth.start()
-    }, 1000);
-
+    }, 1000)
   })
 })

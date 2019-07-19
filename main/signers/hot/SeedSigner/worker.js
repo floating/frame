@@ -53,4 +53,4 @@ class SeedSignerWorker extends HotSignerWorker {
   }
 }
 
-const seedSignerWorker = new SeedSignerWorker()
+export const seedSignerWorker = new SeedSignerWorker()

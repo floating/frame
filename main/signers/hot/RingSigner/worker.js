@@ -71,4 +71,4 @@ class RingSignerWorker extends HotSignerWorker {
   }
 }
 
-const ringSignerWorker = new RingSignerWorker()
+export const ringSignerWorker = new RingSignerWorker()
