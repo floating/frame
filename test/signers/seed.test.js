@@ -3,7 +3,7 @@ const hot = require('../../main/signers/hot')
 const { clean } = require('../util')
 const store = require('../../main/store')
 
-const PASSWORD = 'frame'
+const PASSWORD = 'fr@///3_password'
 
 // Stubs
 const signers = { add: (signer) => {} }

@@ -56,7 +56,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "@aragon/wrapper": "^5.0.0-rc.12",
+    "@aragon/wrapper": "^5.0.0-rc.13",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "4.64.0",
     "@ledgerhq/hw-transport-node-hid": "4.64.0",
@@ -87,6 +87,7 @@
     "react-dom": "16.8.6",
     "react-restore": "0.3.0",
     "react-transition-group": "4.1.1",
+    "scrypt": "6.0.3",
     "semver": "6.1.1",
     "tar": "^4.4.10",
     "trezor-connect": "7.0.3",
@@ -96,7 +97,8 @@
     "uuid": "3.3.2",
     "web3-utils": "1.0.0-beta.37",
     "worker-farm": "1.7.0",
-    "ws": "7.0.0"
+    "ws": "7.0.0",
+    "zxcvbn": "4.4.2"
   },
   "devDependencies": {
     "@babel/core": "7.4.5",
