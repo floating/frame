@@ -30,34 +30,40 @@ class Provider extends EventEmitter {
     this.fillTx = this.fillTx.bind(this)
     this.subs = { accountsChanged: [], networkChanged: [] }
   }
+
   accountsChanged (accounts) {
     this.subs.accountsChanged.forEach(subscription => {
       this.emit('data:accounts', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
     })
   }
+
   networkChanged (netId) {
     this.subs.networkChanged.forEach(subscription => {
       this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
     })
   }
+
   randHex (len) {
-    let maxlen = 8
-    let min = Math.pow(16, Math.min(len, maxlen) - 1)
-    let max = Math.pow(16, Math.min(len, maxlen)) - 1
-    let n = Math.floor(Math.random() * (max - min + 1)) + min
+    const maxlen = 8
+    const min = Math.pow(16, Math.min(len, maxlen) - 1)
+    const max = Math.pow(16, Math.min(len, maxlen)) - 1
+    const n = Math.floor(Math.random() * (max - min + 1)) + min
     let r = n.toString(16)
     while (r.length < len) r = r + this.randHex(len - maxlen)
     return r
   }
+
   getCoinbase (payload, res) {
     accounts.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts[0] })
     })
   }
+
   getAccounts (payload, res) {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
   }
+
   getNetVersion (payload, res) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
@@ -65,27 +71,31 @@ class Provider extends EventEmitter {
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })
   }
+
   declineRequest (req) {
-    let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
-    let payload = req.payload
+    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const payload = req.payload
     this.resError(`User declined transaction`, payload, res)
   }
+
   resError (error, payload, res) {
     if (typeof error === 'string') error = { message: error, code: -1 }
     log.warn(error)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error: error.message })
   }
+
   getSignedAddress (signed, message, cb) {
     const signature = Buffer.from(signed.replace('0x', ''), 'hex')
     if (signature.length !== 65) cb(new Error(`Frame verifySignature: Signature has incorrect length`))
     let v = signature[64]
     v = v === 0 || v === 1 ? v + 27 : v
-    let r = toBuffer(signature.slice(0, 32))
-    let s = toBuffer(signature.slice(32, 64))
+    const r = toBuffer(signature.slice(0, 32))
+    const s = toBuffer(signature.slice(32, 64))
     const hash = hashPersonalMessage(toBuffer(message))
     const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
     cb(null, verifiedAddress)
   }
+
   ecRecover (payload, res) {
     const message = payload.params[0]
     const signed = payload.params[1]
@@ -94,6 +104,7 @@ class Provider extends EventEmitter {
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: verifiedAddress })
     })
   }
+
   verifySignature (signed, message, address, cb) {
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
@@ -101,11 +112,12 @@ class Provider extends EventEmitter {
       cb(null, true)
     })
   }
+
   approveSign (req, cb) {
-    let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
-    let payload = req.payload
-    let address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
-    let message = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
+    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const payload = req.payload
+    const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
+    const message = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
     accounts.signMessage(address, message, (err, signed) => {
       if (err) {
         this.resError(err.message, payload, res)
@@ -123,10 +135,11 @@ class Provider extends EventEmitter {
       }
     })
   }
+
   signAndSend (req, cb) {
-    let rawTx = req.data
-    let res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
-    let payload = req.payload
+    const rawTx = req.data
+    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const payload = req.payload
     accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
       if (err) {
         this.resError(err, payload, res)
@@ -147,27 +160,32 @@ class Provider extends EventEmitter {
       }
     })
   }
+
   approveRequest (req, cb) {
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
       if (response.error) return cb(response.error)
-      let updatedReq = Object.assign({}, req)
+      const updatedReq = Object.assign({}, req)
       updatedReq.data = Object.assign({}, updatedReq.data, { nonce: response.result })
       this.signAndSend(updatedReq, cb)
     })
   }
+
   getRawTx (payload) {
-    let rawTx = payload.params[0]
+    const rawTx = payload.params[0]
     rawTx.gas = rawTx.gas || rawTx.gasLimit
     delete rawTx.gasLimit
     return rawTx
   }
+
   getGasPrice (rawTx, res) {
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, res)
   }
+
   getGasEstimate (rawTx, res) {
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, res)
   }
+
   getNonce (rawTx, res) {
     if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.account === rawTx.from && this.nonce.current) {
       let newNonce = utils.hexToNumber(this.nonce.current)
@@ -182,14 +200,15 @@ class Provider extends EventEmitter {
       })
     }
   }
+
   fillTx (rawTx, cb) {
-    let needs = {}
+    const needs = {}
     // if (!rawTx.nonce) needs.nonce = this.getNonce
     if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
     if (!rawTx.gas) needs.gas = this.getGasEstimate
     let count = 0
-    let list = Object.keys(needs)
-    let errors = []
+    const list = Object.keys(needs)
+    const errors = []
     if (list.length > 0) {
       list.forEach(need => {
         needs[need](rawTx, response => {
@@ -205,43 +224,49 @@ class Provider extends EventEmitter {
       cb(null, rawTx)
     }
   }
+
   sendTransaction (payload, res) {
-    let rawTx = this.getRawTx(payload)
+    const rawTx = this.getRawTx(payload)
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
-      let from = rawTx.from
-      let current = accounts.getAccounts()[0]
+      const from = rawTx.from
+      const current = accounts.getAccounts()[0]
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
-      let handlerId = uuid()
+      const handlerId = uuid()
       this.handlers[handlerId] = res
       accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0] }, res)
     })
   }
+
   ethSign (payload, res) {
-    let handlerId = uuid()
+    const handlerId = uuid()
     this.handlers[handlerId] = res
     accounts.addRequest({ handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] })
   }
+
   subscribe (payload, res) {
-    let subId = '0x' + this.randHex(32)
+    const subId = '0x' + this.randHex(32)
     this.subs[payload.params[0]] = this.subs[payload.params[0]] || []
     this.subs[payload.params[0]].push(subId)
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
+
   ifSubRemove (id) {
     let found = false
     Object.keys(this.subs).some(type => {
-      let index = this.subs[type].indexOf(id)
+      const index = this.subs[type].indexOf(id)
       found = index > -1
       if (found) this.subs[type].splice(index, 1)
       return found
     })
     return found
   }
+
   clientVersion (payload, res) {
     res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${version}` })
   }
+
   send (payload, res = () => {}) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)

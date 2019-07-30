@@ -67,17 +67,18 @@ class Add extends React.Component {
     super(...args)
     this.particles = false
   }
+
   setup () {
     if (this.particles) return
     this.particles = true
-    let canvas = document.getElementById('canvas')
+    const canvas = document.getElementById('canvas')
     if (canvas) {
-      let ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d')
       if (ctx) {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        let particles = []
-        let particleCount = 64
+        const particles = []
+        const particleCount = 64
         class Particle {
           constructor () {
             this.x = canvas.width * Math.random()
@@ -85,6 +86,7 @@ class Add extends React.Component {
             this.vx = (Math.random() / 2) - 0.25
             this.vy = (Math.random() / 2) - 0.25
           }
+
           update () {
             this.x += this.vx
             this.y += this.vy
@@ -95,7 +97,7 @@ class Add extends React.Component {
           }
         }
         for (let i = 0; i < particleCount; i++) particles.push(new Particle())
-        let loop = () => {
+        const loop = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height)
           for (let i = 0; i < particleCount; i++) particles[i].update(ctx)
           this.animate = window.requestAnimationFrame(loop)
@@ -104,13 +106,16 @@ class Add extends React.Component {
       }
     }
   }
+
   toggleAddAccount (state) {
     if (state === 'entered' || state === 'exited') this.store.toggleAddAccount()
   }
+
   exit () {
     window.cancelAnimationFrame(this.animate)
     this.particles = false
   }
+
   render () {
     return (
       <Transition in={Boolean(this.store('view.addAccount'))} timeout={duration} onExit={() => this.exit()}>

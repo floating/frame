@@ -13,7 +13,7 @@ class Geth extends EthereumClient {
       const networkFlag = this._getNetworkFlag(networkId)
 
       // Prepare client arguments
-      let args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc', '--rpcapi', 'admin,eth,net']
+      const args = ['--networkid', networkId, '--syncmode', mode, '--nousb', '--rpc', '--rpcapi', 'admin,eth,net']
       if (networkFlag) args.push(networkFlag)
 
       // Start client

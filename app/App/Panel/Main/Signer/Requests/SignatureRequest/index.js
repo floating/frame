@@ -12,6 +12,7 @@ class TransactionRequest extends React.Component {
       this.setState({ allowInput: true })
     }, 2000)
   }
+
   copyAddress (e) {
     e.preventDefault()
     e.target.select()
@@ -19,31 +20,36 @@ class TransactionRequest extends React.Component {
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
+
   approve (reqId, req) {
     link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
+
   decline (reqId, req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
+
   toggleDataView (id) {
     this.setState({ dataView: !this.state.dataView })
   }
+
   hexToDisplayValue (hex) {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
+
   render () {
-    let type = this.props.req.type
-    let status = this.props.req.status
-    let notice = this.props.req.notice
-    let payload = this.props.req.payload
-    let message = utils.toAscii(payload.method === 'eth_sign' ? payload.params[1] : payload.params[0] || '0x')
+    const type = this.props.req.type
+    const status = this.props.req.status
+    const notice = this.props.req.notice
+    const payload = this.props.req.payload
+    const message = utils.toAscii(payload.method === 'eth_sign' ? payload.params[1] : payload.params[0] || '0x')
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    let mode = this.props.req.mode
-    let height = mode === 'monitor' ? '80px' : '360px'
+    const mode = this.props.req.mode
+    const height = mode === 'monitor' ? '80px' : '360px'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         {type === 'sign' ? (

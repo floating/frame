@@ -72,7 +72,7 @@ class HotSigner extends Signer {
 
   update () {
     // Get derived ID
-    let derivedId = this.addressesId()
+    const derivedId = this.addressesId()
 
     // On new ID ->
     if (!this.id) {
@@ -136,7 +136,7 @@ class HotSigner extends Signer {
     // Handle response
     const listener = (response) => {
       if (response.type === 'rpc' && response.id === id) {
-        let error = response.error ? new Error(response.error) : null
+        const error = response.error ? new Error(response.error) : null
         cb(error, response.result)
         this._worker.removeListener('message', listener)
       }

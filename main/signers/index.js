@@ -11,40 +11,50 @@ class Signers extends EventEmitter {
     ledger.scan(this)
     // trezorConnect.scan(this)
   }
+
   add (signer) {
     if (!this.signers.find(s => s.id === signer.id)) this.signers.push(signer)
   }
+
   remove (id) {
-    let index = this.signers.map(s => s.id).indexOf(id)
+    const index = this.signers.map(s => s.id).indexOf(id)
     if (index > -1) {
-      let signer = this.signers[index]
+      const signer = this.signers[index]
       signer.close()
       // If hot signer -> erase from disk
       if (signer.delete) signer.delete()
       this.signers.splice(index, 1)
     }
   }
+
   find (f) {
     return this.signers.find(f)
   }
+
   filter (f) {
     return this.signers.filter(f)
   }
+
   list () {
     return this.signers
   }
+
   get (id) {
     return this.signers.find(signer => signer.id === id)
   }
+
   createFromPhrase (mnemonic, password, cb) {
     hot.createFromPhrase(this, mnemonic, password, cb)
   }
+
   createFromPrivateKey (privateKey, password, cb) {
     hot.createFromPrivateKey(this, privateKey, password, cb)
   }
+
   createFromKeystore (keystore, keystorePassword, password, cb) {
     hot.createFromKeystore(this, keystore, keystorePassword, password, cb)
   }
+
   addPrivateKey (id, privateKey, password, cb) {
     // Get signer
     const signer = this.get(id)
@@ -53,6 +63,7 @@ class Signers extends EventEmitter {
     // Add private key
     signer.addPrivateKey(privateKey, password, cb)
   }
+
   removePrivateKey (id, index, password, cb) {
     // Get signer
     const signer = this.get(id)
@@ -61,6 +72,7 @@ class Signers extends EventEmitter {
     // Add keystore
     signer.removePrivateKey(index, password, cb)
   }
+
   addKeystore (id, keystore, keystorePassword, password, cb) {
     // Get signer
     const signer = this.get(id)
@@ -69,18 +81,21 @@ class Signers extends EventEmitter {
     // Add keystore
     signer.addKeystore(keystore, keystorePassword, password, cb)
   }
+
   lock (id, cb) {
-    let signer = this.get(id)
+    const signer = this.get(id)
     if (signer && signer.lock) signer.lock(cb)
   }
+
   unlock (id, password, cb) {
-    let signer = this.signers.find(s => s.id === id)
+    const signer = this.signers.find(s => s.id === id)
     if (signer && signer.unlock) {
       signer.unlock(password, cb)
     } else {
       console.error('Signer not unlockable via password')
     }
   }
+
   unsetSigner () {
     console.log('unsetSigner')
   }

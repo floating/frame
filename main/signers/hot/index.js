@@ -78,7 +78,7 @@ module.exports = {
     })
   },
   scan: (signers) => {
-    let storedSigners = {}
+    const storedSigners = {}
 
     // Ensure signer directory exists
     ensureDirSync(SIGNERS_PATH)

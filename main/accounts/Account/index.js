@@ -31,15 +31,16 @@ class Account {
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
         this.signer = undefined
       }
-      let updatedSigner = store('main.signers', this.id)
+      const updatedSigner = store('main.signers', this.id)
       if (this.signer && this.signer.status === 'locked' && updatedSigner && updatedSigner.status === 'ok') this.verifyAddress()
       this.signer = updatedSigner
       this.smart = this.signer ? undefined : this.smart
       this.update()
     })
   }
+
   addRequest (req) {
-    let add = r => {
+    const add = r => {
       this.requests[r.handlerId] = req
       this.requests[r.handlerId].mode = 'normal'
       this.requests[r.handlerId].created = Date.now()
@@ -52,7 +53,7 @@ class Account {
       if (this.smart.type === 'aragon') {
         if (req.type === 'transaction') {
           if (!this.aragon) return log.error('Aragon account could not resolve this.aragon')
-          let rawTx = req.data
+          const rawTx = req.data
           rawTx.data = rawTx.data || '0x'
           this.aragon.pathTransaction(rawTx, (err, tx) => {
             if (err) return log.error(err)
@@ -72,6 +73,7 @@ class Account {
       add(req)
     }
   }
+
   verifyAddress (display) {
     if (this.smart && this.smart.actor && this.smart.actor.signer) {
       signers.get(this.smart.actor.signer.id).verifyAddress(this.index, this.smart.actor.addresses[this.index], display)
@@ -81,12 +83,15 @@ class Account {
       log.info('No signer active to verify address')
     }
   }
+
   getSelectedAddresses () {
     return [this.addresses[this.index]]
   }
+
   getSelectedAddress () {
     return this.addresses[this.index]
   }
+
   setIndex (i, cb) {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them
@@ -94,6 +99,7 @@ class Account {
     cb(null, this.summary())
     this.verifyAddress()
   }
+
   summary () {
     const update = JSON.parse(JSON.stringify({
       id: this.id,
@@ -112,26 +118,33 @@ class Account {
     }
     return update
   }
+
   update (add) {
     this.accounts.update(this.summary(), add)
   }
+
   delete () {
 
   }
+
   getCoinbase (cb) {
     cb(null, this.addresses[0])
   }
+
   getAccounts (cb) {
-    let account = this.addresses[this.index]
+    const account = this.addresses[this.index]
     if (cb) cb(null, account ? [account] : [])
     return account ? [account] : []
   }
+
   open () {
     windows.broadcast('main:action', 'addSigner', this.summary())
   }
+
   close () {
     console.log('Account close needs to remove observers')
   }
+
   signMessage (message, cb) {
     if (!message) return cb(new Error('No message to sign'))
     if (this.signer) {
@@ -146,6 +159,7 @@ class Account {
       cb(new Error(`No signer forund for this account`))
     }
   }
+
   signTransaction (rawTx, cb) {
     this._validateTransaction(rawTx, (err) => {
       if (err) return cb(err)
@@ -163,15 +177,16 @@ class Account {
       }
     })
   }
+
   _validateTransaction (rawTx, cb) {
     // Validate 'from' address
     if (!rawTx.from) return new Error(`Missing 'from' address`)
     if (!isValidAddress(rawTx.from)) return cb(new Error(`Invalid 'from' address`))
 
     // Ensure that transaction params are valid hex strings
-    let keys = Object.keys(rawTx)
+    const keys = Object.keys(rawTx)
     for (let i = 0; i < keys.length; i++) {
-      let key = keys[i]
+      const key = keys[i]
       if (!this._isValidHexString(rawTx[key])) {
         // Break on first error
         cb(new Error(`Transaction parameter '${key}' is not a invalid hex string`))
@@ -180,6 +195,7 @@ class Account {
     }
     return cb(null)
   }
+
   _isValidHexString (string) {
     const pattern = /^0x[0-9a-fA-F]*$/
     return pattern.test(string)

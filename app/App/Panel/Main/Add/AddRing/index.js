@@ -19,29 +19,34 @@ class AddRing extends React.Component {
       keystorePassword: ''
     }
   }
+
   onChange (key, e) {
     e.preventDefault()
-    let update = {}
+    const update = {}
     update[key] = e.target.value || ''
     this.setState(update)
   }
+
   onBlur (key, e) {
     e.preventDefault()
-    let update = {}
+    const update = {}
     update[key] = this.state[key] || ''
     this.setState(update)
   }
+
   onFocus (key, e) {
     e.preventDefault()
     if (this.state[key] === '') {
-      let update = {}
+      const update = {}
       update[key] = ''
       this.setState(update)
     }
   }
+
   next () {
     this.setState({ index: ++this.state.index })
   }
+
   createManual () {
     this.setState({ index: ++this.state.index })
     link.rpc('createFromPrivateKey', this.state.privateKey, this.state.password, (err, signer) => {
@@ -55,6 +60,7 @@ class AddRing extends React.Component {
       }
     })
   }
+
   createKeystore () {
     this.setState({ index: ++this.state.index })
     link.rpc('createFromKeystore', this.state.keystore, this.state.keystorePassword, this.state.password, (err, signer) => {
@@ -68,13 +74,16 @@ class AddRing extends React.Component {
       }
     })
   }
+
   restart () {
     this.setState({ index: 0, adding: true, phrase: '', password: '', status: '', success: false })
   }
+
   addManual () {
     this.setState({ mode: 'manual' })
     this.next()
   }
+
   addKeystore () {
     this.setState({ mode: 'keystore' })
     this.next()
@@ -89,6 +98,7 @@ class AddRing extends React.Component {
       })
     }, 640)
   }
+
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
     if (this.state.adding) itemClass += ' addAccountItemAdding'

@@ -16,6 +16,7 @@ class Signer extends React.Component {
     this.locked = false
     this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '', unlockInput: '' }
   }
+
   copyAddress (e) {
     e.preventDefault()
     e.target.select()
@@ -23,34 +24,41 @@ class Signer extends React.Component {
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
+
   unlockChange (e) {
     this.setState({ unlockInput: e.target.value })
   }
+
   unlockSubmit (e) {
     link.rpc('unlockSigner', this.props.id, this.state.unlockInput, () => {})
   }
+
   trezorPin (num) {
     this.setState({ tPin: this.state.tPin + num.toString() })
   }
+
   submitPin () {
     link.rpc('trezorPin', this.props.id, this.state.tPin, () => {})
     this.setState({ tPin: '' })
   }
+
   backspacePin (e) {
     e.stopPropagation()
     this.setState({ tPin: this.state.tPin ? this.state.tPin.slice(0, -1) : '' })
   }
+
   select () {
     if (this.store('selected.current') === this.props.id) {
       link.rpc('unsetSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
       if (this.props.signer) link.rpc('lockSigner', this.props.signer.id, (err, status) => { if (err) return console.log(err) })
     } else {
-      let bounds = this.signer.getBoundingClientRect()
+      const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
       this.store.initialSignerPos({ top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
+
   renderTrezorPin (active) {
     return (
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
@@ -64,6 +72,7 @@ class Signer extends React.Component {
       </div>
     )
   }
+
   renderArrows () {
     return (
       <React.Fragment>
@@ -84,6 +93,7 @@ class Signer extends React.Component {
       </React.Fragment>
     )
   }
+
   typeClick () {
     if (this.props.status === 'ok') {
       this.select()
@@ -94,6 +104,7 @@ class Signer extends React.Component {
       setTimeout(() => this.setState({ typeShake: false }), 1010)
     }
   }
+
   renderType () {
     let innerClass = 'signerInner'
     if (this.state.typeActive) innerClass += ' signerInnerActive'
@@ -141,6 +152,7 @@ class Signer extends React.Component {
       </div>
     )
   }
+
   renderMenu () {
     let menuClass = 'signerMenu'
     menuClass += this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
@@ -162,12 +174,15 @@ class Signer extends React.Component {
       </div>
     )
   }
+
   setHighlight (mode, index) {
     if (!this.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
   }
+
   closeAccounts () {
     if (this.store('selected.showAccounts')) this.store.toggleShowAccounts(false)
   }
+
   setSignerIndex (index) {
     this.locked = true
     link.rpc('setSignerIndex', index, (err, summary) => {
@@ -177,12 +192,13 @@ class Signer extends React.Component {
       if (err) return console.log(err)
     })
   }
+
   renderSettingsMenu () {
-    let viewIndex = this.store('selected.settings.viewIndex')
-    let views = this.store('selected.settings.views')
-    let itemWidth = 35
-    let markLeft = (itemWidth * viewIndex) + 'px'
-    let markRight = (((views.length - viewIndex) - 1) * itemWidth) + 'px'
+    const viewIndex = this.store('selected.settings.viewIndex')
+    const views = this.store('selected.settings.views')
+    const itemWidth = 35
+    const markLeft = (itemWidth * viewIndex) + 'px'
+    const markRight = (((views.length - viewIndex) - 1) * itemWidth) + 'px'
     return (
       <div className='settingsMenu'>
         <div className='settingsMenuItems'>
@@ -204,17 +220,18 @@ class Signer extends React.Component {
       </div>
     )
   }
+
   renderAccountList () {
-    let index = this.store('main.accounts', this.props.id, 'index')
-    let startIndex = this.store('selected.accountPage') * 5
-    let highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
+    const index = this.store('main.accounts', this.props.id, 'index')
+    const startIndex = this.store('selected.accountPage') * 5
+    const highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
     return (
       <div className='accountListWrap'>
         <div className='accountList' onMouseDown={e => e.stopPropagation()}>
           <div className='accountListItems'>
             {this.store('main.accounts', this.props.id, 'addresses').slice(startIndex, startIndex + 5).map((a, i) => {
               i = startIndex + i
-              let balance = this.store('balances', a)
+              const balance = this.store('balances', a)
               return (
                 <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
                   <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
@@ -234,22 +251,24 @@ class Signer extends React.Component {
       </div>
     )
   }
+
   updateAccountPage (d) {
     let accountPage = this.store('selected.accountPage')
     accountPage = d === '<' ? accountPage - 1 : accountPage + 1
-    let max = Math.ceil((this.store('main.accounts', this.props.id, 'addresses').length / 5) - 1)
+    const max = Math.ceil((this.store('main.accounts', this.props.id, 'addresses').length / 5) - 1)
     if (accountPage < 0) accountPage = 0
     if (accountPage > max) accountPage = max
     this.store.accountPage(accountPage)
   }
+
   renderStatus () {
     // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
     let currentIndex = this.store('main.accounts', this.props.id, 'index')
-    let status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
+    const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-    let address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    let balance = this.store('balances', address)
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const balance = this.store('balances', address)
     if (!address) return null
     return (
       <div className='signerStatus' key={this.props.status}>
@@ -307,10 +326,11 @@ class Signer extends React.Component {
       </div>
     )
   }
+
   render () {
-    let current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    let open = current && this.store('selected.open')
-    let minimized = this.store('selected.minimized')
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const open = current && this.store('selected.open')
+    const minimized = this.store('selected.minimized')
     this.selected = current && !minimized
     let signerClass = 'signer'
     if (this.props.status === 'ok') signerClass += ' okSigner'
@@ -318,8 +338,8 @@ class Signer extends React.Component {
     if (this.store('selected.view') === 'settings') signerClass += ' signerInSettings'
     if (this.store('selected.showAccounts')) signerClass += ' signerAccountExpand'
 
-    let style = {}
-    let initial = this.store('selected.position.initial')
+    const style = {}
+    const initial = this.store('selected.position.initial')
 
     if (current) {
       // Currently selected
@@ -329,7 +349,7 @@ class Signer extends React.Component {
       style.left = 0
       style.right = 0
       style.zIndex = '1000000000000'
-      let panelHeight = document.body.offsetHeight
+      const panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 50 : initial.height - 3
       style.transform = open ? `translateY(-${initial.top - 44}px)` : `translateY(0px)`
     } else if (this.store('selected.current') !== '') {

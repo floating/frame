@@ -11,12 +11,12 @@ const get = (path, obj = persist.get('main')) => {
 }
 
 const main = (path, def) => {
-  let found = get(path)
+  const found = get(path)
   if (found === undefined) return def
   return found
 }
 
-let initial = {
+const initial = {
   panel: {
     show: false,
     view: 'default'
@@ -113,25 +113,25 @@ let initial = {
         type: '',
         network: '',
         settings: {
-          '1': {
+          1: {
             current: 'direct',
             options: {
               direct: 'direct'
             }
           },
-          '3': {
+          3: {
             current: 'direct',
             options: {
               direct: 'direct'
             }
           },
-          '4': {
+          4: {
             current: 'direct',
             options: {
               direct: 'direct'
             }
           },
-          '42': {
+          42: {
             current: 'direct',
             options: {
               direct: 'direct'
@@ -141,28 +141,28 @@ let initial = {
       },
       secondary: {
         settings: {
-          '1': {
+          1: {
             current: main('connection.secondary.settings.1.current', 'infura'),
             options: {
               infura: 'infura',
               custom: main('connection.secondary.settings.1.options.custom', '')
             }
           },
-          '3': {
+          3: {
             current: main('connection.secondary.settings.3.current', 'infura'),
             options: {
               infura: 'infuraRopsten',
               custom: main('connection.secondary.settings.3.options.custom', '')
             }
           },
-          '4': {
+          4: {
             current: main('connection.secondary.settings.4.current', 'infura'),
             options: {
               infura: 'infuraRinkeby',
               custom: main('connection.secondary.settings.4.options.custom', '')
             }
           },
-          '42': {
+          42: {
             current: main('connection.secondary.settings.42.current', 'infura'),
             options: {
               infura: 'infuraKovan',

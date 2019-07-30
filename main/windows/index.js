@@ -11,9 +11,9 @@ const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray
 
-let hideShow = { current: false, running: false, next: false }
+const hideShow = { current: false, running: false, next: false }
 
-let showOnReady = true
+const showOnReady = true
 // let needReload = false
 // let reloadTimeout, resetTimeout
 let mouseTimeout
@@ -21,20 +21,20 @@ let mouseTimeout
 let glide = false
 
 const detectMouse = () => {
-  let m1 = electron.screen.getCursorScreenPoint()
-  let display = electron.screen.getDisplayNearestPoint(m1)
-  let area = display.workArea
-  let bounds = display.bounds
-  let minX = (area.width + area.x) - 2
-  let center = (area.height + (area.y - bounds.y)) / 2
-  let margin = (area.height + (area.y - bounds.y)) / 8
+  const m1 = electron.screen.getCursorScreenPoint()
+  const display = electron.screen.getDisplayNearestPoint(m1)
+  const area = display.workArea
+  const bounds = display.bounds
+  const minX = (area.width + area.x) - 2
+  const center = (area.height + (area.y - bounds.y)) / 2
+  const margin = (area.height + (area.y - bounds.y)) / 8
   m1.y = m1.y - area.y
-  let minY = center - margin
-  let maxY = center + margin
+  const minY = center - margin
+  const maxY = center + margin
   mouseTimeout = setTimeout(() => {
     if (m1.x >= minX && m1.y >= minY && m1.y <= maxY) {
-      let m2 = electron.screen.getCursorScreenPoint()
-      let area = electron.screen.getDisplayNearestPoint(m2).workArea
+      const m2 = electron.screen.getCursorScreenPoint()
+      const area = electron.screen.getDisplayNearestPoint(m2).workArea
       m2.y = m2.y - area.y
       if (m2.x >= minX && m2.y === m1.y) {
         glide = true
@@ -85,7 +85,7 @@ const api = {
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
     windows.tray.setSize(0, 0)
-    let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows.tray.setPosition(area.width + area.x, area.height + area.y)
     // windows.tray.on('hide', () => { if (needReload) api.reload() })
     if (process.platform === 'linux') {
@@ -142,7 +142,7 @@ const api = {
     api.create()
   },
   trayClick: () => {
-    let showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+    const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
     showing ? api.hideTray() : api.showTray()
   },
   hideTray: () => {
@@ -158,10 +158,10 @@ const api = {
           if (store('main.reveal')) detectMouse()
           windows.tray.setVisibleOnAllWorkspaces(true)
           windows.tray.setAlwaysOnTop(false)
-          let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+          const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
           windows.tray.setResizable(true)
           windows.tray.setSize(1, dev ? 740 : area.height)
-          let pos = windows.tray.positioner.calculate('topRight')
+          const pos = windows.tray.positioner.calculate('topRight')
           windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
           windows.tray.hide()
@@ -184,9 +184,9 @@ const api = {
       hideShow.running = 'show'
       windows.tray.setVisibleOnAllWorkspaces(true)
       windows.tray.setResizable(false) // Keeps height consistant
-      let area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+      const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       windows.tray.setSize(360, dev ? 740 : area.height)
-      let pos = windows.tray.positioner.calculate('topRight')
+      const pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')
@@ -203,7 +203,7 @@ const api = {
     }
   },
   close: (e) => {
-    let id = winId(e)
+    const id = winId(e)
     if (windows[id]) windows[id].close()
     delete windows[id]
   },
@@ -218,15 +218,15 @@ const api = {
     Object.keys(windows).forEach(id => windows[id].send(channel, ...args))
   },
   minimize: (e) => {
-    let id = winId(e)
+    const id = winId(e)
     if (windows[id]) windows[id].minimize()
   },
   full: (e) => {
-    let id = winId(e)
+    const id = winId(e)
     if (windows[id]) windows[id].setFullScreen(!windows[id].isFullScreen())
   },
   devTools: (e) => {
-    let id = winId(e)
+    const id = winId(e)
     if (windows[id]) windows[id].webContents.openDevTools()
   },
   activate: () => {

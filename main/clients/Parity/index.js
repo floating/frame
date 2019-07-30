@@ -20,7 +20,7 @@ class Parity extends EthereumClient {
       fs.chmodSync(this.bin, 755)
 
       // Prepare client arguments
-      let args = ['--chain', chain, '--light']
+      const args = ['--chain', chain, '--light']
 
       // Define error handler
       const errorHandler = (err) => {

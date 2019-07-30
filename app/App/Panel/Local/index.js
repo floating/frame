@@ -11,16 +11,17 @@ class Settings extends React.Component {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
     this.network = context.store('main.connection.network')
-    let secondaryCustom = context.store('main.connection.secondary.settings', this.network, 'options.custom') || this.customMessage
+    const secondaryCustom = context.store('main.connection.secondary.settings', this.network, 'options.custom') || this.customMessage
     this.state = { localShake: {}, secondaryCustom, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       if (this.network !== context.store('main.connection.network')) {
         this.network = context.store('main.connection.network')
-        let secondaryCustom = context.store('main.connection.secondary.settings', this.network, 'options.custom') || this.customMessage
+        const secondaryCustom = context.store('main.connection.secondary.settings', this.network, 'options.custom') || this.customMessage
         this.setState({ secondaryCustom })
       }
     })
   }
+
   appInfo () {
     return (
       <div className='appInfo'>
@@ -38,6 +39,7 @@ class Settings extends React.Component {
       </div>
     )
   }
+
   okProtocol (location) {
     if (location === 'injected') return true
     if (location.endsWith('.ipc')) return true
@@ -45,33 +47,38 @@ class Settings extends React.Component {
     if (location.startsWith('https://') || location.startsWith('http://')) return true
     return false
   }
+
   customFocus () {
     if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
   }
+
   customBlur () {
     if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
   }
+
   inputCustom (e) {
     e.preventDefault()
     clearTimeout(this.customInputTimeout)
-    let value = e.target.value
+    const value = e.target.value
     this.setState({ secondaryCustom: value })
     this.customInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', this.state.secondaryCustom), 1000)
   }
+
   localShake (key) {
-    let localShake = Object.assign({}, this.state.localShake)
+    const localShake = Object.assign({}, this.state.localShake)
     localShake[key] = true
     this.setState({ localShake })
     setTimeout(() => {
-      let localShake = Object.assign({}, this.state.localShake)
+      const localShake = Object.assign({}, this.state.localShake)
       localShake[key] = false
       this.setState({ localShake })
     }, 1010)
   }
+
   status (connection) {
     let status = connection.status
-    let network = this.store('main.connection.network')
-    let current = connection.settings[network].current
+    const network = this.store('main.connection.network')
+    const current = connection.settings[network].current
     if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
@@ -81,6 +88,7 @@ class Settings extends React.Component {
       </div>
     )
   }
+
   quit () {
     return (
       <div className='quitFrame'>
@@ -88,6 +96,7 @@ class Settings extends React.Component {
       </div>
     )
   }
+
   indicator (status) {
     if (status === 'connected') {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
@@ -97,6 +106,7 @@ class Settings extends React.Component {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
     }
   }
+
   selectNetwork (net) {
     if (net !== this.store('main.connection.network')) {
       if (net === '1') {
@@ -106,15 +116,17 @@ class Settings extends React.Component {
       }
     }
   }
+
   expandNetwork (e, expand) {
     e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
+
   render () {
-    let network = this.store('main.connection.network')
-    let options = this.store('main.connection.options')
-    let index = options.indexOf(network)
-    let netSetStyle = { marginTop: this.state.expandNetwork ? '0px' : (-26 * index) + 'px' }
+    const network = this.store('main.connection.network')
+    const options = this.store('main.connection.options')
+    const index = options.indexOf(network)
+    const netSetStyle = { marginTop: this.state.expandNetwork ? '0px' : (-26 * index) + 'px' }
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
@@ -151,7 +163,7 @@ class Settings extends React.Component {
                       {this.store('main.connection.local.type') ? (
                         <div className='signerOptionSetText'>{this.store('main.connection.local.type')}</div>
                       ) : (_ => {
-                        let status = this.store('main.connection.local.status')
+                        const status = this.store('main.connection.local.status')
                         if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>{'scanning...'}</div>
                         return ''
                       })()}

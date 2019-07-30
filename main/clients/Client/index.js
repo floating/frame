@@ -45,7 +45,9 @@ class Client extends EventEmitter {
   }
 
   get version () { return fs.existsSync(this.versionFile) ? fs.readFileSync(this.versionFile, 'utf8') : null }
+
   get isInstalled () { return fs.existsSync(this.versionFile) }
+
   get isLatest () { return semver.satisfies(this.latest.version, this.version) }
 
   async install () {
@@ -63,8 +65,8 @@ class Client extends EventEmitter {
     // Get archive from release store
     https.get(this.release.location, (res) => {
       // Stream response into file
-      let stream = fs.createWriteStream(fileName)
-      let file = res.pipe(stream)
+      const stream = fs.createWriteStream(fileName)
+      const file = res.pipe(stream)
 
       // On download complete ->
       file.on('finish', async () => {

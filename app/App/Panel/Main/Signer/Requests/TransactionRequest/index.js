@@ -14,6 +14,7 @@ class TransactionRequest extends React.Component {
       this.setState({ allowInput: true })
     }, 1700)
   }
+
   copyAddress (e) {
     e.preventDefault()
     e.target.select()
@@ -21,38 +22,43 @@ class TransactionRequest extends React.Component {
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
+
   approve (reqId, req) {
     link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
+
   decline (reqId, req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
+
   toggleDataView (id) {
     this.setState({ dataView: !this.state.dataView })
   }
+
   hexToDisplayValue (hex) {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
+
   render () {
-    let req = this.props.req
+    const req = this.props.req
     let notice = req.notice
-    let status = req.status
-    let mode = req.mode
-    let toAddress = req.data && req.data.to ? req.data.to : ''
+    const status = req.status
+    const mode = req.mode
+    const toAddress = req.data && req.data.to ? req.data.to : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
-    let success = req.status === 'confirming' || req.status === 'confirmed'
-    let error = req.status === 'error' || req.status === 'declined'
+    const success = req.status === 'confirming' || req.status === 'confirmed'
+    const error = req.status === 'error' || req.status === 'declined'
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-    let etherRates = this.store('external.rates')
-    let etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-    let value = this.hexToDisplayValue(req.data.value || '0x')
-    let fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
-    let height = mode === 'monitor' ? '145px' : '360px'
-    let z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
-    let confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
+    const etherRates = this.store('external.rates')
+    const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+    const value = this.hexToDisplayValue(req.data.value || '0x')
+    const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
+    const height = mode === 'monitor' ? '145px' : '360px'
+    const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
+    const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let statusClass = 'txStatus'
     if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
@@ -113,7 +119,7 @@ class TransactionRequest extends React.Component {
                     </div>
                     <div className='monitorConfirms'>
                       {[...Array(12).keys()].map(i => {
-                        let monitorConfirmsItem = confirmations > i ? 'txProgressConfirmsItem txProgressConfirmsItemGood' : 'txProgressConfirmsItem'
+                        const monitorConfirmsItem = confirmations > i ? 'txProgressConfirmsItem txProgressConfirmsItemGood' : 'txProgressConfirmsItem'
                         return <div key={i} className={monitorConfirmsItem}>{svg.octicon('chevron-right', { height: 14 })}</div>
                       })}
                     </div>

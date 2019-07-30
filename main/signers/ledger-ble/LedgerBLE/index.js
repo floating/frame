@@ -34,18 +34,21 @@ class LedgerBLE extends Signer {
       }
     })
   }
+
   close () {
     clearTimeout(this.interval)
     this.networkObserver.remove()
     this.closed = true
     super.close()
   }
+
   getDeviceAddress (i, cb) {
     flex.rpc('ledger.ethereumGetAddress', this.id, this.getPath(i), true, (err, result) => {
       if (err) return cb(err)
       cb(null, '0x' + result.message.address)
     })
   }
+
   verifyAddress (display = false, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
     flex.rpc('ledger.ethereumGetAddress', this.id, this.getPath(), display, (err, result) => {
@@ -59,8 +62,8 @@ class LedgerBLE extends Signer {
           this.api.unsetSigner()
         }
       } else {
-        let address = result.address ? result.address.toLowerCase() : ''
-        let current = this.accounts[this.index].toLowerCase()
+        const address = result.address ? result.address.toLowerCase() : ''
+        const current = this.accounts[this.index].toLowerCase()
         log.info('Frame has the current address as: ' + current)
         log.info('Trezor is reporting: ' + address)
         if (address !== current) {
@@ -73,6 +76,7 @@ class LedgerBLE extends Signer {
       }
     })
   }
+
   setIndex (i, cb) {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them
@@ -80,6 +84,7 @@ class LedgerBLE extends Signer {
     cb(null, this.summary())
     this.verifyAddress()
   }
+
   lookupAccounts (cb) {
     flex.rpc('ledger.ethereumGetAddress', this.id, this.basePath(), false, (err, result) => {
       console.log('got result for lookupAccounts')
@@ -88,9 +93,11 @@ class LedgerBLE extends Signer {
       this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
     })
   }
+
   update () {
     if (!this.closed) super.update()
   }
+
   deviceStatus () {
     this.lookupAccounts((err, accounts) => {
       if (err) {
@@ -120,6 +127,7 @@ class LedgerBLE extends Signer {
       }
     })
   }
+
   // deviceStatus (deep, limit = 15) {
   //   if (this.status === 'Invalid sequence') return
   //   this.pollStatus()
@@ -185,9 +193,11 @@ class LedgerBLE extends Signer {
     if (hex.length % 2 !== 0) hex = '0' + hex
     return hex
   }
+
   hexToBuffer (hex) {
     return Buffer.from(this.normalize(hex), 'hex')
   }
+
   // Standard Methods
   signMessage (message, cb) {
     flex.rpc('ledger.ethereumSignMessage', this.id, this.getPath(), this.normalize(message), (err, result) => {
@@ -201,6 +211,7 @@ class LedgerBLE extends Signer {
       }
     })
   }
+
   signTransaction (rawTx, cb) {
     if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
     const trezorTx = {

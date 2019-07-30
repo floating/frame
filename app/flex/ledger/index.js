@@ -13,24 +13,30 @@ class Device {
     this.emit = emit
     this.setup()
   }
+
   setup () {
     this.connect()
   }
+
   summary () {
     return {
       id: this.id
     }
   }
+
   connect () {
     this.emit('ledger:connect', this.summary())
   }
+
   disconnect () {
     this.emit('ledger:disconnect', this.summary())
   }
+
   update (device = this.device) {
     this.device = device
     this.emit('ledger:update', this.summary())
   }
+
   async ethereumGetAddress (path, display, cb) {
     try {
       cb(null, await this.eth.getAddress(path, display, true))
@@ -38,6 +44,7 @@ class Device {
       cb(err.message)
     }
   }
+
   ethereumSignTransaction (path, rawTx, cb) {
     const tx = new EthereumTx(rawTx)
     tx.raw[6] = Buffer.from([rawTx.chainId]) // v
@@ -50,9 +57,11 @@ class Device {
       cb(err.message)
     })
   }
+
   ethereumSignMessage (path, message, cb) {
     console.log('ethereumSignMessage')
   }
+
   ethereumVerifyMessage (path, message, cb) {
     console.log('ethereumVerifyMessage')
   }
@@ -68,6 +77,7 @@ class Ledger {
     this.emit('ledger:scan') // Request synthetic input
     this.scanner = setInterval(() => this.emit('ledger:scan'), 20000)
   }
+
   async scan () {
     try {
       const device = await TransportWebBLE.create()
@@ -84,21 +94,26 @@ class Ledger {
       console.log(e)
     }
   }
+
   deviceNotFound (id, cb) {
     cb(new Error(`Device with id: ${id} not found`))
   }
+
   ethereumGetAddress (id, path, display, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumGetAddress(path, display, cb)
   }
+
   ethereumSignTransaction (id, path, tx, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumSignTransaction(path, tx, cb)
   }
+
   ethereumSignMessage (id, path, message, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumSignMessage(path, message, cb)
   }
+
   ethereumVerifyMessage (id, path, message, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumVerifyMessage(path, message, cb)

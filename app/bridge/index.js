@@ -13,7 +13,7 @@ const source = 'bridge:link'
 
 window.addEventListener('message', e => {
   if (e.origin !== 'file://') return
-  let data = unwrap(e.data)
+  const data = unwrap(e.data)
   if (e.origin === 'file://' && data.source !== source) {
     if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({ id: data.id, args, source, method: 'rpc' }), e.origin))
     if (data.method === 'event') return ipcRenderer.send(...data.args)
@@ -31,8 +31,8 @@ ipcRenderer.on('main:flex', (...args) => {
 })
 
 if (dev) {
-  let path = require('path')
-  let watch = require('node-watch')
+  const path = require('path')
+  const watch = require('node-watch')
   watch(path.resolve(__dirname, '..', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) window.postMessage(wrap({ method: 'reload', type: 'css', target: name }), '*')
   })

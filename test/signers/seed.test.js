@@ -67,7 +67,7 @@ describe('Seed signer', () => {
   })
 
   test('Sign tranasction', (done) => {
-    let rawTx = {
+    const rawTx = {
       nonce: '0x6',
       gasPrice: '0x09184e72a000',
       gasLimit: '0x30000',

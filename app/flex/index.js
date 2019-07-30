@@ -32,7 +32,7 @@ link.on('flex', (id, target, ...args) => {
       link.send('tray:flex:res', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
     })
   } else {
-    let args = [new Error('Unknown flex lib:method: ' + target)]
+    const args = [new Error('Unknown flex lib:method: ' + target)]
     link.send('tray:flex:res', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
   }
 })

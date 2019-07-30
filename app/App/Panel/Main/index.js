@@ -12,12 +12,13 @@ class Main extends React.Component {
   reportScroll () {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
+
   render () {
-    let accounts = this.store('main.accounts')
-    let signers = this.store('main.signers')
-    let untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
-    let current = this.store('selected.current')
-    let scrollTop = this.store('selected.position.scrollTop')
+    const accounts = this.store('main.accounts')
+    const signers = this.store('main.signers')
+    const untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
+    const current = this.store('selected.current')
+    const scrollTop = this.store('selected.position.scrollTop')
     return (
       <div className={this.store('panel.view') !== 'default' ? 'main mainHidden' : 'main'}>
         <Add />

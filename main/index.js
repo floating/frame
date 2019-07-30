@@ -78,7 +78,7 @@ ipcMain.on('tray:openExternal', (e, url) => {
 
 const networks = { 1: '', 3: 'ropsten.', 4: 'rinkeby.', 42: 'kovan.' }
 ipcMain.on('tray:openEtherscan', (e, hash) => {
-  let network = networks[store('main.connection.network')]
+  const network = networks[store('main.connection.network')]
   shell.openExternal('https://' + network + 'etherscan.io/tx/' + hash)
 })
 
@@ -108,8 +108,8 @@ app.on('ready', () => {
   }
   if (app.dock) app.dock.hide()
   protocol.interceptFileProtocol('file', (req, cb) => {
-    let appOrigin = path.resolve(__dirname, '../')
-    let filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
+    const appOrigin = path.resolve(__dirname, '../')
+    const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
 })

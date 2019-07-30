@@ -12,9 +12,11 @@ class Aragon {
     wrap.init().then(() => { this.wrap = wrap }).catch(err => log.error(err))
     setTimeout(() => { this.provider = require('../../../provider') }, 0)
   }
+
   bufferToHex (value) {
     return utils.bufferToHex(value)
   }
+
   pathTransaction (tx, cb) {
     if (!this.wrap) return cb(new Error('Aragon wrapper not ready'))
     this.wrap.calculateTransactionPath(this.actor.address, this.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
@@ -29,6 +31,7 @@ class Aragon {
       })
     }).catch(cb)
   }
+
   aragonSignMessage (message, cb) {
     this.aragon((err, wrap) => {
       if (err) return cb(err)

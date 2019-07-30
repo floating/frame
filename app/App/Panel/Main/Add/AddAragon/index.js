@@ -14,35 +14,41 @@ class AddAragon extends React.Component {
       index: 0
     }
   }
+
   onChange (key, e) {
     e.preventDefault()
-    let update = {}
+    const update = {}
     update[key] = (e.target.value || '').replace(/\W/g, '')
     this.setState(update)
   }
+
   onBlur (key, e) {
     e.preventDefault()
-    let update = {}
+    const update = {}
     update[key] = this.state[key] || '0x0000000000000000000000000000000000000000'
     this.setState(update)
   }
+
   onFocus (key, e) {
     e.preventDefault()
     if (this.state[key] === '0x0000000000000000000000000000000000000000') {
-      let update = {}
+      const update = {}
       update[key] = ''
       this.setState(update)
     }
   }
+
   next () {
     this.setState({ index: ++this.state.index })
   }
+
   actorAccount (actorId) {
     this.setState({ actorId })
     this.next()
   }
+
   actorAddress (actorAddress, actorIndex) {
-    let aragonAccount = {
+    const aragonAccount = {
       id: this.state.dao,
       index: 0,
       addresses: [this.state.agent], // Agent Address
@@ -62,6 +68,7 @@ class AddAragon extends React.Component {
       this.store.toggleAddAccount()
     })
   }
+
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
     if (this.state.adding) itemClass += ' addAccountItemAdding'
@@ -102,7 +109,7 @@ class AddAragon extends React.Component {
                   <div className='addAccountItemOptionTitle'>{'Choose acting account'}</div>
                   <div className='addAccountItemOptionList'>
                     {Object.keys(this.store('main.accounts')).map(id => {
-                      let account = this.store('main.accounts', id)
+                      const account = this.store('main.accounts', id)
                       return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.type + ' Account'}</div>
                     })}
                   </div>

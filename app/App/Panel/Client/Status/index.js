@@ -3,7 +3,7 @@ import Indicator from '../Indicator'
 
 const Status = ({ client }) => {
   const { state, currentBlock, highestBlock } = client
-  let syncPercentage = Math.round((currentBlock / highestBlock) * 100)
+  const syncPercentage = Math.round((currentBlock / highestBlock) * 100)
   return (
     <div className='connectionOptionStatus'>
       <Indicator state={state} />

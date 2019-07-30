@@ -10,9 +10,9 @@ const handlers = {}
 
 const link = new EventEmitter()
 link.rpc = (...args) => {
-  let cb = args.pop()
+  const cb = args.pop()
   if (typeof cb !== 'function') throw new Error('link.rpc requires a callback')
-  let id = uuid()
+  const id = uuid()
   handlers[id] = cb
   window.postMessage(wrap({ id, args, source, method: 'rpc' }), '*')
 }
@@ -22,8 +22,8 @@ link.send = (...args) => {
 
 window.addEventListener('message', e => {
   if (e.origin !== 'file://') return
-  let data = unwrap(e.data)
-  let args = data.args || []
+  const data = unwrap(e.data)
+  const args = data.args || []
   if (e.origin === 'file://' && data.source !== source) {
     if (data.method === 'rpc') {
       if (!handlers[data.id]) return console.log('link.rpc response had no handler')
@@ -38,7 +38,7 @@ window.addEventListener('message', e => {
           if (sheet.visited !== true && sheet.href.indexOf(data.target) > -1) {
             if (sheet.isLoaded === false || !sheet.href || !(sheet.href.indexOf('.css') > -1)) return
             sheet.visited = true
-            let clone = sheet.cloneNode()
+            const clone = sheet.cloneNode()
             clone.isLoaded = false
             clone.addEventListener('load', () => {
               clone.isLoaded = true

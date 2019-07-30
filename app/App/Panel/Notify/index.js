@@ -34,6 +34,7 @@ class Notify extends React.Component {
       </div>
     )
   }
+
   mainnet () {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'mainnet' ? { left: '5px', right: '5px' } : {}}>
@@ -61,6 +62,7 @@ class Notify extends React.Component {
       </div>
     )
   }
+
   rinkeby () {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { left: '5px', right: '5px' } : {}}>
@@ -82,6 +84,7 @@ class Notify extends React.Component {
       </div>
     )
   }
+
   ipfsAlreadyRunning () {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
@@ -102,6 +105,7 @@ class Notify extends React.Component {
       </div>
     )
   }
+
   parityAlreadyRunning () {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
@@ -122,6 +126,7 @@ class Notify extends React.Component {
       </div>
     )
   }
+
   render () {
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>

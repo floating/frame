@@ -9,13 +9,14 @@ class AddHardware extends React.Component {
     this.state = {}
     this.deviceName = this.props.type // .replace(/\b\w/g, l => l.toUpperCase())
   }
+
   render () {
-    let accounts = this.store('main.accounts')
-    let signers = this.store('main.signers')
+    const accounts = this.store('main.accounts')
+    const signers = this.store('main.signers')
     let tethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) > -1)
     let untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
-    let isType = id => this.store('main.signers', id, 'type') === this.props.type
-    let toDevice = id => this.store('main.signers', id)
+    const isType = id => this.store('main.signers', id, 'type') === this.props.type
+    const toDevice = id => this.store('main.signers', id)
     tethered = tethered.filter(isType.bind(this)).map(toDevice.bind(this))
     untethered = untethered.filter(isType.bind(this)).map(toDevice.bind(this))
     return (
