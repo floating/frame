@@ -1,5 +1,7 @@
 const crypto = require('crypto')
 
+const scrypt = require('scrypt')
+
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const EthTx = require('ethereumjs-tx')
 
@@ -67,24 +69,29 @@ class HotSignerWorker {
   }
 
   _encrypt (string, password) {
+    const salt = crypto.randomBytes(16)
     const iv = crypto.randomBytes(16)
-    const cipher = crypto.createCipheriv('aes-256-cbc', this._hash(password), iv)
+    const cipher = crypto.createCipheriv('aes-256-cbc', this._hashPassword(password, salt), iv)
     const encrypted = Buffer.concat([cipher.update(string), cipher.final()])
-    return iv.toString('hex') + ':' + encrypted.toString('hex')
+    return salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted.toString('hex')
   }
 
   _decrypt (string, password) {
     const parts = string.split(':')
+    const salt = Buffer.from(parts.shift(), 'hex')
     const iv = Buffer.from(parts.shift(), 'hex')
-    const decipher = crypto.createDecipheriv('aes-256-cbc', this._hash(password), iv)
+    const decipher = crypto.createDecipheriv('aes-256-cbc', this._hashPassword(password, salt), iv)
     const encryptedString = Buffer.from(parts.join(':'), 'hex')
     const decrypted = Buffer.concat([decipher.update(encryptedString), decipher.final()])
     return decrypted.toString()
   }
 
-  _hash (string) {
-    const hash = crypto.createHash('sha256').update(string)
-    return Buffer.from(hash.digest('hex').substring(0, 32))
+  _hashPassword (password, salt) {
+    try {
+      return scrypt.hashSync(password, { N: 32768, r: 8, p: 1 }, 32, salt)
+    } catch (e) {
+      console.error('Error during hashPassword', e) // TODO: Handle Error
+    }
   }
 }
 
