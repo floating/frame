@@ -71,4 +71,4 @@ class RingSignerWorker extends HotSignerWorker {
   }
 }
 
-const ringSignerWorker = new RingSignerWorker()
+const ringSignerWorker = new RingSignerWorker() // eslint-disable-line

@@ -7,7 +7,6 @@ const { app } = require('electron')
 
 // Parity
 app.on('ready', () => {
-
   // On client toggled ->
   let previousOn = false
   store.observer(_ => {

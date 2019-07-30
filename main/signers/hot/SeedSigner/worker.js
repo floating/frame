@@ -53,4 +53,4 @@ class SeedSignerWorker extends HotSignerWorker {
   }
 }
 
-const seedSignerWorker = new SeedSignerWorker()
+const seedSignerWorker = new SeedSignerWorker() // eslint-disable-line
