@@ -79,7 +79,7 @@ const rpc = {
     signers.createFromPhrase(phrase, password, cb)
   },
   locateKeystore (cb) {
-    let keystore = dialog.showOpenDialog({ properties: ['openFile'] })
+    const keystore = dialog.showOpenDialog({ properties: ['openFile'] })
     if (keystore && keystore.length) {
       fs.readFile(keystore[0], 'utf8', (err, data) => {
         if (err) return cb(err)
@@ -127,7 +127,7 @@ ipcMain.on('main:rpc', (event, id, method, ...args) => {
       event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
     })
   } else {
-    let args = [new Error('Unknown RPC method: ' + method)]
+    const args = [new Error('Unknown RPC method: ' + method)]
     event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
   }
 })

@@ -17,6 +17,7 @@ class Requests extends React.Component {
       unlockHeadShake: false
     }
   }
+
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
     if (this.tPin.length === 4) {
@@ -26,21 +27,25 @@ class Requests extends React.Component {
       this.tPin = ''
     }
   }
+
   minimize () {
     this.setState({ minimized: true })
   }
+
   setSigner () {
     this.setState({ minimized: false })
-    let current = this.store('selected.current') === this.props.id
+    const current = this.store('selected.current') === this.props.id
     if (!current) {
       link.rpc('setSigner', this.props.id, (err, status) => {
         if (err) throw new Error(err)
       })
     }
   }
+
   unlockChange (e) {
     this.setState({ unlockInput: e.target.value })
   }
+
   unlockSubmit (e) {
     link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
       if (err) {
@@ -49,6 +54,7 @@ class Requests extends React.Component {
       }
     })
   }
+
   render () {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).map(key => requests[key])
@@ -57,31 +63,31 @@ class Requests extends React.Component {
     //   return true
     // })
     // transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}
-    let normal = requests.filter(req => req.mode === 'normal')
+    const normal = requests.filter(req => req.mode === 'normal')
     normal.sort((a, b) => {
       if (a.created > b.created) return -1
       if (a.created < b.created) return 1
       return 0
     })
-    let monitor = requests.filter(req => req.mode === 'monitor')
+    const monitor = requests.filter(req => req.mode === 'monitor')
     monitor.sort((a, b) => {
       if (a.created > b.created) return -1
       if (a.created < b.created) return 1
       return 0
     })
-    let monitorHeight = 165
+    const monitorHeight = 165
     let containNormal = normal.length ? (360 + (normal.length * 10)) : 160
     if (normal.length && monitor.length > 0) containNormal += 70
-    let containMonitor = monitor.length * monitorHeight
-    let containHeight = containNormal + containMonitor
+    const containMonitor = monitor.length * monitorHeight
+    const containHeight = containNormal + containMonitor
 
-    let current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    let open = current && this.store('selected.open')
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const open = current && this.store('selected.open')
     // let minimized = this.store('selected.minimized')
 
     let unlockClass = 'signerUnlockRequest'
     if (this.state.unlockHeadShake) unlockClass += ' headShake'
-    let unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '100px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(-200px)', opacity: 0 }
+    const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '100px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(-200px)', opacity: 0 }
 
     return (
       <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
@@ -102,7 +108,7 @@ class Requests extends React.Component {
             </div>
             {normal.concat(monitor).map((req, i) => {
               let pos = 0
-              let z = 2000 + i
+              const z = 2000 + i
               if (req.mode === 'normal') pos = ((normal.length - i) * 10)
               if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight)
               if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} />

@@ -13,10 +13,11 @@ class Flex extends EventEmitter {
     this.ready = true
     this.emit('ready')
   }
+
   rpc (...args) {
-    let cb = args.pop()
+    const cb = args.pop()
     if (typeof cb !== 'function') throw new Error('Flex methods require a callback')
-    let id = uuid()
+    const id = uuid()
     handlers[id] = cb
     args = args.map(arg => defined(arg) ? JSON.stringify(arg) : arg)
     windows.send('tray', 'main:flex', JSON.stringify(id), ...args)

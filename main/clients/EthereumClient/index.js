@@ -31,7 +31,7 @@ class EthereumClient extends Client {
     let state
 
     // Get blocknumber and update store
-    let blockNumber = await this._getBlockNumber()
+    const blockNumber = await this._getBlockNumber()
     store.updateClient(this.name, 'blockNumber', blockNumber)
 
     // Check using JSON RPC method 'eth_blockNumber'

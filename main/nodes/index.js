@@ -23,21 +23,25 @@ class Nodes extends EventEmitter {
     }
     this.observer = store.observer(() => this.connect(store('main.connection')))
   }
+
   update (priority) {
     if (priority === 'local') {
-      let { status, connected, type, network } = this.local
-      let details = { status, connected, type, network }
+      const { status, connected, type, network } = this.local
+      const details = { status, connected, type, network }
       log.info('    Updating local connection to status, ', details)
       store.setLocal(details)
     } else if (priority === 'secondary') {
-      let { status, connected, type, network } = this.secondary
-      let details = { status, connected, type, network }
+      const { status, connected, type, network } = this.secondary
+      const details = { status, connected, type, network }
       log.info('    Updating secondary connection to status, ', details)
       store.setSecondary(details)
     }
   }
+
   getNetwork (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'net_version', params: [], id: 1 }, cb) }
+
   getNodeType (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) }
+
   connect (connection) {
     log.info(' ')
     log.info('Connection has been updated')
@@ -98,7 +102,7 @@ class Nodes extends EventEmitter {
             this.local.status = 'network mismatch'
             this.update('local')
           } else {
-            let current = this.local.status
+            const current = this.local.status
             if ((current === 'loading' || current === 'not found' || current === 'off' || current === 'network mismatch') && status === 'disconnected') status = 'not found'
             this.local.status = status
             this.update('local')
@@ -139,8 +143,8 @@ class Nodes extends EventEmitter {
           this.update('secondary')
         }
       } else {
-        let settings = store('main.connection.secondary.settings', store('main.connection.network'))
-        let target = settings.options[settings.current]
+        const settings = store('main.connection.secondary.settings', store('main.connection.network'))
+        const target = settings.options[settings.current]
         if (!this.secondary.provider || this.secondary.currentTarget !== target) {
           log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
           if (this.secondary.provider) this.secondary.provider.close()
@@ -191,7 +195,7 @@ class Nodes extends EventEmitter {
               this.secondary.status = 'network mismatch'
               this.update('secondary')
             } else {
-              let current = store('main.connection.local.status')
+              const current = store('main.connection.local.status')
               if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
               this.local.status = status
               this.update('secondary')
@@ -216,10 +220,12 @@ class Nodes extends EventEmitter {
       }
     }
   }
+
   resError (error, payload, res) {
     if (typeof error === 'string') error = { message: error, code: -1 }
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
+
   send (payload, res) {
     if (this.local.provider && this.local.connected && this.local.network === store('main.connection.network')) {
       this.local.provider.sendAsync(payload, (err, result) => {

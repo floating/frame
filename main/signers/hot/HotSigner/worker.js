@@ -15,7 +15,7 @@ class HotSignerWorker {
     // Define (pseudo) callback
     const pseudoCallback = (error, result) => {
       // Add correlation id to response
-      let response = { id, error, result, type: 'rpc' }
+      const response = { id, error, result, type: 'rpc' }
       // Send response to parent process
       process.send(response)
     }
@@ -59,8 +59,8 @@ class HotSignerWorker {
       // Verify address
       let v = signature[64]
       v = v === 0 || v === 1 ? v + 27 : v
-      let r = toBuffer(signature.slice(0, 32))
-      let s = toBuffer(signature.slice(32, 64))
+      const r = toBuffer(signature.slice(0, 32))
+      const s = toBuffer(signature.slice(32, 64))
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
       // Return result
@@ -89,6 +89,7 @@ class HotSignerWorker {
   _hashPassword (password, salt) {
     try {
       return scrypt.hashSync(password, { N: 32768, r: 8, p: 1 }, 32, salt)
+      // return crypto.scryptSync(password, salt, 32, { N: 32768, r: 8, p: 1 })
     } catch (e) {
       console.error('Error during hashPassword', e) // TODO: Handle Error
     }

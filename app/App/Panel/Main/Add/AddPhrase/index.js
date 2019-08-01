@@ -16,10 +16,11 @@ class AddPhrase extends React.Component {
       error: false
     }
   }
+
   onChange (key, e) {
     e.preventDefault()
-    let update = {}
-    let value = (e.target.value || '')
+    const update = {}
+    const value = (e.target.value || '')
     // value = value === ' ' ? '' : value
     // value = value.replace(/[ \t]+/g, '_')
     // value = value.replace(/\W/g, '')
@@ -28,23 +29,27 @@ class AddPhrase extends React.Component {
     update[key] = value
     this.setState(update)
   }
+
   onBlur (key, e) {
     e.preventDefault()
-    let update = {}
+    const update = {}
     update[key] = this.state[key] || ''
     this.setState(update)
   }
+
   onFocus (key, e) {
     e.preventDefault()
     if (this.state[key] === '') {
-      let update = {}
+      const update = {}
       update[key] = ''
       this.setState(update)
     }
   }
+
   next () {
     this.setState({ index: ++this.state.index })
   }
+
   create () {
     this.setState({ index: ++this.state.index })
     link.rpc('createFromPhrase', this.state.phrase, this.state.password, (err, signer) => {
@@ -58,9 +63,11 @@ class AddPhrase extends React.Component {
       }
     })
   }
+
   restart () {
     this.setState({ index: 0, adding: true, phrase: '', password: '', status: 'creating signers', success: false })
   }
+
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
     if (this.state.adding) itemClass += ' addAccountItemAdding'

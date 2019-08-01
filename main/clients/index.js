@@ -10,7 +10,7 @@ app.on('ready', () => {
   // On client toggled ->
   let previousOn = false
   store.observer(_ => {
-    let on = store('main.clients.parity.on')
+    const on = store('main.clients.parity.on')
     if (on !== previousOn) {
       on ? parity.start() : parity.stop()
       previousOn = on
@@ -45,7 +45,7 @@ app.on('ready', () => {
   // Link parity on/off with local connection
   let previousState = store('main.clients.parity.state')
   store.observer(_ => {
-    let state = store('main.clients.parity.state')
+    const state = store('main.clients.parity.state')
     if (state !== previousState) {
       if (state === 'ready') store.toggleConnection('local', true)
       if (state === 'off') store.toggleConnection('local', false)

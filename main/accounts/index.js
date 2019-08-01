@@ -70,7 +70,7 @@ class Accounts extends EventEmitter {
     super()
     this._current = ''
     this.accounts = {}
-    let stored = store('main.accounts')
+    const stored = store('main.accounts')
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
@@ -79,34 +79,41 @@ class Accounts extends EventEmitter {
     // this.accounts[aragonTestAccount1.id] = new Account(aragonTestAccount1, this)
     // this.accounts[aragonTestAccount2.id] = new Account(aragonTestAccount2, this)
     store.observer(() => {
-      let signers = store('main.signers')
+      const signers = store('main.signers')
       Object.keys(signers).forEach(id => {
-        let type = store('main.signers', id, 'type')
+        const type = store('main.signers', id, 'type')
         if (!this.accounts[id]) this.add(signers[id].addresses, { type })
       })
     })
   }
+
   list () {
     return Object.keys(this.accounts).map(id => this.accounts[id].summary())
   }
+
   get (id) {
     return this.accounts[id].summary()
   }
+
   select (id) {
     // Set current account
   }
+
   closeAll () {
     // Close all accounts
   }
+
   seedToAddresses (seed) {
     const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0')
     const addresses = []
     for (var i = 0; i < 100; i++) { addresses.push(wallet.deriveChild(i).getWallet().getChecksumAddressString()) }
     return addresses
   }
+
   addressesToId (addresses) {
     return crypt.stringToKey(addresses.join()).toString('hex')
   }
+
   // Public
   addAragon (account, cb = () => {}) {
     if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
@@ -115,6 +122,7 @@ class Accounts extends EventEmitter {
     account.options.type = 'aragon'
     this.accounts[account.id] = new Account(account, this)
   }
+
   add (addresses, options = {}, cb = () => {}) {
     if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
     const id = this.addressesToId(addresses)
@@ -123,12 +131,15 @@ class Accounts extends EventEmitter {
     log.info('Account not found, creating account')
     this.accounts[id] = new Account({ id, addresses, index: 0, created: Date.now(), options }, this)
   }
+
   update (account, add) {
     store.updateAccount(account, add)
   }
+
   current () {
     return this.accounts[this._current]
   }
+
   txMonitor (id, hash) {
     this.current().requests[id].tx = { hash, confirmations: 0 }
     this.current().update()
@@ -149,9 +160,9 @@ class Accounts extends EventEmitter {
                   this.current().requests[id].status = 'confirming'
                   this.current().requests[id].notice = 'Confirming'
                 }
-                let blockHeight = parseInt(newHead.number, 16)
-                let receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
-                let confirmations = blockHeight - receiptBlock
+                const blockHeight = parseInt(newHead.number, 16)
+                const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
+                const confirmations = blockHeight - receiptBlock
                 this.current().requests[id].tx.confirmations = confirmations
                 this.current().update()
                 if (confirmations > 12) {
@@ -171,28 +182,31 @@ class Accounts extends EventEmitter {
       }
     })
   }
+
   getSigners (cb) {
-    let signerSummary = {}
+    const signerSummary = {}
     Object.keys(this.accounts).forEach(id => {
-      let summary = this.accounts[id].summary()
+      const summary = this.accounts[id].summary()
       if (summary.status === 'Invalid sequence' || summary.status === 'initial') return
       signerSummary[id] = summary
     })
     cb(null, signerSummary)
   }
+
   setSigner (id, cb) {
     this.accounts[id].setIndex(this.accounts[id].index, err => {
       if (err) return cb(err)
       this._current = id
-      let summary = this.current().summary()
+      const summary = this.current().summary()
       cb(null, summary)
       windows.broadcast('main:action', 'setSigner', summary)
     })
   }
+
   unsetSigner (cb) {
-    let s = this.current()
+    const s = this.current()
     this._current = null
-    let summary = { id: '', type: '', accounts: [], status: '', index: 0 }
+    const summary = { id: '', type: '', accounts: [], status: '', index: 0 }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
     setTimeout(() => { // Clear signer requests when unset
@@ -202,15 +216,19 @@ class Accounts extends EventEmitter {
       }
     })
   }
+
   verifyAddress (display) {
     if (this.current() && this.current().verifyAddress) this.current().verifyAddress(display)
   }
+
   getSelectedAddresses () {
     return this.current() ? this.current().getSelectedAddresses() : []
   }
+
   getSelectedAddress () {
     return this.current() ? this.current().getSelectedAddress() : undefined
   }
+
   getAccounts (cb) {
     if (!this.current()) {
       if (cb) cb(new Error('No Account Selected'))
@@ -218,32 +236,38 @@ class Accounts extends EventEmitter {
     }
     return this.current().getAccounts(cb)
   }
+
   getCoinbase (cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     this.current().getCoinbase(cb)
   }
+
   signMessage (address, message, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     if (address.toLowerCase() !== this.getSelectedAddress().toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
     this.current().signMessage(message, cb)
   }
+
   signTransaction (rawTx, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
-    let matchSelected = rawTx.from.toLowerCase() === this.getSelectedAddress().toLowerCase()
-    let matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.address.toLowerCase() : false)
+    const matchSelected = rawTx.from.toLowerCase() === this.getSelectedAddress().toLowerCase()
+    const matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.address.toLowerCase() : false)
     if (matchSelected || matchActor) {
       this.current().signTransaction(rawTx, cb)
     } else {
       cb(new Error('signMessage: Account does not match currently selected'))
     }
   }
+
   close () {
     // usbDetect.stopMonitoring()
   }
+
   setSignerIndex (index, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     this.current().setIndex(index, cb)
   }
+
   trezorPin (id, pin, cb) {
     if (!this.accounts[id]) return cb(new Error('No Account Selected'))
     if (this.accounts[id].setPin) {
@@ -253,17 +277,20 @@ class Accounts extends EventEmitter {
       cb(new Error('Set pin not avaliable...'))
     }
   }
+
   addRequest (req) {
     log.info('addRequest', req)
     if (!this.current() || this.current().requests[req.handlerId]) return // If no current signer or the request already exists
     this.current().addRequest(req)
   }
+
   removeRequest (handlerId) {
     if (this.current() && this.current().requests[handlerId]) {
       delete this.current().requests[handlerId]
       this.current().update()
     }
   }
+
   declineRequest (handlerId) {
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId]) {
@@ -277,8 +304,9 @@ class Accounts extends EventEmitter {
       this.current().update()
     }
   }
+
   setRequestPending (req) {
-    let handlerId = req.handlerId
+    const handlerId = req.handlerId
     log.info('setRequestPending', handlerId)
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId]) {
@@ -287,6 +315,7 @@ class Accounts extends EventEmitter {
       this.current().update()
     }
   }
+
   setRequestError (handlerId, err) {
     log.info('setRequestError', handlerId)
     if (!this.current()) return // cb(new Error('No Account Selected'))
@@ -297,7 +326,7 @@ class Accounts extends EventEmitter {
       } else if (err.message === 'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)') {
         this.current().requests[handlerId].notice = 'Ledger Signature Declined'
       } else {
-        let notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
+        const notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
         this.current().requests[handlerId].notice = notice
       }
       if (this.current().requests[handlerId].type === 'transaction') {
@@ -313,6 +342,7 @@ class Accounts extends EventEmitter {
       this.current().update()
     }
   }
+
   setTxSigned (handlerId, cb) {
     log.info('setTxSigned', handlerId)
     if (!this.current()) return cb(new Error('No account selected'))
@@ -329,6 +359,7 @@ class Accounts extends EventEmitter {
       cb(new Error('No valid request for ' + handlerId))
     }
   }
+
   setTxSent (handlerId, hash) {
     log.info('setTxSent', handlerId, 'Hash', hash)
     if (!this.current()) return // cb(new Error('No Account Selected'))
@@ -340,6 +371,7 @@ class Accounts extends EventEmitter {
       this.txMonitor(handlerId, hash)
     }
   }
+
   setRequestSuccess (handlerId) {
     log.info('setRequestSuccess', handlerId)
     if (!this.current()) return // cb(new Error('No Account Selected'))
@@ -354,6 +386,7 @@ class Accounts extends EventEmitter {
       this.current().update()
     }
   }
+
   remove (id) {
     windows.broadcast('main:action', 'unsetSigner')
     setTimeout(() => {

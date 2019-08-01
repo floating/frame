@@ -137,14 +137,14 @@ export const updateUrl = (u, id, url) => u('view.data', id, 'url', () => url)
 export const updateTitle = (u, id, title) => u('view.data', id, 'title', _ => title)
 export const reorderTabs = (u, from, to) => {
   u('view.list', list => {
-    let _from = list[from]
+    const _from = list[from]
     list[from] = list[to]
     list[to] = _from
     return list
   })
 }
 export const newView = (u) => {
-  let id = uuidv4()
+  const id = uuidv4()
   u('view.current', _ => id)
   u('view.list', list => {
     list.push(id)
@@ -155,7 +155,7 @@ export const newView = (u) => {
 
 export const removeView = (u, id, isCurrent) => {
   u('view', view => {
-    let index = view.list.indexOf(id)
+    const index = view.list.indexOf(id)
     if (isCurrent) {
       if (index < view.list.length - 1) {
         view.current = view.list[index + 1]

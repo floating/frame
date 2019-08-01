@@ -11,57 +11,70 @@ class Device {
     if (ready) return this.setup()
     events.once('ready', () => this.setup())
   }
+
   setup () {
     this.connect()
   }
+
   connect () {
     this.emit('trezor:connect', this.device)
   }
+
   disconnect () {
     this.emit('trezor:disconnect', this.device)
   }
+
   update (device = this.device) {
     this.device = device
     this.emit('trezor:update', this.device)
   }
+
   needPin () {
     this.emit('trezor:needPin', this.device)
   }
+
   needPhrase () {
     this.emit('trezor:needPhrase', this.device)
   }
+
   inputPin (pin, cb) {
     TrezorConnect.uiResponse({ device: this.device, type: 'ui-receive_pin', payload: pin })
     cb()
   }
+
   inputPhrase (phrase, cb) {
     TrezorConnect.uiResponse({ device: this.device, type: 'ui-receive_passphrase', payload: { value: phrase } })
     cb()
   }
+
   getPublicKey (path, cb) {
     TrezorConnect.getPublicKey({ device: this.device, path }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
       cb(null, res.payload)
     }).catch(err => cb(err))
   }
+
   ethereumGetAddress (path, showOnTrezor, cb) {
     TrezorConnect.ethereumGetAddress({ device: this.device, path, showOnTrezor }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
       cb(null, res.payload)
     }).catch(err => cb(err))
   }
+
   ethereumSignTransaction (path, transaction, cb) {
     TrezorConnect.ethereumSignTransaction({ device: this.device, path, transaction }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
       cb(null, res.payload)
     }).catch(err => cb(err))
   }
+
   ethereumSignMessage (path, message, cb) {
     TrezorConnect.ethereumSignMessage({ device: this.device, path, message, hex: true }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
       cb(null, res.payload)
     }).catch(err => cb(err))
   }
+
   ethereumVerifyMessage (path, address, message, signature, cb) {
     TrezorConnect.ethereumVerifyMessage({ device: this.device, path, address, message, signature }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
@@ -104,36 +117,45 @@ class Trezor {
       }).catch(err => console.warn('TrezorConnect Init Error', err))
     } catch (e) { console.warn(e) }
   }
+
   scan (cb) {
     Object.keys(this.devices).forEach(id => this.devices[id].update())
   }
+
   deviceNotFound (id, cb) {
     cb(new Error(`Device with id: ${id} not found`))
   }
+
   inputPin (id, pin, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].inputPin(pin, cb)
   }
+
   inputPhrase (id, phrase, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].inputPin(phrase, cb)
   }
+
   getPublicKey (id, path, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].getPublicKey(path, cb)
   }
+
   ethereumGetAddress (id, path, display, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumGetAddress(path, display, cb)
   }
+
   ethereumSignTransaction (id, path, tx, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumSignTransaction(path, tx, cb)
   }
+
   ethereumSignMessage (id, path, message, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumSignMessage(path, message, cb)
   }
+
   ethereumVerifyMessage (id, path, message, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumVerifyMessage(path, message, cb)

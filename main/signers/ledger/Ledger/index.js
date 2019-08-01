@@ -36,32 +36,36 @@ class Ledger extends Signer {
       }
     })
   }
+
   getId () {
     return this.addressesId() || uuid('Ledger' + this.devicePath, ns)
   }
+
   update () {
     if (this.invalid || this.status === 'Invalid sequence' || this.status === 'initial') return
-    let id = this.getId()
+    const id = this.getId()
     if (this.id !== id) { // Singer address representation changed
       store.removeSigner(this.id)
       this.id = id
     }
     store.updateSigner(this.summary())
   }
+
   reset () {
     this.network = store('main.connection.network')
     this.status = 'loading'
     this.addresses = []
     this.update()
   }
+
   async getDeviceAddress (i, cb) {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
       // let transport = await TransportNodeHid.open(this.devicePath)
-      let device = new HID.HID(this.devicePath)
-      let transport = new TransportNodeHid(device)
-      let eth = new Eth(transport)
+      const device = new HID.HID(this.devicePath)
+      const transport = new TransportNodeHid(device)
+      const eth = new Eth(transport)
       eth.getAddress(this.getPath(i), false, true).then(result => {
         transport.close()
         device.close()
@@ -78,20 +82,21 @@ class Ledger extends Signer {
       cb(err)
     }
   }
+
   async verifyAddress (index, current, display) {
     if (verifyActive) return log.info('verifyAddress Called but it\'s already active')
     if (this.pause) return log.info('Device access is paused')
     verifyActive = true
     this.pause = true
     try {
-      let device = new HID.HID(this.devicePath)
-      let transport = new TransportNodeHid(device)
-      let eth = new Eth(transport)
+      const device = new HID.HID(this.devicePath)
+      const transport = new TransportNodeHid(device)
+      const eth = new Eth(transport)
       eth.getAddress(this.getPath(index), display, true).then(result => {
         transport.close()
         device.close()
         this.pause = false
-        let address = result.address.toLowerCase()
+        const address = result.address.toLowerCase()
         current = current.toLowerCase()
         if (address !== current) {
           // TODO: Error Notification
@@ -120,6 +125,7 @@ class Ledger extends Signer {
       this.pause = false
     }
   }
+
   // setIndex (i, cb) {
   //   if (!verifyActive) {
   //     this.index = i
@@ -137,10 +143,10 @@ class Ledger extends Signer {
       if (this.pause) cb(new Error('Device access is paused'))
       this.pause = true
       try {
-        let device = new HID.HID(this.devicePath)
-        let transport = new TransportNodeHid(device)
-        let eth = new Eth(transport)
-        let timeout = setTimeout(() => {
+        const device = new HID.HID(this.devicePath)
+        const transport = new TransportNodeHid(device)
+        const eth = new Eth(transport)
+        const timeout = setTimeout(() => {
           transport.close()
           device.close()
           this.pause = false
@@ -165,6 +171,7 @@ class Ledger extends Signer {
       }
     }, 500)
   }
+
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
     if (this._deviceStatus) clearTimeout(this._deviceStatus)
@@ -174,10 +181,12 @@ class Ledger extends Signer {
     store.removeSigner(this.id)
     super.close()
   }
+
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
     clearTimeout(this._pollStatus)
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
+
   deviceStatus (deep, limit = 100) {
     if (this.status === 'Invalid sequence') return console.log('INVALID SEQUENCE')
     this.pollStatus()
@@ -236,21 +245,23 @@ class Ledger extends Signer {
       }
     })
   }
+
   normalize (hex) {
     if (hex == null) return ''
     if (hex.startsWith('0x')) hex = hex.substring(2)
     if (hex.length % 2 !== 0) hex = '0' + hex
     return hex
   }
+
   // Standard Methods
   async signMessage (index, message, cb) {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
-      let device = new HID.HID(this.devicePath)
-      let transport = new TransportNodeHid(device)
+      const device = new HID.HID(this.devicePath)
+      const transport = new TransportNodeHid(device)
       // let transport = await TransportNodeHid.open(this.devicePath)
-      let eth = new Eth(transport)
+      const eth = new Eth(transport)
       eth.signPersonalMessage(this.getPath(index), message.replace('0x', '')).then(result => {
         let v = (result['v'] - 27).toString(16)
         if (v.length < 2) v = '0' + v
@@ -281,14 +292,15 @@ class Ledger extends Signer {
       log.error(err)
     }
   }
+
   async signTransaction (index, rawTx, cb) {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
       // let transport = await TransportNodeHid.open(this.devicePath)
-      let device = new HID.HID(this.devicePath)
-      let transport = new TransportNodeHid(device)
-      let eth = new Eth(transport)
+      const device = new HID.HID(this.devicePath)
+      const transport = new TransportNodeHid(device)
+      const eth = new Eth(transport)
       if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
       const tx = new EthereumTx(rawTx)
       tx.raw[6] = Buffer.from([rawTx.chainId]) // v
@@ -300,7 +312,7 @@ class Ledger extends Signer {
         device.close()
         this.busyCount = 0
         this.pause = false
-        let tx = new EthereumTx({
+        const tx = new EthereumTx({
           nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
           gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
           gasLimit: Buffer.from(this.normalize(rawTx.gas), 'hex'),

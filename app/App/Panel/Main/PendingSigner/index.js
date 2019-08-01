@@ -9,8 +9,8 @@ class Pending extends React.Component {
   // }
   render () {
     // let current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    let open = this.store('selected.open')
-    let style = {}
+    const open = this.store('selected.open')
+    const style = {}
     if (open) {
       style.opacity = 0
       style.pointerEvents = 'none'

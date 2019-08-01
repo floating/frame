@@ -34,13 +34,16 @@ class Trezor extends Signer {
       }
     })
   }
+
   close () {
     this.networkObserver.remove()
     super.close()
   }
+
   button (label) {
     log.info(`Trezor button "${label}" was pressed`)
   }
+
   getDeviceAddress (i, cb) {
     this.device.run(session => {
       return session.ethereumGetAddress(bip32Path.fromString(this.getPath(i)).toPathArray(), true)
@@ -50,13 +53,14 @@ class Trezor extends Signer {
       cb(err)
     })
   }
+
   verifyAddress (display) {
     log.info('Verify Address')
     this.device.waitForSessionAndRun(session => {
       return session.ethereumGetAddress(bip32Path.fromString(this.getPath(this.index)).toPathArray(), display)
     }).then(result => {
-      let address = '0x' + result.message.address.toLowerCase()
-      let current = this.accounts[this.index].toLowerCase()
+      const address = '0x' + result.message.address.toLowerCase()
+      const current = this.accounts[this.index].toLowerCase()
       log.info('Frame has the current address as: ' + current)
       log.info('Trezor is reporting: ' + address)
       if (address !== current) {
@@ -73,6 +77,7 @@ class Trezor extends Signer {
       this.api.unsetSigner()
     })
   }
+
   setIndex (i, cb) {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them
@@ -80,6 +85,7 @@ class Trezor extends Signer {
     cb(null, this.summary())
     this.verifyAddress()
   }
+
   lookupAccounts (cb) {
     this.device.waitForSessionAndRun(session => {
       return session.getPublicKey(bip32Path.fromString(this.basePath()).toPathArray())
@@ -89,6 +95,7 @@ class Trezor extends Signer {
       cb(err)
     })
   }
+
   deviceStatus (deep, limit = 15) {
     this.lookupAccounts((err, accounts) => {
       if (err) {
@@ -114,11 +121,13 @@ class Trezor extends Signer {
       }
     })
   }
+
   needPassphras (cb) {
     this.status = 'Need Passphrase'
     this.update()
     this.setPin = cb
   }
+
   needPin (cb) {
     this.status = 'Need Pin'
     this.update()
@@ -129,12 +138,14 @@ class Trezor extends Signer {
       setTimeout(() => this.deviceStatus(), 250)
     }
   }
+
   normalize (hex) {
     if (hex == null) return ''
     if (hex.startsWith('0x')) hex = hex.substring(2)
     if (hex.length % 2 !== 0) hex = '0' + hex
     return hex
   }
+
   // Standard Methods
   signMessage (message, cb) {
     this.device.waitForSessionAndRun(session => session.signEthMessage(bip32Path.fromString(this.getPath()).toPathArray(), this.normalize(message))).then(result => {
@@ -146,6 +157,7 @@ class Trezor extends Signer {
       cb(err)
     })
   }
+
   signTransaction (rawTx, cb) {
     if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
     const trezorTx = [

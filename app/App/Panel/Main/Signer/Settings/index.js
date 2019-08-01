@@ -5,8 +5,8 @@ import link from '../../../../../link'
 
 class Settings extends React.Component {
   renderControl (viewIndex) {
-    let i = 2
-    let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
+    const i = 2
+    const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Account Settings'}</div>
@@ -18,9 +18,10 @@ class Settings extends React.Component {
       </div>
     )
   }
+
   renderVerify (viewIndex) {
-    let i = 1
-    let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
+    const i = 1
+    const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Verify Address'}</div>
@@ -33,13 +34,14 @@ class Settings extends React.Component {
       </div>
     )
   }
+
   renderPermissions (viewIndex) {
-    let i = 0
-    let transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
-    let id = this.store('selected.current')
-    let currentIndex = this.store('main.accounts', id, 'index')
-    let address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    let permissions = this.store('main.addresses', address, 'permissions') || {}
+    const i = 0
+    const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
+    const id = this.store('selected.current')
+    const currentIndex = this.store('main.accounts', id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const permissions = this.store('main.addresses', address, 'permissions') || {}
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
@@ -69,8 +71,9 @@ class Settings extends React.Component {
       </div>
     )
   }
+
   render () {
-    let viewIndex = this.store('selected.settings.viewIndex')
+    const viewIndex = this.store('selected.settings.viewIndex')
     return (
       <div className={this.store('selected.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         {this.renderPermissions(viewIndex)}

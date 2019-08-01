@@ -25,8 +25,8 @@ const handler = (socket, req) => {
   }
   socket.on('message', data => {
     let origin = socket.origin
-    let payload = validPayload(data)
-    if (!payload) return
+    const payload = validPayload(data)
+    if (!payload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (payload.__frameOrigin) {
         origin = payload.__frameOrigin
@@ -71,16 +71,16 @@ module.exports = server => {
   ws.on('connection', handler)
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
-    let subscription = subs[payload.params.subscription]
+    const subscription = subs[payload.params.subscription]
     if (subscription) subscription.socket.send(JSON.stringify(payload))
   })
 
   provider.on('data:accounts', (account, payload) => { // Make sure the subscription has access based on current account
-    let subscription = subs[payload.params.subscription]
+    const subscription = subs[payload.params.subscription]
     if (subscription) {
-      let permissions = store('main.accounts', account, 'permissions') || {}
-      let perms = Object.keys(permissions).map(id => permissions[id])
-      let allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
+      const permissions = store('main.accounts', account, 'permissions') || {}
+      const perms = Object.keys(permissions).map(id => permissions[id])
+      const allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
       if (!allowed) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))
     }

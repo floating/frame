@@ -1,7 +1,7 @@
 module.exports = {
   // setSync: (u, key, payload) => u(key, () => payload),
   selectNetwork: (u, net) => {
-    let reset = { status: 'loading', connected: false, type: '', network: '' }
+    const reset = { status: 'loading', connected: false, type: '', network: '' }
     u('main.connection', connection => {
       connection.network = net
       connection.local = Object.assign({}, connection.local, reset)
@@ -12,7 +12,7 @@ module.exports = {
   selectSecondary: (u, direction) => {
     if (direction === '->') {
       u('main.connection', connection => {
-        let options = Object.keys(connection.secondary.settings[connection.network].options)
+        const options = Object.keys(connection.secondary.settings[connection.network].options)
         let index = options.indexOf(connection.secondary.settings[connection.network].current) + 1
         if (index >= options.length) index = 0
         connection.secondary.settings[connection.network].current = options[index]
@@ -20,7 +20,7 @@ module.exports = {
       })
     } else if (direction === '<-') {
       u('main.connection', connection => {
-        let options = Object.keys(connection.secondary.settings[connection.network].options)
+        const options = Object.keys(connection.secondary.settings[connection.network].options)
         let index = options.indexOf(connection.secondary.settings[connection.network].current) - 1
         if (index < 0) index = options.length - 1
         connection.secondary.settings[connection.network].current = options[index]

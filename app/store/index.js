@@ -38,9 +38,9 @@ export default (state, cb) => {
 
   const refreshBalances = () => {
     monitor.forEach(address => {
-      link.rpc('providerSend', { 'jsonrpc': '2.0', 'method': 'eth_getBalance', 'params': [address, 'latest'], 'id': 1 }, res => {
+      link.rpc('providerSend', { jsonrpc: '2.0', method: 'eth_getBalance', params: [address, 'latest'], id: 1 }, res => {
         if (res.error) return
-        let balance = utils.fromWei(utils.hexToNumberString(res.result))
+        const balance = utils.fromWei(utils.hexToNumberString(res.result))
         if (store('balances', address) !== balance) store.setBalance(address, balance)
       })
     })
@@ -49,18 +49,18 @@ export default (state, cb) => {
   store.observer(() => {
     monitor = []
     if (store('selected.current')) {
-      let account = store('main.accounts', store('selected.current'))
+      const account = store('main.accounts', store('selected.current'))
       if (account) {
         if (store('selected.showAccounts')) { // When viewing accounts, refresh them all
-          let startIndex = store('selected.accountPage') * 5
+          const startIndex = store('selected.accountPage') * 5
           if (account.addresses.length) monitor = account.addresses.slice(startIndex, startIndex + 10)
         } else {
           monitor = [account.addresses[account.index]]
         }
       } else {
-        let accounts = store('main.accounts')
+        const accounts = store('main.accounts')
         monitor = Object.keys(accounts).map(id => {
-          let account = accounts[id]
+          const account = accounts[id]
           return account.addresses[account.index]
         })
       }
