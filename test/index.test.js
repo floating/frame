@@ -1,4 +1,4 @@
-/* globals test expect */
+// /* globals test expect */
 
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:1248'))
@@ -65,4 +65,17 @@ test('eth_sign and ecRecover', done => {
       console.log(err)
     })
   })
+}, 30 * 1000)
+
+test('eth_sign bad message', async (done) => {
+  const provider = require('eth-provider')()
+  let error = ''
+  try {
+    let accounts = await provider.send('eth_accounts')
+    await provider.send('eth_sign', [accounts[0], 'ooo'])
+    throw new Error('No error caught')
+  } catch (e) { error = e }
+  expect(error).toBe('ethSign Error: Invalid hex values')
+  provider.close()
+  done()
 }, 30 * 1000)

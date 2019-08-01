@@ -37,8 +37,9 @@ const handler = (req, res) => {
     req.on('data', chunk => body.push(chunk)).on('end', () => {
       res.on('error', err => console.error('res err', err))
       const origin = req.headers.origin || 'Unknown'
-      const payload = validPayload(Buffer.concat(body).toString())
-      if (!payload) return
+      const input = Buffer.concat(body).toString()
+      const payload = validPayload(input)
+      if (!payload) return console.warn('Invalid Payload', input)
       log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
       if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }

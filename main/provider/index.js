@@ -240,6 +240,7 @@ class Provider extends EventEmitter {
   }
 
   ethSign (payload, res) {
+    if (!payload.params.every(utils.isHexStrict)) return this.resError(`ethSign Error: Invalid hex values`, payload, res)
     const handlerId = uuid()
     this.handlers[handlerId] = res
     accounts.addRequest({ handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] })

@@ -26,7 +26,7 @@ const handler = (socket, req) => {
   socket.on('message', data => {
     let origin = socket.origin
     const payload = validPayload(data)
-    if (!payload) return
+    if (!payload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (payload.__frameOrigin) {
         origin = payload.__frameOrigin
