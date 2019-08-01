@@ -71,7 +71,7 @@ test('eth_sign bad message', async (done) => {
   const provider = require('eth-provider')()
   let error = ''
   try {
-    let accounts = await provider.send('eth_accounts')
+    const accounts = await provider.send('eth_accounts')
     await provider.send('eth_sign', [accounts[0], 'ooo'])
     throw new Error('No error caught')
   } catch (e) { error = e }
