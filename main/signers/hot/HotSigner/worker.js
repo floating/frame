@@ -1,7 +1,5 @@
 const crypto = require('crypto')
 
-const scrypt = require('scrypt')
-
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const EthTx = require('ethereumjs-tx')
 
@@ -88,8 +86,7 @@ class HotSignerWorker {
 
   _hashPassword (password, salt) {
     try {
-      return scrypt.hashSync(password, { N: 32768, r: 8, p: 1 }, 32, salt)
-      // return crypto.scryptSync(password, salt, 32, { N: 32768, r: 8, p: 1 })
+      return crypto.scryptSync(password, salt, 32, { N: 32768, r: 8, p: 1, maxmem: 36000000 })
     } catch (e) {
       console.error('Error during hashPassword', e) // TODO: Handle Error
     }
