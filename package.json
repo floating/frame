@@ -87,7 +87,6 @@
     "react-dom": "16.8.6",
     "react-restore": "0.3.0",
     "react-transition-group": "4.2.1",
-    "scrypt": "6.0.3",
     "semver": "6.3.0",
     "tar": "4.4.10",
     "trezor-connect": "7.0.5",
