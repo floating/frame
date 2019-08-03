@@ -41,7 +41,7 @@ class Ledger extends Signer {
   }
 
   getBasePath () {
-    if (this.network === '1') return BASE_PATH_TEST
+    if (this.network !== '1') return BASE_PATH_TEST
     else return store('main.ledger.derivationPath') === 'legacy' ? BASE_PATH_LEGACY : BASE_PATH_LIVE
   }
 
