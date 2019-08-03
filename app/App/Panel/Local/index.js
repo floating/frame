@@ -233,14 +233,15 @@ class Settings extends React.Component {
           <div className='signerPermission'>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
+              <Dropdown selected={this.store('main.ledger.derivationPath')} onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)} options={[
+                { name: 'Legacy', value: 'legacy' },
+                { name: 'Live', value: 'live' }
+              ]} />
             </div>
             <div className='signerPermissionDetails'>
-              {'Select Legacy or Live derivation path'}
+              {`Use Legacy (44'/60'/0'/) or Live (44'/60'/) derivation path`}
             </div>
-            <Dropdown selected='legacy' onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)} options={[
-              { name: 'Legacy', value: 'legacy' },
-              { name: 'Live', value: 'live' }
-            ]} />
+
           </div>
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')}>{'View License'}</div>
