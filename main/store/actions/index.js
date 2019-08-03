@@ -119,5 +119,8 @@ module.exports = {
       })
       return addresses
     })
+  },
+  setLedgerDerivationPath: (u, value) => {
+    u('main.ledger.derivationPath', () => value)
   }
 }

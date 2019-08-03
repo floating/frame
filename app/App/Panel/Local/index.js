@@ -4,6 +4,9 @@ import svg from '../../../svg'
 import link from '../../../link'
 import Client from '../Client'
 
+import Dropdown from '../../Components/Dropdown'
+import DropdownItem from '../../Components/DropdownItem'
+
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
 class Settings extends React.Component {
@@ -226,6 +229,18 @@ class Settings extends React.Component {
             <div className='signerPermissionDetails'>
               {'Run Frame when your computer starts'}
             </div>
+          </div>
+          <div className='signerPermission'>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Select Legacy or Live derivation path'}
+            </div>
+            <Dropdown selected='legacy' onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)} options={[
+              { name: 'Legacy', value: 'legacy' },
+              { name: 'Live', value: 'live' }
+            ]} />
           </div>
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')}>{'View License'}</div>
