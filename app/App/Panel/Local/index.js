@@ -6,8 +6,6 @@ import Client from '../Client'
 
 import Dropdown from '../../Components/Dropdown'
 
-const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
-
 class Settings extends React.Component {
   constructor (props, context) {
     super(props, context)
@@ -109,12 +107,12 @@ class Settings extends React.Component {
     }
   }
 
-  selectNetwork (net) {
-    if (net !== this.store('main.connection.network')) {
-      if (net === '1') {
+  selectNetwork (network) {
+    if (network !== this.store('main.connection.network')) {
+      if (network === '1') {
         this.store.notify('mainnet')
       } else {
-        link.send('tray:action', 'selectNetwork', net)
+        link.send('tray:action', 'selectNetwork', network)
       }
     }
   }
@@ -126,9 +124,6 @@ class Settings extends React.Component {
 
   render () {
     const network = this.store('main.connection.network')
-    const options = this.store('main.connection.options')
-    const index = options.indexOf(network)
-    const netSetStyle = { marginTop: this.state.expandNetwork ? '0px' : (-26 * index) + 'px' }
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
@@ -136,17 +131,15 @@ class Settings extends React.Component {
         <div className='localSettingsWrap'>
           <div className='localSettingsTitle connectionTitle'>
             <div>{'Connection'}</div>
-            <div className={this.state.expandNetwork ? 'connectionTitleSet connectionExpandNetwork' : 'connectionTitleSet'} onMouseDown={e => this.expandNetwork(e)}>
-              <div className='connectionTitleSetItems' style={netSetStyle}>
-                {options.map((option, index) => {
-                  return (
-                    <div key={option + index} className='connectionTitleSetItem' onMouseDown={() => this.selectNetwork(option)}>
-                      <div className='connectionTitleSetText'>{networks[option]}</div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+            <Dropdown
+              onChange={(network) => this.selectNetwork(network)}
+              options={[
+                { text: 'Mainnet', value: '1' },
+                { text: 'Ropsten', value: '3' },
+                { text: 'Rinkeby', value: '4' },
+                { text: 'Kovan', value: '42' }]}
+              selected={this.store('main.connection.network')}
+            />
           </div>
           <div className='signerPermission'>
             <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
@@ -234,7 +227,7 @@ class Settings extends React.Component {
               <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
               <Dropdown
                 onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)}
-                options={[{ name: 'Legacy', value: 'legacy' }, { name: 'Live', value: 'live' }]}
+                options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
                 selected={this.store('main.ledger.derivationPath')}
               />
             </div>
