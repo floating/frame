@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
-import DropdownItem from '../DropdownItem'
 
 const findIndex = (options, value) => {
   const index = options.findIndex((option) => option.value === value)
   return index >= 0 ? index : null
 }
 
-const Dropdown = ({ options, selected, style, onChange }) => {
+const Dropdown = ({ options, selected, style, className, onChange }) => {
   // Hooks
   const [index, setIndex] = useState(findIndex(options, selected) || 0) // default
   const [expanded, setExpanded] = useState(false)
@@ -28,10 +27,14 @@ const Dropdown = ({ options, selected, style, onChange }) => {
 
   // JSX
   return (
-    <div className={expanded ? 'dropdown dropdownExpanded' : 'dropdown dropdownContracted'} style={expanded ? { ...style, height } : { ...style }} onMouseDown={(e) => { setExpanded(!expanded) }}>
+    <div
+      className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown dropdownContracted ${className}`}
+      style={expanded ? { ...style, height } : { ...style }}
+      onMouseDown={(e) => { setExpanded(!expanded) }}
+    >
       <div className='dropdownItems' style={expanded ? {} : { marginTop }}>
         { options.map((option, index) => {
-          return <DropdownItem name={option.name} index={index} onSelect={handleSelect} />
+          return <div className='dropdownItem' onMouseDown={() => handleSelect(index)}>{ option.text }</div>
         })}
       </div>
     </div>

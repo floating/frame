@@ -5,7 +5,6 @@ import link from '../../../link'
 import Client from '../Client'
 
 import Dropdown from '../../Components/Dropdown'
-import DropdownItem from '../../Components/DropdownItem'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
@@ -233,10 +232,11 @@ class Settings extends React.Component {
           <div className='signerPermission'>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
-              <Dropdown selected={this.store('main.ledger.derivationPath')} onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)} options={[
-                { name: 'Legacy', value: 'legacy' },
-                { name: 'Live', value: 'live' }
-              ]} />
+              <Dropdown
+                onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)}
+                options={[{ name: 'Legacy', value: 'legacy' }, { name: 'Live', value: 'live' }]}
+                selected={this.store('main.ledger.derivationPath')}
+              />
             </div>
             <div className='signerPermissionDetails'>
               {`Use Legacy (44'/60'/0'/) or Live (44'/60'/) derivation path`}
