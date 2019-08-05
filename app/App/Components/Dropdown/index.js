@@ -5,18 +5,23 @@ const findIndex = (options, value) => {
   return index >= 0 ? index : null
 }
 
-const Dropdown = ({ options, initialValue, style, className, onChange }) => {
+const Dropdown = ({ options, syncValue, initialValue, style, className, onChange }) => {
+  // Get index for passed value(s)
+  const syncIndex = findIndex(options, syncValue)
+  const initialIndex = findIndex(options, initialValue)
+
   // Hooks
-  const [index, setIndex] = useState(findIndex(options, initialValue) || 0) // default
+  const [index, setIndex] = useState(syncIndex || initialIndex || 0)
   const [expanded, setExpanded] = useState(false)
 
-  // Style calculations
-  const height = (options.length * 26) + 'px'
-  const marginTop = (-26 * index) + 'px'
+  // Handle new sync value
+  if (syncIndex !== index) {
+    setIndex(syncIndex)
+  }
 
-  // Callback: handle select item
+  // Handle item selected
   const handleSelect = (newIndex) => {
-    // Trigger only on selecting new item
+    // Trigger only on new item selected
     if (newIndex !== index) {
       // Return new value
       onChange(options[newIndex].value)
@@ -24,6 +29,10 @@ const Dropdown = ({ options, initialValue, style, className, onChange }) => {
       setIndex(newIndex)
     }
   }
+
+  // Style calculations
+  const height = (options.length * 26) + 'px'
+  const marginTop = (-26 * index) + 'px'
 
   // JSX
   return (

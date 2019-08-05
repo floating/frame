@@ -9,24 +9,11 @@ module.exports = {
       return connection
     })
   },
-  selectSecondary: (u, direction) => {
-    if (direction === '->') {
-      u('main.connection', connection => {
-        const options = Object.keys(connection.secondary.settings[connection.network].options)
-        let index = options.indexOf(connection.secondary.settings[connection.network].current) + 1
-        if (index >= options.length) index = 0
-        connection.secondary.settings[connection.network].current = options[index]
-        return connection
-      })
-    } else if (direction === '<-') {
-      u('main.connection', connection => {
-        const options = Object.keys(connection.secondary.settings[connection.network].options)
-        let index = options.indexOf(connection.secondary.settings[connection.network].current) - 1
-        if (index < 0) index = options.length - 1
-        connection.secondary.settings[connection.network].current = options[index]
-        return connection
-      })
-    }
+  selectSecondary: (u, value) => {
+    u('main.connection', connection => {
+      connection.secondary.settings[connection.network].current = value
+      return connection
+    })
   },
   setSecondaryCustom: (u, target) => {
     u('main.connection', connection => {

@@ -132,7 +132,7 @@ class Settings extends React.Component {
           <div className='localSettingsTitle connectionTitle'>
             <div>{'Connection'}</div>
             <Dropdown
-              initialValue={this.store('main.connection.network')}
+              syncValue={this.store('main.connection.network')}
               onChange={(network) => this.selectNetwork(network)}
               options={[
                 { text: 'Mainnet', value: '1' },
@@ -180,13 +180,17 @@ class Settings extends React.Component {
               <div className='connectionOptionDetails'>
                 <div className='connectionOptionDetailsInset'>
                   {this.status(this.store('main.connection.secondary'))}
-                  <div className='signerOptionSet'>
-                    <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-left', { height: 14 })}</div>
-                    <div className='signerOptionSetText'>{this.store('main.connection.secondary.settings', network, 'current')}</div>
-                    <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-right', { height: 14 })}</div>
-                  </div>
+                  <Dropdown
+                    syncValue={this.store('main.connection.secondary.settings', network, 'current')}
+                    onChange={(value) => link.send('tray:action', 'selectSecondary', value)}
+                    options={[
+                      { text: 'Infura', value: 'infura' },
+                      { text: 'Custom', value: 'custom' }
+                    ]}
+                  />
                 </div>
               </div>
+
               <div className={this.store('main.connection.secondary.settings', network, 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
                 <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
               </div>
@@ -226,7 +230,7 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
               <Dropdown
-                initialValue={this.store('main.ledger.derivationPath')}
+                syncValue={this.store('main.ledger.derivationPath')}
                 onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)}
                 options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
               />
@@ -234,7 +238,6 @@ class Settings extends React.Component {
             <div className='signerPermissionDetails'>
               {`Use Legacy (44'/60'/0'/) or Live (44'/60'/) derivation path`}
             </div>
-
           </div>
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')}>{'View License'}</div>
