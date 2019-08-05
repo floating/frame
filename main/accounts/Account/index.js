@@ -5,7 +5,7 @@ const signers = require('../../signers')
 const windows = require('../../windows')
 const store = require('../../store')
 
-const Aragon = require('./aragon')
+const { Aragon } = require('../aragon')
 
 const capitalize = (s) => {
   if (typeof s !== 'string') return ''
@@ -13,7 +13,7 @@ const capitalize = (s) => {
 }
 
 class Account {
-  constructor ({ id, type, index, name, created, addresses, smart, options = {} }, accounts) {
+  constructor ({ id, type, index, name, created, addresses, network, smart, options = {} }, accounts) {
     this.accounts = accounts
     this.id = id
     this.index = index || 0
@@ -23,6 +23,7 @@ class Account {
     this.created = created
     this.addresses = addresses || ['0x']
     this.smart = smart
+    this.network = network || store('main.connection.network')
     this.requests = {}
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
     this.update(true)
@@ -114,7 +115,7 @@ class Account {
     }))
     if (update.smart && update.smart.actor && update.smart.actor.account) {
       update.signer = update.smart.actor.account.signer
-      if (update.signer) update.signer.type = 'Agent'
+      if (update.signer) update.signer.type = 'aragon'
     }
     return update
   }
@@ -187,9 +188,9 @@ class Account {
     const keys = Object.keys(rawTx)
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i]
-      if (!this._isValidHexString(rawTx[key])) {
+      if (!this._isValidHexString(rawTx[key]) && key !== 'description') {
         // Break on first error
-        cb(new Error(`Transaction parameter '${key}' is not a invalid hex string`))
+        cb(new Error(`Transaction parameter '${key}' is not a valid hex string`))
         break
       }
     }
