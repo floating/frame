@@ -5,18 +5,18 @@ const findIndex = (options, value) => {
   return index >= 0 ? index : null
 }
 
-const Dropdown = ({ options, selected, style, className, onChange }) => {
+const Dropdown = ({ options, initialValue, style, className, onChange }) => {
   // Hooks
-  const [index, setIndex] = useState(findIndex(options, selected) || 0) // default
+  const [index, setIndex] = useState(findIndex(options, initialValue) || 0) // default
   const [expanded, setExpanded] = useState(false)
 
   // Style calculations
   const height = (options.length * 26) + 'px'
   const marginTop = (-26 * index) + 'px'
 
-  // Callback: select
+  // Callback: handle select item
   const handleSelect = (newIndex) => {
-    // Trigger only on new index
+    // Trigger only on selecting new item
     if (newIndex !== index) {
       // Return new value
       onChange(options[newIndex].value)
@@ -28,7 +28,7 @@ const Dropdown = ({ options, selected, style, className, onChange }) => {
   // JSX
   return (
     <div
-      className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown dropdownContracted ${className}`}
+      className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown ${className}`}
       style={expanded ? { ...style, height } : { ...style }}
       onMouseDown={(e) => { setExpanded(!expanded) }}
     >

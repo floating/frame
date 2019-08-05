@@ -138,7 +138,7 @@ class Settings extends React.Component {
                 { text: 'Ropsten', value: '3' },
                 { text: 'Rinkeby', value: '4' },
                 { text: 'Kovan', value: '42' }]}
-              selected={this.store('main.connection.network')}
+              initialValue={this.store('main.connection.network')}
             />
           </div>
           <div className='signerPermission'>
@@ -228,7 +228,7 @@ class Settings extends React.Component {
               <Dropdown
                 onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)}
                 options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
-                selected={this.store('main.ledger.derivationPath')}
+                initialValue={this.store('main.ledger.derivationPath')}
               />
             </div>
             <div className='signerPermissionDetails'>
