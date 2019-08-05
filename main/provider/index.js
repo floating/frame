@@ -268,6 +268,13 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${version}` })
   }
 
+  sendAsync (payload, cb) {
+    this.send(payload, res => {
+      if (res.error) return cb(new Error(res.error))
+      cb(null, res)
+    })
+  }
+
   send (payload, res = () => {}) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)

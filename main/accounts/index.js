@@ -119,17 +119,23 @@ class Accounts extends EventEmitter {
     if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
     account.id = this.addressesToId(account.addresses)
     account.options = account.options || {}
+    account.network = account.network || store('main.connection.network')
+    const existing = store('main.accounts', account.id)
+    if (existing && existing.network === account.network) return cb(null, existing) // Account already exists...
+    log.info('Aragon account not found, creating account')
     account.options.type = 'aragon'
     this.accounts[account.id] = new Account(account, this)
+    cb(null, this.accounts[account.id].summary())
   }
 
   add (addresses, options = {}, cb = () => {}) {
     if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
     const id = this.addressesToId(addresses)
     const account = store('main.accounts', id)
-    if (account) return cb(null, account) // Account already exists...
+    const network = store('main.connection.network')
+    if (account && account.network === network) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
-    this.accounts[id] = new Account({ id, addresses, index: 0, created: Date.now(), options }, this)
+    this.accounts[id] = new Account({ id, addresses, index: 0, network, created: Date.now(), options }, this)
   }
 
   update (account, add) {

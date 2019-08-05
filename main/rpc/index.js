@@ -8,6 +8,8 @@ const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
 
+const { resolveName } = require('../accounts/aragon')
+
 const rpc = {
   getState: cb => {
     cb(null, store())
@@ -72,8 +74,7 @@ const rpc = {
     }
   },
   addAragon (account, cb) {
-    accounts.addAragon(account)
-    cb(null)
+    accounts.addAragon(account, cb)
   },
   createFromPhrase (phrase, password, cb) {
     signers.createFromPhrase(phrase, password, cb)
@@ -112,6 +113,9 @@ const rpc = {
   },
   remove (id, cb) {
     signers.remove(id, cb)
+  },
+  resolveAragonName (name, cb) {
+    resolveName(name).then(result => cb(null, result)).catch(cb)
   }
 }
 

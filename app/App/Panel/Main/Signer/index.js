@@ -128,6 +128,7 @@ class Signer extends React.Component {
                   if (this.props.signer.type === 'ledger') return <img src={ledgerLogo} />
                   if (this.props.signer.type === 'trezor') return <img className='trezorImage' src={trezorLogo} />
                   if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
+                  if (this.props.signer.type === 'aragon' || this.props.signer.type === 'ring') return <span style={{ marginTop: '-5px' }}>{svg.aragon(34)}</span>
                   return svg.octicon('plus', { height: 31 })
                 } else {
                   return null

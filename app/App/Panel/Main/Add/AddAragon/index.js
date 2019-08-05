@@ -9,9 +9,10 @@ class AddAragon extends React.Component {
     super(...args)
     this.state = {
       adding: false,
-      dao: '0x0000000000000000000000000000000000000000',
       agent: '0x0000000000000000000000000000000000000000',
-      index: 0
+      index: 0,
+      status: '',
+      error: false
     }
   }
 
@@ -25,13 +26,13 @@ class AddAragon extends React.Component {
   onBlur (key, e) {
     e.preventDefault()
     const update = {}
-    update[key] = this.state[key] || '0x0000000000000000000000000000000000000000'
+    update[key] = this.state[key] || ''
     this.setState(update)
   }
 
   onFocus (key, e) {
     e.preventDefault()
-    if (this.state[key] === '0x0000000000000000000000000000000000000000') {
+    if (this.state[key] === '') {
       const update = {}
       update[key] = ''
       this.setState(update)
@@ -47,26 +48,49 @@ class AddAragon extends React.Component {
     this.next()
   }
 
+  capitalize (s) {
+    if (typeof s !== 'string') return ''
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
+
   actorAddress (actorAddress, actorIndex) {
-    const aragonAccount = {
-      id: this.state.dao,
-      index: 0,
-      addresses: [this.state.agent], // Agent Address
-      type: 'Aragon',
-      smart: {
-        type: 'aragon',
-        actor: { // Reference to Frame account that will act on behalf of the agent
-          id: this.state.actorId,
-          index: actorIndex,
-          address: actorAddress // External Signer
-        },
-        dao: this.state.dao, // DAO Address
-        agent: this.state.agent // Agent Address
+    link.rpc('resolveAragonName', this.state.name, (err, dao) => {
+      this.next()
+      if (err) return this.setState({ status: err, error: true })
+      const aragonAccount = {
+        id: dao.apps.kernel.proxyAddress,
+        index: 0,
+        addresses: [dao.apps.agent.proxyAddress], // Agent Address
+        type: 'Aragon',
+        name: this.capitalize(dao.name) + ' DAO',
+        ens: dao.ens,
+        network: dao.network,
+        smart: {
+          type: 'aragon',
+          actor: { // Reference to Frame account that will act on behalf of the agent
+            id: this.state.actorId,
+            index: actorIndex,
+            address: actorAddress // External Signer
+          },
+          dao: dao.apps.kernel.proxyAddress, // DAO Address
+          agent: dao.apps.agent.proxyAddress // Agent Address
+        }
       }
-    }
-    link.rpc('addAragon', aragonAccount, () => {
-      this.store.toggleAddAccount()
+      link.rpc('addAragon', aragonAccount, (err) => {
+        if (err) {
+          this.setState({ status: err, error: true })
+        } else {
+          this.setState({ status: 'Successful', error: false })
+          setTimeout(() => {
+            this.store.toggleAddAccount()
+          }, 2000)
+        }
+      })
     })
+  }
+
+  restart () {
+    this.setState({ index: 0, adding: true, phrase: '', password: '', status: 'creating signers', success: false })
   }
 
   render () {
@@ -92,16 +116,9 @@ class AddAragon extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'dao address'}</div>
+                  <div className='addAccountItemOptionTitle'>{'enter dao name'}</div>
                   <div className='addAccountItemOptionInput'>
-                    <textarea tabIndex={'-1'} maxLength='42' value={this.state.dao} onChange={e => this.onChange('dao', e)} onFocus={e => this.onFocus('dao', e)} onBlur={e => this.onBlur('dao', e)} />
-                  </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
-                </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'dao\'s agent address'}</div>
-                  <div className='addAccountItemOptionInput'>
-                    <textarea tabIndex={'-1'}maxLength='42' value={this.state.agent} onChange={e => this.onChange('agent', e)} onFocus={e => this.onFocus('agent', e)} onBlur={e => this.onBlur('agent', e)} />
+                    <textarea tabIndex={'-1'} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                 </div>
@@ -125,6 +142,10 @@ class AddAragon extends React.Component {
                       )
                     })}
                   </div>
+                </div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
+                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>{'try again'}</div> : null}
                 </div>
               </div>
             </div>
