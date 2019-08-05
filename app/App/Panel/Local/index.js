@@ -132,13 +132,13 @@ class Settings extends React.Component {
           <div className='localSettingsTitle connectionTitle'>
             <div>{'Connection'}</div>
             <Dropdown
+              initialValue={this.store('main.connection.network')}
               onChange={(network) => this.selectNetwork(network)}
               options={[
                 { text: 'Mainnet', value: '1' },
                 { text: 'Ropsten', value: '3' },
                 { text: 'Rinkeby', value: '4' },
                 { text: 'Kovan', value: '42' }]}
-              initialValue={this.store('main.connection.network')}
             />
           </div>
           <div className='signerPermission'>
@@ -226,9 +226,9 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
               <Dropdown
+                initialValue={this.store('main.ledger.derivationPath')}
                 onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)}
                 options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
-                initialValue={this.store('main.ledger.derivationPath')}
               />
             </div>
             <div className='signerPermissionDetails'>
