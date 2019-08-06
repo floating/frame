@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../svg'
 import link from '../../../link'
 import Client from '../Client'
 
@@ -109,11 +108,8 @@ class Settings extends React.Component {
 
   selectNetwork (network) {
     if (network !== this.store('main.connection.network')) {
-      if (network === '1') {
-        this.store.notify('mainnet')
-      } else {
-        link.send('tray:action', 'selectNetwork', network)
-      }
+      if (network === '1') this.store.notify('mainnet')
+      else link.send('tray:action', 'selectNetwork', network)
     }
   }
 
@@ -123,7 +119,6 @@ class Settings extends React.Component {
   }
 
   render () {
-    const network = this.store('main.connection.network')
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
@@ -181,7 +176,7 @@ class Settings extends React.Component {
                 <div className='connectionOptionDetailsInset'>
                   {this.status(this.store('main.connection.secondary'))}
                   <Dropdown
-                    syncValue={this.store('main.connection.secondary.settings', network, 'current')}
+                    syncValue={this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'current')}
                     onChange={(value) => link.send('tray:action', 'selectSecondary', value)}
                     options={[
                       { text: 'Infura', value: 'infura' },
@@ -191,7 +186,7 @@ class Settings extends React.Component {
                 </div>
               </div>
 
-              <div className={this.store('main.connection.secondary.settings', network, 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <div className={this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
                 <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
               </div>
             </div>
