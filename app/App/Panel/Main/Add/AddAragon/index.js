@@ -19,7 +19,7 @@ class AddAragon extends React.Component {
   onChange (key, e) {
     e.preventDefault()
     const update = {}
-    update[key] = (e.target.value || '').replace(/\W/g, '')
+    update[key] = (e.target.value || '') // .replace(/\W/g, '')
     this.setState(update)
   }
 
@@ -102,7 +102,7 @@ class AddAragon extends React.Component {
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
             <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconSmart'>{svg.aragon(30)}</div>
+              <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
               <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
             </div>
             <div className='addAccountItemTopTitle'>{'Aragon'}</div>
@@ -117,8 +117,8 @@ class AddAragon extends React.Component {
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{'enter dao name'}</div>
-                  <div className='addAccountItemOptionInput'>
-                    <textarea tabIndex={'-1'} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} />
+                  <div className='addAccountItemOptionInputPhrase'>
+                    <input tabIndex={'-1'} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                 </div>
