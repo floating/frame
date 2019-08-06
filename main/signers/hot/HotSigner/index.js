@@ -16,15 +16,21 @@ class HotSigner extends Signer {
   constructor (signer, workerPath) {
     super()
     this.status = 'locked'
-    this.addresses = (signer && signer.addresses) || []
+    if (signer) {
+      this.network = signer.network || store('main.connection.network')
+      this.addresses = signer.addresses || []
+    } else {
+      this.network = store('main.connection.network')
+      this.addresses = []
+    }
     this._worker = fork(workerPath)
     this._getToken()
   }
 
   save (data) {
     // Construct signer
-    const { id, addresses, type } = this
-    const signer = { id, addresses, type, ...data }
+    const { id, addresses, type, network } = this
+    const signer = { id, addresses, type, network, ...data }
 
     // Ensure signers directory exists
     ensureDirSync(SIGNERS_PATH)
@@ -72,7 +78,7 @@ class HotSigner extends Signer {
 
   update () {
     // Get derived ID
-    const derivedId = this.addressesId()
+    const derivedId = this.fingerprint()
 
     // On new ID ->
     if (!this.id) {
@@ -97,11 +103,13 @@ class HotSigner extends Signer {
   }
 
   signMessage (index, message, cb) {
+    if (this.network !== store('main.connection.network')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.connection.network')}`))
     const payload = { method: 'signMessage', params: { index, message } }
     this._callWorker(payload, cb)
   }
 
   signTransaction (index, rawTx, cb) {
+    if (this.network !== store('main.connection.network')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.connection.network')}`))
     const payload = { method: 'signTransaction', params: { index, rawTx } }
     this._callWorker(payload, cb)
   }

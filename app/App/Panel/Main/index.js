@@ -8,14 +8,30 @@ import Add from './Add'
 
 import svg from '../../../svg'
 
+const accountNames = {
+  1: 'Mainnet',
+  3: 'Ropsten',
+  4: 'Rinkeby',
+  42: 'Kovan'
+}
+
 class Main extends React.Component {
   reportScroll () {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
 
   render () {
-    const accounts = this.store('main.accounts')
-    const signers = this.store('main.signers')
+    const accounts = {}
+    const network = this.store('main.connection.network')
+    Object.keys(this.store('main.accounts')).forEach(id => {
+      const account = this.store('main.accounts', id)
+      if (account.network === network) accounts[id] = account
+    })
+    const signers = {}
+    Object.keys(this.store('main.signers')).forEach(id => {
+      const signer = this.store('main.signers', id)
+      if (signer.network === network) signers[id] = signer
+    })
     const untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
@@ -30,7 +46,7 @@ class Main extends React.Component {
               {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
-                  {'No Accounts Found'}
+                  {`No ${accountNames[network]} Accounts Found`}
                   <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>{'Need help getting started?'}</span>
                   <span className='featureBox'>
                     <span className='featureBoxText'>

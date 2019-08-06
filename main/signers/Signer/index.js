@@ -17,10 +17,8 @@ class Signer {
     deriveHDAccounts(publicKey, chainCode, cb)
   }
 
-  addressesId () {
-    // TODO: Make sure it was okay to remove the second condition below
-    // if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
-    if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
+  fingerprint () {
+    if (this.network && this.addresses && this.addresses.length) return crypt.stringToKey(this.network + this.addresses.join()).toString('hex')
   }
 
   getCoinbase (cb) {
@@ -50,7 +48,8 @@ class Signer {
       id: this.id,
       type: this.type,
       addresses: this.addresses,
-      status: this.status
+      status: this.status,
+      network: this.network
     }
   }
 
