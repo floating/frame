@@ -1,10 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../svg'
 import link from '../../../link'
 import Client from '../Client'
 
-const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
+import Dropdown from '../../Components/Dropdown'
 
 class Settings extends React.Component {
   constructor (props, context) {
@@ -107,13 +106,10 @@ class Settings extends React.Component {
     }
   }
 
-  selectNetwork (net) {
-    if (net !== this.store('main.connection.network')) {
-      if (net === '1') {
-        this.store.notify('mainnet')
-      } else {
-        link.send('tray:action', 'selectNetwork', net)
-      }
+  selectNetwork (network) {
+    if (network !== this.store('main.connection.network')) {
+      if (network === '1') this.store.notify('mainnet')
+      else link.send('tray:action', 'selectNetwork', network)
     }
   }
 
@@ -123,10 +119,6 @@ class Settings extends React.Component {
   }
 
   render () {
-    const network = this.store('main.connection.network')
-    const options = this.store('main.connection.options')
-    const index = options.indexOf(network)
-    const netSetStyle = { marginTop: this.state.expandNetwork ? '0px' : (-26 * index) + 'px' }
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
@@ -134,17 +126,15 @@ class Settings extends React.Component {
         <div className='localSettingsWrap'>
           <div className='localSettingsTitle connectionTitle'>
             <div>{'Connection'}</div>
-            <div className={this.state.expandNetwork ? 'connectionTitleSet connectionExpandNetwork' : 'connectionTitleSet'} onMouseDown={e => this.expandNetwork(e)}>
-              <div className='connectionTitleSetItems' style={netSetStyle}>
-                {options.map((option, index) => {
-                  return (
-                    <div key={option + index} className='connectionTitleSetItem' onMouseDown={() => this.selectNetwork(option)}>
-                      <div className='connectionTitleSetText'>{networks[option]}</div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+            <Dropdown
+              syncValue={this.store('main.connection.network')}
+              onChange={(network) => this.selectNetwork(network)}
+              options={[
+                { text: 'Mainnet', value: '1' },
+                { text: 'Ropsten', value: '3' },
+                { text: 'Rinkeby', value: '4' },
+                { text: 'Kovan', value: '42' }]}
+            />
           </div>
           <div className='signerPermission'>
             <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
@@ -185,14 +175,18 @@ class Settings extends React.Component {
               <div className='connectionOptionDetails'>
                 <div className='connectionOptionDetailsInset'>
                   {this.status(this.store('main.connection.secondary'))}
-                  <div className='signerOptionSet'>
-                    <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-left', { height: 14 })}</div>
-                    <div className='signerOptionSetText'>{this.store('main.connection.secondary.settings', network, 'current')}</div>
-                    <div className='signerOptionSetButton' onMouseDown={() => link.send('tray:action', 'selectSecondary', '<-')}>{svg.octicon('chevron-right', { height: 14 })}</div>
-                  </div>
+                  <Dropdown
+                    syncValue={this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'current')}
+                    onChange={(value) => link.send('tray:action', 'selectSecondary', value)}
+                    options={[
+                      { text: 'Infura', value: 'infura' },
+                      { text: 'Custom', value: 'custom' }
+                    ]}
+                  />
                 </div>
               </div>
-              <div className={this.store('main.connection.secondary.settings', network, 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+
+              <div className={this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
                 <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
               </div>
             </div>
@@ -225,6 +219,19 @@ class Settings extends React.Component {
             </div>
             <div className='signerPermissionDetails'>
               {'Run Frame when your computer starts'}
+            </div>
+          </div>
+          <div className='signerPermission'>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
+              <Dropdown
+                syncValue={this.store('main.ledger.derivationPath')}
+                onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)}
+                options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {`Use Legacy (44'/60'/0'/) or Live (44'/60'/) derivation path`}
             </div>
           </div>
           {this.quit()}

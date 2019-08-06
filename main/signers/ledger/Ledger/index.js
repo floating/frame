@@ -12,6 +12,10 @@ const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 let verifyActive
 
+const BASE_PATH_LEGACY = `44'/60'/0'/`
+const BASE_PATH_LIVE = `44'/60'/`
+const BASE_PATH_TEST = `44'/1'/0'/`
+
 class Ledger extends Signer {
   constructor (devicePath, signers) {
     super()
@@ -25,8 +29,7 @@ class Ledger extends Signer {
     this.pause = false
     this.coinbase = '0x'
     this.network = store('main.connection.network')
-    this.basePath = () => this.network === '1' ? `44'/60'/0'/` : `44'/1'/0'/`
-    this.getPath = (i = 0) => this.basePath() + i
+    this.getPath = (i = 0) => this.getBasePath() + i
     this.handlers = {}
     this.deviceStatus()
     this.networkObserver = store.observer(() => {
@@ -35,6 +38,11 @@ class Ledger extends Signer {
         this.deviceStatus()
       }
     })
+  }
+
+  getBasePath () {
+    if (this.network !== '1') return BASE_PATH_TEST
+    else return store('main.ledger.derivationPath') === 'legacy' ? BASE_PATH_LEGACY : BASE_PATH_LIVE
   }
 
   getId () {
@@ -152,7 +160,7 @@ class Ledger extends Signer {
           this.pause = false
           this.lookupAddresses(cb)
         }, 4000)
-        eth.getAddress(this.basePath(), false, true).then(result => {
+        eth.getAddress(this.getBasePath(), false, true).then(result => {
           clearTimeout(timeout)
           transport.close()
           device.close()
