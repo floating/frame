@@ -56,6 +56,7 @@ class TransactionRequest extends React.Component {
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
+    const feeWarning = fee * etherUSD > 10
     const height = mode === 'monitor' ? '145px' : '360px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
@@ -141,9 +142,10 @@ class TransactionRequest extends React.Component {
                   <div className='transactionFee'>
                     <div className='transactionTotals'>
                       <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
-                      <div className='transactionTotalUSD'>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
+                      <div className={feeWarning ? 'transactionTotalUSD transactionWarning' : 'transactionTotalUSD'}>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
+                      {feeWarning ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null }
                     </div>
-                    <div className='transactionSubtitle'>{'Max Fee'}</div>
+                    <div className='transactionSubtitle'>{'Max Fee'}️</div>
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
