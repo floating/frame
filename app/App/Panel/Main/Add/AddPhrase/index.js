@@ -15,6 +15,7 @@ class AddPhrase extends React.Component {
       status: '',
       error: false
     }
+    this.forms = [React.createRef(), React.createRef()]
   }
 
   onChange (key, e) {
@@ -48,6 +49,7 @@ class AddPhrase extends React.Component {
 
   next () {
     this.setState({ index: ++this.state.index })
+    this.focusActive()
   }
 
   create () {
@@ -65,7 +67,33 @@ class AddPhrase extends React.Component {
   }
 
   restart () {
-    this.setState({ index: 0, adding: true, phrase: '', password: '', status: 'creating signers', success: false })
+    this.setState({ index: 0, adding: false, phrase: '', password: '', success: false })
+    setTimeout(() => {
+      this.setState({ status: '', error: false })
+    }, 500)
+    this.focusActive()
+  }
+
+  keyPress (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const formInput = this.forms[this.state.index]
+      if (formInput) formInput.current.blur()
+      if (this.state.index === 1) return this.create()
+      this.next()
+    }
+  }
+
+  adding () {
+    this.setState({ adding: true })
+    this.focusActive()
+  }
+
+  focusActive () {
+    setTimeout(() => {
+      const formInput = this.forms[this.state.index]
+      if (formInput) formInput.current.focus()
+    }, 500)
   }
 
   render () {
@@ -85,7 +113,7 @@ class AddPhrase extends React.Component {
           </div>
           <div className='addAccountItemSummary'>{'A phrase account uses a list of words to backup and restore your account'}</div>
           <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => { this.setState({ adding: true }) }}>
+            <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
               {'Add Phrase Account'}
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
@@ -93,14 +121,14 @@ class AddPhrase extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{'seed phrase'}</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <textarea tabIndex={'-1'} value={this.state.phrase} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} />
+                    <textarea tabIndex={'-1'} value={this.state.phrase} ref={this.forms[0]} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{'create password'}</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <input type='password' tabIndex={'-1'} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} />
+                    <input type='password' tabIndex={'-1'} value={this.state.password} ref={this.forms[1]} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>{'Create'}</div>
                 </div>

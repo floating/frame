@@ -65,8 +65,12 @@ const initial = {
     rates: {}
   },
   main: {
+    alphaWarningPassed: main('alphaWarningPassed', false),
     launch: main('launch', false),
     reveal: main('reveal', false),
+    ledger: {
+      derivationPath: main('ledger.derivationPath', 'legacy')
+    },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions
     signers: {},
@@ -105,7 +109,6 @@ const initial = {
     },
     connection: {
       network: main('connection.network', '1'),
-      options: ['1', '3', '4', '42'],
       local: {
         on: main('connection.local.on', false),
         status: 'loading',

@@ -105,13 +105,15 @@ class Account {
     const update = JSON.parse(JSON.stringify({
       id: this.id,
       index: this.index,
+      network: this.network,
       name: this.name,
       type: this.type,
       addresses: this.addresses,
       status: this.status,
       signer: this.signer,
       smart: this.smart,
-      requests: this.requests
+      requests: this.requests,
+      created: this.created
     }))
     if (update.smart && update.smart.actor && update.smart.actor.account) {
       update.signer = update.smart.actor.account.signer
