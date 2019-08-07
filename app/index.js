@@ -7,6 +7,8 @@ import Panel from './App/Panel'
 import link from './link'
 import _store from './store'
 
+window.removeAllAccountsAndSigners = () => link.send('tray:removeAllAccountsAndSigners')
+
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
