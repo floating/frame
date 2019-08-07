@@ -30,7 +30,7 @@ class Panel extends React.Component {
       <div id='panel' style={{ transform, transition }}>
         <div className='panelSwoop'>{svg.swoop()}</div>
         <div className='panelSwoopBottom'>{svg.swoop()}</div>
-        <div className='panelMenu'>
+        <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
               {this.indicator(this.store('main.connection'))}

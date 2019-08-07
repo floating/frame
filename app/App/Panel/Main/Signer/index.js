@@ -367,6 +367,13 @@ class Signer extends React.Component {
         style.transform = 'translate(0px, 0px)'
         style.opacity = 1
       }
+    } else {
+      if (this.store('view.addAccount')) {
+        style.opacity = 0
+      } else {
+        style.transition = '1.48s cubic-bezier(.82,0,.12,1) all'
+        style.transitionDelay = '0s'
+      }
     }
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
