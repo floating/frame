@@ -108,8 +108,7 @@ class Settings extends React.Component {
 
   selectNetwork (network) {
     if (network !== this.store('main.connection.network')) {
-      if (network === '1') this.store.notify('mainnet')
-      else link.send('tray:action', 'selectNetwork', network)
+      link.send('tray:action', 'selectNetwork', network)
     }
   }
 

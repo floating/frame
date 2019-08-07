@@ -45,8 +45,8 @@ const resolveName = (name) => {
           const name = appNames[appId]
           if (name) appsSummary[name] = { proxyAddress }
         })
-        if (!appsSummary['kernel']) throw new Error('Unable to locate DAO kernel')
-        if (!appsSummary['agent']) throw new Error('Unable to locate DAO agent, make sure it is installed')
+        if (!appsSummary['kernel']) return reject(new Error('Unable to locate DAO kernel'))
+        if (!appsSummary['agent']) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
         resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.connection.network') })
       })
     } catch (e) {

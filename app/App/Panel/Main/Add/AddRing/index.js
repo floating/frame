@@ -18,6 +18,12 @@ class AddRing extends React.Component {
       keystore: '',
       keystorePassword: ''
     }
+    this.forms = {
+      enterPrivateKey: React.createRef(),
+      manualCreatePassword: React.createRef(),
+      keystorePassword: React.createRef(),
+      keystoreCreatePassword: React.createRef()
+    }
   }
 
   onChange (key, e) {
@@ -44,11 +50,13 @@ class AddRing extends React.Component {
   }
 
   next () {
+    this.blurActive()
     this.setState({ index: ++this.state.index })
+    this.focusActive()
   }
 
   createManual () {
-    this.setState({ index: ++this.state.index })
+    this.next()
     link.rpc('createFromPrivateKey', this.state.privateKey, this.state.password, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
@@ -62,7 +70,7 @@ class AddRing extends React.Component {
   }
 
   createKeystore () {
-    this.setState({ index: ++this.state.index })
+    this.next()
     link.rpc('createFromKeystore', this.state.keystore, this.state.keystorePassword, this.state.password, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
@@ -75,9 +83,9 @@ class AddRing extends React.Component {
     })
   }
 
-  restart () {
-    this.setState({ index: 0, adding: true, phrase: '', password: '', status: '', success: false })
-  }
+  // restart () {
+  //   this.setState({ index: 0, adding: true, phrase: '', password: '', status: '', success: false, error: false })
+  // }
 
   addManual () {
     this.setState({ mode: 'manual' })
@@ -97,6 +105,50 @@ class AddRing extends React.Component {
         }
       })
     }, 640)
+  }
+
+  restart () {
+    this.setState({ index: 0, adding: false, password: '', mode: 'manual', privateKey: '', keystore: '', keystorePassword: '' })
+    setTimeout(() => {
+      this.setState({ status: '', error: false })
+    }, 500)
+    this.focusActive()
+  }
+
+  keyPress (e, next) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      next()
+    }
+  }
+
+  adding () {
+    this.setState({ adding: true })
+    this.focusActive()
+  }
+
+  blurActive () {
+    const formInput = this.currentForm()
+    if (formInput) formInput.current.blur()
+  }
+
+  focusActive () {
+    setTimeout(() => {
+      const formInput = this.currentForm()
+      if (formInput) formInput.current.focus()
+    }, 500)
+  }
+
+  currentForm () {
+    let current
+    if (this.state.mode === 'manual') {
+      if (this.state.index === 1) current = this.forms.enterPrivateKey
+      if (this.state.index === 2) current = this.forms.manualCreatePassword
+    } else if (this.state.mode === 'keystore') {
+      if (this.state.index === 2) current = this.forms.keystorePassword
+      if (this.state.index === 3) current = this.forms.keystoreCreatePassword
+    }
+    return current
   }
 
   render () {
@@ -131,14 +183,14 @@ class AddRing extends React.Component {
                     <div className='addAccountItemOptionSetupFrame'>
                       <div className='addAccountItemOptionTitle'>{'Enter Private Key'}</div>
                       <div className='addAccountItemOptionInputPhrase'>
-                        <input type='password' tabIndex={'-1'} value={this.state.privateKey} onChange={e => this.onChange('privateKey', e)} onFocus={e => this.onFocus('privateKey', e)} onBlur={e => this.onBlur('privateKey', e)} />
+                        <input type='password' tabIndex={'-1'} ref={this.forms.enterPrivateKey} value={this.state.privateKey} onChange={e => this.onChange('privateKey', e)} onFocus={e => this.onFocus('privateKey', e)} onBlur={e => this.onBlur('privateKey', e)} onKeyPress={e => this.keyPress(e, () => this.next())} />
                       </div>
                       <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                     </div>
                     <div className='addAccountItemOptionSetupFrame'>
                       <div className='addAccountItemOptionTitle'>{'Create Password'}</div>
                       <div className='addAccountItemOptionInputPhrase'>
-                        <input type='password' tabIndex={'-1'} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} />
+                        <input type='password' tabIndex={'-1'} ref={this.forms.manualCreatePassword} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e, () => this.createManual())} />
                       </div>
                       <div className='addAccountItemOptionSubmit' onMouseDown={() => this.createManual()}>{'Create'}</div>
                     </div>
@@ -155,14 +207,14 @@ class AddRing extends React.Component {
                     <div className='addAccountItemOptionSetupFrame'>
                       <div className='addAccountItemOptionTitle'>{'Enter Keystore Password'}</div>
                       <div className='addAccountItemOptionInputPhrase'>
-                        <input type='password' tabIndex={'-1'} value={this.state.keystorePassword} onChange={e => this.onChange('keystorePassword', e)} onFocus={e => this.onFocus('keystorePassword', e)} onBlur={e => this.onBlur('keystorePassword', e)} />
+                        <input type='password' tabIndex={'-1'} ref={this.forms.keystorePassword} value={this.state.keystorePassword} onChange={e => this.onChange('keystorePassword', e)} onFocus={e => this.onFocus('keystorePassword', e)} onBlur={e => this.onBlur('keystorePassword', e)} onKeyPress={e => this.keyPress(e, () => this.next())} />
                       </div>
                       <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                     </div>
                     <div className='addAccountItemOptionSetupFrame'>
                       <div className='addAccountItemOptionTitle'>{'Create Account Password'}</div>
                       <div className='addAccountItemOptionInputPhrase'>
-                        <input type='password' tabIndex={'-1'} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} />
+                        <input type='password' tabIndex={'-1'} ref={this.forms.keystoreCreatePassword} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e, () => this.createKeystore())} />
                       </div>
                       <div className='addAccountItemOptionSubmit' onMouseDown={() => this.createKeystore()}>{'Create'}</div>
                     </div>

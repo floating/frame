@@ -34,17 +34,21 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
   const height = (options.length * 26) + 'px'
   const marginTop = (-26 * index) + 'px'
 
+  className = className || ''
+
   // JSX
   return (
-    <div
-      className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown ${className}`}
-      style={expanded ? { ...style, height } : { ...style }}
-      onMouseDown={(e) => { setExpanded(!expanded) }}
-    >
-      <div className='dropdownItems' style={expanded ? {} : { marginTop }}>
-        { options.map((option, index) => {
-          return <div className='dropdownItem' onMouseDown={() => handleSelect(index)}>{ option.text }</div>
-        })}
+    <div className='dropdownWrap'>
+      <div
+        className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown ${className}`}
+        style={expanded ? { ...style, height } : { ...style }}
+        onMouseDown={(e) => { setExpanded(!expanded) }}
+      >
+        <div className='dropdownItems' style={expanded ? {} : { marginTop }}>
+          { options.map((option, index) => {
+            return <div key={option.text + index} className='dropdownItem' onMouseDown={() => handleSelect(index)}>{ option.text }</div>
+          })}
+        </div>
       </div>
     </div>
   )

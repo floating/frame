@@ -89,7 +89,7 @@
     "react-transition-group": "4.2.1",
     "semver": "6.3.0",
     "tar": "4.4.10",
-    "trezor-connect": "7.0.5",
+    "trezor-connect": "https://github.com/trezor/connect",
     "trezor-link": "1.6.4",
     "trezor.js": "8.1.0",
     "usb": "1.6.0",
