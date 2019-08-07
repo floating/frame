@@ -16,6 +16,7 @@ class Requests extends React.Component {
       unlockInput: '',
       unlockHeadShake: false
     }
+    this.unlockInput = React.createRef()
   }
 
   trezorPin (num) {
@@ -55,6 +56,23 @@ class Requests extends React.Component {
     })
   }
 
+  keyPressUnlock (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      this.unlockSubmit()
+    }
+  }
+
+  componentDidMount () {
+    setTimeout(() => {
+      const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+      const open = current && this.store('selected.open')
+      if (open && this.props.signer && this.props.signer.status === 'locked' && this.unlockInput) {
+        this.unlockInput.current.focus()
+      }
+    }, 100)
+  }
+
   render () {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).map(key => requests[key])
@@ -87,13 +105,15 @@ class Requests extends React.Component {
 
     let unlockClass = 'signerUnlockRequest'
     if (this.state.unlockHeadShake) unlockClass += ' headShake'
-    const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '100px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(-200px)', opacity: 0 }
+    const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '110px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(0px)', height: '0px', opacity: 0.3 }
 
     return (
       <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
         <div className={unlockClass} style={unlockStyle}>
-          <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
-          <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+          <div className='signerUnlockWrap'>
+            <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={::this.unlockChange} onKeyPress={e => this.keyPressUnlock(e)} />
+            <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+          </div>
         </div>
         <div className='requestTitle'>
           <div>{'Requests'}</div>

@@ -109,5 +109,8 @@ module.exports = {
   },
   setLedgerDerivationPath: (u, value) => {
     u('main.ledger.derivationPath', () => value)
+  },
+  alphaWarningPassed: (u) => {
+    u('main.alphaWarningPassed', () => true)
   }
 }

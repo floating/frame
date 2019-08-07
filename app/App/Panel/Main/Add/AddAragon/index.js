@@ -12,8 +12,10 @@ class AddAragon extends React.Component {
       agent: '0x0000000000000000000000000000000000000000',
       index: 0,
       status: '',
-      error: false
+      error: false,
+      name: ''
     }
+    this.forms = [React.createRef()]
   }
 
   onChange (key, e) {
@@ -39,8 +41,26 @@ class AddAragon extends React.Component {
     }
   }
 
+  currentForm () {
+    return this.forms[this.state.index]
+  }
+
+  blurActive () {
+    const formInput = this.currentForm()
+    if (formInput) formInput.current.blur()
+  }
+
+  focusActive () {
+    setTimeout(() => {
+      const formInput = this.currentForm()
+      if (formInput) formInput.current.focus()
+    }, 500)
+  }
+
   next () {
+    this.blurActive()
     this.setState({ index: ++this.state.index })
+    this.focusActive()
   }
 
   actorAccount (actorId) {
@@ -90,7 +110,16 @@ class AddAragon extends React.Component {
   }
 
   restart () {
-    this.setState({ index: 0, adding: true, phrase: '', password: '', status: 'creating signers', success: false })
+    this.setState({ adding: false, agent: '0x0000000000000000000000000000000000000000', index: 0, name: '' })
+    setTimeout(() => {
+      this.setState({ status: '', error: false })
+    }, 500)
+    this.focusActive()
+  }
+
+  adding () {
+    this.setState({ adding: true })
+    this.focusActive()
   }
 
   render () {
@@ -110,7 +139,7 @@ class AddAragon extends React.Component {
           </div>
           <div className='addAccountItemSummary'>{'An Aragon smart account allows you to use your Aragon DAO with any dapp'}</div>
           <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => { this.setState({ adding: true }) }}>
+            <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
               <div className='addAccountItemDeviceTitle'>{'Add Aragon Account'}</div>
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
@@ -118,7 +147,7 @@ class AddAragon extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{'enter dao name'}</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <input tabIndex={'-1'} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} />
+                    <input tabIndex={'-1'} ref={this.forms[0]} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
                 </div>

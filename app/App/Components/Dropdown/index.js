@@ -43,7 +43,7 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
     >
       <div className='dropdownItems' style={expanded ? {} : { marginTop }}>
         { options.map((option, index) => {
-          return <div className='dropdownItem' onMouseDown={() => handleSelect(index)}>{ option.text }</div>
+          return <div key={option.text + index} className='dropdownItem' onMouseDown={() => handleSelect(index)}>{ option.text }</div>
         })}
       </div>
     </div>
