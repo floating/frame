@@ -105,6 +105,7 @@ class Account {
     const update = JSON.parse(JSON.stringify({
       id: this.id,
       index: this.index,
+      network: this.network,
       name: this.name,
       type: this.type,
       addresses: this.addresses,

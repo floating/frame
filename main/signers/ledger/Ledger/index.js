@@ -46,7 +46,7 @@ class Ledger extends Signer {
   }
 
   getId () {
-    return this.addressesId() || uuid('Ledger' + this.devicePath, ns)
+    return this.fingerprint() || uuid('Ledger' + this.devicePath, ns)
   }
 
   update () {

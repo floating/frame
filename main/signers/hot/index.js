@@ -93,11 +93,11 @@ module.exports = {
 
     // Add stored signers to store
     Object.keys(storedSigners).forEach(id => {
-      const { addresses, encryptedKeys, encryptedSeed, type } = storedSigners[id]
+      const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
       if (type === 'seed') {
-        signers.add(new SeedSigner({ addresses, encryptedSeed }))
+        signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
       } else if (type === 'ring') {
-        signers.add(new RingSigner({ addresses, encryptedKeys }))
+        signers.add(new RingSigner({ network, addresses, encryptedKeys }))
       }
     })
   }
