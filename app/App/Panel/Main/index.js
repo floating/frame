@@ -20,6 +20,12 @@ class Main extends React.Component {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
 
+  accountSort (accounts, a, b) {
+    if (accounts[a].created > accounts[b].created) return 1
+    if (accounts[a].created < accounts[b].created) return -1
+    return 0
+  }
+
   render () {
     const accounts = {}
     const network = this.store('main.connection.network')
@@ -42,7 +48,7 @@ class Main extends React.Component {
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
-              {Object.keys(accounts).sort().map((id, i) => <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} />)}
+              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} />)}
               {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>

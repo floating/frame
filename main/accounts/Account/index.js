@@ -112,7 +112,8 @@ class Account {
       status: this.status,
       signer: this.signer,
       smart: this.smart,
-      requests: this.requests
+      requests: this.requests,
+      created: this.created
     }))
     if (update.smart && update.smart.actor && update.smart.actor.account) {
       update.signer = update.smart.actor.account.signer
