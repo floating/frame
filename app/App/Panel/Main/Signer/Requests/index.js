@@ -7,6 +7,7 @@ import TransactionRequest from './TransactionRequest'
 import SignatureRequest from './SignatureRequest'
 
 import link from '../../../../../link'
+import SignTypedDataRequest from './SignTypedDataRequest';
 
 class Requests extends React.Component {
   constructor (...args) {
@@ -134,6 +135,7 @@ class Requests extends React.Component {
               if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} />
               if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} />
               if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} />
+              if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} />
               return null
             })}
           </div>
