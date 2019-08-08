@@ -246,6 +246,15 @@ class Provider extends EventEmitter {
     accounts.addRequest({ handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] })
   }
 
+  signTypedData (payload, res) {
+    const [from = '', typedData = {}] = payload.params;
+    const current = accounts.getAccounts()[0];
+    if (from.toLowerCase() !== current.toLowerCase()) return this.resError('signTypedData request is not from currently selected account.', payload, res);
+    const handlerId = uuid()
+    this.handlers[handlerId] = res
+    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: accounts.getAccounts()[0] })
+  }
+
   subscribe (payload, res) {
     const subId = '0x' + this.randHex(32)
     this.subs[payload.params[0]] = this.subs[payload.params[0]] || []
@@ -285,9 +294,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
-    if (payload.method === 'eth_signTypedData') {
-      return res({ id: payload.id, jsonrpc: '2.0', error: `eth_signTypedData is not implemented yet` })
-    }
+    if (payload.method === 'eth_signTypedData') return this.signTypedData(payload, res)
     this.connection.send(payload, res)
   }
 }
