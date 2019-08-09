@@ -107,7 +107,7 @@ class Trezor {
         console.log('Device needs passphrase')
       }
     })
-    const manifest = { email: 'j@j.com', appUrl: 'electron-app-boilerplate' }
+    const manifest = { email: 'jordan@frame.sh', appUrl: 'https://frame.sh' }
     const config = { manifest, popup: false, webusb: false, debug: false, lazyLoad: false }
     try {
       TrezorConnect.init(config).then(() => {
