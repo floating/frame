@@ -72,8 +72,8 @@ class Notify extends React.Component {
             <div className='notifyBodyLine'>{'Please select another Ethereum client or use the secondary connection.'}</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>{'Go Back'}</div>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>{'OK'}</div>
             </div>
           </div>
         </div>
@@ -86,9 +86,6 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-          {/* <div className='notifyTitle'>
-            {'Could not start IPFS'}
-          </div> */}
           <div className='notifyBody'>
             <div className='notifyBodyLine'>{'IPFS daemon is already running on this machine.'}</div>
           </div>
@@ -107,9 +104,6 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-          {/* <div className='notifyTitle'>
-            {'Could not start IPFS'}
-          </div> */}
           <div className='notifyBody'>
             <div className='notifyBodyLine'>{'Parity is already running on this machine.'}</div>
           </div>
@@ -154,6 +148,27 @@ class Notify extends React.Component {
     )
   }
 
+  contractData () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'contractData' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            {'Contract Data not allowed'}
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{`Your device currently doesn't allow signing of contract data.`}</div>
+            <div className='notifyBodyLine'>{`To change this settings go to 'Settings' -> 'Contract Data' on your device and select 'Yes'`}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
+              <div className='notifyInputOptionText'>{'OK'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   render () {
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
@@ -163,6 +178,7 @@ class Notify extends React.Component {
         {this.ipfsAlreadyRunning()}
         {this.parityAlreadyRunning()}
         {this.gasFeeWarning(this.store('view.notifyData'))}
+        {this.contractData()}
       </div>
     )
   }
