@@ -54,7 +54,7 @@ class Device {
     }).catch(err => cb(err))
   }
 
-  ethereumGetAddress (path, showOnTrezor, cb) {
+  ethereumGetAddress (path, showOnTrezor = false, cb) {
     TrezorConnect.ethereumGetAddress({ device: this.device, path, showOnTrezor }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
       cb(null, res.payload)
@@ -107,9 +107,8 @@ class Trezor {
         console.log('Device needs passphrase')
       }
     })
-    const manifest = { email: 'j@j.com', appUrl: 'electron-app-boilerplate' }
-    const connectSrc = 'https://sisyfos.trezor.io/connect-electron/'
-    const config = { connectSrc, manifest, popup: false, webusb: false, debug: false, lazyLoad: false }
+    const manifest = { email: 'jordan@frame.sh', appUrl: 'https://frame.sh' }
+    const config = { manifest, popup: false, webusb: false, debug: false, lazyLoad: false }
     try {
       TrezorConnect.init(config).then(() => {
         ready = true

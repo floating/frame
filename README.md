@@ -8,32 +8,34 @@
   <br>
 </h2>
 
-<h3 align="center">An OS-level Ethereum interface :tada:</h3>
+<h3 align="center">An OS-level web3 Interface :tada:</h3>
 <br>
-<h5 align="center">
+<p align="center">
   <a href="#features">Features</a> ⁃
   <a href="#downloads">Downloads</a> ⁃
   <a href="#related">Related</a>
-</h5>
+</p>
 <br>
 
 <img src="/asset/demo/Frame0-0-5-RC1.gif?raw=true" />
 
-Frame is an OS-level Ethereum interface that lets you use standalone signers, such as a Ledger or Trezor, to securely and transparently interact with dapps and the Ethereum network.
+Frame is an OS-level web3 interface that lets you use standalone signing accounts, to securely and transparently interact with dapps, Ethereum, IPFS and more!
 
 ### Features
 - **First-class Hardware Support**
-  - Use your Ledger and Trezor devices with any dapp!
+  - Use your Ledger and Trezor accounts with any dapp!
+- **Software Signer Support**
+  - Use your mnemonic phrase, keystore.json or standalone private keys to create and backup accounts!
 - **Permissions**
-  - User controls which dapps have permission to access the provider and can monitor with full transparency what requests dapps are making.
-- **Node Management**
-  - Frame simplifies running and syncing your local node and lets you seamlessly swap from local to remote nodes on the fly.
+  - You'll always have full control of which dapps have permission to access Frame and can monitor with full transparency what requests dapps are making to the network.
+- **Run your own Ethereum light client or IPFS gateway**
+  - Frame simplifies running and syncing your local node and lets you seamlessly swap from local to remote nodes on the fly, no command line needed!
 - **Menu Bar Support**
   - Frame stays out of the way and sits quietly in your menu bar until it's needed.
 - **Cross Platform**
   - macOS, Windows and Linux!
 
-### Demos
+### Talks
   - [Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
 
 ### Downloads
@@ -54,17 +56,6 @@ Frame is an OS-level Ethereum interface that lets you use standalone signers, su
 **On Windows:** Run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.
 
 **On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev` **before** running the demo.
-
-### Add Hot Signers
-  - **For testing and development purposes** you can add non-hardware accounts to Frame
-  - After cloning the repo create **`hot.json`** in the root directory
-  ```json
-  {
-    "accounts": ["privateKey1", "privateKey2"]
-  }
-  ```
-  - Run `npm run hot` (production env + hot signers) or `npm run dev` (development env)
-  - Hot signers will not be added when running `npm run alpha` (production env)
 
 ### Build Apps
   ```bash

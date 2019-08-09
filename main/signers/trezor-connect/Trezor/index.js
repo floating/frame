@@ -5,28 +5,72 @@ const store = require('../../../store')
 const Signer = require('../../Signer')
 const windows = require('../../../windows')
 const flex = require('../../../flex')
+const uuid = require('uuid/v5')
+const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 class Trezor extends Signer {
   constructor (device, signers) {
     super()
+    this.addresses = []
     this.signers = signers
     this.device = device
-    this.id = device.path
-    this.type = 'Trezor'
+    this.id = this.getId()
+    this.type = 'trezor'
     this.status = 'loading'
-    this.accounts = []
-    this.index = 0
+    this.network = store('main.connection.network')
     this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
-    this.getPath = (i = this.index) => this.basePath() + '/' + i
+    this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
-    this.open()
+    this.deviceStatus()
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
-        this.network = store('main.connection.network')
+        this.reset()
+        this.deviceStatus()
+      }
+    })
+  }
+
+  getId () {
+    return this.fingerprint() || uuid('Trezor' + this.device.path, ns)
+  }
+
+  update () {
+    const id = this.getId()
+    if (this.id !== id) { // Singer address representation changed
+      store.removeSigner(this.id)
+      this.id = id
+    }
+    store.updateSigner(this.summary())
+  }
+
+  reset () {
+    this.network = store('main.connection.network')
+    this.status = 'loading'
+    this.addresses = []
+    this.update()
+  }
+
+  deviceStatus () {
+    this.lookupAddresses((err, addresses) => {
+      if (err) {
         this.status = 'loading'
-        this.accounts = []
+        if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.version.join('.')})`
+        if (err === 'ui-device_bootloader_mode') this.status = `Device in Bootloader Mode`
+        this.addresses = []
         this.update()
-        if (this.network) this.deviceStatus()
+      } else if (addresses && addresses.length) {
+        if (addresses[0] !== this.coinbase || this.status !== 'ok') {
+          this.coinbase = addresses[0]
+          this.addresses = addresses
+          this.deviceStatus()
+        }
+        if (addresses.length > this.addresses.length) this.addresses = addresses
+        this.status = 'ok'
+        this.update()
+      } else {
+        this.status = 'Unable to find addresses'
+        this.addresses = []
+        this.update()
       }
     })
   }
@@ -34,6 +78,7 @@ class Trezor extends Signer {
   close () {
     this.networkObserver.remove()
     this.closed = true
+    store.removeSigner(this.id)
     super.close()
   }
 
@@ -48,27 +93,27 @@ class Trezor extends Signer {
     })
   }
 
-  verifyAddress (display = false, attempt = 0) {
+  verifyAddress (index, current, display = false, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
-    flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(), display, (err, result) => {
+    flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(index), display, (err, result) => {
       if (err) {
         if (err === 'Device call in progress' && attempt < 5) {
-          setTimeout(() => this.verifyAddress(display, ++attempt), 500)
+          setTimeout(() => this.verifyAddress(index, current, display, ++attempt), 500)
         } else {
           log.info('Verify Address Error: ')
           // TODO: Error Notification
           log.error(err)
-          this.api.unsetSigner()
+          this.signers.remove(this.id)
         }
       } else {
         const address = result.address ? result.address.toLowerCase() : ''
-        const current = this.accounts[this.index].toLowerCase()
+        const current = this.addresses[index].toLowerCase()
         log.info('Frame has the current address as: ' + current)
         log.info('Trezor is reporting: ' + address)
         if (address !== current) {
           // TODO: Error Notification
           log.error(new Error('Address does not match device'))
-          this.signers.unsetSigner()
+          this.signers.remove(this.id)
         } else {
           log.info('Address matches device')
         }
@@ -76,52 +121,24 @@ class Trezor extends Signer {
     })
   }
 
-  setIndex (i, cb) {
-    this.index = i
-    this.requests = {} // TODO Decline these requests before clobbering them
-    windows.broadcast('main:action', 'updateSigner', this.summary())
-    cb(null, this.summary())
-    this.verifyAddress()
-  }
+  // setIndex (i, cb) {
+  //   this.index = i
+  //   this.requests = {} // TODO Decline these requests before clobbering them
+  //   windows.broadcast('main:action', 'updateSigner', this.summary())
+  //   cb(null, this.summary())
+  //   this.main()
+  // }
 
-  lookupAccounts (cb) {
+  lookupAddresses (cb) {
     flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), (err, result) => {
       if (err) return cb(err)
       this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
     })
   }
 
-  update () {
-    if (!this.closed) super.update()
-  }
-
-  deviceStatus () {
-    this.lookupAccounts((err, accounts) => {
-      if (err) {
-        this.status = 'loading'
-        if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.version.join('.')})`
-        if (err === 'ui-device_bootloader_mode') this.status = `Device in Bootloader Mode`
-        this.accounts = []
-        this.index = 0
-        this.update()
-      } else if (accounts && accounts.length) {
-        if (accounts[0] !== this.coinbase || this.status !== 'ok') {
-          this.coinbase = accounts[0]
-          this.accounts = accounts
-          if (this.index > accounts.length - 1) this.index = 0
-          this.deviceStatus()
-        }
-        if (accounts.length > this.accounts.length) this.accounts = accounts
-        this.status = 'ok'
-        this.update()
-      } else {
-        this.status = 'Unable to find accounts'
-        this.accounts = []
-        this.index = 0
-        this.update()
-      }
-    })
-  }
+  // update () {
+  //   if (!this.closed) super.update()
+  // }
 
   needPassphras (cb) {
     this.status = 'Need Passphrase'
@@ -154,8 +171,8 @@ class Trezor extends Signer {
   }
 
   // Standard Methods
-  signMessage (message, cb) {
-    flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(), this.normalize(message), (err, result) => {
+  signMessage (index, message, cb) {
+    flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), (err, result) => {
       if (err) {
         log.error('signMessage Error')
         log.error(err)
@@ -167,7 +184,7 @@ class Trezor extends Signer {
     })
   }
 
-  signTransaction (rawTx, cb) {
+  signTransaction (index, rawTx, cb) {
     if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
     const trezorTx = {
       nonce: this.normalize(rawTx.nonce),
@@ -178,7 +195,7 @@ class Trezor extends Signer {
       data: this.normalize(rawTx.data),
       chainId: utils.hexToNumber(rawTx.chainId)
     }
-    flex.rpc('trezor.ethereumSignTransaction', this.device.path, this.getPath(), trezorTx, (err, result) => {
+    flex.rpc('trezor.ethereumSignTransaction', this.device.path, this.getPath(index), trezorTx, (err, result) => {
       if (err) return cb(err.message)
       const tx = new EthereumTx({
         nonce: this.hexToBuffer(rawTx.nonce),
