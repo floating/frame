@@ -1,7 +1,7 @@
 const EventEmitter = require('events')
 const hot = require('./hot')
 const ledger = require('./ledger')
-// const trezorConnect = require('./trezor-connect')
+const trezorConnect = require('./trezor-connect')
 
 class Signers extends EventEmitter {
   constructor () {
@@ -9,7 +9,17 @@ class Signers extends EventEmitter {
     this.signers = []
     hot.scan(this)
     ledger.scan(this)
-    // trezorConnect.scan(this)
+    trezorConnect.scan(this)
+  }
+
+  trezorPin (id, pin, cb) {
+    let signer = this.get(id)
+    if (signer && signer.setPin) {
+      signer.setPin(pin)
+      cb(null, { status: 'ok' })
+    } else {
+      cb(new Error('Set pin not avaliable...'))
+    }
   }
 
   add (signer) {

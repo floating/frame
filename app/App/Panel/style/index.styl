@@ -111,6 +111,7 @@
   -webkit-app-region no-drag
   z-index 10000
   opacity 1
+  transform translate3d(0, 0, 0)
   // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
   pointer-events none
   transition standard
@@ -124,13 +125,16 @@
     -webkit-app-region no-drag
     transition standard
     pointer-events auto
+    transform translate3d(0, 0, 0)
     svg
       color outerspace
+      transform translate3d(0, 0, 0)
 
     .panelMenuIconArrow
       margin 0px 0px 1px 1px
       min-width 5px
       max-width 5px
+      transform translate3d(0, 0, 0)
 
   .panelDetail
     display flex

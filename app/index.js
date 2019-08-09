@@ -7,6 +7,8 @@ import Panel from './App/Panel'
 import link from './link'
 import _store from './store'
 
+import './flex'
+
 window.removeAllAccountsAndSigners = () => link.send('tray:removeAllAccountsAndSigners')
 
 document.addEventListener('dragover', e => e.preventDefault())

@@ -14,7 +14,7 @@ class Signer extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
-    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, tPin: '', unlockInput: '' }
+    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, unlockInput: '' }
   }
 
   copyAddress (e) {
@@ -274,29 +274,7 @@ class Signer extends React.Component {
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
-          this.props.status === 'Need Pin' ? (
-            <div className='signerStatusNotOk'>
-              <div className='signerPinDisplay' style={!this.state.tPin ? { opacity: 0, height: '0px', paddingBottom: '0px' } : { opacity: 1, height: '13px', paddingBottom: '17px' }}>
-                {this.state.tPin.split('').map((n, i) => {
-                  return (
-                    <div key={i} className='trezorPinInputButton' onMouseDown={this.trezorPin.bind(this, i)}>
-                      {svg.octicon('primitive-dot', { height: 14 })}
-                    </div>
-                  )
-                })}
-              </div>
-              <div className={this.state.tPin ? 'signerPinMessage signerPinSubmit' : 'signerPinMessage'} onMouseDown={this.state.tPin ? () => this.submitPin() : null}>
-                {this.state.tPin ? 'Submit' : 'Enter Pin'}
-                <div className='signerPinDelete' onMouseDown={this.backspacePin.bind(this)}>
-                  {svg.octicon('arrow-left', { height: 24 })}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className='signerStatusNotOk'>
-              {status}
-            </div>
-          )
+          <div className='signerStatusNotOk'>{status}</div>
         ) : (
           <div className='signerAccounts' style={{ width: '100%' }}>
             <div key={address + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
@@ -370,6 +348,7 @@ class Signer extends React.Component {
     } else {
       if (this.store('view.addAccount')) {
         style.opacity = 0
+        style.pointerEvents = 'none'
       } else {
         style.transition = '1.48s cubic-bezier(.82,0,.12,1) all'
         style.transitionDelay = '0s'
@@ -382,7 +361,6 @@ class Signer extends React.Component {
             <div className='signerTop'>
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
               {this.renderStatus()}
-              {this.renderTrezorPin(this.props.type === 'Trezor' && this.props.status === 'Need Pin')}
             </div>
             {current ? this.renderAccountList() : null}
             {current ? (
