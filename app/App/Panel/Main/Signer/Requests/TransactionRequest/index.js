@@ -6,6 +6,8 @@ import link from '../../../../../../link'
 
 import TxBar from './TxBar'
 
+const FEE_WARNING_THRESHOLD_USD = 10
+
 class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
@@ -56,6 +58,7 @@ class TransactionRequest extends React.Component {
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
+    const feeUSD = fee * etherUSD
     const height = mode === 'monitor' ? '145px' : '360px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
@@ -141,9 +144,10 @@ class TransactionRequest extends React.Component {
                   <div className='transactionFee'>
                     <div className='transactionTotals'>
                       <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
-                      <div className='transactionTotalUSD'>{'$ ' + (fee * etherUSD).toFixed(2)}</div>
+                      <div className={feeUSD > FEE_WARNING_THRESHOLD_USD ? 'transactionTotalUSD transactionWarning' : 'transactionTotalUSD'}>{'$ ' + feeUSD.toFixed(2)}</div>
+                      {feeUSD > FEE_WARNING_THRESHOLD_USD ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null }
                     </div>
-                    <div className='transactionSubtitle'>{'Max Fee'}</div>
+                    <div className='transactionSubtitle'>{'Max Fee'}️</div>
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
@@ -189,7 +193,15 @@ class TransactionRequest extends React.Component {
             <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(req.handlerId, req) }}>
               <div className='requestDeclineButton'>{'Decline'}</div>
             </div>
-            <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(req.handlerId, req) }}>
+            <div className='requestSign' onMouseDown={() => {
+              if (this.state.allowInput) {
+                if (feeUSD > FEE_WARNING_THRESHOLD_USD) {
+                  this.store.notify('gasFeeWarning', { req, feeUSD })
+                } else {
+                  this.approve(req.handlerId, req)
+                }
+              }
+            }}>
               <div className='requestSignButton'> {'Sign'} </div>
             </div>
           </div>

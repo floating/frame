@@ -21,7 +21,7 @@ const initial = {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, notify: '', badge: '', addAccount: '' },
+  view: { current: '', list: [], data: {}, notify: '', notifyData: {}, badge: '', addAccount: '' },
   signers: {},
   tray: {
     open: false,
