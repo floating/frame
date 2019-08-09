@@ -10,11 +10,11 @@
 
 <h3 align="center">An OS-level web3 Interface :tada:</h3>
 <br>
-<p align="center">
+<h5 align="center">
   <a href="#features">Features</a> ⁃
   <a href="#downloads">Downloads</a> ⁃
   <a href="#related">Related</a>
-</p>
+</h5>
 <br>
 
 <img src="/asset/demo/Frame0-0-5-RC1.gif?raw=true" />
