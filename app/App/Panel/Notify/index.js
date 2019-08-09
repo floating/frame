@@ -123,6 +123,37 @@ class Notify extends React.Component {
     )
   }
 
+  gasFeeWarning ({ req, feeUSD }) {
+    if (!req) return <div />
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'gasFeeWarning' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            {'Gas Fee Warning'}
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{`This transaction will cost ${parseFloat(feeUSD).toFixed(2)} USD in gas fees.`}</div>
+            <div className='notifyBodyLine'>{'Are you sure you want to proceed?'}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => {
+              link.rpc('declineRequest', req, () => {})
+              this.store.notify()
+            }}>
+              <div className='notifyInputOptionText'>{'Cancel'}</div>
+            </div>
+            <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+              link.rpc('approveRequest', req, () => {})
+              this.store.notify()
+            }}>
+              <div className='notifyInputOptionText'>{'Proceed'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   render () {
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
@@ -131,6 +162,7 @@ class Notify extends React.Component {
         {this.rinkeby()}
         {this.ipfsAlreadyRunning()}
         {this.parityAlreadyRunning()}
+        {this.gasFeeWarning(this.store('view.notifyData'))}
       </div>
     )
   }

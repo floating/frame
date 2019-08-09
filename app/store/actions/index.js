@@ -25,7 +25,10 @@ export const panelRequest = (u, request) => {
 
 export const setBalance = (u, account, balance) => u('balances', account, b => balance)
 
-export const notify = (u, type) => u('view.notify', _ => type)
+export const notify = (u, type, data = {}) => {
+  u('view.notify', _ => type)
+  u('view.notifyData', _ => data)
+}
 
 export const toggleAddAccount = (u) => u('view.addAccount', show => !show)
 
