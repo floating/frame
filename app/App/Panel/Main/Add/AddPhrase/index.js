@@ -113,7 +113,10 @@ class AddPhrase extends React.Component {
           </div>
           <div className='addAccountItemSummary'>{'A phrase account uses a list of words to backup and restore your account'}</div>
           <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
+            <div className='addAccountItemOptionIntro' onMouseDown={() => {
+              this.adding()
+              this.store.notify('hotAccountWarning')
+            }}>
               {'Add Phrase Account'}
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>

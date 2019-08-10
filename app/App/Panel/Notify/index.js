@@ -20,14 +20,14 @@ class Notify extends React.Component {
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '17px', marginBottom: '5px' }}>{'Now Frame is ready to use!'}</div>
-              <div>{'Visit'} <span onMouseDown={() => link.send('tray:openExternal', 'https://frame.sh')}>{'frame.sh'}</span> {'to try it out'}</div>
+              <div>{'Visit'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://frame.sh' })}>{'frame.sh'}</span> {'to try it out'}</div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onMouseDown={() => link.send('tray:openExternal', 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf')}>{'browser extension'}</span></div>
+              <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>{'browser extension'}</span></div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '15px', marginBottom: '5px' }}>{'Need help?'}</div>
-              <div><span onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/issues/new')}>{'Open an issue'}</span> {'or'} <span onMouseDown={() => link.send('tray:openExternal', 'https://gitter.im/framehq/general')}>{'come chat with us'}</span></div>
+              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>{'Open an issue'}</span> {'or'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://gitter.im/framehq/general' })}>{'come chat with us'}</span></div>
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@ class Notify extends React.Component {
             <div className='notifyBodyLine'>{'Proceeed only if you understand and accept these risks.'}</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
               link.send('tray:action', 'alphaWarningPassed')
               this.store.notify()
             }}>
@@ -90,8 +90,8 @@ class Notify extends React.Component {
             <div className='notifyBodyLine'>{'IPFS daemon is already running on this machine.'}</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>{'Go Back'}</div>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>{'Ok'}</div>
             </div>
           </div>
         </div>
@@ -108,8 +108,8 @@ class Notify extends React.Component {
             <div className='notifyBodyLine'>{'Parity is already running on this machine.'}</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>{'Go Back'}</div>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>{'Ok'}</div>
             </div>
           </div>
         </div>
@@ -117,8 +117,7 @@ class Notify extends React.Component {
     )
   }
 
-  gasFeeWarning ({ req, feeUSD }) {
-    if (!req) return <div />
+  gasFeeWarning ({ req = {}, feeUSD = 0 }) {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'gasFeeWarning' ? { left: '5px', right: '5px' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
@@ -153,11 +152,20 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'contractData' ? { left: '5px', right: '5px' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Contract Data not allowed'}
+            <div>{'Contract Data'}</div>
+            <div>{'Not Allowed'}</div>
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`Your device currently doesn't allow signing of contract data.`}</div>
-            <div className='notifyBodyLine'>{`To change this settings go to 'Settings' -> 'Contract Data' on your device and select 'Yes'`}</div>
+            <div className='notifyBodyLine'>{`Your Ledger currently doesn't allow signing of contract data.`}</div>
+            <div className='notifyBodyLine'>
+              <span>{`To change this settings go to`}</span>
+              <br />
+              <span style={{ fontWeight: 'bold' }}>{`Settings > Contract Data`}</span>
+              <br />
+              <span>{'on your Ledger and select'}</span>
+              <br />
+              <span style={{ fontWeight: 'bold' }}>{`Yes`}</span>
+            </div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
@@ -169,19 +177,197 @@ class Notify extends React.Component {
     )
   }
 
-  render () {
+  hotAccountWarning () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotAccountWarning' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            <div>{'Hot Account Alpha'}</div>
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{`Frame's hot account implementation is in alpha. They have been audited but are still undergoing further testing. Please be cautious using hot signers with high value accounts.`}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
+              <div className='notifyInputOptionText'>{'OK'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  openExternal ({ url }) {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExternal' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            {'Open External Link'}
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{`Frame will now open ${url} in your browser`}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => {
+              this.store.notify()
+            }}>
+              <div className='notifyInputOptionText'>{'Cancel'}</div>
+            </div>
+            <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+              link.send('tray:openExternal', url)
+              this.store.notify()
+            }}>
+              <div className='notifyInputOptionText'>{'Proceed'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  openEtherscan ({ hash }) {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openEtherscan' ? { left: '5px', right: '5px' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            {'Open Etherscan'}
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{`Frame will now open Etherscan for transaction ${hash} in your browser`}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => {
+              this.store.notify()
+            }}>
+              <div className='notifyInputOptionText'>{'Cancel'}</div>
+            </div>
+            <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+              link.send('tray:openEtherscan', hash)
+              this.store.notify()
+            }}>
+              <div className='notifyInputOptionText'>{'Proceed'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  render () { // Instead of mounting all of these we should use a transition to mount and animate on demand
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
         {this.mainnet()}
+        {this.gasFeeWarning(this.store('view.notifyData'))}
         {this.intro()}
         {this.rinkeby()}
+        {this.openExternal(this.store('view.notifyData'))}
+        {this.openEtherscan(this.store('view.notifyData'))}
         {this.ipfsAlreadyRunning()}
         {this.parityAlreadyRunning()}
-        {this.gasFeeWarning(this.store('view.notifyData'))}
         {this.contractData()}
+        {this.hotAccountWarning()}
       </div>
     )
   }
 }
+
+// Notification Cycle for Testing
+
+// intro
+// contractData
+// mainnet
+// rinkeby
+// ipfsAlreadyRunning
+// parityAlreadyRunning
+// gasFeeWarning
+// contractData
+// hotAccountWarning
+
+// let notifications = [
+//   {
+//     name: 'intro',
+//     data: {}
+//   },
+//   {
+//     name: 'mainnet',
+//     data: {}
+//   },
+//
+//   {
+//     name: 'rinkeby',
+//     data: {}
+//   },
+//   {
+//     name: 'ipfsAlreadyRunning',
+//     data: {}
+//   },
+//   {
+//     name: 'parityAlreadyRunning',
+//     data: {}
+//   },
+//   {
+//     name: 'gasFeeWarning',
+//     data: {
+//       req: {
+//         handlerId: 'c9a46b23-dced-45a3-a961-cbc5b7873de5',
+//         type: 'transaction',
+//         data: {
+//           value: '0x11e42f05714a67',
+//           to: '0x355587247da36c3130da888d9f608ccf0d2351ce',
+//           from: '0x355587247da36c3130da888d9f608ccf0d2351ce',
+//           gasPrice: '0x3b9aca00',
+//           gas: '0x5208',
+//           chainId: '0x4'
+//         },
+//         payload: {
+//           jsonrpc: '2.0',
+//           id: 3416,
+//           method: 'eth_sendTransaction',
+//           params: [],
+//           account: '0x355587247DA36C3130dA888d9F608ccF0D2351ce'
+//         }
+//       },
+//       feeUSD: 200
+//     }
+//   },
+//   {
+//     name: 'contractData',
+//     data: {}
+//   },
+//   {
+//     name: 'openExternal',
+//     data: {
+//       url: 'https://frame.sh'
+//     }
+//   },
+//   {
+//     name: 'openEtherscan',
+//     data: {
+//       hash: '0x1234'
+//     }
+//   },
+//   {
+//     name: 'hotAccountWarning',
+//     data: {}
+//   }
+// ]
+//
+//
+// let i = -1
+// const checkKey = (e) => {
+//   if ((e || window.event).key === 'ArrowRight') {
+//     i++
+//     if (!notifications[i]) i = 0
+//     console.log(notifications[i].name, notifications[i].data)
+//     store.notify(notifications[i].name, notifications[i].data)
+//   } else if ((e || window.event).key === 'ArrowLeft') {
+//     i--
+//     if (!notifications[i]) i = notifications.length - 1
+//     console.log(notifications[i].name, notifications[i].data)
+//     store.notify(notifications[i].name, notifications[i].data)
+//   }
+// }
+
+// window.addEventListener('keyup', checkKey, true)
 
 export default Restore.connect(Notify)

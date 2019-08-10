@@ -234,7 +234,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.quit()}
-          <div className='viewLicense' onMouseDown={() => link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')}>{'View License'}</div>
+          <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>{'View License'}</div>
         </div>
         {this.appInfo()}
       </div>

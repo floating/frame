@@ -65,7 +65,10 @@ const initial = {
     rates: {}
   },
   main: {
-    alphaWarningPassed: main('alphaWarningPassed', false),
+    mute: {
+      alphaWarning: main('mute.alphaWarning', false),
+      externalLinkWarning: main('mute.externalLinkWarning', false)
+    },
     launch: main('launch', false),
     reveal: main('reveal', false),
     ledger: {
