@@ -3,7 +3,20 @@ import Restore from 'react-restore'
 
 import link from '../../../../../link'
 
+import RenameAccount from './RenameAccount'
+
 class Settings extends React.Component {
+  renderRename (viewIndex) {
+    const i = 3
+    const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
+    return (
+      <div className='signerSlide' style={{ transform }}>
+        <div className='signerSettingsTitle'>Rename Account</div>
+        <RenameAccount onClose={() => this.store.setSettingsView(2)} />
+      </div>
+    )
+  }
+
   renderControl (viewIndex) {
     const i = 2
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
@@ -11,6 +24,8 @@ class Settings extends React.Component {
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Account Settings'}</div>
         <div className='quitFrame'>
+          <div onMouseDown={() => this.store.setSettingsView(3)} className='quitFrameButton'>{'Rename account'}</div>
+          <br />
           <div onMouseDown={() => link.send('tray:removeAccount', this.props.id)} className='quitFrameButton'>{'Remove Account and Signer'}</div>
           <br />
           <div onMouseDown={() => link.send('tray:removeSigner', this.props.id)} className='quitFrameButton'>{'Remove Signer Only'}</div>
@@ -79,6 +94,7 @@ class Settings extends React.Component {
         {this.renderPermissions(viewIndex)}
         {this.renderVerify(viewIndex)}
         {this.renderControl(viewIndex)}
+        {this.renderRename(viewIndex)}
       </div>
     )
   }

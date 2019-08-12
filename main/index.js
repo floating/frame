@@ -73,6 +73,10 @@ ipcMain.on('tray:removeAccount', (e, id) => {
   accounts.remove(id)
 })
 
+ipcMain.on('tray:renameAccount', (e, id, name) => {
+  accounts.rename(id, name)
+})
+
 ipcMain.on('tray:removeSigner', (e, id) => {
   signers.remove(id)
 })
