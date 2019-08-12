@@ -148,6 +148,11 @@ class Accounts extends EventEmitter {
     })
   }
 
+  rename (id, name) {
+    const account = this.get(id)
+    this.update({ ...account, name })
+  }
+
   update (account, add) {
     store.updateAccount(account, add)
   }

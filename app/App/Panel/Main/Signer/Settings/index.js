@@ -3,18 +3,27 @@ import Restore from 'react-restore'
 
 import link from '../../../../../link'
 
+import RenameAccount from './RenameAccount'
+
 class Settings extends React.Component {
+  state = {
+    showRenameAccount: true
+  }
+
   renderControl (viewIndex) {
     const i = 2
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
     return (
       <div className='signerSlide' style={{ transform }}>
-        <div className='signerSettingsTitle'>{'Account Settings'}</div>
-        <div className='quitFrame'>
-          <div onMouseDown={() => link.send('tray:removeAccount', this.props.id)} className='quitFrameButton'>{'Remove Account and Signer'}</div>
-          <br />
-          <div onMouseDown={() => link.send('tray:removeSigner', this.props.id)} className='quitFrameButton'>{'Remove Signer Only'}</div>
-        </div>
+        <div className='signerSettingsTitle'>{ this.state.showRenameAccount ? 'Rename Account' : 'Account Settings'}</div>
+        { this.state.showRenameAccount
+          ? <RenameAccount />
+          : <div className='quitFrame'>
+            <div onMouseDown={() => link.send('tray:removeAccount', this.props.id)} className='quitFrameButton'>{'Remove Account and Signer'}</div>
+            <br />
+            <div onMouseDown={() => link.send('tray:removeSigner', this.props.id)} className='quitFrameButton'>{'Remove Signer Only'}</div>
+          </div>
+        }
       </div>
     )
   }
