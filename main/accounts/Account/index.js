@@ -130,6 +130,11 @@ class Account {
 
   }
 
+  rename (name) {
+    this.name = name
+    this.update()
+  }
+
   getCoinbase (cb) {
     cb(null, this.addresses[0])
   }
