@@ -7,7 +7,6 @@
   <br>
   <br>
 </h2>
-
 <h3 align="center">An OS-level web3 Interface :tada:</h3>
 <br>
 <h5 align="center">
@@ -19,24 +18,26 @@
 
 <img src="/asset/demo/Frame0-0-5-RC1.gif?raw=true" />
 
-Frame is an OS-level web3 interface that lets you use standalone signing accounts, to securely and transparently interact with dapps, Ethereum, IPFS and more!
+Frame is a web3 interface that lets you sign data, manage accounts, run your own connections to Ethereum/IPFS and securely and transparently interact with dapps and web3 protocols.
 
 ### Features
-- **First-class Hardware Support**
+- **First-class Hardware Signer Support**
   - Use your Ledger and Trezor accounts with any dapp!
-- **Software Signer Support**
-  - Use your mnemonic phrase, keystore.json or standalone private keys to create and backup accounts!
+- **Extensive Software Signer Support**
+  - Use a mnemonic phrase, keystore.json or standalone private keys to create and backup accounts!
 - **Permissions**
-  - You'll always have full control of which dapps have permission to access Frame and can monitor with full transparency what requests dapps are making to the network.
-- **Run your own Ethereum light client or IPFS gateway**
-  - Frame simplifies running and syncing your local node and lets you seamlessly swap from local to remote nodes on the fly, no command line needed!
+  - You'll always have full control of which dapps have permission to access Frame and can monitor with full transparency what requests are being made to the network.
+- **Create your own connections to Ethereum/IPFS**
+  - Run your own Ethereum light client or IPFS gateway without the command line!
+  - Seamlessly swap from local to remote nodes on the fly
+  - Never be locked into using a centralized gateway again!
 - **Menu Bar Support**
-  - Frame stays out of the way and sits quietly in your menu bar until it's needed.
+  - Frame stays out of the way and sits quietly in your menu bar until it's needed
 - **Cross Platform**
   - macOS, Windows and Linux!
 
 ### Talks
-  - [Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
+  - [Frame at Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
 
 ### Downloads
   - [All Releases](https://github.com/floating/frame/releases)
@@ -59,9 +60,8 @@ Frame is an OS-level web3 interface that lets you use standalone signing account
 
 ### Build Apps
   ```bash
-  # Build apps for current platform
-  › npm run bundle
-  › npm run build
+  › npm run bundle # Create app bundle
+  › npm run build # Build apps for current platform
   ```
 
 ### Related
@@ -71,10 +71,11 @@ Frame is an OS-level web3 interface that lets you use standalone signing account
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps
 
 <h2>
-<h5 align="center">
-  <br>
-  <a href="https://frame.sh">Website</a> ⁃
-  <a href="https://medium.com/@framehq">Blog</a> ⁃
-  <a href="https://twitter.com/frame_eth">Twitter</a>
-</h5>
+  <h5 align="center">
+    <br>
+    <a href="https://frame.sh">Website</a> ⁃
+    <a href="https://medium.com/@framehq">Blog</a> ⁃
+    <a href="https://twitter.com/frame_eth">Twitter</a> ⁃
+    <a href="https://gitter.im/framehq/general">Chat</a>
+  </h5>
 </h2>

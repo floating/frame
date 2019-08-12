@@ -35,7 +35,8 @@ const initial = {
     view: 'default',
     settings: {
       viewIndex: 0,
-      views: ['permissions', 'verify', 'control']
+      views: ['permissions', 'verify', 'control'],
+      subIndex: 0
     },
     addresses: [],
     showAccounts: false,

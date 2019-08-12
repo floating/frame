@@ -6,7 +6,7 @@ import link from '../../../../../link'
 import RenameAccount from './RenameAccount'
 
 class Settings extends React.Component {
-  renderRename (viewIndex) {
+  renderRename (viewIndex, subIndex) {
     const i = 3
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
     return (
@@ -17,24 +17,51 @@ class Settings extends React.Component {
     )
   }
 
-  renderControl (viewIndex) {
+  renderControl (viewIndex, subIndex)  {
     const i = 2
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
+    const subTransform = `translateX(-${subIndex * 10}%)`
+    // onMouseDown={() => link.send('tray:removeAccount', this.props.id)}
+    // onMouseDown={() => link.send('tray:removeSigner', this.props.id)}
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Account Settings'}</div>
-        <div className='quitFrame'>
-          <div onMouseDown={() => this.store.setSettingsView(3)} className='quitFrameButton'>{'Rename account'}</div>
-          <br />
-          <div onMouseDown={() => link.send('tray:removeAccount', this.props.id)} className='quitFrameButton'>{'Remove Account and Signer'}</div>
-          <br />
-          <div onMouseDown={() => link.send('tray:removeSigner', this.props.id)} className='quitFrameButton'>{'Remove Signer Only'}</div>
+        <div className='signerSubslide'>
+          <div className='signerSubslider' style={{ transform: subTransform }}>
+            <div className='signerSubsliderSlide'>
+              <div className='quitFrame'>
+                <div onMouseDown={() => this.store.setSettingsView(i, 1)} className='quitFrameButton'>{'Rename account'}</div>
+                <br />
+                <div onMouseDown={() => this.store.setSettingsView(i, 2)} className='quitFrameButton'>{'Remove Account and Signer'}</div>
+                <br />
+                <div onMouseDown={() => this.store.setSettingsView(i, 3)} className='quitFrameButton'>{'Remove Signer Only'}</div>
+              </div>
+            </div>
+            <div className='signerSubsliderSlide'>
+              <RenameAccount onClose={() => this.store.setSettingsView(i, 0)} />
+            </div>
+            <div className='signerSubsliderSlide' onMouseDown={() => this.store.setSettingsView(i, 0)}>
+              <div className='signerSubsliderSlideMessage'>{'Are you sure you want to remove all records of this account and this account\'s signer?'}</div>
+              <div className='renameAccountButtonWrap'>
+                <div className='renameAccountButton'>Cancel</div>
+                <div className='renameAccountButton' onMouseDown={() => link.send('tray:removeAccount', this.props.id)}>Yes</div>
+              </div>
+            </div>
+            <div className='signerSubsliderSlide' onMouseDown={() => this.store.setSettingsView(i, 0)}>
+              <div className='signerSubsliderSlideMessage'>{'Are you sure you want to remove all records of this account\'s signer?'}</div>
+              <div className='renameAccountButtonWrap'>
+                <div className='renameAccountButton'>Cancel</div>
+                <div className='renameAccountButton' onMouseDown={() => link.send('tray:removeSigner', this.props.id)}>Yes</div>
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
     )
   }
 
-  renderVerify (viewIndex) {
+  renderVerify (viewIndex, subIndex)  {
     const i = 1
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     return (
@@ -50,7 +77,7 @@ class Settings extends React.Component {
     )
   }
 
-  renderPermissions (viewIndex) {
+  renderPermissions (viewIndex, subIndex)  {
     const i = 0
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     const id = this.store('selected.current')
@@ -89,12 +116,12 @@ class Settings extends React.Component {
 
   render () {
     const viewIndex = this.store('selected.settings.viewIndex')
+    const subIndex = this.store('selected.settings.subIndex')
     return (
       <div className={this.store('selected.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
-        {this.renderPermissions(viewIndex)}
-        {this.renderVerify(viewIndex)}
-        {this.renderControl(viewIndex)}
-        {this.renderRename(viewIndex)}
+        {this.renderPermissions(viewIndex, subIndex)}
+        {this.renderVerify(viewIndex, subIndex) }
+        {this.renderControl(viewIndex, subIndex) }
       </div>
     )
   }
