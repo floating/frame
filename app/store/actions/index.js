@@ -11,7 +11,10 @@ export const setSigner = (u, signer) => {
   }, 50)
 }
 
-export const setSettingsView = (u, index) => u('selected.settings.viewIndex', () => index)
+export const setSettingsView = (u, index, subindex = 0) => {
+  u('selected.settings.viewIndex', () => index)
+  u('selected.settings.subIndex', () => subindex)
+}
 
 export const setAddress = (u, address) => u('address', () => address)
 
