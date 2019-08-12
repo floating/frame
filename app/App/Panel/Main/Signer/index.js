@@ -195,7 +195,11 @@ class Signer extends React.Component {
   }
 
   renderSettingsMenu () {
-    const viewIndex = this.store('selected.settings.viewIndex')
+    let viewIndex = this.store('selected.settings.viewIndex')
+
+    // FIXME: Ugly hack to allow 'Rename Account' view to slide in from right
+    if (viewIndex === 3) viewIndex = 2
+
     const views = this.store('selected.settings.views')
     const itemWidth = 35
     const markLeft = (itemWidth * viewIndex) + 'px'
