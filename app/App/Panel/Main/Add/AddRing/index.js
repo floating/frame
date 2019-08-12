@@ -124,7 +124,6 @@ class AddRing extends React.Component {
 
   adding () {
     this.setState({ adding: true })
-    this.focusActive()
   }
 
   blurActive () {
@@ -168,7 +167,10 @@ class AddRing extends React.Component {
           </div>
           <div className='addAccountItemSummary'>{'A keyring account lets you to add individual private keys to an account'}</div>
           <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => { this.setState({ adding: true }) }}>
+            <div className='addAccountItemOptionIntro' onMouseDown={() => {
+              this.adding()
+              this.store.notify('hotAccountWarning')
+            }}>
               {'Add Keyring Account'}
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>

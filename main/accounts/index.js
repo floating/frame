@@ -104,7 +104,7 @@ class Accounts extends EventEmitter {
   }
 
   getBlockHeight (cb) {
-    proxyProvider.emit('send', {id: '1', jsonrpc: '2.0', method: 'eth_blockNumber'}, (res) => {
+    proxyProvider.emit('send', { id: '1', jsonrpc: '2.0', method: 'eth_blockNumber' }, (res) => {
       if (res.error || !res.result) return cb(new Error('Unable to get current block height: ' + res.error.message))
       cb(null, res.result)
     })

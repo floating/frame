@@ -75,7 +75,7 @@ class TransactionRequest extends React.Component {
                   <div className='requestNoticeInner'>
                     <div className={statusClass}>
                       <div className='txProgressNotice'>
-                        <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'} onMouseDown={() => { if (req && req.tx && req.tx.hash) link.send('tray:openEtherscan', req.tx.hash) }}>
+                        <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'} onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openEtherscan', { hash: req.tx.hash }) }}>
                           <div className={'txProgressDetailHash'}>
                             {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 14) : ''}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
@@ -99,7 +99,9 @@ class TransactionRequest extends React.Component {
                           {status === 'error' ? svg.octicon('circle-slash', { height: 22 }) : null}
                         </div>
                         <div className={success ? 'txProgressNoticeText txProgressNoticeHidden' : mode === 'monitor' ? 'txProgressNoticeText txProgressNoticeSuccess' : 'txProgressNoticeText'}>
-                          <div className='txProgressDetailError'>{status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}</div>
+                          <div className='txProgressDetailError' onMouseDown={() => { if (req && notice && notice.toLowerCase() === 'please enable contract data on the ethereum app settings') this.store.notify('contractData') }}>
+                            {status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}
+                          </div>
                         </div>
                         {status === 'pending' ? <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>{'Cancel'}</div> : null}
                       </div>

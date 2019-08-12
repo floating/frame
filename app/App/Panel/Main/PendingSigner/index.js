@@ -66,6 +66,9 @@ class Pending extends React.Component {
     if (this.props.type === 'trezor' && this.props.status === 'Need Pin') style.height = '300px'
 
     style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
+
+    const status = this.props.status ? this.props.status.charAt(0).toUpperCase() + this.props.status.substring(1) : ''
+
     return (
       <div className='pendingSignerWrap' style={style}>
         <div className='pendingSignerInset'>
@@ -75,7 +78,7 @@ class Pending extends React.Component {
             </div>
             <div className='pendingSignerText'>
               <div className='pendingSignerType'>{this.props.type + ' Found'}</div>
-              <div className='pendingSignerStatus'>{this.props.status}</div>
+              <div className='pendingSignerStatus'>{status}</div>
             </div>
           </div>
           <div className='signerInterface'>

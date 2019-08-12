@@ -3,7 +3,6 @@ const utils = require('web3-utils')
 const EthereumTx = require('ethereumjs-tx')
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const windows = require('../../../windows')
 const flex = require('../../../flex')
 const uuid = require('uuid/v5')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
@@ -121,24 +120,12 @@ class Trezor extends Signer {
     })
   }
 
-  // setIndex (i, cb) {
-  //   this.index = i
-  //   this.requests = {} // TODO Decline these requests before clobbering them
-  //   windows.broadcast('main:action', 'updateSigner', this.summary())
-  //   cb(null, this.summary())
-  //   this.main()
-  // }
-
   lookupAddresses (cb) {
     flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), (err, result) => {
       if (err) return cb(err)
       this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
     })
   }
-
-  // update () {
-  //   if (!this.closed) super.update()
-  // }
 
   needPassphras (cb) {
     this.status = 'Need Passphrase'

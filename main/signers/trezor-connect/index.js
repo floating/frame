@@ -1,19 +1,14 @@
 require('babel-polyfill')
 const log = require('electron-log')
-const store = require('../../store')
 const flex = require('../../flex')
 const Trezor = require('./Trezor')
 
 module.exports = {
   scan: (signers) => {
-    const close = (device) => {
-      if (signers[device.path]) signers[device.path].close()
-      delete signers[device.path]
-    }
     flex.on('ready', () => {
       flex.on('trezor:connect', device => {
         log.info(':: Trezor Scan - Connected Device')
-        signer = new Trezor(device, signers)
+        const signer = new Trezor(device, signers)
         signers.add(signer)
       })
       flex.on('trezor:disconnect', device => {

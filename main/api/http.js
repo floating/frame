@@ -8,6 +8,8 @@ const store = require('../store')
 const trusted = require('./trusted')
 const validPayload = require('./validPayload')
 
+const logTraffic = process.env.LOG_TRAFFIC
+
 const polls = {}
 const pollSubs = {}
 const pending = {}
@@ -40,7 +42,7 @@ const handler = (req, res) => {
       const input = Buffer.concat(body).toString()
       const payload = validPayload(input)
       if (!payload) return console.warn('Invalid Payload', input)
-      log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
+      if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
       if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
         // Review
@@ -55,7 +57,7 @@ const handler = (req, res) => {
             if (result.length || payload.params[1] === 'immediate' || force) {
               res.writeHead(200, { 'Content-Type': 'application/json' })
               const response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
-              log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
+              if (logTraffic) log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
               res.end(JSON.stringify(response))
               delete polls[id]
               clearTimeout(cleanupTimers[id])
@@ -83,7 +85,7 @@ const handler = (req, res) => {
             }
           }
           res.writeHead(200, { 'Content-Type': 'application/json' })
-          log.info('<- res | http | ' + req.headers.origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
+          if (logTraffic) log.info('<- res | http | ' + req.headers.origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
           res.end(JSON.stringify(response))
         })
       }
