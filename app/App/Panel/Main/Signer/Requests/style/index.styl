@@ -642,6 +642,31 @@
       min-height 100%
       box-sizing border-box
       word-break break-all
+  
+  .signTypedData
+    position absolute
+    top 57px
+    left 0
+    right 0
+    bottom 60px
+    margin 0
+    font-size 20px
+    font-weight 300
+    overflow-y scroll
+    overflow-x hidden
+
+    .signTypedDataInner
+      width 100%
+      font-size 20px
+      padding 20px
+      min-height 100%
+      box-sizing border-box
+      
+      b
+        display: block
+        font-size: 12px
+        margin-bottom: 6px
+        margin-top: 12px
 
   .transactionValue
     position absolute
@@ -1533,3 +1558,28 @@ span
     color spacewhite
     font-weight 600
     box-shadow cardDrop,0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+
+.simpleJson
+  font-size: 9px
+  font-family: 'Courier New', Courier, monospace
+
+  .simpleJsonChild
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 0.5em
+
+    .simpleJsonChild
+      margin-bottom: 0.1em
+
+      .simpleJsonKey
+        font-weight: normal
+        font-style: italic
+
+  .simpleJsonKey
+    font-size: 9px
+    font-weight: bold
+    margin-right: 0.5em
+
+  

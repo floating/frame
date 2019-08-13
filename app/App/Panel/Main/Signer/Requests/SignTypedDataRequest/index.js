@@ -4,6 +4,25 @@ import utils from 'web3-utils'
 import svg from '../../../../../../svg'
 import link from '../../../../../../link'
 
+const SimpleJSON = ({ json }) => (
+  <div className="simpleJson">
+    {Object.keys(json).map(key => (
+      <div className="simpleJsonChild">
+        <div className="simpleJsonKey">{key}:</div>
+        <div className="simpleJsonValue">
+          {typeof json[key] === "object" ? (
+            <SimpleJSON json={json[key]} />
+          ) : (
+            json[key]
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+
+
 class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
@@ -22,10 +41,12 @@ class TransactionRequest extends React.Component {
   }
 
   approve (reqId, req) {
+    console.log('approveRequest', req)
     link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
 
   decline (reqId, req) {
+    console.log('declineRequest', req)
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
 
@@ -93,9 +114,13 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
                     <div className='approveRequestHeaderLabel'> {'Sign Message'}</div>
                   </div>
-                  <div className='signValue'>
-                    <div className='signValueInner'>
-                      <pre>{JSON.stringify(typedData.message, null, 2)}</pre>
+                  <div className='signTypedData'>
+                    <div className='signTypedDataInner'>
+                      <b>Domain</b>
+                      <SimpleJSON json={typedData.domain} />
+                      
+                      <b>Message</b>
+                      <SimpleJSON json={typedData.message} />
                     </div>
                   </div>
                 </React.Fragment>
