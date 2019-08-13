@@ -247,9 +247,19 @@ class Provider extends EventEmitter {
   }
 
   signTypedData (payload, res) {
-    const [from = '', typedData = {}] = payload.params;
+    let [from = '', typedData = {}, ...rest] = payload.params;
     const current = accounts.getAccounts()[0];
     if (from.toLowerCase() !== current.toLowerCase()) return this.resError('signTypedData request is not from currently selected account.', payload, res);
+
+    // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
+    if (typeof(typedData) === 'string') {
+      try {
+        typedData = JSON.parse(typedData)
+        payload.params = [from, typedData, ...rest]
+      } catch (e) {
+        return this.resError('Malformed typedData.', payload, res)
+      }
+    }
     const handlerId = uuid()
     this.handlers[handlerId] = res
     accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: accounts.getAccounts()[0] })
@@ -294,7 +304,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
-    if (payload.method === 'eth_signTypedData') return this.signTypedData(payload, res)
+    if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3') return this.signTypedData(payload, res)
     this.connection.send(payload, res)
   }
 }

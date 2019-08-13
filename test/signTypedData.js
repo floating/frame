@@ -45,9 +45,11 @@ const main = async () => {
     const accounts = await ethereum.send('eth_accounts')
     console.log({ accounts })
 
-    const signedTypedData = await ethereum.send('eth_signTypedData', [accounts[0], TYPED_DATA])
+    const signedTypedDataStringified = await ethereum.send('eth_signTypedData_v3', [accounts[0], JSON.stringify(TYPED_DATA)])
+    console.log({ signedTypedDataStringified })
 
-    console.log({ signedTypedData })
+    const signedTypedDataAsObject = await ethereum.send('eth_signTypedData', [accounts[0], TYPED_DATA])
+    console.log({ signedTypedDataAsObject })
   } catch (e) {
     if (e.message === 'Unexpected end of JSON input') {
       console.log('Cannot connect to Frame. Is Frame running?')
