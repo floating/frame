@@ -84,6 +84,7 @@
     "fs-extra": "8.1.0",
     "hdkey": "1.1.1",
     "node-hid": "0.7.9",
+    "node-notifier": "^5.4.1",
     "query-string": "6.8.2",
     "react": "16.8.6",
     "react-dom": "16.8.6",
