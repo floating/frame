@@ -169,7 +169,7 @@ class AddRing extends React.Component {
           <div className='addAccountItemOption'>
             <div className='addAccountItemOptionIntro' onMouseDown={() => {
               this.adding()
-              this.store.notify('hotAccountWarning')
+              setTimeout(() => this.store.notify('hotAccountWarning'), 800)
             }}>
               {'Add Keyring Account'}
             </div>
@@ -229,7 +229,7 @@ class AddRing extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary'>{'-'}</div>
+          <div className='addAccountItemSummary'>{''}</div>
         </div>
       </div>
     )

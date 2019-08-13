@@ -115,7 +115,7 @@ class AddPhrase extends React.Component {
           <div className='addAccountItemOption'>
             <div className='addAccountItemOptionIntro' onMouseDown={() => {
               this.adding()
-              this.store.notify('hotAccountWarning')
+              setTimeout(() => this.store.notify('hotAccountWarning'), 800)
             }}>
               {'Add Phrase Account'}
             </div>
@@ -142,7 +142,7 @@ class AddPhrase extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary'>{'Seed Phrases Generation Coming Soon'}</div>
+          <div className='addAccountItemSummary'>{''}</div>
         </div>
       </div>
     )

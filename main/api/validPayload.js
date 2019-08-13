@@ -1,5 +1,7 @@
 const log = require('electron-log')
 
+const has = value => value !== null && value !== undefined
+
 module.exports = data => {
   let payload
   try {
@@ -8,7 +10,8 @@ module.exports = data => {
     log.info('Error parsing payload: ', data, e)
     return false
   }
-  if (payload && typeof payload === 'object' && payload !== null && payload.id && payload.method) {
+
+  if (payload && typeof payload === 'object' && payload !== null && has(payload.id) && has(payload.method)) {
     if (!payload.params) payload.params = []
     if (!(typeof payload.id === 'number' || typeof payload.id === 'string')) return false
     if (typeof payload.jsonrpc !== 'string') return false
