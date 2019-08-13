@@ -229,7 +229,7 @@ class AddRing extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary'>{'-'}</div>
+          <div className='addAccountItemSummary'>{''}</div>
         </div>
       </div>
     )

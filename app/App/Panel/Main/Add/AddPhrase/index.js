@@ -142,7 +142,7 @@ class AddPhrase extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary'>{'Seed Phrases Generation Coming Soon'}</div>
+          <div className='addAccountItemSummary'>{''}</div>
         </div>
       </div>
     )
