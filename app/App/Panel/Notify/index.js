@@ -185,7 +185,7 @@ class Notify extends React.Component {
             <div>{'Hot Account Alpha'}</div>
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`Frame's hot account implementation is in alpha. They have been audited but are still undergoing further testing. Please be cautious using hot signers with high value accounts.`}</div>
+            <div className='notifyBodyLine'>{`Frame's hot account implementation is in alpha. Please be cautious using hot signers with high value accounts. Make sure you have verified backups of all hot accounts.`}</div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
