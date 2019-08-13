@@ -65,8 +65,11 @@ const rpc = {
         if (err) return accounts.setRequestError(req.handlerId, err)
         accounts.setRequestSuccess(req.handlerId, res)
       })
-    } else {
-      console.log('unknown req.type', req.type, req)
+    } else if (req.type === 'signTypedData') {
+      provider.approveSignTypedData(req, (err, res) => {
+        if (err) return accounts.setRequestError(req.handlerId, err)
+        accounts.setRequestSuccess(req.handlerId, res)
+      })
     }
   },
   declineRequest (req, cb) {
