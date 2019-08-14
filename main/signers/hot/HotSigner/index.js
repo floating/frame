@@ -5,7 +5,6 @@ const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
 const uuid = require('uuid/v4')
-const notifier = require('node-notifier')
 
 const store = require('../../../store')
 const Signer = require('../../Signer')
@@ -26,10 +25,6 @@ class HotSigner extends Signer {
     }
     this._worker = fork(workerPath)
     this._getToken()
-
-    setTimeout(() => {
-      this._notify('test', 'fisk')
-    }, 500)
   }
 
   save (data) {
@@ -156,16 +151,6 @@ class HotSigner extends Signer {
     this._worker.addListener('message', listener)
     // Make RPC call
     this._worker.send({ id, token: this._token, ...payload })
-  }
-
-  _notify (title, message) {
-    notifier.notify({
-      title,
-      message,
-      closeLabel: 'close me',
-      actions: ['one', 'two'],
-      timeout: 2
-    })
   }
 }
 
