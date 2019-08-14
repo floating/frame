@@ -156,7 +156,6 @@ class Provider extends EventEmitter {
           res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
           cb(null, signed)
         }
-        // TODO: Verify signature
       }
     })
   }
