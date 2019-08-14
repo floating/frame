@@ -111,7 +111,6 @@ function hashTypedData(typedData) {
 }
 
 function signTypedData(typedData, privateKey) {
-  console.log(typedData)
   const hash = hashTypedData(typedData);
   const sig = ethUtil.ecsign(hash, privateKey);
   return ethSigUtil.concatSig(sig.v, sig.r, sig.s);

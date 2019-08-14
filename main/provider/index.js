@@ -9,6 +9,7 @@ const proxy = require('./proxy')
 const store = require('../store')
 const nodes = require('../nodes')
 const accounts = require('../accounts')
+const { recoverTypedData } = require('../crypt/typedDataUtils')
 
 const version = require('../../package.json').version
 
@@ -146,9 +147,16 @@ class Provider extends EventEmitter {
         this.resError(err.message, payload, res)
         cb(err.message)
       } else {
+        const recoveredAddress = recoverTypedData(typedData, signed)
+        if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+          const err = new Error('TypedData signature verification failed')
+          this.resError(err.message, { ...payload, recoveredAddress }, res)
+          cb(err.message)
+        } else {
+          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
+          cb(null, signed)
+        }
         // TODO: Verify signature
-        res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
-        cb(null, signed)
       }
     })
   }
