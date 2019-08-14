@@ -115,7 +115,7 @@ class Ledger extends Signer {
 
   async deriveAddresses (cb) {
     let addresses
-    if (this.pause) cb(new Error('Device access is paused'))
+    if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
       // Derive addresses
