@@ -40,7 +40,7 @@ class Signers extends EventEmitter {
   removeAllSigners () {
     this.signers.forEach(signer => {
       signer.close()
-      signer.delete()
+      if (signer.delete) signer.delete()
     })
     this.signers = []
     const { app } = require('electron')

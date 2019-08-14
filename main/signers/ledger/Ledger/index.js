@@ -29,9 +29,15 @@ class Ledger extends Signer {
     this.pause = false
     this.coinbase = '0x'
     this.network = store('main.connection.network')
-    this.getPath = (i = 0) => this.getBasePath() + i
     this.handlers = {}
-    this.deviceStatus()
+
+    setTimeout(() => {
+      this.deriveAddresses((err) => {
+        if (err) { log.error('Ledger address derivation failed') }
+        this.deviceStatus()
+      })
+    }, 3000)
+
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.reset()
@@ -40,9 +46,10 @@ class Ledger extends Signer {
     })
   }
 
-  getBasePath () {
-    if (this.network !== '1') return BASE_PATH_TEST
-    else return store('main.ledger.derivationPath') === 'legacy' ? BASE_PATH_LEGACY : BASE_PATH_LIVE
+  getPath (i = 0) {
+    if (this.network !== '1') return (BASE_PATH_TEST + i)
+    if (store('main.ledger.derivationPath') === 'legacy') return (BASE_PATH_LEGACY + i)
+    else return (BASE_PATH_LIVE + i + `'/0/0`)
   }
 
   getId () {
@@ -70,24 +77,12 @@ class Ledger extends Signer {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
-      // let transport = await TransportNodeHid.open(this.devicePath)
-      const device = new HID.HID(this.devicePath)
-      const transport = new TransportNodeHid(device)
-      const eth = new Eth(transport)
-      eth.getAddress(this.getPath(i), false, true).then(result => {
-        transport.close()
-        device.close()
-        this.pause = false
-        cb(null, result.address)
-      }).catch(err => {
-        transport.close()
-        device.close()
-        this.pause = false
-        cb(err)
-      })
+      const { address } = await this.getAddress(this.getPath(i), false, true)
+      cb(null, address)
     } catch (err) {
-      this.pause = false
       cb(err)
+    } finally {
+      this.pause = false
     }
   }
 
@@ -97,87 +92,49 @@ class Ledger extends Signer {
     verifyActive = true
     this.pause = true
     try {
-      const device = new HID.HID(this.devicePath)
-      const transport = new TransportNodeHid(device)
-      const eth = new Eth(transport)
-      eth.getAddress(this.getPath(index), display, true).then(result => {
-        transport.close()
-        device.close()
-        this.pause = false
-        const address = result.address.toLowerCase()
-        current = current.toLowerCase()
-        if (address !== current) {
-          // TODO: Error Notification
-          log.error(new Error('Address does not match device'))
-          this.signers.remove(this.id)
-        } else {
-          log.info('Address matches device')
-        }
-        verifyActive = false
-      }).catch(err => {
+      const result = await this.getAddress(this.getPath(index), display, true)
+      const address = result.address.toLowerCase()
+      current = current.toLowerCase()
+      if (address !== current) {
         // TODO: Error Notification
-        log.error('Verify Address Error')
-        log.error(err)
-        transport.close()
-        device.close()
-        this.pause = false
+        log.error(new Error('Address does not match device'))
         this.signers.remove(this.id)
-        verifyActive = false
-      })
+      } else {
+        log.info('Address matches device')
+      }
     } catch (err) {
       // TODO: Error Notification
       log.error('Verify Address Error')
       log.error(err)
       this.signers.remove(this.id)
-      verifyActive = false
+    } finally {
       this.pause = false
+      verifyActive = false
     }
   }
 
-  // setIndex (i, cb) {
-  //   if (!verifyActive) {
-  //     this.index = i
-  //     this.requests = {} // TODO Decline these requests before clobbering them
-  //   }
-  //   this.update()
-  //   // windows.broadcast('main:action', 'updateSigner', this.summary())
-  //   cb(null, this.summary())
-  //   setTimeout(() => {
-  //     this.verifyAddress()
-  //   }, 300)
-  // }
-  async lookupAddresses (cb) {
-    setTimeout(() => {
-      if (this.pause) cb(new Error('Device access is paused'))
-      this.pause = true
-      try {
-        const device = new HID.HID(this.devicePath)
-        const transport = new TransportNodeHid(device)
-        const eth = new Eth(transport)
-        const timeout = setTimeout(() => {
-          transport.close()
-          device.close()
-          this.pause = false
-          this.lookupAddresses(cb)
-        }, 4000)
-        eth.getAddress(this.getBasePath(), false, true).then(result => {
-          clearTimeout(timeout)
-          transport.close()
-          device.close()
-          this.pause = false
-          this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
-        }).catch(err => {
-          clearTimeout(timeout)
-          transport.close()
-          device.close()
-          this.pause = false
-          cb(err)
-        })
-      } catch (err) {
-        this.pause = false
-        cb(err)
+  async deriveAddresses (cb) {
+    let addresses
+    if (this.pause) return cb(new Error('Device access is paused'))
+    this.pause = true
+    try {
+      // Derive addresses
+      if (store('main.ledger.derivationPath') === 'legacy') {
+        addresses = await this._deriveLegacyAddresses()
+      } else {
+        this.status = 'Deriving Live Addresses'
+        this.update()
+        addresses = await this._deriveLiveAddresses()
       }
-    }, 500)
+      // Update signer
+      this.addresses = addresses
+      this.update()
+      this.pause = false
+      cb(null)
+    } catch (err) {
+      this.pause = false
+      cb(err)
+    }
   }
 
   close () {
@@ -195,63 +152,56 @@ class Ledger extends Signer {
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
 
-  deviceStatus (deep, limit = 100) {
+  async deviceStatus () {
     if (this.status === 'Invalid sequence') return console.log('INVALID SEQUENCE')
     this.pollStatus()
     if (this.pause) return
-    this.lookupAddresses((err, addresses) => {
-      // let last = this.status
-      if (err) {
-        if (err.message.startsWith('cannot open device with path') || err.message === 'Device access is paused' || err.message === 'Invalid channel') { // Device is busy, try again
-          clearTimeout(this._deviceStatus)
-          if (++this.busyCount > 10) {
-            this.busyCount = 0
-            return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-          } else {
-            this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
-            log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
-          }
+
+    // If signer has no addresses, try deriving them
+    if (this.addresses === []) {
+      this.deriveAddresses((err) => {
+        if (err) { log.error('Ledger address derivation failed') }
+        this.deviceStatus()
+      })
+    }
+
+    try {
+      const { address } = await this.getAddress(this.getPath(0), false, true)
+      this.busyCount = 0
+      if (address !== this.coinbase || this.status !== 'ok') {
+        this.coinbase = address
+        this.deviceStatus()
+      }
+      this.status = 'ok'
+      this.update()
+    } catch (err) {
+      if (this.status === 'Deriving Live Addresses') return
+      if (err.message.startsWith('cannot open device with path') || err.message === 'Device access is paused' || err.message === 'Invalid channel') { // Device is busy, try again
+        clearTimeout(this._deviceStatus)
+        if (++this.busyCount > 10) {
+          this.busyCount = 0
+          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
-          this.status = err.message
-          if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
-          if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
-          if (err.statusCode === 26625 || err.statusCode === 26628) {
-            this.pollStatus(3000)
-            this.status = 'Confirm your Ledger is not asleep and is running firmware v1.4.0+'
-          }
-          if (err.message === 'Cannot write to HID device') {
-            this.status = 'loading'
-            log.error('Device Status: Cannot write to HID device')
-          }
-          // if (err.message === 'Invalid channel') {
-          //   this.status = 'Set browser support to "NO"'
-          //   log.error('Device Status: Invalid channel -> Make sure browser support is set to OFF')
-          // }
-          if (err.message === 'Invalid sequence') this.invalid = true
-          this.addresses = []
-          this.update()
-          // if (this.status !== last) {
-          //   this.update()
-          // }
+          this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
+          log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
         }
-      } else if (addresses && addresses.length) {
-        // this.id = this.signers.addressesToId(addresses)
-        this.busyCount = 0
-        if (addresses[0] !== this.coinbase || this.status !== 'ok') {
-          this.coinbase = addresses[0]
-          this.addresses = addresses
-          this.deviceStatus(true)
-        }
-        if (addresses.length > this.addresses.length) this.addresses = addresses
-        this.status = 'ok'
-        this.update()
       } else {
-        this.busyCount = 0
-        this.status = 'Unable to find accounts'
+        this.status = err.message
+        if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
+        if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
+        if (err.statusCode === 26625 || err.statusCode === 26628) {
+          this.pollStatus(3000)
+          this.status = 'Confirm your Ledger is not asleep and is running firmware v1.4.0+'
+        }
+        if (err.message === 'Cannot write to HID device') {
+          this.status = 'loading'
+          log.error('Device Status: Cannot write to HID device')
+        }
+        if (err.message === 'Invalid sequence') this.invalid = true
         this.addresses = []
         this.update()
       }
-    })
+    }
   }
 
   normalize (hex) {
@@ -268,7 +218,6 @@ class Ledger extends Signer {
     try {
       const device = new HID.HID(this.devicePath)
       const transport = new TransportNodeHid(device)
-      // let transport = await TransportNodeHid.open(this.devicePath)
       const eth = new Eth(transport)
       eth.signPersonalMessage(this.getPath(index), message.replace('0x', '')).then(result => {
         let v = (result['v'] - 27).toString(16)
@@ -305,7 +254,6 @@ class Ledger extends Signer {
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
-      // let transport = await TransportNodeHid.open(this.devicePath)
       const device = new HID.HID(this.devicePath)
       const transport = new TransportNodeHid(device)
       const eth = new Eth(transport)
@@ -353,6 +301,45 @@ class Ledger extends Signer {
       cb(err)
       log.error(err)
     }
+  }
+
+  async getAddress (...args) {
+    const device = new HID.HID(this.devicePath)
+    const transport = new TransportNodeHid(device)
+    const eth = new Eth(transport)
+    try {
+      const result = await eth.getAddress(...args)
+      return result
+    } catch (err) {
+      throw err
+    } finally {
+      device.close()
+      transport.close()
+    }
+  }
+
+  async _deriveLiveAddresses () {
+    const addresses = []
+    for (let i = 0; i < 10; i++) {
+      const { address } = await this.getAddress(this.getPath(i), false, false)
+      log.info(`Found Ledger Live address #${i}: ${address}`)
+      addresses.push(address)
+    }
+    return addresses
+  }
+
+  _deriveLegacyAddresses () {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const result = await this.getAddress(BASE_PATH_LEGACY, false, true)
+        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
+          if (err) reject(err)
+          else resolve(addresses)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
   }
 }
 
