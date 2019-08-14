@@ -73,15 +73,16 @@ class Signer {
     // windows.broadcast('main:action', 'updateSigner', this.summary())
   }
 
-  signMessage (message, cb) {
+  signMessage (index, message, cb) {
     console.warn('Signer:' + this.type + ' did not implement a signMessage method')
   }
 
-  signTransaction (rawTx, cb) {
+  signTransaction (index, rawTx, cb) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
-  signTypedData (typedData, cb) {
-    console.warn('Signer:' + this.type + ' did not implement a signTypedData method')
+
+  signTypedData (index, typedData, cb) {
+    return cb(new Error(`Signer: ${this.type} does not support eth_signTypedData`))
   }
 }
 

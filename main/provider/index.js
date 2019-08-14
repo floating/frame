@@ -136,6 +136,23 @@ class Provider extends EventEmitter {
     })
   }
 
+  approveSignTypedData (req, cb) {
+    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const payload = req.payload
+    const [address, typedData] = payload.params
+
+    accounts.signTypedData(address, typedData, (err, signed) => {
+      if (err) {
+        this.resError(err.message, payload, res)
+        cb(err.message)
+      } else {
+        // TODO: Verify signature
+        res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
+        cb(null, signed)
+      }
+    })
+  }
+
   signAndSend (req, cb) {
     const rawTx = req.data
     const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
