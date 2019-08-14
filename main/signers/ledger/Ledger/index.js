@@ -74,7 +74,6 @@ class Ledger extends Signer {
   }
 
   async getDeviceAddress (i, cb) {
-    console.log('get device address')
     if (this.pause) return cb(new Error('Device access is paused'))
     this.pause = true
     try {
@@ -93,7 +92,7 @@ class Ledger extends Signer {
     verifyActive = true
     this.pause = true
     try {
-      const result = this.getAddress(this.getPath(index), display, true)
+      const result = await this.getAddress(this.getPath(index), display, true)
       const address = result.address.toLowerCase()
       current = current.toLowerCase()
       if (address !== current) {
@@ -123,7 +122,7 @@ class Ledger extends Signer {
       if (store('main.ledger.derivationPath') === 'legacy') {
         addresses = await this._deriveLegacyAddresses()
       } else {
-        this.status = 'derivingLiveAddresses'
+        this.status = 'Deriving Live Addresses'
         this.update()
         addresses = await this._deriveLiveAddresses()
       }
@@ -149,19 +148,17 @@ class Ledger extends Signer {
   }
 
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
-    console.log('poll status')
     clearTimeout(this._pollStatus)
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
 
   async deviceStatus () {
-    console.log('deviceStatus')
     if (this.status === 'Invalid sequence') return console.log('INVALID SEQUENCE')
     this.pollStatus()
     if (this.pause) return
 
     // If signer has no addresses, try deriving them
-    if (this.addresses.length === []) {
+    if (this.addresses === []) {
       this.deriveAddresses((err) => {
         if (err) { log.error('Ledger address derivation failed') }
         this.deviceStatus()
@@ -178,7 +175,7 @@ class Ledger extends Signer {
       this.status = 'ok'
       this.update()
     } catch (err) {
-      console.log('Handling device status error')
+      if (this.status === 'Deriving Live Addresses') return
       if (err.message.startsWith('cannot open device with path') || err.message === 'Device access is paused' || err.message === 'Invalid channel') { // Device is busy, try again
         clearTimeout(this._deviceStatus)
         if (++this.busyCount > 10) {
