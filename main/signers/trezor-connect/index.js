@@ -17,7 +17,7 @@ module.exports = {
         if (signer) signers.remove(signer.id)
       })
       flex.on('trezor:update', device => {
-        log.info(':: Trezor Scan - Updated Device') null, 2))
+        log.info(':: Trezor Scan - Updated Device')
         const signer = signers.find(signer => (signer.device && signer.device.path) === device.path)
         if (signer) signer.update(device)
       })
