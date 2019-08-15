@@ -7,6 +7,7 @@ const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const store = require('../../../store')
 // const windows = require('../../../windows')
 const Signer = require('../../Signer')
+const { hashTypedData } = require('../../../crypt/typedDataUtils')
 const uuid = require('uuid/v5')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -270,6 +271,47 @@ class Ledger extends Signer {
       const transport = new TransportNodeHid(device)
       // let transport = await TransportNodeHid.open(this.devicePath)
       const eth = new Eth(transport)
+      eth.signPersonalMessage(this.getPath(index), message.replace('0x', '')).then(result => {
+        let v = (result['v'] - 27).toString(16)
+        if (v.length < 2) v = '0' + v
+        cb(null, '0x' + result['r'] + result['s'] + v)
+        transport.close()
+        device.close()
+        this.busyCount = 0
+        this.pause = false
+      }).catch(err => {
+        cb(err)
+        transport.close()
+        device.close()
+        this.pause = false
+      })
+    } catch (err) {
+      this.pause = false
+      if (err.message.startsWith('cannot open device with path')) {
+        clearTimeout(this._signMessage)
+        if (++this.busyCount > 10) {
+          this.busyCount = 0
+          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+        } else {
+          this._signMessage = setTimeout(() => this.signMessage(message, cb), 700)
+          return log.info('>>>>>>> Busy: cannot open device with path, will try again (signMessage)')
+        }
+      }
+      cb(err)
+      log.error(err)
+    }
+  }
+
+  async signTypedData (index, typedData, cb) {
+    if (this.pause) return cb(new Error('Device access is paused'))
+    this.pause = true
+    try {
+      const device = new HID.HID(this.devicePath)
+      const transport = new TransportNodeHid(device)
+      // let transport = await TransportNodeHid.open(this.devicePath)
+      const eth = new Eth(transport)
+      const message = hashTypedData(typedData).toString('hex')
+
       eth.signPersonalMessage(this.getPath(index), message.replace('0x', '')).then(result => {
         let v = (result['v'] - 27).toString(16)
         if (v.length < 2) v = '0' + v
