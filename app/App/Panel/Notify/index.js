@@ -6,7 +6,7 @@ import link from '../../../link'
 class Notify extends React.Component {
   intro () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'intro' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'intro' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
@@ -37,7 +37,7 @@ class Notify extends React.Component {
 
   mainnet () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'mainnet' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'mainnet' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             {'Alpha Notice'}
@@ -61,7 +61,7 @@ class Notify extends React.Component {
 
   rinkeby () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
@@ -83,7 +83,7 @@ class Notify extends React.Component {
 
   ipfsAlreadyRunning () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyBody'>
@@ -101,7 +101,7 @@ class Notify extends React.Component {
 
   parityAlreadyRunning () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyBody'>
@@ -119,7 +119,7 @@ class Notify extends React.Component {
 
   gasFeeWarning ({ req = {}, feeUSD = 0 }) {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'gasFeeWarning' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'gasFeeWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             {'Gas Fee Warning'}
@@ -149,7 +149,7 @@ class Notify extends React.Component {
 
   contractData () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'contractData' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'contractData' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             <div>{'Contract Data'}</div>
@@ -179,13 +179,13 @@ class Notify extends React.Component {
 
   hotAccountWarning () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotAccountWarning' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotAccountWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            <div>{'Hot Account Alpha'}</div>
+            <div>{'Hot Signer Alpha'}</div>
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`Frame's hot account implementation is in alpha. Please be cautious using hot signers with high value accounts. Make sure you have verified backups of all hot accounts.`}</div>
+            <div className='notifyBodyLine'>{`Frame hot signers are in alpha! Do not use them with high value accounts and verify your backups are valid. Only proceed if you understand and accept these risks.`}</div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
@@ -199,7 +199,7 @@ class Notify extends React.Component {
 
   openExternal ({ url }) {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExternal' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExternal' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             {'Open External Link'}
@@ -227,7 +227,7 @@ class Notify extends React.Component {
 
   openEtherscan ({ hash }) {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openEtherscan' ? { left: '5px', right: '5px' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openEtherscan' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             {'Open Etherscan'}

@@ -57,7 +57,11 @@ class AddHardware extends React.Component {
               </div>
             )}
           </div>
-          <div className='addAccountItemSummary'>{`Need a signer? Get a ${this.deviceName}`}</div>
+          <div className='addAccountItemSummary' onMouseDown={() => {
+            const open = url => this.store.notify('openExternal', { url })
+            if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
+            if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
+          }}>{`Need a signer? Get a ${this.deviceName}`}</div>
         </div>
       </div>
     )
