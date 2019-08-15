@@ -302,6 +302,9 @@ class Ledger extends Signer {
     }
   }
 
+  //// NOTE: Commented out because Ledger does not support signTypedData at the moment
+  //// see: https://github.com/floating/frame/issues/136
+  ////
   // async signTypedData (index, typedData, cb) {
   //   if (this.pause) return cb(new Error('Device access is paused'))
   //   this.pause = true
