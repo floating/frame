@@ -109,7 +109,7 @@ class Provider extends EventEmitter {
   verifySignature (signed, message, address, cb) {
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
-      if (verifiedAddress !== address) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
+      if (verifiedAddress.toLowerCase() !== address.toLowerCase()) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
       cb(null, true)
     })
   }
