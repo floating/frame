@@ -73,7 +73,7 @@ const initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     ledger: {
-      derivationPath: main('ledger.derivationPath', 'legacy')
+      derivation: main('ledger.derivation', 'legacy')
     },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions
