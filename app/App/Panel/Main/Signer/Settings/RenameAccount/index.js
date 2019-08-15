@@ -6,17 +6,22 @@ import link from '../../../../../../link'
 class RenameAccount extends React.Component {
   constructor (props, context) {
     super(props, context)
-
     const { store } = context
     this.accountId = store('selected.current')
     this.accountName = store(`main.accounts.${this.accountId}.name`)
     this.state = { value: this.accountName }
+  }
 
-    store.observer(() => {
-      this.accountId = store('selected.current')
-      this.accountName = store(`main.accounts.${this.accountId}.name`)
+  componentDidMount () {
+    this.observer = this.store.observer(() => {
+      this.accountId = this.store('selected.current')
+      this.accountName = this.store(`main.accounts.${this.accountId}.name`)
       this.setState({ value: this.accountName })
     })
+  }
+
+  componentWillUnmount () {
+    this.observer.remove()
   }
 
   handleChange = (e) => this.setState({ value: e.target.value })

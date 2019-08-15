@@ -17,7 +17,7 @@ class Settings extends React.Component {
     )
   }
 
-  renderControl (viewIndex, subIndex)  {
+  renderControl (viewIndex, subIndex) {
     const i = 2
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(200%)'
     const subTransform = `translateX(-${subIndex * 10}%)`
@@ -61,7 +61,7 @@ class Settings extends React.Component {
     )
   }
 
-  renderVerify (viewIndex, subIndex)  {
+  renderVerify (viewIndex, subIndex) {
     const i = 1
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     return (
@@ -77,7 +77,7 @@ class Settings extends React.Component {
     )
   }
 
-  renderPermissions (viewIndex, subIndex)  {
+  renderPermissions (viewIndex, subIndex) {
     const i = 0
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     const id = this.store('selected.current')

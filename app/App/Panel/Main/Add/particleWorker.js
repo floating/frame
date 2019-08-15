@@ -1,3 +1,5 @@
+/* globals self */
+
 let canvas, ctx
 const particles = []
 const particleCount = 64
@@ -26,9 +28,9 @@ const loop = () => {
   this.animate = self.requestAnimationFrame(loop)
 }
 
-self.onmessage = function(ev) {
-  if(ev.data.type === 'init') {
-    canvas = ev.data.canvas
+self.onmessage = e => {
+  if (e.data.type === 'init') {
+    canvas = e.data.canvas
     ctx = canvas.getContext('2d')
     if (ctx) {
       for (let i = 0; i < particleCount; i++) particles.push(new Particle())

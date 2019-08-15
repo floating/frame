@@ -230,7 +230,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              {`Use Legacy (44'/60'/0'/) or Live (44'/60'/) derivation path`}
+              {`Use Ledger's Legacy or Live derivation path`}
             </div>
           </div>
           {this.quit()}
