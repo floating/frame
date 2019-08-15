@@ -224,8 +224,8 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>{'Ledger Derivation Path'}</div>
               <Dropdown
-                syncValue={this.store('main.ledger.derivationPath')}
-                onChange={(value) => link.send('tray:action', 'setLedgerDerivationPath', value)}
+                syncValue={this.store('main.ledger.derivation')}
+                onChange={(value) => link.send('tray:action', 'setLedgerDerivation', value)}
                 options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
               />
             </div>

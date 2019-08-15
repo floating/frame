@@ -107,8 +107,8 @@ module.exports = {
       return addresses
     })
   },
-  setLedgerDerivationPath: (u, value) => {
-    u('main.ledger.derivationPath', () => value)
+  setLedgerDerivation: (u, value) => {
+    u('main.ledger.derivation', () => value)
   },
   alphaWarningPassed: (u) => {
     u('main.alphaWarningPassed', () => true)

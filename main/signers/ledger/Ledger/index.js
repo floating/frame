@@ -28,27 +28,27 @@ class Ledger extends Signer {
     this.busyCount = 0
     this.pause = false
     this.coinbase = '0x'
-    this.network = store('main.connection.network')
     this.handlers = {}
-
-    setTimeout(() => {
-      this.deriveAddresses((err) => {
-        if (err) { log.error('Ledger address derivation failed') }
-        this.deviceStatus()
-      })
-    }, 3000)
-
+    this.network = store('main.connection.network')
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.connection.network')) {
         this.reset()
         this.deviceStatus()
       }
     })
+    this.derivation = store('main.ledger.derivation')
+    this.derivationObserver = store.observer(() => {
+      if (this.derivation !== store('main.ledger.derivation')) {
+        this.reset()
+        this.deviceStatus()
+      }
+    })
+    this.deviceStatus()
   }
 
   getPath (i = 0) {
     if (this.network !== '1') return (BASE_PATH_TEST + i)
-    if (store('main.ledger.derivationPath') === 'legacy') return (BASE_PATH_LEGACY + i)
+    if (this.derivation === 'legacy') return (BASE_PATH_LEGACY + i)
     else return (BASE_PATH_LIVE + i + `'/0/0`)
   }
 
@@ -67,6 +67,7 @@ class Ledger extends Signer {
   }
 
   reset () {
+    this.derivation = store('main.ledger.derivation')
     this.network = store('main.connection.network')
     this.status = 'loading'
     this.addresses = []
@@ -113,13 +114,13 @@ class Ledger extends Signer {
     }
   }
 
-  async deriveAddresses (cb) {
+  async deriveAddresses () {
     let addresses
-    if (this.pause) return cb(new Error('Device access is paused'))
+    if (this.pause) throw new Error('Device access is paused')
     this.pause = true
     try {
       // Derive addresses
-      if (store('main.ledger.derivationPath') === 'legacy') {
+      if (this.network !== '1' || this.derivation === 'legacy') {
         addresses = await this._deriveLegacyAddresses()
       } else {
         this.status = 'Deriving Live Addresses'
@@ -130,10 +131,9 @@ class Ledger extends Signer {
       this.addresses = addresses
       this.update()
       this.pause = false
-      cb(null)
     } catch (err) {
       this.pause = false
-      cb(err)
+      throw err
     }
   }
 
@@ -143,6 +143,7 @@ class Ledger extends Signer {
     if (this._signMessage) clearTimeout(this._signMessage)
     if (this._signTransaction) clearTimeout(this._signTransaction)
     this.networkObserver.remove()
+    this.derivationObserver.remove()
     store.removeSigner(this.id)
     super.close()
   }
@@ -157,15 +158,9 @@ class Ledger extends Signer {
     this.pollStatus()
     if (this.pause) return
 
-    // If signer has no addresses, try deriving them
-    if (this.addresses === []) {
-      this.deriveAddresses((err) => {
-        if (err) { log.error('Ledger address derivation failed') }
-        this.deviceStatus()
-      })
-    }
-
     try {
+      // If signer has no addresses, try deriving them
+      if (!this.addresses.length) await this.deriveAddresses()
       const { address } = await this.getAddress(this.getPath(0), false, true)
       this.busyCount = 0
       if (address !== this.coinbase || this.status !== 'ok') {
@@ -331,7 +326,7 @@ class Ledger extends Signer {
   _deriveLegacyAddresses () {
     return new Promise(async (resolve, reject) => {
       try {
-        const result = await this.getAddress(BASE_PATH_LEGACY, false, true)
+        const result = await this.getAddress(this.network === '1' ? BASE_PATH_LEGACY : BASE_PATH_TEST, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
           if (err) reject(err)
           else resolve(addresses)
