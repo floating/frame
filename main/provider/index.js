@@ -271,7 +271,7 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0] }, res)
+      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], radSpec: "ASFD" }, res)
     })
   }
 

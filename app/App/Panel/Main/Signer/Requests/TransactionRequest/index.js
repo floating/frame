@@ -1,6 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
+
+import evaluateRadSpec from '../../../../../../../contractMetadata/evaluateRadSpec'
 import svg from '../../../../../../svg'
 import link from '../../../../../../link'
 
@@ -41,8 +43,13 @@ class TransactionRequest extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
+  getRadSpec (transaction = { chainId: '0x1', data: '0x', to: '0x'}) {
+    return evaluateRadSpec(transaction)
+  }
+
   render () {
     const req = this.props.req
+    console.log(req)
     let notice = req.notice
     const status = req.status
     const mode = req.mode
@@ -153,6 +160,7 @@ class TransactionRequest extends React.Component {
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
+                      <div>{this.getRadSpec(req.data)}</div>
                       <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
                         <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
                         <div className='transactionDataLabel'>{'View Data'}</div>
