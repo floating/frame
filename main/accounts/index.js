@@ -266,6 +266,12 @@ class Accounts extends EventEmitter {
     this.current().signMessage(message, cb)
   }
 
+  signTypedData (address, typedData, cb) {
+    if (!this.current()) return cb(new Error('No Account Selected'))
+    if (address.toLowerCase() !== this.getSelectedAddress().toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
+    this.current().signTypedData(typedData, cb)
+  }
+
   signTransaction (rawTx, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     const matchSelected = rawTx.from.toLowerCase() === this.getSelectedAddress().toLowerCase()

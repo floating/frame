@@ -65,12 +65,21 @@ const rpc = {
         if (err) return accounts.setRequestError(req.handlerId, err)
         accounts.setRequestSuccess(req.handlerId, res)
       })
+    } else if (req.type === 'signTypedData') {
+      provider.approveSignTypedData(req, (err, res) => {
+        if (err) return accounts.setRequestError(req.handlerId, err)
+        accounts.setRequestSuccess(req.handlerId, res)
+      })
     }
   },
   declineRequest (req, cb) {
-    if (req.type === 'transaction' || req.type === 'sign') {
-      accounts.declineRequest(req.handlerId)
-      provider.declineRequest(req)
+    if (
+      req.type === "transaction" ||
+      req.type === "sign" ||
+      req.type === "signTypedData"
+    ) {
+      accounts.declineRequest(req.handlerId);
+      provider.declineRequest(req);
     }
   },
   addAragon (account, cb) {

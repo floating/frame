@@ -164,7 +164,23 @@ class Account {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
     } else {
-      cb(new Error(`No signer forund for this account`))
+      cb(new Error(`No signer found for this account`))
+    }
+  }
+
+  signTypedData (typedData, cb) {
+    if (!typedData) return cb(new Error('No data to sign'))
+    if (typeof(typedData) !== 'object') return cb(new Error('Data to sign has the wrong format'))
+    if (this.signer) {
+      signers.get(this.signer.id).signTypedData(this.index, typedData, cb)
+    } else if (this.smart) {
+      if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
+        signers.get(this.smart.actor.account.id).signTypedData(this.index, typedData, cb)
+      } else {
+        cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
+      }
+    } else {
+      cb(new Error(`No signer found for this account`))
     }
   }
 

@@ -25,7 +25,16 @@ const cleanup = id => {
   })
 }
 
-const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
+const protectedMethods = [
+  "eth_coinbase",
+  "eth_accounts",
+  "eth_sendTransaction",
+  "personal_sign",
+  "personal_ecRecover",
+  "eth_sign",
+  "eth_signTypedData",
+  "eth_signTypedData_v3"
+];
 
 const handler = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')

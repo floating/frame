@@ -3,6 +3,8 @@ const crypto = require('crypto')
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 const EthTx = require('ethereumjs-tx')
 
+const { signTypedData } = require('../../../crypt/typedDataUtils')
+
 class HotSignerWorker {
   constructor () {
     this.token = crypto.randomBytes(32).toString('hex')
@@ -33,6 +35,11 @@ class HotSignerWorker {
     // Return serialized signed message
     const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
     pseudoCallback(null, addHexPrefix(hex))
+  }
+
+  signTypedData (key, typedData, pseudoCallback) {
+    const signature = signTypedData(typedData, key)
+    pseudoCallback(null, signature)
   }
 
   signTransaction (key, rawTx, pseudoCallback) {

@@ -107,6 +107,12 @@ class HotSigner extends Signer {
     this._callWorker(payload, cb)
   }
 
+  signTypedData (index, typedData, cb) {
+    if (this.network !== store('main.connection.network')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.connection.network')}`))
+    const payload = { method: 'signTypedData', params: { index, typedData } }
+    this._callWorker(payload, cb)
+  }
+
   signTransaction (index, rawTx, cb) {
     if (this.network !== store('main.connection.network')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.connection.network')}`))
     const payload = { method: 'signTransaction', params: { index, rawTx } }
