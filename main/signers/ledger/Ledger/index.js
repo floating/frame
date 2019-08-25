@@ -7,7 +7,7 @@ const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const store = require('../../../store')
 // const windows = require('../../../windows')
 const Signer = require('../../Signer')
-const { hashTypedData } = require('../../../crypt/typedDataUtils')
+// const { hashTypedData } = require('../../../crypt/typedDataUtils')
 const uuid = require('uuid/v5')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
