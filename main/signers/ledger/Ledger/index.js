@@ -155,7 +155,7 @@ class Ledger extends Signer {
   }
 
   async deviceStatus () {
-    if (this.status === 'Invalid sequence') return console.log('INVALID SEQUENCE')
+    if (this.status === 'Invalid sequence') return log.warn('INVALID SEQUENCE')
     this.pollStatus()
     if (this.pause) return
 
@@ -246,9 +246,9 @@ class Ledger extends Signer {
     }
   }
 
-  //// NOTE: Commented out because Ledger does not support signTypedData at the moment
-  //// see: https://github.com/floating/frame/issues/136
-  ////
+  /// / NOTE: Commented out because Ledger does not support signTypedData at the moment
+  /// / see: https://github.com/floating/frame/issues/136
+  /// /
   // async signTypedData (index, typedData, cb) {
   //   if (this.pause) return cb(new Error('Device access is paused'))
   //   this.pause = true

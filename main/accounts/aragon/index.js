@@ -89,7 +89,7 @@ class Aragon {
       if (err) return cb(err)
       const params = ['0x' + utils.keccak(message).toString('hex')]
       wrap.calculateTransactionPath(this.smart.actor.address, this.smart.agent, 'presignHash', params).then(result => {
-        console.log(result)
+        log.warn('Trying to sign as Aragon DAO...', result)
       }).catch(cb)
     })
   }

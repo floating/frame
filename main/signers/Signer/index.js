@@ -2,6 +2,7 @@
 // const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
 
 // const deriveHDAccounts = require('worker-farm')(require.resolve('./derive'))
+const log = require('electron-log')
 const deriveHDAccounts = require('./derive')
 
 const crypt = require('../../crypt')
@@ -26,7 +27,7 @@ class Signer {
   }
 
   verifyAddress () {
-    console.log(new Error('Signer:' + this.type + ' did not implement verifyAddress method'))
+    log.error(new Error('Signer:' + this.type + ' did not implement verifyAddress method'))
   }
 
   getAccounts (cb) {
