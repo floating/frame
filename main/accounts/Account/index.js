@@ -170,7 +170,7 @@ class Account {
 
   signTypedData (typedData, cb) {
     if (!typedData) return cb(new Error('No data to sign'))
-    if (typeof(typedData) !== 'object') return cb(new Error('Data to sign has the wrong format'))
+    if (typeof (typedData) !== 'object') return cb(new Error('Data to sign has the wrong format'))
     if (this.signer) {
       signers.get(this.signer.id).signTypedData(this.index, typedData, cb)
     } else if (this.smart) {

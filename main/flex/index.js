@@ -3,6 +3,7 @@
 const EventEmitter = require('events')
 const { ipcMain } = require('electron')
 const uuid = require('uuid/v4')
+const log = require('electron-log')
 
 const windows = require('../windows')
 
@@ -29,7 +30,7 @@ const flex = new Flex()
 const handlers = {}
 
 ipcMain.on('tray:flex:res', (sender, id, ...args) => {
-  if (!handlers[id]) return console.log('Message from main RPC had no handler.')
+  if (!handlers[id]) return log.warn('Message from main RPC had no handler')
   args = args.map(arg => defined(arg) ? JSON.parse(arg) : arg)
   handlers[id](...args)
   delete handlers[id]

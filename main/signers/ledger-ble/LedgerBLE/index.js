@@ -9,7 +9,7 @@ const flex = require('../../../flex')
 class LedgerBLE extends Signer {
   constructor (device, api) {
     super()
-    console.log('setting up LedgerBLE device')
+    log.info('Setting up LedgerBLE device')
     this.api = api
     this.device = device
     this.id = device.id
@@ -87,8 +87,6 @@ class LedgerBLE extends Signer {
 
   lookupAccounts (cb) {
     flex.rpc('ledger.ethereumGetAddress', this.id, this.basePath(), false, (err, result) => {
-      console.log('got result for lookupAccounts')
-      console.log(err, result)
       if (err) return cb(err)
       this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
     })

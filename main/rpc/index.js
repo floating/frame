@@ -74,12 +74,12 @@ const rpc = {
   },
   declineRequest (req, cb) {
     if (
-      req.type === "transaction" ||
-      req.type === "sign" ||
-      req.type === "signTypedData"
+      req.type === 'transaction' ||
+      req.type === 'sign' ||
+      req.type === 'signTypedData'
     ) {
-      accounts.declineRequest(req.handlerId);
-      provider.declineRequest(req);
+      accounts.declineRequest(req.handlerId)
+      provider.declineRequest(req)
     }
   },
   addAragon (account, cb) {

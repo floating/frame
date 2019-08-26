@@ -1,4 +1,6 @@
 const EventEmitter = require('events')
+const log = require('electron-log')
+
 const hot = require('./hot')
 const ledger = require('./ledger')
 const trezorConnect = require('./trezor-connect')
@@ -124,12 +126,12 @@ class Signers extends EventEmitter {
     if (signer && signer.unlock) {
       signer.unlock(password, cb)
     } else {
-      console.error('Signer not unlockable via password')
+      log.error('Signer not unlockable via password, no unlock method')
     }
   }
 
   unsetSigner () {
-    console.log('unsetSigner')
+    log.info('unsetSigner')
   }
 }
 

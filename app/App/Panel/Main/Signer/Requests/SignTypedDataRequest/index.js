@@ -5,12 +5,12 @@ import svg from '../../../../../../svg'
 import link from '../../../../../../link'
 
 const SimpleJSON = ({ json }) => (
-  <div className="simpleJson">
+  <div className='simpleJson'>
     {Object.keys(json).map(key => (
-      <div className="simpleJsonChild">
-        <div className="simpleJsonKey">{key}:</div>
-        <div className="simpleJsonValue">
-          {typeof json[key] === "object" ? (
+      <div className='simpleJsonChild'>
+        <div className='simpleJsonKey'>{key}:</div>
+        <div className='simpleJsonValue'>
+          {typeof json[key] === 'object' ? (
             <SimpleJSON json={json[key]} />
           ) : (
             json[key]
@@ -19,7 +19,7 @@ const SimpleJSON = ({ json }) => (
       </div>
     ))}
   </div>
-);
+)
 
 class TransactionRequest extends React.Component {
   constructor (...args) {
@@ -61,9 +61,9 @@ class TransactionRequest extends React.Component {
     const status = this.props.req.status
     const notice = this.props.req.notice
     const payload = this.props.req.payload
-    const [from = '', typedData = {}] = payload.params;
-    const message = utils.toAscii(payload.method === 'eth_sign' ? payload.params[1] : payload.params[0] || '0x')
-    console.log(payload, message, type, notice, typedData);
+    const [typedData = {}] = payload.params
+    // const message = utils.toAscii(payload.method === 'eth_sign' ? payload.params[1] : payload.params[0] || '0x')
+    // console.log(payload, message, type, notice, typedData)
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -116,7 +116,7 @@ class TransactionRequest extends React.Component {
                     <div className='signTypedDataInner'>
                       <b>Domain</b>
                       <SimpleJSON json={typedData.domain} />
-                      
+
                       <b>Message</b>
                       <SimpleJSON json={typedData.message} />
                     </div>

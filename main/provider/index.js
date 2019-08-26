@@ -271,12 +271,12 @@ class Provider extends EventEmitter {
   }
 
   signTypedData (payload, res) {
-    let [from = '', typedData = {}, ...rest] = payload.params;
-    const current = accounts.getAccounts()[0];
-    if (from.toLowerCase() !== current.toLowerCase()) return this.resError('signTypedData request is not from currently selected account.', payload, res);
+    let [from = '', typedData = {}, ...rest] = payload.params
+    const current = accounts.getAccounts()[0]
+    if (from.toLowerCase() !== current.toLowerCase()) return this.resError('signTypedData request is not from currently selected account.', payload, res)
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
-    if (typeof(typedData) === 'string') {
+    if (typeof (typedData) === 'string') {
       try {
         typedData = JSON.parse(typedData)
         payload.params = [from, typedData, ...rest]
