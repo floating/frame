@@ -12,59 +12,6 @@ const proxyProvider = require('../provider/proxy')
 const Account = require('./Account')
 const windows = require('../windows')
 
-// let aragonTestAccount = {
-//   id: 'test',
-//   index: 0,
-//   addresses: ['0x4F4E43C7a6310a0cD716bbba563B901FAc07D085'], // Agent Address
-//   type: 'Aragon',
-//   smart: {
-//     type: 'aragon',
-//     actor: { // Reference to Frame account that will act on behalf of the agent
-//       id: '3932643439326431633163373864326336383761633466366662366261363337',
-//       index: 0,
-//       address: '0xf4Ed810dEF41F31141B652e49fe847e6D7455BfD' // External Signer
-//     },
-//     dao: '0xd237ea861d39bf43aeed507c53f3826f5eabcafd', // DAO Address
-//     agent: '0x4F4E43C7a6310a0cD716bbba563B901FAc07D085', // Agent Address
-//     vault: '0x98e8e0381abe2c4b8a07000e8a913566fa641005' // Vault Address
-//   }
-// }
-// let aragonTestAccount1 = {
-//   id: 'test1',
-//   index: 0,
-//   addresses: ['0x4f4e43c7a6310a0cd716bbba563b901fac07d085'], // Agent Address
-//   type: 'Aragon',
-//   smart: {
-//     type: 'aragon',
-//     actor: { // Reference to Frame account that will act on behalf of the agent
-//       id: '3932643439326431633163373864326336383761633466366662366261363337',
-//       index: 0,
-//       address: '0xf4Ed810dEF41F31141B652e49fe847e6D7455BfD' // External Signer
-//     },
-//     dao: '0xd237ea861d39bf43aeed507c53f3826f5eabcafd', // DAO Address
-//     agent: '0x4f4e43c7a6310a0cd716bbba563b901fac07d085', // Agent Address
-//     vault: '0x98e8e0381abe2c4b8a07000e8a913566fa641005' // Vault Address
-//   }
-// }
-//
-// let aragonTestAccount2 = {
-//   id: 'test2',
-//   index: 0,
-//   addresses: ['0x4f4e43c7a6310a0cd716bbba563b901fac07d085'], // Agent Address
-//   type: 'Aragon',
-//   smart: {
-//     type: 'aragon',
-//     actor: { // Reference to Frame account that will act on behalf of the agent
-//       id: '3932643439326431633163373864326336383761633466366662366261363337',
-//       index: 0,
-//       address: '0xf4Ed810dEF41F31141B652e49fe847e6D7455BfD' // External Signer
-//     },
-//     dao: '0xd237ea861d39bf43aeed507c53f3826f5eabcafd', // DAO Address
-//     agent: '0x4f4e43c7a6310a0cd716bbba563b901fac07d085', // Agent Address
-//     vault: '0x98e8e0381abe2c4b8a07000e8a913566fa641005' // Vault Address
-//   }
-// }
-
 class Accounts extends EventEmitter {
   constructor () {
     super()
@@ -74,10 +21,6 @@ class Accounts extends EventEmitter {
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
-    // Aragon Testing
-    // this.accounts[aragonTestAccount.id] = new Account(aragonTestAccount, this)
-    // this.accounts[aragonTestAccount1.id] = new Account(aragonTestAccount1, this)
-    // this.accounts[aragonTestAccount2.id] = new Account(aragonTestAccount2, this)
     store.observer(() => {
       const signers = store('main.signers')
       Object.keys(signers).forEach(id => {
