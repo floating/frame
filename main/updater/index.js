@@ -18,7 +18,7 @@ const compareVersions = (a, b) => {
 const checkErr = (err) => log.error('Error checking latest version:', err)
 const options = { host: 'api.github.com', path: '/repos/floating/frame/releases', headers: { 'User-Agent': 'request' } }
 
-autoUpdater.allowPrerelease = true
+// autoUpdater.allowPrerelease = true
 autoUpdater.autoDownload = false
 
 autoUpdater.on('error', err => {

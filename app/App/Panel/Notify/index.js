@@ -125,7 +125,11 @@ class Notify extends React.Component {
             {'Gas Fee Warning'}
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`This transaction will cost ${parseFloat(feeUSD).toFixed(2)} USD in gas fees.`}</div>
+            {feeUSD ? (
+              <div className='notifyBodyLine'>{`This transaction will cost ${parseFloat(feeUSD).toFixed(2)} USD in fees.`}</div>
+            ) : (
+              <div className='notifyBodyLine'>{`We were unable to determine this transaction's fee in USD.`}</div>
+            )}
             <div className='notifyBodyLine'>{'Are you sure you want to proceed?'}</div>
           </div>
           <div className='notifyInput'>
