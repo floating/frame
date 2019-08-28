@@ -35,7 +35,7 @@
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./main",
     "alpha": "npm run bundle && npm run launch",
     "hot": "npm run bundle && npm run launch:hot",
-    "clean": "rimraf dist bundle .cache \"node_modules/!(rimraf|.bin)\" && npm install",
+    "clean": "rimraf dist bundle .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm install && npm audit fix",
     "build": "electron-builder",
     "release": "build",
     "postinstall": "electron-builder install-app-deps",

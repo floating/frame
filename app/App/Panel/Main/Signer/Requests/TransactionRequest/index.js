@@ -146,8 +146,8 @@ class TransactionRequest extends React.Component {
                   <div className='transactionFee'>
                     <div className='transactionTotals'>
                       <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
-                      <div className={feeUSD > FEE_WARNING_THRESHOLD_USD ? 'transactionTotalUSD transactionWarning' : 'transactionTotalUSD'}>{'$ ' + feeUSD.toFixed(2)}</div>
-                      {feeUSD > FEE_WARNING_THRESHOLD_USD ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null }
+                      <div className={feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? 'transactionTotalUSD transactionWarning' : 'transactionTotalUSD'}>{'$ ' + feeUSD.toFixed(2)}</div>
+                      {feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null }
                     </div>
                     <div className='transactionSubtitle'>{'Max Fee'}️</div>
                   </div>
@@ -197,7 +197,7 @@ class TransactionRequest extends React.Component {
             </div>
             <div className='requestSign' onMouseDown={() => {
               if (this.state.allowInput) {
-                if (feeUSD > FEE_WARNING_THRESHOLD_USD) {
+                if (feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) {
                   this.store.notify('gasFeeWarning', { req, feeUSD })
                 } else {
                   this.approve(req.handlerId, req)
