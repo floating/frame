@@ -3,6 +3,7 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+const radspec = require('radspec')
 
 const proxy = require('./proxy')
 

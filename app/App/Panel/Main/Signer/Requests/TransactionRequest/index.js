@@ -44,7 +44,7 @@ class TransactionRequest extends React.Component {
   }
 
   getRadSpec (transaction = { chainId: '0x1', data: '0x', to: '0x'}) {
-    return evaluateRadSpec(transaction)
+    return evaluateRadSpec(transaction, console.log)
   }
 
   render () {
