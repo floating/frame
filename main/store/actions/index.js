@@ -1,7 +1,7 @@
 module.exports = {
   // setSync: (u, key, payload) => u(key, () => payload),
   selectNetwork: (u, net) => {
-    let reset = { status: 'loading', connected: false, type: '', network: '' }
+    const reset = { status: 'loading', connected: false, type: '', network: '' }
     u('main.connection', connection => {
       connection.network = net
       connection.local = Object.assign({}, connection.local, reset)
@@ -9,24 +9,11 @@ module.exports = {
       return connection
     })
   },
-  selectSecondary: (u, direction) => {
-    if (direction === '->') {
-      u('main.connection', connection => {
-        let options = Object.keys(connection.secondary.settings[connection.network].options)
-        let index = options.indexOf(connection.secondary.settings[connection.network].current) + 1
-        if (index >= options.length) index = 0
-        connection.secondary.settings[connection.network].current = options[index]
-        return connection
-      })
-    } else if (direction === '<-') {
-      u('main.connection', connection => {
-        let options = Object.keys(connection.secondary.settings[connection.network].options)
-        let index = options.indexOf(connection.secondary.settings[connection.network].current) - 1
-        if (index < 0) index = options.length - 1
-        connection.secondary.settings[connection.network].current = options[index]
-        return connection
-      })
-    }
+  selectSecondary: (u, value) => {
+    u('main.connection', connection => {
+      connection.secondary.settings[connection.network].current = value
+      return connection
+    })
   },
   setSecondaryCustom: (u, target) => {
     u('main.connection', connection => {
@@ -34,29 +21,29 @@ module.exports = {
       return connection
     })
   },
-  toggleConnection: (u, node) => u('main.connection', node, 'on', on => !on),
+  toggleConnection: (u, node, on) => u('main.connection', node, 'on', (value) => on !== undefined ? on : !value),
   setLocal: (u, status) => u('main.connection.local', local => Object.assign({}, local, status)),
   setSecondary: (u, status) => u('main.connection.secondary', secondary => Object.assign({}, secondary, status)),
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
-  clearPermissions: (u, account) => {
-    u('main.accounts', account, account => {
-      account.permissions = {}
-      return account
+  clearPermissions: (u, address) => {
+    u('main.addresses', address, address => {
+      address.permissions = {}
+      return address
     })
   },
   giveAccess: (u, req, access) => {
-    u('main.accounts', req.account, account => {
-      account = account || { permissions: {} }
-      account.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-      return account
+    u('main.addresses', req.address, address => {
+      address = address || { permissions: {} }
+      address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
+      return address
     })
   },
-  toggleAccess: (u, account, handlerId) => {
-    u('main.accounts', account, account => {
-      account.permissions[handlerId].provider = !account.permissions[handlerId].provider
-      return account
+  toggleAccess: (u, address, handlerId) => {
+    u('main.addresses', address, address => {
+      address.permissions[handlerId].provider = !address.permissions[handlerId].provider
+      return address
     })
   },
   syncPath: (u, path, value) => {
@@ -68,5 +55,62 @@ module.exports = {
       if (dontRemind.indexOf(version) === -1) dontRemind.push(version)
       return dontRemind
     })
+  },
+  updateAccount: (u, updatedAccount, add) => {
+    u('main.accounts', updatedAccount.id, account => {
+      if (account) return updatedAccount // Account exists
+      if (add) return updatedAccount // Account is new and should be added
+      return account
+    })
+  },
+  removeAccount: (u, id) => {
+    u('main.accounts', accounts => {
+      delete accounts[id]
+      return accounts
+    })
+  },
+  removeSigner: (u, id) => {
+    u('main.signers', signers => {
+      delete signers[id]
+      return signers
+    })
+  },
+  updateSigner: (u, signer) => {
+    if (!signer.id) return
+    u('main.signers', signer.id, () => signer)
+  },
+  newSigner: (u, signer) => {
+    u('main.signers', signers => {
+      signers[signer.id] = signer
+      return signers
+    })
+  },
+  // Ethereum and IPFS clients
+  setClientState: (u, client, state) => u(`main.clients.${client}.state`, () => state),
+  updateClient: (u, client, key, value) => u(`main.clients.${client}.${key}`, () => value),
+  toggleClient: (u, client, on) => u(`main.clients.${client}.on`, (value) => on !== undefined ? on : !value),
+  moveOldAccountsToNewAddresses: (u, signer) => {
+    const addressesToMove = {}
+    u('main.accounts', accounts => {
+      Object.keys(accounts).forEach(id => {
+        if (id.startsWith('0x')) {
+          addressesToMove[id] = accounts[id]
+          delete accounts[id]
+        }
+      })
+      return accounts
+    })
+    u('main.addresses', addresses => {
+      Object.keys(addressesToMove).forEach(id => {
+        addresses[id] = addressesToMove[id]
+      })
+      return addresses
+    })
+  },
+  setLedgerDerivation: (u, value) => {
+    u('main.ledger.derivation', () => value)
+  },
+  alphaWarningPassed: (u) => {
+    u('main.alphaWarningPassed', () => true)
   }
 }

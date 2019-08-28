@@ -14,20 +14,23 @@ const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
 class Panel extends React.Component {
   indicator (connection) {
-    let status = [connection.local.status, connection.secondary.status]
+    const status = [connection.local.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
       return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
     } else {
       return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
     }
   }
+
   render () {
-    let open = this.store('tray.open')
-    let transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
-    let transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
+    const open = this.store('tray.open')
+    const transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
     return (
       <div id='panel' style={{ transform, transition }}>
-        <div className='panelMenu'>
+        <div className='panelSwoop'>{svg.swoop()}</div>
+        <div className='panelSwoopBottom'>{svg.swoop()}</div>
+        <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>
               {this.indicator(this.store('main.connection'))}

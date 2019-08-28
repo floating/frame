@@ -3,12 +3,14 @@ const uuid = require('uuid/v4')
 const log = require('electron-log')
 
 const provider = require('../provider')
-const signers = require('../signers')
+const accounts = require('../accounts')
 const store = require('../store')
 
 const trusted = require('./trusted')
 const validPayload = require('./validPayload')
 const isFrameExtension = require('./isFrameExtension')
+
+const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
@@ -25,8 +27,8 @@ const handler = (socket, req) => {
   }
   socket.on('message', data => {
     let origin = socket.origin
-    let payload = validPayload(data)
-    if (!payload) return
+    const payload = validPayload(data)
+    if (!payload) return console.warn('Invalid Payload', data)
     if (socket.isFrameExtension) { // Request from extension, swap origin
       if (payload.__frameOrigin) {
         origin = payload.__frameOrigin
@@ -35,10 +37,11 @@ const handler = (socket, req) => {
         origin = 'frame-extension'
       }
     }
-    log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
+    if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
-      if (!signers.getSelectedAccounts()[0]) error = { message: 'No Frame account selected', code: 4100 }
+      // review
+      if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
       provider.send(payload, response => {
@@ -49,7 +52,7 @@ const handler = (socket, req) => {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
+        if (logTraffic) log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
         res(response)
       })
     }
@@ -70,16 +73,16 @@ module.exports = server => {
   ws.on('connection', handler)
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
-    let subscription = subs[payload.params.subscription]
+    const subscription = subs[payload.params.subscription]
     if (subscription) subscription.socket.send(JSON.stringify(payload))
   })
 
   provider.on('data:accounts', (account, payload) => { // Make sure the subscription has access based on current account
-    let subscription = subs[payload.params.subscription]
+    const subscription = subs[payload.params.subscription]
     if (subscription) {
-      let permissions = store('main.accounts', account, 'permissions') || {}
-      let perms = Object.keys(permissions).map(id => permissions[id])
-      let allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
+      const permissions = store('main.accounts', account, 'permissions') || {}
+      const perms = Object.keys(permissions).map(id => permissions[id])
+      const allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
       if (!allowed) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))
     }
@@ -90,7 +93,7 @@ module.exports = server => {
   // provider.on('close', _ => ws.clients.forEach(socket => socket.close()))
   // When permission is revoked, close connected sockets
   // store.observer(() => {
-  //   let permissions = store('local.accounts', store('signer.accounts', 0), 'permissions') || {}
+  //   let permissions = store('local.accounts', store('selected.accounts', 0), 'permissions') || {}
   //   let ok = []
   //   Object.keys(permissions).forEach(key => { if (permissions[key].provider) ok.push(permissions[key].origin) })
   //   ws.clients.forEach(socket => { if (ok.indexOf(socket.origin) < 0) socket.close() })
@@ -98,8 +101,8 @@ module.exports = server => {
   // When the current account changes, close connected sockets
   // let current = ''
   // store.observer(() => {
-  //   if (store('signer.current') !== current) ws.clients.forEach(socket => socket.close())
-  //   current = store('signer.current')
+  //   if (store('selected.current') !== current) ws.clients.forEach(socket => socket.close())
+  //   current = store('selected.current')
   // })
   // let local
   // let secondary

@@ -1,7 +1,6 @@
 const uuidv5 = require('uuid/v5')
 
-const PersistStore = require('electron-store')
-const persist = new PersistStore()
+const persist = require('../persist')
 
 const get = (path, obj = persist.get('main')) => {
   path.split('.').some((key, i) => {
@@ -12,34 +11,36 @@ const get = (path, obj = persist.get('main')) => {
 }
 
 const main = (path, def) => {
-  let found = get(path)
+  const found = get(path)
   if (found === undefined) return def
   return found
 }
 
-let initial = {
+const initial = {
   panel: {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, notify: '', badge: '' },
+  view: { current: '', list: [], data: {}, notify: '', notifyData: {}, badge: '', addAccount: '' },
   signers: {},
   tray: {
     open: false,
     initial: true
   },
   balances: {},
-  signer: {
+  selected: {
     minimized: true,
     open: false,
     current: '',
     view: 'default',
     settings: {
       viewIndex: 0,
-      views: ['permissions', 'verify']
+      views: ['permissions', 'verify', 'control'],
+      subIndex: 0
     },
-    accounts: [],
+    addresses: [],
     showAccounts: false,
+    accountPage: 0,
     position: {
       scrollTop: 0,
       initial: {
@@ -65,15 +66,53 @@ let initial = {
     rates: {}
   },
   main: {
+    mute: {
+      alphaWarning: main('mute.alphaWarning', false),
+      externalLinkWarning: main('mute.externalLinkWarning', false)
+    },
     launch: main('launch', false),
     reveal: main('reveal', false),
-    accounts: main('accounts', {}), // Persisted account settings and permissions
+    ledger: {
+      derivation: main('ledger.derivation', 'legacy')
+    },
+    accounts: main('accounts', {}),
+    addresses: main('addresses', {}), // New persisted address permissions
+    signers: {},
+    savedSigners: {},
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },
+    clients: {
+      ipfs: {
+        on: main('clients.ipfs.on', false),
+        installed: false,
+        latest: false,
+        version: null,
+        state: 'off'
+      },
+      geth: {
+        on: main('clients.geth.on', false),
+        blockNumber: 0,
+        currentBlock: 0,
+        highestBlock: 0,
+        installed: false,
+        latest: false,
+        version: null,
+        state: 'off'
+      },
+      parity: {
+        on: main('clients.parity.on', false),
+        blockNumber: 0,
+        currentBlock: 0,
+        highestBlock: 0,
+        installed: false,
+        latest: false,
+        version: null,
+        state: 'off'
+      }
+    },
     connection: {
-      network: main('connection.network', '4'),
-      options: ['1', '3', '4', '42'],
+      network: main('connection.network', '1'),
       local: {
         on: main('connection.local.on', false),
         status: 'loading',
@@ -81,25 +120,25 @@ let initial = {
         type: '',
         network: '',
         settings: {
-          '1': {
+          1: {
             current: 'direct',
             options: {
               direct: 'direct'
             }
           },
-          '3': {
+          3: {
             current: 'direct',
             options: {
               direct: 'direct'
             }
           },
-          '4': {
+          4: {
             current: 'direct',
             options: {
               direct: 'direct'
             }
           },
-          '42': {
+          42: {
             current: 'direct',
             options: {
               direct: 'direct'
@@ -109,28 +148,28 @@ let initial = {
       },
       secondary: {
         settings: {
-          '1': {
+          1: {
             current: main('connection.secondary.settings.1.current', 'infura'),
             options: {
               infura: 'infura',
               custom: main('connection.secondary.settings.1.options.custom', '')
             }
           },
-          '3': {
+          3: {
             current: main('connection.secondary.settings.3.current', 'infura'),
             options: {
               infura: 'infuraRopsten',
               custom: main('connection.secondary.settings.3.options.custom', '')
             }
           },
-          '4': {
+          4: {
             current: main('connection.secondary.settings.4.current', 'infura'),
             options: {
               infura: 'infuraRinkeby',
               custom: main('connection.secondary.settings.4.options.custom', '')
             }
           },
-          '42': {
+          42: {
             current: main('connection.secondary.settings.42.current', 'infura'),
             options: {
               infura: 'infuraKovan',
@@ -151,7 +190,10 @@ let initial = {
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.accounts).forEach(account => {
   account = initial.main.accounts[account]
-  if (account && account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
+  if (account) {
+    if (account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
+    delete account.signer
+  }
 })
 
 module.exports = () => initial

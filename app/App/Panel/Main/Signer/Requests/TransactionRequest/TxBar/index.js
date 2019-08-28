@@ -4,7 +4,7 @@ import svg from '../../../../../../../svg'
 
 class TxBar extends React.Component {
   render () {
-    let req = this.props.req
+    const req = this.props.req
     let position = 0
     let txBarClass = 'txBar'
     let progressIconClass = 'txProgressStepIcon'
@@ -21,8 +21,8 @@ class TxBar extends React.Component {
       progressIconClass += ' txProgressStepIconHidden'
       txBarClass += ' txBarError'
     }
-    let slideMap = ['370px', '255px', '165px', '75px', '-40px']
-    let slide = slideMap[position]
+    const slideMap = ['370px', '255px', '165px', '75px', '-40px']
+    const slide = slideMap[position]
 
     return (
       <div className={txBarClass}>

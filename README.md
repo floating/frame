@@ -7,8 +7,7 @@
   <br>
   <br>
 </h2>
-
-<h3 align="center">An OS-level Ethereum interface :tada:</h3>
+<h3 align="center">An OS-level web3 Interface :tada:</h3>
 <br>
 <h5 align="center">
   <a href="#features">Features</a> ⁃
@@ -19,22 +18,26 @@
 
 <img src="/asset/demo/Frame0-0-5-RC1.gif?raw=true" />
 
-Frame is an OS-level Ethereum interface that lets you use standalone signers, such as a Ledger or Trezor, to securely and transparently interact with dapps and the Ethereum network.
+Frame is a web3 interface that lets you sign data, manage accounts, run your own connections to Ethereum/IPFS and securely and transparently interact with dapps and web3 protocols.
 
 ### Features
-- **First-class Hardware Support**
-  - Use your Ledger and Trezor devices with any dapp!
+- **First-class Hardware Signer Support**
+  - Use your Ledger and Trezor accounts with any dapp!
+- **Extensive Software Signer Support**
+  - Use a mnemonic phrase, keystore.json or standalone private keys to create and backup accounts!
 - **Permissions**
-  - User controls which dapps have permission to access the provider and can monitor with full transparency what requests dapps are making.
-- **Node Management**
-  - Frame simplifies running and syncing your local node and lets you seamlessly swap from local to remote nodes on the fly.
+  - You'll always have full control of which dapps have permission to access Frame and can monitor with full transparency what requests are being made to the network.
+- **Create your own connections to Ethereum/IPFS**
+  - Run your own Ethereum light client or IPFS gateway without the command line!
+  - Seamlessly swap from local to remote nodes on the fly
+  - Never be locked into using a centralized gateway again!
 - **Menu Bar Support**
-  - Frame stays out of the way and sits quietly in your menu bar until it's needed.
+  - Frame stays out of the way and sits quietly in your menu bar until it's needed
 - **Cross Platform**
   - macOS, Windows and Linux!
 
-### Demos
-  - [Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
+### Talks
+  - [Frame at Aracon](https://www.youtube.com/watch?v=wlZWLiy2GD0)
 
 ### Downloads
   - [All Releases](https://github.com/floating/frame/releases)
@@ -55,22 +58,10 @@ Frame is an OS-level Ethereum interface that lets you use standalone signers, su
 
 **On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev` **before** running the demo.
 
-### Add Hot Signers
-  - **For testing and development purposes** you can add non-hardware accounts to Frame
-  - After cloning the repo create **`hot.json`** in the root directory
-  ```json
-  {
-    "accounts": ["privateKey1", "privateKey2"]
-  }
-  ```
-  - Run `npm run hot` (production env + hot signers) or `npm run dev` (development env)
-  - Hot signers will not be added when running `npm run alpha` (production env)
-
 ### Build Apps
   ```bash
-  # Build apps for current platform
-  › npm run bundle
-  › npm run build
+  › npm run bundle # Create app bundle
+  › npm run build # Build apps for current platform
   ```
 
 ### Related
@@ -80,10 +71,11 @@ Frame is an OS-level Ethereum interface that lets you use standalone signers, su
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps
 
 <h2>
-<h5 align="center">
-  <br>
-  <a href="https://frame.sh">Website</a> ⁃
-  <a href="https://medium.com/@framehq">Blog</a> ⁃
-  <a href="https://twitter.com/frame_eth">Twitter</a>
-</h5>
+  <h5 align="center">
+    <br>
+    <a href="https://frame.sh">Website</a> ⁃
+    <a href="https://medium.com/@framehq">Blog</a> ⁃
+    <a href="https://twitter.com/frame_eth">Twitter</a> ⁃
+    <a href="https://gitter.im/framehq/general">Chat</a>
+  </h5>
 </h2>

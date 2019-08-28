@@ -13,9 +13,9 @@ ipcRenderer.on('main:rpc', (sender, id, ...args) => {
 })
 
 export default (...args) => {
-  let cb = args.pop()
+  const cb = args.pop()
   if (typeof cb !== 'function') throw new Error('Main RPC requires a callback.')
-  let id = uuid()
+  const id = uuid()
   handlers[id] = cb
   args = args.map(arg => defined(arg) ? JSON.stringify(arg) : arg)
   ipcRenderer.send('main:rpc', JSON.stringify(id), ...args)

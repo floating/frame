@@ -21,11 +21,6 @@ export default (state, cb) => {
     })
   })
 
-  link.rpc('getSigners', (err, signers) => {
-    if (err) return store.signersError(err)
-    store.updateSigners(signers)
-  })
-
   link.on('action', (action, ...args) => { if (store[action]) store[action](...args) })
   link.send('tray:ready') // turn on api
 
@@ -42,26 +37,34 @@ export default (state, cb) => {
   let monitor
 
   const refreshBalances = () => {
-    monitor.forEach(account => {
-      link.rpc('providerSend', { 'jsonrpc': '2.0', 'method': 'eth_getBalance', 'params': [account, 'latest'], 'id': 1 }, res => {
+    monitor.forEach(address => {
+      link.rpc('providerSend', { jsonrpc: '2.0', method: 'eth_getBalance', params: [address, 'latest'], id: 1 }, res => {
         if (res.error) return
-        let balance = utils.fromWei(utils.hexToNumberString(res.result))
-        if (store('balances', account) !== balance) store.setBalance(account, balance)
+        const balance = utils.fromWei(utils.hexToNumberString(res.result))
+        if (store('balances', address) !== balance) store.setBalance(address, balance)
       })
     })
   }
 
   store.observer(() => {
     monitor = []
-    Object.keys(store('signers')).forEach(id => {
-      if (store('signer.current') === id && store('signer.showAccounts')) { // When viewing accounts, refresh them all
-        let accounts = store('signers', id, 'accounts')
-        if (accounts.length) monitor = monitor.concat(accounts)
-      } else { // Monitor index accounts of each signer
-        let account = store('signers', id, 'accounts', store('signers', id, 'index'))
-        if (account) monitor.push(account)
+    if (store('selected.current')) {
+      const account = store('main.accounts', store('selected.current'))
+      if (account) {
+        if (store('selected.showAccounts')) { // When viewing accounts, refresh them all
+          const startIndex = store('selected.accountPage') * 5
+          if (account.addresses.length) monitor = account.addresses.slice(startIndex, startIndex + 10)
+        } else {
+          monitor = [account.addresses[account.index]]
+        }
+      } else {
+        const accounts = store('main.accounts')
+        monitor = Object.keys(accounts).map(id => {
+          const account = accounts[id]
+          return account.addresses[account.index]
+        })
       }
-    })
+    }
     refreshBalances()
   })
 

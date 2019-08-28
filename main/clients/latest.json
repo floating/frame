@@ -1,0 +1,101 @@
+{
+  "geth": {
+    "version": "1.9.2",
+    "platform": {
+      "linux": {
+        "x64": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.9.2-e76047e9.tar.gz",
+          "checksum": "bc7f6837a0fdbbecac36fc3bc4c3d3ae",
+          "bin": "geth"
+        },
+        "ia32": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-linux-386-1.9.2-e76047e9.tar.gz",
+          "checksum": "46e49a038d78c10145da0aac487d0f45",
+          "bin": "geth"
+        }
+      },
+      "darwin": {
+        "x64": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-darwin-amd64-1.9.2-e76047e9.tar.gz",
+          "checksum": "f97d506a0c27d970fb67337f008d74e7",
+          "bin": "geth"
+        }
+      },
+      "win32": {
+        "x64": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-1.9.2-e76047e9.zip",
+          "checksum": "41f258675a40755c52f0cf271f7465b3",
+          "bin": "geth.exe"
+        },
+        "ia32": {
+          "location": "https://gethstore.blob.core.windows.net/builds/geth-windows-386-1.9.2-e76047e9.zip",
+          "checksum": "3384163d24586959586c874bd8fed8af",
+          "bin": "geth.exe"
+        }
+      }
+    }
+  },
+  "ipfs": {
+    "version": "0.4.22",
+    "platform": {
+      "linux": {
+        "x64": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.22/go-ipfs_v0.4.22_linux-amd64.tar.gz",
+          "type": "tar",
+          "bin": "ipfs"
+        },
+        "ia32": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.22/go-ipfs_v0.4.22_linux-386.tar.gz",
+          "type": "tar",
+          "bin": "ipfs"
+        }
+      },
+      "darwin": {
+        "x64": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.22/go-ipfs_v0.4.22_darwin-amd64.tar.gz",
+          "type": "tar",
+          "checksum": "",
+          "bin": "ipfs"
+        }
+      },
+      "win32": {
+        "x64": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.22/go-ipfs_v0.4.22_windows-amd64.zip",
+          "type": "zip",
+          "bin": "ipfs.exe"
+        },
+        "ia32": {
+          "location": "https://dist.ipfs.io/go-ipfs/v0.4.22/go-ipfs_v0.4.22_windows-386.zip",
+          "type": "zip",
+          "bin": "ipfs.exe"
+        }
+      }
+    }
+  },
+  "parity": {
+    "version": "2.5.6",
+    "platform": {
+      "linux": {
+        "x64": {
+          "location": "https://releases.parity.io/ethereum/v2.5.6/x86_64-unknown-linux-gnu/parity",
+          "checksum": "af32e320226c1559cad4e47c1c0edaf7b50ae55822a99fd17f3001ceb08c3e97",
+          "bin": "parity"
+        }
+      },
+      "darwin": {
+        "x64": {
+          "location": "https://releases.parity.io/ethereum/v2.5.6/x86_64-apple-darwin/parity",
+          "checksum": "81352b111872304466868c9193a881fccc76864dbf571b18e7bebf4d8cdbaadc",
+          "bin": "parity"
+        }
+      },
+      "win32": {
+        "x64": {
+          "location": "https://releases.parity.io/ethereum/v2.5.6/x86_64-pc-windows-msvc/parity.exe",
+          "checksum": "5a8624c17af25669ef42cfd76af084318f174407007c76ca0a03dc49154f0391",
+          "bin": "parity.exe"
+        }
+      }
+    }
+  }
+}

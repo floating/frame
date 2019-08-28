@@ -12,7 +12,8 @@ const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
 const source = 'bridge:link'
 
 window.addEventListener('message', e => {
-  let data = unwrap(e.data)
+  if (e.origin !== 'file://') return
+  const data = unwrap(e.data)
   if (e.origin === 'file://' && data.source !== source) {
     if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({ id: data.id, args, source, method: 'rpc' }), e.origin))
     if (data.method === 'event') return ipcRenderer.send(...data.args)
@@ -24,9 +25,14 @@ ipcRenderer.on('main:action', (...args) => {
   window.postMessage(wrap({ channel: 'action', args, source, method: 'event' }), '*')
 })
 
+ipcRenderer.on('main:flex', (...args) => {
+  args.shift()
+  window.postMessage(wrap({ channel: 'flex', args, source, method: 'event' }), '*')
+})
+
 if (dev) {
-  let path = require('path')
-  let watch = require('node-watch')
+  const path = require('path')
+  const watch = require('node-watch')
   watch(path.resolve(__dirname, '..', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) window.postMessage(wrap({ method: 'reload', type: 'css', target: name }), '*')
   })

@@ -11,20 +11,21 @@ class ProviderRequest extends React.Component {
       this.setState({ allowInput: true })
     }, 2000)
   }
+
   render () {
-    let status = this.props.req.status
-    let notice = this.props.req.notice
+    const status = this.props.req.status
+    const notice = this.props.req.notice
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    let origin = this.props.req.origin
+    const origin = this.props.req.origin
     let originClass = 'requestProviderOrigin'
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
-    let mode = this.props.req.mode
-    let height = mode === 'monitor' ? '80px' : '360px'
+    const mode = this.props.req.mode
+    const height = mode === 'monitor' ? '80px' : '360px'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         <div className='approveTransaction'>

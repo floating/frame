@@ -4,15 +4,17 @@ import { URL } from 'url'
 export const syncMain = (u, main) => u('main', _ => main)
 
 export const setSigner = (u, signer) => {
-  u('signer.current', _ => signer.id)
-  u('signer.accounts', _ => signer.accounts)
+  u('selected.current', _ => signer.id)
   setTimeout(_ => {
-    u('signer.minimized', _ => false)
-    u('signer.open', _ => true)
+    u('selected.minimized', _ => false)
+    u('selected.open', _ => true)
   }, 50)
 }
 
-export const setSettingsView = (u, index) => u('signer.settings.viewIndex', () => index)
+export const setSettingsView = (u, index, subindex = 0) => {
+  u('selected.settings.viewIndex', () => index)
+  u('selected.settings.subIndex', () => subindex)
+}
 
 export const setAddress = (u, address) => u('address', () => address)
 
@@ -26,7 +28,12 @@ export const panelRequest = (u, request) => {
 
 export const setBalance = (u, account, balance) => u('balances', account, b => balance)
 
-export const notify = (u, type) => u('view.notify', _ => type)
+export const notify = (u, type, data = {}) => {
+  u('view.notify', _ => type)
+  u('view.notifyData', _ => data)
+}
+
+export const toggleAddAccount = (u) => u('view.addAccount', show => !show)
 
 export const updateBadge = (u, type) => u('view.badge', _ => type)
 
@@ -46,11 +53,15 @@ export const trayOpen = (u, open) => {
 }
 
 export const setSignerView = (u, view) => {
-  u('signer.showAccounts', _ => false)
-  u('signer.view', _ => view)
+  u('selected.showAccounts', _ => false)
+  u('selected.view', _ => view)
 }
 
-export const toggleShowAccounts = u => u('signer.showAccounts', _ => !_)
+export const accountPage = (u, page) => {
+  u('selected.accountPage', () => page)
+}
+
+export const toggleShowAccounts = u => u('selected.showAccounts', _ => !_)
 
 export const addProviderEvent = (u, payload) => {
   u('provider.events', events => {
@@ -59,35 +70,27 @@ export const addProviderEvent = (u, payload) => {
   })
 }
 
-export const setView = (u, view) => u('signer.view', _ => view)
+export const setView = (u, view) => u('selected.view', _ => view)
 
 export const toggleDataView = (u, id) => {
-  u('signer.requests', id, 'viewData', view => !view)
-}
-
-export const updateSigners = (u, signers) => u('signers', _ => signers)
-
-export const addSigner = (u, signer) => {
-  if (signer.status === 'loading') return
-  u('signers', signer.id, _ => signer)
+  u('selected.requests', id, 'viewData', view => !view)
 }
 
 export const updateExternalRates = (u, rates) => u('external.rates', () => rates)
 
 export const resetSigner = u => {
-  u('signer.view', _ => 'default')
-  u('signer.showAccounts', _ => false)
+  u('selected.view', _ => 'default')
+  u('selected.showAccounts', _ => false)
 }
 
 export const unsetSigner = u => {
-  u('signer.minimized', _ => true)
-  u('signer.open', _ => false)
+  u('selected.minimized', _ => true)
+  u('selected.open', _ => false)
   resetSigner(u)
   setTimeout(_ => {
-    u('signer', signer => {
+    u('selected', signer => {
       signer.last = signer.current
       signer.current = ''
-      signer.accounts = []
       signer.requests = {}
       signer.view = 'default'
       return signer
@@ -97,57 +100,57 @@ export const unsetSigner = u => {
 
 export const nodeProvider = (u, connected) => u('node.provider', _ => connected)
 
-export const removeSigner = (u, signer, state) => {
-  let status = 'Removing'
-  u('signers', (signers, state) => {
-    if (state.signer.current === signer.id) unsetSigner(u)
-    if (signers[signer.id]) signers[signer.id].removing = true
-    return signers
-  })
-  setTimeout(_ => {
-    u('signers', signers => {
-      if (signers[signer.id] && signers[signer.id].removing) signers[signer.id].status = status
-      return signers
-    })
-  }, 1200)
-  setTimeout(_ => {
-    u('signers', signers => {
-      if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
-      return signers
-    })
-  }, 4200)
-}
+// export const removeSigner = (u, signer, state) => {
+//   let status = 'Removing'
+//   u('signers', (signers, state) => {
+//     if (state.signer.current === signer.id) unsetSigner(u)
+//     if (signers[signer.id]) signers[signer.id].removing = true
+//     return signers
+//   })
+//   setTimeout(_ => {
+//     u('signers', signers => {
+//       if (signers[signer.id] && signers[signer.id].removing) signers[signer.id].status = status
+//       return signers
+//     })
+//   }, 1200)
+//   setTimeout(_ => {
+//     u('signers', signers => {
+//       if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
+//       return signers
+//     })
+//   }, 4200)
+// }
 
-export const updateSigner = (u, signer) => {
-  u('signers', signer.id, _ => signer)
-  u('signer', s => {
-    if (s.current === signer.id && (signer.status !== 'ok' || signer.accounts[0] !== s.accounts[0])) {
-      s.last = s.current
-      s.current = ''
-      s.accounts = []
-      s.requests = {}
-      s.view = 'default'
-      s.minimized = true
-      s.open = false
-      s.showAccounts = false
-    }
-    return s
-  })
-}
+// export const updateSigner = (u, signer) => {
+//   u('signers', signer.id, _ => signer)
+//   u('selected', s => {
+//     if (s.current === signer.id && (signer.status !== 'ok' || signer.accounts[0] !== s.accounts[0])) {
+//       s.last = s.current
+//       s.current = ''
+//       s.accounts = []
+//       s.requests = {}
+//       s.view = 'default'
+//       s.minimized = true
+//       s.open = false
+//       s.showAccounts = false
+//     }
+//     return s
+//   })
+// }
 
 export const setCurrent = (u, id) => u('view.current', _ => id)
 export const updateUrl = (u, id, url) => u('view.data', id, 'url', () => url)
 export const updateTitle = (u, id, title) => u('view.data', id, 'title', _ => title)
 export const reorderTabs = (u, from, to) => {
   u('view.list', list => {
-    let _from = list[from]
+    const _from = list[from]
     list[from] = list[to]
     list[to] = _from
     return list
   })
 }
 export const newView = (u) => {
-  let id = uuidv4()
+  const id = uuidv4()
   u('view.current', _ => id)
   u('view.list', list => {
     list.push(id)
@@ -158,7 +161,7 @@ export const newView = (u) => {
 
 export const removeView = (u, id, isCurrent) => {
   u('view', view => {
-    let index = view.list.indexOf(id)
+    const index = view.list.indexOf(id)
     if (isCurrent) {
       if (index < view.list.length - 1) {
         view.current = view.list[index + 1]
@@ -172,5 +175,5 @@ export const removeView = (u, id, isCurrent) => {
   })
 }
 
-export const initialSignerPos = (u, pos) => u('signer.position.initial', _ => pos)
-export const initialScrollPos = (u, pos) => u('signer.position.scrollTop', _ => pos)
+export const initialSignerPos = (u, pos) => u('selected.position.initial', _ => pos)
+export const initialScrollPos = (u, pos) => u('selected.position.scrollTop', _ => pos)

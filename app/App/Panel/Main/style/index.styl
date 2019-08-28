@@ -1,4 +1,5 @@
 @import '../Signer/style'
+@import '../PendingSigner/style'
 
 .main
   position absolute
@@ -34,7 +35,7 @@
   #panelWrap
     width 100%
     padding-top 40px
-    padding-bottom 40px
+    padding-bottom 70px
     will-change scroll-position
 
     .noSigners
@@ -44,9 +45,10 @@
       align-items center
       flex-direction column
       font-weight 200
-      font-size 22px
+      font-size 19px
       position relative
       z-index 10000000
+      margin 60px 0px
 
       .introLogo
         padding-bottom 38px
@@ -64,7 +66,6 @@
         justify-content center
         align-items center
         font-size 14px
-        // color spacewhite
         font-weight 300
         background highlight
         transition standard
@@ -80,15 +81,13 @@
         .featureBoxText
           font-size 13px
           font-weight 400
-          // text-transform uppercase
           letter-spacing 4px
 
         .featureBoxSubtext
           margin-top 8px
           font-size 10px
           font-weight 500
-          // text-transform uppercase
-          font-family FiraCode, sans-serif
+          font-family FiraCode, monospace
           justify-content center
           letter-spacing 1px
           opacity 0.7
@@ -101,3 +100,5 @@
   left 0
   z-index 6000
   pointer-events none
+
+@import '../Add/style'

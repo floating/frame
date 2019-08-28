@@ -4,5 +4,9 @@ bundle
 .cache
 hot.json
 nohot.json
+config.json
 dist
 release
+test/.userData
+scratch
+.vscode

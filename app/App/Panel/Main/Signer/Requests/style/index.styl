@@ -641,6 +641,32 @@
       padding 20px
       min-height 100%
       box-sizing border-box
+      word-break break-all
+  
+  .signTypedData
+    position absolute
+    top 57px
+    left 0
+    right 0
+    bottom 60px
+    margin 0
+    font-size 20px
+    font-weight 300
+    overflow-y scroll
+    overflow-x hidden
+
+    .signTypedDataInner
+      width 100%
+      font-size 20px
+      padding 20px
+      min-height 100%
+      box-sizing border-box
+      
+      b
+        display: block
+        font-size: 12px
+        margin-bottom: 6px
+        margin-top: 12px
 
   .transactionValue
     position absolute
@@ -676,6 +702,14 @@
     border-radius 4px
     background highlight
     font-weight 300
+
+  .transactionWarning
+    color bad
+
+  .transactionFeeWarning
+    margin-left 6px
+    padding-bottom 8px
+    color bad
 
   .transactionFee
     position absolute
@@ -784,7 +818,7 @@
       transition standardSlow
       overflow-wrap break-word
       word-wrap break-word
-      font-family FiraCode, sans-serif
+      font-family FiraCode, monospace
       overflow-x hidden
       overlflow-y scroll
 
@@ -1038,14 +1072,14 @@
   width 24px
 
 .monitorTo
-  font-family FiraCode, sans-serif
+  font-family FiraCode, monospace
   svg
     position relative
     padding 0px 3px
     top -1px
 
 .monitorValue
-  font-family FiraCode, sans-serif
+  font-family FiraCode, monospace
 
 .monitorArrow
   padding-top 2px
@@ -1153,7 +1187,7 @@ span
       font-size 16px
       font-weight 400
       letter-spacing 0px
-      font-family FiraCode, sans-serif
+      font-family FiraCode, monospace
       text-transform none
 
       svg
@@ -1470,3 +1504,80 @@ span
   .txProgressConfirmsItem
     svg
       color bad !important
+
+.signerUnlockRequest
+  display flex
+  align-items center
+  flex-direction column
+  justify-content flex-end
+  transform translateY(0px)
+  height 3px
+  transition standard
+  font-size 12px
+  font-weight 400
+  text-transform uppercase
+  letter-spacing 3px
+  height 110px
+  .signerUnlockWrap
+    display flex
+    align-items center
+    flex-direction column
+    transform translateY(0px)
+    min-height 100px
+    height 0
+    width 100%
+    transition standard
+    padding-bottom 10px
+  .signerUnlockInput
+    height 40px
+    width calc(100% - 30px)
+    margin 20px 0px 0px 0px
+    padding-bottom 0px
+    border 0
+    outline 0
+    background spacewhite
+    font-size 20px
+    letter-spacing 6px
+    display flex
+    justify-content center
+    align-items center
+    text-align center
+    border-radius 4px
+    color outerspace08
+    box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+  .signerUnlockSubmit
+    height 30px
+    background outerspace
+    font-size 12px
+    margin 10px 0px 0px 0px
+    padding 0px 40px 0px 44px
+    border-radius 15px
+    display flex
+    justify-content center
+    align-items center
+    color spacewhite
+    font-weight 600
+    box-shadow cardDrop,0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+
+.simpleJson
+  font-size: 9px
+  font-family: 'Courier New', Courier, monospace
+
+  .simpleJsonChild
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 0.5em
+
+    .simpleJsonChild
+      margin-bottom: 0.1em
+
+      .simpleJsonKey
+        font-weight: normal
+        font-style: italic
+
+  .simpleJsonKey
+    font-size: 9px
+    font-weight: bold
+    margin-right: 0.5em
