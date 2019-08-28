@@ -6,7 +6,7 @@ const mapping = require('./mapping.json')
 const openzeppelinContracts = require('./openzeppelin-contracts')
 
 // TODO: Make async
-const evaluateRadSpec = ({ chainId = '0x1', data = '0x', to = '0x'}, callback) => {
+const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x'}) => {
   const contractsInChain = mapping[chainId]
   if (!contractsInChain || Object.keys(contractsInChain).length === 0) return callback(null)
   const metaDataPath = contractsInChain[to] || contractsInChain[toChecksumAddress(to)]
@@ -30,7 +30,7 @@ const evaluateRadSpec = ({ chainId = '0x1', data = '0x', to = '0x'}, callback) =
     abi: metaData.abi,
   }
 
-  radspec.evaluate(expression, call).then(callback)
+  return await radspec.evaluate(expression, call)
 }
 
 module.exports = evaluateRadSpec

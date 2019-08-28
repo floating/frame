@@ -273,7 +273,7 @@ class Provider extends EventEmitter {
       const handlerId = uuid()
       this.handlers[handlerId] = res
 
-      evaluateRadSpec(rawTx, (radspecMessage) => 
+      evaluateRadSpec(rawTx).then((radspecMessage) => 
         accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], radspecMessage }, res)
       )
     })

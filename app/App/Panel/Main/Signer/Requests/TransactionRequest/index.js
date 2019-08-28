@@ -2,7 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 
-// import evaluateRadSpec from '../../../../../../../contractMetadata/evaluateRadSpec'
 import svg from '../../../../../../svg'
 import link from '../../../../../../link'
 
@@ -49,6 +48,7 @@ class TransactionRequest extends React.Component {
     let notice = req.notice
     const status = req.status
     const mode = req.mode
+    const radspecMessage = req.radspecMessage
     const toAddress = req.data && req.data.to ? req.data.to : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
@@ -139,6 +139,7 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
                     <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
                   </div>
+                  {radspecMessage && <div className="radspecMessage">{radspecMessage}</div>}
                   <div className='transactionValue'>
                     <div className='transactionTotals'>
                       <div className='transactionTotalETH'>{'Ξ ' + value}</div>
@@ -156,7 +157,6 @@ class TransactionRequest extends React.Component {
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
-                      {/* <div>{this.getRadSpec(req.data)}</div> */}
                       <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
                         <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
                         <div className='transactionDataLabel'>{'View Data'}</div>
