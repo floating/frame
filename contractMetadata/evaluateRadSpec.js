@@ -1,10 +1,11 @@
-import { toChecksumAddress } from 'web3-utils'
-import abiDecoder from 'abi-decoder'
-// import radspec from 'radspec'
+const { toChecksumAddress } = require('web3-utils')
+const abiDecoder = require('abi-decoder')
+const radspec = require('radspec')
 
-import mapping from './mapping.json'
-import openzeppelinContracts from './openzeppelin-contracts';
+const mapping = require('./mapping.json')
+const openzeppelinContracts = require('./openzeppelin-contracts')
 
+// TODO: Make async
 const evaluateRadSpec = ({ chainId = '0x1', data = '0x', to = '0x'}, callback) => {
   const contractsInChain = mapping[chainId]
   if (!contractsInChain || Object.keys(contractsInChain).length === 0) return callback(null)
@@ -24,8 +25,12 @@ const evaluateRadSpec = ({ chainId = '0x1', data = '0x', to = '0x'}, callback) =
 
   if (!expression) return callback(null)
 
-  // radspec.evaluate(expression, { data, to }).then(callback)
-  
+  const call = {
+    transaction: { data, to },
+    abi: metaData.abi,
+  }
+
+  radspec.evaluate(expression, call).then(callback)
 }
 
-export default evaluateRadSpec
+module.exports = evaluateRadSpec
