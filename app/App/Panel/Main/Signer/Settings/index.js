@@ -64,14 +64,16 @@ class Settings extends React.Component {
   renderVerify (viewIndex, subIndex) {
     const i = 1
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
+    const signerType = this.store('main.accounts', this.props.id, 'signer.type')
+    const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>{'Verify Address'}</div>
         <div className='signerPermission'>
-          <div className='signerVerifyText'>{'Verify that the address displayed in Frame is the same on your device.'}</div>
+          <div className='signerVerifyText'>{'Verify that the address displayed in Frame is correct'}</div>
         </div>
         <div className='quitFrame'>
-          <div onMouseDown={() => link.send('tray:verifyAddress')} className='quitFrameButton'>{'Verify Address on Device'}</div>
+          <div onMouseDown={() => link.send('tray:verifyAddress')} className='quitFrameButton'>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
         </div>
       </div>
     )

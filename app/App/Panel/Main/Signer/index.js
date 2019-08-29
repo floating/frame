@@ -10,6 +10,8 @@ import Settings from './Settings'
 import ledgerLogo from './ledgerLogo.png'
 import trezorLogo from './trezorLogo.png'
 
+// TODO: Rename Signer component to Account
+
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
