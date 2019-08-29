@@ -75,10 +75,6 @@ ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
   updater.installAvailableUpdate(install, dontRemind)
 })
 
-ipcMain.on('tray:verifyAddress', (e) => {
-  accounts.verifyAddress(true)
-})
-
 ipcMain.on('tray:removeAccount', (e, id) => {
   signers.remove(id)
   accounts.remove(id)

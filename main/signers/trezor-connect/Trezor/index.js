@@ -92,17 +92,27 @@ class Trezor extends Signer {
     })
   }
 
-  verifyAddress (index, current, display = false, attempt = 0) {
+  verifyAddress (index, current, display = false, cb = () => {}, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
+    let timeout = false
+    const timer = setTimeout(() => {
+      timeout = true
+      this.signers.remove(this.id)
+      log.error('The flex.rpc, trezor.ethereumGetAddress call timed out')
+      cb(new Error('Address verification timed out'))
+    }, 60 * 1000)
     flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(index), display, (err, result) => {
+      clearTimeout(timer)
+      if (timeout) return
       if (err) {
         if (err === 'Device call in progress' && attempt < 5) {
-          setTimeout(() => this.verifyAddress(index, current, display, ++attempt), 500)
+          setTimeout(() => this.verifyAddress(index, current, display, cb, ++attempt), 500)
         } else {
           log.info('Verify Address Error: ')
           // TODO: Error Notification
           log.error(err)
           this.signers.remove(this.id)
+          cb(new Error('Verify Address Error'))
         }
       } else {
         const address = result.address ? result.address.toLowerCase() : ''
@@ -113,8 +123,10 @@ class Trezor extends Signer {
           // TODO: Error Notification
           log.error(new Error('Address does not match device'))
           this.signers.remove(this.id)
+          cb(new Error('Address does not match device'))
         } else {
           log.info('Address matches device')
+          cb(null, true)
         }
       }
     })

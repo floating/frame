@@ -39,12 +39,10 @@ class TransactionRequest extends React.Component {
   }
 
   approve (reqId, req) {
-    console.log('approveRequest', req)
     link.rpc('approveRequest', req, () => {}) // Move to link.send
   }
 
   decline (reqId, req) {
-    console.log('declineRequest', req)
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
 

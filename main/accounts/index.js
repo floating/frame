@@ -178,8 +178,8 @@ class Accounts extends EventEmitter {
     })
   }
 
-  verifyAddress (display) {
-    if (this.current() && this.current().verifyAddress) this.current().verifyAddress(display)
+  verifyAddress (display, cb) {
+    if (this.current() && this.current().verifyAddress) this.current().verifyAddress(display, cb)
   }
 
   getSelectedAddresses () {

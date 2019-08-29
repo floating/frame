@@ -88,9 +88,15 @@ class Ledger extends Signer {
     }
   }
 
-  async verifyAddress (index, current, display) {
-    if (verifyActive) return log.info('verifyAddress Called but it\'s already active')
-    if (this.pause) return log.info('Device access is paused')
+  async verifyAddress (index, current, display, cb = () => {}) {
+    if (verifyActive) {
+      log.info('verifyAddress Called but it\'s already active')
+      return cb(new Error('verifyAddress Called but it\'s already active'))
+    }
+    if (this.pause) {
+      log.info('Device access is paused')
+      return cb(new Error('Device access is paused'))
+    }
     verifyActive = true
     this.pause = true
     try {
@@ -101,14 +107,16 @@ class Ledger extends Signer {
         // TODO: Error Notification
         log.error(new Error('Address does not match device'))
         this.signers.remove(this.id)
+        cb(new Error('Address does not match device'))
       } else {
         log.info('Address matches device')
+        cb(null, true)
       }
     } catch (err) {
-      // TODO: Error Notification
       log.error('Verify Address Error')
       log.error(err)
       this.signers.remove(this.id)
+      cb(new Error('Verify Address Error'))
     } finally {
       this.pause = false
       verifyActive = false

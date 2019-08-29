@@ -125,6 +125,9 @@ const rpc = {
   },
   resolveAragonName (name, cb) {
     resolveName(name).then(result => cb(null, result)).catch(cb)
+  },
+  verifyAddress (cb) {
+    accounts.verifyAddress(true, cb)
   }
 }
 

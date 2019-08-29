@@ -26,8 +26,10 @@ class Signer {
     cb(null, this.addresses[0])
   }
 
-  verifyAddress () {
-    log.error(new Error('Signer:' + this.type + ' did not implement verifyAddress method'))
+  verifyAddress (cb) {
+    const err = new Error('Signer:' + this.type + ' did not implement verifyAddress method')
+    log.error(err)
+    cb(err)
   }
 
   getAccounts (cb) {
