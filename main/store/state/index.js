@@ -66,6 +66,7 @@ const initial = {
     rates: {}
   },
   main: {
+    _version: main('mute._version', 1),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false)

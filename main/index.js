@@ -1,11 +1,17 @@
 const { app, ipcMain, protocol, shell, dialog } = require('electron')
+app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
+app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
+app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
+app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 
 const log = require('electron-log')
 const path = require('path')
 
 const windows = require('./windows')
 const store = require('./store')
+
+// log.transports.file.level  = 'info'
 
 // Action Monitor
 // store.api.feed((state, actions, obscount) => {

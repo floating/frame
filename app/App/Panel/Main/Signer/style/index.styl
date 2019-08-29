@@ -170,9 +170,9 @@
         position relative
         top 0px
         left 50%
-        display flex
-        justify-content center
-        align-items center
+        // display flex
+        // justify-content center
+        // align-items center
         width 110px
         height 70px
         margin-left -55px
@@ -230,8 +230,8 @@
             color #fff
 
           .trezorImage
-            height 39px
-            margin-top -4px
+            height 35px
+            margin-top -6px
 
         .signerText
           position absolute
@@ -264,7 +264,7 @@
         margin-top -40px
         margin-left -55px
         width 110px
-        height 70px
+        height 74px
         border-bottom-left-radius 6px
         border-bottom-right-radius 6px
         border-top-left-radius 0px
@@ -276,8 +276,9 @@
         transition .32s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
         -webkit-app-region no-drag
         background highlighter
-        z-index 2000000000
+        z-index 15
         color outerspace
+        transform translateZ(0)
         // box-shadow 0px -5px 5px 5px thick, 0px 2px 2px 1px highlighter
 
         border-radius 6px
@@ -379,7 +380,8 @@
         transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
         -webkit-app-region no-drag
         box-shadow 0px 2px 2px rgba(5, 5, 45, 0.4)
-        z-index 2000000000
+        z-index 25
+        transform translateZ(0)
 
         .signerInset
           position absolute
@@ -588,15 +590,16 @@
     .addressSelect
       width 100%
       height 31px
-      display flex
-      justify-content center
+      // display flex
+      // justify-content center
       border-radius 6px
       // transition standard
       position absolute
       bottom 0
-      transform translateY(0px)
-      pointer-events none
-      z-index 20000000
+      z-index 5
+      transform translateZ(0px)
+      // pointer-events none
+      // background blue
 
       .addressSelectButton
         width 100%
@@ -618,7 +621,7 @@
         .addressSelectArrow
           // margin-top 5px
           transform translateZ(0)
-          margin 1px 10px 0px 10px
+          margin 1px 8px 0px 7px
           transition standardFast
           will-change transform
           svg
@@ -916,7 +919,7 @@
     top 0
     bottom 0
     width 25px
-    z-index 3000
+    z-index 1
     color spacewhite
     flex-direction column
     opacity 0
@@ -939,9 +942,15 @@
         animation-iteration-count infinite
         animation-fill-mode none
         animation-play-state running
+        transform translateZ(0)
+        will-change transform, opacity
+        opacity 0
+
         svg
           color outerspace
           opacity 1
+          transform translateZ(0)
+          will-change transform, opacity
 
       .signerSelectArrow:first-child
         animation-delay 0s
