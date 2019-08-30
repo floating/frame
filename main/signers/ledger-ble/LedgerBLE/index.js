@@ -49,6 +49,7 @@ class LedgerBLE extends Signer {
     })
   }
 
+  // This verifyAddress signature is no longer current
   verifyAddress (display = false, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
     flex.rpc('ledger.ethereumGetAddress', this.id, this.getPath(), display, (err, result) => {

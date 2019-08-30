@@ -123,8 +123,11 @@ class HotSigner extends Signer {
     const payload = { method: 'verifyAddress', params: { index, address } }
     this._callWorker(payload, (err, verified) => {
       if (err || !verified) {
-        this.lock(() => log.warn('Unable to verify address, signer locked'))
-        cb(new Error('Unable to verify address, signer locked'))
+        this.lock(() => {
+          log.warn('Unable to verify address')
+          log.error(err)
+        })
+        cb(new Error('Unable to verify address'))
       } else {
         log.info('Hot signer verify address matched')
         cb(null, verified)

@@ -153,7 +153,7 @@ describe('Ring signer', () => {
   })
 
   test('Verify address', (done) => {
-    signer.verifyAddress(0, signer.addresses[0], (err, result) => {
+    signer.verifyAddress(0, signer.addresses[0], false, (err, result) => {
       expect(err).toBe(null)
       expect(result).toBe(true)
       done()
@@ -161,9 +161,9 @@ describe('Ring signer', () => {
   })
 
   test('Verify wrong address', (done) => {
-    signer.verifyAddress(0, '0xabcdef', (err, result) => {
-      expect(err).toBe(null)
-      expect(result).toBe(false)
+    signer.verifyAddress(0, '0xabcdef', false, (err, result) => {
+      expect(err.message).toBe('Unable to verify address')
+      expect(result).toBe(undefined)
       done()
     })
   })
