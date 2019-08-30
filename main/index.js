@@ -9,9 +9,10 @@ const log = require('electron-log')
 const path = require('path')
 
 const windows = require('./windows')
+const menu = require('./menu')
 const store = require('./store')
 
-// log.transports.file.level  = 'info'
+// log.transports.file.level = 'info'
 
 // Action Monitor
 // store.api.feed((state, actions, obscount) => {
@@ -117,6 +118,7 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 
 if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
+  menu()
   if (process.platform === 'darwin' || process.platform === 'win32') {
     windows.tray()
   } else {
