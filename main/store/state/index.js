@@ -66,6 +66,7 @@ const initial = {
     rates: {}
   },
   main: {
+    _version: main('mute._version', 1),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false)
@@ -188,11 +189,10 @@ const initial = {
 }
 
 // Remove permissions granted to unknown origins
-Object.keys(initial.main.accounts).forEach(account => {
-  account = initial.main.accounts[account]
-  if (account) {
-    if (account.permissions) delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
-    delete account.signer
+Object.keys(initial.main.addresses).forEach(address => {
+  address = initial.main.addresses[address]
+  if (address && address.permissions) {
+    delete address.permissions[uuidv5('Unknown', uuidv5.DNS)]
   }
 })
 

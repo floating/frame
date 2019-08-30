@@ -10,11 +10,19 @@ import Settings from './Settings'
 import ledgerLogo from './ledgerLogo.png'
 import trezorLogo from './trezorLogo.png'
 
+// TODO: Rename Signer component to Account
+
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
-    this.state = { typeHover: false, accountHighlight: 'default', highlightIndex: 0, unlockInput: '' }
+    this.state = {
+      typeHover: false,
+      accountHighlight: 'default',
+      highlightIndex: 0,
+      unlockInput: '',
+      openHover: false
+    }
   }
 
   copyAddress (e) {
@@ -114,13 +122,23 @@ class Signer extends React.Component {
     const inSettings = this.store('selected.view') === 'settings'
     return (
       <div className='signerType'>
-        {this.renderArrows('up')}
+        <div className='addressSelect' onMouseDown={e => {
+          e.stopPropagation()
+          this.store.toggleShowAccounts()
+        }}>
+          <div className='addressSelectButton'>
+            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
+            <div className='addressSelectText'>{'Addresses'}</div>
+            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
+          </div>
+        </div>
+        {this.state.openHover ? this.renderArrows('up') : null}
         {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
-          <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}}>
+          <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
           </div>
         ) : null }
-        <div className={innerClass} onMouseDown={::this.typeClick}>
+        <div className={innerClass} onMouseDown={::this.typeClick} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
@@ -138,16 +156,6 @@ class Signer extends React.Component {
             <div className='signerText'>{this.props.signer ? (
               this.props.signer.type === 'ring' || this.props.signer.type === 'seed' ? 'hot' : this.props.signer.type
             ) : 'no signer'}</div>
-          </div>
-        </div>
-        <div className='addressSelect' style={inSettings ? { opacity: 1, transitionDelay: '0s' } : { opacity: 1, transitionDelay: '0.2s' }} onMouseDown={e => {
-          e.stopPropagation()
-          this.store.toggleShowAccounts()
-        }}>
-          <div className={this.props.signer ? 'addressSelectButton' : 'addressSelectButton'}>
-            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-            <div className='addressSelectText'>{'Addresses'}</div>
-            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
           </div>
         </div>
       </div>
