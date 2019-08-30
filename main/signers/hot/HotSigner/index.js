@@ -7,6 +7,7 @@ const log = require('electron-log')
 const uuid = require('uuid/v4')
 
 const store = require('../../../store')
+const windows = require('../../../windows')
 const Signer = require('../../Signer')
 
 const USER_DATA = app ? app.getPath('userData') : './test/.userData'
@@ -124,10 +125,17 @@ class HotSigner extends Signer {
     this._callWorker(payload, (err, verified) => {
       if (err || !verified) {
         this.lock(() => {
-          log.warn('Unable to verify address')
-          log.error(err)
+          if (err) {
+            log.error('HotSigner verifyAddress: Unable to verify address')
+            log.error(err)
+          } else {
+            log.error('HotSigner verifyAddress: Address mismatch')
+            log.error(new Error('verifyAddress: Address mismatch'))
+          }
+          // No error means it was a normal mismatch
+          if (!err) windows.broadcast('main:action', 'notify', 'hotSignerMismatch')
         })
-        cb(new Error('Unable to verify address'))
+        cb(err)
       } else {
         log.info('Hot signer verify address matched')
         cb(null, verified)

@@ -201,6 +201,26 @@ class Notify extends React.Component {
     )
   }
 
+  hotSignerMismatch () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotSignerMismatch' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            <div>{'Hot Signer Address Mismatch'}</div>
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>{`The unlocked hot signer did not match the address shown in Frame and has been relocked.`}</div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
+              <div className='notifyInputOptionText'>{'OK'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   openExternal ({ url }) {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExternal' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
@@ -270,6 +290,7 @@ class Notify extends React.Component {
         {this.parityAlreadyRunning()}
         {this.contractData()}
         {this.hotAccountWarning()}
+        {this.hotSignerMismatch()}
       </div>
     )
   }
