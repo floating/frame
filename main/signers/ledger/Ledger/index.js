@@ -9,8 +9,6 @@ const Signer = require('../../Signer')
 const uuid = require('uuid/v5')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-let verifyActive
-
 const BASE_PATH_LEGACY = `44'/60'/0'/`
 const BASE_PATH_LIVE = `44'/60'/`
 const BASE_PATH_TEST = `44'/1'/0'/`
@@ -73,7 +71,7 @@ class Ledger extends Signer {
 
   async getDevice () {
     if (this.inUse) throw new Error('Device is in use')
-    if (Date.now() - this.lastUse < 500) await this.wait(500)
+    if (Date.now() - this.lastUse < 300) await this.wait(300)
     this.releaseDevice()
     this.inUse = true
     this.pause = true
@@ -88,7 +86,7 @@ class Ledger extends Signer {
     delete this.currentTransport
     delete this.currentDevice
     this.lastUse = Date.now()
-    await this.wait(500)
+    await this.wait(300)
     this.inUse = false
     this.pause = false
   }
@@ -112,7 +110,7 @@ class Ledger extends Signer {
   }
 
   async verifyAddress (index, current, display, cb = () => {}) {
-    if (verifyActive) {
+    if (this.verifyActive) {
       log.info('verifyAddress Called but it\'s already active')
       return cb(new Error('verifyAddress Called but it\'s already active'))
     }
@@ -120,7 +118,7 @@ class Ledger extends Signer {
       log.info('Device access is paused')
       return cb(new Error('Device access is paused'))
     }
-    verifyActive = true
+    this.verifyActive = true
     try {
       const result = await this.getAddress(this.getPath(index), display, true)
       const address = result.address.toLowerCase()
@@ -133,13 +131,13 @@ class Ledger extends Signer {
         log.info('Address matches device')
         cb(null, true)
       }
+      this.verifyActive = false
     } catch (err) {
       log.error('Verify Address Error')
       log.error(err)
       this.signers.remove(this.id)
       cb(new Error('Verify Address Error'))
-    } finally {
-      verifyActive = false
+      this.verifyActive = false
     }
   }
 
@@ -183,8 +181,8 @@ class Ledger extends Signer {
   async deviceStatus () {
     if (this.status === 'Invalid sequence') return log.warn('INVALID SEQUENCE')
     this.pollStatus()
-    if (this.pause) return
-
+    if (this.pause || this.deviceStatusActive || this.verifyActive) return
+    this.deviceStatusActive = true
     try {
       // If signer has no addresses, try deriving them
       if (!this.addresses.length) await this.deriveAddresses()
@@ -196,6 +194,7 @@ class Ledger extends Signer {
       }
       this.status = 'ok'
       this.update()
+      this.deviceStatusActive = false
     } catch (err) {
       const deviceBusy = (
         err.message.startsWith('cannot open device with path') ||
@@ -228,6 +227,7 @@ class Ledger extends Signer {
         this.addresses = []
         this.update()
       }
+      this.deviceStatusActive = false
     }
   }
 
