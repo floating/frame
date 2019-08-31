@@ -363,16 +363,16 @@ class Accounts extends EventEmitter {
     }, 1000)
   }
 
-  removeAllAccounts () {
-    windows.broadcast('main:action', 'unsetSigner')
-    setTimeout(() => {
-      Object.keys(this.accounts).forEach(id => {
-        if (this.accounts[id]) this.accounts[id].close()
-        store.removeAccount(id)
-        delete this.accounts[id]
-      })
-    }, 1000)
-  }
+  // removeAllAccounts () {
+  //   windows.broadcast('main:action', 'unsetSigner')
+  //   setTimeout(() => {
+  //     Object.keys(this.accounts).forEach(id => {
+  //       if (this.accounts[id]) this.accounts[id].close()
+  //       store.removeAccount(id)
+  //       delete this.accounts[id]
+  //     })
+  //   }, 1000)
+  // }
 }
 
 module.exports = new Accounts()

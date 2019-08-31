@@ -67,10 +67,10 @@ ipcMain.on('tray:resetAllSettings', () => {
   app.exit(0)
 })
 
-ipcMain.on('tray:removeAllAccountsAndSigners', () => {
-  signers.removeAllSigners()
-  accounts.removeAllAccounts()
-})
+// ipcMain.on('tray:removeAllAccountsAndSigners', () => {
+//   signers.removeAllSigners()
+//   accounts.removeAllAccounts()
+// })
 
 ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
   updater.installAvailableUpdate(install, dontRemind)
