@@ -149,8 +149,6 @@ class Ledger extends Signer {
       if (this.network !== '1' || this.derivation === 'legacy') {
         addresses = await this._deriveLegacyAddresses()
       } else {
-        this.status = 'Deriving Live Addresses'
-        this.update()
         addresses = await this._deriveLiveAddresses()
       }
       // Update signer
@@ -322,10 +320,14 @@ class Ledger extends Signer {
 
   async _deriveLiveAddresses () {
     const addresses = []
+    this.status = 'Deriving Live Addresses'
+    this.liveAddressesFound = 0
     for (let i = 0; i < 10; i++) {
       const { address } = await this.getAddress(this.getPath(i), false, false)
       log.info(`Found Ledger Live address #${i}: ${address}`)
       addresses.push(address)
+      this.liveAddressesFound = addresses.length
+      this.update()
     }
     return addresses
   }
