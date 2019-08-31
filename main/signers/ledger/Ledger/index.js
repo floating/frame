@@ -197,7 +197,13 @@ class Ledger extends Signer {
       this.status = 'ok'
       this.update()
     } catch (err) {
-      if (err.message.startsWith('cannot open device with path') || err.message === 'Device access is paused' || err.message === 'Invalid channel') { // Device is busy, try again
+      const deviceBusy = (
+        err.message.startsWith('cannot open device with path') ||
+        err.message === 'Device access is paused' ||
+        err.message === 'Invalid channel' ||
+        err.message === 'DisconnectedDevice'
+      )
+      if (deviceBusy) { // Device is busy, try again
         clearTimeout(this._deviceStatus)
         if (++this.busyCount > 10) {
           this.busyCount = 0
