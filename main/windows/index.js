@@ -11,6 +11,8 @@ const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray
 
+const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
+
 const hideShow = { current: false, running: false, next: false }
 
 const showOnReady = true
@@ -109,10 +111,12 @@ const api = {
         windows.tray.focus()
       }, 1260)
     }
-    setTimeout(() => {
-      if (windows && windows.tray) windows.tray.show()
-      setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
-    }, 50)
+    if (!openedAtLogin) {
+      setTimeout(() => {
+        if (windows && windows.tray) windows.tray.show()
+        setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
+      }, 50)
+    }
     // resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
   // reload: () => {
