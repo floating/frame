@@ -1,6 +1,9 @@
 const log = require('electron-log')
 const { isValidAddress } = require('ethereumjs-util')
 
+// Provider Proxy
+const proxyProvider = require('../../provider/proxy')
+
 const signers = require('../../signers')
 const windows = require('../../windows')
 const store = require('../../store')
@@ -37,6 +40,22 @@ class Account {
       this.signer = updatedSigner
       this.smart = this.signer ? undefined : this.smart
       this.update()
+    })
+    if (this.created === -1) {
+      log.info('Account has no creation height, fetching')
+      this.getBlockHeight((err, height) => {
+        if (err) return log.error('getBlockHeight Error', err)
+        log.info('Account creation being set to current height: ', height)
+        this.created = height
+        this.update()
+      })
+    }
+  }
+
+  getBlockHeight (cb) {
+    proxyProvider.emit('send', { id: '1', jsonrpc: '2.0', method: 'eth_blockNumber' }, (res) => {
+      if (res.error || !res.result) return cb(new Error('Unable to get current block height: ' + res.error.message))
+      cb(null, res.result)
     })
   }
 

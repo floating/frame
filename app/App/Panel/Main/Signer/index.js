@@ -25,6 +25,10 @@ class Signer extends React.Component {
     }
   }
 
+  componentDidMount () {
+    if (this.props.index === 0) this.props.resetScroll()
+  }
+
   copyAddress (e) {
     e.preventDefault()
     e.target.select()

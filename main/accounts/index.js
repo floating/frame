@@ -46,13 +46,6 @@ class Accounts extends EventEmitter {
     // Close all accounts
   }
 
-  getBlockHeight (cb) {
-    proxyProvider.emit('send', { id: '1', jsonrpc: '2.0', method: 'eth_blockNumber' }, (res) => {
-      if (res.error || !res.result) return cb(new Error('Unable to get current block height: ' + res.error.message))
-      cb(null, res.result)
-    })
-  }
-
   seedToAddresses (seed) {
     const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0')
     const addresses = []
@@ -85,10 +78,7 @@ class Accounts extends EventEmitter {
     const account = store('main.accounts', id)
     if (account && account.network === network) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
-    this.getBlockHeight((err, created) => {
-      if (err) return cb(err)
-      this.accounts[id] = new Account({ id, addresses, index: 0, network, created, options }, this)
-    })
+    this.accounts[id] = new Account({ id, addresses, index: 0, network, created: -1, options }, this)
   }
 
   rename (id, name) { this.accounts[id].rename(name) }
