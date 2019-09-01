@@ -15,6 +15,8 @@ const accountNames = {
   42: 'Kovan'
 }
 
+let firstScroll = true
+
 class Main extends React.Component {
   reportScroll () {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
@@ -22,7 +24,11 @@ class Main extends React.Component {
 
   resetScroll () {
     setTimeout(() => {
-      this.scroll.scrollTo({ top: -999999999999, left: 0, behavior: 'smooth' })
+      if (firstScroll) {
+        firstScroll = false
+      } else {
+        this.scroll.scrollTo({ top: -999999999999, left: 0, behavior: 'smooth' })
+      }
     }, 3000)
   }
 
