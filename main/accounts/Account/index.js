@@ -52,6 +52,12 @@ class Account {
     }
   }
 
+  resError (error, payload, res) {
+    if (typeof error === 'string') error = { message: error, code: -1 }
+    log.error(error)
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, error: error.message })
+  }
+
   getBlockHeight (cb) {
     proxyProvider.emit('send', { id: '1', jsonrpc: '2.0', method: 'eth_blockNumber' }, (res) => {
       if (res.error || !res.result) return cb(new Error('Unable to get current block height: ' + res.error.message))
@@ -59,7 +65,7 @@ class Account {
     })
   }
 
-  addRequest (req) {
+  addRequest (req, res) {
     const add = r => {
       this.requests[r.handlerId] = req
       this.requests[r.handlerId].mode = 'normal'
@@ -72,11 +78,11 @@ class Account {
     if (this.smart) {
       if (this.smart.type === 'aragon') {
         if (req.type === 'transaction') {
-          if (!this.aragon) return log.error('Aragon account could not resolve this.aragon')
+          if (!this.aragon) return this.resError('Could not resolve Aragon account', req.payload, res)
           const rawTx = req.data
           rawTx.data = rawTx.data || '0x'
           this.aragon.pathTransaction(rawTx, (err, tx) => {
-            if (err) return log.error(err)
+            if (err) return this.resError(err, req.payload, res)
             Object.keys(tx).forEach(key => { // Number to hex conversion
               if (typeof tx[key] === 'number') tx[key] = '0x' + tx[key].toString(16)
             })
