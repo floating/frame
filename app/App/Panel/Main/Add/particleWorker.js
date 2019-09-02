@@ -1,6 +1,6 @@
 /* globals self */
 
-let canvas, ctx
+let canvas, ctx, looper
 const particles = []
 const particleCount = 56
 
@@ -25,7 +25,7 @@ class Particle {
 const loop = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   for (let i = 0; i < particleCount; i++) particles[i].update(ctx)
-  setTimeout(() => {
+  looper = setTimeout(() => {
     this.animate = self.requestAnimationFrame(loop)
   }, 1000 / 20)
 }
@@ -36,7 +36,12 @@ self.onmessage = e => {
     ctx = canvas.getContext('2d')
     if (ctx) {
       for (let i = 0; i < particleCount; i++) particles.push(new Particle())
-      loop()
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      for (let i = 0; i < particleCount; i++) particles[i].update(ctx)
     }
+  } else if (e.data.type === 'start') {
+    loop()
+  } else if (e.data.type === 'stop') {
+    clearTimeout(looper)
   }
 }

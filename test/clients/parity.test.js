@@ -11,7 +11,7 @@ const { emptyDir } = require('fs-extra')
 const axios = require('axios')
 
 // Frame
-const geth = require('../../main/services/geth')
+const parity = require('../../main/clients/Parity')
 const store = require('../../main/store')
 
 // Local
@@ -26,10 +26,10 @@ const makeRPCCall = async () => {
 }
 
 // Global setup
-const observer = new Observer('main.clients.geth', ['state', 'installed', 'latest', 'version'])
+const observer = new Observer('main.clients.parity', ['state', 'installed', 'latest', 'version'])
 const userData = path.resolve('./test/.userData')
 
-describe('Geth', () => {
+describe('Parity', () => {
   // Setup test suite
   jest.setTimeout(30000)
   beforeAll(clean)
@@ -37,14 +37,14 @@ describe('Geth', () => {
 
   test('Client should not be installed', () => {
     // 1) Check for that client directory doesn't exist
-    const gethDir = path.resolve(userData, 'geth')
-    expect(fs.existsSync(gethDir)).toEqual(false)
+    const parityDir = path.resolve(userData, 'parity')
+    expect(fs.existsSync(parityDir)).toEqual(false)
 
     // 2) Check that state reflects that client is not installed
-    const { latest, installed, state } = store('main.clients.geth')
+    const { latest, installed, state } = store('main.clients.parity')
     expect(latest).toBe(false)
     expect(installed).toBe(false)
-    expect(state).toBe(null)
+    expect(state).toBe('off')
   })
 
   test('Install client', (done) => {
@@ -62,7 +62,7 @@ describe('Geth', () => {
       observer.once('state', (state) => counter.expect(state).toBe('off'))
     })
     // Run install process
-    geth.install()
+    parity.install()
   })
 
   test('Uninstall client', (done) => {
@@ -73,13 +73,13 @@ describe('Geth', () => {
     observer.once('latest', (latest) => counter.expect(latest).toBe(false))
     observer.once('version', (version) => counter.expect(version).toBe(null))
     observer.once('state', (state) => {
-      counter.expect(state).toBe(null)
+      counter.expect(state).toBe('off')
       const files = fs.readdirSync(userData)
       counter.expect(files.length).toBe(0)
     })
 
     // Run uninstall process
-    geth.uninstall()
+    parity.uninstall()
   })
 
   test('Start and automatically install client', (done) => {
@@ -104,7 +104,7 @@ describe('Geth', () => {
       })
     })
     // Start client
-    geth.start()
+    parity.start()
   })
 
   test('Stop client', (done) => {
@@ -119,14 +119,14 @@ describe('Geth', () => {
         counter.expect(state).toBe('off')
 
         // 3) Expect process to have terminated
-        counter.expect(geth.process).toBe(null)
+        counter.expect(parity.process).toBe(null)
 
         // 4) Expect JSON RPC call to fail
         counter.expect(makeRPCCall()).rejects.toThrow()
       })
     })
     // Stop client
-    geth.stop()
+    parity.stop()
   })
 
   test('Start client again', (done) => {
@@ -148,7 +148,30 @@ describe('Geth', () => {
 
     // Start client
     setTimeout(() => {
-      geth.start()
+      parity.start()
     }, 1000)
+  })
+
+  test('Stop client again', (done) => {
+    // SETUP: Expect 3 assertions
+    const counter = new Counter(4, done)
+
+    // 1) Expect state to change to 'terminating'
+    observer.once('state', (state) => {
+      counter.expect(state).toBe('terminating')
+
+      // 2) Expect state to chagne to 'off'
+      observer.once('state', (state) => {
+        counter.expect(state).toBe('off')
+
+        // 3) Expect process to have terminated
+        counter.expect(parity.process).toBe(null)
+
+        // 4) Expect JSON RPC call to fail
+        counter.expect(makeRPCCall()).rejects.toThrow()
+      })
+    })
+    // Stop client
+    parity.stop()
   })
 })

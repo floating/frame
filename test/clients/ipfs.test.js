@@ -11,7 +11,7 @@ const { emptyDir } = require('fs-extra')
 const axios = require('axios')
 
 // Frame
-const ipfs = require('../../main/services/ipfs')
+const ipfs = require('../../main/clients/Ipfs')
 const store = require('../../main/store')
 
 // Local
@@ -42,7 +42,7 @@ describe('IPFS client', () => {
     const { latest, installed, state } = store('main.clients.ipfs')
     expect(latest).toBe(false)
     expect(installed).toBe(false)
-    expect(state).toBe(null)
+    expect(state).toBe('off')
   })
 
   test('Install client', (done) => {
@@ -73,7 +73,7 @@ describe('IPFS client', () => {
     observer.once('latest', (latest) => counter.expect(latest).toBe(false))
     observer.once('version', (version) => counter.expect(version).toBe(null))
     observer.once('state', (state) => {
-      counter.expect(state).toBe(null)
+      counter.expect(state).toBe('off')
       const files = fs.readdirSync(userData)
       counter.expect(files.length).toBe(0)
     })
@@ -109,6 +109,52 @@ describe('IPFS client', () => {
   })
 
   test('Stop client', (done) => {
+    // SETUP: Expect 3 assertions
+    const counter = new Counter(4, done)
+
+    // 1) Expect state to change to 'terminating'
+    observer.once('state', (state) => {
+      counter.expect(state).toBe('terminating')
+
+      // 2) Expect state to chagne to 'off'
+      observer.once('state', (state) => {
+        counter.expect(state).toBe('off')
+
+        // 3) Expect process to have terminated
+        counter.expect(ipfs.process).toBe(null)
+
+        // 4) Expect API call to fail
+        counter.expect(getVersion()).rejects.toThrow()
+      })
+    })
+    // Stop client
+    ipfs.stop()
+  })
+
+  test('Start client again', (done) => {
+    const counter = new Counter(3, done)
+
+    // 1) Expect state to change to 'starting'
+    observer.once('state', async (state) => {
+      counter.expect(state).toBe('starting')
+
+      // 2) Expect state to change to 'ready'
+      observer.once('state', async (state) => {
+        counter.expect(state).toBe('ready')
+
+        // 3) Expect client to return version and version to match
+        const version = await getVersion()
+        counter.expect(version).toBe(store('main.clients.ipfs.version'))
+      })
+    })
+
+    // Start client
+    setTimeout(() => {
+      ipfs.start()
+    }, 1000)
+  })
+
+  test('Stop client again', (done) => {
     // SETUP: Expect 3 assertions
     const counter = new Counter(4, done)
 

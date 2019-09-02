@@ -11,6 +11,8 @@ const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray
 
+const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
+
 const hideShow = { current: false, running: false, next: false }
 
 const showOnReady = true
@@ -68,9 +70,6 @@ const api = {
         preload: path.resolve(__dirname, '../../bundle/bridge.js')
       }
     })
-    electron.screen.on('display-added', () => api.hideTray())
-    electron.screen.on('display-removed', () => api.hideTray())
-    electron.screen.on('display-metrics-changed', () => api.hideTray())
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -109,10 +108,18 @@ const api = {
         windows.tray.focus()
       }, 1260)
     }
+    if (!openedAtLogin) {
+      setTimeout(() => {
+        if (windows && windows.tray) windows.tray.show()
+        setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
+      }, 50)
+    }
+
     setTimeout(() => {
-      if (windows && windows.tray) windows.tray.show()
-      setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
-    }, 50)
+      electron.screen.on('display-added', () => api.hideTray())
+      electron.screen.on('display-removed', () => api.hideTray())
+      electron.screen.on('display-metrics-changed', () => api.hideTray())
+    }, 30 * 1000)
     // resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
   // reload: () => {

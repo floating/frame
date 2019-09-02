@@ -200,17 +200,6 @@ class Settings extends React.Component {
           <div className='localSettingsTitle'>{'Settings'}</div>
           <div className='signerPermission'>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>{'Glide'}</div>
-              <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              {'Mouse to the middle of your display\'s right edge to reveal Frame'}
-            </div>
-          </div>
-          <div className='signerPermission'>
-            <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
                 <div className='signerPermissionToggleSwitch' />
@@ -218,6 +207,17 @@ class Settings extends React.Component {
             </div>
             <div className='signerPermissionDetails'>
               {'Run Frame when your computer starts'}
+            </div>
+          </div>
+          <div className='signerPermission'>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>{'Glide'}</div>
+              <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Mouse to the middle of your display\'s right edge to reveal Frame'}
             </div>
           </div>
           <div className='signerPermission'>

@@ -1,7 +1,10 @@
 const fs = require('fs')
 const log = require('electron-log')
+const { app } = require('electron')
 
-const windows = require('../../windows')
+// Mock windows module if running tests
+const windows = app ? require('../../windows') : { broadcast: () => {} }
+
 const store = require('../../store')
 
 const EthereumClient = require('../EthereumClient')

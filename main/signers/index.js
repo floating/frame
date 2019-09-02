@@ -39,27 +39,27 @@ class Signers extends EventEmitter {
     }
   }
 
-  removeAllSigners () {
-    this.signers.forEach(signer => {
-      signer.close()
-      if (signer.delete) signer.delete()
-    })
-    this.signers = []
-    const { app } = require('electron')
-    const fs = require('fs')
-    const path = require('path')
-    const USER_DATA = app ? app.getPath('userData') : './test/.userData'
-    const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
-    const directory = SIGNERS_PATH
-    fs.readdir(directory, (err, files) => {
-      if (err) throw err
-      for (const file of files) {
-        fs.unlink(path.join(directory, file), err => {
-          if (err) throw err
-        })
-      }
-    })
-  }
+  // removeAllSigners () {
+  //   this.signers.forEach(signer => {
+  //     signer.close()
+  //     if (signer.delete) signer.delete()
+  //   })
+  //   this.signers = []
+  //   const { app } = require('electron')
+  //   const fs = require('fs')
+  //   const path = require('path')
+  //   const USER_DATA = app ? app.getPath('userData') : './test/.userData'
+  //   const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
+  //   const directory = SIGNERS_PATH
+  //   fs.readdir(directory, (err, files) => {
+  //     if (err) throw err
+  //     for (const file of files) {
+  //       fs.unlink(path.join(directory, file), err => {
+  //         if (err) throw err
+  //       })
+  //     }
+  //   })
+  // }
 
   find (f) {
     return this.signers.find(f)

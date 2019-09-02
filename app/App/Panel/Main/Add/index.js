@@ -15,17 +15,18 @@ const duration = { appear: 20, enter: 20, exit: 960 }
 class Add extends React.Component {
   constructor (...args) {
     super(...args)
-    this.particles = false
+    this.particleWorker = new Worker('./particleWorker.js')
   }
 
-  setup () {
-    if (this.particles) return
-    this.particles = true
-    const canvas = document.getElementById('canvas').transferControlToOffscreen()
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    this.particleWorker = new Worker('./particleWorker.js')
-    this.particleWorker.postMessage({ type: 'init', canvas }, [ canvas ])
+  componentDidMount () {
+    this.canvas = document.getElementById('canvas').transferControlToOffscreen()
+    this.canvas.width = window.innerWidth
+    this.canvas.height = window.innerHeight
+    this.particleWorker.postMessage({ type: 'init', canvas: this.canvas }, [ this.canvas ])
+  }
+
+  start () {
+    this.particleWorker.postMessage({ type: 'start' })
   }
 
   toggleAddAccount (state) {
@@ -33,15 +34,13 @@ class Add extends React.Component {
   }
 
   exit () {
-    this.particleWorker.terminate()
-    this.particles = false
+    this.particleWorker.postMessage({ type: 'stop' })
   }
 
   render () {
     return (
-      <Transition in={Boolean(this.store('view.addAccount'))} timeout={duration} onExit={() => this.exit()}>
+      <Transition in={Boolean(this.store('view.addAccount'))} timeout={duration} onEnter={() => this.start()} onExit={() => this.exit()}>
         {state => {
-          if (state === 'entered') this.setup()
           return (
             <React.Fragment>
               {state !== 'exited' ? (
@@ -74,11 +73,9 @@ class Add extends React.Component {
                   </div>
                 </div>
               </div>
-              {state !== 'exited' ? (
-                <div className={state === 'entered' ? 'addAccountShadeForward addAccountShadeForwardActive' : 'addAccountShadeForward'}>
-                  <canvas id='canvas' />
-                </div>
-              ) : null}
+              <div style={state === 'exited' ? { display: 'none' } : {}} className={state === 'entered' ? 'addAccountShadeForward addAccountShadeForwardActive' : 'addAccountShadeForward'}>
+                <canvas id='canvas' />
+              </div>
             </React.Fragment>
           )
         }}

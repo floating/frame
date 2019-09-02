@@ -24,6 +24,20 @@ class Pending extends React.Component {
     this.setState({ tPin: '' })
   }
 
+  renderLoadingLive () {
+    if (this.props.type === 'ledger' && this.props.status.toLowerCase() === 'deriving live addresses') {
+      return (
+        <div className='loadingLiveAddresses'>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => {
+            return <div key={'loadingLiveAddress' + i} className='loadingLiveAddress' style={{ opacity: i <= this.props.liveAddressesFound ? '1' : '0.3' }} />
+          })}
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+
   renderTrezorPin (active) {
     return (
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
@@ -73,6 +87,7 @@ class Pending extends React.Component {
       <div className='pendingSignerWrap' style={style}>
         <div className='pendingSignerInset'>
           <div className='pendingSignerTop'>
+            {this.renderLoadingLive()}
             <div className='pendingSignerLogo'>
               {this.props.type === 'ledger' ? <div style={{ marginTop: '4px' }}>{svg.ledger(25)}</div> : svg.trezor(25)}
             </div>

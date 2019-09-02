@@ -52,7 +52,8 @@ class Signer {
       type: this.type,
       addresses: this.addresses,
       status: this.status,
-      network: this.network
+      network: this.network,
+      liveAddressesFound: this.liveAddressesFound || 0
     }
   }
 

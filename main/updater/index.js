@@ -78,7 +78,7 @@ const updater = {
       res.on('data', chunk => { rawData += chunk })
       res.on('end', () => {
         try {
-          const releases = JSON.parse(rawData)
+          const releases = JSON.parse(rawData).filter(r => !r.prerelease)
           if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
             const newVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substr(1) : releases[0].tag_name
             if (compareVersions(newVersion, version) === 1) {
