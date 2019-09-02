@@ -33,9 +33,16 @@ const resolveName = (name) => {
     try {
       // Look up registry address based on current network connection
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
-      const ensRegistryAddress = registryAddress()
-      const address = await resolveAragon(domain, ensRegistryAddress)
-      const wrap = new Wrapper(address, { apm: { ensRegistryAddress } })
+      const options = {
+        apm: {
+          ipfs: {
+            gateway: 'https://ipfs.eth.aragon.network/ipfs'
+          },
+          ensRegistryAddress: registryAddress()
+        }
+      }
+      const address = await resolveAragon(domain, options.apm.ensRegistryAddress)
+      const wrap = new Wrapper(address, options)
       await wrap.init()
       const subscription = wrap.apps.subscribe(apps => {
         subscription.unsubscribe()
@@ -60,7 +67,15 @@ class Aragon {
     this.dao = dao
     this.agent = agent
     this.actor = actor
-    const wrap = new Wrapper(dao, { apm: { ensRegistryAddress: ens } })
+    const options = {
+      apm: {
+        ipfs: {
+          gateway: 'https://ipfs.eth.aragon.network/ipfs'
+        },
+        ensRegistryAddress: registryAddress()
+      }
+    }
+    const wrap = new Wrapper(dao, options)
     wrap.init().then(() => { this.wrap = wrap }).catch(err => log.error(err))
     setTimeout(() => { this.provider = require('../../provider') }, 0)
   }
