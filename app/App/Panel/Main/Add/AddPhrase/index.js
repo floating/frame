@@ -115,7 +115,7 @@ class AddPhrase extends React.Component {
           <div className='addAccountItemOption'>
             <div className='addAccountItemOptionIntro' onMouseDown={() => {
               this.adding()
-              setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+              if (this.store('main.connection.network') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
             }}>
               {'Add Phrase Account'}
             </div>
