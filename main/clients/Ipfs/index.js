@@ -1,6 +1,8 @@
+const { app } = require('electron')
 const log = require('electron-log')
 
-const windows = require('../../windows')
+// Mock windows module if running tests
+const windows = app ? require('../../windows') : { broadcast: () => {} }
 
 const Client = require('../Client')
 
