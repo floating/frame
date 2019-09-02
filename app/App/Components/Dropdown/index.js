@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import uuid from 'uuid'
 
 const findIndex = (options, value) => {
   const index = options.findIndex((option) => option.value === value)
@@ -13,6 +14,16 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
   // Hooks
   const [index, setIndex] = useState(syncIndex || initialIndex || 0)
   const [expanded, setExpanded] = useState(false)
+  const [id] = useState(uuid())
+
+  // On mount -> register listener for document clicks
+  useEffect(() => {
+    document.addEventListener('click', (e) => {
+      // If class list of clicked element doesn't include component id -> contract dropdown
+      const classList = [...e.target.classList]
+      if (!classList.includes(id)) { setExpanded(false) }
+    })
+  }, [])
 
   // Handle new sync value
   if (syncIndex !== index) {
@@ -38,15 +49,15 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
 
   // JSX
   return (
-    <div className='dropdownWrap'>
+    <div className={`dropdownWrap ${id}`}>
       <div
-        className={expanded ? `dropdown dropdownExpanded ${className}` : `dropdown ${className}`}
+        className={expanded ? `dropdown dropdownExpanded ${className} ${id}` : `dropdown ${className} ${id}`}
         style={expanded ? { ...style, height } : { ...style }}
         onMouseDown={(e) => { setExpanded(!expanded) }}
       >
-        <div className='dropdownItems' style={expanded ? {} : { marginTop }}>
+        <div className={`dropdownItems ${id}`} style={expanded ? {} : { marginTop }}>
           { options.map((option, index) => {
-            return <div key={option.text + index} className='dropdownItem' onMouseDown={() => handleSelect(index)}>{ option.text }</div>
+            return <div key={option.text + index} className={`dropdownItem ${id}`} onMouseDown={() => handleSelect(index)}>{ option.text }</div>
           })}
         </div>
       </div>
