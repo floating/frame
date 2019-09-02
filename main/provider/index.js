@@ -74,7 +74,10 @@ class Provider extends EventEmitter {
   }
 
   declineRequest (req) {
-    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const res = data => {
+      if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
+      delete this.handlers[req.handlerId]
+    }
     const payload = req.payload
     this.resError(`User declined transaction`, payload, res)
   }
@@ -115,7 +118,10 @@ class Provider extends EventEmitter {
   }
 
   approveSign (req, cb) {
-    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const res = data => {
+      if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
+      delete this.handlers[req.handlerId]
+    }
     const payload = req.payload
     const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
     const message = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
@@ -138,7 +144,10 @@ class Provider extends EventEmitter {
   }
 
   approveSignTypedData (req, cb) {
-    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const res = data => {
+      if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
+      delete this.handlers[req.handlerId]
+    }
     const payload = req.payload
     const [address, typedData] = payload.params
 
@@ -162,7 +171,10 @@ class Provider extends EventEmitter {
 
   signAndSend (req, cb) {
     const rawTx = req.data
-    const res = data => { if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data) }
+    const res = data => {
+      if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
+      delete this.handlers[req.handlerId]
+    }
     const payload = req.payload
     accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
       if (err) {
@@ -267,7 +279,12 @@ class Provider extends EventEmitter {
     if (!payload.params.every(utils.isHexStrict)) return this.resError(`ethSign Error: Invalid hex values`, payload, res)
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({ handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] })
+    const req = { handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] }
+    const _res = data => {
+      if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
+      delete this.handlers[req.handlerId]
+    }
+    accounts.addRequest(req, _res)
   }
 
   signTypedData (payload, res) {
