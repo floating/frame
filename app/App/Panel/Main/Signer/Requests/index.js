@@ -98,7 +98,7 @@ class Requests extends React.Component {
     let containNormal = normal.length ? (360 + (normal.length * 10)) : 160
     if (normal.length && monitor.length > 0) containNormal += 70
     const containMonitor = monitor.length * monitorHeight
-    const containHeight = containNormal + containMonitor
+    const containHeight = containNormal + containMonitor + 10
 
     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
     const open = current && this.store('selected.open')

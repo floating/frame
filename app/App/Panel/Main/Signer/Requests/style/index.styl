@@ -5,51 +5,51 @@
   60%,
   80%,
   to {
-    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    animation-timing-function cubic-bezier(0.215, 0.61, 0.355, 1)
   }
 
   0% {
-    opacity: 0;
-    transform: scale3d(0.3, 0.3, 0.3);
+    opacity 0
+    transform scale3d(0.3, 0.3, 0.3)
   }
 
   20% {
-    transform: scale3d(1.1, 1.1, 1.1);
+    transform scale3d(1.1, 1.1, 1.1)
   }
 
   40% {
-    transform: scale3d(0.9, 0.9, 0.9);
+    transform scale3d(0.9, 0.9, 0.9)
   }
 
   60% {
-    opacity: 1;
-    transform: scale3d(1.03, 1.03, 1.03);
+    opacity 1
+    transform scale3d(1.03, 1.03, 1.03)
   }
 
   80% {
-    transform: scale3d(0.97, 0.97, 0.97);
+    transform scale3d(0.97, 0.97, 0.97)
   }
 
   to {
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
+    opacity 1
+    transform scale3d(1, 1, 1)
   }
 }
 .bounceIn {
-  animation-duration: 0.75s;
-  animation-name: bounceIn;
+  animation-duration 0.75s
+  animation-name bounceIn
 }
 
 .loader,
 .loader:after {
-  border-radius: 100%;
-  width: 7em;
-  height: 7em;
+  border-radius 100%
+  width 7em
+  height 7em
 }
 .loader {
   font-size 7px
   position relative
-  text-indent -9999em;
+  text-indent -9999em
   border-top 6px solid outerspace01
   border-right 6px solid outerspace01
   border-bottom 6px solid outerspace01
@@ -59,19 +59,19 @@
 }
 @keyframes load8 {
   0% {
-    transform: rotate(0deg);
+    transform rotate(0deg)
   }
   100% {
-    transform: rotate(360deg);
+    transform rotate(360deg)
   }
 }
 
 @keyframes shine {
   0% {
-    transform: translateY(-2000px);
+    transform translateY(-2000px)
   }
   100% {
-    transform: translateY(0);
+    transform translateY(0)
   }
 }
 
@@ -304,7 +304,7 @@
     position relative
     display flex
     align-items flex-end
-    justify-content:space-between;
+    justify-content space-between
     height 40px
     font-size 22px
     padding 0px 10px 10px 10px
@@ -642,7 +642,7 @@
       min-height 100%
       box-sizing border-box
       word-break break-all
-  
+
   .signTypedData
     position absolute
     top 57px
@@ -661,12 +661,15 @@
       padding 20px
       min-height 100%
       box-sizing border-box
-      
-      b
-        display: block
-        font-size: 12px
-        margin-bottom: 6px
-        margin-top: 12px
+
+      .signTypedDataSection
+        margin-bottom 40px
+
+      .signTypedDataTitle
+        display block
+        font-size 16px
+        margin-bottom 5px
+        font-weight bold
 
   .transactionValue
     position absolute
@@ -1560,24 +1563,26 @@ span
     box-shadow cardDrop,0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
 
 .simpleJson
-  font-size: 9px
-  font-family: 'Courier New', Courier, monospace
+  font-size 14px
 
   .simpleJsonChild
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-bottom: 0.5em
-
-    .simpleJsonChild
-      margin-bottom: 0.1em
-
-      .simpleJsonKey
-        font-weight: normal
-        font-style: italic
+    width 100%
+    margin-top 10px
 
   .simpleJsonKey
-    font-size: 9px
-    font-weight: bold
-    margin-right: 0.5em
+    font-size 14px
+    font-weight bold
+    width 100%
+    color outerspace05
+    font-family 'FiraCode', monospace
+
+  .simpleJsonValue
+    margin 10px 10px 10px 3px
+    border-left 2px solid outerspace03
+    padding-left 10px
+    font-size 16px
+    width calc(100% - 3px)
+    box-sizing border-box
+    font-weight 600
+    word-wrap break-word
+    font-family 'FiraCode', monospace

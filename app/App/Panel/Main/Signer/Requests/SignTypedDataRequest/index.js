@@ -4,22 +4,24 @@ import utils from 'web3-utils'
 import svg from '../../../../../../svg'
 import link from '../../../../../../link'
 
-const SimpleJSON = ({ json }) => (
-  <div className='simpleJson'>
-    {Object.keys(json).map(key => (
-      <div className='simpleJsonChild'>
-        <div className='simpleJsonKey'>{key}:</div>
-        <div className='simpleJsonValue'>
-          {typeof json[key] === 'object' ? (
-            <SimpleJSON json={json[key]} />
-          ) : (
-            json[key]
-          )}
+const SimpleJSON = ({ json, key = '_base' }) => {
+  return (
+    <div className='simpleJson'>
+      {Object.keys(json).map((key, o) => (
+        <div key={key + o} className='simpleJsonChild'>
+          <div className='simpleJsonKey'>{key}:</div>
+          <div className='simpleJsonValue'>
+            {typeof json[key] === 'object' ? (
+              <SimpleJSON json={json[key]} key={key} />
+            ) : (
+              json[key]
+            )}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-)
+      ))}
+    </div>
+  )
+}
 
 class TransactionRequest extends React.Component {
   constructor (...args) {
@@ -60,6 +62,7 @@ class TransactionRequest extends React.Component {
     const notice = this.props.req.notice
     const payload = this.props.req.payload
     const typedData = payload.params[1] || {}
+
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -110,11 +113,14 @@ class TransactionRequest extends React.Component {
                   </div>
                   <div className='signTypedData'>
                     <div className='signTypedDataInner'>
-                      <b>Domain</b>
-                      <SimpleJSON json={typedData.domain} />
-
-                      <b>Message</b>
-                      <SimpleJSON json={typedData.message} />
+                      <div className='signTypedDataSection'>
+                        <div className='signTypedDataTitle'>Domain</div>
+                        <SimpleJSON json={typedData.domain} />
+                      </div>
+                      <div className='signTypedDataSection'>
+                        <div className='signTypedDataTitle'>Message</div>
+                        <SimpleJSON json={typedData.message} />
+                      </div>
                     </div>
                   </div>
                 </React.Fragment>

@@ -109,6 +109,24 @@ class AddAragon extends React.Component {
     })
   }
 
+  accountSort (a, b) {
+    const accounts = this.store('main.accounts')
+    a = accounts[a].created
+    b = accounts[b].created
+    if (a === -1 && b !== -1) return -1
+    if (a !== -1 && b === -1) return 1
+    if (a > b) return -1
+    if (a < b) return 1
+    return 0
+  }
+
+  accountFilter (id) {
+    const network = this.store('main.connection.network')
+    const account = this.store('main.accounts', id)
+    if (account.type === 'aragon') return false
+    return account.network === network
+  }
+
   restart () {
     this.setState({ adding: false, agent: '0x0000000000000000000000000000000000000000', index: 0, name: '' })
     setTimeout(() => {
@@ -154,10 +172,13 @@ class AddAragon extends React.Component {
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{'Choose acting account'}</div>
                   <div className='addAccountItemOptionList'>
-                    {Object.keys(this.store('main.accounts')).map(id => {
-                      const account = this.store('main.accounts', id)
-                      return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.type + ' Account'}</div>
-                    })}
+                    {Object.keys(this.store('main.accounts'))
+                      .filter(id => this.accountFilter(id))
+                      .sort((a, b) => this.accountSort(a, b))
+                      .map(id => {
+                        const account = this.store('main.accounts', id)
+                        return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.name}</div>
+                      })}
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
