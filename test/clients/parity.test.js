@@ -7,7 +7,7 @@ const fs = require('fs')
 const path = require('path')
 
 // NPM
-const { emptyDir } = require('fs-extra')
+const { remove } = require('fs-extra')
 const axios = require('axios')
 
 // Frame
@@ -17,17 +17,17 @@ const store = require('../../main/store')
 // Local
 const { Counter, Observer } = require('../util')
 
+// Global setup
+const observer = new Observer('main.clients.parity', ['state', 'installed', 'latest', 'version'])
+const parityDir = path.resolve('./test/.userData/parity')
+
 // Helper functions
-const clean = () => emptyDir(userData)
+const clean = () => remove(parityDir)
 const makeRPCCall = async () => {
   const message = { jsonrpc: '2.0', id: 1, method: 'net_listening', params: [] }
   const res = await axios.post('http://127.0.0.1:8545', message)
   return res.data.result
 }
-
-// Global setup
-const observer = new Observer('main.clients.parity', ['state', 'installed', 'latest', 'version'])
-const userData = path.resolve('./test/.userData')
 
 describe('Parity', () => {
   // Setup test suite
@@ -37,7 +37,6 @@ describe('Parity', () => {
 
   test('Client should not be installed', () => {
     // 1) Check for that client directory doesn't exist
-    const parityDir = path.resolve(userData, 'parity')
     expect(fs.existsSync(parityDir)).toEqual(false)
 
     // 2) Check that state reflects that client is not installed
@@ -74,8 +73,7 @@ describe('Parity', () => {
     observer.once('version', (version) => counter.expect(version).toBe(null))
     observer.once('state', (state) => {
       counter.expect(state).toBe('off')
-      const files = fs.readdirSync(userData)
-      counter.expect(files.length).toBe(0)
+      counter.expect(fs.existsSync(parityDir)).toEqual(false)
     })
 
     // Run uninstall process
