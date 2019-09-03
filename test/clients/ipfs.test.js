@@ -7,7 +7,7 @@ const fs = require('fs')
 const path = require('path')
 
 // NPM
-const { emptyDir } = require('fs-extra')
+const { remove } = require('fs-extra')
 const axios = require('axios')
 
 // Frame
@@ -17,16 +17,16 @@ const store = require('../../main/store')
 // Local
 const { Counter, Observer } = require('../util')
 
+// Global setup
+const observer = new Observer('main.clients.ipfs', ['state', 'installed', 'latest', 'version'])
+const ipfsDir = path.resolve('./test/.userData/ipfs')
+
 // Helper functions
-const clean = () => emptyDir(userData)
+const clean = () => remove(ipfsDir)
 const getVersion = async () => {
   const res = await axios.get('http://127.0.01:5001/api/v0/version')
   return res.data.Version
 }
-
-// Global setup
-const observer = new Observer('main.clients.ipfs', ['state', 'installed', 'latest', 'version'])
-const userData = path.resolve('./test/.userData')
 
 describe('IPFS client', () => {
   // Setup test suite
@@ -36,7 +36,6 @@ describe('IPFS client', () => {
 
   test('Client should not be installed', () => {
     // 1) Check for that client directory doesn't exist
-    const ipfsDir = path.resolve(userData, 'ipfs')
     expect(fs.existsSync(ipfsDir)).toEqual(false)
     // 2) Check that state reflects that client is not installed
     const { latest, installed, state } = store('main.clients.ipfs')
@@ -74,8 +73,7 @@ describe('IPFS client', () => {
     observer.once('version', (version) => counter.expect(version).toBe(null))
     observer.once('state', (state) => {
       counter.expect(state).toBe('off')
-      const files = fs.readdirSync(userData)
-      counter.expect(files.length).toBe(0)
+      counter.expect(fs.existsSync(ipfsDir)).toEqual(false)
     })
 
     // Run uninstall process
