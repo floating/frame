@@ -276,6 +276,7 @@ class Provider extends EventEmitter {
   }
 
   ethSign (payload, res) {
+    payload.params = [payload.params[0], payload.params[1]]
     if (!payload.params.every(utils.isHexStrict)) return this.resError(`ethSign Error: Invalid hex values`, payload, res)
     const handlerId = uuid()
     this.handlers[handlerId] = res

@@ -37,7 +37,12 @@ describe('Seed signer', () => {
 
   test('Scan for signers', (done) => {
     let count = 0
-    const signers = { add: (signer) => { signer.close(() => {}); count++ } }
+    const signers = {
+      add: (signer) => {
+        signer.close(() => {})
+        if (signer.type === 'seed') count++
+      }
+    }
     hot.scan(signers)
     expect(count).toBe(1)
     done()
