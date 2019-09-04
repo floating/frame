@@ -253,7 +253,7 @@ class Signer extends React.Component {
                 <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
                   <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
                   <div className='accountListItemAddress'>{a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}</div>
-                  <div className='accountListItemBalance'>{'Ξ ' + (balance === undefined ? '-.----' : parseFloat(balance).toFixed(6))}</div>
+                  <div className='accountListItemBalance'>{'Ξ ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
                 </div>
               )
             })}
