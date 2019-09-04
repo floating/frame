@@ -116,13 +116,13 @@ ipcMain.on('tray:updateRestart', () => {
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
-if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
+// if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
   menu()
   if (process.platform === 'darwin' || process.platform === 'win32') {
     windows.tray()
   } else {
-    setTimeout(windows.tray, 20)
+    setTimeout(windows.tray, 800)
   }
   if (app.dock) app.dock.hide()
   protocol.interceptFileProtocol('file', (req, cb) => {
