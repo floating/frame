@@ -26,6 +26,14 @@ class RenameAccount extends React.Component {
 
   handleChange = (e) => this.setState({ value: e.target.value })
 
+  onFocus = (e) => {
+    if (e.target.value === this.accountName) this.setState({ value: '' })
+  }
+
+  onBlur = (e) => {
+    if (e.target.value === '') this.setState({ value: this.accountName })
+  }
+
   handleSubmit = () => {
     link.send('tray:renameAccount', this.accountId, this.state.value)
     this.props.onClose()
@@ -40,7 +48,7 @@ class RenameAccount extends React.Component {
     return (
       <div className='renameAccountWrap'>
         <div className='signerSubsliderSlideMessage'>Rename Account</div>
-        <input className='renameAccountInput' value={this.state.value} onChange={this.handleChange} />
+        <input className='renameAccountInput' value={this.state.value} onChange={this.handleChange} onFocus={this.onFocus} onBlur={this.onBlur} />
         <div className='renameAccountButtonWrap'>
           <div className='renameAccountButton' onMouseDown={this.handleCancel}>Cancel</div>
           <div className='renameAccountButton' onMouseDown={this.handleSubmit}>Rename</div>
