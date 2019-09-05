@@ -35,6 +35,7 @@
     "alpha": "npm run bundle && npm run launch",
     "hot": "npm run bundle && npm run launch:hot",
     "clean": "rimraf dist bundle .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm install && npm audit fix",
+    "scrub": "rimraf dist bundle .cache \"node_modules/!(rimraf|.bin)\" && npm install",
     "build": "electron-builder",
     "release": "electron-builder -c.snap.publish=github",
     "postinstall": "electron-builder install-app-deps",
