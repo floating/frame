@@ -22,7 +22,12 @@ const observer = new Observer('main.clients.parity', ['state', 'installed', 'lat
 const parityDir = path.resolve('./test/.userData/parity')
 
 // Helper functions
-const clean = () => remove(parityDir)
+const clean = () => {
+  // Reset work dir
+  remove(parityDir)
+  // Reset client
+  store.resetClient('parity')
+}
 const makeRPCCall = async () => {
   const message = { jsonrpc: '2.0', id: 1, method: 'net_listening', params: [] }
   const res = await axios.post('http://127.0.0.1:8545', message)
@@ -35,15 +40,17 @@ describe('Parity', () => {
   beforeAll(clean)
   afterAll(clean)
 
-  test('Client should not be installed', () => {
-    // 1) Check for that client directory doesn't exist
-    expect(fs.existsSync(parityDir)).toEqual(false)
-
-    // 2) Check that state reflects that client is not installed
-    const { latest, installed, state } = store('main.clients.parity')
-    expect(latest).toBe(false)
-    expect(installed).toBe(false)
-    expect(state).toBe('off')
+  test('Client should not be installed', (done) => {
+    setTimeout(() => {
+      // 1) Check for that client directory doesn't exist
+      expect(fs.existsSync(parityDir)).toEqual(false)
+      // 2) Check that state reflects that client is not installed
+      const { latest, installed, state } = store('main.clients.parity')
+      expect(latest).toBe(false)
+      expect(installed).toBe(false)
+      expect(state).toBe('off')
+      done()
+    }, 100)
   })
 
   test('Install client', (done) => {
