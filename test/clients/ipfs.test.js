@@ -22,7 +22,12 @@ const observer = new Observer('main.clients.ipfs', ['state', 'installed', 'lates
 const ipfsDir = path.resolve('./test/.userData/ipfs')
 
 // Helper functions
-const clean = () => remove(ipfsDir)
+const clean = () => {
+  // Reset work dir
+  remove(ipfsDir)
+  // Reset client
+  store.resetClient('ipfs')
+}
 const getVersion = async () => {
   const res = await axios.get('http://127.0.01:5001/api/v0/version')
   return res.data.Version
@@ -34,14 +39,17 @@ describe('IPFS client', () => {
   beforeAll(clean)
   afterAll(clean)
 
-  test('Client should not be installed', () => {
-    // 1) Check for that client directory doesn't exist
-    expect(fs.existsSync(ipfsDir)).toEqual(false)
-    // 2) Check that state reflects that client is not installed
-    const { latest, installed, state } = store('main.clients.ipfs')
-    expect(latest).toBe(false)
-    expect(installed).toBe(false)
-    expect(state).toBe('off')
+  test('Client should not be installed', (done) => {
+    setTimeout(() => {
+      // 1) Check for that client directory doesn't exist
+      expect(fs.existsSync(ipfsDir)).toEqual(false)
+      // 2) Check that state reflects that client is not installed
+      const { latest, installed, state } = store('main.clients.ipfs')
+      expect(latest).toBe(false)
+      expect(installed).toBe(false)
+      expect(state).toBe('off')
+      done()
+    }, 100)
   })
 
   test('Install client', (done) => {
