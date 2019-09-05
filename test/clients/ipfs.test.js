@@ -29,7 +29,7 @@ const clean = () => {
   store.resetClient('ipfs')
 }
 const getVersion = async () => {
-  const res = await axios.get('http://127.0.01:5001/api/v0/version')
+  const res = await axios.get('http://127.0.0.1:5001/api/v0/version')
   return res.data.Version
 }
 
