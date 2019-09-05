@@ -48,7 +48,7 @@ class Notify extends React.Component {
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
-              link.send('tray:action', 'alphaWarningPassed')
+              link.send('tray:action', 'muteAlphaWarning')
               this.store.notify()
             }}>
               <div className='notifyInputOptionText'>{'Proceed'}</div>

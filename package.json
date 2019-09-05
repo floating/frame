@@ -36,7 +36,7 @@
     "hot": "npm run bundle && npm run launch:hot",
     "clean": "rimraf dist bundle .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm install && npm audit fix",
     "build": "electron-builder",
-    "release": "electron-builder",
+    "release": "electron-builder -c.snap.publish=github",
     "postinstall": "electron-builder install-app-deps",
     "test": "standard && jest",
     "test:clients": "mocha test/clients/*.test.js",

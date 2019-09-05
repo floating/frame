@@ -110,7 +110,7 @@ module.exports = {
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
-  alphaWarningPassed: (u) => {
-    u('main.alphaWarningPassed', () => true)
+  muteAlphaWarning: (u) => {
+    u('main.mute.alphaWarning', () => true)
   }
 }
