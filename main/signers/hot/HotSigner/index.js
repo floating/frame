@@ -27,6 +27,7 @@ class HotSigner extends Signer {
     }
     this._worker = fork(workerPath)
     this._getToken()
+    this.ready = false
   }
 
   save (data) {
@@ -73,7 +74,7 @@ class HotSigner extends Signer {
   }
 
   close () {
-    this._worker.disconnect()
+    if (!this.ready) this.once('ready', () => this._worker.disconnect())
     store.removeSigner(this.id)
     log.info('Signer closed')
   }
@@ -150,6 +151,8 @@ class HotSigner extends Signer {
       if (type === 'token') {
         this._token = token
         this._worker.removeListener('message', listener)
+        this.ready = true
+        this.emit('ready')
       }
     }
     this._worker.addListener('message', listener)
