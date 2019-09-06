@@ -39,9 +39,4 @@ class Counter {
   }
 }
 
-const clean = () => {
-  const userData = path.resolve('./test/.userData')
-  emptyDirSync(userData)
-}
-
-module.exports = { Counter, Observer, clean }
+module.exports = { Counter, Observer }

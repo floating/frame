@@ -6,12 +6,12 @@ const { app } = require('electron')
 const log = require('electron-log')
 const uuid = require('uuid/v4')
 
-const store = require('../../../store')
-// Mock windows module if running tests
-const windows = app ? require('../../../windows') : { broadcast: () => {} }
 const Signer = require('../../Signer')
-
-const USER_DATA = app ? app.getPath('userData') : './test/.userData'
+const store = require('../../../store')
+// Mock windows module during tests
+const windows = app ? require('../../../windows') : { broadcast: () => {} }
+// Mock user data dir during tests
+const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 class HotSigner extends Signer {
@@ -27,6 +27,7 @@ class HotSigner extends Signer {
     }
     this._worker = fork(workerPath)
     this._getToken()
+    this.ready = false
   }
 
   save (data) {
@@ -73,7 +74,8 @@ class HotSigner extends Signer {
   }
 
   close () {
-    this._worker.disconnect()
+    if (this.ready) this._worker.disconnect()
+    else this.once('ready', () => this._worker.disconnect())
     store.removeSigner(this.id)
     log.info('Signer closed')
   }
@@ -150,6 +152,8 @@ class HotSigner extends Signer {
       if (type === 'token') {
         this._token = token
         this._worker.removeListener('message', listener)
+        this.ready = true
+        this.emit('ready')
       }
     }
     this._worker.addListener('message', listener)

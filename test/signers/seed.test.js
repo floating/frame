@@ -1,12 +1,16 @@
 const bip39 = require('bip39')
 const hot = require('../../main/signers/hot')
-const { clean } = require('../util')
+const { remove } = require('fs-extra')
+const path = require('path')
 const store = require('../../main/store')
 
 const PASSWORD = 'fr@///3_password'
+const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 
 // Stubs
-const signers = { add: (signer) => {} }
+const signers = { add: () => {} }
+// Util
+const clean = () => remove(SIGNER_PATH)
 
 describe('Seed signer', () => {
   let signer

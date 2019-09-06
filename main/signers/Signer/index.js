@@ -4,11 +4,12 @@
 // const deriveHDAccounts = require('worker-farm')(require.resolve('./derive'))
 const log = require('electron-log')
 const deriveHDAccounts = require('./derive')
-
+const EventEmitter = require('events')
 const crypt = require('../../crypt')
 
-class Signer {
+class Signer extends EventEmitter {
   constructor () {
+    super()
     this.addresses = []
     this.index = 0
     this.requests = {}
