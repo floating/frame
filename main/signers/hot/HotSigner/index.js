@@ -74,7 +74,8 @@ class HotSigner extends Signer {
   }
 
   close () {
-    if (!this.ready) this.once('ready', () => this._worker.disconnect())
+    if (this.ready) this._worker.disconnect()
+    else this.once('ready', () => this._worker.disconnect())
     store.removeSigner(this.id)
     log.info('Signer closed')
   }
