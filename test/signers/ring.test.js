@@ -1,18 +1,19 @@
 const crypto = require('crypto')
 const fs = require('fs')
+const { remove } = require('fs-extra')
 const path = require('path')
 
 const hot = require('../../main/signers/hot')
-const { clean } = require('../util')
 const store = require('../../main/store')
 
 const PASSWORD = 'fr@///3_password'
+const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
 
 // Stubs
-const signers = {
-  add: (signer) => {}
-}
+const signers = { add: () => {} }
+// Util
+const clean = () => remove(SIGNER_PATH)
 
 describe('Ring signer', () => {
   let signer

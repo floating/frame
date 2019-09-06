@@ -6,12 +6,12 @@ const { app } = require('electron')
 const log = require('electron-log')
 const uuid = require('uuid/v4')
 
-const store = require('../../../store')
-// Mock windows module if running tests
-const windows = app ? require('../../../windows') : { broadcast: () => {} }
 const Signer = require('../../Signer')
-
-const USER_DATA = app ? app.getPath('userData') : './test/.userData'
+const store = require('../../../store')
+// Mock windows module during tests
+const windows = app ? require('../../../windows') : { broadcast: () => {} }
+// Mock user data dir during tests
+const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 class HotSigner extends Signer {
