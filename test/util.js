@@ -1,6 +1,4 @@
 const EventEmitter = require('events')
-const { emptyDirSync } = require('fs-extra')
-const path = require('path')
 const store = require('../main/store')
 
 class Observer extends EventEmitter {
