@@ -39,7 +39,7 @@
     "build": "electron-builder",
     "release": "electron-builder -c.snap.publish=github",
     "postinstall": "electron-builder install-app-deps",
-    "test": "standard && jest",
+    "test": "standard && jest --runInBand",
     "test:clients": "mocha test/clients/*.test.js",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },

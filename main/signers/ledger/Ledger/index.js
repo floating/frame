@@ -26,7 +26,6 @@ class Ledger extends Signer {
     this.pause = false
     this.coinbase = '0x'
     this.handlers = {}
-    this.inUse = false
     this.lastUse = Date.now()
     this.network = store('main.connection.network')
     this.networkObserver = store.observer(() => {
@@ -70,10 +69,9 @@ class Ledger extends Signer {
   }
 
   async getDevice () {
-    if (this.inUse) throw new Error('Device is in use')
+    if (this.pause) throw new Error('Device access is paused')
     if (Date.now() - this.lastUse < 300) await this.wait(300)
-    this.releaseDevice()
-    this.inUse = true
+    await this.releaseDevice()
     this.pause = true
     this.currentDevice = new HID.HID(this.devicePath)
     this.currentTransport = new TransportNodeHid(this.currentDevice)
@@ -87,7 +85,6 @@ class Ledger extends Signer {
     delete this.currentDevice
     this.lastUse = Date.now()
     await this.wait(300)
-    this.inUse = false
     this.pause = false
   }
 
@@ -102,6 +99,7 @@ class Ledger extends Signer {
   async getDeviceAddress (i, cb) {
     if (this.pause) return cb(new Error('Device access is paused'))
     try {
+
       const { address } = await this.getAddress(this.getPath(i), false, true)
       cb(null, address)
     } catch (err) {
@@ -238,8 +236,8 @@ class Ledger extends Signer {
 
   // Standard Methods
   async signMessage (index, message, cb) {
-    if (this.pause) return cb(new Error('Device access is paused'))
     try {
+      if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       const result = await eth.signPersonalMessage(this.getPath(index), message.replace('0x', ''))
       let v = (result['v'] - 27).toString(16)
@@ -248,13 +246,19 @@ class Ledger extends Signer {
       await this.releaseDevice()
       this.busyCount = 0
     } catch (err) {
-      if (err.message.startsWith('cannot open device with path')) {
+      const deviceBusy = (
+        err.message.startsWith('cannot open device with path') ||
+        err.message === 'Device access is paused' ||
+        err.message === 'Invalid channel' ||
+        err.message === 'DisconnectedDevice'
+      )
+      if (deviceBusy) {
         clearTimeout(this._signMessage)
-        if (++this.busyCount > 10) {
+        if (++this.busyCount > 20) {
           this.busyCount = 0
           return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
-          this._signMessage = setTimeout(() => this.signMessage(message, cb), 700)
+          this._signMessage = setTimeout(() => this.signMessage(index, message, cb), 700)
           return log.info('>>>>>>> Busy: cannot open device with path, will try again (signMessage)')
         }
       }
@@ -265,8 +269,8 @@ class Ledger extends Signer {
   }
 
   async signTransaction (index, rawTx, cb) {
-    if (this.pause) return cb(new Error('Device access is paused'))
     try {
+      if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
       const tx = new EthereumTx(rawTx)
@@ -290,17 +294,25 @@ class Ledger extends Signer {
       cb(null, '0x' + _tx.serialize().toString('hex'))
       this.releaseDevice()
     } catch (err) {
-      if (err.message.startsWith('cannot open device with path')) {
+      const deviceBusy = (
+        err.message.startsWith('cannot open device with path') ||
+        err.message === 'Device access is paused' ||
+        err.message === 'Invalid channel' ||
+        err.message === 'DisconnectedDevice'
+      )
+      if (deviceBusy) {
         clearTimeout(this._signTransaction)
-        if (++this.busyCount > 10) {
+        if (++this.busyCount > 20) {
           this.busyCount = 0
+          cb(err)
           return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
-          this._signTransaction = setTimeout(() => this.signTransaction(rawTx, cb), 700)
+          this._signTransaction = setTimeout(() => this.signTransaction(index, rawTx, cb), 700)
           return log.info('>>>>>>> Busy: cannot open device with path, will try again (signTransaction)')
         }
+      } else {
+        cb(err)
       }
-      cb(err)
       this.releaseDevice()
       log.error(err)
     }

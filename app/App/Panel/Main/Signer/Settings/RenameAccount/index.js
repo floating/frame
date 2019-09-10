@@ -16,7 +16,6 @@ class RenameAccount extends React.Component {
     this.observer = this.store.observer(() => {
       this.accountId = this.store('selected.current')
       this.accountName = this.store(`main.accounts.${this.accountId}.name`)
-      this.setState({ value: this.accountName })
     })
   }
 
