@@ -191,7 +191,8 @@ class AddRing extends React.Component {
                     </div>
                     <div className='addAccountItemOptionSetupFrame'>
                       <div className='addAccountItemOptionTitle'>{'Create Password'}</div>
-                      <div className='addAccountItemOptionInputPhrase'>
+                      <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+                        <div className='addAccountItemOptionSubtitle'>{'password must be 12 characters or longer'}</div>
                         <input type='password' tabIndex={'-1'} ref={this.forms.manualCreatePassword} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e, () => this.createManual())} />
                       </div>
                       <div className='addAccountItemOptionSubmit' onMouseDown={() => this.createManual()}>{'Create'}</div>
@@ -215,7 +216,8 @@ class AddRing extends React.Component {
                     </div>
                     <div className='addAccountItemOptionSetupFrame'>
                       <div className='addAccountItemOptionTitle'>{'Create Account Password'}</div>
-                      <div className='addAccountItemOptionInputPhrase'>
+                      <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+                        <div className='addAccountItemOptionSubtitle'>{'password must be 12 characters or longer'}</div>
                         <input type='password' tabIndex={'-1'} ref={this.forms.keystoreCreatePassword} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e, () => this.createKeystore())} />
                       </div>
                       <div className='addAccountItemOptionSubmit' onMouseDown={() => this.createKeystore()}>{'Create'}</div>

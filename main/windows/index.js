@@ -65,6 +65,7 @@ const api = {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        sandbox: true,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
         preload: path.resolve(__dirname, '../../bundle/bridge.js')
@@ -80,6 +81,7 @@ const api = {
     //   if (trezor && details.responseHeaders['x-frame-options']) delete details.responseHeaders['x-frame-options'] // remove 'x-frame-options' header to allow embedding https://connect.trezor.io into an 'iframe' for Tezor flex work around
     //   res({ cancel: false, responseHeaders: details.responseHeaders })
     // })
+    windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
     windows.tray.positioner = new Positioner(windows.tray)
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
@@ -249,6 +251,14 @@ app.on('web-contents-created', (e, contents) => {
   contents.on('will-attach-webview', e => e.preventDefault())
   contents.on('new-window', e => e.preventDefault())
 })
+
+if (dev) {
+  const path = require('path')
+  const watch = require('node-watch')
+  watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
+    if (name.indexOf('css') > -1) windows.tray.send('main:reload:style', name)
+  })
+}
 
 // Frame Events
 // ipcMain.on('frame:close', api.close)

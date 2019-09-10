@@ -502,6 +502,21 @@
       background rgba(5, 25, 35, 0.2)
       transform translate3d(0, 0, 0)
 
+      .addAccountItemOptionSubtitle
+        position absolute
+        bottom 0
+        display flex
+        justify-content center
+        align-items center
+        text-align center
+        font-size 8px
+        // height 50px
+        width 100%
+        // padding 0px 0px 20px 0px
+        font-weight 500
+        letter-spacing 1px
+        box-sizing border-box
+
       input
         width 100%
         height 100%
@@ -538,7 +553,6 @@
         text-align center
         font-size 15px
         line-height 20px
-        // font-weight 100
         font-family FiraCode, monospace
         display flex
         justify-content center
@@ -546,10 +560,13 @@
         overflow-x hidden
         overflow-y scroll
         resize none
-        // background blue
 
       textarea::selection
         background rgba(5, 25, 35, 1)
+
+    .addAccountItemOptionInputPassword
+      input
+        margin-top -7px
 
     .addAccountItemColorBar
       position absolute

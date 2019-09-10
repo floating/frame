@@ -234,7 +234,7 @@ class Account {
     if (!isValidAddress(rawTx.from)) return cb(new Error(`Invalid 'from' address`))
 
     // Ensure that transaction params are valid hex strings
-    const enforcedKeys = ['value', 'data', 'to', 'from', 'gas', 'gasPrice', 'gasLimit']
+    const enforcedKeys = ['value', 'data', 'to', 'from', 'gas', 'gasPrice', 'gasLimit', 'nonce']
     const keys = Object.keys(rawTx)
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i]

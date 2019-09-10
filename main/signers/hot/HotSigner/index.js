@@ -46,8 +46,13 @@ class HotSigner extends Signer {
   }
 
   delete () {
+    const signerPath = path.resolve(SIGNERS_PATH, `${this.id}.json`)
+
+    // Overwrite file
+    fs.writeFileSync(signerPath, '00000000000000000000000000000000000000000000000000000000000000000000')
+
     // Remove file
-    removeSync(path.resolve(SIGNERS_PATH, `${this.id}.json`))
+    removeSync(signerPath)
 
     // Log
     log.info('Signer erased from disk')
