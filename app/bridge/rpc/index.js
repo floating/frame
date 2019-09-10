@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron')
-const uuid = require('uuid/v4')
+// const uuid = require('uuid/v4')
+let i = 0
+const newId = () => ++i
 
 const defined = value => value !== undefined || value !== null
 
@@ -15,7 +17,7 @@ ipcRenderer.on('main:rpc', (sender, id, ...args) => {
 export default (...args) => {
   const cb = args.pop()
   if (typeof cb !== 'function') throw new Error('Main RPC requires a callback.')
-  const id = uuid()
+  const id = newId()
   handlers[id] = cb
   args = args.map(arg => defined(arg) ? JSON.stringify(arg) : arg)
   ipcRenderer.send('main:rpc', JSON.stringify(id), ...args)

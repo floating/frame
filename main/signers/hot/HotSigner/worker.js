@@ -20,7 +20,7 @@ class HotSignerWorker {
       process.send(response)
     }
     // Verify token
-    if (token !== this.token) return pseudoCallback('Invalid token')
+    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) return pseudoCallback('Invalid token')
     // If method exists -> execute
     if (this[method]) return this[method](params, pseudoCallback)
     // Else return error

@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron'
 // import state from '../../state'
 import rpc from './rpc'
 
-const dev = process.env.NODE_ENV === 'development'
+// const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
 // process.once('loaded', () => { global.setImmediate = _setImmediate })
 // webFrame.executeJavaScript(`window.__initialState = ${JSON.stringify(state())}`)
@@ -30,10 +30,6 @@ ipcRenderer.on('main:flex', (...args) => {
   window.postMessage(wrap({ channel: 'flex', args, source, method: 'event' }), '*')
 })
 
-if (dev) {
-  const path = require('path')
-  const watch = require('node-watch')
-  watch(path.resolve(__dirname, '..', 'bundle'), { recursive: true }, (evt, name) => {
-    if (name.indexOf('css') > -1) window.postMessage(wrap({ method: 'reload', type: 'css', target: name }), '*')
-  })
-}
+ipcRenderer.on('main:reload:style', (e, name, ok) => {
+  window.postMessage(wrap({ method: 'reload', type: 'css', target: name }), '*')
+})

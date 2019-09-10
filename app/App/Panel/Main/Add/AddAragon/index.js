@@ -81,7 +81,7 @@ class AddAragon extends React.Component {
         id: dao.apps.kernel.proxyAddress,
         index: 0,
         addresses: [dao.apps.agent.proxyAddress], // Agent Address
-        type: 'Aragon',
+        type: 'aragon',
         name: this.capitalize(dao.name) + ' DAO',
         ens: dao.ens,
         network: dao.network,

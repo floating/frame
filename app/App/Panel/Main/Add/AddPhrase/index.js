@@ -130,7 +130,8 @@ class AddPhrase extends React.Component {
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{'create password'}</div>
-                  <div className='addAccountItemOptionInputPhrase'>
+                  <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+                    <div className='addAccountItemOptionSubtitle'>{'password must be 12 characters or longer'}</div>
                     <input type='password' tabIndex={'-1'} value={this.state.password} ref={this.forms[1]} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>{'Create'}</div>
