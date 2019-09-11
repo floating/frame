@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "An Ethereum Interface",
   "main": "main",
   "build": {
@@ -61,7 +61,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "@aragon/wrapper": "5.0.0-rc.14",
+    "@aragon/wrapper": "5.0.0-rc.17",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "4.68.2",
     "@ledgerhq/hw-transport-node-hid": "4.68.2",
