@@ -99,7 +99,6 @@ class Ledger extends Signer {
   async getDeviceAddress (i, cb) {
     if (this.pause) return cb(new Error('Device access is paused'))
     try {
-
       const { address } = await this.getAddress(this.getPath(i), false, true)
       cb(null, address)
     } catch (err) {
