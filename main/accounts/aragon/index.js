@@ -34,6 +34,7 @@ const resolveName = (name) => {
       // Look up registry address based on current network connection
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
       const options = {
+        provider: require('../../provider'),
         apm: {
           ipfs: {
             gateway: 'https://ipfs.eth.aragon.network/ipfs'
