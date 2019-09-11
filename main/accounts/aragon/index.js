@@ -81,7 +81,7 @@ class Aragon {
       this.provider = require('../../provider')
       const options = {
         provider: this.provider,
-        apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress(this.network) }
+        apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress() }
       }
       const wrap = new Wrapper(this.dao, options)
       wrap.init().then(() => {
