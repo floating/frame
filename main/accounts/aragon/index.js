@@ -69,6 +69,7 @@ class Aragon {
     this.agent = agent
     this.actor = actor
     const options = {
+      provider: require('../../provider'),
       apm: {
         ipfs: {
           gateway: 'https://ipfs.eth.aragon.network/ipfs'
