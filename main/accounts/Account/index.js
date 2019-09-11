@@ -28,7 +28,7 @@ class Account {
     this.smart = smart
     this.network = network || store('main.connection.network')
     this.requests = {}
-    if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
+    if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart, this.network)
     this.update(true)
     store.observer(() => {
       if (this.smart && this.smart.actor && this.smart.actor.id && this.smart.actor.id !== this.id) {
