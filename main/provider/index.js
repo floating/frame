@@ -237,10 +237,19 @@ class Provider extends EventEmitter {
     }
   }
 
+  fillDone (fullTx, res) {
+    this.getGasPrice(fullTx, response => {
+      if (response.error) return res({ need: 'gasPrice', message: response.error.message })
+      const minGas = '0x' + (Math.floor(response.result * 1.2)).toString(16)
+      if (!fullTx.gasPrice || fullTx.gasPrice < minGas) fullTx.gasPrice = minGas
+      res(null, fullTx)
+    })
+  }
+
   fillTx (rawTx, cb) {
     const needs = {}
     // if (!rawTx.nonce) needs.nonce = this.getNonce
-    if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
+    // if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
     if (!rawTx.gas) needs.gas = this.getGasEstimate
     let count = 0
     const list = Object.keys(needs)
@@ -253,11 +262,11 @@ class Provider extends EventEmitter {
           } else {
             rawTx[need] = response.result
           }
-          if (++count === list.length) errors.length > 0 ? cb(errors[0]) : cb(null, rawTx)
+          if (++count === list.length) errors.length > 0 ? cb(errors[0]) : this.fillDone(rawTx, cb)
         })
       })
     } else {
-      cb(null, rawTx)
+      this.fillDone(rawTx, cb)
     }
   }
 
