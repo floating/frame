@@ -138,7 +138,7 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 })
 
 app.on('activate', () => windows.activate())
-app.on('will-quit', () => app.quit())
+app.on('will-quit', () => windows.quit())
 app.on('quit', async () => {
   await clients.stop()
   accounts.close()

@@ -59,6 +59,10 @@ const api = {
       transparent: true,
       hasShadow: false,
       show: false,
+      titleBarStyle: 'customButtonsOnHover',
+      minimizable: false,
+      maximizable: false,
+      closable: false,
       backgroundThrottling: false,
       icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
@@ -242,6 +246,7 @@ const api = {
     api.showTray()
   },
   quit: () => {
+    windows.tray.setClosable(true)
     app.quit()
   }
 }
