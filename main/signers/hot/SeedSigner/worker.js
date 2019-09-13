@@ -1,4 +1,4 @@
-const hdKey = require('ethereumjs-wallet/hdkey')
+const { HDNode } = require('ethers/utils')
 const HotSignerWorker = require('../HotSigner/worker')
 
 class SeedSignerWorker extends HotSignerWorker {
@@ -54,11 +54,12 @@ class SeedSignerWorker extends HotSignerWorker {
   }
 
   _derivePrivateKey (index) {
-    return hdKey.fromMasterSeed(Buffer.from(this.seed, 'hex'))
-      .derivePath('m/44\'/60\'/0\'/0')
-      .deriveChild(index)
-      .getWallet()
-      .getPrivateKey()
+    const privateKey = HDNode.fromSeed('0x' + this.seed)
+      .derivePath(`m/44'/60'/0'/0/${index}`)
+      .privateKey
+      .slice(2)
+
+    return Buffer.from(privateKey, 'hex')
   }
 }
 

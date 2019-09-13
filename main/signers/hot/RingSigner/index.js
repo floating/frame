@@ -1,7 +1,8 @@
 const path = require('path')
 const log = require('electron-log')
-const { fromPrivateKey, fromV1, fromV3 } = require('ethereumjs-wallet')
+const { Wallet } = require('ethers')
 const { isValidPrivate } = require('ethereumjs-util')
+const { toChecksumAddress } = require('web3-utils')
 
 const HotSigner = require('../HotSigner')
 
@@ -28,8 +29,8 @@ class RingSigner extends HotSigner {
     if (!isValidPrivate(this._keyToBuffer(key))) return cb(new Error('Invalid private key'))
 
     // Get address
-    const wallet = fromPrivateKey(this._keyToBuffer(key))
-    const address = '0x' + wallet.getAddress().toString('hex')
+    let wallet = new Wallet('0x' + key)
+    let address = toChecksumAddress(wallet.address)
 
     // Ensure private key hasn't already been added
     if (this.addresses.includes(address)) {
@@ -81,18 +82,15 @@ class RingSigner extends HotSigner {
     })
   }
 
-  // TODO: Encrypt all keys together so that they all get the same password
-  addKeystore (keystore, keystorePassword, password, cb) {
-    let wallet
-    // Try to generate wallet from keystore
+  async addKeystore (keystore, keystorePassword, password, cb) {
     try {
-      if (keystore.version === 1) wallet = fromV1(keystore, keystorePassword)
-      else if (keystore.version === 3) wallet = fromV3(keystore, keystorePassword)
-      else return cb(new Error('Invalid keystore version'))
-    } catch (e) { return cb(e) }
+      // Extract private key from keystore
+      const wallet = await Wallet.fromEncryptedJson(keystore, keystorePassword)
+      const privateKey = wallet.privateKey.slice(2)
 
-    // Add private key
-    this.addPrivateKey(wallet._privKey.toString('hex'), password, cb)
+      // Add private key
+      this.addPrivateKey(privateKey, password, cb)
+    } catch (e) { return cb(e) }
   }
 
   _keyToBuffer (key) {

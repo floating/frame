@@ -1,7 +1,8 @@
 const path = require('path')
 const HotSigner = require('../HotSigner')
 const bip39 = require('bip39')
-const hdKey = require('ethereumjs-wallet/hdkey')
+const { HDNode } = require('ethers/utils')
+const { toChecksumAddress } = require('web3-utils')
 
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
@@ -20,9 +21,12 @@ class SeedSigner extends HotSigner {
       if (err) return cb(err)
 
       // Derive addresses
-      const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0')
+      const masterNode = HDNode.fromSeed('0x' + seed)
       const addresses = []
-      for (var i = 0; i < 100; i++) { addresses.push(wallet.deriveChild(i).getWallet().getChecksumAddressString()) }
+      for (let i = 0; i < 100; i++) {
+        let address = masterNode.derivePath(`m/44'/60'/0'/0/${i}`).address
+        addresses.push(toChecksumAddress(address))
+      }
 
       // Update signer
       this.encryptedSeed = encryptedSeed

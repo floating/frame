@@ -1,7 +1,5 @@
 const EventEmitter = require('events')
-const hdKey = require('ethereumjs-wallet/hdkey')
 const log = require('electron-log')
-// const bip39 = require('bip39')
 
 const crypt = require('../crypt')
 const store = require('../store')
@@ -44,13 +42,6 @@ class Accounts extends EventEmitter {
 
   closeAll () {
     // Close all accounts
-  }
-
-  seedToAddresses (seed) {
-    const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex')).derivePath('m/44\'/60\'/0\'/0')
-    const addresses = []
-    for (var i = 0; i < 100; i++) { addresses.push(wallet.deriveChild(i).getWallet().getChecksumAddressString()) }
-    return addresses
   }
 
   fingerprint (network, addresses) {

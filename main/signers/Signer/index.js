@@ -1,7 +1,3 @@
-// const HDKey = require('hdkey')
-// const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
-
-// const deriveHDAccounts = require('worker-farm')(require.resolve('./derive'))
 const log = require('electron-log')
 const deriveHDAccounts = require('./derive')
 const EventEmitter = require('events')

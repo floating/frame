@@ -93,7 +93,7 @@ const rpc = {
     if (keystore && keystore.length) {
       fs.readFile(keystore[0], 'utf8', (err, data) => {
         if (err) return cb(err)
-        try { cb(null, JSON.parse(data)) } catch (err) { cb(err) }
+        try { cb(null, data) } catch (err) { cb(err) }
       })
     } else {
       cb(new Error('No Keystore Found'))

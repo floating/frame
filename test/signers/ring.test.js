@@ -71,9 +71,8 @@ describe('Ring signer', () => {
   })
 
   test('Create from keystore', (done) => {
-    const file = fs.readFileSync(FILE_PATH, 'utf8')
-    const keystore = JSON.parse(file)
-    hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err, result) => {
+    const json = fs.readFileSync(FILE_PATH, 'utf8')
+    hot.createFromKeystore(signers, json, 'test', PASSWORD, (err, result) => {
       signer = result
       expect(err).toBe(null)
       expect(signer.status).toBe('locked')
@@ -109,10 +108,9 @@ describe('Ring signer', () => {
   })
 
   test('Add private key from keystore', (done) => {
-    const file = fs.readFileSync(FILE_PATH, 'utf8')
-    const keystore = JSON.parse(file)
+    const json = fs.readFileSync(FILE_PATH, 'utf8')
     const previousLength = signer.addresses.length
-    signer.addKeystore(keystore, 'test', PASSWORD, (err, result) => {
+    signer.addKeystore(json, 'test', PASSWORD, (err, result) => {
       expect(err).toBe(null)
       expect(signer.addresses.length).toBe(previousLength + 1)
       done()
