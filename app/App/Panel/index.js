@@ -24,8 +24,12 @@ class Panel extends React.Component {
 
   render () {
     const open = this.store('tray.open')
-    const transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
-    const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
+    // const selected = this.store('selected.open')
+    const transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(440px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    const transition = '0.64s cubic-bezier(.82,0,.12,1) all'
+    // const transitionDelay = open ? '0s' : '0.06s'
+    // const transitionDelay = open ? '0.64s' : '0s'
+    // const transitionDelay = open ? '0s' : '0.22s'
     return (
       <div id='panel' style={{ transform, transition }}>
         <div className='panelSwoop'>{svg.swoop()}</div>

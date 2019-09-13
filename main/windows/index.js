@@ -54,7 +54,7 @@ const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      width: 360,
+      width: 430,
       frame: false,
       transparent: true,
       hasShadow: false,
@@ -172,7 +172,7 @@ const api = {
           windows.tray.setVisibleOnAllWorkspaces(true)
           windows.tray.setAlwaysOnTop(false)
           const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-          windows.tray.setResizable(true)
+          // windows.tray.setResizable(true)
           windows.tray.setSize(1, dev ? 740 : area.height)
           const pos = windows.tray.positioner.calculate('topRight')
           windows.tray.setPosition(area.width + area.x, pos.y)
@@ -182,7 +182,7 @@ const api = {
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 260)
+      }, 640)
     }
   },
   showTray: () => {
@@ -196,9 +196,9 @@ const api = {
       windows.tray.setAlwaysOnTop(true)
       hideShow.running = 'show'
       windows.tray.setVisibleOnAllWorkspaces(true)
-      windows.tray.setResizable(false) // Keeps height consistant
+      // windows.tray.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setSize(360, dev ? 740 : area.height)
+      windows.tray.setSize(430, dev ? 740 : area.height)
       const pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
@@ -248,6 +248,9 @@ const api = {
   quit: () => {
     windows.tray.setClosable(true)
     app.quit()
+  },
+  reload: () => {
+    windows.tray.reload()
   }
 }
 
