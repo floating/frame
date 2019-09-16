@@ -26,6 +26,7 @@ require('./rpc')
 const clients = require('./clients')
 const signers = require('./signers')
 const persist = require('./store/persist')
+const dapps = require('./dapps')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -152,3 +153,12 @@ store.observer(() => {
     launchStatus ? launch.enable() : launch.disable()
   }
 })
+
+// DEBUG
+store.observer(_ => {
+  console.log('<>\n  <>!!')
+  console.log(store('main.dapps'))
+})
+setTimeout(() => {
+  dapps.add('monkybrain.eth')
+}, 1000)

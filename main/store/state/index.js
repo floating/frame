@@ -73,6 +73,7 @@ const initial = {
     },
     launch: main('launch', false),
     reveal: main('reveal', false),
+    dapps: main('dapp', {}),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },

@@ -116,5 +116,9 @@ module.exports = {
   },
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
+  },
+  addDapp: (u, data) => {
+    let { nameHash, ...parsedData } = data
+    u(`main.dapps.${nameHash}`, () => parsedData)
   }
 }
