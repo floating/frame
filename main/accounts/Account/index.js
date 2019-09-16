@@ -67,7 +67,8 @@ class Account {
 
   addRequest (req, res) {
     const add = r => {
-      this.requests[r.handlerId] = req
+      if (r.type === 'transaction' && r.data && r.data.value === '0x') delete r.data.value
+      this.requests[r.handlerId] = r
       this.requests[r.handlerId].mode = 'normal'
       this.requests[r.handlerId].created = Date.now()
       this.update()
