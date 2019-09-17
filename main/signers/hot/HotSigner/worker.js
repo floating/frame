@@ -59,7 +59,7 @@ class HotSignerWorker {
     console.log(addHexPrefix(serialized))
     console.log(' ')
     console.log(' ')
-    pseudoCallback(null, addHexPrefix(serialized))
+    // pseudoCallback(null, addHexPrefix(serialized))
   }
 
   verifyAddress ({ index, address }, pseudoCallback) {
