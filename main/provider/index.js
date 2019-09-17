@@ -2,7 +2,7 @@ const uuid = require('uuid/v4')
 const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
-const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer, addHexPrefix } = require('ethereumjs-util')
 
 const proxy = require('./proxy')
 
@@ -238,10 +238,19 @@ class Provider extends EventEmitter {
   }
 
   fillDone (fullTx, res) {
+    console.warn('TX BEFORE:')
+    console.warn(fullTx)
     this.getGasPrice(fullTx, response => {
       if (response.error) return res({ need: 'gasPrice', message: response.error.message })
       const minGas = '0x' + (Math.floor(response.result * 1.2)).toString(16)
       if (!fullTx.gasPrice || fullTx.gasPrice < minGas) fullTx.gasPrice = minGas
+      Object.keys(fullTx).forEach(key => {
+        if (typeof fullTx[key] !== 'string') fullTx[key] = fullTx[key].toString(16)
+        fullTx[key] = addHexPrefix(fullTx[key])
+        if (fullTx[key].length % 2) fullTx[key] = fullTx[key].replace('0x', '0x0')
+      })
+      console.warn('TX AFTER:')
+      console.warn(fullTx)
       res(null, fullTx)
     })
   }
