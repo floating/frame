@@ -45,6 +45,11 @@ class SeedSignerWorker extends HotSignerWorker {
   }
 
   signTransaction ({ index, rawTx }, pseudoCallback) {
+    console.log(' ')
+    console.log('**** ')
+    console.log('SEED SIGNER, SIGN WITH INDEX', index)
+    console.log(' ')
+    console.log(' ')
     // Make sure signer is unlocked
     if (!this.seed) return pseudoCallback('Signer locked')
     // Derive private key
