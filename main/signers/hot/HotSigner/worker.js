@@ -43,12 +43,22 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
+    console.log(' ')
+    console.log(' ')
+    console.log('::::SIGNING::::')
+    console.log(rawTx)
     // Create tranasction
     const tx = new EthTx(rawTx)
     // Sign transaction
     tx.sign(key)
     // Return serialized transaction
     const serialized = tx.serialize().toString('hex')
+    console.log(' ')
+    console.log(' ')
+    console.log('::::SIGNED::::')
+    console.log(addHexPrefix(serialized))
+    console.log(' ')
+    console.log(' ')
     pseudoCallback(null, addHexPrefix(serialized))
   }
 
