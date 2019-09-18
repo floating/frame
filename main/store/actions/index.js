@@ -120,5 +120,12 @@ module.exports = {
   addDapp: (u, data) => {
     let { nameHash, ...parsedData } = data
     u(`main.dapps.${nameHash}`, () => parsedData)
+  },
+  removeDapp: (u, nameHash) => {
+    u(`main.dapps`, (dapps) => {
+      dapps = { ...dapps }
+      delete dapps[nameHash]
+      return dapps
+    })
   }
 }
