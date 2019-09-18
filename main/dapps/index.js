@@ -27,13 +27,18 @@ const shell = electron.shell ? electron.shell : mock.shell
 class Dapps {
   async add (domain, cb) {
     // Resolve ENS name
-    const nameHash = hash(domain)
+    const namehash = hash(domain)
+
+    // Check if already added
+    if (store(`main.dapps.${namehash}`)) return cb(new Error('Dapp already added'))
+
+    // Resolve content
     const content = await ens.resolveContent(domain)
 
     // If content available -> store dapp
     if (content) {
       const { type, hash } = content
-      store.addDapp({ nameHash, domain, type, hash })
+      store.addDapp({ namehash, domain, type, hash })
       cb(null)
     // Else -> throw
     } else {
@@ -41,9 +46,15 @@ class Dapps {
     }
   }
 
-  remove (domain) {
-    const nameHash = hash(domain)
-    store.removeDapp(nameHash)
+  remove (domain, cb) {
+    const namehash = hash(domain)
+
+    // Check if exists
+    if (!store(`main.dapps.${namehash}`)) return cb(new Error(`Dapp doesn't exist`))
+
+    // Remove dapp
+    store.removeDapp(namehash)
+    cb(null)
   }
 
   async launch (domain, cb) {
@@ -90,10 +101,10 @@ store.observer(_ => {
   console.log(store('main.dapps'))
 })
 
-setTimeout(() => {
-  const domain = 'monkybrain.eth'
-  dapps.add(domain, (err) => {
-    if (err) console.error(err)
-    dapps.launch(domain, () => {})
-  })
-}, 5000)
+// setTimeout(() => {
+//   const domain = 'monkybrain.eth'
+//   dapps.add(domain, (err) => {
+//     if (err) console.error(err)
+//     // dapps.launch(domain, () => {})
+//   })
+// }, 2000)

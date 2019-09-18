@@ -7,6 +7,7 @@ const signers = require('../signers')
 const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
+const dapps = require('../dapps')
 
 const { resolveName } = require('../accounts/aragon')
 
@@ -128,6 +129,15 @@ const rpc = {
   },
   verifyAddress (cb) {
     accounts.verifyAddress(true, cb)
+  },
+  addDapp (domain, cb) {
+    dapps.add(domain, cb)
+  },
+  removeDapp (domain, cb) {
+    dapps.remove(domain, cb)
+  },
+  launchDapp (domain, cb) {
+    dapps.launch(domain, cb)
   }
 }
 
