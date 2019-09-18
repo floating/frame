@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
-import Panel from './App/Panel'
+import App from './App'
 
 import link from './link'
 import _store from './store'
@@ -19,7 +19,7 @@ link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
   if (!store('main.mute.alphaWarning')) store.notify('mainnet')
-  const Frame = Restore.connect(Panel, store)
+  const Frame = Restore.connect(App, store)
   ReactDOM.render(<Frame />, document.getElementById('frame'))
 })
 document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })

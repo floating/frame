@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, globalShortcut } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -11,6 +11,8 @@ const path = require('path')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store')
+
+const dev = process.env.NODE_ENV === 'development'
 
 // log.transports.file.level = 'info'
 
@@ -131,6 +133,9 @@ app.on('ready', () => {
     const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
+  if (dev) {
+    globalShortcut.register('CommandOrControl+R', () => windows.reload())
+  }
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {
@@ -139,7 +144,7 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 })
 
 app.on('activate', () => windows.activate())
-app.on('will-quit', () => app.quit())
+app.on('will-quit', () => windows.quit())
 app.on('quit', async () => {
   await clients.stop()
   accounts.close()

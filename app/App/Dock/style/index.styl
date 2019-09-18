@@ -1,0 +1,57 @@
+#dock
+  position absolute
+  top 45px
+  bottom 10px
+  left 28px
+  width 45px
+  padding-right 23px
+  -webkit-app-region no-drag
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+  // transition standardFast
+  transform translate3d(0px, 0px, 0px)
+  will-change transform
+  background rgba(220, 224, 244, 1)
+  border-top-left-radius 6px
+  border-bottom-left-radius 6px
+  margin 0px
+  box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
+  overflow hidden
+
+  .expandFrame
+    position absolute
+    top 0
+    left 0
+    width 45px
+    height 45px
+    z-index 1000
+    display flex
+    justify-content center
+    align-items center
+
+  .addApp
+    position absolute
+    bottom 0
+    left 0
+    width 45px
+    height 45px
+    z-index 1000
+    display flex
+    justify-content center
+    align-items center
+
+  .dockApps
+    position relative
+    width 100%
+    padding-top 10px
+    z-index 1000
+
+    .dockAppIcon
+      height 45px
+      // background red
+      margin-bottom 10px
+      display flex
+      justify-content center
+      align-items center
