@@ -28,10 +28,6 @@ const clean = () => {
   // Reset client
   store.resetClient('ipfs')
 }
-const getVersion = async () => {
-  const res = await axios.get('http://127.0.0.1:5001/api/v0/version')
-  return res.data.Version
-}
 
 describe('IPFS client', () => {
   // Setup test suite
@@ -105,7 +101,7 @@ describe('IPFS client', () => {
           counter.expect(state).toBe('ready')
 
           // 4) Expect client to return version and version to match
-          const version = await getVersion()
+          const version = await ipfs.getVersion()
           counter.expect(version).toBe(store('main.clients.ipfs.version'))
         })
       })
@@ -130,7 +126,7 @@ describe('IPFS client', () => {
         counter.expect(ipfs.process).toBe(null)
 
         // 4) Expect API call to fail
-        counter.expect(getVersion()).rejects.toThrow()
+        counter.expect(ipfs.getVersion()).rejects.toThrow()
       })
     })
     // Stop client
@@ -149,7 +145,7 @@ describe('IPFS client', () => {
         counter.expect(state).toBe('ready')
 
         // 3) Expect client to return version and version to match
-        const version = await getVersion()
+        const version = await ipfs.getVersion()
         counter.expect(version).toBe(store('main.clients.ipfs.version'))
       })
     })
@@ -176,7 +172,7 @@ describe('IPFS client', () => {
         counter.expect(ipfs.process).toBe(null)
 
         // 4) Expect API call to fail
-        counter.expect(getVersion()).rejects.toThrow()
+        counter.expect(ipfs.getVersion()).rejects.toThrow()
       })
     })
     // Stop client

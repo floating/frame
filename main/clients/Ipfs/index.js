@@ -1,5 +1,6 @@
 const { app } = require('electron')
 const log = require('electron-log')
+const axios = require('axios')
 
 // Mock windows module if running tests
 const windows = app ? require('../../windows') : { broadcast: () => {} }
@@ -47,6 +48,15 @@ class IPFS extends Client {
       log.info('ipfs: repo initiated')
     } catch (err) {
       log.info('ipfs: repo already initiated')
+    }
+  }
+
+  async getVersion () {
+    try {
+      const res = await axios.get('http://localhost:5001/api/v0/version')
+      return res.data.Version
+    } catch (err) {
+      throw new Error('IPFS node is not running')
     }
   }
 }
