@@ -13,11 +13,7 @@ class IPFS extends Client {
     super('ipfs', options)
 
     // TODO: Handle error when client not installed
-    if (this.isInstalled) {
-      this.api = ipfsHttpClient(this.getConfig('Addresses.API'))
-    } else {
-      this.api = null
-    }
+    this.api = ipfsHttpClient(this.getConfig('Addresses.API'))
 
     // On 'service ready' -> start ipfs
     this.on('ready', async () => {
@@ -62,9 +58,10 @@ class IPFS extends Client {
   async getConfig (key) {
     const config = key ? await this.runOnce(['config', key]) : await this.runOnce(['config', 'show'])
     try {
+      config.trim()
       return JSON.parse(config)
     } catch (err) {
-      return config.trim()
+      return config
     }
   }
 
