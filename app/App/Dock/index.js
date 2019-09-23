@@ -28,8 +28,8 @@ class Dock extends React.Component {
   }
 
   handleAddApp () {
-    if (this.state.endInput === '' || this.state.endInput === this.addAppFill) return
-    const domain = this.state.endInput
+    if (this.state.ensInput === '' || this.state.ensInput === this.addAppFill) return
+    const domain = this.state.ensInput
     const cb = (err) => { err ? console.error(err) : console.log('Dapp added') }
     link.rpc('addDapp', domain, cb)
   }
