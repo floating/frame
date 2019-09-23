@@ -122,15 +122,19 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
-  addDapp: (u, data) => {
-    const { namehash, ...parsedData } = data
-    u(`main.dapps.${namehash}`, () => parsedData)
+  addDapp: (u, namehash, data) => {
+    u(`main.dapps.${namehash}`, () => data)
   },
   removeDapp: (u, namehash) => {
     u('main.dapps', (dapps) => {
       dapps = { ...dapps }
       delete dapps[namehash]
       return dapps
+    })
+  },
+  updateDapp: (u, namehash, data) => {
+    u(`main.dapps.${namehash}`, (oldData) => {
+      return { ...oldData, ...data }
     })
   },
   expandDock: (u, expand) => {
