@@ -86,7 +86,7 @@ describe('IPFS client', () => {
 
   test('Start and automatically install client', (done) => {
     // SETUP: Expect 3 assertions
-    const counter = new Counter(4, done)
+    const counter = new Counter(3, done)
 
     // 1) Expect state to change to 'installing'
     observer.once('state', (state) => {
@@ -99,10 +99,6 @@ describe('IPFS client', () => {
         // 3) Expect state to change to 'ready'
         observer.once('state', async (state) => {
           counter.expect(state).toBe('ready')
-
-          // 4) Expect client to return version and version to match
-          const version = await ipfs.getVersion()
-          counter.expect(version).toBe(store('main.clients.ipfs.version'))
         })
       })
     })
@@ -119,14 +115,14 @@ describe('IPFS client', () => {
       counter.expect(state).toBe('terminating')
 
       // 2) Expect state to chagne to 'off'
-      observer.once('state', (state) => {
+      observer.once('state', async (state) => {
         counter.expect(state).toBe('off')
 
         // 3) Expect process to have terminated
         counter.expect(ipfs.process).toBe(null)
 
-        // 4) Expect API call to fail
-        counter.expect(ipfs.getVersion()).rejects.toThrow()
+        // 4) Expect client not to be running
+        counter.expect(await ipfs.isRunning()).toBe(false)
       })
     })
     // Stop client
@@ -144,9 +140,8 @@ describe('IPFS client', () => {
       observer.once('state', async (state) => {
         counter.expect(state).toBe('ready')
 
-        // 3) Expect client to return version and version to match
-        const version = await ipfs.getVersion()
-        counter.expect(version).toBe(store('main.clients.ipfs.version'))
+        // 3) Expect isRunning to be true
+        counter.expect(await ipfs.isRunning()).toBe(true)
       })
     })
 
@@ -165,14 +160,14 @@ describe('IPFS client', () => {
       counter.expect(state).toBe('terminating')
 
       // 2) Expect state to chagne to 'off'
-      observer.once('state', (state) => {
+      observer.once('state', async (state) => {
         counter.expect(state).toBe('off')
 
         // 3) Expect process to have terminated
         counter.expect(ipfs.process).toBe(null)
 
-        // 4) Expect API call to fail
-        counter.expect(ipfs.getVersion()).rejects.toThrow()
+        // 4) Expect isRunning to return false
+        counter.expect(await ipfs.isRunning()).toBe(false)
       })
     })
     // Stop client
