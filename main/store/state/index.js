@@ -53,6 +53,9 @@ const initial = {
       }
     }
   },
+  dock: {
+    expanded: false
+  },
   frame: {
     type: 'tray'
   },

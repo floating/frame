@@ -87,7 +87,7 @@ class Signer extends React.Component {
 
   renderArrows () {
     return (
-      <React.Fragment>
+      <>
         <div className='signerSelect signerSelectLeft'>
           <div className='signerSelectArrows'>
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
@@ -102,7 +102,7 @@ class Signer extends React.Component {
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
           </div>
         </div>
-      </React.Fragment>
+      </>
     )
   }
 
@@ -345,7 +345,7 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 50 : initial.height - 3
+      style.height = open ? panelHeight - 85 : initial.height - 3
       style.transform = open ? `translateY(-${initial.top - 44}px)` : `translateY(0px)`
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is

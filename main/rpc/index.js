@@ -8,6 +8,7 @@ const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
 const dapps = require('../dapps')
+const windows = require('../windows')
 
 const { resolveName } = require('../accounts/aragon')
 
@@ -132,6 +133,16 @@ const rpc = {
   },
   addDapp (domain, cb) {
     dapps.add(domain, cb)
+  },
+  toggleDock (cb) {
+    const expand = !store('dock.expand')
+    if (expand) {
+      windows.setWidth(750)
+      store.expandDock(expand)
+    } else {
+      store.expandDock(expand)
+      setTimeout(() => windows.setWidth(430), 420)
+    }
   },
   removeDapp (domain, cb) {
     dapps.remove(domain, cb)

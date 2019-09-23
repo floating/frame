@@ -3,6 +3,8 @@ import { URL } from 'url'
 
 export const syncMain = (u, main) => u('main', _ => main)
 
+export const sync = (u, path, value) => u(path, () => value)
+
 export const setSigner = (u, signer) => {
   u('selected.current', _ => signer.id)
   setTimeout(_ => {
