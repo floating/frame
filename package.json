@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "An Ethereum Interface",
   "main": "main",
   "build": {
@@ -66,7 +66,8 @@
     "@ledgerhq/hw-app-eth": "4.70.0",
     "@ledgerhq/hw-transport-node-hid": "4.70.0",
     "@ledgerhq/hw-transport-web-ble": "4.70.0",
-    "abi-codec": "0.0.6",
+    "@meltwater/fetch-favicon": "^1.0.4",
+    "abi-codec": "0.0.9",
     "auto-launch": "5.0.5",
     "axios": "0.19.0",
     "babel-polyfill": "6.26.0",
@@ -125,7 +126,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.3",
     "babel-jest": "24.9.0",
-    "electron": "6.0.9",
+    "electron": "^4.2.8",
     "electron-builder": "21.2.0",
     "ganache-cli": "6.7.0",
     "jest": "24.9.0",

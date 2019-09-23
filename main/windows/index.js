@@ -166,6 +166,7 @@ const api = {
     } else {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
+      store.expandDock(false)
       setTimeout(() => {
         if (windows && windows.tray) {
           if (store('main.reveal')) detectMouse()
@@ -219,6 +220,18 @@ const api = {
     const id = winId(e)
     if (windows[id]) windows[id].close()
     delete windows[id]
+  },
+  setWidth: width => {
+    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    windows.tray.setSize(width, dev ? 740 : area.height)
+    const pos = windows.tray.positioner.calculate('topRight')
+    windows.tray.setPosition(pos.x, pos.y)
+    // windows.tray.setBounds({
+    //   width: width,
+    //   height: dev ? 740 : area.height,
+    //   x: area.width - width,
+    //   y: 0
+    // })
   },
   getTray: () => {
     return windows.tray
@@ -292,6 +305,20 @@ ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectEleme
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
-store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
+// store.observer(_ => api.broadcast('main:action', 'app', store('main')))
+
+// Sync all state changes to every window
+store.api.feed((state, actions, obscount) => {
+  actions.forEach(action => {
+    action.updates.forEach(update => {
+      // if (update.path.startsWith('main')) return
+      // console.log('State Update >>>', update.path, '===', update.value)
+      const base = update.path.split('.')[0]
+      if (['main', 'dock'].indexOf(base) > -1) { // Soon to be all?
+        api.broadcast('main:action', 'sync', update.path, update.value)
+      }
+    })
+  })
+})
 
 module.exports = api

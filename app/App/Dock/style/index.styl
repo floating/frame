@@ -1,22 +1,21 @@
 #dock
   position absolute
   top 45px
-  bottom 10px
-  left 28px
-  width 45px
+  bottom 45px
+  right -800px
+  width 800px
   padding-right 23px
   -webkit-app-region no-drag
   display flex
   flex-direction column
   justify-content center
   align-items center
-  // transition standardFast
   transform translate3d(0px, 0px, 0px)
   will-change transform
   background rgba(220, 224, 244, 1)
   border-top-left-radius 6px
   border-bottom-left-radius 6px
-  margin 0px
+  margin 0px -30px 0px 0px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
 
@@ -24,19 +23,19 @@
     position absolute
     top 0
     left 0
-    width 45px
-    height 45px
+    width 48px
+    height 48px
     z-index 1000
     display flex
     justify-content center
     align-items center
 
-  .addApp
+  .toggleDock
     position absolute
     bottom 0
     left 0
-    width 45px
-    height 45px
+    width 48px
+    height 48px
     z-index 1000
     display flex
     justify-content center
@@ -49,9 +48,113 @@
     z-index 1000
 
     .dockAppIcon
-      height 45px
-      // background red
+      height 48px
       margin-bottom 10px
       display flex
       justify-content center
       align-items center
+
+  .appStore
+    z-index 100
+    position absolute
+    top 0
+    left 48px
+    bottom 0
+    width 292px
+    background lightShade
+
+    .addApp
+      height 110px
+      display flex
+      justify-content flex-start
+      align-items center
+      flex-direction column
+
+      .addAppForm
+        width 260px
+        height 110px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+
+        .addAppSubmit
+          min-height 30px
+          height 30px
+          background outerspace
+          font-size 12px
+          margin 10px 0px 0px 0px
+          padding 0px 40px 0px 44px
+          border-radius 15px
+          display flex
+          justify-content center
+          align-items center
+          color spacewhite
+          font-weight 600
+          box-shadow cardDrop,0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+          text-transform uppercase
+          letter-spacing 3px
+
+        .addAppInput
+          background spacewhite
+          min-height 40px
+          height 40px
+          width 100%
+          position relative
+          border-radius 4px
+          color outerspace08
+          box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+
+          input
+            outline none
+            border 0px
+            height 40px
+            background transparent
+            position absolute
+            top 0
+            right 0
+            bottom 0
+            left 0
+            box-shadow none
+            text-align center
+            width 100%
+            font-size 18px
+
+    .addedApps
+      width 100%
+      display flex
+      flex-wrap wrap
+      padding 20px 0px 0px 20px
+      box-sizing border-box
+      position relative
+
+    .addedApp
+      min-width 48px
+      min-height 48px
+      width 48px
+      height 48px
+      margin 0px 20px 20px 0px
+      padding-top 3px
+      box-sizing border-box
+      display flex
+      justify-content center
+      align-items center
+      background light
+      border-radius 6px
+      box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+
+    .addedApp:before
+      content '*'
+
+    .appStoreShade
+      opacity 0
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      z-index 0
+      pointer-events none
+      transition standardSlow
+      transition-delay 0.00s
+      background linear-gradient(45deg, pending04, good04)
