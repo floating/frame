@@ -1,6 +1,7 @@
 const { app } = require('electron')
 const log = require('electron-log')
 const axios = require('axios')
+const ipfsHttpClient = require('ipfs-http-client')
 
 const Client = require('../Client')
 
@@ -10,6 +11,13 @@ const windows = app ? require('../../windows') : { broadcast: () => {} }
 class IPFS extends Client {
   constructor (options) {
     super('ipfs', options)
+
+    // TODO: Handle error when client not installed
+    if (this.isInstalled) {
+      this.api = ipfsHttpClient(this.getConfig('Addresses.API'))
+    } else {
+      this.api = null
+    }
 
     // On 'service ready' -> start ipfs
     this.on('ready', async () => {
