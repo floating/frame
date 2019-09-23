@@ -99,7 +99,7 @@ class Dapps {
 
       // 2) if new content hash -> update dapp and pin content
       if (result && result.hash !== dapp.hash) {
-        store.updateDapp(namehash, { hash: result.hash })
+        store.updateDapp(namehash, { hash: result.hash, pinned: false })
         this._pin(result.hash, (err) => {
           if (err) log.error(err)
         })
