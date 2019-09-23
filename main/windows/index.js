@@ -166,6 +166,7 @@ const api = {
     } else {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
+      store.expandDock(false)
       setTimeout(() => {
         if (windows && windows.tray) {
           if (store('main.reveal')) detectMouse()

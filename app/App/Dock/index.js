@@ -52,7 +52,7 @@ class Dock extends React.Component {
     const selected = this.store('selected.open')
     const expanded = this.store('dock.expand')
     let transform = open && selected ? 'translate3d(-425px, 0px, 0px)' : 'translate3d(0px, 0px, 0px)'
-    if (expanded) transform = 'translate3d(-718px, 0px, 0px)'
+    if (expanded && selected) transform = 'translate3d(-718px, 0px, 0px)'
     const transition = '0.32s cubic-bezier(.82,0,.12,1) all'
     const transitionDelay = expanded ? '0s' : selected ? open ? '0s' : '0s' : '0s'
     const dapps = Object.keys(this.store('main.dapps')).map((key) => this.store(`main.dapps.${key}`))
