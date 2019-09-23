@@ -59,15 +59,6 @@ class IPFS extends Client {
     }
   }
 
-  async getVersion () {
-    try {
-      const res = await axios.get('http://localhost:5001/api/v0/version')
-      return res.data.Version
-    } catch (err) {
-      throw new Error('IPFS node is not running')
-    }
-  }
-
   async getConfig (key) {
     const config = key ? await this.runOnce(['config', key]) : await this.runOnce(['config', 'show'])
     try {
@@ -79,6 +70,15 @@ class IPFS extends Client {
 
   async setConfig (key, value) {
     await this.runOnce(['config', key, value])
+  }
+
+  async isRunning () {
+    try {
+      await this.runOnce(['diag', 'cmds'])
+      return true
+    } catch (err) {
+      return false
+    }
   }
 }
 
