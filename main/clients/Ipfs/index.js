@@ -2,10 +2,10 @@ const { app } = require('electron')
 const log = require('electron-log')
 const axios = require('axios')
 
+const Client = require('../Client')
+
 // Mock windows module if running tests
 const windows = app ? require('../../windows') : { broadcast: () => {} }
-
-const Client = require('../Client')
 
 class IPFS extends Client {
   constructor (options) {
@@ -58,6 +58,19 @@ class IPFS extends Client {
     } catch (err) {
       throw new Error('IPFS node is not running')
     }
+  }
+
+  async getConfig (key) {
+    const config = key ? await this.runOnce(['config', key]) : await this.runOnce(['config', 'show'])
+    try {
+      return JSON.parse(config)
+    } catch (err) {
+      return config.trim()
+    }
+  }
+
+  async setConfig (key, value) {
+    await this.runOnce(['config', key, value])
   }
 }
 
