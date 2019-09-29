@@ -223,7 +223,7 @@ class Account {
           cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
         }
       } else {
-        cb(new Error(`No signer forund for this account`))
+        cb(new Error(`No signer found for this account`))
       }
     })
   }
