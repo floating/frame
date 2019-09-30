@@ -49,6 +49,7 @@ class Dapps {
       const { type, hash } = content
       store.addDapp(namehash, { domain, type, hash, pinned: false })
       this._pin(hash, () => {
+        console.log('Pinned first time')
         store.updateDapp(namehash, { pinned: true })
       })
       cb(null)
@@ -114,7 +115,7 @@ class Dapps {
     Object.entries(store('main.dapps')).forEach(async ([namehash, dapp]) => {
       const ipfsState = store('main.clients.ipfs.state')
       if (ipfsState === 'ready' && !dapp.pinned) {
-        console.log('Pinning ', dapp.domain)
+        console.log('Pinning', dapp.domain)
         this._pin(dapp.hash, (err) => {
           if (err) return log.error(err)
           store.updateDapp(namehash, { pinned: true })

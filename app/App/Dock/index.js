@@ -9,14 +9,12 @@ import link from '../../link'
 // const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
 const Dapp = ({ domain, pinned }) => {
-  console.log(domain, pinned)
   const handleClick = (e) => {
     if (e.button === 2) return link.rpc('removeDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp removed') })
     if (!pinned) return window.alert('Dapp not pinned yet')
     link.rpc('launchDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp launched') })
   }
   const classNames = pinned ? 'dockAppIcon' : 'dockAppIcon dockAppIconNotPinned'
-  console.log(classNames)
   return (
     <div className={classNames} onMouseDown={handleClick}>{svg.aragon(40)}</div>
   )
