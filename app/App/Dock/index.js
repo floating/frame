@@ -8,13 +8,17 @@ import link from '../../link'
 
 // const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
-const Dapp = ({ domain }) => {
+const Dapp = ({ domain, pinned }) => {
+  console.log(domain, pinned)
   const handleClick = (e) => {
-    if (e.button === 2) link.rpc('removeDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp removed') })
-    else link.rpc('launchDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp launched') })
+    if (e.button === 2) return link.rpc('removeDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp removed') })
+    if (!pinned) return window.alert('Dapp not pinned yet')
+    link.rpc('launchDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp launched') })
   }
+  const classNames = pinned ? 'dockAppIcon' : 'dockAppIcon dockAppIconNotPinned'
+  console.log(classNames)
   return (
-    <div className='dockAppIcon' onMouseDown={handleClick}>{svg.aragon(22)}</div>
+    <div className={classNames} onMouseDown={handleClick}>{svg.aragon(40)}</div>
   )
 }
 
@@ -61,8 +65,8 @@ class Dock extends React.Component {
         <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.octicon('chevron-left', { height: 18 })}</div>
         <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.octicon('plus', { height: 18 })}</div>
         <div className='dockApps'>
-          {dapps.map(({ domain }, i) => {
-            return <Dapp key={domain + i} domain={domain} />
+          {dapps.map((dapp, i) => {
+            return <Dapp key={dapp.domain + i} {...dapp} />
           })}
         </div>
         <div className='appStore'>

@@ -1,12 +1,11 @@
 const electron = require('electron')
 const log = require('electron-log')
 const store = require('../store')
-const axios = require('axios')
 const ipfs = require('../clients/Ipfs')
 const { hash } = require('eth-ens-namehash')
 const { fetchFavicon } = require('@meltwater/fetch-favicon')
+const { execSync } = require('child_process')
 
-// const userData = app ? app.getPath('userData') : './test/.userData'
 const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
 const mock = {
@@ -108,18 +107,18 @@ class Dapps {
   }
 
   // EXPERIMENTAL
-  async _getIcon () {
-    const TEMP_URL = 'https://www.myetherwallet.com/'
-    let iconUrl = await fetchFavicon(TEMP_URL)
-    if (iconUrl) {
-      const response = await axios({
-        url: iconUrl,
-        method: 'GET',
-        responseType: 'arraybuffer'
-      })
-      // fs.writeFileSync('test.png', response.data)
-    }
-  }
+  // async _getIcon () {
+  //   const TEMP_URL = 'https://www.myetherwallet.com/'
+  //   let iconUrl = await fetchFavicon(TEMP_URL)
+  //   if (iconUrl) {
+  //     const response = await axios({
+  //       url: iconUrl,
+  //       method: 'GET',
+  //       responseType: 'arraybuffer'
+  //     })
+  //     // fs.writeFileSync('test.png', response.data)
+  //   }
+  // }
 }
 
 const dapps = new Dapps()
