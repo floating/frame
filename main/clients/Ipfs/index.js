@@ -1,6 +1,6 @@
 const { app } = require('electron')
+
 const log = require('electron-log')
-const axios = require('axios')
 const ipfsHttpClient = require('ipfs-http-client')
 
 const Client = require('../Client')
@@ -12,23 +12,22 @@ class IPFS extends Client {
   constructor (options) {
     super('ipfs', options)
 
-    // TODO: Handle error when client not installed
-    this.api = ipfsHttpClient(this.getConfig('Addresses.API'))
+    this.api = null
 
     // On 'service ready' -> start ipfs
     this.on('ready', async () => {
       // Run 'ipfs init'
-      this.init()
+      await this.init()
 
-      // Define error handler
-      const errorHandler = (err) => {
+      // Setup HTTP client
+      this.api = ipfsHttpClient(this.getConfig('Addresses.API'))
+
+      // Run 'ipfs daemon'
+      this.run(['daemon'], (err) => {
         if (err.message.includes('ipfs daemon is running')) {
           windows.broadcast('main:action', 'notify', 'ipfsAlreadyRunning')
         }
-      }
-
-      // Run 'ipfs daemon'
-      this.run(['daemon'], errorHandler)
+      })
     })
 
     // Handle stdout
@@ -40,7 +39,7 @@ class IPFS extends Client {
       }
       // On 'repo migration required' -> run migration
       if (stdout.match(/Run migrations now/i)) {
-        log.info('ipfs: clint asking to run repo migration')
+        log.info('ipfs: client asking to run repo migration')
         this.process.stdin.write('y\n')
       }
     })
@@ -49,7 +48,6 @@ class IPFS extends Client {
   async init () {
     try {
       await this.runOnce(['init'])
-      log.info('ipfs: repo initiated')
     } catch (err) {
       log.info('ipfs: repo already initiated')
     }
