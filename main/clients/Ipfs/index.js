@@ -1,9 +1,11 @@
 const { app } = require('electron')
-
+const path = require('path')
 const log = require('electron-log')
 const ipfsHttpClient = require('ipfs-http-client')
 
 const Client = require('../Client')
+const { userData } = require('../../util')
+const peers = require('./peers.json')
 
 // Mock windows module if running tests
 const windows = app ? require('../../windows') : { broadcast: () => {} }
@@ -11,6 +13,8 @@ const windows = app ? require('../../windows') : { broadcast: () => {} }
 class IPFS extends Client {
   constructor (options) {
     super('ipfs', options)
+
+    process.env.IPFS_PATH = path.resolve(userData, 'ipfs-repo')
 
     this.api = null
 
@@ -31,9 +35,18 @@ class IPFS extends Client {
     })
 
     // Handle stdout
-    this.on('stdout', (stdout) => {
+    this.on('stdout', async (stdout) => {
       // On 'daemon ready' -> client state 'ready'
       if (stdout.match(/Daemon is ready\n$/i)) {
+
+        // Add Frame peers
+        await Promise.all(peers.map((peer) => this.runOnce(['swarm', 'connect', peer])))
+
+        // TODO: Remove logging of active peers below
+        const activePeers = await this.runOnce(['swarm', 'peers'])
+        log.info('ipfs: active peers', activePeers)
+
+        // Set state to 'ready'
         log.info('ipfs: ready')
         this.emit('state', 'ready')
       }
