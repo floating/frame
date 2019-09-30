@@ -29,6 +29,9 @@ class Dapps {
     setInterval(() => {
       this._updateHashes()
     }, 60000)
+    setInterval(() => {
+      this._updatePins()
+    }, 15000)
   }
 
   async add (domain, cb) {
@@ -100,11 +103,27 @@ class Dapps {
       if (result && result.hash !== dapp.hash) {
         store.updateDapp(namehash, { hash: result.hash, pinned: false })
         this._pin(result.hash, (err) => {
-          if (err) log.error(err)
+          if (err) return log.error(err)
+          store.updateDapp(namehash, { pinned: true })
         })
       }
     })
   }
+
+  _updatePins () {
+    Object.entries(store('main.dapps')).forEach(async ([namehash, dapp]) => {
+      const ipfsState = store('main.clients.ipfs.state')
+      if (ipfsState === 'ready' && !dapp.pinned) {
+        console.log('Pinning ', dapp.domain)
+        this._pin(dapp.hash, (err) => {
+          if (err) return log.error(err)
+          store.updateDapp(namehash, { pinned: true })
+        })
+      }
+    })
+  }
+
+
 
   // EXPERIMENTAL
   // async _getIcon () {
