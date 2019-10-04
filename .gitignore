@@ -9,4 +9,5 @@ dist
 release
 test/.userData
 scratch
+orbitdb
 .vscode

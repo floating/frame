@@ -84,6 +84,9 @@ const initial = {
     addresses: main('addresses', {}), // New persisted address permissions
     signers: {},
     savedSigners: {},
+    nebula: {
+      orbits: main('nebula.orbits', {})
+    },
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },

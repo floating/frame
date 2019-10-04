@@ -29,12 +29,13 @@ const clients = require('./clients')
 const signers = require('./signers')
 const persist = require('./store/persist')
 require('./dapps')
+require('./nebula')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
-process.on('uncaughtException', (e) => {
+process.on('uncaughtException', async (e) => {
   if (e.code === 'EADDRINUSE') {
     dialog.showErrorBox('Frame is already running', 'Frame is already running or another appication is using port 1248.')
   } else {
@@ -43,7 +44,7 @@ process.on('uncaughtException', (e) => {
   log.error('uncaughtException')
   log.error(e)
   // Kill all clients running as child processes
-  clients.stop()
+  await clients.stop()
   throw e
   // setTimeout(() => app.quit(), 50)
 })

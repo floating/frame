@@ -89,6 +89,8 @@
     "fs-extra": "8.1.0",
     "hdkey": "1.1.1",
     "ipfs-http-client": "^37.0.2",
+    "lodash": "^4.17.15",
+    "nebula": "floating/nebula-draft",
     "node-hid": "0.7.9",
     "query-string": "6.8.3",
     "react": "16.9.0",

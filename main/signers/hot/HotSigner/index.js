@@ -162,6 +162,7 @@ class HotSigner extends Signer {
   }
 
   _callWorker (payload, cb) {
+    console.log(payload)
     if (!this._worker) throw Error('Worker not running')
     // If token not yet received -> retry in 100 ms
     if (!this._token) return setTimeout(() => this._callWorker(payload, cb), 100)

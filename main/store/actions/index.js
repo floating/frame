@@ -1,5 +1,6 @@
 const uuidv4 = require('uuid/v4')
 const { URL } = require('url')
+const _ = require('lodash')
 
 let trayInitial = true
 
@@ -253,5 +254,12 @@ module.exports = {
     })
   },
   initialSignerPos: (u, pos) => u('selected.position.initial', _ => pos),
-  initialScrollPos: (u, pos) => u('selected.position.scrollTop', _ => pos)
+  initialScrollPos: (u, pos) => u('selected.position.scrollTop', _ => pos),
+  addOrbit: (u, address, orbit) => {
+    u(`main.nebula.orbits.${address}`, (orbits = []) => {
+      // Add orbit, remove duplicates and return
+      return _.uniqWith([...orbits, orbit], _.isEqual)
+    })
+  }
+
 }
