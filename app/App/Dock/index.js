@@ -34,13 +34,15 @@ class Dock extends React.Component {
     this.undocked = (Array.from(Array(50).keys())).map(i => {
       return {
         color: randomColor(),
-        docked: false
+        docked: false,
+        icon: i % 3 === 0 ? svg.aragon(28) : i % 3 === 1 ? svg.fingerprint(20) : svg.seedling(24)
       }
     })
     this.docked = (Array.from(Array(8).keys())).map(i => {
       return {
         color: randomColor(),
-        docked: true
+        docked: true,
+        icon: i % 3 === 0 ? svg.aragon(28) : i % 3 === 1 ? svg.fingerprint(20) : svg.seedling(24)
       }
     })
   }
@@ -162,7 +164,7 @@ class Dock extends React.Component {
               }}
             >
               <div className='draggedAppCard'>
-                {svg.aragon(28)}
+                {this.dragging.dapp.icon}
               </div>
             </div>
           ) : null}
@@ -202,7 +204,7 @@ class Dock extends React.Component {
                     className='dockedApp'
                     style={{ color: dapp.color }}
                   >
-                    <div style={{ opacity: 0.3 }}>{svg.aragon(28)}</div>
+                    <div style={{ opacity: 0.3 }}>{dapp.icon}</div>
                   </div>
                 )
               } else {
@@ -214,7 +216,7 @@ class Dock extends React.Component {
                     onMouseDown={e => this.onMouseDownDocked(e, dapp, i)}
                     onMouseEnter={e => { if (drag) this.moveDrag(dapp, i) }}
                   >
-                    {svg.aragon(28)}
+                    {dapp.icon}
                   </div>
                 )
               }
@@ -241,7 +243,7 @@ class Dock extends React.Component {
                         transform: 'scale(1.4)'
                       }}
                     >
-                      {svg.aragon(28)}
+                      {dapp.icon}
                     </div>
                   </div>
                 )
@@ -255,7 +257,7 @@ class Dock extends React.Component {
                     onMouseEnter={e => { if (drag) this.moveDrag(dapp, i) }}
                   >
                     <div className='addedAppCard'>
-                      {svg.aragon(28)}
+                      {dapp.icon}
                     </div>
                   </div>
                 )
