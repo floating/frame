@@ -40,7 +40,7 @@ const detectMouse = () => {
       m2.y = m2.y - area.y
       if (m2.x >= minX && m2.y === m1.y) {
         glide = true
-        api.showTray()
+        api.showTray(true)
       } else {
         detectMouse()
       }
@@ -186,7 +186,7 @@ const api = {
       }, 640)
     }
   },
-  showTray: () => {
+  showTray: (dock) => {
     clearTimeout(mouseTimeout)
     hideShow.current = 'showing'
     if (hideShow.running) {
@@ -199,13 +199,13 @@ const api = {
       windows.tray.setVisibleOnAllWorkspaces(true)
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setSize(430, dev ? 740 : area.height)
+      windows.tray.setSize(dock ? 48 : 430, dev ? 740 : area.height)
       const pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')
       windows.tray.show()
-      windows.tray.send('main:action', 'trayOpen', true)
+      windows.tray.send('main:action', 'trayOpen', true, { dock })
       windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
         if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()

@@ -141,11 +141,13 @@ class Dock extends React.Component {
 
   render () {
     const open = this.store('tray.open')
+    const dock = this.store('tray.dockOnly')
     const expanded = this.store('dock.expand')
-    let transform = open ? 'translate3d(-425px, 0px, 0px)' : 'translate3d(0px, 0px, 0px)'
-    if (expanded) transform = 'translate3d(-718px, 0px, 0px)'
+    const base = open ? -425 : dock ? -55 : 0
+    let transform = `translate3d(${base}px, 0px, 0px)`
+    if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
     const transition = '0.32s cubic-bezier(.82,0,.12,1) all'
-    const transitionDelay = expanded ? '0s' : open ? '0s' : '0s'
+    const transitionDelay = '0s'
     const dapps = Object.keys(this.store('main.dapps')).map((key) => this.store(`main.dapps.${key}`))
     return (
       <div id='dock' style={{ transform, transition, transitionDelay }}>
@@ -176,7 +178,7 @@ class Dock extends React.Component {
                 onMouseLeave={e => this.cancelRemoval()}
               >
                 {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
-                {svg.trash(18)}
+                {svg.trash(16)}
               </div>
             </div>
           ) : (
