@@ -165,8 +165,8 @@ class Dock extends React.Component {
             </div>
           ) : null}
         </div>
-        <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.octicon('chevron-left', { height: 18 })}</div>
-        <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.octicon('plus', { height: 18 })}</div>
+        <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.logo(18)}</div>
+        <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
         <div className='appStore'>
           <div className='addApp'>
             {this.dragging ? (
@@ -177,7 +177,7 @@ class Dock extends React.Component {
                   onMouseLeave={e => this.cancelRemoval()}
                 >
                   {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
-                  {svg.octicon('trashcan', { height: 22 })}
+                  {svg.trash(18)}
                 </div>
               </div>
             ) : (
@@ -202,7 +202,7 @@ class Dock extends React.Component {
                     className='dockedApp'
                     style={{ color: dapp.color }}
                   >
-                    <div style={{ opacity: 0.2 }}>{svg.aragon(28)}</div>
+                    <div style={{ opacity: 0.3 }}>{svg.aragon(28)}</div>
                   </div>
                 )
               } else {

@@ -31,8 +31,8 @@
 
 #dock
   position absolute
-  top 45px
-  bottom 45px
+  top 20px
+  bottom 20px
   right -800px
   width 800px
   padding-right 23px
@@ -93,6 +93,9 @@
     display flex
     justify-content center
     align-items center
+    color outerspace08
+  .expandFrame:hover
+    color outerspace
 
   .toggleDock
     position absolute
@@ -104,6 +107,9 @@
     display flex
     justify-content center
     align-items center
+    color outerspace08
+  .toggleDock:hover
+    color outerspace
 
   .dockApps
     position absolute
@@ -173,10 +179,11 @@
       z-index 3
 
       .removeApp
+        margin-top 5px
         position relative
         height 70px
         width 70px
-        background thin
+        background bad02
         border-radius 35px
         display flex
         justify-content center
