@@ -31,7 +31,7 @@ class Dock extends React.Component {
       ensInput: this.addAppFill,
       pendingRemoval: false
     }
-    this.undocked = (Array.from(Array(50).keys())).map(i => {
+    this.undocked = (Array.from(Array(20).keys())).map(i => {
       return {
         color: randomColor(),
         docked: false,
@@ -196,6 +196,16 @@ class Dock extends React.Component {
               <div className='addAppSubmit' onMouseDown={::this.handleAddApp}>Add App</div>
             </div>
           )}
+          <div
+            className='dragCatchDock'
+            onMouseEnter={e => {
+              const drag = this.dragging
+              if (drag && !drag.dapp.docked) {
+                const before = e.clientY < (e.target.clientHeight / 2)
+                this.moveDrag({ docked: true }, before ? 0 : this.docked.length)
+              }
+            }}
+          />
           <div className='dockApps' style={{ marginTop: `-${(this.docked.length * 48) / 2}px` }}>
             {dapps.map((dapp, i) => {
               return <Dapp key={dapp.domain + i} {...dapp} />
@@ -226,14 +236,15 @@ class Dock extends React.Component {
                 )
               }
             })}
-            {this.docked.length === 0 && this.dragging ? (
-              <div
-                className='dockedHolder'
-                onMouseEnter={e => { this.moveDrag({ docked: true }, 0) }}
-              />
-            ) : null}
           </div>
           <div className='addedApps'>
+            <div
+              className='dragCatch'
+              onMouseEnter={e => {
+                const drag = this.dragging
+                if (drag && drag.dapp.docked) this.moveDrag({ docked: false }, this.undocked.length)
+              }}
+            />
             {this.undocked.map((dapp, i) => {
               const drag = this.dragging
               if (drag && drag.dapp && drag.dapp.docked === dapp.docked && drag.index === i) {

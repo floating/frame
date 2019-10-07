@@ -50,6 +50,14 @@
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
 
+  .dragCatchDock
+    position absolute
+    top 48px
+    left 0px
+    bottom 48px
+    width 48px
+    z-index 3
+
   .appMovement
     position absolute
     top 0
@@ -263,6 +271,8 @@
       display flex
       flex-wrap wrap
       align-items flex-start
+      align-content flex-start
+      justify-content flex-start
       margin 20px 0px 0px 48px
       padding 130px 10px 10px 10px
       box-sizing border-box
@@ -270,7 +280,17 @@
       overflow-y scroll
       z-index 2
 
+      .dragCatch
+        position absolute
+        top 130px
+        right 10px
+        bottom 0
+        left 10px
+        z-index 3
+
     .addedApp
+      position relative
+      z-index 5
       padding 10px
 
       .addedAppCard
@@ -286,6 +306,7 @@
         display flex
         justify-content center
         align-items center
+        z-index 5
 
       div, svg
         pointer-events none
