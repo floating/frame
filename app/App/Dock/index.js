@@ -91,6 +91,11 @@ class Dock extends React.Component {
   }
 
   releaseDrag = () => {
+    if (this.state.pendingRemoval) {
+      const drag = this.dragging
+      const removeFrom = drag.dapp.docked ? this.docked : this.undocked
+      removeFrom.splice(drag.index, 1)
+    }
     this.dragging = null
     this.forceUpdate()
     this.setState({ pendingRemoval: false })
