@@ -40,7 +40,11 @@ class IPFS extends Client {
       if (stdout.match(/Daemon is ready\n$/i)) {
 
         // Add Frame peers
-        await Promise.all(peers.map((peer) => this.runOnce(['swarm', 'connect', peer])))
+        try {
+          await Promise.all(peers.map((peer) => this.runOnce(['swarm', 'connect', peer])))
+        } catch (err) {
+          log.error('Failed to connect to Frame IPFS peers', err)
+        }
 
         // TODO: Remove logging of active peers below
         const activePeers = await this.runOnce(['swarm', 'peers'])
