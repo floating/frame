@@ -1,7 +1,38 @@
+@keyframes hold {
+  0% {
+    transform rotate(-13deg) scale(1)
+  }
+  100% {
+    transform rotate(-13deg) scale(1.2)
+  }
+}
+
+@keyframes target {
+  0% {
+    transform scale(1)
+    opacity 1
+  }
+  100% {
+    transform scale(1.4)
+    opacity 0
+  }
+}
+
+@keyframes removal {
+  0% {
+    transform scale(1)
+    opacity 1
+  }
+  100% {
+    transform scale(1.7)
+    opacity 0
+  }
+}
+
 #dock
   position absolute
-  top 45px
-  bottom 45px
+  top 20px
+  bottom 20px
   right -800px
   width 800px
   padding-right 23px
@@ -12,12 +43,45 @@
   align-items center
   transform translate3d(0px, 0px, 0px)
   will-change transform
-  background rgba(220, 224, 244, 1)
+  background whiteglow
   border-top-left-radius 6px
   border-bottom-left-radius 6px
   margin 0px -30px 0px 0px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
+
+  .appMovement
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    z-index 2000
+    pointer-events none
+
+    .draggedApp
+      position absolute
+      padding 10px
+
+      .draggedAppCard
+        padding-top 3px
+        min-width 48px
+        min-height 48px
+        width 48px
+        height 48px
+        border-radius 6px
+        box-shadow cardDrop
+        background lowerlight
+        box-sizing border-box
+        display flex
+        justify-content center
+        align-items center
+        pointer-events none
+        animation-name hold
+        animation-iteration-count infinite
+        animation-direction alternate
+        animation-duration 1.4s
+        animation-timing-function linear
 
   .expandFrame
     position absolute
@@ -29,6 +93,10 @@
     display flex
     justify-content center
     align-items center
+    color outerspace08
+
+  .expandFrame:hover
+    color outerspace
 
   .toggleDock
     position absolute
@@ -40,11 +108,15 @@
     display flex
     justify-content center
     align-items center
+    color outerspace08
+
+  .toggleDock:hover
+    color outerspace
 
   .dockApps
-    position relative
-    width 100%
-    padding-top 10px
+    position absolute
+    left 0
+    top 50%
     z-index 1000
 
     .dockAppIcon
@@ -59,107 +131,174 @@
     .dockAppIconNotPinned
       opacity 0.5
 
+  .dockedHolder
+    width 28px
+    height 28px
+    margin -14px 10px 10px 10px
+    box-sizing border-box
+    background thick
+    border-radius 14px
+    animation-name target
+    animation-iteration-count infinite
+    animation-duration 1s
+    animation-timing-function linear
+
+  .dockedApp
+    min-width 48px
+    min-height 48px
+    width 48px
+    height 48px
+    padding-top 3px
+    box-sizing border-box
+    display flex
+    justify-content center
+    align-items center
+    border-bottom 1px solid thick
+    div, svg
+      pointer-events none
+
+  .dockedApp:last-child
+    border-bottom none
+
   .appStore
     z-index 100
     position absolute
     top 0
-    left 48px
+    left 0px
     bottom 0
-    width 292px
-    background lightShade
+    width 340px
+    background thinner
 
-    .addApp
-      height 110px
-      display flex
-      justify-content flex-start
-      align-items center
-      flex-direction column
-
-      .addAppForm
-        width 260px
-        height 110px
-        display flex
-        justify-content center
-        align-items center
-        flex-direction column
-
-        .addAppSubmit
-          min-height 30px
-          height 30px
-          background outerspace
-          font-size 12px
-          margin 10px 0px 0px 0px
-          padding 0px 40px 0px 44px
-          border-radius 15px
-          display flex
-          justify-content center
-          align-items center
-          color spacewhite
-          font-weight 600
-          box-shadow cardDrop,0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-          text-transform uppercase
-          letter-spacing 3px
-
-        .addAppInput
-          background spacewhite
-          min-height 40px
-          height 40px
-          width 100%
-          position relative
-          border-radius 4px
-          color outerspace08
-          box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-
-          input
-            outline none
-            border 0px
-            height 40px
-            background transparent
-            position absolute
-            top 0
-            right 0
-            bottom 0
-            left 0
-            box-shadow none
-            text-align center
-            width 100%
-            font-size 18px
-
-    .addedApps
-      width 100%
-      display flex
-      flex-wrap wrap
-      padding 20px 0px 0px 20px
-      box-sizing border-box
-      position relative
-
-    .addedApp
-      min-width 48px
-      min-height 48px
-      width 48px
-      height 48px
-      margin 0px 20px 20px 0px
-      padding-top 3px
-      box-sizing border-box
+    .addAppForm
+      position absolute
+      left 67px
+      right 19px
+      top 20px
+      height 120px
       display flex
       justify-content center
       align-items center
-      background light
+      flex-direction column
+      z-index 3
       border-radius 6px
-      box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+      box-shadow cardDrop
+      background lowerlight
 
-    .addedApp:before
-      content '*'
+      .removeApp
+        position relative
+        height 60px
+        width 60px
+        background thin
+        border-radius 30px
+        display flex
+        justify-content center
+        align-items center
+        color outerspace08
 
-    .appStoreShade
-      opacity 0
+      .removeAppPending
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        border-radius 35px
+        background bad08
+        animation-name removal
+        animation-iteration-count infinite
+        animation-duration 1s
+        animation-timing-function linear
+
+      .addAppSubmit
+        position absolute
+        bottom 0px
+        left 10px
+        right 10px
+        height 40px
+        font-size 13px
+        display flex
+        justify-content center
+        align-items center
+        font-weight 500
+        text-transform uppercase
+        letter-spacing 2px
+        color outerspace08
+
+      .addAppInput
+        position absolute
+        top 10px
+        bottom 40px
+        left 10px
+        right 10px
+        background lowlight
+        color outerspace08
+        display flex
+        justify-content center
+        align-items center
+        border-radius 4px
+        box-shadow cardDrop, 0px 0px 17px rgba(0, 35, 80, 0.05)
+
+        input
+          padding 10px
+          outline none
+          border 0px
+          height 100%
+          background transparent
+          position absolute
+          top 0
+          right 0
+          bottom 0
+          left 0
+          box-shadow none
+          text-align center
+          width 100%
+          font-size 20px
+          color outerspace08
+
+    .addedApps
       position absolute
       top 0
       right 0
       bottom 0
       left 0
-      z-index 0
+      display flex
+      flex-wrap wrap
+      align-items flex-start
+      margin 20px 0px 0px 48px
+      padding 130px 10px 10px 10px
+      box-sizing border-box
+      overflow-x hidden
+      overflow-y scroll
+      z-index 2
+
+    .addedApp
+      padding 10px
+
+      .addedAppCard
+        padding-top 3px
+        min-width 48px
+        min-height 48px
+        width 48px
+        height 48px
+        border-radius 6px
+        box-shadow cardDrop
+        background lowerlight
+        box-sizing border-box
+        display flex
+        justify-content center
+        align-items center
+
+      div, svg
+        pointer-events none
+
+    .appStoreShade
+      opacity 1
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 48px
+      z-index 1
       pointer-events none
       transition standardSlow
       transition-delay 0.00s
-      background linear-gradient(45deg, pending04, good04)
+      background lightShade

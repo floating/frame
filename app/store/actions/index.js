@@ -44,8 +44,10 @@ export const toggleSettings = u => {
 }
 
 let trayInitial = true
-export const trayOpen = (u, open) => {
+export const trayOpen = (u, open, settings = {}) => {
+  if (settings.dock) return u('tray.dockOnly', _ => open)
   u('tray.open', _ => open)
+  if (!open) u('tray.dockOnly', _ => false)
   if (open && trayInitial) {
     trayInitial = false
     setTimeout(() => {

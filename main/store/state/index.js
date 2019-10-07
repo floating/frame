@@ -25,7 +25,8 @@ const initial = {
   signers: {},
   tray: {
     open: false,
-    initial: true
+    initial: true,
+    dockOnly: false
   },
   balances: {},
   selected: {
