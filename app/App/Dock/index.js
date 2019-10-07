@@ -28,7 +28,8 @@ class Dock extends React.Component {
     super(...args)
     this.addAppFill = 'Enter ENS Domain'
     this.state = {
-      ensInput: this.addAppFill
+      ensInput: this.addAppFill,
+      pendingRemoval: false
     }
     this.undocked = (Array.from(Array(50).keys())).map(i => {
       return {
@@ -71,7 +72,7 @@ class Dock extends React.Component {
     if (this.currentTop > this.topBound) this.currentTop = this.topBound
     const deltaX = e.pageX - this.initialX
     this.currentLeft = this.initialLeft + deltaX
-    if (this.currentLeft < 0) this.currentLeft = 0
+    if (this.currentLeft < -10) this.currentLeft = -10
     if (this.currentLeft > this.leftBound) this.currentLeft = this.leftBound
     this.forceUpdate()
   }
@@ -88,33 +89,40 @@ class Dock extends React.Component {
   }
 
   releaseDrag = () => {
-    this.pressedApp = null
     this.dragging = null
     this.forceUpdate()
+    this.setState({ pendingRemoval: false })
     window.removeEventListener('mousemove', this.tabDrag)
     window.removeEventListener('mouseup', this.releaseDrag)
   }
 
+  removePending () {
+    this.setState({ pendingRemoval: true })
+  }
+
+  cancelRemoval () {
+    this.setState({ pendingRemoval: false })
+  }
+
   onMouseDownDocked = (e, dapp, index) => {
-    e.persist()
+    if (!this.store('dock.expand')) return
     this.dragging = { dapp, index }
     const parent = e.target.offsetParent
     const offsetTop = parent.offsetTop
     const offsetLeft = parent.offsetLeft
-    this.topBound = parent.offsetParent.clientHeight - e.target.clientHeight
-    this.leftBound = parent.offsetParent.clientWidth - e.target.clientWidth
-    this.pressedApp = { index }
+    this.topBound = parent.offsetParent.clientHeight - 68
+    this.leftBound = parent.offsetParent.clientWidth - 68
     this.initialY = e.pageY
     this.initialX = e.pageX
-    this.initialTop = this.currentTop = e.target.offsetTop + offsetTop
-    this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft
+    this.initialTop = this.currentTop = e.target.offsetTop + offsetTop - 10
+    this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft - 10
     this.forceUpdate()
     window.addEventListener('mousemove', this.tabDrag)
     window.addEventListener('mouseup', this.releaseDrag)
   }
 
   onMouseDownUndocked = (e, dapp, index) => {
-    e.persist()
+    if (!this.store('dock.expand')) return
     this.dragging = { dapp, index }
     const parent = e.target.offsetParent
     const scrollTop = parent.scrollTop
@@ -122,7 +130,6 @@ class Dock extends React.Component {
     const offsetLeft = parent.offsetLeft
     this.topBound = parent.offsetParent.clientHeight - e.target.clientHeight
     this.leftBound = parent.offsetParent.clientWidth - e.target.clientWidth
-    this.pressedApp = { index }
     this.initialY = e.pageY
     this.initialX = e.pageX
     this.initialTop = this.currentTop = e.target.offsetTop - scrollTop + offsetTop
@@ -145,14 +152,16 @@ class Dock extends React.Component {
         <div className='appMovement'>
           {this.dragging ? (
             <div
-              className='draggingApp'
+              className='draggedApp'
               style={{
                 top: this.currentTop,
                 left: this.currentLeft,
                 color: this.dragging.dapp.color
               }}
             >
-              {svg.aragon(28)}
+              <div className='draggedAppCard'>
+                {svg.aragon(28)}
+              </div>
             </div>
           ) : null}
         </div>
@@ -160,12 +169,25 @@ class Dock extends React.Component {
         <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.octicon('plus', { height: 18 })}</div>
         <div className='appStore'>
           <div className='addApp'>
-            <div className='addAppForm'>
-              <div className='addAppInput'>
-                <input value={this.state.ensInput} onFocus={::this.handleOnFocus} onBlur={::this.handleOnBlur} onChange={e => this.setState({ ensInput: e.target.value })} />
+            {this.dragging ? (
+              <div className='addAppForm'>
+                <div
+                  className='removeApp'
+                  onMouseEnter={e => this.removePending()}
+                  onMouseLeave={e => this.cancelRemoval()}
+                >
+                  {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
+                  {svg.octicon('trashcan', { height: 22 })}
+                </div>
               </div>
-              <div className='addAppSubmit' onMouseDown={::this.handleAddApp}>Add App</div>
-            </div>
+            ) : (
+              <div className='addAppForm'>
+                <div className='addAppInput'>
+                  <input value={this.state.ensInput} onFocus={::this.handleOnFocus} onBlur={::this.handleOnBlur} onChange={e => this.setState({ ensInput: e.target.value })} />
+                </div>
+                <div className='addAppSubmit' onMouseDown={::this.handleAddApp}>Add App</div>
+              </div>
+            )}
           </div>
           <div className='dockApps' style={{ marginTop: `-${(this.docked.length * 48) / 2}px` }}>
             {dapps.map((dapp, i) => {
@@ -174,7 +196,15 @@ class Dock extends React.Component {
             {this.docked.map((dapp, i) => {
               const drag = this.dragging
               if (drag && drag.dapp && drag.dapp.docked === dapp.docked && drag.index === i) {
-                return <div key={i} className='dockedApp' style={{ opacity: 0.2, color: dapp.color }}>{svg.aragon(28)}</div>
+                return (
+                  <div
+                    key={i}
+                    className='dockedApp'
+                    style={{ color: dapp.color }}
+                  >
+                    <div style={{ opacity: 0.2 }}>{svg.aragon(28)}</div>
+                  </div>
+                )
               } else {
                 return (
                   <div
@@ -182,7 +212,7 @@ class Dock extends React.Component {
                     className='dockedApp'
                     style={{ color: dapp.color }}
                     onMouseDown={e => this.onMouseDownDocked(e, dapp, i)}
-                    onMouseOver={e => { if (drag) this.moveDrag(dapp, i) }}
+                    onMouseEnter={e => { if (drag) this.moveDrag(dapp, i) }}
                   >
                     {svg.aragon(28)}
                   </div>
@@ -192,7 +222,7 @@ class Dock extends React.Component {
             {this.docked.length === 0 && this.dragging ? (
               <div
                 className='dockedHolder'
-                onMouseOver={e => { this.moveDrag({ docked: true }, 0) }}
+                onMouseEnter={e => { this.moveDrag({ docked: true }, 0) }}
               />
             ) : null}
           </div>
@@ -200,7 +230,21 @@ class Dock extends React.Component {
             {this.undocked.map((dapp, i) => {
               const drag = this.dragging
               if (drag && drag.dapp && drag.dapp.docked === dapp.docked && drag.index === i) {
-                return <div key={i} className='addedApp' style={{ opacity: 0.2, color: dapp.color }}>{svg.aragon(28)}</div>
+                return (
+                  <div key={i} className='addedApp'>
+                    <div
+                      className='addedAppCard'
+                      style={{
+                        color: dapp.color,
+                        opacity: 0.3,
+                        boxShadow: 'none',
+                        transform: 'scale(1.4)'
+                      }}
+                    >
+                      {svg.aragon(28)}
+                    </div>
+                  </div>
+                )
               } else {
                 return (
                   <div
@@ -208,9 +252,11 @@ class Dock extends React.Component {
                     className='addedApp'
                     style={{ color: dapp.color }}
                     onMouseDown={e => this.onMouseDownUndocked(e, dapp, i)}
-                    onMouseOver={e => { if (drag) this.moveDrag(dapp, i) }}
+                    onMouseEnter={e => { if (drag) this.moveDrag(dapp, i) }}
                   >
-                    {svg.aragon(28)}
+                    <div className='addedAppCard'>
+                      {svg.aragon(28)}
+                    </div>
                   </div>
                 )
               }

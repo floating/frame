@@ -18,6 +18,17 @@
   }
 }
 
+@keyframes removal {
+  0% {
+    transform scale(1)
+    opacity 1
+  }
+  100% {
+    transform scale(1.7)
+    opacity 0
+  }
+}
+
 #dock
   position absolute
   top 45px
@@ -48,24 +59,29 @@
     z-index 2000
     pointer-events none
 
-    .draggingApp
+    .draggedApp
       position absolute
-      width 48px
-      height 48px
-      margin 0px 20px 20px 0px
-      padding-top 3px
-      box-sizing border-box
-      display flex
-      justify-content center
-      align-items center
-      background lowlight
-      border-radius 6px
-      box-shadow cardDrop, 0px 2px 40px rgba(0, 34, 132, 0.1)
-      animation-name hold
-      animation-iteration-count infinite
-      animation-direction alternate
-      animation-duration 1.4s
-      animation-timing-function linear
+      padding 10px
+
+      .draggedAppCard
+        padding-top 3px
+        min-width 48px
+        min-height 48px
+        width 48px
+        height 48px
+        border-radius 6px
+        box-shadow cardDrop
+        background lowlight
+        box-sizing border-box
+        display flex
+        justify-content center
+        align-items center
+        pointer-events none
+        animation-name hold
+        animation-iteration-count infinite
+        animation-direction alternate
+        animation-duration 1.4s
+        animation-timing-function linear
 
   .expandFrame
     position absolute
@@ -124,7 +140,6 @@
     min-height 48px
     width 48px
     height 48px
-    margin 0px 0px 0px 0px
     padding-top 3px
     box-sizing border-box
     display flex
@@ -154,8 +169,32 @@
       justify-content center
       align-items center
       flex-direction column
-      padding 60px 20px 0px 20px
+      padding 60px 20px 40px 20px
       z-index 3
+
+      .removeApp
+        position relative
+        height 70px
+        width 70px
+        background thin
+        border-radius 35px
+        display flex
+        justify-content center
+        align-items center
+        color bad
+
+      .removeAppPending
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        border-radius 35px
+        background bad08
+        animation-name removal
+        animation-iteration-count infinite
+        animation-duration 1s
+        animation-timing-function linear
 
       .addAppSubmit
         min-height 30px
@@ -210,8 +249,7 @@
       flex-wrap wrap
       align-items flex-start
       margin 180px 0px 0px 48px
-      padding-left 20px
-      padding-top 20px
+      padding 10px
       box-sizing border-box
       overflow-x hidden
       overflow-y scroll
@@ -219,19 +257,21 @@
       background lightShade
 
     .addedApp
-      min-width 48px
-      min-height 48px
-      width 48px
-      height 48px
-      margin 0px 20px 20px 0px
-      padding-top 3px
-      box-sizing border-box
-      display flex
-      justify-content center
-      align-items center
-      background lowlight
-      border-radius 6px
-      box-shadow cardDrop
+      padding 10px
+
+      .addedAppCard
+        padding-top 3px
+        min-width 48px
+        min-height 48px
+        width 48px
+        height 48px
+        border-radius 6px
+        box-shadow cardDrop
+        background lowlight
+        box-sizing border-box
+        display flex
+        justify-content center
+        align-items center
 
       div, svg
         pointer-events none
