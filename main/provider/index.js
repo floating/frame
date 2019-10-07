@@ -112,6 +112,8 @@ class Provider extends EventEmitter {
   verifySignature (signed, message, address, cb) {
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
+        console.log(verifiedAddress.toLowerCase())
+        console.log(address.toLowerCase())
       if (verifiedAddress.toLowerCase() !== address.toLowerCase()) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
       cb(null, true)
     })
@@ -130,15 +132,8 @@ class Provider extends EventEmitter {
         this.resError(err.message, payload, res)
         cb(err.message)
       } else {
-        this.verifySignature(signed, message, address, (err, success) => {
-          if (err) {
-            this.resError(err.message, payload, res)
-            cb(err.message)
-          } else {
-            res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
-            cb(null, signed)
-          }
-        })
+        res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
+        cb(null, signed)
       }
     })
   }
@@ -156,15 +151,8 @@ class Provider extends EventEmitter {
         this.resError(err.message, payload, res)
         cb(err.message)
       } else {
-        const recoveredAddress = recoverTypedData(typedData, signed)
-        if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
-          const err = new Error('TypedData signature verification failed')
-          this.resError(err.message, { ...payload, recoveredAddress }, res)
-          cb(err.message)
-        } else {
-          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
-          cb(null, signed)
-        }
+        res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
+        cb(null, signed)
       }
     })
   }
