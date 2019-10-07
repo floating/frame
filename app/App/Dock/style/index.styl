@@ -43,7 +43,7 @@
   align-items center
   transform translate3d(0px, 0px, 0px)
   will-change transform
-  background rgba(220, 224, 244, 1)
+  background whiteglow
   border-top-left-radius 6px
   border-bottom-left-radius 6px
   margin 0px -30px 0px 0px
@@ -71,7 +71,7 @@
         height 48px
         border-radius 6px
         box-shadow cardDrop
-        background lowlight
+        background lowerlight
         box-sizing border-box
         display flex
         justify-content center
@@ -94,6 +94,7 @@
     justify-content center
     align-items center
     color outerspace08
+
   .expandFrame:hover
     color outerspace
 
@@ -108,6 +109,7 @@
     justify-content center
     align-items center
     color outerspace08
+
   .toggleDock:hover
     color outerspace
 
@@ -169,17 +171,20 @@
 
     .addAppForm
       position absolute
-      left 48px
-      width 260px
+      left 67px
+      right 19px
+      top 20px
+      height 120px
       display flex
       justify-content center
       align-items center
       flex-direction column
-      padding 60px 20px 40px 20px
       z-index 3
+      border-radius 6px
+      box-shadow cardDrop
+      background lowerlight
 
       .removeApp
-        margin-top 5px
         position relative
         height 70px
         width 70px
@@ -204,36 +209,39 @@
         animation-timing-function linear
 
       .addAppSubmit
-        min-height 30px
-        height 30px
-        background lowlight
-        font-size 12px
-        margin 10px 0px 0px 0px
-        padding 0px 40px 0px 44px
-        border-radius 15px
+        position absolute
+        bottom 0px
+        left 10px
+        right 10px
+        height 40px
+        font-size 13px
         display flex
         justify-content center
         align-items center
-        font-weight 600
-        box-shadow cardDrop
+        font-weight 500
         text-transform uppercase
-        letter-spacing 3px
+        letter-spacing 2px
         color outerspace08
 
       .addAppInput
+        position absolute
+        top 10px
+        bottom 40px
+        left 10px
+        right 10px
         background lowlight
-        min-height 40px
-        height 40px
-        width 100%
-        position relative
-        border-radius 4px
         color outerspace08
-        box-shadow cardDrop
+        display flex
+        justify-content center
+        align-items center
+        border-radius 4px
+        box-shadow cardDrop, 0px 0px 17px rgba(0, 35, 80, 0.05)
 
         input
+          padding 10px
           outline none
           border 0px
-          height 40px
+          height 100%
           background transparent
           position absolute
           top 0
@@ -243,7 +251,7 @@
           box-shadow none
           text-align center
           width 100%
-          font-size 18px
+          font-size 20px
           color outerspace08
 
     .addedApps
@@ -255,13 +263,12 @@
       display flex
       flex-wrap wrap
       align-items flex-start
-      margin 180px 0px 0px 48px
-      padding 10px
+      margin 20px 0px 0px 48px
+      padding 130px 10px 10px 10px
       box-sizing border-box
       overflow-x hidden
       overflow-y scroll
       z-index 2
-      background lightShade
 
     .addedApp
       padding 10px
@@ -274,7 +281,7 @@
         height 48px
         border-radius 6px
         box-shadow cardDrop
-        background lowlight
+        background lowerlight
         box-sizing border-box
         display flex
         justify-content center
@@ -294,4 +301,4 @@
       pointer-events none
       transition standardSlow
       transition-delay 0.00s
-      background rgba(0, 0, 50, 0.05)
+      background lightShade

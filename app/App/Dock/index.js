@@ -165,30 +165,28 @@ class Dock extends React.Component {
             </div>
           ) : null}
         </div>
-        <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.logo(18)}</div>
+        <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.logo(16)}</div>
         <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
         <div className='appStore'>
-          <div className='addApp'>
-            {this.dragging ? (
-              <div className='addAppForm'>
-                <div
-                  className='removeApp'
-                  onMouseEnter={e => this.removePending()}
-                  onMouseLeave={e => this.cancelRemoval()}
-                >
-                  {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
-                  {svg.trash(18)}
-                </div>
+          {this.dragging ? (
+            <div className='addAppForm'>
+              <div
+                className='removeApp'
+                onMouseEnter={e => this.removePending()}
+                onMouseLeave={e => this.cancelRemoval()}
+              >
+                {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
+                {svg.trash(18)}
               </div>
-            ) : (
-              <div className='addAppForm'>
-                <div className='addAppInput'>
-                  <input value={this.state.ensInput} onFocus={::this.handleOnFocus} onBlur={::this.handleOnBlur} onChange={e => this.setState({ ensInput: e.target.value })} />
-                </div>
-                <div className='addAppSubmit' onMouseDown={::this.handleAddApp}>Add App</div>
+            </div>
+          ) : (
+            <div className='addAppForm'>
+              <div className='addAppInput'>
+                <input value={this.state.ensInput} onFocus={::this.handleOnFocus} onBlur={::this.handleOnBlur} onChange={e => this.setState({ ensInput: e.target.value })} />
               </div>
-            )}
-          </div>
+              <div className='addAppSubmit' onMouseDown={::this.handleAddApp}>Add App</div>
+            </div>
+          )}
           <div className='dockApps' style={{ marginTop: `-${(this.docked.length * 48) / 2}px` }}>
             {dapps.map((dapp, i) => {
               return <Dapp key={dapp.domain + i} {...dapp} />
@@ -264,8 +262,6 @@ class Dock extends React.Component {
           </div>
           <div className='appStoreShade' />
         </div>
-        <div className='panelSwoop' style={{ bottom: '0px', top: '200px', left: '-20px', height: '1000px' }}>{svg.swoop()}</div>
-        <div className='panelSwoopBottom' style={{ bottom: '0px', left: '-20px' }}>{svg.swoop()}</div>
       </div>
     )
   }
