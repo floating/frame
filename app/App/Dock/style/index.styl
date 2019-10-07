@@ -1,3 +1,23 @@
+@keyframes hold {
+  0% {
+    transform rotate(-13deg) scale(1)
+  }
+  100% {
+    transform rotate(-13deg) scale(1.2)
+  }
+}
+
+@keyframes target {
+  0% {
+    transform scale(1)
+    opacity 1
+  }
+  100% {
+    transform scale(1.4)
+    opacity 0
+  }
+}
+
 #dock
   position absolute
   top 45px
@@ -18,6 +38,34 @@
   margin 0px -30px 0px 0px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
+
+  .appMovement
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    z-index 2000
+    pointer-events none
+
+    .draggingApp
+      position absolute
+      width 48px
+      height 48px
+      margin 0px 20px 20px 0px
+      padding-top 3px
+      box-sizing border-box
+      display flex
+      justify-content center
+      align-items center
+      background lowlight
+      border-radius 6px
+      box-shadow cardDrop, 0px 2px 40px rgba(0, 34, 132, 0.1)
+      animation-name hold
+      animation-iteration-count infinite
+      animation-direction alternate
+      animation-duration 1.4s
+      animation-timing-function linear
 
   .expandFrame
     position absolute
@@ -42,9 +90,9 @@
     align-items center
 
   .dockApps
-    position relative
-    width 100%
-    padding-top 10px
+    position absolute
+    left 0
+    top 50%
     z-index 1000
 
     .dockAppIcon
@@ -59,79 +107,116 @@
     .dockAppIconNotPinned
       opacity 0.5
 
+  .dockedHolder
+    width 28px
+    height 28px
+    margin -14px 10px 10px 10px
+    box-sizing border-box
+    background thick
+    border-radius 14px
+    animation-name target
+    animation-iteration-count infinite
+    animation-duration 1s
+    animation-timing-function linear
+
+  .dockedApp
+    min-width 48px
+    min-height 48px
+    width 48px
+    height 48px
+    margin 0px 0px 0px 0px
+    padding-top 3px
+    box-sizing border-box
+    display flex
+    justify-content center
+    align-items center
+    border-bottom 1px solid thick
+    div, svg
+      pointer-events none
+
+  .dockedApp:last-child
+    border-bottom none
+
   .appStore
     z-index 100
     position absolute
     top 0
-    left 48px
+    left 0px
     bottom 0
-    width 292px
-    background lightShade
+    width 340px
+    background thinner
 
-    .addApp
-      height 110px
+    .addAppForm
+      position absolute
+      left 48px
+      width 260px
       display flex
-      justify-content flex-start
+      justify-content center
       align-items center
       flex-direction column
+      padding 60px 20px 0px 20px
+      z-index 3
 
-      .addAppForm
-        width 260px
-        height 110px
+      .addAppSubmit
+        min-height 30px
+        height 30px
+        background lowlight
+        font-size 12px
+        margin 10px 0px 0px 0px
+        padding 0px 40px 0px 44px
+        border-radius 15px
         display flex
         justify-content center
         align-items center
-        flex-direction column
+        font-weight 600
+        box-shadow cardDrop
+        text-transform uppercase
+        letter-spacing 3px
+        color outerspace08
 
-        .addAppSubmit
-          min-height 30px
-          height 30px
-          background outerspace
-          font-size 12px
-          margin 10px 0px 0px 0px
-          padding 0px 40px 0px 44px
-          border-radius 15px
-          display flex
-          justify-content center
-          align-items center
-          color spacewhite
-          font-weight 600
-          box-shadow cardDrop,0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-          text-transform uppercase
-          letter-spacing 3px
+      .addAppInput
+        background lowlight
+        min-height 40px
+        height 40px
+        width 100%
+        position relative
+        border-radius 4px
+        color outerspace08
+        box-shadow cardDrop
 
-        .addAppInput
-          background spacewhite
-          min-height 40px
+        input
+          outline none
+          border 0px
           height 40px
+          background transparent
+          position absolute
+          top 0
+          right 0
+          bottom 0
+          left 0
+          box-shadow none
+          text-align center
           width 100%
-          position relative
-          border-radius 4px
+          font-size 18px
           color outerspace08
-          box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-
-          input
-            outline none
-            border 0px
-            height 40px
-            background transparent
-            position absolute
-            top 0
-            right 0
-            bottom 0
-            left 0
-            box-shadow none
-            text-align center
-            width 100%
-            font-size 18px
 
     .addedApps
-      width 100%
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
       display flex
       flex-wrap wrap
-      padding 20px 0px 0px 20px
+      align-items flex-start
+      margin 180px 0px 0px 48px
+      padding-left 20px
+      padding-top 20px
       box-sizing border-box
-      position relative
+      overflow-x hidden
+      overflow-y scroll
+      z-index 2
+      background lightShade
 
     .addedApp
       min-width 48px
@@ -144,22 +229,22 @@
       display flex
       justify-content center
       align-items center
-      background light
+      background lowlight
       border-radius 6px
-      box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+      box-shadow cardDrop
 
-    .addedApp:before
-      content '*'
+      div, svg
+        pointer-events none
 
     .appStoreShade
-      opacity 0
+      opacity 1
       position absolute
       top 0
       right 0
       bottom 0
-      left 0
-      z-index 0
+      left 48px
+      z-index 1
       pointer-events none
       transition standardSlow
       transition-delay 0.00s
-      background linear-gradient(45deg, pending04, good04)
+      background rgba(0, 0, 50, 0.05)
