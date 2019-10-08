@@ -185,7 +185,7 @@ class Account {
       signers.get(this.signer.id).signMessage(this.index, message, cb)
     } else if (this.smart) {
       if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-        signers.get(this.smart.actor.account.id).signMessage(this.index, message, cb)
+        signers.get(this.smart.actor.account.id).signMessage(this.index, message, this.aragon.processSignedMessage(cb))
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
