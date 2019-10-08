@@ -6,22 +6,32 @@ import link from '../../link'
 // import DevTools from 'restore-devtools'
 // <DevTools />
 
-const Dapp = ({ domain, pinned }) => {
-  const handleClick = (e) => {
-    if (e.button === 2) return link.rpc('removeDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp removed') })
-    if (!pinned) return window.alert('Dapp not pinned yet')
-    link.rpc('launchDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp launched') })
-  }
-  const classNames = pinned ? 'dockAppIcon' : 'dockAppIcon dockAppIconNotPinned'
-  return (
-    <div className={classNames} onMouseDown={handleClick}>{svg.aragon(40)}</div>
-  )
-}
+// const Dapp = ({ domain, pinned }) => {
+//   const handleClick = (e) => {
+//     if (e.button === 2) return link.rpc('removeDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp removed') })
+//     if (!pinned) return window.alert('Dapp not pinned yet')
+//     link.rpc('launchDapp', domain, (err) => { err ? console.error(err) : console.log('Dapp launched') })
+//   }
+//   const classNames = pinned ? 'dockAppIcon' : 'dockAppIcon dockAppIconNotPinned'
+//   return (
+//     <div className={classNames} onMouseDown={handleClick}>{svg.aragon(40)}</div>
+//   )
+// }
 
-const randomColor = () => {
-  const v = (f, c) => Math.round(Math.random() * (c - f)) + f
-  return `rgb(${v(40, 200)}, ${v(90, 140)}, ${v(90, 210)})`
-}
+// class _App extends React.Component {
+//   constructor (...args) {
+//   }
+//   render () {
+//     const docked = this.props.docked
+//   }
+// }
+//
+// const App = Restore.connect(_App)
+
+// const randomColor = () => {
+//   const v = (f, c) => Math.round(Math.random() * (c - f)) + f
+//   return `rgb(${v(40, 200)}, ${v(90, 140)}, ${v(90, 210)})`
+// }
 
 class Dock extends React.Component {
   constructor (...args) {
@@ -31,20 +41,8 @@ class Dock extends React.Component {
       ensInput: this.addAppFill,
       pendingRemoval: false
     }
-    this.undocked = (Array.from(Array(20).keys())).map(i => {
-      return {
-        color: randomColor(),
-        docked: false,
-        icon: i % 3 === 0 ? svg.aragon(28) : i % 3 === 1 ? svg.fingerprint(20) : svg.seedling(24)
-      }
-    })
-    this.docked = (Array.from(Array(8).keys())).map(i => {
-      return {
-        color: randomColor(),
-        docked: true,
-        icon: i % 3 === 0 ? svg.aragon(28) : i % 3 === 1 ? svg.fingerprint(20) : svg.seedling(24)
-      }
-    })
+    this.added = []
+    this.docked = []
     this.inDockCatch = false
     this.inAddedCatch = false
   }
@@ -88,20 +86,24 @@ class Dock extends React.Component {
       return
     }
     const drag = this.dragging
-    const removeFrom = drag.docked ? this.docked : this.undocked
-    removeFrom.splice(drag.index, 1)
-    const addTo = docked ? this.docked : this.undocked
-    this.dragging.index = index
-    this.dragging.docked = docked
-    addTo.splice(index, 0, drag.dapp)
-    this.forceUpdate()
+    // const removeFrom = drag.docked ? this.docked : this.added
+    // removeFrom.splice(drag.index, 1)
+    // const addTo = docked ? this.docked : this.added
+    // addTo.splice(index, 0, drag.dapp)
+    const fromArea = drag.docked ? 'docked' : 'added'
+    const toArea = docked ? 'docked' : 'added'
+    link.rpc('moveDapp', fromArea, drag.index, toArea, index, (err) => {
+      err ? console.error(err) : console.log('Dapp MOVED!')
+      this.dragging.index = index
+      this.dragging.docked = docked
+      this.forceUpdate()
+    })
   }
 
   releaseDrag = () => {
     if (this.state.pendingRemoval) {
       const drag = this.dragging
-      const removeFrom = drag.docked ? this.docked : this.undocked
-      removeFrom.splice(drag.index, 1)
+      link.rpc('removeDapp', drag.dapp.domain, (err) => { err ? console.error(err) : console.log('Dapp removed') })
     }
     this.dragging = null
     this.forceUpdate()
@@ -162,7 +164,6 @@ class Dock extends React.Component {
     if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
     const transition = '0.32s cubic-bezier(.82,0,.12,1) all'
     const transitionDelay = '0s'
-    const dapps = Object.keys(this.store('main.dapps')).map((key) => this.store(`main.dapps.${key}`))
     return (
       <div id='dock' style={{ transform, transition, transitionDelay }}>
         <div className='appMovement'>
@@ -176,7 +177,7 @@ class Dock extends React.Component {
               }}
             >
               <div className='draggedAppCard'>
-                {this.dragging.dapp.icon}
+                {this.dragging.dapp.domain[0].toUpperCase() + this.dragging.dapp.domain[1]}
               </div>
             </div>
           ) : null}
@@ -230,10 +231,8 @@ class Dock extends React.Component {
             }}
           />
           <div className='dockApps' style={{ marginTop: `-${(this.docked.length * 48) / 2}px` }}>
-            {dapps.map((dapp, i) => {
-              return <Dapp key={dapp.domain + i} {...dapp} />
-            })}
-            {this.docked.map((dapp, i) => {
+            {this.store('main.dappMap.docked').map((hash, i) => {
+              const dapp = this.store(`main.dapps.${hash}`)
               const drag = this.dragging
               if (drag && drag.dapp && drag.docked === true && drag.index === i) {
                 return (
@@ -242,7 +241,9 @@ class Dock extends React.Component {
                     className='dockedApp'
                     style={{ color: dapp.color }}
                   >
-                    <div style={{ opacity: 0.3 }}>{dapp.icon}</div>
+                    <div style={{ opacity: 0.3 }}>
+                      {dapp.domain[0].toUpperCase() + dapp.domain[1]}
+                    </div>
                   </div>
                 )
               } else {
@@ -250,7 +251,6 @@ class Dock extends React.Component {
                   <div
                     key={i}
                     className='dockedApp'
-                    style={{ color: dapp.color }}
                     onMouseDown={e => {
                       e.persist()
                       this.enableDragTimeout = setTimeout(() => {
@@ -259,11 +259,11 @@ class Dock extends React.Component {
                     }}
                     onMouseUp={e => {
                       clearTimeout(this.enableDragTimeout)
-                      if (!this.dragging) window.alert('open dapp')
+                      if (!this.dragging) link.rpc('launchDapp', dapp.domain, (err) => { err ? console.error(err) : console.log('Dapp launched') })
                     }}
                     onMouseEnter={e => { if (drag) this.moveDrag(i, true) }}
                   >
-                    {dapp.icon}
+                    {dapp.domain[0].toUpperCase() + dapp.domain[1]}
                   </div>
                 )
               }
@@ -277,14 +277,15 @@ class Dock extends React.Component {
                 const drag = this.dragging
                 if (drag && drag.docked) {
                   this.inAddedCatch = true
-                  this.moveDrag(this.undocked.length, false)
+                  this.moveDrag(this.added.length, false)
                 }
               }}
               onMouseLeave={e => {
                 this.inAddedCatch = false
               }}
             />
-            {this.undocked.map((dapp, i) => {
+            {this.store('main.dappMap.added').map((hash, i) => {
+              const dapp = this.store(`main.dapps.${hash}`)
               const drag = this.dragging
               if (drag && drag.dapp && drag.docked === false && drag.index === i) {
                 return (
@@ -298,7 +299,7 @@ class Dock extends React.Component {
                         transform: 'scale(1.4)'
                       }}
                     >
-                      {dapp.icon}
+                      {dapp.domain[0].toUpperCase() + dapp.domain[1]}
                     </div>
                   </div>
                 )
@@ -316,14 +317,14 @@ class Dock extends React.Component {
                     }}
                     onMouseUp={e => {
                       clearTimeout(this.enableDragTimeout)
-                      if (!this.dragging) window.alert('open dapp')
+                      if (!this.dragging) link.rpc('launchDapp', dapp.domain, (err) => { err ? console.error(err) : console.log('Dapp launched') })
                     }}
                     onMouseEnter={e => {
                       if (drag) this.moveDrag(i, false)
                     }}
                   >
                     <div className='addedAppCard'>
-                      {dapp.icon}
+                      {dapp.domain[0].toUpperCase() + dapp.domain[1]}
                     </div>
                   </div>
                 )

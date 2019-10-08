@@ -147,6 +147,9 @@ const rpc = {
   removeDapp (domain, cb) {
     dapps.remove(domain, cb)
   },
+  moveDapp (fromArea, fromIndex, toArea, toIndex, cb) {
+    dapps.move(fromArea, fromIndex, toArea, toIndex, cb)
+  },
   launchDapp (domain, cb) {
     dapps.launch(domain, cb)
   }

@@ -124,12 +124,34 @@ module.exports = {
   },
   addDapp: (u, namehash, data) => {
     u(`main.dapps.${namehash}`, () => data)
+    u('main.dappMap.added', added => {
+      added.unshift(namehash)
+      return added
+    })
   },
   removeDapp: (u, namehash) => {
     u('main.dapps', (dapps) => {
       dapps = { ...dapps }
       delete dapps[namehash]
       return dapps
+    })
+    u('main.dappMap', map => {
+      let index = map.added.indexOf(namehash)
+      if (index !== -1) {
+        map.added.splice(index, 1)
+      } else {
+        index = map.docked.find(nh => nh === namehash)
+        if (index !== -1) map.docked.splice(index, 1)
+      }
+      return map
+    })
+  },
+  moveDapp: (u, fromArea, fromIndex, toArea, toIndex) => {
+    u('main.dappMap', map => {
+      const hash = map[fromArea][fromIndex]
+      map[fromArea].splice(fromIndex, 1)
+      map[toArea].splice(toIndex, 0, hash)
+      return map
     })
   },
   updateDapp: (u, namehash, data) => {
@@ -205,7 +227,7 @@ module.exports = {
   unsetSigner: u => {
     u('selected.minimized', _ => true)
     u('selected.open', _ => false)
-    resetSigner(u)
+    resetSigner(u) // These actions were moved from the app side
     setTimeout(_ => {
       u('selected', signer => {
         signer.last = signer.current
