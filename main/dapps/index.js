@@ -1,10 +1,14 @@
 const electron = require('electron')
 const log = require('electron-log')
+const path = require('path')
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
 const { hash } = require('eth-ens-namehash')
-const { fetchFavicon } = require('@meltwater/fetch-favicon')
-const { execSync } = require('child_process')
+// const { fetchFavicon } = require('@meltwater/fetch-favicon')
+// const { execSync } = require('child_process')
+const cheerio = require('cheerio')
+const { userData } = require('../util')
+const { mkdirp, outputFile } = require('fs-extra')
 
 const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
@@ -23,6 +27,7 @@ const mock = {
 
 const ens = electron.app ? require('../ens') : mock.ens
 const shell = electron.shell ? electron.shell : mock.shell
+const dappCache = path.resolve(userData, 'dapp-cache')
 
 class Dapps {
   constructor () {
@@ -35,6 +40,9 @@ class Dapps {
   }
 
   async add (domain, cb) {
+    // If dappCache directory doesn't exist -> create it
+    await mkdirp(dappCache)
+
     // Resolve ENS name
     const namehash = hash(domain)
 
@@ -51,6 +59,9 @@ class Dapps {
       this._pin(hash, () => {
         console.log('Pinned first time')
         store.updateDapp(namehash, { pinned: true })
+      })
+      this._cache(hash, () => {
+        store.updateDapp(namehash, { ready: true })
       })
       cb(null)
     // Else -> throw
@@ -91,8 +102,35 @@ class Dapps {
     cb(null)
   }
 
-  async _pin (hash, cb) {
+  async _cache (hash, cb) {
     if (store('main.clients.ipfs.state' !== 'ready')) return cb(new Error('IPFS client not ready'))
+    ipfs.api.get(hash, (err, files) => {
+      if (err) return cb(new Error(`Failed to install app with hash ${hash}`))
+      const process = async () => {
+        if (files.length === 0) return cb()
+        const file = files.shift()
+        const path = dappCache + '/' + file.path
+        if (!file.content) {
+          await mkdirp(path)
+        } else {
+          if (path.endsWith('index.html')) {
+            const root = cheerio.load(file.content.toString('utf8'))
+            root('head').append(`
+              <script>
+                window.alert('Frame Injected Script')
+              </script>
+            `)
+            file.content = Buffer.from(root.html())
+          }
+          await outputFile(path, file.content)
+        }
+        process()
+      }
+      process()
+    })
+  }
+
+  async _pin (hash, cb) {
     ipfs.api.pin.add(hash, (err, res) => {
       if (err) return cb(new Error(`Failed to pin content with hash ${hash}`))
       cb(null)
