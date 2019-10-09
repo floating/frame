@@ -7,6 +7,14 @@ import AppTile from './AppTile'
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
+const hashCode = str => str.split('').reduce((prevHash, currVal) => (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0)
+const fallbackColor = dapp => {
+  const hex = hashCode(dapp.domain).toString(16).replace('-', '')
+  const r = Math.round(((220 - 210) * (parseInt(hex[0] + hex[1], 16) / 255)) + 210)
+  const g = Math.round(((220 - 210) * (parseInt(hex[2] + hex[3], 16) / 255)) + 210)
+  const b = Math.round(((240 - 230) * (parseInt(hex[4] + hex[5], 16) / 255)) + 230)
+  return `rgb(${r}, ${g}, ${b})`
+}
 
 class Dock extends React.Component {
   constructor (...args) {
@@ -132,7 +140,9 @@ class Dock extends React.Component {
               style={{ top: this.currentTop, left: this.currentLeft }}
             >
               <div className='draggedAppCard'>
-                {this.dragging.dapp.domain[0].toUpperCase() + this.dragging.dapp.domain[1]}
+                <div className='appCardIconPlaceholder' style={{ background: fallbackColor(this.dragging.dapp) }}>
+                  {this.dragging.dapp.domain[0].toUpperCase() + this.dragging.dapp.domain[1]}
+                </div>
               </div>
             </div>
           ) : null}

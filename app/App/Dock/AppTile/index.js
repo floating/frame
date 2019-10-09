@@ -2,6 +2,15 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../link'
 
+const hashCode = str => str.split('').reduce((prevHash, currVal) => (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0)
+const fallbackColor = dapp => {
+  const hex = hashCode(dapp.domain).toString(16).replace('-', '')
+  const r = Math.round(((220 - 210) * (parseInt(hex[0] + hex[1], 16) / 255)) + 210)
+  const g = Math.round(((220 - 210) * (parseInt(hex[2] + hex[3], 16) / 255)) + 210)
+  const b = Math.round(((240 - 230) * (parseInt(hex[4] + hex[5], 16) / 255)) + 230)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 class AppTile extends React.Component {
   render () {
     const { index, hash, dragging, docked, mouseDown, moveDrag } = this.props
@@ -13,7 +22,9 @@ class AppTile extends React.Component {
       return (
         <div key={index} className={tileClass}>
           <div className={cardClass} style={style}>
-            {dapp.domain[0].toUpperCase() + dapp.domain[1]}
+            <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dapp) }}>
+              {dapp.domain[0].toUpperCase() + dapp.domain[1]}
+            </div>
           </div>
         </div>
       )
@@ -34,12 +45,12 @@ class AppTile extends React.Component {
               })
             }
           }}
-          onMouseEnter={e => {
-            if (dragging) moveDrag(index, docked)
-          }}
+          onMouseEnter={e => { if (dragging) moveDrag(index, docked) }}
         >
           <div className='addedAppCard'>
-            {dapp.domain[0].toUpperCase() + dapp.domain[1]}
+            <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dapp) }}>
+              {dapp.domain[0].toUpperCase() + dapp.domain[1]}
+            </div>
           </div>
         </div>
       )
