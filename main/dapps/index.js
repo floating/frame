@@ -63,10 +63,15 @@ class Dapps {
     const namehash = hash(domain)
 
     // Check if exists
-    if (!store(`main.dapps.${namehash}`)) return cb(new Error(`Dapp doesn't exist`))
+    if (!store(`main.dapps.${namehash}`)) return cb(new Error('Dapp doesn\'t exist'))
 
     // Remove dapp
     store.removeDapp(namehash)
+    cb(null)
+  }
+
+  move (fromArea, fromIndex, toArea, toIndex, cb) {
+    store.moveDapp(fromArea, fromIndex, toArea, toIndex)
     cb(null)
   }
 
@@ -74,7 +79,7 @@ class Dapps {
     // Get dapp meta data
     const nameHash = hash(domain)
     const dapp = store(`main.dapps.${nameHash}`)
-    if (!dapp) return cb(new Error(`Could not find dapp`))
+    if (!dapp) return cb(new Error('Could not find dapp'))
 
     // Determine if local node or gateway should be used
     const running = await ipfs.isRunning()
@@ -123,8 +128,6 @@ class Dapps {
       }
     })
   }
-
-
 
   // EXPERIMENTAL
   // async _getIcon () {

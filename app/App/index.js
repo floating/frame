@@ -13,10 +13,10 @@ import Dock from './Dock'
 class App extends React.Component {
   render () {
     return (
-      <React.Fragment>
+      <>
         <Dock />
         <Panel />
-      </React.Fragment>
+      </>
     )
   }
 }
