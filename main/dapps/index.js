@@ -5,6 +5,7 @@ const ipfs = require('../clients/Ipfs')
 const { hash } = require('eth-ens-namehash')
 const { fetchFavicon } = require('@meltwater/fetch-favicon')
 const { execSync } = require('child_process')
+const browser = require('./browser')
 
 const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
@@ -87,7 +88,8 @@ class Dapps {
     const baseUrl = running ? 'http://localhost:8080' : IPFS_GATEWAY_URL
 
     // Launch dapp in browser
-    shell.openExternal(`${baseUrl}/${dapp.type}/${dapp.hash}`)
+    const url = `${baseUrl}/${dapp.type}/${dapp.hash}`
+    browser.launch(url)
     cb(null)
   }
 
