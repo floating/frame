@@ -6,9 +6,9 @@ const ipfs = require('../clients/Ipfs')
 const { hash } = require('eth-ens-namehash')
 // const { fetchFavicon } = require('@meltwater/fetch-favicon')
 // const { execSync } = require('child_process')
-const cheerio = require('cheerio')
 const { userData } = require('../util')
 const { mkdirp, outputFile } = require('fs-extra')
+require('./server')
 
 const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
@@ -27,7 +27,7 @@ const mock = {
 
 const ens = electron.app ? require('../ens') : mock.ens
 const shell = electron.shell ? electron.shell : mock.shell
-const dappCache = path.resolve(userData, 'dapp-cache')
+const dappCache = path.resolve(userData, 'dapps')
 
 class Dapps {
   constructor () {
@@ -60,7 +60,7 @@ class Dapps {
         console.log('Pinned first time')
         store.updateDapp(namehash, { pinned: true })
       })
-      this._cache(hash, () => {
+      this._cache(domain, hash, () => {
         store.updateDapp(namehash, { ready: true })
       })
       cb(null)
@@ -102,26 +102,26 @@ class Dapps {
     cb(null)
   }
 
-  async _cache (hash, cb) {
+  async _cache (domain, hash, cb) {
     if (store('main.clients.ipfs.state' !== 'ready')) return cb(new Error('IPFS client not ready'))
     ipfs.api.get(hash, (err, files) => {
       if (err) return cb(new Error(`Failed to install app with hash ${hash}`))
       const process = async () => {
         if (files.length === 0) return cb()
         const file = files.shift()
-        const path = dappCache + '/' + file.path
+        const path = dappCache + '/' + file.path.replace(hash, domain)
         if (!file.content) {
           await mkdirp(path)
         } else {
-          if (path.endsWith('index.html')) {
-            const root = cheerio.load(file.content.toString('utf8'))
-            root('head').append(`
-              <script>
-                window.alert('Frame Injected Script')
-              </script>
-            `)
-            file.content = Buffer.from(root.html())
-          }
+          // if (path.endsWith('index.html')) {
+          //   const root = cheerio.load(file.content.toString('utf8'))
+          //   root('head').append(`
+          //     <script>
+          //       window.alert('Frame Injected Script')
+          //     </script>
+          //   `)
+          //   file.content = Buffer.from(root.html())
+          // }
           await outputFile(path, file.content)
         }
         process()

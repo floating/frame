@@ -75,6 +75,7 @@
     "cheerio": "1.0.0-rc.3",
     "conf": "6.0.1",
     "content-hash": "2.4.3",
+    "cookie": "^0.4.0",
     "cross-env": "5.2.1",
     "electron-log": "3.0.7",
     "electron-positioner": "4.1.0",
