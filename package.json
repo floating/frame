@@ -25,8 +25,8 @@
   },
   "scripts": {
     "start": "npm run launch",
-    "bundle": "parcel build app/tray.html --public-url . -d bundle --target browser && parcel build app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
-    "watch": "parcel watch app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron --no-hmr & parcel watch app/tray.html --public-url . -d bundle --target browser --no-hmr",
+    "bundle": "parcel build app/tray.html --public-url . -d bundle --target browser && parcel build app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron && parcel build main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
+    "watch": "parcel watch app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron --no-hmr & parcel watch app/tray.html --public-url . -d bundle --target browser --no-hmr & parcel watch main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser --no-hmr",
     "dev": "npm run bundle && npm run launch:dev",
     "dev:traffic": "npm run bundle && npm run launch:dev:traffic",
     "inspect": "npm run bundle && npm run launch:inspect",
