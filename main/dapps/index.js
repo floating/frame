@@ -1,15 +1,20 @@
 const electron = require('electron')
 const log = require('electron-log')
 const path = require('path')
+const { mkdirp, outputFile } = require('fs-extra')
+const uuid = require('uuid/v4')
+const { hash } = require('eth-ens-namehash')
+
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
-const { hash } = require('eth-ens-namehash')
+const { userData } = require('../util')
+const windows = require('../windows')
+
+require('./server')
+const sessions = require('./sessions')
+
 // const { fetchFavicon } = require('@meltwater/fetch-favicon')
 // const { execSync } = require('child_process')
-const { userData } = require('../util')
-const { mkdirp, outputFile } = require('fs-extra')
-require('./server')
-
 // const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
 const mock = {
@@ -90,7 +95,10 @@ class Dapps {
     const dapp = store(`main.dapps.${hash(domain)}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
     if (!dapp.ready) return cb(new Error('Dapp not ready'))
-    shell.openExternal(`http://localhost:8421?app=${domain}`)
+    const session = uuid()
+    sessions.add(domain, session)
+    windows.openView(`http://localhost:8421?app=${domain}&session=${session}`)
+    // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
     cb(null)
   }
 
