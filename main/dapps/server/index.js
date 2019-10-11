@@ -1,25 +1,28 @@
 const fs = require('fs')
-const http = require('http')
-const asset = require('./asset')
-const cheerio = require('cheerio')
 const path = require('path')
-const { userData } = require('../../util')
-const dapps = path.resolve(userData, 'dapps')
+const http = require('http')
 const cookie = require('cookie')
+const qs = require('querystring')
+const cheerio = require('cheerio')
+
+const { userData } = require('../../util')
+
+const asset = require('./asset')
+
+const dapps = path.resolve(userData, 'dapps')
 
 const handler = (req, res) => {
-  const locator = req.url.split('/').filter(o => ['', '.', '..', '...', 'favicon.ico'].indexOf(o) === -1)
-  if (locator.length === 0) {
-    res.end('No dapp requested')
-  } else if (locator.length === 1) {
-    const app = locator[0]
+  const app = qs.parse(req.url.split('?')[1]).app
+  if (app) {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+    res.setHeader('Set-Cookie', `_dapp=${app}`)
     fs.readFile(dapps + '/' + app + '/' + 'index.html', 'utf8', (err, html) => {
       if (err) return res.end('Error rendering dapp: ' + err.message)
       const root = cheerio.load(html)
       root('html').prepend(`
         <script>
-          console.log('Injected By Frame')
-          document.cookie = "_dapp=${app}"
+          console.log('Frame Injection')
           var currentScript = document.currentScript || document.scripts[document.scripts.length - 1]
           currentScript.parentNode.removeChild(currentScript)
         </script>
@@ -27,9 +30,9 @@ const handler = (req, res) => {
       res.end(root.html())
     })
   } else {
-    const app = cookie.parse(req.headers.cookie)._dapp
-    if (locator[0] === app) locator.shift()
-    asset(res, dapps + '/' + app + '/' + locator.join('/'))
+    const dapp = req.headers.cookie ? cookie.parse(req.headers.cookie)._dapp : null
+    const locator = req.url.split('?')[0].split('/').filter(o => ['', '.', '..'].indexOf(o) === -1)
+    asset(res, dapps + '/' + dapp + '/' + locator.join('/'))
   }
 }
 http.createServer(handler).listen(8421, '127.0.0.1')

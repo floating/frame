@@ -82,6 +82,7 @@ module.exports = server => {
     if (subscription) {
       const permissions = store('main.accounts', account, 'permissions') || {}
       const perms = Object.keys(permissions).map(id => permissions[id])
+      perms.push({ origin: 'http://localhost:8421', provider: true })
       const allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
       if (!allowed) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))

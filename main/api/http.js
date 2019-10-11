@@ -120,6 +120,7 @@ provider.on('data:accounts', (account, payload) => { // Make sure the subscripti
     const { id, origin } = pollSubs[payload.params.subscription]
     const permissions = store('main.accounts', account, 'permissions') || {}
     const perms = Object.keys(permissions).map(id => permissions[id])
+    perms.push({ origin: 'http://localhost:8421', provider: true })
     const allowed = perms.map(p => p.origin).indexOf(origin) > -1
     if (!allowed) payload.params.result = []
     polls[id] = polls[id] || []

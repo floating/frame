@@ -10,7 +10,7 @@ const { userData } = require('../util')
 const { mkdirp, outputFile } = require('fs-extra')
 require('./server')
 
-const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
+// const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
 const mock = {
   ens: {
@@ -87,18 +87,10 @@ class Dapps {
   }
 
   async launch (domain, cb) {
-    // Get dapp meta data
-    const nameHash = hash(domain)
-    const dapp = store(`main.dapps.${nameHash}`)
+    const dapp = store(`main.dapps.${hash(domain)}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
-
-    // Determine if local node or gateway should be used
-    const running = await ipfs.isRunning()
-    if (!running) return cb(new Error('IPFS client not running'))
-    const baseUrl = running ? 'http://localhost:8080' : IPFS_GATEWAY_URL
-
-    // Launch dapp in browser
-    shell.openExternal(`${baseUrl}/${dapp.type}/${dapp.hash}`)
+    if (!dapp.ready) return cb(new Error('Dapp not ready'))
+    shell.openExternal(`http://localhost:8421?app=${domain}`)
     cb(null)
   }
 
@@ -113,15 +105,6 @@ class Dapps {
         if (!file.content) {
           await mkdirp(path)
         } else {
-          // if (path.endsWith('index.html')) {
-          //   const root = cheerio.load(file.content.toString('utf8'))
-          //   root('head').append(`
-          //     <script>
-          //       window.alert('Frame Injected Script')
-          //     </script>
-          //   `)
-          //   file.content = Buffer.from(root.html())
-          // }
           await outputFile(path, file.content)
         }
         process()
