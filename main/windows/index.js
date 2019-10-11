@@ -264,6 +264,43 @@ const api = {
   },
   reload: () => {
     windows.tray.reload()
+  },
+  openView: (url) => {
+    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    windows[url] = new BrowserWindow({
+      id: 'tray',
+      x: 0,
+      y: 0,
+      width: area.width - 420,
+      height: area.height,
+      // frame: false,
+      // transparent: true,
+      // hasShadow: false,
+      show: true,
+      // titleBarStyle: 'customButtonsOnHover',
+      // minimizable: false,
+      // maximizable: false,
+      // closable: false,
+      // backgroundThrottling: false,
+      // icon: path.join(__dirname, './AppIcon.png'),
+      // skipTaskbar: process.platform !== 'linux',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
+        disableBlinkFeatures: 'Auxclick',
+        enableRemoteModule: false
+        // preload: path.resolve(__dirname, '../../bundle/bridge.js')
+      }
+    })
+    if (dev) windows[url].openDevTools()
+    windows[url].on('closed', () => { delete windows[url] })
+    // Load a remote URL
+    windows[url].loadURL(url)
+    // const view = new BrowserView()
+    // windows.tray.setBrowserView(view)
+    // view.setBounds({ x: 0, y: 0, width: 800, height: 300 })
+    // view.webContents.loadURL(url)
   }
 }
 

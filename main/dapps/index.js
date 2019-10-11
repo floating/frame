@@ -1,12 +1,21 @@
 const electron = require('electron')
 const log = require('electron-log')
+const path = require('path')
+const { mkdirp, outputFile } = require('fs-extra')
+const uuid = require('uuid/v4')
+const { hash } = require('eth-ens-namehash')
+
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
-const { hash } = require('eth-ens-namehash')
-const { fetchFavicon } = require('@meltwater/fetch-favicon')
-const { execSync } = require('child_process')
+const { userData } = require('../util')
+const windows = require('../windows')
 
-const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
+require('./server')
+const sessions = require('./sessions')
+
+// const { fetchFavicon } = require('@meltwater/fetch-favicon')
+// const { execSync } = require('child_process')
+// const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
 const mock = {
   ens: {
@@ -23,6 +32,7 @@ const mock = {
 
 const ens = electron.app ? require('../ens') : mock.ens
 const shell = electron.shell ? electron.shell : mock.shell
+const dappCache = path.resolve(userData, 'dapps')
 
 class Dapps {
   constructor () {
@@ -35,6 +45,9 @@ class Dapps {
   }
 
   async add (domain, cb) {
+    // If dappCache directory doesn't exist -> create it
+    await mkdirp(dappCache)
+
     // Resolve ENS name
     const namehash = hash(domain)
 
@@ -51,6 +64,9 @@ class Dapps {
       this._pin(hash, () => {
         console.log('Pinned first time')
         store.updateDapp(namehash, { pinned: true })
+      })
+      this._cache(domain, hash, () => {
+        store.updateDapp(namehash, { ready: true })
       })
       cb(null)
     // Else -> throw
@@ -76,23 +92,36 @@ class Dapps {
   }
 
   async launch (domain, cb) {
-    // Get dapp meta data
-    const nameHash = hash(domain)
-    const dapp = store(`main.dapps.${nameHash}`)
+    const dapp = store(`main.dapps.${hash(domain)}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
-
-    // Determine if local node or gateway should be used
-    const running = await ipfs.isRunning()
-    if (!running) return cb(new Error('IPFS client not running'))
-    const baseUrl = running ? 'http://localhost:8080' : IPFS_GATEWAY_URL
-
-    // Launch dapp in browser
-    shell.openExternal(`${baseUrl}/${dapp.type}/${dapp.hash}`)
+    if (!dapp.ready) return cb(new Error('Dapp not ready'))
+    const session = uuid()
+    sessions.add(domain, session)
+    windows.openView(`http://localhost:8421?app=${domain}&session=${session}`)
+    // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
     cb(null)
   }
 
-  async _pin (hash, cb) {
+  async _cache (domain, hash, cb) {
     if (store('main.clients.ipfs.state' !== 'ready')) return cb(new Error('IPFS client not ready'))
+    ipfs.api.get(hash, (err, files) => {
+      if (err) return cb(new Error(`Failed to install app with hash ${hash}`))
+      const process = async () => {
+        if (files.length === 0) return cb()
+        const file = files.shift()
+        const path = dappCache + '/' + file.path.replace(hash, domain)
+        if (!file.content) {
+          await mkdirp(path)
+        } else {
+          await outputFile(path, file.content)
+        }
+        process()
+      }
+      process()
+    })
+  }
+
+  async _pin (hash, cb) {
     ipfs.api.pin.add(hash, (err, res) => {
       if (err) return cb(new Error(`Failed to pin content with hash ${hash}`))
       cb(null)

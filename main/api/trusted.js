@@ -15,6 +15,7 @@ module.exports = origin => {
   if (!address) return
   const permissions = store('main.addresses', address, 'permissions') || {}
   const perms = Object.keys(permissions).map(id => permissions[id])
+  perms.push({ origin: 'http://localhost:8421', provider: true })
   const permIndex = perms.map(p => p.origin).indexOf(origin)
   const handlerId = uuidv5(origin, uuidv5.DNS)
   if (permIndex === -1) accounts.addRequest({ handlerId, type: 'access', origin, address })

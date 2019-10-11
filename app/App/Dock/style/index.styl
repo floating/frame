@@ -32,7 +32,7 @@
 #dock
   position absolute
   top 20px
-  bottom 20px
+  bottom 17px
   right -800px
   width 800px
   padding-right 23px
@@ -43,12 +43,45 @@
   align-items center
   transform translate3d(0px, 0px, 0px)
   will-change transform
-  background whiteglow
+  background whiteglowShade
   border-top-left-radius 6px
   border-bottom-left-radius 6px
   margin 0px -30px 0px 0px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
+
+  .underStoreShade
+    opacity 1
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 48px
+    z-index 1
+    pointer-events none
+    transition standardSlow
+    transition-delay 0.00s
+    background lightShader
+
+  .dockInset
+    position absolute
+    top 0px
+    right 0px
+    bottom 2px
+    left 0px
+    background whiteglow
+    border-top-left-radius 6px
+    border-bottom-left-radius 6px
+
+  .appCardIconPlaceholder
+    display flex
+    justify-content center
+    align-items center
+    height 34px
+    width 34px
+    border-radius 3px
+    font-size 12px
+    font-weight bold
 
   .dragCatchDock
     position absolute
@@ -72,7 +105,6 @@
       padding 10px
 
       .draggedAppCard
-        padding-top 3px
         min-width 48px
         min-height 48px
         width 48px
@@ -134,7 +166,6 @@
       justify-content center
       align-items center
       width 48px
-      transition opacity 1s
 
     .dockAppIconNotPinned
       opacity 0.5
@@ -155,8 +186,7 @@
     min-width 48px
     min-height 48px
     width 48px
-    height 48px
-    padding-top 3px
+    height 49px
     box-sizing border-box
     display flex
     justify-content center
@@ -174,7 +204,7 @@
     top 0
     left 0px
     bottom 0
-    width 340px
+    width 341px
     background thinner
 
     .addAppForm
@@ -294,7 +324,6 @@
       padding 10px
 
       .addedAppCard
-        padding-top 3px
         min-width 48px
         min-height 48px
         width 48px
@@ -308,6 +337,7 @@
         align-items center
         z-index 5
         color outerspace
+        transition 0.1s linear all
 
       div, svg
         pointer-events none

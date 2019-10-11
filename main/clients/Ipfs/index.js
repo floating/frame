@@ -27,7 +27,7 @@ class IPFS extends Client {
       this.api = ipfsHttpClient(this.getConfig('Addresses.API'))
 
       // Run 'ipfs daemon'
-      this.run(['daemon'], (err) => {
+      this.run(['daemon', '--enable-pubsub-experiment'], (err) => {
         if (err.message.includes('ipfs daemon is running')) {
           windows.broadcast('main:action', 'notify', 'ipfsAlreadyRunning')
         }
@@ -38,7 +38,6 @@ class IPFS extends Client {
     this.on('stdout', async (stdout) => {
       // On 'daemon ready' -> client state 'ready'
       if (stdout.match(/Daemon is ready\n$/i)) {
-
         // Add Frame peers
         try {
           await Promise.all(peers.map((peer) => this.runOnce(['swarm', 'connect', peer])))

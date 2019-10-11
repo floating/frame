@@ -1,5 +1,5 @@
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx')
+const EthereumTx = require('ethereumjs-tx').Transaction
 const log = require('electron-log')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
