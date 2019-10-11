@@ -108,12 +108,12 @@ const api = {
       }, 2000)
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) {
-      setTimeout(() => {
-        windows.tray.on('blur', _ => api.hideTray())
-        windows.tray.focus()
-      }, 1260)
-    }
+    setTimeout(() => {
+      windows.tray.on('blur', _ => {
+        if (!store('main.pin')) api.hideTray()
+      })
+      windows.tray.focus()
+    }, 1260)
     if (!openedAtLogin) {
       setTimeout(() => {
         if (windows && windows.tray) windows.tray.show()
@@ -269,14 +269,14 @@ const api = {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows[url] = new BrowserWindow({
       id: 'tray',
-      x: 0,
+      x: 40,
       y: 0,
-      width: area.width - 420,
+      width: area.width - 500,
       height: area.height,
+      show: false,
       // frame: false,
       // transparent: true,
       // hasShadow: false,
-      show: true,
       // titleBarStyle: 'customButtonsOnHover',
       // minimizable: false,
       // maximizable: false,
@@ -293,14 +293,10 @@ const api = {
         // preload: path.resolve(__dirname, '../../bundle/bridge.js')
       }
     })
-    if (dev) windows[url].openDevTools()
+    // if (dev) windows[url].openDevTools()
     windows[url].on('closed', () => { delete windows[url] })
-    // Load a remote URL
     windows[url].loadURL(url)
-    // const view = new BrowserView()
-    // windows.tray.setBrowserView(view)
-    // view.setBounds({ x: 0, y: 0, width: 800, height: 300 })
-    // view.webContents.loadURL(url)
+    windows[url].webContents.on('did-finish-load', () => windows[url].show())
   }
 }
 
@@ -331,10 +327,13 @@ ipcMain.on('tray:ready', () => {
   if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
 })
 
+ipcMain.on('tray:pin', () => store.pin())
+ipcMain.on('tray:expand', () => api.showTray())
+
 ipcMain.on('tray:mouseout', () => {
   if (glide) {
     glide = false
-    api.hideTray()
+    if (!store('main.pin')) api.hideTray()
   }
 })
 

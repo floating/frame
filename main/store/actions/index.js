@@ -162,6 +162,9 @@ module.exports = {
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
   },
+  pin: (u) => {
+    u('main.pin', pin => !pin)
+  },
   // Tray actions...
   // syncMain: (u, main) => u('main', _ => main),
   setSigner: (u, signer) => {

@@ -138,6 +138,38 @@
   .expandFrame:hover
     color outerspace
 
+  .pinFrame
+    position absolute
+    top 49px
+    left 0
+    width 48px
+    height 48px
+    z-index 1000
+    display flex
+    justify-content center
+    align-items center
+    color outerspace03
+    border-top 1px solid thick
+
+    svg
+      transform rotate(45deg)
+      transition standardFast
+
+  .pinFrame:hover
+    svg
+      color outerspace05
+      // transform rotate(0deg)
+
+  .pinFrameActive
+    svg
+      color outerspace08
+      transform rotate(0deg)
+
+  .pinFrameActive:hover
+    svg
+      color outerspace08
+      transform rotate(0deg)
+
   .toggleDock
     position absolute
     bottom 0
