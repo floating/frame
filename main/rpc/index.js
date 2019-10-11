@@ -137,7 +137,7 @@ const rpc = {
   toggleDock (cb) {
     const expand = !store('dock.expand')
     if (expand) {
-      windows.setWidth(750)
+      windows.setWidth(740)
       store.expandDock(expand)
     } else {
       store.expandDock(expand)

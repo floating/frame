@@ -29,7 +29,7 @@ const detectMouse = () => {
   const bounds = display.bounds
   const minX = (area.width + area.x) - 2
   const center = (area.height + (area.y - bounds.y)) / 2
-  const margin = (area.height + (area.y - bounds.y)) / 8
+  const margin = center - 68
   m1.y = m1.y - area.y
   const minY = center - margin
   const maxY = center + margin
@@ -181,6 +181,7 @@ const api = {
           windows.tray.hide()
         }
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
+        if (hideShow.next === 'dock') setTimeout(() => api.showTray(true), 0)
         hideShow.running = false
         hideShow.next = false
       }, 640)
@@ -191,7 +192,7 @@ const api = {
     hideShow.current = 'showing'
     if (hideShow.running) {
       hideShow.next = false
-      if (hideShow.running !== 'show') hideShow.next = 'show'
+      if (hideShow.running !== 'show' && hideShow.running !== 'dock') hideShow.next = dock ? 'dock' : 'show'
     } else {
       if (!windows.tray) return api.tray()
       windows.tray.setAlwaysOnTop(true)
@@ -199,7 +200,7 @@ const api = {
       windows.tray.setVisibleOnAllWorkspaces(true)
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setSize(dock ? 48 : 430, dev ? 740 : area.height)
+      windows.tray.setSize(dock ? 48 : store('dock.expand') ? 740 : 430, dev ? 740 : area.height)
       const pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
@@ -327,7 +328,14 @@ ipcMain.on('tray:ready', () => {
   if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
 })
 
-ipcMain.on('tray:pin', () => store.pin())
+ipcMain.on('tray:pin', () => {
+  if (store('main.pin')) {
+    setTimeout(() => {
+      api.hideTray()
+    }, 200)
+  }
+  store.pin()
+})
 ipcMain.on('tray:expand', () => api.showTray())
 
 ipcMain.on('tray:mouseout', () => {
