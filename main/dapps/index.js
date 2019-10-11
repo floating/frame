@@ -1,7 +1,6 @@
 const electron = require('electron')
 const log = require('electron-log')
 const path = require('path')
-const { mkdirp, outputFile } = require('fs-extra')
 const uuid = require('uuid/v4')
 const { hash } = require('eth-ens-namehash')
 
@@ -45,9 +44,6 @@ class Dapps {
   }
 
   async add (domain, cb) {
-    // If dappCache directory doesn't exist -> create it
-    await mkdirp(dappCache)
-
     // Resolve ENS name
     const namehash = hash(domain)
 
@@ -64,9 +60,6 @@ class Dapps {
       this._pin(hash, () => {
         console.log('Pinned first time')
         store.updateDapp(namehash, { pinned: true })
-      })
-      this._cache(domain, hash, () => {
-        store.updateDapp(namehash, { ready: true })
       })
       cb(null)
     // Else -> throw
@@ -101,25 +94,6 @@ class Dapps {
     windows.openView(`http://localhost:8421?hash=${dapp.hash}&app=${domain}&session=${session}`)
     // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
     cb(null)
-  }
-
-  async _cache (domain, hash, cb) {
-    if (store('main.clients.ipfs.state' !== 'ready')) return cb(new Error('IPFS client not ready'))
-    ipfs.api.get(hash, (err, files) => {
-      if (err) return cb(new Error(`Failed to install app with hash ${hash}`))
-      const process = async () => {
-        if (files.length === 0) return cb()
-        const file = files.shift()
-        const path = dappCache + '/' + file.path.replace(hash, domain)
-        if (!file.content) {
-          await mkdirp(path)
-        } else {
-          await outputFile(path, file.content)
-        }
-        process()
-      }
-      process()
-    })
   }
 
   async _pin (hash, cb) {
