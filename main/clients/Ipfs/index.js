@@ -24,7 +24,7 @@ class IPFS extends Client {
       await this.init()
 
       // Setup HTTP client
-      this.api = ipfsHttpClient(this.getConfig('Addresses.API'))
+      this.api = ipfsHttpClient(await this.getConfig('Addresses.API'))
 
       // Run 'ipfs daemon'
       this.run(['daemon', '--enable-pubsub-experiment'], (err) => {

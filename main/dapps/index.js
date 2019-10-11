@@ -31,7 +31,7 @@ const mock = {
 }
 
 const ens = electron.app ? require('../ens') : mock.ens
-const shell = electron.shell ? electron.shell : mock.shell
+// const shell = electron.shell ? electron.shell : mock.shell
 const dappCache = path.resolve(userData, 'dapps')
 
 class Dapps {
@@ -92,12 +92,13 @@ class Dapps {
   }
 
   async launch (domain, cb) {
-    const dapp = store(`main.dapps.${hash(domain)}`)
+    const namehash = hash(domain)
+    const dapp = store(`main.dapps.${namehash}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
     if (!dapp.ready) return cb(new Error('Dapp not ready'))
     const session = uuid()
-    sessions.add(domain, session)
-    windows.openView(`http://localhost:8421?app=${domain}&session=${session}`)
+    sessions.add(dapp.hash, session)
+    windows.openView(`http://localhost:8421?hash=${dapp.hash}&app=${domain}&session=${session}`)
     // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
     cb(null)
   }
