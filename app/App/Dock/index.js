@@ -149,7 +149,8 @@ class Dock extends React.Component {
               </div>
             ) : null}
           </div>
-          <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.logo(16)}</div>
+          <div className='expandFrame' onMouseDown={() => link.send('tray:expand')}>{svg.logo(16)}</div>
+          <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
           <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
           <div className='appStore'>
             {this.dragging ? (

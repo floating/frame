@@ -75,6 +75,7 @@ const initial = {
       alphaWarning: main('mute.alphaWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false)
     },
+    pin: main('pin', false),
     launch: main('launch', false),
     reveal: main('reveal', false),
     dapps: main('dapps', {}),
