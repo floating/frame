@@ -48,7 +48,7 @@ const detectMouse = () => {
     } else {
       detectMouse()
     }
-  }, 200)
+  }, 100)
 }
 
 const api = {
@@ -185,7 +185,7 @@ const api = {
         if (hideShow.next === 'dock') setTimeout(() => api.showTray(true), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 640)
+      }, dockOnly ? 260 : 640)
     }
   },
   showTray: (dock) => {

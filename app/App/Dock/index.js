@@ -28,6 +28,13 @@ class Dock extends React.Component {
     this.docked = []
     this.inDockCatch = false
     this.inAddedCatch = false
+    this.context.store.observer(() => {
+      const open = this.context.store('tray.open')
+      this.context.store('tray.dockOnly') // Rerun
+      this.context.store('dock.expand') // Rerun
+      this.delayDock = open && this._open !== open
+      this._open = open
+    })
   }
 
   handleAddApp () {
@@ -130,7 +137,7 @@ class Dock extends React.Component {
     let transform = `translate3d(${base}px, 0px, 0px)`
     if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
     const transition = '0.32s cubic-bezier(.82,0,.12,1) all'
-    const transitionDelay = '0s'
+    const transitionDelay = open && !dock && !expanded && this.delayDock ? '0.32s' : '0s'
     return (
       <div id='dock' style={{ transform, transition, transitionDelay }}>
         <div className='overStoreShade' />
