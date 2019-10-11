@@ -88,7 +88,7 @@ class Dapps {
     const namehash = hash(domain)
     const dapp = store(`main.dapps.${namehash}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
-    if (!dapp.ready) return cb(new Error('Dapp not ready'))
+    if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
     const session = uuid()
     sessions.add(dapp.hash, session)
     windows.openView(`http://localhost:8421?hash=${dapp.hash}&app=${domain}&session=${session}`)
