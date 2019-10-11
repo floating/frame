@@ -21,6 +21,7 @@ const showOnReady = true
 let mouseTimeout
 
 let glide = false
+let dockOnly = false
 
 const detectMouse = () => {
   const m1 = electron.screen.getCursorScreenPoint()
@@ -188,6 +189,7 @@ const api = {
     }
   },
   showTray: (dock) => {
+    dockOnly = dock
     clearTimeout(mouseTimeout)
     hideShow.current = 'showing'
     if (hideShow.running) {
@@ -336,7 +338,11 @@ ipcMain.on('tray:pin', () => {
   }
   store.pin()
 })
-ipcMain.on('tray:expand', () => api.showTray())
+ipcMain.on('tray:expand', () => {
+  glide = false
+  const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+  showing && !dockOnly ? api.hideTray() : api.showTray()
+})
 
 ipcMain.on('tray:mouseout', () => {
   if (glide) {

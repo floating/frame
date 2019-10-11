@@ -133,6 +133,7 @@ class Dock extends React.Component {
     const transitionDelay = '0s'
     return (
       <div id='dock' style={{ transform, transition, transitionDelay }}>
+        <div className='overStoreShade' />
         <div className='underStoreShade' />
         <div className='dockInset'>
           <div className='appMovement'>
@@ -240,7 +241,6 @@ class Dock extends React.Component {
                 )
               })}
             </div>
-            <div className='appStoreShade' />
           </div>
         </div>
       </div>
