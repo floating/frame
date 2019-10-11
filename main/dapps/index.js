@@ -6,6 +6,8 @@ const { hash } = require('eth-ens-namehash')
 const { fetchFavicon } = require('@meltwater/fetch-favicon')
 const { execSync } = require('child_process')
 
+require('./server')
+
 const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
 
 const mock = {

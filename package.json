@@ -85,6 +85,7 @@
     "ethereumjs-tx": "2.1.1",
     "ethereumjs-util": "6.1.0",
     "ethereumjs-wallet": "0.6.3",
+    "express": "^4.17.1",
     "extract-zip": "1.6.7",
     "fs-extra": "8.1.0",
     "hdkey": "1.1.1",
