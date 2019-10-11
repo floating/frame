@@ -345,8 +345,8 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 85 : initial.height - 3
-      style.transform = open ? `translateY(-${initial.top - 44}px)` : `translateY(0px)`
+      style.height = open ? panelHeight - 49 : initial.height - 3
+      style.transform = open ? `translateY(-${initial.top - 44}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0

@@ -133,111 +133,114 @@ class Dock extends React.Component {
     const transitionDelay = '0s'
     return (
       <div id='dock' style={{ transform, transition, transitionDelay }}>
-        <div className='appMovement'>
-          {this.dragging ? (
-            <div
-              className={this.state.dragHeadShake ? 'draggedApp headshake' : 'draggedApp'}
-              style={{ top: this.currentTop, left: this.currentLeft }}
-            >
-              <div className='draggedAppCard'>
-                <div className='appCardIconPlaceholder' style={{ background: fallbackColor(this.dragging.dapp) }}>
-                  {this.dragging.dapp.domain[0].toUpperCase() + this.dragging.dapp.domain[1]}
+        <div className='underStoreShade' />
+        <div className='dockInset'>
+          <div className='appMovement'>
+            {this.dragging ? (
+              <div
+                className={this.state.dragHeadShake ? 'draggedApp headshake' : 'draggedApp'}
+                style={{ top: this.currentTop, left: this.currentLeft }}
+              >
+                <div className='draggedAppCard'>
+                  <div className='appCardIconPlaceholder' style={{ background: fallbackColor(this.dragging.dapp) }}>
+                    {this.dragging.dapp.domain[0].toUpperCase() + this.dragging.dapp.domain[1]}
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : null}
-        </div>
-        <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.logo(16)}</div>
-        <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
-        <div className='appStore'>
-          {this.dragging ? (
-            <div className='addAppForm'>
-              <div
-                className='removeApp'
-                onMouseEnter={e => this.removePending()}
-                onMouseLeave={e => this.cancelRemoval()}
-              >
-                {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
-                {svg.trash(16)}
-              </div>
-            </div>
-          ) : (
-            <div className='addAppForm'>
-              <div className='addAppInput'>
-                <input
-                  value={this.state.ensInput}
-                  onFocus={::this.handleOnFocus}
-                  onBlur={::this.handleOnBlur}
-                  onChange={e => this.setState({ ensInput: e.target.value })}
-                  onKeyPress={e => { if (e.key === 'Enter') this.handleAddApp() }}
-                />
-              </div>
-              <div
-                className='addAppSubmit'
-                onMouseDown={::this.handleAddApp}
-              >
-                {'Add Dapp'}
-              </div>
-            </div>
-          )}
-          <div
-            className='dragCatchDock'
-            onMouseMove={e => {
-              if (this.inDockCatch) return
-              const drag = this.dragging
-              if (drag && !drag.docked) {
-                this.inDockCatch = true
-                const before = e.clientY < (e.target.clientHeight / 2)
-                this.moveDrag(before ? 0 : this.store('main.dappMap.docked').length, true)
-              }
-            }}
-            onMouseLeave={e => {
-              this.inDockCatch = false
-            }}
-          />
-          <div className='dockApps' style={{ marginTop: `-${(this.store('main.dappMap.docked').length * 48) / 2}px` }}>
-            {this.store('main.dappMap.docked').map((hash, i) => {
-              return (
-                <AppTile
-                  key={i}
-                  index={i}
-                  hash={hash}
-                  dragging={this.dragging}
-                  docked
-                  mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
-                  moveDrag={(...args) => this.moveDrag(...args)}
-                />
-              )
-            })}
+            ) : null}
           </div>
-          <div className='addedApps'>
+          <div className='expandFrame' onMouseDown={() => window.alert('Expand Frame')}>{svg.logo(16)}</div>
+          <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
+          <div className='appStore'>
+            {this.dragging ? (
+              <div className='addAppForm'>
+                <div
+                  className='removeApp'
+                  onMouseEnter={e => this.removePending()}
+                  onMouseLeave={e => this.cancelRemoval()}
+                >
+                  {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
+                  {svg.trash(16)}
+                </div>
+              </div>
+            ) : (
+              <div className='addAppForm'>
+                <div className='addAppInput'>
+                  <input
+                    value={this.state.ensInput}
+                    onFocus={::this.handleOnFocus}
+                    onBlur={::this.handleOnBlur}
+                    onChange={e => this.setState({ ensInput: e.target.value })}
+                    onKeyPress={e => { if (e.key === 'Enter') this.handleAddApp() }}
+                  />
+                </div>
+                <div
+                  className='addAppSubmit'
+                  onMouseDown={::this.handleAddApp}
+                >
+                  {'Add Dapp'}
+                </div>
+              </div>
+            )}
             <div
-              className='dragCatch'
+              className='dragCatchDock'
               onMouseMove={e => {
-                if (this.inAddedCatch) return
+                if (this.inDockCatch) return
                 const drag = this.dragging
-                if (drag && drag.docked) {
-                  this.inAddedCatch = true
-                  this.moveDrag(this.store('main.dappMap.added').length, false)
+                if (drag && !drag.docked) {
+                  this.inDockCatch = true
+                  const before = e.clientY < (e.target.clientHeight / 2)
+                  this.moveDrag(before ? 0 : this.store('main.dappMap.docked').length, true)
                 }
               }}
-              onMouseLeave={e => { this.inAddedCatch = false }}
+              onMouseLeave={e => {
+                this.inDockCatch = false
+              }}
             />
-            {this.store('main.dappMap.added').map((hash, i) => {
-              return (
-                <AppTile
-                  key={i}
-                  index={i}
-                  hash={hash}
-                  dragging={this.dragging}
-                  docked={false}
-                  mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, false)}
-                  moveDrag={(...args) => this.moveDrag(...args)}
-                />
-              )
-            })}
+            <div className='dockApps' style={{ marginTop: `-${(this.store('main.dappMap.docked').length * 48) / 2}px` }}>
+              {this.store('main.dappMap.docked').map((hash, i) => {
+                return (
+                  <AppTile
+                    key={i}
+                    index={i}
+                    hash={hash}
+                    dragging={this.dragging}
+                    docked
+                    mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
+                    moveDrag={(...args) => this.moveDrag(...args)}
+                  />
+                )
+              })}
+            </div>
+            <div className='addedApps'>
+              <div
+                className='dragCatch'
+                onMouseMove={e => {
+                  if (this.inAddedCatch) return
+                  const drag = this.dragging
+                  if (drag && drag.docked) {
+                    this.inAddedCatch = true
+                    this.moveDrag(this.store('main.dappMap.added').length, false)
+                  }
+                }}
+                onMouseLeave={e => { this.inAddedCatch = false }}
+              />
+              {this.store('main.dappMap.added').map((hash, i) => {
+                return (
+                  <AppTile
+                    key={i}
+                    index={i}
+                    hash={hash}
+                    dragging={this.dragging}
+                    docked={false}
+                    mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, false)}
+                    moveDrag={(...args) => this.moveDrag(...args)}
+                  />
+                )
+              })}
+            </div>
+            <div className='appStoreShade' />
           </div>
-          <div className='appStoreShade' />
         </div>
       </div>
     )
