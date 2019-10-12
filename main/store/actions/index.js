@@ -159,6 +159,9 @@ module.exports = {
       return { ...oldData, ...data }
     })
   },
+  setDappStorage: (u, hash, state) => {
+    u(`main.dappStorage.${hash}`, () => state)
+  },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
   },
