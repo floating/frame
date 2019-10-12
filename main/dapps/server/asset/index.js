@@ -13,7 +13,8 @@ const error = (res, code, message) => {
 
 module.exports = {
   stream: (res, path) => { // Stream assets from IPFS back to the client
-    ipfs.api.getReadableStream(path).on('data', file => {
+    const stream = ipfs.api.getReadableStream(path)
+    stream.on('data', file => {
       res.setHeader('content-type', getType(path))
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
@@ -21,11 +22,12 @@ module.exports = {
       file.content.on('data', data => res.write(data))
       file.content.once('end', () => res.end())
     })
+    stream.on('error', err => error(res, err.statusCode, err.message))
   },
   dapp: (res, hash, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     ipfs.api.get(`${hash}/index.html`, (err, files) => {
       if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
-      res.setHeader('Set-Cookie', [`_hash=${hash}`, `_session=${session}`])
+      res.setHeader('Set-Cookie', [`__hash__=${hash}`, `__session__=${session}`])
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
       res.writeHead(200)
