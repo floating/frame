@@ -140,7 +140,7 @@ module.exports = {
       if (index !== -1) {
         map.added.splice(index, 1)
       } else {
-        index = map.docked.find(nh => nh === namehash)
+        index = map.docked.indexOf(nh => nh === namehash)
         if (index !== -1) map.docked.splice(index, 1)
       }
       return map

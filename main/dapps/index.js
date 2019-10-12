@@ -80,21 +80,23 @@ class Dapps {
     cb(null)
   }
 
-  launch (domain, cb) {
+  async launch (domain, cb) {
     const namehash = hash(domain)
     const dapp = store(`main.dapps.${namehash}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
     if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
+    if (!(await ipfs.isRunning())) return cb(new Error('IPFS client not running'))
     const session = uuid()
     server.sessions.add(dapp.hash, session)
-    windows.openView(`http://localhost:8421?hash=${dapp.hash}&app=${domain}&session=${session}`, () => {
+    windows.openView(`http://localhost:8421?__hash__=${dapp.hash}&__session__=${session}`, () => {
       server.sessions.remove(dapp.hash, session)
     })
     // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
     cb(null)
   }
 
-  _pin (hash, cb) {
+  async _pin (hash, cb) {
+    if (!(await ipfs.isRunning())) return cb(new Error('IPFS client not running'))
     ipfs.api.pin.add(hash, (err, res) => {
       if (err) return cb(new Error(`Failed to pin content with hash ${hash}`))
       cb(null)

@@ -10,7 +10,7 @@ const types = {
   png: 'image/png'
 }
 
-module.exports = (path) => {
+module.exports = path => {
   const ext = path.substr(path.lastIndexOf('.') + 1)
   return types[ext] || 'text/plain'
 }
