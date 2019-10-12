@@ -1,16 +1,13 @@
 const electron = require('electron')
 const log = require('electron-log')
-const path = require('path')
 const uuid = require('uuid/v4')
 const { hash } = require('eth-ens-namehash')
 
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
-const { userData } = require('../util')
 const windows = require('../windows')
 
-require('./server')
-const sessions = require('./sessions')
+const server = require('./server')
 
 // const { fetchFavicon } = require('@meltwater/fetch-favicon')
 // const { execSync } = require('child_process')
@@ -31,7 +28,6 @@ const mock = {
 
 const ens = electron.app ? require('../ens') : mock.ens
 // const shell = electron.shell ? electron.shell : mock.shell
-const dappCache = path.resolve(userData, 'dapps')
 
 class Dapps {
   constructor () {
@@ -84,19 +80,21 @@ class Dapps {
     cb(null)
   }
 
-  async launch (domain, cb) {
+  launch (domain, cb) {
     const namehash = hash(domain)
     const dapp = store(`main.dapps.${namehash}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
     if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
     const session = uuid()
-    sessions.add(dapp.hash, session)
-    windows.openView(`http://localhost:8421?hash=${dapp.hash}&app=${domain}&session=${session}`)
+    server.sessions.add(dapp.hash, session)
+    windows.openView(`http://localhost:8421?hash=${dapp.hash}&app=${domain}&session=${session}`, () => {
+      server.sessions.remove(dapp.hash, session)
+    })
     // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
     cb(null)
   }
 
-  async _pin (hash, cb) {
+  _pin (hash, cb) {
     ipfs.api.pin.add(hash, (err, res) => {
       if (err) return cb(new Error(`Failed to pin content with hash ${hash}`))
       cb(null)
@@ -108,7 +106,6 @@ class Dapps {
     Object.entries(store('main.dapps')).forEach(async ([namehash, dapp]) => {
       // 1) resolve content
       const result = await ens.resolveContent(dapp.domain)
-
       // 2) if new content hash -> update dapp and pin content
       if (result && result.hash !== dapp.hash) {
         store.updateDapp(namehash, { hash: result.hash, pinned: false })
@@ -159,11 +156,3 @@ store.observer(_ => {
 // setInterval(async () => {
 //   console.log('peers', (await ipfs.api.swarm.peers()).length)
 // }, 3000)
-
-// setTimeout(() => {
-//   const domain = 'monkybrain.eth'
-//   dapps.add(domain, (err) => {
-//     if (err) console.error(err)
-//     // dapps.launch(domain, () => {})
-//   })
-// }, 2000)

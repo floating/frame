@@ -83,6 +83,7 @@ const initial = {
       added: [],
       docked: []
     }),
+    dappStorage: main('dappStorage', {}),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },

@@ -1,86 +1,36 @@
-const fs = require('fs')
-const path = require('path')
 const http = require('http')
 const cookie = require('cookie')
 const qs = require('querystring')
-const cheerio = require('cheerio')
 
-const ipfs = require('../../clients/Ipfs')
-const sessions = require('../sessions')
+const sessions = require('./sessions')
+const storage = require('./storage')
+const asset = require('./asset')
 
-const inject = fs.readFileSync(path.resolve(__dirname, '../../../bundle/inject.js'), 'utf8')
-
-const storage = {}
-const updateStorage = (res, hash, session, state) => {
-  if (!hash || !session || !state) {
-    res.end('Storage update error')
-    console.log('Storage update error: missing dapp, session or state', hash, session, state)
-  } else {
-    const permission = sessions.check(hash, session)
-    if (permission) {
-      storage[hash] = state
-      res.writeHead(200)
-      res.end()
-    } else {
-      res.end('Missing session permissions to update storage')
-      console.log('Missing session permissions to update storage', hash, session, state)
-    }
-  }
-}
-
-const types = {
-  html: 'text/html',
-  css: 'text/css',
-  js: 'application/javascript',
-  ttf: 'application/font-sfnt',
-  svg: 'image/svg+xml',
-  jpeg: 'image/jpeg',
-  jpg: 'image/jpeg',
-  gif: 'image/gif',
-  png: 'image/png'
+const error = (res, code, message) => {
+  res.writeHead(code)
+  res.end(message)
 }
 
 const handler = (req, res) => {
-  const hash = qs.parse(req.url.split('?')[1]).hash
-  if (hash) {
-    const session = qs.parse(req.url.split('?')[1]).session
-    if (!sessions.check(hash, session)) return res.end('Missing session permission to access app')
-    ipfs.api.get(`${hash}/index.html`, (err, files) => {
-      if (err) return res.end('Error resolving dapp index: ' + err.message)
-      res.setHeader('Access-Control-Allow-Origin', '*')
-      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-      res.setHeader('Set-Cookie', [`_hash=${hash}`, `_session=${session}`])
-      const root = cheerio.load(files[0].content.toString('utf8'))
-      root('html').prepend(`
-        <script>
-          window.__storage__ = ${JSON.stringify(storage[hash] || {})}
-          ${inject}
-        </script>
-      `)
-      res.end(root.html())
-    })
-  } else {
-    const hash = req.headers.cookie ? cookie.parse(req.headers.cookie)._hash : null
-    const session = req.headers.cookie ? cookie.parse(req.headers.cookie)._session : null
-    if (!hash || !session) return res.end(`Dapp or session missing, hash: ${hash}, session: ${session}`)
-    if (req.method === 'POST') {
+  const { hash, session } = qs.parse(req.url.split('?')[1])
+  if (hash) { // If hash query, this is a request to resolve a dapp and inject it with Frame functionality
+    if (!sessions.verify(hash, session)) return error(res, 403, 'You do not have permissions to access this dapp')
+    asset.dapp(res, hash, session)
+  } else { // If no hash query, this is a request from the dapp itself for an asset
+    const { _hash, _session } = req.headers.cookie ? cookie.parse(req.headers.cookie) : {}
+    if (!sessions.verify(_hash, _session)) return error(res, 403, 'You do not have permissions to access this dapp')
+    if (req.method === 'GET') { // GET reqests are for streaming assets
+      asset.stream(res, `${_hash}${req.url.split('?')[0]}`)
+    } else if (req.method === 'POST') { // POST requests are updates to storage
       let state = ''
       req.on('data', data => { state += data })
-      req.on('end', () => {
-        try { updateStorage(res, hash, session, JSON.parse(state)) } catch (e) { res.end() }
-      })
-    } else {
-      const path = `${hash}${req.url.split('?')[0]}`
-      ipfs.api.getReadableStream(path).on('data', file => {
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-        const ext = path.substr(path.lastIndexOf('.') + 1)
-        res.setHeader('content-type', types[ext] || 'text/plain')
-        file.content.on('data', data => res.write(data))
-        file.content.once('end', () => res.end())
-      })
+      req.on('end', () => storage.update(res, _hash, state))
+    } else { // Request method not handled by the server
+      error(res, 404, 'No handler found for request')
     }
   }
 }
 
 http.createServer(handler).listen(8421, '127.0.0.1')
+
+module.exports = { sessions }

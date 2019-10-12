@@ -268,7 +268,7 @@ const api = {
   reload: () => {
     windows.tray.reload()
   },
-  openView: (url) => {
+  openView: (url, onClose) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows[url] = new BrowserWindow({
       id: 'tray',
@@ -297,7 +297,11 @@ const api = {
       }
     })
     // if (dev) windows[url].openDevTools()
-    windows[url].on('closed', () => { delete windows[url] })
+
+    windows[url].on('closed', () => {
+      delete windows[url]
+      onClose()
+    })
     windows[url].loadURL(url)
     windows[url].webContents.on('did-finish-load', () => windows[url].show())
   }
