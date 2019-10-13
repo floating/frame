@@ -12,7 +12,8 @@ const error = (res, code, message) => {
 }
 
 module.exports = {
-  stream: (res, path) => { // Stream assets from IPFS back to the client
+  stream: async (res, path) => { // Stream assets from IPFS back to the client
+    if (!(await ipfs.isRunning())) return error(res, 404, 'IPFS client not running')
     const stream = ipfs.api.getReadableStream(path)
     stream.on('data', file => {
       res.setHeader('content-type', getType(path))
@@ -24,7 +25,8 @@ module.exports = {
     })
     stream.on('error', err => error(res, err.statusCode, err.message))
   },
-  dapp: (res, hash, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
+  dapp: async (res, hash, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
+    if (!(await ipfs.isRunning())) return error(res, 404, 'IPFS client not running')
     ipfs.api.get(`${hash}/index.html`, (err, files) => {
       if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
       res.setHeader('Set-Cookie', [`__hash__=${hash}`, `__session__=${session}`])
