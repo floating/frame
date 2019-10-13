@@ -12,27 +12,29 @@ const error = (res, code, message) => {
 }
 
 const handler = (req, res) => {
-  const { __hash__, __session__ } = qs.parse(req.url.split('?')[1])
+  const hash = qs.parse(req.url.split('?')[1]).__hash__
+  const session = qs.parse(req.url.split('?')[1]).__session__
 
   // If hash query, this is a request to resolve a dapp and inject it with Frame functionality
-  if (__hash__) {
-    if (!sessions.verify(__hash__, __session__)) return error(res, 403, 'You do not have permissions to access this dapp')
-    asset.dapp(res, __hash__, __session__)
+  if (hash) {
+    if (!sessions.verify(hash, session)) return error(res, 403, 'You do not have permissions to access this dapp')
+    asset.dapp(res, hash, session)
 
   // If no hash query, this is a request from the dapp itself
   } else {
-    const { __hash__, __session__ } = req.headers.cookie ? cookie.parse(req.headers.cookie) : {}
-    if (!sessions.verify(__hash__, __session__)) return error(res, 403, 'You do not have permissions to access this dapp')
+    const hash = req.headers.cookie ? cookie.parse(req.headers.cookie).__hash__ : null
+    const session = req.headers.cookie ? cookie.parse(req.headers.cookie).__session__ : null
+    if (!sessions.verify(hash, session)) return error(res, 403, 'You do not have permissions to access this dapp')
 
     // GET reqests are for streaming assets
     if (req.method === 'GET') {
-      asset.stream(res, `${__hash__}${req.url.split('?')[0]}`)
+      asset.stream(res, `${hash}${req.url.split('?')[0]}`)
 
     // POST requests are updates to storage
     } else if (req.method === 'POST') {
       let state = ''
       req.on('data', data => { state += data })
-      req.on('end', () => storage.update(res, __hash__, state))
+      req.on('end', () => storage.update(res, hash, state))
 
     // Request not handled by the server
     } else {
