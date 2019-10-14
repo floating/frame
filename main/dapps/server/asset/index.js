@@ -16,6 +16,7 @@ module.exports = {
     if (!(await ipfs.isRunning() || !ipfs.api) && ipfs.api) return error(res, 404, 'IPFS client not running')
     const stream = ipfs.api.getReadableStream(path)
     stream.on('data', file => {
+      if (!file) return error(res, 404, 'Asset not found')
       res.setHeader('content-type', getType(path))
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
@@ -23,7 +24,7 @@ module.exports = {
       file.content.on('data', data => res.write(data))
       file.content.once('end', () => res.end())
     })
-    stream.on('error', err => error(res, err.statusCode, err.message))
+    stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
   },
   dapp: async (res, hash, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     if (!(await ipfs.isRunning()) || !ipfs.api) return error(res, 404, 'IPFS client not running')

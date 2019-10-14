@@ -55,5 +55,8 @@ window.localStorage.hasOwnProperty = key => {
   return Boolean(storage[escape(key)])
 }
 
+const domain = (new URLSearchParams(window.location.search)).get('app')
+window.history.replaceState({}, document.title, `/${domain}`)
+
 const currentScript = document.currentScript || document.scripts[document.scripts.length - 1]
 currentScript.parentNode.removeChild(currentScript)

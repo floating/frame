@@ -16,7 +16,7 @@ const server = http.createServer((req, res) => {
   if (sessions.verify(__hash, __session)) return asset.stream(res, `${__hash}${req.url.split('?')[0]}`)
 
   res.writeHead(403)
-  res.end('You do not have permissions to access this dapp')
+  res.end('For security reasons, please launch this app from Frame')
 })
 
 ws(server).listen(8421, '127.0.0.1')

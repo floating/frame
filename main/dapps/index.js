@@ -5,7 +5,7 @@ const { hash } = require('eth-ens-namehash')
 
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
-const windows = require('../windows')
+// const windows = require('../windows')
 
 const server = require('./server')
 
@@ -27,7 +27,7 @@ const mock = {
 }
 
 const ens = electron.app ? require('../ens') : mock.ens
-// const shell = electron.shell ? electron.shell : mock.shell
+const shell = electron.shell ? electron.shell : mock.shell
 
 class Dapps {
   constructor () {
@@ -88,8 +88,8 @@ class Dapps {
     if (!(await ipfs.isRunning())) return cb(new Error('IPFS client not running'))
     const session = uuid()
     server.sessions.add(dapp.hash, session)
-    windows.openView(`http://localhost:8421?app={domain}&hash=${dapp.hash}&session=${session}`)
-    // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
+    // windows.openView(`http://localhost:8421?app={domain}&hash=${dapp.hash}&session=${session}`)
+    shell.openExternal(`http://localhost:8421?app=${domain}&hash=${dapp.hash}&session=${session}`)
     cb(null)
   }
 
