@@ -88,9 +88,7 @@ class Dapps {
     if (!(await ipfs.isRunning())) return cb(new Error('IPFS client not running'))
     const session = uuid()
     server.sessions.add(dapp.hash, session)
-    windows.openView(`http://localhost:8421?__hash__=${dapp.hash}&__session__=${session}`, () => {
-      server.sessions.remove(dapp.hash, session)
-    })
+    windows.openView(`http://localhost:8421?app={domain}&hash=${dapp.hash}&session=${session}`)
     // shell.openExternal(`http://localhost:8421?app=${domain}&session=${session}`)
     cb(null)
   }

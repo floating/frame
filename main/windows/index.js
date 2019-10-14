@@ -268,7 +268,7 @@ const api = {
   reload: () => {
     windows.tray.reload()
   },
-  openView: (url, onClose) => {
+  openView: (url) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows[url] = new BrowserWindow({
       id: 'tray',
@@ -296,12 +296,8 @@ const api = {
         // preload: path.resolve(__dirname, '../../bundle/bridge.js')
       }
     })
-    // if (dev) windows[url].openDevTools()
-
-    windows[url].on('closed', () => {
-      delete windows[url]
-      onClose()
-    })
+    if (dev) windows[url].openDevTools()
+    windows[url].on('closed', () => { delete windows[url] })
     windows[url].loadURL(url)
     windows[url].webContents.on('did-finish-load', () => windows[url].show())
   }

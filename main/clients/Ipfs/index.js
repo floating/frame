@@ -16,18 +16,13 @@ class IPFS extends Client {
 
     process.env.IPFS_PATH = path.resolve(userData, 'ipfs-repo')
 
-    this.api = null
-
     // On 'service ready' -> start ipfs
     this.on('ready', async () => {
       // Run 'ipfs init'
       await this.init()
 
-      // Setup HTTP client
-      this.api = ipfsHttpClient(await this.getConfig('Addresses.API'))
-
       // Run 'ipfs daemon'
-      this.run(['daemon', '--enable-pubsub-experiment'], (err) => {
+      this.run(['daemon', '--enable-pubsub-experiment'], async (err) => {
         if (err.message.includes('ipfs daemon is running')) {
           windows.broadcast('main:action', 'notify', 'ipfsAlreadyRunning')
         }
@@ -44,6 +39,9 @@ class IPFS extends Client {
         } catch (err) {
           log.error('Failed to connect to Frame IPFS peers', err)
         }
+
+        // Setup HTTP client
+        this.api = ipfsHttpClient(await this.getConfig('Addresses.API'))
 
         // TODO: Remove logging of active peers below
         const activePeers = await this.runOnce(['swarm', 'peers'])

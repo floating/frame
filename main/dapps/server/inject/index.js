@@ -1,43 +1,58 @@
+/* globals WebSocket, _storage */
+
 window.ethereum = require('eth-provider')('frame')
 
+let storage = _storage
+
+const c = {}
+document.cookie.split('; ').forEach(i => { c[i.split('=')[0]] = i.split('=')[1] })
+const socket = new WebSocket(`ws://127.0.0.1:8421?hash=${c.__hash}&session=${c.__session}`)
+let socketOpen = false
+socket.addEventListener('open', e => { socketOpen = true })
+socket.addEventListener('message', e => {
+  try {
+    const message = JSON.parse(e.data)
+    if (message.type === 'localStorage') {
+      storage = JSON.parse(message.state)
+      window.dispatchEvent('storage')
+    }
+  } catch (e) {}
+})
 const updateStorage = () => {
-  const method = 'POST'
-  const headers = { 'Content-Type': 'application/json' }
-  const body = JSON.stringify(window.__storage__)
-  window.fetch('/', { method, headers, body })
+  if (socketOpen) socket.send(JSON.stringify({ type: 'localStorage', state: JSON.stringify(storage) }))
 }
 
 window.localStorage.clear()
 
-window.localStorage.length = Object.keys(window.__storage__).length
+window.localStorage.length = Object.keys(storage).length
 
 window.localStorage.getItem = key => {
-  if (!key || !window.__storage__[escape(key)]) return null
-  return unescape(window.__storage__[escape(key)])
+  if (!key || !storage[escape(key)]) return null
+  return unescape(storage[escape(key)])
 }
 
 window.localStorage.setItem = (key, value) => {
   if (!key) return null
-  window.__storage__[escape(key)] = escape(value)
-  window.localStorage.length = Object.keys(window.__storage__)
+  storage[escape(key)] = escape(value)
+  window.localStorage.length = Object.keys(storage)
   updateStorage()
 }
 
 window.localStorage.removeItem = key => {
   if (!key) return null
-  delete window.__storage__[escape(key)]
-  window.localStorage.length = Object.keys(window.__storage__)
+  delete storage[escape(key)]
+  window.localStorage.length = Object.keys(storage)
   updateStorage()
 }
 
 window.localStorage.clear = () => {
-  window.__storage__ = {}
-  window.localStorage.length = Object.keys(window.__storage__)
+  storage = {}
+  window.localStorage.length = Object.keys(storage)
   updateStorage()
 }
 
 window.localStorage.hasOwnProperty = key => {
-  return Boolean(window.__storage__[escape(key)])
+  return Boolean(storage[escape(key)])
 }
 
 const currentScript = document.currentScript || document.scripts[document.scripts.length - 1]
