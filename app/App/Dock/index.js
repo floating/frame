@@ -35,6 +35,18 @@ class Dock extends React.Component {
       this.delayDock = open && this._open !== open
       this._open = open
     })
+    this.dockOnly = false
+    // this.mouseout = e => { if (e.clientX < 400) link.send('tray:mouseout') }
+    // this.context.store.observer(() => {
+    //   if (this.dockOnly !== this.context.store('tray.dockOnly')) {
+    //     this.dockOnly = this.context.store('tray.dockOnly')
+    //     if (this.dockOnly) {
+    //       document.addEventListener('mouseout', this.mouseout)
+    //     } else {
+    //       document.removeEventListener('mouseout', this.mouseout)
+    //     }
+    //   }
+    // })
   }
 
   handleAddApp () {
@@ -132,12 +144,11 @@ class Dock extends React.Component {
   render () {
     const open = this.store('tray.open')
     const dock = this.store('tray.dockOnly')
-    const expanded = this.store('dock.expand')
-    const base = open ? -425 : dock ? -55 : 0
-    let transform = `translate3d(${base}px, 0px, 0px)`
-    if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
-    const transition = '0.32s cubic-bezier(.82,0,.12,1) all'
-    const transitionDelay = open && !dock && !expanded && this.delayDock ? '0.32s' : '0s'
+    const base = open || this.store('dock.expand') ? -425 : dock ? -55 : 0
+    const transform = `translate3d(${base}px, 0px, 0px)`
+    // if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
+    const transition = '0.48s cubic-bezier(.82,0,.12,1) all'
+    const transitionDelay = open && !dock && this.delayDock ? '0.36s' : '0s'
     return (
       <div id='dock' style={{ transform, transition, transitionDelay }}>
         <div className='overStoreShade' />

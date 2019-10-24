@@ -137,12 +137,12 @@ const rpc = {
   toggleDock (cb) {
     const expand = !store('dock.expand')
     if (expand) {
-      windows.setWidth(740)
-      store.expandDock(expand)
-    } else {
-      store.expandDock(expand)
-      setTimeout(() => windows.setWidth(430), 420)
+      // windows.setWidth(430)
+      windows.getTray().send('main:action', 'trayOpen', true)
+      windows.setGlide(false)
+      // store.trayOpen(true)
     }
+    store.expandDock(expand)
   },
   removeDapp (domain, cb) {
     dapps.remove(domain, cb)
