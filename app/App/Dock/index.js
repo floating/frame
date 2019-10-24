@@ -19,7 +19,7 @@ const fallbackColor = dapp => {
 class Dock extends React.Component {
   constructor (...args) {
     super(...args)
-    this.addAppFill = 'Enter ENS Domain'
+    this.addAppFill = 'Enter ENS Name'
     this.state = {
       ensInput: this.addAppFill,
       pendingRemoval: false
@@ -247,6 +247,15 @@ class Dock extends React.Component {
                   />
                 )
               })}
+            </div>
+            <div className='browserExtension'>
+              <div className='browserExtensionText browserExtensionBot'>
+                {'Connect dapps in your browser to Frame too!'}
+              </div>
+              <div className='browserExtensionIcons'>
+                <div className='browserExtensionIcon' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>{svg.chrome(20)}</div>
+                <div className='browserExtensionIcon' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>{svg.firefox(20)}</div>
+              </div>
             </div>
           </div>
         </div>

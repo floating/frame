@@ -1,7 +1,7 @@
 const electron = require('electron')
 const log = require('electron-log')
-const uuid = require('uuid/v4')
 const { hash } = require('eth-ens-namehash')
+const crypto = require('crypto')
 
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
@@ -81,15 +81,14 @@ class Dapps {
   }
 
   async launch (domain, cb) {
-    const namehash = hash(domain)
-    const dapp = store(`main.dapps.${namehash}`)
+    const dapp = store(`main.dapps.${hash(domain)}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
     if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
-    if (!(await ipfs.isRunning())) return cb(new Error('IPFS client not running'))
-    const session = uuid()
-    server.sessions.add(dapp.hash, session)
-    // windows.openView(`http://localhost:8421?app={domain}&hash=${dapp.hash}&session=${session}`)
-    shell.openExternal(`http://localhost:8421?app=${domain}&hash=${dapp.hash}&session=${session}`)
+    if (!(await ipfs.isRunning()) || !ipfs.api) return cb(new Error('IPFS client not running'))
+    const session = crypto.randomBytes(6).toString('hex')
+    server.sessions.add(domain, session)
+    // windows.openView(`http://localhost:8421/${domain}?session=${session}`)
+    shell.openExternal(`http://localhost:8421/?dapp=${domain}:${session}`)
     cb(null)
   }
 

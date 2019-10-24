@@ -251,18 +251,81 @@
     bottom 0
     width 341px
 
+    .browserExtension
+      position absolute
+      left 58px
+      right 10px
+      bottom 0px
+      height 60px
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+      border-top-left-radius 6px
+      border-top-right-radius 6px
+      z-index 3
+      box-shadow cardDrop, 0px 2px 0px lowestlight
+      background lowerlight
+
+      .browserExtensionIcons
+        position absolute
+        bottom 17px
+        left 0
+        right 0
+        top 0
+        display flex
+        justify-content center
+        align-items center
+        // background blue
+
+        .browserExtensionIcon
+          height 30px
+          width 30px
+          display flex
+          justify-content center
+          align-items center
+          // margin 3px
+          font-size 11px
+          border-radius 6px
+          color outerspace08
+          transition 0.1s linear all
+
+        .browserExtensionIcon:hover
+          background light
+          box-shadow cardDrop
+
+      .browserExtensionText
+        position absolute
+        font-size 11px
+        left 10px
+        right 10px
+        display flex
+        text-align center
+        justify-content center
+        align-items center
+        font-weight 600
+
+      .browserExtensionTop
+        top 10px
+        height 10px
+
+      .browserExtensionBot
+        bottom 0px
+        height 30px
+
     .addAppForm
       position absolute
-      left 67px
-      right 19px
-      top 20px
-      height 120px
+      left 57px
+      right 10px
+      top 0px
+      height 90px
       display flex
       justify-content center
       align-items center
       flex-direction column
       z-index 3
-      border-radius 6px
+      border-bottom-left-radius 6px
+      border-bottom-right-radius 6px
       box-shadow cardDrop
       background lowerlight
 
@@ -295,8 +358,8 @@
         bottom 0px
         left 10px
         right 10px
-        height 40px
-        font-size 13px
+        height 30px
+        font-size 12px
         display flex
         justify-content center
         align-items center
@@ -308,7 +371,7 @@
       .addAppInput
         position absolute
         top 10px
-        bottom 40px
+        bottom 30px
         left 10px
         right 10px
         background lowlight
@@ -334,7 +397,7 @@
           text-align center
           width 100%
           font-size 20px
-          color outerspace08
+          color outerspace05
 
     .addedApps
       position absolute
@@ -348,7 +411,7 @@
       align-content flex-start
       justify-content flex-start
       margin 20px 0px 0px 48px
-      padding 130px 10px 10px 10px
+      padding 80px 10px 10px 10px
       box-sizing border-box
       overflow-x hidden
       overflow-y scroll

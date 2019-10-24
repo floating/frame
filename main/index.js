@@ -58,7 +58,9 @@ const externalWhitelist = [
   'https://mainnet.aragon.org',
   'https://rinkeby.aragon.org',
   'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
-  'https://shop.trezor.io/?offer_id=10&aff_id=3270'
+  'https://shop.trezor.io/?offer_id=10&aff_id=3270',
+  'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
+  'https://addons.mozilla.org/en-US/firefox/addon/frame-extension'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
