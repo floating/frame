@@ -35,18 +35,6 @@ class Dock extends React.Component {
       this.delayDock = open && this._open !== open
       this._open = open
     })
-    this.dockOnly = false
-    // this.mouseout = e => { if (e.clientX < 400) link.send('tray:mouseout') }
-    // this.context.store.observer(() => {
-    //   if (this.dockOnly !== this.context.store('tray.dockOnly')) {
-    //     this.dockOnly = this.context.store('tray.dockOnly')
-    //     if (this.dockOnly) {
-    //       document.addEventListener('mouseout', this.mouseout)
-    //     } else {
-    //       document.removeEventListener('mouseout', this.mouseout)
-    //     }
-    //   }
-    // })
   }
 
   handleAddApp () {
