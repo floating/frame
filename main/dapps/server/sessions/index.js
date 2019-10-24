@@ -1,15 +1,20 @@
 const sessions = {}
 
+const timers = {}
+
 module.exports = {
-  add: (hash, session) => {
-    sessions[hash] = sessions[hash] || []
-    sessions[hash].push(session)
+  add: (app, session) => {
+    sessions[app] = sessions[app] || []
+    sessions[app].push(session)
   },
-  verify: (hash, session) => {
-    return sessions[hash] && sessions[hash].indexOf(session) > -1
+  verify: (app, session) => {
+    clearTimeout(timers[session])
+    return sessions[app] && sessions[app].indexOf(session) > -1
   },
-  remove: (hash, session) => {
-    sessions[hash].splice(sessions[hash].indexOf(session), 1)
-    if (sessions[hash].length === 0) delete sessions[hash]
+  remove: (app, session) => {
+    timers[session] = setTimeout(() => {
+      sessions[app].splice(sessions[app].indexOf(session), 1)
+      if (sessions[app].length === 0) delete sessions[app]
+    }, 60 * 1000)
   }
 }

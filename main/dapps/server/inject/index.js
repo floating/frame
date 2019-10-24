@@ -1,12 +1,12 @@
-/* globals WebSocket, _storage */
+/* globals WebSocket, initial */
 
 window.ethereum = require('eth-provider')('frame')
 
-let storage = _storage
+let storage = initial
 
 const c = {}
 document.cookie.split('; ').forEach(i => { c[i.split('=')[0]] = i.split('=')[1] })
-const socket = new WebSocket(`ws://127.0.0.1:8421?hash=${c.__hash}&session=${c.__session}`)
+const socket = new WebSocket(`ws://127.0.0.1:8421?app=${c.__app}&session=${c.__session}`)
 let socketOpen = false
 socket.addEventListener('open', e => { socketOpen = true })
 socket.addEventListener('message', e => {
@@ -55,8 +55,7 @@ window.localStorage.hasOwnProperty = key => {
   return Boolean(storage[escape(key)])
 }
 
-const domain = (new URLSearchParams(window.location.search)).get('app')
-window.history.replaceState({}, document.title, `/${domain}`)
+// window.history.replaceState({}, document.title, `/${c.__app}`)
 
 const currentScript = document.currentScript || document.scripts[document.scripts.length - 1]
 currentScript.parentNode.removeChild(currentScript)
