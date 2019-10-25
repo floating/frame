@@ -1,3 +1,5 @@
+/* globals fetch */
+
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../link'
@@ -12,6 +14,20 @@ const fallbackColor = dapp => {
 }
 
 class AppTile extends React.Component {
+  constructor (props, context) {
+    super(props, context)
+    this.icon = ''
+    this.cid = context.store(`main.dapps.${props.hash}.hash`)
+    console.log(`http://localhost:8080/ipfs/${this.cid}/favicon.ico`)
+    fetch(`http://localhost:8080/ipfs/${this.cid}/favicon.ico`)
+      .then(response => response.blob())
+      .then(images => {
+        this.icon = URL.createObjectURL(images)
+        this.forceUpdate()
+        console.log(this.icon)
+      })
+  }
+
   onMouseDown (e) {
     const { index, hash, mouseDown } = this.props
     const dapp = this.store(`main.dapps.${hash}`)
@@ -48,9 +64,13 @@ class AppTile extends React.Component {
     return (
       <div key={index} className={tileClass} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseEnter={handleMouseEnter}>
         <div className={cardClass} style={style}>
-          <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dapp) }}>
-            {dapp.domain[0].toUpperCase() + dapp.domain[1]}
-          </div>
+          {this.icon ? (
+            <img src={this.icon} />
+          ) : (
+            <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dapp) }}>
+              {dapp.domain[0].toUpperCase() + dapp.domain[1] + dapp.domain[2]}
+            </div>
+          )}
         </div>
       </div>
     )

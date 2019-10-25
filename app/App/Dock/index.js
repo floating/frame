@@ -157,8 +157,8 @@ class Dock extends React.Component {
             ) : null}
           </div>
           <div className='expandFrame' onMouseDown={() => link.send('tray:expand')}>{svg.logo(16)}</div>
-          <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
           <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
+          <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
           <div className='appStore'>
             {this.dragging ? (
               <div className='addAppForm'>
@@ -249,11 +249,11 @@ class Dock extends React.Component {
             </div>
             <div className='browserExtension'>
               <div className='browserExtensionText browserExtensionBot'>
-                {'Connect dapps in your browser to Frame too!'}
+                <div>{'Use Frame with dapps in your browser too!'}</div>
               </div>
               <div className='browserExtensionIcons'>
-                <div className='browserExtensionIcon' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>{svg.chrome(20)}</div>
-                <div className='browserExtensionIcon' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>{svg.firefox(20)}</div>
+                <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf')}>{svg.chrome(22)}</div>
+                <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension')}>{svg.firefox(22)}</div>
               </div>
             </div>
           </div>

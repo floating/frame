@@ -132,9 +132,11 @@ const rpc = {
     accounts.verifyAddress(true, cb)
   },
   addDapp (domain, cb) {
+    if (!domain.endsWith('.eth')) domain += '.eth'
     dapps.add(domain, cb)
   },
   toggleDock (cb) {
+    windows.setDockOnly(false)
     const expand = !store('dock.expand')
     if (expand) {
       // windows.setWidth(430)

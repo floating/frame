@@ -48,7 +48,7 @@ const detectMouse = () => {
     } else {
       detectMouse()
     }
-  }, 200)
+  }, 150)
 }
 
 const api = {
@@ -303,6 +303,9 @@ const api = {
     windows[url].on('closed', () => { delete windows[url] })
     windows[url].loadURL(url)
     windows[url].webContents.on('did-finish-load', () => windows[url].show())
+  },
+  setDockOnly: (bool) => {
+    dockOnly = bool
   }
 }
 

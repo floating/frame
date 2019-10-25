@@ -5,7 +5,7 @@ const crypto = require('crypto')
 
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
-// const windows = require('../windows')
+const windows = require('../windows')
 
 const server = require('./server')
 
@@ -87,8 +87,8 @@ class Dapps {
     if (!(await ipfs.isRunning()) || !ipfs.api) return cb(new Error('IPFS client not running'))
     const session = crypto.randomBytes(6).toString('hex')
     server.sessions.add(domain, session)
-    // windows.openView(`http://localhost:8421/${domain}?session=${session}`)
-    shell.openExternal(`http://localhost:8421/?dapp=${domain}:${session}`)
+    windows.openView(`http://localhost:8421/?dapp=${domain}:${session}`)
+    // shell.openExternal(`http://localhost:8421/?dapp=${domain}:${session}`)
     cb(null)
   }
 
@@ -129,19 +129,21 @@ class Dapps {
     })
   }
 
-  // EXPERIMENTAL
-  // async _getIcon () {
-  //   const TEMP_URL = 'https://www.myetherwallet.com/'
-  //   let iconUrl = await fetchFavicon(TEMP_URL)
-  //   if (iconUrl) {
-  //     const response = await axios({
-  //       url: iconUrl,
-  //       method: 'GET',
-  //       responseType: 'arraybuffer'
-  //     })
-  //     // fs.writeFileSync('test.png', response.data)
-  //   }
-  // }
+  EXPERIMENTAL
+  async _getIcon () {
+    // look for favicon in hash
+    // look for link tag in html
+    // const TEMP_URL = 'https://www.myetherwallet.com/'
+    // let iconUrl = await fetchFavicon(TEMP_URL)
+    // if (iconUrl) {
+    //   const response = await axios({
+    //     url: iconUrl,
+    //     method: 'GET',
+    //     responseType: 'arraybuffer'
+    //   })
+    //   // fs.writeFileSync('test.png', response.data)
+    // }
+  }
 }
 
 const dapps = new Dapps()

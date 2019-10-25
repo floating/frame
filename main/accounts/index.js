@@ -151,6 +151,7 @@ class Accounts extends EventEmitter {
       const summary = this.current().summary()
       cb(null, summary)
       windows.broadcast('main:action', 'setSigner', summary)
+      store.saveAccount(id)
     })
   }
 
@@ -160,6 +161,7 @@ class Accounts extends EventEmitter {
     const summary = { id: '', type: '', accounts: [], status: '', index: 0 }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
+    store.saveAccount('')
     setTimeout(() => { // Clear signer requests when unset
       if (s) {
         s.requests = {}

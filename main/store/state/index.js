@@ -94,6 +94,9 @@ const initial = {
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },
+    save: {
+      account: main('save.account', '')
+    },
     clients: {
       ipfs: {
         on: main('clients.ipfs.on', false),
