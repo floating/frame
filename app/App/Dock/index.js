@@ -130,14 +130,14 @@ class Dock extends React.Component {
   }
 
   render () {
+    const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
     const open = this.store('tray.open')
     const dock = this.store('tray.dockOnly')
-    const expanded = this.store('dock.expand')
-    const base = open ? -425 : dock ? -55 : 0
-    let transform = `translate3d(${base}px, 0px, 0px)`
-    if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
-    const transition = '0.32s cubic-bezier(.82,0,.12,1) all'
-    const transitionDelay = open && !dock && !expanded && this.delayDock ? '0.32s' : '0s'
+    const base = open || this.store('dock.expand') ? -425 : dock ? -55 : 0
+    const transform = `translate3d(${base}px, 0px, 0px)`
+    // if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
+    const transition = '0.48s cubic-bezier(.82,0,.12,1) all'
+    const transitionDelay = open && !dock && this.delayDock ? '0.36s' : '0s'
     return (
       <div id='dock' style={{ transform, transition, transitionDelay }}>
         <div className='overStoreShade' />
@@ -150,16 +150,16 @@ class Dock extends React.Component {
                 style={{ top: this.currentTop, left: this.currentLeft }}
               >
                 <div className='draggedAppCard'>
-                  <div className='appCardIconPlaceholder' style={{ background: fallbackColor(this.dragging.dapp) }}>
-                    {this.dragging.dapp.domain[0].toUpperCase() + this.dragging.dapp.domain[1]}
-                  </div>
+                  <AppTile moving dragging={this.dragging} cid={this.dragging.dapp.hash} />
                 </div>
               </div>
             ) : null}
           </div>
           <div className='expandFrame' onMouseDown={() => link.send('tray:expand')}>{svg.logo(16)}</div>
+          {ipfsReady ? (
+            <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
+          ) : null}
           <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
-          <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
           <div className='appStore'>
             {this.dragging ? (
               <div className='addAppForm'>
@@ -206,21 +206,26 @@ class Dock extends React.Component {
                 this.inDockCatch = false
               }}
             />
-            <div className='dockApps' style={{ marginTop: `-${(this.store('main.dappMap.docked').length * 48) / 2}px` }}>
-              {this.store('main.dappMap.docked').map((hash, i) => {
-                return (
-                  <AppTile
-                    key={i}
-                    index={i}
-                    hash={hash}
-                    dragging={this.dragging}
-                    docked
-                    mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
-                    moveDrag={(...args) => this.moveDrag(...args)}
-                  />
-                )
-              })}
+            <div className='appsOff' style={ipfsReady ? { display: 'none' } : {}}>
+              {'NO IPFS CONNECTION'}
             </div>
+            {ipfsReady ? (
+              <div className='dockApps' style={{ marginTop: `-${(this.store('main.dappMap.docked').length * 48) / 2}px` }}>
+                {this.store('main.dappMap.docked').map((hash, i) => {
+                  return (
+                    <AppTile
+                      key={hash}
+                      index={i}
+                      hash={hash}
+                      dragging={this.dragging}
+                      docked
+                      mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
+                      moveDrag={(...args) => this.moveDrag(...args)}
+                    />
+                  )
+                })}
+              </div>
+            ) : null}
             <div className='addedApps'>
               <div
                 className='dragCatch'
@@ -237,7 +242,7 @@ class Dock extends React.Component {
               {this.store('main.dappMap.added').map((hash, i) => {
                 return (
                   <AppTile
-                    key={i}
+                    key={hash}
                     index={i}
                     hash={hash}
                     dragging={this.dragging}
@@ -250,11 +255,11 @@ class Dock extends React.Component {
             </div>
             <div className='browserExtension'>
               <div className='browserExtensionText browserExtensionBot'>
-                {'Connect dapps in your browser to Frame too!'}
+                <div>{'Use Frame with dapps in your browser too!'}</div>
               </div>
               <div className='browserExtensionIcons'>
-                <div className='browserExtensionIcon' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>{svg.chrome(20)}</div>
-                <div className='browserExtensionIcon' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>{svg.firefox(20)}</div>
+                <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf')}>{svg.chrome(22)}</div>
+                <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension')}>{svg.firefox(22)}</div>
               </div>
             </div>
           </div>

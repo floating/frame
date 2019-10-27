@@ -153,7 +153,7 @@
 
   .pinFrame
     position absolute
-    top 49px
+    bottom 0
     left 0
     width 48px
     height 48px
@@ -162,7 +162,6 @@
     justify-content center
     align-items center
     color outerspace03
-    border-top 1px solid thick
 
     svg
       transform rotate(45deg)
@@ -175,17 +174,17 @@
 
   .pinFrameActive
     svg
-      color outerspace08
+      color pending08
       transform rotate(0deg)
 
   .pinFrameActive:hover
     svg
-      color outerspace08
+      color pending
       transform rotate(0deg)
 
   .toggleDock
     position absolute
-    bottom 0
+    top 49px
     left 0
     width 48px
     height 48px
@@ -194,9 +193,34 @@
     justify-content center
     align-items center
     color outerspace08
+    border-top 1px solid thick
 
   .toggleDock:hover
     color outerspace
+
+  .appsOff
+    position absolute
+    left -87px
+    top 50%
+    // background blue
+    z-index 1000
+    transform rotate(-90deg)
+    width 220px
+    height 47px
+    margin-top -13px
+    display flex
+    justify-content center
+    align-items center
+    text-transform uppercase
+    letter-spacing 4px
+    font-size 8px
+    font-weight 600
+    transition standardSlow
+    opacity 0
+
+  .appsOff:hover
+    opacity 0.4
+
 
   .dockApps
     position absolute
@@ -237,7 +261,12 @@
     justify-content center
     align-items center
     border-bottom 1px solid thick
-    div, svg
+
+    img
+      height 26px
+      width 26px
+
+    div, svg, img
       pointer-events none
 
   .dockedApp:last-child
@@ -256,7 +285,7 @@
       left 58px
       right 10px
       bottom 0px
-      height 60px
+      height 62px
       display flex
       justify-content center
       align-items center
@@ -269,26 +298,28 @@
 
       .browserExtensionIcons
         position absolute
-        bottom 17px
-        left 0
-        right 0
-        top 0
+        bottom 0px
+        top 2px
+        right 3px
+        padding 5px
+        width 100px
         display flex
         justify-content center
         align-items center
         // background blue
 
         .browserExtensionIcon
-          height 30px
-          width 30px
+          min-height 40px
+          min-width 40px
           display flex
           justify-content center
           align-items center
-          // margin 3px
+          margin 2px 5px 0px 6px
           font-size 11px
-          border-radius 6px
+          border-radius 4px
           color outerspace08
           transition 0.1s linear all
+          border 1px solid thick
 
         .browserExtensionIcon:hover
           background light
@@ -297,21 +328,19 @@
       .browserExtensionText
         position absolute
         font-size 11px
+        // left 10px
+        top 4px
+        bottom 0
         left 10px
-        right 10px
+        width 148px
         display flex
         text-align center
         justify-content center
         align-items center
-        font-weight 600
-
-      .browserExtensionTop
-        top 10px
-        height 10px
-
-      .browserExtensionBot
-        bottom 0px
-        height 30px
+        font-weight 400
+        flex-direction column
+        line-height 14px
+        // background orange
 
     .addAppForm
       position absolute
@@ -446,5 +475,9 @@
         color outerspace
         transition 0.1s linear all
 
-      div, svg
+      img
+        height 26px
+        width 26px
+
+      div, svg, img
         pointer-events none

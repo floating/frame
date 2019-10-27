@@ -113,7 +113,6 @@ class Settings extends React.Component {
   }
 
   expandNetwork (e, expand) {
-    e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
 

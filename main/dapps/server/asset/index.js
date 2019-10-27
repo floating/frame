@@ -12,7 +12,7 @@ const getType = require('./getType')
 const inject = fs.readFileSync(path.resolve(__dirname, '../../../../bundle/inject.js'), 'utf8')
 
 const error = (res, code, message) => {
-  res.writeHead(code)
+  res.writeHead(code || 404)
   res.end(message)
 }
 

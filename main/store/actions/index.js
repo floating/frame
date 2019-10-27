@@ -168,6 +168,9 @@ module.exports = {
   pin: (u) => {
     u('main.pin', pin => !pin)
   },
+  saveAccount: (u, id) => {
+    u('main.save.account', () => id)
+  },
   // Tray actions...
   // syncMain: (u, main) => u('main', _ => main),
   setSigner: (u, signer) => {

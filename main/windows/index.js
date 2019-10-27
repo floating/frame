@@ -48,7 +48,7 @@ const detectMouse = () => {
     } else {
       detectMouse()
     }
-  }, 100)
+  }, 150)
 }
 
 const api = {
@@ -185,7 +185,7 @@ const api = {
         if (hideShow.next === 'dock') setTimeout(() => api.showTray(true), 0)
         hideShow.running = false
         hideShow.next = false
-      }, dockOnly ? 260 : 640)
+      }, dockOnly ? 360 : 640)
     }
   },
   showTray: (dock) => {
@@ -202,7 +202,7 @@ const api = {
       windows.tray.setVisibleOnAllWorkspaces(true)
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setSize(dock ? 48 : store('dock.expand') ? 740 : 430, dev ? 740 : area.height)
+      windows.tray.setSize(430, dev ? 740 : area.height)
       const pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
@@ -268,6 +268,9 @@ const api = {
   reload: () => {
     windows.tray.reload()
   },
+  setGlide: (bool) => {
+    glide = bool
+  },
   openView: (url) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows[url] = new BrowserWindow({
@@ -300,6 +303,9 @@ const api = {
     windows[url].on('closed', () => { delete windows[url] })
     windows[url].loadURL(url)
     windows[url].webContents.on('did-finish-load', () => windows[url].show())
+  },
+  setDockOnly: (bool) => {
+    dockOnly = bool
   }
 }
 

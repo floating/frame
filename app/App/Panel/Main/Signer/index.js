@@ -23,6 +23,9 @@ class Signer extends React.Component {
       unlockInput: '',
       openHover: false
     }
+    if (this.context.store('main.save.account') === this.props.id) {
+      setTimeout(() => this.select(), 200)
+    }
   }
 
   componentDidMount () {
