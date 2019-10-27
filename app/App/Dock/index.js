@@ -130,6 +130,7 @@ class Dock extends React.Component {
   }
 
   render () {
+    const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
     const open = this.store('tray.open')
     const dock = this.store('tray.dockOnly')
     const base = open || this.store('dock.expand') ? -425 : dock ? -55 : 0
@@ -149,15 +150,15 @@ class Dock extends React.Component {
                 style={{ top: this.currentTop, left: this.currentLeft }}
               >
                 <div className='draggedAppCard'>
-                  <div className='appCardIconPlaceholder' style={{ background: fallbackColor(this.dragging.dapp) }}>
-                    {this.dragging.dapp.domain[0].toUpperCase() + this.dragging.dapp.domain[1]}
-                  </div>
+                  <AppTile moving dragging={this.dragging} cid={this.dragging.dapp.hash} />
                 </div>
               </div>
             ) : null}
           </div>
           <div className='expandFrame' onMouseDown={() => link.send('tray:expand')}>{svg.logo(16)}</div>
-          <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
+          {ipfsReady ? (
+            <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
+          ) : null}
           <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
           <div className='appStore'>
             {this.dragging ? (
@@ -205,21 +206,26 @@ class Dock extends React.Component {
                 this.inDockCatch = false
               }}
             />
-            <div className='dockApps' style={{ marginTop: `-${(this.store('main.dappMap.docked').length * 48) / 2}px` }}>
-              {this.store('main.dappMap.docked').map((hash, i) => {
-                return (
-                  <AppTile
-                    key={i}
-                    index={i}
-                    hash={hash}
-                    dragging={this.dragging}
-                    docked
-                    mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
-                    moveDrag={(...args) => this.moveDrag(...args)}
-                  />
-                )
-              })}
+            <div className='appsOff' style={ipfsReady ? { display: 'none' } : {}}>
+              {'NO IPFS CONNECTION'}
             </div>
+            {ipfsReady ? (
+              <div className='dockApps' style={{ marginTop: `-${(this.store('main.dappMap.docked').length * 48) / 2}px` }}>
+                {this.store('main.dappMap.docked').map((hash, i) => {
+                  return (
+                    <AppTile
+                      key={hash}
+                      index={i}
+                      hash={hash}
+                      dragging={this.dragging}
+                      docked
+                      mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
+                      moveDrag={(...args) => this.moveDrag(...args)}
+                    />
+                  )
+                })}
+              </div>
+            ) : null}
             <div className='addedApps'>
               <div
                 className='dragCatch'
@@ -236,7 +242,7 @@ class Dock extends React.Component {
               {this.store('main.dappMap.added').map((hash, i) => {
                 return (
                   <AppTile
-                    key={i}
+                    key={hash}
                     index={i}
                     hash={hash}
                     dragging={this.dragging}

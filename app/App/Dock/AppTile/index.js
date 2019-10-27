@@ -4,6 +4,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../link'
 
+const icons = {}
+
 const hashCode = str => str.split('').reduce((prevHash, currVal) => (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0)
 const fallbackColor = dapp => {
   const hex = hashCode(dapp.domain).toString(16).replace('-', '')
@@ -16,16 +18,23 @@ const fallbackColor = dapp => {
 class AppTile extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.icon = ''
-    this.cid = context.store(`main.dapps.${props.hash}.hash`)
-    console.log(`http://localhost:8080/ipfs/${this.cid}/favicon.ico`)
-    fetch(`http://localhost:8080/ipfs/${this.cid}/favicon.ico`)
-      .then(response => response.blob())
-      .then(images => {
-        this.icon = URL.createObjectURL(images)
-        this.forceUpdate()
-        console.log(this.icon)
-      })
+    this.cid = props.moving ? props.cid : context.store(`main.dapps.${props.hash}.hash`)
+    if (this.cid && !icons[this.cid]) {
+      fetch(`http://localhost:8080/ipfs/${this.cid}/favicon.ico`)
+        .then(res => {
+          if (res.status === 200) return res
+          throw new Error(res.statusText)
+        })
+        .then(response => response.blob())
+        .then(images => {
+          icons[this.cid] = URL.createObjectURL(images)
+          this.forceUpdate()
+        })
+        .catch(e => {
+          delete icons[this.cid]
+          console.log(e)
+        })
+    }
   }
 
   onMouseDown (e) {
@@ -52,28 +61,44 @@ class AppTile extends React.Component {
   }
 
   render () {
-    const { index, hash, dragging, docked } = this.props
-    const dapp = this.store(`main.dapps.${hash}`)
-    const tileClass = docked ? 'dockedApp' : 'addedApp'
-    const cardClass = docked ? 'dockedAppCard' : 'addedAppCard'
-    const beingDragged = dragging && dragging.dapp && dragging.docked === docked && dragging.index === index
-    const style = !beingDragged ? {} : !docked ? { opacity: 0.3, boxShadow: 'none', transform: 'scale(1.4)' } : { opacity: 0.3 }
-    const handleMouseDown = beingDragged ? () => {} : this.onMouseDown.bind(this)
-    const handleMouseUp = beingDragged ? () => {} : this.onMouseUp.bind(this)
-    const handleMouseEnter = beingDragged ? () => {} : this.onMouseEnter.bind(this)
-    return (
-      <div key={index} className={tileClass} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseEnter={handleMouseEnter}>
-        <div className={cardClass} style={style}>
-          {this.icon ? (
-            <img src={this.icon} />
-          ) : (
-            <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dapp) }}>
-              {dapp.domain[0].toUpperCase() + dapp.domain[1] + dapp.domain[2]}
-            </div>
-          )}
+    const { index, hash, dragging, docked, moving } = this.props
+    if (moving) {
+      return (
+        <div key={index} className='addedApp'>
+          <div className='addedAppCard'>
+            {icons[this.cid] ? (
+              <img src={icons[this.cid]} />
+            ) : (
+              <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dragging.dapp) }}>
+                {dragging.dapp.domain[0].toUpperCase() + dragging.dapp.domain[1] + dragging.dapp.domain[2]}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    )
+      )
+    } else {
+      const dapp = this.store(`main.dapps.${hash}`)
+      const tileClass = docked ? 'dockedApp' : 'addedApp'
+      const cardClass = docked ? 'dockedAppCard' : 'addedAppCard'
+      const beingDragged = dragging && dragging.dapp && dragging.docked === docked && dragging.index === index
+      const style = !beingDragged ? {} : !docked ? { opacity: 0.3, boxShadow: 'none', transform: 'scale(1.4)' } : { opacity: 0.3 }
+      const handleMouseDown = beingDragged ? () => {} : this.onMouseDown.bind(this)
+      const handleMouseUp = beingDragged ? () => {} : this.onMouseUp.bind(this)
+      const handleMouseEnter = beingDragged ? () => {} : this.onMouseEnter.bind(this)
+      return (
+        <div key={index} className={tileClass} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseEnter={handleMouseEnter}>
+          <div className={cardClass} style={style}>
+            {icons[this.cid] ? (
+              <img src={icons[this.cid]} />
+            ) : (
+              <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dapp) }}>
+                {dapp.domain[0].toUpperCase() + dapp.domain[1] + dapp.domain[2]}
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
   }
 }
 
