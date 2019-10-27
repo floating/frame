@@ -63,10 +63,9 @@
   "dependencies": {
     "@aragon/wrapper": "5.0.0-rc.17",
     "@githubprimer/octicons-react": "8.5.0",
-    "@ledgerhq/hw-app-eth": "4.73.2",
-    "@ledgerhq/hw-transport-node-hid": "4.73.2",
-    "@ledgerhq/hw-transport-web-ble": "4.73.2",
-    "@meltwater/fetch-favicon": "1.0.4",
+    "@ledgerhq/hw-app-eth": "4.73.3",
+    "@ledgerhq/hw-transport-node-hid": "4.73.3",
+    "@ledgerhq/hw-transport-web-ble": "4.73.3",
     "abi-codec": "0.0.9",
     "auto-launch": "5.0.5",
     "axios": "0.19.0",

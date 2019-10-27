@@ -9,10 +9,6 @@ const windows = require('../windows')
 
 const server = require('./server')
 
-// const { fetchFavicon } = require('@meltwater/fetch-favicon')
-// const { execSync } = require('child_process')
-// const IPFS_GATEWAY_URL = 'https://cloudflare-ipfs.com'
-
 const mock = {
   ens: {
     resolveContent: (domain) => {
@@ -127,22 +123,6 @@ class Dapps {
         })
       }
     })
-  }
-
-  EXPERIMENTAL
-  async _getIcon () {
-    // look for favicon in hash
-    // look for link tag in html
-    // const TEMP_URL = 'https://www.myetherwallet.com/'
-    // let iconUrl = await fetchFavicon(TEMP_URL)
-    // if (iconUrl) {
-    //   const response = await axios({
-    //     url: iconUrl,
-    //     method: 'GET',
-    //     responseType: 'arraybuffer'
-    //   })
-    //   // fs.writeFileSync('test.png', response.data)
-    // }
   }
 }
 
