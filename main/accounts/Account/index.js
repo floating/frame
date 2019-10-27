@@ -185,7 +185,7 @@ class Account {
       signers.get(this.signer.id).signMessage(this.index, message, cb)
     } else if (this.smart) {
       if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-        signers.get(this.smart.actor.account.id).signMessage(this.index, message, cb)
+        signers.get(this.smart.actor.account.id).signMessage(this.index, message, this.aragon.processSignedMessage(cb))
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
@@ -201,7 +201,7 @@ class Account {
       signers.get(this.signer.id).signTypedData(this.index, typedData, cb)
     } else if (this.smart) {
       if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-        signers.get(this.smart.actor.account.id).signTypedData(this.index, typedData, cb)
+        signers.get(this.smart.actor.account.id).signTypedData(this.index, typedData, this.aragon.processSignedMessage(cb))
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
@@ -218,12 +218,12 @@ class Account {
         signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
       } else if (this.smart) {
         if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-          signers.get(this.smart.actor.account.id).signTransaction(this.index, rawTx, cb)
+          signers.get(this.smart.actor.account.id).signTransaction(this.smart.actor.index, rawTx, cb)
         } else {
           cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
         }
       } else {
-        cb(new Error(`No signer forund for this account`))
+        cb(new Error(`No signer found for this account`))
       }
     })
   }

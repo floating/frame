@@ -110,9 +110,18 @@ class Provider extends EventEmitter {
   }
 
   verifySignature (signed, message, address, cb) {
+    if (signed.length === 134) { // Aragon smart signed message
+      try {
+        signed = '0x' + signed.substring(4)
+        const actor = accounts.current().smart && accounts.current().smart.actor
+        address = accounts.get(actor.id).addresses[actor.index]
+      } catch (e) {
+        return cb(new Error('Could not resolve message or actor for smart accoount'))
+      }
+    }
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
-      if (verifiedAddress.toLowerCase() !== address.toLowerCase()) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
+      if (verifiedAddress.toLowerCase() !== address.toLowerCase()) return cb(new Error('Frame verifySignature: Failed ecRecover check'))
       cb(null, true)
     })
   }
