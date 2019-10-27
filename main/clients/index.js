@@ -67,7 +67,7 @@ app.on('ready', () => {
 })
 
 module.exports = {
-  stop: async () => {
+  stop: () => {
     return Promise.all([
       geth.stop(),
       ipfs.stop(),

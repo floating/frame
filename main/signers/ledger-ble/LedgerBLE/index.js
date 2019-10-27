@@ -1,6 +1,6 @@
 const log = require('electron-log')
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx')
+const EthereumTx = require('ethereumjs-tx').Transaction
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const windows = require('../../../windows')

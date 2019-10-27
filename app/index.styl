@@ -22,12 +22,16 @@ lowlight = rgba(230, 236, 248, 1)
 lowerlight = rgba(227, 232, 250, 1)
 light = #eaf0f9
 lightShade = rgba(220, 224, 244, 1) // #d9e1ef
+lightShader = rgba(190, 194, 214, 1)
 thinner = rgba(16, 44, 180, .02)
 thin = rgba(16, 44, 180, .04)
 thick = rgba(16, 44, 180, .07)
 doubleThick = rgba(16, 44, 180, .14)
 tripleThick = rgba(16, 44, 180, .21)
 thick0 = rgba(16, 44, 180, 0)
+
+whiteglow = rgba(232, 236, 249, 1)
+whiteglowShade = rgba(208, 212, 225, 1)
 
 hardware = rgba(170, 240, 255, 1)
 smart = rgba(150, 255, 210, 1)
@@ -51,8 +55,11 @@ good06 = rgba(0, 210, 180, 0.6)
 
 bad = rgb(250, 100, 155)
 bad01 = rgba(250, 100, 155, 0.1)
+bad02 = rgba(250, 100, 155, 0.2)
+bad03 = rgba(250, 100, 155, 0.3)
 bad04 = rgba(250, 100, 155, 0.4)
 bad06 = rgba(250, 100, 155, 0.6)
+bad08 = rgba(250, 100, 155, 0.8)
 badLight = rgb(255, 104, 159)
 badLighter = rgb(255, 107, 163)
 badShade = rgb(230, 80, 135)
@@ -62,6 +69,7 @@ pending = rgb(94, 110, 255)
 pending02 = rgba(94, 110, 255, 0.4)
 pending01 = rgba(94, 110, 255, 0.2)
 pending04 = rgba(94, 110, 255, 0.4)
+pending08 = rgba(94, 110, 255, 0.8)
 pendingShade = rgb(74, 90, 235)
 pendingShader = rgb(64, 80, 225)
 
@@ -74,6 +82,7 @@ standardSlow = .64s cubic-bezier(.82,0,.12,1) all
 standardSlower = .96s cubic-bezier(.82,0,.12,1) all
 standardSlowest = 1.6s cubic-bezier(.82,0,.12,1) all
 standardFast = .16s cubic-bezier(.82,0,.12,1) all
+standardFaster = .08s cubic-bezier(.82,0,.12,1) all
 // 0.18s cubic-bezier(0.8, 1, 0.2, 1) all
 cubic = cubic-bezier(.82,0,.12,1)
 
@@ -97,7 +106,7 @@ div
 #panel
   background rgba(220, 224, 244, 1)
   margin 0px
-  border-radius 3px
+  border-radius 6px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
 
@@ -143,5 +152,4 @@ div
 .hidden
   visibility hidden
 
-@import './App/Panel/style'
-@import './App/Components/'
+@import './App/style'

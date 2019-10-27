@@ -1,7 +1,6 @@
 const path = require('path')
 const fs = require('fs')
 const { ensureDirSync } = require('fs-extra')
-const { app } = require('electron')
 const log = require('electron-log')
 const bip39 = require('bip39')
 const zxcvbn = require('zxcvbn')
@@ -9,8 +8,8 @@ const zxcvbn = require('zxcvbn')
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
 
-const USER_DATA = app ? app.getPath('userData') : './test/.userData'
-const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
+const { userData } = require('../../util')
+const SIGNERS_PATH = path.resolve(userData, 'signers')
 
 module.exports = {
   newPhrase: (cb) => {

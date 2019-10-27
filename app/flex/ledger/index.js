@@ -3,7 +3,7 @@ import 'babel-polyfill'
 // Libraries
 import TransportWebBLE from '@ledgerhq/hw-transport-web-ble'
 import AppEth from '@ledgerhq/hw-app-eth'
-import EthereumTx from 'ethereumjs-tx'
+import { Transaction } from 'ethereumjs-tx'
 
 class Device {
   constructor (device, emit) {
@@ -46,7 +46,7 @@ class Device {
   }
 
   ethereumSignTransaction (path, rawTx, cb) {
-    const tx = new EthereumTx(rawTx)
+    const tx = new Transaction(rawTx)
     tx.raw[6] = Buffer.from([rawTx.chainId]) // v
     tx.raw[7] = Buffer.from([]) // r
     tx.raw[8] = Buffer.from([]) // s

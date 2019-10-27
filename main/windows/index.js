@@ -21,6 +21,7 @@ const showOnReady = true
 let mouseTimeout
 
 let glide = false
+let dockOnly = false
 
 const detectMouse = () => {
   const m1 = electron.screen.getCursorScreenPoint()
@@ -29,7 +30,7 @@ const detectMouse = () => {
   const bounds = display.bounds
   const minX = (area.width + area.x) - 2
   const center = (area.height + (area.y - bounds.y)) / 2
-  const margin = (area.height + (area.y - bounds.y)) / 8
+  const margin = center - 68
   m1.y = m1.y - area.y
   const minY = center - margin
   const maxY = center + margin
@@ -40,25 +41,29 @@ const detectMouse = () => {
       m2.y = m2.y - area.y
       if (m2.x >= minX && m2.y === m1.y) {
         glide = true
-        api.showTray()
+        api.showTray(true)
       } else {
         detectMouse()
       }
     } else {
       detectMouse()
     }
-  }, 200)
+  }, 150)
 }
 
 const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      width: 360,
+      width: 430,
       frame: false,
       transparent: true,
       hasShadow: false,
       show: false,
+      titleBarStyle: 'customButtonsOnHover',
+      minimizable: false,
+      maximizable: false,
+      closable: false,
       backgroundThrottling: false,
       icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
@@ -104,12 +109,12 @@ const api = {
       }, 2000)
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) {
-      setTimeout(() => {
-        windows.tray.on('blur', _ => api.hideTray())
-        windows.tray.focus()
-      }, 1260)
-    }
+    setTimeout(() => {
+      windows.tray.on('blur', _ => {
+        if (!store('main.pin')) api.hideTray()
+      })
+      windows.tray.focus()
+    }, 1260)
     if (!openedAtLogin) {
       setTimeout(() => {
         if (windows && windows.tray) windows.tray.show()
@@ -162,13 +167,14 @@ const api = {
     } else {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
+      store.expandDock(false)
       setTimeout(() => {
         if (windows && windows.tray) {
           if (store('main.reveal')) detectMouse()
           windows.tray.setVisibleOnAllWorkspaces(true)
           windows.tray.setAlwaysOnTop(false)
           const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-          windows.tray.setResizable(true)
+          // windows.tray.setResizable(true)
           windows.tray.setSize(1, dev ? 740 : area.height)
           const pos = windows.tray.positioner.calculate('topRight')
           windows.tray.setPosition(area.width + area.x, pos.y)
@@ -176,31 +182,33 @@ const api = {
           windows.tray.hide()
         }
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
+        if (hideShow.next === 'dock') setTimeout(() => api.showTray(true), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 260)
+      }, dockOnly ? 360 : 640)
     }
   },
-  showTray: () => {
+  showTray: (dock) => {
+    dockOnly = dock
     clearTimeout(mouseTimeout)
     hideShow.current = 'showing'
     if (hideShow.running) {
       hideShow.next = false
-      if (hideShow.running !== 'show') hideShow.next = 'show'
+      if (hideShow.running !== 'show' && hideShow.running !== 'dock') hideShow.next = dock ? 'dock' : 'show'
     } else {
       if (!windows.tray) return api.tray()
       windows.tray.setAlwaysOnTop(true)
       hideShow.running = 'show'
       windows.tray.setVisibleOnAllWorkspaces(true)
-      windows.tray.setResizable(false) // Keeps height consistant
+      // windows.tray.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setSize(360, dev ? 740 : area.height)
+      windows.tray.setSize(430, dev ? 740 : area.height)
       const pos = windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')
       windows.tray.show()
-      windows.tray.send('main:action', 'trayOpen', true)
+      windows.tray.send('main:action', 'trayOpen', true, { dock })
       windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
         if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
@@ -215,6 +223,18 @@ const api = {
     const id = winId(e)
     if (windows[id]) windows[id].close()
     delete windows[id]
+  },
+  setWidth: width => {
+    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    windows.tray.setSize(width, dev ? 740 : area.height)
+    const pos = windows.tray.positioner.calculate('topRight')
+    windows.tray.setPosition(pos.x, pos.y)
+    // windows.tray.setBounds({
+    //   width: width,
+    //   height: dev ? 740 : area.height,
+    //   x: area.width - width,
+    //   y: 0
+    // })
   },
   getTray: () => {
     return windows.tray
@@ -242,7 +262,50 @@ const api = {
     api.showTray()
   },
   quit: () => {
+    windows.tray.setClosable(true)
     app.quit()
+  },
+  reload: () => {
+    windows.tray.reload()
+  },
+  setGlide: (bool) => {
+    glide = bool
+  },
+  openView: (url) => {
+    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    windows[url] = new BrowserWindow({
+      id: 'tray',
+      x: 40,
+      y: 0,
+      width: area.width - 500,
+      height: area.height,
+      show: false,
+      // frame: false,
+      // transparent: true,
+      // hasShadow: false,
+      // titleBarStyle: 'customButtonsOnHover',
+      // minimizable: false,
+      // maximizable: false,
+      // closable: false,
+      // backgroundThrottling: false,
+      // icon: path.join(__dirname, './AppIcon.png'),
+      // skipTaskbar: process.platform !== 'linux',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
+        disableBlinkFeatures: 'Auxclick',
+        enableRemoteModule: false
+        // preload: path.resolve(__dirname, '../../bundle/bridge.js')
+      }
+    })
+    if (dev) windows[url].openDevTools()
+    windows[url].on('closed', () => { delete windows[url] })
+    windows[url].loadURL(url)
+    windows[url].webContents.on('did-finish-load', () => windows[url].show())
+  },
+  setDockOnly: (bool) => {
+    dockOnly = bool
   }
 }
 
@@ -273,10 +336,24 @@ ipcMain.on('tray:ready', () => {
   if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
 })
 
+ipcMain.on('tray:pin', () => {
+  if (store('main.pin')) {
+    setTimeout(() => {
+      api.hideTray()
+    }, 200)
+  }
+  store.pin()
+})
+ipcMain.on('tray:expand', () => {
+  glide = false
+  const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+  showing && !dockOnly ? api.hideTray() : api.showTray()
+})
+
 ipcMain.on('tray:mouseout', () => {
   if (glide) {
     glide = false
-    api.hideTray()
+    if (!store('main.pin')) api.hideTray()
   }
 })
 
@@ -284,6 +361,20 @@ ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectEleme
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
-store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
+// store.observer(_ => api.broadcast('main:action', 'app', store('main')))
+
+// Sync all state changes to every window
+store.api.feed((state, actions, obscount) => {
+  actions.forEach(action => {
+    action.updates.forEach(update => {
+      // if (update.path.startsWith('main')) return
+      // console.log('State Update >>>', update.path, '===', update.value)
+      const base = update.path.split('.')[0]
+      if (['main', 'dock'].indexOf(base) > -1) { // Soon to be all?
+        api.broadcast('main:action', 'sync', update.path, update.value)
+      }
+    })
+  })
+})
 
 module.exports = api

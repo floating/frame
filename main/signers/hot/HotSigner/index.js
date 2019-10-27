@@ -2,17 +2,14 @@ const path = require('path')
 const fs = require('fs')
 const { ensureDirSync, removeSync } = require('fs-extra')
 const { fork } = require('child_process')
-const { app } = require('electron')
 const log = require('electron-log')
 const uuid = require('uuid/v4')
+const { userData, windows } = require('../../../util')
 
 const Signer = require('../../Signer')
 const store = require('../../../store')
-// Mock windows module during tests
-const windows = app ? require('../../../windows') : { broadcast: () => {} }
-// Mock user data dir during tests
-const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData')
-const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
+
+const SIGNERS_PATH = path.resolve(userData, 'signers')
 
 class HotSigner extends Signer {
   constructor (signer, workerPath) {
