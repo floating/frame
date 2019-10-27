@@ -130,6 +130,13 @@ class Aragon {
       }).catch(cb)
     })
   }
+
+  processSignedMessage (cb) {
+    return (err, msg) => {
+      if (err) return cb(err)
+      cb(null, '0x01' + msg.substring(2))
+    }
+  }
 }
 
 module.exports = { Aragon, resolveName }

@@ -336,7 +336,7 @@ class Accounts extends EventEmitter {
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId]) {
       this.current().requests[handlerId].status = 'success'
-      this.current().requests[handlerId].notice = 'Succesful'
+      this.current().requests[handlerId].notice = 'Successful'
       if (this.current().requests[handlerId].type === 'transaction') {
         this.current().requests[handlerId].mode = 'monitor'
       } else {
