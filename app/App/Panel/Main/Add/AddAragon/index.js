@@ -187,7 +187,7 @@ class AddAragon extends React.Component {
                     {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map((a, i) => {
                       return (
                         <div key={a + i} className='addAccountItemOptionListItem fira' onMouseDown={e => this.actorAddress(a, i)}>
-                          {a ? a.substring(0, 10) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 10) : ''}
+                          {a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}
                         </div>
                       )
                     })}

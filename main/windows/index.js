@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
 const Positioner = require('electron-positioner')
 const log = require('electron-log')
+const url = require('url')
 
 const store = require('../store')
 
@@ -271,9 +272,9 @@ const api = {
   setGlide: (bool) => {
     glide = bool
   },
-  openView: (url) => {
+  openView: (location, ens) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    windows[url] = new BrowserWindow({
+    windows[location] = new BrowserWindow({
       id: 'tray',
       x: 40,
       y: 0,
@@ -288,21 +289,25 @@ const api = {
       // maximizable: false,
       // closable: false,
       // backgroundThrottling: false,
-      // icon: path.join(__dirname, './AppIcon.png'),
+      icon: path.join(__dirname, './AppIcon.png'),
       // skipTaskbar: process.platform !== 'linux',
       webPreferences: {
+        webviewTag: true,
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
-        enableRemoteModule: false
-        // preload: path.resolve(__dirname, '../../bundle/bridge.js')
+        enableRemoteModule: false,
+        preload: path.resolve(__dirname, '../../bundle/dapp/bridge.js')
       }
     })
-    if (dev) windows[url].openDevTools()
-    windows[url].on('closed', () => { delete windows[url] })
-    windows[url].loadURL(url)
-    windows[url].webContents.on('did-finish-load', () => windows[url].show())
+    if (dev) windows[location].openDevTools()
+    windows[location].on('closed', () => { delete windows[location] })
+    windows[location].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
+    windows[location].webContents.on('did-finish-load', () => {
+      windows[location].show()
+      windows[location].send('main:location', { url: location, ens: ens })
+    })
   },
   setDockOnly: (bool) => {
     dockOnly = bool
@@ -311,8 +316,8 @@ const api = {
 
 app.on('web-contents-created', (e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
-  contents.on('will-attach-webview', e => e.preventDefault())
-  contents.on('new-window', e => e.preventDefault())
+  // contents.on('will-attach-webview', e => e.preventDefault())
+  // scontents.on('new-window', e => e.preventDefault())
 })
 
 if (dev) {

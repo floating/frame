@@ -83,7 +83,7 @@ class Dapps {
     if (!(await ipfs.isRunning()) || !ipfs.api) return cb(new Error('IPFS client not running'))
     const session = crypto.randomBytes(6).toString('hex')
     server.sessions.add(domain, session)
-    windows.openView(`http://localhost:8421/?dapp=${domain}:${session}`)
+    windows.openView(`http://localhost:8421/?dapp=${domain}:${session}`, domain)
     // shell.openExternal(`http://localhost:8421/?dapp=${domain}:${session}`)
     cb(null)
   }

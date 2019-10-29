@@ -90,11 +90,26 @@
     display flex
     justify-content center
     align-items center
-    height 34px
-    width 34px
-    border-radius 3px
-    font-size 12px
+    height 27px
+    width 27px
+    border-radius 14px
+    font-size 10px
+    letter-spacing 0px
     font-weight bold
+    display flex
+    flex-direction column
+
+    div
+      padding-left 1px
+      width 18px
+      overflow hidden
+      height 10px
+      display flex
+      align-items center
+      justify-content center
+
+      span
+        padding 0px
 
   .dragCatchDock
     position absolute
@@ -136,6 +151,13 @@
         animation-duration 1.4s
         animation-timing-function linear
 
+        img
+          height 26px
+          width 26px
+
+        div, svg, img
+          pointer-events none
+
   .expandFrame
     position absolute
     top 0
@@ -174,12 +196,12 @@
 
   .pinFrameActive
     svg
-      color pending08
+      color outerspace08
       transform rotate(0deg)
 
   .pinFrameActive:hover
     svg
-      color pending
+      color outerspace
       transform rotate(0deg)
 
   .toggleDock
