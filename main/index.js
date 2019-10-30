@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, globalShortcut } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -11,6 +11,8 @@ const path = require('path')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store')
+
+const dev = process.env.NODE_ENV === 'development'
 
 // log.transports.file.level = 'info'
 
@@ -26,6 +28,7 @@ require('./rpc')
 const clients = require('./clients')
 const signers = require('./signers')
 const persist = require('./store/persist')
+require('./dapps')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -55,7 +58,9 @@ const externalWhitelist = [
   'https://mainnet.aragon.org',
   'https://rinkeby.aragon.org',
   'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
-  'https://shop.trezor.io/?offer_id=10&aff_id=3270'
+  'https://shop.trezor.io/?offer_id=10&aff_id=3270',
+  'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
+  'https://addons.mozilla.org/en-US/firefox/addon/frame-extension'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
@@ -130,6 +135,9 @@ app.on('ready', () => {
     const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
+  if (dev) {
+    globalShortcut.register('CommandOrControl+R', () => windows.reload())
+  }
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {
@@ -138,12 +146,15 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 })
 
 app.on('activate', () => windows.activate())
-app.on('will-quit', () => app.quit())
+app.on('will-quit', () => windows.quit())
 app.on('quit', async () => {
   await clients.stop()
   accounts.close()
 })
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+app.on('window-all-closed', async () => {
+  await clients.stop()
+  if (process.platform !== 'darwin') app.quit()
+})
 
 let launchStatus = store('main.launch')
 store.observer(() => {

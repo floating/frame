@@ -113,7 +113,6 @@ class Settings extends React.Component {
   }
 
   expandNetwork (e, expand) {
-    e.stopPropagation()
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
 
@@ -217,7 +216,7 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              {'Mouse to the middle of your display\'s right edge to reveal Frame'}
+              {'Mouse to your display\'s right edge to reveal Frame'}
             </div>
           </div>
           <div className='signerPermission'>

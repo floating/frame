@@ -34,6 +34,7 @@ const resolveName = (name) => {
       // Look up registry address based on current network connection
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
       const options = {
+        provider: require('../../provider'),
         apm: {
           ipfs: {
             gateway: 'https://ipfs.eth.aragon.network/ipfs'
@@ -63,21 +64,34 @@ const resolveName = (name) => {
 }
 
 class Aragon {
-  constructor ({ name, apps, dao, agent, actor, ens }) {
+  constructor ({ name, apps, dao, agent, actor, ens }, network) {
     this.dao = dao
     this.agent = agent
     this.actor = actor
-    const options = {
-      apm: {
-        ipfs: {
-          gateway: 'https://ipfs.eth.aragon.network/ipfs'
-        },
-        ensRegistryAddress: registryAddress()
+    this.network = network
+    store.observer(() => this.setup())
+  }
+
+  setup () {
+    const connection = store('main.connection')
+    const status = [connection.local.status, connection.secondary.status]
+    if (status.indexOf('connected') > -1 && this.network === connection.network && !this.wrap && !this.inSetup) {
+      log.info('\n ** Setting Up Aragon DAO:', this.dao)
+      this.inSetup = true
+      this.provider = require('../../provider')
+      const options = {
+        provider: this.provider,
+        apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress() }
       }
+      const wrap = new Wrapper(this.dao, options)
+      wrap.init().then(() => {
+        this.wrap = wrap
+        this.inSetup = false
+      }).catch(err => {
+        log.error(err)
+        this.inSetup = false
+      })
     }
-    const wrap = new Wrapper(dao, options)
-    wrap.init().then(() => { this.wrap = wrap }).catch(err => log.error(err))
-    setTimeout(() => { this.provider = require('../../provider') }, 0)
   }
 
   bufferToHex (value) {
@@ -85,18 +99,24 @@ class Aragon {
   }
 
   pathTransaction (tx, cb) {
-    if (!this.wrap) return cb(new Error('Aragon wrapper not ready'))
+    if (!this.wrap) {
+      this.setup()
+      return cb(new Error('Aragon wrapper was not ready or is not on correct network, try again'))
+    }
     tx.value = tx.value || '0x'
     tx.data = tx.data || '0x'
     this.wrap.calculateTransactionPath(this.actor.address, this.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
       var newTx = result[0]
       delete newTx.nonce
+      newTx.chainId = tx.chainId
       this.provider.getNonce(newTx, res => {
         if (res.error) return cb(res.error)
         newTx.nonce = res.result
-        if (typeof newTx.value === 'undefined') newTx.value = '0x'
-        if (typeof newTx.gasPrice === 'undefined') newTx.gasPrice = tx.gasPrice
-        cb(null, newTx)
+        this.provider.fillTx(newTx, (err, fullTx) => {
+          if (err) return cb(err)
+          if (typeof fullTx.value === 'undefined') fullTx.value = '0x'
+          cb(null, fullTx)
+        })
       })
     }).catch(cb)
   }
@@ -109,6 +129,13 @@ class Aragon {
         log.warn('Trying to sign as Aragon DAO...', result)
       }).catch(cb)
     })
+  }
+
+  processSignedMessage (cb) {
+    return (err, msg) => {
+      if (err) return cb(err)
+      cb(null, '0x01' + msg.substring(2))
+    }
   }
 }
 

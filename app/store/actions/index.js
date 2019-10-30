@@ -3,6 +3,8 @@ import { URL } from 'url'
 
 export const syncMain = (u, main) => u('main', _ => main)
 
+export const sync = (u, path, value) => u(path, () => value)
+
 export const setSigner = (u, signer) => {
   u('selected.current', _ => signer.id)
   setTimeout(_ => {
@@ -42,8 +44,10 @@ export const toggleSettings = u => {
 }
 
 let trayInitial = true
-export const trayOpen = (u, open) => {
+export const trayOpen = (u, open, settings = {}) => {
+  if (settings.dock) return u('tray.dockOnly', _ => open)
   u('tray.open', _ => open)
+  if (!open) u('tray.dockOnly', _ => false)
   if (open && trayInitial) {
     trayInitial = false
     setTimeout(() => {

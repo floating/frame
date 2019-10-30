@@ -25,7 +25,8 @@ const initial = {
   signers: {},
   tray: {
     open: false,
-    initial: true
+    initial: true,
+    dockOnly: false
   },
   balances: {},
   selected: {
@@ -53,6 +54,9 @@ const initial = {
       }
     }
   },
+  dock: {
+    expanded: false
+  },
   frame: {
     type: 'tray'
   },
@@ -66,13 +70,20 @@ const initial = {
     rates: {}
   },
   main: {
-    _version: main('mute._version', 1),
+    _version: main('_version', 1),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false)
     },
+    pin: main('pin', false),
     launch: main('launch', false),
     reveal: main('reveal', false),
+    dapps: main('dapps', {}),
+    dappMap: main('dappMap', {
+      added: [],
+      docked: []
+    }),
+    dappStorage: main('dappStorage', {}),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },
@@ -82,6 +93,9 @@ const initial = {
     savedSigners: {},
     updater: {
       dontRemind: main('updater.dontRemind', [])
+    },
+    save: {
+      account: '', // main('save.account', '')
     },
     clients: {
       ipfs: {

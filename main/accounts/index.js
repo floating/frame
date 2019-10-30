@@ -151,6 +151,7 @@ class Accounts extends EventEmitter {
       const summary = this.current().summary()
       cb(null, summary)
       windows.broadcast('main:action', 'setSigner', summary)
+      store.saveAccount(id)
     })
   }
 
@@ -160,6 +161,7 @@ class Accounts extends EventEmitter {
     const summary = { id: '', type: '', accounts: [], status: '', index: 0 }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
+    store.saveAccount('')
     setTimeout(() => { // Clear signer requests when unset
       if (s) {
         s.requests = {}
@@ -334,7 +336,7 @@ class Accounts extends EventEmitter {
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId]) {
       this.current().requests[handlerId].status = 'success'
-      this.current().requests[handlerId].notice = 'Succesful'
+      this.current().requests[handlerId].notice = 'Successful'
       if (this.current().requests[handlerId].type === 'transaction') {
         this.current().requests[handlerId].mode = 'monitor'
       } else {
