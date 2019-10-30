@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
+
 import svg from '../../../../../../svg'
 import link from '../../../../../../link'
 
@@ -43,9 +44,11 @@ class TransactionRequest extends React.Component {
 
   render () {
     const req = this.props.req
+    console.log(req)
     let notice = req.notice
     const status = req.status
     const mode = req.mode
+    const radspecMessage = req.radspecMessage
     const toAddress = req.data && req.data.to ? req.data.to : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
@@ -136,6 +139,7 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
                     <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
                   </div>
+                  {radspecMessage && <div className="radspecMessage">{radspecMessage}</div>}
                   <div className='transactionValue'>
                     <div className='transactionTotals'>
                       <div className='transactionTotalETH'>{'Ξ ' + value}</div>
