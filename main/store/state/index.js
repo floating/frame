@@ -79,10 +79,10 @@ const initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     dapps: main('dapps', {}),
-    dappMap: main('dappMap', {
-      added: [],
-      docked: []
-    }),
+    dappMap: {
+      added: main('dappMap.added', []),
+      docked: main('dappMap.docked', [])
+    },
     dappStorage: main('dappStorage', {}),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')

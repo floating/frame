@@ -2,6 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import link from './link'
+import svg from '../app/svg'
+
+// import Native from './Native'
 
 // import App from './App'
 
@@ -20,17 +23,19 @@ class App extends React.Component {
 
   componentDidMount () {
     this.webview = document.createElement('webview')
-    // if (this.current === this.id) this.webview.style.zIndex = 1250
     this.webview.className = 'view'
+    this.webview.src = this.props.location
+    this.webwrap.appendChild(this.webview)
+    // if (this.current === this.id) this.webview.style.zIndex = 1250
     // this.webview.setAttribute('backgroundThrottling', false)
     // this.webview.setAttribute('preload', path.join(__dirname, 'inject/index.js'))
     // this.webview.src = this.store('view.data', id, 'url')
-    this.webview.src = this.props.location
-    this.webwrap.appendChild(this.webview)
-    this.webview.addEventListener('did-finish-load', () => {
-      this.setState({ ready: true })
-    })
-
+    // this.webview.addEventListener('did-finish-load', () => {
+    //   this.setState({ ready: true })
+    // })
+    // setTimeout(() => {
+    //   this.webview.openDevTools()
+    // }, 1000)
     // this.webview.innerHTML = `<webview />`
     // this.view = this.webview.querySelector('webview')
     // this.view.loadURL()
@@ -38,7 +43,21 @@ class App extends React.Component {
 
   render () {
     return (
-      <div className='webwrap' style={{ opacity: this.state.ready ? 1 : 0 }} ref={ww => { this.webwrap = ww }} />
+      <>
+        <div className='backdrop' />
+        <div className='top'>
+          <div className='title'>
+            {this.props.ens}
+          </div>
+          <div className='menu'>
+            <div className='reload'>
+              {svg.reload(13)}
+            </div>
+          </div>
+        </div>
+        <div className='shade' />
+        <div className='webwrap' ref={ww => { this.webwrap = ww }} />
+      </>
     )
   }
 }
@@ -49,12 +68,9 @@ document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 
-// const store = _store()
-
 link.on('location', location => {
-  console.log(location)
   document.title = location.ens
   const store = Restore.create({}, {})
   const Frame = Restore.connect(App, store)
-  ReactDOM.render(<Frame location={location.url} />, document.getElementById('frame'))
+  ReactDOM.render(<Frame location={location.url} ens={location.ens} />, document.getElementById('frame'))
 })

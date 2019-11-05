@@ -18,7 +18,7 @@ const error = (res, code, message) => {
 
 module.exports = {
   stream: async (res, app, path) => { // Stream assets from IPFS back to the client
-    if (!(await ipfs.isRunning() || !ipfs.api)) return error(res, 404, 'IPFS client not running')
+    if (!ipfs.api) return error(res, 404, 'IPFS client not running')
     const stream = ipfs.api.getReadableStream(`${resolve.hash(app)}${path}`)
     stream.on('data', file => {
       if (!file) return error(res, 404, 'Asset not found')
@@ -32,7 +32,7 @@ module.exports = {
     stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
   },
   dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
-    if (!(await ipfs.isRunning()) || !ipfs.api) return error(res, 404, 'IPFS client not running')
+    if (!ipfs.api) return error(res, 404, 'IPFS client not running')
     const hash = resolve.hash(app)
     ipfs.api.get(`${hash}/index.html`, (err, files) => {
       if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
@@ -48,6 +48,39 @@ module.exports = {
         </script>
       `)
       res.end($.html())
+    })
+  },
+  icon: async (app, cb) => {
+    if (!ipfs.api) return cb(new Error('IPFS Not Running')) //  return error(res, 404, 'IPFS client not running')
+    const hash = resolve.hash(app)
+    // TODO: Look for icon.svg in root.. this is most ideal
+    // Otherwise
+    ipfs.api.get(`${hash}/index.html`, (err, files) => {
+      if (err) cb(new Error('Could not resolve dapp: ' + err.message))
+      const $ = cheerio.load(files[0].content.toString('utf8'))
+      let favicon = ''
+      $('body').find('link').some(link => {
+        if (link.attribs.rel === 'icon' || link.attribs.rel === 'shortcut icon') {
+          favicon = link.attribs.rel.href
+          return true
+        } else {
+          return false
+        }
+      })
+      if (favicon) {
+        cb(null, favicon)
+      } else {
+        // try just looking standard favicon endpoints...
+        cb(new Error('Favicon not found'))
+      }
+      // return favicon;
+      // $('html').prepend(`
+      //   <script>
+      //     const initial = ${JSON.stringify(storage.get(hash) || {})}
+      //     ${inject}
+      //   </script>
+      // `)
+      // res.end($.html())
     })
   }
 }

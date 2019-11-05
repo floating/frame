@@ -156,9 +156,9 @@ app.on('window-all-closed', async () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-process.on('exit', async () => {
-  await clients.stop()
-})
+// process.on('exit', async () => {
+//   await clients.stop()
+// })
 
 let launchStatus = store('main.launch')
 store.observer(() => {

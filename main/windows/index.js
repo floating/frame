@@ -1,13 +1,14 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
 const Positioner = require('electron-positioner')
 const log = require('electron-log')
-const url = require('url')
+// const url = require('url')
 
 const store = require('../store')
 
 const dev = process.env.NODE_ENV === 'development'
+const winSession = e => e.sender.webContents.browserWindowOptions.session
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray
@@ -221,8 +222,11 @@ const api = {
     }
   },
   close: (e) => {
-    const id = winId(e)
-    if (windows[id]) windows[id].close()
+    const id = winSession(e)
+    if (windows[id]) {
+      windows[id].setClosable(true)
+      windows[id].close()
+    }
     delete windows[id]
   },
   setWidth: width => {
@@ -272,19 +276,18 @@ const api = {
   setGlide: (bool) => {
     glide = bool
   },
-  openView: (location, ens) => {
+  openView: (ens, session) => {
+    const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    windows[location] = new BrowserWindow({
-      id: 'tray',
+    windows[session] = new BrowserWindow({
+      session,
       x: 40,
       y: 0,
       width: area.width - 500,
       height: area.height,
       show: false,
-      // frame: false,
-      // transparent: true,
-      // hasShadow: false,
-      // titleBarStyle: 'customButtonsOnHover',
+      frame: false,
+      titleBarStyle: 'hiddenInset',
       // minimizable: false,
       // maximizable: false,
       // closable: false,
@@ -301,12 +304,12 @@ const api = {
         preload: path.resolve(__dirname, '../../bundle/dapp/bridge.js')
       }
     })
-    if (dev) windows[location].openDevTools()
-    windows[location].on('closed', () => { delete windows[location] })
-    windows[location].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
-    windows[location].webContents.on('did-finish-load', () => {
-      windows[location].show()
-      windows[location].send('main:location', { url: location, ens: ens })
+    if (dev) windows[session].openDevTools()
+    windows[session].on('closed', () => { delete windows[session] })
+    windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
+    windows[session].webContents.on('did-finish-load', () => {
+      windows[session].show()
+      windows[session].send('main:location', { url, ens })
     })
   },
   setDockOnly: (bool) => {
@@ -324,7 +327,11 @@ if (dev) {
   const path = require('path')
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
-    if (name.indexOf('css') > -1) windows.tray.send('main:reload:style', name)
+    if (name.indexOf('css') > -1) {
+      Object.keys(windows).forEach(id => {
+        windows[id].send('main:reload:style', name)
+      })
+    }
   })
 }
 
@@ -362,6 +369,8 @@ ipcMain.on('tray:mouseout', () => {
   }
 })
 
+ipcMain.on('window:close', api.close)
+
 ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
 
 // Data Change Events
@@ -379,6 +388,16 @@ store.api.feed((state, actions, obscount) => {
         api.broadcast('main:action', 'sync', update.path, update.value)
       }
     })
+  })
+})
+
+app.on('ready', () => {
+  globalShortcut.register('CommandOrControl+,', () => {
+    api.showTray()
+  })
+
+  globalShortcut.register('CommandOrControl+.', () => {
+    api.hideTray()
   })
 })
 

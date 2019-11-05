@@ -14,6 +14,8 @@ class IPFS extends Client {
   constructor (options) {
     super('ipfs', options)
 
+    console.log(userData)
+
     process.env.IPFS_PATH = path.resolve(userData, 'ipfs-repo')
 
     // On 'service ready' -> start ipfs
@@ -21,16 +23,11 @@ class IPFS extends Client {
       // Run 'ipfs init'
       await this.init()
 
-      // Run 'ipfs daemon'
-      this.run(['daemon', '--enable-pubsub-experiment'], async (err) => {
-        if (err.message.includes('ipfs daemon is running')) {
-          windows.broadcast('main:action', 'notify', 'ipfsAlreadyRunning')
-        }
-      })
     })
 
     // Handle stdout
     this.on('stdout', async (stdout) => {
+      console.log('IPFS PROCESS:', stdout)
       // On 'daemon ready' -> client state 'ready'
       if (stdout.match(/Daemon is ready\n$/i)) {
         // Add Frame peers
@@ -41,6 +38,7 @@ class IPFS extends Client {
         }
 
         // Setup HTTP client
+        console.log('Setup HTTP Xlietn', await this.getConfig('Addresses.API'))
         this.api = ipfsHttpClient(await this.getConfig('Addresses.API'))
 
         // TODO: Remove logging of active peers below
@@ -50,6 +48,9 @@ class IPFS extends Client {
         // Set state to 'ready'
         log.info('ipfs: ready')
         this.emit('state', 'ready')
+
+        const id = await this.runOnce(['id'])
+        log.info('ipfs: id', id)
       }
       // On 'repo migration required' -> run migration
       if (stdout.match(/Run migrations now/i)) {
@@ -59,10 +60,78 @@ class IPFS extends Client {
     })
   }
 
+  start () {
+    // Run 'ipfs daemon'
+    this.run(['daemon', '--enable-pubsub-experiment'], async (err) => {
+      if (err.message.includes('ipfs daemon is running')) {
+        // windows.broadcast('main:action', 'notify', 'ipfsAlreadyRunning')
+        this.emit('state', 'off')
+        await this.runOnce(['shutdown'])
+        this.setTimeout(() => this.start(), 5000)
+      } else if (err.message.includes('Received interrupt signal')) {
+        console.log('IPFS Force Quit...')
+        this.emit('state', 'off')
+      } else if (err.message.includes('Received another interrupt before graceful shutdown')) {
+        console.log('IPFS Force Quit...')
+        this.emit('state', 'off')
+      } else if (err) {
+        // Stop client
+        console.log('errrrRROPROROR', err)
+        this.emit('on', false)
+        this.emit('state', 'off')
+      }
+    })
+  }
+
+  // Routing.Type to "dhtclient"
+  // Reprovider.Interval to "0"
+  // Swarm.ConnMgr.LowWater to 20
+  // Swarm.ConnMgr.HighWater to 40
+  // Swarm.ConnMgr.GracePeriod to 1
+
+  async printPowerSettings () {
+    console.log('Routing.Type', await this.getConfig('Routing.Type'))
+    console.log('Reprovider.Interval', await this.getConfig('Reprovider.Interval'))
+    console.log('Swarm.ConnMgr.LowWater', await this.getConfig('Swarm.ConnMgr.LowWater'))
+    console.log('Swarm.ConnMgr.HighWater', await this.getConfig('Swarm.ConnMgr.HighWater'))
+    console.log('Swarm.ConnMgr.GracePeriod', await this.getConfig('Swarm.ConnMgr.GracePeriod'))
+  }
+
+  // Routing.Type dht
+  // Reprovider.Interval 12h
+  // Swarm.ConnMgr.LowWater 600
+  // Swarm.ConnMgr.HighWater 900
+  // Swarm.ConnMgr.GracePeriod 20s
+
+  async setNormalPower () {
+    await this.setConfig('Routing.Type', 'dht')
+    await this.setConfig('Reprovider.Interval', '12h')
+    await this.setConfig('Swarm.ConnMgr.LowWater', 600)
+    await this.setConfig('Swarm.ConnMgr.HighWater', 900)
+    await this.setConfig('Swarm.ConnMgr.GracePeriod', '20s')
+  }
+
+  // Routing.Type dhtclient
+  // Reprovider.Interval 24
+  // Swarm.ConnMgr.LowWater 20
+  // Swarm.ConnMgr.HighWater 40
+  // Swarm.ConnMgr.GracePeriod 1s
+
+  async setLowPower () {
+    await this.runOnce(['config', 'profile', 'apply', 'lowpower'])
+    // await this.setConfig('Routing.Type', 'dhtclient')
+    // await this.setConfig('Reprovider.Interval', '0')
+    // await this.setConfig('Swarm.ConnMgr.LowWater', 20)
+    // await this.setConfig('Swarm.ConnMgr.HighWater', 40)
+    // await this.setConfig('Swarm.ConnMgr.GracePeriod', '1s')
+  }
+
   async init () {
     try {
-      await this.runOnce(['init'])
+      await this.runOnce(['init', '--profile=lowpower'])
+      log.info('ipfs init successful')
     } catch (err) {
+      log.error(err)
       log.info('ipfs: repo already initiated')
     }
   }
@@ -78,7 +147,7 @@ class IPFS extends Client {
   }
 
   async setConfig (key, value) {
-    await this.runOnce(['config', key, value])
+    await this.runOnce(['config', '--json', key, JSON.stringify(value)])
   }
 
   async isRunning () {

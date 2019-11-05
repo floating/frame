@@ -10,7 +10,7 @@ const hashCode = str => str.split('').reduce((prevHash, currVal) => (((prevHash 
 const fallbackColor = (dapp, a) => {
   const hex = hashCode(dapp.domain).toString(16).replace('-', '')
   const r = Math.round(((150 - 90) * (parseInt(hex[0] + hex[1], 16) / 255)) + 90)
-  const g = Math.round(((150 - 90) * (parseInt(hex[2] + hex[3], 16) / 255)) + 90)
+  const g = Math.round(((130 - 70) * (parseInt(hex[2] + hex[3], 16) / 255)) + 70)
   const b = Math.round(((200 - 140) * (parseInt(hex[4] + hex[5], 16) / 255)) + 140)
   return `rgba(${r}, ${g}, ${b}, ${a})`
 }
