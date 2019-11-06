@@ -131,16 +131,17 @@ class Dock extends React.Component {
 
   render () {
     const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
-    const open = this.store('tray.open')
-    const dock = this.store('tray.dockOnly')
-    const base = open || this.store('dock.expand') ? -425 : dock ? -55 : 0
-    const transform = `translate3d(${base}px, 0px, 0px)`
+    // const open = this.store('tray.open')
+    // const dock = this.store('tray.dockOnly')
+    // const base = open || this.store('dock.expand') ? -425 : dock ? -55 : 0
+    // const transform = `translate3d(${base}px, 0px, 0px)`
     // if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
-    const transition = '0.24s cubic-bezier(.82,0,.42,1) transform'
-    const transitionDelay = '0s' // open && !dock && this.delayDock ? '0.16s' : '0s'
+    // const transition = '0.24s cubic-bezier(.82,0,.42,1) transform'
+    // const transitionDelay = '0s' // open && !dock && this.delayDock ? '0.16s' : '0s'
+    // style={{ transform, transition, transitionDelay }}
+    // <div className='overStoreShade' />
     return (
-      <div id='dock' style={{ transform, transition, transitionDelay }}>
-        <div className='overStoreShade' />
+      <div id='dock'>
         <div className='underStoreShade' />
         <div className='dockInset'>
           <div className='appMovement'>

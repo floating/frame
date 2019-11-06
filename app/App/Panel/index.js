@@ -24,16 +24,17 @@ class Panel extends React.Component {
   }
 
   render () {
-    const open = this.store('tray.open')
     const expanded = this.store('dock.expand')
+    const transform = expanded ? 'translate3d(293px, 0px, 0px)' : 'translate3d(0px, 0px, 0px)'
+    // const open = this.store('tray.open')
     // const selected = this.store('selected.open')
-    const transform = open ? expanded ? 'translate3d(290px, 0px, 0px)' : 'translate3d(0px, 0px, 0px)' : 'translate3d(440px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
-    const transition = '0.16s cubic-bezier(.82,0,.12,1) transform'
+    // const transition = '0.16s cubic-bezier(.82,0,.12,1) transform'
     // const transitionDelay = open ? '0s' : '0.06s'
     // const transitionDelay = open ? '0.64s' : '0s'
-    const transitionDelay = open ? '0.16s' : '0s'
+    // const transitionDelay = open ? '0.16s' : '0s'
+    // style={{ transform, transition, transitionDelay }}
     return (
-      <div id='panel' style={{ transform, transition, transitionDelay }} onMouseDown={() => { if (expanded) link.rpc('toggleDock', () => {}) }}>
+      <div id='panel' style={{ transform }} onMouseDown={() => { if (expanded) link.rpc('toggleDock', () => {}) }}>
         <div className='panelSwoop'>{svg.swoop()}</div>
         <div className='panelSwoopBottom'>{svg.swoop()}</div>
         <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>

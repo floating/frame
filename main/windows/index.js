@@ -7,6 +7,8 @@ const log = require('electron-log')
 
 const store = require('../store')
 
+// const menu = require('./menu')
+
 const dev = process.env.NODE_ENV === 'development'
 const winSession = e => e.sender.webContents.browserWindowOptions.session
 const winId = e => e.sender.webContents.browserWindowOptions.id
@@ -210,15 +212,17 @@ const api = {
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')
       windows.tray.show()
-      windows.tray.send('main:action', 'trayOpen', true, { dock })
-      windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
-        if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
-        if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
-        hideShow.running = false
-        hideShow.next = false
-        windows.tray.setVisibleOnAllWorkspaces(false)
-      }, 260)
+        windows.tray.send('main:action', 'trayOpen', true, { dock })
+        windows.tray.send('main:action', 'setSignerView', 'default')
+        setTimeout(() => {
+          if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
+          if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
+          hideShow.running = false
+          hideShow.next = false
+          windows.tray.setVisibleOnAllWorkspaces(false)
+        }, 260)
+      }, 0)
     }
   },
   close: (e) => {
@@ -277,14 +281,15 @@ const api = {
     glide = bool
   },
   openView: (ens, session) => {
+    windows.tray.blur()
     const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows[session] = new BrowserWindow({
       session,
       x: 40,
       y: 0,
-      width: area.width - 500,
-      height: area.height,
+      width: area.width - 460,
+      height: area.height - 40,
       show: false,
       frame: false,
       titleBarStyle: 'hiddenInset',
@@ -304,13 +309,19 @@ const api = {
         preload: path.resolve(__dirname, '../../bundle/dapp/bridge.js')
       }
     })
+    windows[session].positioner = new Positioner(windows[session])
+    const pos = windows[session].positioner.calculate('topLeft')
+    windows[session].setPosition(pos.x + 20, pos.y + 20)
     if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
     windows[session].webContents.on('did-finish-load', () => {
-      windows[session].show()
       windows[session].send('main:location', { url, ens })
+      windows[session].show()
     })
+    // console.log(menu(ens))
+    // windows[session].setMenu(menu(ens))
+    // Menu.setApplicationMenu(menu(ens))
   },
   setDockOnly: (bool) => {
     dockOnly = bool
@@ -370,6 +381,11 @@ ipcMain.on('tray:mouseout', () => {
 })
 
 ipcMain.on('window:close', api.close)
+
+// ipcMain.on('window:show', e => {
+//   const session = winSession(e)
+//   if (windows[session]) windows[session].show()
+// })
 
 ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
 

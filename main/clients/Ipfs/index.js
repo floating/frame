@@ -38,19 +38,19 @@ class IPFS extends Client {
         }
 
         // Setup HTTP client
-        console.log('Setup HTTP Xlietn', await this.getConfig('Addresses.API'))
+        // console.log('Setup HTTP Xlietn', await this.getConfig('Addresses.API'))
         this.api = ipfsHttpClient(await this.getConfig('Addresses.API'))
 
         // TODO: Remove logging of active peers below
-        const activePeers = await this.runOnce(['swarm', 'peers'])
-        log.info('ipfs: active peers', activePeers)
+        // const activePeers = await this.runOnce(['swarm', 'peers'])
+        // log.info('ipfs: active peers', activePeers)
 
         // Set state to 'ready'
         log.info('ipfs: ready')
         this.emit('state', 'ready')
 
-        const id = await this.runOnce(['id'])
-        log.info('ipfs: id', id)
+        // const id = await this.runOnce(['id'])
+      //   log.info('ipfs: id', id)
       }
       // On 'repo migration required' -> run migration
       if (stdout.match(/Run migrations now/i)) {
@@ -58,16 +58,20 @@ class IPFS extends Client {
         this.process.stdin.write('y\n')
       }
     })
+    // this.restart()
   }
 
   start () {
+    super.start()
     // Run 'ipfs daemon'
     this.run(['daemon', '--enable-pubsub-experiment'], async (err) => {
       if (err.message.includes('ipfs daemon is running')) {
         // windows.broadcast('main:action', 'notify', 'ipfsAlreadyRunning')
         this.emit('state', 'off')
         await this.runOnce(['shutdown'])
-        this.setTimeout(() => this.start(), 5000)
+        this.setTimeout(() => {
+          this.start()
+        }, 5000)
       } else if (err.message.includes('Received interrupt signal')) {
         console.log('IPFS Force Quit...')
         this.emit('state', 'off')
@@ -76,9 +80,8 @@ class IPFS extends Client {
         this.emit('state', 'off')
       } else if (err) {
         // Stop client
-        console.log('errrrRROPROROR', err)
-        this.emit('on', false)
-        this.emit('state', 'off')
+        // TODO: Better errer descriptions
+        this.emit('state', err.message)
       }
     })
   }

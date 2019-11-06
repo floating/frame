@@ -15,6 +15,9 @@ import svg from '../app/svg'
 
 // const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
+// const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
+// const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
+
 class App extends React.Component {
   constructor (...args) {
     super(...args)
@@ -25,7 +28,51 @@ class App extends React.Component {
     this.webview = document.createElement('webview')
     this.webview.className = 'view'
     this.webview.src = this.props.location
+    // this.webview.setAttribute('preload', './preload.js')
     this.webwrap.appendChild(this.webview)
+    this.webview.addEventListener('did-finish-load', () => {
+      this.setState({ ready: true })
+      // this.webview.capturePage((err, img) => {
+      //   console.log(err)
+      //   const src = img.toDataURL()
+      //   console.log(src)
+      // })
+      // setTimeout(() => {
+      //   this.webview.capturePage().then(img => {
+      //     // const i = img.toPNG()
+      //     console.log('herer')
+      //     console.log(img.toDataURL())
+      //   }).catch(e => {
+      //     console.log('ooo herer')
+      //     console.log(e)
+      //   })
+      // }, 5000)
+
+      // this.webview.executeJavaScript(`
+      //   return {
+      //     top: document.body.style.backgroundColor,
+      //     one: document.body.firstChild.style.backgroundColor
+      //   }
+      // `).then(color => {
+      //   console.log('Background color is', color)
+      //   this.webview.openDevTools()
+      //   this.setState({ ready: true })
+      // }).catch(e => {
+      //   console.error(e)
+      // })
+    })
+
+    // this.webview.addEventListener('ipc-message', event => {
+    //   // prints "ping"
+    //   console.log(event.channel)
+    // })
+    // this.webview.addEventListener('message', e => {
+    //   console.log('GOT A MESSAGE')
+    //   console.log(unwrap(e.data))
+    // })
+    // setTimeout(() => {
+    //   this.webview.openDevTools()
+    // }, 1000)
     // if (this.current === this.id) this.webview.style.zIndex = 1250
     // this.webview.setAttribute('backgroundThrottling', false)
     // this.webview.setAttribute('preload', path.join(__dirname, 'inject/index.js'))
@@ -50,13 +97,22 @@ class App extends React.Component {
             {this.props.ens}
           </div>
           <div className='menu'>
-            <div className='reload'>
+            <div
+              className='reload'
+              onMouseDown={() => {
+                this.setState({ ready: false })
+                this.webview.reload()
+              }}
+            >
               {svg.reload(13)}
             </div>
           </div>
         </div>
         <div className='shade' />
-        <div className='webwrap' ref={ww => { this.webwrap = ww }} />
+        <div className='webloading'>
+          <div className='loader' />
+        </div>
+        <div className='webwrap' style={this.state.ready ? { display: 'block' } : { display: 'none' }} ref={ww => { this.webwrap = ww }} />
       </>
     )
   }
