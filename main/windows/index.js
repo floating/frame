@@ -1,12 +1,16 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
 const Positioner = require('electron-positioner')
 const log = require('electron-log')
+// const url = require('url')
 
 const store = require('../store')
 
+// const menu = require('./menu')
+
 const dev = process.env.NODE_ENV === 'development'
+const winSession = e => e.sender.webContents.browserWindowOptions.session
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray
@@ -121,7 +125,6 @@ const api = {
         setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
       }, 50)
     }
-
     setTimeout(() => {
       electron.screen.on('display-added', () => api.hideTray())
       electron.screen.on('display-removed', () => api.hideTray())
@@ -167,8 +170,8 @@ const api = {
     } else {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
-      store.expandDock(false)
       setTimeout(() => {
+        store.expandDock(false)
         if (windows && windows.tray) {
           if (store('main.reveal')) detectMouse()
           windows.tray.setVisibleOnAllWorkspaces(true)
@@ -208,20 +211,25 @@ const api = {
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')
       windows.tray.show()
-      windows.tray.send('main:action', 'trayOpen', true, { dock })
-      windows.tray.send('main:action', 'setSignerView', 'default')
       setTimeout(() => {
-        if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
-        if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
-        hideShow.running = false
-        hideShow.next = false
-        windows.tray.setVisibleOnAllWorkspaces(false)
-      }, 260)
+        windows.tray.send('main:action', 'trayOpen', true, { dock })
+        windows.tray.send('main:action', 'setSignerView', 'default')
+        setTimeout(() => {
+          if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
+          if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
+          hideShow.running = false
+          hideShow.next = false
+          windows.tray.setVisibleOnAllWorkspaces(false)
+        }, 260)
+      }, 0)
     }
   },
   close: (e) => {
-    const id = winId(e)
-    if (windows[id]) windows[id].close()
+    const id = winSession(e)
+    if (windows[id]) {
+      windows[id].setClosable(true)
+      windows[id].close()
+    }
     delete windows[id]
   },
   setWidth: width => {
@@ -271,38 +279,48 @@ const api = {
   setGlide: (bool) => {
     glide = bool
   },
-  openView: (url) => {
+  openView: (ens, session) => {
+    windows.tray.blur()
+    const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    windows[url] = new BrowserWindow({
-      id: 'tray',
+    windows[session] = new BrowserWindow({
+      session,
       x: 40,
       y: 0,
-      width: area.width - 500,
-      height: area.height,
+      width: area.width - 460,
+      height: area.height - 40,
       show: false,
-      // frame: false,
-      // transparent: true,
-      // hasShadow: false,
-      // titleBarStyle: 'customButtonsOnHover',
+      frame: false,
+      titleBarStyle: 'hiddenInset',
       // minimizable: false,
       // maximizable: false,
       // closable: false,
       // backgroundThrottling: false,
-      // icon: path.join(__dirname, './AppIcon.png'),
+      icon: path.join(__dirname, './AppIcon.png'),
       // skipTaskbar: process.platform !== 'linux',
       webPreferences: {
+        webviewTag: true,
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
-        enableRemoteModule: false
-        // preload: path.resolve(__dirname, '../../bundle/bridge.js')
+        enableRemoteModule: false,
+        preload: path.resolve(__dirname, '../../bundle/dapp/bridge.js')
       }
     })
-    if (dev) windows[url].openDevTools()
-    windows[url].on('closed', () => { delete windows[url] })
-    windows[url].loadURL(url)
-    windows[url].webContents.on('did-finish-load', () => windows[url].show())
+    windows[session].positioner = new Positioner(windows[session])
+    const pos = windows[session].positioner.calculate('topLeft')
+    windows[session].setPosition(pos.x + 20, pos.y + 20)
+    if (dev) windows[session].openDevTools()
+    windows[session].on('closed', () => { delete windows[session] })
+    windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
+    windows[session].webContents.on('did-finish-load', () => {
+      windows[session].send('main:location', { url, ens })
+      windows[session].show()
+    })
+    // console.log(menu(ens))
+    // windows[session].setMenu(menu(ens))
+    // Menu.setApplicationMenu(menu(ens))
   },
   setDockOnly: (bool) => {
     dockOnly = bool
@@ -311,15 +329,19 @@ const api = {
 
 app.on('web-contents-created', (e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
-  contents.on('will-attach-webview', e => e.preventDefault())
-  contents.on('new-window', e => e.preventDefault())
+  // contents.on('will-attach-webview', e => e.preventDefault())
+  // scontents.on('new-window', e => e.preventDefault())
 })
 
 if (dev) {
   const path = require('path')
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
-    if (name.indexOf('css') > -1) windows.tray.send('main:reload:style', name)
+    if (name.indexOf('css') > -1) {
+      Object.keys(windows).forEach(id => {
+        windows[id].send('main:reload:style', name)
+      })
+    }
   })
 }
 
@@ -357,6 +379,13 @@ ipcMain.on('tray:mouseout', () => {
   }
 })
 
+ipcMain.on('window:close', api.close)
+
+// ipcMain.on('window:show', e => {
+//   const session = winSession(e)
+//   if (windows[session]) windows[session].show()
+// })
+
 ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
 
 // Data Change Events
@@ -374,6 +403,16 @@ store.api.feed((state, actions, obscount) => {
         api.broadcast('main:action', 'sync', update.path, update.value)
       }
     })
+  })
+})
+
+app.on('ready', () => {
+  globalShortcut.register('CommandOrControl+,', () => {
+    api.showTray()
+  })
+
+  globalShortcut.register('CommandOrControl+.', () => {
+    api.hideTray()
   })
 })
 

@@ -144,7 +144,7 @@ class Signer extends React.Component {
           <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
           </div>
-        ) : null }
+        ) : null}
         <div className={innerClass} onMouseDown={::this.typeClick} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
           <div className='signerInset'>
             <div className='signerImage'>
@@ -296,7 +296,7 @@ class Signer extends React.Component {
           <div className='signerStatusNotOk'>{status}</div>
         ) : (
           <div className='signerAccounts' style={{ width: '100%' }}>
-            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
+            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: 'calc(100%)' }}>
               <div className='signerName'>
                 <div className='signerNameText'>
                   {this.props.name}
@@ -305,7 +305,7 @@ class Signer extends React.Component {
               </div>
               <div className='signerAddress'>
                 <div className='transactionToAddress'>
-                  <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+                  <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 17 })} {address.substr(address.length - 4)}</div>
                   <div className='transactionToAddressFull'>
                     {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
                     <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />

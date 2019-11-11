@@ -7,20 +7,21 @@ import link from '../../../link'
 const icons = {}
 
 const hashCode = str => str.split('').reduce((prevHash, currVal) => (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0)
-const fallbackColor = dapp => {
+const fallbackColor = (dapp, a) => {
   const hex = hashCode(dapp.domain).toString(16).replace('-', '')
-  const r = Math.round(((220 - 210) * (parseInt(hex[0] + hex[1], 16) / 255)) + 210)
-  const g = Math.round(((220 - 210) * (parseInt(hex[2] + hex[3], 16) / 255)) + 210)
-  const b = Math.round(((240 - 230) * (parseInt(hex[4] + hex[5], 16) / 255)) + 230)
-  return `rgb(${r}, ${g}, ${b})`
+  const r = Math.round(((150 - 90) * (parseInt(hex[0] + hex[1], 16) / 255)) + 90)
+  const g = Math.round(((130 - 70) * (parseInt(hex[2] + hex[3], 16) / 255)) + 70)
+  const b = Math.round(((200 - 140) * (parseInt(hex[4] + hex[5], 16) / 255)) + 140)
+  return `rgba(${r}, ${g}, ${b}, ${a})`
 }
 
 class AppTile extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.cid = props.moving ? props.cid : context.store(`main.dapps.${props.hash}.hash`)
-    if (this.cid && !icons[this.cid]) {
-      fetch(`http://localhost:8080/ipfs/${this.cid}/favicon.ico`)
+    const dapp = props.hash ? context.store(`main.dapps.${props.hash}`) : ''
+    this.cid = props.moving ? props.cid : dapp.hash
+    if (this.cid && !icons[this.cid] && dapp) {
+      fetch(`http://localhost:8080/ipfs/${this.cid}/${dapp.icon}`)
         .then(res => {
           if (res.status === 200) return res
           throw new Error(res.statusText)
@@ -32,7 +33,6 @@ class AppTile extends React.Component {
         })
         .catch(e => {
           delete icons[this.cid]
-          console.log(e)
         })
     }
   }
@@ -60,6 +60,17 @@ class AppTile extends React.Component {
     if (dragging) moveDrag(index, docked)
   }
 
+  appCardIconPlacholder (dapp) {
+    return (
+      <div className='appCardIconPlaceholder' style={{ color: fallbackColor(dapp, 1), background: fallbackColor(dapp, 0.2) }}>
+        <div>
+          <span>{dapp.domain[0].toUpperCase()}</span>
+          <span>{dapp.domain[1]}</span>
+        </div>
+      </div>
+    )
+  }
+
   render () {
     const { index, hash, dragging, docked, moving } = this.props
     if (moving) {
@@ -69,9 +80,7 @@ class AppTile extends React.Component {
             {icons[this.cid] ? (
               <img src={icons[this.cid]} />
             ) : (
-              <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dragging.dapp) }}>
-                {dragging.dapp.domain[0].toUpperCase() + dragging.dapp.domain[1] + dragging.dapp.domain[2]}
-              </div>
+              this.appCardIconPlacholder(dragging.dapp)
             )}
           </div>
         </div>
@@ -91,9 +100,7 @@ class AppTile extends React.Component {
             {icons[this.cid] ? (
               <img src={icons[this.cid]} />
             ) : (
-              <div className='appCardIconPlaceholder' style={{ background: fallbackColor(dapp) }}>
-                {dapp.domain[0].toUpperCase() + dapp.domain[1] + dapp.domain[2]}
-              </div>
+              this.appCardIconPlacholder(dapp)
             )}
           </div>
         </div>

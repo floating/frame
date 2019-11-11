@@ -7,14 +7,14 @@ import AppTile from './AppTile'
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
-const hashCode = str => str.split('').reduce((prevHash, currVal) => (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0)
-const fallbackColor = dapp => {
-  const hex = hashCode(dapp.domain).toString(16).replace('-', '')
-  const r = Math.round(((220 - 210) * (parseInt(hex[0] + hex[1], 16) / 255)) + 210)
-  const g = Math.round(((220 - 210) * (parseInt(hex[2] + hex[3], 16) / 255)) + 210)
-  const b = Math.round(((240 - 230) * (parseInt(hex[4] + hex[5], 16) / 255)) + 230)
-  return `rgb(${r}, ${g}, ${b})`
-}
+// const hashCode = str => str.split('').reduce((prevHash, currVal) => (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0)
+// const fallbackColor = dapp => {
+//   const hex = hashCode(dapp.domain).toString(16).replace('-', '')
+//   const r = Math.round(((220 - 210) * (parseInt(hex[0] + hex[1], 16) / 255)) + 210)
+//   const g = Math.round(((220 - 210) * (parseInt(hex[2] + hex[3], 16) / 255)) + 210)
+//   const b = Math.round(((240 - 230) * (parseInt(hex[4] + hex[5], 16) / 255)) + 230)
+//   return `rgb(${r}, ${g}, ${b})`
+// }
 
 class Dock extends React.Component {
   constructor (...args) {
@@ -131,16 +131,17 @@ class Dock extends React.Component {
 
   render () {
     const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
-    const open = this.store('tray.open')
-    const dock = this.store('tray.dockOnly')
-    const base = open || this.store('dock.expand') ? -425 : dock ? -55 : 0
-    const transform = `translate3d(${base}px, 0px, 0px)`
+    // const open = this.store('tray.open')
+    // const dock = this.store('tray.dockOnly')
+    // const base = open || this.store('dock.expand') ? -425 : dock ? -55 : 0
+    // const transform = `translate3d(${base}px, 0px, 0px)`
     // if (expanded) transform = `translate3d(${base - 293}px, 0px, 0px)`
-    const transition = '0.48s cubic-bezier(.82,0,.12,1) all'
-    const transitionDelay = open && !dock && this.delayDock ? '0.36s' : '0s'
+    // const transition = '0.24s cubic-bezier(.82,0,.42,1) transform'
+    // const transitionDelay = '0s' // open && !dock && this.delayDock ? '0.16s' : '0s'
+    // style={{ transform, transition, transitionDelay }}
+    // <div className='overStoreShade' />
     return (
-      <div id='dock' style={{ transform, transition, transitionDelay }}>
-        <div className='overStoreShade' />
+      <div id='dock'>
         <div className='underStoreShade' />
         <div className='dockInset'>
           <div className='appMovement'>

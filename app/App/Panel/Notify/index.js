@@ -280,17 +280,17 @@ class Notify extends React.Component {
   render () { // Instead of mounting all of these we should use a transition to mount and animate on demand
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
-        {this.mainnet()}
-        {this.gasFeeWarning(this.store('view.notifyData'))}
-        {this.intro()}
-        {this.rinkeby()}
-        {this.openExternal(this.store('view.notifyData'))}
-        {this.openEtherscan(this.store('view.notifyData'))}
-        {this.ipfsAlreadyRunning()}
-        {this.parityAlreadyRunning()}
-        {this.contractData()}
-        {this.hotAccountWarning()}
-        {this.hotSignerMismatch()}
+        {this.store('view.notify') === 'mainnet' ? this.mainnet() : null}
+        {this.store('view.notify') === 'gasFeeWarning' ? this.gasFeeWarning(this.store('view.notifyData')) : null}
+        {this.store('view.notify') === 'intro' ? this.intro() : null}
+        {this.store('view.notify') === 'rinkeby' ? this.rinkeby() : null}
+        {this.store('view.notify') === 'openExternal' ? this.openExternal(this.store('view.notifyData')) : null}
+        {this.store('view.notify') === 'openEtherscan' ? this.openEtherscan(this.store('view.notifyData')) : null}
+        {this.store('view.notify') === 'ipfsAlreadyRunning' ? this.ipfsAlreadyRunning() : null}
+        {this.store('view.notify') === 'parityAlreadyRunning' ? this.parityAlreadyRunning() : null}
+        {this.store('view.notify') === 'contractData' ? this.contractData() : null}
+        {this.store('view.notify') === 'hotAccountWarning' ? this.hotAccountWarning() : null}
+        {this.store('view.notify') === 'hotSignerMismatch' ? this.hotSignerMismatch() : null}
       </div>
     )
   }

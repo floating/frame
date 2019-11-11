@@ -31,11 +31,11 @@
 
 #dock
   position absolute
-  top 20px
-  bottom 17px
-  right -800px
-  width 800px
-  padding-right 23px
+  top 0px
+  bottom 0px
+  left 12px
+  width 400px
+  padding-right 28px
   -webkit-app-region no-drag
   display flex
   flex-direction column
@@ -74,13 +74,13 @@
     pointer-events none
     transition standardSlow
     transition-delay 0.00s
-    background lightShader
+    background rgba(33, 45, 126, 0.1)
 
   .dockInset
     position absolute
     top 0px
     right 0px
-    bottom 2px
+    bottom 0px
     left 0px
     background whiteglow
     border-top-left-radius 6px
@@ -90,11 +90,27 @@
     display flex
     justify-content center
     align-items center
-    height 34px
-    width 34px
-    border-radius 3px
-    font-size 12px
+    height 27px
+    width 27px
+    border-radius 14px
+    font-size 11px
+    letter-spacing 0px
     font-weight bold
+    display flex
+    flex-direction column
+
+    div
+      padding-bottom 1px
+      padding-left 1px
+      width 18px
+      overflow hidden
+      height 10px
+      display flex
+      align-items center
+      justify-content center
+
+      span
+        padding 0px
 
   .dragCatchDock
     position absolute
@@ -136,6 +152,13 @@
         animation-duration 1.4s
         animation-timing-function linear
 
+        img
+          height 26px
+          width 26px
+
+        div, svg, img
+          pointer-events none
+
   .expandFrame
     position absolute
     top 0
@@ -170,16 +193,15 @@
   .pinFrame:hover
     svg
       color outerspace05
-      // transform rotate(0deg)
 
   .pinFrameActive
     svg
-      color pending08
+      color outerspace08
       transform rotate(0deg)
 
   .pinFrameActive:hover
     svg
-      color pending
+      color outerspace
       transform rotate(0deg)
 
   .toggleDock
@@ -202,7 +224,6 @@
     position absolute
     left -87px
     top 50%
-    // background blue
     z-index 1000
     transform rotate(-90deg)
     width 220px

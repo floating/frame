@@ -2,7 +2,7 @@ const EventEmitter = require('events')
 const fs = require('fs')
 const https = require('https')
 const path = require('path')
-const { app } = require('electron')
+// const { app } = require('electron')
 const log = require('electron-log')
 const semver = require('semver')
 const { execFile } = require('child_process')
@@ -133,7 +133,7 @@ class Client extends EventEmitter {
         log.info(`${this.name}: exit code ${code}`)
 
         // Reset client
-        this.emit('on', false)
+        // this.emit('on', false)
         this.emit('state', 'off')
 
         // Clear 'SIGKILL' timeout
@@ -184,6 +184,7 @@ class Client extends EventEmitter {
   }
 
   run (args, errorHandler) {
+    console.log('::::run::::', this.name, args)
     // Spawn child process
     this.process = execFile(this.bin, args, (err, stdout, stderr) => {
       // No errors
@@ -193,11 +194,13 @@ class Client extends EventEmitter {
       if (err.signal === 'SIGKILL') log.info(`${this.name}: killed`)
 
       // Apply client specific error handler
-      if (errorHandler) errorHandler(err)
-
-      // Stop client
-      this.emit('on', false)
-      this.emit('state', 'off')
+      if (errorHandler) {
+        errorHandler(err)
+      } else {
+        // Stop client
+        this.emit('on', false)
+        this.emit('state', 'off')
+      }
     })
 
     // Handle stdout/stderr
@@ -212,6 +215,7 @@ class Client extends EventEmitter {
   }
 
   runOnce (args) {
+    console.log('::::runOnce::::', this.name, args)
     return new Promise((resolve, reject) => {
       execFile(this.bin, args, (err, stdout, stderr) => {
         if (!err) return resolve(stdout)

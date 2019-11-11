@@ -64,7 +64,13 @@ class Main extends React.Component {
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
-              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />)}
+              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
+                if (i === 0) {
+                  return <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                } else {
+                  return null
+                }
+              })}
               {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>

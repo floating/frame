@@ -3,6 +3,8 @@ const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
 const crypto = require('crypto')
 
+const cheerio = require('cheerio')
+
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
 const windows = require('../windows')
@@ -27,12 +29,15 @@ const shell = electron.shell ? electron.shell : mock.shell
 
 class Dapps {
   constructor () {
-    setInterval(() => {
-      this._updateHashes()
-    }, 60000)
-    setInterval(() => {
-      this._updatePins()
-    }, 15000)
+    // setInterval(() => {
+    //   this._updateHashes()
+    // }, 60000)
+    // setInterval(() => {
+    //   this._updatePins()
+    // }, 15000)
+    ipfs.on('state', state => {
+      if (state === 'ready') this._updatePins()
+    })
   }
 
   async add (domain, cb) {
@@ -40,7 +45,13 @@ class Dapps {
     const namehash = hash(domain)
 
     // Check if already added
-    if (store(`main.dapps.${namehash}`)) return cb(new Error('Dapp already added'))
+    if (store(`main.dapps.${namehash}`)) {
+      console.log(store(`main.dapps.${namehash}`))
+      // store.removeDapp(namehash)
+      // store.addDapp()
+      // store.addDapp(namehash, { domain, type, hash, pinned: false })
+      return cb(new Error('Dapp already added'))
+    }
 
     // Resolve content
     const content = await ens.resolveContent(domain)
@@ -49,6 +60,19 @@ class Dapps {
     if (content) {
       const { type, hash } = content
       store.addDapp(namehash, { domain, type, hash, pinned: false })
+      // Get Dapp Icon
+      ipfs.api.get(`${hash}/index.html`, (err, files) => {
+        if (err) log.error(new Error('Could not resolve dapp: ' + err.message))
+        const $ = cheerio.load(files[0].content.toString('utf8'))
+        let favicon = ''
+        $('link').each((i, link) => {
+          if ($(link).attr('rel') === 'icon' || $(link).attr('rel') === 'shortcut icon') {
+            favicon = favicon || $(link).attr('href')
+          }
+        })
+        if (favicon.startsWith('./')) favicon = favicon.substring(2)
+        store.updateDapp(namehash, { icon: favicon || 'favicon.ico' })
+      })
       this._pin(hash, () => {
         console.log('Pinned first time')
         store.updateDapp(namehash, { pinned: true })
@@ -79,17 +103,17 @@ class Dapps {
   async launch (domain, cb) {
     const dapp = store(`main.dapps.${hash(domain)}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
-    if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
-    if (!(await ipfs.isRunning()) || !ipfs.api) return cb(new Error('IPFS client not running'))
+    // if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
+    if (!ipfs.api) return cb(new Error('IPFS client not running'))
     const session = crypto.randomBytes(6).toString('hex')
     server.sessions.add(domain, session)
-    windows.openView(`http://localhost:8421/?dapp=${domain}:${session}`)
+    windows.openView(domain, session)
     // shell.openExternal(`http://localhost:8421/?dapp=${domain}:${session}`)
     cb(null)
   }
 
   async _pin (hash, cb) {
-    if (!(await ipfs.isRunning())) return cb(new Error('IPFS client not running'))
+    if (!ipfs.api) return cb(new Error('IPFS client not running'))
     ipfs.api.pin.add(hash, (err, res) => {
       if (err) return cb(new Error(`Failed to pin content with hash ${hash}`))
       cb(null)
