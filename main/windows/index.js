@@ -125,7 +125,6 @@ const api = {
         setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
       }, 50)
     }
-
     setTimeout(() => {
       electron.screen.on('display-added', () => api.hideTray())
       electron.screen.on('display-removed', () => api.hideTray())
@@ -171,8 +170,8 @@ const api = {
     } else {
       hideShow.running = 'hide'
       windows.tray.send('main:action', 'trayOpen', false)
-      store.expandDock(false)
       setTimeout(() => {
+        store.expandDock(false)
         if (windows && windows.tray) {
           if (store('main.reveal')) detectMouse()
           windows.tray.setVisibleOnAllWorkspaces(true)

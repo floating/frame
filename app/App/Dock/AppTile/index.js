@@ -18,9 +18,10 @@ const fallbackColor = (dapp, a) => {
 class AppTile extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.cid = props.moving ? props.cid : context.store(`main.dapps.${props.hash}.hash`)
-    if (this.cid && !icons[this.cid]) {
-      fetch(`http://localhost:8080/ipfs/${this.cid}/favicon.ico`)
+    const dapp = props.hash ? context.store(`main.dapps.${props.hash}`) : ''
+    this.cid = props.moving ? props.cid : dapp.hash
+    if (this.cid && !icons[this.cid] && dapp) {
+      fetch(`http://localhost:8080/ipfs/${this.cid}/${dapp.icon}`)
         .then(res => {
           if (res.status === 200) return res
           throw new Error(res.statusText)

@@ -3,6 +3,8 @@ const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
 const crypto = require('crypto')
 
+const cheerio = require('cheerio')
+
 const store = require('../store')
 const ipfs = require('../clients/Ipfs')
 const windows = require('../windows')
@@ -58,17 +60,19 @@ class Dapps {
     if (content) {
       const { type, hash } = content
       store.addDapp(namehash, { domain, type, hash, pinned: false })
-      // console.log('GET FILES ', hash)
-      // const files = await ipfs.api.get(hash)
-      // console.log('GOOT FILES ', hash)
-      // files.forEach((file) => {
-      //   try {
-      //     console.log(file.path)
-      //     // console.log(file.content.toString('utf8'))
-      //   } catch (e) {
-      //     // console.log(e.message)
-      //   }
-      // })
+      // Get Dapp Icon
+      ipfs.api.get(`${hash}/index.html`, (err, files) => {
+        if (err) log.error(new Error('Could not resolve dapp: ' + err.message))
+        const $ = cheerio.load(files[0].content.toString('utf8'))
+        let favicon = ''
+        $('link').each((i, link) => {
+          if ($(link).attr('rel') === 'icon' || $(link).attr('rel') === 'shortcut icon') {
+            favicon = favicon || $(link).attr('href')
+          }
+        })
+        if (favicon.startsWith('./')) favicon = favicon.substring(2)
+        store.updateDapp(namehash, { icon: favicon || 'favicon.ico' })
+      })
       this._pin(hash, () => {
         console.log('Pinned first time')
         store.updateDapp(namehash, { pinned: true })

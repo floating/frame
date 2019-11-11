@@ -13,8 +13,9 @@ import Dock from './Dock'
 class App extends React.Component {
   render () {
     const open = this.store('tray.open')
-    const transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(430px, 0px, 0px)'
     // const expanded = this.store('dock.expand')
+    const dock = this.store('tray.dockOnly')
+    const transform = dock ? 'translate3d(370px, 0px, 0px)' : open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(430px, 0px, 0px)'
     // const selected = this.store('selected.open')
     // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
     return (

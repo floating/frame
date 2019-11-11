@@ -32,6 +32,9 @@ class App extends React.Component {
     this.webwrap.appendChild(this.webview)
     this.webview.addEventListener('did-finish-load', () => {
       this.setState({ ready: true })
+      // setTimeout(() => {
+      //   this.webview.openDevTools()
+      // }, 1000)
       // this.webview.capturePage((err, img) => {
       //   console.log(err)
       //   const src = img.toDataURL()
@@ -80,9 +83,7 @@ class App extends React.Component {
     // this.webview.addEventListener('did-finish-load', () => {
     //   this.setState({ ready: true })
     // })
-    // setTimeout(() => {
-    //   this.webview.openDevTools()
-    // }, 1000)
+    //
     // this.webview.innerHTML = `<webview />`
     // this.view = this.webview.querySelector('webview')
     // this.view.loadURL()
