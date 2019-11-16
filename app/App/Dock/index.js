@@ -151,7 +151,7 @@ class Dock extends React.Component {
                 style={{ top: this.currentTop, left: this.currentLeft }}
               >
                 <div className='draggedAppCard'>
-                  <AppTile moving dragging={this.dragging} cid={this.dragging.dapp.hash} />
+                  <AppTile moving dragging={this.dragging} cid={this.dragging.dapp.cid} />
                 </div>
               </div>
             ) : null}
@@ -200,7 +200,7 @@ class Dock extends React.Component {
                 if (drag && !drag.docked) {
                   this.inDockCatch = true
                   const before = e.clientY < (e.target.clientHeight / 2)
-                  this.moveDrag(before ? 0 : this.store('main.dappMap.docked').length, true)
+                  this.moveDrag(before ? 0 : this.store('main.dapp.map.docked').length, true)
                 }
               }}
               onMouseLeave={e => {
@@ -211,8 +211,8 @@ class Dock extends React.Component {
               {'NO IPFS CONNECTION'}
             </div>
             {ipfsReady ? (
-              <div className='dockApps' style={{ marginTop: `-${(this.store('main.dappMap.docked').length * 48) / 2}px` }}>
-                {this.store('main.dappMap.docked').map((hash, i) => {
+              <div className='dockApps' style={{ marginTop: `-${(this.store('main.dapp.map.docked').length * 48) / 2}px` }}>
+                {this.store('main.dapp.map.docked').map((hash, i) => {
                   return (
                     <AppTile
                       key={hash}
@@ -235,12 +235,12 @@ class Dock extends React.Component {
                   const drag = this.dragging
                   if (drag && drag.docked) {
                     this.inAddedCatch = true
-                    this.moveDrag(this.store('main.dappMap.added').length, false)
+                    this.moveDrag(this.store('main.dapp.map.added').length, false)
                   }
                 }}
                 onMouseLeave={e => { this.inAddedCatch = false }}
               />
-              {this.store('main.dappMap.added').map((hash, i) => {
+              {this.store('main.dapp.map.added').map((hash, i) => {
                 return (
                   <AppTile
                     key={hash}

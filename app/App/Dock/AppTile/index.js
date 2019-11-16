@@ -18,35 +18,41 @@ const fallbackColor = (dapp, a) => {
 class AppTile extends React.Component {
   constructor (props, context) {
     super(props, context)
-    const dapp = props.hash ? context.store(`main.dapps.${props.hash}`) : ''
-    this.cid = props.moving ? props.cid : dapp.hash
-    if (this.cid && !icons[this.cid] && dapp) {
-      fetch(`http://localhost:8080/ipfs/${this.cid}/${dapp.icon}`)
-        .then(res => {
-          if (res.status === 200) return res
-          throw new Error(res.statusText)
-        })
-        .then(response => response.blob())
-        .then(images => {
-          icons[this.cid] = URL.createObjectURL(images)
-          this.forceUpdate()
-        })
-        .catch(e => {
-          delete icons[this.cid]
-        })
-    }
+    const dapp = props.hash ? context.store(`main.dapp.details.${props.hash}`) : ''
+    this.cid = props.moving ? props.cid : dapp.cid
+    setTimeout(() => {
+      this.setState({ settled: true })
+    })
+    context.store.observer(() => {
+      const dapp = props.hash ? context.store(`main.dapp.details.${props.hash}`) : ''
+      if (this.cid && !icons[this.cid] && dapp) {
+        fetch(`http://localhost:8080/ipfs/${this.cid}/${dapp.icon}`)
+          .then(res => {
+            if (res.status === 200) return res
+            throw new Error(res.statusText)
+          })
+          .then(response => response.blob())
+          .then(images => {
+            icons[this.cid] = URL.createObjectURL(images)
+            this.forceUpdate()
+          })
+          .catch(e => {
+            delete icons[this.cid]
+          })
+      }
+    })
   }
 
   onMouseDown (e) {
     const { index, hash, mouseDown } = this.props
-    const dapp = this.store(`main.dapps.${hash}`)
+    const dapp = this.store(`main.dapp.details.${hash}`)
     e.persist()
     this.enableDragTimeout = setTimeout(() => mouseDown(e, dapp, index), 200)
   }
 
   onMouseUp (e) {
     const { hash, dragging } = this.props
-    const dapp = this.store(`main.dapps.${hash}`)
+    const dapp = this.store(`main.dapp.details.${hash}`)
     clearTimeout(this.enableDragTimeout)
     if (!dragging) {
       link.rpc('launchDapp', dapp.domain, (err) => {
@@ -71,6 +77,16 @@ class AppTile extends React.Component {
     )
   }
 
+  appTileLoader () {
+    return (
+      <div className='appTileLoader'>
+        <div>
+          <div className='miniloader' />
+        </div>
+      </div>
+    )
+  }
+
   render () {
     const { index, hash, dragging, docked, moving } = this.props
     if (moving) {
@@ -86,7 +102,7 @@ class AppTile extends React.Component {
         </div>
       )
     } else {
-      const dapp = this.store(`main.dapps.${hash}`)
+      const dapp = this.store(`main.dapp.details.${hash}`)
       const tileClass = docked ? 'dockedApp' : 'addedApp'
       const cardClass = docked ? 'dockedAppCard' : 'addedAppCard'
       const beingDragged = dragging && dragging.dapp && dragging.docked === docked && dragging.index === index
@@ -97,11 +113,14 @@ class AppTile extends React.Component {
       return (
         <div key={index} className={tileClass} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseEnter={handleMouseEnter}>
           <div className={cardClass} style={style}>
-            {icons[this.cid] ? (
-              <img src={icons[this.cid]} />
-            ) : (
-              this.appCardIconPlacholder(dapp)
-            )}
+            {!dapp.pinned ? this.appTileLoader() : null}
+            <div className='appTileIconWrap' style={dapp.pinned ? { opacity: 1, transform: 'scale(1)' } : { opacity: 0.3, transform: 'scale(0.6)' }}>
+              {icons[this.cid] ? (
+                <img src={icons[this.cid]} />
+              ) : (
+                this.appCardIconPlacholder(dapp)
+              )}
+            </div>
           </div>
         </div>
       )

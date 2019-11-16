@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
 const Positioner = require('electron-positioner')
 const log = require('electron-log')
+const { hash } = require('eth-ens-namehash')
 // const url = require('url')
 
 const store = require('../store')
@@ -315,7 +316,8 @@ const api = {
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
     windows[session].webContents.on('did-finish-load', () => {
-      windows[session].send('main:location', { url, ens })
+      const dapp = store(`main.dapp.details.${hash(ens)}`)
+      windows[session].send('main:location', { dapp, url, ens })
       windows[session].show()
     })
     // console.log(menu(ens))

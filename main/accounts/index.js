@@ -2,7 +2,6 @@ const EventEmitter = require('events')
 const hdKey = require('ethereumjs-wallet/hdkey')
 const log = require('electron-log')
 // const bip39 = require('bip39')
-
 const crypt = require('../crypt')
 const store = require('../store')
 

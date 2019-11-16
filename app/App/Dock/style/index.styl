@@ -29,6 +29,15 @@
   }
 }
 
+@keyframes load {
+  0% {
+    transform rotate(0deg)
+  }
+  100% {
+    transform rotate(360deg)
+  }
+}
+
 #dock
   position absolute
   top 0px
@@ -85,6 +94,33 @@
     background whiteglow
     border-top-left-radius 6px
     border-bottom-left-radius 6px
+
+  .appTileIconWrap
+    transition standard
+
+  .appTileLoader
+    position absolute
+    display flex
+    justify-content center
+    align-items center
+
+    .miniloader,
+    .miniloader:after {
+      border-radius 100%
+      width 25px
+      height 25px
+    }
+    .miniloader {
+      font-size 4px
+      position relative
+      text-indent -9999em
+      border-top 2px solid thin
+      border-right 2px solid thin
+      border-bottom 2px solid thin
+      border-left 2px solid doubleThick
+      transform translateZ(0)
+      animation load 0.6s infinite linear !important
+    }
 
   .appCardIconPlaceholder
     display flex
@@ -153,8 +189,8 @@
         animation-timing-function linear
 
         img
-          height 26px
-          width 26px
+          height 28px
+          width 28px
 
         div, svg, img
           pointer-events none
@@ -284,8 +320,8 @@
     border-bottom 1px solid thick
 
     img
-      height 26px
-      width 26px
+      height 28px
+      width 28px
 
     div, svg, img
       pointer-events none
@@ -495,10 +531,11 @@
         z-index 5
         color outerspace
         transition 0.1s linear all
+        overflow hidden
 
       img
-        height 26px
-        width 26px
+        height 28px
+        width 28px
 
       div, svg, img
         pointer-events none

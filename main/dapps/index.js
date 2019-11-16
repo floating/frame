@@ -45,8 +45,8 @@ class Dapps {
     const namehash = hash(domain)
 
     // Check if already added
-    if (store(`main.dapps.${namehash}`)) {
-      console.log(store(`main.dapps.${namehash}`))
+    if (store(`main.dapp.details.${namehash}`)) {
+      console.log(store(`main.dapp.details.${namehash}`))
       // store.removeDapp(namehash)
       // store.addDapp()
       // store.addDapp(namehash, { domain, type, hash, pinned: false })
@@ -59,10 +59,14 @@ class Dapps {
     // If content available -> store dapp
     if (content) {
       const { type, hash } = content
-      store.addDapp(namehash, { domain, type, hash, pinned: false })
+      store.addDapp(namehash, { domain, type, cid: hash, pinned: false })
       // Get Dapp Icon
       ipfs.api.get(`${hash}/index.html`, (err, files) => {
-        if (err) log.error(new Error('Could not resolve dapp: ' + err.message))
+        if (err) {
+          log.error(err)
+          store.removeDapp(namehash)
+          return cb(new Error('Could not resolve dapp: ' + err.message))
+        }
         const $ = cheerio.load(files[0].content.toString('utf8'))
         let favicon = ''
         $('link').each((i, link) => {
@@ -72,12 +76,12 @@ class Dapps {
         })
         if (favicon.startsWith('./')) favicon = favicon.substring(2)
         store.updateDapp(namehash, { icon: favicon || 'favicon.ico' })
+        this._pin(hash, () => {
+          console.log('Pinned first time')
+          store.updateDapp(namehash, { pinned: true })
+        })
+        cb(null)
       })
-      this._pin(hash, () => {
-        console.log('Pinned first time')
-        store.updateDapp(namehash, { pinned: true })
-      })
-      cb(null)
     // Else -> throw
     } else {
       cb(new Error('Could not resolve ENS name to content hash'))
@@ -88,7 +92,7 @@ class Dapps {
     const namehash = hash(domain)
 
     // Check if exists
-    if (!store(`main.dapps.${namehash}`)) return cb(new Error('Dapp doesn\'t exist'))
+    if (!store(`main.dapp.details.${namehash}`)) return cb(new Error('Dapp doesn\'t exist'))
 
     // Remove dapp
     store.removeDapp(namehash)
@@ -101,7 +105,7 @@ class Dapps {
   }
 
   async launch (domain, cb) {
-    const dapp = store(`main.dapps.${hash(domain)}`)
+    const dapp = store(`main.dapp.details.${hash(domain)}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
     // if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
     if (!ipfs.api) return cb(new Error('IPFS client not running'))
@@ -122,12 +126,12 @@ class Dapps {
 
   _updateHashes () {
     // For each registered dapp ->
-    Object.entries(store('main.dapps')).forEach(async ([namehash, dapp]) => {
+    Object.entries(store('main.dapp.details')).forEach(async ([namehash, dapp]) => {
       // 1) resolve content
       const result = await ens.resolveContent(dapp.domain)
       // 2) if new content hash -> update dapp and pin content
-      if (result && result.hash !== dapp.hash) {
-        store.updateDapp(namehash, { hash: result.hash, pinned: false })
+      if (result && result.hash !== dapp.cid) {
+        store.updateDapp(namehash, { cid: result.hash, pinned: false })
         this._pin(result.hash, (err) => {
           if (err) return log.error(err)
           store.updateDapp(namehash, { pinned: true })
@@ -137,11 +141,11 @@ class Dapps {
   }
 
   _updatePins () {
-    Object.entries(store('main.dapps')).forEach(async ([namehash, dapp]) => {
+    Object.entries(store('main.dapp.details')).forEach(async ([namehash, dapp]) => {
       const ipfsState = store('main.clients.ipfs.state')
       if (ipfsState === 'ready' && !dapp.pinned) {
         console.log('Pinning', dapp.domain)
-        this._pin(dapp.hash, (err) => {
+        this._pin(dapp.cid, (err) => {
           if (err) return log.error(err)
           store.updateDapp(namehash, { pinned: true })
         })
@@ -155,8 +159,13 @@ module.exports = dapps
 
 // DEBUG
 store.observer(_ => {
-  console.log(store('main.dapps'))
+  console.log('<><><><><><><>')
+  console.log(store('main'))
+  console.log('<><><><><><><>')
+  // console.log(store('main.dapp.map'))
 })
+
+// Default dapps
 
 // setInterval(async () => {
 //   console.log('peers', (await ipfs.api.swarm.peers()).length)

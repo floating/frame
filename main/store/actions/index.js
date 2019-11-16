@@ -123,19 +123,19 @@ module.exports = {
     u('main.mute.alphaWarning', () => true)
   },
   addDapp: (u, namehash, data) => {
-    u(`main.dapps.${namehash}`, () => data)
-    u('main.dappMap.added', added => {
+    u(`main.dapp.details.${namehash}`, () => data)
+    u('main.dapp.map.added', added => {
       added.unshift(namehash)
       return added
     })
   },
   removeDapp: (u, namehash) => {
-    u('main.dapps', (dapps) => {
+    u('main.dapp.details', (dapps) => {
       dapps = { ...dapps }
       delete dapps[namehash]
       return dapps
     })
-    u('main.dappMap', map => {
+    u('main.dapp.map', map => {
       let index = map.added.indexOf(namehash)
       if (index !== -1) {
         map.added.splice(index, 1)
@@ -147,7 +147,7 @@ module.exports = {
     })
   },
   moveDapp: (u, fromArea, fromIndex, toArea, toIndex) => {
-    u('main.dappMap', map => {
+    u('main.dapp.map', map => {
       const hash = map[fromArea][fromIndex]
       map[fromArea].splice(fromIndex, 1)
       map[toArea].splice(toIndex, 0, hash)
@@ -155,12 +155,12 @@ module.exports = {
     })
   },
   updateDapp: (u, namehash, data) => {
-    u(`main.dapps.${namehash}`, (oldData) => {
+    u(`main.dapp.details.${namehash}`, (oldData) => {
       return { ...oldData, ...data }
     })
   },
   setDappStorage: (u, hash, state) => {
-    if (state) u(`main.dappStorage.${hash}`, () => state)
+    if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

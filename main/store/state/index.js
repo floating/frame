@@ -1,6 +1,7 @@
 const uuidv5 = require('uuid/v5')
 
 const persist = require('../persist')
+// const defaults = require('../defaults')
 
 const get = (path, obj = persist.get('main')) => {
   path.split('.').some((key, i) => {
@@ -78,12 +79,14 @@ const initial = {
     pin: main('pin', false),
     launch: main('launch', false),
     reveal: main('reveal', false),
-    dapps: main('dapps', {}),
-    dappMap: {
-      added: main('dappMap.added', []),
-      docked: main('dappMap.docked', [])
+    dapp: {
+      details: {},
+      map: {
+        added: [],
+        docked: []
+      },
+      storage: {}
     },
-    dappStorage: main('dappStorage', {}),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },
