@@ -25,7 +25,7 @@ const mock = {
 }
 
 const ens = electron.app ? require('../ens') : mock.ens
-const shell = electron.shell ? electron.shell : mock.shell
+// const shell = electron.shell ? electron.shell : mock.shell
 
 class Dapps {
   constructor () {
@@ -35,15 +35,50 @@ class Dapps {
     // setInterval(() => {
     //   this._updatePins()
     // }, 15000)
+    this.defaults = [
+      {
+        name: 'wallet.frame.eth',
+        options: { docked: true }
+      },
+      {
+        name: 'aragon.frame.eth',
+        options: { docked: true }
+      },
+      {
+        name: 'uniswap.frame.eth',
+        options: { docked: false }
+      },
+      {
+        name: 'matoken.eth',
+        options: { docked: false }
+      }
+    ]
     ipfs.on('state', state => {
-      if (state === 'ready') this._updatePins()
+      if (state === 'ready') {
+        this._updatePins()
+        this._addDefaults()
+      }
     })
   }
 
-  async add (domain, cb) {
-    // Resolve ENS name
-    const namehash = hash(domain)
+  async _addDefaults () {
+    this.defaults.forEach(async dapp => {
+      if (store('main.dapp.removed').indexOf(dapp.name) === -1) {
+        await dapps.add(dapp.name, dapp.options, err => {
+          if (err) log.error('Error adding default dapp', dapp.name, err)
+        })
+      }
+    })
+  }
 
+  async add (domain, options, cb) {
+    // Resolve ENS name
+    let namehash
+    try {
+      namehash = hash(domain)
+    } catch (e) {
+      return cb(e)
+    }
     // Check if already added
     if (store(`main.dapp.details.${namehash}`)) {
       console.log(store(`main.dapp.details.${namehash}`))
@@ -59,7 +94,7 @@ class Dapps {
     // If content available -> store dapp
     if (content) {
       const { type, hash } = content
-      store.addDapp(namehash, { domain, type, cid: hash, pinned: false })
+      store.addDapp(namehash, { domain, type, cid: hash, pinned: false }, options)
       // Get Dapp Icon
       ipfs.api.get(`${hash}/index.html`, (err, files) => {
         if (err) {
@@ -158,14 +193,12 @@ const dapps = new Dapps()
 module.exports = dapps
 
 // DEBUG
-store.observer(_ => {
-  console.log('<><><><><><><>')
-  console.log(store('main'))
-  console.log('<><><><><><><>')
-  // console.log(store('main.dapp.map'))
-})
-
-// Default dapps
+// store.observer(_ => {
+//   console.log('<><><><><><><>')
+//   console.log(store('main.dapps'))
+//   console.log('<><><><><><><>')
+//   // console.log(store('main.dapp.map'))
+// })
 
 // setInterval(async () => {
 //   console.log('peers', (await ipfs.api.swarm.peers()).length)

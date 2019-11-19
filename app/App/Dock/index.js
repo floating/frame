@@ -22,7 +22,9 @@ class Dock extends React.Component {
     this.addAppFill = 'Enter ENS Name'
     this.state = {
       ensInput: this.addAppFill,
-      pendingRemoval: false
+      pending: '',
+      pendingRemoval: false,
+      pendingAdd: false
     }
     this.added = []
     this.docked = []
@@ -40,8 +42,22 @@ class Dock extends React.Component {
   handleAddApp () {
     if (this.state.ensInput === '' || this.state.ensInput === this.addAppFill) return
     const domain = this.state.ensInput
-    const cb = (err) => { err ? console.error(err) : console.log('Dapp added') }
-    link.rpc('addDapp', domain, cb)
+    const options = {}
+    this.setState({ pending: 'add', pendingMessage: 'Installing ' + domain, ensInput: this.addAppFill })
+    const cb = (err) => {
+      if (err) {
+        console.log(err)
+        this.setState({ pending: 'error', pendingMessage: err })
+        setTimeout(() => {
+          this.setState({ pending: '', pendingMessage: '' })
+        }, 3000)
+      } else {
+        this.setState({ pending: '', pendingMessage: '' })
+      }
+    }
+    link.rpc('addDapp', domain, options, cb)
+    // if (this.dappInput) this.dappInput.blur()
+    // this.setState({ ensInput: this.addAppFill })
   }
 
   handleToggleDock () {
@@ -162,35 +178,42 @@ class Dock extends React.Component {
           ) : null}
           <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
           <div className='appStore'>
-            {this.dragging ? (
+            {this.state.pending ? (
               <div className='addAppForm'>
-                <div
-                  className='removeApp'
-                  onMouseEnter={e => this.removePending()}
-                  onMouseLeave={e => this.cancelRemoval()}
-                >
-                  {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
-                  {svg.trash(16)}
-                </div>
+                {this.state.pendingMessage}
               </div>
             ) : (
-              <div className='addAppForm'>
-                <div className='addAppInput'>
-                  <input
-                    value={this.state.ensInput}
-                    onFocus={::this.handleOnFocus}
-                    onBlur={::this.handleOnBlur}
-                    onChange={e => this.setState({ ensInput: e.target.value })}
-                    onKeyPress={e => { if (e.key === 'Enter') this.handleAddApp() }}
-                  />
+              this.dragging ? (
+                <div className='addAppForm'>
+                  <div
+                    className='removeApp'
+                    onMouseEnter={e => this.removePending()}
+                    onMouseLeave={e => this.cancelRemoval()}
+                  >
+                    {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
+                    {svg.trash(16)}
+                  </div>
                 </div>
-                <div
-                  className='addAppSubmit'
-                  onMouseDown={::this.handleAddApp}
-                >
-                  {'Add Dapp'}
+              ) : (
+                <div className='addAppForm'>
+                  <div className='addAppInput'>
+                    <input
+                      ref={c => { this.dappInput = c }}
+                      value={this.state.ensInput}
+                      onFocus={::this.handleOnFocus}
+                      onBlur={::this.handleOnBlur}
+                      onChange={e => this.setState({ ensInput: e.target.value })}
+                      onKeyPress={e => { if (e.key === 'Enter') this.handleAddApp() }}
+                    />
+                  </div>
+                  <div
+                    className='addAppSubmit'
+                    onMouseDown={::this.handleAddApp}
+                  >
+                    {'Add Dapp'}
+                  </div>
                 </div>
-              </div>
+              )
             )}
             <div
               className='dragCatchDock'

@@ -284,12 +284,14 @@ const api = {
     windows.tray.blur()
     const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    const height = area.height - 40
+    const width = area.width - 460
     windows[session] = new BrowserWindow({
       session,
       x: 40,
       y: 0,
-      width: area.width - 460,
-      height: area.height - 40,
+      width: width > height ? height : width,
+      height,
       show: false,
       frame: false,
       titleBarStyle: 'hiddenInset',
@@ -310,8 +312,8 @@ const api = {
       }
     })
     windows[session].positioner = new Positioner(windows[session])
-    const pos = windows[session].positioner.calculate('topLeft')
-    windows[session].setPosition(pos.x + 20, pos.y + 20)
+    const pos = windows[session].positioner.calculate('topRight')
+    windows[session].setPosition(pos.x - 440, pos.y + 20)
     if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)

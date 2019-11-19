@@ -122,11 +122,15 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
-  addDapp: (u, namehash, data) => {
+  addDapp: (u, namehash, data, options) => {
     u(`main.dapp.details.${namehash}`, () => data)
-    u('main.dapp.map.added', added => {
-      added.unshift(namehash)
-      return added
+    u('main.dapp.map', map => {
+      if (options.docked && map.docked.length <= 10) {
+        map.docked.push(namehash)
+      } else {
+        map.added.unshift(namehash)
+      }
+      return map
     })
   },
   removeDapp: (u, namehash) => {

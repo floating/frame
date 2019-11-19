@@ -23,9 +23,9 @@ class Signer extends React.Component {
       unlockInput: '',
       openHover: false
     }
-    if (this.context.store('main.save.account') === this.props.id) {
-      setTimeout(() => this.select(), 200)
-    }
+    // if (this.context.store('main.save.account') === this.props.id) {
+    //   setTimeout(() => this.select(), 200)
+    // }
   }
 
   componentDidMount () {
@@ -251,11 +251,18 @@ class Signer extends React.Component {
           <div className='accountListItems'>
             {this.store('main.accounts', this.props.id, 'addresses').slice(startIndex, startIndex + 5).map((a, i) => {
               i = startIndex + i
+              const ens = this.store('main.accounts', this.props.id, 'ens', i)
               const balance = this.store('balances', a)
               return (
                 <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
                   <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
-                  <div className='accountListItemAddress'>{a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}</div>
+                  {
+                    ens ? (
+                      <div className='accountListItemAddress'>{ens}</div>
+                    ) : (
+                      <div className='accountListItemAddress'>{a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}</div>
+                    )
+                  }
                   <div className='accountListItemBalance'>{'Ξ ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
                 </div>
               )
@@ -288,6 +295,7 @@ class Signer extends React.Component {
     const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
     const balance = this.store('balances', address)
     if (!address) return null
     return (
@@ -305,7 +313,17 @@ class Signer extends React.Component {
               </div>
               <div className='signerAddress'>
                 <div className='transactionToAddress'>
-                  <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 17 })} {address.substr(address.length - 4)}</div>
+                  {ens ? (
+                    <div className='transactionToAddressLarge'>
+                      {ens}
+                    </div>
+                  ) : (
+                    <div className='transactionToAddressLarge'>
+                      {address.substring(0, 6)}
+                      {svg.octicon('kebab-horizontal', { height: 17 })}
+                      {address.substr(address.length - 4)}
+                    </div>
+                  )}
                   <div className='transactionToAddressFull'>
                     {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
                     <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />

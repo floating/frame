@@ -131,9 +131,9 @@ const rpc = {
   verifyAddress (cb) {
     accounts.verifyAddress(true, cb)
   },
-  addDapp (domain, cb) {
-    if (!domain.endsWith('.eth')) domain += '.eth'
-    dapps.add(domain, cb)
+  addDapp (domain, options, cb) {
+    if (!(domain.endsWith('.eth') || domain.endsWith('.xyz'))) domain += '.eth'
+    dapps.add(domain, options, cb)
   },
   toggleDock (cb) {
     windows.setDockOnly(false)

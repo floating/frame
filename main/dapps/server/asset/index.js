@@ -33,10 +33,8 @@ module.exports = {
   },
   dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     if (!ipfs.api) return error(res, 404, 'IPFS client not running')
-    console.log('appppp: ', app)
     const cid = await resolve.cid(app)
     ipfs.api.get(`${cid}/index.html`, (err, files) => {
-      console.log('err here?', err, cid)
       if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
       res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
       res.setHeader('Access-Control-Allow-Origin', '*')

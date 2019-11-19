@@ -85,7 +85,8 @@ const initial = {
         added: [],
         docked: []
       },
-      storage: {}
+      storage: {},
+      removed: []
     },
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
