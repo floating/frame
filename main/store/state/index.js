@@ -1,7 +1,6 @@
 const uuidv5 = require('uuid/v5')
 
 const persist = require('../persist')
-// const defaults = require('../defaults')
 
 const get = (path, obj = persist.get('main')) => {
   path.split('.').some((key, i) => {
