@@ -19,7 +19,7 @@ const error = (res, code, message) => {
 module.exports = {
   stream: async (res, app, path) => { // Stream assets from IPFS back to the client
     if (!ipfs.api) return error(res, 404, 'IPFS client not running')
-    const stream = ipfs.api.getReadableStream(`${resolve.hash(app)}${path}`)
+    const stream = ipfs.api.getReadableStream(`${await resolve.cid(app)}${path}`)
     stream.on('data', file => {
       if (!file) return error(res, 404, 'Asset not found')
       res.setHeader('content-type', getType(path))
@@ -33,8 +33,8 @@ module.exports = {
   },
   dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     if (!ipfs.api) return error(res, 404, 'IPFS client not running')
-    const hash = resolve.hash(app)
-    ipfs.api.get(`${hash}/index.html`, (err, files) => {
+    const cid = await resolve.cid(app)
+    ipfs.api.get(`${cid}/index.html`, (err, files) => {
       if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
       res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
       res.setHeader('Access-Control-Allow-Origin', '*')
@@ -43,44 +43,11 @@ module.exports = {
       const $ = cheerio.load(files[0].content.toString('utf8'))
       $('html').prepend(`
         <script>
-          const initial = ${JSON.stringify(storage.get(hash) || {})}
+          const initial = ${JSON.stringify(storage.get(cid) || {})}
           ${inject}
         </script>
       `)
       res.end($.html())
-    })
-  },
-  icon: async (app, cb) => {
-    if (!ipfs.api) return cb(new Error('IPFS Not Running')) //  return error(res, 404, 'IPFS client not running')
-    const hash = resolve.hash(app)
-    // TODO: Look for icon.svg in root.. this is most ideal
-    // Otherwise
-    ipfs.api.get(`${hash}/index.html`, (err, files) => {
-      if (err) cb(new Error('Could not resolve dapp: ' + err.message))
-      const $ = cheerio.load(files[0].content.toString('utf8'))
-      let favicon = ''
-      $('body').find('link').some(link => {
-        if (link.attribs.rel === 'icon' || link.attribs.rel === 'shortcut icon') {
-          favicon = link.attribs.rel.href
-          return true
-        } else {
-          return false
-        }
-      })
-      if (favicon) {
-        cb(null, favicon)
-      } else {
-        // try just looking standard favicon endpoints...
-        cb(new Error('Favicon not found'))
-      }
-      // return favicon;
-      // $('html').prepend(`
-      //   <script>
-      //     const initial = ${JSON.stringify(storage.get(hash) || {})}
-      //     ${inject}
-      //   </script>
-      // `)
-      // res.end($.html())
     })
   }
 }

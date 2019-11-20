@@ -4,7 +4,9 @@ const namehash = require('eth-ens-namehash')
 const contentHash = require('content-hash')
 
 // Frame modules
-const provider = require('../provider')
+// const provider = require('../provider')
+const proxyProvider = require('../provider/proxy')
+const store = require('../store')
 
 // Local modules
 const interfaces = require('./artifacts/interfaces')
@@ -94,7 +96,7 @@ const getResolverAddress = async (name) => {
   const hash = namehash.hash(name)
 
   // Get registry contract address for selected network
-  const networkId = provider.connection.network
+  const networkId = store('main.connection.network')
   const registryAddress = registryAddresses[networkId]
 
   // Encode function input
@@ -118,6 +120,6 @@ const makeCall = (method, params) => {
     const payload = { jsonrpc: '2.0', id: 1, method: method, params: [params, 'latest'] }
 
     // Send payload to provider and resolve promise with result
-    provider.send(payload, ({ result }) => resolve(result))
+    proxyProvider.emit('send', payload, ({ result }) => resolve(result))
   })
 }

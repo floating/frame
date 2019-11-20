@@ -7,6 +7,7 @@ const proxyProvider = require('../../provider/proxy')
 const signers = require('../../signers')
 const windows = require('../../windows')
 const store = require('../../store')
+const nameService = require('../../ens')
 
 const { Aragon } = require('../aragon')
 
@@ -16,7 +17,7 @@ const capitalize = (s) => {
 }
 
 class Account {
-  constructor ({ id, type, index, name, created, addresses, network, smart, options = {} }, accounts) {
+  constructor ({ id, type, index, name, ens, created, addresses, network, smart, options = {} }, accounts) {
     this.accounts = accounts
     this.id = id
     this.index = index || 0
@@ -25,6 +26,7 @@ class Account {
     this.type = type || options.type
     this.created = created
     this.addresses = addresses || ['0x']
+    this.ens = ens || []
     this.smart = smart
     this.network = network || store('main.connection.network')
     this.requests = {}
@@ -41,15 +43,35 @@ class Account {
       this.smart = this.signer ? undefined : this.smart
       this.update()
     })
-    if (this.created === -1) {
-      log.info('Account has no creation height, fetching')
-      this.getBlockHeight((err, height) => {
-        if (err) return log.error('getBlockHeight Error', err)
-        log.info('Account creation being set to current height: ', height)
-        this.created = height
+    store.observer(() => {
+      store('main.connection')
+      this.lookups()
+    })
+  }
+
+  lookups () {
+    clearTimeout(this.updatesTimer)
+    this.updatesTimer = setTimeout(() => {
+      this.addresses.forEach(async (address, index) => {
+        if (index !== this.index) {
+          this.ens[index] = this.ens[index] || ''
+        } else {
+          let name
+          try { name = await nameService.resolveAddress(address) } catch (e) { console.error(e) }
+          this.ens[index] = name || ''
+        }
         this.update()
       })
-    }
+      if (this.created === -1) {
+        log.info('Account has no creation height, fetching')
+        this.getBlockHeight((err, height) => {
+          if (err) return log.error('getBlockHeight Error', err)
+          log.info('Account creation being set to current height: ', height)
+          this.created = height
+          this.update()
+        })
+      }
+    }, 10000)
   }
 
   resError (error, payload, res) {
@@ -123,6 +145,7 @@ class Account {
     this.index = i
     this.requests = {} // TODO Decline these requests before clobbering them
     this.update()
+    this.lookups()
     cb(null, this.summary())
     this.verifyAddress()
   }
@@ -135,6 +158,7 @@ class Account {
       name: this.name,
       type: this.type,
       addresses: this.addresses,
+      ens: this.ens,
       status: this.status,
       signer: this.signer,
       smart: this.smart,

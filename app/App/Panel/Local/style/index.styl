@@ -181,6 +181,7 @@
       .connectionOptionStatus
         display flex
         height 25px
+        width 100%
         .connectionOptionStatusIndicator
           height 20px
           margin-top 5px
@@ -200,9 +201,13 @@
 
         .connectionOptionStatusText
           height 20px
-          margin-top 5px
-          display flex
-          align-items center
+          margin-top 7px
+          text-overflow ellipsis
+          white-space nowrap
+          overflow hidden
+
+          // display flex
+          // align-items center
 
       .signerOptionSetWrap
         height 25px

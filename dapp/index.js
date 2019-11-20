@@ -5,16 +5,11 @@ import link from './link'
 import svg from '../app/svg'
 
 // import Native from './Native'
-
 // import App from './App'
-
 // import _store from './store'
-
 // import DevTools from 'restore-devtools'
 // <DevTools />
-
 // const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
-
 // const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
 // const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
 
@@ -110,9 +105,12 @@ class App extends React.Component {
           </div>
         </div>
         <div className='shade' />
-        <div className='webloading'>
-          <div className='loader' />
-        </div>
+        {!this.state.ready ? (
+          <div className='webloading'>
+            <img src={`http://localhost:8080/ipfs/${this.props.dapp.cid}/${this.props.dapp.icon}`} />
+            <div className='loader' />
+          </div>
+        ) : null}
         <div className='webwrap' style={this.state.ready ? { display: 'block' } : { display: 'none' }} ref={ww => { this.webwrap = ww }} />
       </>
     )
@@ -129,5 +127,5 @@ link.on('location', location => {
   document.title = location.ens
   const store = Restore.create({}, {})
   const Frame = Restore.connect(App, store)
-  ReactDOM.render(<Frame location={location.url} ens={location.ens} />, document.getElementById('frame'))
+  ReactDOM.render(<Frame dapp={location.dapp} location={location.url} ens={location.ens} />, document.getElementById('frame'))
 })

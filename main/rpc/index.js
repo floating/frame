@@ -8,6 +8,7 @@ const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
 const dapps = require('../dapps')
+const ens = require('../ens')
 const windows = require('../windows')
 
 const { resolveName } = require('../accounts/aragon')
@@ -131,9 +132,9 @@ const rpc = {
   verifyAddress (cb) {
     accounts.verifyAddress(true, cb)
   },
-  addDapp (domain, cb) {
-    if (!domain.endsWith('.eth')) domain += '.eth'
-    dapps.add(domain, cb)
+  addDapp (domain, options, cb) {
+    if (!(domain.endsWith('.eth') || domain.endsWith('.xyz'))) domain += '.eth'
+    dapps.add(domain, options, cb)
   },
   toggleDock (cb) {
     windows.setDockOnly(false)
@@ -154,6 +155,13 @@ const rpc = {
   },
   launchDapp (domain, cb) {
     dapps.launch(domain, cb)
+  },
+  async lookupEns (address, cb) {
+    try {
+      cb(null, await ens.resolveAddress(address))
+    } catch (e) {
+      cb(e)
+    }
   }
 }
 

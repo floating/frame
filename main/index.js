@@ -7,7 +7,6 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 
 const log = require('electron-log')
 const path = require('path')
-
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store')
