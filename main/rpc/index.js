@@ -8,6 +8,7 @@ const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
 const dapps = require('../dapps')
+const ens = require('../ens')
 const windows = require('../windows')
 
 const { resolveName } = require('../accounts/aragon')
@@ -154,6 +155,13 @@ const rpc = {
   },
   launchDapp (domain, cb) {
     dapps.launch(domain, cb)
+  },
+  async lookupEns (address, cb) {
+    try {
+      cb(null, await ens.resolveAddress(address))
+    } catch (e) {
+      cb(e)
+    }
   }
 }
 

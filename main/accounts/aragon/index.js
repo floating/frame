@@ -105,6 +105,14 @@ class Aragon {
     }
     tx.value = tx.value || '0x'
     tx.data = tx.data || '0x'
+
+    //    if no eth is included AND web3.eth.gasEstimate({ from: agent, to: target, data: calldata }) returns a bounded amount
+    //        run with 'safeExecute'
+    //          if no path/result found
+    //            run with 'execute'
+    //    else
+    //      run with 'execute'
+
     this.wrap.calculateTransactionPath(this.actor.address, this.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
       var newTx = result[0]
       delete newTx.nonce

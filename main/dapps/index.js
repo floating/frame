@@ -64,7 +64,7 @@ class Dapps {
   async _addDefaults () {
     this.defaults.forEach(async dapp => {
       if (store('main.dapp.removed').indexOf(dapp.name) === -1) {
-        await dapps.add(dapp.name, dapp.options, err => {
+        await this.add(dapp.name, dapp.options, err => {
           if (err) log.error('Error adding default dapp', dapp.name, err)
         })
       }

@@ -1,7 +1,7 @@
 const electron = require('electron')
 const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
-const Positioner = require('electron-positioner')
+// const Positioner = require('electron-positioner')
 const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
 // const url = require('url')
@@ -27,6 +27,17 @@ let mouseTimeout
 
 let glide = false
 let dockOnly = false
+let pinArea
+
+const topRight = (window) => {
+  const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+  const screenSize = area
+  const windowSize = window.getSize()
+  return {
+    x: Math.floor(screenSize.x + (screenSize.width - windowSize[0])),
+    y: screenSize.y
+  }
+}
 
 const detectMouse = () => {
   const m1 = electron.screen.getCursorScreenPoint()
@@ -92,7 +103,7 @@ const api = {
     //   res({ cancel: false, responseHeaders: details.responseHeaders })
     // })
     windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
-    windows.tray.positioner = new Positioner(windows.tray)
+    // windows.tray.positioner = new Positioner(windows.tray)
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
     windows.tray.setSize(0, 0)
@@ -127,10 +138,18 @@ const api = {
       }, 50)
     }
     setTimeout(() => {
-      electron.screen.on('display-added', () => api.hideTray())
-      electron.screen.on('display-removed', () => api.hideTray())
-      electron.screen.on('display-metrics-changed', () => api.hideTray())
-    }, 30 * 1000)
+      electron.screen.on('display-added', () => {
+        api.hideTray()
+      })
+      electron.screen.on('display-removed', () => {
+        api.hideTray()
+        pinArea = null
+      })
+      electron.screen.on('display-metrics-changed', () => {
+        api.hideTray()
+        pinArea = null
+      })
+    }, 10 * 1000)
     // resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
   // reload: () => {
@@ -177,10 +196,10 @@ const api = {
           if (store('main.reveal')) detectMouse()
           windows.tray.setVisibleOnAllWorkspaces(true)
           windows.tray.setAlwaysOnTop(false)
-          const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+          const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
           // windows.tray.setResizable(true)
           windows.tray.setSize(1, dev ? 740 : area.height)
-          const pos = windows.tray.positioner.calculate('topRight')
+          const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
           windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
           windows.tray.hide()
@@ -205,9 +224,10 @@ const api = {
       hideShow.running = 'show'
       windows.tray.setVisibleOnAllWorkspaces(true)
       // windows.tray.setResizable(false) // Keeps height consistant
-      const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+      const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+      if (!pinArea && store('main.pin')) pinArea = area
       windows.tray.setSize(430, dev ? 740 : area.height)
-      const pos = windows.tray.positioner.calculate('topRight')
+      const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')
@@ -234,9 +254,9 @@ const api = {
     delete windows[id]
   },
   setWidth: width => {
-    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     windows.tray.setSize(width, dev ? 740 : area.height)
-    const pos = windows.tray.positioner.calculate('topRight')
+    const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
     windows.tray.setPosition(pos.x, pos.y)
     // windows.tray.setBounds({
     //   width: width,
@@ -311,8 +331,8 @@ const api = {
         preload: path.resolve(__dirname, '../../bundle/dapp/bridge.js')
       }
     })
-    windows[session].positioner = new Positioner(windows[session])
-    const pos = windows[session].positioner.calculate('topRight')
+    // windows[session].positioner = new Positioner(windows[session])
+    const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
     windows[session].setPosition(pos.x - 440, pos.y + 20)
     if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
@@ -364,9 +384,10 @@ ipcMain.on('tray:ready', () => {
 
 ipcMain.on('tray:pin', () => {
   if (store('main.pin')) {
-    setTimeout(() => {
-      api.hideTray()
-    }, 200)
+    pinArea = null
+    setTimeout(() => api.hideTray(), 200)
+  } else {
+    pinArea = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
   }
   store.pin()
 })
