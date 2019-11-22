@@ -5,6 +5,7 @@
   "main": "main",
   "build": {
     "appId": "sh.frame.app",
+    "afterSign": "./build/notarize.js",
     "productName": "Frame",
     "linux": {
       "target": [
@@ -15,7 +16,8 @@
       ]
     },
     "mac": {
-      "hardenedRuntime": false
+      "hardenedRuntime": true,
+      "entitlements": "./entitlements.plist"
     },
     "win": {},
     "files": [
@@ -79,7 +81,7 @@
     "cookie": "0.4.0",
     "cross-env": "6.0.3",
     "electron-log": "3.0.9",
-    "electron-positioner": "4.1.0",
+    "electron-notarize": "0.2.0",
     "electron-updater": "4.2.0",
     "eth-ens-namehash": "2.0.8",
     "eth-provider": "0.2.5",
