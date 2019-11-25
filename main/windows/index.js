@@ -1,6 +1,7 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut, shell } = electron
 const path = require('path')
+const fs = require('fs')
 // const Positioner = require('electron-positioner')
 const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
@@ -354,7 +355,7 @@ const api = {
 app.on('web-contents-created', (e, contents) => {
   contents.on('will-navigate', e => e.preventDefault())
   // contents.on('will-attach-webview', e => e.preventDefault())
-  // scontents.on('new-window', e => e.preventDefault())
+  // contents.on('new-window', e => e.preventDefault())
 })
 
 if (dev) {

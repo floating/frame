@@ -3,7 +3,7 @@
   top 0px
   right 0px
   bottom 0px
-  left 0px
+  left 50px
   display flex
   justify-content center
   flex-direction column
@@ -12,14 +12,14 @@
 
   .localSettingsWrapFadeTop
     position absolute
-    background red
+    // background red
     top 0
     left 0
     right 0
     height 140px
     pointer-events none
     z-index 5
-    background linear-gradient(0deg, rgba(255,255,255,0) 0%, lightShade 70%)
+    // background linear-gradient(0deg, rgba(255,255,255,0) 0%, light 70%)
 
   .localSettingsWrapFadeBot
     position absolute
@@ -30,7 +30,7 @@
     height 140px
     pointer-events none
     z-index 5
-    background linear-gradient(-180deg, rgba(255,255,255,0) 0%, lightShade 70%)
+    background linear-gradient(-180deg, rgba(255,255,255,0) 0%, light 70%)
 
   .localSettingsWrap
     padding 100px 0px 100px 0px
@@ -61,8 +61,7 @@
     margin 50px 0px 0px 0px
 
 .localSettingsHidden
-  right -100%
-  left 100%
+  transform translateX(100%)
 
 .signerSetting
   display flex
@@ -343,7 +342,7 @@
   opacity 1
 
 .connectionOptionOn
-  background lowlight
+  background highlighter
   margin -5px -15px
   padding 15px 15px
   .connectionOptionDetails

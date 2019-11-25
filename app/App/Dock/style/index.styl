@@ -42,9 +42,9 @@
   position absolute
   top 0px
   bottom 0px
-  left 12px
-  width 400px
-  padding-right 28px
+  left 3px
+  width 420px
+  // padding-right 28px
   -webkit-app-region no-drag
   display flex
   flex-direction column
@@ -52,10 +52,11 @@
   align-items center
   transform translate3d(0px, 0px, 0px)
   will-change transform
-  background whiteglowShade
+  // background whiteglowShade
+  background light
   border-top-left-radius 6px
   border-bottom-left-radius 6px
-  margin 0px -30px 0px 0px
+  // margin 0px -30px 0px 0px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
 
@@ -83,7 +84,9 @@
     pointer-events none
     transition standardSlow
     transition-delay 0.00s
-    background rgba(33, 45, 126, 0.1)
+    background linear-gradient(90deg, highlight, lowlight)
+    // background linear-gradient(90deg, rgba(16, 44, 100, 0), rgba(16, 44, 100, .1))
+    // background
 
   .dockInset
     position absolute
@@ -91,7 +94,7 @@
     right 0px
     bottom 0px
     left 0px
-    background whiteglow
+    background lowerlight
     border-top-left-radius 6px
     border-bottom-left-radius 6px
 
@@ -105,12 +108,11 @@
     align-items center
 
     .miniloader,
-    .miniloader:after {
+    .miniloader:after
       border-radius 100%
       width 25px
       height 25px
-    }
-    .miniloader {
+    .miniloader
       font-size 4px
       position relative
       text-indent -9999em
@@ -120,7 +122,6 @@
       border-left 2px solid doubleThick
       transform translateZ(0)
       animation load 0.6s infinite linear !important
-    }
 
   .appCardIconPlaceholder
     display flex
@@ -197,25 +198,30 @@
 
   .expandFrame
     position absolute
-    top 0
+    top 50px
     left 0
-    width 48px
-    height 48px
+    width 50px
+    height 32px
     z-index 1000
     display flex
     justify-content center
     align-items center
     color outerspace08
-
   .expandFrame:hover
     color outerspace
 
+  .selectDapps
+    top 83px
+
+  .selectSettings
+    top 116px
+
   .pinFrame
     position absolute
-    bottom 0
+    bottom 10px
     left 0
-    width 48px
-    height 48px
+    width 50px
+    height 32px
     z-index 1000
     display flex
     justify-content center
@@ -351,7 +357,7 @@
       border-top-right-radius 6px
       z-index 3
       box-shadow cardDrop, 0px 2px 0px lowestlight
-      background lowerlight
+      background light
 
       .browserExtensionIcons
         position absolute
@@ -401,19 +407,19 @@
 
     .addAppForm
       position absolute
-      left 57px
-      right 10px
+      left 47px
+      right 0px
       top 0px
-      height 90px
+      height 80px
       display flex
       justify-content center
       align-items center
       flex-direction column
       z-index 3
       border-bottom-left-radius 6px
-      border-bottom-right-radius 6px
+      // border-bottom-right-radius 6px
       box-shadow cardDrop
-      background lowerlight
+      background highlight
 
       .removeApp
         position relative
@@ -456,17 +462,17 @@
 
       .addAppInput
         position absolute
-        top 10px
-        bottom 30px
-        left 10px
-        right 10px
-        background lowlight
+        top 0px
+        bottom 31px
+        left 0px
+        right 0px
+        background highlighter
         color outerspace08
         display flex
         justify-content center
         align-items center
-        border-radius 4px
-        box-shadow cardDrop, 0px 0px 17px rgba(0, 35, 80, 0.05)
+        // border-radius 4px
+        // box-shadow cardDrop, 0px 0px 17px rgba(0, 35, 80, 0.05)
 
         input
           padding 10px
@@ -497,7 +503,7 @@
       align-content flex-start
       justify-content flex-start
       margin 20px 0px 0px 48px
-      padding 80px 10px 10px 10px
+      padding 70px 10px 10px 10px
       box-sizing border-box
       overflow-x hidden
       overflow-y scroll
@@ -523,7 +529,7 @@
         height 48px
         border-radius 6px
         box-shadow cardDrop
-        background lowerlight
+        background highlight
         box-sizing border-box
         display flex
         justify-content center
@@ -539,3 +545,8 @@
 
       div, svg, img
         pointer-events none
+
+
+@import './card.styl'
+@import '../Main/style'
+@import '../Local/style'

@@ -21,7 +21,15 @@ const initial = {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, notify: '', notifyData: {}, badge: '', addAccount: '' },
+  view: {
+    current: '',
+    list: [],
+    data: {},
+    notify: '',
+    notifyData: {},
+    badge: '',
+    addAccount: ''
+  },
   signers: {},
   tray: {
     open: false,
@@ -30,6 +38,7 @@ const initial = {
   },
   balances: {},
   selected: {
+    card: 'default',
     minimized: true,
     open: false,
     current: '',

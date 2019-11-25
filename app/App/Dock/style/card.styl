@@ -1,0 +1,155 @@
+.dockCardInset
+  position absolute
+  top 1px
+  right 1px
+  left 1px
+  bottom 3px
+  z-index 40
+  border-radius 9px
+  z-index 2
+  background highlight
+  overflow hidden
+  // background red
+
+.dockCard
+  position absolute
+  top 49px
+  left 50px
+  bottom 10px
+  right 10px
+  background blue
+  border-radius 9px
+  z-index 1
+  box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 15px 15px 25px -10px tripleThick
+  background linear-gradient(135deg, white, doubleThick)
+  transition settle
+
+.panelMenu
+  position absolute
+  left 0px
+  right 0px
+  top 0
+  height 50px
+  // padding 0px 5px 100px 5px
+  display flex
+  justify-content space-between
+  align-items center
+  -webkit-app-region no-drag
+  z-index 10000
+  opacity 1
+  transform translate3d(0, 0, 0)
+  // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
+  pointer-events none
+  transition standard
+
+  .panelMenuItem
+    width 50px
+    height 50px
+    display flex
+    justify-content center
+    align-items center
+    -webkit-app-region no-drag
+    transition standard
+    pointer-events auto
+    transform translate3d(0, 0, 0)
+
+    svg
+      color outerspace
+      transform translate3d(0, 0, 0)
+
+    .panelMenuIconArrow
+      margin 0px 0px 1px 1px
+      min-width 5px
+      max-width 5px
+      transform translate3d(0, 0, 0)
+
+  .panelDetail
+    display flex
+    align-items center
+    margin-left 0%
+    transition standardSlow
+
+  .panelDetailText
+    transition standard
+    text-transform uppercase
+    font-size 10px
+    letter-spacing 6px
+    font-weight 400
+    color outerspace08
+    height 30px
+    display flex
+    justify-content center
+    align-items center
+    margin-top -1px
+
+  .panelDetailIndicator
+    height 30px
+    width 50px
+    // background blue
+    padding-right 5px
+    border-radius 5px
+    display flex
+    align-items center
+    justify-content center
+    padding 1px
+
+    .panelDetailIndicatorShade
+      margin-left -2px
+      padding 2px
+      box-shadow 0px 0px 4px rgba(6, 54, 252, 0.05), cardDrop, 3px 3px 2px thick, -3px -3px 6px rgba(255, 255, 255, 1)
+      // background linear-gradient(135deg, white, tripleThick)
+      border-radius 100%
+
+      .panelDetailIndicatorInner
+        height 12px
+        width 12px
+        border-radius 100%
+
+      .panelDetailIndicatorGood
+        transition standardSlow
+        background good
+
+      .panelDetailIndicatorBad
+        transition standardSlow
+        background bad
+
+      .panelDetailIndicatorPending
+        transition standardSlow
+        background pending
+
+.panelMenuAddMode
+  transition standard
+  z-index 10000
+  .panelDetail
+    transition standardSlowest
+    // margin-left calc(50% - 50px)
+  .panelMenuItem
+    transition standard
+    opacity 0
+    pointer-events none
+    svg
+      color spacewhite
+  .panelDetailText
+    transition standard
+    color spacewhite
+  .panelDetailIndicator
+    .panelDetailIndicatorGood
+      transition standardSlow
+      background smart
+    .panelDetailIndicatorBad
+      transition standardSlow
+      background hot
+    .panelDetailIndicatorPending
+      transition standardSlow
+      background hardware
+
+
+
+
+
+  // .signerContainer
+  //   position relative
+  //   z-index 3002
+  //   border-radius 6px
+  //   background lightShade
+  //   padding-bottom 3px

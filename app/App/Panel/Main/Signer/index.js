@@ -162,7 +162,8 @@ class Signer extends React.Component {
             </div>
             <div className='signerText'>{this.props.signer ? (
               this.props.signer.type === 'ring' || this.props.signer.type === 'seed' ? 'hot' : this.props.signer.type
-            ) : 'no signer'}</div>
+            ) : 'no signer'}
+            </div>
           </div>
         </div>
       </div>
@@ -175,7 +176,7 @@ class Signer extends React.Component {
     if (this.store('selected.current') === this.props.id & this.store('selected.open')) menuClass += ' signerMenuOpen'
     return (
       <div className={menuClass}>
-        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')} >
+        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
           <div className='signerMenuItemIcon'>
             {svg.octicon('pulse', { height: 23 })}
             <div className='iconUnderline' />

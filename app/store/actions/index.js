@@ -61,6 +61,10 @@ export const setSignerView = (u, view) => {
   u('selected.view', _ => view)
 }
 
+export const setCard = (u, card) => {
+  u('selected.card', _ => card)
+}
+
 export const accountPage = (u, page) => {
   u('selected.accountPage', () => page)
 }
