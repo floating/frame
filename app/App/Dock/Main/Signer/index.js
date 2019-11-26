@@ -129,17 +129,19 @@ class Signer extends React.Component {
     const inSettings = this.store('selected.view') === 'settings'
     return (
       <div className='signerType'>
-        <div className='addressSelect' onMouseDown={e => {
-          e.stopPropagation()
-          this.store.toggleShowAccounts()
-        }}>
+        <div
+          className='addressSelect'
+          onMouseDown={e => {
+            e.stopPropagation()
+            this.store.toggleShowAccounts()
+          }}
+        >
           <div className='addressSelectButton'>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-            <div className='addressSelectText'>{'Addresses'}</div>
+            <div className='addressSelectText'>Addresses</div>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
           </div>
         </div>
-        {this.state.openHover ? this.renderArrows('up') : null}
         {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
           <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
@@ -159,10 +161,6 @@ class Signer extends React.Component {
                   return null
                 }
               })()}
-            </div>
-            <div className='signerText'>{this.props.signer ? (
-              this.props.signer.type === 'ring' || this.props.signer.type === 'seed' ? 'hot' : this.props.signer.type
-            ) : 'no signer'}
             </div>
           </div>
         </div>
@@ -361,14 +359,14 @@ class Signer extends React.Component {
     if (current) {
       // Currently selected
       style.position = 'absolute'
-      style.top = initial.top // open ? 40 : initial.top
+      style.top = initial.top - 50 // open ? 40 : initial.top
       style.bottom = initial.bottom // open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
       style.zIndex = '1000000000000'
-      const panelHeight = document.body.offsetHeight
+      const panelHeight = document.body.offsetHeight - 60
       style.height = open ? panelHeight : initial.height - 3
-      style.transform = open ? `translateY(-${initial.top}px)` : 'translateY(0px)'
+      style.transform = open ? `translateY(-${initial.top - 50}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0
@@ -397,7 +395,8 @@ class Signer extends React.Component {
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             <div className='signerTop'>
-              <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
+              {this.renderType()}
+              {this.renderMenu()}
               {this.renderStatus()}
             </div>
             {current ? this.renderAccountList() : null}
@@ -407,7 +406,6 @@ class Signer extends React.Component {
                 <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
               </div>
             ) : null}
-            <div className='signerBot' />
           </div>
         </div>
       </div>

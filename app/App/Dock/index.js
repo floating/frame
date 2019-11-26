@@ -19,174 +19,8 @@ const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 //   const b = Math.round(((240 - 230) * (parseInt(hex[4] + hex[5], 16) / 255)) + 230)
 //   return `rgb(${r}, ${g}, ${b})`
 // // }
+
 class _Dapps extends React.Component {
-  handleAddApp () {
-    if (this.state.ensInput === '' || this.state.ensInput === this.addAppFill) return
-    const domain = this.state.ensInput
-    const options = {}
-    this.setState({ pending: 'add', pendingMessage: 'Installing ' + domain, ensInput: this.addAppFill })
-    const cb = (err) => {
-      if (err) {
-        console.log(err)
-        this.setState({ pending: 'error', pendingMessage: err })
-        setTimeout(() => {
-          this.setState({ pending: '', pendingMessage: '' })
-        }, 3000)
-      } else {
-        this.setState({ pending: '', pendingMessage: '' })
-      }
-    }
-    link.rpc('addDapp', domain, options, cb)
-    // if (this.dappInput) this.dappInput.blur()
-    // this.setState({ ensInput: this.addAppFill })
-  }
-
-  handleOnFocus () {
-    if (this.state.ensInput === this.addAppFill) this.setState({ ensInput: '' })
-  }
-
-  handleOnBlur () {
-    if (this.state.ensInput === '') this.setState({ ensInput: this.addAppFill })
-  }
-
-  render () {
-    const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
-    return (
-      <div className='appStore'>
-        {this.props.pending ? (
-          <div className='addAppForm'>
-            {this.props.pendingMessage}
-          </div>
-        ) : (
-          this.dragging ? (
-            <div className='addAppForm'>
-              <div
-                className='removeApp'
-                onMouseEnter={e => this.removePending()}
-                onMouseLeave={e => this.cancelRemoval()}
-              >
-                {this.props.pendingRemoval ? <div className='removeAppPending' /> : null}
-                {svg.trash(16)}
-              </div>
-            </div>
-          ) : (
-            <div className='addAppForm'>
-              <div className='addAppInput'>
-                <input
-                  ref={c => { this.dappInput = c }}
-                  value={this.props.ensInput}
-                  onFocus={::this.handleOnFocus}
-                  onBlur={::this.handleOnBlur}
-                  onChange={e => this.setState({ ensInput: e.target.value })}
-                  onKeyPress={e => { if (e.key === 'Enter') this.handleAddApp() }}
-                />
-              </div>
-              <div
-                className='addAppSubmit'
-                onMouseDown={::this.handleAddApp}
-              >
-                {'Add Dapp'}
-              </div>
-            </div>
-          )
-        )}
-        <div
-          className='dragCatchDock'
-          onMouseMove={e => {
-            if (this.inDockCatch) return
-            const drag = this.dragging
-            if (drag && !drag.docked) {
-              this.inDockCatch = true
-              const before = e.clientY < (e.target.clientHeight / 2)
-              this.moveDrag(before ? 0 : this.store('main.dapp.map.docked').length, true)
-            }
-          }}
-          onMouseLeave={e => {
-            this.inDockCatch = false
-          }}
-        />
-        <div className='appsOff' style={ipfsReady ? { display: 'none' } : {}}>
-          {'NO IPFS CONNECTION'}
-        </div>
-        {ipfsReady ? (
-          <div className='dockApps' style={{ marginTop: `-${(this.store('main.dapp.map.docked').length * 48) / 2}px` }}>
-            {this.store('main.dapp.map.docked').map((hash, i) => {
-              return (
-                <AppTile
-                  key={hash}
-                  index={i}
-                  hash={hash}
-                  dragging={this.dragging}
-                  docked
-                  mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
-                  moveDrag={(...args) => this.moveDrag(...args)}
-                />
-              )
-            })}
-          </div>
-        ) : null}
-        <div className='addedApps'>
-          <div
-            className='dragCatch'
-            onMouseMove={e => {
-              if (this.inAddedCatch) return
-              const drag = this.dragging
-              if (drag && drag.docked) {
-                this.inAddedCatch = true
-                this.moveDrag(this.store('main.dapp.map.added').length, false)
-              }
-            }}
-            onMouseLeave={e => { this.inAddedCatch = false }}
-          />
-          {this.store('main.dapp.map.added').map((hash, i) => {
-            return (
-              <AppTile
-                key={hash}
-                index={i}
-                hash={hash}
-                dragging={this.dragging}
-                docked={false}
-                mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, false)}
-                moveDrag={(...args) => this.moveDrag(...args)}
-              />
-            )
-          })}
-        </div>
-        <div className='browserExtension'>
-          <div className='browserExtensionText browserExtensionBot'>
-            <div>Use Frame with dapps in your browser too!</div>
-          </div>
-          <div className='browserExtensionIcons'>
-            <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf')}>{svg.chrome(22)}</div>
-            <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension')}>{svg.firefox(22)}</div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-}
-
-const Dapps = Restore.connect(_Dapps)
-
-class _Card extends React.Component {
-  render () {
-    console.log(this.props, this.props.card)
-    const current = this.props.name === this.store('selected.card')
-    const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
-    return (
-      <div className='dockCard' style={style}>
-        <div className='dockCardInset'>
-          {this.props.name === 'dapps' ? <Dapps props={this.props} /> : null}
-          {this.props.name === 'local' ? <Local /> : null}
-        </div>
-      </div>
-    )
-  }
-}
-
-const Card = Restore.connect(_Card)
-
-class Dock extends React.Component {
   constructor (...args) {
     super(...args)
     this.addAppFill = 'Enter ENS Name'
@@ -194,8 +28,7 @@ class Dock extends React.Component {
       ensInput: this.addAppFill,
       pending: '',
       pendingRemoval: false,
-      pendingAdd: false,
-      card: 'main'
+      pendingAdd: false
     }
     this.added = []
     this.docked = []
@@ -208,15 +41,6 @@ class Dock extends React.Component {
       this.delayDock = open && this._open !== open
       this._open = open
     })
-  }
-
-  indicator (connection) {
-    const status = [connection.local.status, connection.secondary.status]
-    if (status.indexOf('connected') > -1) {
-      return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
-    } else {
-      return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
-    }
   }
 
   handleToggleDock () {
@@ -274,7 +98,9 @@ class Dock extends React.Component {
   }
 
   onMouseDown = (e, dapp, index, docked) => {
-    if (!this.store('dock.expand')) return
+    console.log('onMouseDown')
+    if (this.store('selected.card') !== 'dapps') return
+    console.log('onMouseDown 1')
     this.dragging = { dapp, index, docked }
     const parent = e.target.offsetParent
     const offsetTop = parent.offsetTop
@@ -283,17 +109,218 @@ class Dock extends React.Component {
       this.initialTop = this.currentTop = e.target.offsetTop + offsetTop - 10
       this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft - 10
     } else {
+      console.log('modue down on added app ')
+      console.log('parent', parent)
+      console.log('offsetTop', offsetTop)
+      console.log('offsetLeft', offsetLeft)
       const scrollTop = parent.scrollTop
-      this.initialTop = this.currentTop = e.target.offsetTop - scrollTop + offsetTop
-      this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft
+      console.log('scrollTop', scrollTop)
+      this.initialTop = this.currentTop = e.target.offsetTop - scrollTop + offsetTop + 50
+      this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft + 50
     }
-    this.topBound = parent.offsetParent.clientHeight - 68
-    this.leftBound = parent.offsetParent.clientWidth - 68
+    this.topBound = parent.offsetParent.clientHeight
+    this.leftBound = parent.offsetParent.clientWidth
     this.initialY = e.pageY
     this.initialX = e.pageX
     this.forceUpdate()
     window.addEventListener('mousemove', this.tabDrag)
     window.addEventListener('mouseup', this.releaseDrag)
+  }
+
+  handleAddApp () {
+    if (this.state.ensInput === '' || this.state.ensInput === this.addAppFill) return
+    const domain = this.state.ensInput
+    const options = {}
+    this.setState({ pending: 'add', pendingMessage: 'Installing ' + domain, ensInput: this.addAppFill })
+    const cb = (err) => {
+      if (err) {
+        console.log(err)
+        this.setState({ pending: 'error', pendingMessage: err })
+        setTimeout(() => {
+          this.setState({ pending: '', pendingMessage: '' })
+        }, 3000)
+      } else {
+        this.setState({ pending: '', pendingMessage: '' })
+      }
+    }
+    link.rpc('addDapp', domain, options, cb)
+    // if (this.dappInput) this.dappInput.blur()
+    // this.setState({ ensInput: this.addAppFill })
+  }
+
+  handleOnFocus () {
+    if (this.state.ensInput === this.addAppFill) this.setState({ ensInput: '' })
+  }
+
+  handleOnBlur () {
+    if (this.state.ensInput === '') this.setState({ ensInput: this.addAppFill })
+  }
+
+  render () {
+    const current = this.store('selected.card') === 'dapps'
+    const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
+    const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
+    console.log('this.dragging', this.dragging)
+    console.log(this.currentTop, this.currentLeft)
+    return (
+      <>
+        <div className='appMovement'>
+          {this.dragging ? (
+            <div
+              className={this.state.dragHeadShake ? 'draggedApp headshake' : 'draggedApp'}
+              style={{ top: this.currentTop, left: this.currentLeft }}
+            >
+              <div className='draggedAppCard'>
+                <AppTile moving dragging={this.dragging} cid={this.dragging.dapp.cid} />
+              </div>
+            </div>
+          ) : null}
+        </div>
+        <div
+          className='dragCatchDock'
+          onMouseMove={e => {
+            if (this.inDockCatch) return
+            const drag = this.dragging
+            if (drag && !drag.docked) {
+              this.inDockCatch = true
+              const before = e.clientY < (e.target.clientHeight / 2)
+              this.moveDrag(before ? 0 : this.store('main.dapp.map.docked').length, true)
+            }
+          }}
+          onMouseLeave={e => {
+            this.inDockCatch = false
+          }}
+        />
+        <div className='appsOff' style={ipfsReady ? { display: 'none' } : {}}>
+          {'NO IPFS CONNECTION'}
+        </div>
+        {ipfsReady ? (
+          <div className='dockApps' style={{ marginTop: `-${(this.store('main.dapp.map.docked').length * 48) / 2}px` }}>
+            {this.store('main.dapp.map.docked').map((hash, i) => {
+              return (
+                <AppTile
+                  key={hash}
+                  index={i}
+                  hash={hash}
+                  dragging={this.dragging}
+                  docked
+                  mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, true)}
+                  moveDrag={(...args) => this.moveDrag(...args)}
+                />
+              )
+            })}
+          </div>
+        ) : null}
+        <div className='dockCard' style={style}>
+          <div className='dockCardInset'>
+            <div className='appStore'>
+              {this.state.pending ? (
+                <div className='addAppForm'>
+                  {this.state.pendingMessage}
+                </div>
+              ) : (
+                this.dragging ? (
+                  <div className='addAppForm'>
+                    <div
+                      className='removeApp'
+                      onMouseEnter={e => this.removePending()}
+                      onMouseLeave={e => this.cancelRemoval()}
+                    >
+                      {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
+                      {svg.trash(16)}
+                    </div>
+                  </div>
+                ) : (
+                  <div className='addAppForm'>
+                    <div className='addAppInput'>
+                      <input
+                        ref={c => { this.dappInput = c }}
+                        value={this.state.ensInput}
+                        onFocus={::this.handleOnFocus}
+                        onBlur={::this.handleOnBlur}
+                        onChange={e => this.setState({ ensInput: e.target.value })}
+                        onKeyPress={e => { if (e.key === 'Enter') this.handleAddApp() }}
+                      />
+                    </div>
+                    <div
+                      className='addAppSubmit'
+                      onMouseDown={::this.handleAddApp}
+                    >
+                      {'Add Dapp'}
+                    </div>
+                  </div>
+                )
+              )}
+              <div className='addedApps'>
+                <div
+                  className='dragCatch'
+                  onMouseMove={e => {
+                    if (this.inAddedCatch) return
+                    const drag = this.dragging
+                    if (drag && drag.docked) {
+                      this.inAddedCatch = true
+                      this.moveDrag(this.store('main.dapp.map.added').length, false)
+                    }
+                  }}
+                  onMouseLeave={e => { this.inAddedCatch = false }}
+                />
+                {this.store('main.dapp.map.added').map((hash, i) => {
+                  return (
+                    <AppTile
+                      key={hash}
+                      index={i}
+                      hash={hash}
+                      dragging={this.dragging}
+                      docked={false}
+                      mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, false)}
+                      moveDrag={(...args) => this.moveDrag(...args)}
+                    />
+                  )
+                })}
+              </div>
+              <div className='browserExtension'>
+                <div className='browserExtensionText browserExtensionBot'>
+                  <div>Use Frame with dapps in your browser too!</div>
+                </div>
+                <div className='browserExtensionIcons'>
+                  <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://chrome.google.com/webstore/detail/frame/ldcoohedfbjoobcadoglnnmmfbdlmmhf')}>{svg.chrome(22)}</div>
+                  <div className='browserExtensionIcon' onMouseDown={() => link.send('tray:openExternal', 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension')}>{svg.firefox(22)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+}
+
+const Dapps = Restore.connect(_Dapps)
+
+class _Card extends React.Component {
+  render () {
+    const current = this.store('selected.card') === 'local'
+    const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
+    return (
+      <div className='dockCard' style={style}>
+        <div className='dockCardInset'>
+          <Local />
+        </div>
+      </div>
+    )
+  }
+}
+
+const Card = Restore.connect(_Card)
+
+class Dock extends React.Component {
+  indicator (connection) {
+    const status = [connection.local.status, connection.secondary.status]
+    if (status.indexOf('connected') > -1) {
+      return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
+    } else {
+      return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
+    }
   }
 
   render () {
@@ -323,26 +350,13 @@ class Dock extends React.Component {
               <div className='panelDetailText'>{networks[this.store('main.connection.network')]}</div>
             </div>
           </div>
-          <div className='appMovement'>
-            {this.dragging ? (
-              <div
-                className={this.state.dragHeadShake ? 'draggedApp headshake' : 'draggedApp'}
-                style={{ top: this.currentTop, left: this.currentLeft }}
-              >
-                <div className='draggedAppCard'>
-                  <AppTile moving dragging={this.dragging} cid={this.dragging.dapp.cid} />
-                </div>
-              </div>
-            ) : null}
-          </div>
           <div className='expandFrame' onMouseDown={() => this.store.setCard('default')}>{svg.logo(16)}</div>
           <div className='expandFrame selectDapps' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(16)}</div>
           <div className='expandFrame selectSettings' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 20 })}</div>
-
           <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
-          <Main {...this.state} />
-          <Card name='dapps' {...this.state} />
-          <Card name='local' {...this.state} />
+          <Main />
+          <Dapps />
+          <Card name='local' />
         </div>
       </div>
     )

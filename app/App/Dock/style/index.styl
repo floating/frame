@@ -54,8 +54,8 @@
   will-change transform
   // background whiteglowShade
   background light
-  border-top-left-radius 6px
-  border-bottom-left-radius 6px
+  border-top-left-radius 9px
+  border-bottom-left-radius 9px
   // margin 0px -30px 0px 0px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
@@ -151,7 +151,7 @@
 
   .dragCatchDock
     position absolute
-    top 48px
+    top 155px
     left 0px
     bottom 48px
     width 48px
@@ -171,17 +171,21 @@
       padding 10px
 
       .draggedAppCard
-        min-width 48px
-        min-height 48px
-        width 48px
-        height 48px
+        min-width 47px
+        min-height 47px
+        width 47px
+        height 47px
         border-radius 6px
-        box-shadow cardDrop
-        background lowerlight
+        box-shadow cardDrop, 3px 3px 3px thick
+        background highlighter
         box-sizing border-box
         display flex
         justify-content center
         align-items center
+        z-index 5
+        color outerspace
+        transition 0.1s linear all
+        overflow hidden
         pointer-events none
         animation-name hold
         animation-iteration-count infinite
@@ -341,29 +345,30 @@
     top 0
     left 0px
     bottom 0
-    width 341px
+    right 0px
+    background light
 
     .browserExtension
       position absolute
-      left 58px
-      right 10px
+      left 0px
+      right 0px
       bottom 0px
-      height 62px
+      height 59px
       display flex
       justify-content center
       align-items center
       flex-direction column
-      border-top-left-radius 6px
-      border-top-right-radius 6px
+      border-top-left-radius 9px
+      border-top-right-radius 9px
       z-index 3
-      box-shadow cardDrop, 0px 2px 0px lowestlight
-      background light
+      box-shadow reverseCardDrop, 0px -10px 10px 0px thin
+      // background orange
 
       .browserExtensionIcons
         position absolute
-        bottom 0px
-        top 2px
-        right 3px
+        bottom 4px
+        top 4px
+        right 2px
         padding 5px
         width 100px
         display flex
@@ -377,9 +382,9 @@
           display flex
           justify-content center
           align-items center
-          margin 2px 5px 0px 6px
+          margin 2px 0px 0px 8px
           font-size 11px
-          border-radius 4px
+          border-radius 6px
           color outerspace08
           transition 0.1s linear all
           border 1px solid thick
@@ -391,11 +396,10 @@
       .browserExtensionText
         position absolute
         font-size 11px
-        // left 10px
-        top 4px
+        top 6px
         bottom 0
-        left 10px
-        width 148px
+        left 11px
+        right 110px
         display flex
         text-align center
         justify-content center
@@ -405,21 +409,42 @@
         line-height 14px
         // background orange
 
-    .addAppForm
+    .addAppForm:before
+      content ''
       position absolute
-      left 47px
+      left 0px
       right 0px
       top 0px
+      bottom 3px
+      // height 80px
+      border-bottom-left-radius 6px
+      border-bottom-right-radius 6px
+      background highlighter
+      // display flex
+      // justify-content center
+      // align-items center
+      // flex-direction column
+      // z-index 3
+      // border-bottom-left-radius 6px
+      // border-bottom-right-radius 6px
+      // box-shadow cardDrop, 0px 10px 10px 0px thin
+      // background highlighter
+
+    .addAppForm
+      position absolute
+      left 10px
+      right 10px
+      top 10px
       height 80px
       display flex
       justify-content center
       align-items center
       flex-direction column
       z-index 3
-      border-bottom-left-radius 6px
-      // border-bottom-right-radius 6px
-      box-shadow cardDrop
-      background highlight
+      border-radius 6px
+      box-shadow cardDrop, 0px 10px 10px 0px thin
+      background lowerlight
+      overflow hidden
 
       .removeApp
         position relative
@@ -447,7 +472,7 @@
 
       .addAppSubmit
         position absolute
-        bottom 0px
+        bottom 1px
         left 10px
         right 10px
         height 30px
@@ -466,19 +491,20 @@
         bottom 31px
         left 0px
         right 0px
-        background highlighter
+        // background highlightest
         color outerspace08
         display flex
         justify-content center
         align-items center
-        // border-radius 4px
-        // box-shadow cardDrop, 0px 0px 17px rgba(0, 35, 80, 0.05)
+        border-radius 9px
+        box-shadow 0px 8px 8px rgba(0, 35,190, 0.05)
 
         input
           padding 10px
           outline none
           border 0px
           height 100%
+          border-radius 9px
           background transparent
           position absolute
           top 0
@@ -502,8 +528,7 @@
       align-items flex-start
       align-content flex-start
       justify-content flex-start
-      margin 20px 0px 0px 48px
-      padding 70px 10px 10px 10px
+      padding 100px 0px 10px 10px
       box-sizing border-box
       overflow-x hidden
       overflow-y scroll
@@ -523,13 +548,13 @@
       padding 10px
 
       .addedAppCard
-        min-width 48px
-        min-height 48px
-        width 48px
-        height 48px
+        min-width 47px
+        min-height 47px
+        width 47px
+        height 47px
         border-radius 6px
-        box-shadow cardDrop
-        background highlight
+        box-shadow cardDrop, 3px 3px 3px thick
+        background highlighter
         box-sizing border-box
         display flex
         justify-content center

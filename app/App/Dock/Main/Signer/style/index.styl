@@ -47,7 +47,7 @@
 
 .signer
   position relative
-  padding 0px 20px 20px 20px
+  padding 0px 10px 10px 10px
   z-index 3001
   transition standard
   will-change transform
@@ -56,17 +56,15 @@
   box-sizing border-box
   z-index 10000000
 
-  // background blue
-
   .signerContainer:before
     content ''
     position absolute
     top -1px
     right -1px
     left -1px
-    bottom 2px
-    background linear-gradient(135deg, white, white, thick)
-    box-shadow 0px 0px 4px 3px rgba(6, 54, 252, 0.06), cardDrop, -6px -6px 10px white, 4px 8px 10px thick
+    bottom 3px
+    // background linear-gradient(135deg, white, white, thick)
+    // box-shadow 0px 0px 4px 3px rgba(6, 54, 252, 0.06), cardDrop, -6px -6px 10px white, 4px 8px 10px thick
     z-index 40
     border-radius 9px
     z-index 3003
@@ -75,9 +73,9 @@
   .signerContainer
     position relative
     z-index 3002
-    border-radius 9px
-    background lightShade
-    padding-bottom 3px
+    border-radius 10px
+    // background lightShade
+    // padding-bottom 3px
     // background blue
 
   .transactionToAddress
@@ -147,284 +145,260 @@
     position relative
     opacity 1
     z-index 3030
-    border-top-left-radius 5px
-    border-top-right-radius 5px
-    border-bottom-left-radius 9px
-    border-bottom-right-radius 9px
+    border-radius 9px
     box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
-    background highlight
+    // background green
     transition standard
-    margin-bottom 21px
+    // margin-bottom 3px
     .transactionToAddress
       .transactionToAddressLarge
         svg
           color outerspace
 
-    .signerNav
-      position relative
-      opacity 1
-      display flex
-      z-index 3004
+    .signerType
+      position absolute
+      top 5px
+      left 5px
+      width 60px
+      height 50px
+      z-index 3400
+      border-bottom-left-radius 6px
+      border-bottom-right-radius 6px
+      transition standard
+      -webkit-app-region no-drag
 
-      // .signerType:hover
-      //   width 166px
-      //   margin-left -83px
-
-      .signerType
-        position relative
+      .signerGlow
+        position absolute
         top 0px
-        left 50%
-        // display flex
-        // justify-content center
-        // align-items center
-        width 110px
-        height 70px
-        margin-left -55px
-        z-index 3400
-        /// background linear-gradient(lowlight, lowlight)
-        // background linear-gradient(lowlight, highlighter)
-        // box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
+        left 0px
+        right 0px
+        bottom 0px
         border-bottom-left-radius 6px
         border-bottom-right-radius 6px
-        transition standard
-        -webkit-app-region no-drag
+        overflow hidden
 
-        .signerGlow
+        .glow
           position absolute
           top 0px
           left 0px
-          right 0px
-          bottom 0px
-          border-bottom-left-radius 6px
-          border-bottom-right-radius 6px
-          overflow hidden
+          height 100px
+          width 100px
+          margin-left -50px
+          margin-top -50px
+          border-radius 50px
+          background rgba(105, 255, 255, 0.1)
+          opacity 0
+          filter blur(30px)
 
-          .glow
-            position absolute
-            top 0px
-            left 0px
-            height 100px
-            width 100px
-            margin-left -50px
-            margin-top -50px
-            border-radius 50px
-            background rgba(105, 255, 255, 0.1)
-            opacity 0
-            filter blur(30px)
-
-          .glowActive
-            opacity 1
-
-        .signerImage
-          position absolute
-          top 14px
-          left 0
-          right 0
-          display flex
-          justify-content center
-          align-items center
+        .glowActive
           opacity 1
-          transition standardSlow
-          // padding-right 6px
 
-          img
-            height 28px
+      .signerImage
+        position absolute
+        top 14px
+        left 0
+        right 0
+        display flex
+        justify-content center
+        align-items center
+        opacity 1
+        transition standardSlow
+        // padding-right 6px
 
-          svg
-            color #fff
+        img
+          height 28px
 
-          .trezorImage
-            height 35px
-            margin-top -6px
+        svg
+          color #fff
 
-        .signerText
-          position absolute
-          top 44px
-          left 0
-          right 0
-          height 20px
-          display flex
-          flex-direction column
-          justify-content center
-          align-items center
-          text-transform uppercase
-          font-size 11px
-          line-height 10px
-          font-weight 600
-          letter-spacing 2px
-          color spacewhite
-          opacity 1
-          transition standardSlow
-          margin-left 2px
+        .trezorImage
+          height 35px
+          margin-top -6px
 
-      // .signerTypeDisconnected:hover
-      //   margin-left -58px
-      //   width 116px
+      .signerText
+        position absolute
+        top 44px
+        left 0
+        right 0
+        height 20px
+        display flex
+        flex-direction column
+        justify-content center
+        align-items center
+        text-transform uppercase
+        font-size 11px
+        line-height 10px
+        font-weight 600
+        letter-spacing 2px
+        color spacewhite
+        opacity 1
+        transition standardSlow
+        margin-left 2px
 
-      .signerTypeDisconnected
+    // .signerTypeDisconnected:hover
+    //   margin-left -58px
+    //   width 116px
+
+    .signerTypeDisconnected
+      position absolute
+      top 10px
+      left 10px
+      width 60px
+      height 50px
+      border-radius 6px
+      display flex
+      justify-content center
+      align-items center
+      overflow hidden
+      transition .32s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
+      -webkit-app-region no-drag
+      background highlighter
+      z-index 15
+      color outerspace
+      transform translateZ(0)
+      // box-shadow 0px -5px 5px 5px thick, 0px 2px 2px 1px highlighter
+
+      border-radius 6px
+      display flex
+      justify-content center
+      align-items center
+      overflow hidden
+      transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
+      -webkit-app-region no-drag
+      box-shadow 0px 2px 2px thick
+
+      .signerDisconnectedTextOpen, .signerDisconnectedTextClose
         position absolute
         top 50%
-        left 50%
-        margin-top -40px
-        margin-left -55px
-        width 110px
-        height 74px
-        border-bottom-left-radius 6px
-        border-bottom-right-radius 6px
-        border-top-left-radius 0px
-        border-top-right-radius 0px
+        left 0
+        right 0
+        height 30px
+        margin-top -15px
+        // margin-top 40px
         display flex
+        flex-direction column
         justify-content center
         align-items center
-        overflow hidden
-        transition .32s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
-        -webkit-app-region no-drag
-        background highlighter
-        z-index 15
-        color outerspace
-        transform translateZ(0)
-        // box-shadow 0px -5px 5px 5px thick, 0px 2px 2px 1px highlighter
+        text-transform uppercase
+        font-size 11px
+        line-height 10px
+        font-weight 600
+        letter-spacing 2px
+        color outerspaceLight
+        transition standardFast
+        opacity 0 !important
+      //
+      // .signerTypeDisconnectedImageBack
+      //   color outerspace05 //lowerlight
+      //   text-transform uppercase
+      //   font-size 11px
+      //   line-height 10px
+      //   font-weight 300
+      //   letter-spacing 1px
+      //   filter drop-shadow(0px 4px 1px doubleThick)
+      //   position absolute
+      //   transition standardFast
+      //   opacity 0
 
-        border-radius 6px
-        display flex
-        justify-content center
-        align-items center
-        overflow hidden
-        transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
-        -webkit-app-region no-drag
-        box-shadow 0px 2px 2px thick
-
-        .signerDisconnectedTextOpen, .signerDisconnectedTextClose
-          position absolute
-          top 50%
-          left 0
-          right 0
-          height 30px
-          margin-top -15px
-          // margin-top 40px
-          display flex
-          flex-direction column
-          justify-content center
-          align-items center
-          text-transform uppercase
-          font-size 11px
-          line-height 10px
-          font-weight 600
-          letter-spacing 2px
-          color outerspaceLight
-          transition standardFast
-          opacity 0 !important
-        //
-        // .signerTypeDisconnectedImageBack
-        //   color outerspace05 //lowerlight
-        //   text-transform uppercase
-        //   font-size 11px
-        //   line-height 10px
-        //   font-weight 300
-        //   letter-spacing 1px
-        //   filter drop-shadow(0px 4px 1px doubleThick)
-        //   position absolute
-        //   transition standardFast
-        //   opacity 0
-
-        .signerTypeDisconnectedImageFront
-          color outerspace08
-          text-transform uppercase
-          font-size 11px
-          line-height 10px
-          font-weight 300
-          letter-spacing 1px
-          position absolute
-          margin-top 0px
-          transition standardFast
-          opacity 1
-          filter drop-shadow(0px 1px 1px thick)
-
-        .signerTypeDisconnectedText
-          text-transform uppercase
-          position absolute
-          bottom -40px
-          font-size 11px
-          font-weight 600
-          letter-spacing 1px
-          margin-left 1px
-          transform translateY(0px)
-          color highlightest
-          transition standardFast
-          text-shadow 0px 1px 1px tripleThick
-
-      // .signerTypeDisconnected:hover
-      //   .signerTypeDisconnectedImageFront
-      //     color highlighter
-      // .signerDisconnectedTextOpen
-      //   //margin-top -7px
-      //   opacity 1 !important
-      //   .signerDisconnectedTextClose
-      //     //-top -7px
-      //     opacity 1 !important
-      //   .signerTypeDisconnectedImageBack
-      //     ////margin-top -52px
-      //     opacity 0
-      //   .signerTypeDisconnectedImageFront
-      //     //margin-top -52px
-      //     opacity 0
-
-      .signerInner
+      .signerTypeDisconnectedImageFront
+        color outerspace08
+        text-transform uppercase
+        font-size 11px
+        line-height 10px
+        font-weight 300
+        letter-spacing 1px
         position absolute
-        top -5px
+        margin-top 0px
+        transition standardFast
+        opacity 1
+        filter drop-shadow(0px 1px 1px thick)
+
+      .signerTypeDisconnectedText
+        text-transform uppercase
+        position absolute
+        bottom -40px
+        font-size 11px
+        font-weight 600
+        letter-spacing 1px
+        margin-left 1px
+        transform translateY(0px)
+        color highlightest
+        transition standardFast
+        text-shadow 0px 1px 1px tripleThick
+
+    // .signerTypeDisconnected:hover
+    //   .signerTypeDisconnectedImageFront
+    //     color highlighter
+    // .signerDisconnectedTextOpen
+    //   //margin-top -7px
+    //   opacity 1 !important
+    //   .signerDisconnectedTextClose
+    //     //-top -7px
+    //     opacity 1 !important
+    //   .signerTypeDisconnectedImageBack
+    //     ////margin-top -52px
+    //     opacity 0
+    //   .signerTypeDisconnectedImageFront
+    //     //margin-top -52px
+    //     opacity 0
+
+    .signerInner
+      position absolute
+      top -5px
+      left 0px
+      right 0px
+      bottom 2px
+      background outerspaceDark
+      border-radius 6px
+      display flex
+      justify-content center
+      align-items center
+      overflow hidden
+      transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
+      -webkit-app-region no-drag
+      box-shadow 0px 2px 2px rgba(5, 5, 45, 0.4)
+      z-index 25
+      transform translateZ(0)
+
+      .signerInset
+        position absolute
+        top 0px
         left 0px
         right 0px
         bottom 2px
-        background outerspaceDark
+        background outerspace
         border-radius 6px
-        display flex
-        justify-content center
-        align-items center
-        overflow hidden
-        transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
-        -webkit-app-region no-drag
-        box-shadow 0px 2px 2px rgba(5, 5, 45, 0.4)
-        z-index 25
-        transform translateZ(0)
 
-        .signerInset
-          position absolute
-          top 0px
-          left 0px
-          right 0px
-          bottom 2px
-          background outerspace
-          border-top-left-radius 6px
-          border-top-right-radius 6px
-          border-bottom-left-radius 5px
-          border-bottom-right-radius 5px
+    .signerInnerActive
+      top 0px
+      bottom -2px
+      box-shadow 0px 1px 1px rgba(5, 5, 45, 0.4)
+      transform translateY(0px)
 
-      .signerInnerActive
-        top 0px
-        bottom -2px
-        box-shadow 0px 1px 1px rgba(5, 5, 45, 0.4)
-        transform translateY(0px)
+    .signerInnerDisconnected
+      pointer-events none
+      opacity 0
+      transform translateY(-50px)
 
-      .signerInnerDisconnected
-        pointer-events none
-        opacity 0
-        transform translateY(-50px)
+    .signerMin
+      position absolute
+      right 0
+      top 0
+      bottom 0
+      width 40px
+      display flex
+      justify-content center
+      align-items center
 
-      .signerMin
-        position absolute
-        right 0
-        top 0
-        bottom 0
-        width 40px
-        display flex
-        justify-content center
-        align-items center
-
-      @import './menu'
+    @import './menu'
 
     .signerStatus
+      position absolute
+      top 0
+      left 0
+      right 0
+      height 100px
       font-size 16px
-      width 100%
       transition standard
       position relative
       display flex
@@ -511,7 +485,7 @@
         display flex
         justify-content center
         align-items center
-        height 40px
+        height 20px
         transform translateZ(0)
 
         .signerNameText
@@ -521,7 +495,7 @@
           padding-bottom 0px
           position relative
           transition standard
-          font-size 28px
+          font-size 20px
           display flex
           justify-content center
           align-items center
@@ -566,7 +540,7 @@
         font-family FiraCode
         letter-spacing 0px
         position relative
-        height 30px
+        height 20px
         transform translateZ(0)
 
       .signerInfo
@@ -835,7 +809,7 @@
     opacity 1
     transition standard, 0.1s linear background
     will-change transform
-    background lowlight
+    background highlight
 
     > div
       transition standard
@@ -1050,8 +1024,6 @@
       .signerDisconnectedTextClose
         opacity 0 !important
       .signerType
-        width 160px
-        margin-left -80px
         .signerSelect
           opacity 1
         .signerInner
@@ -1061,7 +1033,7 @@
           transform translateY(-30px)
 
 .openSigner
-  padding 0px 5px 5px 5px
+  padding 0px
   .signerMid
     > div
       opacity 1
@@ -1071,22 +1043,21 @@
         opacity 1
         height 20px
         padding-top 2px
-    .signerNav
-      .signerTypeDisconnected
-        width 160px
-        margin-left -80px
-        // .signerDisconnectedTextOpen
-        //   opacity 0
-        // .signerDisconnectedTextClose
-        //   opacity 1
-      .signerType
-        .signerSelect
-          opacity 0
-        .signerInner
-          left 0px
-          right 0px
-          .low
-            margin-left -20px
+    .signerTypeDisconnected
+      width 160px
+      margin-left -80px
+      // .signerDisconnectedTextOpen
+      //   opacity 0
+      // .signerDisconnectedTextClose
+      //   opacity 1
+    .signerType
+      .signerSelect
+        opacity 0
+      .signerInner
+        left 0px
+        right 0px
+        .low
+          margin-left -20px
 
   .signerSelectDown.signerSelectRight
     right 0

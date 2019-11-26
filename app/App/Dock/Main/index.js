@@ -55,7 +55,6 @@ class Main extends React.Component {
   //   </div>
 
   render () {
-    console.log(this.props)
     const accounts = {}
     const network = this.store('main.connection.network')
     Object.keys(this.store('main.accounts')).forEach(id => {
@@ -71,10 +70,10 @@ class Main extends React.Component {
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
     const style = this.store('selected.card') === 'default' ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
+    if (!this.store('selected.open')) style.bottom = '80px'
     // const cardSelected = this.props.card === 'main'
     return (
       <div className={this.store('selected.card') !== 'default' ? 'main mainHidden' : 'main'}>
-        <Add />
         <div className='dockCard' style={style}>
           <div className='dockCardInset'>
             <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
@@ -104,6 +103,7 @@ class Main extends React.Component {
             </div>
           </div>
         </div>
+        <Add />
       </div>
     )
   }
