@@ -67,7 +67,7 @@ class Add extends React.Component {
                 </React.Fragment>
               ) : null}
               <div className={state !== 'exited' && state !== 'entering' ? 'addAccountInterface addAccountInterfaceActive' : 'addAccountInterface'}>
-                <div className='panelBottomMenu'>
+                <div className='panelBottomMenu' style={this.store('selected.open') ? { opacity: 0 } : null}>
                   <div className={state === 'entered' ? 'addAccountTrigger addAccountTriggerActive' : 'addAccountTrigger'} onMouseDown={() => this.toggleAddAccount(state)}>
                     <div className='addAccountTriggerIcon'>{'+'}</div>
                   </div>

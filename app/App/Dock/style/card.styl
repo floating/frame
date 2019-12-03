@@ -1,13 +1,13 @@
 .dockCardInset
   position absolute
-  top 1px
-  right 1px
-  left 1px
-  bottom 3px
+  top 0px
+  right 0px
+  left 0px
+  bottom 2px
   z-index 40
   border-radius 9px
   z-index 20000000
-  background highlight
+  background lowlight
   overflow hidden
   // background red
 
@@ -20,9 +20,11 @@
   background blue
   border-radius 9px
   z-index 1
-  box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 15px 15px 25px -10px tripleThick
-  background linear-gradient(135deg, white, doubleThick)
+  // box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 15px 15px 25px -10px tripleThick
+  // background linear-gradient(135deg, white, doubleThick)
   transition settle
+  box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 5px 5px 5px 0px thick
+  background linear-gradient(135deg, lowlight, thick)
 
 .panelMenu
   position absolute

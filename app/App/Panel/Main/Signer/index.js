@@ -289,6 +289,29 @@ class Signer extends React.Component {
     this.store.accountPage(accountPage)
   }
 
+  renderAccountInfo () {
+    let currentIndex = this.store('main.accounts', this.props.id, 'index')
+    // const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
+    if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
+    return (
+      <div className='accountInfo'>
+        {ens ? (
+          <div className='transactionToAddressLarge'>
+            {ens}
+          </div>
+        ) : (
+          <div className='transactionToAddressLarge'>
+            {address.substring(0, 6)}
+            {svg.octicon('kebab-horizontal', { height: 17 })}
+            {address.substr(address.length - 4)}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   renderStatus () {
     // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
@@ -397,23 +420,32 @@ class Signer extends React.Component {
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             <div className='signerTop'>
-              <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
-              {this.renderStatus()}
+              {this.renderAccountInfo()}
             </div>
-            {current ? this.renderAccountList() : null}
             {current ? (
               <div className='signerMid' style={open ? { top: '170px' } : { pointerEvents: 'none' }}>
                 <Settings id={this.props.id} />
                 <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
               </div>
             ) : null}
-            <div className='signerBot' />
           </div>
         </div>
       </div>
     )
   }
 }
+
+// <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
+// {this.renderStatus()}
+
+// {current ? this.renderAccountList() : null}
+// {current ? (
+//   <div className='signerMid' style={open ? { top: '170px' } : { pointerEvents: 'none' }}>
+//     <Settings id={this.props.id} />
+//     <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
+//   </div>
+// ) : null}
+// <div className='signerBot' />
 
 // <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
 //   {current ? (

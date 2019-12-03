@@ -73,33 +73,29 @@ class Main extends React.Component {
     if (!this.store('selected.open')) style.bottom = '80px'
     // const cardSelected = this.props.card === 'main'
     return (
-      <div className={this.store('selected.card') !== 'default' ? 'main mainHidden' : 'main'}>
-        <div className='dockCard' style={style}>
-          <div className='dockCardInset'>
-            <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
-              <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
-                <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
-                  {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
-                  {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
-                    return <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
-                  })}
-                  {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
-                    <div className='noSigners'>
-                      <div className='introLogo'>{svg.logo(70)}</div>
-                      {`No ${accountNames[network]} Accounts Found`}
-                      <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
-                      <span className='featureBox'>
-                        <span className='featureBoxText'>
-                          FRAME ALPHA
-                        </span>
-                        <span className='featureBoxSubtext'>
-                          {'v' + require('../../../../package.json').version}
-                        </span>
-                      </span>
-                    </div>
-                  ) : null}
+      <div className={this.store('selected.card') !== 'default' && !this.store('selected.open') ? 'main mainHidden' : 'main'}>
+        <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
+          <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
+            <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
+              {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
+              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
+                return <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+              })}
+              {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
+                <div className='noSigners'>
+                  <div className='introLogo'>{svg.logo(70)}</div>
+                  {`No ${accountNames[network]} Accounts Found`}
+                  <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
+                  <span className='featureBox'>
+                    <span className='featureBoxText'>
+                      FRAME ALPHA
+                    </span>
+                    <span className='featureBoxSubtext'>
+                      {'v' + require('../../../../package.json').version}
+                    </span>
+                  </span>
                 </div>
-              </div>
+              ) : null}
             </div>
           </div>
         </div>

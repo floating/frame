@@ -100,6 +100,7 @@
 
   .appTileIconWrap
     transition standard
+    z-index 20
 
   .appTileLoader
     position absolute
@@ -318,16 +319,21 @@
     animation-duration 1s
     animation-timing-function linear
 
+  .dockedApp:hover
+    background lowlight
+    border-radius 9px
+
   .dockedApp
     min-width 48px
     min-height 48px
     width 48px
     height 49px
+    margin-left 1px
     box-sizing border-box
     display flex
     justify-content center
     align-items center
-    border-bottom 1px solid thick
+    // border-bottom 1px solid thick
 
     img
       height 28px
@@ -358,10 +364,11 @@
       justify-content center
       align-items center
       flex-direction column
-      border-top-left-radius 9px
-      border-top-right-radius 9px
+      // border-top-left-radius 9px
+      // border-top-right-radius 9px
       z-index 3
-      box-shadow reverseCardDrop, 0px -10px 10px 0px thin
+      // border-top 1px solid thick
+      // box-shadow reverseCardDrop, 0px -10px 10px 0px thin
       // background orange
 
       .browserExtensionIcons
@@ -387,10 +394,10 @@
           border-radius 6px
           color outerspace08
           transition 0.1s linear all
-          border 1px solid thick
+          border 1px solid thin
 
         .browserExtensionIcon:hover
-          background light
+          background highlight
           box-shadow cardDrop
 
       .browserExtensionText
@@ -417,8 +424,8 @@
       top 0px
       bottom 3px
       // height 80px
-      border-bottom-left-radius 6px
-      border-bottom-right-radius 6px
+      // border-bottom-left-radius 6px
+      // border-bottom-right-radius 6px
       background highlighter
       // display flex
       // justify-content center
@@ -432,18 +439,18 @@
 
     .addAppForm
       position absolute
-      left 10px
-      right 10px
-      top 10px
+      left 0px
+      right 0px
+      top 0px
       height 80px
       display flex
       justify-content center
       align-items center
       flex-direction column
       z-index 3
-      border-radius 6px
-      box-shadow cardDrop, 0px 10px 10px 0px thin
-      background lowerlight
+      //border-radius 6px
+      //box-shadow cardDrop, 0px 10px 10px 0px thin
+      background red
       overflow hidden
 
       .removeApp
@@ -547,14 +554,29 @@
       z-index 5
       padding 10px
 
+      // .addedAppCard:before
+      //   content ''
+      //   position absolute
+      //   top 0px
+      //   right 0px
+      //   left 0px
+      //   bottom 2px
+      //   z-index 40
+      //   border-radius 9px
+      //   z-index 6
+      //   background highlight
+      //   overflow hidden
+      //   // background red
+
       .addedAppCard
+        position relative
         min-width 47px
         min-height 47px
         width 47px
         height 47px
-        border-radius 6px
-        box-shadow cardDrop, 3px 3px 3px thick
-        background highlighter
+        border-radius 9px
+        // box-shadow cardDrop, 3px 3px 3px thick
+        // background highlighter
         box-sizing border-box
         display flex
         justify-content center
@@ -563,6 +585,10 @@
         color outerspace
         transition 0.1s linear all
         overflow hidden
+        background highlight
+        border 1px solid thin
+        // box-shadow cardDrop, 2px 2px 0px 0px thin
+        // background linear-gradient(135deg, highlight, thin)
 
       img
         height 28px
