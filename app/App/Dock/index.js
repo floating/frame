@@ -246,7 +246,7 @@ class _Dapps extends React.Component {
                       className='addAppSubmit'
                       onMouseDown={::this.handleAddApp}
                     >
-                      {'Add Dapp'}
+                      <div className='addAppSubmitButton'>+</div>
                     </div>
                   </div>
                 )
@@ -337,6 +337,9 @@ class Dock extends React.Component {
     // {ipfsReady ? (
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
+    const indicatorStyle = { top: '60px' }
+    if (this.store('selected.card') === 'dapps') indicatorStyle.top = '93px'
+    if (this.store('selected.card') === 'local') indicatorStyle.top = '126px'
     return (
       <div id='dock'>
         <div className='dockInset'>
@@ -350,9 +353,12 @@ class Dock extends React.Component {
               <div className='panelDetailText'>{networks[this.store('main.connection.network')]}</div>
             </div>
           </div>
-          <div className='expandFrame' onMouseDown={() => this.store.setCard('default')}>{svg.logo(16)}</div>
-          <div className='expandFrame selectDapps' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(16)}</div>
-          <div className='expandFrame selectSettings' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 20 })}</div>
+          <div className='dockMenuIndicator' style={indicatorStyle}>
+            <div className='dockMenuIndicatorRight'>{svg.roundedTri(8)}</div>
+          </div>
+          <div className='expandFrame' onMouseDown={() => this.store.setCard('default')}>{svg.logo(14)}</div>
+          <div className='expandFrame selectDapps' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(14)}</div>
+          <div className='expandFrame selectSettings' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 18 })}</div>
           <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
           <Main />
           <Dapps />

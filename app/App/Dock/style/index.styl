@@ -24,7 +24,7 @@
     opacity 1
   }
   100% {
-    transform scale(1.7)
+    transform scale(2.7)
     opacity 0
   }
 }
@@ -201,6 +201,32 @@
         div, svg, img
           pointer-events none
 
+  .dockMenuIndicator
+    position absolute
+    left 0px
+    width 50px
+    // background blue
+    margin-top -1px
+    height 14px
+    border-top-right-radius 2px
+    border-bottom-right-radius 2px
+    z-index 1000
+    display flex
+    justify-content center
+    align-items center
+    color outerspace08
+    transition standardFast
+
+    .dockMenuIndicatorLeft
+      position relative
+      left -12px
+      transform rotate(90deg)
+
+    .dockMenuIndicatorRight
+      position absolute
+      right 5px
+      transform rotate(-90deg)
+
   .expandFrame
     position absolute
     top 50px
@@ -212,14 +238,17 @@
     justify-content center
     align-items center
     color outerspace08
+    left 0px
   .expandFrame:hover
     color outerspace
 
   .selectDapps
     top 83px
+    left 0px
 
   .selectSettings
     top 116px
+    left -1px
 
   .pinFrame
     position absolute
@@ -284,10 +313,10 @@
     font-size 8px
     font-weight 600
     transition standardSlow
-    opacity 0
+    opacity 0.05
 
   .appsOff:hover
-    opacity 0.4
+    opacity 0.5
 
 
   .dockApps
@@ -352,14 +381,14 @@
     left 0px
     bottom 0
     right 0px
-    background light
+    // background light
 
     .browserExtension
       position absolute
       left 0px
       right 0px
       bottom 0px
-      height 59px
+      height 60px
       display flex
       justify-content center
       align-items center
@@ -373,15 +402,14 @@
 
       .browserExtensionIcons
         position absolute
-        bottom 4px
-        top 4px
-        right 2px
-        padding 5px
+        bottom 0px
+        right 0px
+        padding 10px
         width 100px
+        // background blue
         display flex
         justify-content center
         align-items center
-        // background blue
 
         .browserExtensionIcon
           min-height 40px
@@ -389,12 +417,12 @@
           display flex
           justify-content center
           align-items center
-          margin 2px 0px 0px 8px
+          margin 0px 0px 0px 5px
           font-size 11px
-          border-radius 6px
+          border-radius 20px
           color outerspace08
           transition 0.1s linear all
-          border 1px solid thin
+          border 1px solid thick
 
         .browserExtensionIcon:hover
           background highlight
@@ -403,9 +431,9 @@
       .browserExtensionText
         position absolute
         font-size 11px
-        top 6px
+        top 4px
         bottom 0
-        left 11px
+        left 10px
         right 110px
         display flex
         text-align center
@@ -416,26 +444,38 @@
         line-height 14px
         // background orange
 
+    // .addAppForm:before
+    //   content ''
+    //   position absolute
+    //   left 0px
+    //   right 0px
+    //   top 0px
+    //   bottom 0px
+    //   // height 80px
+    //   // border-bottom-left-radius 6px
+    //   // border-bottom-right-radius 6px
+    //   // background highlighter
+    //   // display flex
+    //   // justify-content center
+    //   // align-items center
+    //   // flex-direction column
+    //   // z-index 3
+    //   // border-bottom-left-radius 6px
+    //   // border-bottom-right-radius 6px
+    //   // box-shadow cardDrop, 0px 10px 10px 0px thin
+    //   // background highlighter
+
     .addAppForm:before
       content ''
       position absolute
-      left 0px
-      right 0px
-      top 0px
-      bottom 3px
-      // height 80px
-      // border-bottom-left-radius 6px
-      // border-bottom-right-radius 6px
-      background highlighter
-      // display flex
-      // justify-content center
-      // align-items center
-      // flex-direction column
-      // z-index 3
-      // border-bottom-left-radius 6px
-      // border-bottom-right-radius 6px
-      // box-shadow cardDrop, 0px 10px 10px 0px thin
-      // background highlighter
+      bottom 0px
+      left 10px
+      right 10px
+      height 3px
+      border-radius 2px
+      background thick
+      z-index 300
+
 
     .addAppForm
       position absolute
@@ -450,7 +490,7 @@
       z-index 3
       //border-radius 6px
       //box-shadow cardDrop, 0px 10px 10px 0px thin
-      background red
+      // background light
       overflow hidden
 
       .removeApp
@@ -458,7 +498,7 @@
         height 60px
         width 60px
         background thin
-        border-radius 30px
+        border-radius 40px
         display flex
         justify-content center
         align-items center
@@ -471,31 +511,65 @@
         bottom 0
         left 0
         border-radius 35px
-        background bad08
+        background bad
         animation-name removal
         animation-iteration-count infinite
-        animation-duration 1s
-        animation-timing-function linear
+        animation-duration 1.3s
+        animation-timing-function ease-out
 
       .addAppSubmit
         position absolute
-        bottom 1px
-        left 10px
-        right 10px
-        height 30px
-        font-size 12px
+        top 0
+        bottom 0
+        // left 0px
+        right 0px
+        // height 30px
+        // border-radius 30px
+        width 80px
         display flex
         justify-content center
         align-items center
         font-weight 500
         text-transform uppercase
-        letter-spacing 2px
+        // letter-spacing 2px
         color outerspace08
+        // background blue
+
+      .addAppSubmitButton:hover
+        background highlight
+        box-shadow cardDrop
+        // border 1px solid thin
+
+      .addAppSubmitButton
+        width 40px
+        height 40px
+        border-radius 20px
+        // background highlight
+        // box-shadow 3px 3px 3px 0px thin
+        display flex
+        justify-content center
+        align-items center
+        font-size 26px
+        // background highlight
+        border 1px solid thin
+        transition standard
+
+
+      // .addAppInput:before
+      //   content ''
+      //   position absolute
+      //   bottom -4px
+      //   left 10px
+      //   right 10px
+      //   height 3px
+      //   border-radius 2px
+      //   background thick
+      //   z-index 300
 
       .addAppInput
         position absolute
         top 0px
-        bottom 31px
+        bottom 0px
         left 0px
         right 0px
         // background highlightest
@@ -503,26 +577,26 @@
         display flex
         justify-content center
         align-items center
-        border-radius 9px
-        box-shadow 0px 8px 8px rgba(0, 35,190, 0.05)
+        // border-radius 9px
+        // background red
+        // box-shadow 0px 8px 8px rgba(0, 35,190, 0.05)
 
         input
           padding 10px
           outline none
           border 0px
-          height 100%
-          border-radius 9px
+          height 80px
+          // border-radius 9px
           background transparent
           position absolute
           top 0
-          right 0
           bottom 0
           left 0
           box-shadow none
           text-align center
-          width 100%
+          width calc(100% - 40px)
           font-size 20px
-          color outerspace05
+          color shift05
 
     .addedApps
       position absolute
@@ -568,6 +642,10 @@
       //   overflow hidden
       //   // background red
 
+      .addedAppCard:hover
+        background highlight
+        box-shadow cardDrop
+
       .addedAppCard
         position relative
         min-width 47px
@@ -581,14 +659,17 @@
         display flex
         justify-content center
         align-items center
-        z-index 5
+        z-index 10
         color outerspace
         transition 0.1s linear all
         overflow hidden
+        // background highlight
+        // border 1px solid thick
         background highlight
-        border 1px solid thin
+        box-shadow cardDrop
         // box-shadow cardDrop, 2px 2px 0px 0px thin
         // background linear-gradient(135deg, highlight, thin)
+        transition standard
 
       img
         height 28px

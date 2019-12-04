@@ -82,21 +82,7 @@
   //   background linear-gradient(135deg, white, doubleThick)
   //   transition settle
 
-  .signerContainer:before
-    content ''
-    position absolute
-    top 0px
-    right 0px
-    left 0px
-    bottom 2px
-    // background linear-gradient(135deg, white, white, thick)
-    // box-shadow 0px 0px 4px 3px rgba(6, 54, 252, 0.06), cardDrop, -6px -6px 10px white, 4px 8px 10px thick
-    z-index 40
-    border-radius 9px
-    z-index 3003
-    background lowlight
-    transition standard
-    // background red
+
 
   .signerContainer
     position relative
@@ -111,10 +97,68 @@
     transition settle
     pointer-events auto
     background thick
-    min-height 50px
+    min-height 60px
     transition standard
     box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 5px 5px 5px 0px thick
     background linear-gradient(135deg, lowlight, thick)
+
+    .signerContainerInset
+      content ''
+      position absolute
+      top 0px
+      right 0px
+      left 0px
+      bottom 2px
+      // background linear-gradient(135deg, white, white, thick)
+      // box-shadow 0px 0px 4px 3px rgba(6, 54, 252, 0.06), cardDrop, -6px -6px 10px white, 4px 8px 10px thick
+      z-index 40
+      border-radius 9px
+      z-index 3003
+      background lowlight
+      transition standard
+      // background red
+      overflow hidden
+
+  .accountInfo
+    width 100%
+    position relative
+    z-index 2000000
+    height 60px
+
+    .accountStatus
+      height 40px
+      width 40px
+      background thick
+      border-radius 20px
+      position absolute
+      top 10px
+      left 10px
+      display flex
+      justify-content center
+      align-items center
+
+    .accountName
+      height 60px
+      position absolute
+      right 10px
+      display flex
+      justify-content center
+      align-items center
+
+  .accountBalances
+    position absolute
+    height 40px
+    left 10px
+    right 10px
+    // background blue
+    z-index 200000
+
+    .accountBalance
+      height 20px
+      width 100%
+      display flex
+      justify-content space-between
+
 
   .transactionToAddress
     font-size 12px
@@ -835,7 +879,7 @@
 
   .signerMid
     position absolute
-    top 50px
+    top 90px
     right 0px
     bottom 0px
     left 0px

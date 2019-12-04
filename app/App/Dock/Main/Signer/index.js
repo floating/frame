@@ -331,11 +331,51 @@ class Signer extends React.Component {
               </div>
               <div className='signerInfo'>
                 <div className='signerBalance'>
-                  <span className='signerBalanceCurrency'>{'Ξ'}</span>
+                  <span className='signerBalanceCurrency'>Ξ</span>
                   {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
                 </div>
               </div>
             </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  renderBalances () {
+    // const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    // const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    // const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
+    return (
+      <div className='accountBalances'>
+        <div className='accountBalance'>
+          <div className='accountBalanceCurrency'>Ξ</div>
+          <div className='accountBalanceValue'>100.00</div>
+        </div>
+        <div className='accountBalance'>
+          <div className='accountBalanceCurrency'>DAI</div>
+          <div className='accountBalanceValue'>100.00</div>
+        </div>
+      </div>
+    )
+  }
+
+  renderAccountInfo () {
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
+    return (
+      <div className='accountInfo'>
+        <div className='accountStatus' />
+        {ens ? (
+          <div className='accountName'>
+            {ens}
+          </div>
+        ) : (
+          <div className='accountName'>
+            {address.substring(0, 6)}
+            {svg.octicon('kebab-horizontal', { height: 17 })}
+            {address.substr(address.length - 4)}
           </div>
         )}
       </div>
@@ -394,13 +434,16 @@ class Signer extends React.Component {
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}} onMouseDown={::this.typeClick}>
-            account
-            {current ? (
-              <div className='signerMid' style={open ? {} : { pointerEvents: 'none' }}>
-                <Settings id={this.props.id} />
-                <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
-              </div>
-            ) : null}
+            <div className='signerContainerInset'>
+              {this.renderAccountInfo()}
+              {this.renderBalances()}
+              {current ? (
+                <div className='signerMid' style={open ? {} : { pointerEvents: 'none' }}>
+                  <Settings id={this.props.id} />
+                  <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
