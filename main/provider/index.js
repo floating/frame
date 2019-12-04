@@ -3,6 +3,7 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+const evaluateRadSpec = require('../contracts/contractMetadata/evaluateRadSpec')
 
 const proxy = require('./proxy')
 
@@ -289,7 +290,10 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0] }, res)
+
+      evaluateRadSpec(rawTx).then((radspecMessage) =>
+        accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], radspecMessage }, res)
+      )
     })
   }
 
