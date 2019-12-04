@@ -7,7 +7,7 @@
   right 0px
   bottom 0px
   left 0px
-  z-index 1
+  z-index 100000
   transition settle
 .mainHidden
   transform translateX(100%)
@@ -29,7 +29,7 @@
     overflow-y scroll
     overflow-x visible
     transition standardSlow
-    padding 50px 0px 50px 0px
+    // padding 50px 0px 50px 0px
 
   #panelSlide::-webkit-scrollbar
     display none
@@ -39,6 +39,7 @@
     padding-top 20px
     padding-bottom 0px
     will-change scroll-position
+    padding 50px 0px 60px 0px
 
     .noSigners
       width 100%

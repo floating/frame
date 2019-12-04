@@ -72,8 +72,13 @@ class Main extends React.Component {
     const style = this.store('selected.card') === 'default' ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     if (!this.store('selected.open')) style.bottom = '80px'
     // const cardSelected = this.props.card === 'main'
+
+    let mainClass = 'main'
+    if (this.store('selected.card') !== 'default' && !this.store('selected.open')) mainClass = 'main mainHidden'
+    if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
+
     return (
-      <div className={this.store('selected.card') !== 'default' && !this.store('selected.open') ? 'main mainHidden' : 'main'}>
+      <div className={mainClass}>
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>

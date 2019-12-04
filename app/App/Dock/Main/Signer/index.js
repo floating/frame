@@ -350,11 +350,11 @@ class Signer extends React.Component {
       <div className='accountBalances'>
         <div className='accountBalance'>
           <div className='accountBalanceCurrency'>Ξ</div>
-          <div className='accountBalanceValue'>100.00</div>
+          <div className='accountBalanceValue'>100.0000000000</div>
         </div>
         <div className='accountBalance'>
           <div className='accountBalanceCurrency'>DAI</div>
-          <div className='accountBalanceValue'>100.00</div>
+          <div className='accountBalanceValue'>100.0000000000</div>
         </div>
       </div>
     )
@@ -368,15 +368,21 @@ class Signer extends React.Component {
       <div className='accountInfo'>
         <div className='accountStatus' />
         {ens ? (
-          <div className='accountName'>
-            {ens}
-          </div>
+          <>
+            <div className='accountName'>
+              {ens}
+            </div>
+            <div className='accountNameLocal'>{this.props.name}</div>
+          </>
         ) : (
-          <div className='accountName'>
-            {address.substring(0, 6)}
-            {svg.octicon('kebab-horizontal', { height: 17 })}
-            {address.substr(address.length - 4)}
-          </div>
+          <>
+            <div className='accountName'>
+              {address.substring(0, 6)}
+              {svg.octicon('kebab-horizontal', { height: 14 })}
+              {address.substr(address.length - 4)}
+            </div>
+            <div className='accountNameLocal'>{this.props.name}</div>
+          </>
         )}
       </div>
     )
@@ -396,6 +402,8 @@ class Signer extends React.Component {
     const style = {}
     const initial = this.store('selected.position.initial')
 
+    console.log(initial)
+
     if (current) {
       // Currently selected
       style.position = 'absolute'
@@ -406,7 +414,8 @@ class Signer extends React.Component {
       style.zIndex = '10000000000000000'
       const panelHeight = document.body.offsetHeight - 50
       style.height = open ? panelHeight : initial.height
-      style.transform = open ? `translateY(-${initial.top - 50}px)` : 'translateY(0px)'
+      const translateTop = (initial.top - 50) * -1
+      style.transform = open ? `translateY(${translateTop + 'px'})` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0
