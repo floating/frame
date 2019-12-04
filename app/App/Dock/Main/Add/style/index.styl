@@ -1,0 +1,610 @@
+.panelBottomMenu
+  position absolute
+  left 50px
+  right 0
+  bottom 0
+  height 70px
+  display flex
+  justify-content center
+  align-items center
+  -webkit-app-region no-drag
+  z-index 10000000
+  opacity 1
+  transition standard
+
+.addAccountShade
+  opacity 0
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 10
+  pointer-events none
+  transition standardSlow
+  background outerspaceDarker
+
+.addAccountShadeActive
+  pointer-events none
+  transition-delay 0s
+  opacity 0.9
+  z-index 10
+
+.addAccountShadeForward
+  opacity 0
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 90000000000090
+  pointer-events none
+  transition standardSlow
+  transition-delay 0.00s
+  background linear-gradient(45deg, pending04, good04)
+
+.addAccountShadeForwardActive
+  opacity 0.61
+
+.addAccountInterface
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 0
+  pointer-events none
+
+  .addAccountTrigger
+    position relative
+    height 40px
+    width 40px
+    border-radius 20px
+    display flex
+    justify-content center
+    align-items center
+    background highlight
+    pointer-events auto
+    transition standardSlow
+    z-index 4
+    color outerspace08
+    transform rotate(-1deg)
+    box-shadow 0px 0px 4px -1px rgba(6, 54, 52, 0.05), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
+
+    .addAccountTriggerIcon
+      z-index 3
+      transition standardSlower
+      font-size 30px
+      margin 0px 0px 2px 1px
+      color outerspace08
+      transform rotate(1deg)
+
+  .addAccountTriggerActive
+    background phase
+    box-shadow 0px 8px 7px -5px rgba(5, 5, 45, 0.4)
+    .addAccountTriggerIcon
+      color white
+      transform rotate(406deg)
+
+.addAccountInterfaceActive
+  z-index 900000000000
+
+.addAccountMain
+  pointer-events none
+  opacity 0
+  transform scale(2)
+  position absolute
+  background phaseShade
+  color rgba(5, 5, 45, 0.4)
+  top 50px
+  right 10px
+  bottom 80px
+  left 50px
+  border-radius 10px
+  transition standardSlow
+  z-index 9000000002
+  box-shadow 0px 40px 50px -40px rgba(5, 5, 45, 0.4), 0px 0px 10px 0px rgba(5, 5, 45, 0.4)
+  overflow hidden
+  transition-delay 0s
+  font-weight 600
+
+  .addAccountMainInner
+    position absolute
+    background phase
+    color white
+    top 0px
+    right 0px
+    bottom 3px
+    left 0px
+    border-radius 10px
+    z-index 1
+    overflow-y scroll
+    overflow-x hidden
+    padding 20px 10px 20px 10px
+
+  .addAccountBreak
+    position relative
+    bottom 0px
+    right 0px
+    left 0px
+    height 4px
+    border-radius 2px
+    background rgba(5, 25, 35, 0.6)
+
+  .addAccountTitle
+    width calc(100% - 20px)
+    position relative
+    display flex
+    align-items center
+    justify-content center
+    z-index 9999999
+    line-height 22px
+    font-size 32px
+    font-weight 200
+    letter-spacing 1px
+    padding 20px 10px 40px 10px
+    text-align center
+
+  .addAccountSubtitle
+    position relative
+    display flex
+    align-items flex-start
+    z-index 9999999
+    line-height 23px
+    font-size 12px
+    text-transform uppercase
+    letter-spacing 3px
+    padding 10px
+    font-weight 400
+    text-align justify
+    text-align-last justify
+
+  .addAccountFooter
+    position relative
+    display flex
+    align-items center
+    justify-content center
+    z-index 9999999
+    line-height 22px
+    font-size 12px
+    text-transform uppercase
+    letter-spacing 3px
+    padding 30px 10px 10px 10px
+    text-align justify
+    text-align-last justify
+    color rgba(5, 25, 35, 0.6)
+
+  .addAccountHeader
+    width 100%
+    margin 40px 0px 0px 10px
+    font-size 12px
+    text-transform uppercase
+    letter-spacing 1px
+    display flex
+    svg
+      width 13px
+      height 16px
+      // margin 0px 15px 0px 0px
+
+  .addAccountItem
+    padding 3px 0px 3px 0px
+    width calc(100%)
+    margin 10px 0px 0px 0px
+    border-radius 6px
+    background outerspaceShader
+    box-shadow 0px 35px 40px -20px rgba(5, 25, 35, 1)
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    transform translateY(150px) scale(1)
+    opacity 0
+    transition standardSlowest
+    transition-delay 0.32s
+    position relative
+    overflow hidden
+    position relative
+
+    .addAccountItemBar
+      content ''
+      position absolute
+      top 0
+      left 0
+      right 0
+      height 12px
+      background hardware
+      z-index 1
+
+    .addAccountItemWrap
+      width 100%
+      background outerspaceLight
+      border-radius 6px
+      padding 0px 0px 10px 0px
+      z-index 2
+      box-shadow 0px 0px 40px -20px rgba(5, 25, 35, 0.6)
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+
+    .addAccountItemTop
+      width 100%
+      display flex
+      justify-content flex-start
+      align-items center
+      font-size 20px
+      width calc(100% - 20px)
+      text-transform uppercase
+      letter-spacing 3px
+      font-weight 300
+      margin-top 10px
+
+      .addAccountItemIconHardware
+        color hardware
+
+      .addAccountItemIconHot
+        color hot
+
+      .addAccountItemIconSmart
+        color smart
+
+      .addAccountItemIcon
+        position relative
+        height 50px
+        width 50px
+        display flex
+        justify-content center
+        align-items center
+        margin-right 10px
+
+      .addAccountItemIconHex
+        margin-left -1px
+        //margin-bottom -1px
+        margin-top 1px
+        width 45px
+        height 45px
+        opacity 0.08
+        position absolute
+        border-radius 5px
+        // padding-bottom 3px
+
+      .addAccountItemIconHexHardware
+        background hardware
+
+      .addAccountItemIconHexHot
+        background hot
+
+      .addAccountItemIconHexSmart
+        background smart
+
+    .addAccountItemBreak
+      position relative
+      bottom 0px
+      width calc(100% - 20px)
+      height 4px
+      border-radius 2px
+      background rgba(5, 25, 35, 0.3)
+
+    .addAccountItemSummary:before
+      content ''
+      position absolute
+      top 10px
+      left 10px
+      right 10px
+      height 4px
+      border-radius 2px
+      background rgba(5, 25, 35, 0.2)
+
+    .addAccountItemSummary
+      position relative
+      display flex
+      align-items center
+      justify-content center
+      z-index 9999999
+      line-height 22px
+      font-size 11px
+      width calc(100% - 40px)
+      text-transform uppercase
+      letter-spacing 1px
+      padding 24px 20px 0px 20px
+      text-align justify
+      text-align-last center-justify
+      min-height 22px
+
+    .addAccountItemDevices
+      width calc(100% - 20px)
+      font-size 12px
+      text-transform uppercase
+      letter-spacing 2px
+      margin-top 12px
+      border-radius 4px
+      transition standardSlow
+      position relative
+      overflow hidden
+      font-weight 400
+      flex-direction column
+      background rgba(5, 25, 35, 0.2)
+      padding-bottom 10px
+
+      .addAccountItemDevice
+        margin-top 10px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+        padding 0px 7px
+
+      .addAccountItemDevice:hover
+        background rgba(5, 25, 35, 0.1)
+
+      .addAccountItemDeviceTitle
+        font-weight 600
+        text-align center
+
+      .addAccountItemDeviceStatus
+        font-size 10px
+        display flex
+        justify-content center
+        align-items center
+        text-align center
+
+    .addAccountItemOption
+      width calc(100% - 20px)
+      height 40px
+      line-height 22px
+      font-size 14px
+      text-transform uppercase
+      letter-spacing 3px
+      display flex
+      align-items center
+      justify-content center
+      margin-top 12px
+      border-radius 4px
+      transition standardSlow
+      position relative
+      overflow hidden
+      font-weight 400
+
+    .addAccountItemOptionIntro
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      display flex
+      align-items center
+      justify-content center
+      transition standardSlow
+      flex-direction column
+      background rgba(5, 25, 35, 0.2)
+
+    .addAccountItemOptionIntro:hover
+      background rgba(5, 25, 35, 0.3)
+
+    .addAccountItemOptionSetup
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      opacity 0
+      pointer-events none
+      transition standardSlow
+      transform translateX(0%)
+
+      .addAccountItemOptionSetupFrames
+        display flex
+        width 1000%
+        height 100%
+        background rgba(5, 25, 35, 0.2)
+
+        .addAccountItemOptionSetupFrame
+          display flex
+          align-items center
+          justify-content center
+          flex-direction column
+          transition standardSlow
+          width 10%
+
+          .addAccountItemOptionTitle
+            display flex
+            justify-content center
+            align-items center
+            text-align center
+            font-size 14px
+            // height 50px
+            width 100%
+            padding 20px 40px
+            font-weight 500
+            letter-spacing 1px
+            box-sizing border-box
+
+    .addAccountItemOptionSubmit
+      background rgba(5, 25, 35, 0.2)
+      height 30px
+      padding 0px 40px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 20px
+
+    .addAccountItemOptionSubmit:hover
+      background rgba(5, 25, 35, 0.3)
+
+    .addAccountItemOptionList
+      width calc(100% - 20px)
+      border-radius 4px
+      padding 10px 0px
+      height 160px
+      margin 0px 0px 10px 0px
+      position relative
+      overflow hidden
+      background rgba(5, 25, 35, 0.2)
+      box-sizing border-box
+      overflow-x hidden
+      overflow-y scroll
+
+    .fira
+      font-family FiraCode, monospace
+      font-weight 600
+      text-transform none
+
+    .addAccountItemOptionListItem
+      width 100%
+      text-align center
+      padding 4px 7px 4px 5px
+      margin-left -3px
+      font-weight 600
+
+      svg
+        padding 0px 9px 0px 6px
+        margin-bottom -2
+
+    .addAccountItemOptionListItem:hover
+      background rgba(5, 25, 35, 0.2)
+
+    .addAccountItemOptionInput
+      width calc(100% - 40px)
+      border-radius 6px
+      height 50px
+      padding 10px
+      margin 0px 0px 20px 0px
+      position relative
+      overflow hidden
+      background rgba(5, 25, 35, 0.2)
+
+      textarea
+        width calc(100%)
+        background transparent
+        border none
+        outline none
+        color white
+        text-align center
+        font-size 13px
+        letter-spacing 4px
+        line-height 20px
+        font-weight 600
+        font-family FiraCode, monospace
+        padding-bottom 100px
+        overflow hidden
+        margin 4px 0px 0px 3px
+
+      textarea::selection
+        background rgba(5, 25, 35, 1)
+
+    .addAccountItemOptionInputPhrase
+      width calc(100% - 20px)
+      border-radius 6px
+      height 80px
+      padding 0px 0px
+      margin 0px 10px 20px 10px
+      position relative
+      overflow hidden
+      background rgba(5, 25, 35, 0.2)
+      transform translate3d(0, 0, 0)
+
+      .addAccountItemOptionSubtitle
+        position absolute
+        bottom 0
+        display flex
+        justify-content center
+        align-items center
+        text-align center
+        font-size 8px
+        // height 50px
+        width 100%
+        // padding 0px 0px 20px 0px
+        font-weight 500
+        letter-spacing 1px
+        box-sizing border-box
+
+      input
+        width 100%
+        height 100%
+        padding 10px 20px
+        background transparent
+        border none
+        outline none
+        color white
+        text-align center
+        font-size 20px
+        // letter-spacing 3px
+        line-height 20px
+        font-weight 400
+        // font-family FiraCode, monospace
+        display flex
+        justify-content center
+        align-items center
+        // overflow hidden
+        resize none
+        transform translate3d(0, 0, 0)
+        letter-spacing 3px
+
+      input::selection
+        background rgba(5, 25, 35, 1)
+
+      textarea
+        width 100%
+        height 100%
+        padding 10px 20px
+        background transparent
+        border none
+        outline none
+        color white
+        text-align center
+        font-size 15px
+        line-height 20px
+        font-family FiraCode, monospace
+        display flex
+        justify-content center
+        align-items center
+        overflow-x hidden
+        overflow-y scroll
+        resize none
+
+      textarea::selection
+        background rgba(5, 25, 35, 1)
+
+    .addAccountItemOptionInputPassword
+      input
+        margin-top -7px
+
+    .addAccountItemColorBar
+      position absolute
+      top 0px
+      left -40px
+      right -40px
+      height 4px
+      background white
+      border-radius 6px
+
+    .addAccountItemHardware
+      background hardware
+
+    .addAccountItemSmart
+      background rgb(150, 255, 210)
+
+    .addAccountItemHot
+      background rgb(255, 150, 150)
+
+  .addAccountItemAdding
+    .addAccountItemOption
+      height 225px
+    .addAccountItemOptionIntro
+      opacity 0
+      pointer-events none
+    .addAccountItemOptionSetup
+      opacity 1
+      pointer-events auto
+
+.addAccountMainActive
+  .addAccountMainInner
+    .addAccountItem
+      opacity 1
+      transform translateY(0) scale(1)
+
+.addAccountMainActive
+  pointer-events auto
+  opacity 1
+  transform translateY(0px) scale(1) rotateY(0deg)
+  transition-delay 0.00s

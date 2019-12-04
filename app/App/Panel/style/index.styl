@@ -15,13 +15,13 @@
   top 0
   right 0
   bottom 0px
-  width 370px
+  width 420px
   -webkit-app-region no-drag
   display flex
   flex-direction column
   justify-content center
   align-items center
-  transition standardFast
+  transition .62s cubic-bezier(1, 0, 0, 1.1) all
   will-change transform
 
 .panelSwoop
@@ -100,116 +100,6 @@
 
   svg
     color rgba(0, 0, 50, 0.1)
-
-.panelMenu
-  position absolute
-  left 0
-  right 0px
-  top 0
-  height 40px
-  padding 0px 5px 100px 5px
-  display flex
-  justify-content space-between
-  align-items center
-  -webkit-app-region no-drag
-  z-index 10000
-  opacity 1
-  transform translate3d(0, 0, 0)
-  // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
-  pointer-events none
-  transition standard
-
-  .panelMenuItem
-    width 40px
-    height 40px
-    display flex
-    justify-content center
-    align-items center
-    -webkit-app-region no-drag
-    transition standard
-    pointer-events auto
-    transform translate3d(0, 0, 0)
-    svg
-      color outerspace
-      transform translate3d(0, 0, 0)
-
-    .panelMenuIconArrow
-      margin 0px 0px 1px 1px
-      min-width 5px
-      max-width 5px
-      transform translate3d(0, 0, 0)
-
-  .panelDetail
-    display flex
-    align-items center
-    margin-left 0%
-    transition standardSlow
-
-  .panelDetailText
-    transition standard
-    text-transform uppercase
-    font-size 10px
-    letter-spacing 1px
-    font-weight bold
-    color outerspace08
-    height 40px
-    display flex
-    justify-content center
-    align-items center
-    margin-top -1px
-    font-weight 400
-
-  .panelDetailIndicator
-    height 10px
-    width 10px
-    margin 10px 8px 10px 8px
-    border-radius 5px
-    display flex
-    align-items center
-    justify-content center
-
-    .panelDetailIndicatorInner
-      height 10px
-      width 10px
-      border-radius 100%
-
-    .panelDetailIndicatorGood
-      transition standardSlow
-      background good
-
-    .panelDetailIndicatorBad
-      transition standardSlow
-      background bad
-
-    .panelDetailIndicatorPending
-      transition standardSlow
-      background pending
-
-.panelMenuAddMode
-  transition standard
-  z-index 10000
-  .panelDetail
-    transition standardSlowest
-    margin-left calc(50% - 50px)
-  .panelMenuItem
-    transition standard
-    opacity 0
-    pointer-events none
-    svg
-      color spacewhite
-  .panelDetailText
-    transition standard
-    color spacewhite
-  .panelDetailIndicator
-    .panelDetailIndicatorGood
-      transition standardSlow
-      background smart
-    .panelDetailIndicatorBad
-      transition standardSlow
-      background hot
-    .panelDetailIndicatorPending
-      transition standardSlow
-      background hardware
 
 @import '../Main/style'
 @import '../Local/style'

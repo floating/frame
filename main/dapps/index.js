@@ -56,7 +56,15 @@ class Dapps {
     ipfs.on('state', state => {
       if (state === 'ready') {
         this._updatePins()
-        this._addDefaults()
+        const ethCon = store.observer(() => {
+          const connection = store('main.connection')
+          const status = [connection.local.status, connection.secondary.status]
+          const connected = status.indexOf('connected') > -1
+          if (connected) {
+            this._addDefaults()
+            setTimeout(() => ethCon.remove(), 0)
+          }
+        })
       }
     })
   }

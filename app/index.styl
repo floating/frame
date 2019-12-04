@@ -1,6 +1,11 @@
 // Colors
 bg = #dadfea // #dce1e8
 v = #4e5758
+
+shift = rgba(33, 55, 86, 1)
+shift08 = rgba(33, 55, 86, 0.8)
+shift05 = rgba(33, 55, 86, 0.5)
+
 outerspace01 = rgba(33, 45, 46, 0.1)
 outerspace03 = rgba(33, 45, 46, 0.3)
 outerspace05 = rgba(33, 45, 46, 0.5)
@@ -17,10 +22,11 @@ spacewhite = rgba(247, 251, 255, 1)
 spacewhite07 = rgba(247, 251, 255, 0.5)
 highlightest = rgba(244, 250, 255, 1)
 highlighter = rgba(240, 246, 255, 1)
-highlight = rgba(237, 242, 255, 1)
-lowlight = rgba(230, 236, 248, 1)
+highlight = rgba(237, 242, 253, 1)
+lowlight = rgba(232, 236, 253, 1)
+lowlight0 = rgba(232, 236, 253, 0)
 lowerlight = rgba(227, 232, 250, 1)
-light = #eaf0f9
+light = rgba(235, 240, 255, 1)
 lightShade = rgba(220, 224, 244, 1) // #d9e1ef
 lightShader = rgba(190, 194, 214, 1)
 thinner = rgba(16, 44, 180, .02)
@@ -53,6 +59,9 @@ good03 = rgba(0, 210, 180, 0.3)
 good04 = rgba(0, 210, 180, 0.4)
 good06 = rgba(0, 210, 180, 0.6)
 
+
+// berry = rgb(250, 150, 205)
+
 bad = rgb(250, 100, 155)
 bad01 = rgba(250, 100, 155, 0.1)
 bad02 = rgba(250, 100, 155, 0.2)
@@ -74,7 +83,9 @@ pendingShade = rgb(74, 90, 235)
 pendingShader = rgb(64, 80, 225)
 
 // Shadows
-cardDrop = 0px 1px 1px rgba(0, 34, 32, 0.1)
+cardDrop = 0px 1px 1px rgba(0, 34, 42, 0.05)
+cardDrop0 = 0px 1px 1px rgba(0, 34, 42, 0)
+reverseCardDrop = 0px 1px 1px rgba(0, 34, 32, 0.1)
 
 // Transistions
 standard = .32s cubic-bezier(.82,0,.12,1) all
@@ -85,6 +96,9 @@ standardFast = .16s cubic-bezier(.82,0,.12,1) all
 standardFaster = .08s cubic-bezier(.82,0,.12,1) all
 // 0.18s cubic-bezier(0.8, 1, 0.2, 1) all
 cubic = cubic-bezier(.82,0,.12,1)
+
+settle = .5s cubic-bezier(0.475, -0.175, 0.32, 1.075) all
+settleFast = .25s cubic-bezier(0.475, -0.175, 0.32, 1.075) all
 
 html, body
   margin 0
@@ -104,12 +118,13 @@ div
   background transparent
 
 #panel
-  background rgba(220, 224, 244, 1)
+  // background linear-gradient(90deg, light, lowlight)
+  // background blue
   margin 0px
   border-top-right-radius 6px
   border-bottom-right-radius 6px
   // box-shadow 0px 0px 0px 1px rgba(110, 120, 140, 0.08)
-  border-left 1px solid thick
+  // border-left 1px solid thick
   overflow hidden
 
   #bar
