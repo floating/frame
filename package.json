@@ -22,7 +22,9 @@
     "win": {},
     "files": [
       "main",
-      "bundle"
+      "state",
+      "bundle",
+      "contractMetadata"
     ]
   },
   "scripts": {
@@ -71,6 +73,7 @@
     "@ledgerhq/hw-transport-node-hid": "4.74.2",
     "@ledgerhq/hw-transport-web-ble": "4.74.2",
     "abi-codec": "0.0.9",
+    "abi-decoder": "^2.2.2",
     "auto-launch": "5.0.5",
     "axios": "0.19.0",
     "babel-polyfill": "6.26.0",
@@ -98,6 +101,7 @@
     "query-string": "6.9.0",
     "react": "16.12.0",
     "react-dom": "16.12.0",
+    "radspec": "1.6.1",
     "react-restore": "0.3.0",
     "react-transition-group": "4.3.0",
     "semver": "6.3.0",
@@ -125,6 +129,7 @@
     "@babel/plugin-proposal-optional-chaining": "7.6.0",
     "@babel/plugin-proposal-pipeline-operator": "7.5.0",
     "@babel/plugin-proposal-throw-expressions": "7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "7.2.0",
     "@babel/plugin-syntax-import-meta": "7.2.0",
     "@babel/preset-env": "7.7.1",
     "@babel/preset-react": "7.7.0",
@@ -138,6 +143,7 @@
     "node-watch": "0.6.3",
     "parcel-bundler": "1.12.4",
     "restore-devtools": "0.0.1",
+    "web3-eth-contract": "^1.2.1",
     "standard": "14.3.1",
     "stylus": "0.54.7"
   },
