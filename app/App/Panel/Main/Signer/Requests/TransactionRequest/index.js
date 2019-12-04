@@ -145,7 +145,7 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
                     <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
                   </div>
-                  {radspecMessage && <div className="radspecMessage">{radspecMessage}</div>}
+                  {radspecMessage && <div className='radspecMessage'>{radspecMessage}</div>}
                   <div className='transactionValue'>
                     <div className='transactionTotals'>
                       <div className='transactionTotalETH'>{'Ξ ' + value}</div>

@@ -3,7 +3,7 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
-const evaluateRadSpec = require('../../contractMetadata/evaluateRadSpec')
+const evaluateRadSpec = require('../contracts/contractMetadata/evaluateRadSpec')
 
 const proxy = require('./proxy')
 
@@ -291,7 +291,7 @@ class Provider extends EventEmitter {
       const handlerId = uuid()
       this.handlers[handlerId] = res
 
-      evaluateRadSpec(rawTx).then((radspecMessage) => 
+      evaluateRadSpec(rawTx).then((radspecMessage) =>
         accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], radspecMessage }, res)
       )
     })
