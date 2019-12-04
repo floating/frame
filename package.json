@@ -22,7 +22,9 @@
     "win": {},
     "files": [
       "main",
-      "bundle"
+      "state",
+      "bundle",
+      "contractMetadata"
     ]
   },
   "scripts": {
