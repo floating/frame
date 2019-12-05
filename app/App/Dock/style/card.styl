@@ -11,20 +11,80 @@
   overflow hidden
   // background red
 
+.main
+  position absolute
+  top 0px
+  right 0px
+  bottom 0px
+  left 0px
+  z-index 1
+
 .dockCard
   position absolute
   top 49px
   left 50px
   bottom 10px
   right 10px
-  background blue
   border-radius 9px
   z-index 1
   // box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 15px 15px 25px -10px tripleThick
   // background linear-gradient(135deg, white, doubleThick)
-  transition settle
+  // transition settle
   box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 5px 5px 5px 0px thick
   background linear-gradient(135deg, lowlight, thick)
+
+/* Generated with Bounce.js. Edit at http://bouncejs.com#%7Bl%3A1%2Cs%3A%5B%7BT%3A%22t%22%2Ce%3A%22b%22%2Cd%3A890%2CD%3A0%2Cf%3A%7Bx%3A370%2Cy%3A0%7D%2Ct%3A%7Bx%3A0%2Cy%3A0%7D%2Cs%3A3%2Cb%3A3%7D%5D%7D */
+
+@keyframes cardShow
+  0%
+    opacity 0
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 370, 0, 0, 1)
+
+  5.31%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 161.829, 0, 0, 1)
+
+  10.51%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 41.48, 0, 0, 1)
+
+  15.82%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -9.026, 0, 0, 1)
+
+  21.02%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -19.292, 0, 0, 1)
+
+  35.34%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -3.681, 0, 0, 1)
+
+  49.55%
+    opacity 1
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0.594, 0, 0, 1)
+
+  78.18%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -0.018, 0, 0, 1)
+
+  100%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+
+
+@keyframes cardHide
+  0%
+    opacity 1
+    transform translateX(0px)
+
+  100%
+    opacity 0
+    transform translateX(370px)
+
+
+
+.cardShow
+  z-index 1
+  animation cardShow 1500ms linear both
+  // animation-delay 0.14s
+
+.cardHide
+  z-index 3
+  animation cardHide 0.5s normal forwards cubic-bezier(.82,0,.12,1)
 
 .panelMenu
   position absolute

@@ -129,13 +129,15 @@ class Signer extends React.Component {
     const inSettings = this.store('selected.view') === 'settings'
     return (
       <div className='signerType'>
-        <div className='addressSelect' onMouseDown={e => {
-          e.stopPropagation()
-          this.store.toggleShowAccounts()
-        }}>
+        <div
+          className='addressSelect' onMouseDown={e => {
+            e.stopPropagation()
+            this.store.toggleShowAccounts()
+          }}
+        >
           <div className='addressSelectButton'>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-            <div className='addressSelectText'>{'Addresses'}</div>
+            <div className='addressSelectText'>Addresses</div>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
           </div>
         </div>
@@ -356,7 +358,7 @@ class Signer extends React.Component {
               </div>
               <div className='signerInfo'>
                 <div className='signerBalance'>
-                  <span className='signerBalanceCurrency'>{'Ξ'}</span>
+                  <span className='signerBalanceCurrency'>Ξ</span>
                   {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
                 </div>
               </div>
