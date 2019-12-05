@@ -1,3 +1,12 @@
+.mainAdd
+  position absolute
+  top 0px
+  right 0px
+  bottom 0px
+  left 0px
+  z-index 1000000000
+  pointer-events none
+
 .panelBottomMenu
   position absolute
   left 50px
@@ -8,7 +17,7 @@
   justify-content center
   align-items center
   -webkit-app-region no-drag
-  z-index 10000000
+  z-index 1000000000
   opacity 1
   transition standard
 
@@ -19,13 +28,13 @@
   right 0
   bottom 0
   left 0
-  z-index 10
+  z-index 10000000000000
   pointer-events none
   transition standardSlow
   background outerspaceDarker
 
 .addAccountShadeActive
-  pointer-events none
+  pointer-events auto
   transition-delay 0s
   opacity 0.9
   z-index 10
@@ -98,7 +107,7 @@
   color rgba(5, 5, 45, 0.4)
   top 50px
   right 10px
-  bottom 80px
+  bottom 70px
   left 50px
   border-radius 10px
   transition standardSlow

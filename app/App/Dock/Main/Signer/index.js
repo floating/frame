@@ -5,7 +5,10 @@ import svg from '../../../../svg'
 import link from '../../../../link'
 
 import Requests from './Requests'
-import Settings from './Settings'
+import Verify from './Verify'
+import Control from './Control'
+import Permissions from './Permissions'
+// import Settings from './Settings'
 
 import ledgerLogo from './ledgerLogo.png'
 import trezorLogo from './trezorLogo.png'
@@ -23,9 +26,7 @@ class Signer extends React.Component {
       unlockInput: '',
       openHover: false
     }
-    // if (this.context.store('main.save.account') === this.props.id) {
-    //   setTimeout(() => this.select(), 200)
-    // }
+    this.views = [Requests, Permissions, Verify, Control]
   }
 
   componentDidMount () {
@@ -168,27 +169,27 @@ class Signer extends React.Component {
     )
   }
 
-  renderMenu () {
-    let menuClass = 'signerMenu'
-    menuClass += this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
-    if (this.store('selected.current') === this.props.id & this.store('selected.open')) menuClass += ' signerMenuOpen'
-    return (
-      <div className={menuClass}>
-        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
-          <div className='signerMenuItemIcon'>
-            {svg.octicon('pulse', { height: 23 })}
-            <div className='iconUnderline' />
-          </div>
-        </div>
-        <div className='signerMenuItem signerMenuItemRight' onMouseDown={() => this.store.setSignerView('settings')}>
-          <div className='signerMenuItemIcon'>
-            {svg.octicon('settings', { height: 23 })}
-            <div className='iconUnderline' />
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // renderMenu () {
+  //   let menuClass = 'signerMenu'
+  //   menuClass += this.store('selected.view') === 'settings' ? ' signerMenuSettings' : ' signerMenuDefault'
+  //   if (this.store('selected.current') === this.props.id & this.store('selected.open')) menuClass += ' signerMenuOpen'
+  //   return (
+  //     <div className={menuClass}>
+  //       <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
+  //         <div className='signerMenuItemIcon'>
+  //           {svg.octicon('pulse', { height: 23 })}
+  //           <div className='iconUnderline' />
+  //         </div>
+  //       </div>
+  //       <div className='signerMenuItem signerMenuItemRight' onMouseDown={() => this.store.setSignerView('settings')}>
+  //         <div className='signerMenuItemIcon'>
+  //           {svg.octicon('settings', { height: 23 })}
+  //           <div className='iconUnderline' />
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   setHighlight (mode, index) {
     if (!this.locked) this.setState({ accountHighlight: mode, highlightIndex: index || 0 })
@@ -287,6 +288,30 @@ class Signer extends React.Component {
     this.store.accountPage(accountPage)
   }
 
+  renderView (index) {
+    const visible = this.store('selected.visible')
+    const show = visible.indexOf(index) > -1
+    const View = this.views[index]
+    return (
+      <div className='accountView'>
+        {show ? <View {...this.props} /> : null}
+      </div>
+    )
+  }
+
+  renderViews (open) {
+    const count = 4
+    const index = this.store('selected.view')
+    return open && (
+      <div className='accountViews' style={{ transform: `translateX(-${index * (100 / count)}%)`, width: (count * 100) + '%' }}>
+        {this.renderView(0)}
+        {this.renderView(1)}
+        {this.renderView(2)}
+        {this.renderView(3)}
+      </div>
+    )
+  }
+
   renderStatus () {
     // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
@@ -360,12 +385,65 @@ class Signer extends React.Component {
     )
   }
 
+  renderMenu () {
+    // let viewIndex = this.store('selected.settings.viewIndex')
+    //
+    // // FIXME: Ugly hack to allow 'Rename Account' view to slide in from right
+    // if (viewIndex === 3) viewIndex = 2
+    //
+    // const views = this.store('selected.settings.views')
+    // const itemWidth = 35
+    // const markLeft = (itemWidth * viewIndex) + 'px'
+    // const markRight = (((views.length - viewIndex) - 1) * itemWidth) + 'px'
+    // return (
+    //   <div className='settingsMenu'>
+    //     <div className='settingsMenuItems'>
+    //       <div className={viewIndex === 0 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(0)}>
+    //         <div className='settingsMenuItemIcon' style={{ left: '2px', top: '2px' }}>{svg.octicon('key', { height: 18 })}</div>
+    //       </div>
+    //       <div className={viewIndex === 1 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(1)}>
+    //         <div className='settingsMenuItemIcon'>{svg.octicon('checklist', { height: 22 })}</div>
+    //       </div>
+    //       <div className={viewIndex === 2 ? 'settingsMenuItem settingsMenuItemSelected' : 'settingsMenuItem'} onMouseDown={() => this.store.setSettingsView(2)}>
+    //         <div className='settingsMenuItemIcon' style={{ left: '-1px', top: '0px' }}>{svg.octicon('gear', { height: 20 })}</div>
+    //       </div>
+    //     </div>
+    //     <div className='settingsMenuSelect'>
+    //       <div className='settingsMenuMark' style={{ left: markLeft, right: markRight }}>
+    //         <div className='settingsMenuMarkLine' />
+    //       </div>
+    //     </div>
+    //   </div>
+    // )
+
+    return (
+      <div className='accountMenu'>
+        <div className='accountMenuHome'>
+          <div className='accountMenuItem' onMouseDown={() => this.store.setAccountView(0)}>{svg.octicon('pulse', { height: 19 })}</div>
+        </div>
+        <div className='accountMenuSettings'>
+          <div className='accountMenuItem' onMouseDown={() => this.store.setAccountView(1)} style={{ paddingRight: '3px' }}>
+            {svg.octicon('key', { height: 16 })}
+          </div>
+          <div className='accountMenuItem' onMouseDown={() => this.store.setAccountView(2)}>
+            {svg.octicon('checklist', { height: 18 })}
+          </div>
+          <div className='accountMenuItem' onMouseDown={() => this.store.setAccountView(3)}>
+            {svg.octicon('gear', { height: 17 })}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   renderAccountInfo () {
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const open = current && this.store('selected.open')
     const currentIndex = this.store('main.accounts', this.props.id, 'index')
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
     return (
-      <div className='accountInfo'>
+      <div className='accountInfo' onMouseDown={open ? ::this.typeClick : null}>
         <div className='accountStatus' />
         {ens ? (
           <>
@@ -401,8 +479,6 @@ class Signer extends React.Component {
 
     const style = {}
     const initial = this.store('selected.position.initial')
-
-    console.log(initial)
 
     if (current) {
       // Currently selected
@@ -442,16 +518,12 @@ class Signer extends React.Component {
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
-          <div className='signerContainer' style={current ? { height: '100%' } : {}} onMouseDown={::this.typeClick}>
+          <div className='signerContainer' style={current ? { height: '100%' } : {}} onMouseDown={!open ? ::this.typeClick : null}>
             <div className='signerContainerInset'>
-              {this.renderAccountInfo()}
-              {this.renderBalances()}
-              {current ? (
-                <div className='signerMid' style={open ? {} : { pointerEvents: 'none' }}>
-                  <Settings id={this.props.id} />
-                  <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
-                </div>
-              ) : null}
+              {this.renderAccountInfo(open)}
+              {this.renderBalances(open)}
+              {this.renderMenu(open)}
+              {this.renderViews(open)}
             </div>
           </div>
         </div>
@@ -459,6 +531,13 @@ class Signer extends React.Component {
     )
   }
 }
+
+// {current ? (
+//   <div className='signerMid' style={open ? {} : { pointerEvents: 'none' }}>
+//     <Settings id={this.props.id} />
+//     <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
+//   </div>
+// ) : null}
 
 // {this.renderType()}
 // {this.renderMenu()}

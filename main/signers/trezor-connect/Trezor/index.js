@@ -17,7 +17,7 @@ class Trezor extends Signer {
     this.type = 'trezor'
     this.status = 'loading'
     this.network = store('main.connection.network')
-    this.basePath = () => this.network === '1' ? `m/44'/60'/0'/0` : `m/44'/1'/0'/0`
+    this.basePath = () => this.network === '1' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
@@ -54,7 +54,7 @@ class Trezor extends Signer {
       if (err) {
         this.status = 'loading'
         if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.version.join('.')})`
-        if (err === 'ui-device_bootloader_mode') this.status = `Device in Bootloader Mode`
+        if (err === 'ui-device_bootloader_mode') this.status = 'Device in Bootloader Mode'
         this.addresses = []
         this.update()
       } else if (addresses && addresses.length) {

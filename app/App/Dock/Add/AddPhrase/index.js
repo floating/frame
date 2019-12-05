@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../link'
-import svg from '../../../../../svg'
+import link from '../../../../link'
+import svg from '../../../../svg'
 
 class AddPhrase extends React.Component {
   constructor (...args) {
@@ -108,42 +108,44 @@ class AddPhrase extends React.Component {
               <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
               <div className='addAccountItemIconHex addAccountItemIconHexHot' />
             </div>
-            <div className='addAccountItemTopTitle'>{'Phrase'}</div>
-            <div className='addAccountItemTopTitle'>{''}</div>
+            <div className='addAccountItemTopTitle'>Phrase</div>
+            <div className='addAccountItemTopTitle' />
           </div>
-          <div className='addAccountItemSummary'>{'A phrase account uses a list of words to backup and restore your account'}</div>
+          <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
           <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => {
-              this.adding()
-              if (this.store('main.connection.network') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
-            }}>
+            <div
+              className='addAccountItemOptionIntro' onMouseDown={() => {
+                this.adding()
+                if (this.store('main.connection.network') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+              }}
+            >
               {'Add Phrase Account'}
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'seed phrase'}</div>
+                  <div className='addAccountItemOptionTitle'>seed phrase</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <textarea tabIndex={'-1'} value={this.state.phrase} ref={this.forms[0]} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} onKeyPress={e => this.keyPress(e)} />
+                    <textarea tabIndex='-1' value={this.state.phrase} ref={this.forms[0]} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'create password'}</div>
+                  <div className='addAccountItemOptionTitle'>create password</div>
                   <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
-                    <div className='addAccountItemOptionSubtitle'>{'password must be 12 characters or longer'}</div>
-                    <input type='password' tabIndex={'-1'} value={this.state.password} ref={this.forms[1]} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e)} />
+                    <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
+                    <input type='password' tabIndex='-1' value={this.state.password} ref={this.forms[1]} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>{'Create'}</div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>{'try again'}</div> : null}
+                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                 </div>
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary'>{''}</div>
+          <div className='addAccountItemSummary' />
         </div>
       </div>
     )

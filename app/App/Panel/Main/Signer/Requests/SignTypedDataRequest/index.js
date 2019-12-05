@@ -82,8 +82,8 @@ class TransactionRequest extends React.Component {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
                           <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
-                          <div className='requestNoticeInnerText'>{'See Signer'}</div>
-                          <div className='cancelRequest' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>{'Cancel'}</div>
+                          <div className='requestNoticeInnerText'>See Signer</div>
+                          <div className='cancelRequest' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>Cancel</div>
                         </div>
                       )
                     } else if (status === 'success') {
@@ -106,7 +106,7 @@ class TransactionRequest extends React.Component {
                   })()}
                 </div>
               ) : (
-                <React.Fragment>
+                <>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
                     <div className='approveRequestHeaderLabel'> {'Sign Message'}</div>
@@ -123,7 +123,7 @@ class TransactionRequest extends React.Component {
                       </div>
                     </div>
                   </div>
-                </React.Fragment>
+                </>
               )}
             </div>
           </div>
@@ -132,10 +132,10 @@ class TransactionRequest extends React.Component {
         )}
         <div className='requestApprove'>
           <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestDeclineButton'>{'Decline'}</div>
+            <div className='requestDeclineButton'>Decline</div>
           </div>
           <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestSignButton'>{'Sign'}</div>
+            <div className='requestSignButton'>Sign</div>
           </div>
         </div>
       </div>

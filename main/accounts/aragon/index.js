@@ -19,7 +19,7 @@ const registryAddress = () => {
 const resolveAragon = async (domain, registryAddress) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let address = await ensResolve(domain, { provider: require('../../provider'), registryAddress })
+      const address = await ensResolve(domain, { provider: require('../../provider'), registryAddress })
       if (address.replace('0x', '')) return resolve(address)
       throw new Error('Invalid address')
     } catch (e) {
@@ -53,8 +53,8 @@ const resolveName = (name) => {
           const name = appNames[appId]
           if (name) appsSummary[name] = { proxyAddress }
         })
-        if (!appsSummary['kernel']) return reject(new Error('Unable to locate DAO kernel'))
-        if (!appsSummary['agent']) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
+        if (!appsSummary.kernel) return reject(new Error('Unable to locate DAO kernel'))
+        if (!appsSummary.agent) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
         resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.connection.network') })
       })
     } catch (e) {

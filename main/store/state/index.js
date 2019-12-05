@@ -42,12 +42,13 @@ const initial = {
     minimized: true,
     open: false,
     current: '',
-    view: 'default',
-    settings: {
-      viewIndex: 0,
-      views: ['permissions', 'verify', 'control'],
-      subIndex: 0
-    },
+    view: 0,
+    visible: [0],
+    // settings: {
+    //   viewIndex: 0,
+    //   views: ['permissions', 'verify', 'control'],
+    //   subIndex: 0
+    // },
     addresses: [],
     showAccounts: false,
     accountPage: 0,

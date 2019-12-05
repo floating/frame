@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../link'
-import svg from '../../../../../svg'
+import link from '../../../../link'
+import svg from '../../../../svg'
 
 class AddAragon extends React.Component {
   constructor (...args) {
@@ -152,25 +152,25 @@ class AddAragon extends React.Component {
               <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
               <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
             </div>
-            <div className='addAccountItemTopTitle'>{'Aragon'}</div>
-            <div className='addAccountItemTopTitle'>{''}</div>
+            <div className='addAccountItemTopTitle'>Aragon</div>
+            <div className='addAccountItemTopTitle' />
           </div>
-          <div className='addAccountItemSummary'>{'An Aragon smart account allows you to use your Aragon DAO with any dapp'}</div>
+          <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
           <div className='addAccountItemOption'>
             <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
-              <div className='addAccountItemDeviceTitle'>{'Add Aragon Account'}</div>
+              <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'enter dao name'}</div>
+                  <div className='addAccountItemOptionTitle'>enter dao name</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <input tabIndex={'-1'} ref={this.forms[0]} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
+                    <input tabIndex='-1' ref={this.forms[0]} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>{'Next'}</div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'Choose acting account'}</div>
+                  <div className='addAccountItemOptionTitle'>Choose acting account</div>
                   <div className='addAccountItemOptionList'>
                     {Object.keys(this.store('main.accounts'))
                       .filter(id => this.accountFilter(id))
@@ -182,7 +182,7 @@ class AddAragon extends React.Component {
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{'Choose acting address'}</div>
+                  <div className='addAccountItemOptionTitle'>Choose acting address</div>
                   <div className='addAccountItemOptionList'>
                     {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map((a, i) => {
                       return (
@@ -195,18 +195,21 @@ class AddAragon extends React.Component {
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>{'try again'}</div> : null}
+                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                 </div>
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary' onMouseDown={() => {
-            const net = this.store('main.connection.network')
-            const open = url => this.store.notify('openExternal', { url })
-            if (net === '1') return open('https://mainnet.aragon.org')
-            if (net === '4') return open('https://rinkeby.aragon.org')
-            return open('https://aragon.org')
-          }}>{'Don\'t have a dao? Create one'}</div>
+          <div
+            className='addAccountItemSummary' onMouseDown={() => {
+              const net = this.store('main.connection.network')
+              const open = url => this.store.notify('openExternal', { url })
+              if (net === '1') return open('https://mainnet.aragon.org')
+              if (net === '4') return open('https://rinkeby.aragon.org')
+              return open('https://aragon.org')
+            }}
+          >{'Don\'t have a dao? Create one'}
+          </div>
         </div>
       </div>
     )

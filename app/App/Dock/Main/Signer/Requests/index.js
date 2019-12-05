@@ -12,6 +12,7 @@ import SignTypedDataRequest from './SignTypedDataRequest'
 class Requests extends React.Component {
   constructor (...args) {
     super(...args)
+    console.log(this.props)
     this.state = {
       minimized: false,
       unlockInput: '',
@@ -109,22 +110,22 @@ class Requests extends React.Component {
     const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '110px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(0px)', height: '0px', opacity: 0.3 }
 
     return (
-      <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
+      <div className='signerRequests'>
         <div className={unlockClass} style={unlockStyle}>
           <div className='signerUnlockWrap'>
             <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={::this.unlockChange} onKeyPress={e => this.keyPressUnlock(e)} />
-            <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+            <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit}>Unlock</div>
           </div>
         </div>
         <div className='requestTitle'>
-          <div>{'Requests'}</div>
+          <div>Requests</div>
           <div className='requestCount'>{normal.length}</div>
         </div>
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
-            <div key={'noReq'} style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>{'No Pending Requests'}</div>
+            <div key='noReq' style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>No Pending Requests</div>
             <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal - 15}px)` }}>
-              <span>{'Recent Transactions'}</span>
+              <span>Recent Transactions</span>
               <span>{monitor.length}</span>
             </div>
             {normal.concat(monitor).map((req, i) => {

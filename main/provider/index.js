@@ -80,7 +80,7 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
-    this.resError(`User declined transaction`, payload, res)
+    this.resError('User declined transaction', payload, res)
   }
 
   resError (error, payload, res) {
@@ -91,7 +91,7 @@ class Provider extends EventEmitter {
 
   getSignedAddress (signed, message, cb) {
     const signature = Buffer.from(signed.replace('0x', ''), 'hex')
-    if (signature.length !== 65) cb(new Error(`Frame verifySignature: Signature has incorrect length`))
+    if (signature.length !== 65) cb(new Error('Frame verifySignature: Signature has incorrect length'))
     let v = signature[64]
     v = v === 0 || v === 1 ? v + 27 : v
     const r = toBuffer(signature.slice(0, 32))
@@ -186,7 +186,9 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
+    console.log('SIGN THIS', rawTx)
     accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
+      console.log('SIGNED TX', signedTx)
       if (err) {
         this.resError(err, payload, res)
         cb(new Error(err))
@@ -299,7 +301,7 @@ class Provider extends EventEmitter {
 
   ethSign (payload, res) {
     payload.params = [payload.params[0], payload.params[1]]
-    if (!payload.params.every(utils.isHexStrict)) return this.resError(`ethSign Error: Invalid hex values`, payload, res)
+    if (!payload.params.every(utils.isHexStrict)) return this.resError('ethSign Error: Invalid hex values', payload, res)
     const handlerId = uuid()
     this.handlers[handlerId] = res
     const req = { handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] }

@@ -5,6 +5,8 @@ const EthTx = require('ethereumjs-tx').Transaction
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
 
+const networks = { '0x1': 'mainnet', '0x3': 'ropsten', '0x4': 'rinkeby', '0x2A': 'kovan' }
+
 class HotSignerWorker {
   constructor () {
     this.token = crypto.randomBytes(32).toString('hex')
@@ -44,7 +46,7 @@ class HotSignerWorker {
 
   signTransaction (key, rawTx, pseudoCallback) {
     // Create tranasction
-    const tx = new EthTx(rawTx)
+    const tx = new EthTx(rawTx, { chain: networks[rawTx.chainId] })
     // Sign transaction
     tx.sign(key)
     // Return serialized transaction
@@ -53,14 +55,14 @@ class HotSignerWorker {
   }
 
   verifyAddress ({ index, address }, pseudoCallback) {
-    const message = crypto.randomBytes(32).toString('hex')
+    const message = '0x' + crypto.randomBytes(32).toString('hex')
     this.signMessage({ index, message }, (err, signedMessage) => {
       // Handle signing errors
       if (err) return pseudoCallback(err)
       // Signature -> buffer
       const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
       // Ensure correct length
-      if (signature.length !== 65) throw new Error(`Frame verifyAddress signature has incorrect length`)
+      if (signature.length !== 65) throw new Error('Frame verifyAddress signature has incorrect length')
       // Verify address
       let v = signature[64]
       v = v === 0 || v === 1 ? v + 27 : v

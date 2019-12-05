@@ -4,7 +4,6 @@ import Restore from 'react-restore'
 
 import Signer from './Signer'
 import PendingSigner from './PendingSigner'
-import Add from './Add'
 
 import svg from '../../../svg'
 
@@ -73,9 +72,9 @@ class Main extends React.Component {
     if (!this.store('selected.open')) style.bottom = '80px'
     // const cardSelected = this.props.card === 'main'
 
-    let mainClass = 'main'
-    if (this.store('selected.card') !== 'default' && !this.store('selected.open')) mainClass = 'main mainHidden'
-    if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
+    let mainClass = 'main cardShow'
+    if (this.store('selected.card') !== 'default') mainClass = 'main cardHide'
+    // if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
 
     return (
       <div className={mainClass}>
@@ -104,7 +103,6 @@ class Main extends React.Component {
             </div>
           </div>
         </div>
-        <Add />
       </div>
     )
   }

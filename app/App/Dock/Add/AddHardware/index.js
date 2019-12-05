@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import svg from '../../../../../svg'
+import svg from '../../../../svg'
 
 class AddHardware extends React.Component {
   constructor (...args) {
@@ -29,7 +29,7 @@ class AddHardware extends React.Component {
               <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
             </div>
             <div className='addAccountItemTopTitle'>{this.deviceName}</div>
-            <div className='addAccountItemTopTitle'>{''}</div>
+            <div className='addAccountItemTopTitle' />
           </div>
           <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           <div className='addAccountItemDevices'>
@@ -37,15 +37,15 @@ class AddHardware extends React.Component {
               untethered.map((signer, i) => {
                 return (
                   <div className='addAccountItemDevice' key={signer.id}>
-                    <div className='addAccountItemDeviceTitle'>{'Device Found'}</div>
+                    <div className='addAccountItemDeviceTitle'>Device Found</div>
                     <div className='addAccountItemDeviceStatus'>{signer.status}</div>
                   </div>
                 )
               }).concat(tethered.map((signer, i) => {
                 return (
                   <div className='addAccountItemDevice' key={signer.id} onMouseDown={() => this.store.toggleAddAccount()}>
-                    <div className='addAccountItemDeviceTitle'>{'Device Found'}</div>
-                    <div className='addAccountItemDeviceStatus'>{'Account Created'}</div>
+                    <div className='addAccountItemDeviceTitle'>Device Found</div>
+                    <div className='addAccountItemDeviceStatus'>Account Created</div>
                   </div>
                 )
               }))
@@ -57,11 +57,14 @@ class AddHardware extends React.Component {
               </div>
             )}
           </div>
-          <div className='addAccountItemSummary' onMouseDown={() => {
-            const open = url => this.store.notify('openExternal', { url })
-            if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
-            if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
-          }}>{`Need a signer? Get a ${this.deviceName}`}</div>
+          <div
+            className='addAccountItemSummary' onMouseDown={() => {
+              const open = url => this.store.notify('openExternal', { url })
+              if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
+              if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
+            }}
+          >{`Need a signer? Get a ${this.deviceName}`}
+          </div>
         </div>
       </div>
     )
