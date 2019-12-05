@@ -13,9 +13,18 @@ export const setSigner = (u, signer) => {
   }, 50)
 }
 
-export const setSettingsView = (u, index, subindex = 0) => {
-  u('selected.settings.viewIndex', () => index)
-  u('selected.settings.subIndex', () => subindex)
+let visibleTimeout
+
+export const setAccountView = (u, index = 0) => {
+  clearTimeout(visibleTimeout)
+  u('selected.view', () => index)
+  u('selected.visible', visible => {
+    visible.push(index)
+    return visible
+  })
+  visibleTimeout = setTimeout(() => {
+    u('selected.visible', visible => [index])
+  }, 320)
 }
 
 export const setAddress = (u, address) => u('address', () => address)

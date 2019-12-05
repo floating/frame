@@ -56,48 +56,16 @@
   box-sizing border-box
   z-index 10000000
   pointer-events none
-  // .dockCardInset
-  //   position absolute
-  //   top 1px
-  //   right 1px
-  //   left 1px
-  //   bottom 3px
-  //   z-index 40
-  //   border-radius 9px
-  //   z-index 20000000
-  //   background highlight
-  //   overflow hidden
-  //   // background red
-  //
-  // .dockCard
-  //   position absolute
-  //   top 49px
-  //   left 50px
-  //   bottom 10px
-  //   right 10px
-  //   background blue
-  //   border-radius 9px
-  //   z-index 1
-  //   box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 15px 15px 25px -10px tripleThick
-  //   background linear-gradient(135deg, white, doubleThick)
-  //   transition settle
-
-
 
   .signerContainer
     position relative
     z-index 300002
     border-radius 10px
-    // background lightShade
-    // padding-bottom 3px
-    // background blue
-    // box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 15px 15px 25px -10px tripleThick
     box-shadow cardDrop
-    // background linear-gradient(135deg, white, doubleThick)
     transition settle
     pointer-events auto
     background thick
-    min-height 70px
+    min-height 90px
     transition standard
     box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 5px 5px 5px 0px thick
     background linear-gradient(135deg, lowlight, thick)
@@ -109,52 +77,54 @@
       right 0px
       left 0px
       bottom 2px
-      // background linear-gradient(135deg, white, white, thick)
-      // box-shadow 0px 0px 4px 3px rgba(6, 54, 252, 0.06), cardDrop, -6px -6px 10px white, 4px 8px 10px thick
       z-index 40
       border-radius 9px
       z-index 3003
       background lowlight
       transition standard
-      // background red
       overflow hidden
 
   .accountInfo
     width 100%
     position relative
     z-index 2000000
-    height 70px
+    height 90px
 
     .accountStatus
       height 50px
       width 50px
       background thin
-      border-radius 4px
+      border-radius 6px
       position absolute
-      top 10px
-      left 10px
+      top 20px
+      left 20px
       display flex
       justify-content center
       align-items center
 
     .accountNameLocal
       position absolute
-      height 20px
-      // top 30px
-      right 20px
-      bottom 15px
-      font-size 14px
+      right 18px
+      bottom 20px
+      font-size 12px
+      font-weight 400
+      background thin
+      height 23px
+      border-radius 6px
+      padding 0px 8px 0px 8px
+      display flex
+      justify-content center
+      align-items center
 
     .accountName
-      top 12px
-      height 25px
+      top 19px
       position absolute
-      right 20px
+      right 19px
       display flex
       justify-content center
       align-items center
       font-family FiraCode, sans-serif
-      font-size 16px
+      font-size 18px
       // background blue
       svg
         padding 2px 3px 0px 3px
@@ -172,26 +142,86 @@
   .accountBalances
     position absolute
     // height 40px
-    left 5px
-    right 5px
+    padding-top 0px
+    padding-bottom 5px
+    left 20px
+    right 20px
     z-index 200000
+    // background highlight
+    // border-radius 4px
     // padding-top 4px
 
     .accountBalance
-      height 24px
+      // height 24px
       display flex
       justify-content space-between
-      align-items center
-      font-size 12px
+      // align-items center
+      font-size 13px
       font-weight bold
       font-family FiraCode, sans-serif
-      padding 0px 5px 0px 5px
-      margin-bottom 5px
-      border-radius 4px
-      background light
+      padding 0px 0px 4px 0px
+      // margin-bottom 5px
+      // border-radius 4px
+      // background light
       color outerspace08
       // box-shadow cardDrop
       // letter-spacing 0px
+
+    // .accountBalance:first-child
+    //   background blue
+
+  .accountMenu
+    position absolute
+    top 142px
+    left 10px
+    right 10px
+    height 40px
+    background highlight
+    border-radius 6px
+    display flex
+    justify-content space-between
+    box-shadow cardDrop
+    z-index 3007
+
+    .accountMenuHome
+      // background green
+      display flex
+      .accountMenuItem
+        margin-left 11px
+
+    .accountMenuSettings
+      // background red
+      display flex
+
+      .accountMenuItem
+        margin-right 11px
+
+    .accountMenuItem
+      // width 30px
+      display flex
+      justify-content center
+      align-items center
+
+  .accountViews
+    position absolute
+    top 182px
+    right 0px
+    bottom 0px
+    left 0px
+    z-index 3005
+    overflow-x hidden
+    overflow-y hidden
+    opacity 1
+    transition standard
+    will-change transform
+    display flex
+
+    .accountView
+      width 100%
+      height 100%
+      overflow-y scroll
+      overflow-x hidden
+
 
   .transactionToAddress
     font-size 12px
@@ -912,12 +942,13 @@
 
   .signerMid
     position absolute
-    top 130px
+    top 182px
     right 0px
     bottom 0px
     left 0px
+    // background blue
     // padding-top 20px
-    border-radius 6px
+    // border-radius 6px
     z-index 3005
     overflow-x hidden
     overflow-y hidden
