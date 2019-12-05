@@ -22,7 +22,6 @@ class IPFS extends Client {
     this.on('ready', async () => {
       // Run 'ipfs init'
       await this.init()
-
     })
 
     // Handle stdout

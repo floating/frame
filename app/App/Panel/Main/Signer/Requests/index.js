@@ -113,18 +113,18 @@ class Requests extends React.Component {
         <div className={unlockClass} style={unlockStyle}>
           <div className='signerUnlockWrap'>
             <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={::this.unlockChange} onKeyPress={e => this.keyPressUnlock(e)} />
-            <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+            <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit}>Unlock</div>
           </div>
         </div>
         <div className='requestTitle'>
-          <div>{'Requests'}</div>
+          <div>Requests</div>
           <div className='requestCount'>{normal.length}</div>
         </div>
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
-            <div key={'noReq'} style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>{'No Pending Requests'}</div>
+            <div key='noReq' style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>No Pending Requests</div>
             <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal - 15}px)` }}>
-              <span>{'Recent Transactions'}</span>
+              <span>Recent Transactions</span>
               <span>{monitor.length}</span>
             </div>
             {normal.concat(monitor).map((req, i) => {

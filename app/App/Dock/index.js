@@ -98,9 +98,7 @@ class _Dapps extends React.Component {
   }
 
   onMouseDown = (e, dapp, index, docked) => {
-    console.log('onMouseDown')
     if (this.store('selected.card') !== 'dapps') return
-    console.log('onMouseDown 1')
     this.dragging = { dapp, index, docked }
     const parent = e.target.offsetParent
     const offsetTop = parent.offsetTop
@@ -109,12 +107,7 @@ class _Dapps extends React.Component {
       this.initialTop = this.currentTop = e.target.offsetTop + offsetTop - 10
       this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft - 10
     } else {
-      console.log('modue down on added app ')
-      console.log('parent', parent)
-      console.log('offsetTop', offsetTop)
-      console.log('offsetLeft', offsetLeft)
       const scrollTop = parent.scrollTop
-      console.log('scrollTop', scrollTop)
       this.initialTop = this.currentTop = e.target.offsetTop - scrollTop + offsetTop + 50
       this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft + 50
     }
@@ -158,10 +151,9 @@ class _Dapps extends React.Component {
 
   render () {
     const current = this.store('selected.card') === 'dapps'
-    const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
+    const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
+    // const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
-    console.log('this.dragging', this.dragging)
-    console.log(this.currentTop, this.currentLeft)
     return (
       <>
         <div className='appMovement'>
@@ -211,7 +203,7 @@ class _Dapps extends React.Component {
             })}
           </div>
         ) : null}
-        <div className='dockCard' style={style}>
+        <div className={dockCardClass}>
           <div className='dockCardInset'>
             <div className='appStore'>
               {this.state.pending ? (
@@ -300,9 +292,9 @@ const Dapps = Restore.connect(_Dapps)
 class _Card extends React.Component {
   render () {
     const current = this.store('selected.card') === 'local'
-    const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
+    const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
     return (
-      <div className='dockCard' style={style}>
+      <div className={dockCardClass}>
         <div className='dockCardInset'>
           <Local />
         </div>

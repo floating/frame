@@ -28,10 +28,10 @@ class Settings extends React.Component {
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <span className='appInfoLineResetConfirm'>
-              {'Are you sure?'} <span onMouseDown={() => link.send('tray:resetAllSettings')}>{'Yes'}</span> <span>{'/'}</span> <span onMouseDown={() => this.setState({ resetConfirm: false })}>{'No'}</span>
+              {'Are you sure?'} <span onMouseDown={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span onMouseDown={() => this.setState({ resetConfirm: false })}>No</span>
             </span>
           ) : (
-            <span onMouseDown={() => this.setState({ resetConfirm: true })}>{'Reset All Settings & Data'}</span>
+            <span onMouseDown={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
           )}
         </div>
         <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../../package.json').version}</div>
@@ -122,7 +122,7 @@ class Settings extends React.Component {
         <div className='localSettingsWrapFadeBot' />
         <div className='localSettingsWrap'>
           <div className='localSettingsTitle connectionTitle'>
-            <div>{'Connection'}</div>
+            <div>Connection</div>
             <Dropdown
               syncValue={this.store('main.connection.network')}
               onChange={(network) => this.selectNetwork(network)}
@@ -136,7 +136,7 @@ class Settings extends React.Component {
           <div className='signerPermission'>
             <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
-                <div className='signerPermissionOrigin'>{'Local'}</div>
+                <div className='signerPermissionOrigin'>Local</div>
                 <div className={this.store('main.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'local')}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
@@ -151,7 +151,7 @@ class Settings extends React.Component {
                         <div className='signerOptionSetText'>{this.store('main.connection.local.type')}</div>
                       ) : (_ => {
                         const status = this.store('main.connection.local.status')
-                        if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>{'scanning...'}</div>
+                        if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>scanning...</div>
                         return ''
                       })()}
                       <div className='signerOptionSetButton' />
@@ -164,7 +164,7 @@ class Settings extends React.Component {
           <div className='signerPermission'>
             <div className={this.store('main.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
-                <div className='signerPermissionOrigin'>{'Secondary'}</div>
+                <div className='signerPermissionOrigin'>Secondary</div>
                 <div className={this.store('main.connection.secondary.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'secondary')}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
@@ -190,15 +190,15 @@ class Settings extends React.Component {
           </div>
           {/* Local clients */}
           <div className='localSettingsTitle connectionTitle'>
-            <div>{'Local Clients'}</div>
+            <div>Local Clients</div>
           </div>
           <Client client='parity' />
           <Client client='ipfs' />
 
-          <div className='localSettingsTitle'>{'Settings'}</div>
+          <div className='localSettingsTitle'>Settings</div>
           <div className='signerPermission'>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>{'Run on Startup'}</div>
+              <div className='signerPermissionOrigin'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -232,7 +232,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.quit()}
-          <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>{'View License'}</div>
+          <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
         </div>
         {this.appInfo()}
       </div>

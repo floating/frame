@@ -22,7 +22,7 @@ describe('Seed signer', () => {
     const mnemonic = 'invalid mnemonic'
     hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
       expect(err).not.toBe(null)
-      expect(store(`main.signers`)).toEqual({})
+      expect(store('main.signers')).toEqual({})
       done()
     })
   })

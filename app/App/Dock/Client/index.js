@@ -34,7 +34,8 @@ class Client extends React.Component {
             <div className='signerPermissionOrigin' style={{ direction: 'initial' }}>{this.fullName(client)}</div>
             <div
               className={this.store(`main.clients.${client}.on`) ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
-              onMouseDown={_ => this.toggle()}>
+              onMouseDown={_ => this.toggle()}
+            >
               <div className='signerPermissionToggleSwitch' />
             </div>
           </div>
