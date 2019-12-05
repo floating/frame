@@ -4,7 +4,6 @@ import Restore from 'react-restore'
 
 import Signer from './Signer'
 import PendingSigner from './PendingSigner'
-import Add from './Add'
 
 import svg from '../../../svg'
 
@@ -104,7 +103,6 @@ class Main extends React.Component {
             </div>
           </div>
         </div>
-        <Add />
       </div>
     )
   }

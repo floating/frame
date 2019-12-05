@@ -5,7 +5,10 @@ import svg from '../../../../svg'
 import link from '../../../../link'
 
 import Requests from './Requests'
-import Settings from './Settings'
+import Verify from './Verify'
+import Control from './Control'
+import Permissions from './Permissions'
+// import Settings from './Settings'
 
 import ledgerLogo from './ledgerLogo.png'
 import trezorLogo from './trezorLogo.png'
@@ -23,9 +26,7 @@ class Signer extends React.Component {
       unlockInput: '',
       openHover: false
     }
-    // if (this.context.store('main.save.account') === this.props.id) {
-    //   setTimeout(() => this.select(), 200)
-    // }
+    this.views = [Requests, Permissions, Verify, Control]
   }
 
   componentDidMount () {
@@ -290,9 +291,10 @@ class Signer extends React.Component {
   renderView (index) {
     const visible = this.store('selected.visible')
     const show = visible.indexOf(index) > -1
+    const View = this.views[index]
     return (
       <div className='accountView'>
-        {show ? index : null}
+        {show ? <View {...this.props} /> : null}
       </div>
     )
   }

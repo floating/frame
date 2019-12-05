@@ -5,6 +5,8 @@ const EthTx = require('ethereumjs-tx').Transaction
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
 
+const networks = { '0x1': 'mainnet', '0x3': 'ropsten', '0x4': 'rinkeby', '0x2A': 'kovan' }
+
 class HotSignerWorker {
   constructor () {
     this.token = crypto.randomBytes(32).toString('hex')
@@ -44,7 +46,7 @@ class HotSignerWorker {
 
   signTransaction (key, rawTx, pseudoCallback) {
     // Create tranasction
-    const tx = new EthTx(rawTx)
+    const tx = new EthTx(rawTx, { chain: networks[rawTx.chainId] })
     // Sign transaction
     tx.sign(key)
     // Return serialized transaction

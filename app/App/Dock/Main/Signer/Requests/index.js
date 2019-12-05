@@ -12,6 +12,7 @@ import SignTypedDataRequest from './SignTypedDataRequest'
 class Requests extends React.Component {
   constructor (...args) {
     super(...args)
+    console.log(this.props)
     this.state = {
       minimized: false,
       unlockInput: '',
@@ -109,7 +110,7 @@ class Requests extends React.Component {
     const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '110px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(0px)', height: '0px', opacity: 0.3 }
 
     return (
-      <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
+      <div className='signerRequests'>
         <div className={unlockClass} style={unlockStyle}>
           <div className='signerUnlockWrap'>
             <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={::this.unlockChange} onKeyPress={e => this.keyPressUnlock(e)} />

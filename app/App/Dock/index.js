@@ -6,6 +6,7 @@ import link from '../../link'
 import AppTile from './AppTile'
 import Main from './Main'
 import Local from './Local'
+import Add from './Add'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
@@ -335,6 +336,7 @@ class Dock extends React.Component {
     return (
       <div id='dock'>
         <div className='dockInset'>
+          <Add />
           <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
             <div className='panelDetail'>
               <div className='panelDetailIndicator'>

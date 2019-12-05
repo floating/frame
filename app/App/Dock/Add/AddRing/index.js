@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../link'
-import svg from '../../../../../svg'
+import link from '../../../../link'
+import svg from '../../../../svg'
 
 class AddRing extends React.Component {
   constructor (...args) {
