@@ -368,18 +368,18 @@ class Signer extends React.Component {
   }
 
   renderBalances () {
-    // const currentIndex = this.store('main.accounts', this.props.id, 'index')
-    // const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    // const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const balance = this.store('balances', address)
     return (
       <div className='accountBalances'>
         <div className='accountBalance'>
           <div className='accountBalanceCurrency'>Ξ</div>
-          <div className='accountBalanceValue'>100.0000000000</div>
+          <div className='accountBalanceValue'>{(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
         </div>
         <div className='accountBalance'>
           <div className='accountBalanceCurrency'>DAI</div>
-          <div className='accountBalanceValue'>100.0000000000</div>
+          <div className='accountBalanceValue'>{(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
         </div>
       </div>
     )
