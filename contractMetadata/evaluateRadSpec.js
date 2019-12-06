@@ -1,18 +1,25 @@
 const { toChecksumAddress } = require('web3-utils')
 const abiDecoder = require('abi-decoder')
 const radspec = require('radspec')
-//const provider = require('../main/provider')
 const Web3 = require('web3')
 const mapping = require('./mapping.json')
 const openzeppelinContracts = require('./openzeppelin-contracts')
 
-// TODO: Make async
 const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x'}) => {
+  const web3 = new Web3(require('../main/provider'));
   const contractsInChain = mapping[chainId]
   if (!contractsInChain || Object.keys(contractsInChain).length === 0) return null
   const metaDataPath = contractsInChain[to] || contractsInChain[toChecksumAddress(to)]
-  if (!metaDataPath) return null
-  const metaData = openzeppelinContracts[metaDataPath]
+  var metaData = null 
+  if (metaDataPath){
+    metaData = openzeppelinContracts[metaDataPath]
+  }else{
+    console.log(to)
+    const code = await web3.eth.getCode(to)
+    console.log(code)
+    if(mapping.code[code]) metaData = openzeppelinContracts[mapping.code[code]];
+    console.log(metaData)
+  }
   if (!metaData) return null
   abiDecoder.addABI(metaData.abi)
   const decoded = abiDecoder.decodeMethod(data)
@@ -31,7 +38,6 @@ const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x'}) => {
     abi: metaData.abi,
   }
 
-  const web3 = new Web3(require('../main/provider'));
   return await radspec.evaluate(expression, call, {eth: web3.eth})
 }
 
