@@ -38,15 +38,9 @@
 @keyframes cardShow
   0%
     opacity 0
-    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 370, 0, 0, 1)
-
-  5.31%
-    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 161.829, 0, 0, 1)
-
-  10.51%
-    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 41.48, 0, 0, 1)
 
   15.82%
+    opacity 0
     transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -9.026, 0, 0, 1)
 
   21.02%
@@ -154,6 +148,8 @@
     align-items center
     justify-content center
     padding 1px
+    transition standardSlow
+    transition-delay 0.64s
 
     .panelDetailIndicatorShade
       margin-left -2px
@@ -184,7 +180,7 @@
   z-index 10000
   .panelDetail
     transition standardSlowest
-    // margin-left calc(50% - 50px)
+    margin-left calc(50% - 75px)
   .panelMenuItem
     transition standard
     opacity 0
@@ -195,6 +191,9 @@
     transition standard
     color spacewhite
   .panelDetailIndicator
+    transition standard
+    transition-delay 0s
+    opacity 0
     .panelDetailIndicatorGood
       transition standardSlow
       background smart
@@ -205,9 +204,8 @@
       transition standardSlow
       background hardware
 
-
-
-
+.dockVanish
+  transition standard
 
   // .signerContainer
   //   position relative

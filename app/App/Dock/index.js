@@ -6,7 +6,6 @@ import link from '../../link'
 import AppTile from './AppTile'
 import Main from './Main'
 import Local from './Local'
-import Add from './Add'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
@@ -336,7 +335,6 @@ class Dock extends React.Component {
     return (
       <div id='dock'>
         <div className='dockInset'>
-          <Add />
           <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
             <div className='panelDetail'>
               <div className='panelDetailIndicator'>
@@ -347,13 +345,15 @@ class Dock extends React.Component {
               <div className='panelDetailText'>{networks[this.store('main.connection.network')]}</div>
             </div>
           </div>
-          <div className='dockMenuIndicator' style={indicatorStyle}>
-            <div className='dockMenuIndicatorRight'>{svg.roundedTri(8)}</div>
+          <div className='dockVanish' style={this.store('view.addAccount') ? { pointerEvents: 'none', opacity: 0 } : null}>
+            <div className='dockMenuIndicator' style={indicatorStyle}>
+              <div className='dockMenuIndicatorRight'>{svg.roundedTri(8)}</div>
+            </div>
+            <div className='expandFrame' onMouseDown={() => this.store.setCard('default')}>{svg.logo(14)}</div>
+            <div className='expandFrame selectDapps' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(14)}</div>
+            <div className='expandFrame selectSettings' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 18 })}</div>
+            <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>
           </div>
-          <div className='expandFrame' onMouseDown={() => this.store.setCard('default')}>{svg.logo(14)}</div>
-          <div className='expandFrame selectDapps' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(14)}</div>
-          <div className='expandFrame selectSettings' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 18 })}</div>
-          <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>
           <Main />
           <Dapps />
           <Card name='local' />

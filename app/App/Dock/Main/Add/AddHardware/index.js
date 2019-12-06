@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import svg from '../../../../svg'
+import svg from '../../../../../svg'
 
 class AddHardware extends React.Component {
   constructor (...args) {
