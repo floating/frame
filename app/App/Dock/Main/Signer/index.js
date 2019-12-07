@@ -70,7 +70,14 @@ class Signer extends React.Component {
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({ top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
+      console.log('this.store(selected.position.scrollTop)', this.store('selected.position.scrollTop'))
+      console.log('this.store(selected.position.shiftTop)', this.store('selected.position.shiftTop'))
+      this.store.initialSignerPos({
+        top: bounds.top - 55,
+        bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3,
+        height: this.signer.clientHeight,
+        index: this.props.index
+      })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
@@ -479,6 +486,8 @@ class Signer extends React.Component {
 
     const style = {}
     const initial = this.store('selected.position.initial')
+    const scrollTop = this.store('selected.position.scrollTop')
+    const shiftTop = this.store('selected.position.shiftTop')
 
     if (current) {
       // Currently selected
@@ -487,20 +496,24 @@ class Signer extends React.Component {
       style.bottom = initial.bottom // open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
+      style.opacity = 0
       style.zIndex = '10000000000000000'
       const panelHeight = document.body.offsetHeight - 50
       style.height = open ? panelHeight : initial.height
-      const translateTop = (initial.top - 50) * -1
+      console.log('scrollTop', scrollTop)
+
+      console.log('shiftTop', shiftTop)
+      const translateTop = ((initial.top) * -1) + shiftTop
       style.transform = open ? `translateY(${translateTop + 'px'})` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
-      style.opacity = 0
+      style.opacity = 1
       style.pointerEvents = 'none'
       style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
       if (this.store('selected.open')) {
         // Not open, but another signer is
         style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
-        style.opacity = 0
+        style.opacity = 1
         style.pointerEvents = 'none'
       } else {
         style.transform = 'translate(0px, 0px)'
@@ -515,6 +528,7 @@ class Signer extends React.Component {
         style.transitionDelay = '0s'
       }
     }
+    console.log('PLace holder height', (initial.height - 33) + 'px')
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>

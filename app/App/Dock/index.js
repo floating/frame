@@ -154,6 +154,12 @@ class _Dapps extends React.Component {
     const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
     // const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
+
+    const dockStyle = { marginTop: `-${(this.store('main.dapp.map.docked').length * 48) / 2}px` }
+    if (this.store('view.addAccount')) {
+      dockStyle.opacity = 0
+      dockStyle.pointerEvents = 'none'
+    }
     return (
       <>
         <div className='appMovement'>
@@ -187,7 +193,7 @@ class _Dapps extends React.Component {
           {'NO IPFS CONNECTION'}
         </div>
         {ipfsReady ? (
-          <div className='dockApps' style={{ marginTop: `-${(this.store('main.dapp.map.docked').length * 48) / 2}px` }}>
+          <div className='dockApps' style={dockStyle}>
             {this.store('main.dapp.map.docked').map((hash, i) => {
               return (
                 <AppTile
@@ -345,15 +351,13 @@ class Dock extends React.Component {
               <div className='panelDetailText'>{networks[this.store('main.connection.network')]}</div>
             </div>
           </div>
-          <div className='dockVanish' style={this.store('view.addAccount') ? { pointerEvents: 'none', opacity: 0 } : null}>
-            <div className='dockMenuIndicator' style={indicatorStyle}>
-              <div className='dockMenuIndicatorRight'>{svg.roundedTri(8)}</div>
-            </div>
-            <div className='expandFrame' onMouseDown={() => this.store.setCard('default')}>{svg.logo(14)}</div>
-            <div className='expandFrame selectDapps' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(14)}</div>
-            <div className='expandFrame selectSettings' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 18 })}</div>
-            <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>
+          <div className='dockMenuIndicator' style={indicatorStyle}>
+            <div className='dockMenuIndicatorRight'>{svg.roundedTri(8)}</div>
           </div>
+          <div className='expandFrame' onMouseDown={() => this.store.setCard('default')}>{svg.logo(14)}</div>
+          <div className='expandFrame selectDapps' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(14)}</div>
+          <div className='expandFrame selectSettings' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 18 })}</div>
+          <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>
           <Main />
           <Dapps />
           <Card name='local' />

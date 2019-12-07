@@ -1,25 +1,45 @@
 .pendingSignerWrap
   position relative
-  height 70px
-  width calc(100% - 20px)
-  box-shadow 0px 7px 6px -5px outerspace03, 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
-  background outerspace // lightShade
-  margin 10px 10px 10px 10px
-  border-radius 4px
-  z-index 99999999
+  margin 0px 10px 10px 50px
+  z-index 3001
   transition standard
   will-change transform
-  transform translate(0px, 0px)
-  opacity 1
+  transform translate3d(0, 0, 0)
+  pointer-events auto
+  box-sizing border-box
+  pointer-events none
+  height 80px
+  // right 10px
+  // left 50px
+  width calc(100% - 60px)
+  padding-bottom 3px
+  background outerspace
+  border-radius 10px
+  box-shadow 7px 7px 6px -5px outerspace03, 1px 1px 2px 0px rgba(6, 54, 82, 0.15), cardDrop
+
+  // position relative
+  // left 40px
+  // right 10px
+  // height 70px
+  // // width calc(100% - 20px)
+  // box-shadow 0px 7px 6px -5px outerspace03, 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
+  // background outerspace // lightShade
+  // margin 0px 10px 10px 10px
+  // border-radius 4px
+  // z-index 99999999
+  // transition standard
+  // will-change transform
+  // transform translate(0px, 0px)
+  // opacity 1
 
   .pendingSignerInset
     position absolute
     top 0
     right 0
-    bottom 3px
+    bottom 2px
     left 0px
     background outerspaceLight // light
-    border-radius 4px
+    border-radius 10px
     color spacewhite
     overflow hidden
 
@@ -52,14 +72,14 @@
           margin 5px 0px 0px 5px
 
       .pendingSignerLogo
-        height 63px
-        margin 0px 15px 0px 18px
+        height 73px
+        margin 0px 25px 0px 32px
         display flex
         justify-content center
         align-items center
 
       .pendingSignerText
-        height 70px
+        height 80px
         width calc(100% - 60px)
         display flex
         justify-content center
@@ -75,7 +95,7 @@
           margin-bottom 4px
 
         .pendingSignerStatus
-          font-size 11px
+          font-size 10px
           line-height 14px
           font-weight 400
 

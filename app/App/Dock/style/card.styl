@@ -69,15 +69,13 @@
     opacity 0
     transform translateX(370px)
 
-
-
 .cardShow
-  z-index 1
+  z-index 1000000
   animation cardShow 1200ms linear both
   // animation-delay 0.14s
 
 .cardHide
-  z-index 3
+  z-index 3000000
   animation cardHide 0.6s normal forwards cubic-bezier(.82,0,.12,1)
 
 .panelMenu
@@ -206,6 +204,8 @@
 
 .dockVanish
   transition standard
+  position relative
+  z-index 99999999999999
 
   // .signerContainer
   //   position relative
