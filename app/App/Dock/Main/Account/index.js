@@ -309,12 +309,12 @@ class Signer extends React.Component {
   renderViews (open) {
     const count = 4
     const index = this.store('selected.view')
-    return open && (
-      <div className='accountViews' style={{ transform: `translateX(-${index * (100 / count)}%)`, width: (count * 100) + '%' }}>
-        {this.renderView(0)}
-        {this.renderView(1)}
-        {this.renderView(2)}
-        {this.renderView(3)}
+    return (
+      <div className={open ? 'accountViews accountViewsShow' : 'accountViews accountViewsHide'} style={{ transform: `translateX(-${index * (100 / count)}%)`, width: (count * 100) + '%' }}>
+        {open && this.renderView(0)}
+        {open && this.renderView(1)}
+        {open && this.renderView(2)}
+        {open && this.renderView(3)}
       </div>
     )
   }
@@ -374,12 +374,12 @@ class Signer extends React.Component {
     )
   }
 
-  renderBalances () {
+  renderBalances (open) {
     const currentIndex = this.store('main.accounts', this.props.id, 'index')
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const balance = this.store('balances', address)
     return (
-      <div className='accountBalances'>
+      <div className={open ? 'accountBalances accountBalancesShow' : 'accountBalances accountBalancesHide'}>
         <div className='accountBalance'>
           <div className='accountBalanceCurrency'>Ξ</div>
           <div className='accountBalanceValue'>{(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
@@ -392,7 +392,7 @@ class Signer extends React.Component {
     )
   }
 
-  renderMenu () {
+  renderMenu (open) {
     // let viewIndex = this.store('selected.settings.viewIndex')
     //
     // // FIXME: Ugly hack to allow 'Rename Account' view to slide in from right
@@ -424,7 +424,7 @@ class Signer extends React.Component {
     // )
 
     return (
-      <div className='accountMenu'>
+      <div className={open ? 'accountMenu accountMenuShow' : 'accountMenu accountMenuHide'}>
         <div className='accountMenuHome'>
           <div className='accountMenuItem' onMouseDown={() => this.store.setAccountView(0)}>{svg.octicon('pulse', { height: 19 })}</div>
         </div>
