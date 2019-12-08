@@ -73,7 +73,7 @@ class Signer extends React.Component {
       console.log('this.store(selected.position.scrollTop)', this.store('selected.position.scrollTop'))
       console.log('this.store(selected.position.shiftTop)', this.store('selected.position.shiftTop'))
       this.store.initialSignerPos({
-        top: bounds.top - 55,
+        top: bounds.top,
         bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3,
         height: this.signer.clientHeight,
         index: this.props.index
@@ -486,7 +486,7 @@ class Signer extends React.Component {
 
     const style = {}
     const initial = this.store('selected.position.initial')
-    const scrollTop = this.store('selected.position.scrollTop')
+    // const scrollTop = this.store('selected.position.scrollTop')
     const shiftTop = this.store('selected.position.shiftTop')
 
     if (current) {
@@ -496,15 +496,12 @@ class Signer extends React.Component {
       style.bottom = initial.bottom // open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
-      style.opacity = 0
+      style.opacity = 1
       style.zIndex = '10000000000000000'
       const panelHeight = document.body.offsetHeight - 50
       style.height = open ? panelHeight : initial.height
-      console.log('scrollTop', scrollTop)
-
-      console.log('shiftTop', shiftTop)
       const translateTop = ((initial.top) * -1) + shiftTop
-      style.transform = open ? `translateY(${translateTop + 'px'})` : 'translateY(0px)'
+      style.transform = open ? `translateY(${(translateTop + 50) + 'px'})` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 1
@@ -513,7 +510,7 @@ class Signer extends React.Component {
       if (this.store('selected.open')) {
         // Not open, but another signer is
         style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
-        style.opacity = 1
+        style.opacity = 0
         style.pointerEvents = 'none'
       } else {
         style.transform = 'translate(0px, 0px)'
@@ -528,7 +525,7 @@ class Signer extends React.Component {
         style.transitionDelay = '0s'
       }
     }
-    console.log('PLace holder height', (initial.height - 33) + 'px')
+    // console.log('PLace holder height', (initial.height - 33) + 'px')
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
