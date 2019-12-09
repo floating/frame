@@ -28,7 +28,7 @@ class Panel extends React.Component {
     const scale = 1.05
     const right = (((294 * scale) - 294) / 2) + 294
     const transform = expanded ? `translate3d(${right}px, 0px, 0px)` : 'translate3d(0px, 0px, 0px)'
-    const boxShadow = expanded ? '-30px 0px 100px 0px rgba(16, 44, 100, .34)' : '0px 0px 0px rgba(16, 44, 100, 0)'
+    // const boxShadow = expanded ? '-30px 0px 100px 0px rgba(16, 44, 100, .34)' : '0px 0px 0px rgba(16, 44, 100, 0)'
     // const open = this.store('tray.open')
     // const selected = this.store('selected.open')
     // const transition = '0.16s cubic-bezier(.82,0,.12,1) transform'
