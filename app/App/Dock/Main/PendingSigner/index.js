@@ -83,6 +83,11 @@ class Pending extends React.Component {
 
     const status = this.props.status ? this.props.status.charAt(0).toUpperCase() + this.props.status.substring(1) : ''
 
+    if (this.store('view.addAccount')) {
+      style.opacity = 0
+      style.pointerEvents = 'none'
+    }
+
     return (
       <div className='pendingSignerWrap' style={style}>
         <div className='pendingSignerInset'>

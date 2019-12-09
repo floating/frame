@@ -2,8 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
-import Signer from './Signer'
+import Account from './Account'
 import PendingSigner from './PendingSigner'
+import Add from './Add'
 
 import svg from '../../../svg'
 
@@ -18,7 +19,9 @@ let firstScroll = true
 
 class Main extends React.Component {
   reportScroll () {
-    this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
+    const scroll = ReactDOM.findDOMNode(this.scroll)
+    const wrap = ReactDOM.findDOMNode(this.wrap)
+    this.store.initialScrollPos(scroll.scrollTop, ((scroll.clientHeight - wrap.clientHeight) / 2) - 40)
   }
 
   resetScroll () {
@@ -67,23 +70,22 @@ class Main extends React.Component {
     })
     const untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     const current = this.store('selected.current')
-    const scrollTop = this.store('selected.position.scrollTop')
+    // const scrollTop = this.store('selected.position.scrollTop')
     const style = this.store('selected.card') === 'default' ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     if (!this.store('selected.open')) style.bottom = '80px'
     // const cardSelected = this.props.card === 'main'
-
     let mainClass = 'main cardShow'
     if (this.store('selected.card') !== 'default') mainClass = 'main cardHide'
     // if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
-
     return (
       <div className={mainClass}>
-        <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
-          <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
-            <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
+        <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
+          <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>
+            <Add />
+            <div id='panelWrap' ref={ref => { if (ref) this.wrap = ref }}>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
               {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
-                return <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
               })}
               {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
                 <div className='noSigners'>

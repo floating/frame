@@ -70,7 +70,14 @@ class Signer extends React.Component {
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({ top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
+      console.log('this.store(selected.position.scrollTop)', this.store('selected.position.scrollTop'))
+      console.log('this.store(selected.position.shiftTop)', this.store('selected.position.shiftTop'))
+      this.store.initialSignerPos({
+        top: bounds.top,
+        bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3,
+        height: this.signer.clientHeight,
+        index: this.props.index
+      })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
@@ -302,12 +309,12 @@ class Signer extends React.Component {
   renderViews (open) {
     const count = 4
     const index = this.store('selected.view')
-    return open && (
-      <div className='accountViews' style={{ transform: `translateX(-${index * (100 / count)}%)`, width: (count * 100) + '%' }}>
-        {this.renderView(0)}
-        {this.renderView(1)}
-        {this.renderView(2)}
-        {this.renderView(3)}
+    return (
+      <div className={open ? 'accountViews accountViewsShow' : 'accountViews accountViewsHide'} style={{ transform: `translateX(-${index * (100 / count)}%)`, width: (count * 100) + '%' }}>
+        {open && this.renderView(0)}
+        {open && this.renderView(1)}
+        {open && this.renderView(2)}
+        {open && this.renderView(3)}
       </div>
     )
   }
@@ -367,25 +374,25 @@ class Signer extends React.Component {
     )
   }
 
-  renderBalances () {
-    // const currentIndex = this.store('main.accounts', this.props.id, 'index')
-    // const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    // const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
+  renderBalances (open) {
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const balance = this.store('balances', address)
     return (
-      <div className='accountBalances'>
+      <div className={open ? 'accountBalances accountBalancesShow' : 'accountBalances accountBalancesHide'}>
         <div className='accountBalance'>
           <div className='accountBalanceCurrency'>Ξ</div>
-          <div className='accountBalanceValue'>100.0000000000</div>
+          <div className='accountBalanceValue'>{(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
         </div>
         <div className='accountBalance'>
           <div className='accountBalanceCurrency'>DAI</div>
-          <div className='accountBalanceValue'>100.0000000000</div>
+          <div className='accountBalanceValue'>{(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
         </div>
       </div>
     )
   }
 
-  renderMenu () {
+  renderMenu (open) {
     // let viewIndex = this.store('selected.settings.viewIndex')
     //
     // // FIXME: Ugly hack to allow 'Rename Account' view to slide in from right
@@ -417,7 +424,7 @@ class Signer extends React.Component {
     // )
 
     return (
-      <div className='accountMenu'>
+      <div className={open ? 'accountMenu accountMenuShow' : 'accountMenu accountMenuHide'}>
         <div className='accountMenuHome'>
           <div className='accountMenuItem' onMouseDown={() => this.store.setAccountView(0)}>{svg.octicon('pulse', { height: 19 })}</div>
         </div>
@@ -479,6 +486,8 @@ class Signer extends React.Component {
 
     const style = {}
     const initial = this.store('selected.position.initial')
+    // const scrollTop = this.store('selected.position.scrollTop')
+    const shiftTop = this.store('selected.position.shiftTop')
 
     if (current) {
       // Currently selected
@@ -487,14 +496,15 @@ class Signer extends React.Component {
       style.bottom = initial.bottom // open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
+      style.opacity = 1
       style.zIndex = '10000000000000000'
       const panelHeight = document.body.offsetHeight - 50
       style.height = open ? panelHeight : initial.height
-      const translateTop = (initial.top - 50) * -1
-      style.transform = open ? `translateY(${translateTop + 'px'})` : 'translateY(0px)'
+      const translateTop = ((initial.top) * -1) + shiftTop
+      style.transform = open ? `translateY(${(translateTop + 50) + 'px'})` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
-      style.opacity = 0
+      style.opacity = 1
       style.pointerEvents = 'none'
       style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
       if (this.store('selected.open')) {
@@ -515,6 +525,7 @@ class Signer extends React.Component {
         style.transitionDelay = '0s'
       }
     }
+    // console.log('PLace holder height', (initial.height - 33) + 'px')
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>

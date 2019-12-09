@@ -1,4 +1,4 @@
-@import '../Signer/style'
+@import '../Account/style'
 @import '../PendingSigner/style'
 
 #panelScroll
@@ -25,10 +25,9 @@
 
   #panelWrap
     width 100%
-    padding-top 20px
-    padding-bottom 0px
     will-change scroll-position
     padding 50px 0px 60px 0px
+    z-index 99999999999
 
     .noSigners
       width 100%
@@ -92,3 +91,5 @@
   left 0
   z-index 6000
   pointer-events none
+
+@import '../Add/style'

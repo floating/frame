@@ -53,6 +53,7 @@ const initial = {
     showAccounts: false,
     accountPage: 0,
     position: {
+      shiftTop: 0,
       scrollTop: 0,
       initial: {
         top: 5,
