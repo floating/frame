@@ -85,22 +85,17 @@
       overflow hidden
 
   .accountInfo
-    width 100%
-    position relative
-    z-index 2000000
+    position absolute
+    top 0
+    right 0
+    left 0
+    z-index 20000000000000
     height 90px
 
-    .accountStatus
-      height 50px
-      width 50px
-      background thin
-      border-radius 6px
-      position absolute
-      top 20px
-      left 20px
-      display flex
-      justify-content center
-      align-items center
+    .accountStatusOpen
+      height 172px
+      transform translate(-10px, -10px)
+      width 340px
 
     .accountNameLocal
       position absolute
@@ -154,6 +149,7 @@
     padding-bottom 5px
     left 20px
     right 20px
+    top 90px
     z-index 200000
     transition standardSlowest
     transition-delay 0s
@@ -226,9 +222,11 @@
 
   .accountViewsShow
     opacity 1
+    transform translateY(0px)
 
   .accountViewsHide
     opacity 0
+    transform translateY(30px)
 
   .accountViews
     position absolute
@@ -244,12 +242,25 @@
     transition standardSlowest
     transition-delay 0.6s
 
-    .accountView
-      position relative
-      width 100%
-      height 100%
-      overflow-y scroll
-      overflow-x hidden
+    .accountViewsSlide
+        position absolute
+        top 0px
+        right 0px
+        bottom 0px
+        left 0px
+        z-index 3005
+        overflow-x hidden
+        overflow-y hidden
+        will-change transform
+        display flex
+        transition standard
+
+      .accountView
+        position relative
+        width 100%
+        height 100%
+        overflow-y scroll
+        overflow-x hidden
 
   .transactionToAddress
     font-size 12px
@@ -1291,3 +1302,4 @@
 @import './views'
 @import '../Requests/style'
 @import '../Control/style'
+@import '../Status/style'

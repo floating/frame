@@ -8,14 +8,9 @@ import Requests from './Requests'
 import Verify from './Verify'
 import Control from './Control'
 import Permissions from './Permissions'
-// import Settings from './Settings'
+import Status from './Status'
 
-import ledgerLogo from './ledgerLogo.png'
-import trezorLogo from './trezorLogo.png'
-
-// TODO: Rename Signer component to Account
-
-class Signer extends React.Component {
+class Account extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
@@ -128,53 +123,53 @@ class Signer extends React.Component {
     }
   }
 
-  renderType () {
-    let innerClass = 'signerInner'
-    if (this.state.typeActive) innerClass += ' signerInnerActive'
-    if (this.state.typeShake) innerClass += ' headShake'
-    if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
-    if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
-    const inSettings = this.store('selected.view') === 'settings'
-    return (
-      <div className='signerType'>
-        <div
-          className='addressSelect'
-          onMouseDown={e => {
-            e.stopPropagation()
-            this.store.toggleShowAccounts()
-          }}
-        >
-          <div className='addressSelectButton'>
-            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-            <div className='addressSelectText'>Addresses</div>
-            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-          </div>
-        </div>
-        {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
-          <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-            <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
-          </div>
-        ) : null}
-        <div className={innerClass} onMouseDown={::this.typeClick} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-          <div className='signerInset'>
-            <div className='signerImage'>
-              {(_ => {
-                if (this.props.signer) {
-                  if (this.props.signer.type === 'ledger') return <img src={ledgerLogo} />
-                  if (this.props.signer.type === 'trezor') return <img className='trezorImage' src={trezorLogo} />
-                  if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
-                  if (this.props.signer.type === 'aragon') return svg.aragon(32)
-                  return svg.octicon('plus', { height: 31 })
-                } else {
-                  return null
-                }
-              })()}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // renderType () {
+  //   let innerClass = 'signerInner'
+  //   if (this.state.typeActive) innerClass += ' signerInnerActive'
+  //   if (this.state.typeShake) innerClass += ' headShake'
+  //   if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
+  //   if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
+  //   const inSettings = this.store('selected.view') === 'settings'
+  //   return (
+  //     <div className='signerType'>
+  //       <div
+  //         className='addressSelect'
+  //         onMouseDown={e => {
+  //           e.stopPropagation()
+  //           this.store.toggleShowAccounts()
+  //         }}
+  //       >
+  //         <div className='addressSelectButton'>
+  //           <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
+  //           <div className='addressSelectText'>Addresses</div>
+  //           <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
+  //         </div>
+  //       </div>
+  //       {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
+  //         <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+  //           <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
+  //         </div>
+  //       ) : null}
+  //       <div className={innerClass} onMouseDown={::this.typeClick} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+  //         <div className='signerInset'>
+  //           <div className='signerImage'>
+  //             {(_ => {
+  //               if (this.props.signer) {
+  //                 if (this.props.signer.type === 'ledger') return <img src={ledgerLogo} />
+  //                 if (this.props.signer.type === 'trezor') return <img className='trezorImage' src={trezorLogo} />
+  //                 if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
+  //                 if (this.props.signer.type === 'aragon') return svg.aragon(32)
+  //                 return svg.octicon('plus', { height: 31 })
+  //               } else {
+  //                 return null
+  //               }
+  //             })()}
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   // renderMenu () {
   //   let menuClass = 'signerMenu'
@@ -310,11 +305,13 @@ class Signer extends React.Component {
     const count = 4
     const index = this.store('selected.view')
     return (
-      <div className={open ? 'accountViews accountViewsShow' : 'accountViews accountViewsHide'} style={{ transform: `translateX(-${index * (100 / count)}%)`, width: (count * 100) + '%' }}>
-        {open && this.renderView(0)}
-        {open && this.renderView(1)}
-        {open && this.renderView(2)}
-        {open && this.renderView(3)}
+      <div className={open ? 'accountViews accountViewsShow' : 'accountViews accountViewsHide'}>
+        <div className='accountViewsSlide' style={{ transform: `translateX(-${index * (100 / count)}%)`, width: (count * 100) + '%' }}>
+          {open && this.renderView(0)}
+          {open && this.renderView(1)}
+          {open && this.renderView(2)}
+          {open && this.renderView(3)}
+        </div>
       </div>
     )
   }
@@ -450,8 +447,8 @@ class Signer extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
     return (
-      <div className='accountInfo' onMouseDown={open ? ::this.typeClick : null}>
-        <div className='accountStatus' />
+      <div className='accountInfo'>
+        <Status {...this.props} />
         {ens ? (
           <>
             <div className='accountName'>
@@ -466,7 +463,9 @@ class Signer extends React.Component {
               {svg.octicon('kebab-horizontal', { height: 14 })}
               {address.substr(address.length - 4)}
             </div>
-            <div className='accountNameLocal'>{this.props.name}</div>
+            <div className='accountNameLocal' onMouseDown={open ? ::this.typeClick : null}>
+              {this.props.name}
+            </div>
           </>
         )}
       </div>
@@ -571,4 +570,4 @@ class Signer extends React.Component {
 //   ) : null}
 // </div>
 
-export default Restore.connect(Signer)
+export default Restore.connect(Account)

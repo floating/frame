@@ -1,7 +1,7 @@
 const electron = require('electron')
 const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut, shell } = electron
 const path = require('path')
-const fs = require('fs')
+// const fs = require('fs')
 // const Positioner = require('electron-positioner')
 const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
