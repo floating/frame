@@ -37,7 +37,7 @@ const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x' }) => {
     abi: metaData.abi
   }
 
-  return await radspec.evaluate(expression, call, { eth: web3.eth })
+  return radspec.evaluate(expression, call, { eth: web3.eth })
 }
 
 module.exports = evaluateRadSpec

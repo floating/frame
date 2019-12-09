@@ -1,4 +1,4 @@
-const { app } = require('electron')
+// const { app } = require('electron')
 const path = require('path')
 const log = require('electron-log')
 const ipfsHttpClient = require('ipfs-http-client')
@@ -8,7 +8,7 @@ const { userData } = require('../../util')
 const peers = require('./peers.json')
 
 // Mock windows module if running tests
-const windows = app ? require('../../windows') : { broadcast: () => {} }
+// const windows = app ? require('../../windows') : { broadcast: () => {} }
 
 class IPFS extends Client {
   constructor (options) {

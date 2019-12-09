@@ -1,5 +1,5 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut, shell } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
 // const fs = require('fs')
 // const Positioner = require('electron-positioner')

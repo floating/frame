@@ -40,7 +40,7 @@ module.exports = async function (to, web3) {
       methods: {}
     }
   }
-  app.functions.forEach((func) => detailed.userdoc.methods[func.sig] = { notice: func.notice })
+  app.functions.forEach(func => { detailed.userdoc.methods[func.sig] = { notice: func.notice } })
   console.log(detailed)
   return detailed
 }

@@ -141,19 +141,15 @@ class Ledger extends Signer {
   async deriveAddresses () {
     let addresses
     if (this.pause) throw new Error('Device access is paused')
-    try {
-      // Derive addresses
-      if (this.network !== '1' || this.derivation === 'legacy') {
-        addresses = await this._deriveLegacyAddresses()
-      } else {
-        addresses = await this._deriveLiveAddresses()
-      }
-      // Update signer
-      this.addresses = addresses
-      this.update()
-    } catch (err) {
-      throw err
+    // Derive addresses
+    if (this.network !== '1' || this.derivation === 'legacy') {
+      addresses = await this._deriveLegacyAddresses()
+    } else {
+      addresses = await this._deriveLiveAddresses()
     }
+    // Update signer
+    this.addresses = addresses
+    this.update()
   }
 
   close () {
