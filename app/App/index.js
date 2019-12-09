@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 // import svg from '../../svg'
 
-import Panel from './Panel'
+// import Panel from './Panel'
 import Dock from './Dock'
 
 // import DevTools from 'restore-devtools'

@@ -1,7 +1,7 @@
-store = require('../../main/store')
-
-describe('Dapps', () => {
-  test('Dapps', () => {
-
-  })
-})
+// store = require('../../main/store')
+//
+// describe('Dapps', () => {
+//   test('Dapps', () => {
+//
+//   })
+// })

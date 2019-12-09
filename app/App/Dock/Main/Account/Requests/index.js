@@ -10,16 +10,16 @@ import link from '../../../../../link'
 import SignTypedDataRequest from './SignTypedDataRequest'
 
 class Requests extends React.Component {
-  constructor (...args) {
-    super(...args)
-    console.log(this.props)
-    this.state = {
-      minimized: false,
-      unlockInput: '',
-      unlockHeadShake: false
-    }
-    this.unlockInput = React.createRef()
-  }
+  // constructor (...args) {
+  //   super(...args)
+  //   // console.log(this.props)
+  //   this.state = {
+  //     minimized: false,
+  //     unlockInput: '',
+  //     unlockHeadShake: false
+  //   }
+  //   this.unlockInput = React.createRef()
+  // }
 
   trezorPin (num) {
     this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
@@ -101,22 +101,8 @@ class Requests extends React.Component {
     const containMonitor = monitor.length * monitorHeight
     const containHeight = containNormal + containMonitor + 10
 
-    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    const open = current && this.store('selected.open')
-    // let minimized = this.store('selected.minimized')
-
-    let unlockClass = 'signerUnlockRequest'
-    if (this.state.unlockHeadShake) unlockClass += ' headShake'
-    const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '110px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(0px)', height: '0px', opacity: 0.3 }
-
     return (
       <div className='signerRequests'>
-        <div className={unlockClass} style={unlockStyle}>
-          <div className='signerUnlockWrap'>
-            <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={::this.unlockChange} onKeyPress={e => this.keyPressUnlock(e)} />
-            <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit}>Unlock</div>
-          </div>
-        </div>
         <div className='requestTitle'>
           <div>Requests</div>
           <div className='requestCount'>{normal.length}</div>
