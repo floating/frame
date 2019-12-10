@@ -56,7 +56,7 @@ Frame is a web3 interface that lets you sign data, manage accounts, run your own
 
 **On Windows:** Run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.
 
-**On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev` **before** running the demo.
+**On Ubuntu:** Run `sudo apt-get install build-essential libudev-dev libusb-1.0-0-dev` **before** running the demo.
 
 ### Build Apps
   ```bash
