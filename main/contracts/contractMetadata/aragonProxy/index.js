@@ -1,4 +1,4 @@
-const store = require('../../main/store')
+const store = require('../../../store')
 const Wrapper = require('@aragon/wrapper').default
 const first = require('rxjs/operators').first
 
@@ -22,7 +22,7 @@ module.exports = async function (to, web3) {
   const proxy = new web3.eth.Contract(require('./AppProxyBase.json').abi, to)
   const kernel = await proxy.methods.kernel().call()
   const options = {
-    provider: require('../../main/provider'),
+    provider: require('../../../provider'),
     apm: {
       ipfs: {
         gateway: 'https://ipfs.eth.aragon.network/ipfs'
@@ -41,6 +41,5 @@ module.exports = async function (to, web3) {
     }
   }
   app.functions.forEach(func => { detailed.userdoc.methods[func.sig] = { notice: func.notice } })
-  console.log(detailed)
   return detailed
 }
