@@ -398,12 +398,12 @@
     border-radius 2px
     justify-content space-between
     box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-    border-radius 6px
+    border-radius 15px
     height 380px
     display flex
     justify-content center
     transition standard
-    background lowlight
+    background light
     z-index 2000
     color outerspace08
     tranform translateZ(0)
@@ -574,7 +574,7 @@
       top 0
       left 0
       right 0
-      height 60px
+      height 40px
       display flex
       justify-content center
       align-items center
@@ -582,15 +582,14 @@
       letter-spacing 2px
       font-weight 400
       font-size 14px
-      background highlight
+      // background blue
       color outerspace08
-      border-top-left-radius 6px
-      border-top-right-radius 6px
-      box-shadow 0px 1px 0px thick
-
+      border-top-left-radius 9px
+      border-top-right-radius 9px
+      // box-shadow 0px 1px 0px thick
       .approveRequestHeaderIcon
         width 40px
-        height 60px
+        height 40px
         display flex
         justify-content center
         align-items center
@@ -602,7 +601,7 @@
         color outerspace08
 
       .approveRequestHeaderClose
-        width 60px
+        width 40px
         display flex
         justify-content center
         align-items center
@@ -688,76 +687,86 @@
 
   .transactionSubtitle
     text-transform uppercase
-    font-size 13px
+    font-size 11px
     font-weight 400
     padding-top 2px
-    letter-spacing 1px
+    letter-spacing 0px
+    position absolute
+    left 0
+    bottom 0
+    right 0
+    // height 48px
+    //width 60px
+    // background highlighter
+    display flex
+    justify-content center
+    padding 0px 10px
+    align-items center
 
-  .transactionTotals
+
+  .txDescription
+    font-family Raleway
+    font-size 18px
+    text-transform none
+
+  .txDetails
+    position absolute
+    // bottom 130px
+    left 10px
+    right 10px
+    top 40px
+    // height 48px
+    z-index 1
+    background highlighter
+    box-shadow cardDrop
+    border-radius 15px
+    bottom 180px
     display flex
     justify-content center
     align-items center
-    font-size 28px
-
-  .transactionTotalUSD
-    margin-left 10px
-    padding 3px 10px
-    font-size 20px
-    border-radius 4px
-    background highlight
-    font-weight 300
-
-  .transactionWarning
-    color bad
-
-  .transactionFeeWarning
-    margin-left 6px
-    padding-bottom 8px
-    color bad
-
-  .transactionFee
-    position absolute
-    top 120px
-    left 0
-    right 0
-    height 45px
-    display flex
-    justify-content space-around
-    align-items center
     flex-direction column
-    padding 15px 10px 10px 10px
-    font-weight 300
 
-    .transactionTotals
-      font-size 20px
 
-    .transactionTotalUSD
-      font-size 15px
-      padding 2px 8px
-      font-weight 300
-
-  .transactionData
+  .txSection
     position absolute
-    bottom 130px
-    left 5px
-    right 5px
-    top 190px
+    // bottom 130px
+    left 0px
+    right 0px
+    bottom 0px
+    height 48px
     z-index 2000
     display flex
     justify-content center
     align-items center
-    background highlight
+    // background highlight
     color outerspace08
     font-size 14px
     font-weight 400
-    letter-spacing 1px
-    text-transform uppercase
-    transition standard
+    // letter-spacing 1px
+    // text-transform uppercase
+    transition standardSlow
     overflow hidden
-    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-    border-radius 3px
+    border-radius 0px
+    // background transparent
+    // background blue
 
-    .transactionDataHeader
+    font-family OpenSans
+    // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+    // border-radius 3px
+    // background blue
+    // background blue
+    left 10px
+    right 10px
+    border-radius 15px
+    height 30px
+    background highlighter
+    box-shadow cardDrop
+    position absolute
+    overflow hidden
+    font-size 13px
+    font-weight 400
+
+    .txSectionHeader
       position absolute
       top 0
       left 0
@@ -772,14 +781,14 @@
       font-weight 400
       z-index 10
 
-      .transactionDataLabel
+      .txSectionLabel
         display flex
         justify-content center
         align-items center
         z-index 10
         transition standard
 
-      .transactionDataNotice
+      .txSectionNotice
         width 40px
         display flex
         justify-content center
@@ -788,7 +797,7 @@
         transition standard
         color outerspace08
 
-      .transactionDataIndicator
+      .txSectionIndicator
         width 40px
         display flex
         justify-content center
@@ -796,6 +805,227 @@
         z-index 10
         transform rotate(-180deg)
         transition standardSlow
+
+    .networkFee
+      position absolute
+      left 0
+      // padding-left 5px
+      width 60px
+      height 30px
+      box-sizing border-box
+      display flex
+      justify-content center
+      align-items center
+      border-right 1px solid thick
+      background highlightest
+      border-radius 15px
+
+    .networkSpeed
+      position absolute
+      right 0px
+      width 60px
+      height 30px
+      box-sizing border-box
+      display flex
+      justify-content center
+      align-items center
+      border-left 1px solid thick
+      border-radius 15px
+      color good
+      background highlightest
+      border-radius 15px
+
+    .networkFeeTotal
+      position absolute
+      left 60px
+      right 60px
+      // width 140px
+      height 30px
+      box-sizing border-box
+      display flex
+      justify-content center
+      // align-items center
+      font-size 14px
+      letter-spacing 0px
+
+      .networkFeeTotalSection
+        padding 0px 4px
+        height 30px
+        display flex
+        justify-content center
+        align-items center
+
+      .networkFeeTotalETH
+        font-size 18px
+        // font-family FiraCode
+        // font-weight 600
+
+    // .networkFeeTotalUSD
+      // position absolute
+      // left 230px
+      // padding-left 5px
+      // width 100px
+      // height 30px
+      // box-sizing border-box
+      // display flex
+      // justify-content center
+      // align-items center
+      // border-right 1px solid thick
+
+    // .transactionTotals
+    //   display flex
+    //   justify-content center
+    //   align-items center
+    //   font-size 18px
+    //   letter-spacing 0
+    //   // flex-direction column
+    //
+    // .transactionTotalUSD
+    //   margin-left 4px
+    //   padding 0px 10px
+    //   font-size 14px
+    //   border-radius 9px
+    //   height 18px
+    //   background highlightest
+    //   box-shadow cardDrop
+    //   font-weight 400
+    //   box-sizing border-box
+
+    .transactionWarning
+      color bad
+
+    .transactionFeeWarning
+      margin-left 6px
+      padding-bottom 8px
+      color bad
+
+    .transactionFee
+      .transactionTotals
+        font-size 12px
+
+      .transactionTotalUSD
+        font-size 15px
+        padding 2px 8px
+        font-weight 300
+
+
+  .txSectionBody
+    position absolute
+    color outerspace08
+    top 50px
+    left 0
+    right 0
+    bottom 0
+    display flex
+    padding 16px 14px
+    user-select all
+    overflow hidden
+    z-index 9
+
+    .txSectionBodyInner
+      opacity 0
+      top -100px
+      position relative
+      max-width 100%
+      width 100%
+      height 100%
+      font-size 13px
+      text-transform none
+      transition standardSlow
+      overflow-wrap break-word
+      word-wrap break-word
+      font-family FiraCode, monospace
+      overflow-x hidden
+      overlflow-y scroll
+
+
+  .txSectionSelected
+    position absolute
+    bottom 5px
+    left 5px
+    right 5px
+    top 65px
+
+    .txSectionHeader
+      .txSectionIndicator
+        transform rotate(0deg)
+
+    .txSectionBody
+      .txSectionBodyInner
+        opacity 1
+        top 0px
+
+  // .transactionData
+  //   position absolute
+  //   bottom 130px
+  //   left 5px
+  //   right 5px
+  //   top 190px
+  //   z-index 2000
+  //   display flex
+  //   justify-content center
+  //   align-items center
+  //   background highlight
+  //   color outerspace08
+  //   font-size 14px
+  //   font-weight 400
+  //   letter-spacing 1px
+  //   text-transform uppercase
+  //   transition standard
+  //   overflow hidden
+  //   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+  //   border-radius 3px
+
+  .txData
+    height 18px
+    // margin-top -10px
+    // padding-bottom 10px
+
+  .transactionDataHeader
+    position absolute
+    top 10px
+    left 50%
+    right 0
+    height 18px
+    width 170px
+    margin-left -90px
+    // border-bottom 1px solid thick
+    justify-content space-between
+    display flex
+    align-items center
+    text-transform uppercase
+    letter-spacing 1px
+    font-weight 400
+    z-index 10
+    background highlight
+    border-radius 9px
+
+    .transactionDataLabel
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      transition standard
+
+    .transactionDataNotice
+      width 18px
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      transition standard
+      color outerspace08
+
+    .transactionDataIndicator
+    // width 22px
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      margin-bottom 2px
+      margin-right 6px
+      transform rotate(-180deg)
+      transition standardSlow
 
   .transactionDataBody
     position absolute
@@ -860,7 +1090,7 @@
 
     .transactionToAddress
       font-size 12px
-      font-family firaCode
+      // font-family firaCode
       position relative
       height 25px
       width 100%
@@ -938,8 +1168,8 @@
     justify-content space-around
     align-items center
     font-weight 400
-    border-top 1px solid thick
-    background highlight
+    // border-top 1px solid thick
+    // background highlight
 
     .requestDecline
       position relative
@@ -1533,3 +1763,25 @@ span
     font-weight 600
     word-wrap break-word
     font-family 'FiraCode', monospace
+
+.radspecMessage
+  position absolute
+  top 53px
+  background-color white
+  width 318px
+  z-index 1
+  font-size 13px
+  padding 5px
+  height 62px
+  text-align center
+
+.approveRequestHeaderLabel
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+
+.requestOrigin
+  font-size 10px
+  text-transform none
+  letter-spacing 1px

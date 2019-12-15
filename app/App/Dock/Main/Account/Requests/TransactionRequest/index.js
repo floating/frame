@@ -11,7 +11,7 @@ const FEE_WARNING_THRESHOLD_USD = 10
 class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
-    this.state = { allowInput: false, dataView: false }
+    this.state = { allowInput: false, dataView: false, selectedIndex: -1 }
     setTimeout(() => {
       this.setState({ allowInput: true })
     }, 1700)
@@ -47,11 +47,37 @@ class TransactionRequest extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
+  txSectionStyle (index, height) {
+    // console.log('heaigh', height)
+    if (this.state.selectedIndex === index) {
+      return {
+        transform: `translateY(${0}px)`,
+        height: `calc(${height} + 10px)`,
+        zIndex: 20,
+        borderRadius: '9px',
+        background: 'rgba(237, 242, 253, 1)'
+      }
+    } else {
+      return {
+        transform: `translateY(${(index * -40) - 60}px)`,
+        zIndex: 1
+      }
+    }
+  }
+
+  selectSection (index) {
+    if (index === this.state.selectedIndex) {
+      this.setState({ selectedIndex: -1 })
+    } else {
+      this.setState({ selectedIndex: index })
+    }
+  }
+
   render () {
     const req = this.props.req
-    let notice = req.notice
-    const status = req.status
-    const mode = req.mode
+    let { notice } = req
+    const { status, mode, description, origin } = req
+    const originString = 'Created by ' + origin.replace('http://', '').replace('https://', '')
     const toAddress = req.data && req.data.to ? req.data.to : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
@@ -139,30 +165,28 @@ class TransactionRequest extends React.Component {
               ) : (
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
-                    <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
-                  </div>
-                  <div className='transactionValue'>
-                    <div className='transactionTotals'>
-                      <div className='transactionTotalETH'>{'Ξ ' + value}</div>
-                      <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
+                    <div className='approveRequestHeaderLabel'>
+                      <div>Action</div>
                     </div>
-                    <div className='transactionSubtitle'>Value</div>
+                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 18 })}</div>
                   </div>
-                  <div className='transactionFee'>
-                    <div className='transactionTotals'>
-                      <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
-                      <div className={feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? 'transactionTotalUSD transactionWarning' : 'transactionTotalUSD'}>{'$ ' + feeUSD.toFixed(2)}</div>
-                      {feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null}
-                    </div>
-                    <div className='transactionSubtitle'>{'Max Fee'}️</div>
+                  <div className='txDetails'>
+                    {description ? (
+                      <>
+                        <div className='txDescription'>{description.type + description.message}</div>
+                        <div className='transactionTotals'>
+                          <div className='transactionTotalETH'>{'Ξ ' + value}</div>
+                          <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
+                        </div>
+                      </>
+                    ) : 'Loading'}
                   </div>
                   {utils.toAscii(req.data.data || '0x') ? (
-                    <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
+                    <div className='txSection txData' style={this.txSectionStyle(2, height)} onMouseDown={() => this.selectSection(2)}>
                       <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
-                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
-                        <div className='transactionDataLabel'>View Data</div>
-                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
+                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 16 })}</div>
+                        <div className='transactionDataLabel'>Raw Data</div>
+                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 16 })}</div>
                       </div>
                       <div className='transactionDataBody'>
                         <div className='transactionDataBodyInner'>
@@ -171,10 +195,12 @@ class TransactionRequest extends React.Component {
                       </div>
                     </div>
                   ) : (
-                    <div className='transactionData transactionNoData'>No Data</div>
+                    <div className='txSection txData' style={this.txSectionStyle(2, height)}>
+                      No Data
+                    </div>
                   )}
                   {req.data.to ? (
-                    <div className='transactionTo'>
+                    <div className='txSection' style={this.txSectionStyle(1, height)} onMouseDown={() => this.selectSection(1)}>
                       <div className='transactionToAddress'>
                         {this.state.toEnsName ? (
                           <div className='transactionToAddressLarge'>{this.state.toEnsName}</div>
@@ -186,13 +212,23 @@ class TransactionRequest extends React.Component {
                           <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={req.data.to} readOnly />
                         </div>
                       </div>
-                      <div className='transactionToSub'>Send To</div>
+                      <div className='networkFee'>To</div>
                     </div>
                   ) : (
-                    <div className='transactionTo'>
+                    <div className='txSection' style={this.txSectionStyle(1, height)} onMouseDown={() => this.selectSection(1)}>
                       <div className='transactionToSub'>Deploying Contract</div>
                     </div>
                   )}
+                  <div className='txSection' style={this.txSectionStyle(0, height)} onMouseDown={() => this.selectSection(0)}>
+                    <div className='networkFee'>Fee</div>
+                    <div className='networkSpeed'>Fast</div>
+                    <div className='networkFeeTotal'>
+                      <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + fee}</div>
+                      <div className='networkFeeTotalSection'>≈</div>
+                      <div className='networkFeeTotalSection'>{'$ ' + feeUSD.toFixed(2)}</div>
+                      {feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null}
+                    </div>
+                  </div>
                 </>
               )}
             </div>

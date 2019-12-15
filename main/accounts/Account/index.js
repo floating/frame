@@ -9,6 +9,8 @@ const windows = require('../../windows')
 const store = require('../../store')
 const nameService = require('../../ens')
 
+const description = require('../../description')
+
 const { Aragon } = require('../aragon')
 
 const capitalize = (s) => {
@@ -87,6 +89,12 @@ class Account {
     })
   }
 
+  async loadDescription (req) {
+    const rawTx = req.data
+    req.description = await description.load(rawTx)
+    this.update()
+  }
+
   addRequest (req, res) {
     const add = r => {
       this.requests[r.handlerId] = req
@@ -95,6 +103,7 @@ class Account {
       this.update()
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')
+      this.loadDescription(req)
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {

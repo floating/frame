@@ -3,7 +3,6 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
-const evaluateRadSpec = require('../contracts/contractMetadata/evaluateRadSpec')
 
 const proxy = require('./proxy')
 
@@ -292,10 +291,8 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-
-      evaluateRadSpec(rawTx).then((radspecMessage) =>
-        accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], radspecMessage }, res)
-      )
+      // console.log(payload)
+      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin }, res)
     })
   }
 
@@ -304,7 +301,7 @@ class Provider extends EventEmitter {
     if (!payload.params.every(utils.isHexStrict)) return this.resError('ethSign Error: Invalid hex values', payload, res)
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    const req = { handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] }
+    const req = { handlerId, type: 'sign', payload, account: accounts.getAccounts()[0], origin: payload._origin }
     const _res = data => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
@@ -328,7 +325,7 @@ class Provider extends EventEmitter {
     }
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: accounts.getAccounts()[0] })
+    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: accounts.getAccounts()[0], origin: payload._origin })
   }
 
   subscribe (payload, res) {
@@ -371,6 +368,8 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3') return this.signTypedData(payload, res)
+    // Delete custom data
+    delete payload._origin
     this.connection.send(payload, res)
   }
 }

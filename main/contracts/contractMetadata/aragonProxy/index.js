@@ -1,4 +1,4 @@
-const store = require('../../main/store')
+const store = require('../../../store')
 const Wrapper = require('@aragon/wrapper').default
 const first = require('rxjs/operators').first
 
@@ -22,7 +22,7 @@ module.exports = async function (to, web3) {
   const proxy = new web3.eth.Contract(require('./AppProxyBase.json').abi, to)
   const kernel = await proxy.methods.kernel().call()
   const options = {
-    provider: require('../../main/provider'),
+    provider: require('../../../provider'),
     apm: {
       ipfs: {
         gateway: 'https://ipfs.eth.aragon.network/ipfs'
@@ -33,7 +33,9 @@ module.exports = async function (to, web3) {
   const wrap = new Wrapper(kernel, options)
   await wrap.init()
   const apps = await wrap.apps.pipe(first()).toPromise()
+  console.log(apps)
   const app = apps.find((app) => addressesEqual(app.proxyAddress, to))
+  if (!app) return console.log('NO APP FOUND')
   var detailed = {
     abi: app.abi,
     userdoc: {
