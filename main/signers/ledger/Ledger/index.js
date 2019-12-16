@@ -340,12 +340,13 @@ class Ledger extends Signer {
   }
 
   _deriveLegacyAddresses () {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
-        const result = await this.getAddress(this.network === '1' ? BASE_PATH_LEGACY : BASE_PATH_TEST, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
+        this.getAddress(this.network === '1' ? BASE_PATH_LEGACY : BASE_PATH_TEST, false, true).then((result) => {
+          this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
+            if (err) reject(err)
+            else resolve(addresses)
+          })
         })
       } catch (err) {
         reject(err)

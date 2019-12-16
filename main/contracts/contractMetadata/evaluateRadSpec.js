@@ -5,17 +5,17 @@ const Web3 = require('web3')
 const mapping = require('./mapping.json')
 const contracts = require('./contracts')
 
-const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x'}) => {
-  const web3 = new Web3(require('../../provider'));
+const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x' }) => {
+  const web3 = new Web3(require('../../provider'))
   const contractsInChain = mapping[chainId]
   if (!contractsInChain || Object.keys(contractsInChain).length === 0) return null
   const metaDataPath = contractsInChain[to] || contractsInChain[toChecksumAddress(to)]
-  var metaData = null 
-  if (metaDataPath){
-    metaData = await contracts(metaDataPath,to,web3)
-  }else{
+  var metaData = null
+  if (metaDataPath) {
+    metaData = await contracts(metaDataPath, to, web3)
+  } else {
     const code = await web3.eth.getCode(to)
-    if(mapping.code[code]) metaData = await contracts(mapping.code[code],to,web3);
+    if (mapping.code[code]) metaData = await contracts(mapping.code[code], to, web3)
   }
   if (!metaData) return null
   abiDecoder.addABI(metaData.abi)
@@ -29,6 +29,7 @@ const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x'}) => {
     metaData.userdoc.methods[signature] &&
     metaData.userdoc.methods[signature].notice
 
+  console.log(expression)
   if (!expression) return null
 
   const call = {
@@ -36,10 +37,10 @@ const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x'}) => {
     abi: metaData.abi
   }
 
-  const result = await radspec.evaluate(expression, call, {eth: web3.eth})
+  const result = await radspec.evaluate(expression, call, { eth: web3.eth })
 
-  console.log(result)
-  return result
+  console.log(result.radspec)
+  return result.radspec
 }
 
 module.exports = evaluateRadSpec

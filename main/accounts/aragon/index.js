@@ -16,12 +16,13 @@ const registryAddress = () => {
   throw new Error('Unable to locate Aragon ENS registry for current network')
 }
 
-const resolveAragon = async (domain, registryAddress) => {
-  return new Promise(async (resolve, reject) => {
+const resolveAragon = (domain, registryAddress) => {
+  return new Promise((resolve, reject) => {
     try {
-      const address = await ensResolve(domain, { provider: require('../../provider'), registryAddress })
-      if (address.replace('0x', '')) return resolve(address)
-      throw new Error('Invalid address')
+      ensResolve(domain, { provider: require('../../provider'), registryAddress }).then((address) => {
+        if (address.replace('0x', '')) return resolve(address)
+        throw new Error('Invalid address')
+      })
     } catch (e) {
       reject(new Error(`Unable to resolve DAO ${domain} on current network`))
     }
@@ -29,7 +30,7 @@ const resolveAragon = async (domain, registryAddress) => {
 }
 
 const resolveName = (name) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       // Look up registry address based on current network connection
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
@@ -42,20 +43,22 @@ const resolveName = (name) => {
           ensRegistryAddress: registryAddress()
         }
       }
-      const address = await resolveAragon(domain, options.apm.ensRegistryAddress)
-      const wrap = new Wrapper(address, options)
-      await wrap.init()
-      const subscription = wrap.apps.subscribe(apps => {
-        subscription.unsubscribe()
-        const appsSummary = {}
-        apps.forEach(app => {
-          const { appId, proxyAddress } = app
-          const name = appNames[appId]
-          if (name) appsSummary[name] = { proxyAddress }
+      resolveAragon(domain, options.apm.ensRegistryAddress).then((address) => {
+        const wrap = new Wrapper(address, options)
+        wrap.init().then(() => {
+          const subscription = wrap.apps.subscribe(apps => {
+            subscription.unsubscribe()
+            const appsSummary = {}
+            apps.forEach(app => {
+              const { appId, proxyAddress } = app
+              const name = appNames[appId]
+              if (name) appsSummary[name] = { proxyAddress }
+            })
+            if (!appsSummary.kernel) return reject(new Error('Unable to locate DAO kernel'))
+            if (!appsSummary.agent) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
+            resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.connection.network') })
+          })
         })
-        if (!appsSummary.kernel) return reject(new Error('Unable to locate DAO kernel'))
-        if (!appsSummary.agent) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
-        resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.connection.network') })
       })
     } catch (e) {
       reject(e)
