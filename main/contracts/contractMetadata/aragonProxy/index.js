@@ -33,7 +33,9 @@ module.exports = async function (to, web3) {
   const wrap = new Wrapper(kernel, options)
   await wrap.init()
   const apps = await wrap.apps.pipe(first()).toPromise()
+  console.log(apps)
   const app = apps.find((app) => addressesEqual(app.proxyAddress, to))
+  if (!app) return console.log('NO APP FOUND')
   var detailed = {
     abi: app.abi,
     userdoc: {

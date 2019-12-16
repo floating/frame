@@ -57,6 +57,9 @@
   z-index 10000000
   pointer-events none
 
+  div
+    transition-delay 1s height
+
   .signerContainer
     position relative
     z-index 300002
@@ -296,9 +299,10 @@
       bottom 0
       left 0
       display flex
+      letter-spacing 0
       justify-content center
       align-items center
-      font-size 13px
+      font-size 12px
       opacity 0
       transition standard
 
@@ -1228,6 +1232,11 @@
     box-shadow cardDrop0
 
 .openSigner
+  // .signerContainer
+  //   background transparent
+  //   box-shadow none
+  //   .signerContainerInset
+  //     background transparent
   .signerMid
     > div
       opacity 1
