@@ -344,7 +344,7 @@ class TransactionRequest extends React.Component {
                   <div className='txDetails'>
                     {description ? (
                       <>
-                        <div className='txDescription'>{description.type + description.message}</div>
+                        <div className='txDescription'>{description.type + " " + description.message}</div>
                         <div className='transactionTotals'>
                           <div className='transactionTotalETH'>{'Ξ ' + value}</div>
                           <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
