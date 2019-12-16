@@ -126,7 +126,7 @@ class Status extends React.Component {
       <div className={statusClass} onMouseDown={statusOpen}>
         {status === 'locked' ? (
           <div className='accountStatusInner'>
-            <div className='accountStatusIndicator'>
+            <div className='accountStatusIndicator accountStatusIndicatorLocked'>
               {svg.octicon('shield', { height: 18 })}
             </div>
             <div className='accountStatusTitle'>
@@ -147,7 +147,7 @@ class Status extends React.Component {
         ) : null}
         {status === 'disconnected' ? (
           <div className='accountStatusInner'>
-            <div className='accountStatusIndicator'>
+            <div className='accountStatusIndicator accountStatusIndicatorLocked'>
               {svg.unlink(16)}
             </div>
             <div className='accountStatusTitle'>

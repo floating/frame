@@ -251,8 +251,11 @@ class Provider extends EventEmitter {
   fillDone (fullTx, res) {
     this.getGasPrice(fullTx, response => {
       if (response.error) return res({ need: 'gasPrice', message: response.error.message })
-      const minGas = '0x' + (Math.floor(response.result * 1.2)).toString(16)
-      if (!fullTx.gasPrice || fullTx.gasPrice < minGas) fullTx.gasPrice = minGas
+      const gasPrice = store('main.gasPrice')
+      // const minGas = '0x' + (Math.floor(response.result * 1.2)).toString(16)
+      // if (!fullTx.gasPrice) fullTx.gasPrice = defaultGas
+      const defaultGas = gasPrice.levels[gasPrice.default]
+      fullTx.gasPrice = defaultGas
       res(null, fullTx)
     })
   }

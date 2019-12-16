@@ -103,7 +103,7 @@ class Account {
       this.update()
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')
-      this.loadDescription(req)
+      if (req.type === 'transaction') this.loadDescription(req)
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {

@@ -397,13 +397,13 @@
     padding-bottom 10px
     border-radius 2px
     justify-content space-between
-    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+    box-shadow 3px 3px 3px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
     border-radius 15px
     height 380px
     display flex
     justify-content center
     transition standard
-    background light
+    background ghostD
     z-index 2000
     color outerspace08
     tranform translateZ(0)
@@ -582,13 +582,14 @@
       letter-spacing 2px
       font-weight 400
       font-size 14px
+      z-index 30000
       // background blue
       color outerspace08
       border-top-left-radius 9px
       border-top-right-radius 9px
       // box-shadow 0px 1px 0px thick
       .approveRequestHeaderIcon
-        width 40px
+        width 0px
         height 40px
         display flex
         justify-content center
@@ -596,9 +597,33 @@
         z-index 10
         transition standard
         position absolute
-        border-radius 3px
-        left 5px
+        border-top-right-radius 15px
+        border-bottom-left-radius 15px
+        right 0px
+        padding-left 0px
         color outerspace08
+        background ghostC
+        box-shadow cardDrop
+
+      .approveRequestHeaderLabel
+        height 40px
+        display flex
+        justify-content center
+        align-items center
+        z-index 10
+        transition standard
+        position absolute
+        border-top-left-radius 15px
+        border-bottom-right-radius 15px
+        left 0px
+        padding 0px 15px 0px 45px
+        color outerspace08
+        background ghostC
+        box-shadow cardDrop
+
+        svg
+          position absolute
+          left 15px
 
       .approveRequestHeaderClose
         width 40px
@@ -726,270 +751,49 @@
     align-items center
     flex-direction column
 
+.txSection
+  position absolute
+  // bottom 130px
+  left 0px
+  right 0px
+  bottom 0px
+  height 48px
+  z-index 2000
+  // background highlight
+  color outerspace08
+  font-size 14px
+  font-weight 400
+  // letter-spacing 1px
+  // text-transform uppercase
+  transition standard
+  overflow hidden
+  border-radius 0px
+  // background transparent
+  // background blue
 
-  .txSection
+  font-family OpenSans
+  // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+  // border-radius 3px
+  // background blue
+  // background blue
+  left 10px
+  right 10px
+  border-radius 15px
+  height 30px
+  background ghostC
+  box-shadow cardDrop
+  position absolute
+  overflow hidden
+  font-size 13px
+  font-weight 400
+
+  .txSectionHeader
     position absolute
-    // bottom 130px
-    left 0px
-    right 0px
-    bottom 0px
-    height 48px
-    z-index 2000
-    display flex
-    justify-content center
-    align-items center
-    // background highlight
-    color outerspace08
-    font-size 14px
-    font-weight 400
-    // letter-spacing 1px
-    // text-transform uppercase
-    transition standardSlow
-    overflow hidden
-    border-radius 0px
-    // background transparent
-    // background blue
-
-    font-family OpenSans
-    // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-    // border-radius 3px
-    // background blue
-    // background blue
-    left 10px
-    right 10px
-    border-radius 15px
-    height 30px
-    background highlighter
-    box-shadow cardDrop
-    position absolute
-    overflow hidden
-    font-size 13px
-    font-weight 400
-
-    .txSectionHeader
-      position absolute
-      top 0
-      left 0
-      right 0
-      height 50px
-      border-bottom 1px solid thick
-      justify-content space-between
-      display flex
-      align-items center
-      text-transform uppercase
-      letter-spacing 1px
-      font-weight 400
-      z-index 10
-
-      .txSectionLabel
-        display flex
-        justify-content center
-        align-items center
-        z-index 10
-        transition standard
-
-      .txSectionNotice
-        width 40px
-        display flex
-        justify-content center
-        align-items center
-        z-index 10
-        transition standard
-        color outerspace08
-
-      .txSectionIndicator
-        width 40px
-        display flex
-        justify-content center
-        align-items center
-        z-index 10
-        transform rotate(-180deg)
-        transition standardSlow
-
-    .networkFee
-      position absolute
-      left 0
-      // padding-left 5px
-      width 60px
-      height 30px
-      box-sizing border-box
-      display flex
-      justify-content center
-      align-items center
-      border-right 1px solid thick
-      background highlightest
-      border-radius 15px
-
-    .networkSpeed
-      position absolute
-      right 0px
-      width 60px
-      height 30px
-      box-sizing border-box
-      display flex
-      justify-content center
-      align-items center
-      border-left 1px solid thick
-      border-radius 15px
-      color good
-      background highlightest
-      border-radius 15px
-
-    .networkFeeTotal
-      position absolute
-      left 60px
-      right 60px
-      // width 140px
-      height 30px
-      box-sizing border-box
-      display flex
-      justify-content center
-      // align-items center
-      font-size 14px
-      letter-spacing 0px
-
-      .networkFeeTotalSection
-        padding 0px 4px
-        height 30px
-        display flex
-        justify-content center
-        align-items center
-
-      .networkFeeTotalETH
-        font-size 18px
-        // font-family FiraCode
-        // font-weight 600
-
-    // .networkFeeTotalUSD
-      // position absolute
-      // left 230px
-      // padding-left 5px
-      // width 100px
-      // height 30px
-      // box-sizing border-box
-      // display flex
-      // justify-content center
-      // align-items center
-      // border-right 1px solid thick
-
-    // .transactionTotals
-    //   display flex
-    //   justify-content center
-    //   align-items center
-    //   font-size 18px
-    //   letter-spacing 0
-    //   // flex-direction column
-    //
-    // .transactionTotalUSD
-    //   margin-left 4px
-    //   padding 0px 10px
-    //   font-size 14px
-    //   border-radius 9px
-    //   height 18px
-    //   background highlightest
-    //   box-shadow cardDrop
-    //   font-weight 400
-    //   box-sizing border-box
-
-    .transactionWarning
-      color bad
-
-    .transactionFeeWarning
-      margin-left 6px
-      padding-bottom 8px
-      color bad
-
-    .transactionFee
-      .transactionTotals
-        font-size 12px
-
-      .transactionTotalUSD
-        font-size 15px
-        padding 2px 8px
-        font-weight 300
-
-
-  .txSectionBody
-    position absolute
-    color outerspace08
-    top 50px
+    top 0
     left 0
     right 0
-    bottom 0
-    display flex
-    padding 16px 14px
-    user-select all
-    overflow hidden
-    z-index 9
-
-    .txSectionBodyInner
-      opacity 0
-      top -100px
-      position relative
-      max-width 100%
-      width 100%
-      height 100%
-      font-size 13px
-      text-transform none
-      transition standardSlow
-      overflow-wrap break-word
-      word-wrap break-word
-      font-family FiraCode, monospace
-      overflow-x hidden
-      overlflow-y scroll
-
-
-  .txSectionSelected
-    position absolute
-    bottom 5px
-    left 5px
-    right 5px
-    top 65px
-
-    .txSectionHeader
-      .txSectionIndicator
-        transform rotate(0deg)
-
-    .txSectionBody
-      .txSectionBodyInner
-        opacity 1
-        top 0px
-
-  // .transactionData
-  //   position absolute
-  //   bottom 130px
-  //   left 5px
-  //   right 5px
-  //   top 190px
-  //   z-index 2000
-  //   display flex
-  //   justify-content center
-  //   align-items center
-  //   background highlight
-  //   color outerspace08
-  //   font-size 14px
-  //   font-weight 400
-  //   letter-spacing 1px
-  //   text-transform uppercase
-  //   transition standard
-  //   overflow hidden
-  //   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-  //   border-radius 3px
-
-  .txData
-    height 18px
-    // margin-top -10px
-    // padding-bottom 10px
-
-  .transactionDataHeader
-    position absolute
-    top 10px
-    left 50%
-    right 0
-    height 18px
-    width 170px
-    margin-left -90px
-    // border-bottom 1px solid thick
+    height 50px
+    border-bottom 1px solid thick
     justify-content space-between
     display flex
     align-items center
@@ -997,18 +801,16 @@
     letter-spacing 1px
     font-weight 400
     z-index 10
-    background highlight
-    border-radius 9px
 
-    .transactionDataLabel
+    .txSectionLabel
       display flex
       justify-content center
       align-items center
       z-index 10
       transition standard
 
-    .transactionDataNotice
-      width 18px
+    .txSectionNotice
+      width 40px
       display flex
       justify-content center
       align-items center
@@ -1016,242 +818,503 @@
       transition standard
       color outerspace08
 
-    .transactionDataIndicator
-    // width 22px
+    .txSectionIndicator
+      width 40px
       display flex
       justify-content center
       align-items center
       z-index 10
-      margin-bottom 2px
-      margin-right 6px
       transform rotate(-180deg)
       transition standardSlow
 
-  .transactionDataBody
+  .txSectionLabelLeft
     position absolute
-    color outerspace08
-    top 50px
     left 0
     right 0
-    bottom 0
+    width 70px
+    height 30px
+    box-sizing border-box
+    border-right 1px solid thick
+    background ghostA
+    box-shadow cardDrop, 0px 1px 1px thin
+    // border-top-left-radius 3px
+    // border-bottom-left-radius 3px
+    // border-top-right-radius 15px
+    border-radius 15px
+    text-align center
     display flex
-    padding 16px 14px
-    user-select all
     overflow hidden
-    z-index 9
 
-    .transactionDataBodyInner
-      opacity 0
-      top -100px
-      position relative
-      max-width 100%
-      width 100%
-      height 100%
-      font-size 13px
-      text-transform none
+    .txSectionLabelLeftInner
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      padding 5px
       transition standardSlow
-      overflow-wrap break-word
-      word-wrap break-word
-      font-family FiraCode, monospace
-      overflow-x hidden
-      overlflow-y scroll
 
-
-  .transactionDataSelected
+  .txSectionLabelRight
     position absolute
-    bottom 5px
-    left 5px
-    right 5px
-    top 65px
+    right 0px
+    width 70px
+    height 30px
+    box-sizing border-box
+    border-left 1px solid thick
+    // border-top-right-radius 3px
+    // border-bottom-right-radius 3px
+    // border-top-left-radius 15px
+    border-radius 15px
+    // color good
+    background ghostA
+    box-shadow cardDrop, 0px 1px 1px thin
+    padding 5px
+    text-align center
 
-    .transactionDataHeader
-      .transactionDataIndicator
-        transform rotate(0deg)
-
-    .transactionDataBody
-      .transactionDataBodyInner
-        opacity 1
-        top 0px
-
-  .transactionNoData
-    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-
-  .transactionTo
-    height 70px
+  .networkFeeOptions
+    position realtive
+    height 160px
     width 100%
+    padding-top 10px
+    transition standard
+
+  .networkFeeOption
+    position relative
+    height 30px
+    width 100%
+    margin-bottom 10px
+
+    div, svg
+      pointer-events none
+
+  .networkFeeTotal
+    position absolute
+    left 60px
+    right 60px
+    // width 140px
+    height 30px
+    box-sizing border-box
     display flex
     justify-content center
-    align-items center
-    flex-direction column
-    position absolute
-    bottom 60px
-    right 0
-    left 0
+    // align-items center
+    font-size 13px
+    letter-spacing 0px
 
-    .transactionToAddress
-      font-size 12px
-      // font-family firaCode
-      position relative
-      height 25px
-      width 100%
-      -webkit-app-region no-drag
+    .networkFeeTotalSection
+      padding 0px 4px
+      height 30px
+      // display flex
+      // justify-content center
+      // align-items center
 
-      .transactionToAddressLarge
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
-        display flex
-        justify-content center
-        align-items center
-        font-size 20px
-        opacity 1
-        transition standard
-
-        svg
-          color outerspace08
-          padding-top 5px
-          padding-left 5px
-          padding-right 5px
-
-      .transactionToAddressFull
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
-        display flex
-        justify-content center
-        align-items center
-        font-size 12px
-        opacity 0
-        transition standard
-        font-weight bold
-
-    .transactionToAddress:hover
-        .transactionToAddressLarge
-          opacity 0
-        .transactionToAddressFull
-          opacity  1
-
-    .transactionToSub
-      font-weight 400
-      text-transform uppercase
-      font-size 13px
+    .networkFeeTotalETH
+      font-size 16px
       margin-top 4px
-      letter-spacing 1px
+      // font-family FiraCode
+      // font-weight 600
+     .networkFeeTotalUSD
+       margin-top 6px
 
-  .unknownType
+      .networkFeeTotalApprox
+        margin-top 6px
+
+  // .networkFeeTotalUSD
+    // position absolute
+    // left 230px
+    // padding-left 5px
+    // width 100px
+    // height 30px
+    // box-sizing border-box
+    // display flex
+    // justify-content center
+    // align-items center
+    // border-right 1px solid thick
+
+  // .transactionTotals
+  //   display flex
+  //   justify-content center
+  //   align-items center
+  //   font-size 18px
+  //   letter-spacing 0
+  //   // flex-direction column
+  //
+  // .transactionTotalUSD
+  //   margin-left 4px
+  //   padding 0px 10px
+  //   font-size 14px
+  //   border-radius 9px
+  //   height 18px
+  //   background highlightest
+  //   box-shadow cardDrop
+  //   font-weight 400
+  //   box-sizing border-box
+
+  .transactionWarning
+    color bad
+
+  .transactionFeeWarning
+    margin-left 6px
+    padding-bottom 8px
+    color bad
+
+  .transactionFee
+    .transactionTotals
+      font-size 12px
+
+    .transactionTotalUSD
+      font-size 15px
+      padding 2px 8px
+      font-weight 300
+
+.txSectionBody
+  position absolute
+  color outerspace08
+  top 50px
+  left 0
+  right 0
+  bottom 0
+  display flex
+  padding 16px 14px
+  user-select all
+  overflow hidden
+  z-index 9
+
+  .txSectionBodyInner
+    opacity 0
+    top -100px
+    position relative
+    max-width 100%
+    width 100%
+    height 100%
+    font-size 13px
+    text-transform none
+    transition standardSlow
+    overflow-wrap break-word
+    word-wrap break-word
+    font-family FiraCode, monospace
+    overflow-x hidden
+    overlflow-y scroll
+
+.txSectionSelected
+  position absolute
+  bottom 5px
+  left 5px
+  right 5px
+  top 65px
+
+  .txSectionHeader
+    .txSectionIndicator
+      transform rotate(0deg)
+
+  .txSectionBody
+    .txSectionBodyInner
+      opacity 1
+      top 0px
+
+// .transactionData
+//   position absolute
+//   bottom 130px
+//   left 5px
+//   right 5px
+//   top 190px
+//   z-index 2000
+//   display flex
+//   justify-content center
+//   align-items center
+//   background highlight
+//   color outerspace08
+//   font-size 14px
+//   font-weight 400
+//   letter-spacing 1px
+//   text-transform uppercase
+//   transition standard
+//   overflow hidden
+//   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+//   border-radius 3px
+
+.txData
+  height 18px
+  // margin-top -10px
+  // padding-bottom 10px
+
+.transactionDataHeader
+  position absolute
+  top 10px
+  left 50%
+  right 0
+  height 18px
+  width 170px
+  margin-left -90px
+  // border-bottom 1px solid thick
+  justify-content space-between
+  display flex
+  align-items center
+  text-transform uppercase
+  letter-spacing 1px
+  font-weight 400
+  z-index 10
+  background highlight
+  border-radius 9px
+
+  .transactionDataLabel
     display flex
     justify-content center
     align-items center
-    width 100%
-    margin-bottom 60px
-    padding 20px
+    z-index 10
+    transition standard
 
-  .requestApprove
+  .transactionDataNotice
+    width 18px
+    display flex
+    justify-content center
+    align-items center
+    z-index 10
+    transition standard
+    color outerspace08
+
+  .transactionDataIndicator
+  // width 22px
+    display flex
+    justify-content center
+    align-items center
+    z-index 10
+    margin-bottom 2px
+    margin-right 6px
+    transform rotate(-180deg)
+    transition standardSlow
+
+.transactionDataBody
+  position absolute
+  color outerspace08
+  top 50px
+  left 0
+  right 0
+  bottom 0
+  display flex
+  padding 16px 14px
+  user-select all
+  overflow hidden
+  z-index 9
+
+  .transactionDataBodyInner
+    opacity 0
+    top -100px
+    position relative
+    max-width 100%
+    width 100%
+    height 100%
+    font-size 13px
+    text-transform none
+    transition standardSlow
+    overflow-wrap break-word
+    word-wrap break-word
+    font-family FiraCode, monospace
+    overflow-x hidden
+    overlflow-y scroll
+
+
+.transactionDataSelected
+  position absolute
+  bottom 5px
+  left 5px
+  right 5px
+  top 65px
+
+  .transactionDataHeader
+    .transactionDataIndicator
+      transform rotate(0deg)
+
+  .transactionDataBody
+    .transactionDataBodyInner
+      opacity 1
+      top 0px
+
+.transactionNoData
+  box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+
+.transactionTo
+  height 70px
+  width 100%
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+  position absolute
+  bottom 60px
+  right 0
+  left 0
+
+  .transactionToAddress
+    font-size 12px
+    // font-family firaCode
+    position relative
+    height 25px
+    width 100%
+    -webkit-app-region no-drag
+
+    .transactionToAddressLarge
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      display flex
+      justify-content center
+      align-items center
+      font-size 20px
+      opacity 1
+      transition standard
+
+      svg
+        color outerspace08
+        padding-top 5px
+        padding-left 5px
+        padding-right 5px
+
+    .transactionToAddressFull
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      display flex
+      justify-content center
+      align-items center
+      font-size 12px
+      opacity 0
+      transition standard
+      font-weight bold
+
+  .transactionToAddress:hover
+      .transactionToAddressLarge
+        opacity 0
+      .transactionToAddressFull
+        opacity  1
+
+  .transactionToSub
+    font-weight 400
+    text-transform uppercase
+    font-size 13px
+    margin-top 4px
+    letter-spacing 1px
+
+.unknownType
+  display flex
+  justify-content center
+  align-items center
+  width 100%
+  margin-bottom 60px
+  padding 20px
+
+.requestApprove
+  position absolute
+  left 0
+  right 0
+  bottom 0
+  height 60px
+  border-bottom-left-radius 6px
+  border-bottom-right-radius 6px
+  font-size 14px
+  text-transform uppercase
+  -webkit-app-region no-drag
+  pointer-events auto
+  opacity 1
+  transition standardFast
+  display flex
+  // justify-content space-around
+  align-items center
+  font-weight 400
+  // border-top 1px solid thick
+  // background highlight
+
+  .requestApproveSplit
     position absolute
-    left 0
+    width 1px
+    background doubleThick
+    height 100%
+    left 50%
+
+  .requestDecline
+    position relative
+    width 50%
+    height 100%
+    // border-right 1px solid thick
+    overflow hidden
+    position relative
+
+  .requestDeclineButton
+    position absolute
+    top 15px
     right 0
     bottom 0
-    height 60px
-    border-bottom-left-radius 6px
-    border-bottom-right-radius 6px
-    font-size 14px
-    text-transform uppercase
-    -webkit-app-region no-drag
-    pointer-events auto
-    opacity 1
-    transition standardFast
+    left 0
+    animation scalein 3000ms cubic
+    transform translateZ(0px)
     display flex
-    justify-content space-around
-    align-items center
-    font-weight 400
-    // border-top 1px solid thick
-    // background highlight
+    justify-content center
+    // align-items center
+    -webkit-app-region no-drag
+    transition standard
+    letter-spacing 2px
+    padding-left 2px
+    padding-bottom 10px
 
-    .requestDecline
-      position relative
-      width 50%
-      height 100%
-      border-right 1px solid thick
-      overflow hidden
-      position relative
+  .requestDeclineButton:before
+    content ''
+    position absolute
+    margin-left -1px
+    height 4px
+    border-radius 2px
+    width 30px
+    background bad06
+    bottom 14px
 
-    .requestDeclineButton
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
-      animation scalein 3000ms cubic
-      transform translateZ(0px)
-      display flex
-      justify-content center
-      align-items center
-      -webkit-app-region no-drag
-      transition standard
-      letter-spacing 2px
-      padding-left 2px
-      padding-bottom 10px
+  .requestDeclineButton:hover:before
+    background bad
 
-    .requestDeclineButton:before
-      content ''
-      position absolute
-      margin-left -1px
-      height 4px
-      border-radius 2px
-      width 30px
-      background bad06
-      bottom 14px
+  .requestSign
+    position relative
+    width 50%
+    height 100%
+    overflow hidden
 
-    .requestDeclineButton:hover:before
-      background bad
+  .requestSignButton
+    position absolute
+    top 15px
+    right 0
+    bottom 0
+    left 0
+    animation scalein 3000ms cubic
+    transform translateZ(0px)
+    display flex
+    justify-content center
+    // align-items center
+    -webkit-app-region no-drag
+    transition standard
+    letter-spacing 2px
+    padding-left 2px
+    padding-bottom 10px
 
-    .requestSign
-      position relative
-      width 50%
-      height 100%
-      overflow hidden
+  .requestSignButton:before
+    content ''
+    position absolute
+    margin-left -1px
+    height 4px
+    border-radius 2px
+    width 30px
+    background good06
+    bottom 14px
 
-    .requestSignButton
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
-      animation scalein 3000ms cubic
-      transform translateZ(0px)
-      display flex
-      justify-content center
-      align-items center
-      -webkit-app-region no-drag
-      transition standard
-      letter-spacing 2px
-      padding-left 2px
-      padding-bottom 10px
+  .requestSignButton:hover:before
+    background good
 
-    .requestSignButton:before
-      content ''
-      position absolute
-      margin-left -1px
-      height 4px
-      border-radius 2px
-      width 30px
-      background good06
-      bottom 14px
-
-    .requestSignButton:hover:before
-      background good
-
-  .requestApproveDisabled
+.requestApproveDisabled
+  pointer-events none
+  opacity 0.2
+  .requestDecline
     pointer-events none
-    opacity 0.2
-    .requestDecline
-      pointer-events none
-    .requestSign
-      pointer-events none
+  .requestSign
+    pointer-events none
 
 .signerRequestsHidden
   left -100%
@@ -1775,13 +1838,46 @@ span
   height 62px
   text-align center
 
-.approveRequestHeaderLabel
-  display flex
-  flex-direction column
-  justify-content center
-  align-items center
-
 .requestOrigin
   font-size 10px
   text-transform none
   letter-spacing 1px
+
+.txFee
+  box-shadow cardDrop, 0px 2px 2px thick
+
+  .networkFeeLabel
+    position absolute
+    top 0
+    right 0
+    height 30px
+    border-top-right-radius 15px
+    border-bottom-left-radius 15px
+    padding 0px 20px 0px 20px
+    height 40px
+    display flex
+    justify-content center
+    align-items center
+    transition standard
+    position absolute
+    color outerspace08
+    background ghostB
+    box-shadow cardDrop
+    letter-spacing 2px
+    font-weight 400
+    font-size 14px
+    text-transform uppercase
+    transition standard
+
+.customGasPriceBar
+  position absolute
+  bottom -9px
+  left 10px
+  right 10px
+  height 4px
+
+  .customGasPriceBarInner
+    width 20px
+    height 4px
+    position absolute
+    border-radius 2px
