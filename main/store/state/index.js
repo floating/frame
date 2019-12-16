@@ -101,6 +101,14 @@ const initial = {
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },
+    gasPrice: {
+      default: 'normal',
+      levels: {
+        slow: '0x' + (8000000000).toString(16), // We set
+        normal: '0x' + (12000000000).toString(16), // We set
+        fast: '0x' + (20000000000).toString(16)
+      }
+    },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions
     signers: {},

@@ -162,6 +162,9 @@ const rpc = {
     } catch (e) {
       cb(e)
     }
+  },
+  setGasPrice (price, handlerId, cb) {
+    accounts.setGasPrice(price, handlerId)
   }
 }
 

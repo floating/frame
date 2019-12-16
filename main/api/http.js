@@ -85,6 +85,7 @@ const handler = (req, res) => {
           res.writeHead(401, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ error: 'Invalid Client ID' }))
         }
+        payload._origin = origin
         provider.send(payload, response => {
           if (response && response.result) {
             if (payload.method === 'eth_subscribe') {

@@ -44,6 +44,7 @@ const handler = (socket, req) => {
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
+      payload._origin = origin
       provider.send(payload, response => {
         if (response && response.result) {
           if (payload.method === 'eth_subscribe') {

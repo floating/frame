@@ -7,7 +7,7 @@ const mapping = require('./mapping.json')
 const contracts = require('./contracts')
 
 const evaluateRadSpec = async ({ chainId = '0x1', data = '0x', to = '0x' }) => {
-  const web3 = new Web3(require('../main/provider'))
+  const web3 = new Web3(require('../../provider'))
   const contractsInChain = mapping[chainId]
   if (!contractsInChain || Object.keys(contractsInChain).length === 0) return null
   const metaDataPath = contractsInChain[to] || contractsInChain[toChecksumAddress(to)]
