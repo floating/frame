@@ -2,6 +2,8 @@
 // const { URL } = require('url')
 //
 // const trayInitial = true
+const fetch = require('node-fetch');
+
 
 module.exports = {
   // setSync: (u, key, payload) => u(key, () => payload),
@@ -31,6 +33,7 @@ module.exports = {
   setSecondary: (u, status) => u('main.connection.secondary', secondary => Object.assign({}, secondary, status)),
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
+  toggleGasStation: u => u('main.gasStation', gasStation => !gasStation),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   clearPermissions: (u, address) => {
     u('main.addresses', address, address => {
@@ -174,6 +177,17 @@ module.exports = {
   },
   saveAccount: (u, id) => {
     u('main.save.account', () => id)
+  },
+  updatePrices: (u, prices) => {
+    fetch("https://ethgasstation.info/json/ethgasAPI.json")
+      .then((res) => res.json())
+      .then((json) => u('main.gasPrice.levels', () => {
+        return {
+          slow: ('0x' + (json.safeLow * 100000000).toString(16)), 
+          normal: ('0x' + (json.average * 100000000).toString(16)), 
+          fast: ('0x' + (json.fast * 100000000).toString(16))
+        }
+      }))
   }
   // TODO move all tray actions here..
 }

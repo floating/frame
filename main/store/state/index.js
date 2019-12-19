@@ -88,6 +88,7 @@ const initial = {
     },
     pin: main('pin', false),
     launch: main('launch', false),
+    gasStation: main('gasStation', true),
     reveal: main('reveal', false),
     dapp: {
       details: {},

@@ -209,6 +209,17 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission'>
             <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Use Eth Gas Station</div>
+              <div className={this.store('main.gasStation') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleGasStation')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Use the third party Eth Gas Station service to choose gas price options based on network conjestion'}
+            </div>
+          </div>
+          <div className='signerPermission'>
+            <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
                 <div className='signerPermissionToggleSwitch' />

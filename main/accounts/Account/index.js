@@ -91,6 +91,9 @@ class Account {
 
   async loadDescription (req) {
     const rawTx = req.data
+    if(store('main.gasStation')){
+      store.updatePrices()
+    }
     req.description = await description.load(rawTx)
     this.update()
   }
