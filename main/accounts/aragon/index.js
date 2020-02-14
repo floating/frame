@@ -9,7 +9,7 @@ const appNames = require('./appNames')
 const registryAddress = () => {
   const network = store('main.connection.network')
   const addresses = {
-    1: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    1: '0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e',
     4: '0x98df287b6c145399aaa709692c8d308357bc085d'
   }
   if (addresses[network]) return addresses[network]
