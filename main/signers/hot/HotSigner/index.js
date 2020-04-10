@@ -3,7 +3,7 @@ const fs = require('fs')
 const { ensureDirSync, removeSync } = require('fs-extra')
 const { fork } = require('child_process')
 const log = require('electron-log')
-const uuid = require('uuid/v4')
+const { v4: uuid } = require('uuid')
 const { userData, windows } = require('../../../util')
 
 const Signer = require('../../Signer')

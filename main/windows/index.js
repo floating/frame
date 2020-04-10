@@ -175,7 +175,7 @@ const api = {
   // },
   tray: () => {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
-    tray.setHighlightMode('never')
+    // tray.setHighlightMode('never')
     tray.on('click', api.trayClick)
     api.create()
   },

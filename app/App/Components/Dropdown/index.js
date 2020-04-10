@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import uuid from 'uuid'
+import { v4 as uuid } from 'uuid'
 
 const findIndex = (options, value) => {
   const index = options.findIndex((option) => option.value === value)

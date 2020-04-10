@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 import { URL } from 'url'
 
 export const syncMain = (u, main) => u('main', _ => main)
