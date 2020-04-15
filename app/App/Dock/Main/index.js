@@ -74,34 +74,38 @@ class Main extends React.Component {
     const style = this.store('selected.card') === 'default' ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     if (!this.store('selected.open')) style.bottom = '80px'
     // const cardSelected = this.props.card === 'main'
-    let mainClass = 'main cardShow'
-    if (this.store('selected.card') !== 'default') mainClass = 'main cardHide'
+    // const current = this.store('selected.card') === 'main'
+    // const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
+    let mainClass = 'dockCard cardShow'
+    if (this.store('selected.card') !== 'default') mainClass = 'dockCard cardHide'
     // if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
     return (
       <div className={mainClass}>
-        <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
-          <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>
-            <Add />
-            <div id='panelWrap' ref={ref => { if (ref) this.wrap = ref }}>
-              {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
-              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
-                return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
-              })}
-              {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
-                <div className='noSigners'>
-                  <div className='introLogo'>{svg.logo(70)}</div>
-                  {`No ${accountNames[network]} Accounts Found`}
-                  <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
-                  <span className='featureBox'>
-                    <span className='featureBoxText'>
-                      FRAME ALPHA
+        <div className='dockCardInset'>
+          <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
+            <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>
+              <Add />
+              <div id='panelWrap' ref={ref => { if (ref) this.wrap = ref }}>
+                {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
+                {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
+                  return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                })}
+                {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
+                  <div className='noSigners'>
+                    <div className='introLogo'>{svg.logo(70)}</div>
+                    {`No ${accountNames[network]} Accounts Found`}
+                    <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
+                    <span className='featureBox'>
+                      <span className='featureBoxText'>
+                        FRAME ALPHA
+                      </span>
+                      <span className='featureBoxSubtext'>
+                        {'v' + require('../../../../package.json').version}
+                      </span>
                     </span>
-                    <span className='featureBoxSubtext'>
-                      {'v' + require('../../../../package.json').version}
-                    </span>
-                  </span>
-                </div>
-              ) : null}
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

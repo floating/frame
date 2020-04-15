@@ -200,31 +200,116 @@
         div, svg, img
           pointer-events none
 
+  .dockMenu
+    position absolute
+    top 0px
+    left 0px
+    right 0px
+    height 50px
+    z-index 100000000
+
+    .dockMenuMain
+      height 22px
+      width 22px
+      margin-left 13px
+      border-radius 20px
+      border 2px solid good
+      overflow hidden
+      position relative
+          
+      .dockMenuMainIcon
+        height 22px
+        width 22px
+        border-radius 15px
+        position absolute
+        bottom 0
+        display flex
+        justify-content center
+        align-items center
+
+        svg
+          margin-top 2px
+  
+    .dockMenuItem
+      // width 50px
+      height 50px
+      display flex
+      justify-content center
+      align-items center
+      margin-right 13px
+
+    .dockMenuLeft
+      position absolute
+      top 0px
+      left 0px
+      display flex
+      // background red
+
+    .dockMenuRight
+      position absolute
+      top 0px
+      right 0px
+      display flex
+
+    .pinFrame
+      // position absolute
+      // bottom 10px
+      left 0
+      width 50px
+      height 50px
+      z-index 10000000
+      display flex
+      justify-content center
+      align-items center
+      color outerspace03
+
+      svg
+        transform rotate(45deg)
+        transition standardFast
+
+    .pinFrame:hover
+      svg
+        color outerspace05
+
+    .pinFrameActive
+      svg
+        color outerspace08
+        transform rotate(0deg)
+
+    .pinFrameActive:hover
+      svg
+        color outerspace
+        transform rotate(0deg)
+
+    
   .dockMenuIndicator
     position absolute
+    top 0px
     left 0px
     width 50px
     // background blue
-    margin-top -1px
-    height 14px
-    border-top-right-radius 2px
-    border-bottom-right-radius 2px
+    // margin-top -1px
+    height 2px
+    // border-top-right-radius 2px
+    // border-bottom-right-radius 2px
     z-index 0
     display flex
     justify-content center
     align-items center
     color outerspace08
     transition standardFast
+    transform rotate(180deg)
+    // background blue
 
-    .dockMenuIndicatorLeft
-      position relative
-      left -12px
-      transform rotate(90deg)
+    // .dockMenuIndicatorLeft
+    //   position relative
+    //   left -12px
+    //   transform rotate(90deg)
 
-    .dockMenuIndicatorRight
-      position absolute
-      right 5px
-      transform rotate(-90deg)
+    // .dockMenuIndicatorRight
+    //   position absolute
+    //   right 5px
+      
 
   .expandFrame
     position absolute
@@ -251,36 +336,7 @@
     top 116px
     left -1px
 
-  .pinFrame
-    position absolute
-    bottom 10px
-    left 0
-    width 50px
-    height 32px
-    z-index 10000000
-    display flex
-    justify-content center
-    align-items center
-    color outerspace03
-
-    svg
-      transform rotate(45deg)
-      transition standardFast
-
-  .pinFrame:hover
-    svg
-      color outerspace05
-
-  .pinFrameActive
-    svg
-      color outerspace08
-      transform rotate(0deg)
-
-  .pinFrameActive:hover
-    svg
-      color outerspace
-      transform rotate(0deg)
-
+  
   .toggleDock
     position absolute
     top 49px

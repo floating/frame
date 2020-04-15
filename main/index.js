@@ -28,6 +28,7 @@ const clients = require('./clients')
 const signers = require('./signers')
 const persist = require('./store/persist')
 require('./dapps')
+require('./ipfs')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)

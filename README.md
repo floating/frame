@@ -7,7 +7,7 @@
   <br>
   <br>
 </h2>
-<h3 align="center">An OS-level web3 Interface :tada:</h3>
+<h3 align="center">System-wide web3 :tada:</h3>
 <br>
 <h5 align="center">
   <a href="#features">Features</a> ⁃

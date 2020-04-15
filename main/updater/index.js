@@ -19,6 +19,7 @@ const checkErr = (err) => log.error('Error checking latest version:', err)
 const options = { host: 'api.github.com', path: '/repos/floating/frame/releases', headers: { 'User-Agent': 'request' } }
 
 // autoUpdater.allowPrerelease = true
+// Add ability to turn this on in settings 
 autoUpdater.autoDownload = false
 
 autoUpdater.on('error', err => {

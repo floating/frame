@@ -57,13 +57,13 @@ app.on('ready', () => {
 // Ipfs
 app.on('ready', () => {
   // On client toggled ->
-  let on = false
-  store.observer(_ => {
-    if (on !== store('main.clients.ipfs.on')) {
-      on = store('main.clients.ipfs.on')
-      on ? ipfs.start() : ipfs.stop()
-    }
-  })
+  // let on = false
+  // store.observer(_ => {
+  //   if (on !== store('main.clients.ipfs.on')) {
+  //     on = store('main.clients.ipfs.on')
+  //     on ? ipfs.start() : ipfs.stop()
+  //   }
+  // })
 })
 
 module.exports = {

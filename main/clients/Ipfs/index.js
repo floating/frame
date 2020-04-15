@@ -10,6 +10,8 @@ const peers = require('./peers.json')
 // Mock windows module if running tests
 // const windows = app ? require('../../windows') : { broadcast: () => {} }
 
+// Use ipfs.js for always on, intergrated connections
+
 class IPFS extends Client {
   constructor (options) {
     super('ipfs', options)
