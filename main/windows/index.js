@@ -339,6 +339,7 @@ const api = {
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
     windows[session].webContents.on('did-finish-load', () => {
+      // windows[session].webContents.openDevTools()
       const dapp = store(`main.dapp.details.${hash(ens)}`)
       windows[session].send('main:location', { dapp, url, ens })
       windows[session].show()

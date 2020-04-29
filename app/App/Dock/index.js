@@ -63,8 +63,8 @@ class Dock extends React.Component {
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
     const indicatorStyle = { left: '0px' }
-    if (this.store('selected.card') === 'dapps') indicatorStyle.left = '34px'
-    if (this.store('selected.card') === 'local') indicatorStyle.left = '63px'
+    if (this.store('selected.card') === 'dapps') indicatorStyle.left = '36px'
+    if (this.store('selected.card') === 'local') indicatorStyle.left = '69px'
     return (
       <div id='dock'>
         <div className='dockInset'>
@@ -76,12 +76,12 @@ class Dock extends React.Component {
               <div className='dockMenuItem'>
                 <div className='dockMenuMain'>
                   <div className='dockMenuMainIcon'>
-                    <div onMouseDown={() => this.store.setCard('default')}>{svg.user(16)}</div>
+                    <div onMouseDown={() => this.store.setCard('default')}>{svg.user(14)}</div>
                   </div>
                 </div>
               </div>
-              <div className='dockMenuItem' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(14)}</div>
-              <div className='dockMenuItem' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 18 })}</div>
+              <div className='dockMenuItem' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(15)}</div>
+              <div className='dockMenuItem' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 19 })}</div>
             </div>
             <div className='dockMenuRight'>
               <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>

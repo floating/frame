@@ -89,6 +89,7 @@ const initial = {
     pin: main('pin', false),
     launch: main('launch', false),
     reveal: main('reveal', false),
+    ipfs: {},
     dapp: {
       details: {},
       map: {

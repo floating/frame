@@ -53,7 +53,7 @@
   transform translate3d(0px, 0px, 0px)
   will-change transform
   // background whiteglowShade
-  background lowlight
+  background lowerlight
   border-top-left-radius 9px
   border-bottom-left-radius 9px
   // margin 0px -30px 0px 0px
@@ -163,7 +163,7 @@
     right 0
     bottom 0
     left 0
-    z-index 2000
+    z-index 9999999999
     pointer-events none
 
     .draggedApp
@@ -209,8 +209,8 @@
     z-index 100000000
 
     .dockMenuMain
-      height 22px
-      width 22px
+      height 20px
+      width 20px
       margin-left 13px
       border-radius 20px
       border 2px solid good
@@ -218,8 +218,8 @@
       position relative
           
       .dockMenuMainIcon
-        height 22px
-        width 22px
+        height 20px
+        width 20px
         border-radius 15px
         position absolute
         bottom 0
@@ -236,7 +236,7 @@
       display flex
       justify-content center
       align-items center
-      margin-right 13px
+      margin-right 16px
 
     .dockMenuLeft
       position absolute
@@ -253,9 +253,8 @@
 
     .pinFrame
       // position absolute
-      // bottom 10px
       left 0
-      width 50px
+      width 45px
       height 50px
       z-index 10000000
       display flex
@@ -266,6 +265,7 @@
       svg
         transform rotate(45deg)
         transition standardFast
+        margin-top -2px
 
     .pinFrame:hover
       svg

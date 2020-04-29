@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const cheerio = require('cheerio')
 
-const ipfs = require('../../../clients/Ipfs')
+const ipfs = require('../../../ipfs')
 
 const resolve = require('../resolve')
 const storage = require('../storage')
@@ -18,36 +18,71 @@ const error = (res, code, message) => {
 
 module.exports = {
   stream: async (res, app, path) => { // Stream assets from IPFS back to the client
-    if (!ipfs.api) return error(res, 404, 'IPFS client not running')
-    const stream = ipfs.api.getReadableStream(`${await resolve.cid(app)}${path}`)
-    stream.on('data', file => {
-      if (!file) return error(res, 404, 'Asset not found')
+    // if (!ipfs( return error(res, 404, 'IPFS client not running')
+    let file
+    try {
+      file = await ipfs.getFile(`${await resolve.cid(app)}${path}`)
+      if (!file) throw new Error('Asset not found')
+    } catch (e) {
+      error(res, 404, e.message)
+    }
+    if (file) {
       res.setHeader('content-type', getType(path))
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
       res.writeHead(200)
-      file.content.on('data', data => res.write(data))
-      file.content.once('end', () => res.end())
-    })
-    stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
+      res.write(file.content.toString())
+      res.end()
+    }
+
+    // file.content.on('data', data => res.write(data))
+    // file.content.once('end', () => res.end())
+    // stream.on('data', file => {
+    //   if (!file) return error(res, 404, 'Asset not found')
+    //   res.setHeader('content-type', getType(path))
+    //   res.setHeader('Access-Control-Allow-Origin', '*')
+    //   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+    //   res.writeHead(200)
+    //   file.content.on('data', data => res.write(data))
+    //   file.content.once('end', () => res.end())
+    // })
+    // stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
   },
   dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
-    if (!ipfs.api) return error(res, 404, 'IPFS client not running')
+    // if (!ipfs return error(res, 404, 'IPFS client not running')
     const cid = await resolve.cid(app)
-    ipfs.api.get(`${cid}/index.html`, (err, files) => {
-      if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
-      res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
-      res.setHeader('Access-Control-Allow-Origin', '*')
-      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-      res.writeHead(200)
-      const $ = cheerio.load(files[0].content.toString('utf8'))
-      $('html').prepend(`
-        <script>
-          const initial = ${JSON.stringify(storage.get(cid) || {})}
-          ${inject}
-        </script>
-      `)
-      res.end($.html())
-    })
+    const index = await ipfs.getFile(`${cid}/index.html`)
+    res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+    res.writeHead(200)
+    const $ = cheerio.load(index.content.toString('utf8'))
+    $('html').prepend(`
+      <script>
+        const initial = ${JSON.stringify(storage.get(cid) || {})}
+        ${inject}
+      </script>
+    `)
+    res.end($.html())
   }
 }
+
+  //   ipfs.get(`${cid}/index.html`, (err, files) => {
+  //     if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
+  //     res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
+  //     res.setHeader('Access-Control-Allow-Origin', '*')
+  //     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+  //     res.writeHead(200)
+
+  //     let file = files[0].content.toString('utf8')
+
+  //     const $ = cheerio.load(file.toString('utf8'))
+  //     $('html').prepend(`
+  //       <script>
+  //         const initial = ${JSON.stringify(storage.get(cid) || {})}
+  //         ${inject}
+  //       </script>
+  //     `)
+  //     res.end($.html())
+  //   })
+  // }
