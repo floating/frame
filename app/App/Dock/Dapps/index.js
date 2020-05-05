@@ -198,7 +198,18 @@ class Dapps extends React.Component {
         <div className={dockCardClass}>
           <div className='dockCardInset'>
             <div className='appStore'>
-              <div>{'Dapps'}</div>
+              <div className='dockCardHeader'>
+                <div className='dockCardHeaderLeft'>
+                  <div className='dockCardHeaderTitle'> 
+                    {'Dapps'}
+                  </div>
+                </div>
+                <div className='dockCardHeaderRight'>
+                  <div className='dockCardAddDapp'>
+                    <div className='dockCardAddDappButton'>{'Add +'}</div>
+                  </div>
+                </div>
+              </div>
               {this.state.pending ? (
                 <div className='addAppForm'>
                   {this.state.pendingMessage}

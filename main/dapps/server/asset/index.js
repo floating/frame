@@ -20,10 +20,12 @@ module.exports = {
   stream: async (res, app, path) => { // Stream assets from IPFS back to the client
     // if (!ipfs( return error(res, 404, 'IPFS client not running')
     let file
+    // console.log(`get file: ${await resolve.cid(app)}${path}`)
     try {
       file = await ipfs.getFile(`${await resolve.cid(app)}${path}`)
       if (!file) throw new Error('Asset not found')
     } catch (e) {
+      // console.error('   ---   ' + e.message)
       error(res, 404, e.message)
     }
     if (file) {

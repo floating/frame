@@ -29,6 +29,14 @@ class _Card extends React.Component {
     return (
       <div className={dockCardClass}>
         <div className='dockCardInset'>
+          <div className='dockCardHeader'>
+            <div className='dockCardHeaderLeft'>
+              <div className='dockCardHeaderTitle'> 
+                {'Settings'}
+              </div>
+            </div>
+            <div className='dockCardHeaderRight'>{'Add +'}</div>
+          </div>
           <Local />
         </div>
       </div>
@@ -62,30 +70,28 @@ class Dock extends React.Component {
     // {ipfsReady ? (
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
-    const indicatorStyle = { left: '0px' }
-    if (this.store('selected.card') === 'dapps') indicatorStyle.left = '36px'
-    if (this.store('selected.card') === 'local') indicatorStyle.left = '69px'
+    const indicatorStyle = { top: '0px' }
+    if (this.store('selected.card') === 'dapps') indicatorStyle.top = '48px'
+    if (this.store('selected.card') === 'local') indicatorStyle.top = '96px'
     return (
       <div id='dock'>
         <div className='dockInset'>
           <div className='dockMenu'>
-            <div className='dockMenuLeft'>
-              <div className='dockMenuIndicator' style={indicatorStyle}>
-                <div className='dockMenuIndicatorRight'>{svg.roundedTri(14)}</div>
-              </div>
-              <div className='dockMenuItem'>
-                <div className='dockMenuMain'>
-                  <div className='dockMenuMainIcon'>
-                    <div onMouseDown={() => this.store.setCard('default')}>{svg.user(14)}</div>
-                  </div>
+            <div className='dockMenuIndicator' style={indicatorStyle}>
+              <div className='dockMenuIndicatorRight'>{svg.roundedTri(14)}</div>
+            </div>
+            <div className='dockMenuItem'>
+              <div className='dockMenuMain'>
+                <div className='dockMenuMainIcon'>
+                  <div onMouseDown={() => this.store.setCard('default')}>{svg.user(16)}</div>
                 </div>
               </div>
-              <div className='dockMenuItem' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(15)}</div>
-              <div className='dockMenuItem' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 19 })}</div>
             </div>
-            <div className='dockMenuRight'>
-              <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>
-            </div>
+            <div className='dockMenuItem' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(17)}</div>
+            <div className='dockMenuItem' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 21 })}</div>
+          </div>
+          <div className='dockPin'>
+            <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(14)}</div>
           </div>
           {/* <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
             <div className='panelDetail'>

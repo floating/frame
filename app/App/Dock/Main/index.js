@@ -82,6 +82,14 @@ class Main extends React.Component {
     return (
       <div className={mainClass}>
         <div className='dockCardInset'>
+          <div className='dockCardHeader'>
+            <div className='dockCardHeaderLeft'>
+              <div className='dockCardHeaderTitle'> 
+                {'Accounts'}
+              </div>
+            </div>
+            <div className='dockCardHeaderRight'>{'Add +'}</div>
+          </div>
           <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
             <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>
               <Add />
