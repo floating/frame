@@ -133,7 +133,18 @@ class Dapps {
           }
         })
         if (favicon.startsWith('./')) favicon = favicon.substring(2)
-        store.updateDapp(namehash, { icon: favicon || 'favicon.ico' })
+        let icon
+        let file = await ipfs.getFile(`${cid}/${favicon || 'favicon.ico'}`)
+        if (file) {
+          icon = {
+            cid: file.cid.toString(),
+            path: file.path, 
+            name: file.name,
+            content: Buffer.from(file.content).toString('base64')
+          }
+        }
+
+        store.updateDapp(namehash, { icon })
         this._pin(cid)
         cb(null)
       } catch (e) {
@@ -189,7 +200,6 @@ class Dapps {
         } else {
           return false
         }
-
       })
     } catch (e) {
       log.error(e)

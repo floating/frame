@@ -34,7 +34,7 @@ const topRight = (window) => {
   const screenSize = area
   const windowSize = window.getSize()
   return {
-    x: Math.floor(screenSize.x + (screenSize.width - windowSize[0])),
+    x: Math.floor(screenSize.x + (screenSize.width - (window.isTray && dockOnly ? 50 : windowSize[0]))),
     y: screenSize.y
   }
 }
@@ -59,10 +59,12 @@ const detectMouse = () => {
         glide = true
         api.showTray(true)
       } else {
-        detectMouse()
+        const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+        if (!showing) detectMouse()
       }
     } else {
-      detectMouse()
+      const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+      if (!showing) detectMouse()
     }
   }, 150)
 }
@@ -158,7 +160,8 @@ const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      width: 432,
+      width: 422,
+      minWidth: 422,
       frame: false,
       transparent: true,
       hasShadow: false,
@@ -179,6 +182,7 @@ const api = {
         preload: path.resolve(__dirname, '../../bundle/bridge.js')
       }
     })
+    windows.tray.isTray = true
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -313,7 +317,7 @@ const api = {
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       if (!pinArea && store('main.pin')) pinArea = area
-      windows.tray.setSize(dockOnly ? 50 : 432, dev ? 740 : area.height)
+      windows.tray.setSize(dockOnly ? 422 : 422, dev ? 740 : area.height)
       const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()

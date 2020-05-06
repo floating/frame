@@ -24,7 +24,7 @@ const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 
 class _Card extends React.Component {
   render () {
-    const current = this.store('selected.card') === 'local'
+    const current = this.store('selected.card')  === 'local' && !this.store('tray.dockOnly') && this.store('tray.open')
     const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
     return (
       <div className={dockCardClass}>
@@ -35,7 +35,6 @@ class _Card extends React.Component {
                 {'Settings'}
               </div>
             </div>
-            <div className='dockCardHeaderRight'>{'Add +'}</div>
           </div>
           <Local />
         </div>
@@ -71,27 +70,37 @@ class Dock extends React.Component {
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
     const indicatorStyle = { top: '0px' }
-    if (this.store('selected.card') === 'dapps') indicatorStyle.top = '48px'
-    if (this.store('selected.card') === 'local') indicatorStyle.top = '96px'
+    if (this.store('selected.card') === 'dapps') indicatorStyle.top = '36px'
+    if (this.store('selected.card') === 'local') indicatorStyle.top = '71px'
+    let mainHidden = this.store('tray.dockOnly') || !this.store('tray.open')
+    if (mainHidden) indicatorStyle.left = '-8px'
     return (
       <div id='dock'>
+        <div className='dockOverlay' />
         <div className='dockInset'>
           <div className='dockMenu'>
-            <div className='dockMenuIndicator' style={indicatorStyle}>
-              <div className='dockMenuIndicatorRight'>{svg.roundedTri(14)}</div>
-            </div>
+            <div className='dockMenuIndicator' style={indicatorStyle} />
             <div className='dockMenuItem'>
               <div className='dockMenuMain'>
                 <div className='dockMenuMainIcon'>
-                  <div onMouseDown={() => this.store.setCard('default')}>{svg.user(16)}</div>
+                  <div onMouseDown={() => {
+                    if (mainHidden) link.send('tray:dockSlide')
+                    this.store.setCard('default')
+                  }}>{svg.user(14)}</div>
                 </div>
               </div>
             </div>
-            <div className='dockMenuItem' onMouseDown={() => this.store.setCard('dapps')}>{svg.apps(17)}</div>
-            <div className='dockMenuItem' onMouseDown={() => this.store.setCard('local')}>{svg.octicon('settings', { height: 21 })}</div>
+            <div className='dockMenuItem' onMouseDown={() => {
+            if (mainHidden) link.send('tray:dockSlide')
+              this.store.setCard('dapps')
+            }}>{svg.apps(15)}</div>
+            <div className='dockMenuItem' onMouseDown={() => {
+              if (mainHidden) link.send('tray:dockSlide')
+              this.store.setCard('local')
+            }}>{svg.octicon('settings', { height: 20 })}</div>
           </div>
           <div className='dockPin'>
-            <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(14)}</div>
+            <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
           </div>
           {/* <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
             <div className='panelDetail'>

@@ -25,20 +25,10 @@ class AppTile extends React.Component {
     })
     context.store.observer(() => {
       const dapp = props.hash ? context.store(`main.dapp.details.${props.hash}`) : ''
-      if (this.cid && !icons[this.cid] && dapp) {
-        fetch(`http://localhost:8080/ipfs/${this.cid}/${dapp.icon}`)
-          .then(res => {
-            if (res.status === 200) return res
-            throw new Error(res.statusText)
-          })
-          .then(response => response.blob())
-          .then(images => {
-            icons[this.cid] = URL.createObjectURL(images)
-            this.forceUpdate()
-          })
-          .catch(e => {
-            delete icons[this.cid]
-          })
+      if (this.cid && !icons[this.cid] && dapp && dapp.icon) {
+        let ext = dapp.icon.name.substr(dapp.icon.name.lastIndexOf('.') + 1)
+        icons[this.cid] = `data:image/${ext};base64, ${dapp.icon.content}`
+        this.forceUpdate()
       }
     })
   }
