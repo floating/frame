@@ -159,6 +159,7 @@ module.exports = {
     })
   },
   updateDapp: (u, namehash, data) => {
+    // console.log('updateDapp', namehash, data)
     u(`main.dapp.details.${namehash}`, (oldData) => {
       return { ...oldData, ...data }
     })
@@ -174,6 +175,9 @@ module.exports = {
   },
   saveAccount: (u, id) => {
     u('main.save.account', () => id)
+  },
+  setIPFS: (u, ipfs) => {
+    u('main.ipfs', () => ipfs)
   }
   // TODO move all tray actions here..
 }

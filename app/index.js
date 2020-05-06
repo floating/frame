@@ -19,7 +19,7 @@ link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
   document.addEventListener('mouseout', e => {
-    if (e.clientX < (store('tray.dockOnly') ? 400 : 0)) link.send('tray:mouseout')
+    if (e.clientX <= 0) link.send('tray:mouseout')
   })
   if (!store('main.mute.alphaWarning')) store.notify('mainnet')
   const Frame = Restore.connect(App, store)

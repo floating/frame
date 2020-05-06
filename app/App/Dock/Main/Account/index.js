@@ -67,8 +67,9 @@ class Account extends React.Component {
       this.props.reportScroll()
       console.log('this.store(selected.position.scrollTop)', this.store('selected.position.scrollTop'))
       console.log('this.store(selected.position.shiftTop)', this.store('selected.position.shiftTop'))
+      console.log('bounds.top', bounds.top)
       this.store.initialSignerPos({
-        top: bounds.top,
+        top: bounds.top - 50,
         bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3,
         height: this.signer.clientHeight,
         index: this.props.index
@@ -500,7 +501,7 @@ class Account extends React.Component {
       const panelHeight = document.body.offsetHeight - 50
       style.height = open ? panelHeight : initial.height
       const translateTop = ((initial.top) * -1) + shiftTop
-      style.transform = open ? `translateY(${(translateTop + 50) + 'px'})` : 'translateY(0px)'
+      style.transform = open ? `translateY(${(translateTop) + 'px'})` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 1

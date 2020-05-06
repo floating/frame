@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const cheerio = require('cheerio')
 
 const store = require('../store')
-const ipfs = require('../clients/Ipfs')
+const ipfs = require('../ipfs')
 const windows = require('../windows')
 
 const server = require('./server')
@@ -53,20 +53,39 @@ class Dapps {
         options: { docked: false }
       }
     ]
-    ipfs.on('state', state => {
-      if (state === 'ready') {
-        this._updatePins()
-        const ethCon = store.observer(() => {
-          const connection = store('main.connection')
-          const status = [connection.local.status, connection.secondary.status]
-          const connected = status.indexOf('connected') > -1
-          if (connected) {
-            this._addDefaults()
-            setTimeout(() => ethCon.remove(), 0)
-          }
-        })
-      }
-    })
+    // this.observer = store.observer(() => {
+    //   const ipfs = store('main.ipfs')
+    //   if (ipfs.id) {
+    //     console.log('Got IPFS update')
+    //     this._updatePins()
+    //     console.log('IPFS IS READYYYyyyy now')
+    //     console.log(ipfs)
+    //     const ethCon = store.observer(() => {
+    //       const connection = store('main.connection')
+    //       const status = [connection.local.status, connection.secondary.status]
+    //       const connected = status.indexOf('connected') > -1
+    //       if (connected) {
+    //         this._addDefaults()
+    //         setTimeout(() => ethCon.remove(), 0)
+    //       }
+    //     })
+    //   }
+    // })
+    
+    // ipfs.on('state', state => {
+    //   if (state === 'ready') {
+    //     this._updatePins()
+    //     const ethCon = store.observer(() => {
+    //       const connection = store('main.connection')
+    //       const status = [connection.local.status, connection.secondary.status]
+    //       const connected = status.indexOf('connected') > -1
+    //       if (connected) {
+    //         this._addDefaults()
+    //         setTimeout(() => ethCon.remove(), 0)
+    //       }
+    //     })
+    //   }
+    // })
   }
 
   async _addDefaults () {
@@ -101,16 +120,12 @@ class Dapps {
 
     // If content available -> store dapp
     if (content) {
-      const { type, hash } = content
-      store.addDapp(namehash, { domain, type, cid: hash, pinned: false }, options)
+      const { type, hash: cid } = content
+      store.addDapp(namehash, { domain, type, cid, pinned: false }, options)
       // Get Dapp Icon
-      ipfs.api.get(`${hash}/index.html`, (err, files) => {
-        if (err) {
-          log.error(err)
-          store.removeDapp(namehash)
-          return cb(new Error('Could not resolve dapp: ' + err.message))
-        }
-        const $ = cheerio.load(files[0].content.toString('utf8'))
+      try {
+        const index = await ipfs.getFile(`${cid}/index.html`)
+        const $ = cheerio.load(index.content.toString('utf8'))
         let favicon = ''
         $('link').each((i, link) => {
           if ($(link).attr('rel') === 'icon' || $(link).attr('rel') === 'shortcut icon') {
@@ -118,13 +133,25 @@ class Dapps {
           }
         })
         if (favicon.startsWith('./')) favicon = favicon.substring(2)
-        store.updateDapp(namehash, { icon: favicon || 'favicon.ico' })
-        this._pin(hash, () => {
-          console.log('Pinned first time')
-          store.updateDapp(namehash, { pinned: true })
-        })
+        let icon
+        let file = await ipfs.getFile(`${cid}/${favicon || 'favicon.ico'}`)
+        if (file) {
+          icon = {
+            cid: file.cid.toString(),
+            path: file.path, 
+            name: file.name,
+            content: Buffer.from(file.content).toString('base64')
+          }
+        }
+
+        store.updateDapp(namehash, { icon })
+        this._pin(cid)
         cb(null)
-      })
+      } catch (e) {
+        log.error(e)
+        store.removeDapp(namehash)
+        return cb(new Error('Could not resolve dapp: ' + e.message))
+      }
     // Else -> throw
     } else {
       cb(new Error('Could not resolve ENS name to content hash'))
@@ -151,7 +178,7 @@ class Dapps {
     const dapp = store(`main.dapp.details.${hash(domain)}`)
     if (!dapp) return cb(new Error('Could not find dapp'))
     // if (!dapp.pinned) return cb(new Error('Dapp not pinned'))
-    if (!ipfs.api) return cb(new Error('IPFS client not running'))
+    // if (!ipfs return cb(new Error('IPFS client not running'))
     const session = crypto.randomBytes(6).toString('hex')
     server.sessions.add(domain, session)
     windows.openView(domain, session)
@@ -159,12 +186,25 @@ class Dapps {
     cb(null)
   }
 
-  async _pin (hash, cb) {
-    if (!ipfs.api) return cb(new Error('IPFS client not running'))
-    ipfs.api.pin.add(hash, (err, res) => {
-      if (err) return cb(new Error(`Failed to pin content with hash ${hash}`))
-      cb(null)
-    })
+  async _pin (cid) {
+    // if (!ipfs return cb(new Error('IPFS client not running'))
+    try {
+      await ipfs.pin(cid)
+      const namehash = hash()
+      const dapps = store('main.dapp.details')
+      Object.keys(store('main.dapp.details')).some(namehash => {
+        const dappCID = store('main.dapp.details', namehash, 'cid')
+        if (cid === dappCID) {
+          store.updateDapp(namehash, { pinned: true })
+          return true
+        } else {
+          return false
+        }
+      })
+    } catch (e) {
+      log.error(e)
+      // Retry Pin
+    }
   }
 
   _updateHashes () {
@@ -175,10 +215,7 @@ class Dapps {
       // 2) if new content hash -> update dapp and pin content
       if (result && result.hash !== dapp.cid) {
         store.updateDapp(namehash, { cid: result.hash, pinned: false })
-        this._pin(result.hash, (err) => {
-          if (err) return log.error(err)
-          store.updateDapp(namehash, { pinned: true })
-        })
+        this._pin(result.hash)
       }
     })
   }
@@ -188,10 +225,7 @@ class Dapps {
       const ipfsState = store('main.clients.ipfs.state')
       if (ipfsState === 'ready' && !dapp.pinned) {
         console.log('Pinning', dapp.domain)
-        this._pin(dapp.cid, (err) => {
-          if (err) return log.error(err)
-          store.updateDapp(namehash, { pinned: true })
-        })
+        this._pin(dapp.cid)
       }
     })
   }
@@ -203,11 +237,11 @@ module.exports = dapps
 // DEBUG
 // store.observer(_ => {
 //   console.log('<><><><><><><>')
-//   console.log(store('main.dapps'))
+//   console.log(store('main.dapp'))
 //   console.log('<><><><><><><>')
 //   // console.log(store('main.dapp.map'))
 // })
 
 // setInterval(async () => {
-//   console.log('peers', (await ipfs.api.swarm.peers()).length)
+//   console.log('peers', (await ipfs.swarm.peers()).length)
 // }, 3000)

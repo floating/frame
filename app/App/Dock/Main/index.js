@@ -77,11 +77,19 @@ class Main extends React.Component {
     // const current = this.store('selected.card') === 'main'
     // const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
     let mainClass = 'dockCard cardShow'
-    if (this.store('selected.card') !== 'default') mainClass = 'dockCard cardHide'
+    if (this.store('selected.card') !== 'default' || this.store('tray.dockOnly') || !this.store('tray.open')) mainClass = 'dockCard cardHide'
     // if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
     return (
       <div className={mainClass}>
         <div className='dockCardInset'>
+          <div className='dockCardHeader'>
+            <div className='dockCardHeaderLeft'>
+              <div className='dockCardHeaderTitle'> 
+                {'Accounts'}
+              </div>
+            </div>
+            <div className='dockCardHeaderRight'>{'Add +'}</div>
+          </div>
           <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
             <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>
               <Add />

@@ -53,12 +53,25 @@
   transform translate3d(0px, 0px, 0px)
   will-change transform
   // background whiteglowShade
-  background lowlight
+  background lowerlight
   border-top-left-radius 9px
   border-bottom-left-radius 9px
   // margin 0px -30px 0px 0px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
+  
+  .dockOverlay
+    position absolute
+    top 0px
+    bottom 0px
+    left 0px
+    right 0px
+    // background linear-gradient(-55deg, rgba(205,254,243,1) 0%, rgba(200,232,248,1) 100%)
+    z-index 999999999
+    // mix-blend-mode multiply
+    // opacity 0.2
+    pointer-events none
+
 
   .overStoreShade
     opacity 1
@@ -151,9 +164,9 @@
 
   .dragCatchDock
     position absolute
-    top 155px
+    top 118px
     left 0px
-    bottom 48px
+    bottom 46px
     width 48px
     z-index 3
 
@@ -163,7 +176,7 @@
     right 0
     bottom 0
     left 0
-    z-index 2000
+    z-index 9999999999
     pointer-events none
 
     .draggedApp
@@ -171,10 +184,10 @@
       padding 10px
 
       .draggedAppCard
-        min-width 47px
-        min-height 47px
-        width 47px
-        height 47px
+        min-width 64px
+        min-height 64px
+        width 64px
+        height 64px
         border-radius 6px
         box-shadow cardDrop, 3px 3px 3px thick
         background highlighter
@@ -194,69 +207,26 @@
         animation-timing-function linear
 
         img
-          height 28px
-          width 28px
+          height 20px
+          width 20px
 
         div, svg, img
           pointer-events none
 
-  .dockMenu
+  .dockPin
     position absolute
-    top 0px
+    bottom 10px
     left 0px
     right 0px
-    height 50px
+    height 36px
+    width 48px
     z-index 100000000
-
-    .dockMenuMain
-      height 22px
-      width 22px
-      margin-left 13px
-      border-radius 20px
-      border 2px solid good
-      overflow hidden
-      position relative
-          
-      .dockMenuMainIcon
-        height 22px
-        width 22px
-        border-radius 15px
-        position absolute
-        bottom 0
-        display flex
-        justify-content center
-        align-items center
-
-        svg
-          margin-top 2px
-  
-    .dockMenuItem
-      // width 50px
-      height 50px
-      display flex
-      justify-content center
-      align-items center
-      margin-right 13px
-
-    .dockMenuLeft
-      position absolute
-      top 0px
-      left 0px
-      display flex
-      // background red
-
-    .dockMenuRight
-      position absolute
-      top 0px
-      right 0px
-      display flex
 
     .pinFrame
       // position absolute
-      // bottom 10px
       left 0
-      width 50px
-      height 50px
+      width 48px
+      height 36px
       z-index 10000000
       display flex
       justify-content center
@@ -266,6 +236,7 @@
       svg
         transform rotate(45deg)
         transition standardFast
+        // margin-top -2px
 
     .pinFrame:hover
       svg
@@ -281,15 +252,55 @@
         color outerspace
         transform rotate(0deg)
 
-    
+  .dockMenu
+    position absolute
+    top 10px
+    left 0px
+    right 0px
+    height 192px
+    width 48px
+    z-index 100000000
+    display flex
+    flex-direction column
+
+    .dockMenuMain
+      height 20px
+      width 20px
+      border-radius 20px
+      border 2px solid good
+      overflow hidden
+      position relative
+          
+      .dockMenuMainIcon
+        height 20px
+        width 20px
+        border-radius 15px
+        position absolute
+        bottom 0
+        display flex
+        justify-content center
+        align-items center
+
+        svg
+          margin-top 2px
+  
+    .dockMenuItem
+      // width 50px
+      height 36px
+      width 48px
+      display flex
+      justify-content center
+      align-items center
+
   .dockMenuIndicator
     position absolute
     top 0px
     left 0px
-    width 50px
+    width 15px
     // background blue
     // margin-top -1px
-    height 2px
+    height 6px
+    border-radius 3px
     // border-top-right-radius 2px
     // border-bottom-right-radius 2px
     z-index 0
@@ -298,7 +309,14 @@
     align-items center
     color outerspace08
     transition standardFast
-    transform rotate(180deg)
+    background outerspace08
+    transform translate3d(-8px, 16px, 0px)
+    // border 1px sold good
+    box-shadow 0px 0px 2px outerspace-5
+    
+    
+    // svg
+    //   transform rotate(90deg) translate3d(-3px, 0px, 0px)
     // background blue
 
     // .dockMenuIndicatorLeft
@@ -375,13 +393,12 @@
   .appsOff:hover
     opacity 0.5
 
-
   .dockApps
     position absolute
     left 0
     top 50%
     z-index 1000
-    transition standard
+    // transition standard
 
     .dockAppIcon
       height 48px
@@ -407,24 +424,29 @@
     animation-timing-function linear
 
   .dockedApp:hover
-    background lowlight
-    border-radius 9px
+    background highlighter
+    box-shadow cardDrop, 0px 3px 0px 2px thinner
+    // transform translateY(-2px)
 
   .dockedApp
-    min-width 48px
-    min-height 48px
-    width 48px
-    height 49px
-    margin-left 1px
+    min-width 40px
+    min-height 40px
+    width 40px
+    height 40px
+    margin-bottom 4px
+    margin-left 4px
     box-sizing border-box
     display flex
     justify-content center
     align-items center
-    // border-bottom 1px solid thick
+    transition standardFast
+    border-radius 6px
+    background highlight
+    box-shadow cardDrop, 0px 1px 0px 2px thinner
 
     img
-      height 28px
-      width 28px
+      height 20px
+      width 20px
 
     div, svg, img
       pointer-events none
@@ -539,7 +561,7 @@
       position absolute
       left 0px
       right 0px
-      top 0px
+      top 64px
       height 80px
       display flex
       justify-content center
@@ -667,7 +689,7 @@
       align-items flex-start
       align-content flex-start
       justify-content flex-start
-      padding 100px 0px 10px 10px
+      padding 74px 0px 10px 10px
       box-sizing border-box
       overflow-x hidden
       overflow-y scroll
@@ -706,10 +728,10 @@
 
       .addedAppCard
         position relative
-        min-width 47px
-        min-height 47px
-        width 47px
-        height 47px
+        min-width 64px
+        min-height 64px
+        width 64px
+        height 64px
         border-radius 9px
         // box-shadow cardDrop, 3px 3px 3px thick
         // background highlighter
@@ -723,15 +745,15 @@
         overflow hidden
         // background highlight
         // border 1px solid thick
-        background highlight
-        box-shadow cardDrop
+        background highlighter
+        box-shadow cardDrop, 0px 1px 0px 2px thinner
         // box-shadow cardDrop, 2px 2px 0px 0px thin
         // background linear-gradient(135deg, highlight, thin)
         transition standard
 
       img
-        height 28px
-        width 28px
+        height 20px
+        width 20px
 
       div, svg, img
         pointer-events none
@@ -739,3 +761,4 @@
 @import './card.styl'
 @import '../Main/style'
 @import '../Local/style'
+@import '../Dapps/style'

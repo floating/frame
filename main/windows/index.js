@@ -1,11 +1,10 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
+const { app, shell, BrowserWindow, BrowserView, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
-// const fs = require('fs')
-// const Positioner = require('electron-positioner')
+const fs = require('fs')
 const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
-// const url = require('url')
+const pixels = require('get-pixels')
 
 const store = require('../store')
 
@@ -35,7 +34,7 @@ const topRight = (window) => {
   const screenSize = area
   const windowSize = window.getSize()
   return {
-    x: Math.floor(screenSize.x + (screenSize.width - windowSize[0])),
+    x: Math.floor(screenSize.x + (screenSize.width - (window.isTray && dockOnly ? 50 : windowSize[0]))),
     y: screenSize.y
   }
 }
@@ -60,19 +59,83 @@ const detectMouse = () => {
         glide = true
         api.showTray(true)
       } else {
-        detectMouse()
+        const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+        if (!showing) detectMouse()
       }
     } else {
-      detectMouse()
+      const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+      if (!showing) detectMouse()
     }
   }, 150)
+}
+
+const timeout = ms => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+const mode = array =>  {
+  if (array.length === 0) return null
+  let modeMap = {}
+  let maxEl = array[0], maxCount = 1
+  for (let i = 0; i < array.length; i++) {
+    let el = array[i]
+    if (!modeMap[el]) {
+      modeMap[el] = 1
+    } else {
+      modeMap[el]++
+    }
+    if (modeMap[el] > maxCount) {
+      maxEl = el
+      maxCount = modeMap[el]
+    }
+  }
+  return maxEl
+}
+
+const pixelColor = image => {
+  return new Promise(async (resolve, reject) => {
+    pixels(image.toPNG(), 'image/png', (err, pixels) => {
+      if (err) return reject(err)
+      let colors = []
+      let width = pixels.shape[0]
+      let height = 37
+      let depth = pixels.shape[2]
+      let limit = width * depth * height
+      for (let step = 0; step <= limit; step += depth) {
+        let rgb = []
+        for (let dive = 0; dive < depth; dive++) rgb.push(pixels.data[step + dive])
+        colors.push(`${rgb[0]}, ${rgb[1]}, ${rgb[2]}`)
+      }
+      let selectedColor = mode(colors)
+      let colorArray = selectedColor.split(', ')
+      let color = {
+        background: `rgb(${selectedColor})`,
+        text: textColor(...colorArray)
+      }
+      resolve(color)
+    })
+  })
+}
+
+const getColor = async (view) => {
+  let image = await view.webContents.capturePage()
+  // fs.writeFile('test.png', image.toPNG(), (err) => {
+  //   if (err) throw err
+  // })
+  let color = await pixelColor(image)
+  return color
+}
+
+const textColor = (r, g, b) => { // http://alienryderflex.com/hsp.html
+  return Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b)) > 127.5 ? 'black' : 'white'
 }
 
 const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      width: 420,
+      width: 422,
+      minWidth: 422,
       frame: false,
       transparent: true,
       hasShadow: false,
@@ -93,6 +156,7 @@ const api = {
         preload: path.resolve(__dirname, '../../bundle/bridge.js')
       }
     })
+    windows.tray.isTray = true
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
@@ -104,7 +168,6 @@ const api = {
     //   res({ cancel: false, responseHeaders: details.responseHeaders })
     // })
     windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
-    // windows.tray.positioner = new Positioner(windows.tray)
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
     windows.tray.setSize(0, 0)
@@ -227,7 +290,7 @@ const api = {
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       if (!pinArea && store('main.pin')) pinArea = area
-      windows.tray.setSize(dockOnly ? 50 : 420, dev ? 740 : area.height)
+      windows.tray.setSize(dockOnly ? 422 : 422, dev ? 740 : area.height)
       const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
@@ -303,15 +366,31 @@ const api = {
   },
   openView: (ens, session) => {
     windows.tray.blur()
+
+    let existingWindow
+    let dappViews = 0
+
+    Object.keys(windows).forEach(window => {
+      if (windows[window].dapp) {
+        dappViews ++
+        if (windows[window].dapp.ens === ens) {
+          existingWindow = windows[window]
+        }
+      }
+    })
+
+    if (existingWindow) return existingWindow.focus()
+
     const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 40
-    const width = area.width - 460
+    const width = area.width - 460 > height ? height : area.width - 460
+
     windows[session] = new BrowserWindow({
       session,
       x: 40,
       y: 0,
-      width: width > height ? height : width,
+      width,
       height,
       show: false,
       frame: false,
@@ -323,7 +402,7 @@ const api = {
       icon: path.join(__dirname, './AppIcon.png'),
       // skipTaskbar: process.platform !== 'linux',
       webPreferences: {
-        webviewTag: true,
+        webviewTag: false,
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
@@ -332,17 +411,66 @@ const api = {
         preload: path.resolve(__dirname, '../../bundle/dapp/bridge.js')
       }
     })
+
+    windows[session].dapp = { ens }
+ 
     // windows[session].positioner = new Positioner(windows[session])
     const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
-    windows[session].setPosition(pos.x - 440, pos.y + 20)
+    const offset = dappViews * 37
+    windows[session].setPosition(pos.x - 440 - offset, pos.y + 20)
     if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
-    windows[session].webContents.on('did-finish-load', () => {
-      const dapp = store(`main.dapp.details.${hash(ens)}`)
-      windows[session].send('main:location', { dapp, url, ens })
-      windows[session].show()
+    let namehash = hash(ens)
+
+    windows[session].webContents.on('did-finish-load', async () => {
+      // windows[session].webContents.openDevTools()
+      let dapp = Object.assign({}, store(`main.dapp.details.${namehash}`))
+      dapp.url = url
+      dapp.ens = ens
+      windows[session].send('main:dapp', dapp)
     })
+    windows[session].show()
+    windows[session].on('closed', () => {
+      delete windows[session]
+    })
+
+    const loadApp = hidden => {
+      const view = new BrowserView({
+        webPreferences: {
+          contextIsolation: true,
+          webviewTag: false,
+          sandbox: true,
+          defaultEncoding: 'utf-8',
+          nativeWindowOpen: true,
+          nodeIntegration: false
+          // scrollBounce: true
+          // navigateOnDragDrop: true
+        }
+      })
+      windows[session].setBrowserView(view)
+      view.setBounds({ x: 0, y: hidden ? height : 37, width, height: height - 37 })
+      view.setAutoResize({ width: true, height: true })
+      view.webContents.loadURL(url)
+      return view
+    }
+
+    let dapp = store(`main.dapp.details.${namehash}`)
+    if (dapp.color) return loadApp()
+
+    // If Frame hasn't collected color data for dapp, do that first
+    const tempView = loadApp(true)
+    tempView.webContents.on('did-finish-load', async () => {
+      await timeout(200)
+      const color = await getColor(tempView)
+      store.updateDapp(namehash, { color } )
+      windows[session].send('main:dapp', store(`main.dapp.details.${namehash}`))
+      loadApp()
+      setTimeout(() => {
+        tempView.destroy()
+        delete tempView
+      }, 0)
+    })    
     // console.log(menu(ens))
     // windows[session].setMenu(menu(ens))
     // Menu.setApplicationMenu(menu(ens))
@@ -353,7 +481,14 @@ const api = {
 }
 
 app.on('web-contents-created', (e, contents) => {
-  contents.on('will-navigate', e => e.preventDefault())
+  contents.on('will-navigate', (e, url) => {
+    if (url.startsWith('http://localhost:8421/')) {
+      console.log('Navigation -> ', url)
+    } else {
+      e.preventDefault()
+      shell.openExternal(url)
+    }
+  })
   // contents.on('will-attach-webview', e => e.preventDefault())
   // contents.on('new-window', e => e.preventDefault())
 })

@@ -1,4 +1,4 @@
-const uuidv5 = require('uuid/v5')
+const { v5: uuidv5 } = require('uuid')
 
 const store = require('../store')
 const accounts = require('../accounts')

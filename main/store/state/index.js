@@ -1,4 +1,4 @@
-const uuidv5 = require('uuid/v5')
+const { v5: uuidv5 } = require('uuid')
 
 const persist = require('../persist')
 
@@ -89,6 +89,7 @@ const initial = {
     pin: main('pin', false),
     launch: main('launch', false),
     reveal: main('reveal', false),
+    ipfs: {},
     dapp: {
       details: {},
       map: {

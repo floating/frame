@@ -27,7 +27,6 @@ require('./rpc')
 const clients = require('./clients')
 const signers = require('./signers')
 const persist = require('./store/persist')
-require('./dapps')
 require('./ipfs')
 
 log.info('Chrome: v' + process.versions.chrome)
@@ -120,6 +119,10 @@ ipcMain.on('tray:updateRestart', () => {
 })
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
+
+ipcMain.on('tray:dockSlide', () => {
+  windows.showTray()
+})
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {

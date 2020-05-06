@@ -6,7 +6,7 @@ const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const uuid = require('uuid/v5')
+const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
