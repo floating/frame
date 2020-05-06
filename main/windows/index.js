@@ -120,10 +120,7 @@ const pixelColor = image => {
 const getColor = async (view) => {
   let image = await view.webContents.capturePage()
   // fs.writeFile('test.png', image.toPNG(), (err) => {
-  //   console.log('hello 3')
   //   if (err) throw err
-  //   console.log('It\'s saved!')
-  //   console.log('ok got color')
   // })
   let color = await pixelColor(image)
   return color
@@ -132,29 +129,6 @@ const getColor = async (view) => {
 const textColor = (r, g, b) => { // http://alienryderflex.com/hsp.html
   return Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b)) > 127.5 ? 'black' : 'white'
 }
-
-// function lightOrDark(color) {
-
-//   // Variables for red, green, blue values
-//   var r, g, b, hsp;
-
-//   // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
-//   hsp = Math.sqrt(
-//   0.299 * (r * r) +
-//   0.587 * (g * g) +
-//   0.114 * (b * b)
-//   );
-
-//   // Using the HSP value, determine whether the color is light or dark
-//   if (hsp>127.5) {
-
-//       return 'light';
-//   } 
-//   else {
-
-//       return 'dark';
-//   }
-// }
 
 const api = {
   create: () => {
@@ -194,7 +168,6 @@ const api = {
     //   res({ cancel: false, responseHeaders: details.responseHeaders })
     // })
     windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
-    // windows.tray.positioner = new Positioner(windows.tray)
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
     windows.tray.setSize(0, 0)
