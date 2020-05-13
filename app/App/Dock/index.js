@@ -70,23 +70,26 @@ class Dock extends React.Component {
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
     const indicatorStyle = { top: '0px' }
-    if (this.store('selected.card') === 'dapps') indicatorStyle.top = '36px'
-    if (this.store('selected.card') === 'local') indicatorStyle.top = '71px'
+    if (this.store('selected.card') === 'dapps') indicatorStyle.top = '48px'
+    if (this.store('selected.card') === 'local') indicatorStyle.top = '95px'
     let mainHidden = this.store('tray.dockOnly') || !this.store('tray.open')
     if (mainHidden) indicatorStyle.left = '-8px'
     return (
       <div id='dock'>
-        <div className='dockOverlay' />
+        <div className='dockDivide' />
         <div className='dockInset'>
           <div className='dockMenu'>
-            <div className='dockMenuIndicator' style={indicatorStyle} />
-            <div className='dockMenuItem'>
+            <div className='dockMenuIndicator' style={indicatorStyle}>
+              <div className='dockMenuIndicatorLeft' />
+              <div className='dockMenuIndicatorRight' />
+            </div>
+            <div className='dockMenuItem' onMouseDown={() => {
+              if (mainHidden) link.send('tray:dockSlide')
+              this.store.setCard('default')
+            }}>
               <div className='dockMenuMain'>
                 <div className='dockMenuMainIcon'>
-                  <div onMouseDown={() => {
-                    if (mainHidden) link.send('tray:dockSlide')
-                    this.store.setCard('default')
-                  }}>{svg.user(14)}</div>
+                  <div>{svg.user(14)}</div>
                 </div>
               </div>
             </div>

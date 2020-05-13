@@ -104,13 +104,13 @@ class Status extends React.Component {
     //   if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     //   const inSettings = this.store('selected.view') === 'settings'
     let status
-    console.log(this.props.signer)
+    // console.log(this.props.signer)
     if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) {
       status = 'disconnected'
     } else {
       status = this.props.signer.status
     }
-    console.log('signer status', status)
+    // console.log('signer status', status)
     const statusClass = this.state.expandSigner ? 'accountStatus accountStatusOpen' : 'accountStatus'
     const statusOpen = !this.state.expandSigner ? ::this.handleSignerToggle : null
 
@@ -127,7 +127,7 @@ class Status extends React.Component {
         {status === 'locked' ? (
           <div className='accountStatusInner'>
             <div className='accountStatusIndicator accountStatusIndicatorLocked'>
-              {svg.octicon('shield', { height: 18 })}
+              {svg.octicon('primitive-dot', { height: 22 })}
             </div>
             <div className='accountStatusTitle'>
               Signer is locked
@@ -148,7 +148,7 @@ class Status extends React.Component {
         {status === 'disconnected' ? (
           <div className='accountStatusInner'>
             <div className='accountStatusIndicator accountStatusIndicatorLocked'>
-              {svg.unlink(16)}
+              {svg.octicon('primitive-dot', { height: 22 })}
             </div>
             <div className='accountStatusTitle'>
               Signer is disconnected
@@ -161,7 +161,7 @@ class Status extends React.Component {
         {status === 'ok' ? (
           <div className='accountStatusInner'>
             <div className='accountStatusIndicator'>
-              {svg.fingerprint(16)}
+              {svg.octicon('primitive-dot', { height: 22 })}
             </div>
             <div className='accountStatusTitle'>
               Signer is ready!

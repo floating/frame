@@ -190,8 +190,8 @@ class Dapps extends React.Component {
       this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft - 10
     } else {
       const scrollTop = parent.scrollTop
-      this.initialTop = this.currentTop = e.target.offsetTop - scrollTop + offsetTop + 50
-      this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft + 50
+      this.initialTop = this.currentTop = e.target.offsetTop - scrollTop + offsetTop - 14
+      this.initialLeft = this.currentLeft = e.target.offsetLeft + offsetLeft + 84
     }
     this.topBound = parent.offsetParent.clientHeight
     this.leftBound = parent.offsetParent.clientWidth
@@ -208,7 +208,7 @@ class Dapps extends React.Component {
     // const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
 
-    const dockStyle = { marginTop: `-${(this.store('main.dapp.map.docked').length * 48) / 2}px` }
+    const dockStyle = { marginTop: `-${(this.store('main.dapp.map.docked').length * 64) / 2}px` }
     if (this.store('view.addAccount')) {
       dockStyle.opacity = 0
       dockStyle.pointerEvents = 'none'
@@ -265,13 +265,13 @@ class Dapps extends React.Component {
         <div className={dockCardClass}>
           <div className='dockCardInset'>
             <div className='appStore'>
-              <AddDapp />
               <div className='dockCardHeader'>
                 <div className='dockCardHeaderLeft'>
                   <div className='dockCardHeaderTitle'> 
                     {'Apps'}
                   </div>
                 </div>
+                <AddDapp />
               </div>
               <div className='addedApps'>
                 <div

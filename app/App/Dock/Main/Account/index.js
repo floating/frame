@@ -69,7 +69,7 @@ class Account extends React.Component {
       console.log('this.store(selected.position.shiftTop)', this.store('selected.position.shiftTop'))
       console.log('bounds.top', bounds.top)
       this.store.initialSignerPos({
-        top: bounds.top - 50,
+        top: bounds.top,
         bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3,
         height: this.signer.clientHeight,
         index: this.props.index
@@ -448,7 +448,7 @@ class Account extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
     return (
-      <div className='accountInfo'>
+      <div className='accountInfo' onMouseDown={ !open ? ::this.typeClick : null }>
         <Status {...this.props} />
         {ens ? (
           <>
@@ -464,11 +464,16 @@ class Account extends React.Component {
               {svg.octicon('kebab-horizontal', { height: 14 })}
               {address.substr(address.length - 4)}
             </div>
-            <div className='accountNameLocal' onMouseDown={open ? ::this.typeClick : null}>
+            <div className='accountNameLocal' >
               {this.props.name}
             </div>
           </>
         )}
+        <div className='accountExpand' onMouseDown={::this.typeClick}>
+          <div className='accountStatusIndicator' style={open ? { transform: 'rotate(180deg)' } : {}}>
+            {svg.octicon('chevron-up', { height: 22 })}
+          </div>
+        </div>
       </div>
     )
   }
@@ -487,7 +492,7 @@ class Account extends React.Component {
     const style = {}
     const initial = this.store('selected.position.initial')
     // const scrollTop = this.store('selected.position.scrollTop')
-    const shiftTop = this.store('selected.position.shiftTop')
+    // const shiftTop = this.store('selected.position.shiftTop')
 
     if (current) {
       // Currently selected
@@ -498,9 +503,10 @@ class Account extends React.Component {
       style.right = 0
       style.opacity = 1
       style.zIndex = '10000000000000000'
-      const panelHeight = document.body.offsetHeight - 50
-      style.height = open ? panelHeight : initial.height
-      const translateTop = ((initial.top) * -1) + shiftTop
+      const panelHeight = document.body.offsetHeight
+      style.height = open ? panelHeight - 5: initial.height
+      // console.log('shiftTop', shiftTop)
+      const translateTop = (initial.top * -1) + 0
       style.transform = open ? `translateY(${(translateTop) + 'px'})` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
@@ -526,10 +532,11 @@ class Account extends React.Component {
       }
     }
     // console.log('PLace holder height', (initial.height - 33) + 'px')
+    // onMouseDown={!open ? ::this.typeClick : null}
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
-          <div className='signerContainer' style={current ? { height: '100%' } : {}} onMouseDown={!open ? ::this.typeClick : null}>
+          <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             <div className='signerContainerInset'>
               {this.renderAccountInfo(open)}
               {this.renderBalances(open)}

@@ -121,6 +121,7 @@ ipcMain.on('tray:updateRestart', () => {
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
 ipcMain.on('tray:dockSlide', () => {
+  windows.setGlide(false)
   windows.showTray()
 })
 

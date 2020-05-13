@@ -8,15 +8,14 @@
 
 .panelBottomMenu
   position absolute
-  left 50px
-  right 0
-  bottom 0
-  height 70px
+  right 10
+  top 10px
+  height 64px
   display flex
   justify-content center
   align-items center
   -webkit-app-region no-drag
-  z-index 1000000000
+  z-index 8000000
   opacity 1
   transition standard
 
@@ -60,7 +59,7 @@
   right 0
   bottom 0
   left 0
-  z-index 0
+  z-index 5000001
   pointer-events none
 
   .addAccountTrigger
@@ -82,11 +81,12 @@
     .addAccountTriggerIcon
       z-index 3
       transition standardSlower
-      font-size 30px
+      font-size 40px
       margin 0px 0px 2px 1px
       color outerspace08
       transform rotate(1deg)
-
+      font-weight 200
+      
   .addAccountTriggerActive
     background phase
     box-shadow 0px 8px 7px -5px rgba(5, 5, 45, 0.4)
@@ -104,10 +104,10 @@
   position absolute
   background phaseShade
   color rgba(5, 5, 45, 0.4)
-  top 50px
+  top 74px
   right 10px
-  bottom 70px
-  left 50px
+  bottom 10px
+  left 10px
   border-radius 10px
   transition standardSlow
   z-index 9000000002

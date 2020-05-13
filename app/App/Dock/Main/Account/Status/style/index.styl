@@ -1,16 +1,35 @@
-.accountStatus
-  height 50px
-  width 50px
-  border-radius 6px
+.accountStatusIndicator
   position absolute
-  top 20px
-  left 20px
+  top 16px
+  left 16px
+  height 32px
+  width 32px
+  border-radius 16px
   display flex
   justify-content center
   align-items center
-  z-index 1
-  background highlighter
-  box-shadow cardDrop
+  color outerspace08
+  transition standard
+  box-shadow 0px 3px 4px thick0
+  border 1px solid thin
+
+.accountStatusIndicator:hover
+  background rgba(255, 255, 255, 0.75)
+  box-shadow 0px 3px 4px thin
+
+.accountStatus
+  top 0px
+  left 0px
+  width 64px
+  height 64px
+  border-radius 16px
+  position absolute
+  display flex
+  justify-content center
+  align-items center
+  z-index 30
+  // background highlighter
+  // box-shadow cardDrop
   transition standard
   opacity 0.96
   overflow hidden
@@ -19,22 +38,14 @@
     position absolute
     top 0
     left 0
-    height 172px
-    width 340px
-
-  .accountStatusIndicator
-    position absolute
-    top 0
-    left 0
-    height 50px
-    width 50px
-    display flex
-    justify-content center
-    align-items center
-    color outerspace08
+    height 360px
+    width 360px
+    background rgba(255, 255, 255, 0)
+    transition standard
 
   .accountStatusIndicatorLocked
-    background ghostD
+    // background ghostD
+    color outerspace08
 
   .accountStatusClose
     position absolute
@@ -60,6 +71,12 @@
     align-items center
     color outerspace08
 
+.accountStatusOpen
+  height 362px
+  width 362px
+
+  .accountStatusInner
+    background highlightest
 
 .signerUnlockRequest
   position absolute

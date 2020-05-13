@@ -88,7 +88,9 @@ class Main extends React.Component {
                 {'Accounts'}
               </div>
             </div>
-            <div className='dockCardHeaderRight'>{'Add +'}</div>
+            <div className='addAppButton'>
+              {'Add +'}
+            </div>
           </div>
           <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
             <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>

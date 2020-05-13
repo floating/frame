@@ -47,7 +47,7 @@
 
 .signer
   position relative
-  padding 0px // 10px 10px 10px
+  padding 8px 9px 0px 6px
   z-index 3001
   transition standard
   will-change transform
@@ -63,15 +63,15 @@
   .signerContainer
     position relative
     z-index 300002
-    border-radius 10px
+    border-radius 16px
     box-shadow cardDrop
     transition settle
     pointer-events auto
     background thick
-    min-height 90px
+    min-height 64px
     // transition standard
-    box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 5px 5px 5px 0px thick
-    background linear-gradient(135deg, lowlight, thick)
+    // box-shadow 0px 4px 6px 0px rgba(6, 54, 52, 0.3), cardDrop, 5px 5px 5px 0px thick
+    background linear-gradient(135deg, light, thick)
 
     .signerContainerInset
       content ''
@@ -81,9 +81,9 @@
       left 0px
       bottom 2px
       z-index 40
-      border-radius 9px
+      border-radius 16px
       z-index 3003
-      background light
+      background highlighter
       // transition standard
       overflow hidden
 
@@ -93,37 +93,55 @@
     right 0
     left 0
     z-index 20000000000000
-    height 90px
+    height 64px
+    border-bottom 1px solid thick
+    // background blue
 
-    .accountStatusOpen
-      height 172px
-      transform translate(-10px, -10px)
-      width 340px
-
-    .accountNameLocal
+    .accountExpand
+      width 64px
+      border-radius 16px
       position absolute
-      right 18px
-      bottom 20px
-      font-size 12px
-      font-weight 400
-      background thin
-      height 23px
-      border-radius 6px
-      padding 0px 8px 0px 8px
+      top 0px
+      right 0px
+      bottom 0px
       display flex
       justify-content center
       align-items center
+      z-index 1
+      // background highlighter
+      // box-shadow cardDrop
+      transition standard
+      opacity 0.96
+      overflow hidden
+      color outerspace08
+
+    .accountNameLocal
+      position absolute
+      right 100px
+      left 100px
+      bottom 14px
+      font-size 11px
+      font-weight 400
+      // background thin
+      // border-radius 12px
+      // padding 0px 8px 0px 8px
+      display flex
+      justify-content center
+      align-items center
+      // text-transform uppercase
+      // letter-spacing 1px
 
     .accountName
-      top 19px
       position absolute
-      right 19px
+      right 48px
+      left 48px
+      top 14px
       display flex
       justify-content center
       align-items center
       font-family FiraCode, sans-serif
-      font-size 18px
-      // background blue
+      font-size 17px
+      
       svg
         padding 2px 3px 0px 3px
 
@@ -148,14 +166,14 @@
   .accountBalances
     position absolute
     // height 40px
-    padding-top 0px
-    padding-bottom 5px
-    left 20px
-    right 20px
-    top 90px
+    padding 20px 26px
+    left 2px
+    right 0px
+    top 64px
     z-index 200000
     transition standardSlowest
     transition-delay 0s
+    // background blue
 
     // background highlight
     // border-radius 4px
@@ -166,14 +184,15 @@
       display flex
       justify-content space-between
       // align-items center
-      font-size 13px
+      font-size 15px
       font-weight bold
       font-family FiraCode, sans-serif
-      padding 0px 0px 4px 0px
+      margin 0px 0px 5px 0px
       // margin-bottom 5px
       // border-radius 4px
       // background light
       color outerspace08
+      // background blue
       // box-shadow cardDrop
       // letter-spacing 0px
 
@@ -188,18 +207,17 @@
     opacity 1
     transform translateY(0px)
 
-
   .accountMenu
     position absolute
-    top 142px
-    left 10px
-    right 10px
-    height 40px
-    background highlighter
-    border-radius 6px
+    top 144px
+    left 8px
+    right 8px
+    height 48px
+    background highlightest
+    border-radius 16px
     display flex
     justify-content space-between
-    box-shadow cardDrop
+    box-shadow 8px 8px 10px -10px thick // , -4px -4px 10px rgba(250, 250, 255, 0.9)
     z-index 3007
     transition standardSlowest
     transition-delay 0.3s
@@ -208,14 +226,17 @@
       // background green
       display flex
       .accountMenuItem
-        margin-left 11px
+        margin-left 24px
 
     .accountMenuSettings
       // background red
       display flex
 
       .accountMenuItem
-        margin-right 11px
+        margin-right 10px
+
+      .accountMenuItem:last-child
+        margin-right 24px
 
     .accountMenuItem
       // width 30px
@@ -233,7 +254,7 @@
 
   .accountViews
     position absolute
-    top 182px
+    top 194px
     right 0px
     bottom 0px
     left 0px
@@ -333,7 +354,8 @@
     position relative
     opacity 1
     z-index 3030
-    border-radius 9px
+    // border-radius 9px
+    border-radius 16px
     box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
     // background green
     transition standard

@@ -34,7 +34,7 @@ const topRight = (window) => {
   const screenSize = area
   const windowSize = window.getSize()
   return {
-    x: Math.floor(screenSize.x + (screenSize.width - (window.isTray && dockOnly ? 50 : windowSize[0]))),
+    x: Math.floor(screenSize.x + (screenSize.width - (window.isTray && dockOnly ? 64 : windowSize[0]))),
     y: screenSize.y
   }
 }
@@ -134,8 +134,8 @@ const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      width: 422,
-      minWidth: 422,
+      width: 426,
+      minWidth: 426,
       frame: false,
       transparent: true,
       hasShadow: false,
@@ -290,7 +290,7 @@ const api = {
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       if (!pinArea && store('main.pin')) pinArea = area
-      windows.tray.setSize(dockOnly ? 422 : 422, dev ? 740 : area.height)
+      windows.tray.setSize(dockOnly ? 426 : 426, dev ? 740 : area.height)
       const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
