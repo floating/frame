@@ -43,7 +43,7 @@
   top 0px
   bottom 0px
   left 3px
-  width 424px
+  width 430px
   // padding-right 28px
   -webkit-app-region no-drag
   display flex
@@ -112,6 +112,18 @@
   .appTileIconWrap
     transition standard
     z-index 20
+
+  .appTileIndicator
+    position absolute
+    top 10px
+    left 5px
+    height 7px
+    width 7px
+    border-radius 4.5px
+    background good
+
+  .appTileIndicatorOff
+    background doubleThick
 
   .appTileLoader
     position absolute
@@ -229,10 +241,10 @@
 
   .dockPin
     position absolute
-    bottom 10px
+    bottom 32px
     left 0px
     right 0px
-    height 48px
+    height 32px
     width 64px
     z-index 100000000
 
@@ -268,7 +280,7 @@
 
   .dockMenu
     position absolute
-    top 25px
+    top 32px
     left 0px
     right 0px
     height 192px
@@ -281,9 +293,11 @@
       height 20px
       width 20px
       border-radius 20px
-      border 2px solid good
+      border 3px solid outerspace08 // highlightest // bad // good // outerspace08 // rgba(255, 190, 0, 1) 
       overflow hidden
       position relative
+      // color good
+      transition standardSlow
           
       .dockMenuMainIcon
         height 20px
@@ -300,13 +314,29 @@
   
     .dockMenuItem
       // width 50px
-      height 36px
-      width 64px
+      position relative
+      z-index 20
+      height 32px
+      width 32px
       display flex
+      border-radius 16px
       justify-content center
       align-items center
+      background lowlight
+      margin 0px 0px 8px 16px
+      transition standard
+      // border 1px solid thick
       // border-bottom 1px solid thick
       // background red
+
+    .dockMenuItem:hover
+      background highlighter
+      box-shadow 0px 2px 2px thin
+
+    .dockMenuItemSelected
+      background highlighter
+      box-shadow 0px 2px 2px thin
+
 
   .dockDivide
     position absolute
@@ -323,47 +353,50 @@
   .dockMenuIndicator
     position absolute
     top 0px
-    left 0px
-    right 0
+    left 10px
+    right 10px
     // width 15px
     // background blue
     // margin-top -1px
-    height 4px
+    height 1px
     // border-radius 2px
     // border-top-right-radius 2px
     // border-bottom-right-radius 2px
     z-index 0
+    background outerspace01
     display flex
     justify-content center
     align-items center
     color outerspace08
-    transition standardFast
+    transition standardSlow
     // background outerspace08
-    transform translate3d(0px, 23px, 0px)
     // border 1px sold good
     // box-shadow 0px 0px 2px outerspace05
     // background blue
 
     .dockMenuIndicatorLeft
       position absolute
-      top 0px
+      top -2px
       left 0px
       bottom 0px
-      width 12px
-      background thin
-      border-top-right-radius 2px
-      border-bottom-right-radius 2px
+      width 5px
+      height 5px
+      background outerspace08
+      border-radius 3px
+      // border-bottom-right-radius 2.5px
       // box-shadow 1px 1px 1px outerspace01
 
     .dockMenuIndicatorRight
       position absolute
-      top 0px
+      top -2px
       right 0px
       bottom 0px
-      width 12px
-      background thin
-      border-top-left-radius 2px
-      border-bottom-left-radius 2px
+      width 5px
+      background outerspace08
+      height 5px
+      border-radius 3px
+      // display none
+      // border-bottom-left-radius 2.5px
       // box-shadow -1px 1px 1px outerspace01
     
     // svg
@@ -475,8 +508,8 @@
     animation-duration 1s
     animation-timing-function linear
 
-  .dockedApp:hover
-    background highlighter
+  // .dockedApp:hover
+    // background highlighter
     // box-shadow cardDrop, 0px 3px 0px 2px thinner
     // transform translateY(-2px)
 
@@ -494,10 +527,10 @@
     justify-content center
     align-items center
     // transition standardFast
-    border-radius 6px
-    background highlight
-    box-shadow cardDrop, 0px 6px 6px -3px doubleThick
-    border-radius 50% / 10%
+    // border-radius 6px
+    // background highlight
+    // box-shadow cardDrop, 0px 6px 6px -3px doubleThick
+    // border-radius 50% / 10%
 
     img
       position relative
@@ -508,7 +541,17 @@
     div, svg, img
       pointer-events none
 
-  .dockedApp:before
+  .dockedApp:last-child
+    border-bottom none
+
+  .dockedAppCard
+    background highlightest
+    border-radius 6px
+    background highlight
+    box-shadow cardDrop, 0px 6px 6px -3px doubleThick
+    border-radius 50% / 10%
+
+  .dockedAppCard:before
     content: ''
     position: absolute
     top: 10%
@@ -518,9 +561,6 @@
     background: inherit 
     border-radius: 5% / 50%
     z-index 4
-
-  .dockedApp:last-child
-    border-bottom none
 
   .appStore
     z-index 100
@@ -613,139 +653,6 @@
     //   // box-shadow cardDrop, 0px 10px 10px 0px thin
     //   // background highlighter
 
-    .addAppForm:before
-      content ''
-      position absolute
-      bottom 0px
-      left 10px
-      right 10px
-      height 3px
-      border-radius 2px
-      background thick
-      z-index 300
-
-
-    .addAppForm
-      position absolute
-      left 0px
-      right 0px
-      top 64px
-      height 80px
-      display flex
-      justify-content center
-      align-items center
-      flex-direction column
-      z-index 3
-      //border-radius 6px
-      //box-shadow cardDrop, 0px 10px 10px 0px thin
-      // background light
-      overflow hidden
-
-      .removeApp
-        position relative
-        height 60px
-        width 60px
-        background thin
-        border-radius 40px
-        display flex
-        justify-content center
-        align-items center
-        color outerspace08
-
-      .removeAppPending
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
-        border-radius 35px
-        background bad
-        animation-name removal
-        animation-iteration-count infinite
-        animation-duration 1.3s
-        animation-timing-function ease-out
-
-      .addAppSubmit
-        position absolute
-        top 0
-        bottom 0
-        // left 0px
-        right 0px
-        // height 30px
-        // border-radius 30px
-        width 80px
-        display flex
-        justify-content center
-        align-items center
-        font-weight 500
-        text-transform uppercase
-        // letter-spacing 2px
-        color outerspace08
-        // background blue
-
-      .addAppSubmitButton:hover
-        background highlight
-        box-shadow cardDrop
-        // border 1px solid thin
-
-      .addAppSubmitButton
-        width 40px
-        height 40px
-        border-radius 20px
-        // background highlight
-        // box-shadow 3px 3px 3px 0px thin
-        display flex
-        justify-content center
-        align-items center
-        font-size 26px
-        // background highlight
-        border 1px solid thin
-        transition standard
-
-
-      // .addAppInput:before
-      //   content ''
-      //   position absolute
-      //   bottom -4px
-      //   left 10px
-      //   right 10px
-      //   height 3px
-      //   border-radius 2px
-      //   background thick
-      //   z-index 300
-
-      .addAppInput
-        position absolute
-        top 0px
-        bottom 0px
-        left 0px
-        right 0px
-        // background highlightest
-        color outerspace08
-        display flex
-        justify-content center
-        align-items center
-        // border-radius 9px
-        // background red
-        // box-shadow 0px 8px 8px rgba(0, 35,190, 0.05)
-
-        input
-          padding 10px
-          outline none
-          border 0px
-          height 80px
-          // border-radius 9px
-          background transparent
-          position absolute
-          top 0
-          bottom 0
-          left 0
-          box-shadow none
-          text-align center
-          width calc(100% - 40px)
-          font-size 20px
-          color shift05
-
     .addedApps
       position absolute
       top 0
@@ -757,7 +664,7 @@
       align-items flex-start
       align-content flex-start
       justify-content flex-start
-      padding 68px 0px 0px 0px
+      padding 110px 0px 0px 0px
       box-sizing border-box
       overflow-x hidden
       overflow-y scroll
@@ -835,7 +742,6 @@
         background: inherit;
         border-radius: 5% / 50%;
   
-
       img
         height 20px
         width 20px
@@ -847,3 +753,6 @@
 @import '../Main/style'
 @import '../Local/style'
 @import '../Dapps/style'
+@import '../Jump/style'
+
+

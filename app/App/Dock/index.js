@@ -8,8 +8,15 @@ import Local from './Local'
 import Dapps from './Dapps'
 import Notify from './Notify'
 import Badge from './Badge'
+import Jump from './Jump'
 
 const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
+
+const color = {
+  good: 'rgb(0, 210, 180)',
+  bad: 'rgb(250, 100, 155)',
+  berry: 'rgb(250, 150, 205)'
+}
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
@@ -21,29 +28,6 @@ const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
 //   const b = Math.round(((240 - 230) * (parseInt(hex[4] + hex[5], 16) / 255)) + 230)
 //   return `rgb(${r}, ${g}, ${b})`
 // // }
-
-class _Card extends React.Component {
-  render () {
-    const current = this.store('selected.card')  === 'local' && !this.store('tray.dockOnly') && this.store('tray.open')
-    const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
-    return (
-      <div className={dockCardClass}>
-        <div className='dockCardInset'>
-          <div className='dockCardHeader'>
-            <div className='dockCardHeaderLeft'>
-              <div className='dockCardHeaderTitle'> 
-                {'Settings'}
-              </div>
-            </div>
-          </div>
-          <Local />
-        </div>
-      </div>
-    )
-  }
-}
-
-const Card = Restore.connect(_Card)
 
 class Dock extends React.Component {
   indicator (connection) {
@@ -69,13 +53,16 @@ class Dock extends React.Component {
     // {ipfsReady ? (
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
-    const indicatorStyle = { top: '0px' }
-    if (this.store('selected.card') === 'dapps') indicatorStyle.top = '48px'
-    if (this.store('selected.card') === 'local') indicatorStyle.top = '95px'
+    let card = this.store('selected.card')
+    const indicatorStyle = { transform: 'translate3d(0px, 16px, 0px) rotate(0deg)' }
+    if (card === 'dapps') indicatorStyle.transform = 'translate3d(0px, 56px, 0px) rotate(180deg)'
+    if (card === 'local') indicatorStyle.transform = 'translate3d(0px, 96px, 0px) rotate(0deg)'
     let mainHidden = this.store('tray.dockOnly') || !this.store('tray.open')
-    if (mainHidden) indicatorStyle.left = '-8px'
+    // if (mainHidden) indicatorStyle.left = '-8px'
+
     return (
       <div id='dock'>
+        <Jump />
         <div className='dockDivide' />
         <div className='dockInset'>
           <div className='dockMenu'>
@@ -83,27 +70,27 @@ class Dock extends React.Component {
               <div className='dockMenuIndicatorLeft' />
               <div className='dockMenuIndicatorRight' />
             </div>
-            <div className='dockMenuItem' onMouseDown={() => {
+            <div className={card === 'default' ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
               if (mainHidden) link.send('tray:dockSlide')
               this.store.setCard('default')
             }}>
-              <div className='dockMenuMain'>
+              <div className='dockMenuMain' style={{ borderColor: this.store('selected.open') ? color.good : '' }}>
                 <div className='dockMenuMainIcon'>
                   <div>{svg.user(14)}</div>
                 </div>
               </div>
             </div>
-            <div className='dockMenuItem' onMouseDown={() => {
+            <div className={card === 'dapps' ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
             if (mainHidden) link.send('tray:dockSlide')
               this.store.setCard('dapps')
-            }}>{svg.apps(15)}</div>
-            <div className='dockMenuItem' onMouseDown={() => {
+            }}>{svg.apps(14)}</div>
+            <div className={card === 'local' ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
               if (mainHidden) link.send('tray:dockSlide')
               this.store.setCard('local')
-            }}>{svg.octicon('settings', { height: 20 })}</div>
+            }}>{svg.octicon('settings', { height: 18 })}</div>
           </div>
           <div className='dockPin'>
-            <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(12)}</div>
+            <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>
           </div>
           {/* <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
             <div className='panelDetail'>
@@ -124,7 +111,7 @@ class Dock extends React.Component {
           {/* <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div> */}
           <Main />
           <Dapps />
-          <Card name='local' />
+          <Local />
           <Notify />
           <Badge />
         </div>

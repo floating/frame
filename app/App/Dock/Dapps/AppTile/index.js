@@ -96,13 +96,15 @@ class AppTile extends React.Component {
       const tileClass = docked ? 'dockedApp' : 'addedApp'
       const cardClass = docked ? 'dockedAppCard' : 'addedAppCard'
       const beingDragged = dragging && dragging.dapp && dragging.docked === docked && dragging.index === index
-      const style = !beingDragged ? {} : !docked ? { opacity: 0.3, boxShadow: 'none', transform: 'scale(1.4)' } : { opacity: 0.3 }
+      const style = !beingDragged ? {} : !docked ? { opacity: 0.6, transform: 'scale(1.4)' } : { opacity: 0.6 }
       const handleMouseDown = beingDragged ? () => {} : this.onMouseDown.bind(this)
       const handleMouseUp = beingDragged ? () => {} : this.onMouseUp.bind(this)
       const handleMouseEnter = beingDragged ? () => {} : this.onMouseEnter.bind(this)
+      const on = this.store(`main.openDapps`).indexOf(dapp.domain) > -1
       return (
         <div key={index} className={tileClass} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseEnter={handleMouseEnter}>
           <div className={cardClass} style={style}>
+            <div className={on ? 'appTileIndicator' : 'appTileIndicator appTileIndicatorOff'} />
             {!dapp.pinned ? this.appTileLoader() : null}
             <div className='appTileIconWrap' style={dapp.pinned ? { opacity: 1, transform: 'scale(1)' } : { opacity: 0.3, transform: 'scale(0.6)' }}>
               {icons[this.cid] ? (

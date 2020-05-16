@@ -5,7 +5,7 @@ import Client from '../Client'
 
 import Dropdown from '../../Components/Dropdown'
 
-class Settings extends React.Component {
+class _Settings extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
@@ -136,7 +136,7 @@ class Settings extends React.Component {
           <div className='signerPermission'>
             <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
-                <div className='signerPermissionOrigin'>Local</div>
+                <div className='signerPermissionOrigin'>Primary</div>
                 <div className={this.store('main.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'local')}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
@@ -190,12 +190,12 @@ class Settings extends React.Component {
           </div>
           {/* Local clients */}
           <div className='localSettingsTitle connectionTitle'>
-            <div>Local Clients</div>
+            <div>Services</div>
           </div>
           <Client client='parity' />
-          <Client client='ipfs' />
+          {/* <Client client='ipfs' /> */}
 
-          <div className='localSettingsTitle'>Settings</div>
+          <div className='localSettingsTitle'>Preferences</div>
           <div className='signerPermission'>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Dock</div>
@@ -240,7 +240,33 @@ class Settings extends React.Component {
   }
 }
 
-export default Restore.connect(Settings)
+const Settings = Restore.connect(_Settings)
+
+class Card extends React.Component {
+  render () {
+    const current = this.store('selected.card')  === 'local' && !this.store('tray.dockOnly') && this.store('tray.open')
+    const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
+    const headerClass =  current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
+    return (
+      <>
+        <div className={headerClass}>
+          <div className='dockCardHeaderLeft'>
+            <div className='dockCardHeaderTitle'> 
+              {'Settings'}
+            </div>
+          </div>
+        </div>
+        <div className={dockCardClass}>
+          <div className='dockCardInset'>
+            <Settings />
+          </div>
+        </div>
+      </>
+    )
+  }
+}
+
+export default Restore.connect(Card)
 
 // <div className='signerPermission'>
 //   <div>{provider.url}</div>

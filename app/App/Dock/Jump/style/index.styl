@@ -35,7 +35,7 @@
   pointer-events auto
   transition-delay 0s
   opacity 0.9
-  z-index 10
+  z-index 30000000000
 
 .addAccountShadeForward
   opacity 0
@@ -44,11 +44,11 @@
   right 0
   bottom 0
   left 0
-  z-index 90000000000090
+  z-index 90000000000090999
   pointer-events none
   transition standardSlow
   transition-delay 0.00s
-  background linear-gradient(45deg, pending04, good04)
+  background linear-gradient(45deg, pending02, good02)
 
 .addAccountShadeForwardActive
   opacity 0.61
@@ -62,37 +62,38 @@
   z-index 5000001
   pointer-events none
 
-  .addAccountTrigger
-    position relative
-    height 40px
-    width 40px
-    border-radius 20px
-    display flex
-    justify-content center
-    align-items center
-    background highlight
-    pointer-events auto
-    transition standardSlow
-    z-index 4
-    color outerspace08
-    transform rotate(-1deg)
-    box-shadow 0px 0px 4px -1px rgba(6, 54, 52, 0.05), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
+.addAccountTrigger
+  position relative
+  height 32px
+  width 32px
+  border-radius 16px
+  display flex
+  justify-content center
+  align-items center
+  // background highlight
+  pointer-events auto
+  transition standardSlow
+  z-index 4
+  color outerspace08
+  transform rotate(-1deg)
+  // box-shadow 0px 0px 4px -1px rgba(6, 54, 52, 0.05), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
 
-    .addAccountTriggerIcon
-      z-index 3
-      transition standardSlower
-      font-size 40px
-      margin 0px 0px 2px 1px
-      color outerspace08
-      transform rotate(1deg)
-      font-weight 200
-      
-  .addAccountTriggerActive
-    background phase
-    box-shadow 0px 8px 7px -5px rgba(5, 5, 45, 0.4)
-    .addAccountTriggerIcon
-      color white
-      transform rotate(406deg)
+  .addAccountTriggerIcon
+    z-index 3
+    transition standardSlower
+    font-size 40px
+    margin 0px 0px 2px 1px
+    color outerspace08
+    transform rotate(1deg)
+    font-weight 200
+    
+.addAccountTriggerActive
+  // opacity 0.8
+  // background good04
+  // box-shadow 0px 8px 7px -5px rgba(5, 5, 45, 0.4)
+  .addAccountTriggerIcon
+    // color white
+    transform rotate(406deg)
 
 .addAccountInterfaceActive
   z-index 900000000000
@@ -104,17 +105,17 @@
   position absolute
   background phaseShade
   color rgba(5, 5, 45, 0.4)
-  top 74px
-  right 10px
-  bottom 10px
-  left 10px
-  border-radius 10px
+  top 96px
+  right 16px
+  bottom 16px
+  left 76px
+  border-radius 16px
   transition standardSlow
   z-index 9000000002
   box-shadow 0px 40px 50px -40px rgba(5, 5, 45, 0.1), 0px 0px 10px 0px rgba(5, 5, 45, 0.1)
   overflow hidden
   transition-delay 0s
-  font-weight 600
+  font-weight 300
 
   .addAccountMainInner
     position absolute
@@ -124,11 +125,18 @@
     right 0px
     bottom 3px
     left 0px
-    border-radius 10px
+    border-radius 16px
     z-index 1
     overflow-y scroll
     overflow-x hidden
-    padding 20px 10px 20px 10px
+    // padding 20px 10px 20px 10px
+    pointer-events auto
+    opacity 1
+    transition standardSlow
+  
+  .addAccountMainInnerHide
+    pointer-events none
+    opacity 0
 
   .addAccountBreak
     position relative
@@ -162,7 +170,7 @@
     font-size 12px
     text-transform uppercase
     letter-spacing 3px
-    padding 10px
+    padding 20px 20px 36px 20px
     font-weight 400
     text-align justify
     text-align-last justify
@@ -198,7 +206,7 @@
     padding 3px 0px 3px 0px
     width calc(100%)
     margin 10px 0px 0px 0px
-    border-radius 6px
+    border-radius 16px
     background outerspaceShader
     box-shadow 0px 35px 40px -20px rgba(5, 25, 35, 1)
     display flex
@@ -226,7 +234,7 @@
     .addAccountItemWrap
       width 100%
       background outerspaceLight
-      border-radius 6px
+      border-radius 16px
       padding 0px 0px 10px 0px
       z-index 2
       box-shadow 0px 0px 40px -20px rgba(5, 25, 35, 0.6)
@@ -612,7 +620,247 @@
       transform translateY(0) scale(1)
 
 .addAccountMainActive
-  pointer-events auto
   opacity 1
   transform translateY(0px) scale(1) rotateY(0deg)
   transition-delay 0.00s
+
+// Add Apps Variant
+
+.addAppsIntro
+  position relative
+  width 100%
+  box-sizing border-box
+  padding 32px
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+  font-size 15px
+  text-align justify
+  text-align-last center
+  line-height 20px
+  // border-bottom 1px solid rgba(5, 25, 35, 0.6)
+  
+.addAppsUpdates
+  position relative
+  width 100%
+  // height 50px
+  // background highlight
+  // border-radius 16px
+  color outerspace08
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+  // background yellow
+  // background white
+  // margin-top 16px
+  // margin-bottom 16px
+  padding-top 4px
+  padding-bottom 4px
+  // background rgba(5, 25, 35, 0.4)
+
+  .addAppsUpdate:last-child
+    border-bottom 1px solid rgba(5, 25, 35, 0)
+
+  .addAppsUpdate
+    position relative
+    width 100%
+    height 48px
+    border-bottom 1px solid rgba(5, 25, 35, 0.6)
+    color spacewhite
+    font-weight 300
+    font-size 14px
+    // letter-spacing 1px
+    // text-transform uppercase
+
+    .addAppsUpdateName
+      position absolute
+      top 0
+      left 16px
+      bottom 0
+      display flex
+      justify-content center
+      align-items center
+
+    .addAppsUpdateStatus
+      position absolute
+      top 0
+      right 16px
+      bottom 0
+      width 128px
+      display flex
+      justify-content flex-end
+      align-items center
+      // background red
+
+    .addAppsUpdateTime
+      position absolute
+      top 0
+      right 16px
+      bottom 0
+      width 96px
+      display flex
+      justify-content flex-end
+      align-items center
+      // background blue
+
+  .addAppsUpdateGood
+    .addAppsUpdateStatus
+      color good
+
+  .addAppsUpdateBad
+    .addAppsUpdateStatus
+      color bad
+    
+.addAppsFeatured
+  position relative
+  width 100%
+  height 128px
+  background outerspaceLight
+  // border-radius 16px
+  color spacewhite
+  display flex
+  justify-content center
+  align-items center
+  background rgba(5, 25, 35, 0.2)
+  font-size 20px
+  font-weight 200
+
+.addAppsMore
+  position relative
+  display flex
+  justify-content center
+  align-items center
+
+.addAppForm:before
+  content ''
+  position absolute
+  bottom 0px
+  left 10px
+  right 10px
+  height 3px
+  border-radius 2px
+  background thick
+  z-index 300
+
+.addAppForm
+  position relative
+  height 96px
+  width 100%
+  display flex
+  justify-content center
+  align-items center
+  flex-direction column
+  z-index 3
+  // border-radius 16px
+  // margin-top 0px
+  // border-bottom 1px solid rgba(5, 25, 35, 0.6)
+  //box-shadow cardDrop, 0px 10px 10px 0px thin
+  // background light
+  // overflow hidden
+  // background phase
+  // background rgba(5, 25, 35, 0.2)
+  // box-shadow inset 0px -42px 40px -12px rgba(5, 25, 35, 0.4)
+  // margin-bottom 16px
+
+  // .removeApp
+  //   position relative
+  //   height 60px
+  //   width 60px
+  //   background thin
+  //   border-radius 40px
+  //   display flex
+  //   justify-content center
+  //   align-items center
+  //   color outerspace08
+
+  // .removeAppPending
+  //   position absolute
+  //   top 0
+  //   right 0
+  //   bottom 0
+  //   left 0
+  //   border-radius 35px
+  //   background bad
+  //   animation-name removal
+  //   animation-iteration-count infinite
+  //   animation-duration 1.3s
+  //   animation-timing-function ease-out
+
+  .addAppSubmit
+    position absolute
+    bottom -8px
+    left 0px
+    right 0px
+    // height 30px
+    // border-radius 30px
+    height 16px
+    display flex
+    justify-content center
+    align-items center
+    text-transform uppercase
+    // letter-spacing 2px
+    color outerspace08
+    // background red
+    z-index 9999
+    box-shadow cardDrop
+
+  .addAppSubmitButton:hover
+    background highlight
+    box-shadow cardDrop
+    // border 1px solid thin
+
+  .addAppSubmitButton
+    width 96px
+    height 16px
+    border-radius 20px
+    display flex
+    justify-content center
+    align-items center
+    font-size 11px
+    background highlight
+    font-weight 600
+    transition standard
+
+
+  // .addAppInput:before
+  //   content ''
+  //   position absolute
+  //   bottom -4px
+  //   left 10px
+  //   right 10px
+  //   height 3px
+  //   border-radius 2px
+  //   background thick
+  //   z-index 300
+
+  .addAppInput
+    position absolute
+    top 0px
+    bottom 0px
+    left 0px
+    right 0px
+    display flex
+    justify-content center
+    align-items center
+    color spacewhite
+    background rgba(5, 25, 35, 0.2)
+
+    input
+      padding 10px
+      outline none
+      border 0px
+      height 96px
+      background transparent
+      position absolute
+      outline none
+      border none
+      top 0
+      bottom 0
+      left 0
+      box-shadow none
+      text-align center
+      width 100%
+      font-size 20px
+      color spacewhite

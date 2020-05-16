@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 
 import Account from './Account'
 import PendingSigner from './PendingSigner'
-import Add from './Add'
+// import Jump from '../Jump'
 
 import svg from '../../../svg'
 
@@ -77,49 +77,60 @@ class Main extends React.Component {
     // const current = this.store('selected.card') === 'main'
     // const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
     let mainClass = 'dockCard cardShow'
-    if (this.store('selected.card') !== 'default' || this.store('tray.dockOnly') || !this.store('tray.open')) mainClass = 'dockCard cardHide'
+    let headerClass = 'dockCardHeader headerShow'
+    if (this.store('selected.card') !== 'default' || this.store('tray.dockOnly') || !this.store('tray.open')){
+      mainClass = 'dockCard cardHide'
+      headerClass = 'dockCardHeader headerHide'
+    } 
     // if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
+    let addAccount = this.store('view.addAccount')
+    let open = this.store('selected.open')
+    if (this.store('selected.card') === 'default' && (open || current)) headerClass = 'dockCardHeader headerHide'
+
     return (
-      <div className={mainClass}>
-        <div className='dockCardInset'>
-          <div className='dockCardHeader'>
-            <div className='dockCardHeaderLeft'>
-              <div className='dockCardHeaderTitle'> 
-                {'Accounts'}
-              </div>
-            </div>
-            <div className='addAppButton'>
-              {'Add +'}
+      <>
+        <div className={headerClass}>
+          <div className='dockCardHeaderLeft'>
+            <div className={addAccount ? 'dockCardHeaderTitle dockCardHeaderTitleAdd' : 'dockCardHeaderTitle'}> 
+              {addAccount ? 'Add Accounts' :  'Accounts'}
             </div>
           </div>
-          <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
-            <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>
-              <Add />
-              <div id='panelWrap' ref={ref => { if (ref) this.wrap = ref }}>
-                {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
-                {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
-                  return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
-                })}
-                {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
-                  <div className='noSigners'>
-                    <div className='introLogo'>{svg.logo(70)}</div>
-                    {`No ${accountNames[network]} Accounts Found`}
-                    <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
-                    <span className='featureBox'>
-                      <span className='featureBoxText'>
-                        FRAME ALPHA
+          <div className='addAppButton'>
+            <div className={addAccount ? 'addAccountTrigger addAccountTriggerActive' : 'addAccountTrigger'} onMouseDown={() => this.store.toggleAddAccount()}>
+              <div className='addAccountTriggerIcon'>+</div>
+            </div>
+          </div>
+        </div>
+        <div className={mainClass} style={(open || current) ? { animationDelay: '0s' } : {}}>
+          <div className='dockCardInset'>
+            <div id='panelScroll' style={current ? { pointerEvents: 'none' } : {}}>
+              <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }}>
+                <div id='panelWrap' ref={ref => { if (ref) this.wrap = ref }}>
+                  {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
+                  {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
+                    return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                  })}
+                  {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
+                    <div className='noSigners'>
+                      <div className='introLogo'>{svg.logo(70)}</div>
+                      {`No ${accountNames[network]} Accounts Found`}
+                      <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
+                      <span className='featureBox'>
+                        <span className='featureBoxText'>
+                          FRAME ALPHA
+                        </span>
+                        <span className='featureBoxSubtext'>
+                          {'v' + require('../../../../package.json').version}
+                        </span>
                       </span>
-                      <span className='featureBoxSubtext'>
-                        {'v' + require('../../../../package.json').version}
-                      </span>
-                    </span>
-                  </div>
-                ) : null}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 }

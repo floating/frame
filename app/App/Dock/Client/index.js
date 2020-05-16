@@ -21,7 +21,7 @@ class Client extends React.Component {
   }
 
   fullName = (client) => {
-    if (client === 'parity') return 'Ethereum (Light Client)'
+    if (client === 'parity') return 'Run Ethereum Light Client'
     if (client === 'ipfs') return 'IPFS'
   }
 

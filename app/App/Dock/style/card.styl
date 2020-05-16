@@ -28,6 +28,7 @@
   // background light
   // border-radius 9px
   z-index 1
+  animation-delay 3s
   // box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 15px 15px 25px -10px tripleThick
   // background linear-gradient(135deg, white, doubleThick)
   // transition settle
@@ -35,42 +36,66 @@
   // box-shadow 0px 0px 4px 0px rgba(6, 54, 252, 0.05), cardDrop, 3px 10px 10px 0px thick
   // background linear-gradient(135deg, light, thick)
 
-  .dockCardHeader
+.dockCardHeader
+  position absolute 
+  top 0px
+  left 68px
+  right 0px
+  height 96px
+  opacity 1
+  transition 4s linear all
+  // background blue
+  // background blue
+  // border-bottom 1px solid thin
+  z-index 999999999999999
+  // background blue
+  // border-bottom 4px solid thin
+  // background light
+  // border-radius 16px
+  // box-shadow cardDrop
+  pointer-events none
+  // background blue
+  
+  .dockCardHeaderLeft
     position absolute 
-    top 10px
-    left 0px
-    right 0px
-    height 64px
-    // background blue
-    // border-bottom 1px solid thin
-    z-index 90000
-    // background blue
-    // border-bottom 4px solid thin
-    // background light
-    // border-radius 16px
-    // box-shadow cardDrop
-    
-    .dockCardHeaderLeft
-      position absolute 
-      top 0px
-      left 19px
-      bottom 0
+    top 32px
+    left 16px
 
-      .dockCardHeaderTitle
-        display flex
-        justify-content center
-        align-items center
-        height 64px
-        // padding 0px 3px
-        font-size 26px
-        font-weight 200
-        // background red
-        
-    .dockCardHeaderRight
-      position absolute 
-      top 0
-      right 0
-      bottom 0
+    .dockCardHeaderTitle
+      display flex
+      justify-content center
+      align-items center
+      height 32px
+      // padding 0px 3px
+      font-size 26px
+      font-weight 200
+      // background red
+      transistion standardSlow
+
+    .dockCardHeaderTitleAdd
+      color spacewhite
+      
+  .dockCardHeaderRight
+    position absolute 
+    top 0px
+    right 0
+    bottom 0
+
+  .addAppButton
+    position absolute
+    top 32px
+    right 16px
+    height 32px
+    max-height 32px
+    width 80px
+    border-radius 18px
+    // background highlighter
+    display flex
+    justify-content center 
+    align-items center
+    z-index 5000000
+    box-shadow cardDrop, 0px 6px 6px -3px thin
+  
 
 /* Generated with Bounce.js. Edit at http://bouncejs.com#%7Bl%3A1%2Cs%3A%5B%7BT%3A%22t%22%2Ce%3A%22b%22%2Cd%3A890%2CD%3A0%2Cf%3A%7Bx%3A370%2Cy%3A0%7D%2Ct%3A%7Bx%3A0%2Cy%3A0%7D%2Cs%3A3%2Cb%3A3%7D%5D%7D */
 
@@ -90,7 +115,7 @@
 
   49.55%
     opacity 1
-    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0.594, 0, 0, 1)
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2.594, 0, 0, 1)
 
   78.18%
     transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -0.018, 0, 0, 1)
@@ -104,18 +129,31 @@
     opacity 1
     transform translateX(0px)
 
+  50%
+    opacity 0
+    transform translateX(100px)
+
   100%
     opacity 0
-    transform translateX(370px)
+    transform translateX(500px)
 
 .cardShow
-  z-index 1000000
-  animation cardShow 1200ms linear both
-  // animation-delay 0.14s
+  z-index 3000000
+  animation cardShow 1000ms linear both
+  animation-delay 0.2s
 
 .cardHide
   z-index 3000000
-  animation cardHide 0.6s normal forwards cubic-bezier(.82,0,.12,1)
+  animation cardHide 0.8s normal forwards cubic-bezier(.82,0,.12,1)
+  animation-delay 0.2s
+
+.headerShow
+  z-index 999999999999999
+  animation cardShow 1000ms linear both
+
+.headerHide
+  z-index 999999999999999
+  animation cardHide 0.8s normal forwards cubic-bezier(.82,0,.12,1)
 
 .panelMenu
   position absolute

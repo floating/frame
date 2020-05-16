@@ -44,7 +44,15 @@ export const notify = (u, type, data = {}) => {
   u('view.notifyData', _ => data)
 }
 
-export const toggleAddAccount = (u) => u('view.addAccount', show => !show)
+export const toggleAddAccount = (u) => {
+  u('view.addApp', show => false)
+  u('view.addAccount', show => !show)
+}
+
+export const toggleAddApp = (u) => {
+  u('view.addAccount', show => false)
+  u('view.addApp', show => !show)
+}
 
 export const updateBadge = (u, type) => u('view.badge', _ => type)
 

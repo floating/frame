@@ -4,103 +4,33 @@ import Restore from 'react-restore'
 import svg from '../../../svg'
 import link from '../../../link'
 
+// import Jump from '../Jump'
+
 import AppTile from './AppTile'
 
-class AddDapp extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.addAppFill = 'Enter ENS Name'
-    this.state = {
-      ensInput: this.addAppFill,
-      expanded: false
-    }
-  }
+// Dev
+// function fillArray(value, len) {
+//   if (len == 0) return [];
+//   var a = [value];
+//   while (a.length * 2 <= len) a = a.concat(a);
+//   if (a.length < len) a = a.concat(a.slice(0, len - a.length));
+//   return a;
+// }
 
-  handleAddApp () {
-    if (this.state.ensInput === '' || this.state.ensInput === this.addAppFill) return
-    const domain = this.state.ensInput
-    const options = {}
-    this.setState({ pending: 'add', pendingMessage: 'Installing ' + domain, ensInput: this.addAppFill })
-    const cb = (err) => {
-      if (err) {
-        console.log(err)
-        this.setState({ pending: 'error', pendingMessage: err })
-        setTimeout(() => {
-          this.setState({ pending: '', pendingMessage: '' })
-        }, 3000)
-      } else {
-        this.setState({ pending: '', pendingMessage: '' })
-      }
-    }
-    link.rpc('addDapp', domain, options, cb)
-    // if (this.dappInput) this.dappInput.blur()
-    // this.setState({ ensInput: this.addAppFill })
-  }
-
-  handleOnFocus () {
-    if (this.state.ensInput === this.addAppFill) this.setState({ ensInput: '' })
-  }
-
-  handleOnBlur () {
-    if (this.state.ensInput === '') this.setState({ ensInput: this.addAppFill })
-  }
-  render () {
-    let addDappClass = this.state.expanded ? 'dockCardAddDapp dockCardAddDappExpanded' : 'dockCardAddDapp'
-    return (
-      <>
-        <div className='addAppButton' onMouseDown={() => {
-          this.setState({ expanded: !this.state.expanded })
-        }}>
-          {'Add +'}
-        </div>
-        <div className={addDappClass}>
-          <div className='addAppButton' onMouseDown={() => {
-            this.setState({ expanded: !this.state.expanded })
-          }}>
-            {'Add +'}
-          </div>
-          {this.state.pending ? (
-            <div className='addAppForm'>
-              {this.state.pendingMessage}
-            </div>
-          ) : (
-            this.dragging ? (
-              <div className='addAppForm'>
-                <div
-                  className='removeApp'
-                  onMouseEnter={e => this.removePending()}
-                  onMouseLeave={e => this.cancelRemoval()}
-                >
-                  {this.state.pendingRemoval ? <div className='removeAppPending' /> : null}
-                  {svg.trash(16)}
-                </div>
-              </div>
-            ) : (
-              <div className='addAppForm'>
-                <div className='addAppInput'>
-                  <input
-                    ref={c => { this.dappInput = c }}
-                    value={this.state.ensInput}
-                    onFocus={::this.handleOnFocus}
-                    onBlur={::this.handleOnBlur}
-                    onChange={e => this.setState({ ensInput: e.target.value })}
-                    onKeyPress={e => { if (e.key === 'Enter') this.handleAddApp() }}
-                  />
-                </div>
-                <div
-                  className='addAppSubmit'
-                  onMouseDown={::this.handleAddApp}
-                >
-                  <div className='addAppSubmitButton'>+</div>
-                </div>
-              </div>
-            )
-          )}
-        </div>
-      </>
-    )
-  }
-}
+// {fillArray('0x56d9213c8c7affe61942eb34f679415c2b245809651e45ccaa3fa12832367ca5', 100).map((hash, i) => {
+//   i = i + 1
+//   return (
+//     <AppTile
+//       key={hash}
+//       index={i}
+//       hash={hash}
+//       dragging={this.dragging}
+//       docked={false}
+//       mouseDown={(e, dapp, i) => this.onMouseDown(e, dapp, i, false)}
+//       moveDrag={(...args) => this.moveDrag(...args)}
+//     />
+//   )
+// })}
 
 class Dapps extends React.Component {
   constructor (...args) {
@@ -205,14 +135,15 @@ class Dapps extends React.Component {
   render () {
     const current = this.store('selected.card') === 'dapps' && !this.store('tray.dockOnly') && this.store('tray.open')
     const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
+    const headerClass =  current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
     // const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
 
     const dockStyle = { marginTop: `-${(this.store('main.dapp.map.docked').length * 64) / 2}px` }
-    if (this.store('view.addAccount')) {
-      dockStyle.opacity = 0
-      dockStyle.pointerEvents = 'none'
-    }
+    // if (this.store('view.addApp')) {
+    //   dockStyle.opacity = 0
+    //   dockStyle.pointerEvents = 'none'
+    // }
     return (
       <>
         <div className='appMovement'>
@@ -262,17 +193,21 @@ class Dapps extends React.Component {
             })}
           </div>
         ) : null}
+        <div className={headerClass}>
+          <div className='dockCardHeaderLeft'>
+            <div className={this.store('view.addApp') ? 'dockCardHeaderTitle dockCardHeaderTitleAdd' : 'dockCardHeaderTitle'}> 
+              {this.store('view.addApp') ? 'Add Apps' :  'Apps'}
+            </div>
+          </div>
+          <div className='addAppButton'>
+            <div className={this.store('view.addApp') ? 'addAccountTrigger addAccountTriggerActive' : 'addAccountTrigger'} onMouseDown={() => this.store.toggleAddApp()}>
+              <div className='addAccountTriggerIcon'>+</div>
+            </div>
+          </div>
+        </div>
         <div className={dockCardClass}>
           <div className='dockCardInset'>
             <div className='appStore'>
-              <div className='dockCardHeader'>
-                <div className='dockCardHeaderLeft'>
-                  <div className='dockCardHeaderTitle'> 
-                    {'Apps'}
-                  </div>
-                </div>
-                <AddDapp />
-              </div>
               <div className='addedApps'>
                 <div
                   className='dragCatch'

@@ -133,6 +133,16 @@ module.exports = {
       return map
     })
   },
+  setDappOpen: (u, ens, open) => {
+    u('main.openDapps', (dapps) => {
+      if (open) {
+        if (dapps.indexOf(ens) === -1) dapps.push(ens)
+      } else {
+        dapps = dapps.filter(e => e !== ens)
+      }
+      return dapps
+    })
+  },
   removeDapp: (u, namehash) => {
     u('main.dapp.details', (dapps) => {
       dapps = { ...dapps }

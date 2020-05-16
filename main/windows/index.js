@@ -134,8 +134,8 @@ const api = {
   create: () => {
     windows.tray = new BrowserWindow({
       id: 'tray',
-      width: 426,
-      minWidth: 426,
+      width: 432,
+      minWidth: 432,
       frame: false,
       transparent: true,
       hasShadow: false,
@@ -290,7 +290,7 @@ const api = {
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       if (!pinArea && store('main.pin')) pinArea = area
-      windows.tray.setSize(dockOnly ? 426 : 426, dev ? 740 : area.height)
+      windows.tray.setSize(dockOnly ? 432 : 432, dev ? 740 : area.height)
       const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
@@ -379,7 +379,11 @@ const api = {
       }
     })
 
-    if (existingWindow) return existingWindow.focus()
+    if (existingWindow) {
+      existingWindow.restore()
+      existingWindow.focus()
+      return
+    }
 
     const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
@@ -429,10 +433,12 @@ const api = {
       dapp.url = url
       dapp.ens = ens
       windows[session].send('main:dapp', dapp)
+      store.setDappOpen(ens, true)
     })
     windows[session].show()
     windows[session].on('closed', () => {
       delete windows[session]
+      store.setDappOpen(ens, false)
     })
 
     const loadApp = hidden => {

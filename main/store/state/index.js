@@ -28,7 +28,8 @@ const initial = {
     notify: '',
     notifyData: {},
     badge: '',
-    addAccount: ''
+    addAccount: '',
+    addApp: ''
   },
   signers: {},
   tray: {
@@ -90,7 +91,8 @@ const initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     ipfs: {},
-    dapp: {
+    openDapps: [],
+    dapp: main('dapp',{
       details: {},
       map: {
         added: [],
@@ -98,9 +100,9 @@ const initial = {
       },
       storage: {},
       removed: []
-    },
+    }),
     ledger: {
-      derivation: main('ledger.derivation', 'legacy')
+      derivation: main('ledger.derivation', 'live')
     },
     gasPrice: {
       default: 'normal',
