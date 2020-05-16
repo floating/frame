@@ -40,8 +40,6 @@ class Add extends React.Component {
   }
 
   render () {
-    console.log(`this.store('view.addAccount'), this.store('view.addApp')`)
-    console.log(this.store('view.addAccount'), this.store('view.addApp'))
     return (
       <Transition in={Boolean(this.store('view.addAccount') || this.store('view.addApp'))} timeout={duration} onEnter={() => this.start()} onExit={() => this.exit()}>
         {state => {

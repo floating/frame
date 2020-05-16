@@ -54,10 +54,11 @@ class Dock extends React.Component {
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
     let card = this.store('selected.card')
-    const indicatorStyle = { transform: 'translate3d(0px, 16px, 0px) rotate(0deg)' }
+    let indicatorStyle = { transform: 'translate3d(0px, 16px, 0px) rotate(0deg)' }
     if (card === 'dapps') indicatorStyle.transform = 'translate3d(0px, 56px, 0px) rotate(180deg)'
     if (card === 'local') indicatorStyle.transform = 'translate3d(0px, 96px, 0px) rotate(0deg)'
     let mainHidden = this.store('tray.dockOnly') || !this.store('tray.open')
+    if (mainHidden) indicatorStyle = { transform: 'translate3d(0px, -26px, 0px) rotate(180deg)', opacity: '0' }
     // if (mainHidden) indicatorStyle.left = '-8px'
 
     return (
@@ -70,7 +71,7 @@ class Dock extends React.Component {
               <div className='dockMenuIndicatorLeft' />
               <div className='dockMenuIndicatorRight' />
             </div>
-            <div className={card === 'default' ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
+            <div className={card === 'default' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
               if (mainHidden) link.send('tray:dockSlide')
               this.store.setCard('default')
             }}>
@@ -80,11 +81,11 @@ class Dock extends React.Component {
                 </div>
               </div>
             </div>
-            <div className={card === 'dapps' ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
+            <div className={card === 'dapps' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
             if (mainHidden) link.send('tray:dockSlide')
               this.store.setCard('dapps')
             }}>{svg.apps(14)}</div>
-            <div className={card === 'local' ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
+            <div className={card === 'local' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
               if (mainHidden) link.send('tray:dockSlide')
               this.store.setCard('local')
             }}>{svg.octicon('settings', { height: 18 })}</div>

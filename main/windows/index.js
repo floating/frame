@@ -34,7 +34,7 @@ const topRight = (window) => {
   const screenSize = area
   const windowSize = window.getSize()
   return {
-    x: Math.floor(screenSize.x + (screenSize.width - (window.isTray && dockOnly ? 64 : windowSize[0]))),
+    x: Math.floor(screenSize.x + (screenSize.width - (window.isTray && dockOnly ? 70 : windowSize[0]))),
     y: screenSize.y
   }
 }
