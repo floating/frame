@@ -48,10 +48,11 @@ class Add extends React.Component {
               {state !== 'exited' ? (
                 <>
                   <div className={state === 'entered' ? 'addAccountShade addAccountShadeActive' : 'addAccountShade'} />
+                  <div className={state === 'entered' ? 'dockDivideDark dockDivideDarkActive' : 'dockDivideDarkShade'} />
                   <div className={state === 'entered' ? 'addAccountMain addAccountMainActive' : 'addAccountMain'}>
                     <div className={this.store('view.addApp') ? 'addAccountMainInner' : 'addAccountMainInner addAccountMainInnerHide'}>
                       <div className='addAppsIntro'>
-                        {'Install decentralized apps you use daily. Frame will resolve and keep them updated in a fully decentralized way. No one can in between you and access to your apps.'}
+                        {'Install decentralized apps you use regularly. Frame will keep them updated and accessable via fully decentralized ENS/IPFS infrastrcutre'}
                       </div>
                       <AddDapp />
                       <div className='addAppsUpdates'>
@@ -105,7 +106,9 @@ class Add extends React.Component {
                       </div>
                     </div>
                     <div className={this.store('view.addAccount') ? 'addAccountMainInner' : 'addAccountMainInner addAccountMainInnerHide'}>
-                      <div className='addAccountSubtitle'>Add accounts to use with your decentralized apps</div>
+                      <div className='addAppsIntro'>
+                        {'Add your accounts and use them with your all your decentralized apps'}
+                      </div>
                       <div className='addAccountBreak' />
                       <div className='addAccountHeader'><div style={{ marginRight: '10px' }}>{svg.octicon('server', { height: 17 })}</div><div>Hardware Accounts</div></div>
                       <AddHardware index={1} type='ledger' />

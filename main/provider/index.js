@@ -29,7 +29,7 @@ class Provider extends EventEmitter {
     this.getGasEstimate = this.getGasEstimate.bind(this)
     this.getNonce = this.getNonce.bind(this)
     this.fillTx = this.fillTx.bind(this)
-    this.subs = { accountsChanged: [], networkChanged: [] }
+    this.subs = { accountsChanged: [], chainChanged: [] }
   }
 
   accountsChanged (accounts) {
@@ -38,8 +38,8 @@ class Provider extends EventEmitter {
     })
   }
 
-  networkChanged (netId) {
-    this.subs.networkChanged.forEach(subscription => {
+  chainChanged (netId) {
+    this.subs.chainChanged.forEach(subscription => {
       this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
     })
   }
@@ -194,15 +194,28 @@ class Provider extends EventEmitter {
       } else {
         accounts.setTxSigned(req.handlerId, err => {
           if (err) return cb(err)
-          this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, response => {
-            if (response.error) {
-              this.resError(response.error, payload, res)
-              cb(response.error.message)
-            } else {
-              res(response)
-              cb(null, response.result)
-            }
-          })
+          let done = false
+          const cast = () => {
+            this.connection.send({ 
+              id: req.payload.id, 
+              jsonrpc: req.payload.jsonrpc, 
+              method: 'eth_sendRawTransaction', 
+              params: [signedTx] 
+            }, response => {
+              clearInterval(broadcastTimer)
+              if (done) return
+              done = true
+              if (response.error) {
+                this.resError(response.error, payload, res)
+                cb(response.error.message)
+              } else {
+                res(response)
+                cb(null, response.result)
+              }
+            })
+          }
+          const broadcastTimer = setInterval(() => cast(), 1000)
+          cast()
         })
       }
     })
@@ -363,6 +376,7 @@ class Provider extends EventEmitter {
   send (payload, res = () => {}) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
+    if (payload.method === 'eth_requestAccounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
@@ -384,7 +398,7 @@ store.observer(() => {
   if (network !== store('main.connection.network')) {
     network = store('main.connection.network')
     accounts.unsetSigner()
-    provider.networkChanged(network)
+    provider.chainChanged(network)
     provider.accountsChanged([])
   }
 })

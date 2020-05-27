@@ -42,8 +42,8 @@
   position absolute
   top 0px
   bottom 0px
-  left 3px
-  width 430px
+  left 2px
+  width 428px
   // padding-right 28px
   -webkit-app-region no-drag
   display flex
@@ -54,11 +54,12 @@
   will-change transform
   // background whiteglowShade
   background lowlight
-  border-top-left-radius 9px
-  border-bottom-left-radius 9px
+  border-top-left-radius 16px
+  border-bottom-left-radius 16px
   // margin 0px -30px 0px 0px
-  box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
+  box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 1px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
+  // border 1px solid highlightest
   
   .dockOverlay
     position absolute
@@ -106,12 +107,20 @@
     right 0px
     bottom 0px
     left 0px
-    border-top-left-radius 6px
-    border-bottom-left-radius 6px
+    border-top-left-radius 16px
+    border-bottom-left-radius 16px
 
   .appTileIconWrap
+    position relative
     transition standard
     z-index 20
+
+  .dockedApp
+    .appTileIndicator
+      top 7px
+      left 4px
+      height 5px
+      width 5px
 
   .appTileIndicator
     position absolute
@@ -121,6 +130,7 @@
     width 7px
     border-radius 4.5px
     background good
+    z-index 200
 
   .appTileIndicatorOff
     background doubleThick
@@ -201,7 +211,7 @@
         width 64px
         height 64px
         border-radius 6px
-        box-shadow cardDrop, 0px 3px 6px thick
+        // box-shadow cardDrop, 0px 3px 6px thick
         background highlighter
         box-sizing border-box
         display flex
@@ -218,11 +228,13 @@
         animation-duration 1.4s
         animation-timing-function linear
         border-radius 50% / 10%
+        // box-shadow -8px 36px 24px -12px rgba(20, 40, 100, 0.1)
+        opacity 0.7
 
         img
           position relative
-          height 20px
-          width 20px
+          max-height 32px
+          max-width 24px
           z-index 8
 
         div, svg, img
@@ -280,7 +292,7 @@
 
   .dockMenu
     position absolute
-    top 32px
+    top 24px
     left 0px
     right 0px
     height 192px
@@ -340,8 +352,8 @@
 
   .dockDivide
     position absolute
-    top 10px
-    bottom 10px
+    top 24px
+    bottom 24px
     left 64px
     width 4px
     border-radius 2px
@@ -383,6 +395,7 @@
       height 5px
       background outerspace08
       border-radius 3px
+      transition standardSlow
       // border-bottom-right-radius 2.5px
       // box-shadow 1px 1px 1px outerspace01
 
@@ -395,9 +408,16 @@
       background outerspace08
       height 5px
       border-radius 3px
+      transition standardSlow
       // display none
       // border-bottom-left-radius 2.5px
       // box-shadow -1px 1px 1px outerspace01
+
+  .dockMenuIndicatorGood
+    .dockMenuIndicatorLeft
+      background good
+    .dockMenuIndicatorRight
+      background good
     
     // svg
     //   transform rotate(90deg) translate3d(-3px, 0px, 0px)
@@ -482,6 +502,12 @@
     top 50%
     z-index 1000
     // background blue
+    width 64px
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    // background blue
     // transition standard
 
     .dockAppIcon
@@ -507,6 +533,7 @@
     animation-iteration-count infinite
     animation-duration 1s
     animation-timing-function linear
+    // background blue
 
   // .dockedApp:hover
     // background highlighter
@@ -514,12 +541,12 @@
     // transform translateY(-2px)
 
   .dockedApp
-    position: relative
+    position relative
     min-width 48px
     min-height 48px
     width 48px
     height 48px
-    margin 8px 4px 8px 10px
+    margin 4px 0px 4px 0px
     // margin-bottom 4px
     // margin-left 4px
     box-sizing border-box
@@ -534,8 +561,8 @@
 
     img
       position relative
-      height 20px
-      width 20px
+      max-height 48px
+      max-width 20px
       z-index 8
 
     div, svg, img
@@ -545,11 +572,18 @@
     border-bottom none
 
   .dockedAppCard
-    background highlightest
-    border-radius 6px
-    background highlight
-    box-shadow cardDrop, 0px 6px 6px -3px doubleThick
+    position relative
+    z-index 6
+    // border-radius 6px
+    background highlighter
+    // box-shadow cardDrop, 0px 6px 6px -3px doubleThick
+    box-shadow 0px 2px 3px thin
     border-radius 50% / 10%
+    width 48px
+    height 48px
+    display flex
+    justify-content center
+    align-items center
 
   .dockedAppCard:before
     content: ''
@@ -557,10 +591,14 @@
     top: 10%
     bottom: 10%
     right: -5%
-    left: -5%
+    left: -4%
     background: inherit 
     border-radius: 5% / 50%
     z-index 4
+    pointer-events none
+
+  // .dockedAppCard:hover
+  //   background blue
 
   .appStore
     z-index 100
@@ -712,6 +750,7 @@
         width 64px
         height 64px
         border-radius 9px
+        box-shadow 0px 2px 3px thin
         // box-shadow cardDrop, 3px 3px 3px thick
         // background highlighter
         box-sizing border-box
@@ -724,13 +763,17 @@
         // overflow hidden
         // background highlight
         // border 1px solid thick
-        background highlight
+        background highlighter
         // box-shadow cardDrop, 0px 1px 0px 2px thinner
-        box-shadow cardDrop, 2px 2px 0px 0px thin, 0px 6px 0px -2px thin, 0px 10px 25px -10px doubleThick
+        // box-shadow 0px 0px 20px -10px rgba(45, 85, 149, 1)
+        // box-shadow cardDrop, 2px 2px 0px 0px thin, 0px 6px 0px -2px thin, 0px 10px 25px -10px doubleThick
         // background linear-gradient(135deg, highlight, thin)
         transition standard
         // background red
         border-radius 50% / 10%
+        // border 1px solid highlightest
+        // border-bottom 1px solid highlightest
+        // box-shadow 0px 24px 24px -24px rgba(20, 40, 160, 0.4)
 
       .addedAppCard:before
         content: '';
@@ -743,8 +786,8 @@
         border-radius: 5% / 50%;
   
       img
-        height 20px
-        width 20px
+        max-height 32px
+        max-width 24px
 
       div, svg, img
         pointer-events none
@@ -754,5 +797,6 @@
 @import '../Local/style'
 @import '../Dapps/style'
 @import '../Jump/style'
-
+@import '../Notify/style'
+@import '../Badge/style'
 

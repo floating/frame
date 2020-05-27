@@ -2,7 +2,8 @@ const ipfs = require('ipfs')
 
 const store = require('../store')
 
-const peers = require('./peers.json')
+// const peers = require('./peers.json')
+const ens = require('../ens')
 
 let node 
 
@@ -70,6 +71,7 @@ const start = async () => {
   console.log('IPFS carrying on...')
 
   const connectPeers = async () => {
+    const peers = await ens.resolvePeers('frame.eth')
     for (const peer of peers) await node.swarm.connect(peer)
   }
 

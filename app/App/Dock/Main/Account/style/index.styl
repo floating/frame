@@ -47,7 +47,7 @@
 
 .signer
   position relative
-  padding 8px 9px 0px 6px
+  padding 8px 6px 0px 4px
   transition standard
   will-change transform
   transform translate3d(0, 0, 0)
@@ -63,7 +63,7 @@
     position relative
     z-index 300002
     border-radius 16px
-    box-shadow cardDrop
+    box-shadow cardDrop // , 0px 16px 16px -8px thick
     transition settle
     pointer-events auto
     background thick
@@ -83,7 +83,7 @@
       border-radius 16px
       z-index 3003
       background highlighter
-      // transition standard
+      transition standardSlowest
       overflow hidden
 
   .accountInfo
@@ -97,11 +97,11 @@
     // background blue
 
     .accountExpand
-      width 64px
+      width 32px
       border-radius 16px
       position absolute
-      top 0px
-      right 0px
+      top 16px
+      right 16px
       bottom 0px
       display flex
       justify-content center
@@ -118,7 +118,7 @@
       position absolute
       right 100px
       left 100px
-      bottom 14px
+      bottom 16px
       font-size 11px
       font-weight 400
       // background thin
@@ -187,16 +187,30 @@
       font-weight bold
       font-family FiraCode, sans-serif
       margin 0px 0px 5px 0px
-      // margin-bottom 5px
-      // border-radius 4px
-      // background light
       color outerspace08
-      // background blue
-      // box-shadow cardDrop
-      // letter-spacing 0px
 
-    // .accountBalance:first-child
-    //   background blue
+      .accountBalanceValue
+        position relative
+        z-index 2
+        background highlight
+        padding-left 12px
+
+      .accountBalanceCurrency
+        position relative
+        z-index 2
+        background highlight
+        padding-right 10px
+
+      .accountBalanceConnect
+        position relative
+        z-index 1
+        position absolute
+        top 50%
+        margin-top -3px
+        right 30px
+        left 30px
+        height 2px
+        background thick
 
   .accountMenuHide
     opacity 0
@@ -208,7 +222,7 @@
 
   .accountMenu
     position absolute
-    top 144px
+    top 120px
     left 8px
     right 8px
     height 48px
@@ -253,7 +267,7 @@
 
   .accountViews
     position absolute
-    top 194px
+    top 168px
     right 0px
     bottom 0px
     left 0px
@@ -816,20 +830,20 @@
 
   .accountListWrap
     position absolute
-    top 100px
+    top 65px
     left 0
     right 0
     // height 0px
-    height 0px
-    background lowlight
+    background highlighter
     // height 40px
-    z-index 3015
-    transition standardFast
-    border-bottom-left-radius 6px
-    border-bottom-right-radius 6px
+    z-index 9999999999
+    transition standard
+    border-bottom-left-radius 16px
+    border-bottom-right-radius 16px
     overflow hidden
-    box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
+    box-shadow 0px 2px 3px thin /// , 0px 19px 9px -14px thin !important
     transform translateZ(0)
+    // background red
 
     .accountList
       position absolute
@@ -840,6 +854,10 @@
       z-index 3018
       overflow hidden
       padding 15px 0px 10px 0px
+      border-bottom-left-radius 16px
+      border-bottom-right-radius 16px
+      border-bottom 1px solid thick
+      // background blue
 
       .settingsMenu
         background linear-gradient(lowlight, highlight)
@@ -908,7 +926,7 @@
             color outerspace
 
       .accountListItems
-        background lowlight
+        background highlighter
         height 280px
         min-height 280px
         width 100%
@@ -924,7 +942,7 @@
         pointer-events none
 
         .accountListItem
-          background lowlight
+          background highlighter
           width calc(100% - 40px)
           height 55px
           min-height 55px
@@ -950,9 +968,9 @@
           border-bottom none
 
         .accountListItemSelected
-          background light
+          background highlightest
           color outerspace
-          border-radius 6px
+          border-radius 16px
           border-bottom 1px solid thick0
           box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
           position relative
@@ -1253,11 +1271,10 @@
     box-shadow cardDrop0
 
 .openSigner
-  // .signerContainer
-  //   background transparent
-  //   box-shadow none
-  //   .signerContainerInset
-  //     background transparent
+  .signerContainer
+    box-shadow cardDrop, 0px 0px 16px 0px thick
+    // .signerContainerInset
+    //   box-shadow inset 0px 0px 16px 0px highlightest
   .signerMid
     > div
       opacity 1
@@ -1290,7 +1307,7 @@
     left 0
 
   .accountListWrap
-    height 60px
+    height 0px
 
 .signerInSettings
   .signerTop
@@ -1298,7 +1315,7 @@
       transform translateY(0px)
       pointer-events auto
   .accountListWrap
-    height 130px
+    height 230px
     transform translateY(0px)
     will-change height
 
@@ -1313,7 +1330,7 @@
       transform rotate(180deg)
   .accountListWrap
     transition standardSlow
-    height 425px
+    height 505px
     .accountList
       .accountListItems
         pointer-events auto

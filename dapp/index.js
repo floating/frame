@@ -34,7 +34,7 @@ class App extends React.Component {
     return (
       <div className='splash' style={{ background, color }}>
         <div className='top'>
-          {dapp && dapp.color ? <div className='title'>{name}</div> : null}
+          {dapp && dapp.color ? <div className='title'>{dapp.domain}</div> : null}
         </div>
       </div>
     )

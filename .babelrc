@@ -4,7 +4,6 @@
     "@babel/preset-react"
   ],
   "plugins": [
-    "@babel/plugin-proposal-class-properties",
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
     "@babel/plugin-proposal-do-expressions",
     "@babel/plugin-proposal-export-default-from",

@@ -24,7 +24,7 @@
     background good
 
   .signerSlide
-    position absolute
+    position relative
     top 50px
     right 0
     left 0
@@ -38,6 +38,7 @@
       display flex
     .signerSubsliderSlide
       width 10%
+      
     .signerSubsliderSlideMessage
       padding 20px
       display flex
@@ -45,13 +46,14 @@
       justify-content flex-start
       align-items center
       text-align center
+
     .renameAccountButtonWrap
       padding 10px
       display flex
       justify-content center
       align-items center
       text-align center
-
+      flex-direction column
 
   .signerSettingsTitle:before
     content ''
@@ -100,6 +102,9 @@
     justify-content space-between
     transform translateZ(0)
     z-index 40
+    // display flex
+    // justify-content flex-end
+    align-items center
 
   .signerPermissionDetails
     display flex
@@ -140,6 +145,8 @@
     overflow hidden
     text-align left
     white-space nowrap
+    font-size 15px
+    font-weight 300
 
   .signerPermissionToggle
     position relative

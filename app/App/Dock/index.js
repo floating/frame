@@ -61,13 +61,28 @@ class Dock extends React.Component {
     if (mainHidden) indicatorStyle = { transform: 'translate3d(0px, -26px, 0px) rotate(180deg)', opacity: '0' }
     // if (mainHidden) indicatorStyle.left = '-8px'
 
+
+    let dockMenuIndicatorClass = 'dockMenuIndicator'
+
+    let dockMenuMainStyle = { borderColor: '' }
+
+    /// if (account status is ready and we are on default make indicator green)
+    const current = this.store('selected.current')
+    if (current) {
+      const account = this.store('main.accounts', this.store('selected.current'))
+      if (account && account.signer && account.signer.status === 'ok') {
+        dockMenuMainStyle = { borderColor: color.good }
+        if ( card === 'default') dockMenuIndicatorClass = 'dockMenuIndicator dockMenuIndicatorGood'
+      }
+    }
+
     return (
       <div id='dock'>
         <Jump />
         <div className='dockDivide' />
         <div className='dockInset'>
           <div className='dockMenu'>
-            <div className='dockMenuIndicator' style={indicatorStyle}>
+            <div className={dockMenuIndicatorClass} style={indicatorStyle}>
               <div className='dockMenuIndicatorLeft' />
               <div className='dockMenuIndicatorRight' />
             </div>
@@ -75,7 +90,7 @@ class Dock extends React.Component {
               if (mainHidden) link.send('tray:dockSlide')
               this.store.setCard('default')
             }}>
-              <div className='dockMenuMain' style={{ borderColor: this.store('selected.open') ? color.good : '' }}>
+              <div className='dockMenuMain' style={dockMenuMainStyle}>
                 <div className='dockMenuMainIcon'>
                   <div>{svg.user(14)}</div>
                 </div>

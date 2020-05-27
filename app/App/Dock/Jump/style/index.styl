@@ -53,6 +53,20 @@
 .addAccountShadeForwardActive
   opacity 0.61
 
+.dockDivideDark
+  position absolute
+  top 24px
+  bottom 24px
+  left 64px
+  width 4px
+  border-radius 2px
+  background rgba(5, 25, 35, 0.3)
+  opacity 0
+  transition standardSlower
+
+.dockDivideDarkActive
+  opacity 1
+
 .addAccountInterface
   position absolute
   top 0
@@ -105,9 +119,9 @@
   position absolute
   background phaseShade
   color rgba(5, 5, 45, 0.4)
-  top 96px
-  right 16px
-  bottom 16px
+  top 80px
+  right 8px
+  bottom 8px
   left 76px
   border-radius 16px
   transition standardSlow
@@ -129,10 +143,11 @@
     z-index 1
     overflow-y scroll
     overflow-x hidden
-    // padding 20px 10px 20px 10px
+    padding 16px 0px 16px 0px
     pointer-events auto
     opacity 1
     transition standardSlow
+    // padding 50px 0px 50p 0px
   
   .addAccountMainInnerHide
     pointer-events none
@@ -143,8 +158,8 @@
     bottom 0px
     right 0px
     left 0px
-    height 4px
-    border-radius 2px
+    height 2px
+    // border-radius 2px
     background rgba(5, 25, 35, 0.6)
 
   .addAccountTitle
@@ -203,9 +218,9 @@
       // margin 0px 15px 0px 0px
 
   .addAccountItem
-    padding 3px 0px 3px 0px
-    width calc(100%)
-    margin 10px 0px 0px 0px
+    padding 2px
+    // width calc(100%)
+    margin 16px 8px 0px 8px
     border-radius 16px
     background outerspaceShader
     box-shadow 0px 35px 40px -20px rgba(5, 25, 35, 1)
@@ -220,6 +235,7 @@
     position relative
     overflow hidden
     position relative
+    box-sizing border-box
 
     .addAccountItemBar
       content ''
@@ -227,14 +243,15 @@
       top 0
       left 0
       right 0
-      height 12px
+      bottom 0
+      // height 16px
       background hardware
       z-index 1
 
     .addAccountItemWrap
       width 100%
       background outerspaceLight
-      border-radius 16px
+      border-radius 14px
       padding 0px 0px 10px 0px
       z-index 2
       box-shadow 0px 0px 40px -20px rgba(5, 25, 35, 0.6)
@@ -333,7 +350,7 @@
       text-transform uppercase
       letter-spacing 2px
       margin-top 12px
-      border-radius 4px
+      border-radius 16px
       transition standardSlow
       position relative
       overflow hidden
@@ -375,11 +392,12 @@
       align-items center
       justify-content center
       margin-top 12px
-      border-radius 4px
+      border-radius 16px
       transition standardSlow
       position relative
       overflow hidden
       font-weight 400
+      // box-shadow cardDrop, 0px 5px 20px rgba(24, 25, 67, 0.9)
 
     .addAccountItemOptionIntro
       position absolute
@@ -392,7 +410,8 @@
       justify-content center
       transition standardSlow
       flex-direction column
-      background rgba(5, 25, 35, 0.2)
+      background rgba(5, 25, 35, 0.3)
+      
 
     .addAccountItemOptionIntro:hover
       background rgba(5, 25, 35, 0.3)
@@ -449,7 +468,7 @@
 
     .addAccountItemOptionList
       width calc(100% - 20px)
-      border-radius 4px
+      border-radius 16px
       padding 10px 0px
       height 160px
       margin 0px 0px 10px 0px
@@ -481,7 +500,7 @@
 
     .addAccountItemOptionInput
       width calc(100% - 40px)
-      border-radius 6px
+      border-radius 16px
       height 50px
       padding 10px
       margin 0px 0px 20px 0px
@@ -510,7 +529,7 @@
 
     .addAccountItemOptionInputPhrase
       width calc(100% - 20px)
-      border-radius 6px
+      border-radius 16px
       height 80px
       padding 0px 0px
       margin 0px 10px 20px 10px
@@ -630,15 +649,17 @@
   position relative
   width 100%
   box-sizing border-box
-  padding 32px
+  padding 16px 16px 32px 16px
   display flex
   justify-content center
   align-items center
   flex-direction column
-  font-size 15px
-  text-align justify
-  text-align-last center
-  line-height 20px
+  font-size 16px
+  text-align center
+  font-weight 100
+  // text-align-last center
+  line-height 28px
+  // font-family OpenSans
   // border-bottom 1px solid rgba(5, 25, 35, 0.6)
   
 .addAppsUpdates

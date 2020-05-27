@@ -23,14 +23,6 @@ class AppTile extends React.Component {
     setTimeout(() => {
       this.setState({ settled: true })
     })
-    context.store.observer(() => {
-      const dapp = props.hash ? context.store(`main.dapp.details.${props.hash}`) : ''
-      if (this.cid && !icons[this.cid] && dapp && dapp.icon) {
-        let ext = dapp.icon.name.substr(dapp.icon.name.lastIndexOf('.') + 1)
-        icons[this.cid] = `data:image/${ext};base64, ${dapp.icon.content}`
-        this.forceUpdate()
-      }
-    })
   }
 
   onMouseDown (e) {
@@ -76,6 +68,17 @@ class AppTile extends React.Component {
       </div>
     )
   }
+  
+  componentDidMount () {
+    this.store.observer(() => {
+      const dapp = this.props.hash ? this.store(`main.dapp.details.${this.props.hash}`) : ''
+      if (this.cid && !icons[this.cid] && dapp && dapp.icon) {
+        let ext = dapp.icon.name.substr(dapp.icon.name.lastIndexOf('.') + 1)
+        icons[this.cid] = `data:image/${ext};base64, ${dapp.icon.content}`
+        this.forceUpdate()
+      }
+    })
+  }
 
   render () {
     const { index, hash, dragging, docked, moving } = this.props
@@ -96,7 +99,7 @@ class AppTile extends React.Component {
       const tileClass = docked ? 'dockedApp' : 'addedApp'
       const cardClass = docked ? 'dockedAppCard' : 'addedAppCard'
       const beingDragged = dragging && dragging.dapp && dragging.docked === docked && dragging.index === index
-      const style = !beingDragged ? {} : !docked ? { opacity: 0.6, transform: 'scale(1.4)' } : { opacity: 0.6 }
+      const style = !beingDragged ? {} : !docked ? { opacity: 0.6, transform: 'scale(1.2)', boxShadow: 'none' } : { opacity: 0.6 }
       const handleMouseDown = beingDragged ? () => {} : this.onMouseDown.bind(this)
       const handleMouseUp = beingDragged ? () => {} : this.onMouseUp.bind(this)
       const handleMouseEnter = beingDragged ? () => {} : this.onMouseEnter.bind(this)

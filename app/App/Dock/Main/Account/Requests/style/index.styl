@@ -470,8 +470,9 @@
     height 100%
     width 100%
     transform translateZ(0px)
-    background linear-gradient(highlight, lowlight, highlight)
-    border-radius 6px
+    // background linear-gradient(highlight, lowlight, highlight)
+    background highlighter
+    border-radius 16px
     overflow hidden
 
     .requestNoticeInner
@@ -484,6 +485,7 @@
       justify-content center
       align-items center
       flex-direction column
+      border-radius 16px
 
       .requestNoticeInnerText
         padding-top 30px
@@ -835,7 +837,7 @@
     height 30px
     box-sizing border-box
     border-right 1px solid thick
-    background ghostA
+    background ghostB
     box-shadow cardDrop, 0px 1px 1px thin
     // border-top-left-radius 3px
     // border-bottom-left-radius 3px
@@ -866,7 +868,7 @@
     // border-top-left-radius 15px
     border-radius 15px
     // color good
-    background ghostA
+    background ghostB
     box-shadow cardDrop, 0px 1px 1px thin
     padding 5px
     text-align center
@@ -1443,12 +1445,12 @@ span
   left 5px
   right 5px
   bottom 40px
-  border-radius 6px
-  box-shadow 0px 2px 0px thick, 0px 8px 5px -5px thick
+  border-radius 16px
+  box-shadow 0px 2px 0px thick, 0px 0px 8px thick
   text-align center
   box-sizing border-box
-  background rgba(255, 255, 255, 0.05)
-  background highlight
+  // background rgba(255, 255, 255, 0.05)
+  background highlighter
   z-index 100000
   font-size 12px
   font-weight 400

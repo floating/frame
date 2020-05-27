@@ -40,7 +40,9 @@ self.onmessage = e => {
       for (let i = 0; i < particleCount; i++) particles[i].update(ctx)
     }
   } else if (e.data.type === 'start') {
-    loop()
+    setTimeout(() => {
+      loop()
+    }, 640)
   } else if (e.data.type === 'stop') {
     clearTimeout(looper)
   }

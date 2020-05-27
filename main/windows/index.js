@@ -213,8 +213,13 @@ const api = {
         api.hideTray()
         pinArea = null
       })
+      // console.log ('electron.getPosition', windows.tray.getPosition())
+      // electron.systemPreferences.subscribeWorkspaceNotification(event, callback) 
+      // setInterval(() => {
+      //   // console.log(electron.screen.getAllDisplays())
+      //   console.log ('electron.getPosition', windows.tray.getPosition())
+      // }, 2000)
     }, 10 * 1000)
-    // resetTimeout = setTimeout(() => api.reset(), 60 * 60 * 1000)
   },
   // reload: () => {
   //   log.info('Tray Reset: Reloading')
@@ -290,23 +295,21 @@ const api = {
       // windows.tray.setResizable(false) // Keeps height consistant
       const area = pinArea || electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       if (!pinArea && store('main.pin')) pinArea = area
-      windows.tray.setSize(dockOnly ? 432 : 432, dev ? 740 : area.height)
+      windows.tray.setSize(dockOnly ? 432 : 432, dev ? 724 : area.height)
       const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
+      windows.tray.send('main:action', 'trayOpen', true, { dock })
+      windows.tray.send('main:action', 'setSignerView', 'default')
       windows.tray.emit('show')
       windows.tray.show()
       setTimeout(() => {
-        windows.tray.send('main:action', 'trayOpen', true, { dock })
-        windows.tray.send('main:action', 'setSignerView', 'default')
-        setTimeout(() => {
-          if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
-          if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
-          hideShow.running = false
-          hideShow.next = false
-          windows.tray.setVisibleOnAllWorkspaces(false)
-        }, 260)
-      }, 0)
+        if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
+        if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
+        hideShow.running = false
+        hideShow.next = false
+        windows.tray.setVisibleOnAllWorkspaces(false)
+      }, 260)
     }
   },
   close: (e) => {
@@ -387,8 +390,8 @@ const api = {
 
     const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    const height = area.height - 40
-    const width = area.width - 460 > height ? height : area.width - 460
+    const height = area.height - 32
+    const width = area.width - 444 > height ? height : area.width - 444
 
     windows[session] = new BrowserWindow({
       session,
@@ -420,8 +423,8 @@ const api = {
  
     // windows[session].positioner = new Positioner(windows[session])
     const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
-    const offset = dappViews * 37
-    windows[session].setPosition(pos.x - 440 - offset, pos.y + 20)
+    const offset = dappViews * 48
+    windows[session].setPosition(pos.x - 444 - offset, pos.y + 16)
     if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
@@ -542,7 +545,7 @@ ipcMain.on('tray:expand', () => {
 ipcMain.on('tray:mouseout', () => {
   if (glide) {
     glide = false
-    if (!store('main.pin')) api.hideTray()
+    api.hideTray()
   }
 })
 

@@ -72,6 +72,10 @@ class Status extends React.Component {
     this.setState({ expandSigner: !this.state.expandSigner })
   }
 
+  closeExapnd () {
+    this.setState({ expandSigner: false })
+  }
+
   unlockChange (e) {
     this.setState({ unlockInput: e.target.value })
   }
@@ -111,29 +115,27 @@ class Status extends React.Component {
       status = this.props.signer.status
     }
     // console.log('signer status', status)
-    const statusClass = this.state.expandSigner ? 'accountStatus accountStatusOpen' : 'accountStatus'
-    const statusOpen = !this.state.expandSigner ? ::this.handleSignerToggle : null
 
     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
     const open = current && this.store('selected.open')
     // let minimized = this.store('selected.minimized')
+
+    const statusClass = this.state.expandSigner ? open ? 'accountStatus accountStatusOpen' : 'accountStatus accountStatusGlimpse' : 'accountStatus'
+    const statusOpen = !this.state.expandSigner ? ::this.handleSignerToggle : null
 
     let unlockClass = 'signerUnlockRequest'
     if (this.state.unlockHeadShake) unlockClass += ' headShake'
     const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '110px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(0px)', height: '0px', opacity: 0.3 }
 
     return (
-      <div className={statusClass} onMouseDown={statusOpen}>
+      <div className={statusClass} onMouseEnter={statusOpen} onMouseLeave={::this.closeExapnd}>
         {status === 'locked' ? (
           <div className='accountStatusInner'>
-            <div className='accountStatusIndicator accountStatusIndicatorLocked'>
+            <div className='accountStatusIndicator'>
               {svg.octicon('primitive-dot', { height: 22 })}
             </div>
             <div className='accountStatusTitle'>
               Signer is locked
-            </div>
-            <div className='accountStatusClose' onMouseDown={::this.handleSignerToggle}>
-              {'x'}
             </div>
             <div>
               <div className={unlockClass} style={unlockStyle}>
@@ -147,27 +149,21 @@ class Status extends React.Component {
         ) : null}
         {status === 'disconnected' ? (
           <div className='accountStatusInner'>
-            <div className='accountStatusIndicator accountStatusIndicatorLocked'>
+            <div className='accountStatusIndicator'>
               {svg.octicon('primitive-dot', { height: 22 })}
             </div>
             <div className='accountStatusTitle'>
               Signer is disconnected
             </div>
-            <div className='accountStatusClose' onMouseDown={::this.handleSignerToggle}>
-              {'x'}
-            </div>
           </div>
         ) : null}
         {status === 'ok' ? (
           <div className='accountStatusInner'>
-            <div className='accountStatusIndicator'>
+            <div className='accountStatusIndicator accountStatusIndicatorUnlocked'>
               {svg.octicon('primitive-dot', { height: 22 })}
             </div>
             <div className='accountStatusTitle'>
               Signer is ready!
-            </div>
-            <div className='accountStatusClose' onMouseDown={::this.handleSignerToggle}>
-              {'x'}
             </div>
           </div>
         ) : null}

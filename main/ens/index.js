@@ -36,6 +36,34 @@ exports.resolveName = async (name) => {
   return decodedOutput[0]
 }
 
+exports.resolvePeers = async (name) => {
+  // Get resolver address
+  const resolverAddress = await getResolverAddress(name)
+
+  // If no resolver found -> return []
+  if (!resolverAddress) return []
+
+  // Encode function input
+  const node = namehash.hash(name)
+  const input = codec.encodeInput(interfaces.resolver, 'text', [node, 'peers'])
+
+  // Make JSON RPC call
+  const params = { to: resolverAddress, data: input }
+  const output = await makeCall('eth_call', params)
+
+  // If output empty -> return []
+  if (output === '0x') return []
+
+  // Decode output and return value
+  const decodedOutput = codec.decodeOutput(interfaces.resolver, 'text', output)
+  try {
+    return JSON.parse(decodedOutput[0])
+  } catch (e) {
+    console.log(e)
+    return []
+  }
+}
+
 exports.resolveAddress = async (address) => {
   // Construct name
   const name = `${address.slice(2)}.addr.reverse`

@@ -14,7 +14,7 @@ const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
-const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
+const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_requestAccounts','eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
 
 const handler = (socket, req) => {
   socket.id = uuid()
@@ -25,7 +25,7 @@ const handler = (socket, req) => {
       socket.send(JSON.stringify(payload), err => { if (err) log.info(err) })
     }
   }
-  socket.on('message', data => {
+  socket.on('message', async data => {
     let origin = socket.origin
     const payload = validPayload(data)
     if (!payload) return console.warn('Invalid Payload', data)
@@ -38,24 +38,27 @@ const handler = (socket, req) => {
       }
     }
     if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
-    if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
-      let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
-      // review
-      if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
-    } else {
-      payload._origin = origin
-      provider.send(payload, response => {
-        if (response && response.result) {
-          if (payload.method === 'eth_subscribe') {
-            subs[response.result] = { socket, origin }
-          } else if (payload.method === 'eth_unsubscribe') {
-            payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
+    try {
+      if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
+        let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
+        if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
+        res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
+      } else {
+        payload._origin = origin
+        provider.send(payload, response => {
+          if (response && response.result) {
+            if (payload.method === 'eth_subscribe') {
+              subs[response.result] = { socket, origin }
+            } else if (payload.method === 'eth_unsubscribe') {
+              payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
+            }
           }
-        }
-        if (logTraffic) log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
-        res(response)
-      })
+          if (logTraffic) log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
+          res(response)
+        })
+      }
+    } catch (e) {
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, error: { message: e.message, code: 4100 } })
     }
   })
   socket.on('error', err => err) // Handle Error
@@ -84,7 +87,9 @@ module.exports = server => {
       const permissions = store('main.accounts', account, 'permissions') || {}
       const perms = Object.keys(permissions).map(id => permissions[id])
       perms.push({ origin: 'http://localhost:8421', provider: true })
-      const allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
+      let origin = subscription.origin
+      if (!origin || origin === 'null') origin = 'Unknown'
+      const allowed = perms.map(p => p.origin).indexOf(origin) > -1
       if (!allowed) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))
     }

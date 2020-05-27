@@ -1,7 +1,7 @@
 .accountStatusIndicator
   position absolute
-  top 16px
-  left 16px
+  top 0px
+  left 0px
   height 32px
   width 32px
   border-radius 16px
@@ -11,69 +11,93 @@
   color outerspace08
   transition standard
   box-shadow 0px 3px 4px thick0
-  border 1px solid thin
-
-.accountStatusIndicator:hover
+  border 1px solid thick
   background rgba(255, 255, 255, 0.75)
-  box-shadow 0px 3px 4px thin
+
+// .accountStatusIndicator:hover
+//   background rgba(255, 255, 255, 0.75)
+//   box-shadow 0px 3px 4px thin
 
 .accountStatus
-  top 0px
-  left 0px
-  width 64px
-  height 64px
+  top 15px
+  left 15px
+  right 15px
+  width 34px
+  height 34px
   border-radius 16px
   position absolute
   display flex
   justify-content center
   align-items center
   z-index 30
+  box-sizing border-box
   // background highlighter
   // box-shadow cardDrop
   transition standard
-  opacity 0.96
+  opacity 1
   overflow hidden
+  box-shadow cardDrop // , 0px 2px 0px thick, 0px 0px 10px -2px thick
+  // height 312px
+  // width 312px
+  background highlightest
 
   .accountStatusInner
     position absolute
-    top 0
-    left 0
-    height 360px
-    width 360px
-    background rgba(255, 255, 255, 0)
+    top 0px
+    left 0px
+    // right 0px
+    // bottom 0px
     transition standard
+    border-radius 16px
+    height 322px
+    width 322px
 
-  .accountStatusIndicatorLocked
+  .accountStatusIndicatorUnlocked
     // background ghostD
-    color outerspace08
+    color good
 
   .accountStatusClose
     position absolute
     top 0
     right 0
-    height 50px
-    width 50px
+    height 32px
+    width 32px
     display flex
     justify-content center
     align-items center
     color outerspace08
     font-size 20px
+    display none
     // background blue
 
   .accountStatusTitle
     position absolute
     top 0
-    right 50px
-    height 50px
-    left 50px
+    right 32px
+    height 32px
+    left 32px
     display flex
     justify-content center
     align-items center
     color outerspace08
+    // background highlight
+    z-index 200
+    text-transform uppercase
+    font-size 12px
+    font-weight 600
 
 .accountStatusOpen
-  height 362px
-  width 362px
+  transform translate3d(-16px, -16px, 0px)
+  height 322px
+  width 354px
+  box-shadow cardDrop, 0px 2px 0px thick, 0px 0px 10px -2px thick
+
+  .accountStatusInner
+    transform translate3d(16px, 16px, 0px)
+    background highlightsupreme
+    
+.accountStatusGlimpse
+  width 322px
 
   .accountStatusInner
     background highlightest

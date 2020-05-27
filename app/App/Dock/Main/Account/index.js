@@ -72,6 +72,7 @@ class Account extends React.Component {
         top: bounds.top,
         bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3,
         height: this.signer.clientHeight,
+        width: this.signer.clientWidth,
         index: this.props.index
       })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
@@ -135,10 +136,7 @@ class Account extends React.Component {
   //     <div className='signerType'>
   //       <div
   //         className='addressSelect'
-  //         onMouseDown={e => {
-  //           e.stopPropagation()
-  //           this.store.toggleShowAccounts()
-  //         }}
+  //         v
   //       >
   //         <div className='addressSelectButton'>
   //           <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
@@ -276,7 +274,6 @@ class Account extends React.Component {
             <div className='accountPageCurrent'>{this.store('selected.accountPage') + 1}</div>
             <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
           </div>
-          {this.renderSettingsMenu()}
         </div>
       </div>
     )
@@ -379,13 +376,14 @@ class Account extends React.Component {
     return (
       <div className={open ? 'accountBalances accountBalancesShow' : 'accountBalances accountBalancesHide'}>
         <div className='accountBalance'>
+          <div className='accountBalanceConnect' />
           <div className='accountBalanceCurrency'>Ξ</div>
           <div className='accountBalanceValue'>{(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
         </div>
-        <div className='accountBalance'>
+        {/* <div className='accountBalance'>
           <div className='accountBalanceCurrency'>DAI</div>
           <div className='accountBalanceValue'>{(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
-        </div>
+        </div> */}
       </div>
     )
   }
@@ -448,7 +446,10 @@ class Account extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
     return (
-      <div className='accountInfo' onMouseDown={ !open ? ::this.typeClick : null }>
+      <div className='accountInfo' onMouseDown={e => {
+        e.stopPropagation()
+        this.store.toggleShowAccounts()
+      }}>
         <Status {...this.props} />
         {ens ? (
           <>
@@ -500,19 +501,21 @@ class Account extends React.Component {
       style.top = initial.top // open ? 40 : initial.top
       style.bottom = initial.bottom // open ? 3 : initial.bottom
       style.left = 0
-      style.right = 0
+      // style.right = 0
       style.opacity = 1
       style.zIndex = '10000000000000000'
-      const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 5: initial.height
+      const panelHeight = document.body.offsetHeight - 8
+      style.height = open ? panelHeight: initial.height
+      style.width = open ? initial.width + 8 : initial.width
       // console.log('shiftTop', shiftTop)
-      const translateTop = (initial.top * -1) + 0
-      style.transform = open ? `translateY(${(translateTop) + 'px'})` : 'translateY(0px)'
+      const translateTop = (initial.top * -1)
+      style.transform = open ? `translate(-8px, ${(translateTop) + 'px'})` : 'translate(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 1
       style.pointerEvents = 'none'
       style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
+      style.zIndex = '21000'
       if (this.store('selected.open')) {
         // Not open, but another signer is
         style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
@@ -542,6 +545,7 @@ class Account extends React.Component {
               {this.renderBalances(open)}
               {this.renderMenu(open)}
               {this.renderViews(open)}
+              {current ? this.renderAccountList() : null}
             </div>
           </div>
         </div>
