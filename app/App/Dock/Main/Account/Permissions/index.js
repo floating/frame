@@ -44,7 +44,7 @@ class Permissions extends React.Component {
         ) : (
           Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
             return (
-              <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:action', 'toggleAccess', address, o)}>
+              <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:toggleAccess', address, o)}>
                 <div className='signerPermissionControls'>
                   <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                   <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
@@ -56,7 +56,7 @@ class Permissions extends React.Component {
           })
         )}
         <div className='quitFrame'>
-          <div onMouseDown={() => link.send('tray:action', 'clearPermissions', address)} className='quitFrameButton'>Clear All Permissions</div>
+          <div onMouseDown={() => link.send('tray:clearPermissions', address)} className='quitFrameButton'>Clear All Permissions</div>
         </div>
       </div>
     )

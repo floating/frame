@@ -29,17 +29,23 @@ class Provider extends EventEmitter {
     this.getGasEstimate = this.getGasEstimate.bind(this)
     this.getNonce = this.getNonce.bind(this)
     this.fillTx = this.fillTx.bind(this)
-    this.subs = { accountsChanged: [], chainChanged: [] }
+    this.subs = { accountsChanged: [], chainChanged: [], networkChanged: [] }
+    this.subOriginMap = {}
   }
 
-  accountsChanged (accounts) {
+  accountsChanged (accounts, targetOrigin) {
     this.subs.accountsChanged.forEach(subscription => {
+      if (targetOrigin && this.subOriginMap[subscription] !== targetOrigin) return // When targetOrigin is passed, only send to that origin
       this.emit('data:accounts', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
     })
   }
 
   chainChanged (netId) {
     this.subs.chainChanged.forEach(subscription => {
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
+    })
+    // Legacy Event
+    this.subs.networkChanged.forEach(subscription => {
       this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
     })
   }
@@ -348,6 +354,8 @@ class Provider extends EventEmitter {
     const subId = '0x' + this.randHex(32)
     this.subs[payload.params[0]] = this.subs[payload.params[0]] || []
     this.subs[payload.params[0]].push(subId)
+    this.subOriginMap[subId] = payload._origin
+    if (!this.subOriginMap[subId] || this.subOriginMap[subId] === 'null') this.subOriginMap[subId] = 'Unknown'
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
 
@@ -356,7 +364,10 @@ class Provider extends EventEmitter {
     Object.keys(this.subs).some(type => {
       const index = this.subs[type].indexOf(id)
       found = index > -1
-      if (found) this.subs[type].splice(index, 1)
+      if (found) {
+        this.subs[type].splice(index, 1)
+        delete this.subOriginMap[id]
+      }
       return found
     })
     return found

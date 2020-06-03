@@ -5,6 +5,8 @@ const store = require('../store')
 // const peers = require('./peers.json')
 const ens = require('../ens')
 
+const OrbitDB = require('orbit-db')
+
 let node 
 
 const api = {
@@ -57,10 +59,117 @@ const api = {
   }
 }
 
-const start = async () => {
+// var fs = require('fs');
 
+
+// let seen = require('./seen.json')
+
+
+// const notify = n => {
+//   if (seen.map(n => n.time).indexOf(n.time) > -1) return
+//   seen.unshift(n)
+//   if (seen.length > 32) seen = seen.slice(0, 32)
+//   // fs.writeFile('./seen.json', seen, (err) {
+//   //   if (err) console.log(err)
+//   // })
+//   console.log('New notification!')
+//   console.log(n)
+// }
+
+// const connectNotifications = async () => {
+//   // const address = await ens.resolvePeers('frame.eth')
+//   const orbitdb = await OrbitDB.createInstance(node)
+//   const db = await orbitdb.feed('/orbitdb/zdpuAyP1FDwU5wyQ1tkhxhq7TNCSiFihE6cSKtKS2t9tHawNC/notifications')
+//   await db.load(32)
+
+//   let getTimer, running
+  
+//   const getNotifications = async ()=> {
+//     const notifications = await db.iterator({ limit: 32, reverse: true }).collect().map(e => e.payload.value)
+//     notifications.forEach(n => notify(n))
+//   }
+//   getNotifications()
+//   db.events.on('replicated', getNotifications)
+// }
+
+
+let noteHeight = 0
+let pendingNotes = []
+
+// const addNote = (note) => {
+//   notes.unshift(note)
+  
+//   console.log('new note', note)
+// }
+
+const sortedIndex = (array, value) => {
+	var low = 0, high = array.length
+	while (low < high) {
+    let mid = low + high >>> 1
+		if (array[mid] < value) low = mid + 1
+		else high = mid
+	}
+	return low
+}
+
+let updateTimer
+const announceUpdate = () => {
+  console.log('UPDATES TO NOTES')
+  console.log(pendingNotes)
+}
+
+const updateNoteHeight = height => {
+  if (height <= noteHeight) return
+  noteHeight = height
+  let sliceIndex = pendingNotes.map(n => n.id).indexOf(noteHeight)
+  pendingNotes = pendingNotes.slice(sliceIndex, pendingNotes.length - 1)
+  console.log('noteHeight update:', noteHeight)
+}
+
+const submitNote = async note => {
+  if (!note) return
+  if (note.id <= noteHeight) return
+  const index = sortedIndex(pendingNotes.map(n => n.id), note.id)
+  if (pendingNotes[index] && pendingNotes[index].id === note.id) return // We're inserting before same id
+  pendingNotes.splice(index, 0, note)
+  announceUpdate()
+  setTimeout(() => {
+    updateNoteHeight(note.id)
+  }, 10 * 1000)
+}
+
+let fetchTimeout
+
+const connectNotifications = async () => {
+  // const address = await ens.resolvePeers('frame.eth')
+  const orbitdb = await OrbitDB.createInstance(node)
+  const db = await orbitdb.keyvalue('/orbitdb/zdpuB2fQQdxECgPxPTr1EM4yz39oCrWvWq8puEJGuxRRsRB8y/neubla')
+  await db.load()
+  const getNotifications = async () => {
+    clearTimeout(fetchTimeout)
+    fetchTimeout = setTimeout(async () => {
+      try {
+        let notes = await db.get('notifications')
+        if (notes && Array.isArray(notes)) {
+          if (notes.length > 32) notes = notes.slice(0, 32)
+          notes.forEach(submitNote)
+        }
+      } catch (e) {
+        console.error('ERROR GETTING NOTIFICATIONS', e)
+      }
+    }, 1000)
+  }
+  getNotifications()
+  db.events.on('replicated', getNotifications)
+}
+
+const start = async () => {
   try {
-    node = await ipfs.create()
+    node = await ipfs.create({
+      EXPERIMENTAL: {
+        pubsub: true
+      }
+    })
     console.log('IPFS Node Created')
   } catch (e) {
     console.error(e) 
@@ -71,15 +180,28 @@ const start = async () => {
   console.log('IPFS carrying on...')
 
   const connectPeers = async () => {
-    const peers = await ens.resolvePeers('frame.eth')
-    for (const peer of peers) await node.swarm.connect(peer)
+    // const peers = await ens.resolvePeers('frame.eth')
+    const peers = ['/ip4/134.122.6.89/tcp/4001/ipfs/QmdZBuhwZZygi1i2ukZnpcZ1sFtHT7Da3mCcbrjF2xHAg6']
+    console.log('connecting peers', peers)
+    try{
+      for (const peer of peers) await node.swarm.connect(peer)
+    } catch (e) {
+      console.log('Could not connect peer - ' + e.message)
+    }
+    
   }
 
   console.log('IPFS Node Ready')
 
+  console.log('Connection Peers')
+
   await connectPeers()
 
   console.log('IPFS Peers connected!')
+
+  console.log('Connection orbits')
+
+  connectNotifications()
 
   console.log('Getting IPFS peer ID')
 

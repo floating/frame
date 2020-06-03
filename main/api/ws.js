@@ -81,11 +81,11 @@ module.exports = server => {
     if (subscription) subscription.socket.send(JSON.stringify(payload))
   })
 
-  provider.on('data:accounts', (account, payload) => { // Make sure the subscription has access based on current account
+  provider.on('data:accounts', (address, payload) => { // Make sure the subscription has access based on current account
     const subscription = subs[payload.params.subscription]
     if (subscription) {
-      const permissions = store('main.accounts', account, 'permissions') || {}
-      const perms = Object.keys(permissions).map(id => permissions[id])
+      const permissions = store('main.addresses', address, 'permissions') || {}
+      const perms = Object.keys(permissions).map(id => permissions[id]).filter(p => p.provider)
       perms.push({ origin: 'http://localhost:8421', provider: true })
       let origin = subscription.origin
       if (!origin || origin === 'null') origin = 'Unknown'

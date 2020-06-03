@@ -10,6 +10,7 @@ const path = require('path')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store')
+const provider = require('./provider')
 
 const dev = process.env.NODE_ENV === 'development'
 
@@ -106,6 +107,26 @@ ipcMain.on('tray:openEtherscan', (e, hash) => {
 ipcMain.on('tray:giveAccess', (e, req, access) => {
   store.giveAccess(req, access)
   accounts.removeRequest(req.handlerId)
+})
+
+ipcMain.on('tray:toggleAccess', (e, address, handlerId) => {
+  store.toggleAccess(address, handlerId)
+  let addressSettings = store('main.addresses', address)
+  let origin = addressSettings.permissions[handlerId].origin
+  if (!origin || origin === 'null') origin = 'Unknown'
+  provider.accountsChanged([address], origin)
+  // store.giveAccess(req, access)
+  // accounts.removeRequest(req.handlerId)
+})
+
+ipcMain.on('tray:clearPermissions', (e, address) => {
+  let addressSettings = store('main.addresses', address)
+  Object.keys(addressSettings.permissions).forEach(perm => {
+    let origin = perm.origin
+    if (!origin || origin === 'null') origin = 'Unknown'
+    provider.accountsChanged([], perm.origin)
+  })
+  store.clearPermissions(address)
 })
 
 ipcMain.on('tray:syncPath', (e, path, value) => {

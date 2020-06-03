@@ -119,8 +119,10 @@ provider.on('data', payload => {
 provider.on('data:accounts', (account, payload) => { // Make sure the subscription has access based on current account
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
-    const permissions = store('main.accounts', account, 'permissions') || {}
-    const perms = Object.keys(permissions).map(id => permissions[id])
+    // const permissions = store('main.accounts', account, 'permissions') || {}
+    // const perms = Object.keys(permissions).map(id => permissions[id])
+    const permissions = store('main.addresses', address, 'permissions') || {}
+    const perms = Object.keys(permissions).map(id => permissions[id]).filter(p => p.provider)
     perms.push({ origin: 'http://localhost:8421', provider: true })
     const allowed = perms.map(p => p.origin).indexOf(origin) > -1
     if (!allowed) payload.params.result = []
