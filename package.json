@@ -130,7 +130,7 @@
     "ganache-cli": "6.5.1",
     "jest": "24.8.0",
     "node-watch": "0.6.2",
-    "parcel-bundler": "^1.12.4",
+    "parcel-bundler": "1.12.3",
     "restore-devtools": "0.0.1",
     "standard": "12.0.1",
     "stylus": "0.54.5"
