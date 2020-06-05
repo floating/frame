@@ -9,8 +9,8 @@ const appNames = require('./appNames')
 const registryAddress = () => {
   const network = store('main.connection.network')
   const addresses = {
-    1: '0x314159265dd8dbb310642f98f50c066173c1259b',
-    4: '0x98df287b6c145399aaa709692c8d308357bc085d'
+    1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    4: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
   }
   if (addresses[network]) return addresses[network]
   throw new Error('Unable to locate Aragon ENS registry for current network')
