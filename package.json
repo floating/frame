@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "An Ethereum Interface",
   "main": "main",
   "build": {
@@ -95,7 +95,7 @@
     "react-transition-group": "4.2.1",
     "semver": "6.3.0",
     "tar": "4.4.10",
-    "trezor-connect": "8.0.0-rc.1",
+    "trezor-connect": "8.1.5",
     "usb": "1.6.0",
     "uuid": "3.3.2",
     "web3-utils": "1.2.1",
