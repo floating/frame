@@ -1,8 +1,9 @@
-const uuid = require('uuid/v4')
+const { v4: uuid } = require('uuid')
 const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+const fetch = require('node-fetch')
 
 const proxy = require('./proxy')
 
@@ -29,7 +30,7 @@ class Provider extends EventEmitter {
     this.getGasEstimate = this.getGasEstimate.bind(this)
     this.getNonce = this.getNonce.bind(this)
     this.fillTx = this.fillTx.bind(this)
-    this.subs = { accountsChanged: [], networkChanged: [] }
+    this.subs = { accountsChanged: [], chainChanged: [] }
   }
 
   accountsChanged (accounts) {
@@ -38,8 +39,8 @@ class Provider extends EventEmitter {
     })
   }
 
-  networkChanged (netId) {
-    this.subs.networkChanged.forEach(subscription => {
+  chainChanged (netId) {
+    this.subs.chainChanged.forEach(subscription => {
       this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
     })
   }
@@ -79,7 +80,7 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
-    this.resError(`User declined transaction`, payload, res)
+    this.resError('User declined transaction', payload, res)
   }
 
   resError (error, payload, res) {
@@ -90,7 +91,7 @@ class Provider extends EventEmitter {
 
   getSignedAddress (signed, message, cb) {
     const signature = Buffer.from(signed.replace('0x', ''), 'hex')
-    if (signature.length !== 65) cb(new Error(`Frame verifySignature: Signature has incorrect length`))
+    if (signature.length !== 65) cb(new Error('Frame verifySignature: Signature has incorrect length'))
     let v = signature[64]
     v = v === 0 || v === 1 ? v + 27 : v
     const r = toBuffer(signature.slice(0, 32))
@@ -110,9 +111,18 @@ class Provider extends EventEmitter {
   }
 
   verifySignature (signed, message, address, cb) {
+    if (signed.length === 134) { // Aragon smart signed message
+      try {
+        signed = '0x' + signed.substring(4)
+        const actor = accounts.current().smart && accounts.current().smart.actor
+        address = accounts.get(actor.id).addresses[actor.index]
+      } catch (e) {
+        return cb(new Error('Could not resolve message or actor for smart accoount'))
+      }
+    }
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
-      if (verifiedAddress.toLowerCase() !== address.toLowerCase()) return cb(new Error(`Frame verifySignature: Failed ecRecover check`))
+      if (verifiedAddress.toLowerCase() !== address.toLowerCase()) return cb(new Error('Frame verifySignature: Failed ecRecover check'))
       cb(null, true)
     })
   }
@@ -183,15 +193,28 @@ class Provider extends EventEmitter {
       } else {
         accounts.setTxSigned(req.handlerId, err => {
           if (err) return cb(err)
-          this.connection.send({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, method: 'eth_sendRawTransaction', params: [signedTx] }, response => {
-            if (response.error) {
-              this.resError(response.error, payload, res)
-              cb(response.error.message)
-            } else {
-              res(response)
-              cb(null, response.result)
-            }
-          })
+          let done = false
+          const cast = () => {
+            this.connection.send({ 
+              id: req.payload.id, 
+              jsonrpc: req.payload.jsonrpc, 
+              method: 'eth_sendRawTransaction', 
+              params: [signedTx] 
+            }, response => {
+              clearInterval(broadcastTimer)
+              if (done) return
+              done = true
+              if (response.error) {
+                this.resError(response.error, payload, res)
+                cb(response.error.message)
+              } else {
+                res(response)
+                cb(null, response.result)
+              }
+            })
+          }
+          const broadcastTimer = setInterval(() => cast(), 1000)
+          cast()
         })
       }
     })
@@ -214,8 +237,14 @@ class Provider extends EventEmitter {
     return rawTx
   }
 
-  getGasPrice (rawTx, res) {
-    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, res)
+  async getGasPrice (rawTx, res) {
+    try {
+      const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
+      const prices = await response.json()
+      res({ result: '0x' + (prices.fast * 100000000).toString(16) })
+    } catch (error) {
+      res({ error })
+    }
   }
 
   getGasEstimate (rawTx, res) {
@@ -240,8 +269,7 @@ class Provider extends EventEmitter {
   fillDone (fullTx, res) {
     this.getGasPrice(fullTx, response => {
       if (response.error) return res({ need: 'gasPrice', message: response.error.message })
-      const minGas = '0x' + (Math.floor(response.result * 1.2)).toString(16)
-      if (!fullTx.gasPrice || fullTx.gasPrice < minGas) fullTx.gasPrice = minGas
+      fullTx.gasPrice = response.result
       res(null, fullTx)
     })
   }
@@ -249,7 +277,6 @@ class Provider extends EventEmitter {
   fillTx (rawTx, cb) {
     const needs = {}
     // if (!rawTx.nonce) needs.nonce = this.getNonce
-    // if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
     if (!rawTx.gas) needs.gas = this.getGasEstimate
     let count = 0
     const list = Object.keys(needs)
@@ -280,16 +307,16 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0] }, res)
+      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin }, res)
     })
   }
 
   ethSign (payload, res) {
     payload.params = [payload.params[0], payload.params[1]]
-    if (!payload.params.every(utils.isHexStrict)) return this.resError(`ethSign Error: Invalid hex values`, payload, res)
+    if (!payload.params.every(utils.isHexStrict)) return this.resError('ethSign Error: Invalid hex values', payload, res)
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    const req = { handlerId, type: 'sign', payload, account: accounts.getAccounts()[0] }
+    const req = { handlerId, type: 'sign', payload, account: accounts.getAccounts()[0], origin: payload._origin }
     const _res = data => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
@@ -313,7 +340,7 @@ class Provider extends EventEmitter {
     }
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: accounts.getAccounts()[0] })
+    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: accounts.getAccounts()[0], origin: payload._origin })
   }
 
   subscribe (payload, res) {
@@ -348,6 +375,7 @@ class Provider extends EventEmitter {
   send (payload, res = () => {}) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
+    if (payload.method === 'eth_requestAccounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
@@ -356,6 +384,8 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3') return this.signTypedData(payload, res)
+    // Delete custom data
+    delete payload._origin
     this.connection.send(payload, res)
   }
 }
@@ -367,7 +397,7 @@ store.observer(() => {
   if (network !== store('main.connection.network')) {
     network = store('main.connection.network')
     accounts.unsetSigner()
-    provider.networkChanged(network)
+    provider.chainChanged(network)
     provider.accountsChanged([])
   }
 })

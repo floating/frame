@@ -1,5 +1,4 @@
 const { ipcRenderer } = require('electron')
-// const uuid = require('uuid/v4')
 let i = 0
 const newId = () => ++i
 

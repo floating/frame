@@ -2,7 +2,7 @@
 
 const EventEmitter = require('events')
 const { ipcMain } = require('electron')
-const uuid = require('uuid/v4')
+const { v4 : uuid } = require('uuid')
 const log = require('electron-log')
 
 const windows = require('../windows')

@@ -4,7 +4,7 @@ const EthereumTx = require('ethereumjs-tx')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const flex = require('../../../flex')
-const uuid = require('uuid/v5')
+const { v5 : uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 class Trezor extends Signer {
