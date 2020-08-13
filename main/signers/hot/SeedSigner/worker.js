@@ -1,4 +1,4 @@
-const hdKey = require('ethereumjs-wallet/hdkey')
+const hdKey = require('ethereum-cryptography/hdkey')
 const HotSignerWorker = require('../HotSigner/worker')
 
 class SeedSignerWorker extends HotSignerWorker {

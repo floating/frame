@@ -61,7 +61,7 @@ class Nodes extends EventEmitter {
       log.info('    Local connection: ON')
       if (!this.local.provider) {
         log.info('    Local connection doesn\'t exist, creating connection')
-        this.local.provider = provider('direct', { name: 'local' })
+        this.local.provider = provider('direct', { name: 'local', infuraId: '786ade30f36244469480aa5c2bf0743b' })
 
         // Local connection connected
         this.local.provider.on('connect', details => {
@@ -157,7 +157,7 @@ class Nodes extends EventEmitter {
             this.update('secondary')
           }
 
-          this.secondary.provider = provider(target, { name: 'secondary' })
+          this.secondary.provider = provider(target, { name: 'secondary', infuraId: '786ade30f36244469480aa5c2bf0743b' })
           this.secondary.currentTarget = target
 
           this.secondary.provider.on('connect', () => {

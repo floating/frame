@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import uuid from 'uuid'
+import { v4 } from 'uuid'
 
 const findIndex = (options, value) => {
   const index = options.findIndex((option) => option.value === value)
@@ -14,7 +14,7 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
   // Hooks
   const [index, setIndex] = useState(syncIndex || initialIndex || 0)
   const [expanded, setExpanded] = useState(false)
-  const [id] = useState(uuid())
+  const [id] = useState(v4())
 
   // On mount -> register listener for document clicks
   useEffect(() => {

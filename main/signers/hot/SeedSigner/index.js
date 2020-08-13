@@ -1,7 +1,7 @@
 const path = require('path')
 const HotSigner = require('../HotSigner')
 const bip39 = require('bip39')
-const hdKey = require('ethereumjs-wallet/hdkey')
+const hdKey = require('ethereum-cryptography/hdkey')
 
 const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 
