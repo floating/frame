@@ -53,7 +53,7 @@ class HotSignerWorker {
   }
 
   verifyAddress ({ index, address }, pseudoCallback) {
-    const message = crypto.randomBytes(32).toString('hex')
+    const message = '0x' + crypto.randomBytes(32).toString('hex')
     this.signMessage({ index, message }, (err, signedMessage) => {
       // Handle signing errors
       if (err) return pseudoCallback(err)
