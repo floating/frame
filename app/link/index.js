@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid'
+import { v4 : uuid } from 'uuid'
 import EventEmitter from 'events'
 
 const source = 'tray:link'
