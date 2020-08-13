@@ -185,9 +185,7 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
-    console.log('SIGN THIS', rawTx)
     accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
-      console.log('SIGNED TX', signedTx)
       if (err) {
         this.resError(err, payload, res)
         cb(new Error(err))
