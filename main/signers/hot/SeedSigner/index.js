@@ -22,9 +22,7 @@ class SeedSigner extends HotSigner {
 
       // Derive addresses
       const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex'))
-      
-      
-      console.log(wallet.publicKey)
+
       const addresses = []
       for (var i = 0; i < 100; i++) { 
         const publicKey = wallet.derive('m/44\'/60\'/0\'/0/' + i).publicKey
