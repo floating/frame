@@ -1,4 +1,4 @@
-import { v4 : uuid } from 'uuid'
+import { v4 } from 'uuid'
 import EventEmitter from 'events'
 
 const source = 'tray:link'
@@ -12,7 +12,7 @@ const link = new EventEmitter()
 link.rpc = (...args) => {
   const cb = args.pop()
   if (typeof cb !== 'function') throw new Error('link.rpc requires a callback')
-  const id = uuid()
+  const id = v4()
   handlers[id] = cb
   window.postMessage(wrap({ id, args, source, method: 'rpc' }), '*')
 }
