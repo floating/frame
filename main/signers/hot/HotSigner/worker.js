@@ -1,9 +1,11 @@
 const crypto = require('crypto')
 
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
-const EthTx = require('ethereumjs-tx')
+const EthTx = require('ethereumjs-tx').Transaction
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
+
+const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
 
 class HotSignerWorker {
   constructor () {
@@ -43,8 +45,9 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
+    const chain = chains[parseInt(rawTx.chainId)]
     // Create tranasction
-    const tx = new EthTx(rawTx)
+    const tx = new EthTx(rawTx, { chain })
     // Sign transaction
     tx.sign(key)
     // Return serialized transaction
