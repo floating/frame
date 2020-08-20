@@ -108,24 +108,24 @@ describe('Seed signer', () => {
     })
   })
 
-  // test('Lock', (done) => {
-  //   signer.lock((err, result) => {
-  //     expect(err).toBe(null)
-  //     expect(signer.status).toBe('locked')
-  //     done()
-  //   })
-  // })
+  test('Lock', (done) => {
+    signer.lock((err, result) => {
+      expect(err).toBe(null)
+      expect(signer.status).toBe('locked')
+      done()
+    })
+  })
 
-  // test('Sign message when locked', (done) => {
-  //   signer.signMessage(0, 'test', (err, result) => {
-  //     expect(err.message).toBe('Signer locked')
-  //     done()
-  //   })
-  // })
+  test('Sign message when locked', (done) => {
+    signer.signMessage(0, 'test', (err, result) => {
+      expect(err.message).toBe('Signer locked')
+      done()
+    })
+  })
 
-  // test('Close signer', (done) => {
-  //   signer.close()
-  //   expect(store(`main.signers.${signer.id}`)).toBe(undefined)
-  //   done()
-  // })
+  test('Close signer', (done) => {
+    signer.close()
+    expect(store(`main.signers.${signer.id}`)).toBe(undefined)
+    done()
+  })
 })

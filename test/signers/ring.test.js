@@ -42,7 +42,6 @@ describe('Ring signer', () => {
   test('Create from private key', (done) => {
     const privateKey = crypto.randomBytes(32).toString('hex')
     hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
-      console.log('here in cb', err, result)
       signer = result
       expect(err).toBe(null)
       expect(signer.status).toBe('locked')
