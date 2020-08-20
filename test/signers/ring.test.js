@@ -25,7 +25,7 @@ describe('Ring signer', () => {
     const privateKey = 'invalid key'
     hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
       expect(err).not.toBe(null)
-      expect(store(`main.signers`)).toEqual({})
+      expect(store('main.signers')).toEqual({})
       done()
     })
   })
@@ -34,7 +34,7 @@ describe('Ring signer', () => {
     const keystore = { invalid: 'keystore' }
     hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err, result) => {
       expect(err).not.toBe(null)
-      expect(store(`main.signers`)).toEqual({})
+      expect(store('main.signers')).toEqual({})
       done()
     })
   })
@@ -42,6 +42,7 @@ describe('Ring signer', () => {
   test('Create from private key', (done) => {
     const privateKey = crypto.randomBytes(32).toString('hex')
     hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
+      console.log('here in cb', err, result)
       signer = result
       expect(err).toBe(null)
       expect(signer.status).toBe('locked')

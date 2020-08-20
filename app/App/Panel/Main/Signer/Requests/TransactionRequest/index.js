@@ -76,12 +76,12 @@ class TransactionRequest extends React.Component {
                     <div className={statusClass}>
                       <div className='txProgressNotice'>
                         <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'} onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openEtherscan', { hash: req.tx.hash }) }}>
-                          <div className={'txProgressDetailHash'}>
+                          <div className='txProgressDetailHash'>
                             {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 14) : ''}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
                             {req && req.tx && req.tx.hash ? req.tx.hash.substr(req.tx.hash.length - 12) : ''}
                           </div>
-                          <div className='txProgressDetailExpand'>{'View Details'}</div>
+                          <div className='txProgressDetailExpand'>View Details</div>
                         </div>
                         <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
                           {[...Array(10).keys()].map(i => {
@@ -103,14 +103,14 @@ class TransactionRequest extends React.Component {
                             {status === 'verifying' || status === 'confirming' || status === 'confirmed' ? '' : notice}
                           </div>
                         </div>
-                        {status === 'pending' ? <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>{'Cancel'}</div> : null}
+                        {status === 'pending' ? <div className='txProgressCancel' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>Cancel</div> : null}
                       </div>
                     </div>
                     <TxBar req={req} />
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
                     <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
-                      <div className='monitorValue'><span>{'Ξ'}</span>{value}</div>
+                      <div className='monitorValue'><span>Ξ</span>{value}</div>
                       <div className='monitorArrow'>{svg.longArrow(14)}</div>
                       {toAddress ? (
                         <div className='monitorTo'>
@@ -119,7 +119,7 @@ class TransactionRequest extends React.Component {
                           {toAddress.substr(toAddress.length - 4)}
                         </div>
                       ) : (
-                        <div className='monitorDeploy'>{'deploy'}</div>
+                        <div className='monitorDeploy'>deploy</div>
                       )}
                     </div>
                     <div className='monitorConfirms'>
@@ -131,7 +131,7 @@ class TransactionRequest extends React.Component {
                   </div>
                 </div>
               ) : (
-                <React.Fragment>
+                <>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
                     <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
@@ -141,13 +141,13 @@ class TransactionRequest extends React.Component {
                       <div className='transactionTotalETH'>{'Ξ ' + value}</div>
                       <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
                     </div>
-                    <div className='transactionSubtitle'>{'Value'}</div>
+                    <div className='transactionSubtitle'>Value</div>
                   </div>
                   <div className='transactionFee'>
                     <div className='transactionTotals'>
                       <div className='transactionTotalETH'>{'Ξ ' + fee}</div>
                       <div className={feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? 'transactionTotalUSD transactionWarning' : 'transactionTotalUSD'}>{'$ ' + feeUSD.toFixed(2)}</div>
-                      {feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null }
+                      {feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD ? <div className='transactionFeeWarning'>{svg.octicon('alert', { height: 16 })}️️️</div> : null}
                     </div>
                     <div className='transactionSubtitle'>{'Max Fee'}️</div>
                   </div>
@@ -155,7 +155,7 @@ class TransactionRequest extends React.Component {
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
                       <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
                         <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
-                        <div className='transactionDataLabel'>{'View Data'}</div>
+                        <div className='transactionDataLabel'>View Data</div>
                         <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
                       </div>
                       <div className='transactionDataBody'>
@@ -165,7 +165,7 @@ class TransactionRequest extends React.Component {
                       </div>
                     </div>
                   ) : (
-                    <div className='transactionData transactionNoData'>{'No Data'}</div>
+                    <div className='transactionData transactionNoData'>No Data</div>
                   )}
                   {req.data.to ? (
                     <div className='transactionTo'>
@@ -176,14 +176,14 @@ class TransactionRequest extends React.Component {
                           <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={req.data.to} readOnly />
                         </div>
                       </div>
-                      <div className='transactionToSub'>{'Send To'}</div>
+                      <div className='transactionToSub'>Send To</div>
                     </div>
                   ) : (
                     <div className='transactionTo'>
-                      <div className='transactionToSub'>{'Deploying Contract'}</div>
+                      <div className='transactionToSub'>Deploying Contract</div>
                     </div>
                   )}
-                </React.Fragment>
+                </>
               )}
             </div>
           </div>
@@ -193,17 +193,19 @@ class TransactionRequest extends React.Component {
         {!notice ? (
           <div className='requestApprove'>
             <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(req.handlerId, req) }}>
-              <div className='requestDeclineButton'>{'Decline'}</div>
+              <div className='requestDeclineButton'>Decline</div>
             </div>
-            <div className='requestSign' onMouseDown={() => {
-              if (this.state.allowInput) {
-                if (feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) {
-                  this.store.notify('gasFeeWarning', { req, feeUSD })
-                } else {
-                  this.approve(req.handlerId, req)
+            <div
+              className='requestSign' onMouseDown={() => {
+                if (this.state.allowInput) {
+                  if (feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) {
+                    this.store.notify('gasFeeWarning', { req, feeUSD })
+                  } else {
+                    this.approve(req.handlerId, req)
+                  }
                 }
-              }
-            }}>
+              }}
+            >
               <div className='requestSignButton'> {'Sign'} </div>
             </div>
           </div>

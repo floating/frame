@@ -17,7 +17,7 @@ class LedgerBLE extends Signer {
     this.status = 'loading'
     this.accounts = []
     this.index = 0
-    this.basePath = () => this.network === '1' ? `44'/60'/0'/` : `44'/1'/0'/`
+    this.basePath = () => this.network === '1' ? '44\'/60\'/0\'/' : '44\'/1\'/0\'/'
     this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.open()

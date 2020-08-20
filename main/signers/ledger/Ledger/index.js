@@ -6,12 +6,12 @@ const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const { v5 : uuid } = require('uuid')
+const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-const BASE_PATH_LEGACY = `44'/60'/0'/`
-const BASE_PATH_LIVE = `44'/60'/`
-const BASE_PATH_TEST = `44'/1'/0'/`
+const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
+const BASE_PATH_LIVE = '44\'/60\'/'
+const BASE_PATH_TEST = '44\'/1\'/0\'/'
 
 class Ledger extends Signer {
   constructor (devicePath, signers) {
@@ -47,7 +47,7 @@ class Ledger extends Signer {
   getPath (i = 0) {
     if (this.network !== '1') return (BASE_PATH_TEST + i)
     if (this.derivation === 'legacy') return (BASE_PATH_LEGACY + i)
-    else return (BASE_PATH_LIVE + i + `'/0/0`)
+    else return (BASE_PATH_LIVE + i + '\'/0/0')
   }
 
   getId () {
@@ -141,19 +141,15 @@ class Ledger extends Signer {
   async deriveAddresses () {
     let addresses
     if (this.pause) throw new Error('Device access is paused')
-    try {
-      // Derive addresses
-      if (this.network !== '1' || this.derivation === 'legacy') {
-        addresses = await this._deriveLegacyAddresses()
-      } else {
-        addresses = await this._deriveLiveAddresses()
-      }
-      // Update signer
-      this.addresses = addresses
-      this.update()
-    } catch (err) {
-      throw err
+    // Derive addresses
+    if (this.network !== '1' || this.derivation === 'legacy') {
+      addresses = await this._deriveLegacyAddresses()
+    } else {
+      addresses = await this._deriveLiveAddresses()
     }
+    // Update signer
+    this.addresses = addresses
+    this.update()
   }
 
   close () {
@@ -239,9 +235,9 @@ class Ledger extends Signer {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       const result = await eth.signPersonalMessage(this.getPath(index), message.replace('0x', ''))
-      let v = (result['v'] - 27).toString(16)
+      let v = (result.v - 27).toString(16)
       if (v.length < 2) v = '0' + v
-      cb(null, '0x' + result['r'] + result['s'] + v)
+      cb(null, '0x' + result.r + result.s + v)
       await this.releaseDevice()
       this.busyCount = 0
     } catch (err) {
@@ -344,7 +340,7 @@ class Ledger extends Signer {
   }
 
   _deriveLegacyAddresses () {
-    return new Promise(async (resolve, reject) => {
+    const executor = async (resolve, reject) => {
       try {
         const result = await this.getAddress(this.network === '1' ? BASE_PATH_LEGACY : BASE_PATH_TEST, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
@@ -354,7 +350,8 @@ class Ledger extends Signer {
       } catch (err) {
         reject(err)
       }
-    })
+    }
+    return new Promise(executor)
   }
 }
 

@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
+const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
 const EthTx = require('ethereumjs-tx').Transaction
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
@@ -30,6 +30,12 @@ class HotSignerWorker {
   }
 
   signMessage (key, message, pseudoCallback) {
+    // Check is message is hex
+    if (isHexString(message)) {
+      if (!isHexPrefixed(message)) message = '0x' + message
+    } else {
+      message = fromUtf8(message)
+    }
     // Hash message
     const hash = hashPersonalMessage(toBuffer(message))
     // Sign message
@@ -63,7 +69,7 @@ class HotSignerWorker {
       // Signature -> buffer
       const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
       // Ensure correct length
-      if (signature.length !== 65) throw new Error(`Frame verifyAddress signature has incorrect length`)
+      if (signature.length !== 65) return pseudoCallback(new Error('Frame verifyAddress signature has incorrect length'))
       // Verify address
       let v = signature[64]
       v = v === 0 || v === 1 ? v + 27 : v
@@ -71,6 +77,7 @@ class HotSignerWorker {
       const s = toBuffer(signature.slice(32, 64))
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+      console.log(verifiedAddress, verifiedAddress)
       // Return result
       pseudoCallback(null, verifiedAddress.toLowerCase() === address.toLowerCase())
     })

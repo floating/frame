@@ -14,20 +14,20 @@ class Notify extends React.Component {
           </div>
           <div className='introInstructions'>
             <div className='introInstructionList'>
-              <div>{'1. Connect your Ledger or Trezor'}</div>
-              <div>{'2. Select a connected device to use'}</div>
-              <div>{'3. Verify Frame is connected to Ethereum'}</div>
+              <div>1. Connect your Ledger or Trezor</div>
+              <div>2. Select a connected device to use</div>
+              <div>3. Verify Frame is connected to Ethereum</div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '17px', marginBottom: '5px' }}>{'Now Frame is ready to use!'}</div>
-              <div>{'Visit'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://frame.sh' })}>{'frame.sh'}</span> {'to try it out'}</div>
+              <div style={{ fontSize: '17px', marginBottom: '5px' }}>Now Frame is ready to use!</div>
+              <div>{'Visit'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://frame.sh' })}>frame.sh</span> {'to try it out'}</div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>{'browser extension'}</span></div>
+              <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>browser extension</span></div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '15px', marginBottom: '5px' }}>{'Need help?'}</div>
-              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>{'Open an issue'}</span> {'or'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://gitter.im/framehq/general' })}>{'come chat with us'}</span></div>
+              <div style={{ fontSize: '15px', marginBottom: '5px' }}>Need help?</div>
+              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> {'or'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://gitter.im/framehq/general' })}>come chat with us</span></div>
             </div>
           </div>
         </div>
@@ -43,15 +43,17 @@ class Notify extends React.Component {
             {'Alpha Notice'}
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{'Frame is still in alpha, be cautious using alpha versions of Frame on the mainnet and verify all transactions and account details on your signing device.'}</div>
-            <div className='notifyBodyLine'>{'Proceed only if you understand and accept these risks.'}</div>
+            <div className='notifyBodyLine'>Frame is still in alpha, be cautious using alpha versions of Frame on the mainnet and verify all transactions and account details on your signing device.</div>
+            <div className='notifyBodyLine'>Proceed only if you understand and accept these risks.</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
-              link.send('tray:action', 'muteAlphaWarning')
-              this.store.notify()
-            }}>
-              <div className='notifyInputOptionText'>{'Proceed'}</div>
+            <div
+              className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
+                link.send('tray:action', 'muteAlphaWarning')
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Proceed</div>
             </div>
           </div>
         </div>
@@ -68,12 +70,12 @@ class Notify extends React.Component {
             {'Parity 💔 Rinkeby'}
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{'Unfortunately, Parity does not support the Rinkeby testnet.'}</div>
-            <div className='notifyBodyLine'>{'Please select another Ethereum client or use the secondary connection.'}</div>
+            <div className='notifyBodyLine'>Unfortunately, Parity does not support the Rinkeby testnet.</div>
+            <div className='notifyBodyLine'>Please select another Ethereum client or use the secondary connection.</div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>{'OK'}</div>
+              <div className='notifyInputOptionText'>OK</div>
             </div>
           </div>
         </div>
@@ -87,11 +89,11 @@ class Notify extends React.Component {
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{'IPFS daemon is already running on this machine.'}</div>
+            <div className='notifyBodyLine'>IPFS daemon is already running on this machine.</div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>{'Ok'}</div>
+              <div className='notifyInputOptionText'>Ok</div>
             </div>
           </div>
         </div>
@@ -105,11 +107,11 @@ class Notify extends React.Component {
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{'Parity is already running on this machine.'}</div>
+            <div className='notifyBodyLine'>Parity is already running on this machine.</div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>{'Ok'}</div>
+              <div className='notifyInputOptionText'>Ok</div>
             </div>
           </div>
         </div>
@@ -128,22 +130,26 @@ class Notify extends React.Component {
             {feeUSD ? (
               <div className='notifyBodyLine'>{`This transaction will cost ${parseFloat(feeUSD).toFixed(2)} USD in fees.`}</div>
             ) : (
-              <div className='notifyBodyLine'>{`We were unable to determine this transaction's fee in USD.`}</div>
+              <div className='notifyBodyLine'>We were unable to determine this transaction's fee in USD.</div>
             )}
-            <div className='notifyBodyLine'>{'Are you sure you want to proceed?'}</div>
+            <div className='notifyBodyLine'>Are you sure you want to proceed?</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => {
-              link.rpc('declineRequest', req, () => {})
-              this.store.notify()
-            }}>
-              <div className='notifyInputOptionText'>{'Cancel'}</div>
+            <div
+              className='notifyInputOption notifyInputDeny' onMouseDown={() => {
+                link.rpc('declineRequest', req, () => {})
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Cancel</div>
             </div>
-            <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
-              link.rpc('approveRequest', req, () => {})
-              this.store.notify()
-            }}>
-              <div className='notifyInputOptionText'>{'Proceed'}</div>
+            <div
+              className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+                link.rpc('approveRequest', req, () => {})
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Proceed</div>
             </div>
           </div>
         </div>
@@ -156,24 +162,24 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'contractData' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            <div>{'Contract Data'}</div>
-            <div>{'Not Allowed'}</div>
+            <div>Contract Data</div>
+            <div>Not Allowed</div>
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`Your Ledger currently doesn't allow signing of contract data.`}</div>
+            <div className='notifyBodyLine'>Your Ledger currently doesn't allow signing of contract data.</div>
             <div className='notifyBodyLine'>
-              <span>{`To change this settings go to`}</span>
+              <span>To change this settings go to</span>
               <br />
-              <span style={{ fontWeight: 'bold' }}>{`Settings > Contract Data`}</span>
+              <span style={{ fontWeight: 'bold' }}>{'Settings > Contract Data'}</span>
               <br />
-              <span>{'on your Ledger and select'}</span>
+              <span>on your Ledger and select</span>
               <br />
-              <span style={{ fontWeight: 'bold' }}>{`Yes`}</span>
+              <span style={{ fontWeight: 'bold' }}>Yes</span>
             </div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
-              <div className='notifyInputOptionText'>{'OK'}</div>
+              <div className='notifyInputOptionText'>OK</div>
             </div>
           </div>
         </div>
@@ -186,14 +192,14 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotAccountWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            <div>{'Hot Signer Alpha'}</div>
+            <div>Hot Signer Alpha</div>
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`Frame hot signers are in alpha! Do not use them with high value accounts and verify your backups are valid. Only proceed if you understand and accept these risks.`}</div>
+            <div className='notifyBodyLine'>Frame hot signers are in alpha! Do not use them with high value accounts and verify your backups are valid. Only proceed if you understand and accept these risks.</div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
-              <div className='notifyInputOptionText'>{'OK'}</div>
+              <div className='notifyInputOptionText'>OK</div>
             </div>
           </div>
         </div>
@@ -206,14 +212,14 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotSignerMismatch' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            <div>{'Hot Signer Address Mismatch'}</div>
+            <div>Hot Signer Address Mismatch</div>
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`The unlocked hot signer did not match the address shown in Frame and has been relocked.`}</div>
+            <div className='notifyBodyLine'>The unlocked hot signer did not match the address shown in Frame and has been relocked.</div>
           </div>
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
-              <div className='notifyInputOptionText'>{'OK'}</div>
+              <div className='notifyInputOptionText'>OK</div>
             </div>
           </div>
         </div>
@@ -232,16 +238,20 @@ class Notify extends React.Component {
             <div className='notifyBodyLine'>{`Frame will now open ${url} in your browser`}</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => {
-              this.store.notify()
-            }}>
-              <div className='notifyInputOptionText'>{'Cancel'}</div>
+            <div
+              className='notifyInputOption notifyInputDeny' onMouseDown={() => {
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Cancel</div>
             </div>
-            <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
-              link.send('tray:openExternal', url)
-              this.store.notify()
-            }}>
-              <div className='notifyInputOptionText'>{'Proceed'}</div>
+            <div
+              className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+                link.send('tray:openExternal', url)
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Proceed</div>
             </div>
           </div>
         </div>
@@ -260,16 +270,20 @@ class Notify extends React.Component {
             <div className='notifyBodyLine'>{`Frame will now open Etherscan for transaction ${hash} in your browser`}</div>
           </div>
           <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputDeny' onMouseDown={() => {
-              this.store.notify()
-            }}>
-              <div className='notifyInputOptionText'>{'Cancel'}</div>
+            <div
+              className='notifyInputOption notifyInputDeny' onMouseDown={() => {
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Cancel</div>
             </div>
-            <div className='notifyInputOption notifyInputProceed' onMouseDown={() => {
-              link.send('tray:openEtherscan', hash)
-              this.store.notify()
-            }}>
-              <div className='notifyInputOptionText'>{'Proceed'}</div>
+            <div
+              className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+                link.send('tray:openEtherscan', hash)
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Proceed</div>
             </div>
           </div>
         </div>

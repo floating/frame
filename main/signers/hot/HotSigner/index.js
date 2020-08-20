@@ -4,7 +4,7 @@ const { ensureDirSync, removeSync } = require('fs-extra')
 const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
-const { v4 : uuid } = require('uuid')
+const { v4: uuid } = require('uuid')
 
 const Signer = require('../../Signer')
 const store = require('../../../store')
@@ -138,6 +138,7 @@ class HotSigner extends Signer {
         }
         this.lock(() => {
           if (err) {
+            console.log(err)
             log.error('HotSigner verifyAddress: Unable to verify address')
           } else {
             log.error('HotSigner verifyAddress: Address mismatch')

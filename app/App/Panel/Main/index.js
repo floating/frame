@@ -69,10 +69,10 @@ class Main extends React.Component {
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
                   {`No ${accountNames[network]} Accounts Found`}
-                  <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>{'Need help getting started?'}</span>
+                  <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
                   <span className='featureBox'>
                     <span className='featureBoxText'>
-                      {`FRAME ALPHA`}
+                      {'FRAME ALPHA'}
                     </span>
                     <span className='featureBoxSubtext'>
                       {'v' + require('../../../../package.json').version}

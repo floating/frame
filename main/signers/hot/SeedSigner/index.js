@@ -24,10 +24,10 @@ class SeedSigner extends HotSigner {
       const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex'))
 
       const addresses = []
-      for (var i = 0; i < 100; i++) { 
+      for (var i = 0; i < 100; i++) {
         const publicKey = wallet.derive('m/44\'/60\'/0\'/0/' + i).publicKey
         const address = publicKeyToAddress(publicKey)
-        addresses.push(address) 
+        addresses.push(address)
       }
 
       // Update signer
