@@ -4,7 +4,7 @@ const { ensureDirSync, removeSync } = require('fs-extra')
 const { fork } = require('child_process')
 const { app } = require('electron')
 const log = require('electron-log')
-const { v4 : uuid } = require('uuid')
+const { v4: uuid } = require('uuid')
 
 const Signer = require('../../Signer')
 const store = require('../../../store')

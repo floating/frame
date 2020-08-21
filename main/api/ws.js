@@ -1,5 +1,5 @@
 const WebSocket = require('ws')
-const { v4 : uuid } = require('uuid')
+const { v4: uuid } = require('uuid')
 const log = require('electron-log')
 
 const provider = require('../provider')

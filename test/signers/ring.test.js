@@ -25,7 +25,7 @@ describe('Ring signer', () => {
     const privateKey = 'invalid key'
     hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
       expect(err).not.toBe(null)
-      expect(store(`main.signers`)).toEqual({})
+      expect(store('main.signers')).toEqual({})
       done()
     })
   })
@@ -34,7 +34,7 @@ describe('Ring signer', () => {
     const keystore = { invalid: 'keystore' }
     hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err, result) => {
       expect(err).not.toBe(null)
-      expect(store(`main.signers`)).toEqual({})
+      expect(store('main.signers')).toEqual({})
       done()
     })
   })

@@ -46,16 +46,16 @@ class Settings extends React.Component {
     // onMouseDown={() => link.send('tray:removeSigner', this.props.id)}
     return (
       <div className='signerSlide' style={{ transform }}>
-        <div className='signerSettingsTitle'>{'Account Settings'}</div>
+        <div className='signerSettingsTitle'>Account Settings</div>
         <div className='signerSubslide'>
           <div className='signerSubslider' style={{ transform: subTransform }}>
             <div className='signerSubsliderSlide'>
               <div className='quitFrame'>
-                <div onMouseDown={() => this.store.setSettingsView(i, 1)} className='quitFrameButton'>{'Rename account'}</div>
+                <div onMouseDown={() => this.store.setSettingsView(i, 1)} className='quitFrameButton'>Rename account</div>
                 <br />
-                <div onMouseDown={() => this.store.setSettingsView(i, 2)} className='quitFrameButton'>{'Remove Account and Signer'}</div>
+                <div onMouseDown={() => this.store.setSettingsView(i, 2)} className='quitFrameButton'>Remove Account and Signer</div>
                 <br />
-                <div onMouseDown={() => this.store.setSettingsView(i, 3)} className='quitFrameButton'>{'Remove Signer Only'}</div>
+                <div onMouseDown={() => this.store.setSettingsView(i, 3)} className='quitFrameButton'>Remove Signer Only</div>
               </div>
             </div>
             <div className='signerSubsliderSlide'>
@@ -89,12 +89,12 @@ class Settings extends React.Component {
     const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
     return (
       <div className='signerSlide' style={{ transform }}>
-        <div className='signerSettingsTitle'>{'Verify Address'}</div>
+        <div className='signerSettingsTitle'>Verify Address</div>
         <div className='signerPermission'>
-          <div className='signerVerifyText'>{'Verify that the address displayed in Frame is correct'}</div>
+          <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
           {this.state.verifyAddressResponse ? (
             <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
-          ) : null }
+          ) : null}
         </div>
         <div className='quitFrame'>
           <div onMouseDown={() => this.verifyAddress()} className='quitFrameButton'>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
@@ -112,11 +112,11 @@ class Settings extends React.Component {
     const permissions = this.store('main.addresses', address, 'permissions') || {}
     return (
       <div className='signerSlide' style={{ transform }}>
-        <div className='signerSettingsTitle'>{'Dapp Permissions'}</div>
+        <div className='signerSettingsTitle'>Dapp Permissions</div>
         {Object.keys(permissions).length === 0 ? (
           <div className='signerPermission'>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>{'No Permissions Set'}</div>
+              <div className='signerPermissionOrigin'>No Permissions Set</div>
             </div>
           </div>
         ) : (
@@ -134,7 +134,7 @@ class Settings extends React.Component {
           })
         )}
         <div className='quitFrame'>
-          <div onMouseDown={() => link.send('tray:action', 'clearPermissions', address)} className='quitFrameButton'>{'Clear All Permissions'}</div>
+          <div onMouseDown={() => link.send('tray:action', 'clearPermissions', address)} className='quitFrameButton'>Clear All Permissions</div>
         </div>
       </div>
     )
@@ -146,8 +146,8 @@ class Settings extends React.Component {
     return (
       <div className={this.store('selected.view') === 'settings' ? 'signerSettings' : 'signerSettings signerSettingsHidden'}>
         {this.renderPermissions(viewIndex, subIndex)}
-        {this.renderVerify(viewIndex, subIndex) }
-        {this.renderControl(viewIndex, subIndex) }
+        {this.renderVerify(viewIndex, subIndex)}
+        {this.renderControl(viewIndex, subIndex)}
       </div>
     )
   }

@@ -190,7 +190,7 @@ class Account {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
     } else {
-      cb(new Error(`No signer found for this account`))
+      cb(new Error('No signer found for this account'))
     }
   }
 
@@ -206,7 +206,7 @@ class Account {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
     } else {
-      cb(new Error(`No signer found for this account`))
+      cb(new Error('No signer found for this account'))
     }
   }
 
@@ -223,15 +223,15 @@ class Account {
           cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
         }
       } else {
-        cb(new Error(`No signer found for this account`))
+        cb(new Error('No signer found for this account'))
       }
     })
   }
 
   _validateTransaction (rawTx, cb) {
     // Validate 'from' address
-    if (!rawTx.from) return new Error(`Missing 'from' address`)
-    if (!isValidAddress(rawTx.from)) return cb(new Error(`Invalid 'from' address`))
+    if (!rawTx.from) return new Error('Missing \'from\' address')
+    if (!isValidAddress(rawTx.from)) return cb(new Error('Invalid \'from\' address'))
 
     // Ensure that transaction params are valid hex strings
     const enforcedKeys = ['value', 'data', 'to', 'from', 'gas', 'gasPrice', 'gasLimit', 'nonce']

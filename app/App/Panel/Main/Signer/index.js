@@ -87,7 +87,7 @@ class Signer extends React.Component {
 
   renderArrows () {
     return (
-      <React.Fragment>
+      <>
         <div className='signerSelect signerSelectLeft'>
           <div className='signerSelectArrows'>
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
@@ -102,7 +102,7 @@ class Signer extends React.Component {
             <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
           </div>
         </div>
-      </React.Fragment>
+      </>
     )
   }
 
@@ -126,13 +126,15 @@ class Signer extends React.Component {
     const inSettings = this.store('selected.view') === 'settings'
     return (
       <div className='signerType'>
-        <div className='addressSelect' onMouseDown={e => {
-          e.stopPropagation()
-          this.store.toggleShowAccounts()
-        }}>
+        <div
+          className='addressSelect' onMouseDown={e => {
+            e.stopPropagation()
+            this.store.toggleShowAccounts()
+          }}
+        >
           <div className='addressSelectButton'>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-            <div className='addressSelectText'>{'Addresses'}</div>
+            <div className='addressSelectText'>Addresses</div>
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
           </div>
         </div>
@@ -141,7 +143,7 @@ class Signer extends React.Component {
           <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
           </div>
-        ) : null }
+        ) : null}
         <div className={innerClass} onMouseDown={::this.typeClick} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
           <div className='signerInset'>
             <div className='signerImage'>
@@ -159,7 +161,8 @@ class Signer extends React.Component {
             </div>
             <div className='signerText'>{this.props.signer ? (
               this.props.signer.type === 'ring' || this.props.signer.type === 'seed' ? 'hot' : this.props.signer.type
-            ) : 'no signer'}</div>
+            ) : 'no signer'}
+            </div>
           </div>
         </div>
       </div>
@@ -172,7 +175,7 @@ class Signer extends React.Component {
     if (this.store('selected.current') === this.props.id & this.store('selected.open')) menuClass += ' signerMenuOpen'
     return (
       <div className={menuClass}>
-        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')} >
+        <div className='signerMenuItem signerMenuItemLeft' onMouseDown={() => this.store.setSignerView('default')}>
           <div className='signerMenuItemIcon'>
             {svg.octicon('pulse', { height: 23 })}
             <div className='iconUnderline' />
@@ -293,7 +296,7 @@ class Signer extends React.Component {
           <div className='signerStatusNotOk'>{status}</div>
         ) : (
           <div className='signerAccounts' style={{ width: '100%' }}>
-            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: `calc(100%)` }}>
+            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: 'calc(100%)' }}>
               <div className='signerName'>
                 <div className='signerNameText'>
                   {this.props.name}
@@ -311,7 +314,7 @@ class Signer extends React.Component {
               </div>
               <div className='signerInfo'>
                 <div className='signerBalance'>
-                  <span className='signerBalanceCurrency'>{'Ξ'}</span>
+                  <span className='signerBalanceCurrency'>Ξ</span>
                   {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
                 </div>
               </div>
@@ -346,7 +349,7 @@ class Signer extends React.Component {
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 50 : initial.height - 3
-      style.transform = open ? `translateY(-${initial.top - 44}px)` : `translateY(0px)`
+      style.transform = open ? `translateY(-${initial.top - 44}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0

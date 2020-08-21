@@ -15,7 +15,7 @@ class Signers extends EventEmitter {
   }
 
   trezorPin (id, pin, cb) {
-    let signer = this.get(id)
+    const signer = this.get(id)
     if (signer && signer.setPin) {
       signer.setPin(pin)
       cb(null, { status: 'ok' })

@@ -53,17 +53,17 @@ class ProviderRequest extends React.Component {
               </div>
               <div className='requestProvider bounceIn'>
                 <div className={originClass}>{origin}</div>
-                <div className='requestProviderSub'>{'wants to connect'}</div>
+                <div className='requestProviderSub'>wants to connect</div>
               </div>
             </div>
           )}
         </div>
         <div className='requestApprove'>
           <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, false) }}>
-            <div className='requestDeclineButton'>{'Decline'}</div>
+            <div className='requestDeclineButton'>Decline</div>
           </div>
           <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, true) }}>
-            <div className='requestSignButton'>{'Approve'}</div>
+            <div className='requestSignButton'>Approve</div>
           </div>
         </div>
       </div>

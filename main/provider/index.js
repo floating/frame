@@ -195,11 +195,11 @@ class Provider extends EventEmitter {
           if (err) return cb(err)
           let done = false
           const cast = () => {
-            this.connection.send({ 
-              id: req.payload.id, 
-              jsonrpc: req.payload.jsonrpc, 
-              method: 'eth_sendRawTransaction', 
-              params: [signedTx] 
+            this.connection.send({
+              id: req.payload.id,
+              jsonrpc: req.payload.jsonrpc,
+              method: 'eth_sendRawTransaction',
+              params: [signedTx]
             }, response => {
               clearInterval(broadcastTimer)
               if (done) return

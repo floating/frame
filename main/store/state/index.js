@@ -1,4 +1,4 @@
-const { v5 : uuidv5 } = require('uuid')
+const { v5: uuidv5 } = require('uuid')
 
 const persist = require('../persist')
 
@@ -85,14 +85,14 @@ const initial = {
     },
     clients: {
       ipfs: {
-        on: main('clients.ipfs.on', false),
+        on: false, // main('clients.ipfs.on', false),
         installed: false,
         latest: false,
         version: null,
         state: 'off'
       },
       geth: {
-        on: main('clients.geth.on', false),
+        on: false, // main('clients.geth.on', false),
         blockNumber: 0,
         currentBlock: 0,
         highestBlock: 0,
