@@ -30,7 +30,7 @@ class HotSignerWorker {
   }
 
   signMessage (key, message, pseudoCallback) {
-    // Check is message is hex
+    // Check if message is hex
     if (isHexString(message)) {
       if (!isHexPrefixed(message)) message = '0x' + message
     } else {
