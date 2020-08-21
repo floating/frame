@@ -77,7 +77,6 @@ class HotSignerWorker {
       const s = toBuffer(signature.slice(32, 64))
       const hash = hashPersonalMessage(toBuffer(message))
       const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
-      console.log(verifiedAddress, verifiedAddress)
       // Return result
       pseudoCallback(null, verifiedAddress.toLowerCase() === address.toLowerCase())
     })

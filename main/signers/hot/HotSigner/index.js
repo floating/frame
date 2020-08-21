@@ -138,7 +138,6 @@ class HotSigner extends Signer {
         }
         this.lock(() => {
           if (err) {
-            console.log(err)
             log.error('HotSigner verifyAddress: Unable to verify address')
           } else {
             log.error('HotSigner verifyAddress: Address mismatch')
