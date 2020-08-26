@@ -16,7 +16,9 @@
       ]
     },
     "mac": {
-      "hardenedRuntime": true
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist"
     },
     "win": {},
     "files": [

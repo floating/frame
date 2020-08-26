@@ -1,5 +1,5 @@
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx')
+const EthereumTx = require('ethereumjs-tx').Transaction
 const log = require('electron-log')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
@@ -12,6 +12,8 @@ const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
 const BASE_PATH_LIVE = '44\'/60\'/'
 const BASE_PATH_TEST = '44\'/1\'/0\'/'
+
+const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
 
 class Ledger extends Signer {
   constructor (devicePath, signers) {
@@ -187,6 +189,8 @@ class Ledger extends Signer {
       this.update()
       this.deviceStatusActive = false
     } catch (err) {
+      log.error(err)
+      log.error(err.message)
       const deviceBusy = (
         err.message.startsWith('cannot open device with path') ||
         err.message === 'Device access is paused' ||
@@ -268,7 +272,7 @@ class Ledger extends Signer {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
-      const tx = new EthereumTx(rawTx)
+      const tx = new EthereumTx(rawTx, { chain: chains[parseInt(rawTx.chainId)] })
       tx.raw[6] = Buffer.from([rawTx.chainId]) // v
       tx.raw[7] = Buffer.from([]) // r
       tx.raw[8] = Buffer.from([]) // s
@@ -285,10 +289,12 @@ class Ledger extends Signer {
         v: Buffer.from(this.normalize(result.v), 'hex'),
         r: Buffer.from(this.normalize(result.r), 'hex'),
         s: Buffer.from(this.normalize(result.s), 'hex')
-      })
+      }, { chain: chains[parseInt(rawTx.chainId)] })
       cb(null, '0x' + _tx.serialize().toString('hex'))
       this.releaseDevice()
     } catch (err) {
+      log.error(err)
+      log.error(err.message)
       const deviceBusy = (
         err.message.startsWith('cannot open device with path') ||
         err.message === 'Device access is paused' ||
