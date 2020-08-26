@@ -1,10 +1,11 @@
 {
   "name": "frame",
   "version": "0.3.0",
-  "description": "An Ethereum Interface",
+  "description": "System-wide web3",
   "main": "main",
   "build": {
     "appId": "sh.frame.app",
+    "afterSign": "./build/notarize.js",
     "productName": "Frame",
     "linux": {
       "target": [
@@ -15,7 +16,7 @@
       ]
     },
     "mac": {
-      "hardenedRuntime": false
+      "hardenedRuntime": true
     },
     "win": {},
     "files": [
@@ -30,11 +31,11 @@
     "dev": "npm run bundle && npm run launch:dev",
     "dev:traffic": "npm run bundle && npm run launch:dev:traffic",
     "inspect": "npm run bundle && npm run launch:inspect",
-    "launch": "cross-env NODE_ENV=production electron ./main",
-    "launch:hot": "cross-env NODE_ENV=production WITH_HOT=true electron ./main",
-    "launch:dev": "cross-env NODE_ENV=development electron ./main",
-    "launch:dev:traffic": "cross-env NODE_ENV=development LOG_TRAFFIC=true electron ./main",
-    "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./main",
+    "launch": "cross-env NODE_ENV=production electron --enable-transparent-visuals ./main",
+    "launch:hot": "cross-env NODE_ENV=production WITH_HOT=true electron --enable-transparent-visuals ./main",
+    "launch:dev": "cross-env NODE_ENV=development electron --enable-transparent-visuals ./main",
+    "launch:dev:traffic": "cross-env NODE_ENV=development LOG_TRAFFIC=true electron --enable-transparent-visuals ./main",
+    "launch:inspect": "cross-env NODE_ENV=production electron --enable-transparent-visuals --inspect ./main",
     "alpha": "npm run bundle && npm run launch",
     "hot": "npm run bundle && npm run launch:hot",
     "clean": "rimraf dist bundle .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm install && npm audit fix",
@@ -119,6 +120,7 @@
     "babel-eslint": "10.1.0",
     "electron": "9.2.1",
     "electron-builder": "22.8.0",
+    "electron-notarize": "^1.0.0",
     "ganache-cli": "6.10.1",
     "jest": "26.4.1",
     "node-watch": "0.6.4",
