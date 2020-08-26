@@ -1,11 +1,13 @@
 const log = require('electron-log')
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx')
+const EthereumTx = require('ethereumjs-tx').Transaction
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const flex = require('../../../flex')
 const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
+
+const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
 
 class Trezor extends Signer {
   constructor (device, signers) {
@@ -206,7 +208,7 @@ class Trezor extends Signer {
         v: this.hexToBuffer(result.v),
         r: this.hexToBuffer(result.r),
         s: this.hexToBuffer(result.s)
-      })
+      }, { chain: chains[parseInt(rawTx.chainId)] })
       cb(null, '0x' + tx.serialize().toString('hex'))
     })
   }
