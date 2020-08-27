@@ -32,8 +32,8 @@ module.exports = {
           log.info('Updating Ledger: ', JSON.stringify(signer.summary()))
         }
       })
+      if (current.length !== 0) setTimeout(scan, 5 * 60 * 1000)
     }
-    if (current.length !== 0) setTimeout(scan, 5 * 60 * 1000)
     const listenScan = () => {
       scan()
       setTimeout(scan, 200)
