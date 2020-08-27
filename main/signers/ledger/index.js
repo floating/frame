@@ -32,10 +32,15 @@ module.exports = {
           log.info('Updating Ledger: ', JSON.stringify(signer.summary()))
         }
       })
+      if (current.length !== 0) setTimeout(scan, 5 * 60 * 1000)
     }
     const listenScan = () => {
       scan()
       setTimeout(scan, 200)
+      setTimeout(scan, 400)
+      setTimeout(scan, 800)
+      setTimeout(scan, 1600)
+      setTimeout(scan, 3200)
     }
     usb.on('attach', listenScan)
     usb.on('detach', listenScan)
