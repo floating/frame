@@ -71,7 +71,7 @@ class Dapps {
     //     })
     //   }
     // })
-    
+
     // ipfs.on('state', state => {
     //   if (state === 'ready') {
     //     this._updatePins()
@@ -134,11 +134,11 @@ class Dapps {
         })
         if (favicon.startsWith('./')) favicon = favicon.substring(2)
         let icon
-        let file = await ipfs.getFile(`${cid}/${favicon || 'favicon.ico'}`)
+        const file = await ipfs.getFile(`${cid}/${favicon || 'favicon.ico'}`)
         if (file) {
           icon = {
             cid: file.cid.toString(),
-            path: file.path, 
+            path: file.path,
             name: file.name,
             content: Buffer.from(file.content).toString('base64')
           }
@@ -190,8 +190,8 @@ class Dapps {
     // if (!ipfs return cb(new Error('IPFS client not running'))
     try {
       await ipfs.pin(cid)
-      const namehash = hash()
-      const dapps = store('main.dapp.details')
+      // const namehash = hash()
+      // const dapps = store('main.dapp.details')
       Object.keys(store('main.dapp.details')).some(namehash => {
         const dappCID = store('main.dapp.details', namehash, 'cid')
         if (cid === dappCID) {

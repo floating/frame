@@ -5,19 +5,17 @@ const store = require('../store')
 // const peers = require('./peers.json')
 const ens = require('../ens')
 
-let node 
+let node
 
 const api = {
   pin: async path => {
-    const pinset = await node.pin.add(path)
+    await node.pin.add(path)
     console.log(`${path} has been pinned!`)
-  }, 
+  },
   // getStream: async path => {
   //   // if (!node) throw new Error(`IPFS is not running`)
   //   // console.log(node)
   //   // return node.getReadableStream(path)
-
-
 
   //   if (!node) throw new Error(`IPFS is not running`)
   //   const files = []
@@ -36,7 +34,7 @@ const api = {
 
   // },
   get: async path => {
-    if (!node) throw new Error(`IPFS is not running`)
+    if (!node) throw new Error('IPFS is not running')
     const files = []
     for await (const file of node.get(path)) {
       if (!file || !file.content) continue
@@ -53,18 +51,17 @@ const api = {
     const files = await api.get(path)
     if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
     if (files[0].path !== path || files.length !== 1) throw new Error(`Path ${path} could not be found`)
-    return files[0] 
+    return files[0]
   }
 }
 
 const start = async () => {
-
   try {
     node = await ipfs.create()
     console.log('IPFS Node Created')
   } catch (e) {
-    console.error(e) 
-    setTimeout(() => start(), 15 * 1000) 
+    console.error(e)
+    setTimeout(() => start(), 15 * 1000)
     return
   }
 
@@ -90,7 +87,6 @@ const start = async () => {
   store.setIPFS(update)
 
   store.setClientState('ipfs', 'ready')
-
 }
 
 start()

@@ -137,7 +137,6 @@ class Add extends React.Component {
 
 export default Restore.connect(Add)
 
-
 class AddDapp extends React.Component {
   constructor (...args) {
     super(...args)
@@ -198,18 +197,22 @@ class AddDapp extends React.Component {
   }
 
   renderOld () {
-    let addDappClass = this.state.expanded ? 'dockCardAddDapp dockCardAddDappExpanded' : 'dockCardAddDapp'
+    const addDappClass = this.state.expanded ? 'dockCardAddDapp dockCardAddDappExpanded' : 'dockCardAddDapp'
     return (
       <>
-        <div className='addAppButton' onMouseDown={() => {
-          this.setState({ expanded: !this.state.expanded })
-        }}>
+        <div
+          className='addAppButton' onMouseDown={() => {
+            this.setState({ expanded: !this.state.expanded })
+          }}
+        >
           {'Add +'}
         </div>
         <div className={addDappClass}>
-          <div className='addAppButton' onMouseDown={() => {
-            this.setState({ expanded: !this.state.expanded })
-          }}>
+          <div
+            className='addAppButton' onMouseDown={() => {
+              this.setState({ expanded: !this.state.expanded })
+            }}
+          >
             {'Add +'}
           </div>
           {this.state.pending ? (

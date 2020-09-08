@@ -17,7 +17,7 @@ class App extends React.Component {
     const dock = this.store('tray.dockOnly')
     const transform = dock || open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(440px, 0px, 0px)'
     const opacity = dock || open ? '1' : '0'
-    
+
     // const selected = this.store('selected.open')
     // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
     return (

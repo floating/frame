@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../link'
-import Client from '../Client'
+// import Client from '../Client'
 
 import Dropdown from '../../Components/Dropdown'
 
@@ -189,10 +189,10 @@ class _Settings extends React.Component {
             </div>
           </div>
           {/* Local clients */}
-          <div className='localSettingsTitle connectionTitle'>
-            <div>Services</div>
-          </div>
-          <Client client='parity' />
+          {/* <div className='localSettingsTitle connectionTitle'>  */}
+          {/* <div>Services</div> */}
+          {/* </div> */}
+          {/* <Client client='parity' /> */}
           {/* <Client client='ipfs' /> */}
 
           <div className='localSettingsTitle'>Preferences</div>
@@ -244,14 +244,14 @@ const Settings = Restore.connect(_Settings)
 
 class Card extends React.Component {
   render () {
-    const current = this.store('selected.card')  === 'local' && !this.store('tray.dockOnly') && this.store('tray.open')
+    const current = this.store('selected.card') === 'local' && !this.store('tray.dockOnly') && this.store('tray.open')
     const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
-    const headerClass =  current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
+    const headerClass = current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
     return (
       <>
         <div className={headerClass}>
           <div className='dockCardHeaderLeft'>
-            <div className='dockCardHeaderTitle'> 
+            <div className='dockCardHeaderTitle'>
               {'Settings'}
             </div>
           </div>

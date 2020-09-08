@@ -10,8 +10,6 @@ import Notify from './Notify'
 import Badge from './Badge'
 import Jump from './Jump'
 
-const networks = { 1: 'Mainnet', 3: 'Ropsten', 4: 'Rinkeby', 42: 'Kovan' }
-
 const color = {
   good: 'rgb(0, 210, 180)',
   bad: 'rgb(250, 100, 155)',
@@ -53,14 +51,13 @@ class Dock extends React.Component {
     // {ipfsReady ? (
     //   <div className='toggleDock' onMouseDown={this.handleToggleDock}>{svg.apps(17)}</div>
     // ) : null}
-    let card = this.store('selected.card')
+    const card = this.store('selected.card')
     let indicatorStyle = { transform: 'translate3d(0px, 16px, 0px) rotate(0deg)' }
     if (card === 'dapps') indicatorStyle.transform = 'translate3d(0px, 56px, 0px) rotate(180deg)'
     if (card === 'local') indicatorStyle.transform = 'translate3d(0px, 96px, 0px) rotate(0deg)'
-    let mainHidden = this.store('tray.dockOnly') || !this.store('tray.open')
+    const mainHidden = this.store('tray.dockOnly') || !this.store('tray.open')
     if (mainHidden) indicatorStyle = { transform: 'translate3d(0px, -26px, 0px) rotate(180deg)', opacity: '0' }
     // if (mainHidden) indicatorStyle.left = '-8px'
-
 
     let dockMenuIndicatorClass = 'dockMenuIndicator'
 
@@ -72,7 +69,7 @@ class Dock extends React.Component {
       const account = this.store('main.accounts', this.store('selected.current'))
       if (account && account.signer && account.signer.status === 'ok') {
         dockMenuMainStyle = { borderColor: color.good }
-        if ( card === 'default') dockMenuIndicatorClass = 'dockMenuIndicator dockMenuIndicatorGood'
+        if (card === 'default') dockMenuIndicatorClass = 'dockMenuIndicator dockMenuIndicatorGood'
       }
     }
 
@@ -86,24 +83,32 @@ class Dock extends React.Component {
               <div className='dockMenuIndicatorLeft' />
               <div className='dockMenuIndicatorRight' />
             </div>
-            <div className={card === 'default' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
-              if (mainHidden) link.send('tray:dockSlide')
-              this.store.setCard('default')
-            }}>
+            <div
+              className={card === 'default' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
+                if (mainHidden) link.send('tray:dockSlide')
+                this.store.setCard('default')
+              }}
+            >
               <div className='dockMenuMain' style={dockMenuMainStyle}>
                 <div className='dockMenuMainIcon'>
                   <div>{svg.user(14)}</div>
                 </div>
               </div>
             </div>
-            <div className={card === 'dapps' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
-            if (mainHidden) link.send('tray:dockSlide')
-              this.store.setCard('dapps')
-            }}>{svg.apps(14)}</div>
-            <div className={card === 'local' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
-              if (mainHidden) link.send('tray:dockSlide')
-              this.store.setCard('local')
-            }}>{svg.octicon('settings', { height: 18 })}</div>
+            <div
+              className={card === 'dapps' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
+                if (mainHidden) link.send('tray:dockSlide')
+                this.store.setCard('dapps')
+              }}
+            >{svg.apps(14)}
+            </div>
+            <div
+              className={card === 'local' & !mainHidden ? 'dockMenuItem dockMenuItemSelected' : 'dockMenuItem'} onMouseDown={() => {
+                if (mainHidden) link.send('tray:dockSlide')
+                this.store.setCard('local')
+              }}
+            >{svg.octicon('settings', { height: 18 })}
+            </div>
           </div>
           <div className='dockPin'>
             <div className={this.store('main.pin') ? 'pinFrame pinFrameActive' : 'pinFrame'} onMouseDown={() => link.send('tray:pin')}>{svg.thumbtack(11)}</div>

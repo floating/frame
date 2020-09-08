@@ -3,6 +3,7 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+const fetch = require('node-fetch')
 
 const proxy = require('./proxy')
 
@@ -196,11 +197,11 @@ class Provider extends EventEmitter {
           if (err) return cb(err)
           let done = false
           const cast = () => {
-            this.connection.send({ 
-              id: req.payload.id, 
-              jsonrpc: req.payload.jsonrpc, 
-              method: 'eth_sendRawTransaction', 
-              params: [signedTx] 
+            this.connection.send({
+              id: req.payload.id,
+              jsonrpc: req.payload.jsonrpc,
+              method: 'eth_sendRawTransaction',
+              params: [signedTx]
             }, response => {
               clearInterval(broadcastTimer)
               if (done) return
@@ -238,8 +239,14 @@ class Provider extends EventEmitter {
     return rawTx
   }
 
-  getGasPrice (rawTx, res) {
-    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, res)
+  async getGasPrice (rawTx, res) {
+    try {
+      const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
+      const prices = await response.json()
+      res({ result: '0x' + (prices.fast * 100000000).toString(16) })
+    } catch (error) {
+      res({ error })
+    }
   }
 
   getGasEstimate (rawTx, res) {
@@ -276,7 +283,6 @@ class Provider extends EventEmitter {
   fillTx (rawTx, cb) {
     const needs = {}
     // if (!rawTx.nonce) needs.nonce = this.getNonce
-    // if (!rawTx.gasPrice) needs.gasPrice = this.getGasPrice
     if (!rawTx.gas) needs.gas = this.getGasEstimate
     let count = 0
     const list = Object.keys(needs)
@@ -307,7 +313,6 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-      // console.log(payload)
       accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin }, res)
     })
   }

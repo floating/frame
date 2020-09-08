@@ -1,7 +1,7 @@
 const electron = require('electron')
 const { app, shell, BrowserWindow, BrowserView, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
-const fs = require('fs')
+// const fs = require('fs')
 const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
 const pixels = require('get-pixels')
@@ -73,12 +73,12 @@ const timeout = ms => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const mode = array =>  {
+const mode = array => {
   if (array.length === 0) return null
-  let modeMap = {}
-  let maxEl = array[0], maxCount = 1
+  const modeMap = {}
+  let maxEl = array[0]; let maxCount = 1
   for (let i = 0; i < array.length; i++) {
-    let el = array[i]
+    const el = array[i]
     if (!modeMap[el]) {
       modeMap[el] = 1
     } else {
@@ -93,36 +93,37 @@ const mode = array =>  {
 }
 
 const pixelColor = image => {
-  return new Promise(async (resolve, reject) => {
+  const executor = async (resolve, reject) => {
     pixels(image.toPNG(), 'image/png', (err, pixels) => {
       if (err) return reject(err)
-      let colors = []
-      let width = pixels.shape[0]
-      let height = 37
-      let depth = pixels.shape[2]
-      let limit = width * depth * height
+      const colors = []
+      const width = pixels.shape[0]
+      const height = 37
+      const depth = pixels.shape[2]
+      const limit = width * depth * height
       for (let step = 0; step <= limit; step += depth) {
-        let rgb = []
+        const rgb = []
         for (let dive = 0; dive < depth; dive++) rgb.push(pixels.data[step + dive])
         colors.push(`${rgb[0]}, ${rgb[1]}, ${rgb[2]}`)
       }
-      let selectedColor = mode(colors)
-      let colorArray = selectedColor.split(', ')
-      let color = {
+      const selectedColor = mode(colors)
+      const colorArray = selectedColor.split(', ')
+      const color = {
         background: `rgb(${selectedColor})`,
         text: textColor(...colorArray)
       }
       resolve(color)
     })
-  })
+  }
+  return new Promise(executor)
 }
 
 const getColor = async (view) => {
-  let image = await view.webContents.capturePage()
+  const image = await view.webContents.capturePage()
   // fs.writeFile('test.png', image.toPNG(), (err) => {
   //   if (err) throw err
   // })
-  let color = await pixelColor(image)
+  const color = await pixelColor(image)
   return color
 }
 
@@ -214,7 +215,7 @@ const api = {
         pinArea = null
       })
       // console.log ('electron.getPosition', windows.tray.getPosition())
-      // electron.systemPreferences.subscribeWorkspaceNotification(event, callback) 
+      // electron.systemPreferences.subscribeWorkspaceNotification(event, callback)
       // setInterval(() => {
       //   // console.log(electron.screen.getAllDisplays())
       //   console.log ('electron.getPosition', windows.tray.getPosition())
@@ -375,7 +376,7 @@ const api = {
 
     Object.keys(windows).forEach(window => {
       if (windows[window].dapp) {
-        dappViews ++
+        dappViews++
         if (windows[window].dapp.ens === ens) {
           existingWindow = windows[window]
         }
@@ -420,7 +421,7 @@ const api = {
     })
 
     windows[session].dapp = { ens }
- 
+
     // windows[session].positioner = new Positioner(windows[session])
     const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
     const offset = dappViews * 48
@@ -428,11 +429,11 @@ const api = {
     if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../bundle/dapp/dapp.html`)
-    let namehash = hash(ens)
+    const namehash = hash(ens)
 
     windows[session].webContents.on('did-finish-load', async () => {
       // windows[session].webContents.openDevTools()
-      let dapp = Object.assign({}, store(`main.dapp.details.${namehash}`))
+      const dapp = Object.assign({}, store(`main.dapp.details.${namehash}`))
       dapp.url = url
       dapp.ens = ens
       windows[session].send('main:dapp', dapp)
@@ -464,22 +465,22 @@ const api = {
       return view
     }
 
-    let dapp = store(`main.dapp.details.${namehash}`)
+    const dapp = store(`main.dapp.details.${namehash}`)
     if (dapp.color) return loadApp()
 
     // If Frame hasn't collected color data for dapp, do that first
-    const tempView = loadApp(true)
+    let tempView = loadApp(true)
     tempView.webContents.on('did-finish-load', async () => {
       await timeout(200)
       const color = await getColor(tempView)
-      store.updateDapp(namehash, { color } )
+      store.updateDapp(namehash, { color })
       windows[session].send('main:dapp', store(`main.dapp.details.${namehash}`))
       loadApp()
       setTimeout(() => {
         tempView.destroy()
-        delete tempView
+        tempView = null
       }, 0)
-    })    
+    })
     // console.log(menu(ens))
     // windows[session].setMenu(menu(ens))
     // Menu.setApplicationMenu(menu(ens))

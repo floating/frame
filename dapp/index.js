@@ -2,8 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import link from './link'
-import svg from '../app/svg'
 
+// import svg from '../app/svg'
 // import Native from './Native'
 // import App from './App'
 // import _store from './store'
@@ -20,7 +20,7 @@ class App extends React.Component {
   }
 
   render () {
-    let dapp = this.store('dapp')
+    const dapp = this.store('dapp')
     let name = dapp ? dapp.domain : null
     if (name) {
       name = name.split('.')
@@ -29,8 +29,8 @@ class App extends React.Component {
       name.forEach((v, i) => { name[i] = v.charAt(0).toUpperCase() + v.slice(1) })
       name = name.join(' ')
     }
-    let background = dapp && dapp.color ? dapp.color.background : 'white'
-    let color = dapp && dapp.color ? dapp.color.text : 'white'
+    const background = dapp && dapp.color ? dapp.color.background : 'white'
+    const color = dapp && dapp.color ? dapp.color.text : 'white'
     return (
       <div className='splash' style={{ background, color }}>
         <div className='top'>

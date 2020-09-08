@@ -9,7 +9,7 @@ const appNames = require('./appNames')
 const registryAddress = () => {
   const network = store('main.connection.network')
   const addresses = {
-    1: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     4: '0x98df287b6c145399aaa709692c8d308357bc085d'
   }
   if (addresses[network]) return addresses[network]
@@ -17,7 +17,7 @@ const registryAddress = () => {
 }
 
 const resolveAragon = async (domain, registryAddress) => {
-  return new Promise(async (resolve, reject) => {
+  const executor = async (resolve, reject) => {
     try {
       const address = await ensResolve(domain, { provider: require('../../provider'), registryAddress })
       if (address.replace('0x', '')) return resolve(address)
@@ -25,11 +25,12 @@ const resolveAragon = async (domain, registryAddress) => {
     } catch (e) {
       reject(new Error(`Unable to resolve DAO ${domain} on current network`))
     }
-  })
+  }
+  return new Promise(executor)
 }
 
 const resolveName = (name) => {
-  return new Promise(async (resolve, reject) => {
+  const executor = async (resolve, reject) => {
     try {
       // Look up registry address based on current network connection
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
@@ -60,7 +61,8 @@ const resolveName = (name) => {
     } catch (e) {
       reject(e)
     }
-  })
+  }
+  return new Promise(executor)
 }
 
 class Aragon {

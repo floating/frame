@@ -46,7 +46,7 @@ const getPermission = (account, origin) => {
       return reject(new Error('No Frame account is selected'))
     }, 5 * 1000)
     const permissionObserver = store.observer(() => {
-      let trusted = checkPermissions(account, origin)
+      const trusted = checkPermissions(account, origin)
       if (trusted) {
         resolve(true)
         clearTimeout(permissionTimer)
