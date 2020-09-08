@@ -84,7 +84,6 @@
     "content-hash": "2.5.2",
     "cross-env": "7.0.2",
     "electron-log": "4.2.4",
-    "electron-positioner": "4.1.0",
     "electron-updater": "4.3.4",
     "eth-ens-namehash": "2.0.8",
     "eth-provider": "0.4.0",
