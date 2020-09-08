@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../link'
-import Client from '../Client'
+// import Client from '../Client'
 
 import Dropdown from '../../Components/Dropdown'
 
@@ -189,10 +189,10 @@ class _Settings extends React.Component {
             </div>
           </div>
           {/* Local clients */}
-          <div className='localSettingsTitle connectionTitle'>
-            <div>Services</div>
-          </div>
-          <Client client='parity' />
+          {/* <div className='localSettingsTitle connectionTitle'>  */}
+            {/* <div>Services</div> */}
+          {/* </div> */}
+          {/* <Client client='parity' /> */}
           {/* <Client client='ipfs' /> */}
 
           <div className='localSettingsTitle'>Preferences</div>

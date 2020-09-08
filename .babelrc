@@ -7,11 +7,9 @@
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
     "@babel/plugin-proposal-do-expressions",
     "@babel/plugin-proposal-export-default-from",
-    "@babel/plugin-proposal-export-namespace-from",
     "@babel/plugin-proposal-function-bind",
     "@babel/plugin-proposal-function-sent",
     "@babel/plugin-proposal-throw-expressions",
-    "@babel/plugin-proposal-logical-assignment-operators",
     ["@babel/plugin-proposal-pipeline-operator", { "proposal": "minimal" }],
     "@babel/plugin-syntax-import-meta"
   ]

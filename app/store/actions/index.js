@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import { v4 } from 'uuid'
 import { URL } from 'url'
 
 export const syncMain = (u, main) => u('main', _ => main)
@@ -175,7 +175,7 @@ export const reorderTabs = (u, from, to) => {
   })
 }
 export const newView = (u) => {
-  const id = uuidv4()
+  const id = v4()
   u('view.current', _ => id)
   u('view.list', list => {
     list.push(id)

@@ -470,7 +470,7 @@ class Account extends React.Component {
             </div>
           </>
         )}
-        <div className='accountExpand' onMouseDown={::this.typeClick}>
+        <div className='accountExpand' onMouseDown={() => this.typeClick()}>
           <div className='accountStatusIndicator' style={open ? { transform: 'rotate(180deg)' } : {}}>
             {svg.octicon('chevron-up', { height: 22 })}
           </div>

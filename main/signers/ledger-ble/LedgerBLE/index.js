@@ -6,6 +6,8 @@ const Signer = require('../../Signer')
 const windows = require('../../../windows')
 const flex = require('../../../flex')
 
+const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
+
 class LedgerBLE extends Signer {
   constructor (device, api) {
     super()
@@ -234,7 +236,7 @@ class LedgerBLE extends Signer {
         v: this.hexToBuffer(result.v),
         r: this.hexToBuffer(result.r),
         s: this.hexToBuffer(result.s)
-      })
+      }, { chain: chains[parseInt(rawTx.chainId)] })
       cb(null, '0x' + tx.serialize().toString('hex'))
     })
   }

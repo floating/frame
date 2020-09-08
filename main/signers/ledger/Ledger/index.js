@@ -13,6 +13,8 @@ const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
 const BASE_PATH_LIVE = '44\'/60\'/'
 const BASE_PATH_TEST = '44\'/1\'/0\'/'
 
+const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
+
 class Ledger extends Signer {
   constructor (devicePath, signers) {
     super()
@@ -187,6 +189,8 @@ class Ledger extends Signer {
       this.update()
       this.deviceStatusActive = false
     } catch (err) {
+      log.error(err)
+      log.error(err.message)
       const deviceBusy = (
         err.message.startsWith('cannot open device with path') ||
         err.message === 'Device access is paused' ||
@@ -208,7 +212,7 @@ class Ledger extends Signer {
         if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
         if (err.statusCode === 26625 || err.statusCode === 26628) {
           this.pollStatus(3000)
-          this.status = 'Confirm your Ledger is not asleep and is running firmware v1.4.0+'
+          this.status = 'Confirm your Ledger is not asleep'
         }
         if (err.message === 'Cannot write to HID device') {
           this.status = 'loading'
@@ -268,7 +272,7 @@ class Ledger extends Signer {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
-      const tx = new EthereumTx(rawTx)
+      const tx = new EthereumTx(rawTx, { chain: chains[parseInt(rawTx.chainId)] })
       tx.raw[6] = Buffer.from([rawTx.chainId]) // v
       tx.raw[7] = Buffer.from([]) // r
       tx.raw[8] = Buffer.from([]) // s
@@ -285,10 +289,12 @@ class Ledger extends Signer {
         v: Buffer.from(this.normalize(result.v), 'hex'),
         r: Buffer.from(this.normalize(result.r), 'hex'),
         s: Buffer.from(this.normalize(result.s), 'hex')
-      })
+      }, { chain: chains[parseInt(rawTx.chainId)] })
       cb(null, '0x' + _tx.serialize().toString('hex'))
       this.releaseDevice()
     } catch (err) {
+      log.error(err)
+      log.error(err.message)
       const deviceBusy = (
         err.message.startsWith('cannot open device with path') ||
         err.message === 'Device access is paused' ||
@@ -340,7 +346,7 @@ class Ledger extends Signer {
   }
 
   _deriveLegacyAddresses () {
-    return new Promise(async (resolve, reject) => {
+    const executor = async (resolve, reject) => {
       try {
         const result = await this.getAddress(this.network === '1' ? BASE_PATH_LEGACY : BASE_PATH_TEST, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
@@ -350,7 +356,8 @@ class Ledger extends Signer {
       } catch (err) {
         reject(err)
       }
-    })
+    }
+    return new Promise(executor)
   }
 }
 

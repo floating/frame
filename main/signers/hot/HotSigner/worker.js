@@ -1,11 +1,11 @@
 const crypto = require('crypto')
 
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
+const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
 const EthTx = require('ethereumjs-tx').Transaction
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
 
-const networks = { '0x1': 'mainnet', '0x3': 'ropsten', '0x4': 'rinkeby', '0x2A': 'kovan' }
+const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
 
 class HotSignerWorker {
   constructor () {
@@ -30,6 +30,12 @@ class HotSignerWorker {
   }
 
   signMessage (key, message, pseudoCallback) {
+    // Check if message is hex
+    if (isHexString(message)) {
+      if (!isHexPrefixed(message)) message = '0x' + message
+    } else {
+      message = fromUtf8(message)
+    }
     // Hash message
     const hash = hashPersonalMessage(toBuffer(message))
     // Sign message
@@ -45,8 +51,9 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
+    const chain = chains[parseInt(rawTx.chainId)]
     // Create tranasction
-    const tx = new EthTx(rawTx, { chain: networks[rawTx.chainId] })
+    const tx = new EthTx(rawTx, { chain })
     // Sign transaction
     tx.sign(key)
     // Return serialized transaction
@@ -62,7 +69,7 @@ class HotSignerWorker {
       // Signature -> buffer
       const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
       // Ensure correct length
-      if (signature.length !== 65) throw new Error('Frame verifyAddress signature has incorrect length')
+      if (signature.length !== 65) return pseudoCallback(new Error('Frame verifyAddress signature has incorrect length'))
       // Verify address
       let v = signature[64]
       v = v === 0 || v === 1 ? v + 27 : v
