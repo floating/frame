@@ -190,7 +190,7 @@ class _Settings extends React.Component {
           </div>
           {/* Local clients */}
           {/* <div className='localSettingsTitle connectionTitle'>  */}
-            {/* <div>Services</div> */}
+          {/* <div>Services</div> */}
           {/* </div> */}
           {/* <Client client='parity' /> */}
           {/* <Client client='ipfs' /> */}
@@ -244,14 +244,14 @@ const Settings = Restore.connect(_Settings)
 
 class Card extends React.Component {
   render () {
-    const current = this.store('selected.card')  === 'local' && !this.store('tray.dockOnly') && this.store('tray.open')
+    const current = this.store('selected.card') === 'local' && !this.store('tray.dockOnly') && this.store('tray.open')
     const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
-    const headerClass =  current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
+    const headerClass = current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
     return (
       <>
         <div className={headerClass}>
           <div className='dockCardHeaderLeft'>
-            <div className='dockCardHeaderTitle'> 
+            <div className='dockCardHeaderTitle'>
               {'Settings'}
             </div>
           </div>

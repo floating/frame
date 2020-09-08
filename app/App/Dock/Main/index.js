@@ -78,21 +78,21 @@ class Main extends React.Component {
     // const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
     let mainClass = 'dockCard cardShow'
     let headerClass = 'dockCardHeader headerShow'
-    if (this.store('selected.card') !== 'default' || this.store('tray.dockOnly') || !this.store('tray.open')){
+    if (this.store('selected.card') !== 'default' || this.store('tray.dockOnly') || !this.store('tray.open')) {
       mainClass = 'dockCard cardHide'
       headerClass = 'dockCardHeader headerHide'
-    } 
+    }
     // if (this.store('selected.card') !== 'default' && this.store('selected.open')) mainClass = 'main mainMelt'
-    let addAccount = this.store('view.addAccount')
-    let open = this.store('selected.open')
+    const addAccount = this.store('view.addAccount')
+    const open = this.store('selected.open')
     if (this.store('selected.card') === 'default' && (open || current)) headerClass = 'dockCardHeader headerHide'
 
     return (
       <>
         <div className={headerClass}>
           <div className='dockCardHeaderLeft'>
-            <div className={addAccount ? 'dockCardHeaderTitle dockCardHeaderTitleAdd' : 'dockCardHeaderTitle'}> 
-              {addAccount ? 'Add Accounts' :  'Accounts'}
+            <div className={addAccount ? 'dockCardHeaderTitle dockCardHeaderTitleAdd' : 'dockCardHeaderTitle'}>
+              {addAccount ? 'Add Accounts' : 'Accounts'}
             </div>
           </div>
           <div className='addAppButton'>

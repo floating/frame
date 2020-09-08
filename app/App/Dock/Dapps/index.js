@@ -135,7 +135,7 @@ class Dapps extends React.Component {
   render () {
     const current = this.store('selected.card') === 'dapps' && !this.store('tray.dockOnly') && this.store('tray.open')
     const dockCardClass = current ? 'dockCard cardShow' : 'dockCard cardHide'
-    const headerClass =  current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
+    const headerClass = current ? 'dockCardHeader headerShow' : 'dockCardHeader headerHide'
     // const style = current ? { transform: 'translate3d(0px, 0px, 0px)' } : { transform: 'translate3d(370px, 0px, 0px)' }
     const ipfsReady = this.store('main.clients.ipfs.state') === 'ready'
 
@@ -195,8 +195,8 @@ class Dapps extends React.Component {
         ) : null}
         <div className={headerClass}>
           <div className='dockCardHeaderLeft'>
-            <div className={this.store('view.addApp') ? 'dockCardHeaderTitle dockCardHeaderTitleAdd' : 'dockCardHeaderTitle'}> 
-              {this.store('view.addApp') ? 'Add Apps' :  'Apps'}
+            <div className={this.store('view.addApp') ? 'dockCardHeaderTitle dockCardHeaderTitleAdd' : 'dockCardHeaderTitle'}>
+              {this.store('view.addApp') ? 'Add Apps' : 'Apps'}
             </div>
           </div>
           <div className='addAppButton'>

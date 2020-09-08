@@ -14,7 +14,7 @@ const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
-const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_requestAccounts','eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
+const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_requestAccounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
 
 const handler = (socket, req) => {
   socket.id = uuid()

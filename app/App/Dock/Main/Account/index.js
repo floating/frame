@@ -446,10 +446,12 @@ class Account extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const ens = this.store('main.accounts', this.props.id, 'ens', currentIndex)
     return (
-      <div className='accountInfo' onMouseDown={e => {
-        e.stopPropagation()
-        this.store.toggleShowAccounts()
-      }}>
+      <div
+        className='accountInfo' onMouseDown={e => {
+          e.stopPropagation()
+          this.store.toggleShowAccounts()
+        }}
+      >
         <Status {...this.props} />
         {ens ? (
           <>
@@ -465,7 +467,7 @@ class Account extends React.Component {
               {svg.octicon('kebab-horizontal', { height: 14 })}
               {address.substr(address.length - 4)}
             </div>
-            <div className='accountNameLocal' >
+            <div className='accountNameLocal'>
               {this.props.name}
             </div>
           </>
@@ -505,7 +507,7 @@ class Account extends React.Component {
       style.opacity = 1
       style.zIndex = '10000000000000000'
       const panelHeight = document.body.offsetHeight - 8
-      style.height = open ? panelHeight: initial.height
+      style.height = open ? panelHeight : initial.height
       style.width = open ? initial.width + 8 : initial.width
       // console.log('shiftTop', shiftTop)
       const translateTop = (initial.top * -1)

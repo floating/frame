@@ -1,5 +1,3 @@
-/* globals fetch */
-
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../link'
@@ -68,12 +66,12 @@ class AppTile extends React.Component {
       </div>
     )
   }
-  
+
   componentDidMount () {
     this.store.observer(() => {
       const dapp = this.props.hash ? this.store(`main.dapp.details.${this.props.hash}`) : ''
       if (this.cid && !icons[this.cid] && dapp && dapp.icon) {
-        let ext = dapp.icon.name.substr(dapp.icon.name.lastIndexOf('.') + 1)
+        const ext = dapp.icon.name.substr(dapp.icon.name.lastIndexOf('.') + 1)
         icons[this.cid] = `data:image/${ext};base64, ${dapp.icon.content}`
         this.forceUpdate()
       }
@@ -103,7 +101,7 @@ class AppTile extends React.Component {
       const handleMouseDown = beingDragged ? () => {} : this.onMouseDown.bind(this)
       const handleMouseUp = beingDragged ? () => {} : this.onMouseUp.bind(this)
       const handleMouseEnter = beingDragged ? () => {} : this.onMouseEnter.bind(this)
-      const on = this.store(`main.openDapps`).indexOf(dapp.domain) > -1
+      const on = this.store('main.openDapps').indexOf(dapp.domain) > -1
       return (
         <div key={index} className={tileClass} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseEnter={handleMouseEnter}>
           <div className={cardClass} style={style}>

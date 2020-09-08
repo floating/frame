@@ -69,22 +69,22 @@ module.exports = {
   }
 }
 
-  //   ipfs.get(`${cid}/index.html`, (err, files) => {
-  //     if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
-  //     res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
-  //     res.setHeader('Access-Control-Allow-Origin', '*')
-  //     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-  //     res.writeHead(200)
+//   ipfs.get(`${cid}/index.html`, (err, files) => {
+//     if (err) return error(res, 404, 'Could not resolve dapp: ' + err.message)
+//     res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
+//     res.setHeader('Access-Control-Allow-Origin', '*')
+//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+//     res.writeHead(200)
 
-  //     let file = files[0].content.toString('utf8')
+//     let file = files[0].content.toString('utf8')
 
-  //     const $ = cheerio.load(file.toString('utf8'))
-  //     $('html').prepend(`
-  //       <script>
-  //         const initial = ${JSON.stringify(storage.get(cid) || {})}
-  //         ${inject}
-  //       </script>
-  //     `)
-  //     res.end($.html())
-  //   })
-  // }
+//     const $ = cheerio.load(file.toString('utf8'))
+//     $('html').prepend(`
+//       <script>
+//         const initial = ${JSON.stringify(storage.get(cid) || {})}
+//         ${inject}
+//       </script>
+//     `)
+//     res.end($.html())
+//   })
+// }

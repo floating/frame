@@ -92,7 +92,7 @@ const initial = {
     reveal: main('reveal', false),
     ipfs: {},
     openDapps: [],
-    dapp: main('dapp',{
+    dapp: main('dapp', {
       details: {},
       map: {
         added: [],
