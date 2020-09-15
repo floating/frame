@@ -248,6 +248,7 @@ class Accounts extends EventEmitter {
 
   removeRequest (handlerId) {
     if (this.current() && this.current().requests[handlerId]) {
+      if (this.current().requests[handlerId].res) this.current().requests[handlerId].res()
       delete this.current().requests[handlerId]
       this.current().update()
     }
