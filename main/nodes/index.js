@@ -21,7 +21,9 @@ class Nodes extends EventEmitter {
       type: '',
       connected: false
     }
-    this.observer = store.observer(() => this.connect(store('main.connection')))
+    this.observer = store.observer(() => {
+      this.connect(store('main.connection'))
+    })
   }
 
   update (priority) {
@@ -55,83 +57,11 @@ class Nodes extends EventEmitter {
       log.info('    Network changed from ' + this.network + ' to ' + connection.network)
       this.network = connection.network
     }
-
-    // Local connection is on
-    if (connection.local.on) {
-      log.info('    Local connection: ON')
-      if (!this.local.provider) {
-        log.info('    Local connection doesn\'t exist, creating connection')
-        this.local.provider = provider('direct', { name: 'local', infuraId: '786ade30f36244469480aa5c2bf0743b' })
-
-        // Local connection connected
-        this.local.provider.on('connect', details => {
-          log.info('    Local connection connected')
-          this.getNetwork(this.local.provider, (netErr, netResponse) => {
-            this.getNodeType(this.local.provider, (typeErr, typeResponse) => {
-              this.local.network = !netErr && netResponse && !netResponse.error ? netResponse.result : ''
-              this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : '?'
-              if (this.local.type === 'EthereumJS TestRPC') this.local.type = 'Ganache'
-              if (this.local.network && this.local.network !== store('main.connection.network')) {
-                this.local.connected = false
-                this.local.status = 'network mismatch'
-                this.update('local')
-              } else {
-                this.local.status = 'connected'
-                this.local.connected = true
-                this.update('local')
-                this.emit('connect')
-              }
-            })
-          })
-        })
-
-        // Local connection close
-        this.local.provider.on('close', details => {
-          log.info('    Local connection closed')
-          this.local.connected = false
-          this.local.type = ''
-          this.local.network = ''
-          this.update('local')
-          this.emit('close')
-        })
-
-        // Local connection status
-        this.local.provider.on('status', status => {
-          if (status === 'connected' && this.local.network && this.local.network !== store('main.connection.network')) {
-            this.local.connected = false
-            this.local.status = 'network mismatch'
-            this.update('local')
-          } else {
-            const current = this.local.status
-            if ((current === 'loading' || current === 'not found' || current === 'off' || current === 'network mismatch') && status === 'disconnected') status = 'not found'
-            this.local.status = status
-            this.update('local')
-          }
-        })
-
-        this.local.provider.on('data', data => this.emit('data', data))
-        this.local.provider.on('error', err => this.emit('error', err))
-      } else {
-        log.info('    Local connection already exists')
-      }
-    // Local connection is set OFF by the user
-    } else {
-      log.info('    Local connection: OFF')
-      if (this.local.provider) this.local.provider.close()
-      this.local.provider = null
-      if (this.local.status !== 'off') {
-        this.local.status = 'off'
-        this.local.connected = false
-        this.local.type = ''
-        this.local.network = ''
-        this.update('local')
-      }
-    }
-
+    
     // Secondary connection is on
     if (connection.secondary.on) {
       log.info('    Secondary connection: ON')
-      if (connection.local.on && (connection.local.status === 'connected' || connection.local.status === 'loading')) {
+      if (connection.local.on && connection.local.status === 'connected') {
         // Connection is on Standby
         log.info('    Secondary connection on STANDBY', connection.secondary.status === 'standby')
         if (this.secondary.provider) this.secondary.provider.close()
@@ -145,21 +75,16 @@ class Nodes extends EventEmitter {
       } else {
         const settings = store('main.connection.secondary.settings', store('main.connection.network'))
         const target = settings.options[settings.current]
-        if (!this.secondary.provider || this.secondary.currentTarget !== target) {
+        if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== target) {
           log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
           if (this.secondary.provider) this.secondary.provider.close()
           this.secondary.provider = null
-
-          if (connection.secondary.status !== 'loading') {
-            this.secondary.status = 'loading'
-            this.secondary.connected = false
-            this.secondary.type = ''
-            this.update('secondary')
-          }
-
+          this.secondary.currentSecondaryTarget = target
+          this.secondary.status = 'loading'
+          this.secondary.connected = false
+          this.secondary.type = ''
+          this.update('secondary')
           this.secondary.provider = provider(target, { name: 'secondary', infuraId: '786ade30f36244469480aa5c2bf0743b' })
-          this.secondary.currentTarget = target
-
           this.secondary.provider.on('connect', () => {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
@@ -178,7 +103,6 @@ class Nodes extends EventEmitter {
               }
             })
           })
-
           this.secondary.provider.on('close', () => {
             log.info('    Secondary connection close')
             this.secondary.connected = false
@@ -187,7 +111,6 @@ class Nodes extends EventEmitter {
             this.update('secondary')
             this.emit('close')
           })
-
           this.secondary.provider.on('status', status => {
             if (status === 'connected' && this.secondary.network && this.secondary.network !== store('main.connection.network')) {
               this.secondary.connected = false
@@ -195,13 +118,10 @@ class Nodes extends EventEmitter {
               this.secondary.status = 'network mismatch'
               this.update('secondary')
             } else {
-              const current = store('main.connection.local.status')
-              if ((current === 'loading' || current === 'not found') && status === 'disconnected') status = 'not found'
               this.local.status = status
               this.update('secondary')
             }
           })
-
           this.secondary.provider.on('data', data => this.emit('data', data))
           this.secondary.provider.on('error', err => this.emit('error', err))
         }
@@ -219,6 +139,74 @@ class Nodes extends EventEmitter {
         this.update('secondary')
       }
     }
+
+
+    if (connection.local.on) {
+      log.info('    local connection: ON')
+      const settings = store('main.connection.local.settings', store('main.connection.network'))
+      const target = settings.options[settings.current]
+      if (!this.local.provider || this.local.currentLocalTarget !== target) {
+        log.info('    Creating local connection becasue it didn\'t exist or the target changed')
+        if (this.local.provider) this.local.provider.close()
+        this.local.provider = null
+        this.local.currentLocalTarget = target
+        this.local.status = 'loading'
+        this.local.connected = false
+        this.local.type = ''
+        this.update('local')
+        this.local.provider = provider(target, { name: 'local', infuraId: '786ade30f36244469480aa5c2bf0743b' })
+        this.local.provider.on('connect', () => {
+          log.info('    Local connection connected')
+          this.getNetwork(this.local.provider, (err, response) => {
+            this.local.network = !err && response && !response.error ? response.result : ''
+            if (this.local.network && this.local.network !== store('main.connection.network')) {
+              this.local.connected = false
+              this.local.type = ''
+              this.local.status = 'network mismatch'
+              this.update('local')
+            } else {
+              this.local.status = 'connected'
+              this.local.connected = true
+              this.local.type = ''
+              this.update('local')
+              this.emit('connect')
+            }
+          })
+        })
+        this.local.provider.on('close', () => {
+          log.info('    local connection close')
+          this.local.connected = false
+          this.local.type = ''
+          this.local.network = ''
+          this.update('local')
+          this.emit('close')
+        })
+        this.local.provider.on('status', status => {
+          if (status === 'connected' && this.local.network && this.local.network !== store('main.connection.network')) {
+            this.local.connected = false
+            this.local.type = ''
+            this.local.status = 'network mismatch'
+            this.update('local')
+          } else {
+            this.local.status = status
+            this.update('local')
+          }
+        })
+        this.local.provider.on('data', data => this.emit('data', data))
+        this.local.provider.on('error', err => this.emit('error', err))
+      }
+    } else {
+      log.info('    local connection: OFF')
+      if (this.local.provider) this.local.provider.close()
+      this.local.provider = null
+      if (this.local.status !== 'off') {
+        this.local.status = 'off'
+        this.local.connected = false
+        this.local.type = ''
+        this.local.network = ''
+        this.update('local')
+      }
+    }
   }
 
   resError (error, payload, res) {
@@ -227,6 +215,7 @@ class Nodes extends EventEmitter {
   }
 
   send (payload, res) {
+    console.log(payload)
     if (this.local.provider && this.local.connected && this.local.network === store('main.connection.network')) {
       this.local.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
@@ -244,3 +233,79 @@ class Nodes extends EventEmitter {
 }
 
 module.exports = new Nodes()
+
+
+
+
+    // // Local connection is on
+    // if (connection.local.on) {
+    //   log.info('    Local connection: ON')
+    //   if (!this.local.provider) {
+    //     log.info('    Local connection doesn\'t exist, creating connection')
+    //     this.local.provider = provider('direct', { name: 'local', infuraId: '786ade30f36244469480aa5c2bf0743b' })
+
+    //     // Local connection connected
+    //     this.local.provider.on('connect', details => {
+    //       log.info('    Local connection connected')
+    //       this.getNetwork(this.local.provider, (netErr, netResponse) => {
+    //         this.getNodeType(this.local.provider, (typeErr, typeResponse) => {
+    //           this.local.network = !netErr && netResponse && !netResponse.error ? netResponse.result : ''
+    //           this.local.type = !typeErr && typeResponse && !typeResponse.error ? typeResponse.result.split('/')[0] : '?'
+    //           if (this.local.type === 'EthereumJS TestRPC') this.local.type = 'Ganache'
+    //           if (this.local.network && this.local.network !== store('main.connection.network')) {
+    //             this.local.connected = false
+    //             this.local.status = 'network mismatch'
+    //             this.update('local')
+    //           } else {
+    //             this.local.status = 'connected'
+    //             this.local.connected = true
+    //             this.update('local')
+    //             this.emit('connect')
+    //           }
+    //         })
+    //       })
+    //     })
+
+    //     // Local connection close
+    //     this.local.provider.on('close', details => {
+    //       log.info('    Local connection closed')
+    //       this.local.connected = false
+    //       this.local.type = ''
+    //       this.local.network = ''
+    //       this.update('local')
+    //       this.emit('close')
+    //     })
+
+    //     // Local connection status
+    //     this.local.provider.on('status', status => {
+    //       if (status === 'connected' && this.local.network && this.local.network !== store('main.connection.network')) {
+    //         this.local.connected = false
+    //         this.local.status = 'network mismatch'
+    //         this.update('local')
+    //       } else {
+    //         const current = this.local.status
+    //         if ((current === 'loading' || current === 'not found' || current === 'off' || current === 'network mismatch') && status === 'disconnected') status = 'not found'
+    //         this.local.status = status
+    //         this.update('local')
+    //       }
+    //     })
+
+    //     this.local.provider.on('data', data => this.emit('data', data))
+    //     this.local.provider.on('error', err => this.emit('error', err))
+    //   } else {
+    //     log.info('    Local connection already exists')
+    //   }
+    // // Local connection is set OFF by the user
+    // } else {
+    //   log.info('    Local connection: OFF')
+    //   if (this.local.provider) this.local.provider.close()
+    //   this.local.provider = null
+    //   if (this.local.status !== 'off') {
+    //     this.local.status = 'off'
+    //     this.local.connected = false
+    //     this.local.type = ''
+    //     this.local.network = ''
+    //     this.update('local')
+    //   }
+    // }
+
