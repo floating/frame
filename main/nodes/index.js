@@ -215,7 +215,6 @@ class Nodes extends EventEmitter {
   }
 
   send (payload, res) {
-    console.log(payload)
     if (this.local.provider && this.local.connected && this.local.network === store('main.connection.network')) {
       this.local.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
