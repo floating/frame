@@ -92,11 +92,17 @@ class Settings extends React.Component {
     }, 1010)
   }
 
-  status (connection) {
+  status (layer) {
+    const connection = this.store('main.connection', layer) // primary is 'local' and secondary is 'secondary'
+    console.log(connection)
     let status = connection.status
     const network = this.store('main.connection.network')
     const current = connection.settings[network].current
-    if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+
+    if (current === 'custom' ) {
+      if (layer === 'local' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage && !this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
+      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+    }
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
       <div className='connectionOptionStatus'>
@@ -197,7 +203,7 @@ class Settings extends React.Component {
               </div>
               <div className='connectionOptionDetails'>
                 <div className='connectionOptionDetailsInset'>
-                  {this.status(this.store('main.connection.local'))}
+                  {this.status('local')}
                   <Dropdown
                     syncValue={this.store('main.connection.local.settings', this.store('main.connection.network'), 'current')}
                     onChange={(value) => link.send('tray:action', 'selectPrimary', value)}
@@ -220,7 +226,7 @@ class Settings extends React.Component {
               </div>
               <div className='connectionOptionDetails'>
                 <div className='connectionOptionDetailsInset'>
-                  {this.status(this.store('main.connection.secondary'))}
+                  {this.status('secondary')}
                   <Dropdown
                     syncValue={this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'current')}
                     onChange={(value) => link.send('tray:action', 'selectSecondary', value)}

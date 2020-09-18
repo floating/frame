@@ -61,7 +61,7 @@ class Nodes extends EventEmitter {
     // Secondary connection is on
     if (connection.secondary.on) {
       log.info('    Secondary connection: ON')
-      if (connection.local.on && (connection.local.status === 'connected' || connection.local.status === 'loading')) {
+      if (connection.local.on && connection.local.status === 'connected') {
         // Connection is on Standby
         log.info('    Secondary connection on STANDBY', connection.secondary.status === 'standby')
         if (this.secondary.provider) this.secondary.provider.close()

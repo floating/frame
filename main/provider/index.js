@@ -30,7 +30,7 @@ class Provider extends EventEmitter {
     this.getGasEstimate = this.getGasEstimate.bind(this)
     this.getNonce = this.getNonce.bind(this)
     this.fillTx = this.fillTx.bind(this)
-    this.subs = { accountsChanged: [], chainChanged: [] }
+    this.subs = { accountsChanged: [], chainChanged: [], networkChanged: [] }
   }
 
   accountsChanged (accounts) {
@@ -41,6 +41,12 @@ class Provider extends EventEmitter {
 
   chainChanged (netId) {
     this.subs.chainChanged.forEach(subscription => {
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
+    })
+  }
+
+  networkChanged (netId) {
+    this.subs.networkChanged.forEach(subscription => {
       this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
     })
   }
@@ -238,12 +244,16 @@ class Provider extends EventEmitter {
   }
 
   async getGasPrice (rawTx, res) {
-    try {
-      const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
-      const prices = await response.json()
-      res({ result: '0x' + (prices.fast * 100000000).toString(16) })
-    } catch (error) {
-      res({ error })
+    if (rawTx.chainId === '0x1') {
+      try {
+        const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
+        const prices = await response.json()
+        res({ result: '0x' + (prices.fast * 100000000).toString(16) })
+      } catch (error) {
+        res({ error })
+      }
+    } else {
+      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, res)
     }
   }
 
@@ -299,9 +309,9 @@ class Provider extends EventEmitter {
 
   sendTransaction (payload, res) {
     const rawTx = this.getRawTx(payload)
+    if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-      if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
       const from = rawTx.from
       const current = accounts.getAccounts()[0]
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
@@ -398,6 +408,7 @@ store.observer(() => {
     network = store('main.connection.network')
     accounts.unsetSigner()
     provider.chainChanged(network)
+    provider.networkChanged(network)
     provider.accountsChanged([])
   }
 })
