@@ -1,0 +1,431 @@
+.txSection
+  position absolute
+  // bottom 130px
+  nakground bl
+  left 0px
+  right 0px
+  bottom 0px
+  height 48px
+  z-index 2000
+  // background highlight
+  color outerspace08
+  font-size 14px
+  font-weight 400
+  // letter-spacing 1px
+  // text-transform uppercase
+  transition standard
+  overflow hidden
+  border-radius 0px
+  // background transparent
+  // background blue
+
+  font-family OpenSans
+  // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+  // border-radius 3px
+  // background blue
+  // background blue
+  left 10px
+  right 10px
+  border-radius 15px
+  height 30px
+  background ghostD
+  box-shadow cardDrop
+  position absolute
+  overflow hidden
+  font-size 13px
+  font-weight 400
+
+  .txSectionHeader
+    position absolute
+    top 0
+    left 0
+    right 0
+    height 50px
+    border-bottom 1px solid thick
+    justify-content space-between
+    display flex
+    align-items center
+    text-transform uppercase
+    letter-spacing 1px
+    font-weight 400
+    z-index 10
+
+    .txSectionLabel
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      transition standard
+
+    .txSectionNotice
+      width 40px
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      transition standard
+      color outerspace08
+
+    .txSectionIndicator
+      width 40px
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      transform rotate(-180deg)
+      transition standardSlow
+
+  .txSectionLabelLeft
+    position absolute
+    left 0
+    right 0
+    width 50px
+    height 30px
+    box-sizing border-box
+    border-right 1px solid thick
+    background ghostB
+    box-shadow cardDrop, 0px 1px 1px thin
+    // border-top-left-radius 3px
+    // border-bottom-left-radius 3px
+    // border-top-right-radius 15px
+    border-radius 15px
+    text-align center
+    display flex
+    overflow hidden
+
+    .txSectionLabelLeftInner
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      padding 5px
+      transition standardSlow
+      
+      svg
+        color good
+
+  .txSectionLabelRight
+    position absolute
+    right 0px
+    width 80px
+    height 30px
+    box-sizing border-box
+    border-left 1px solid thick
+    // border-top-right-radius 3px
+    // border-bottom-right-radius 3px
+    // border-top-left-radius 15px
+    border-radius 15px
+    // color good
+    background ghostB
+    box-shadow cardDrop, 0px 1px 1px thin
+    padding 5px
+    text-align center
+
+  .networkFeeOptions
+    position realtive
+    height 160px
+    width 100%
+    padding-top 10px
+    transition standard
+
+  .networkFeeOption
+    position relative
+    height 30px
+    width 100%
+    padding-bottom 10px
+    // transition standardFast
+
+    .networkFeeOptionBack
+      position absolute 
+      top 0
+      left 0
+      right 0
+      bottom 10px
+      border-radius 15px
+
+    div, svg
+      pointer-events none
+
+  .networkFeeOption:hover
+    .networkFeeOptionBack
+      background ghostC
+
+  .networkFeeTotalWarn
+    .networkFeeTotalUSD
+      color bad
+
+  .networkFeeTotal
+    position absolute
+    left 50px
+    right 80px
+    // background blue
+    // width 140px
+    height 30px
+    box-sizing border-box
+    display flex
+    justify-content center
+    // align-items center
+    font-size 13px
+    letter-spacing 0px
+
+    .networkFeeTotalSection
+      padding 0px 4px
+      // height 30px
+      // display flex
+      // justify-content center
+      // align-items center
+
+    .networkFeeTotalETH
+      font-size 16px
+      margin-top 4px
+      // font-family FiraCode
+      // font-weight 600
+     .networkFeeTotalUSD
+       margin-top 6px
+
+      .networkFeeTotalApprox
+        margin-top 6px
+
+  // .networkFeeTotalUSD
+    // position absolute
+    // left 230px
+    // padding-left 5px
+    // width 100px
+    // height 30px
+    // box-sizing border-box
+    // display flex
+    // justify-content center
+    // align-items center
+    // border-right 1px solid thick
+
+  // .transactionTotals
+  //   display flex
+  //   justify-content center
+  //   align-items center
+  //   font-size 18px
+  //   letter-spacing 0
+  //   // flex-direction column
+  //
+  // .transactionTotalUSD
+  //   margin-left 4px
+  //   padding 0px 10px
+  //   font-size 14px
+  //   border-radius 9px
+  //   height 18px
+  //   background highlightest
+  //   box-shadow cardDrop
+  //   font-weight 400
+  //   box-sizing border-box
+
+  .transactionWarning
+    color bad
+
+  .transactionFeeWarning
+    margin-left 6px
+    padding-bottom 8px
+    color bad
+
+  .transactionFee
+    .transactionTotals
+      font-size 12px
+
+    .transactionTotalUSD
+      font-size 15px
+      padding 2px 8px
+      font-weight 300
+
+.txSectionBody
+  position absolute
+  color outerspace08
+  top 50px
+  left 0
+  right 0
+  bottom 0
+  display flex
+  padding 16px 14px
+  user-select all
+  overflow hidden
+  z-index 9
+
+  .txSectionBodyInner
+    opacity 0
+    top -100px
+    position relative
+    max-width 100%
+    width 100%
+    height 100%
+    font-size 13px
+    text-transform none
+    transition standardSlow
+    overflow-wrap break-word
+    word-wrap break-word
+    font-family FiraCode, monospace
+    overflow-x hidden
+    overlflow-y scroll
+
+.txSectionSelected
+  position absolute
+  bottom 5px
+  left 5px
+  right 5px
+  top 65px
+
+  .txSectionHeader
+    .txSectionIndicator
+      transform rotate(0deg)
+
+  .txSectionBody
+    .txSectionBodyInner
+      opacity 1
+      top 0px
+
+// .transactionData
+//   position absolute
+//   bottom 130px
+//   left 5px
+//   right 5px
+//   top 190px
+//   z-index 2000
+//   display flex
+//   justify-content center
+//   align-items center
+//   background highlight
+//   color outerspace08
+//   font-size 14px
+//   font-weight 400
+//   letter-spacing 1px
+//   text-transform uppercase
+//   transition standard
+//   overflow hidden
+//   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+//   border-radius 3px
+
+.txData
+  height 18px
+  // margin-top -10px
+  // padding-bottom 10px
+
+.transactionDataHeader
+  position absolute
+  top 10px
+  left 50%
+  right 0
+  height 18px
+  width 170px
+  margin-left -90px
+  // border-bottom 1px solid thick
+  justify-content space-between
+  display flex
+  align-items center
+  text-transform uppercase
+  letter-spacing 1px
+  font-weight 400
+  z-index 10
+  background highlight
+  border-radius 9px
+
+  .transactionDataLabel
+    display flex
+    justify-content center
+    align-items center
+    z-index 10
+    transition standard
+
+  .transactionDataNotice
+    width 18px
+    display flex
+    justify-content center
+    align-items center
+    z-index 10
+    transition standard
+    color outerspace08
+
+  .transactionDataIndicator
+  // width 22px
+    display flex
+    justify-content center
+    align-items center
+    z-index 10
+    margin-bottom 2px
+    margin-right 6px
+    transform rotate(-180deg)
+    transition standardSlow
+
+.txFee
+  box-shadow cardDrop, 0px 2px 2px thick
+
+  .txFeeGwei
+    position absolute
+    right 0
+    left 0
+    top 10px
+    // padding 0px 20px 0px 20px
+    height 90px
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    transition standard
+    position absolute
+    
+    .txFeeGweiValue
+      font-size 40px
+      font-weight 200
+      // letter-spacing 2px
+      // margin-left 2px
+      line-height 40px
+      letter-spacing -1px
+      font-family FiraCode, monospace
+
+    .txFeeGweiLabel
+      font-size 13px
+      font-weight 300
+      letter-spacing 2px
+      margin-left 4px
+      
+    // color outerspace08
+    // background ghostB
+    // box-shadow cardDrop
+    // letter-spacing 2px
+    // font-weight 400
+    // font-size 14px
+    // text-transform uppercase
+    // transition standard
+
+
+  .networkFeeLabel
+    position absolute
+    top 0
+    right 0
+    height 30px
+    border-top-right-radius 15px
+    border-bottom-left-radius 15px
+    padding 0px 20px 0px 20px
+    height 40px
+    display flex
+    justify-content center
+    align-items center
+    transition standard
+    position absolute
+    color outerspace08
+    background ghostB
+    box-shadow cardDrop
+    letter-spacing 2px
+    font-weight 400
+    font-size 14px
+    text-transform uppercase
+    transition standard
+
+.customGasPriceBar
+  position absolute
+  bottom -4px
+  left 10px
+  right 10px
+  height 4px
+
+  .customGasPriceBarInner
+    width 20px
+    height 4px
+    position absolute
+    border-radius 2px

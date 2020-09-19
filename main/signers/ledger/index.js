@@ -10,7 +10,6 @@ module.exports = {
   scan: (signers) => {
     log.info('Ledger Scaner Started...')
     const scan = () => {
-      log.info('Ledger Scan Triggered:')
       const current = HID.devices().filter(isLedger)
       signers.list().forEach((signer, i) => {
         if (current.map(device => device.path).indexOf(signer.devicePath) === -1 && signer.type === 'ledger') {

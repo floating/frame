@@ -137,5 +137,13 @@ module.exports = {
   },
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
+  },
+  setGasPrices: (u, chain, prices) => {
+    // console.log('setGasPrices', chain, prices)
+    u('main.gasPrice', chain, 'levels', () => prices)
+  },
+  setGasDefault: (u, chain, level) => {
+    // console.log('setGasDefault', chain, level)
+    u('main.gasPrice', chain, 'default', () => level)
   }
 }

@@ -128,6 +128,10 @@ const rpc = {
   },
   verifyAddress (cb) {
     accounts.verifyAddress(true, cb)
+  },
+  setGasPrice (price, level, handlerId, cb) {
+    accounts.setGasPrice(price, handlerId)
+    store.setGasDefault(store('main.connection.network'), level)
   }
 }
 

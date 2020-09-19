@@ -248,12 +248,52 @@ class Provider extends EventEmitter {
       try {
         const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
         const prices = await response.json()
-        res({ result: '0x' + (prices.fast * 100000000).toString(16) })
+        store.setGasPrices(parseInt(rawTx.chainId, 'hex'), {
+          safelow: ('0x' + (prices.safeLow * 100000000).toString(16)), 
+          normal: ('0x' + (prices.average * 100000000).toString(16)), 
+          fast: ('0x' + (prices.fast * 100000000).toString(16)),
+          trader: ('0x' + (prices.fastest * 100000000).toString(16))
+        })
+        res({ result: store('main.gasPrice.levels', store('main.gasPrice.default')) })
       } catch (error) {
         res({ error })
       }
     } else {
-      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, res)
+      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, (response) => {
+        if (response.result) {
+          try {
+            store.setGasPrices({
+              safelow: response.result, 
+              normal: '0x' + (Math.round(parseInt(response.result, 16) * 2)).toString(16), 
+              fast: '0x' + (Math.round(parseInt(response.result, 16) * 4).toString(16)),
+              trader: '0x' + (Math.round(parseInt(response.result, 16) * 8).toString(16))
+            })
+            const result = store('main.gasPrice.levels', store('main.gasPrice.default')) 
+            res({ result })
+          } catch (error) {
+            res({ error })
+          }
+        } else {
+          res(response)
+        }
+      })  
+      //  (response) => {
+      //   console.log('eth_gasPirce response', response)
+      //   if (response.error) return res(response)
+      //   if (response.result) {
+      //     try {
+      //       store.setGasPrices({
+      //         slow: response.result, 
+      //         normal: response.result, 
+      //         fast: response.result
+      //       })
+      //       console.log('return gas price', store('main.gasPrice.levels', store('main.gasPrice.default')) )
+      //       res({ result: store('gasPrice.levels', store('gasPrice.default')) })
+      //     } catch (error) {
+      //       res({ error })
+      //     }
+      //   }
+      // })
     }
   }
 

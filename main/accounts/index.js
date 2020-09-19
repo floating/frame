@@ -359,6 +359,14 @@ class Accounts extends EventEmitter {
     }, 1000)
   }
 
+  setGasPrice (price, handlerId) {
+    if (!this.current()) return // cb(new Error('No Account Selected'))
+    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      this.current().requests[handlerId].data.gasPrice = price
+      this.current().update()
+    }
+  }
+
   // removeAllAccounts () {
   //   windows.broadcast('main:action', 'unsetSigner')
   //   setTimeout(() => {

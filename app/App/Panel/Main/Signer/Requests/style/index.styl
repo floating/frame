@@ -689,7 +689,6 @@
     text-transform uppercase
     font-size 13px
     font-weight 400
-    padding-top 2px
     letter-spacing 1px
 
   .transactionTotals
@@ -710,9 +709,15 @@
     color bad
 
   .transactionFeeWarning
-    margin-left 6px
-    padding-bottom 8px
     color bad
+    position absolute
+    top 0
+    left 0
+    right 0
+    height 20px
+    display flex
+    justify-content center
+    align-items center
 
   .transactionFee
     position absolute
@@ -1586,3 +1591,6 @@ span
     font-weight 600
     word-wrap break-word
     font-family 'FiraCode', monospace
+
+
+@import './next'
