@@ -42,7 +42,9 @@ class TransactionRequest extends React.Component {
   }
 
   setGasPrice (price, level) {
-    if (price && price !== this.props.req.data.gasPrice) link.rpc('setGasPrice', price, level, this.props.req.handlerId, e => console.log(e))
+    const chain = this.store('main.connection.network')
+    const feeLevel = this.store('main.gasPrice', chain, 'default')
+    if (price && (price !== this.props.req.data.gasPrice || level !== feeLevel)) link.rpc('setGasPrice', price, level, this.props.req.handlerId, e => console.log(e))
     this.setState({ selectedIndex: -1 })
   }
 
@@ -94,12 +96,16 @@ class TransactionRequest extends React.Component {
 
   hoverBar (hoverGasPercent) {
     console.log('this.store(main.connection.network)', this.store('main.connection.network'))
+    console.log('this.store(main.gasPrice, this.store(main.connection.network)', this.store('main.gasPrice', this.store('main.connection.network')))
     const trader = this.store('main.gasPrice', this.store('main.connection.network'),'levels.trader')
+    console.log('trader', trader)
     // const safelow = this.store('main.gasPrice.levels.safelow')
     const top = parseInt(trader, 16) * 4
     const bottom = 1 // parseInt(safelow, 16) / 10
     const percentBuffer = Math.round((bottom / top) * 100) / 100
+    console.log('percentBuffer', percentBuffer)
     hoverGasPercent = hoverGasPercent + percentBuffer
+    console.log('hoverGasPercent', hoverGasPercent)
     let gwei = Math.round(top * hoverGasPercent / 1000000000)
     gwei = gwei < bottom ? bottom : gwei
     console.log('hoverGasPrice', gwei * 1000000000)
@@ -142,26 +148,30 @@ class TransactionRequest extends React.Component {
   renderFee () {
     const expanded = this.state.selectedIndex === 0
     const { data, mode } = this.props.req
-    let feeLevel = 'custom'
-    const gasLevels = this.store('main.gasPrice.levels')
-    Object.keys(gasLevels).forEach(level => {
-      if (gasLevels[level] === data.gasPrice) feeLevel = level
-    })
+    const chain = this.store('main.connection.network')
+    let feeLevel = this.store('main.gasPrice', chain, 'default') // 'custom'
+    const gasLevels = this.store('main.gasPrice', chain, 'levels')
+    console.log('gasLevels[feeLevel]', gasLevels[feeLevel])
+    console.log('data.gasPrice', data.gasPrice)
+    if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
+    // Object.keys(gasLevels).forEach(level => {
+    //   if (gasLevels[level] === data.gasPrice) feeLevel = level
+    // })
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-
+    console.log('1', 'gasLevels.safelow', gasLevels.safelow)
     const safelowFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.safelow, 16)))
     const safelowFeeUSD = safelowFee * etherUSD
-
+    console.log('2', 'gasLevels.normal', gasLevels.normal)
     const normalFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.normal, 16)))
     const normalFeeUSD = normalFee * etherUSD
-
+    console.log('3', 'gasLevels.fast', gasLevels.fast)
     const fastFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.fast, 16)))
     const fastFeeUSD = fastFee * etherUSD
-
+    console.log('4', 'gasLevels.trader', gasLevels.trader)
     const traderFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.trader, 16)))
     const traderFeeUSD = traderFee * etherUSD
-
+    console.log('5', 'gasLevels.hoverGasPrice', this.state.hoverGasPrice, 'data.gasPrice', data.gasPrice)
     const customFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(this.state.hoverGasPrice || data.gasPrice, 16)))
     const customFeeUSD = customFee * etherUSD
 
@@ -184,6 +194,9 @@ class TransactionRequest extends React.Component {
 
     return (
       <div className='txSection txFee' style={style} onMouseDown={() => this.selectSection(0)}>
+        <div className='txFeeClose' style={{ opacity: expanded ? 1 : 0 }}>
+          {'COLLAPSE'}
+        </div>
         <div className='txFeeGwei' style={{ opacity: expanded ? 1 : 0 }}>
           <div className='txFeeGweiValue'>
             {this.state.hoverGwei || (this.state.hoverGasPrice ? parseInt(this.state.hoverGasPrice, 'hex') / 1000000000  : false) || (parseInt(data.gasPrice, 'hex') / 1000000000) }

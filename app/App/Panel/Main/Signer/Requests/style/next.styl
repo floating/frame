@@ -119,7 +119,7 @@
     // color good
     background ghostB
     box-shadow cardDrop, 0px 1px 1px thin
-    padding 5px
+    padding 6px
     text-align center
 
   .networkFeeOptions
@@ -306,62 +306,81 @@
   // margin-top -10px
   // padding-bottom 10px
 
-.transactionDataHeader
-  position absolute
-  top 10px
-  left 50%
-  right 0
-  height 18px
-  width 170px
-  margin-left -90px
-  // border-bottom 1px solid thick
-  justify-content space-between
-  display flex
-  align-items center
-  text-transform uppercase
-  letter-spacing 1px
-  font-weight 400
-  z-index 10
-  background highlight
-  border-radius 9px
+// .transactionDataHeader
+//   position absolute
+//   top 10px
+//   left 50%
+//   right 0
+//   height 18px
+//   // width 170px
+//   // margin-left -90px
+//   // border-bottom 1px solid thick
+//   justify-content space-between
+//   display flex
+//   align-items center
+//   text-transform uppercase
+//   letter-spacing 1px
+//   font-weight 400
+//   z-index 10
+//   background highlight
+//   border-radius 9px
 
-  .transactionDataLabel
-    display flex
-    justify-content center
-    align-items center
-    z-index 10
-    transition standard
+//   .transactionDataLabel
+//     display flex
+//     justify-content center
+//     align-items center
+//     z-index 10
+//     transition standard
 
-  .transactionDataNotice
-    width 18px
-    display flex
-    justify-content center
-    align-items center
-    z-index 10
-    transition standard
-    color outerspace08
+//   .transactionDataNotice
+//     width 18px
+//     display flex
+//     justify-content center
+//     align-items center
+//     z-index 10
+//     transition standard
+//     color outerspace08
 
-  .transactionDataIndicator
-  // width 22px
-    display flex
-    justify-content center
-    align-items center
-    z-index 10
-    margin-bottom 2px
-    margin-right 6px
-    transform rotate(-180deg)
-    transition standardSlow
+//   .transactionDataIndicator
+//   // width 22px
+//     display flex
+//     justify-content center
+//     align-items center
+//     z-index 10
+//     margin-bottom 2px
+//     margin-right 6px
+//     transform rotate(-180deg)
+//     transition standardSlow
 
 .txFee
   box-shadow cardDrop, 0px 2px 2px thick
+
+  .txFeeClose
+    position absolute
+    right 0
+    left 0
+    bottom 0px
+    height 60px
+    display flex
+    justify-content center
+    align-items center
+    flex-direction column
+    letter-spacing 3px
+    margin-left 3px
+    font-weight 300
+    // font-size 10px
+    color outerspace01
+    transition standardFast
+
+  .txFeeClose:hover
+    color outerspace03
 
   .txFeeGwei
     position absolute
     right 0
     left 0
-    top 10px
+    top 32px
     // padding 0px 20px 0px 20px
-    height 90px
     display flex
     justify-content center
     align-items center

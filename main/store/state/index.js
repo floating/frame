@@ -112,24 +112,24 @@ const initial = {
         state: 'off'
       }
     },
-    gasPrice: main('gasPrice', {
+    gasPrice:{
       1: {
         default: main('gasPrice.1.default', 'normal'),
-        levels: { safelow: '0x0', normal: '0x0', fast: '0x0', trader: '0x0', custom: main('gasPrice.1.levels.custom', '0x0') }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.1.levels.custom', '') }
       },
       3: {
         default: main('gasPrice.3.default', 'normal'),
-        levels: { safelow: '0x0', normal: '0x0', fast: '0x0', trader: '0x0', custom: main('gasPrice.3.levels.custom', '0x0')  }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.3.levels.custom', '')  }
       },
       4: {
         default: main('gasPrice.4.default', 'normal'),
-        levels: { safelow: '0x0', normal: '0x0', fast: '0x0', trader: '0x0', custom: main('gasPrice.4.levels.custom', '0x0')  }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.4.levels.custom', '')  }
       },
       42: {
         default: main('gasPrice.42.default', 'normal'),
-        levels: { safelow: '0x0', normal: '0x0', fast: '0x0', trader: '0x0', custom: main('gasPrice.42.levels.custom', '0x0')  }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.42.levels.custom', '')  }
       }
-    }),
+    },
     connection: {
       network: main('connection.network', '1'),
       // local: {

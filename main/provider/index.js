@@ -248,13 +248,17 @@ class Provider extends EventEmitter {
       try {
         const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
         const prices = await response.json()
-        store.setGasPrices(parseInt(rawTx.chainId, 'hex'), {
+        const chain = parseInt(rawTx.chainId, 'hex')
+        store.setGasPrices(chain, {
           safelow: ('0x' + (prices.safeLow * 100000000).toString(16)), 
           normal: ('0x' + (prices.average * 100000000).toString(16)), 
           fast: ('0x' + (prices.fast * 100000000).toString(16)),
-          trader: ('0x' + (prices.fastest * 100000000).toString(16))
+          trader: ('0x' + (prices.fastest * 100000000).toString(16)),
+          custom: store('main.gasPrice', chain, 'levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
         })
-        res({ result: store('main.gasPrice.levels', store('main.gasPrice.default')) })
+        const levels = store('main.gasPrice', chain, 'levels')
+        const selected = store('main.gasPrice', chain, 'default')
+        res({ result: levels[selected] })
       } catch (error) {
         res({ error })
       }
@@ -262,13 +266,17 @@ class Provider extends EventEmitter {
       this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, (response) => {
         if (response.result) {
           try {
-            store.setGasPrices({
+            const chain = parseInt(rawTx.chainId, 'hex')
+            store.setGasPrices(chain, {
               safelow: response.result, 
-              normal: '0x' + (Math.round(parseInt(response.result, 16) * 2)).toString(16), 
-              fast: '0x' + (Math.round(parseInt(response.result, 16) * 4).toString(16)),
-              trader: '0x' + (Math.round(parseInt(response.result, 16) * 8).toString(16))
+              normal: response.result, 
+              fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
+              trader: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
+              custom: store('main.gasPrice', chain, 'levels.custom') || response.result
             })
-            const result = store('main.gasPrice.levels', store('main.gasPrice.default')) 
+            const levels = store('main.gasPrice', chain, 'levels')
+            const selected = store('main.gasPrice', chain, 'default')
+            res({ result: levels[selected] })
             res({ result })
           } catch (error) {
             res({ error })
