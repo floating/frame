@@ -115,19 +115,19 @@ const initial = {
     gasPrice: main('gasPrice', {
       1: {
         default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.1.levels.custom', '') }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
       },
       3: {
         default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.3.levels.custom', '')  }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
       },
       4: {
         default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.4.levels.custom', '')  }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
       },
       42: {
         default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.42.levels.custom', '')  }
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
       }
     }),
     connection: {

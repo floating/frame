@@ -44,7 +44,6 @@ module.exports = {
       return Object.assign({}, secondary, status)
     })
   },
-  // setSecondary: (u, status) => u('main.connection.secondary', secondary => Object.assign({}, secondary, status)),
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
@@ -143,8 +142,6 @@ module.exports = {
   },
   setGasDefault: (u, chain, level, price) => {
     u('main.gasPrice', chain, 'default', () => level)
-    if (level === 'custom') {
-      u('main.gasPrice', chain, 'levels.custom', () => price)
-    }
+    if (level === 'custom') u('main.gasPrice', chain, 'levels.custom', () => price)
   }
 }

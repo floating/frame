@@ -285,24 +285,7 @@ class Provider extends EventEmitter {
         } else {
           res(response)
         }
-      })  
-      //  (response) => {
-      //   console.log('eth_gasPirce response', response)
-      //   if (response.error) return res(response)
-      //   if (response.result) {
-      //     try {
-      //       store.setGasPrices({
-      //         slow: response.result, 
-      //         normal: response.result, 
-      //         fast: response.result
-      //       })
-      //       console.log('return gas price', store('main.gasPrice.levels', store('main.gasPrice.default')) )
-      //       res({ result: store('gasPrice.levels', store('gasPrice.default')) })
-      //     } catch (error) {
-      //       res({ error })
-      //     }
-      //   }
-      // })
+      })
     }
   }
 
