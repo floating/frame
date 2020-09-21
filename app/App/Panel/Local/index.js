@@ -94,7 +94,6 @@ class Settings extends React.Component {
 
   status (layer) {
     const connection = this.store('main.connection', layer) // primary is 'local' and secondary is 'secondary'
-    console.log(connection)
     let status = connection.status
     const network = this.store('main.connection.network')
     const current = connection.settings[network].current
