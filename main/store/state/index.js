@@ -112,147 +112,102 @@ const initial = {
         state: 'off'
       }
     },
-    gasPrice:{
+    gasPrice: main('gasPrice', {
       1: {
-        default: main('gasPrice.1.default', 'normal'),
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.1.levels.custom', '') }
+        default: 'normal',
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.1.levels.custom', '') }
       },
       3: {
-        default: main('gasPrice.3.default', 'normal'),
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.3.levels.custom', '')  }
+        default: 'normal',
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.3.levels.custom', '')  }
       },
       4: {
-        default: main('gasPrice.4.default', 'normal'),
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.4.levels.custom', '')  }
+        default: 'normal',
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.4.levels.custom', '')  }
       },
       42: {
-        default: main('gasPrice.42.default', 'normal'),
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: main('gasPrice.42.levels.custom', '')  }
+        default: 'normal',
+        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' } // main('gasPrice.42.levels.custom', '')  }
       }
-    },
+    }),
     connection: {
       network: main('connection.network', '1'),
-      // local: {
-      //   on: main('connection.local.on', false),
-      //   status: 'loading',
-      //   connected: false,
-      //   type: '',
-      //   network: '',
-      //   settings: {
-      //     1: {
-      //       current: 'direct',
-      //       options: {
-      //         direct: 'direct'
-      //       }
-      //     },
-      //     3: {
-      //       current: 'direct',
-      //       options: {
-      //         direct: 'direct'
-      //       }
-      //     },
-      //     4: {
-      //       current: 'direct',
-      //       options: {
-      //         direct: 'direct'
-      //       }
-      //     },
-      //     42: {
-      //       current: 'direct',
-      //       options: {
-      //         direct: 'direct'
-      //       }
-      //     }
-      //   }
-      // },
       local: {
-        settings: {
+        settings: main('connection.local.settings', {
           1: {
-            current: 'infura', // main('connection.local.settings.1.current', 'custom'),
+            current: 'infura',
             options: {
               infura: 'infura',
-              custom: main('connection.local.settings.1.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
           },
           3: {
-            current: main('connection.local.settings.3.current', 'infura'),
+            current: 'infura',
             options: {
               infura: 'infuraRopsten',
-              custom: main('connection.local.settings.3.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
           },
           4: {
-            current: main('connection.local.settings.4.current', 'infura'),
+            current: 'infura',
             options: {
               infura: 'infuraRinkeby',
-              custom: main('connection.local.settings.4.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
           },
           42: {
-            current: main('connection.local.settings.42.current', 'infura'),
+            current: 'infura',
             options: {
               infura: 'infuraKovan',
-              custom: main('connection.local.settings.42.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
-          },
-          custom: {
-            current: main('connection.secondary.settings.custom.current', 'custom'),
-            options: {
-              custom: main('connection.secondary.settings.42.options.custom', '')
-            }
           }
-        },
-        on: main('connection.secondary.on', true),
+        }),
+        on: main('connection.local.on', true),
         status: 'loading',
         connected: false,
         type: '',
         network: ''
       },
       secondary: {
-        settings: {
+        settings: main('connection.secondary.settings', {
           1: {
-            current: main('connection.secondary.settings.1.current', 'custom'),
+            current: 'custom',
             options: {
               infura: 'infura',
-              custom: main('connection.secondary.settings.1.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
           },
           3: {
-            current: main('connection.secondary.settings.3.current', 'custom'),
+            current: 'custom',
             options: {
               infura: 'infuraRopsten',
-              custom: main('connection.secondary.settings.3.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
           },
           4: {
-            current: main('connection.secondary.settings.4.current', 'custom'),
+            current: 'custom',
             options: {
               infura: 'infuraRinkeby',
-              custom: main('connection.secondary.settings.4.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
           },
           42: {
-            current: main('connection.secondary.settings.42.current', 'custom'),
+            current: 'custom',
             options: {
               infura: 'infuraKovan',
-              custom: main('connection.secondary.settings.42.options.custom', ''),
+              custom: '',
               local: 'direct'
             }
-          },
-          custom: {
-            current: main('connection.secondary.settings.custom.current', 'custom'),
-            options: {
-              custom: main('connection.secondary.settings.42.options.custom', '')
-            }
           }
-        },
+        }),
         on: main('connection.secondary.on', true),
         status: 'loading',
         connected: false,

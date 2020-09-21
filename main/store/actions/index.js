@@ -141,7 +141,10 @@ module.exports = {
   setGasPrices: (u, chain, prices) => {
     u('main.gasPrice', chain, 'levels', () => prices)
   },
-  setGasDefault: (u, chain, level) => {
+  setGasDefault: (u, chain, level, price) => {
     u('main.gasPrice', chain, 'default', () => level)
+    if (level === 'custom') {
+      u('main.gasPrice', chain, 'levels.custom', () => price)
+    }
   }
 }

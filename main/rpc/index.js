@@ -131,7 +131,7 @@ const rpc = {
   },
   setGasPrice (price, level, handlerId, cb) {
     accounts.setGasPrice(price, handlerId)
-    store.setGasDefault(store('main.connection.network'), level)
+    store.setGasDefault(store('main.connection.network'), level, price)
   }
 }
 

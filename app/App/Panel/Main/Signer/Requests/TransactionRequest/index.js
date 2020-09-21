@@ -94,28 +94,26 @@ class TransactionRequest extends React.Component {
     }
   }
 
+  barColor (percent) {
+    const low = [0, 210, 180] // good
+    const high = [33, 45, 46] // outerspace
+    const w1 = percent
+    const w2 = 1 - w1
+    return `rgba(${Math.round(low[0] * w1 + high[0] * w2)}, ${Math.round(low[1] * w1 + high[1] * w2)}, ${Math.round(low[2] * w1 + high[2] * w2)}, 1)`
+  }
+
   hoverBar (hoverGasPercent) {
-    console.log('this.store(main.connection.network)', this.store('main.connection.network'))
-    console.log('this.store(main.gasPrice, this.store(main.connection.network)', this.store('main.gasPrice', this.store('main.connection.network')))
     const trader = this.store('main.gasPrice', this.store('main.connection.network'),'levels.trader')
-    console.log('trader', trader)
     // const safelow = this.store('main.gasPrice.levels.safelow')
     const top = parseInt(trader, 16) * 4
     const bottom = 1 // parseInt(safelow, 16) / 10
     const percentBuffer = Math.round((bottom / top) * 100) / 100
-    console.log('percentBuffer', percentBuffer)
     hoverGasPercent = hoverGasPercent + percentBuffer
-    console.log('hoverGasPercent', hoverGasPercent)
     let gwei = Math.round(top * hoverGasPercent / 1000000000)
     gwei = gwei < bottom ? bottom : gwei
-    console.log('hoverGasPrice', gwei * 1000000000)
     const hoverGasPrice = utils.numberToHex(gwei * 1000000000)
     hoverGasPercent = (hoverGasPrice / top) + percentBuffer
-    const low = [0, 210, 180] // good
-    const high = [33, 45, 46] // outerspace
-    const w1 = hoverGasPercent
-    const w2 = 1 - w1
-    const hoverGasColor = `rgba(${Math.round(low[0] * w1 + high[0] * w2)}, ${Math.round(low[1] * w1 + high[1] * w2)}, ${Math.round(low[2] * w1 + high[2] * w2)}, 1)`
+    const hoverGasColor = this.barColor(hoverGasPercent)
     this.setState({ hoverGasPercent, hoverGasColor, hoverGasPrice })
   }
 
@@ -127,7 +125,7 @@ class TransactionRequest extends React.Component {
   }
 
   handleCustomPriceHoverReset () {
-    this.setState({ hoverGasPrice: '', hoverGasColor: 'rgba(255, 255, 255, 1)', hoverGasPercent: '' })
+    this.setState({ hoverGasPrice: '', hoverGasColor: '#212d2e', hoverGasPercent: '' })
   }
 
   renderFeeLabel (current, expanded) {
@@ -151,27 +149,27 @@ class TransactionRequest extends React.Component {
     const chain = this.store('main.connection.network')
     let feeLevel = this.store('main.gasPrice', chain, 'default') // 'custom'
     const gasLevels = this.store('main.gasPrice', chain, 'levels')
-    console.log('gasLevels[feeLevel]', gasLevels[feeLevel])
-    console.log('data.gasPrice', data.gasPrice)
+    // console.log('gasLevels[feeLevel]', gasLevels[feeLevel])
+    // console.log('data.gasPrice', data.gasPrice)
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
     // Object.keys(gasLevels).forEach(level => {
     //   if (gasLevels[level] === data.gasPrice) feeLevel = level
     // })
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-    console.log('1', 'gasLevels.safelow', gasLevels.safelow)
+    // console.log('1', 'gasLevels.safelow', gasLevels.safelow)
     const safelowFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.safelow, 16)))
     const safelowFeeUSD = safelowFee * etherUSD
-    console.log('2', 'gasLevels.normal', gasLevels.normal)
+    // console.log('2', 'gasLevels.normal', gasLevels.normal)
     const normalFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.normal, 16)))
     const normalFeeUSD = normalFee * etherUSD
-    console.log('3', 'gasLevels.fast', gasLevels.fast)
+    // console.log('3', 'gasLevels.fast', gasLevels.fast)
     const fastFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.fast, 16)))
     const fastFeeUSD = fastFee * etherUSD
-    console.log('4', 'gasLevels.trader', gasLevels.trader)
+    // console.log('4', 'gasLevels.trader', gasLevels.trader)
     const traderFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.trader, 16)))
     const traderFeeUSD = traderFee * etherUSD
-    console.log('5', 'gasLevels.hoverGasPrice', this.state.hoverGasPrice, 'data.gasPrice', data.gasPrice)
+    // console.log('5', 'gasLevels.hoverGasPrice', this.state.hoverGasPrice, 'data.gasPrice', data.gasPrice)
     const customFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(this.state.hoverGasPrice || data.gasPrice, 16)))
     const customFeeUSD = customFee * etherUSD
 

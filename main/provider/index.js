@@ -260,6 +260,7 @@ class Provider extends EventEmitter {
         const selected = store('main.gasPrice', chain, 'default')
         res({ result: levels[selected] })
       } catch (error) {
+        log.error(error)
         res({ error })
       }
     } else {
@@ -277,8 +278,8 @@ class Provider extends EventEmitter {
             const levels = store('main.gasPrice', chain, 'levels')
             const selected = store('main.gasPrice', chain, 'default')
             res({ result: levels[selected] })
-            res({ result })
           } catch (error) {
+            log.error(error)
             res({ error })
           }
         } else {

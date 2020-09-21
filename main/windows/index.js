@@ -68,7 +68,8 @@ const api = {
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
-        preload: path.resolve(__dirname, '../../bundle/bridge.js')
+        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+        worldSafeExecuteJavaScript: true
       }
     })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
