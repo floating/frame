@@ -120,7 +120,7 @@
     "@babel/preset-env": "7.11.5",
     "@babel/preset-react": "7.10.4",
     "babel-eslint": "10.1.0",
-    "electron": "10.1.2",
+    "electron": "9.3.1",
     "electron-builder": "22.8.1",
     "electron-notarize": "1.0.0",
     "ganache-cli": "6.10.2",
