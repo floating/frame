@@ -218,6 +218,17 @@ const initial = {
   }
 }
 
+// Rename direct to local
+if (initial.main.connection.local.settings[1].current === 'direct') initial.main.connection.local.settings[1].current = 'local'
+if (initial.main.connection.local.settings[3].current === 'direct') initial.main.connection.local.settings[3].current = 'local'
+if (initial.main.connection.local.settings[4].current === 'direct') initial.main.connection.local.settings[4].current = 'local'
+if (initial.main.connection.local.settings[42].current === 'direct') initial.main.connection.local.settings[42].current = 'local'
+
+if (initial.main.connection.secondary.settings[1].current === 'direct') initial.main.connection.secondary.settings[1].current = 'local'
+if (initial.main.connection.secondary.settings[3].current === 'direct') initial.main.connection.secondary.settings[3].current = 'local'
+if (initial.main.connection.secondary.settings[4].current === 'direct') initial.main.connection.secondary.settings[4].current = 'local'
+if (initial.main.connection.secondary.settings[42].current === 'direct') initial.main.connection.secondary.settings[42].current = 'local'
+
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.addresses).forEach(address => {
   address = initial.main.addresses[address]
