@@ -144,4 +144,5 @@ module.exports = {
     u('main.gasPrice', chain, 'default', () => level)
     if (level === 'custom') u('main.gasPrice', chain, 'levels.custom', () => price)
   }
+  // __overwrite: (path, value) => u(path, () => value)
 }

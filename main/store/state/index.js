@@ -133,40 +133,40 @@ const initial = {
     connection: {
       network: main('connection.network', '1'),
       local: {
-        settings: main('connection.local.settings', {
+        settings: {
           1: {
-            current: 'infura',
+            current: main('connection.local.settings.1.current', 'infura'),
             options: {
               infura: 'infura',
-              custom: '',
+              custom: main('connection.local.settings.1.options.custom', ''),
               local: 'direct'
             }
           },
           3: {
-            current: 'infura',
+            current: main('connection.local.settings.3.current', 'infura'),
             options: {
               infura: 'infuraRopsten',
-              custom: '',
+              custom: main('connection.local.settings.3.options.custom', ''),
               local: 'direct'
             }
           },
           4: {
-            current: 'infura',
+            current: main('connection.local.settings.4.current', 'infura'),
             options: {
               infura: 'infuraRinkeby',
-              custom: '',
+              custom: main('connection.local.settings.4.options.custom', ''),
               local: 'direct'
             }
           },
           42: {
-            current: 'infura',
+            current: main('connection.local.settings.42.current', 'infura'),
             options: {
               infura: 'infuraKovan',
-              custom: '',
+              custom: main('connection.local.settings.42.options.custom', ''),
               local: 'direct'
             }
           }
-        }),
+        },
         on: main('connection.local.on', true),
         status: 'loading',
         connected: false,
@@ -174,41 +174,41 @@ const initial = {
         network: ''
       },
       secondary: {
-        settings: main('connection.secondary.settings', {
+        settings: {
           1: {
-            current: 'custom',
+            current: main('connection.secondary.settings.1.current', 'custom'),
             options: {
               infura: 'infura',
-              custom: '',
+              custom: main('connection.secondary.settings.1.options.custom', ''),
               local: 'direct'
             }
           },
           3: {
-            current: 'custom',
+            current: main('connection.secondary.settings.3.current', 'custom'),
             options: {
               infura: 'infuraRopsten',
-              custom: '',
+              custom: main('connection.secondary.settings.3.options.custom', ''),
               local: 'direct'
             }
           },
-          4: {
-            current: 'custom',
+          4: { 
+            current: main('connection.secondary.settings.4.current', 'custom'),
             options: {
               infura: 'infuraRinkeby',
-              custom: '',
+              custom: main('connection.secondary.settings.4.options.custom', ''),
               local: 'direct'
             }
           },
           42: {
-            current: 'custom',
+            current: main('connection.secondary.settings.42.current', 'custom'),
             options: {
               infura: 'infuraKovan',
-              custom: '',
+              custom: main('connection.secondary.settings.42.options.custom', ''),
               local: 'direct'
             }
           }
-        }),
-        on: main('connection.secondary.on', true),
+        },
+        on: main('connection.secondary.on', false),
         status: 'loading',
         connected: false,
         type: '',
