@@ -112,73 +112,103 @@ const initial = {
         state: 'off'
       }
     },
+    gasPrice: main('gasPrice', {
+      1: {
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      },
+      3: {
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      },
+      4: {
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      },
+      42: {
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      }
+    }),
     connection: {
       network: main('connection.network', '1'),
       local: {
-        on: main('connection.local.on', false),
-        status: 'loading',
-        connected: false,
-        type: '',
-        network: '',
         settings: {
           1: {
-            current: 'direct',
+            current: main('connection.local.settings.1.current', 'infura'),
             options: {
-              direct: 'direct'
+              infura: 'infura',
+              custom: main('connection.local.settings.1.options.custom', ''),
+              local: 'direct'
             }
           },
           3: {
-            current: 'direct',
+            current: main('connection.local.settings.3.current', 'infura'),
             options: {
-              direct: 'direct'
+              infura: 'infuraRopsten',
+              custom: main('connection.local.settings.3.options.custom', ''),
+              local: 'direct'
             }
           },
           4: {
-            current: 'direct',
+            current: main('connection.local.settings.4.current', 'infura'),
             options: {
-              direct: 'direct'
+              infura: 'infuraRinkeby',
+              custom: main('connection.local.settings.4.options.custom', ''),
+              local: 'direct'
             }
           },
           42: {
-            current: 'direct',
+            current: main('connection.local.settings.42.current', 'infura'),
             options: {
-              direct: 'direct'
+              infura: 'infuraKovan',
+              custom: main('connection.local.settings.42.options.custom', ''),
+              local: 'direct'
             }
           }
-        }
+        },
+        on: main('connection.local.on', true),
+        status: 'loading',
+        connected: false,
+        type: '',
+        network: ''
       },
       secondary: {
         settings: {
           1: {
-            current: main('connection.secondary.settings.1.current', 'infura'),
+            current: main('connection.secondary.settings.1.current', 'custom'),
             options: {
               infura: 'infura',
-              custom: main('connection.secondary.settings.1.options.custom', '')
+              custom: main('connection.secondary.settings.1.options.custom', ''),
+              local: 'direct'
             }
           },
           3: {
-            current: main('connection.secondary.settings.3.current', 'infura'),
+            current: main('connection.secondary.settings.3.current', 'custom'),
             options: {
               infura: 'infuraRopsten',
-              custom: main('connection.secondary.settings.3.options.custom', '')
+              custom: main('connection.secondary.settings.3.options.custom', ''),
+              local: 'direct'
             }
           },
-          4: {
-            current: main('connection.secondary.settings.4.current', 'infura'),
+          4: { 
+            current: main('connection.secondary.settings.4.current', 'custom'),
             options: {
               infura: 'infuraRinkeby',
-              custom: main('connection.secondary.settings.4.options.custom', '')
+              custom: main('connection.secondary.settings.4.options.custom', ''),
+              local: 'direct'
             }
           },
           42: {
-            current: main('connection.secondary.settings.42.current', 'infura'),
+            current: main('connection.secondary.settings.42.current', 'custom'),
             options: {
               infura: 'infuraKovan',
-              custom: main('connection.secondary.settings.42.options.custom', '')
+              custom: main('connection.secondary.settings.42.options.custom', ''),
+              local: 'direct'
             }
           }
         },
-        on: main('connection.secondary.on', true),
+        on: main('connection.secondary.on', false),
         status: 'loading',
         connected: false,
         type: '',
@@ -187,6 +217,22 @@ const initial = {
     }
   }
 }
+
+// Rename direct to local
+if (initial.main.connection.local.settings[1].current === 'direct') initial.main.connection.local.settings[1].current = 'local'
+if (initial.main.connection.local.settings[3].current === 'direct') initial.main.connection.local.settings[3].current = 'local'
+if (initial.main.connection.local.settings[4].current === 'direct') initial.main.connection.local.settings[4].current = 'local'
+if (initial.main.connection.local.settings[42].current === 'direct') initial.main.connection.local.settings[42].current = 'local'
+
+if (initial.main.connection.secondary.settings[1].current === 'direct') initial.main.connection.secondary.settings[1].current = 'local'
+if (initial.main.connection.secondary.settings[3].current === 'direct') initial.main.connection.secondary.settings[3].current = 'local'
+if (initial.main.connection.secondary.settings[4].current === 'direct') initial.main.connection.secondary.settings[4].current = 'local'
+if (initial.main.connection.secondary.settings[42].current === 'direct') initial.main.connection.secondary.settings[42].current = 'local'
+
+// Earlier prerelease versions of 0.3.2 used 'normal' instead of 'standard'
+Object.keys(initial.main.gasPrice).forEach(network => {
+  if (initial.main.gasPrice[network].default === 'normal') initial.main.gasPrice[network].default = 'standard'
+})
 
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.addresses).forEach(address => {

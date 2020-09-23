@@ -68,7 +68,8 @@ const api = {
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
-        preload: path.resolve(__dirname, '../../bundle/bridge.js')
+        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+        worldSafeExecuteJavaScript: true
       }
     })
     windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
@@ -165,7 +166,7 @@ const api = {
       setTimeout(() => {
         if (windows && windows.tray) {
           if (store('main.reveal')) detectMouse()
-          windows.tray.setVisibleOnAllWorkspaces(true)
+          windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
           windows.tray.setAlwaysOnTop(false)
           const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
           windows.tray.setResizable(true)
@@ -191,7 +192,7 @@ const api = {
       if (!windows.tray) return api.tray()
       windows.tray.setAlwaysOnTop(true)
       hideShow.running = 'show'
-      windows.tray.setVisibleOnAllWorkspaces(true)
+      windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.tray.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       windows.tray.setSize(360, dev ? 740 : area.height)
@@ -207,7 +208,7 @@ const api = {
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
         hideShow.running = false
         hideShow.next = false
-        windows.tray.setVisibleOnAllWorkspaces(false)
+        windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
       }, 260)
     }
   },

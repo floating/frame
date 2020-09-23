@@ -25,7 +25,7 @@ const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
-const clients = require('./clients')
+// const clients = require('./clients')
 const signers = require('./signers')
 const persist = require('./store/persist')
 
@@ -42,7 +42,7 @@ process.on('uncaughtException', (e) => {
   log.error('uncaughtException')
   log.error(e)
   // Kill all clients running as child processes
-  clients.stop()
+  // clients.stop()
   throw e
   // setTimeout(() => app.quit(), 50)
 })
@@ -95,9 +95,11 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
-const networks = { 1: '', 3: 'ropsten.', 4: 'rinkeby.', 42: 'kovan.' }
+// TODO: Custom networks link to custom explorers 
+const networks = { 1: '', 3: 'ropsten.', 4: 'rinkeby.', 5: 'goerli.', 42: 'kovan.' }
 ipcMain.on('tray:openEtherscan', (e, hash) => {
-  const network = networks[store('main.connection.network')]
+  const id = store('main.connection.network')
+  const network = networks[id]
   shell.openExternal('https://' + network + 'etherscan.io/tx/' + hash)
 })
 
@@ -142,7 +144,7 @@ ipcMain.on('tray:action', (e, action, ...args) => {
 app.on('activate', () => windows.activate())
 app.on('will-quit', () => app.quit())
 app.on('quit', async () => {
-  await clients.stop()
+  // await clients.stop()
   accounts.close()
 })
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })

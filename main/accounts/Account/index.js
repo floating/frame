@@ -70,6 +70,7 @@ class Account {
       this.requests[r.handlerId] = req
       this.requests[r.handlerId].mode = 'normal'
       this.requests[r.handlerId].created = Date.now()
+      this.requests[r.handlerId].res = res
       this.update()
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')

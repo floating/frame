@@ -248,6 +248,7 @@ class Accounts extends EventEmitter {
 
   removeRequest (handlerId) {
     if (this.current() && this.current().requests[handlerId]) {
+      if (this.current().requests[handlerId].res) this.current().requests[handlerId].res()
       delete this.current().requests[handlerId]
       this.current().update()
     }
@@ -356,6 +357,14 @@ class Accounts extends EventEmitter {
       store.removeAccount(id)
       delete this.accounts[id]
     }, 1000)
+  }
+
+  setGasPrice (price, handlerId) {
+    if (!this.current()) return // cb(new Error('No Account Selected'))
+    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      this.current().requests[handlerId].data.gasPrice = price
+      this.current().update()
+    }
   }
 
   // removeAllAccounts () {

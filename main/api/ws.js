@@ -14,7 +14,7 @@ const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
-const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
+const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_requestAccounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
 
 const handler = (socket, req) => {
   socket.id = uuid()
@@ -25,7 +25,7 @@ const handler = (socket, req) => {
       socket.send(JSON.stringify(payload), err => { if (err) log.info(err) })
     }
   }
-  socket.on('message', data => {
+  socket.on('message', async data => {
     let origin = socket.origin
     const payload = validPayload(data)
     if (!payload) return console.warn('Invalid Payload', data)
@@ -38,7 +38,7 @@ const handler = (socket, req) => {
       }
     }
     if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
-    if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
+    if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review
       if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }

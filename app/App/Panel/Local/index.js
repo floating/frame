@@ -10,13 +10,15 @@ class Settings extends React.Component {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
     this.network = context.store('main.connection.network')
+    const primaryCustom = context.store('main.connection.local.settings', this.network, 'options.custom') || this.customMessage
     const secondaryCustom = context.store('main.connection.secondary.settings', this.network, 'options.custom') || this.customMessage
-    this.state = { localShake: {}, secondaryCustom, resetConfirm: false, expandNetwork: false }
+    this.state = { localShake: {}, primaryCustom, secondaryCustom, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       if (this.network !== context.store('main.connection.network')) {
         this.network = context.store('main.connection.network')
+        const primaryCustom = context.store('main.connection.local.settings', this.network, 'options.custom') || this.customMessage
         const secondaryCustom = context.store('main.connection.secondary.settings', this.network, 'options.custom') || this.customMessage
-        this.setState({ secondaryCustom })
+        this.setState({ primaryCustom, secondaryCustom })
       }
     })
   }
@@ -47,20 +49,36 @@ class Settings extends React.Component {
     return false
   }
 
-  customFocus () {
+  customSecondaryFocus () {
     if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
   }
 
-  customBlur () {
+  customSecondaryBlur () {
     if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
   }
 
-  inputCustom (e) {
+  customPrimaryFocus () {
+    if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
+  }
+
+  customPrimaryBlur () {
+    if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
+  }
+
+  inputPrimaryCustom (e) {
     e.preventDefault()
-    clearTimeout(this.customInputTimeout)
+    clearTimeout(this.customPrimaryInputTimeout)
+    const value = e.target.value
+    this.setState({ primaryCustom: value })
+    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', this.state.primaryCustom), 1000)
+  }
+
+  inputSecondaryCustom (e) {
+    e.preventDefault()
+    clearTimeout(this.customSecondaryInputTimeout)
     const value = e.target.value
     this.setState({ secondaryCustom: value })
-    this.customInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', this.state.secondaryCustom), 1000)
+    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', this.state.secondaryCustom), 1000)
   }
 
   localShake (key) {
@@ -74,11 +92,16 @@ class Settings extends React.Component {
     }, 1010)
   }
 
-  status (connection) {
+  status (layer) {
+    const connection = this.store('main.connection', layer) // primary is 'local' and secondary is 'secondary'
     let status = connection.status
     const network = this.store('main.connection.network')
     const current = connection.settings[network].current
-    if (current === 'custom' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+
+    if (current === 'custom' ) {
+      if (layer === 'local' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage && !this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
+      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+    }
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
       <div className='connectionOptionStatus'>
@@ -118,6 +141,12 @@ class Settings extends React.Component {
   }
 
   render () {
+    let primaryOptions = this.store('main.connection.local.settings', this.store('main.connection.network'), 'options')
+    let secondaryOptions = this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'options')
+
+    primaryOptions = Object.keys(primaryOptions).map(i => ({ text: i, value: i }))
+    secondaryOptions = Object.keys(secondaryOptions).map(i => ({ text: i, value: i }))
+
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
@@ -135,7 +164,7 @@ class Settings extends React.Component {
                 { text: 'Kovan', value: '42' }]}
             />
           </div>
-          <div className='signerPermission'>
+          {/* <div className='signerPermission'>
             <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
                 <div className='signerPermissionOrigin'>Local</div>
@@ -162,8 +191,31 @@ class Settings extends React.Component {
                 </div>
               </div>
             </div>
+          </div> */}
+          <div className='signerPermission' style={{ zIndex: 2 }}>
+            <div className={this.store('main.connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+              <div className='connectionOptionToggle'>
+                <div className='signerPermissionOrigin'>Primary</div>
+                <div className={this.store('main.connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'local')}>
+                  <div className='signerPermissionToggleSwitch' />
+                </div>
+              </div>
+              <div className='connectionOptionDetails'>
+                <div className='connectionOptionDetailsInset'>
+                  {this.status('local')}
+                  <Dropdown
+                    syncValue={this.store('main.connection.local.settings', this.store('main.connection.network'), 'current')}
+                    onChange={(value) => link.send('tray:action', 'selectPrimary', value)}
+                    options={primaryOptions}
+                  />
+                </div>
+              </div>
+              <div className={this.store('main.connection.local.settings', this.store('main.connection.network'), 'current') === 'custom' && this.store('main.connection.local.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+                <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
+              </div>
+            </div>
           </div>
-          <div className='signerPermission'>
+          <div className='signerPermission' style={{ zIndex: 1 }}>
             <div className={this.store('main.connection.secondary.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
                 <div className='signerPermissionOrigin'>Secondary</div>
@@ -173,20 +225,17 @@ class Settings extends React.Component {
               </div>
               <div className='connectionOptionDetails'>
                 <div className='connectionOptionDetailsInset'>
-                  {this.status(this.store('main.connection.secondary'))}
+                  {this.status('secondary')}
                   <Dropdown
                     syncValue={this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'current')}
                     onChange={(value) => link.send('tray:action', 'selectSecondary', value)}
-                    options={[
-                      { text: 'Infura', value: 'infura' },
-                      { text: 'Custom', value: 'custom' }
-                    ]}
+                    options={secondaryOptions}
                   />
                 </div>
               </div>
 
               <div className={this.store('main.connection.secondary.settings', this.store('main.connection.network'), 'current') === 'custom' && this.store('main.connection.secondary.on') ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-                <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customFocus()} onBlur={() => this.customBlur()} onChange={e => this.inputCustom(e)} />
+                <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
               </div>
             </div>
           </div>

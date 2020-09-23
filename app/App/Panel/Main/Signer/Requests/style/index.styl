@@ -230,7 +230,7 @@
     right 100px
     margin-top 50px
     height 20px
-    border-radius 10px
+    border-radius 16px
     display flex
     justify-content center
     align-items center
@@ -394,10 +394,9 @@
     left 0px
     right 0px
     padding-bottom 10px
-    border-radius 2px
     justify-content space-between
     box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-    border-radius 6px
+    border-radius 16px
     height 380px
     display flex
     justify-content center
@@ -415,7 +414,7 @@
     right 0px
     bottom 0px
     z-index 9999999999999
-    border-radius 6px
+    border-radius 16px
     pointer-events none
     overflow hidden
     .requestSheen
@@ -470,7 +469,7 @@
     width 100%
     transform translateZ(0px)
     background linear-gradient(highlight, lowlight, highlight)
-    border-radius 6px
+    border-radius 16px
     overflow hidden
 
     .requestNoticeInner
@@ -500,7 +499,7 @@
         background thin
         height 20px
         padding 0px 20px 0px 22px
-        border-radius 10px
+        border-radius 16px
         letter-spacing 2px
         font-weight 500
         display flex
@@ -583,8 +582,8 @@
       font-size 14px
       background highlight
       color outerspace08
-      border-top-left-radius 6px
-      border-top-right-radius 6px
+      border-top-left-radius 16px
+      border-top-right-radius 16px
       box-shadow 0px 1px 0px thick
 
       .approveRequestHeaderIcon
@@ -596,7 +595,7 @@
         z-index 10
         transition standard
         position absolute
-        border-radius 3px
+        border-radius 2px
         left 5px
         color outerspace08
 
@@ -689,7 +688,6 @@
     text-transform uppercase
     font-size 13px
     font-weight 400
-    padding-top 2px
     letter-spacing 1px
 
   .transactionTotals
@@ -700,9 +698,10 @@
 
   .transactionTotalUSD
     margin-left 10px
+    margin-top 2px
     padding 3px 10px
     font-size 20px
-    border-radius 4px
+    border-radius 2px
     background highlight
     font-weight 300
 
@@ -710,9 +709,15 @@
     color bad
 
   .transactionFeeWarning
-    margin-left 6px
-    padding-bottom 8px
     color bad
+    position absolute
+    top 0
+    left 0
+    right 0
+    height 20px
+    display flex
+    justify-content center
+    align-items center
 
   .transactionFee
     position absolute
@@ -738,8 +743,8 @@
   .transactionData
     position absolute
     bottom 130px
-    left 5px
-    right 5px
+    left 10px
+    right 10px
     top 190px
     z-index 2000
     display flex
@@ -754,7 +759,7 @@
     transition standard
     overflow hidden
     box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-    border-radius 3px
+    border-radius 16px
 
     .transactionDataHeader
       position absolute
@@ -816,7 +821,7 @@
       max-width 100%
       width 100%
       height 100%
-      font-size 13px
+      font-size 15px
       text-transform none
       transition standardSlow
       overflow-wrap break-word
@@ -828,9 +833,9 @@
 
   .transactionDataSelected
     position absolute
-    bottom 5px
-    left 5px
-    right 5px
+    bottom 10px
+    left 10px
+    right 10px
     top 65px
 
     .transactionDataHeader
@@ -925,8 +930,8 @@
     right 0
     bottom 0
     height 60px
-    border-bottom-left-radius 6px
-    border-bottom-right-radius 6px
+    border-bottom-left-radius 16px
+    border-bottom-right-radius 16px
     font-size 14px
     text-transform uppercase
     -webkit-app-region no-drag
@@ -1149,7 +1154,7 @@ span
   left 5px
   right 5px
   bottom 40px
-  border-radius 6px
+  border-radius 16px
   box-shadow 0px 2px 0px thick, 0px 8px 5px -5px thick
   text-align center
   box-sizing border-box
@@ -1213,8 +1218,8 @@ span
   height 58px
   bottom 0px
   width 331px
-  border-bottom-left-radius 6px
-  border-bottom-right-radius 6px
+  border-bottom-left-radius 16px
+  border-bottom-right-radius 16px
   overflow hidden
   transition standard
 
@@ -1278,7 +1283,7 @@ span
             background red
             margin-top -6px
             margin-left -6px
-            border-radius 6px
+            border-radius 16px
             background highlight
 
           .txProgressStepCenter
@@ -1330,7 +1335,7 @@ span
           z-index 1007
           height 16px
           width 16px
-          border-radius 10px
+          border-radius 16px 
           overflow hidden
           animation spin 0.7s infinite linear
           position absolute
@@ -1419,7 +1424,7 @@ span
   height 60px
   width 310px
   bottom 10px
-  border-radius 4px
+  border-radius 16px
   overflow hidden
   font-size 12px
   font-weight bold
@@ -1462,9 +1467,9 @@ span
     height 120px
     transform rotate(45deg)
     top -29px
-    border-radius 8px
+    border-radius 16px
     background highlightest
-    border-radius 8px
+    border-radius 16px
     box-shadow 5px -5px 40px thick
   .confirmBarSent
     z-index 1202
@@ -1480,7 +1485,7 @@ span
     transform rotate(45deg)
     top -29px
     margin-left -60px
-    border-radius 8px
+    border-radius 16px
 
 .confirmBarDropBottom
   box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
@@ -1491,7 +1496,7 @@ span
   right 10px
   top 10px
   height 30px
-  border-radius 4px
+  border-radius 15px
 
 .signerRequestSuccess
   .monitorIconIndicator
@@ -1545,7 +1550,7 @@ span
     justify-content center
     align-items center
     text-align center
-    border-radius 4px
+    border-radius 20px
     color outerspace08
     box-shadow cardDrop, 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
   .signerUnlockSubmit
@@ -1586,3 +1591,6 @@ span
     font-weight 600
     word-wrap break-word
     font-family 'FiraCode', monospace
+
+
+@import './next'

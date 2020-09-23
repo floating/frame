@@ -9,9 +9,21 @@ module.exports = {
       return connection
     })
   },
+  selectPrimary: (u, value) => {
+    u('main.connection', connection => {
+      connection.local.settings[connection.network].current = value
+      return connection
+    })
+  },
   selectSecondary: (u, value) => {
     u('main.connection', connection => {
       connection.secondary.settings[connection.network].current = value
+      return connection
+    })
+  },
+  setPrimaryCustom: (u, target) => {
+    u('main.connection', connection => {
+      connection.local.settings[connection.network].options.custom = target
       return connection
     })
   },
@@ -22,8 +34,16 @@ module.exports = {
     })
   },
   toggleConnection: (u, node, on) => u('main.connection', node, 'on', (value) => on !== undefined ? on : !value),
-  setLocal: (u, status) => u('main.connection.local', local => Object.assign({}, local, status)),
-  setSecondary: (u, status) => u('main.connection.secondary', secondary => Object.assign({}, secondary, status)),
+  setLocal: (u, status) => {
+    u('main.connection.local', local => {
+      return Object.assign({}, local, status)
+    })
+  },
+  setSecondary: (u, status) => {
+    u('main.connection.secondary', secondary => {
+      return Object.assign({}, secondary, status)
+    })
+  },
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
@@ -116,5 +136,13 @@ module.exports = {
   },
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
+  },
+  setGasPrices: (u, chain, prices) => {
+    u('main.gasPrice', chain, 'levels', () => prices)
+  },
+  setGasDefault: (u, chain, level, price) => {
+    u('main.gasPrice', chain, 'default', () => level)
+    if (level === 'custom') u('main.gasPrice', chain, 'levels.custom', () => price)
   }
+  // __overwrite: (path, value) => u(path, () => value)
 }

@@ -28,6 +28,7 @@ const cleanup = id => {
 const protectedMethods = [
   'eth_coinbase',
   'eth_accounts',
+  'eth_requestAccounts',
   'eth_sendTransaction',
   'personal_sign',
   'personal_ecRecover',
@@ -45,14 +46,14 @@ const handler = (req, res) => {
     res.end()
   } else if (req.method === 'POST') {
     const body = []
-    req.on('data', chunk => body.push(chunk)).on('end', () => {
+    req.on('data', chunk => body.push(chunk)).on('end', async () => {
       res.on('error', err => console.error('res err', err))
       const origin = req.headers.origin || 'Unknown'
       const input = Buffer.concat(body).toString()
       const payload = validPayload(input)
       if (!payload) return console.warn('Invalid Payload', input)
       if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
-      if (protectedMethods.indexOf(payload.method) > -1 && !trusted(origin)) {
+      if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
         // Review
         if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
