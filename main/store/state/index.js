@@ -114,20 +114,20 @@ const initial = {
     },
     gasPrice: main('gasPrice', {
       1: {
-        default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       },
       3: {
-        default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       },
       4: {
-        default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       },
       42: {
-        default: 'normal',
-        levels: { safelow: '', normal: '', fast: '', trader: '', custom: '' }
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       }
     }),
     connection: {
@@ -228,6 +228,11 @@ if (initial.main.connection.secondary.settings[1].current === 'direct') initial.
 if (initial.main.connection.secondary.settings[3].current === 'direct') initial.main.connection.secondary.settings[3].current = 'local'
 if (initial.main.connection.secondary.settings[4].current === 'direct') initial.main.connection.secondary.settings[4].current = 'local'
 if (initial.main.connection.secondary.settings[42].current === 'direct') initial.main.connection.secondary.settings[42].current = 'local'
+
+// Earlier prerelease versions of 0.3.2 used 'normal' instead of 'standard'
+Object.keys(initial.main.gasPrice).forEach(network => {
+  if (initial.main.gasPrice[network].default === 'normal') initial.main.gasPrice[network].default = 'standard'
+})
 
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.addresses).forEach(address => {

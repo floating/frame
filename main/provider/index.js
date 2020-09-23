@@ -251,7 +251,7 @@ class Provider extends EventEmitter {
         const chain = parseInt(rawTx.chainId, 'hex')
         store.setGasPrices(chain, {
           safelow: ('0x' + (prices.safeLow * 100000000).toString(16)), 
-          normal: ('0x' + (prices.average * 100000000).toString(16)), 
+          standard: ('0x' + (prices.average * 100000000).toString(16)), 
           fast: ('0x' + (prices.fast * 100000000).toString(16)),
           trader: ('0x' + (prices.fastest * 100000000).toString(16)),
           custom: store('main.gasPrice', chain, 'levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
@@ -270,7 +270,7 @@ class Provider extends EventEmitter {
             const chain = parseInt(rawTx.chainId, 'hex')
             store.setGasPrices(chain, {
               safelow: response.result, 
-              normal: response.result, 
+              standard: response.result, 
               fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
               trader: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
               custom: store('main.gasPrice', chain, 'levels.custom') || response.result

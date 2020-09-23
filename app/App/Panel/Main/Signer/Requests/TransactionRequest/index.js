@@ -147,29 +147,19 @@ class TransactionRequest extends React.Component {
     const expanded = this.state.selectedIndex === 0
     const { data, mode } = this.props.req
     const chain = this.store('main.connection.network')
-    let feeLevel = this.store('main.gasPrice', chain, 'default') // 'custom'
+    let feeLevel = this.store('main.gasPrice', chain, 'default')
     const gasLevels = this.store('main.gasPrice', chain, 'levels')
-    // console.log('gasLevels[feeLevel]', gasLevels[feeLevel])
-    // console.log('data.gasPrice', data.gasPrice)
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
-    // Object.keys(gasLevels).forEach(level => {
-    //   if (gasLevels[level] === data.gasPrice) feeLevel = level
-    // })
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-    // console.log('1', 'gasLevels.safelow', gasLevels.safelow)
     const safelowFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.safelow, 16)))
     const safelowFeeUSD = safelowFee * etherUSD
-    // console.log('2', 'gasLevels.normal', gasLevels.normal)
-    const normalFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.normal, 16)))
-    const normalFeeUSD = normalFee * etherUSD
-    // console.log('3', 'gasLevels.fast', gasLevels.fast)
+    const standardFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.standard, 16)))
+    const standardFeeUSD = standardFee * etherUSD
     const fastFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.fast, 16)))
     const fastFeeUSD = fastFee * etherUSD
-    // console.log('4', 'gasLevels.trader', gasLevels.trader)
     const traderFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(gasLevels.trader, 16)))
     const traderFeeUSD = traderFee * etherUSD
-    // console.log('5', 'gasLevels.hoverGasPrice', this.state.hoverGasPrice, 'data.gasPrice', data.gasPrice)
     const customFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(this.state.hoverGasPrice || data.gasPrice, 16)))
     const customFeeUSD = customFee * etherUSD
 
@@ -180,7 +170,7 @@ class TransactionRequest extends React.Component {
 
     if (feeLevel === 'safelow') {
       slideLevel = '-10px'
-    } else if (feeLevel === 'normal') {
+    } else if (feeLevel === 'standard') {
       slideLevel = '-50px'
     } else if (feeLevel === 'fast') {
       slideLevel = '-90px'
@@ -220,17 +210,17 @@ class TransactionRequest extends React.Component {
             </div>
           </div>
           <div className='networkFeeOption' 
-            onMouseDown={expanded ? () => this.setGasPrice(gasLevels.normal, 'normal') : null}
-            onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.normal, 'hex') / 1000000000 }) : null}
+            onMouseDown={expanded ? () => this.setGasPrice(gasLevels.standard, 'standard') : null}
+            onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.standard, 'hex') / 1000000000 }) : null}
             onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
           >
             <div className='networkFeeOptionBack' /> 
-            {this.renderFeeLabel(feeLevel === 'normal', expanded)}
-            <div className='txSectionLabelRight'>Normal</div>
-            <div className={normalFeeUSD > FEE_WARNING_THRESHOLD_USD || !normalFeeUSD ? 'networkFeeTotal networkFeeTotalWarn' : 'networkFeeTotal'}>
-              <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + normalFee}</div>
+            {this.renderFeeLabel(feeLevel === 'standard', expanded)}
+            <div className='txSectionLabelRight'>Standard</div>
+            <div className={standardFeeUSD > FEE_WARNING_THRESHOLD_USD || !standardFeeUSD ? 'networkFeeTotal networkFeeTotalWarn' : 'networkFeeTotal'}>
+              <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + standardFee}</div>
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
-              <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + normalFeeUSD.toFixed(2)}</div>
+              <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + standardFeeUSD.toFixed(2)}</div>
             </div>
           </div>
           <div className='networkFeeOption' 
