@@ -112,6 +112,44 @@ const initial = {
         state: 'off'
       }
     },
+    networks: {
+      1: {
+        type: 'ethereum',
+        slug: 'mainnet',
+        name: 'Mainnet',
+        explorer: 'https://etherscan.io'
+      },
+      3: {
+        type: 'ethereum',
+        slug: 'ropsten',
+        name: 'Ropsten',
+        explorer: 'https://ropsten.etherscan.io'
+      },
+      4: {
+        type: 'ethereum',
+        slug: 'rinkeby',
+        name: 'Rinkeby',
+        explorer: 'https://rinkeby.etherscan.io'
+      },
+      42: {
+        type: 'ethereum',
+        slug: 'kovan',
+        name: 'Kovan',
+        explorer: 'https://kovan.etherscan.io'
+      },
+      // 74: {
+      //   type: 'ethereum',
+      //   slug: 'idchain',
+      //   name: 'IDChain',
+      //   explorer: 'https://explorer.idchain.one'
+      // },
+      100: {
+        type: 'ethereum',
+        slug: 'xdai',
+        name: 'xDai',
+        explorer: 'https://blockscout.com/poa/xdai'
+      }
+    },
     gasPrice: main('gasPrice', {
       1: {
         default: 'standard',
@@ -126,6 +164,14 @@ const initial = {
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       },
       42: {
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      },
+      // 74: {
+      //   default: 'standard',
+      //   levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      // },
+      100: {
         default: 'standard',
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       }
@@ -163,6 +209,22 @@ const initial = {
             options: {
               infura: 'infuraKovan',
               custom: main('connection.local.settings.42.options.custom', ''),
+              local: 'direct'
+            }
+          },
+          // 74: {
+          //   current: main('connection.local.settings.74.current', 'idchain'),
+          //   options: {
+          //     idchain: 'https://idchain.one/api/eth_rpc',
+          //     custom: main('connection.local.settings.74.options.custom', ''),
+          //     local: 'direct'
+          //   }
+          // },
+          100: {
+            current: main('connection.local.settings.100.current', 'poa'),
+            options: {
+              poa: 'https://dai.poa.network',
+              custom: main('connection.local.settings.100.options.custom', ''),
               local: 'direct'
             }
           }
@@ -204,6 +266,22 @@ const initial = {
             options: {
               infura: 'infuraKovan',
               custom: main('connection.secondary.settings.42.options.custom', ''),
+              local: 'direct'
+            }
+          },
+          // 74: {
+          //   current: main('connection.secondary.settings.74.current', 'idchain'),
+          //   options: {
+          //     idchain: 'https://idchain.one/api/eth_rpc',
+          //     custom: main('connection.secondary.settings.74.options.custom', ''),
+          //     local: 'direct'
+          //   }
+          // },
+          100: {
+            current: main('connection.secondary.settings.100.current', 'poa'),
+            options: {
+              poa: 'https://dai.poa.network',
+              custom: main('connection.secondary.settings.100.options.custom', ''),
               local: 'direct'
             }
           }

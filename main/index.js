@@ -95,12 +95,10 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
-// TODO: Custom networks link to custom explorers 
-const networks = { 1: '', 3: 'ropsten.', 4: 'rinkeby.', 5: 'goerli.', 42: 'kovan.' }
 ipcMain.on('tray:openEtherscan', (e, hash) => {
   const id = store('main.connection.network')
-  const network = networks[id]
-  shell.openExternal('https://' + network + 'etherscan.io/tx/' + hash)
+  const explorer = store('main.networks', id, 'explorer')
+  shell.openExternal(explorer + '/tx/' + hash)
 })
 
 ipcMain.on('tray:giveAccess', (e, req, access) => {

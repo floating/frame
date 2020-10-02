@@ -7,8 +7,6 @@ const flex = require('../../../flex')
 const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
-
 class Trezor extends Signer {
   constructor (device, signers) {
     super()
@@ -208,7 +206,7 @@ class Trezor extends Signer {
         v: this.hexToBuffer(result.v),
         r: this.hexToBuffer(result.r),
         s: this.hexToBuffer(result.s)
-      }, { chain: chains[parseInt(rawTx.chainId)] })
+      }, { chain: parseInt(rawTx.chainId) })
       cb(null, '0x' + tx.serialize().toString('hex'))
     })
   }

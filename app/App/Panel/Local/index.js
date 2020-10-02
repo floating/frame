@@ -159,9 +159,11 @@ class Settings extends React.Component {
               onChange={(network) => this.selectNetwork(network)}
               options={[
                 { text: 'Mainnet', value: '1' },
+                { text: 'xDai', value: '100' },
                 { text: 'Ropsten', value: '3' },
                 { text: 'Rinkeby', value: '4' },
-                { text: 'Kovan', value: '42' }]}
+                { text: 'Kovan', value: '42' }
+              ]}
             />
           </div>
           {/* <div className='signerPermission'>
