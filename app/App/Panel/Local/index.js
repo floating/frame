@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../link'
+import svg from '../../../svg'
 // import Client from '../Client'
 
 import Dropdown from '../../Components/Dropdown'
@@ -147,6 +148,9 @@ class Settings extends React.Component {
     primaryOptions = Object.keys(primaryOptions).map(i => ({ text: i, value: i }))
     secondaryOptions = Object.keys(secondaryOptions).map(i => ({ text: i, value: i }))
 
+    let networks = this.store('main.networks')
+    let networkOptions = Object.keys(networks).map(i => ({ text: networks[i].name, value: i }))
+
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
@@ -154,16 +158,11 @@ class Settings extends React.Component {
         <div className='localSettingsWrap'>
           <div className='localSettingsTitle connectionTitle'>
             <div>Connection</div>
+            <div className='localSettingsAddChain' onMouseDown={() => this.store.notify('editNetworks')}>{svg.broadcast(16)}</div>
             <Dropdown
               syncValue={this.store('main.connection.network')}
               onChange={(network) => this.selectNetwork(network)}
-              options={[
-                { text: 'Mainnet', value: '1' },
-                { text: 'xDai', value: '100' },
-                { text: 'Ropsten', value: '3' },
-                { text: 'Rinkeby', value: '4' },
-                { text: 'Kovan', value: '42' }
-              ]}
+              options={networkOptions}
             />
           </div>
           {/* <div className='signerPermission'>

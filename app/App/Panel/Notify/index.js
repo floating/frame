@@ -3,11 +3,77 @@ import Restore from 'react-restore'
 import svg from '../../../svg'
 import link from '../../../link'
 
+class Network extends React.Component {
+  constructor (...args) {
+    super(...args)
+    const { id, name, explorer } = this.props
+    this.state = { id, name, explorer }
+  }
+  render () {
+    const changed = (
+      this.props.id !== this.state.id ||
+      this.props.name !== this.state.name ||
+      this.props.explorer !== this.state.explorer
+    )
+    return (
+      <div className='notifyNetworkLine'>
+        {changed ? (
+          <div className='notifyNetworkSubmit notifyNetworkSubmitEnabled'>{svg.save(16)}</div>
+        ):(
+          <div className='notifyNetworkSubmit notifyNetworkRemove'>{svg.octicon('x', { height: 16 })}</div>
+        )}
+        <div className='notifyNetworkName'>
+          <input value={this.state.name} spellCheck='false' 
+            onChange={(e) => {
+              this.setState({ name: e.target.value })
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '') this.setState({ name: this.props.name })
+            }}
+          />
+        </div> 
+        <div className='notifyNetworkId'>
+          <input value={this.state.id} spellCheck='false' 
+            onChange={(e) => {
+              this.setState({ id: e.target.value })
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '') this.setState({ id: this.props.id })
+            }}
+          />
+        </div>
+        <div className='notifyNetworkExplorer'>
+          <input value={this.state.explorer} spellCheck='false' 
+            onChange={(e) => {
+              this.setState({ explorer: e.target.value })
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '') this.setState({ explorer: this.props.explorer })
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
+}
+
 class Notify extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.newNetworkIdDefault = 'ID'
+    this.newNetworkNameDefault = 'New Network'
+    this.newNetworkExplorerDefault = 'Block Explorer'
+    this.state = {
+      newNetworkId: this.newNetworkIdDefault,
+      newNetworkName: this.newNetworkNameDefault,
+      newNetworkExplorer: this.newNetworkExplorerDefault
+    }
+  }
+
   intro () {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'intro' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 22 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             {'Getting Started'}
@@ -291,6 +357,106 @@ class Notify extends React.Component {
     )
   }
 
+  renderNetworks () {
+    const networks = this.store('main.networks')
+    return Object.keys(networks).map(id => {
+      return <Network key={id} id={id} name={networks[id].name} explorer={networks[id].explorer} />
+    })
+  }
+
+  editNetworks () {
+    const changedNewNetwork = (
+      this.state.newNetworkId !== this.newNetworkIdDefault ||
+      this.state.newNetworkName !== this.newNetworkNameDefault ||
+      this.state.newNetworkExplorer !== this.newNetworkExplorerDefault
+    )
+
+    const newNetworkReady = (
+      this.state.newNetworkId !== this.newNetworkIdDefault &&  this.state.newNetworkId !== '' &&
+      this.state.newNetworkName !== this.newNetworkNameDefault && this.state.newNetworkName !== '' &&
+      this.state.newNetworkExplorer !== this.newNetworkExplorerDefault && this.state.newNetworkExplorer !== ''
+    )
+
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'editNetworks' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            {'Networks'}
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyNetwork'>
+              {this.renderNetworks()}
+              <div className='notifyNetworkLine notifyNetworkCreate'>
+                {changedNewNetwork ? (
+                  newNetworkReady ? (
+                    <div className='notifyNetworkSubmit'>
+                      {svg.save(18)}
+                    </div>
+                  ):(
+                    <div className='notifyNetworkSubmit notifyNetworkSubmitDisabled'>
+                      {svg.octicon('check', { height: 19 })}
+                    </div>
+                  )
+                ):(
+                  <div className='notifyNetworkSubmit'>
+                    {svg.octicon('plus', { height: 17 })}
+                  </div>
+                )}
+                <div className='notifyNetworkName'>
+                  <input value={this.state.newNetworkName} spellCheck='false' 
+                    onChange={(e) => {
+                      this.setState({ newNetworkName: e.target.value })
+                    }}
+                    onFocus={(e) => {
+                      if (e.target.value === this.newNetworkNameDefault) this.setState({ newNetworkName: '' })
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value === '') this.setState({ newNetworkName: this.newNetworkNameDefault  })
+                    }}
+                  />
+                </div>
+                <div className='notifyNetworkId'>
+                  <input value={this.state.newNetworkId} spellCheck='false' 
+                    onChange={(e) => {
+                      if (Number(parseInt(e.target.value)) || e.target.value === '') {
+                        this.setState({ newNetworkId: e.target.value })
+                      }
+                    }}
+                    onFocus={(e) => {
+                      console.log(e.target.value, this.newNetworkIdDefault)
+                      if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault  })
+                    }}
+                  />
+                </div>
+                <div className='notifyNetworkExplorer'>
+                  <input value={this.state.newNetworkExplorer} spellCheck='false' 
+                    onChange={(e) => {
+                      this.setState({ newNetworkExplorer: e.target.value })
+                    }}
+                    onFocus={(e) => {
+                      if (e.target.value === this.newNetworkExplorerDefault) this.setState({ newNetworkExplorer: '' })
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value === '') this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault  })
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className='notifyInput'>
+              <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
+                <div className='notifyInputOptionText'>Close</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   render () { // Instead of mounting all of these we should use a transition to mount and animate on demand
     return (
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
@@ -305,6 +471,7 @@ class Notify extends React.Component {
         {this.contractData()}
         {this.hotAccountWarning()}
         {this.hotSignerMismatch()}
+        {this.editNetworks()}
       </div>
     )
   }

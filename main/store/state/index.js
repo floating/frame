@@ -115,42 +115,41 @@ const initial = {
     networks: {
       1: {
         type: 'ethereum',
-        slug: 'mainnet',
         name: 'Mainnet',
         explorer: 'https://etherscan.io'
       },
       3: {
         type: 'ethereum',
-        slug: 'ropsten',
         name: 'Ropsten',
         explorer: 'https://ropsten.etherscan.io'
       },
       4: {
         type: 'ethereum',
-        slug: 'rinkeby',
         name: 'Rinkeby',
         explorer: 'https://rinkeby.etherscan.io'
       },
+      5: {
+        type: 'ethereum',
+        name: 'Görli',
+        explorer: 'https://goerli.etherscan.io'
+      },
       42: {
         type: 'ethereum',
-        slug: 'kovan',
         name: 'Kovan',
         explorer: 'https://kovan.etherscan.io'
       },
-      // 74: {
-      //   type: 'ethereum',
-      //   slug: 'idchain',
-      //   name: 'IDChain',
-      //   explorer: 'https://explorer.idchain.one'
-      // },
+      74: {
+        type: 'ethereum',
+        name: 'IDChain',
+        explorer: 'https://explorer.idchain.one'
+      },
       100: {
         type: 'ethereum',
-        slug: 'xdai',
         name: 'xDai',
         explorer: 'https://blockscout.com/poa/xdai'
       }
     },
-    gasPrice: main('gasPrice', {
+    gasPrice: {
       1: {
         default: 'standard',
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
@@ -163,19 +162,23 @@ const initial = {
         default: 'standard',
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       },
+      5: {
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      },
       42: {
         default: 'standard',
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       },
-      // 74: {
-      //   default: 'standard',
-      //   levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      // },
+      74: {
+        default: 'standard',
+        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+      },
       100: {
         default: 'standard',
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       }
-    }),
+    },
     connection: {
       network: main('connection.network', '1'),
       local: {
@@ -204,6 +207,14 @@ const initial = {
               local: 'direct'
             }
           },
+          5: {
+            current: main('connection.local.settings.5.current', 'prylabs'),
+            options: {
+              prylabs: 'https://goerli.prylabs.net',
+              custom: main('connection.local.settings.5.options.custom', ''),
+              local: 'direct'
+            }
+          },
           42: {
             current: main('connection.local.settings.42.current', 'infura'),
             options: {
@@ -212,14 +223,13 @@ const initial = {
               local: 'direct'
             }
           },
-          // 74: {
-          //   current: main('connection.local.settings.74.current', 'idchain'),
-          //   options: {
-          //     idchain: 'https://idchain.one/api/eth_rpc',
-          //     custom: main('connection.local.settings.74.options.custom', ''),
-          //     local: 'direct'
-          //   }
-          // },
+          74: {
+            current: main('connection.local.settings.74.current', 'custom'),
+            options: {
+              custom: main('connection.local.settings.74.options.custom', ''),
+              local: 'direct'
+            }
+          },
           100: {
             current: main('connection.local.settings.100.current', 'poa'),
             options: {
@@ -261,6 +271,14 @@ const initial = {
               local: 'direct'
             }
           },
+          5: {
+            current: main('connection.local.settings.5.current', 'prylabs'),
+            options: {
+              prylabs: 'https://goerli.prylabs.net',
+              custom: main('connection.local.settings.5.options.custom', ''),
+              local: 'direct'
+            }
+          },
           42: {
             current: main('connection.secondary.settings.42.current', 'custom'),
             options: {
@@ -269,14 +287,13 @@ const initial = {
               local: 'direct'
             }
           },
-          // 74: {
-          //   current: main('connection.secondary.settings.74.current', 'idchain'),
-          //   options: {
-          //     idchain: 'https://idchain.one/api/eth_rpc',
-          //     custom: main('connection.secondary.settings.74.options.custom', ''),
-          //     local: 'direct'
-          //   }
-          // },
+          74: {
+            current: main('connection.secondary.settings.74.current', 'custom'),
+            options: {
+              custom: main('connection.secondary.settings.74.options.custom', ''),
+              local: 'direct'
+            }
+          },
           100: {
             current: main('connection.secondary.settings.100.current', 'poa'),
             options: {
