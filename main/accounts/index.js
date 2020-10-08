@@ -65,7 +65,7 @@ class Accounts extends EventEmitter {
   // Public
   addAragon (account, cb = () => {}) {
     if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
-    account.network = account.network || store('main.connection.network')
+    account.network = account.network || store('main.currentNetwork.id')
     account.id = this.fingerprint(account.network, account.addresses)
     account.options = account.options || {}
     const existing = store('main.accounts', account.id)
@@ -78,7 +78,7 @@ class Accounts extends EventEmitter {
 
   add (addresses, options = {}, cb = () => {}) {
     if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
-    const network = store('main.connection.network')
+    const network = store('main.currentNetwork.id')
     const id = this.fingerprint(network, addresses)
     const account = store('main.accounts', id)
     if (account && account.network === network) return cb(null, account) // Account already exists...

@@ -16,7 +16,7 @@ class Parity extends EthereumClient {
     // On ready -> start client
     this.on('ready', () => {
       // Get client mode and current network id
-      const networkId = store('main.connection.network')
+      const networkId = store('main.currentNetwork.id')
       const chain = this._getChain(networkId)
 
       // Make sure parity is executable

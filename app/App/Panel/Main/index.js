@@ -37,7 +37,7 @@ class Main extends React.Component {
 
   render () {
     const accounts = {}
-    const network = this.store('main.connection.network')
+    const network = this.store('main.currentNetwork.id')
     Object.keys(this.store('main.accounts')).forEach(id => {
       const account = this.store('main.accounts', id)
       if (account.network === network) accounts[id] = account

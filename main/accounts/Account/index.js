@@ -26,7 +26,7 @@ class Account {
     this.created = created
     this.addresses = addresses || ['0x']
     this.smart = smart
-    this.network = network || store('main.connection.network')
+    this.network = network || store('main.currentNetwork.id')
     this.requests = {}
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart, this.network)
     this.update(true)

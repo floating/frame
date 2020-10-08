@@ -121,7 +121,7 @@ class AddAragon extends React.Component {
   }
 
   accountFilter (id) {
-    const network = this.store('main.connection.network')
+    const network = this.store('main.currentNetwork.id')
     const account = this.store('main.accounts', id)
     if (account.type === 'aragon') return false
     return account.network === network
@@ -202,7 +202,7 @@ class AddAragon extends React.Component {
           </div>
           <div
             className='addAccountItemSummary' onMouseDown={() => {
-              const net = this.store('main.connection.network')
+              const net = this.store('main.currentNetwork.id')
               const open = url => this.store.notify('openExternal', { url })
               if (net === '1') return open('https://mainnet.aragon.org')
               if (net === '4') return open('https://rinkeby.aragon.org')

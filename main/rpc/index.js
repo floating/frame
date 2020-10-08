@@ -39,11 +39,11 @@ const rpc = {
   providerSend: (payload, cb) => provider.send(payload, cb),
   connectionStatus: (cb) => {
     cb(null, {
-      local: {
-        status: provider.connection.local.status,
-        network: provider.connection.local.network,
-        type: provider.connection.local.type,
-        connected: provider.connection.local.connected
+      primary: {
+        status: provider.connection.primary.status,
+        network: provider.connection.primary.network,
+        type: provider.connection.primary.type,
+        connected: provider.connection.primary.connected
       },
       secondary: {
         status: provider.connection.secondary.status,
@@ -129,9 +129,9 @@ const rpc = {
   verifyAddress (cb) {
     accounts.verifyAddress(true, cb)
   },
-  setGasPrice (price, level, handlerId, cb) {
+  setGasPrice (netType, netId, price, level, handlerId, cb) {
     accounts.setGasPrice(price, handlerId)
-    store.setGasDefault(store('main.connection.network'), level, price)
+    store.setGasDefault(netType, netId, level, price)
   }
 }
 

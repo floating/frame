@@ -16,13 +16,13 @@ class Trezor extends Signer {
     this.id = this.getId()
     this.type = 'trezor'
     this.status = 'loading'
-    this.network = store('main.connection.network')
+    this.network = store('main.currentNetwork.id')
     this.basePath = () => this.network === '1' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
     this.networkObserver = store.observer(() => {
-      if (this.network !== store('main.connection.network')) {
+      if (this.network !== store('main.currentNetwork.id')) {
         this.reset()
         this.deviceStatus()
       }
@@ -43,7 +43,7 @@ class Trezor extends Signer {
   }
 
   reset () {
-    this.network = store('main.connection.network')
+    this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []
     this.update()

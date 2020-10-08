@@ -18,9 +18,9 @@ app.on('ready', () => {
   })
 
   // On network switched
-  let previousNetworkId = store('main.connection.network')
+  let previousNetworkId = store('main.currentNetwork.id')
   store.observer(_ => {
-    const networkId = store('main.connection.network')
+    const networkId = store('main.currentNetwork.id')
     const on = store('main.clients.parity.on')
     const state = store('main.clients.parity.state')
 
@@ -38,17 +38,17 @@ app.on('ready', () => {
       }
 
       // Update holder variable
-      previousNetworkId = store('main.connection.network')
+      previousNetworkId = store('main.currentNetwork.id')
     }
   })
 
-  // Link parity on/off with local connection
+  // Link parity on/off primary connection
   let previousState = store('main.clients.parity.state')
   store.observer(_ => {
     const state = store('main.clients.parity.state')
     if (state !== previousState) {
-      if (state === 'ready') store.toggleConnection('local', true)
-      if (state === 'off') store.toggleConnection('local', false)
+      if (state === 'ready') store.toggleConnection('primary', true)
+      if (state === 'off') store.toggleConnection('primary', false)
       previousState = state
     }
   })

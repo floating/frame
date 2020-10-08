@@ -25,8 +25,8 @@ class LedgerBLE extends Signer {
       this.deviceStatus()
     }, 4000)
     this.networkObserver = store.observer(() => {
-      if (this.network !== store('main.connection.network')) {
-        this.network = store('main.connection.network')
+      if (this.network !== store('main.currentNetwork.id')) {
+        this.network = store('main.currentNetwork.id')
         this.status = 'loading'
         this.accounts = []
         this.update()

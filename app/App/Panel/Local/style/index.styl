@@ -10,16 +10,15 @@
   transition standard
   transform translateZ(0)
 
-  .localSettingsAddChain
+  .localSettingsAddNetwork
     position absolute
-    right 130px
+    right 145px
     display flex
     justify-content center
     align-items center
     height 26px
     z-index 9999999
     border-radius 13px
-    // letter-spacing 1px
     height 26px
     font-weight 200
     width 26px
@@ -27,7 +26,7 @@
     text-transform uppercase
     background highlight
     overflow hidden
-    box-shadow cardDrop, 0px 2px 1px thick
+    box-shadow cardDrop, 0px 2px 1px thin
     padding 0px 0px 0px 0px
     transition standard
     transform translateZ(0)
@@ -75,12 +74,14 @@
     position relative
     display flex
     align-items flex-start
-    z-index 9999999
     height 26px
-    font-size 22px
+    font-size 25px
     font-weight 200
     padding 0px 10px 15px 10px
     margin 50px 0px 0px 0px
+
+    .localSettingsTitleText
+      margin-top -5px
 
 .localSettingsHidden
   right -100%

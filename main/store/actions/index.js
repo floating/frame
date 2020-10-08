@@ -1,46 +1,36 @@
 module.exports = {
   // setSync: (u, key, payload) => u(key, () => payload),
-  selectNetwork: (u, net) => {
+  selectNetwork: (u, type, id) => {
     const reset = { status: 'loading', connected: false, type: '', network: '' }
-    u('main.connection', connection => {
-      connection.network = net
-      connection.local = Object.assign({}, connection.local, reset)
-      connection.secondary = Object.assign({}, connection.secondary, reset)
-      return connection
+    u('main.currentNetwork', selected => {
+      u('main.networks', selected.type, selected.id, connection => {
+        connection.primary = Object.assign({}, connection.primary, reset)
+        connection.secondary = Object.assign({}, connection.secondary, reset)
+        return connection
+      })
+      return { type, id }
     })
   },
-  selectPrimary: (u, value) => {
-    u('main.connection', connection => {
-      connection.local.settings[connection.network].current = value
-      return connection
+  selectPrimary: (u, netType, netId, value) => {
+    u('main.networks', netType, netId, 'connection.primary.current', () => value)
+  },
+  selectSecondary: (u, netType, netId, value) => {
+    u('main.networks', netType, netId, 'connection.secondary.current', () => value)
+  },
+  setPrimaryCustom: (u, netType, netId, target) => {
+    u('main.networks', netType, netId, 'connection.primary.custom', () => target)
+  },
+  setSecondaryCustom: (u, netType, netId, target) => {
+    u('main.networks', netType, netId, 'connection.secondary.custom', () => target)
+  },
+  toggleConnection: (u, netType, netId, node, on) => u('main', netType, netId, 'connection', node, 'on', (value) => on !== undefined ? on : !value),
+  setPrimary: (u, netType, netId, status) => {
+    u('main.networks', netType, netId, 'connection.primary', primary => {
+      return Object.assign({}, primary, status)
     })
   },
-  selectSecondary: (u, value) => {
-    u('main.connection', connection => {
-      connection.secondary.settings[connection.network].current = value
-      return connection
-    })
-  },
-  setPrimaryCustom: (u, target) => {
-    u('main.connection', connection => {
-      connection.local.settings[connection.network].options.custom = target
-      return connection
-    })
-  },
-  setSecondaryCustom: (u, target) => {
-    u('main.connection', connection => {
-      connection.secondary.settings[connection.network].options.custom = target
-      return connection
-    })
-  },
-  toggleConnection: (u, node, on) => u('main.connection', node, 'on', (value) => on !== undefined ? on : !value),
-  setLocal: (u, status) => {
-    u('main.connection.local', local => {
-      return Object.assign({}, local, status)
-    })
-  },
-  setSecondary: (u, status) => {
-    u('main.connection.secondary', secondary => {
+  setSecondary: (u, netType, netId, status) => {
+    u('main.networks', netType, netId, 'connection.secondary', secondary => {
       return Object.assign({}, secondary, status)
     })
   },
@@ -137,12 +127,12 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
-  setGasPrices: (u, chain, prices) => {
-    u('main.gasPrice', chain, 'levels', () => prices)
+  setGasPrices: (u, netType, netId, prices) => {
+    u('main.netwotks', netType, netId, 'gas.price.levels', () => prices)
   },
-  setGasDefault: (u, chain, level, price) => {
-    u('main.gasPrice', chain, 'default', () => level)
-    if (level === 'custom') u('main.gasPrice', chain, 'levels.custom', () => price)
+  setGasDefault: (u, netType, netId, level, price) => {
+    u('main.netwotks', netType, netId, 'gas.price.selected', () => level)
+    if (level === 'custom') u('main.netwotks', netType, netId, 'gas.price.levels.custom', () => price)
   }
   // __overwrite: (path, value) => u(path, () => value)
 }

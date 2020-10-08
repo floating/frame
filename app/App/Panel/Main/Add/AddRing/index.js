@@ -153,6 +153,8 @@ class AddRing extends React.Component {
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart'
     if (this.state.adding) itemClass += ' addAccountItemAdding'
+    const { type, id } = this.store('main.currentNetwork')
+    const network = type + ':' +  id
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemHot' />
@@ -170,7 +172,7 @@ class AddRing extends React.Component {
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {
                 this.adding()
-                if (this.store('main.connection.network') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+                if (network === 'ethereum:1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
               }}
             >
               {'Add Keyring Account'}
