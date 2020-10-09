@@ -27,9 +27,9 @@ class Ledger extends Signer {
     this.coinbase = '0x'
     this.handlers = {}
     this.lastUse = Date.now()
-    this.network = store('main.connection.network')
+    this.network = store('main.currentNetwork.id')
     this.networkObserver = store.observer(() => {
-      if (this.network !== store('main.connection.network')) {
+      if (this.network !== store('main.currentNetwork.id')) {
         this.reset()
         this.deviceStatus()
       }
@@ -90,7 +90,7 @@ class Ledger extends Signer {
 
   reset () {
     this.derivation = store('main.ledger.derivation')
-    this.network = store('main.connection.network')
+    this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []
     this.update()

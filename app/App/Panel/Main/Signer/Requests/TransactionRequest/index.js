@@ -41,10 +41,12 @@ class TransactionRequest extends React.Component {
     return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
-  setGasPrice (price, level) {
-    const chain = this.store('main.connection.network')
-    const feeLevel = this.store('main.gasPrice', chain, 'default')
-    if (price && (price !== this.props.req.data.gasPrice || level !== feeLevel)) link.rpc('setGasPrice', price, level, this.props.req.handlerId, e => console.log(e))
+  setGasPrice (netType, netId, price, level) {
+    const network = this.store('main.currentNetwork')
+    const feeLevel = this.store('main.networks', network.type, network.id, 'gas.price.selected')
+    if (price && (price !== this.props.req.data.gasPrice || level !== feeLevel)) link.rpc('setGasPrice', netType, netId, price, level, this.props.req.handlerId, e => {
+      if (e) console.log(e)
+    })
     this.setState({ selectedIndex: -1 })
   }
 
@@ -103,8 +105,8 @@ class TransactionRequest extends React.Component {
   }
 
   hoverBar (hoverGasPercent) {
-    const trader = this.store('main.gasPrice', this.store('main.connection.network'),'levels.trader')
-    // const safelow = this.store('main.gasPrice.levels.safelow')
+    const network = this.store('main.currentNetwork')
+    const trader = this.store('main.networks', network.type, network.id, 'gas.price.levels.trader')
     const top = parseInt(trader, 16) * 4
     const bottom = 1 // parseInt(safelow, 16) / 10
     const percentBuffer = Math.round((bottom / top) * 100) / 100
@@ -146,9 +148,9 @@ class TransactionRequest extends React.Component {
   renderFee () {
     const expanded = this.state.selectedIndex === 0
     const { data, mode } = this.props.req
-    const chain = this.store('main.connection.network')
-    let feeLevel = this.store('main.gasPrice', chain, 'default')
-    const gasLevels = this.store('main.gasPrice', chain, 'levels')
+    const network = this.store('main.currentNetwork')
+    let feeLevel = this.store('main.networks', network.type, network.id, 'gas.price.selected')
+    const gasLevels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
@@ -196,7 +198,7 @@ class TransactionRequest extends React.Component {
         <div className='networkFeeLabel' style={{ transform: expanded ? 'translateY(0px)' : 'translateY(-40px)' }}>Fee</div>
         <div className='networkFeeOptions' style={!expanded ? { transitionDelay: '0s', transform: `translateY(${slideLevel})` } : { transform: 'translateY(0px)' }}>
           <div className='networkFeeOption' 
-            onMouseDown={expanded ? () => this.setGasPrice(gasLevels.safelow, 'safelow') : null}
+            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.safelow, 'safelow') : null}
             onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.safelow, 'hex') / 1000000000 }) : null}
             onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
           >
@@ -210,7 +212,7 @@ class TransactionRequest extends React.Component {
             </div>
           </div>
           <div className='networkFeeOption' 
-            onMouseDown={expanded ? () => this.setGasPrice(gasLevels.standard, 'standard') : null}
+            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.standard, 'standard') : null}
             onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.standard, 'hex') / 1000000000 }) : null}
             onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
           >
@@ -224,7 +226,7 @@ class TransactionRequest extends React.Component {
             </div>
           </div>
           <div className='networkFeeOption' 
-            onMouseDown={expanded ? () => this.setGasPrice(gasLevels.fast, 'fast') : null}
+            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.fast, 'fast') : null}
             onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.fast, 'hex') / 1000000000 }) : null}
             onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
           >
@@ -238,7 +240,7 @@ class TransactionRequest extends React.Component {
             </div>
           </div>
           <div className='networkFeeOption' 
-            onMouseDown={expanded ? () => this.setGasPrice(gasLevels.trader, 'trader') : null}
+            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.trader, 'trader') : null}
             onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.trader, 'hex') / 1000000000 }) : null}
             onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
           >
@@ -253,7 +255,7 @@ class TransactionRequest extends React.Component {
           </div>
           <div
             className='networkFeeOption'
-            onMouseDown={expanded ? () => { this.setGasPrice(this.state.hoverGasPrice, 'custom') } : null}
+            onMouseDown={expanded ? () => { this.setGasPrice(network.type, network.id, this.state.hoverGasPrice, 'custom') } : null}
             onMouseEnter={expanded ? e => this.handleCustomPriceHover(e, true) : null}
             onMouseMove={expanded ? e => this.handleCustomPriceHover(e) : null}
             onMouseLeave={expanded ? e => this.handleCustomPriceHoverReset() : null}

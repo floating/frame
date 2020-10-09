@@ -18,7 +18,12 @@ const store = require('./store')
 
 // Action Monitor
 // store.api.feed((state, actions, obscount) => {
-//   console.log(actions)
+//   actions.forEach(a => {
+//     console.log(a.name)
+//     a.updates.forEach(u => {
+//       console.log(u.path)
+//     })
+//   })
 // })
 
 const accounts = require('./accounts')
@@ -96,8 +101,8 @@ ipcMain.on('tray:openExternal', (e, url) => {
 })
 
 ipcMain.on('tray:openEtherscan', (e, hash) => {
-  const id = store('main.connection.network')
-  const explorer = store('main.networks', id, 'explorer')
+  const { type, id } = store('main.currentNetwork')
+  const explorer = store('main.networks', type, id, 'explorer')
   shell.openExternal(explorer + '/tx/' + hash)
 })
 

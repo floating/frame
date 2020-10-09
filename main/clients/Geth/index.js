@@ -9,7 +9,7 @@ class Geth extends EthereumClient {
     this.on('ready', () => {
       // Get client mode and current network id
       const mode = store('main.clients.geth.mode')
-      const networkId = store('main.connection.network')
+      const networkId = store('main.currentNetwork.id')
       const networkFlag = this._getNetworkFlag(networkId)
 
       // Prepare client arguments

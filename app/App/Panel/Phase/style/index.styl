@@ -1,0 +1,696 @@
+.phase
+  position fixed
+  top 0px
+  right 0px
+  left 0px
+  bottom 0px
+  z-index 99999999999999999
+  pointer-events none
+  transition standard
+  display flex
+  justify-content center
+  align-items center
+  text-align center
+  opacity 1
+
+  ::selection
+    background good // #ffb7b7
+
+  .phaseClose:after
+    content ''
+    position absolute
+    top 0px
+    left 0
+    right 0
+    bottom 3px
+    background rgba(0, 185, 185, 1)
+    z-index 0
+    border-radius 22px
+    opacity 0.5
+
+  .phaseClose:before
+    content ''
+    position absolute
+    top 1px
+    left 0px
+    right 0px
+    bottom 1px
+    background outerspacePhase
+    z-index 2
+    border-radius 20px
+
+  .phaseClose
+    position absolute
+    top 16px
+    right 50%
+    margin-right -48px
+    width 96px
+    height 24px
+    transition standardSlow
+    z-index 9000000009
+    overflow hidden
+    transition-delay 0s
+    font-weight 600
+    display flex
+    justify-content center
+    align-items center
+    color spacewhite
+    transform translate(0px, -430px)
+    transition-delay 0s
+    background outerspacePhaseDark /// rgba(0, 105, 105, 1)
+    box-shadow 0px 3px 2px 0px rgba(0, 10, 20, 1), 0px 0px 5px 0px rgba(10, 30, 30, 1)
+    border-radius 20px
+
+    svg
+      z-index 222
+      pointer-events none
+
+  .phaseCloseActive
+    transform translate(0px, 0px)
+
+  .panelBottomMenu
+    position absolute
+    left 0
+    right 0px
+    bottom 0
+    height 80px
+    display flex
+    justify-content center
+    align-items center
+    -webkit-app-region no-drag
+    z-index 10000000
+    opacity 1
+
+  .phaseShade
+    opacity 0
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    z-index 10
+    pointer-events none
+    transition standardSlow
+    background outerspaceDark
+
+  .phaseShadeActive
+    pointer-events auto
+    transition-delay 0s
+    opacity 1
+    z-index 1000000000000000
+
+  .phaseShadeForward
+    opacity 0
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    z-index 90000000000090
+    pointer-events none
+    transition standardSlow
+    transition-delay 0.00s
+    background linear-gradient(45deg, pending04, good04)
+
+  .phaseShadeForwardActive
+    opacity 0.80
+
+  .phaseInterface
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    z-index 900
+    pointer-events none
+
+    .phaseTrigger
+      position relative
+      height 40px
+      width 40px
+      border-radius 20px
+      display flex
+      justify-content center
+      align-items center
+      background highlight
+      pointer-events auto
+      transition standardSlow
+      z-index 4
+      color outerspace08
+      transform rotate(-1deg)
+      box-shadow 0px 0px 4px -1px rgba(6, 54, 52, 0.05), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
+
+      .phaseTriggerIcon
+        z-index 3
+        transition standardSlower
+        font-size 30px
+        margin 0px 0px 2px 1px
+        color outerspace08
+        transform rotate(1deg)
+
+    .phaseTriggerActive
+      background phase
+      box-shadow 0px 8px 7px -5px rgba(5, 5, 45, 0.4)
+      .phaseTriggerIcon
+        color white
+        transform rotate(406deg)
+
+  .phaseInterfaceActive
+    z-index 900000000000
+
+  .phaseMain
+    pointer-events none
+    opacity 0
+    transform scale(2)
+    position absolute
+    background phaseShade
+    color rgba(5, 5, 45, 0.4)
+    top 56px
+    right 10px
+    bottom 10px
+    left 10px
+    border-radius 16px
+    transition standardSlow
+    z-index 9000000002
+    box-shadow 0px 50px 20px -20px rgba(0, 0, 0, 0.8), 0px 0px 10px 0px rgba(5, 5, 35, 0.5)
+    overflow hidden
+    transition-delay 0s
+    font-weight 600
+
+    .phaseMainInner
+      position absolute
+      background phase
+      color white
+      top 0px
+      right 0px
+      bottom 2px
+      left 0px
+      border-radius 16px
+      z-index 1
+      overflow-y scroll
+      overflow-x hidden
+      padding 20px 10px 20px 10px
+
+    .phaseBreak
+      position relative
+      bottom 0px
+      right 0px
+      left 0px
+      height 4px
+      border-radius 2px
+      background rgba(5, 25, 35, 0.6)
+
+    .phaseTitle
+      width calc(100% - 20px)
+      position relative
+      display flex
+      align-items center
+      justify-content center
+      z-index 9999999
+      line-height 22px
+      font-size 32px
+      font-weight 200
+      letter-spacing 1px
+      padding 20px 10px 40px 10px
+      text-align center
+
+    .phaseSubtitle
+      position relative
+      // display flex
+      // align-items flex-start
+      z-index 9999999
+      line-height 23px
+      font-size 12px
+      text-transform uppercase
+      letter-spacing 3px
+      margin-lwft 3px
+      padding 10px
+      font-weight 400
+      text-align center
+
+    .phaseFooter
+      position relative
+      display flex
+      align-items center
+      justify-content center
+      z-index 9999999
+      line-height 22px
+      font-size 12px
+      text-transform uppercase
+      letter-spacing 3px
+      padding 20px 10px 10px 10px
+      text-align justify
+      text-align-last justify
+      color rgba(5, 25, 35, 0.6)
+
+    .phaseHeader
+      font-size 12px
+      text-transform uppercase
+      letter-spacing 1px
+      margin-left -1px
+      font-weight 300
+      display flex
+      justify-content center
+      align-items center
+      height 30px
+      padding-bottom 10px
+
+      .phaseHeaderText
+        margin-left 15px
+        position relative
+
+        .phaseHeaderIcon
+          position absolute
+          top 0
+          bottom 0
+          left -25px
+          display flex
+          justify-content center
+          align-items center
+
+    .phaseItem
+      padding 3px 0px 3px 0px
+      width calc(100%)
+      margin 10px 0px 0px 0px
+      border-radius 6px
+      background outerspaceShader
+      box-shadow 0px 35px 40px -20px rgba(5, 25, 35, 1)
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+      transform translateY(150px) scale(1)
+      opacity 0
+      transition standardSlowest
+      transition-delay 0.32s
+      position relative
+      overflow hidden
+      position relative
+
+      .phaseItemBar
+        content ''
+        position absolute
+        top 0
+        left 0
+        right 0
+        height 12px
+        background hardware
+        z-index 1
+
+      .phaseItemWrap
+        width 100%
+        background outerspaceLight
+        border-radius 6px
+        padding 0px 0px 10px 0px
+        z-index 2
+        box-shadow 0px 0px 40px -20px rgba(5, 25, 35, 0.6)
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+
+      .phaseItemTop
+        width 100%
+        display flex
+        justify-content flex-start
+        align-items center
+        font-size 20px
+        width calc(100% - 20px)
+        text-transform uppercase
+        letter-spacing 3px
+        font-weight 300
+        margin-top 10px
+
+        .phaseItemIconHardware
+          color hardware
+
+        .phaseItemIconHot
+          color hot
+
+        .phaseItemIconSmart
+          color smart
+
+        .phaseItemIcon
+          position relative
+          height 50px
+          width 50px
+          display flex
+          justify-content center
+          align-items center
+          margin-right 10px
+
+        .phaseItemIconHex
+          margin-left -1px
+          //margin-bottom -1px
+          margin-top 1px
+          width 45px
+          height 45px
+          opacity 0.08
+          position absolute
+          border-radius 5px
+          // padding-bottom 3px
+
+        .phaseItemIconHexHardware
+          background hardware
+
+        .phaseItemIconHexHot
+          background hot
+
+        .phaseItemIconHexSmart
+          background smart
+
+      .phaseItemBreak
+        position relative
+        bottom 0px
+        width calc(100% - 20px)
+        height 4px
+        border-radius 2px
+        background rgba(5, 25, 35, 0.3)
+
+      .phaseItemSummary:before
+        content ''
+        position absolute
+        top 10px
+        left 10px
+        right 10px
+        height 4px
+        border-radius 2px
+        background rgba(5, 25, 35, 0.2)
+
+      .phaseItemSummary
+        position relative
+        display flex
+        align-items center
+        justify-content center
+        z-index 9999999
+        line-height 22px
+        font-size 11px
+        width calc(100% - 40px)
+        text-transform uppercase
+        letter-spacing 1px
+        padding 24px 20px 0px 20px
+        text-align justify
+        text-align-last center-justify
+        min-height 22px
+
+      .phaseItemDevices
+        width calc(100% - 20px)
+        font-size 12px
+        text-transform uppercase
+        letter-spacing 2px
+        margin-top 12px
+        border-radius 4px
+        transition standardSlow
+        position relative
+        overflow hidden
+        font-weight 400
+        flex-direction column
+        background rgba(5, 25, 35, 0.2)
+        padding-bottom 10px
+
+        .phaseItemDevice
+          margin-top 10px
+          display flex
+          justify-content center
+          align-items center
+          flex-direction column
+          padding 0px 7px
+
+        .phaseItemDevice:hover
+          background rgba(5, 25, 35, 0.1)
+
+        .phaseItemDeviceTitle
+          font-weight 600
+          text-align center
+
+        .phaseItemDeviceStatus
+          font-size 10px
+          display flex
+          justify-content center
+          align-items center
+          text-align center
+
+      .phaseItemOption
+        width calc(100% - 20px)
+        height 40px
+        line-height 22px
+        font-size 14px
+        text-transform uppercase
+        letter-spacing 3px
+        display flex
+        align-items center
+        justify-content center
+        margin-top 12px
+        border-radius 4px
+        transition standardSlow
+        position relative
+        overflow hidden
+        font-weight 400
+
+      .phaseItemOptionIntro
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display flex
+        align-items center
+        justify-content center
+        transition standardSlow
+        flex-direction column
+        background rgba(5, 25, 35, 0.2)
+
+      .phaseItemOptionIntro:hover
+        background rgba(5, 25, 35, 0.3)
+
+      .phaseItemOptionSetup
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        opacity 0
+        pointer-events none
+        transition standardSlow
+        transform translateX(0%)
+
+        .phaseItemOptionSetupFrames
+          display flex
+          width 1000%
+          height 100%
+          background rgba(5, 25, 35, 0.2)
+
+          .phaseItemOptionSetupFrame
+            display flex
+            align-items center
+            justify-content center
+            flex-direction column
+            transition standardSlow
+            width 10%
+
+            .phaseItemOptionTitle
+              display flex
+              justify-content center
+              align-items center
+              text-align center
+              font-size 14px
+              // height 50px
+              width 100%
+              padding 20px 40px
+              font-weight 500
+              letter-spacing 1px
+              box-sizing border-box
+
+      .phaseItemOptionSubmit
+        background rgba(5, 25, 35, 0.2)
+        height 30px
+        padding 0px 40px
+        display flex
+        justify-content center
+        align-items center
+        border-radius 20px
+
+      .phaseItemOptionSubmit:hover
+        background rgba(5, 25, 35, 0.3)
+
+      .phaseItemOptionList
+        width calc(100% - 20px)
+        border-radius 4px
+        padding 10px 0px
+        height 160px
+        margin 0px 0px 10px 0px
+        position relative
+        overflow hidden
+        background rgba(5, 25, 35, 0.2)
+        box-sizing border-box
+        overflow-x hidden
+        overflow-y scroll
+
+      .fira
+        font-family FiraCode, monospace
+        font-weight 600
+        text-transform none
+
+      .phaseItemOptionListItem
+        width 100%
+        text-align center
+        padding 4px 7px 4px 5px
+        margin-left -3px
+        font-weight 600
+
+        svg
+          padding 0px 9px 0px 6px
+          margin-bottom -2
+          // filter drop-shadow(0px 3px 1px rgba(0, 10, 20, 0.5))
+
+      .phaseItemOptionListItem:hover
+        background rgba(5, 25, 35, 0.2)
+
+      .phaseItemOptionInput
+        width calc(100% - 40px)
+        border-radius 6px
+        height 50px
+        padding 10px
+        margin 0px 0px 20px 0px
+        position relative
+        overflow hidden
+        background rgba(5, 25, 35, 0.2)
+
+        textarea
+          width calc(100%)
+          background transparent
+          border none
+          outline none
+          color white
+          text-align center
+          font-size 13px
+          letter-spacing 4px
+          line-height 20px
+          font-weight 600
+          font-family FiraCode, monospace
+          padding-bottom 100px
+          overflow hidden
+          margin 4px 0px 0px 3px
+
+        textarea::selection
+          background rgba(5, 25, 35, 1)
+
+      .phaseItemOptionInputPhrase
+        width calc(100% - 20px)
+        border-radius 6px
+        height 80px
+        padding 0px 0px
+        margin 0px 10px 20px 10px
+        position relative
+        overflow hidden
+        background rgba(5, 25, 35, 0.2)
+        transform translate3d(0, 0, 0)
+
+        .phaseItemOptionSubtitle
+          position absolute
+          bottom 0
+          display flex
+          justify-content center
+          align-items center
+          text-align center
+          font-size 8px
+          // height 50px
+          width 100%
+          // padding 0px 0px 20px 0px
+          font-weight 500
+          letter-spacing 1px
+          box-sizing border-box
+
+        input
+          width 100%
+          height 100%
+          padding 10px 20px
+          background transparent
+          border none
+          outline none
+          color white
+          text-align center
+          font-size 20px
+          // letter-spacing 3px
+          line-height 20px
+          font-weight 400
+          // font-family FiraCode, monospace
+          display flex
+          justify-content center
+          align-items center
+          // overflow hidden
+          resize none
+          transform translate3d(0, 0, 0)
+          letter-spacing 3px
+
+        input::selection
+          background rgba(5, 25, 35, 1)
+
+        textarea
+          width 100%
+          height 100%
+          padding 10px 20px
+          background transparent
+          border none
+          outline none
+          color white
+          text-align center
+          font-size 15px
+          line-height 20px
+          font-family FiraCode, monospace
+          display flex
+          justify-content center
+          align-items center
+          overflow-x hidden
+          overflow-y scroll
+          resize none
+
+        textarea::selection
+          background rgba(5, 25, 35, 1)
+
+      .phaseItemOptionInputPassword
+        input
+          margin-top -7px
+
+      .phaseItemColorBar
+        position absolute
+        top 0px
+        left -40px
+        right -40px
+        height 4px
+        background white
+        border-radius 6px
+
+      .phaseItemHardware
+        background hardware
+
+      .phaseItemSmart
+        background rgb(150, 255, 210)
+
+      .phaseItemHot
+        background rgb(255, 150, 150)
+
+    .phaseItemAdding
+      .phaseItemOption
+        height 225px
+      .phaseItemOptionIntro
+        opacity 0
+        pointer-events none
+      .phaseItemOptionSetup
+        opacity 1
+        pointer-events auto
+
+  .phaseMainActive
+    .phaseMainInner
+      .phaseItem
+        opacity 1
+        transform translateY(0) scale(1)
+
+  .phaseMainActive
+    pointer-events auto
+    opacity 1
+    transform translateY(0px) scale(1) rotateY(0deg)
+    transition-delay 0.00s
+
+
+@import '../Networks/style'

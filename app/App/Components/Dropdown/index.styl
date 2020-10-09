@@ -3,14 +3,14 @@
   display flex
   align-items flex-start
   height 26px
-  z-index 9999999
+  z-index 99999999999999
 
 .dropdown
   border-radius 13px
   letter-spacing 1px
   height 26px
   font-weight 400
-  width 113px
+  width 125px
   font-size 13px
   text-transform uppercase
   background highlight
@@ -30,11 +30,18 @@
 
 .dropdownItem
   display flex
-  justify-content center
   align-items center
   height 26px
   min-height 26px
-  width 100%
+  width calc(100% - 20px)
   box-sizing border-box
-  padding 0px 15px 0px 15px
   transform translateZ(0)
+  margin 0px 10px 0px 10px
+  overflow hidden
+  position relative
+  z-index 99999999999999
+
+  &::before, &::after
+    pointer-events: none
+    content: ''
+    flex: 1

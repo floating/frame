@@ -9,7 +9,7 @@ const store = require('../store')
 class Nodes extends EventEmitter {
   constructor () {
     super()
-    this.local = {
+    this.primary = {
       status: 'off',
       network: '',
       type: '',
@@ -22,21 +22,23 @@ class Nodes extends EventEmitter {
       connected: false
     }
     this.observer = store.observer(() => {
-      this.connect(store('main.connection'))
+      const { type, id } = store('main.currentNetwork')
+      this.connect(store('main.networks', type, id, 'connection'))
     })
   }
 
   update (priority) {
-    if (priority === 'local') {
-      const { status, connected, type, network } = this.local
+    const currentNetwork = store('main.currentNetwork')
+    if (priority === 'primary') {
+      const { status, connected, type, network } = this.primary
       const details = { status, connected, type, network }
-      log.info('    Updating local connection to status, ', details)
-      store.setLocal(details)
+      log.info('    Updating primary connection to status, ', details)
+      store.setPrimary(currentNetwork.type, currentNetwork.id, details)
     } else if (priority === 'secondary') {
       const { status, connected, type, network } = this.secondary
       const details = { status, connected, type, network }
       log.info('    Updating secondary connection to status, ', details)
-      store.setSecondary(details)
+      store.setSecondary(currentNetwork.type, currentNetwork.id, details)
     }
   }
 
@@ -48,11 +50,11 @@ class Nodes extends EventEmitter {
     log.info(' ')
     log.info('Connection has been updated')
     if (this.network !== connection.network) {
-      if (this.local.provider) this.local.provider.close()
+      if (this.primary.provider) this.primary.provider.close()
       if (this.secondary.provider) this.secondary.provider.close()
-      this.local = { status: 'loading', network: '', type: '', connected: false }
+      this.primary = { status: 'loading', network: '', type: '', connected: false }
       this.secondary = { status: 'loading', network: '', type: '', connected: false }
-      this.update('local')
+      this.update('primary')
       this.update('secondary')
       log.info('    Network changed from ' + this.network + ' to ' + connection.network)
       this.network = connection.network
@@ -61,7 +63,7 @@ class Nodes extends EventEmitter {
     // Secondary connection is on
     if (connection.secondary.on) {
       log.info('    Secondary connection: ON')
-      if (connection.local.on && connection.local.status === 'connected') {
+      if (connection.primary.on && connection.primary.status === 'connected') {
         // Connection is on Standby
         log.info('    Secondary connection on STANDBY', connection.secondary.status === 'standby')
         if (this.secondary.provider) this.secondary.provider.close()
@@ -73,8 +75,12 @@ class Nodes extends EventEmitter {
           this.update('secondary')
         }
       } else {
-        const settings = store('main.connection.secondary.settings', store('main.connection.network'))
-        const target = settings.options[settings.current]
+        const { type, id } = store('main.currentNetwork')
+        const connection = store('main.networks', type, id, 'connection')
+        const { secondary } = connection
+        const presets = store('main.networkPresets', type)
+        const currentPresets = Object.assign({}, presets.default, presets[id])
+        const target = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
         if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== target) {
           log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
           if (this.secondary.provider) this.secondary.provider.close()
@@ -89,7 +95,7 @@ class Nodes extends EventEmitter {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
               this.secondary.network = !err && response && !response.error ? response.result : ''
-              if (this.secondary.network && this.secondary.network !== store('main.connection.network')) {
+              if (this.secondary.network && this.secondary.network !== store('main.currentNetwork.id')) {
                 this.secondary.connected = false
                 this.secondary.type = ''
                 this.secondary.status = 'network mismatch'
@@ -112,13 +118,13 @@ class Nodes extends EventEmitter {
             this.emit('close')
           })
           this.secondary.provider.on('status', status => {
-            if (status === 'connected' && this.secondary.network && this.secondary.network !== store('main.connection.network')) {
+            if (status === 'connected' && this.secondary.network && this.secondary.network !== store('main.currentNetwork.id')) {
               this.secondary.connected = false
               this.secondary.type = ''
               this.secondary.status = 'network mismatch'
               this.update('secondary')
             } else {
-              this.local.status = status
+              this.primary.status = status
               this.update('secondary')
             }
           })
@@ -141,70 +147,74 @@ class Nodes extends EventEmitter {
     }
 
 
-    if (connection.local.on) {
-      log.info('    local connection: ON')
-      const settings = store('main.connection.local.settings', store('main.connection.network'))
-      const target = settings.options[settings.current]
-      if (!this.local.provider || this.local.currentLocalTarget !== target) {
-        log.info('    Creating local connection becasue it didn\'t exist or the target changed')
-        if (this.local.provider) this.local.provider.close()
-        this.local.provider = null
-        this.local.currentLocalTarget = target
-        this.local.status = 'loading'
-        this.local.connected = false
-        this.local.type = ''
-        this.update('local')
-        this.local.provider = provider(target, { name: 'local', infuraId: '786ade30f36244469480aa5c2bf0743b' })
-        this.local.provider.on('connect', () => {
-          log.info('    Local connection connected')
-          this.getNetwork(this.local.provider, (err, response) => {
-            this.local.network = !err && response && !response.error ? response.result : ''
-            if (this.local.network && this.local.network !== store('main.connection.network')) {
-              this.local.connected = false
-              this.local.type = ''
-              this.local.status = 'network mismatch'
-              this.update('local')
+    if (connection.primary.on) {
+      log.info('    Primary connection: ON')
+      const { type, id } = store('main.currentNetwork')
+      const connection = store('main.networks', type, id, 'connection')
+      const { primary } = connection
+      const presets = store('main.networkPresets', type)
+      const currentPresets = Object.assign({}, presets.default, presets[id])
+      const target = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
+      if (!this.primary.provider || this.primary.currentPrimaryTarget !== target) {
+        log.info('    Creating primary connection becasue it didn\'t exist or the target changed')
+        if (this.primary.provider) this.primary.provider.close()
+        this.primary.provider = null
+        this.primary.currentPrimaryTarget = target
+        this.primary.status = 'loading'
+        this.primary.connected = false
+        this.primary.type = ''
+        this.update('primary')
+        this.primary.provider = provider(target, { name: 'primary', infuraId: '786ade30f36244469480aa5c2bf0743b' })
+        this.primary.provider.on('connect', () => {
+          log.info('    Primary connection connected')
+          this.getNetwork(this.primary.provider, (err, response) => {
+            this.primary.network = !err && response && !response.error ? response.result : ''
+            if (this.primary.network && this.primary.network !== store('main.currentNetwork.id')) {
+              this.primary.connected = false
+              this.primary.type = ''
+              this.primary.status = 'network mismatch'
+              this.update('primary')
             } else {
-              this.local.status = 'connected'
-              this.local.connected = true
-              this.local.type = ''
-              this.update('local')
+              this.primary.status = 'connected'
+              this.primary.connected = true
+              this.primary.type = ''
+              this.update('primary')
               this.emit('connect')
             }
           })
         })
-        this.local.provider.on('close', () => {
-          log.info('    local connection close')
-          this.local.connected = false
-          this.local.type = ''
-          this.local.network = ''
-          this.update('local')
+        this.primary.provider.on('close', () => {
+          log.info('    Primary connection close')
+          this.primary.connected = false
+          this.primary.type = ''
+          this.primary.network = ''
+          this.update('primary')
           this.emit('close')
         })
-        this.local.provider.on('status', status => {
-          if (status === 'connected' && this.local.network && this.local.network !== store('main.connection.network')) {
-            this.local.connected = false
-            this.local.type = ''
-            this.local.status = 'network mismatch'
-            this.update('local')
+        this.primary.provider.on('status', status => {
+          if (status === 'connected' && this.primary.network && this.primary.network !== store('main.currentNetwork.id')) {
+            this.primary.connected = false
+            this.primary.type = ''
+            this.primary.status = 'network mismatch'
+            this.update('primary')
           } else {
-            this.local.status = status
-            this.update('local')
+            this.primary.status = status
+            this.update('primary')
           }
         })
-        this.local.provider.on('data', data => this.emit('data', data))
-        this.local.provider.on('error', err => this.emit('error', err))
+        this.primary.provider.on('data', data => this.emit('data', data))
+        this.primary.provider.on('error', err => this.emit('error', err))
       }
     } else {
-      log.info('    local connection: OFF')
-      if (this.local.provider) this.local.provider.close()
-      this.local.provider = null
-      if (this.local.status !== 'off') {
-        this.local.status = 'off'
-        this.local.connected = false
-        this.local.type = ''
-        this.local.network = ''
-        this.update('local')
+      log.info('    Primary connection: OFF')
+      if (this.primary.provider) this.primary.provider.close()
+      this.primary.provider = null
+      if (this.primary.status !== 'off') {
+        this.primary.status = 'off'
+        this.primary.connected = false
+        this.primary.type = ''
+        this.primary.network = ''
+        this.update('primary')
       }
     }
   }
@@ -215,12 +225,12 @@ class Nodes extends EventEmitter {
   }
 
   send (payload, res) {
-    if (this.local.provider && this.local.connected && this.local.network === store('main.connection.network')) {
-      this.local.provider.sendAsync(payload, (err, result) => {
+    if (this.primary.provider && this.primary.connected && this.primary.network === store('main.currentNetwork.id')) {
+      this.primary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
       })
-    } else if (this.secondary.provider && this.secondary.connected && this.secondary.network === store('main.connection.network')) {
+    } else if (this.secondary.provider && this.secondary.connected && this.secondary.network === store('main.currentNetwork.id')) {
       this.secondary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)

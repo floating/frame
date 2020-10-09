@@ -97,55 +97,55 @@ class AddPhrase extends React.Component {
   }
 
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'phaseItem phaseItemSmart'
+    if (this.state.adding) itemClass += ' phaseItemAdding'
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
-        <div className='addAccountItemBar addAccountItemHot' />
-        <div className='addAccountItemWrap'>
-          <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+        <div className='phaseItemBar phaseItemHot' />
+        <div className='phaseItemWrap'>
+          <div className='phaseItemTop'>
+            <div className='phaseItemIcon'>
+              <div className='phaseItemIconType phaseItemIconHot'>{svg.quote(18)}</div>
+              <div className='phaseItemIconHex phaseItemIconHexHot' />
             </div>
-            <div className='addAccountItemTopTitle'>Phrase</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='phaseItemTopTitle'>Phrase</div>
+            <div className='phaseItemTopTitle' />
           </div>
-          <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
-          <div className='addAccountItemOption'>
+          <div className='phaseItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
+          <div className='phaseItemOption'>
             <div
-              className='addAccountItemOptionIntro' onMouseDown={() => {
+              className='phaseItemOptionIntro' onMouseDown={() => {
                 this.adding()
                 if (this.store('main.currentNetwork.id') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
               }}
             >
               {'Add Phrase Account'}
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className='addAccountItemOptionSetupFrames'>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>seed phrase</div>
-                  <div className='addAccountItemOptionInputPhrase'>
+            <div className='phaseItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className='phaseItemOptionSetupFrames'>
+                <div className='phaseItemOptionSetupFrame'>
+                  <div className='phaseItemOptionTitle'>seed phrase</div>
+                  <div className='phaseItemOptionInputPhrase'>
                     <textarea tabIndex='-1' value={this.state.phrase} ref={this.forms[0]} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
+                  <div className='phaseItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>create password</div>
-                  <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
-                    <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
+                <div className='phaseItemOptionSetupFrame'>
+                  <div className='phaseItemOptionTitle'>create password</div>
+                  <div className='phaseItemOptionInputPhrase phaseItemOptionInputPassword'>
+                    <div className='phaseItemOptionSubtitle'>password must be 12 characters or longer</div>
                     <input type='password' tabIndex='-1' value={this.state.password} ref={this.forms[1]} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
+                  <div className='phaseItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                <div className='phaseItemOptionSetupFrame'>
+                  <div className='phaseItemOptionTitle'>{this.state.status}</div>
+                  {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                 </div>
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary' />
+          <div className='phaseItemSummary' />
         </div>
       </div>
     )
