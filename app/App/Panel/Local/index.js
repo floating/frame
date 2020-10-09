@@ -20,7 +20,7 @@ class Settings extends React.Component {
       if (this.network !== id || this.networkType !== type) {
         this.networkType = type
         this.network = id
-        const primaryCustom = context.store('main.networks', type, id , 'primary.custom') || this.customMessage
+        const primaryCustom = context.store('main.networks', type, id, 'primary.custom') || this.customMessage
         const secondaryCustom = context.store('main.networks', type, id, 'secondary.custom') || this.customMessage
         this.setState({ primaryCustom, secondaryCustom })
       }
@@ -102,7 +102,7 @@ class Settings extends React.Component {
     let status = connection.status
     const current = connection.current
 
-    if (current === 'custom' ) {
+    if (current === 'custom') {
       if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage && !this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
       if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
     }
@@ -151,7 +151,7 @@ class Settings extends React.Component {
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
-    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom'})
+    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
     const networkOptions = []
     Object.keys(networks).map(type => {
       Object.keys(networks[type]).map(id => {
@@ -263,7 +263,7 @@ class Settings extends React.Component {
             </div>
           </div>
           <div className='snipIt'>
-            <div>{'Trying to use Frame with a dapp in your browser?'}</div>
+            <div>Trying to use Frame with a dapp in your browser?</div>
             <div className='snipItBrowserExtensionIcons'>
               <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
                 {svg.chrome(30)}
@@ -272,7 +272,7 @@ class Settings extends React.Component {
                 {svg.firefox(30)}
               </div>
             </div>
-            <div>{'Inject Frame with our extension!'}</div>
+            <div>Inject Frame with our extension!</div>
           </div>
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
@@ -299,7 +299,7 @@ export default Restore.connect(Settings)
 //   </div>
 // </div>
 
-{/* <div className='signerPermission'>
+/* <div className='signerPermission'>
   <div className={this.store('main..connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
     <div className='connectionOptionToggle'>
       <div className='signerPermissionOrigin'>Local</div>
@@ -326,4 +326,4 @@ export default Restore.connect(Settings)
       </div>
     </div>
   </div>
-</div> */}
+</div> */

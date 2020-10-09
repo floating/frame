@@ -154,7 +154,7 @@ class AddRing extends React.Component {
     let itemClass = 'addAccountItem addAccountItemSmart'
     if (this.state.adding) itemClass += ' addAccountItemAdding'
     const { type, id } = this.store('main.currentNetwork')
-    const network = type + ':' +  id
+    const network = type + ':' + id
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemHot' />

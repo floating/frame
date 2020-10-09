@@ -3,7 +3,7 @@ const state = require('./state')
 const actions = require('./actions')
 const persist = require('./persist')
 
-// TODO: Layer persisted op top of initial state 
+// TODO: Layer persisted op top of initial state
 
 // const get = (path, obj = persist.get('main')) => {
 //   path.split('.').some((key, i) => {

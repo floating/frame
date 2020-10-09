@@ -10,6 +10,7 @@ class Network extends React.Component {
     const { id, name, type, explorer } = this.props
     this.state = { id, name, explorer, type }
   }
+
   render () {
     const changed = (
       this.props.id !== this.state.id ||
@@ -20,23 +21,28 @@ class Network extends React.Component {
     return (
       <div className='phaseNetworkLine'>
         {changed ? (
-          <div className='phaseNetworkSubmit phaseNetworkSubmitEnabled'  onMouseDown={() => {
-            const net = { id: this.props.id, name: this.props.name, type: this.props.type, explorer: this.props.explorer }
-            const newNet = { id: this.state.id, name: this.state.name, type: this.state.type,  explorer: this.state.explorer }
-            link.send('tray:action', 'updateNetwork', net, newNet)
-          }}>
+          <div
+            className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
+              const net = { id: this.props.id, name: this.props.name, type: this.props.type, explorer: this.props.explorer }
+              const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, explorer: this.state.explorer }
+              link.send('tray:action', 'updateNetwork', net, newNet)
+            }}
+          >
             {svg.save(16)}
           </div>
-        ):(
-          <div className='phaseNetworkSubmit phaseNetworkRemove'  onMouseDown={() => {
-            const { id, name, type, explorer } = this.props
-            link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
-          }}>
+        ) : (
+          <div
+            className='phaseNetworkSubmit phaseNetworkRemove' onMouseDown={() => {
+              const { id, name, type, explorer } = this.props
+              link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+            }}
+          >
             {svg.trash(16)}
           </div>
         )}
         <div className='phaseNetworkName'>
-          <input value={this.state.name} spellCheck='false' 
+          <input
+            value={this.state.name} spellCheck='false'
             onChange={(e) => {
               this.setState({ name: e.target.value })
             }}
@@ -44,9 +50,10 @@ class Network extends React.Component {
               if (e.target.value === '') this.setState({ name: this.props.name })
             }}
           />
-        </div> 
+        </div>
         <div className='phaseNetworkId'>
-          <input value={this.state.id} spellCheck='false' 
+          <input
+            value={this.state.id} spellCheck='false'
             onChange={(e) => {
               this.setState({ id: e.target.value })
             }}
@@ -56,7 +63,8 @@ class Network extends React.Component {
           />
         </div>
         <div className='phaseNetworkExplorer'>
-          <input value={this.state.explorer} spellCheck='false' 
+          <input
+            value={this.state.explorer} spellCheck='false'
             onChange={(e) => {
               this.setState({ explorer: e.target.value })
             }}
@@ -69,7 +77,6 @@ class Network extends React.Component {
     )
   }
 }
-
 
 class NetworkWrap extends React.Component {
   constructor (...args) {
@@ -123,7 +130,7 @@ class NetworkWrap extends React.Component {
     )
 
     const newNetworkReady = (
-      this.state.newNetworkId !== this.newNetworkIdDefault &&  this.state.newNetworkId !== '' &&
+      this.state.newNetworkId !== this.newNetworkIdDefault && this.state.newNetworkId !== '' &&
       this.state.newNetworkName !== this.newNetworkNameDefault && this.state.newNetworkName !== '' &&
       this.state.newNetworkExplorer !== this.newNetworkExplorerDefault && this.state.newNetworkExplorer !== ''
     )
@@ -139,29 +146,32 @@ class NetworkWrap extends React.Component {
           <div className='phaseBreak' style={{ margin: '13px 0px 11px 0px' }} />
           <div className='phaseNetworkLine phaseNetworkCreate'>
             {changedNewNetwork && newNetworkReady ? (
-              <div className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
-                const net = {
-                  id: this.state.newNetworkId, 
-                  name: this.state.newNetworkName,
-                  type: this.state.newNetworkType, 
-                  explorer: this.state.newNetworkExplorer
-                }
-                link.send('tray:action', 'addNetwork', net)
-                this.setState({
-                  newNetworkId: this.newNetworkIdDefault,
-                  newNetworkName: this.newNetworkNameDefault,
-                  newNetworkExplorer: this.newNetworkExplorerDefault
-                })
-              }}>
+              <div
+                className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
+                  const net = {
+                    id: this.state.newNetworkId,
+                    name: this.state.newNetworkName,
+                    type: this.state.newNetworkType,
+                    explorer: this.state.newNetworkExplorer
+                  }
+                  link.send('tray:action', 'addNetwork', net)
+                  this.setState({
+                    newNetworkId: this.newNetworkIdDefault,
+                    newNetworkName: this.newNetworkNameDefault,
+                    newNetworkExplorer: this.newNetworkExplorerDefault
+                  })
+                }}
+              >
                 {svg.save(18)}
               </div>
-            ):(
+            ) : (
               <div className='phaseNetworkSubmit'>
                 {svg.octicon('plus', { height: 17 })}
               </div>
             )}
             <div className='phaseNetworkName'>
-              <input value={this.state.newNetworkName} spellCheck='false' 
+              <input
+                value={this.state.newNetworkName} spellCheck='false'
                 onChange={(e) => {
                   this.setState({ newNetworkName: e.target.value })
                 }}
@@ -169,12 +179,13 @@ class NetworkWrap extends React.Component {
                   if (e.target.value === this.newNetworkNameDefault) this.setState({ newNetworkName: '' })
                 }}
                 onBlur={(e) => {
-                  if (e.target.value === '') this.setState({ newNetworkName: this.newNetworkNameDefault  })
+                  if (e.target.value === '') this.setState({ newNetworkName: this.newNetworkNameDefault })
                 }}
               />
             </div>
             <div className='phaseNetworkId'>
-              <input value={this.state.newNetworkId} spellCheck='false' 
+              <input
+                value={this.state.newNetworkId} spellCheck='false'
                 onChange={(e) => {
                   if (Number(parseInt(e.target.value)) || e.target.value === '') {
                     this.setState({ newNetworkId: e.target.value })
@@ -184,12 +195,13 @@ class NetworkWrap extends React.Component {
                   if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
                 }}
                 onBlur={(e) => {
-                  if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault  })
+                  if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
                 }}
               />
             </div>
             <div className='phaseNetworkExplorer'>
-              <input value={this.state.newNetworkExplorer} spellCheck='false' 
+              <input
+                value={this.state.newNetworkExplorer} spellCheck='false'
                 onChange={(e) => {
                   this.setState({ newNetworkExplorer: e.target.value })
                 }}
@@ -197,7 +209,7 @@ class NetworkWrap extends React.Component {
                   if (e.target.value === this.newNetworkExplorerDefault) this.setState({ newNetworkExplorer: '' })
                 }}
                 onBlur={(e) => {
-                  if (e.target.value === '') this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault  })
+                  if (e.target.value === '') this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault })
                 }}
               />
             </div>

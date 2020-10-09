@@ -160,10 +160,10 @@ module.exports = {
       try {
         net.id = parseInt(net.id)
         if (
-          typeof(parseInt(net.id)) !== 'number' ||
-          typeof(net.type) !== 'string' ||
-          typeof(net.name) !== 'string' ||
-          typeof(net.explorer) !== 'string' ||
+          typeof (parseInt(net.id)) !== 'number' ||
+          typeof (net.type) !== 'string' ||
+          typeof (net.name) !== 'string' ||
+          typeof (net.explorer) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
           throw new Error('Invalid network settings')
@@ -183,25 +183,25 @@ module.exports = {
     u('main', main => {
       try {
         if (
-          typeof(parseInt(net.id)) !== 'number' ||
-          typeof(net.type) !== 'string' ||
-          typeof(net.name) !== 'string' ||
-          typeof(net.explorer) !== 'string' ||
+          typeof (parseInt(net.id)) !== 'number' ||
+          typeof (net.type) !== 'string' ||
+          typeof (net.name) !== 'string' ||
+          typeof (net.explorer) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
           throw new Error('Invalid network settings')
         }
         if (
-          typeof(parseInt(newNet.id)) !== 'number' ||
-          typeof(newNet.type) !== 'string' ||
-          typeof(newNet.name) !== 'string' ||
-          typeof(newNet.explorer) !== 'string' ||
+          typeof (parseInt(newNet.id)) !== 'number' ||
+          typeof (newNet.type) !== 'string' ||
+          typeof (newNet.name) !== 'string' ||
+          typeof (newNet.explorer) !== 'string' ||
           ['ethereum'].indexOf(newNet.type) === -1
         ) {
           throw new Error('Invalid new network settings')
         }
       } catch (e) {
-        log.error(e)
+        console.error(e)
         return main
       }
       if (main.networks[newNet.type][newNet.id]) {
@@ -218,7 +218,7 @@ module.exports = {
       main.networks[newNet.type][newNet.id] = updateNetwork
       if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's being changed
         const reset = { status: 'loading', connected: false, type: '', network: '' }
-        main.currentNetwork = { type: newNet.type, id: newNet.id}
+        main.currentNetwork = { type: newNet.type, id: newNet.id }
         main.networks[newNet.type][newNet.id].primary = Object.assign({}, main.networks[newNet.type][newNet.id].primary, reset)
         main.networks[newNet.type][newNet.id].secondary = Object.assign({}, main.networks[newNet.type][newNet.id].secondary, reset)
       }

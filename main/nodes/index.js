@@ -59,7 +59,7 @@ class Nodes extends EventEmitter {
       log.info('    Network changed from ' + this.network + ' to ' + connection.network)
       this.network = connection.network
     }
-    
+
     // Secondary connection is on
     if (connection.secondary.on) {
       log.info('    Secondary connection: ON')
@@ -145,7 +145,6 @@ class Nodes extends EventEmitter {
         this.update('secondary')
       }
     }
-
 
     if (connection.primary.on) {
       log.info('    Primary connection: ON')

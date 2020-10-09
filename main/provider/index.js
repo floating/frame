@@ -252,13 +252,13 @@ class Provider extends EventEmitter {
         const network = store('main.currentNetwork')
         if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
         store.setGasPrices(network.type, network.id, {
-          safelow: ('0x' + (prices.safeLow * 100000000).toString(16)), 
-          standard: ('0x' + (prices.average * 100000000).toString(16)), 
+          safelow: ('0x' + (prices.safeLow * 100000000).toString(16)),
+          standard: ('0x' + (prices.average * 100000000).toString(16)),
           fast: ('0x' + (prices.fast * 100000000).toString(16)),
           trader: ('0x' + (prices.fastest * 100000000).toString(16)),
           custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
         })
-        const { levels, selected }= store('main.networks', network.type, network.id, 'gas.price')
+        const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
         res({ result: levels[selected] })
       } catch (error) {
         log.error(error)
@@ -272,8 +272,8 @@ class Provider extends EventEmitter {
             const network = store('main.currentNetwork')
             if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
             store.setGasPrices(network.type, network.id, {
-              safelow: response.result, 
-              standard: response.result, 
+              safelow: response.result,
+              standard: response.result,
               fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
               trader: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
               custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || response.result

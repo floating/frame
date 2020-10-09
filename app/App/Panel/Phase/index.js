@@ -5,7 +5,6 @@ import Restore from 'react-restore'
 import { Transition } from 'react-transition-group'
 import svg from '../../../svg'
 
-
 import Networks from './Networks'
 
 // import AddHardware from './AddHardware'
@@ -42,20 +41,22 @@ class Add extends React.Component {
 
   render () {
     return (
-      <div className='phase' style={{ pointerEvents: this.store('view.addNetwork') ? 'auto': 'none' }}>
+      <div className='phase' style={{ pointerEvents: this.store('view.addNetwork') ? 'auto' : 'none' }}>
         <Transition in={Boolean(this.store('view.addNetwork'))} timeout={duration} onEnter={() => this.start()} onExit={() => this.exit()}>
           {state => {
             return (
               <>
                 {state !== 'exited' ? (
-                  <> 
+                  <>
                     <div className={state === 'entered' ? 'phaseShade phaseShadeActive' : 'phaseShade'} />
                     <div className={state === 'entered' ? 'phaseMain phaseMainActive' : 'phaseMain'}>
                       <Networks />
                     </div>
-                    <div className={state === 'entered' ? 'phaseClose phaseCloseActive' : 'phaseClose'} onMouseDown={() => {
-                      this.store.toggleAddNetwork()
-                    }}>
+                    <div
+                      className={state === 'entered' ? 'phaseClose phaseCloseActive' : 'phaseClose'} onMouseDown={() => {
+                        this.store.toggleAddNetwork()
+                      }}
+                    >
                       {svg.octicon('x', { height: 18 })}
                     </div>
                   </>
@@ -74,12 +75,11 @@ class Add extends React.Component {
 
 export default Restore.connect(Add)
 
-
-{/* <div className='phaseHeader'><div style={{ marginRight: '10px' }}>{svg.octicon('server', { height: 17 })}</div><div>Hardware Accounts</div></div>
+/* <div className='phaseHeader'><div style={{ marginRight: '10px' }}>{svg.octicon('server', { height: 17 })}</div><div>Hardware Accounts</div></div>
 <AddHardware index={1} type='ledger' />
 <AddHardware index={2} type='trezor' />
 <div className='phaseHeader'><div>{svg.lightbulb(20)}</div><div>Smart Accounts</div></div>
 <AddAragon index={3} />
 <div className='phaseHeader'><div>{svg.flame(20)}</div><div>Hot Accounts</div></div>
 <AddPhrase index={4} />
-<AddRing index={5} /> */}
+<AddRing index={5} /> */

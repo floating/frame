@@ -21,13 +21,13 @@ const initial = {
     show: false,
     view: 'default'
   },
-  view: { 
-    current: '', 
-    list: [], 
-    data: {}, 
-    notify: '', 
-    notifyData: {}, 
-    badge: '', 
+  view: {
+    current: '',
+    list: [],
+    data: {},
+    notify: '',
+    notifyData: {},
+    badge: '',
     addAccount: '', // Add view (needs to be merged into Phase)
     addNetwork: false // Phase view (needs to be merged with Add)
   },
@@ -122,7 +122,7 @@ const initial = {
       }
     },
     currentNetwork: {
-      type: 'ethereum', 
+      type: 'ethereum',
       id: 1
     },
     networkPresets: {
@@ -130,22 +130,22 @@ const initial = {
         default: {
           local: 'direct'
         },
-        1: { 
+        1: {
           infura: 'infura'
         },
-        3: { 
+        3: {
           infura: 'infuraRopsten'
         },
-        4: { 
+        4: {
           infura: 'infuraRinkeby'
         },
-        5: { 
+        5: {
           prylabs: 'https://goerli.prylabs.net'
         },
-        42: { 
+        42: {
           infura: 'infuraKovan'
         },
-        100: { 
+        100: {
           poa: 'https://dai.poa.network'
         }
       }
@@ -380,7 +380,7 @@ const initial = {
               local: 'direct'
             }
           },
-          4: { 
+          4: {
             current: main('connection.secondary.settings.4.current', 'custom'),
             options: {
               infura: 'infuraRinkeby',
@@ -430,10 +430,10 @@ const initial = {
   }
 }
 
-// Persist these paths
-const syncPaths = [
-  'main.networks'
-]
+// New perist pattern, persist these paths
+// const syncPaths = [
+//   'main.networks'
+// ]
 
 // Rename direct to local
 if (initial.main.connection.local.settings[1].current === 'direct') initial.main.connection.local.settings[1].current = 'local'
@@ -470,7 +470,7 @@ if (initial.main.gasPrice) {
   delete initial.main.gasPrice
 }
 
-// If state still had inital.main.connection, move connection settings into networks 
+// If state still had inital.main.connection, move connection settings into networks
 if (initial.main.connection) {
   // Copy all local connection settings to new connection object
   if (initial.main.connection.local && initial.main.connection.local.settings) {
@@ -485,7 +485,7 @@ if (initial.main.connection) {
       }
     })
   }
-  
+
   // Copy all secondary connection settings to new connection object
   if (initial.main.connection.secondary && initial.main.connection.secondary.settings) {
     Object.keys(initial.main.connection.secondary.settings).forEach(id => {
@@ -493,7 +493,7 @@ if (initial.main.connection) {
       if (initial.main.connection.secondary.settings[id].options && initial.main.networks.ethereum[id].connection && initial.main.networks.ethereum[id].connection.primary) {
         initial.main.networks.ethereum[id].connection.secondary.custom = initial.main.connection.secondary.settings[id].options.custom
       }
-  
+
       // Copy local current selection to new connection object
       if (initial.main.connection.secondary.settings[id].current) {
         initial.main.networks.ethereum[id].connection.secondary.current = initial.main.connection.secondary.settings[id].current
@@ -507,9 +507,9 @@ if (initial.main.connection) {
   })
   // Copy current network
   initial.main.currentNetwork = {
-    type: 'ethereum', 
+    type: 'ethereum',
     id: initial.main.connection.network
-  } 
+  }
   // Delete initial.main.connection
   delete initial.main.connection
 }

@@ -17,7 +17,7 @@ const addPermissionRequest = (address, origin) => {
       if (perms[permIndex] && perms[permIndex].provider) {
         resolve(true)
       } else {
-        reject(false)
+        reject(new Error('Origin does not have provider permissions'))
       }
     })
   })
