@@ -248,7 +248,7 @@ class Provider extends EventEmitter {
       try {
         const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
         const prices = await response.json()
-        const chain = parseInt(rawTx.chainId, 'hex')
+        const chain = parseInt(rawTx.chainId, 'hex').toString()
         const network = store('main.currentNetwork')
         if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
         store.setGasPrices(network.type, network.id, {
@@ -268,8 +268,9 @@ class Provider extends EventEmitter {
       this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, (response) => {
         if (response.result) {
           try {
-            const chain = parseInt(rawTx.chainId, 'hex')
+            const chain = parseInt(rawTx.chainId, 'hex').toString()
             const network = store('main.currentNetwork')
+            console.log(chain, network)
             if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
             store.setGasPrices(network.type, network.id, {
               safelow: response.result,
