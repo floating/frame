@@ -23,7 +23,11 @@ module.exports = {
   setSecondaryCustom: (u, netType, netId, target) => {
     u('main.networks', netType, netId, 'connection.secondary.custom', () => target)
   },
-  toggleConnection: (u, netType, netId, node, on) => u('main', netType, netId, 'connection', node, 'on', (value) => on !== undefined ? on : !value),
+  toggleConnection: (u, netType, netId, node, on) => {
+    u('main.networks', netType, netId, 'connection', node, 'on', (value) => {
+      return on !== undefined ? on : !value
+    })
+  },
   setPrimary: (u, netType, netId, status) => {
     u('main.networks', netType, netId, 'connection.primary', primary => {
       return Object.assign({}, primary, status)
@@ -211,7 +215,6 @@ module.exports = {
       if (main.networks[net.type]) delete main.networks[net.type][net.id]
       if (!main.networks[newNet.type]) main.networks[newNet.type] = {}
       const updateNetwork = Object.assign(existingNet, newNet)
-      console.log('updateNetwork', updateNetwork)
       main.networks[newNet.type][newNet.id] = updateNetwork
       return main
     })
@@ -228,7 +231,6 @@ module.exports = {
         const id = Object.keys(main.networks[net.type]).map(i => parseInt(i)).sort((a, b) => a - b)[0].toString()
         const reset = { status: 'loading', connected: false, type: '', network: '' }
         main.currentNetwork = { type: net.type, id }
-        console.log('setting current network to ', main.currentNetwork)
         main.networks[net.type][id].primary = Object.assign({}, main.networks[net.type][id].primary, reset)
         main.networks[net.type][id].secondary = Object.assign({}, main.networks[net.type][id].secondary, reset)
       }

@@ -18,16 +18,12 @@ const store = require('./store')
 
 // Action Monitor
 // store.api.feed((state, actions, obscount) => {
-//   console.log('  ')
-//   console.log(' VVVVVV ')
 //   actions.forEach(a => {
 //     console.log(a.name)
 //     a.updates.forEach(u => {
 //       console.log(u.path)
 //     })
 //   })
-//   console.log(' ^^^^^^^ ')
-//   console.log(' ')
 // })
 
 const accounts = require('./accounts')

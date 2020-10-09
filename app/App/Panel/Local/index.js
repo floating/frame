@@ -158,9 +158,6 @@ class Settings extends React.Component {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
-
-    console.log('connection.primary.current', connection.primary)
-
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
@@ -179,7 +176,7 @@ class Settings extends React.Component {
             <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
                 <div className='signerPermissionOrigin'>Primary</div>
-                <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'primary')}>
+                <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
               </div>
@@ -190,7 +187,6 @@ class Settings extends React.Component {
                     syncValue={type + ':' + id + ':' + connection.primary.current}
                     onChange={preset => {
                       const [type, id, value] = preset.split(':')
-                      console.log('setPrimary', type, id, value)
                       link.send('tray:action', 'selectPrimary', type, id, value)
                     }}
                     options={presets}
@@ -206,7 +202,7 @@ class Settings extends React.Component {
             <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
                 <div className='signerPermissionOrigin'>Secondary</div>
-                <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'secondary')}>
+                <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
               </div>

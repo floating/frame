@@ -23,7 +23,6 @@ class Network extends React.Component {
           <div className='phaseNetworkSubmit phaseNetworkSubmitEnabled'  onMouseDown={() => {
             const net = { id: this.props.id, name: this.props.name, type: this.props.type, explorer: this.props.explorer }
             const newNet = { id: this.state.id, name: this.state.name, type: this.state.type,  explorer: this.state.explorer }
-            console.log('updateNetwork', net, newNet)
             link.send('tray:action', 'updateNetwork', net, newNet)
           }}>
             {svg.save(16)}
@@ -90,7 +89,6 @@ class NetworkWrap extends React.Component {
   renderNetworks () {
     const networks = this.store('main.networks')
     const nets = []
-    console.log('renderNetwors, ', networks)
     Object.keys(networks).forEach(type => {
       nets.push(
         <div key={type}>
@@ -183,7 +181,6 @@ class NetworkWrap extends React.Component {
                   }
                 }}
                 onFocus={(e) => {
-                  console.log(e.target.value, this.newNetworkIdDefault)
                   if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
                 }}
                 onBlur={(e) => {

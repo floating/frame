@@ -13,7 +13,6 @@ import Badge from './Badge'
 
 class Panel extends React.Component {
   indicator (connection) {
-    console.log(connection)
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
       return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
