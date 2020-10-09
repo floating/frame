@@ -78,8 +78,9 @@ class Nodes extends EventEmitter {
         const { type, id } = store('main.currentNetwork')
         const connection = store('main.networks', type, id, 'connection')
         const { secondary } = connection
-        // const settings = store('main.networks', type, id, 'connection.secondary')
-        const target = secondary.current === 'custom' ? secondary.custom : connection.presets[secondary.current]
+        const presets = store('main.networkPresets', type)
+        const currentPresets = Object.assign({}, presets.default, presets[id])
+        const target = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
         if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== target) {
           log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
           if (this.secondary.provider) this.secondary.provider.close()
@@ -151,7 +152,9 @@ class Nodes extends EventEmitter {
       const { type, id } = store('main.currentNetwork')
       const connection = store('main.networks', type, id, 'connection')
       const { primary } = connection
-      const target = primary.current === 'custom' ? primary.custom : connection.presets[primary.current]
+      const presets = store('main.networkPresets', type)
+      const currentPresets = Object.assign({}, presets.default, presets[id])
+      const target = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
       if (!this.primary.provider || this.primary.currentPrimaryTarget !== target) {
         log.info('    Creating primary connection becasue it didn\'t exist or the target changed')
         if (this.primary.provider) this.primary.provider.close()

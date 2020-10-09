@@ -5,6 +5,7 @@ import svg from '../../svg'
 import Main from './Main'
 import Local from './Local'
 import Notify from './Notify'
+import Phase from './Phase'
 import Badge from './Badge'
 
 // import DevTools from 'restore-devtools'
@@ -46,6 +47,7 @@ class Panel extends React.Component {
         <Local />
         <Main />
         <Notify />
+        <Phase />
         <Badge />
       </div>
     )

@@ -38,6 +38,7 @@ class Main extends React.Component {
   render () {
     const accounts = {}
     const network = this.store('main.currentNetwork.id')
+    const type = this.store('main.currentNetwork.type')
     Object.keys(this.store('main.accounts')).forEach(id => {
       const account = this.store('main.accounts', id)
       if (account.network === network) accounts[id] = account
@@ -61,7 +62,7 @@ class Main extends React.Component {
               {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
-                  {`No ${this.store('main.networks', network, 'name')} Accounts Found`}
+                  {`No ${this.store('main.networks', type, network, 'name')} Accounts Found`}
                   <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
                   <span className='featureBox'>
                     <span className='featureBoxText'>

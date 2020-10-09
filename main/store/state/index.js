@@ -21,7 +21,16 @@ const initial = {
     show: false,
     view: 'default'
   },
-  view: { current: '', list: [], data: {}, notify: '', notifyData: {}, badge: '', addAccount: '' },
+  view: { 
+    current: '', 
+    list: [], 
+    data: {}, 
+    notify: '', 
+    notifyData: {}, 
+    badge: '', 
+    addAccount: '', // Add view (needs to be merged into Phase)
+    addNetwork: false // Phase view (needs to be merged with Add)
+  },
   signers: {},
   tray: {
     open: false,
@@ -116,6 +125,31 @@ const initial = {
       type: 'ethereum', 
       id: 1
     },
+    networkPresets: {
+      ethereum: {
+        default: {
+          local: 'direct'
+        },
+        1: { 
+          infura: 'infura'
+        },
+        3: { 
+          infura: 'infuraRopsten'
+        },
+        4: { 
+          infura: 'infuraRinkeby'
+        },
+        5: { 
+          prylabs: 'https://goerli.prylabs.net'
+        },
+        42: { 
+          infura: 'infuraKovan'
+        },
+        100: { 
+          poa: 'https://dai.poa.network'
+        }
+      }
+    },
     networks: {
       ethereum: {
         1: {
@@ -130,12 +164,9 @@ const initial = {
             }
           },
           connection: {
-            presets: { infura: 'infura', local: 'direct' },
             primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          preset: true,
-          hidden: false
+          }
         },
         3: {
           id: 3,
@@ -149,12 +180,9 @@ const initial = {
             }
           },
           connection: {
-            presets: { infura: 'infuraRopsten', local: 'direct' },
             primary: { on: true, current: 'infuraRopsten', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          preset: true,
-          hidden: false
+          }
         },
         4: {
           id: 4,
@@ -168,12 +196,9 @@ const initial = {
             }
           },
           connection: {
-            presets: { infura: 'infuraRinkeby', local: 'direct' },
             primary: { on: true, current: 'infuraRinkeby', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          preset: true,
-          hidden: false
+          }
         },
         5: {
           id: 5,
@@ -187,12 +212,9 @@ const initial = {
             }
           },
           connection: {
-            presets: { prylabs: 'https://goerli.prylabs.net', local: 'direct' },
             primary: { on: true, current: 'prylabs', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          preset: true,
-          hidden: false
+          }
         },
         42: {
           id: 42,
@@ -206,12 +228,9 @@ const initial = {
             }
           },
           connection: {
-            presets: { infura: 'infuraKovan', local: 'direct' },
             primary: { on: true, current: 'infuraKovan', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          preset: true,
-          hidden: false
+          }
         },
         74: {
           id: 74,
@@ -225,12 +244,9 @@ const initial = {
             }
           },
           connection: {
-            presets: { local: 'direct' },
             primary: { on: true, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          preset: true,
-          hidden: false
+          }
         },
         100: {
           id: 100,
@@ -244,16 +260,13 @@ const initial = {
             }
           },
           connection: {
-            presets: { poa: 'https://dai.poa.network', local: 'direct' },
             primary: { on: true, current: 'poa', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          },
-          preset: true,
-          hidden: false
+          }
         }
       }
     },
-    gasPrice: {
+    gasPrice: main('gasPrice', {
       1: {
         default: 'standard',
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
@@ -282,7 +295,7 @@ const initial = {
         default: 'standard',
         levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
       }
-    },
+    }),
     connection: {
       network: main('connection.network', '1'),
       local: {

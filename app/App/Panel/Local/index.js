@@ -147,10 +147,11 @@ class Settings extends React.Component {
     const { type, id } = this.store('main.currentNetwork')
     const networks = this.store('main.networks')
     const connection = networks[type][id].connection
-    const primaryPresets = Object.keys(connection.presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    primaryPresets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom'})
-    const secondaryPresets = Object.keys(connection.presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    secondaryPresets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+    const networkPresets = this.store('main.networkPresets', type)
+    let presets = networkPresets[id]
+    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
+    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
+    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom'})
     const networkOptions = []
     Object.keys(networks).map(type => {
       Object.keys(networks[type]).map(id => {
@@ -167,7 +168,7 @@ class Settings extends React.Component {
         <div className='localSettingsWrap'>
           <div className='localSettingsTitle connectionTitle' style={{ zIndex: 3 }}>
             <div className='localSettingsTitleText'>Connection</div>
-            <div className='localSettingsAddNetwork' onMouseDown={() => this.store.notify('editNetworks')}>{svg.broadcast(16)}</div>
+            <div className='localSettingsAddNetwork' onMouseDown={() => this.store.toggleAddNetwork()}>{svg.broadcast(16)}</div>
             <Dropdown
               syncValue={type + ':' + id}
               onChange={(network) => this.selectNetwork(network)}
@@ -192,7 +193,7 @@ class Settings extends React.Component {
                       console.log('setPrimary', type, id, value)
                       link.send('tray:action', 'selectPrimary', type, id, value)
                     }}
-                    options={primaryPresets}
+                    options={presets}
                   />
                 </div>
               </div>
@@ -218,7 +219,7 @@ class Settings extends React.Component {
                       const [type, id, value] = preset.split(':')
                       link.send('tray:action', 'selectSecondary', type, id, value)
                     }}
-                    options={secondaryPresets}
+                    options={presets}
                   />
                 </div>
               </div>
