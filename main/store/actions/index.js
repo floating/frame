@@ -162,6 +162,7 @@ module.exports = {
         if (
           typeof(parseInt(net.id)) !== 'number' ||
           typeof(net.type) !== 'string' ||
+          typeof(net.name) !== 'string' ||
           typeof(net.explorer) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
@@ -184,6 +185,7 @@ module.exports = {
         if (
           typeof(parseInt(net.id)) !== 'number' ||
           typeof(net.type) !== 'string' ||
+          typeof(net.name) !== 'string' ||
           typeof(net.explorer) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
@@ -192,6 +194,7 @@ module.exports = {
         if (
           typeof(parseInt(newNet.id)) !== 'number' ||
           typeof(newNet.type) !== 'string' ||
+          typeof(newNet.name) !== 'string' ||
           typeof(newNet.explorer) !== 'string' ||
           ['ethereum'].indexOf(newNet.type) === -1
         ) {
@@ -201,7 +204,13 @@ module.exports = {
         log.error(e)
         return main
       }
-      if (main.networks[newNet.type][newNet.id]) return main // Network already exists, don't overwrite, notify user
+      if (main.networks[newNet.type][newNet.id]) {
+        if (net.type === newNet.type && net.id === newNet.id) {
+          // Update data.without changing connection..
+          Object.assign(main.networks[newNet.type][newNet.id], newNet)
+        }
+        return main
+      } // Network already exists, don't overwrite, notify user
       const existingNet = Object.assign({}, main.networks[net.type][net.id])
       if (main.networks[net.type]) delete main.networks[net.type][net.id]
       if (!main.networks[newNet.type]) main.networks[newNet.type] = {}
