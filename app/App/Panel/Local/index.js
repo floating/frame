@@ -262,6 +262,18 @@ class Settings extends React.Component {
               {'Use Ledger\'s Legacy or Live derivation path'}
             </div>
           </div>
+          <div className='snipIt'>
+            <div>{'Trying to use Frame with a dapp in your browser?'}</div>
+            <div className='snipItBrowserExtensionIcons'>
+              <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
+                {svg.chrome(30)}
+              </div>
+              <div className='snipItBrowserExtensionIcon snipItSpinRight' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
+                {svg.firefox(30)}
+              </div>
+            </div>
+            <div>{'Inject Frame with our extension!'}</div>
+          </div>
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
         </div>

@@ -55,6 +55,7 @@ process.on('uncaughtException', (e) => {
 const externalWhitelist = [
   'https://frame.sh',
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
+  'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
   'https://github.com/floating/frame/issues/new',
   'https://gitter.im/framehq/general',
   'https://github.com/floating/frame/blob/master/LICENSE',
