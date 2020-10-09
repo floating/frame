@@ -181,10 +181,8 @@ module.exports = {
   updateNetwork: (u, net, newNet) => {
     u('main', main => {
       try {
-        net.id = parseInt(net.id)
-        newNet.id = parseInt(newNet.id)
         if (
-          typeof(net.id) !== 'number' ||
+          typeof(parseInt(net.id)) !== 'number' ||
           typeof(net.type) !== 'string' ||
           typeof(net.explorer) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
@@ -192,7 +190,7 @@ module.exports = {
           throw new Error('Invalid network settings')
         }
         if (
-          typeof(newNet.id) !== 'number' ||
+          typeof(parseInt(newNet.id)) !== 'number' ||
           typeof(newNet.type) !== 'string' ||
           typeof(newNet.explorer) !== 'string' ||
           ['ethereum'].indexOf(newNet.type) === -1
@@ -204,18 +202,17 @@ module.exports = {
         return main
       }
       if (main.networks[newNet.type][newNet.id]) return main // Network already exists, don't overwrite, notify user
-      if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's being changed
-        actions.selectNetwork(u, newNet.type, newNet.id)
-        const reset = { status: 'loading', connected: false, type: '', network: '' }
-        main.currentNetwork = { type: newNet.type, id: newNet.id}
-        main.networks[newNet.type][newNet.id].primary = Object.assign({}, main.networks[newNet.type][newNet.id].primary, reset)
-        main.networks[newNet.type][newNet.id].secondary = Object.assign({}, main.networks[newNet.type][newNet.id].secondary, reset)
-      }
       const existingNet = Object.assign({}, main.networks[net.type][net.id])
       if (main.networks[net.type]) delete main.networks[net.type][net.id]
       if (!main.networks[newNet.type]) main.networks[newNet.type] = {}
       const updateNetwork = Object.assign(existingNet, newNet)
       main.networks[newNet.type][newNet.id] = updateNetwork
+      if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's being changed
+        const reset = { status: 'loading', connected: false, type: '', network: '' }
+        main.currentNetwork = { type: newNet.type, id: newNet.id}
+        main.networks[newNet.type][newNet.id].primary = Object.assign({}, main.networks[newNet.type][newNet.id].primary, reset)
+        main.networks[newNet.type][newNet.id].secondary = Object.assign({}, main.networks[newNet.type][newNet.id].secondary, reset)
+      }
       return main
     })
   },

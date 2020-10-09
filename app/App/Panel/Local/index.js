@@ -148,7 +148,7 @@ class Settings extends React.Component {
     const networks = this.store('main.networks')
     const connection = networks[type][id].connection
     const networkPresets = this.store('main.networkPresets', type)
-    let presets = networkPresets[id]
+    let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom'})
