@@ -127,7 +127,7 @@ class Accounts extends EventEmitter {
       if (newHeadRes.error) {
         log.warn(newHeadRes.error)
         const monitor = async () => {
-          let confirmations 
+          let confirmations
           try {
             confirmations = await this.confirmations(id, hash)
           } catch (e) {
@@ -150,7 +150,7 @@ class Accounts extends EventEmitter {
         const handler = async payload => {
           if (payload.method === 'eth_subscription' && payload.params.subscription === headSub) {
             // const newHead = payload.params.result
-            let confirmations 
+            let confirmations
             try {
               confirmations = await this.confirmations(id, hash)
             } catch (e) {
