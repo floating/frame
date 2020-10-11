@@ -121,10 +121,10 @@ const initial = {
         state: 'off'
       }
     },
-    currentNetwork: {
+    currentNetwork: main('currentNetwork', {
       type: 'ethereum',
       id: 1
-    },
+    }),
     networkPresets: {
       ethereum: {
         default: {
@@ -150,7 +150,7 @@ const initial = {
         }
       }
     },
-    networks: {
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
@@ -265,168 +265,7 @@ const initial = {
           }
         }
       }
-    },
-    gasPrice: main('gasPrice', {
-      1: {
-        default: 'standard',
-        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      },
-      3: {
-        default: 'standard',
-        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      },
-      4: {
-        default: 'standard',
-        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      },
-      5: {
-        default: 'standard',
-        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      },
-      42: {
-        default: 'standard',
-        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      },
-      74: {
-        default: 'standard',
-        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      },
-      100: {
-        default: 'standard',
-        levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
-      }
-    }),
-    connection: {
-      network: main('connection.network', '1'),
-      local: {
-        settings: {
-          1: {
-            current: main('connection.local.settings.1.current', 'infura'),
-            options: {
-              infura: 'infura',
-              custom: main('connection.local.settings.1.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          3: {
-            current: main('connection.local.settings.3.current', 'infura'),
-            options: {
-              infura: 'infuraRopsten',
-              custom: main('connection.local.settings.3.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          4: {
-            current: main('connection.local.settings.4.current', 'infura'),
-            options: {
-              infura: 'infuraRinkeby',
-              custom: main('connection.local.settings.4.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          5: {
-            current: main('connection.local.settings.5.current', 'prylabs'),
-            options: {
-              prylabs: 'https://goerli.prylabs.net',
-              custom: main('connection.local.settings.5.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          42: {
-            current: main('connection.local.settings.42.current', 'infura'),
-            options: {
-              infura: 'infuraKovan',
-              custom: main('connection.local.settings.42.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          74: {
-            current: main('connection.local.settings.74.current', 'custom'),
-            options: {
-              custom: main('connection.local.settings.74.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          100: {
-            current: main('connection.local.settings.100.current', 'poa'),
-            options: {
-              poa: 'https://dai.poa.network',
-              custom: main('connection.local.settings.100.options.custom', ''),
-              local: 'direct'
-            }
-          }
-        },
-        on: main('connection.local.on', true),
-        status: 'loading',
-        connected: false,
-        type: '',
-        network: ''
-      },
-      secondary: {
-        settings: {
-          1: {
-            current: main('connection.secondary.settings.1.current', 'custom'),
-            options: {
-              infura: 'infura',
-              custom: main('connection.secondary.settings.1.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          3: {
-            current: main('connection.secondary.settings.3.current', 'custom'),
-            options: {
-              infura: 'infuraRopsten',
-              custom: main('connection.secondary.settings.3.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          4: {
-            current: main('connection.secondary.settings.4.current', 'custom'),
-            options: {
-              infura: 'infuraRinkeby',
-              custom: main('connection.secondary.settings.4.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          5: {
-            current: main('connection.local.settings.5.current', 'prylabs'),
-            options: {
-              prylabs: 'https://goerli.prylabs.net',
-              custom: main('connection.local.settings.5.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          42: {
-            current: main('connection.secondary.settings.42.current', 'custom'),
-            options: {
-              infura: 'infuraKovan',
-              custom: main('connection.secondary.settings.42.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          74: {
-            current: main('connection.secondary.settings.74.current', 'custom'),
-            options: {
-              custom: main('connection.secondary.settings.74.options.custom', ''),
-              local: 'direct'
-            }
-          },
-          100: {
-            current: main('connection.secondary.settings.100.current', 'poa'),
-            options: {
-              poa: 'https://dai.poa.network',
-              custom: main('connection.secondary.settings.100.options.custom', ''),
-              local: 'direct'
-            }
-          }
-        },
-        on: main('connection.secondary.on', false),
-        status: 'loading',
-        connected: false,
-        type: '',
-        network: ''
-      }
-    }
+    })
   }
 }
 
@@ -434,22 +273,6 @@ const initial = {
 // const syncPaths = [
 //   'main.networks'
 // ]
-
-// Rename direct to local
-if (initial.main.connection.local.settings[1].current === 'direct') initial.main.connection.local.settings[1].current = 'local'
-if (initial.main.connection.local.settings[3].current === 'direct') initial.main.connection.local.settings[3].current = 'local'
-if (initial.main.connection.local.settings[4].current === 'direct') initial.main.connection.local.settings[4].current = 'local'
-if (initial.main.connection.local.settings[42].current === 'direct') initial.main.connection.local.settings[42].current = 'local'
-
-if (initial.main.connection.secondary.settings[1].current === 'direct') initial.main.connection.secondary.settings[1].current = 'local'
-if (initial.main.connection.secondary.settings[3].current === 'direct') initial.main.connection.secondary.settings[3].current = 'local'
-if (initial.main.connection.secondary.settings[4].current === 'direct') initial.main.connection.secondary.settings[4].current = 'local'
-if (initial.main.connection.secondary.settings[42].current === 'direct') initial.main.connection.secondary.settings[42].current = 'local'
-
-// Earlier prerelease versions of 0.3.2 used 'normal' instead of 'standard'
-Object.keys(initial.main.gasPrice).forEach(network => {
-  if (initial.main.gasPrice[network].default === 'normal') initial.main.gasPrice[network].default = 'standard'
-})
 
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.addresses).forEach(address => {
@@ -459,59 +282,195 @@ Object.keys(initial.main.addresses).forEach(address => {
   }
 })
 
-// If state still had inital.main.gasPrice, move gas settings into networks
-if (initial.main.gasPrice) {
-  // For each network with gasPrices, copy over default and custom level
-  Object.keys(initial.main.gasPrice).forEach(network => {
-    initial.main.networks.ethereum[network].gas.price.selected = initial.main.gasPrice[network].default
-    initial.main.networks.ethereum[network].gas.price.levels.custom = initial.main.gasPrice[network].levels.custom
+// If persisted state still has main.gasPrice, move gas settings into networks
+const gasPrice = main('gasPrice', false)
+
+if (gasPrice) {
+  Object.keys(gasPrice).forEach(network => {
+    // Prerelease versions of 0.3.2 used 'normal' instead of 'standard'
+    if (gasPrice[network].default === 'normal') gasPrice[network].default = 'standard'
+    // For each network with gasPrices, copy over default and custom level
+    if (initial.main.networks.ethereum[network] && initial.main.networks.ethereum[network].gas) {
+      initial.main.networks.ethereum[network].gas.price.selected = initial.main.gasPrice[network].default
+      initial.main.networks.ethereum[network].gas.price.levels.custom = initial.main.gasPrice[network].levels.custom
+    }
   })
-  // Delete initial.main.gasPrice
-  delete initial.main.gasPrice
 }
 
-// If state still had inital.main.connection, move connection settings into networks
-if (initial.main.connection) {
+// If persisted state state still has main.connection, move connection settings into networks
+const connection = main('connection', false)
+if (connection) {
   // Copy all local connection settings to new connection object
-  if (initial.main.connection.local && initial.main.connection.local.settings) {
-    Object.keys(initial.main.connection.local.settings).forEach(id => {
-      // Copy local custom endpoint to new connection object
-      if (initial.main.connection.local.settings[id].options && initial.main.networks.ethereum[id].connection && initial.main.networks.ethereum[id].connection.primary) {
-        initial.main.networks.ethereum[id].connection.primary.custom = initial.main.connection.local.settings[id].options.custom
-      }
-      // Copy local current selection to new connection object
-      if (initial.main.connection.local.settings[id].current) {
-        initial.main.networks.ethereum[id].connection.primary.current = initial.main.connection.local.settings[id].current
+  if (connection.local && connection.local.settings) {
+    Object.keys(connection.local.settings).forEach(id => {
+      if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection && initial.main.networks.ethereum[id].connection.secondary) {
+        // Copy local custom endpoint to new connection object
+        if (connection.local.settings[id].options) initial.main.networks.ethereum[id].connection.primary.custom = connection.local.settings[id].options.custom
+        // Copy local current selection to new connection object
+        if (connection.local.settings[id].current) initial.main.networks.ethereum[id].connection.primary.current = connection.local.settings[id].current 
       }
     })
   }
-
   // Copy all secondary connection settings to new connection object
-  if (initial.main.connection.secondary && initial.main.connection.secondary.settings) {
-    Object.keys(initial.main.connection.secondary.settings).forEach(id => {
-      // Copy all secondary connection settings to new connection object
-      if (initial.main.connection.secondary.settings[id].options && initial.main.networks.ethereum[id].connection && initial.main.networks.ethereum[id].connection.primary) {
-        initial.main.networks.ethereum[id].connection.secondary.custom = initial.main.connection.secondary.settings[id].options.custom
-      }
-
-      // Copy local current selection to new connection object
-      if (initial.main.connection.secondary.settings[id].current) {
-        initial.main.networks.ethereum[id].connection.secondary.current = initial.main.connection.secondary.settings[id].current
+  if (connection.secondary && connection.secondary.settings) { 
+    Object.keys(connection.secondary.settings).forEach(id => {
+      if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection && initial.main.networks.ethereum[id].connection.secondary) {
+        // Copy all secondary connection settings to new connection object
+        if (connection.secondary.settings[id].options) initial.main.networks.ethereum[id].connection.secondary.custom = connection.secondary.settings[id].options.custom
+        // Copy local current selection to new connection object
+        if (connection.secondary.settings[id].current) initial.main.networks.ethereum[id].connection.secondary.current = connection.secondary.settings[id].current
       }
     })
   }
   // Copy primary/secondary on/off
   Object.keys(initial.main.networks.ethereum).forEach(id => {
-    initial.main.networks.ethereum[id].connection.primary.on = initial.main.connection.local.on
-    initial.main.networks.ethereum[id].connection.secondary.on = initial.main.connection.secondary.on
+    initial.main.networks.ethereum[id].connection.primary.on = main('connection.local.on', initial.main.networks.ethereum[id].connection.primary.on)
+    initial.main.networks.ethereum[id].connection.secondary.on = main('connection.secondary.on', connection.secondary.on, initial.main.networks.ethereum[id].connection.secondary.on)
   })
-  // Copy current network
-  initial.main.currentNetwork = {
-    type: 'ethereum',
-    id: initial.main.connection.network
-  }
-  // Delete initial.main.connection
-  delete initial.main.connection
+  initial.main.currentNetwork.id == main('connection.network', initial.main.currentNetwork.id)
 }
 
 module.exports = () => initial
+
+// connection: {
+//   network: main('connection.network', '1'),
+//   local: {
+//     settings: {
+//       1: {
+//         current: main('connection.local.settings.1.current', 'infura'),
+//         options: {
+//           infura: 'infura',
+//           custom: main('connection.local.settings.1.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       3: {
+//         current: main('connection.local.settings.3.current', 'infura'),
+//         options: {
+//           infura: 'infuraRopsten',
+//           custom: main('connection.local.settings.3.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       4: {
+//         current: main('connection.local.settings.4.current', 'infura'),
+//         options: {
+//           infura: 'infuraRinkeby',
+//           custom: main('connection.local.settings.4.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       5: {
+//         current: main('connection.local.settings.5.current', 'prylabs'),
+//         options: {
+//           prylabs: 'https://goerli.prylabs.net',
+//           custom: main('connection.local.settings.5.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       42: {
+//         current: main('connection.local.settings.42.current', 'infura'),
+//         options: {
+//           infura: 'infuraKovan',
+//           custom: main('connection.local.settings.42.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       74: {
+//         current: main('connection.local.settings.74.current', 'custom'),
+//         options: {
+//           custom: main('connection.local.settings.74.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       100: {
+//         current: main('connection.local.settings.100.current', 'poa'),
+//         options: {
+//           poa: 'https://dai.poa.network',
+//           custom: main('connection.local.settings.100.options.custom', ''),
+//           local: 'direct'
+//         }
+//       }
+//     },
+//     on: main('connection.local.on', true),
+//     status: 'loading',
+//     connected: false,
+//     type: '',
+//     network: ''
+//   },
+//   secondary: {
+//     settings: {
+//       1: {
+//         current: main('connection.secondary.settings.1.current', 'custom'),
+//         options: {
+//           infura: 'infura',
+//           custom: main('connection.secondary.settings.1.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       3: {
+//         current: main('connection.secondary.settings.3.current', 'custom'),
+//         options: {
+//           infura: 'infuraRopsten',
+//           custom: main('connection.secondary.settings.3.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       4: {
+//         current: main('connection.secondary.settings.4.current', 'custom'),
+//         options: {
+//           infura: 'infuraRinkeby',
+//           custom: main('connection.secondary.settings.4.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       5: {
+//         current: main('connection.local.settings.5.current', 'prylabs'),
+//         options: {
+//           prylabs: 'https://goerli.prylabs.net',
+//           custom: main('connection.local.settings.5.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       42: {
+//         current: main('connection.secondary.settings.42.current', 'custom'),
+//         options: {
+//           infura: 'infuraKovan',
+//           custom: main('connection.secondary.settings.42.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       74: {
+//         current: main('connection.secondary.settings.74.current', 'custom'),
+//         options: {
+//           custom: main('connection.secondary.settings.74.options.custom', ''),
+//           local: 'direct'
+//         }
+//       },
+//       100: {
+//         current: main('connection.secondary.settings.100.current', 'poa'),
+//         options: {
+//           poa: 'https://dai.poa.network',
+//           custom: main('connection.secondary.settings.100.options.custom', ''),
+//           local: 'direct'
+//         }
+//       }
+//     },
+//     on: main('connection.secondary.on', false),
+//     status: 'loading',
+//     connected: false,
+//     type: '',
+//     network: ''
+//   }
+// }
+
+// Rename direct to local
+// if (initial.main.connection.local.settings[1].current === 'direct') initial.main.connection.local.settings[1].current = 'local'
+// if (initial.main.connection.local.settings[3].current === 'direct') initial.main.connection.local.settings[3].current = 'local'
+// if (initial.main.connection.local.settings[4].current === 'direct') initial.main.connection.local.settings[4].current = 'local'
+// if (initial.main.connection.local.settings[42].current === 'direct') initial.main.connection.local.settings[42].current = 'local'
+
+// if (initial.main.connection.secondary.settings[1].current === 'direct') initial.main.connection.secondary.settings[1].current = 'local'
+// if (initial.main.connection.secondary.settings[3].current === 'direct') initial.main.connection.secondary.settings[3].current = 'local'
+// if (initial.main.connection.secondary.settings[4].current === 'direct') initial.main.connection.secondary.settings[4].current = 'local'
+// if (initial.main.connection.secondary.settings[42].current === 'direct') initial.main.connection.secondary.settings[42].current = 'local'
