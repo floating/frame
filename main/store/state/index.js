@@ -291,8 +291,8 @@ if (gasPrice) {
     if (gasPrice[network].default === 'normal') gasPrice[network].default = 'standard'
     // For each network with gasPrices, copy over default and custom level
     if (initial.main.networks.ethereum[network] && initial.main.networks.ethereum[network].gas) {
-      initial.main.networks.ethereum[network].gas.price.selected = initial.main.gasPrice[network].default
-      initial.main.networks.ethereum[network].gas.price.levels.custom = initial.main.gasPrice[network].levels.custom
+      initial.main.networks.ethereum[network].gas.price.selected = gasPrice[network].default
+      initial.main.networks.ethereum[network].gas.price.levels.custom = gasPrice[network].levels.custom
     }
   })
 }
