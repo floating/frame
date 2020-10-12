@@ -212,7 +212,65 @@
       transition standardSlow
       background hardware
 
+.snipIt
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+  transform translateZ(0)
+  font-size 14px
+  margin 24px 10px 0px 10px
+  background highlight
+  padding 20px
+  border-radius 16px
+  font-size 12px
+  font-weight 400
+
+  @keyframes spin
+    0% 
+      transform rotate(0deg)
+    100%
+      transform rotate(360deg)
+
+  @keyframes spinReverse
+    0% 
+      transform rotate(0deg)
+    100%
+      transform rotate(-360deg)
+
+  .snipItBrowserExtensionIcons
+    display flex
+    justify-content center
+    align-items center
+    padding 20px
+    color outerspace08
+    .snipItBrowserExtensionIcon:hover
+      background highlightest
+
+    .snipItBrowserExtensionIcon
+      display flex
+      justify-content center
+      align-items center
+      background highlighter
+      height 60px
+      width 60px
+      border 1px solid thick
+      border-radius 16px
+      margin 0px 5px
+      box-shadow cardDrop // , 0px 4px 2px -3px rgba(0, 25, 35, 0.14)
+
+    .snipItSpinRight
+      svg
+        transform rotate(0deg)
+        animation spin 12s linear infinite 
+    .snipItSpinLeft
+      svg
+        transform rotate(0deg)
+        animation spinReverse 12s linear infinite 
+
+
 @import '../Main/style'
 @import '../Local/style'
 @import '../Notify/style'
+@import '../Phase/style'
 @import '../Badge/style'

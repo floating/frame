@@ -12,6 +12,9 @@
   align-items center
   text-align center
   opacity 1
+  
+  ::selection
+    background good02 // #ffb7b7
 
   .notifyBox:before
     content ''
@@ -20,25 +23,26 @@
     bottom 3px
     left 0
     position absolute
-    border-radius 3px
+    border-radius 8px
     background light
     z-index 2
 
   .notifyBoxWrap
-    border-radius 6px
+    border-radius 8px
     box-sizing border-box
     position absolute
-    top 5px
-    bottom 5px
-    left calc(100% + 95px)
-    width calc(100% - 10px)
+    top 10px
+    bottom 10px
+    left calc(100% + 90px)
+    width calc(100% - 20px)
     transition standard
     box-shadow 0px -1px 4px -1px rgba(6, 54, 52, 0.15), 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
-    background lightShade
+    background lowerlight
     display flex
     justify-content center
     align-items center
     text-align center
+    opacity 1
 
     .notifyClose
       position absolute
@@ -56,7 +60,9 @@
       padding 55px 20px 60px 20px
       border-top 1px solid lightShade
       border-bottom 1px solid lightShade
-
+      min-width calc(100% - 40px)
+      overflow hidden
+      
       .notifyTitle
         font-size 32px
         position relative

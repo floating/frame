@@ -75,7 +75,7 @@ class Provider extends EventEmitter {
   getNetVersion (payload, res) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      if (response.result !== store('main.connection.network')) this.resError('Network mismatch', payload, res)
+      if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })
   }
@@ -248,16 +248,17 @@ class Provider extends EventEmitter {
       try {
         const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
         const prices = await response.json()
-        const chain = parseInt(rawTx.chainId, 'hex')
-        store.setGasPrices(chain, {
-          safelow: ('0x' + (prices.safeLow * 100000000).toString(16)), 
-          standard: ('0x' + (prices.average * 100000000).toString(16)), 
+        const chain = parseInt(rawTx.chainId, 'hex').toString()
+        const network = store('main.currentNetwork')
+        if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
+        store.setGasPrices(network.type, network.id, {
+          safelow: ('0x' + (prices.safeLow * 100000000).toString(16)),
+          standard: ('0x' + (prices.average * 100000000).toString(16)),
           fast: ('0x' + (prices.fast * 100000000).toString(16)),
           trader: ('0x' + (prices.fastest * 100000000).toString(16)),
-          custom: store('main.gasPrice', chain, 'levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
+          custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
         })
-        const levels = store('main.gasPrice', chain, 'levels')
-        const selected = store('main.gasPrice', chain, 'default')
+        const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
         res({ result: levels[selected] })
       } catch (error) {
         log.error(error)
@@ -267,16 +268,18 @@ class Provider extends EventEmitter {
       this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, (response) => {
         if (response.result) {
           try {
-            const chain = parseInt(rawTx.chainId, 'hex')
-            store.setGasPrices(chain, {
-              safelow: response.result, 
-              standard: response.result, 
+            const chain = parseInt(rawTx.chainId, 'hex').toString()
+            const network = store('main.currentNetwork')
+            console.log(chain, network)
+            if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
+            store.setGasPrices(network.type, network.id, {
+              safelow: response.result,
+              standard: response.result,
               fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
               trader: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
-              custom: store('main.gasPrice', chain, 'levels.custom') || response.result
+              custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || response.result
             })
-            const levels = store('main.gasPrice', chain, 'levels')
-            const selected = store('main.gasPrice', chain, 'default')
+            const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
             res({ result: levels[selected] })
           } catch (error) {
             log.error(error)
@@ -341,7 +344,7 @@ class Provider extends EventEmitter {
 
   sendTransaction (payload, res) {
     const rawTx = this.getRawTx(payload)
-    if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.connection.network'))
+    if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.currentNetwork.id'))
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
       const from = rawTx.from
@@ -434,10 +437,10 @@ class Provider extends EventEmitter {
 
 const provider = new Provider()
 
-let network = store('main.connection.network')
+let network = store('main.currentNetwork.id')
 store.observer(() => {
-  if (network !== store('main.connection.network')) {
-    network = store('main.connection.network')
+  if (network !== store('main.currentNetwork.id')) {
+    network = store('main.currentNetwork.id')
     accounts.unsetSigner()
     provider.chainChanged(network)
     provider.networkChanged(network)

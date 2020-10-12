@@ -1,46 +1,40 @@
 module.exports = {
   // setSync: (u, key, payload) => u(key, () => payload),
-  selectNetwork: (u, net) => {
+  selectNetwork: (u, type, id) => {
     const reset = { status: 'loading', connected: false, type: '', network: '' }
-    u('main.connection', connection => {
-      connection.network = net
-      connection.local = Object.assign({}, connection.local, reset)
-      connection.secondary = Object.assign({}, connection.secondary, reset)
-      return connection
+    u('main.currentNetwork', selected => {
+      u('main.networks', selected.type, selected.id, connection => {
+        connection.primary = Object.assign({}, connection.primary, reset)
+        connection.secondary = Object.assign({}, connection.secondary, reset)
+        return connection
+      })
+      return { type, id }
     })
   },
-  selectPrimary: (u, value) => {
-    u('main.connection', connection => {
-      connection.local.settings[connection.network].current = value
-      return connection
+  selectPrimary: (u, netType, netId, value) => {
+    u('main.networks', netType, netId, 'connection.primary.current', () => value)
+  },
+  selectSecondary: (u, netType, netId, value) => {
+    u('main.networks', netType, netId, 'connection.secondary.current', () => value)
+  },
+  setPrimaryCustom: (u, netType, netId, target) => {
+    u('main.networks', netType, netId, 'connection.primary.custom', () => target)
+  },
+  setSecondaryCustom: (u, netType, netId, target) => {
+    u('main.networks', netType, netId, 'connection.secondary.custom', () => target)
+  },
+  toggleConnection: (u, netType, netId, node, on) => {
+    u('main.networks', netType, netId, 'connection', node, 'on', (value) => {
+      return on !== undefined ? on : !value
     })
   },
-  selectSecondary: (u, value) => {
-    u('main.connection', connection => {
-      connection.secondary.settings[connection.network].current = value
-      return connection
+  setPrimary: (u, netType, netId, status) => {
+    u('main.networks', netType, netId, 'connection.primary', primary => {
+      return Object.assign({}, primary, status)
     })
   },
-  setPrimaryCustom: (u, target) => {
-    u('main.connection', connection => {
-      connection.local.settings[connection.network].options.custom = target
-      return connection
-    })
-  },
-  setSecondaryCustom: (u, target) => {
-    u('main.connection', connection => {
-      connection.secondary.settings[connection.network].options.custom = target
-      return connection
-    })
-  },
-  toggleConnection: (u, node, on) => u('main.connection', node, 'on', (value) => on !== undefined ? on : !value),
-  setLocal: (u, status) => {
-    u('main.connection.local', local => {
-      return Object.assign({}, local, status)
-    })
-  },
-  setSecondary: (u, status) => {
-    u('main.connection.secondary', secondary => {
+  setSecondary: (u, netType, netId, status) => {
+    u('main.networks', netType, netId, 'connection.secondary', secondary => {
       return Object.assign({}, secondary, status)
     })
   },
@@ -137,12 +131,117 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
-  setGasPrices: (u, chain, prices) => {
-    u('main.gasPrice', chain, 'levels', () => prices)
+  setGasPrices: (u, netType, netId, prices) => {
+    u('main.networks', netType, netId, 'gas.price.levels', () => prices)
   },
-  setGasDefault: (u, chain, level, price) => {
-    u('main.gasPrice', chain, 'default', () => level)
-    if (level === 'custom') u('main.gasPrice', chain, 'levels.custom', () => price)
+  setGasDefault: (u, netType, netId, level, price) => {
+    u('main.networks', netType, netId, 'gas.price.selected', () => level)
+    if (level === 'custom') u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+  },
+  addNetwork: (u, net) => {
+    const defaultNetwork = {
+      id: 0,
+      type: '',
+      name: '',
+      explorer: '',
+      gas: {
+        price: {
+          selected: 'standard',
+          levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+        }
+      },
+      connection: {
+        presets: { local: 'direct' },
+        primary: { on: true, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
+        secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+      }
+    }
+    u('main.networks', networks => {
+      try {
+        net.id = parseInt(net.id)
+        if (
+          typeof (parseInt(net.id)) !== 'number' ||
+          typeof (net.type) !== 'string' ||
+          typeof (net.name) !== 'string' ||
+          typeof (net.explorer) !== 'string' ||
+          ['ethereum'].indexOf(net.type) === -1
+        ) {
+          throw new Error('Invalid network settings')
+        }
+      } catch (e) {
+        console.error(e)
+        return networks
+      }
+      if (!networks[net.type]) networks[net.type] = {}
+      if (networks[net.type][net.id]) return networks // Network already exists, don't overwrite, notify user
+      const newNetwork = Object.assign({}, defaultNetwork, net)
+      networks[net.type][net.id] = newNetwork
+      return networks
+    })
+  },
+  updateNetwork: (u, net, newNet) => {
+    u('main', main => {
+      try {
+        if (
+          typeof (parseInt(net.id)) !== 'number' ||
+          typeof (net.type) !== 'string' ||
+          typeof (net.name) !== 'string' ||
+          typeof (net.explorer) !== 'string' ||
+          ['ethereum'].indexOf(net.type) === -1
+        ) {
+          throw new Error('Invalid network settings')
+        }
+        if (
+          typeof (parseInt(newNet.id)) !== 'number' ||
+          typeof (newNet.type) !== 'string' ||
+          typeof (newNet.name) !== 'string' ||
+          typeof (newNet.explorer) !== 'string' ||
+          ['ethereum'].indexOf(newNet.type) === -1
+        ) {
+          throw new Error('Invalid new network settings')
+        }
+      } catch (e) {
+        console.error(e)
+        return main
+      }
+      if (main.networks[newNet.type][newNet.id]) {
+        if (net.type === newNet.type && net.id === newNet.id) {
+          // Update data.without changing connection..
+          Object.assign(main.networks[newNet.type][newNet.id], newNet)
+        }
+        return main
+      } // Network already exists, don't overwrite, notify user
+      const existingNet = Object.assign({}, main.networks[net.type][net.id])
+      if (main.networks[net.type]) delete main.networks[net.type][net.id]
+      if (!main.networks[newNet.type]) main.networks[newNet.type] = {}
+      const updateNetwork = Object.assign(existingNet, newNet)
+      main.networks[newNet.type][newNet.id] = updateNetwork
+      if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's being changed
+        const reset = { status: 'loading', connected: false, type: '', network: '' }
+        main.currentNetwork = { type: newNet.type, id: newNet.id }
+        main.networks[newNet.type][newNet.id].primary = Object.assign({}, main.networks[newNet.type][newNet.id].primary, reset)
+        main.networks[newNet.type][newNet.id].secondary = Object.assign({}, main.networks[newNet.type][newNet.id].secondary, reset)
+      }
+      return main
+    })
+  },
+  removeNetwork: (u, net) => {
+    u('main', main => {
+      let netCount = 0
+      Object.keys(main.networks[net.type]).forEach(id => {
+        netCount++
+      })
+      if (netCount <= 1) return main // Cannot delete last network without adding a new network of this type first
+      if (main.networks[net.type]) delete main.networks[net.type][net.id]
+      if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's deleted while selected
+        const id = Object.keys(main.networks[net.type]).map(i => parseInt(i)).sort((a, b) => a - b)[0].toString()
+        const reset = { status: 'loading', connected: false, type: '', network: '' }
+        main.currentNetwork = { type: net.type, id }
+        main.networks[net.type][id].primary = Object.assign({}, main.networks[net.type][id].primary, reset)
+        main.networks[net.type][id].secondary = Object.assign({}, main.networks[net.type][id].secondary, reset)
+      }
+      return main
+    })
   }
   // __overwrite: (path, value) => u(path, () => value)
 }

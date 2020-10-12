@@ -19,10 +19,10 @@ class HotSigner extends Signer {
     super()
     this.status = 'locked'
     if (signer) {
-      this.network = signer.network || store('main.connection.network')
+      this.network = signer.network || store('main.currentNetwork.id')
       this.addresses = signer.addresses || []
     } else {
-      this.network = store('main.connection.network')
+      this.network = store('main.currentNetwork.id')
       this.addresses = []
     }
     this._worker = fork(workerPath)
@@ -111,19 +111,19 @@ class HotSigner extends Signer {
   }
 
   signMessage (index, message, cb) {
-    if (this.network !== store('main.connection.network')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.connection.network')}`))
+    if (this.network !== store('main.currentNetwork.id')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
     const payload = { method: 'signMessage', params: { index, message } }
     this._callWorker(payload, cb)
   }
 
   signTypedData (index, typedData, cb) {
-    if (this.network !== store('main.connection.network')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.connection.network')}`))
+    if (this.network !== store('main.currentNetwork.id')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
     const payload = { method: 'signTypedData', params: { index, typedData } }
     this._callWorker(payload, cb)
   }
 
   signTransaction (index, rawTx, cb) {
-    if (this.network !== store('main.connection.network')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.connection.network')}`))
+    if (this.network !== store('main.currentNetwork.id')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
     const payload = { method: 'signTransaction', params: { index, rawTx } }
     this._callWorker(payload, cb)
   }

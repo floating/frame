@@ -10,6 +10,27 @@
   transition standard
   transform translateZ(0)
 
+  .localSettingsAddNetwork
+    position absolute
+    right 145px
+    display flex
+    justify-content center
+    align-items center
+    height 26px
+    z-index 9999999
+    border-radius 13px
+    height 26px
+    font-weight 200
+    width 26px
+    font-size 23px
+    text-transform uppercase
+    background highlight
+    overflow hidden
+    box-shadow cardDrop, 0px 2px 1px thin
+    padding 0px 0px 0px 0px
+    transition standard
+    transform translateZ(0)
+
   .localSettingsWrapFadeTop
     position absolute
     background red
@@ -53,12 +74,14 @@
     position relative
     display flex
     align-items flex-start
-    z-index 9999999
     height 26px
-    font-size 22px
+    font-size 25px
     font-weight 200
     padding 0px 10px 15px 10px
     margin 50px 0px 0px 0px
+
+    .localSettingsTitleText
+      margin-top -5px
 
 .localSettingsHidden
   right -100%
@@ -108,7 +131,7 @@
   color outerspace08
 
 .quitFrame
-  padding 20px
+  padding 10px
   margin-top 15px
 
   .quitFrameButton
@@ -137,7 +160,7 @@
   width 100%
   align-items space-between
   transition standard
-  border-radius 3px
+  border-radius 16px
   margin 0px -15px -15px -15px
   padding 0px 15px 15px 15px
   // overflow hidden
@@ -162,6 +185,7 @@
     position relative
     margin-top 0px
     transition standard
+    pointer-events none
 
     .connectionOptionDetailsInset
       height 25px
@@ -310,7 +334,7 @@
   padding-top 0px
   transition standardFast
   background thin
-  border-radius 3px
+  border-radius 8px
   transform translateZ(0)
   z-index 20
 
@@ -347,3 +371,4 @@
     transition-delay 0ms, 30ms
     transition-property height, opacity
     margin-top 5px
+    pointer-events auto

@@ -65,7 +65,7 @@ class Accounts extends EventEmitter {
   // Public
   addAragon (account, cb = () => {}) {
     if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
-    account.network = account.network || store('main.connection.network')
+    account.network = account.network || store('main.currentNetwork.id')
     account.id = this.fingerprint(account.network, account.addresses)
     account.options = account.options || {}
     const existing = store('main.accounts', account.id)
@@ -78,7 +78,7 @@ class Accounts extends EventEmitter {
 
   add (addresses, options = {}, cb = () => {}) {
     if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
-    const network = store('main.connection.network')
+    const network = store('main.currentNetwork.id')
     const id = this.fingerprint(network, addresses)
     const account = store('main.accounts', id)
     if (account && account.network === network) return cb(null, account) // Account already exists...
@@ -96,42 +96,78 @@ class Accounts extends EventEmitter {
     return this.accounts[this._current]
   }
 
-  txMonitor (id, hash) {
+  async confirmations (id, hash) {
+    return new Promise((resolve, reject) => {
+      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', params: [] }, (res) => {
+        if (res.error) return reject(new Error(res.error))
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
+          if (receiptRes.error) return reject(new Error(receiptRes.error))
+          if (receiptRes.result && this.current().requests[id]) {
+            this.current().requests[id].tx.receipt = receiptRes.result
+            if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
+              this.current().requests[id].status = 'confirming'
+              this.current().requests[id].notice = 'Confirming'
+            }
+            const blockHeight = parseInt(res.result, 16)
+            const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
+            resolve(blockHeight - receiptBlock)
+          } else {
+            console.log(receiptRes.result, this.current().requests, id)
+            reject(new Error('Trying to confirm but missing a result or request..'))
+          }
+        })
+      })
+    })
+  }
+
+  async txMonitor (id, hash) {
     this.current().requests[id].tx = { hash, confirmations: 0 }
     this.current().update()
     proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
       if (newHeadRes.error) {
-        // TODO: Handle Error
+        log.warn(newHeadRes.error)
+        const monitor = async () => {
+          let confirmations
+          try {
+            confirmations = await this.confirmations(id, hash)
+          } catch (e) {
+            log.warn(e)
+            return
+          }
+          this.current().requests[id].tx.confirmations = confirmations
+          this.current().update()
+          if (confirmations > 12) {
+            this.current().requests[id].status = 'confirmed'
+            this.current().requests[id].notice = 'Confirmed'
+            this.current().update()
+            clearTimeout(monitorTimer)
+          }
+        }
+        setTimeout(() => monitor(), 3000)
+        const monitorTimer = setInterval(monitor, 15000)
       } else if (newHeadRes.result) {
         const headSub = newHeadRes.result
-        const handler = payload => {
+        const handler = async payload => {
           if (payload.method === 'eth_subscription' && payload.params.subscription === headSub) {
-            const newHead = payload.params.result
-            proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
-              if (receiptRes.error) {
+            // const newHead = payload.params.result
+            let confirmations
+            try {
+              confirmations = await this.confirmations(id, hash)
+            } catch (e) {
+              log.warn(e)
+              return
+            }
+            this.current().requests[id].tx.confirmations = confirmations
+            this.current().update()
+            if (confirmations > 12) {
+              this.current().requests[id].status = 'confirmed'
+              this.current().requests[id].notice = 'Confirmed'
+              this.current().update()
+              proxyProvider.removeListener('data', handler)
+              proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, unsubRes => {
                 // TODO: Handle Error
-              } else if (receiptRes.result && this.current().requests[id]) {
-                this.current().requests[id].tx.receipt = receiptRes.result
-                if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
-                  this.current().requests[id].status = 'confirming'
-                  this.current().requests[id].notice = 'Confirming'
-                }
-                const blockHeight = parseInt(newHead.number, 16)
-                const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
-                const confirmations = blockHeight - receiptBlock
-                this.current().requests[id].tx.confirmations = confirmations
-                this.current().update()
-                if (confirmations > 12) {
-                  this.current().requests[id].status = 'confirmed'
-                  this.current().requests[id].notice = 'Confirmed'
-                  this.current().update()
-                  proxyProvider.removeListener('data', handler)
-                  proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, unsubRes => {
-                    // TODO: Handle Error
-                  })
-                }
-              }
-            })
+              })
+            }
           }
         }
         proxyProvider.on('data', handler)

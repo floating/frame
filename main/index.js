@@ -18,7 +18,12 @@ const store = require('./store')
 
 // Action Monitor
 // store.api.feed((state, actions, obscount) => {
-//   console.log(actions)
+//   actions.forEach(a => {
+//     console.log(a.name)
+//     a.updates.forEach(u => {
+//       console.log(u.path)
+//     })
+//   })
 // })
 
 const accounts = require('./accounts')
@@ -50,6 +55,7 @@ process.on('uncaughtException', (e) => {
 const externalWhitelist = [
   'https://frame.sh',
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
+  'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
   'https://github.com/floating/frame/issues/new',
   'https://gitter.im/framehq/general',
   'https://github.com/floating/frame/blob/master/LICENSE',
@@ -95,12 +101,10 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
-// TODO: Custom networks link to custom explorers 
-const networks = { 1: '', 3: 'ropsten.', 4: 'rinkeby.', 5: 'goerli.', 42: 'kovan.' }
 ipcMain.on('tray:openEtherscan', (e, hash) => {
-  const id = store('main.connection.network')
-  const network = networks[id]
-  shell.openExternal('https://' + network + 'etherscan.io/tx/' + hash)
+  const { type, id } = store('main.currentNetwork')
+  const explorer = store('main.networks', type, id, 'explorer')
+  shell.openExternal(explorer + '/tx/' + hash)
 })
 
 ipcMain.on('tray:giveAccess', (e, req, access) => {

@@ -10,6 +10,8 @@ outerspace = #212d2e
 outerspaceShade = #1c2526
 outerspaceLight = #29393a
 outerspacePulse = #395153
+outerspacePhase = rgba(30, 65, 70, 1)
+outerspacePhaseDark = rgba(20, 45, 50, 1)
 outerspaceShader = rgb(16, 36, 38) // rgb(24, 54, 56)
 outerspaceDark = #0b1819
 outerspaceDarker = #02090a
@@ -28,7 +30,7 @@ ghostH = rgba(227, 232, 245, 1)
 highlightest = rgba(244, 250, 255, 1)
 highlighter = rgba(240, 246, 255, 1)
 highlight = rgba(237, 242, 255, 1)
-lowlight = rgba(230, 236, 248, 1)
+lowlight = rgba(232, 236, 248, 1)
 lowerlight = rgba(227, 232, 250, 1)
 light = #eaf0f9
 lightShade = rgba(220, 224, 244, 1) // #d9e1ef
@@ -39,7 +41,7 @@ doubleThick = rgba(16, 44, 180, .14)
 tripleThick = rgba(16, 44, 180, .21)
 thick0 = rgba(16, 44, 180, 0)
 
-hardware = rgba(170, 240, 255, 1)
+hardware = rgba(110, 230, 255, 1)
 smart = rgba(150, 255, 210, 1)
 smart04 = rgba(150, 255, 210, 0.4)
 smart02 = rgba(150, 255, 210, 0.2)
@@ -48,8 +50,13 @@ hot = rgba(255, 150, 150, 1)
 
 shader = rgba(16, 44, 60, 0.7)
 
-phase = #212d2e
-phaseShade = #1c2526
+oldPhase = #212d2e
+oldPhaseShade = #1c2526
+
+phase = rgba(18, 45, 56, 1)
+phaseLight = rgba(28, 60, 76, 1)
+phaseLighter = rgba(38, 70, 86, 1)
+phaseShade = rgba(8 , 20, 26, 1)
 
 good = rgb(0, 210, 180)
 goodShade = rgb(0, 190, 160)
@@ -107,7 +114,7 @@ div
 #panel
   background rgba(220, 224, 244, 1)
   margin 0px
-  border-radius 3px
+  border-radius 8px
   box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
   overflow hidden
 

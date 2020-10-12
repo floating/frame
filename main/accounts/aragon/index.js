@@ -7,10 +7,12 @@ const store = require('../../store')
 const appNames = require('./appNames')
 
 const registryAddress = () => {
-  const network = store('main.connection.network')
+  const network = store('main.currentNetwork.id')
   const addresses = {
     1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-    4: '0x98df287b6c145399aaa709692c8d308357bc085d'
+    3: '0x6afe2cacee211ea9179992f89dc61ff25c61e923',
+    4: '0x98df287b6c145399aaa709692c8d308357bc085d',
+    100: '0xaafca6b0c89521752e559650206d7c925fd0e530'
   }
   if (addresses[network]) return addresses[network]
   throw new Error('Unable to locate Aragon ENS registry for current network')
@@ -56,7 +58,7 @@ const resolveName = (name) => {
         })
         if (!appsSummary.kernel) return reject(new Error('Unable to locate DAO kernel'))
         if (!appsSummary.agent) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
-        resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.connection.network') })
+        resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.currentNetwork.id') })
       })
     } catch (e) {
       reject(e)
@@ -75,8 +77,9 @@ class Aragon {
   }
 
   setup () {
-    const connection = store('main.connection')
-    const status = [connection.local.status, connection.secondary.status]
+    const { type, id } = store('main.currentNetwork')
+    const connection = store('main.networks', type, id, 'connection')
+    const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1 && this.network === connection.network && !this.wrap && !this.inSetup) {
       log.info('\n ** Setting Up Aragon DAO:', this.dao)
       this.inSetup = true

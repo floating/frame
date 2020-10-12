@@ -13,8 +13,6 @@ const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
 const BASE_PATH_LIVE = '44\'/60\'/'
 const BASE_PATH_TEST = '44\'/1\'/0\'/'
 
-const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
-
 class Ledger extends Signer {
   constructor (devicePath, signers) {
     super()
@@ -29,9 +27,9 @@ class Ledger extends Signer {
     this.coinbase = '0x'
     this.handlers = {}
     this.lastUse = Date.now()
-    this.network = store('main.connection.network')
+    this.network = store('main.currentNetwork.id')
     this.networkObserver = store.observer(() => {
-      if (this.network !== store('main.connection.network')) {
+      if (this.network !== store('main.currentNetwork.id')) {
         this.reset()
         this.deviceStatus()
       }
@@ -92,7 +90,7 @@ class Ledger extends Signer {
 
   reset () {
     this.derivation = store('main.ledger.derivation')
-    this.network = store('main.connection.network')
+    this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []
     this.update()
@@ -272,7 +270,7 @@ class Ledger extends Signer {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
-      const tx = new EthereumTx(rawTx, { chain: chains[parseInt(rawTx.chainId)] })
+      const tx = new EthereumTx(rawTx, { chain: parseInt(rawTx.chainId) })
       tx.raw[6] = Buffer.from([rawTx.chainId]) // v
       tx.raw[7] = Buffer.from([]) // r
       tx.raw[8] = Buffer.from([]) // s
@@ -289,7 +287,7 @@ class Ledger extends Signer {
         v: Buffer.from(this.normalize(result.v), 'hex'),
         r: Buffer.from(this.normalize(result.r), 'hex'),
         s: Buffer.from(this.normalize(result.s), 'hex')
-      }, { chain: chains[parseInt(rawTx.chainId)] })
+      }, { chain: parseInt(rawTx.chainId) })
       cb(null, '0x' + _tx.serialize().toString('hex'))
       this.releaseDevice()
     } catch (err) {

@@ -121,7 +121,7 @@ class AddAragon extends React.Component {
   }
 
   accountFilter (id) {
-    // Need to migrate accounts to use network type
+    // Need to update accounts to use network type
     const network = this.store('main.currentNetwork.id')
     const account = this.store('main.accounts', id)
     if (account.type === 'aragon') return false
@@ -142,67 +142,67 @@ class AddAragon extends React.Component {
   }
 
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'phaseItem phaseItemSmart'
+    if (this.state.adding) itemClass += ' phaseItemAdding'
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
-        <div className='addAccountItemBar addAccountItemSmart' />
-        <div className='addAccountItemWrap'>
-          <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
+        <div className='phaseItemBar phaseItemSmart' />
+        <div className='phaseItemWrap'>
+          <div className='phaseItemTop'>
+            <div className='phaseItemIcon'>
+              <div className='phaseItemIconType phaseItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
+              <div className='phaseItemIconHex phaseItemIconHexSmart' />
             </div>
-            <div className='addAccountItemTopTitle'>Aragon</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='phaseItemTopTitle'>Aragon</div>
+            <div className='phaseItemTopTitle' />
           </div>
-          <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
-          <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
-              <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
+          <div className='phaseItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
+          <div className='phaseItemOption'>
+            <div className='phaseItemOptionIntro' onMouseDown={() => this.adding()}>
+              <div className='phaseItemDeviceTitle'>Add Aragon Account</div>
             </div>
-            <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
-              <div className='addAccountItemOptionSetupFrames'>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>enter dao name</div>
-                  <div className='addAccountItemOptionInputPhrase'>
+            <div className='phaseItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
+              <div className='phaseItemOptionSetupFrames'>
+                <div className='phaseItemOptionSetupFrame'>
+                  <div className='phaseItemOptionTitle'>enter dao name</div>
+                  <div className='phaseItemOptionInputPhrase'>
                     <input tabIndex='-1' ref={this.forms[0]} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
+                  <div className='phaseItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>Choose acting account</div>
-                  <div className='addAccountItemOptionList'>
+                <div className='phaseItemOptionSetupFrame'>
+                  <div className='phaseItemOptionTitle'>Choose acting account</div>
+                  <div className='phaseItemOptionList'>
                     {Object.keys(this.store('main.accounts'))
                       .filter(id => this.accountFilter(id))
                       .sort((a, b) => this.accountSort(a, b))
                       .map(id => {
                         const account = this.store('main.accounts', id)
-                        return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.name}</div>
+                        return <div key={id} className='phaseItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.name}</div>
                       })}
                   </div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>Choose acting address</div>
-                  <div className='addAccountItemOptionList'>
+                <div className='phaseItemOptionSetupFrame'>
+                  <div className='phaseItemOptionTitle'>Choose acting address</div>
+                  <div className='phaseItemOptionList'>
                     {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map((a, i) => {
                       return (
-                        <div key={a + i} className='addAccountItemOptionListItem fira' onMouseDown={e => this.actorAddress(a, i)}>
+                        <div key={a + i} className='phaseItemOptionListItem fira' onMouseDown={e => this.actorAddress(a, i)}>
                           {a ? a.substring(0, 10) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 10) : ''}
                         </div>
                       )
                     })}
                   </div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                <div className='phaseItemOptionSetupFrame'>
+                  <div className='phaseItemOptionTitle'>{this.state.status}</div>
+                  {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                 </div>
               </div>
             </div>
           </div>
           <div
-            className='addAccountItemSummary' onMouseDown={() => {
+            className='phaseItemSummary' onMouseDown={() => {
               const net = this.store('main.currentNetwork.id')
               const open = url => this.store.notify('openExternal', { url })
               if (net === '1') return open('https://mainnet.aragon.org')

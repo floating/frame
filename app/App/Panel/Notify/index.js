@@ -7,7 +7,7 @@ class Notify extends React.Component {
   intro () {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'intro' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 22 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             {'Getting Started'}

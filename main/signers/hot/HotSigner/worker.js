@@ -5,8 +5,6 @@ const EthTx = require('ethereumjs-tx').Transaction
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
 
-const chains = { 1: 'mainnet', 3: 'ropsten', 4: 'rinkeby', 42: 'kovan' }
-
 class HotSignerWorker {
   constructor () {
     this.token = crypto.randomBytes(32).toString('hex')
@@ -51,7 +49,7 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
-    const chain = chains[parseInt(rawTx.chainId)]
+    const chain = parseInt(rawTx.chainId)
     // Create tranasction
     const tx = new EthTx(rawTx, { chain })
     // Sign transaction

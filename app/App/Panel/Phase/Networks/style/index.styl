@@ -1,0 +1,150 @@
+.phaseNetwork
+  padding-top 20px
+  border-radius 24px
+  color spacewhite
+
+  input 
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    width 100%
+    height 100%
+    border none 
+    outline none
+    background transparent
+    text-align center
+    font-size 16px
+    font-family Raleway, sans-serif
+    padding 0px 10px 0px 10px
+    color spacewhite
+    // text-shadow 0px 3px 1px rgba(0, 10, 20, 0.5)
+    // filter drop-shadow(0px 3px 1px rgba(0, 10, 20, 0.5))
+  
+.phaseNetworkLine:before
+  content ''
+  position absolute
+  top 1px
+  left 0
+  right 0
+  bottom 1px
+  background outerspacePhase
+  z-index 2
+  border-radius 16px
+
+.phaseNetworkLine:after
+  content ''
+  position absolute
+  top 0px
+  left 0
+  right 0
+  bottom 1px
+  background rgba(0, 185, 185, 1)
+  z-index 0
+  border-radius 16px
+  opacity 0.4
+
+.phaseNetworkLine
+  position relative
+  margin 10px 1px 14px 1px
+  height 84px
+  overflow hidden
+  background outerspacePhaseDark
+  padding-top 1px
+  box-shadow 0px 4px 1px -2px rgba(0, 10, 20, 0.4), 0px 5px 5px 0px rgba(10, 30, 30, 0.21)
+  border-radius 16px
+
+  div 
+    z-index 3
+    display flex
+    justify-content center
+    align-items center
+
+  .phaseNetworkRemove:hover:before
+    content ''
+    position absolute
+    top 1px
+    left 0
+    right 0
+    bottom 0px
+    background bad
+    border-top-right-radius 16px
+    opacity 1
+
+  .phaseNetworkRemove:hover
+    border-top-right-radius 16px
+    background rgba(255, 155, 210, 1)
+    svg 
+      color white
+      // filter drop-shadow(0px 3px 1px rgba(0, 10, 20, 0.5))
+
+  .phaseNetworkSubmit
+    position absolute
+    right 0
+    top 0
+    bottom 40px
+    width 60px
+
+    svg
+      position relative
+      z-index 2
+      // filter drop-shadow(0px 3px 1px rgba(0, 10, 20, 0.5))
+
+  .phaseNetworkSubmitEnabled:hover:before
+    content ''
+    position absolute
+    top 1px
+    left 0
+    right 0
+    bottom 0px
+    background good
+    border-top-right-radius 16px
+    opacity 1
+
+  .phaseNetworkSubmitEnabled:hover
+    border-top-right-radius 16px
+    background rgba(55, 255, 255, 1)
+    svg 
+      color white
+      // filter drop-shadow(0px 1px 1px rgba(0, 110, 120, 0.5))
+    
+  .phaseNetworkName
+    position absolute
+    top 1px
+    left 60px
+    right 60px 
+    bottom 40px
+    border-left 1px solid rgba(0, 50, 50, 0.8)
+    border-right 1px solid rgba(0, 50, 50, 0.8)
+
+    input 
+      font-size 20px
+
+  .phaseNetworkName:hover
+    background rgba(0, 255, 255, 0.08)
+
+  .phaseNetworkId
+    position absolute
+    left 0
+    top 0
+    bottom 40px
+    width 60px
+
+    input 
+      font-size 20px
+
+  .phaseNetworkId:hover
+    background rgba(0, 255, 255, 0.08)
+
+  .phaseNetworkExplorer
+    position absolute
+    right 0
+    left 0
+    top 44px
+    bottom 2px
+    border-top 1px solid rgba(0, 50, 50, 0.8)
+    font-size 14px
+
+  .phaseNetworkExplorer:hover
+    background rgba(0, 255, 255, 0.08)
