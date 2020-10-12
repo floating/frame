@@ -20,8 +20,8 @@ class Settings extends React.Component {
       if (this.network !== id || this.networkType !== type) {
         this.networkType = type
         this.network = id
-        const primaryCustom = context.store('main.networks', type, id, 'primary.custom') || this.customMessage
-        const secondaryCustom = context.store('main.networks', type, id, 'secondary.custom') || this.customMessage
+        const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
+        const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
         this.setState({ primaryCustom, secondaryCustom })
       }
     })

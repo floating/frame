@@ -104,7 +104,7 @@ const api = {
         windows.tray.on('focus', () => { if (hideShow.current === 'hidden') api.showTray() })
       }, 2000)
     }
-    windows.tray.openDevTools()
+    if (dev) windows.tray.openDevTools()
     if (!dev) {
       setTimeout(() => {
         windows.tray.on('blur', _ => api.hideTray())
