@@ -123,7 +123,7 @@ const initial = {
     },
     currentNetwork: main('currentNetwork', {
       type: 'ethereum',
-      id: 1
+      id: '1'
     }),
     networkPresets: {
       ethereum: {
@@ -303,7 +303,7 @@ if (connection) {
   // Copy all local connection settings to new connection object
   if (connection.local && connection.local.settings) {
     Object.keys(connection.local.settings).forEach(id => {
-      if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection && initial.main.networks.ethereum[id].connection.secondary) {
+      if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection) {
         // Copy local custom endpoint to new connection object
         if (connection.local.settings[id].options) initial.main.networks.ethereum[id].connection.primary.custom = connection.local.settings[id].options.custom
         // Copy local current selection to new connection object
@@ -314,7 +314,7 @@ if (connection) {
   // Copy all secondary connection settings to new connection object
   if (connection.secondary && connection.secondary.settings) {
     Object.keys(connection.secondary.settings).forEach(id => {
-      if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection && initial.main.networks.ethereum[id].connection.secondary) {
+      if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection) {
         // Copy all secondary connection settings to new connection object
         if (connection.secondary.settings[id].options) initial.main.networks.ethereum[id].connection.secondary.custom = connection.secondary.settings[id].options.custom
         // Copy local current selection to new connection object
@@ -324,10 +324,10 @@ if (connection) {
   }
   // Copy primary/secondary on/off
   Object.keys(initial.main.networks.ethereum).forEach(id => {
-    initial.main.networks.ethereum[id].connection.primary.on = main('connection.local.on', initial.main.networks.ethereum[id].connection.primary.on)
-    initial.main.networks.ethereum[id].connection.secondary.on = main('connection.secondary.on', connection.secondary.on, initial.main.networks.ethereum[id].connection.secondary.on)
+    initial.main.networks.ethereum[id].connection.primary.on = connection.local.on
+    initial.main.networks.ethereum[id].connection.secondary.on = connection.secondary.on
   })
-  initial.main.currentNetwork.id = main('connection.network', initial.main.currentNetwork.id)
+  initial.main.currentNetwork.id = connection.network + '' || initial.main.currentNetwork.id || '1'
 }
 
 module.exports = () => initial

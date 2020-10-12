@@ -12,8 +12,8 @@ class Settings extends React.Component {
     this.customMessage = 'Custom Endpoint'
     this.network = context.store('main.currentNetwork.id')
     this.networkType = context.store('main.currentNetwork.type')
-    const primaryCustom = context.store('main.networks', this.networkType, this.network, 'primary.custom') || this.customMessage
-    const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'secondary.custom') || this.customMessage
+    const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
+    const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     this.state = { localShake: {}, primaryCustom, secondaryCustom, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
@@ -74,7 +74,8 @@ class Settings extends React.Component {
     clearTimeout(this.customPrimaryInputTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ primaryCustom: value })
-    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', this.state.primaryCustom), 1000)
+    const { type, id } = this.store('main.currentNetwork')
+    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom), 1000)
   }
 
   inputSecondaryCustom (e) {
@@ -82,7 +83,8 @@ class Settings extends React.Component {
     clearTimeout(this.customSecondaryInputTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ secondaryCustom: value })
-    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', this.state.secondaryCustom), 1000)
+    const { type, id } = this.store('main.currentNetwork')
+    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom), 1000)
   }
 
   localShake (key) {
