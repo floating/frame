@@ -145,6 +145,9 @@ const initial = {
         42: {
           infura: 'infuraKovan'
         },
+        74: {
+          idchain: 'wss://idchain.one/ws/'
+        },
         100: {
           poa: 'https://dai.poa.network'
         }
@@ -244,7 +247,7 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'idchain', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           }
         },
