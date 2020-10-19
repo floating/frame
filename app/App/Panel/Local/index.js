@@ -266,15 +266,15 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission' style={{ zIndex: 1 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Hot Signer Sessions</div>
+              <div className='signerPermissionOrigin'>Relock Hot Signers</div>
               <Dropdown
                 syncValue={this.store('main.accountCloseLock')}
                 onChange={(value) => link.send('tray:action', 'setAccountCloseLock', value)}
-                options={[{ text: 'Account', value: true }, { text: 'Frame', value: false }]}
+                options={[{ text: 'Acct Close', value: true }, { text: 'Frame Quit', value: false }]}
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'Hot signers stay unlocked until either the account or Frame is closed'}
+              {'When should Frame relock your hot signers?'}
             </div>
           </div>
           <div className='snipIt'>
