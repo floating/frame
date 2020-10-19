@@ -112,7 +112,6 @@ class Accounts extends EventEmitter {
             const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
             resolve(blockHeight - receiptBlock)
           } else {
-            console.log(receiptRes.result, this.current().requests, id)
             reject(new Error('Trying to confirm but missing a result or request..'))
           }
         })

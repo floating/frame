@@ -270,7 +270,6 @@ class Provider extends EventEmitter {
           try {
             const chain = parseInt(rawTx.chainId, 'hex').toString()
             const network = store('main.currentNetwork')
-            console.log(chain, network)
             if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
             store.setGasPrices(network.type, network.id, {
               safelow: response.result,

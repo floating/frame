@@ -13,8 +13,6 @@ module.exports = {
     log.info('Ledger Scaner Started...')
     const scan = (followup = false) => {
       clearTimeout(scanTimer)
-      const start = Date.now()
-      log.info('LedgerSCAN.....')
       const current = HID.devices().filter(isLedger)
       signers.list().forEach((signer, i) => {
         if (current.map(device => device.path).indexOf(signer.devicePath) === -1 && signer.type === 'ledger') {
@@ -37,7 +35,6 @@ module.exports = {
         }
       })
       if (followup) scanTimer = setTimeout(() => scan(), 800)
-      console.log('scan done...', Math.round((Date.now() - start)) + ' ms')
     }
     usb.on('attach', () => scan(true))
     usb.on('detach', () => scan(true))

@@ -184,7 +184,6 @@ module.exports = {
     })
   },
   updateNetwork: (u, net, newNet) => {
-    console.log(net, newNet)
     u('main', main => {
       try {
         if (
