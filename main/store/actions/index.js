@@ -60,6 +60,9 @@ module.exports = {
       return address
     })
   },
+  setAccountCloseLock: (u, value) => {
+    u('main.accountCloseLock', () => Boolean(value))
+  },
   syncPath: (u, path, value) => {
     if (!path || path === '*' || path.startsWith('main')) return // Don't allow updates to main state
     u(path, () => value)

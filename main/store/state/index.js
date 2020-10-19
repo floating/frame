@@ -82,6 +82,7 @@ const initial = {
     },
     launch: main('launch', false),
     reveal: main('reveal', false),
+    accountCloseLock: main('accountCloseLock', false),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },
@@ -352,6 +353,9 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
     }
   }
 })
+
+// If migrating from before this was a setting make it 'true' to grandfather behavior
+if (get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
 
 module.exports = () => initial
 

@@ -62,7 +62,7 @@ class Signer extends React.Component {
   select () {
     if (this.store('selected.current') === this.props.id) {
       link.rpc('unsetSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
-      if (this.props.signer) link.rpc('lockSigner', this.props.signer.id, (err, status) => { if (err) return console.log(err) })
+      if (this.props.signer && this.store('main.accountCloseLock')) link.rpc('lockSigner', this.props.signer.id, (err, status) => { if (err) return console.log(err) })
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
