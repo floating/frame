@@ -251,7 +251,7 @@ class Settings extends React.Component {
               {'Mouse to the middle of your display\'s right edge to reveal Frame'}
             </div>
           </div>
-          <div className='signerPermission'>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Path</div>
               <Dropdown
@@ -262,6 +262,19 @@ class Settings extends React.Component {
             </div>
             <div className='signerPermissionDetails'>
               {'Use Ledger\'s Legacy or Live derivation path'}
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 1 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Relock Hot Signers</div>
+              <Dropdown
+                syncValue={this.store('main.accountCloseLock')}
+                onChange={(value) => link.send('tray:action', 'setAccountCloseLock', value)}
+                options={[{ text: 'Acct Close', value: true }, { text: 'Frame Quit', value: false }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'When should Frame relock your hot signers?'}
             </div>
           </div>
           <div className='snipIt'>

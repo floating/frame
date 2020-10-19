@@ -1,7 +1,6 @@
 const electron = require('electron')
 const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
 const path = require('path')
-const Positioner = require('electron-positioner')
 const log = require('electron-log')
 
 const store = require('../store')
@@ -21,6 +20,17 @@ const showOnReady = true
 let mouseTimeout
 
 let glide = false
+
+const topRight = (window) => {
+  // pinArea ||
+  const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+  const screenSize = area
+  const windowSize = window.getSize()
+  return {
+    x: Math.floor(screenSize.x + screenSize.width - windowSize[0]),
+    y: screenSize.y
+  }
+}
 
 const detectMouse = () => {
   const m1 = electron.screen.getCursorScreenPoint()
@@ -60,6 +70,7 @@ const api = {
       hasShadow: false,
       show: false,
       backgroundThrottling: false,
+      offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
       webPreferences: {
@@ -83,7 +94,6 @@ const api = {
     //   res({ cancel: false, responseHeaders: details.responseHeaders })
     // })
     windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
-    windows.tray.positioner = new Positioner(windows.tray)
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
     windows.tray.setSize(0, 0)
@@ -171,7 +181,7 @@ const api = {
           const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
           windows.tray.setResizable(true)
           windows.tray.setSize(1, dev ? 740 : area.height)
-          const pos = windows.tray.positioner.calculate('topRight')
+          const pos = topRight(windows.tray)
           windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
           windows.tray.hide()
@@ -196,7 +206,7 @@ const api = {
       windows.tray.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       windows.tray.setSize(360, dev ? 740 : area.height)
-      const pos = windows.tray.positioner.calculate('topRight')
+      const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
       windows.tray.setPosition(pos.x, pos.y)
       if (!glide) windows.tray.focus()
       windows.tray.emit('show')

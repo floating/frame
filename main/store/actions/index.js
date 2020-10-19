@@ -60,6 +60,9 @@ module.exports = {
       return address
     })
   },
+  setAccountCloseLock: (u, value) => {
+    u('main.accountCloseLock', () => Boolean(value))
+  },
   syncPath: (u, path, value) => {
     if (!path || path === '*' || path.startsWith('main')) return // Don't allow updates to main state
     u(path, () => value)
@@ -164,6 +167,7 @@ module.exports = {
           typeof (net.type) !== 'string' ||
           typeof (net.name) !== 'string' ||
           typeof (net.explorer) !== 'string' ||
+          typeof (net.symbol) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
           throw new Error('Invalid network settings')
@@ -187,6 +191,7 @@ module.exports = {
           typeof (net.type) !== 'string' ||
           typeof (net.name) !== 'string' ||
           typeof (net.explorer) !== 'string' ||
+          typeof (net.symbol) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
           throw new Error('Invalid network settings')
@@ -196,6 +201,7 @@ module.exports = {
           typeof (newNet.type) !== 'string' ||
           typeof (newNet.name) !== 'string' ||
           typeof (newNet.explorer) !== 'string' ||
+          typeof (newNet.symbol) !== 'string' ||
           ['ethereum'].indexOf(newNet.type) === -1
         ) {
           throw new Error('Invalid new network settings')

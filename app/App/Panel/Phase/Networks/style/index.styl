@@ -66,14 +66,14 @@
     position absolute
     top 1px
     left 0
-    right 0
+    right 0px
     bottom 0px
     background bad
-    border-top-right-radius 16px
+    border-bottom-right-radius 18px
     opacity 1
 
   .phaseNetworkRemove:hover
-    border-top-right-radius 16px
+    // border-top-right-radius 16px
     background rgba(255, 155, 210, 1)
     svg 
       color white
@@ -82,9 +82,12 @@
   .phaseNetworkSubmit
     position absolute
     right 0
-    top 0
-    bottom 40px
+    bottom 1px
+    top 45px
     width 60px
+    background rgba(0, 255, 255, 0.04)
+    padding-bottom 1px
+    border-bottom-right-radius 18px
 
     svg
       position relative
@@ -95,15 +98,15 @@
     content ''
     position absolute
     top 1px
-    left 0
-    right 0
+    left 0px
+    right 0px
     bottom 0px
     background good
-    border-top-right-radius 16px
+    border-bottom-right-radius 18px
     opacity 1
 
   .phaseNetworkSubmitEnabled:hover
-    border-top-right-radius 16px
+    // border-top-right-radius 16px
     background rgba(55, 255, 255, 1)
     svg 
       color white
@@ -117,11 +120,27 @@
     bottom 40px
     border-left 1px solid rgba(0, 50, 50, 0.8)
     border-right 1px solid rgba(0, 50, 50, 0.8)
+    border-bottom 1px solid rgba(0, 50, 50, 0.8)
 
     input 
       font-size 20px
 
   .phaseNetworkName:hover
+    background rgba(0, 255, 255, 0.08)
+
+  .phaseNetworkSymbol
+    position absolute
+    top 0
+    bottom 40px
+    right 0px 
+    width 60px
+    border-bottom 1px solid rgba(0, 50, 50, 0.8)
+
+    input 
+      font-size 16px
+      font-family FiraCode, sans-serif
+
+  .phaseNetworkSymbol:hover
     background rgba(0, 255, 255, 0.08)
 
   .phaseNetworkId
@@ -130,21 +149,26 @@
     top 0
     bottom 40px
     width 60px
+    border-bottom 1px solid rgba(0, 50, 50, 0.8)
 
     input 
-      font-size 20px
+      font-size 16px
+      font-family FiraCode, sans-serif
 
   .phaseNetworkId:hover
     background rgba(0, 255, 255, 0.08)
 
   .phaseNetworkExplorer
     position absolute
-    right 0
+    right 60px
     left 0
-    top 44px
+    top 45px
     bottom 2px
-    border-top 1px solid rgba(0, 50, 50, 0.8)
-    font-size 14px
+    border-right 1px solid rgba(0, 50, 50, 0.8)
+    
+    input 
+      font-size 14px
+      // font-family FiraCode, sans-serif
 
   .phaseNetworkExplorer:hover
     background rgba(0, 255, 255, 0.08)

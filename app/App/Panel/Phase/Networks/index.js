@@ -7,14 +7,15 @@ import link from '../../../../link'
 class Network extends React.Component {
   constructor (...args) {
     super(...args)
-    const { id, name, type, explorer } = this.props
-    this.state = { id, name, explorer, type }
+    const { id, name, type, explorer, symbol } = this.props
+    this.state = { id, name, explorer, type, symbol }
   }
 
   render () {
     const changed = (
       this.props.id !== this.state.id ||
       this.props.name !== this.state.name ||
+      this.props.symbol !== this.state.symbol ||
       this.props.explorer !== this.state.explorer ||
       this.props.type !== this.state.type
     )
@@ -23,8 +24,8 @@ class Network extends React.Component {
         {changed ? (
           <div
             className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
-              const net = { id: this.props.id, name: this.props.name, type: this.props.type, explorer: this.props.explorer }
-              const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, explorer: this.state.explorer }
+              const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer }
+              const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer }
               link.send('tray:action', 'updateNetwork', net, newNet)
             }}
           >
@@ -48,6 +49,18 @@ class Network extends React.Component {
             }}
             onBlur={(e) => {
               if (e.target.value === '') this.setState({ name: this.props.name })
+            }}
+          />
+        </div>
+        <div className='phaseNetworkSymbol'>
+          <input
+            value={this.state.symbol} spellCheck='false'
+            onChange={(e) => {
+              if (e.target.value.length > 8) return e.preventDefault()
+              this.setState({ symbol: e.target.value })
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '') this.setState({ symbol: this.props.symbol })
             }}
           />
         </div>
@@ -84,11 +97,13 @@ class NetworkWrap extends React.Component {
     this.newNetworkIdDefault = 'ID'
     this.newNetworkNameDefault = 'New Network'
     this.newNetworkExplorerDefault = 'Block Explorer'
+    this.newNetworkSymbolDefault = 'Ξ'
     this.newNetworkType = 'ethereum'
     this.state = {
       newNetworkId: this.newNetworkIdDefault,
       newNetworkName: this.newNetworkNameDefault,
       newNetworkExplorer: this.newNetworkExplorerDefault,
+      newNetworkSymbol: this.newNetworkSymbolDefault,
       newNetworkType: this.newNetworkType
     }
   }
@@ -114,7 +129,7 @@ class NetworkWrap extends React.Component {
           {Object.keys(networks[type]).sort((a, b) => {
             return parseInt(a) - parseInt(b)
           }).map(id => {
-            return <Network key={type + id + networks[type][id].name} id={id} name={networks[type][id].name} explorer={networks[type][id].explorer} type={type} />
+            return <Network key={type + id + networks[type][id].name} id={id} name={networks[type][id].name} symbol={networks[type][id].symbol} explorer={networks[type][id].explorer} type={type} />
           })}
         </div>
       )
@@ -126,7 +141,8 @@ class NetworkWrap extends React.Component {
     const changedNewNetwork = (
       this.state.newNetworkId !== this.newNetworkIdDefault ||
       this.state.newNetworkName !== this.newNetworkNameDefault ||
-      this.state.newNetworkExplorer !== this.newNetworkExplorerDefault
+      this.state.newNetworkExplorer !== this.newNetworkExplorerDefault ||
+      this.state.newNetworkSymbol !== this.newNetworkSymbolDefault
     )
 
     const newNetworkReady = (
@@ -152,17 +168,19 @@ class NetworkWrap extends React.Component {
                     id: this.state.newNetworkId,
                     name: this.state.newNetworkName,
                     type: this.state.newNetworkType,
-                    explorer: this.state.newNetworkExplorer
+                    explorer: this.state.newNetworkExplorer,
+                    symbol: this.state.newNetworkSymbol
                   }
                   link.send('tray:action', 'addNetwork', net)
                   this.setState({
                     newNetworkId: this.newNetworkIdDefault,
                     newNetworkName: this.newNetworkNameDefault,
-                    newNetworkExplorer: this.newNetworkExplorerDefault
+                    newNetworkExplorer: this.newNetworkExplorerDefault,
+                    newNetworkSymbol: this.newNetworkSymbolDefault
                   })
                 }}
               >
-                {svg.save(18)}
+                {svg.save(16)}
               </div>
             ) : (
               <div className='phaseNetworkSubmit'>
@@ -196,6 +214,21 @@ class NetworkWrap extends React.Component {
                 }}
                 onBlur={(e) => {
                   if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
+                }}
+              />
+            </div>
+            <div className='phaseNetworkSymbol'>
+              <input
+                value={this.state.newNetworkSymbol} spellCheck='false'
+                onChange={(e) => {
+                  if (e.target.value.length > 8) return e.preventDefault()
+                  this.setState({ newNetworkSymbol: e.target.value })
+                }}
+                onFocus={(e) => {
+                  if (e.target.value === this.newNetworkSymbolDefault) this.setState({ newNetworkSymbol: '' })
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === '') this.setState({ newNetworkSymbol: this.newNetworkSymbolDefault })
                 }}
               />
             </div>
