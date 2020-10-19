@@ -164,6 +164,7 @@ module.exports = {
           typeof (net.type) !== 'string' ||
           typeof (net.name) !== 'string' ||
           typeof (net.explorer) !== 'string' ||
+          typeof (net.symbol) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
           throw new Error('Invalid network settings')
@@ -180,6 +181,7 @@ module.exports = {
     })
   },
   updateNetwork: (u, net, newNet) => {
+    console.log(net, newNet)
     u('main', main => {
       try {
         if (
@@ -187,6 +189,7 @@ module.exports = {
           typeof (net.type) !== 'string' ||
           typeof (net.name) !== 'string' ||
           typeof (net.explorer) !== 'string' ||
+          typeof (net.symbol) !== 'string' ||
           ['ethereum'].indexOf(net.type) === -1
         ) {
           throw new Error('Invalid network settings')
@@ -196,6 +199,7 @@ module.exports = {
           typeof (newNet.type) !== 'string' ||
           typeof (newNet.name) !== 'string' ||
           typeof (newNet.explorer) !== 'string' ||
+          typeof (newNet.symbol) !== 'string' ||
           ['ethereum'].indexOf(newNet.type) === -1
         ) {
           throw new Error('Invalid new network settings')

@@ -24,12 +24,11 @@ class Panel extends React.Component {
   render () {
     const open = this.store('tray.open')
     const transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    // const opacity = open ? '1' : '0'
     const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
     const { type, id } = this.store('main.currentNetwork')
     return (
       <div id='panel' style={{ transform, transition }}>
-        <div className='panelSwoop'>{svg.swoop()}</div>
-        <div className='panelSwoopBottom'>{svg.swoop()}</div>
         <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>

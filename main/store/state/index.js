@@ -158,6 +158,7 @@ const initial = {
         1: {
           id: 1,
           type: 'ethereum',
+          symbol: 'Ξ',
           name: 'Mainnet',
           explorer: 'https://etherscan.io',
           gas: {
@@ -174,6 +175,7 @@ const initial = {
         3: {
           id: 3,
           type: 'ethereum',
+          symbol: 'Ξ',
           name: 'Ropsten',
           explorer: 'https://ropsten.etherscan.io',
           gas: {
@@ -183,13 +185,14 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infuraRopsten', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           }
         },
         4: {
           id: 4,
           type: 'ethereum',
+          symbol: 'Ξ',
           name: 'Rinkeby',
           explorer: 'https://rinkeby.etherscan.io',
           gas: {
@@ -199,13 +202,14 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infuraRinkeby', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           }
         },
         5: {
           id: 5,
           type: 'ethereum',
+          symbol: 'Ξ',
           name: 'Görli',
           explorer: 'https://goerli.etherscan.io',
           gas: {
@@ -222,6 +226,7 @@ const initial = {
         42: {
           id: 42,
           type: 'ethereum',
+          symbol: 'Ξ',
           name: 'Kovan',
           explorer: 'https://kovan.etherscan.io',
           gas: {
@@ -231,13 +236,14 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'infuraKovan', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           }
         },
         74: {
           id: 74,
           type: 'ethereum',
+          symbol: 'EIDI',
           name: 'IDChain',
           explorer: 'https://explorer.idchain.one',
           gas: {
@@ -254,6 +260,7 @@ const initial = {
         100: {
           id: 100,
           type: 'ethereum',
+          symbol: 'xDAI',
           name: 'xDai',
           explorer: 'https://blockscout.com/poa/xdai',
           gas: {
@@ -332,6 +339,19 @@ if (connection) {
   })
   initial.main.currentNetwork.id = connection.network + '' || initial.main.currentNetwork.id || '1'
 }
+
+// Earlier versions of v0.3.3 did not include symbols
+Object.keys(initial.main.networks.ethereum).forEach(id => {
+  if (!initial.main.networks.ethereum[id].symbol) {
+    if (id === 74) {
+      initial.main.networks.ethereum[id].symbol = 'EIDI'
+    } else if (id === 100) {
+      initial.main.networks.ethereum[id].symbol = 'xDAI'
+    } else {
+      initial.main.networks.ethereum[id].symbol = 'Ξ'
+    }
+  }
+})
 
 module.exports = () => initial
 

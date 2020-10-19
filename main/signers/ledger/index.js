@@ -6,10 +6,15 @@ const Ledger = require('./Ledger')
 // const isLedger = d => (['win32', 'darwin'].includes(process.platform) ? d.usagePage === 0xffa0 : d.interface === 0) && ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
 const isLedger = d => ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
 
+let scanTimer = null
+
 module.exports = {
   scan: (signers) => {
     log.info('Ledger Scaner Started...')
-    const scan = () => {
+    const scan = (followup = false) => {
+      clearTimeout(scanTimer)
+      const start = Date.now()
+      log.info('LedgerSCAN.....')
       const current = HID.devices().filter(isLedger)
       signers.list().forEach((signer, i) => {
         if (current.map(device => device.path).indexOf(signer.devicePath) === -1 && signer.type === 'ledger') {
@@ -31,17 +36,11 @@ module.exports = {
           log.info('Updating Ledger: ', JSON.stringify(signer.summary()))
         }
       })
+      if (followup) scanTimer = setTimeout(() => scan(), 800)
+      console.log('scan done...', Math.round((Date.now() - start)) + ' ms')
     }
-    const listenScan = () => {
-      scan()
-      setTimeout(scan, 200)
-      setTimeout(scan, 400)
-      setTimeout(scan, 800)
-      setTimeout(scan, 1600)
-      setTimeout(scan, 3200)
-    }
-    usb.on('attach', listenScan)
-    usb.on('detach', listenScan)
-    scan()
+    usb.on('attach', () => scan(true))
+    usb.on('detach', () => scan(true))
+    scan(true)
   }
 }

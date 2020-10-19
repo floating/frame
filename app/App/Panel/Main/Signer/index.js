@@ -140,11 +140,11 @@ class Signer extends React.Component {
         </div>
         {this.state.openHover ? this.renderArrows('up') : null}
         {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
-          <div className='signerTypeDisconnected' onMouseDown={::this.typeClick} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+          <div className='signerTypeDisconnected' onMouseDown={this.typeClick.bind(this)} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
           </div>
         ) : null}
-        <div className={innerClass} onMouseDown={::this.typeClick} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+        <div className={innerClass} onMouseDown={this.typeClick.bind(this)} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
           <div className='signerInset'>
             <div className='signerImage'>
               {(_ => {
@@ -245,6 +245,8 @@ class Signer extends React.Component {
     const index = this.store('main.accounts', this.props.id, 'index')
     const startIndex = this.store('selected.accountPage') * 5
     const highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
+    const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
     return (
       <div className='accountListWrap'>
         <div className='accountList' onMouseDown={e => e.stopPropagation()}>
@@ -256,7 +258,7 @@ class Signer extends React.Component {
                 <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
                   <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
                   <div className='accountListItemAddress'>{a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}</div>
-                  <div className='accountListItemBalance'>{'Ξ ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
+                  <div className='accountListItemBalance'>{currentSymbol + ' ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
                 </div>
               )
             })}
@@ -290,6 +292,8 @@ class Signer extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const balance = this.store('balances', address)
     if (!address) return null
+    const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -314,7 +318,7 @@ class Signer extends React.Component {
               </div>
               <div className='signerInfo'>
                 <div className='signerBalance'>
-                  <span className='signerBalanceCurrency'>Ξ</span>
+                  <span className='signerBalanceCurrency'>{currentSymbol}</span>
                   {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
                 </div>
               </div>
@@ -348,7 +352,7 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 50 : initial.height - 3
+      style.height = open ? panelHeight - 48 : initial.height - 3
       style.transform = open ? `translateY(-${initial.top - 44}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is

@@ -170,6 +170,9 @@ class TransactionRequest extends React.Component {
     const height = mode === 'monitor' ? '145px' : '360px'
     const style = this.expandFee(0, height)
 
+    const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
+
     let slideLevel
 
     if (feeLevel === 'safelow') {
@@ -209,9 +212,16 @@ class TransactionRequest extends React.Component {
             {this.renderFeeLabel(feeLevel === 'safelow', expanded)}
             <div className='txSectionLabelRight'>Safe Low</div>
             <div className={safelowFeeUSD > FEE_WARNING_THRESHOLD_USD || !safelowFeeUSD ? 'networkFeeTotal networkFeeTotalWarn' : 'networkFeeTotal'}>
-              <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + safelowFee}</div>
-              <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
-              <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + safelowFeeUSD.toFixed(2)}</div>
+              <div className='networkFeeTotalSection networkFeeTotalETH'>
+                <span className='networkFeeSymbol'>{currentSymbol}</span>
+                <span>{safelowFee}</span>
+              </div>
+              {id === '1' ? (
+                <>
+                  <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
+                  <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + safelowFeeUSD.toFixed(2)}</div>
+                </>
+              ) : null}
             </div>
           </div>
           <div
@@ -224,9 +234,16 @@ class TransactionRequest extends React.Component {
             {this.renderFeeLabel(feeLevel === 'standard', expanded)}
             <div className='txSectionLabelRight'>Standard</div>
             <div className={standardFeeUSD > FEE_WARNING_THRESHOLD_USD || !standardFeeUSD ? 'networkFeeTotal networkFeeTotalWarn' : 'networkFeeTotal'}>
-              <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + standardFee}</div>
-              <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
-              <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + standardFeeUSD.toFixed(2)}</div>
+              <div className='networkFeeTotalSection networkFeeTotalETH'>
+                <span className='networkFeeSymbol'>{currentSymbol}</span>
+                <span>{standardFee}</span>
+              </div>
+              {id === '1' ? (
+                <>
+                  <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
+                  <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + standardFeeUSD.toFixed(2)}</div>
+                </>
+              ) : null}
             </div>
           </div>
           <div
@@ -239,9 +256,16 @@ class TransactionRequest extends React.Component {
             {this.renderFeeLabel(feeLevel === 'fast', expanded)}
             <div className='txSectionLabelRight'>Fast</div>
             <div className={fastFeeUSD > FEE_WARNING_THRESHOLD_USD || !fastFeeUSD ? 'networkFeeTotal networkFeeTotalWarn' : 'networkFeeTotal'}>
-              <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + fastFee}</div>
-              <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
-              <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + fastFeeUSD.toFixed(2)}</div>
+              <div className='networkFeeTotalSection networkFeeTotalETH'>
+                <span className='networkFeeSymbol'>{currentSymbol}</span>
+                <span>{fastFee}</span>
+              </div>
+              {id === '1' ? (
+                <>
+                  <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
+                  <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + fastFeeUSD.toFixed(2)}</div>
+                </>
+              ) : null}
             </div>
           </div>
           <div
@@ -254,9 +278,16 @@ class TransactionRequest extends React.Component {
             {this.renderFeeLabel(feeLevel === 'trader', expanded)}
             <div className='txSectionLabelRight'>Trader</div>
             <div className={traderFeeUSD > FEE_WARNING_THRESHOLD_USD || !traderFeeUSD ? 'networkFeeTotal networkFeeTotalWarn' : 'networkFeeTotal'}>
-              <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + traderFee}</div>
-              <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
-              <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + traderFeeUSD.toFixed(2)}</div>
+              <div className='networkFeeTotalSection networkFeeTotalETH'>
+                <span className='networkFeeSymbol'>{currentSymbol}</span>
+                <span>{traderFee}</span>
+              </div>
+              {id === '1' ? (
+                <>
+                  <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
+                  <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + traderFeeUSD.toFixed(2)}</div>
+                </>
+              ) : null}
             </div>
           </div>
           <div
@@ -270,9 +301,16 @@ class TransactionRequest extends React.Component {
             {this.renderFeeLabel(feeLevel === 'custom', expanded)}
             <div className='txSectionLabelRight'>Custom</div>
             <div className={customFeeUSD > FEE_WARNING_THRESHOLD_USD || !customFeeUSD ? 'networkFeeTotal networkFeeTotalWarn' : 'networkFeeTotal'}>
-              <div className='networkFeeTotalSection networkFeeTotalETH'>{'Ξ ' + customFee}</div>
-              <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
-              <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + customFeeUSD.toFixed(2)}</div>
+              <div className='networkFeeTotalSection networkFeeTotalETH'>
+                <span className='networkFeeSymbol'>{currentSymbol}</span>
+                <span>{customFee}</span>
+              </div>
+              {id === '1' ? (
+                <>
+                  <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
+                  <div className='networkFeeTotalSection networkFeeTotalUSD'>{'$ ' + customFeeUSD.toFixed(2)}</div>
+                </>
+              ) : null}
             </div>
             <div className='customGasPriceBar'>
               <div className='customGasPriceBarInner' style={{ background: this.state.hoverGasColor, width: ((this.state.hoverGasPercent * 100) + 5) + '%', transform: 'translateX(-50%)', left: '50%' }} />
@@ -301,12 +339,14 @@ class TransactionRequest extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     const feeUSD = fee * etherUSD
-    const height = mode === 'monitor' ? '145px' : '360px'
+    const height = mode === 'monitor' ? '165px' : '360px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     let statusClass = 'txStatus'
     if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
+    const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {req.type === 'transaction' ? (
@@ -315,15 +355,21 @@ class TransactionRequest extends React.Component {
               {notice ? (
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
-                    <div className={statusClass}>
+                    <div
+                      className='txDetails'
+                      style={req.tx ? { opacity: 1, pointerEvents: 'auto' } : { opacity: 1, pointerEvents: 'none' }}
+                      onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openEtherscan', { hash: req.tx.hash }) }}
+                    >
+                      {'View Details'}
+                    </div>
+                    <div className={statusClass} style={req.tx ? { top: '85px' } : {}} onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openEtherscan', { hash: req.tx.hash }) }}>
                       <div className='txProgressNotice'>
-                        <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'} onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openEtherscan', { hash: req.tx.hash }) }}>
+                        <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'}>
                           <div className='txProgressDetailHash'>
                             {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 14) : ''}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
                             {req && req.tx && req.tx.hash ? req.tx.hash.substr(req.tx.hash.length - 12) : ''}
                           </div>
-                          <div className='txProgressDetailExpand'>View Details</div>
                         </div>
                         <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
                           {[...Array(10).keys()].map(i => {
@@ -380,8 +426,13 @@ class TransactionRequest extends React.Component {
                   </div>
                   <div className='transactionValue'>
                     <div className='transactionTotals'>
-                      <div className='transactionTotalETH'>{'Ξ ' + value}</div>
-                      <div className='transactionTotalUSD'>{'$ ' + (value * etherUSD).toFixed(2)}</div>
+                      <div className='transactionTotalETH'>
+                        <span className='transactionSymbol'>{currentSymbol}</span>
+                        <span>{value}</span>
+                      </div>
+                      {id === '1' ? (
+                        <div className='transactionTotalUSD'>{'$' + (value * etherUSD).toFixed(2)}</div>
+                      ) : null}
                     </div>
                     <div className='transactionSubtitle'>Value</div>
                   </div>
