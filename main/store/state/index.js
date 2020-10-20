@@ -357,7 +357,8 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
 })
 
 // If migrating from before this was a setting make it 'true' to grandfather behavior
-if (initial.main._version < 4 && get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
+const v = initial.main._version
+if (v > 0 && v < 4 && get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
 initial.main._version = 4
 
 module.exports = () => initial
