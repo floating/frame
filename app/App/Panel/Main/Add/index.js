@@ -9,6 +9,7 @@ import AddHardware from './AddHardware'
 import AddAragon from './AddAragon'
 import AddPhrase from './AddPhrase'
 import AddRing from './AddRing'
+import AddAddress from './AddAddress'
 
 const duration = { appear: 20, enter: 20, exit: 960 }
 
@@ -55,11 +56,13 @@ class Add extends React.Component {
                       <div className='addAccountHeader'><div style={{ marginRight: '10px' }}>{svg.octicon('server', { height: 17 })}</div><div>Hardware Accounts</div></div>
                       <AddHardware index={1} type='ledger' />
                       <AddHardware index={2} type='trezor' />
-                      <div className='addAccountHeader'><div>{svg.lightbulb(20)}</div><div>Smart Accounts</div></div>
+                      <div className='addAccountHeader'><div style={{ marginRight: '10px' }}>{svg.lightbulb(12)}</div><div>Smart Accounts</div></div>
                       <AddAragon index={3} />
-                      <div className='addAccountHeader'><div>{svg.flame(20)}</div><div>Hot Accounts</div></div>
+                      <div className='addAccountHeader'><div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(13)}</div><div>Hot Accounts</div></div>
                       <AddPhrase index={4} />
                       <AddRing index={5} />
+                      <div className='addAccountHeader'><div style={{ margin: '-3px 10px 0px 0px' }}>{svg.handshake(23)}</div><div>Mock Accounts</div></div>
+                      <AddAddress index={6} />
                       <div className='addAccountBreak' style={{ margin: '40px 0px 0px 0px' }} />
                       <div className='addAccountFooter'>{svg.logo(32)}</div>
                     </div>
