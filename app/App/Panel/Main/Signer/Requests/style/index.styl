@@ -1190,10 +1190,10 @@ span
 
 .txDetails
   position absolute
-  top 54px
+  top 59px
   left 5px
   right 5px
-  height 30px
+  height 22px
   font-size 12px
   display flex
   justify-content center
@@ -1201,8 +1201,14 @@ span
   text-transform uppercase
   letter-spacing 2px
   margin-left 2px
-  font-weight 400
-  // background blue
+  font-weight 500
+  background highlight
+  box-shadow 0px 2px 1px thick
+  border-radius 11px
+  transition standardFast
+
+.txDetails:hover, .txStatus:hover
+  background highlighter
 
 .txStatus
   position absolute
@@ -1211,7 +1217,7 @@ span
   right 5px
   bottom 40px
   border-radius 16px
-  box-shadow 0px 2px 0px thick, 0px 8px 5px -5px thick
+  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
   text-align center
   box-sizing border-box
   background rgba(255, 255, 255, 0.05)

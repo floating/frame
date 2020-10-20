@@ -267,7 +267,8 @@ class Notify extends React.Component {
             {'Open Etherscan'}
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`Frame will now open Etherscan for transaction ${hash} in your browser`}</div>
+            <div className='notifyBodyLine'>{'Frame will now open Etherscan in your browser for transaction:'}</div>
+            <div className='notifyBodyHash'>{hash}</div>
           </div>
           <div className='notifyInput'>
             <div
@@ -284,6 +285,18 @@ class Notify extends React.Component {
               }}
             >
               <div className='notifyInputOptionText'>Proceed</div>
+            </div>
+          </div>
+          <div className='notifyCheck' onMouseDown={() => {
+            link.send('tray:action', 'toggleEtherScanWarning')
+          }}>
+            <div className='notifyCheckBox'>
+              {this.store('main.mute.etherScanWarning') ? (
+                svg.octicon('check', { height: 26 })
+              ) : null}
+            </div>
+            <div className='notifyCheckText'>
+              {'Don\'t show this warning again'}
             </div>
           </div>
         </div>

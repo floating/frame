@@ -78,7 +78,9 @@ const initial = {
     _version: main('_version', 3),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
-      externalLinkWarning: main('mute.externalLinkWarning', false)
+      externalLinkWarning: main('mute.externalLinkWarning', false),
+      etherScanWarning: main('mute.etherScanWarning', false),
+      signerRelockChange: main('mute.signerRelockChange', false)
     },
     launch: main('launch', false),
     reveal: main('reveal', false),
@@ -355,7 +357,7 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
 })
 
 // If migrating from before this was a setting make it 'true' to grandfather behavior
-if (get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
+// if (get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
 
 module.exports = () => initial
 

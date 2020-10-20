@@ -358,7 +358,15 @@ class TransactionRequest extends React.Component {
                     <div
                       className='txDetails'
                       style={req.tx ? { opacity: 1, pointerEvents: 'auto' } : { opacity: 1, pointerEvents: 'none' }}
-                      onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openEtherscan', { hash: req.tx.hash }) }}
+                      onMouseDown={() => { 
+                        if (req && req.tx && req.tx.hash) {
+                          console.log('this.store(\'main.mute.etherScanWarning\')', this.store('main.mute.etherScanWarning'))
+                          if (this.store('main.mute.etherScanWarning')) {
+                            link.send('tray:openEtherscan', req.tx.hash)
+                          } else {
+                            this.store.notify('openEtherscan', { hash: req.tx.hash }) }}
+                          }                      
+                        } 
                     >
                       {'View Details'}
                     </div>
