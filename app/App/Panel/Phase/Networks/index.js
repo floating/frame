@@ -34,19 +34,19 @@ class Network extends React.Component {
             {svg.save(16)}
           </div>
         ) : (this.state.submitted ? (
-            <div className='phaseNetworkSubmit phaseNetworkSubmitted'>
-              {svg.octicon('check', { height: 22 })}
-            </div>
-          ) : (
-            <div
-              className='phaseNetworkSubmit phaseNetworkRemove' onMouseDown={() => {
-                const { id, name, type, explorer } = this.props
-                link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
-              }}
-            >
-              {svg.trash(16)}
-            </div>
-          )
+          <div className='phaseNetworkSubmit phaseNetworkSubmitted'>
+            {svg.octicon('check', { height: 22 })}
+          </div>
+        ) : (
+          <div
+            className='phaseNetworkSubmit phaseNetworkRemove' onMouseDown={() => {
+              const { id, name, type, explorer } = this.props
+              link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+            }}
+          >
+            {svg.trash(16)}
+          </div>
+        )
         )}
         <div className='phaseNetworkName'>
           <input

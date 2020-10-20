@@ -321,6 +321,12 @@ class TransactionRequest extends React.Component {
     )
   }
 
+  copyData (data) {
+    link.send('tray:clipboardData', data)
+    this.setState({ copiedData: true })
+    setTimeout(_ => this.setState({ copiedData: false }), 1000)
+  }
+
   render () {
     const req = this.props.req
     let notice = req.notice
@@ -358,19 +364,19 @@ class TransactionRequest extends React.Component {
                     <div
                       className='txDetails'
                       style={req.tx ? { opacity: 1, pointerEvents: 'auto' } : { opacity: 1, pointerEvents: 'none' }}
-                      onMouseDown={() => { 
+                      onMouseDown={() => {
                         if (req && req.tx && req.tx.hash) {
-                          console.log('this.store(\'main.mute.etherScanWarning\')', this.store('main.mute.etherScanWarning'))
-                          if (this.store('main.mute.etherScanWarning')) {
-                            link.send('tray:openEtherscan', req.tx.hash)
+                          if (this.store('main.mute.explorerWarning')) {
+                            link.send('tray:openExplorer', req.tx.hash)
                           } else {
-                            this.store.notify('openEtherscan', { hash: req.tx.hash }) }}
-                          }                      
-                        } 
+                            this.store.notify('openExplorer', { hash: req.tx.hash })
+                          }
+                        }
+                      }}
                     >
                       {'View Details'}
                     </div>
-                    <div className={statusClass} style={req.tx ? { top: '85px' } : {}} onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openEtherscan', { hash: req.tx.hash }) }}>
+                    <div className={statusClass} style={req.tx ? { top: '85px' } : {}} onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openExplorer', { hash: req.tx.hash }) }}>
                       <div className='txProgressNotice'>
                         <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'}>
                           <div className='txProgressDetailHash'>
@@ -453,8 +459,13 @@ class TransactionRequest extends React.Component {
                         <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
                       </div>
                       <div className='transactionDataBody'>
-                        <div className='transactionDataBodyInner'>
-                          {req.data.data}
+                        <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
+                          {this.state.copiedData ? (
+                            <div className='transactionDataBodyCopied'>
+                              <div>{'Copied'}</div>
+                              {svg.octicon('clippy', { height: 20 })}
+                            </div>
+                          ) : req.data.data}
                         </div>
                       </div>
                     </div>

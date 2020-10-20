@@ -259,15 +259,15 @@ class Notify extends React.Component {
     )
   }
 
-  openEtherscan ({ hash }) {
+  openExplorer ({ hash }) {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openEtherscan' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExplorer' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Open Etherscan'}
+            {'Open Block Explorer'}
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{'Frame will now open Etherscan in your browser for transaction:'}</div>
+            <div className='notifyBodyLine'>Frame will open a block explorer in your browser for transaction:</div>
             <div className='notifyBodyHash'>{hash}</div>
           </div>
           <div className='notifyInput'>
@@ -280,18 +280,20 @@ class Notify extends React.Component {
             </div>
             <div
               className='notifyInputOption notifyInputProceed' onMouseDown={() => {
-                link.send('tray:openEtherscan', hash)
+                link.send('tray:openExplorer', hash)
                 this.store.notify()
               }}
             >
               <div className='notifyInputOptionText'>Proceed</div>
             </div>
           </div>
-          <div className='notifyCheck' onMouseDown={() => {
-            link.send('tray:action', 'toggleEtherScanWarning')
-          }}>
+          <div
+            className='notifyCheck' onMouseDown={() => {
+              link.send('tray:action', 'toggleexplorerWarning')
+            }}
+          >
             <div className='notifyCheckBox'>
-              {this.store('main.mute.etherScanWarning') ? (
+              {this.store('main.mute.explorerWarning') ? (
                 svg.octicon('check', { height: 26 })
               ) : null}
             </div>
@@ -312,7 +314,7 @@ class Notify extends React.Component {
         {this.intro()}
         {this.rinkeby()}
         {this.openExternal(this.store('view.notifyData'))}
-        {this.openEtherscan(this.store('view.notifyData'))}
+        {this.openExplorer(this.store('view.notifyData'))}
         {this.ipfsAlreadyRunning()}
         {this.parityAlreadyRunning()}
         {this.contractData()}
@@ -393,7 +395,7 @@ class Notify extends React.Component {
 //     }
 //   },
 //   {
-//     name: 'openEtherscan',
+//     name: 'openExplorer',
 //     data: {
 //       hash: '0x1234'
 //     }

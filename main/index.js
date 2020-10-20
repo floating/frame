@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -80,6 +80,10 @@ ipcMain.on('tray:resetAllSettings', () => {
 //   accounts.removeAllAccounts()
 // })
 
+ipcMain.on('tray:clipboardData', (e, data) => {
+  clipboard.writeText(data)
+})
+
 ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
   updater.installAvailableUpdate(install, dontRemind)
 })
@@ -101,7 +105,7 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
-ipcMain.on('tray:openEtherscan', (e, hash) => {
+ipcMain.on('tray:openExplorer', (e, hash) => {
   const { type, id } = store('main.currentNetwork')
   const explorer = store('main.networks', type, id, 'explorer')
   shell.openExternal(explorer + '/tx/' + hash)

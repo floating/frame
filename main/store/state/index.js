@@ -79,7 +79,7 @@ const initial = {
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false),
-      etherScanWarning: main('mute.etherScanWarning', false),
+      explorerWarning: main('mute.explorerWarning', false),
       signerRelockChange: main('mute.signerRelockChange', false)
     },
     launch: main('launch', false),
