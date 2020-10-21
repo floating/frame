@@ -462,7 +462,7 @@ class TransactionRequest extends React.Component {
                         <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
                           {this.state.copiedData ? (
                             <div className='transactionDataBodyCopied'>
-                              <div>{'Copied'}</div>
+                              <div>Copied</div>
                               {svg.octicon('clippy', { height: 20 })}
                             </div>
                           ) : req.data.data}
