@@ -361,7 +361,7 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
 })
 
 // If migrating from before this was a setting make it 'true' to grandfather behavior
-if (main('mute', false) && get('mute.accountCloseLock') === undefined) initial.main.accountCloseLock = true
+if (main('mute', false) && get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
 
 initial.main._version = 4
 

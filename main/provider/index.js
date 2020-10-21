@@ -448,6 +448,7 @@ store.observer(() => {
 })
 
 proxy.on('send', (payload, cd) => provider.send(payload, cd))
+proxy.ready = true
 provider.on('data', data => proxy.emit('data', data))
 
 module.exports = provider
