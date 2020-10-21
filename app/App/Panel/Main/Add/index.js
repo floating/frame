@@ -61,7 +61,7 @@ class Add extends React.Component {
                       <div className='addAccountHeader'><div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(13)}</div><div>Hot Accounts</div></div>
                       <AddPhrase index={4} />
                       <AddRing index={5} />
-                      <div className='addAccountHeader'><div style={{ margin: '-3px 10px 0px 0px' }}>{svg.handshake(23)}</div><div>Mock Accounts</div></div>
+                      <div className='addAccountHeader'><div style={{ margin: '-3px 10px 0px 0px' }}>{svg.handshake(23)}</div><div>Nonsigning Accounts</div></div>
                       <AddAddress index={6} />
                       <div className='addAccountBreak' style={{ margin: '40px 0px 0px 0px' }} />
                       <div className='addAccountFooter'>{svg.logo(32)}</div>

@@ -320,7 +320,9 @@ if (connection) {
         // Copy local custom endpoint to new connection object
         if (connection.local.settings[id].options) initial.main.networks.ethereum[id].connection.primary.custom = connection.local.settings[id].options.custom
         // Copy local current selection to new connection object
-        if (connection.local.settings[id].current) initial.main.networks.ethereum[id].connection.primary.current = connection.local.settings[id].current
+        let current = connection.local.settings[id].current
+        if (current === 'direct') current = 'local'
+        if (current) initial.main.networks.ethereum[id].connection.primary.current = current
       }
     })
   }
@@ -331,7 +333,9 @@ if (connection) {
         // Copy all secondary connection settings to new connection object
         if (connection.secondary.settings[id].options) initial.main.networks.ethereum[id].connection.secondary.custom = connection.secondary.settings[id].options.custom
         // Copy local current selection to new connection object
-        if (connection.secondary.settings[id].current) initial.main.networks.ethereum[id].connection.secondary.current = connection.secondary.settings[id].current
+        let current = connection.secondary.settings[id].current
+        if (current === 'direct') current = 'local'
+        if (current) initial.main.networks.ethereum[id].connection.secondary.current = current
       }
     })
   }
@@ -357,8 +361,8 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
 })
 
 // If migrating from before this was a setting make it 'true' to grandfather behavior
-const v = initial.main._version
-if (v > 0 && v < 4 && get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
+if (main('mute', false) && get('mute.accountCloseLock') === undefined) initial.main.accountCloseLock = true
+
 initial.main._version = 4
 
 module.exports = () => initial
