@@ -7,7 +7,7 @@
   <br>
   <br>
 </h2>
-<h3 align="center">An OS-level web3 Interface :tada:</h3>
+<h3 align="center">System-wide Web3 for macOS, Windows and Linux :tada:</h3>
 <br>
 <h5 align="center">
   <a href="#features">Features</a> ⁃
@@ -16,7 +16,7 @@
 </h5>
 <br>
 
-<img src="/asset/demo/Frame0-0-5-RC1.gif?raw=true" />
+<img src="/asset/png/FrameExample0-3-4.png?raw=true" />
 
 Frame is a web3 interface that lets you sign data, manage accounts, run your own connections to Ethereum/IPFS and securely and transparently interact with dapps and web3 protocols.
 
