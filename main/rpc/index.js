@@ -1,6 +1,7 @@
 const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
 // const log = require('electron-log')
+const utils = require('web3-utils')
 
 const accounts = require('../accounts')
 const signers = require('../signers')
@@ -84,6 +85,11 @@ const rpc = {
   },
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
+  },
+  createFromAddress (address, cb) {
+    if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
+    accounts.add([address], { type: 'Address' })
+    cb()
   },
   createFromPhrase (phrase, password, cb) {
     signers.createFromPhrase(phrase, password, cb)

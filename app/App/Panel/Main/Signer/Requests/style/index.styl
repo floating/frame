@@ -854,6 +854,21 @@
     overflow hidden
     z-index 9
 
+    .transactionDataBodyCopied
+      position absolute
+      top 0
+      left 0
+      right 0
+      display flex
+      justify-content center
+      align-items center
+      font-size 16px
+      letter-spacing 0px
+      height 76px
+
+      svg
+        margin -3px 0px 0px 10px
+
     .transactionDataBodyInner
       opacity 0
       top -100px
@@ -1190,10 +1205,10 @@ span
 
 .txDetails
   position absolute
-  top 54px
+  top 59px
   left 5px
   right 5px
-  height 30px
+  height 22px
   font-size 12px
   display flex
   justify-content center
@@ -1201,8 +1216,14 @@ span
   text-transform uppercase
   letter-spacing 2px
   margin-left 2px
-  font-weight 400
-  // background blue
+  font-weight 500
+  background highlight
+  box-shadow 0px 2px 1px thick
+  border-radius 11px
+  transition standardFast
+
+.txDetails:hover, .txStatus:hover
+  background highlighter
 
 .txStatus
   position absolute
@@ -1211,7 +1232,7 @@ span
   right 5px
   bottom 40px
   border-radius 16px
-  box-shadow 0px 2px 0px thick, 0px 8px 5px -5px thick
+  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
   text-align center
   box-sizing border-box
   background rgba(255, 255, 255, 0.05)

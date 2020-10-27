@@ -23,18 +23,18 @@
     bottom 3px
     left 0
     position absolute
-    border-radius 8px
-    background light
+    border-radius 16px
+    background highlight
     z-index 2
 
   .notifyBoxWrap
-    border-radius 8px
+    border-radius 16px
     box-sizing border-box
     position absolute
-    top 10px
-    bottom 10px
-    left calc(100% + 90px)
-    width calc(100% - 20px)
+    top 5px
+    bottom 8px
+    left calc(100% + 95px)
+    width calc(100% - 10px)
     transition standard
     box-shadow 0px -1px 4px -1px rgba(6, 54, 52, 0.15), 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
     background lowerlight
@@ -77,14 +77,65 @@
         padding-top 10px
         word-break break-word
 
-        .notifyBodyLine
-          margin-bottom 40px
+        .notifyBodyHash
+          font-size 17px
+          font-family FiraCode, monospace
+          background thin
+          letter-spacing 2px
+          line-height 20px
+          // margin-left 4px
+          box-shadow inset 0px 2px 14px thin
+          padding 18px
+          border-radius 16px
+          margin-top 10px
+          border 1px solid highlighter
+          text-shadow 0px 2px 0px thick
+          min-height 58px
+          max-height 58px
+
+      .notifyCheck
+        display flex
+        position relative
+        justify-content center
+        align-items center
+        font-weight 400
+        z-index 3
+        margin-top 16px
+        margin-left 8px
+        padding 0px 30px
+        // background blue
+
+        .notifyCheckBox 
+          width 32px
+          height 32px
+          min-width 32px
+          min-height 32px
+          border-radius 16px
+          background highlightest
+          border 1px solid white
+          box-shadow cardDrop, 0px 2px 1px thick, 0px 0px 7px 2px thin
+          margin-right 10px
+          box-sizing border-box
+          display flex
+          position relative
+          justify-content center
+          align-items center
+
+          svg 
+            height 22px
+
+        .notifyCheckText
+          text-align left
+          font-size 13px
+          line-height 13px
+          width 210px
 
       .notifyInput
         display flex
         position relative
         justify-content space-between
         z-index 3
+        margin-top 40px
 
         .notifyInputOption
           position relative
@@ -170,6 +221,7 @@
       line-height 18px
       font-weight 300
       color outerspace08
+
       .introInstructionItem
         margin-bottom 20px
         padding 0px 20px

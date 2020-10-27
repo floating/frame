@@ -41,7 +41,7 @@ class Account {
       this.smart = this.signer ? undefined : this.smart
       this.update()
     })
-    if (this.created === -1) {
+    if (this.created === -1 || !this.created) {
       log.info('Account has no creation height, fetching')
       this.getBlockHeight((err, height) => {
         if (err) return log.error('getBlockHeight Error', err)
@@ -59,6 +59,7 @@ class Account {
   }
 
   getBlockHeight (cb) {
+    if (!proxyProvider.ready) return setTimeout(() => this.getBlockHeight(cb), 1000)
     proxyProvider.emit('send', { id: '1', jsonrpc: '2.0', method: 'eth_blockNumber' }, (res) => {
       if (res.error || !res.result) return cb(new Error('Unable to get current block height: ' + res.error.message))
       cb(null, res.result)

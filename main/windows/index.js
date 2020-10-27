@@ -1,5 +1,5 @@
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
 const log = require('electron-log')
 
@@ -268,6 +268,11 @@ if (dev) {
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) windows.tray.send('main:reload:style', name)
+  })
+  app.on('ready', () => {
+    globalShortcut.register('CommandOrControl+R', () => {
+      windows.tray.reload()
+    })
   })
 }
 

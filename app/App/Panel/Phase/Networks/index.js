@@ -8,7 +8,7 @@ class Network extends React.Component {
   constructor (...args) {
     super(...args)
     const { id, name, type, explorer, symbol } = this.props
-    this.state = { id, name, explorer, type, symbol }
+    this.state = { id, name, explorer, type, symbol, submitted: false }
   }
 
   render () {
@@ -26,10 +26,16 @@ class Network extends React.Component {
             className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
               const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer }
               const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer }
+              this.setState({ submitted: true })
               link.send('tray:action', 'updateNetwork', net, newNet)
+              setTimeout(() => this.setState({ submitted: false }), 1600)
             }}
           >
             {svg.save(16)}
+          </div>
+        ) : (this.state.submitted ? (
+          <div className='phaseNetworkSubmit phaseNetworkSubmitted'>
+            {svg.octicon('check', { height: 22 })}
           </div>
         ) : (
           <div
@@ -40,6 +46,7 @@ class Network extends React.Component {
           >
             {svg.trash(16)}
           </div>
+        )
         )}
         <div className='phaseNetworkName'>
           <input
@@ -129,7 +136,7 @@ class NetworkWrap extends React.Component {
           {Object.keys(networks[type]).sort((a, b) => {
             return parseInt(a) - parseInt(b)
           }).map(id => {
-            return <Network key={type + id + networks[type][id].name} id={id} name={networks[type][id].name} symbol={networks[type][id].symbol} explorer={networks[type][id].explorer} type={type} />
+            return <Network key={type + id} id={id} name={networks[type][id].name} symbol={networks[type][id].symbol} explorer={networks[type][id].explorer} type={type} />
           })}
         </div>
       )

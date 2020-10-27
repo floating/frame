@@ -134,6 +134,9 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
+  toggleexplorerWarning: (u) => {
+    u('main.mute.explorerWarning', v => !v)
+  },
   setGasPrices: (u, netType, netId, prices) => {
     u('main.networks', netType, netId, 'gas.price.levels', () => prices)
   },
