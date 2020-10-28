@@ -17,12 +17,20 @@ class Trezor extends Signer {
     this.type = 'trezor'
     this.status = 'loading'
     this.network = store('main.currentNetwork.id')
-    this.basePath = () => this.network === '1' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
+    this.hardwareDerivation = store('main.hardwareDerivation')
+    this.basePath = () => this.hardwareDerivation === 'mainnet' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.currentNetwork.id')) {
+        this.reset()
+        this.deviceStatus()
+      }
+    })
+    this.hardwareDerivationObserver = store.observer(() => {
+      if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
+        this.hardwareDerivation = store('main.hardwareDerivation')
         this.reset()
         this.deviceStatus()
       }
@@ -76,6 +84,7 @@ class Trezor extends Signer {
 
   close () {
     this.networkObserver.remove()
+    this.hardwareDerivationObserver.remove()
     this.closed = true
     store.removeSigner(this.id)
     super.close()
@@ -139,10 +148,17 @@ class Trezor extends Signer {
     })
   }
 
-  needPassphras (cb) {
-    this.status = 'Need Passphrase'
+  needPhrase (cb) {
+    this.status = 'Enter Passphrase'
     this.update()
-    this.setPin = cb
+    this.trezorPhrase = (phrase) => {
+      this.status = 'loading'
+      this.update()
+      flex.rpc('trezor.inputPhrase', this.device.path, phrase, err => {
+        if (err) log.error(err)
+        setTimeout(() => this.deviceStatus(), 1000)
+      })
+    }
   }
 
   needPin () {

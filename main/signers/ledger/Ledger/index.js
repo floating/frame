@@ -10,8 +10,10 @@ const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
+const BASE_PATH_LEGACY_TEST = '44\'/1\'/0\'/'
+
 const BASE_PATH_LIVE = '44\'/60\'/'
-const BASE_PATH_TEST = '44\'/1\'/0\'/'
+const BASE_PATH_LIVE_TEST = '44\'/1\'/'
 
 class Ledger extends Signer {
   constructor (devicePath, signers) {
@@ -41,13 +43,33 @@ class Ledger extends Signer {
         this.deviceStatus()
       }
     })
+    this.hardwareDerivation = store('main.hardwareDerivation')
+    this.hardwareDerivationObserver = store.observer(() => {
+      if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
+        this.reset()
+        this.deviceStatus()
+      }
+    })
     this.deviceStatus()
   }
 
   getPath (i = 0) {
-    if (this.network !== '1') return (BASE_PATH_TEST + i)
-    if (this.derivation === 'legacy') return (BASE_PATH_LEGACY + i)
-    else return (BASE_PATH_LIVE + i + '\'/0/0')
+    if (this.derivation === 'legacy') {
+      if (store('main.hardwareDerivation') === 'mainnet') {
+        return (BASE_PATH_LEGACY + i)
+      } else {
+        return (BASE_PATH_LEGACY_TEST + i)
+      }
+    } else {
+      if (store('main.hardwareDerivation') === 'mainnet') {
+        return (BASE_PATH_LIVE + i + '\'/0/0')
+      } else {
+        return (BASE_PATH_LIVE_TEST + i + '\'/0/0')
+      }
+    }
+    // if (store('main.hardwareDerivation') !== 'mainnet') return (BASE_PATH_LEGACY_TEST + i)
+    // if (this.derivation === 'legacy') return (BASE_PATH_LEGACY + i)
+    // else return (BASE_PATH_LIVE + i + '\'/0/0')
   }
 
   getId () {
@@ -91,6 +113,7 @@ class Ledger extends Signer {
   reset () {
     this.derivation = store('main.ledger.derivation')
     this.network = store('main.currentNetwork.id')
+    this.hardwareDerivation = store('main.hardwareDerivation')
     this.status = 'loading'
     this.addresses = []
     this.update()
@@ -141,8 +164,13 @@ class Ledger extends Signer {
   async deriveAddresses () {
     let addresses
     if (this.pause) throw new Error('Device access is paused')
+    if (this.derivingAddresses) {
+      await this.wait(1000)
+      return await this.deriveAddresses()
+    }
+    this.derivingAddresses = true
     // Derive addresses
-    if (this.network !== '1' || this.derivation === 'legacy') {
+    if (this.derivation === 'legacy') {
       addresses = await this._deriveLegacyAddresses()
     } else {
       addresses = await this._deriveLiveAddresses()
@@ -150,6 +178,7 @@ class Ledger extends Signer {
     // Update signer
     this.addresses = addresses
     this.update()
+    this.derivingAddresses = false
   }
 
   close () {
@@ -346,7 +375,13 @@ class Ledger extends Signer {
   _deriveLegacyAddresses () {
     const executor = async (resolve, reject) => {
       try {
-        const result = await this.getAddress(this.network === '1' ? BASE_PATH_LEGACY : BASE_PATH_TEST, false, true)
+        let path
+        if (store('main.hardwareDerivation') === 'mainnet') {
+          path = BASE_PATH_LEGACY
+        } else {
+          path = BASE_PATH_LEGACY_TEST
+        }
+        const result = await this.getAddress(path, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
           if (err) reject(err)
           else resolve(addresses)

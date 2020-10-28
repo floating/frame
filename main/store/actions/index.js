@@ -131,6 +131,9 @@ module.exports = {
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
+  setHardwareDerivation: (u, value) => {
+    u('main.hardwareDerivation', () => value)
+  },
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },

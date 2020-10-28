@@ -85,6 +85,7 @@ const initial = {
     launch: main('launch', false),
     reveal: main('reveal', false),
     accountCloseLock: main('accountCloseLock', false),
+    hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },

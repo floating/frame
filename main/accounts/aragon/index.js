@@ -80,22 +80,24 @@ class Aragon {
     const { type, id } = store('main.currentNetwork')
     const connection = store('main.networks', type, id, 'connection')
     const status = [connection.primary.status, connection.secondary.status]
-    if (status.indexOf('connected') > -1 && this.network === connection.network && !this.wrap && !this.inSetup) {
-      log.info('\n ** Setting Up Aragon DAO:', this.dao)
-      this.inSetup = true
-      this.provider = require('../../provider')
-      const options = {
-        provider: this.provider,
-        apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress() }
-      }
-      const wrap = new Wrapper(this.dao, options)
-      wrap.init().then(() => {
-        this.wrap = wrap
-        this.inSetup = false
-      }).catch(err => {
-        log.error(err)
-        this.inSetup = false
-      })
+    if (status.indexOf('connected') > -1 && this.network === id && !this.wrap && !this.inSetup) {
+      setTimeout(() => {
+        log.info('\n ** Setting Up Aragon DAO:', this.dao)
+        this.inSetup = true
+        this.provider = require('../../provider')
+        const options = {
+          provider: this.provider,
+          apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress() }
+        }
+        const wrap = new Wrapper(this.dao, options)
+        wrap.init().then(() => {
+          this.wrap = wrap
+          this.inSetup = false
+        }).catch(err => {
+          log.error(err)
+          this.inSetup = false
+        })
+      }, 50)
     }
   }
 
