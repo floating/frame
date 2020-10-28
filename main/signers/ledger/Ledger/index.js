@@ -376,18 +376,10 @@ class Ledger extends Signer {
     const executor = async (resolve, reject) => {
       try {
         let path
-        if (this.derivation === 'legacy') {
-          if (store('main.hardwareDerivation') === 'mainnet') {
-            path = BASE_PATH_LEGACY
-          } else {
-            path = BASE_PATH_LEGACY_TEST
-          }
+        if (store('main.hardwareDerivation') === 'mainnet') {
+          path = BASE_PATH_LEGACY
         } else {
-          if (store('main.hardwareDerivation') === 'mainnet') {
-            path = BASE_PATH_LIVE
-          } else {
-            path = BASE_PATH_LIVE_TEST
-          }
+          path = BASE_PATH_LEGACY_TEST
         }
         const result = await this.getAddress(path, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
