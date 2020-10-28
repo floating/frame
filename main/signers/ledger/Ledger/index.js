@@ -161,10 +161,6 @@ class Ledger extends Signer {
     }
   }
 
-  async wait (ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
   async deriveAddresses () {
     let addresses
     if (this.pause) throw new Error('Device access is paused')
