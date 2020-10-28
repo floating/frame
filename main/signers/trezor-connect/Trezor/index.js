@@ -18,7 +18,7 @@ class Trezor extends Signer {
     this.status = 'loading'
     this.network = store('main.currentNetwork.id')
     this.hardwareDerevation = store('main.hardwareDerevation')
-    this.basePath = () => this.hardwareDerevation  === 'mainnet' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
+    this.basePath = () => this.hardwareDerevation === 'mainnet' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
@@ -151,15 +151,12 @@ class Trezor extends Signer {
   needPhrase (cb) {
     this.status = 'Enter Passphrase'
     this.update()
-    console.log('were here...')
     this.trezorPhrase = (phrase) => {
       this.status = 'loading'
       this.update()
-      console.log('trezor.inputPhrase', this.device.path, phrase)
       flex.rpc('trezor.inputPhrase', this.device.path, phrase, err => {
         if (err) log.error(err)
-        setTimeout(() => this.deviceStatus(), 500)
-        setTimeout(() => this.deviceStatus(), 1500)
+        setTimeout(() => this.deviceStatus(), 1000)
       })
     }
   }

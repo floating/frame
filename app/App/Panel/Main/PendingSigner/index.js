@@ -61,8 +61,8 @@ class Pending extends React.Component {
               Submit Pin
               {this.state.tPin ? (
                 <div className='signerPinDelete' onMouseDown={this.backspacePin.bind(this)}>
-                {svg.octicon('chevron-left', { height: 18 })}
-              </div>
+                  {svg.octicon('chevron-left', { height: 18 })}
+                </div>
               ) : null}
             </div>
             <div className='trezorPinInputWrap'>
@@ -75,9 +75,16 @@ class Pending extends React.Component {
               </div>
             </div>
           </>
-        ) : null }
+        ) : null}
       </div>
     )
+  }
+
+  phraseKeyPress (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      this.submitPhrase()
+    }
   }
 
   renderTrezorPhrase (active) {
@@ -86,13 +93,13 @@ class Pending extends React.Component {
         {active ? (
           <>
             <div className='trezorPhraseInput'>
-              <input type='password' onChange={(e) => this.setState({ tPhrase: e.target.value })} autoFocus />
+              <input type='password' onChange={(e) => this.setState({ tPhrase: e.target.value })} onKeyPress={e => this.phraseKeyPress(e)} autoFocus />
             </div>
-            <div className={'signerPinMessage signerPinSubmit'} onMouseDown={ () => this.submitPhrase() }>
+            <div className='signerPinMessage signerPinSubmit' onMouseDown={() => this.submitPhrase()}>
               Submit Passphrase
             </div>
           </>
-        ) : null}        
+        ) : null}
       </div>
     )
   }
