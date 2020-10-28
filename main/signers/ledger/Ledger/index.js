@@ -395,7 +395,6 @@ class Ledger extends Signer {
         }
         const result = await this.getAddress(path, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          console.log('we derived LEGACY addresses', addresses)
           if (err) reject(err)
           else resolve(addresses)
         })
