@@ -17,8 +17,8 @@ class Trezor extends Signer {
     this.type = 'trezor'
     this.status = 'loading'
     this.network = store('main.currentNetwork.id')
-    this.hardwareDerevation = store('main.hardwareDerevation')
-    this.basePath = () => this.hardwareDerevation === 'mainnet' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
+    this.hardwareDerivation = store('main.hardwareDerivation')
+    this.basePath = () => this.hardwareDerivation === 'mainnet' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
@@ -28,9 +28,9 @@ class Trezor extends Signer {
         this.deviceStatus()
       }
     })
-    this.hardwareDerevationObserver = store.observer(() => {
-      if (this.hardwareDerevation !== store('main.hardwareDerevation')) {
-        this.hardwareDerevation = store('main.hardwareDerevation')
+    this.hardwareDerivationObserver = store.observer(() => {
+      if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
+        this.hardwareDerivation = store('main.hardwareDerivation')
         this.reset()
         this.deviceStatus()
       }
@@ -84,7 +84,7 @@ class Trezor extends Signer {
 
   close () {
     this.networkObserver.remove()
-    this.hardwareDerevationObserver.remove()
+    this.hardwareDerivationObserver.remove()
     this.closed = true
     store.removeSigner(this.id)
     super.close()

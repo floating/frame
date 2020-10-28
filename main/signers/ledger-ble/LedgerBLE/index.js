@@ -17,8 +17,8 @@ class LedgerBLE extends Signer {
     this.status = 'loading'
     this.accounts = []
     this.index = 0
-    this.hardwareDerevation = store('main.hardwareDerevation')
-    this.basePath = () => this.hardwareDerevation === 'mainnet' ? '44\'/60\'/0\'/' : '44\'/1\'/0\'/'
+    this.hardwareDerivation = store('main.hardwareDerivation')
+    this.basePath = () => this.hardwareDerivation === 'mainnet' ? '44\'/60\'/0\'/' : '44\'/1\'/0\'/'
     this.getPath = (i = this.index) => this.basePath() + i
     this.handlers = {}
     this.open()
@@ -34,9 +34,9 @@ class LedgerBLE extends Signer {
         if (this.network) this.deviceStatus()
       }
     })
-    this.hardwareDerevationObserver = store.observer(() => {
-      if (this.hardwareDerevation !== store('main.hardwareDerevation')) {
-        this.hardwareDerevation = store('main.hardwareDerevation')
+    this.hardwareDerivationObserver = store.observer(() => {
+      if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
+        this.hardwareDerivation = store('main.hardwareDerivation')
         this.reset()
         this.deviceStatus()
       }
@@ -46,7 +46,7 @@ class LedgerBLE extends Signer {
   close () {
     clearTimeout(this.interval)
     this.networkObserver.remove()
-    this.hardwareDerevationObserver.remove()
+    this.hardwareDerivationObserver.remove()
     this.closed = true
     super.close()
   }

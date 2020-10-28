@@ -41,10 +41,9 @@ class Ledger extends Signer {
         this.deviceStatus()
       }
     })
-    this.hardwareDerevation = store('main.hardwareDerivation')
-    this.hardwareDerevationObserver = store.observer(() => {
-      if (this.hardwareDerevation !== store('main.hardwareDerivation')) {
-        this.hardwareDerevation = store('main.hardwareDerivation')
+    this.hardwareDerivation = store('main.hardwareDerivation')
+    this.hardwareDerivationObserver = store.observer(() => {
+      if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
         this.reset()
         this.deviceStatus()
       }
@@ -53,7 +52,7 @@ class Ledger extends Signer {
   }
 
   getPath (i = 0) {
-    if (store('main.hardwareDerevation') !== 'mainnet') return (BASE_PATH_TEST + i)
+    if (store('main.hardwareDerivation') !== 'mainnet') return (BASE_PATH_TEST + i)
     if (this.derivation === 'legacy') return (BASE_PATH_LEGACY + i)
     else return (BASE_PATH_LIVE + i + '\'/0/0')
   }
@@ -99,6 +98,7 @@ class Ledger extends Signer {
   reset () {
     this.derivation = store('main.ledger.derivation')
     this.network = store('main.currentNetwork.id')
+    this.hardwareDerivation = store('main.hardwareDerivation')
     this.status = 'loading'
     this.addresses = []
     this.update()

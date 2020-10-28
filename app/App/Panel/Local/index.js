@@ -255,8 +255,8 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>
               <Dropdown
-                syncValue={this.store('main.hardwareDerevation')}
-                onChange={(value) => link.send('tray:action', 'setHardwareDerevation', value)}
+                syncValue={this.store('main.hardwareDerivation')}
+                onChange={(value) => link.send('tray:action', 'setHardwareDerivation', value)}
                 options={[{ text: 'Mainnet', value: 'mainnet' }, { text: 'Testnet', value: 'testnet' }]}
               />
             </div>
