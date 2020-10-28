@@ -51,7 +51,6 @@ class Trezor extends Signer {
   }
 
   reset () {
-    console.log('reset...')
     this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []

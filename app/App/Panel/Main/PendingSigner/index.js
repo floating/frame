@@ -81,7 +81,6 @@ class Pending extends React.Component {
   }
 
   renderTrezorPhrase (active) {
-    console.log('ewnsweRewzorPhrase', active)
     return (
       <div className='trezorPinWrap' style={active ? {} : { height: '0px', padding: '0px 0px 0px 0px' }}>
         {active ? (
