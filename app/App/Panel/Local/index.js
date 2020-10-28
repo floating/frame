@@ -251,9 +251,22 @@ class Settings extends React.Component {
               {'Mouse to the middle of your display\'s right edge to reveal Frame'}
             </div>
           </div>
+          <div className='signerPermission' style={{ zIndex: 3 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Hardware Derivation</div>
+              <Dropdown
+                syncValue={this.store('main.hardwareDerevation')}
+                onChange={(value) => link.send('tray:action', 'setHardwareDerevation', value)}
+                options={[{ text: 'Mainnet', value: 'mainnet' }, { text: 'Testnet', value: 'testnet' }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Derive seperate sets of addresses based on use'}
+            </div>
+          </div>
           <div className='signerPermission' style={{ zIndex: 2 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Ledger Path</div>
+              <div className='signerPermissionOrigin'>Ledger Type</div>
               <Dropdown
                 syncValue={this.store('main.ledger.derivation')}
                 onChange={(value) => link.send('tray:action', 'setLedgerDerivation', value)}
@@ -261,7 +274,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'Use Ledger\'s Legacy or Live derivation path'}
+              {'Use Ledger\'s Legacy or Live derivation type'}
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 1 }}>

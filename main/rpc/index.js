@@ -36,6 +36,7 @@ const rpc = {
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
   trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
+  trezorPhrase: (id, phrase, cb) => signers.trezorPhrase(id, phrase, cb),
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),
   connectionStatus: (cb) => {

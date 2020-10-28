@@ -28,7 +28,8 @@ module.exports = {
       })
       flex.on('trezor:needPhrase', device => {
         log.info(':: Trezor Scan - Device Needs Phrase')
-        // TODO
+        const signer = signers.find(signer => (signer.device && signer.device.path) === device.path)
+        if (signer) signer.needPhrase()
       })
       flex.rpc('trezor.scan', err => { if (err) return log.error(err) })
     })

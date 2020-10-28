@@ -17,12 +17,20 @@ class Trezor extends Signer {
     this.type = 'trezor'
     this.status = 'loading'
     this.network = store('main.currentNetwork.id')
-    this.basePath = () => this.network === '1' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
+    this.hardwareDerevation = store('main.hardwareDerevation')
+    this.basePath = () => this.hardwareDerevation  === 'mainnet' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
     this.networkObserver = store.observer(() => {
       if (this.network !== store('main.currentNetwork.id')) {
+        this.reset()
+        this.deviceStatus()
+      }
+    })
+    this.hardwareDerevationObserver = store.observer(() => {
+      if (this.hardwareDerevation !== store('main.hardwareDerevation')) {
+        this.hardwareDerevation = store('main.hardwareDerevation')
         this.reset()
         this.deviceStatus()
       }
@@ -43,6 +51,7 @@ class Trezor extends Signer {
   }
 
   reset () {
+    console.log('reset...')
     this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []
@@ -76,6 +85,7 @@ class Trezor extends Signer {
 
   close () {
     this.networkObserver.remove()
+    this.hardwareDerevationObserver.remove()
     this.closed = true
     store.removeSigner(this.id)
     super.close()
@@ -139,10 +149,20 @@ class Trezor extends Signer {
     })
   }
 
-  needPassphras (cb) {
-    this.status = 'Need Passphrase'
+  needPhrase (cb) {
+    this.status = 'Enter Passphrase'
     this.update()
-    this.setPin = cb
+    console.log('were here...')
+    this.trezorPhrase = (phrase) => {
+      this.status = 'loading'
+      this.update()
+      console.log('trezor.inputPhrase', this.device.path, phrase)
+      flex.rpc('trezor.inputPhrase', this.device.path, phrase, err => {
+        if (err) log.error(err)
+        setTimeout(() => this.deviceStatus(), 500)
+        setTimeout(() => this.deviceStatus(), 1500)
+      })
+    }
   }
 
   needPin () {

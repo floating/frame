@@ -104,7 +104,8 @@ class Trezor {
         const device = this.devices[e.payload.device.path]
         if (device) device.needPin()
       } else if (e.type === 'ui-request_passphrase') {
-        console.log('Device needs passphrase')
+        const device = this.devices[e.payload.device.path]
+        if (device) device.needPhrase()
       }
     })
     const manifest = { email: 'jordan@frame.sh', appUrl: 'https://frame.sh' }
@@ -132,7 +133,7 @@ class Trezor {
 
   inputPhrase (id, phrase, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
-    this.devices[id].inputPin(phrase, cb)
+    this.devices[id].inputPhrase(phrase, cb)
   }
 
   getPublicKey (id, path, cb) {

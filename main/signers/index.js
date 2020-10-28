@@ -24,6 +24,16 @@ class Signers extends EventEmitter {
     }
   }
 
+  trezorPhrase (id, phrase, cb) {
+    const signer = this.get(id)
+    if (signer && signer.trezorPhrase) {
+      signer.trezorPhrase(phrase || '')
+      cb(null, { status: 'ok' })
+    } else {
+      cb(new Error('Set phrase not avaliable...'))
+    }
+  }
+
   add (signer) {
     if (!this.signers.find(s => s.id === signer.id)) this.signers.push(signer)
   }

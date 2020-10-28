@@ -41,11 +41,19 @@ class Ledger extends Signer {
         this.deviceStatus()
       }
     })
+    this.hardwareDerevation = store('main.hardwareDerivation')
+    this.hardwareDerevationObserver = store.observer(() => {
+      if (this.hardwareDerevation !== store('main.hardwareDerivation')) {
+        this.hardwareDerevation = store('main.hardwareDerivation')
+        this.reset()
+        this.deviceStatus()
+      }
+    })
     this.deviceStatus()
   }
 
   getPath (i = 0) {
-    if (this.network !== '1') return (BASE_PATH_TEST + i)
+    if (store('main.hardwareDerevation') !== 'mainnet') return (BASE_PATH_TEST + i)
     if (this.derivation === 'legacy') return (BASE_PATH_LEGACY + i)
     else return (BASE_PATH_LIVE + i + '\'/0/0')
   }
@@ -346,7 +354,7 @@ class Ledger extends Signer {
   _deriveLegacyAddresses () {
     const executor = async (resolve, reject) => {
       try {
-        const result = await this.getAddress(this.network === '1' ? BASE_PATH_LEGACY : BASE_PATH_TEST, false, true)
+        const result = await this.getAddress(this.getPath(0), false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
           if (err) reject(err)
           else resolve(addresses)
