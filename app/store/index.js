@@ -33,7 +33,6 @@ export default (state, cb) => {
         store.updateExternalRates({ USD: res.result.ethusd })
       }
     }).catch(e => console.log('Unable to fetch exchange rate', e))
-
   }
   etherRates()
   setInterval(etherRates, 10000)
