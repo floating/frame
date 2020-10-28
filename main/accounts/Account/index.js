@@ -103,9 +103,9 @@ class Account {
   }
 
   verifyAddress (display, cb = () => {}) {
-    if (this.smart && this.smart.actor && this.smart.actor.signer) {
+    if (this.smart && this.smart.actor && this.smart.actor.signer && signers.get(this.smart.actor.signer.id) && signers.get(this.smart.actor.signer.id).verifyAddress) {
       signers.get(this.smart.actor.signer.id).verifyAddress(this.index, this.smart.actor.addresses[this.index], display, cb)
-    } else if (this.signer) {
+    } else if (this.signer && signers.get(this.signer.id) && signers.get(this.signer.id).verifyAddress) {
       signers.get(this.signer.id).verifyAddress(this.index, this.addresses[this.index], display, cb)
     } else {
       log.info('No signer active to verify address')

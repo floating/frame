@@ -26,7 +26,7 @@ module.exports = {
         if (validInterface(device)) {
           if (!signer) {
             log.info('Creating Ledger Signer: ...', device.path.substr(device.path.length - 5))
-            signer = new Ledger(device.path, signers)
+            signer = new Ledger(device.path, signers, scan)
             signers.add(signer)
           } else {
             signer.deviceStatus()

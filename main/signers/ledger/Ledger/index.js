@@ -16,12 +16,13 @@ const BASE_PATH_LIVE = '44\'/60\'/'
 const BASE_PATH_LIVE_TEST = '44\'/1\'/'
 
 class Ledger extends Signer {
-  constructor (devicePath, signers) {
+  constructor (devicePath, signers, scan) {
     super()
     this.devicePath = devicePath
     this.addresses = []
     this.id = this.getId()
     this.signers = signers
+    this.scan = scan
     this.type = 'ledger'
     this.status = 'initial'
     this.busyCount = 0
@@ -117,6 +118,8 @@ class Ledger extends Signer {
     this.status = 'loading'
     this.addresses = []
     this.update()
+    this.signers.remove(this.id)
+    this.scan()
   }
 
   async getDeviceAddress (i, cb) {
