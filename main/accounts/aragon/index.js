@@ -80,7 +80,7 @@ class Aragon {
     const { type, id } = store('main.currentNetwork')
     const connection = store('main.networks', type, id, 'connection')
     const status = [connection.primary.status, connection.secondary.status]
-    if (status.indexOf('connected') > -1 && this.network === connection.network && !this.wrap && !this.inSetup) {
+    if (status.indexOf('connected') > -1 && this.network === id && !this.wrap && !this.inSetup) {
       log.info('\n ** Setting Up Aragon DAO:', this.dao)
       this.inSetup = true
       this.provider = require('../../provider')
