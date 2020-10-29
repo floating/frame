@@ -31,24 +31,15 @@ class Ledger extends Signer {
     this.handlers = {}
     this.lastUse = Date.now()
     this.network = store('main.currentNetwork.id')
-    this.networkObserver = store.observer(() => {
-      if (this.network !== store('main.currentNetwork.id')) {
-        this.reset()
-        this.deviceStatus()
-      }
-    })
     this.derivation = store('main.ledger.derivation')
-    this.derivationObserver = store.observer(() => {
-      if (this.derivation !== store('main.ledger.derivation')) {
-        this.reset()
-        this.deviceStatus()
-      }
-    })
     this.hardwareDerivation = store('main.hardwareDerivation')
-    this.hardwareDerivationObserver = store.observer(() => {
-      if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
+    this.varObserver = store.observer(() => {
+      if (
+        this.derivation !== store('main.ledger.derivation') || 
+        this.hardwareDerivation !== store('main.hardwareDerivation') ||
+        this.network !== store('main.currentNetwork.id')
+      ) {
         this.reset()
-        this.deviceStatus()
       }
     })
     this.deviceStatus()
@@ -112,17 +103,17 @@ class Ledger extends Signer {
   }
 
   reset () {
-    this.derivation = store('main.ledger.derivation')
+    this.pauseLive = true
     this.network = store('main.currentNetwork.id')
+    this.derivation = store('main.ledger.derivation')
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.status = 'loading'
     this.addresses = []
     this.update()
-    this.signers.remove(this.id)
-    this.scan()
+    this.deriveAddresses()
   }
 
-  async getDeviceAddress (i, cb) {
+  async getDeviceAddress (i, cb = () => {}) {
     if (this.pause) return cb(new Error('Device access is paused'))
     try {
       const { address } = await this.getAddress(this.getPath(i), false, true)
@@ -189,9 +180,9 @@ class Ledger extends Signer {
     if (this._deviceStatus) clearTimeout(this._deviceStatus)
     if (this._signMessage) clearTimeout(this._signMessage)
     if (this._signTransaction) clearTimeout(this._signTransaction)
+    if (this._scanTimer) clearTimeout(this._scanTimer)
     this.releaseDevice()
-    this.networkObserver.remove()
-    this.derivationObserver.remove()
+    this.varObserver.remove()
     store.removeSigner(this.id)
     super.close()
   }
@@ -216,6 +207,10 @@ class Ledger extends Signer {
         this.deviceStatus()
       }
       this.status = 'ok'
+      if (!this.addresses.length) {
+        this.status = 'loading'
+        this.deriveAddresses()
+      }
       this.update()
       this.deviceStatusActive = false
     } catch (err) {
@@ -362,10 +357,19 @@ class Ledger extends Signer {
   }
 
   async _deriveLiveAddresses () {
-    const addresses = []
+    let addresses = []
     this.status = 'Deriving Live Addresses'
     this.liveAddressesFound = 0
     for (let i = 0; i < 10; i++) {
+      if (this.pauseLive) {
+        this.status = 'loading'
+        addresses = []
+        this.liveAddressesFound = 0
+        this.update()
+        this.pauseLive = false
+        this._scanTimer = setTimeout(() => this.scan(), 300)
+        break
+      } 
       const { address } = await this.getAddress(this.getPath(i), false, false)
       log.info(`Found Ledger Live address #${i}: ${address}`)
       addresses.push(address)
