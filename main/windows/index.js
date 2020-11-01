@@ -166,7 +166,7 @@ const api = {
         const gasPrice = store('main.networks', type, id, 'gas.price.levels.standard')
         if (!gasPrice) return
         const gasDisplay = Math.round(parseInt(gasPrice, 'hex') / 1000000000).toString()
-        title = 'Ⓖ' + gasDisplay //'ɢ-' +  '🄶Ⓖ' //'ᴳᵂᴱᴵ' // ' ᴳᵂᴱᴵ' //
+        title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
       }
       if (tray && tray.setTitle) tray.setTitle(title)
     })
