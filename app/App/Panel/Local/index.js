@@ -292,18 +292,18 @@ class Settings extends React.Component {
           </div>
           {this.store('platform') === 'darwin' ? (
             <div className='signerPermission' style={{ zIndex: 1 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Gas Price in Menubar</div>
-              <Dropdown
-                syncValue={this.store('main.menubarGasPrice')}
-                onChange={(value) => link.send('tray:action', 'setMenubarGasPrice', value)}
-                options={[{ text: 'Yes', value: true }, { text: 'No', value: false }]}
-              />
+              <div className='signerPermissionControls'>
+                <div className='signerPermissionOrigin'>Gas Price in Menubar</div>
+                <Dropdown
+                  syncValue={this.store('main.menubarGasPrice')}
+                  onChange={(value) => link.send('tray:action', 'setMenubarGasPrice', value)}
+                  options={[{ text: 'Yes', value: true }, { text: 'No', value: false }]}
+                />
+              </div>
+              <div className='signerPermissionDetails'>
+                {'Show mainnet gas price in menubar (Gwei)'}
+              </div>
             </div>
-            <div className='signerPermissionDetails'>
-              {'Show mainnet gas price in menubar (Gwei)'}
-            </div>
-          </div>
           ) : null}
           <div className='snipIt'>
             <div>Trying to use Frame with a dapp in your browser?</div>
