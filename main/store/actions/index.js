@@ -134,6 +134,9 @@ module.exports = {
   setHardwareDerivation: (u, value) => {
     u('main.hardwareDerivation', () => value)
   },
+  setMenubarGasPrice: (u, value) => {
+    u('main.menubarGasPrice', () => value)
+  },
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },

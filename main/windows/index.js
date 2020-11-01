@@ -158,6 +158,18 @@ const api = {
   tray: () => {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     // tray.setHighlightMode('never')
+    if (this.gasObserver) this.gasObserver.close()
+    this.gasObserver = store.observer(() => {
+      let title = ''
+      if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
+        const { type, id } = store('main.currentNetwork')
+        const gasPrice = store('main.networks', type, id, 'gas.price.levels.standard')
+        if (!gasPrice) return
+        const gasDisplay = Math.round(parseInt(gasPrice, 'hex') / 1000000000).toString()
+        title = 'Ⓖ' + gasDisplay //'ɢ-' +  '🄶Ⓖ' //'ᴳᵂᴱᴵ' // ' ᴳᵂᴱᴵ' //
+      }
+      if (tray && tray.setTitle) tray.setTitle(title)
+    })
     tray.on('click', api.trayClick)
     api.create()
   },

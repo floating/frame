@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
-const EthTx = require('ethereumjs-tx').Transaction
+const EthTx = require('ethereumjs-tx')
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
 

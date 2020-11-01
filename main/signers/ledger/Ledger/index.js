@@ -1,5 +1,5 @@
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx').Transaction
+const EthereumTx = require('ethereumjs-tx')
 const log = require('electron-log')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
@@ -35,7 +35,7 @@ class Ledger extends Signer {
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.varObserver = store.observer(() => {
       if (
-        this.derivation !== store('main.ledger.derivation') || 
+        this.derivation !== store('main.ledger.derivation') ||
         this.hardwareDerivation !== store('main.hardwareDerivation') ||
         this.network !== store('main.currentNetwork.id')
       ) {
@@ -369,7 +369,7 @@ class Ledger extends Signer {
         this.pauseLive = false
         this._scanTimer = setTimeout(() => this.scan(), 300)
         break
-      } 
+      }
       const { address } = await this.getAddress(this.getPath(i), false, false)
       log.info(`Found Ledger Live address #${i}: ${address}`)
       addresses.push(address)

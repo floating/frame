@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "System-wide web3",
   "main": "main",
   "build": {
@@ -85,7 +85,7 @@
     "eth-sig-util": "2.5.3",
     "ethereum-public-key-to-address": "0.0.5",
     "ethereumjs-abi": "0.6.8",
-    "ethereumjs-tx": "2.1.2",
+    "ethereumjs-tx": "1.3.7",
     "ethereumjs-util": "7.0.7",
     "ethereumjs-wallet": "1.0.1",
     "extract-zip": "2.0.1",
