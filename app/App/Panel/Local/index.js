@@ -251,7 +251,7 @@ class Settings extends React.Component {
               {'Mouse to the middle of your display\'s right edge to reveal Frame'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 3 }}>
+          <div className='signerPermission' style={{ zIndex: 4 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>
               <Dropdown
@@ -264,7 +264,7 @@ class Settings extends React.Component {
               {'Derive seperate sets of addresses based on use'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
+          <div className='signerPermission' style={{ zIndex: 3 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Type</div>
               <Dropdown
@@ -277,7 +277,7 @@ class Settings extends React.Component {
               {'Use Ledger\'s Legacy or Live derivation type'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 1 }}>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lock Hot Signers on</div>
               <Dropdown
@@ -290,6 +290,21 @@ class Settings extends React.Component {
               {'When should Frame relock your hot signers?'}
             </div>
           </div>
+          {this.store('platform') === 'darwin' ? (
+            <div className='signerPermission' style={{ zIndex: 1 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Gas Price in Menubar</div>
+              <Dropdown
+                syncValue={this.store('main.menubarGasPrice')}
+                onChange={(value) => link.send('tray:action', 'setMenubarGasPrice', value)}
+                options={[{ text: 'Yes', value: true }, { text: 'No', value: false }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Show mainnet gas price in menubar (Gwei)'}
+            </div>
+          </div>
+          ) : null}
           <div className='snipIt'>
             <div>Trying to use Frame with a dapp in your browser?</div>
             <div className='snipItBrowserExtensionIcons'>

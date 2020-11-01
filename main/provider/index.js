@@ -447,6 +447,21 @@ store.observer(() => {
   }
 })
 
+const gasSync = async () => {
+  const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
+  const prices = await response.json()
+  store.setGasPrices('ethereum', '1', {
+    safelow: ('0x' + (prices.safeLow * 100000000).toString(16)),
+    standard: ('0x' + (prices.average * 100000000).toString(16)),
+    fast: ('0x' + (prices.fast * 100000000).toString(16)),
+    trader: ('0x' + (prices.fastest * 100000000).toString(16)),
+    custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
+  })
+}
+
+gasSync()
+setInterval(gasSync, 15 * 1000)
+
 proxy.on('send', (payload, cd) => provider.send(payload, cd))
 proxy.ready = true
 provider.on('data', data => proxy.emit('data', data))

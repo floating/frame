@@ -74,6 +74,7 @@ const initial = {
   external: {
     rates: {}
   },
+  platform: process.platform,
   main: {
     _version: main('_version', 4),
     mute: {
@@ -86,6 +87,7 @@ const initial = {
     reveal: main('reveal', false),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
+    menubarGasPrice: main('menubarGasPrice', false),
     ledger: {
       derivation: main('ledger.derivation', 'legacy')
     },
