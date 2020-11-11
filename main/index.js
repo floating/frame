@@ -80,6 +80,14 @@ ipcMain.on('tray:resetAllSettings', () => {
 //   accounts.removeAllAccounts()
 // })
 
+ipcMain.on('tray:speedTx', async (e, id) => {
+  try {
+    await accounts.speedTx(id)
+  } catch (e) {
+    console.log('tray:speedTx Error', e)
+  }
+})
+
 ipcMain.on('tray:clipboardData', (e, data) => {
   clipboard.writeText(data)
 })

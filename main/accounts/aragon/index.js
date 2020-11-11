@@ -113,7 +113,7 @@ class Aragon {
     tx.value = tx.value || '0x'
     tx.data = tx.data || '0x'
     this.wrap.calculateTransactionPath(this.actor.address, this.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
-      var newTx = result[0]
+      const newTx = result[0]
       delete newTx.nonce
       newTx.chainId = tx.chainId
       this.provider.getNonce(newTx, res => {

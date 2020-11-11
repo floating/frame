@@ -89,7 +89,7 @@ class TransactionRequest extends React.Component {
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
-                    <div className='approveRequestHeaderLabel'> {'Sign Message'}</div>
+                    <div className='approveRequestHeaderLabel'> Sign Message</div>
                   </div>
                   <div className='signValue'>
                     <div className='signValueInner'>{message}</div>

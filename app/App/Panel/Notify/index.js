@@ -10,7 +10,7 @@ class Notify extends React.Component {
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 22 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Getting Started'}
+            Getting Started
           </div>
           <div className='introInstructions'>
             <div className='introInstructionList'>
@@ -20,14 +20,14 @@ class Notify extends React.Component {
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '17px', marginBottom: '5px' }}>Now Frame is ready to use!</div>
-              <div>{'Visit'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://frame.sh' })}>frame.sh</span> {'to try it out'}</div>
+              <div>Visit <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://frame.sh' })}>frame.sh</span> to try it out</div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
               <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>browser extension</span></div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '15px', marginBottom: '5px' }}>Need help?</div>
-              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> {'or'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://gitter.im/framehq/general' })}>come chat with us</span></div>
+              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://gitter.im/framehq/general' })}>come chat with us</span></div>
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'mainnet' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Alpha Notice'}
+            Alpha Notice
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>Frame is still in alpha, be cautious using alpha versions of Frame on the mainnet and verify all transactions and account details on your signing device.</div>
@@ -67,7 +67,7 @@ class Notify extends React.Component {
         <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Parity 💔 Rinkeby'}
+            Parity 💔 Rinkeby
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>Unfortunately, Parity does not support the Rinkeby testnet.</div>
@@ -124,7 +124,7 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'gasFeeWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Gas Fee Warning'}
+            Gas Fee Warning
           </div>
           <div className='notifyBody'>
             {feeUSD ? (
@@ -232,7 +232,7 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExternal' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Open External Link'}
+            Open External Link
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>{`Frame will now open ${url} in your browser`}</div>
@@ -264,7 +264,7 @@ class Notify extends React.Component {
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExplorer' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
-            {'Open Block Explorer'}
+            Open Block Explorer
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>Frame will open a block explorer in your browser for transaction:</div>

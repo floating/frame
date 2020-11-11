@@ -1,28 +1,17 @@
 .txSection
   position absolute
-  // bottom 130px
   left 0px
   right 0px
   bottom 0px
   height 48px
   z-index 2000
-  // background highlight
   color outerspace08
   font-size 14px
   font-weight 400
-  // letter-spacing 1px
-  // text-transform uppercase
   transition standard
   overflow hidden
   border-radius 0px
-  // background transparent
-  // background blue
-
   font-family OpenSans
-  // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-  // border-radius 3px
-  // background blue
-  // background blue
   left 10px
   right 10px
   border-radius 15px
@@ -351,13 +340,19 @@
 
 .txFee
   box-shadow cardDrop, 0px 2px 2px thick
+  transform translateY(-162px)
+  zIndex 1
+  height 31px
+  left 10px
+  right 10px
+  padding 0px 0px
 
   .txFeeClose
     position absolute
     right 0
     left 0
     bottom 0px
-    height 60px
+    height 20px
     display flex
     justify-content center
     align-items center
@@ -376,7 +371,7 @@
     position absolute
     right 0
     left 0
-    top 32px
+    top 24px
     // padding 0px 20px 0px 20px
     display flex
     justify-content center
@@ -433,9 +428,17 @@
     text-transform uppercase
     transition standard
 
+.txFeeExpanded
+  transform translateY(0px)
+  height 220px
+  left 0px
+  right 0px
+  padding 110px 10px 0px 10px
+  z-index 20000
+
 .customGasPriceBar
   position absolute
-  bottom -4px
+  top 96px
   left 10px
   right 10px
   height 4px

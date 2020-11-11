@@ -49,7 +49,7 @@ class ProviderRequest extends React.Component {
             <div className='approveTransactionPayload'>
               <div className='approveRequestHeader approveTransactionHeader'>
                 <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
-                <div className='approveRequestHeaderLabel'> {'Connection'}</div>
+                <div className='approveRequestHeaderLabel'> Connection</div>
               </div>
               <div className='requestProvider bounceIn'>
                 <div className={originClass}>{origin}</div>

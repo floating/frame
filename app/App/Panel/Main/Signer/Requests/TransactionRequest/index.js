@@ -8,6 +8,50 @@ import TxBar from './TxBar'
 
 const FEE_WARNING_THRESHOLD_USD = 10
 
+class Time extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      time: Date.now()
+    }
+    setInterval(() => {
+      this.setState({ time: Date.now() })
+    }, 1000)
+  }
+
+  msToTime (duration) {
+    const seconds = Math.floor((duration / 1000) % 60)
+    const minutes = Math.floor((duration / (1000 * 60)) % 60)
+    const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
+    let label, time
+    if (hours) {
+      label = hours === 1 ? 'hour ago' : 'hours ago'
+      time = hours
+    } else if (minutes) {
+      label = minutes === 1 ? 'minute ago' : 'minutes ago'
+      time = minutes
+    } else {
+      label = 'seconds ago'
+      time = seconds
+    }
+    return { time, label }
+  }
+
+  render () {
+    const { time, label } = this.msToTime(this.state.time - this.props.time)
+    return (
+      <div className='txProgressSuccessItem'>
+        <div className='txProgressSuccessItemValue'>
+          {time}
+        </div>
+        <div className='txProgressSuccessItemLabel'>
+          {label}
+        </div>
+      </div>
+    )
+  }
+}
+
 class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
@@ -80,24 +124,6 @@ class TransactionRequest extends React.Component {
     }
   }
 
-  expandFee (index, height) {
-    if (this.state.selectedIndex === index) {
-      return {
-        transform: 'translateY(0px)',
-        height: '170px',
-        zIndex: 200000,
-        left: '0px',
-        right: '0px',
-        padding: '100px 10px'
-      }
-    } else {
-      return {
-        transform: `translateY(${-190}px)`,
-        zIndex: 1
-      }
-    }
-  }
-
   barColor (percent) {
     const low = [0, 210, 180] // good
     const high = [33, 45, 46] // outerspace
@@ -129,7 +155,14 @@ class TransactionRequest extends React.Component {
   }
 
   handleCustomPriceHoverReset () {
-    this.setState({ hoverGasPrice: '', hoverGasColor: '#212d2e', hoverGasPercent: '' })
+    const { data } = this.props.req
+    this.hoverBar(this.gasPriceToPercent(data.gasPrice))
+  }
+
+  gasPriceToPercent (price) {
+    const network = this.store('main.currentNetwork')
+    const trader = this.store('main.networks', network.type, network.id, 'gas.price.levels.trader')
+    return parseInt(price) / (parseInt(trader, 16) * 4)
   }
 
   renderFeeLabel (current, expanded) {
@@ -149,7 +182,7 @@ class TransactionRequest extends React.Component {
 
   renderFee () {
     const expanded = this.state.selectedIndex === 0
-    const { data, mode } = this.props.req
+    const { data } = this.props.req
     const network = this.store('main.currentNetwork')
     let feeLevel = this.store('main.networks', network.type, network.id, 'gas.price.selected')
     const gasLevels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
@@ -167,8 +200,8 @@ class TransactionRequest extends React.Component {
     const customFee = this.hexToDisplayValue(utils.numberToHex(parseInt(data.gas, 16) * parseInt(this.state.hoverGasPrice || data.gasPrice, 16)))
     const customFeeUSD = customFee * etherUSD
 
-    const height = mode === 'monitor' ? '145px' : '360px'
-    const style = this.expandFee(0, height)
+    // const height = mode === 'monitor' ? '145px' : '360px'
+    // const style = this.expandFee(0, height)
 
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
@@ -188,25 +221,31 @@ class TransactionRequest extends React.Component {
     }
 
     return (
-      <div className='txSection txFee' style={style} onMouseDown={() => this.selectSection(0)}>
-        <div className='txFeeClose' style={{ opacity: expanded ? 1 : 0 }}>
-          {'COLLAPSE'}
-        </div>
+      <div className={expanded ? 'txSection txFee txFeeExpanded' : 'txSection txFee'} onMouseDown={() => this.selectSection(0)}>
         <div className='txFeeGwei' style={{ opacity: expanded ? 1 : 0 }}>
           <div className='txFeeGweiValue'>
             {this.state.hoverGwei || (this.state.hoverGasPrice ? parseInt(this.state.hoverGasPrice, 'hex') / 1000000000 : false) || (parseInt(data.gasPrice, 'hex') / 1000000000)}
           </div>
           <div className='txFeeGweiLabel'>
-            {'GWEI'}
+            GWEI
           </div>
+        </div>
+        <div className='customGasPriceBar'>
+          <div className='customGasPriceBarInner' style={{ background: this.state.hoverGasColor, width: ((this.state.hoverGasPercent * 100) + 5) + '%', transform: 'translateX(-50%)', left: '50%' }} />
         </div>
         <div className='networkFeeLabel' style={{ transform: expanded ? 'translateY(0px)' : 'translateY(-40px)' }}>Fee</div>
         <div className='networkFeeOptions' style={!expanded ? { transitionDelay: '0s', transform: `translateY(${slideLevel})` } : { transform: 'translateY(0px)' }}>
           <div
             className='networkFeeOption'
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.safelow, 'safelow') : null}
-            onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.safelow, 'hex') / 1000000000 }) : null}
-            onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
+            onMouseEnter={expanded ? () => {
+              this.setState({ hoverGwei: parseInt(gasLevels.safelow, 'hex') / 1000000000 })
+              this.hoverBar(this.gasPriceToPercent(gasLevels.safelow))
+            } : null}
+            onMouseLeave={expanded ? () => {
+              this.setState({ hoverGwei: 0 })
+              this.handleCustomPriceHoverReset()
+            } : null}
           >
             <div className='networkFeeOptionBack' />
             {this.renderFeeLabel(feeLevel === 'safelow', expanded)}
@@ -227,8 +266,14 @@ class TransactionRequest extends React.Component {
           <div
             className='networkFeeOption'
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.standard, 'standard') : null}
-            onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.standard, 'hex') / 1000000000 }) : null}
-            onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
+            onMouseEnter={expanded ? () => {
+              this.setState({ hoverGwei: parseInt(gasLevels.standard, 'hex') / 1000000000 })
+              this.hoverBar(this.gasPriceToPercent(gasLevels.standard))
+            } : null}
+            onMouseLeave={expanded ? () => {
+              this.setState({ hoverGwei: 0 })
+              this.handleCustomPriceHoverReset()
+            } : null}
           >
             <div className='networkFeeOptionBack' />
             {this.renderFeeLabel(feeLevel === 'standard', expanded)}
@@ -249,8 +294,14 @@ class TransactionRequest extends React.Component {
           <div
             className='networkFeeOption'
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.fast, 'fast') : null}
-            onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.fast, 'hex') / 1000000000 }) : null}
-            onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
+            onMouseEnter={expanded ? () => {
+              this.setState({ hoverGwei: parseInt(gasLevels.fast, 'hex') / 1000000000 })
+              this.hoverBar(this.gasPriceToPercent(gasLevels.fast))
+            } : null}
+            onMouseLeave={expanded ? () => {
+              this.setState({ hoverGwei: 0 })
+              this.handleCustomPriceHoverReset()
+            } : null}
           >
             <div className='networkFeeOptionBack' />
             {this.renderFeeLabel(feeLevel === 'fast', expanded)}
@@ -271,8 +322,14 @@ class TransactionRequest extends React.Component {
           <div
             className='networkFeeOption'
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.trader, 'trader') : null}
-            onMouseEnter={expanded ? () => this.setState({ hoverGwei: parseInt(gasLevels.trader, 'hex') / 1000000000 }) : null}
-            onMouseLeave={expanded ? () => this.setState({ hoverGwei: 0 }) : null}
+            onMouseEnter={expanded ? () => {
+              this.setState({ hoverGwei: parseInt(gasLevels.trader, 'hex') / 1000000000 })
+              this.hoverBar(this.gasPriceToPercent(gasLevels.trader))
+            } : null}
+            onMouseLeave={expanded ? () => {
+              this.setState({ hoverGwei: 0 })
+              this.handleCustomPriceHoverReset()
+            } : null}
           >
             <div className='networkFeeOptionBack' />
             {this.renderFeeLabel(feeLevel === 'trader', expanded)}
@@ -312,9 +369,6 @@ class TransactionRequest extends React.Component {
                 </>
               ) : null}
             </div>
-            <div className='customGasPriceBar'>
-              <div className='customGasPriceBarInner' style={{ background: this.state.hoverGasColor, width: ((this.state.hoverGasPercent * 100) + 5) + '%', transform: 'translateX(-50%)', left: '50%' }} />
-            </div>
           </div>
         </div>
       </div>
@@ -335,7 +389,7 @@ class TransactionRequest extends React.Component {
     const toAddress = req.data && req.data.to ? req.data.to : ''
     let requestClass = 'signerRequest'
     if (mode === 'monitor') requestClass += ' signerRequestMonitor'
-    const success = req.status === 'confirming' || req.status === 'confirmed'
+    const success = (req.status === 'confirming' || req.status === 'confirmed')
     const error = req.status === 'error' || req.status === 'declined'
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
@@ -345,11 +399,11 @@ class TransactionRequest extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     const feeUSD = fee * etherUSD
-    const height = mode === 'monitor' ? '165px' : '360px'
+    const height = mode === 'monitor' ? '185px' : '320px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
-    let statusClass = 'txStatus'
-    if (!success && !error) statusClass += ' txStatusCompact'
+    // const statusClass = 'txStatus'
+    // if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
@@ -361,30 +415,55 @@ class TransactionRequest extends React.Component {
               {notice ? (
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
-                    <div
-                      className='txDetails'
-                      style={req.tx ? { opacity: 1, pointerEvents: 'auto' } : { opacity: 1, pointerEvents: 'none' }}
-                      onMouseDown={() => {
-                        if (req && req.tx && req.tx.hash) {
-                          if (this.store('main.mute.explorerWarning')) {
-                            link.send('tray:openExplorer', req.tx.hash)
-                          } else {
-                            this.store.notify('openExplorer', { hash: req.tx.hash })
-                          }
-                        }
-                      }}
-                    >
-                      {'View Details'}
-                    </div>
-                    <div className={statusClass} style={req.tx ? { top: '85px' } : {}} onMouseDown={() => { if (req && req.tx && req.tx.hash) this.store.notify('openExplorer', { hash: req.tx.hash }) }}>
-                      <div className='txProgressNotice'>
-                        <div className={success ? 'txProgressNoticeSuccess' : 'txProgressNoticeSuccess txProgressNoticeHidden'}>
-                          <div className='txProgressDetailHash'>
-                            {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 14) : ''}
-                            {svg.octicon('kebab-horizontal', { height: 14 })}
-                            {req && req.tx && req.tx.hash ? req.tx.hash.substr(req.tx.hash.length - 12) : ''}
-                          </div>
+                    {!error ? (
+                      <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
+                        <div className='txAugmentCancel animate__flipInX'>Cancel</div>
+                        <div
+                          className={req.tx ? 'txDetails txDetailsShow animate__flipInX' : 'txDetails'}
+                          onMouseDown={() => {
+                            if (req && req.tx && req.tx.hash) {
+                              if (this.store('main.mute.explorerWarning')) {
+                                link.send('tray:openExplorer', req.tx.hash)
+                              } else {
+                                this.store.notify('openExplorer', { hash: req.tx.hash })
+                              }
+                            }
+                          }}
+                        >
+                          View Details
                         </div>
+                        <div
+                          className='txAugmentSpeedUp animate__flipInX' onMouseDown={() => {
+                            link.send('tray:speedTx', req.handlerId)
+                          }}
+                        >Speed Up
+                        </div>
+                      </div>
+                    ) : null}
+                    <div className={success ? 'txSuccessHash ' : 'txSuccessHash'}>
+                      {req && req.tx && req.tx.hash ? req.tx.hash.substring(0, 9) : ''}
+                      {svg.octicon('kebab-horizontal', { height: 16 })}
+                      {req && req.tx && req.tx.hash ? req.tx.hash.substr(req.tx.hash.length - 7) : ''}
+                    </div>
+                    <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
+                      {req && req.tx && req.tx.receipt ? (
+                        <>
+                          <div className='txProgressSuccessLine' />
+                          <div className='txProgressSuccessItem' style={{ justifyContent: 'flex-end' }}>
+                            <div className='txProgressSuccessItemLabel'>
+                              In Block
+                            </div>
+                            <div className='txProgressSuccessItemValue'>
+                              {parseInt(req.tx.receipt.blockNumber, 'hex')}
+                            </div>
+                          </div>
+                          <Time time={req.completed} />
+                        </>
+                      ) : null}
+                    </div>
+                    <div className='txStatus' style={!req.tx && !error ? { top: '60px' } : {}}>
+                      {success ? <div>Successful</div> : null}
+                      <div className='txProgressNotice'>
                         <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
                           {[...Array(10).keys()].map(i => {
                             return <div key={'f' + i} className={`txProgressNoticeBar txProgressNoticeBar-${i}`} />
@@ -436,7 +515,7 @@ class TransactionRequest extends React.Component {
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
-                    <div className='approveRequestHeaderLabel'> {'Transaction'}</div>
+                    <div className='approveRequestHeaderLabel'> Transaction</div>
                   </div>
                   <div className='transactionValue'>
                     <div className='transactionTotals'>
@@ -454,9 +533,9 @@ class TransactionRequest extends React.Component {
                   {utils.toAscii(req.data.data || '0x') ? (
                     <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
                       <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
-                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 22 })}</div>
+                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
                         <div className='transactionDataLabel'>View Data</div>
-                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 22 })}</div>
+                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 16 })}</div>
                       </div>
                       <div className='transactionDataBody'>
                         <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
@@ -511,7 +590,7 @@ class TransactionRequest extends React.Component {
                 }
               }}
             >
-              <div className='requestSignButton'> {'Sign'} </div>
+              <div className='requestSignButton'> Sign </div>
             </div>
           </div>
         ) : null}

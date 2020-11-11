@@ -94,7 +94,7 @@ class Requests extends React.Component {
       if (a.created < b.created) return 1
       return 0
     })
-    const monitorHeight = 185
+    const monitorHeight = 205
     let containNormal = normal.length ? (360 + (normal.length * 10)) : 160
     if (normal.length && monitor.length > 0) containNormal += 70
     const containMonitor = monitor.length * monitorHeight

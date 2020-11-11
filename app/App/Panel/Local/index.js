@@ -34,7 +34,7 @@ class Settings extends React.Component {
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <span className='appInfoLineResetConfirm'>
-              {'Are you sure?'} <span onMouseDown={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span onMouseDown={() => this.setState({ resetConfirm: false })}>No</span>
+              Are you sure? <span onMouseDown={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span onMouseDown={() => this.setState({ resetConfirm: false })}>No</span>
             </span>
           ) : (
             <span onMouseDown={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
@@ -237,7 +237,7 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              {'Run Frame when your computer starts'}
+              Run Frame when your computer starts
             </div>
           </div>
           <div className='signerPermission'>
@@ -261,7 +261,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'Derive seperate sets of addresses based on use'}
+              Derive seperate sets of addresses based on use
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 3 }}>
@@ -287,7 +287,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'When should Frame relock your hot signers?'}
+              When should Frame relock your hot signers?
             </div>
           </div>
           {this.store('platform') === 'darwin' ? (
@@ -301,7 +301,7 @@ class Settings extends React.Component {
                 />
               </div>
               <div className='signerPermissionDetails'>
-                {'Show mainnet gas price in menubar (Gwei)'}
+                Show mainnet gas price in menubar (Gwei)
               </div>
             </div>
           ) : null}

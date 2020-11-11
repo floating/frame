@@ -50,7 +50,7 @@ class Accounts extends EventEmitter {
   seedToAddresses (seed) {
     const wallet = hdKey.fromMasterSeed(Buffer.from(seed, 'hex'))
     const addresses = []
-    for (var i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) {
       const publicKey = wallet.derive('m/44\'/60\'/0\'/0/' + i).publicKey
       const address = publicKeyToAddress(publicKey)
       addresses.push(address)
@@ -96,6 +96,28 @@ class Accounts extends EventEmitter {
     return this.accounts[this._current]
   }
 
+  // async cancelTx (id, hash) {
+  //   return new Promise((resolve, reject) => {
+  //   })
+  // }
+
+  async speedTx (id) {
+    return new Promise((resolve, reject) => {
+      if (!this.current().requests[id]) return reject(new Error('Could not find request'))
+      if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
+      const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
+      data.gasPrice = (parseInt(data.gasPrice, 16) * 1.2).toString(16)
+      proxyProvider.emit('send', {
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'eth_sendTransaction',
+        params: [data]
+      }, res => {
+        if (res.error) return reject(new Error(res.error))
+      })
+    })
+  }
+
   async confirmations (id, hash) {
     return new Promise((resolve, reject) => {
       proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', params: [] }, (res) => {
@@ -107,6 +129,7 @@ class Accounts extends EventEmitter {
             if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
               this.current().requests[id].status = 'confirming'
               this.current().requests[id].notice = 'Confirming'
+              this.current().requests[id].completed = Date.now()
             }
             const blockHeight = parseInt(res.result, 16)
             const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
