@@ -301,6 +301,19 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission' style={{ zIndex: 3 }}>
             <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
+              <Dropdown
+                syncValue={this.store('main.ledger.numLiveAccounts')}
+                onChange={(value) => link.send('tray:action', 'setNumLiveAccounts', value)}
+                options={[{ text: '10', value: 10 }, { text: '20', value: 20 }, { text: '30', value: 30 }, { text: '40', value: 40 }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Choose the number of accounts to query from the Ledger Live derivation'}
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
+            <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lock Hot Signers on</div>
               <Dropdown
                 syncValue={this.store('main.accountCloseLock')}
