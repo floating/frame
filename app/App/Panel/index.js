@@ -38,19 +38,19 @@ class Panel extends React.Component {
               {this.indicator(this.store('main.networks', type, id, 'connection'))}
             </div>
             <div className='panelDetailText'>{this.store('main.networks', type, id, 'name')}</div>
-            {type === 'ethereum' && id === '1' ? (
-              <>
-                <div className='panelDetailText gasPrice'>
-                  <div className='usd'>$</div>
-                  <div>{this.store('external.rates.USD')}</div>
-                </div>
-                <div className='panelDetailText gasPrice'>
-                  <div className='svg'>{svg.gas(9)}</div>
-                  {gasPrice}
-                </div>
-              </>
-            ) : null}
           </div>
+          {type === 'ethereum' && id === '1' ? (
+            <div className='panelMenuData'>
+              <div className='panelMenuDataItem'>
+                <div className='svg'>{svg.gas(10)}</div>
+                {gasPrice}
+              </div>
+              <div className='panelMenuDataItem'>
+                <div className='usd'>$</div>
+                <div>{this.store('external.rates.USD') ? Math.floor(this.store('external.rates.USD')) : ''}</div>
+              </div>
+            </div>
+          ) : null}
           <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onMouseDown={() => this.store.toggleSettings()}>
             <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
             <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>

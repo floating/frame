@@ -329,7 +329,7 @@ class TransactionRequest extends React.Component {
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
                 <span className='networkFeeSymbolUSD'>{'$'}</span>
-                {network.id === '1' ? slowFeeUSD.toFixed(2) : '*.**'}
+                {network.id === '1' ? slowFeeUSD.toFixed(2) : '?'}
               </div>
             </div>
           </div>
@@ -443,7 +443,7 @@ class TransactionRequest extends React.Component {
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
                 <span className='networkFeeSymbolUSD'>{'$'}</span>
-                {network.id === '1' ? customFeeUSD.toFixed(2) : '*.**'}
+                {network.id === '1' ? customFeeUSD.toFixed(2) : '?'}
               </div>
             </div>
           </div>
