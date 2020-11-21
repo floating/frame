@@ -170,7 +170,7 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
           connection: {
@@ -187,7 +187,7 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
           connection: {
@@ -204,7 +204,7 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
           connection: {
@@ -221,7 +221,7 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
           connection: {
@@ -238,7 +238,7 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
           connection: {
@@ -255,7 +255,7 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
           connection: {
@@ -272,7 +272,7 @@ const initial = {
           gas: {
             price: {
               selected: 'standard',
-              levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
           },
           connection: {
@@ -350,8 +350,8 @@ if (connection) {
   initial.main.currentNetwork.id = connection.network + '' || initial.main.currentNetwork.id || '1'
 }
 
-// Earlier versions of v0.3.3 did not include symbols
 Object.keys(initial.main.networks.ethereum).forEach(id => {
+  // Earlier versions of v0.3.3 did not include symbols
   if (!initial.main.networks.ethereum[id].symbol) {
     if (id === 74) {
       initial.main.networks.ethereum[id].symbol = 'EIDI'
@@ -361,6 +361,9 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
       initial.main.networks.ethereum[id].symbol = 'Ξ'
     }
   }
+  // Update safelow -> slow and trader -> asap
+  if (initial.main.networks.ethereum[id].gas.price.selected === 'safelow') initial.main.networks.ethereum[id].gas.price.selected = 'slow'
+  if (initial.main.networks.ethereum[id].gas.price.selected === 'trader') initial.main.networks.ethereum[id].gas.price.selected = 'asap'
 })
 
 // If migrating from before this was a setting make it 'true' to grandfather behavior

@@ -25,7 +25,7 @@ const store = require('./store')
 //     })
 //   })
 // })
-
+const data = require('./data')
 const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
@@ -63,7 +63,8 @@ const externalWhitelist = [
   'https://mainnet.aragon.org',
   'https://rinkeby.aragon.org',
   'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
-  'https://shop.trezor.io/?offer_id=10&aff_id=3270'
+  'https://shop.trezor.io/?offer_id=10&aff_id=3270',
+  'https://discord.gg/pE5EXGXMeS'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line

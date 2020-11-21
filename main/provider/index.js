@@ -73,8 +73,13 @@ class Provider extends EventEmitter {
   }
 
   getNetVersion (payload, res) {
+    // console.log(payload)
     this.connection.send(payload, (response) => {
+      // console.log(response)
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
+      // console.log('get net version')
+      //console.log('response.result: ', response.result)
+     // console.log('store(\'main.currentNetwork.id\')): ', store('main.currentNetwork.id'))
       if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })
@@ -246,20 +251,38 @@ class Provider extends EventEmitter {
   async getGasPrice (rawTx, res) {
     if (rawTx.chainId === '0x1') {
       try {
-        const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
-        const prices = await response.json()
         const chain = parseInt(rawTx.chainId, 'hex').toString()
         const network = store('main.currentNetwork')
         if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
-        store.setGasPrices(network.type, network.id, {
-          safelow: ('0x' + (prices.safeLow * 100000000).toString(16)),
-          standard: ('0x' + (prices.average * 100000000).toString(16)),
-          fast: ('0x' + (prices.fast * 100000000).toString(16)),
-          trader: ('0x' + (prices.fastest * 100000000).toString(16)),
-          custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
-        })
-        const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
-        res({ result: levels[selected] })
+        const { lastUpdate, quality } = store('main.networks', network.type, network.id, 'gas.price')
+        if (lastUpdate && (Date.now() - lastUpdate < 20 * 1000) && quality !== 'stale') {
+          // use curennt gas store values
+          console.log('Using current gas store as it is up to date... ')
+          const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
+          res({ result: levels[selected] })
+        } else {
+          const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
+          const prices = await response.json()
+          store.setGasPrices(network.type, network.id, {
+            slow: ('0x' + (prices.safeLow * 100000000).toString(16)),
+            slowTime: undefined,
+            standard: ('0x' + (prices.average * 100000000).toString(16)),
+            standardTime: undefined,
+            fast: ('0x' + (prices.fast * 100000000).toString(16)),
+            fastTime: undefined,
+            asap: ('0x' + (prices.fastest * 100000000).toString(16)),
+            asapTime: undefined,
+            custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16)),
+            lastUpdate: Date.now(),
+            quality: 'medium',
+            source: {
+              name: 'EthGasStation',
+              url: 'https://ethgasstation.info'
+            }
+          })
+          const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
+          res({ result: levels[selected] })
+        }
       } catch (error) {
         log.error(error)
         res({ error })
@@ -272,11 +295,16 @@ class Provider extends EventEmitter {
             const network = store('main.currentNetwork')
             if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
             store.setGasPrices(network.type, network.id, {
-              safelow: response.result,
+              slow: response.result,
+              slowTime: undefined,
               standard: response.result,
+              standardTime: undefined,
               fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
-              trader: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
-              custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || response.result
+              fastTime: undefined,
+              asap: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
+              asapTime: undefined,
+              custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || response.result,
+              customTime: undefined
             })
             const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
             res({ result: levels[selected] })
@@ -447,21 +475,6 @@ store.observer(() => {
     provider.accountsChanged([])
   }
 })
-
-const gasSync = async () => {
-  const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
-  const prices = await response.json()
-  store.setGasPrices('ethereum', '1', {
-    safelow: ('0x' + (prices.safeLow * 100000000).toString(16)),
-    standard: ('0x' + (prices.average * 100000000).toString(16)),
-    fast: ('0x' + (prices.fast * 100000000).toString(16)),
-    trader: ('0x' + (prices.fastest * 100000000).toString(16)),
-    custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
-  })
-}
-
-gasSync()
-setInterval(gasSync, 15 * 1000)
 
 proxy.on('send', (payload, cd) => provider.send(payload, cd))
 proxy.ready = true

@@ -271,7 +271,6 @@
 
     .txProgressNoticeLoaderBars
       position absolute
-      background blue
       top 0
       right 0
       height 50px
@@ -717,20 +716,13 @@
     align-items center
 
   .networkFeeSymbol
-    font-size 16px
-    font-weight bold
+    position relative
+    font-size 13px
+    font-weight 600
     font-family FiraCode, sans-serif
-    padding 0px 8px 0px 0px
+    left -2px
 
   .transactionTotalUSD
-    // margin-left 10px
-    // margin-top 2px
-    // padding 3px 10px
-    // font-size 20px
-    // border-radius 2px
-    // background highlight
-    // font-weight 300
-
     display flex
     justify-content center
     align-items center
@@ -1222,7 +1214,7 @@ span
 
 .txAugment
   position absolute
-  top 63px
+  top 100px
   left 5px
   height 32px
   right 5px
@@ -1278,12 +1270,12 @@ span
     justify-content center
     align-items center
     transform translateY(0px)
+    z-index 900000000
 
   .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
     background highlighter
-    transform translateY(-1px) scale(1.05)
-    box-shadow 0px 4px 5px -3px thick, 0px 35px 20px -5px thick
-    z-index 90000
+    transform scale(1.05)
+    box-shadow 0px 4px 5px -2px thick, 0px 25px 25px -5px thick
   
   .txAugmentCancel:active, .txAugmentSpeedUp:active, .txDetails:active
     transform translateY(0px) scale(1)
@@ -1362,12 +1354,13 @@ span
 
 .txStatus
   position absolute
-  top 100px
+  top 63px
   left 5px
   right 5px
-  bottom 63px
+  bottom 100px
   border-radius 16px
-  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
+  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
+  // box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
   text-align center
   box-sizing border-box
   background rgba(255, 255, 255, 0.05)

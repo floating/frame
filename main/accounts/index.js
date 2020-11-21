@@ -2,6 +2,8 @@ const EventEmitter = require('events')
 const hdKey = require('hdkey')
 const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
+const { shell, Notification } = require('electron') 
+
 // const bip39 = require('bip39')
 
 const crypt = require('../crypt')
@@ -12,6 +14,15 @@ const proxyProvider = require('../provider/proxy')
 
 const Account = require('./Account')
 const windows = require('../windows')
+
+const notify = (title, body, action) => { 
+  const notification = { title, body } 
+  const note  = new Notification(notification)
+  note.on('click', action)
+  setTimeout(() => {
+    note.show()
+  }, 1000)  
+}
 
 class Accounts extends EventEmitter {
   constructor () {
@@ -130,6 +141,11 @@ class Accounts extends EventEmitter {
               this.current().requests[id].status = 'confirming'
               this.current().requests[id].notice = 'Confirming'
               this.current().requests[id].completed = Date.now()
+              notify('Transaction Successful', this.current().requests[id].tx.hash, () => {
+                const { type, id } = store('main.currentNetwork')
+                const explorer = store('main.networks', type, id, 'explorer')
+                shell.openExternal(explorer + '/tx/' + hash)
+              })
             }
             const blockHeight = parseInt(res.result, 16)
             const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
@@ -165,8 +181,8 @@ class Accounts extends EventEmitter {
             clearTimeout(monitorTimer)
           }
         }
-        setTimeout(() => monitor(), 3000)
-        const monitorTimer = setInterval(monitor, 15000)
+        // setTimeout(() => monitor(), 3000)
+        // const monitorTimer = setInterval(monitor, 15000)
       } else if (newHeadRes.result) {
         const headSub = newHeadRes.result
         const handler = async payload => {

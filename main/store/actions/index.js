@@ -144,6 +144,7 @@ module.exports = {
     u('main.mute.explorerWarning', v => !v)
   },
   setGasPrices: (u, netType, netId, prices) => {
+    console.log('setGasPrices', prices)
     u('main.networks', netType, netId, 'gas.price.levels', () => prices)
   },
   setGasDefault: (u, netType, netId, level, price) => {
@@ -159,7 +160,7 @@ module.exports = {
       gas: {
         price: {
           selected: 'standard',
-          levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
         }
       },
       connection: {

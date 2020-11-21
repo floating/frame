@@ -117,6 +117,14 @@ class Settings extends React.Component {
     )
   }
 
+  discord () {
+    return (
+      <div className='quitFrame'>
+        <div onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/pE5EXGXMeS')} className='quitFrameButton'>Need help? Join our Discord!</div>
+      </div>
+    )
+  }
+
   quit () {
     return (
       <div className='quitFrame'>
@@ -294,11 +302,10 @@ class Settings extends React.Component {
             <div className='signerPermission' style={{ zIndex: 1 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionOrigin'>Gas Price in Menubar</div>
-                <Dropdown
-                  syncValue={this.store('main.menubarGasPrice')}
-                  onChange={(value) => link.send('tray:action', 'setMenubarGasPrice', value)}
-                  options={[{ text: 'Yes', value: true }, { text: 'No', value: false }]}
-                />
+
+                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
+                  <div className='signerPermissionToggleSwitch' />
+                </div>
               </div>
               <div className='signerPermissionDetails'>
                 Show mainnet gas price in menubar (Gwei)
@@ -306,7 +313,7 @@ class Settings extends React.Component {
             </div>
           ) : null}
           <div className='snipIt'>
-            <div>Trying to use Frame with a dapp in your browser?</div>
+            <div>Browser dapp doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
               <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
                 {svg.chrome(30)}
@@ -317,6 +324,7 @@ class Settings extends React.Component {
             </div>
             <div>Inject Frame with our extension!</div>
           </div>
+          {this.discord()}
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
         </div>
