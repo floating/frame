@@ -89,7 +89,8 @@ const initial = {
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
     ledger: {
-      derivation: main('ledger.derivation', 'legacy')
+      derivation: main('ledger.derivation', 'legacy'),
+      numLiveAccounts: main('ledger.numLiveAccounts', 10)
     },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions

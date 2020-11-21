@@ -131,6 +131,9 @@ module.exports = {
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
+  setNumLiveAccounts: (u, value) => {
+    u('main.ledger.numLiveAccounts', () => value)
+  },
   setHardwareDerivation: (u, value) => {
     u('main.hardwareDerivation', () => value)
   },

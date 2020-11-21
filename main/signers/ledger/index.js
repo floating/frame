@@ -10,7 +10,7 @@ let scanTimer = null
 
 module.exports = {
   scan: (signers) => {
-    log.info('Ledger Scaner Started...')
+    log.info('Ledger Scanner Started...')
     const scan = (followup = false) => {
       clearTimeout(scanTimer)
       const current = HID.devices().filter(isLedger)

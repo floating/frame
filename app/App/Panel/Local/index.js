@@ -251,7 +251,7 @@ class Settings extends React.Component {
               {'Mouse to the middle of your display\'s right edge to reveal Frame'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 4 }}>
+          <div className='signerPermission' style={{ zIndex: 5 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>
               <Dropdown
@@ -264,7 +264,7 @@ class Settings extends React.Component {
               {'Derive seperate sets of addresses based on use'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 3 }}>
+          <div className='signerPermission' style={{ zIndex: 4 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Type</div>
               <Dropdown
@@ -275,6 +275,19 @@ class Settings extends React.Component {
             </div>
             <div className='signerPermissionDetails'>
               {'Use Ledger\'s Legacy or Live derivation type'}
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 3 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
+              <Dropdown
+                syncValue={this.store('main.ledger.numLiveAccounts')}
+                onChange={(value) => link.send('tray:action', 'setNumLiveAccounts', value)}
+                options={[{ text: '10', value: 10 }, { text: '20', value: 20 }, { text: '30', value: 30 }, { text: '40', value: 40 }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Choose the number of accounts to query from the Ledger Live derivation'}
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 2 }}>

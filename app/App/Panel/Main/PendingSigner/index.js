@@ -31,9 +31,12 @@ class Pending extends React.Component {
 
   renderLoadingLive () {
     if (this.props.type === 'ledger' && this.props.status.toLowerCase() === 'deriving live addresses') {
+      var numLiveAccounts = this.store('main.ledger.numLiveAccounts');
+      var stylePadding = numLiveAccounts > 20 ? 10 : 20;
+      var styleWidth = numLiveAccounts > 10 ? 120 : 60;
       return (
-        <div className='loadingLiveAddresses'>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => {
+        <div className='loadingLiveAddresses' style={{ padding: stylePadding.toString().concat('px 20px'), width: styleWidth.toString().concat('px') }}>
+          {[...Array(numLiveAccounts).keys()].map(i => i + 1).map(i => {
             return <div key={'loadingLiveAddress' + i} className='loadingLiveAddress' style={{ opacity: i <= this.props.liveAddressesFound ? '1' : '0.3' }} />
           })}
         </div>
