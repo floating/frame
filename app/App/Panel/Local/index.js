@@ -237,7 +237,7 @@ class Settings extends React.Component {
           <div className='localSettingsTitle'>
             <div className='localSettingsTitleText'>Settings</div>
           </div>
-          <div className='signerPermission'>
+          <div className='signerPermission'  style={{ zIndex: 7 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
@@ -248,7 +248,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission'>
+          <div className='signerPermission'  style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -259,7 +259,31 @@ class Settings extends React.Component {
               {'Mouse to the middle of your display\'s right edge to reveal Frame'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 4 }}>
+          <div className='signerPermission' style={{ zIndex: 5 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Summon Shortcut</div>
+              <div className={this.store('main.shortcuts.altSpace') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSpace'))}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              Summon Frame by pressing Alt+Space
+            </div>
+          </div>
+          {this.store('platform') === 'darwin' ? (
+            <div className='signerPermission' style={{ zIndex: 4 }}>
+              <div className='signerPermissionControls'>
+                <div className='signerPermissionOrigin'>Gas Price in Menubar</div>
+                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
+                  <div className='signerPermissionToggleSwitch' />
+                </div>
+              </div>
+              <div className='signerPermissionDetails'>
+                Show mainnet gas price in menubar (Gwei)
+              </div>
+            </div>
+          ) : null}
+          <div className='signerPermission' style={{ zIndex: 3 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>
               <Dropdown
@@ -272,7 +296,7 @@ class Settings extends React.Component {
               Derive seperate sets of addresses based on use
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 3 }}>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Type</div>
               <Dropdown
@@ -285,7 +309,7 @@ class Settings extends React.Component {
               {'Use Ledger\'s Legacy or Live derivation type'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
+          <div className='signerPermission' style={{ zIndex: 1 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lock Hot Signers on</div>
               <Dropdown
@@ -298,20 +322,6 @@ class Settings extends React.Component {
               When should Frame relock your hot signers?
             </div>
           </div>
-          {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission' style={{ zIndex: 1 }}>
-              <div className='signerPermissionControls'>
-                <div className='signerPermissionOrigin'>Gas Price in Menubar</div>
-
-                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
-                  <div className='signerPermissionToggleSwitch' />
-                </div>
-              </div>
-              <div className='signerPermissionDetails'>
-                Show mainnet gas price in menubar (Gwei)
-              </div>
-            </div>
-          ) : null}
           <div className='snipIt'>
             <div>Browser dapp doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>

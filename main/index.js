@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -150,6 +150,16 @@ app.on('ready', () => {
     const appOrigin = path.resolve(__dirname, '../')
     const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
+  })
+  store.observer(() => {
+    const altspace = store('main.shortcuts.altSpace')
+    if (altspace) {
+      console.log('registering shortcut')
+      globalShortcut.unregister('Alt+Space')
+      globalShortcut.register('Alt+Space', () => windows.trayClick())
+    } else {
+      globalShortcut.unregister('Alt+Space')
+    }
   })
 })
 

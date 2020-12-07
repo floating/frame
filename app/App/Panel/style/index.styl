@@ -164,9 +164,10 @@
     
   .panelMenuData
     position absolute
-    top 5.5px
-    width 150px
-    left 51px
+    top 0px
+    width 100px
+    max-width 100px
+    left 50%
     transition standard
     letter-spacing 0px
     text-transform uppercase
@@ -174,25 +175,41 @@
     display flex
     justify-content center
     align-items center
-    font-weight 400
+    font-weight 600
     font-size 11px
+    font-family Fira Code, monospace
+    background highlighter
+    height 16px
+    border-radius 8px
+    transform translate(-50px, 12px)
+
+    .panelMenuDataDivide
+      position absolute
+      top 0
+      bottom 0
+      left 50%
+      width 1px
+      margin-left -1px
+      background doubleThick
 
     .panelMenuDataItem
       display flex
       justify-content center
       align-items center
-      padding 5px
+      padding 0px 5px
 
       .svg
         position relative
-        padding-right 3px
-        top 0.5px
+        padding-left 3px
+        margint-top -1px
 
       .usd
         position relative
-        font-size 13px
-        font-weight 500
-        padding-right 2px
+        margin-right 0px
+        margin-top -1px
+
+    .panelMenuDataItem:last-child
+      margin-left 2px
 
   .panelDetailIndicator
     height 10px

@@ -25,7 +25,7 @@ let socket, reconnectTimer, connected
 const reconnect = now => {
   log.info('Trying to reconnect to realtime')
   clearTimeout(reconnectTimer)
-  reconnectTimer = setInterval(setUpSocket, now ? 0 : 15 * 1000)
+  reconnectTimer = setInterval(() => setUpSocket('reconnectTimer'), now ? 0 : 15 * 1000)
 }
 
 const onOpen = () => {
@@ -35,12 +35,16 @@ const onOpen = () => {
 // const weiToGwei = v => v / 1e9
 const gweiToWei = v => v * 1e9
 
+let staleTimer
+
 const onData = data => {
   try {
     data = JSON.parse(data)
     if (data.status === 'ok' && data.mainnet && data.mainnet.gas) {
       const { gas } = data.mainnet
-      const network = store('main.currentNetwork')
+      clearTimeout(staleTimer)
+      // If we havent recieved gas data in 60s, make sure we're connected
+      staleTimer = setTimeout(() => setUpSocket('staleTimer'), 60 * 1000)
       store.setGasPrices('ethereum', '1', {
         slow: ('0x' + gweiToWei(gas.slow).toString(16)),
         slowTime: gas.slowTime,
@@ -50,7 +54,7 @@ const onData = data => {
         fastTime: gas.fastTime,
         asap: ('0x' + gweiToWei(gas.asap).toString(16)),
         asapTime: gas.asapTime,
-        custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.standard * 100000000).toString(16)),
+        custom: store('main.networks.ethereum.1.gas.price.levels.custom') || ('0x' + (prices.standard * 100000000).toString(16)),
         lastUpdate: gas.lastUpdate,
         quality: gas.quality,
         source: gas.source
@@ -70,11 +74,11 @@ const onClose = () => {
 const onError = e => {
   console.log('gasSocket error', e)
   clearTimeout(reconnectTimer)
-  reconnectTimer = setInterval(setUpSocket, 15 * 1000)
+  reconnectTimer = setInterval(() => setUpSocket('reconnectTimer -- onError'), 15 * 1000)
 }
 
-const setUpSocket = () => {
-  console.log('setUpSocket')
+const setUpSocket = (reason) => {
+  // console.log('setUpSocket', reason)
   try {
     clearTimeout(reconnectTimer)
     socket = new WebSocket('wss://realtime.frame.sh')
@@ -88,18 +92,6 @@ const setUpSocket = () => {
   }
 }
 
-setUpSocket()
-
-powerMonitor.on('resume', setUpSocket)
-powerMonitor.on('unlock-screen', setUpSocket)
-
-
-let staleTimer
-
-const staleObserver = store.observer(() => {
-  // When gas values change reet the staleTimer
-  store('main.networks.ethereum.1.gas')
-  clearTimeout(staleTimer)
-  // If gas values havent been updated in 30s, make sure we're connected 
-  staleTimer = setTimeout(setUpSocket, 30 * 1000)
-})
+setUpSocket('initial')
+powerMonitor.on('resume', () => setUpSocket('resume'))
+powerMonitor.on('unlock-screen', () => setUpSocket('unlock-screen'))

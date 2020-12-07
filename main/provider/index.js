@@ -35,7 +35,7 @@ class Provider extends EventEmitter {
 
   accountsChanged (accounts) {
     this.subs.accountsChanged.forEach(subscription => {
-      this.emit('data:accounts', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
+      this.emit('data:address', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
     })
   }
 
@@ -73,14 +73,18 @@ class Provider extends EventEmitter {
   }
 
   getNetVersion (payload, res) {
-    // console.log(payload)
     this.connection.send(payload, (response) => {
-      // console.log(response)
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      // console.log('get net version')
-      //console.log('response.result: ', response.result)
-     // console.log('store(\'main.currentNetwork.id\')): ', store('main.currentNetwork.id'))
       if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
+    })
+  }
+
+  getChainId (payload, res) {
+    this.connection.send(payload, (response) => {
+      if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
+      const id = parseInt(response.result, 'hex').toString()
+      if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })
   }
@@ -450,7 +454,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_requestAccounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
     if (payload.method === 'net_version') return this.getNetVersion(payload, res)
-    if (payload.method === 'eth_chainId') return this.getNetVersion(payload, res)
+    if (payload.method === 'eth_chainId') return this.getChainId(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
     if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)

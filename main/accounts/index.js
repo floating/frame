@@ -2,7 +2,7 @@ const EventEmitter = require('events')
 const hdKey = require('hdkey')
 const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
-const { shell, Notification } = require('electron') 
+const { shell, Notification } = require('electron')
 
 // const bip39 = require('bip39')
 
@@ -15,13 +15,13 @@ const proxyProvider = require('../provider/proxy')
 const Account = require('./Account')
 const windows = require('../windows')
 
-const notify = (title, body, action) => { 
-  const notification = { title, body } 
-  const note  = new Notification(notification)
+const notify = (title, body, action) => {
+  const notification = { title, body }
+  const note = new Notification(notification)
   note.on('click', action)
   setTimeout(() => {
     note.show()
-  }, 1000)  
+  }, 1000)
 }
 
 class Accounts extends EventEmitter {

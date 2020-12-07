@@ -289,7 +289,7 @@ class Notify extends React.Component {
           </div>
           <div
             className='notifyCheck' onMouseDown={() => {
-              link.send('tray:action', 'toggleexplorerWarning')
+              link.send('tray:action', 'toggleExplorerWarning')
             }}
           >
             <div className='notifyCheckBox'>

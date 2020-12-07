@@ -140,11 +140,13 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
-  toggleexplorerWarning: (u) => {
+  toggleExplorerWarning: (u) => {
     u('main.mute.explorerWarning', v => !v)
   },
+  setAltSpace: (u, v) => {
+    u('main.shortcuts.altSpace', () => v)
+  },
   setGasPrices: (u, netType, netId, prices) => {
-    console.log('setGasPrices', prices)
     u('main.networks', netType, netId, 'gas.price.levels', () => prices)
   },
   setGasDefault: (u, netType, netId, level, price) => {

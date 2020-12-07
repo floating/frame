@@ -1,6 +1,7 @@
 const TrezorConnect = require('trezor-connect').default
 const EventEmitter = require('events')
 const events = new EventEmitter()
+events.setMaxListeners(128)
 let ready = false
 
 class Device {

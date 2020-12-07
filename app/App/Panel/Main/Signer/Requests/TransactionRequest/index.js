@@ -7,6 +7,7 @@ import link from '../../../../../../link'
 import TxBar from './TxBar'
 
 const weiToGwei = v => Math.ceil(v / 1e9)
+const gweiToWei = v => Math.ceil(v * 1e9)
 
 const FEE_WARNING_THRESHOLD_USD = 10
 
@@ -55,12 +56,39 @@ class Time extends React.Component {
 }
 
 class TransactionRequest extends React.Component {
-  constructor (...args) {
-    super(...args)
+  constructor (props, context) {
+    super(props, context)
+    this.feeWrapperRef = React.createRef()
+    this.feeUpdateRealtimeRef = React.createRef()
+    this.feeHaloClickRef = React.createRef()
+    this.inital = true
     this.state = { allowInput: false, dataView: false, hoverGwei: 0 }
     setTimeout(() => {
       this.setState({ allowInput: true })
     }, 1700)
+    this.gasCache = {}
+    context.store.observer(() => {
+      const network = context.store('main.currentNetwork')
+      const { slow, standard, fast, asap } = context.store('main.networks', network.type, network.id, 'gas.price.levels')
+      const levels = slow + standard + fast + asap
+      if (
+        this.feeUpdateRealtimeRef &&
+        this.feeUpdateRealtimeRef.current &&
+        this.gasCache !== levels &&
+        this.state.selectedIndex === 0
+      ) {
+        this.gasCache = levels
+        this.feeUpdateRealtimeRef.current.animate([
+          { opacity: '0' },
+          { opacity: '0.3' },
+          { opacity: '0' }
+        ], {
+            duration: 400,
+            iterations: 1
+          }
+        )
+      }
+    })
   }
 
   copyAddress (e) {
@@ -95,6 +123,36 @@ class TransactionRequest extends React.Component {
         if (e) console.log(e)
       })
     }
+    if (this.feeHaloClickRef && this.feeHaloClickRef.current) {
+      this.feeHaloClickRef.current.animate(
+        [
+          {
+            opacity: 1,
+            transform: 'scale(1)'
+          },
+          {
+            opacity: 0.8,
+            transform: 'scale(1.2)'
+          },
+          {
+            opacity: 0.6,
+            transform: 'scale(2)'
+          },
+          {
+            opacity: 0.5,
+            transform: 'scale(2)'
+          },
+          {
+            opacity: 0,
+            transform: 'scale(3)'
+          }
+        ], {
+          duration: 400,
+          iterations: 1,
+          easing: 'ease-in-out'
+        }
+      )
+    }
     // this.setState({ selectedIndex: -1 })
   }
 
@@ -118,8 +176,16 @@ class TransactionRequest extends React.Component {
     }
   }
 
+  mouseDetect (e) {
+    if (this.feeWrapperRef && this.feeWrapperRef.current && !this.feeWrapperRef.current.contains(e.target)) {
+      this.setState({ selectedIndex: -1 })
+      document.removeEventListener('mousedown', this.mouseDetect)
+    }
+  }
+
   selectSection (index) {
     this.setState({ selectedIndex: index })
+    if (index > -1) document.addEventListener('mousedown', this.mouseDetect.bind(this))
     // if (index === this.state.selectedIndex) {
     //   this.setState({ selectedIndex: -1 })
     // } else {
@@ -128,30 +194,34 @@ class TransactionRequest extends React.Component {
   }
 
   barColor (percent) {
-    const low = [0, 210, 180] // good
-    const high = [0, 105, 90] // outerspace
-    const w1 = percent
+    const low = [250, 100, 155]
+    const high = [250, 100, 155]
+    const w1 = percent * 3 > 1 ? 1 : percent * 3
     const w2 = 1 - w1
-    return `rgba(${Math.round(low[0] * w1 + high[0] * w2)}, ${Math.round(low[1] * w1 + high[1] * w2)}, ${Math.round(low[2] * w1 + high[2] * w2)}, 1)`
+    return `rgba(${Math.round(high[0] * w1 + low[0] * w2)}, ${Math.round(high[1] * w1 + low[1] * w2)}, ${Math.round(high[2] * w1 + low[2] * w2)}, ${percent < 0.5 ? 0.5 : percent})`
   }
 
   hoverBar (hoverGasPercent, isCustom) {
+    const hoverGasPercentOrigin = hoverGasPercent
     const network = this.store('main.currentNetwork')
     const asap = this.store('main.networks', network.type, network.id, 'gas.price.levels.asap')
-    const top = parseInt(asap, 16) * 2
-    const bottom = 1 // parseInt(slow, 16) / 10
-    const percentBuffer = Math.round((bottom / top) * 100) / 100
-    hoverGasPercent = hoverGasPercent + percentBuffer
-    let gwei = Math.round(top * hoverGasPercent / 1000000000)
-    gwei = gwei < bottom ? bottom : gwei
+    const slow = this.store('main.networks', network.type, network.id, 'gas.price.levels.slow')
+    const top = parseInt(asap, 16) * 1.5
+    const bottom = gweiToWei(1) 
+    let gwei = Math.round(weiToGwei(top * hoverGasPercent))
+    gwei = gwei < weiToGwei(bottom) ? weiToGwei(bottom) : gwei
     const hoverGasPrice = utils.numberToHex(gwei * 1000000000)
-    hoverGasPercent = (hoverGasPrice / top) + percentBuffer
-    const hoverGasColor = this.barColor(hoverGasPercent)
+    hoverGasPercent = (hoverGasPrice / top) // + percentBuffer
+    hoverGasPercent = (hoverGasPercent * 2) > 1 ? 1 : hoverGasPercent * 2
+    const diff = asap - slow
+    const adjustedGasPercent = hoverGasPrice / diff
+    const hoverGasColor = this.barColor(adjustedGasPercent)
     const hoverGasPriceCustom = isCustom ? hoverGasPrice : false
-    this.setState({ 
-      hoverGasPercent, 
-      hoverGasColor, 
-      hoverGasPrice, 
+    this.setState({
+      hoverGasPercentOrigin,
+      hoverGasPercent,
+      hoverGasColor,
+      hoverGasPrice,
       hoverGasPriceCustom
     })
   }
@@ -166,8 +236,8 @@ class TransactionRequest extends React.Component {
   handleCustomPriceHoverReset () {
     const { data } = this.props.req
     this.hoverBar(this.gasPriceToPercent(data.gasPrice))
-    this.setState({ 
-      hoverGasPrice: '', 
+    this.setState({
+      hoverGasPrice: '',
       hoverGasPriceCustom: ''
     })
   }
@@ -179,7 +249,7 @@ class TransactionRequest extends React.Component {
   }
 
   renderFeeLabel (current, expanded, currentGas) {
-    const network = this.store('main.currentNetwork')        
+    const network = this.store('main.currentNetwork')
     const levels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
     const price = levels[current]
     return (
@@ -203,33 +273,65 @@ class TransactionRequest extends React.Component {
     return <>{Math.round(time / 3600)}<span className='timeUnit'>h</span></>
   }
 
+  timeDisplay (sec) {
+    if (!sec) {
+      return {
+        context: '',
+        value: '?',
+        unit: '',
+        sec: 0
+      }
+    } else if (sec < 60) {
+      return {
+        context: '~',
+        value: sec,
+        unit: 's',
+        sec
+      }
+    } else if (sec < 3600) {
+      return {
+        context: '~',
+        value: sec / 60,
+        unit: 'm',
+        sec
+      }
+    } else {
+      return {
+        context: '~',
+        value: sec / 3600,
+        unit: 'h',
+        sec
+      }
+    }
+  }
+
   renderFee () {
     const expanded = this.state.selectedIndex === 0
     const { data } = this.props.req
     const network = this.store('main.currentNetwork')
     let feeLevel = this.store('main.networks', network.type, network.id, 'gas.price.selected')
     const gasLevels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
-    const {slow, slowTime, standard, standardTime, fast, fastTime, asap, asapTime, customTime} = gasLevels
+    const { slow, slowTime, standard, standardTime, fast, fastTime, asap, asapTime, customTime } = gasLevels
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const gasLimit = parseInt(data.gas, 16)
     const slowFee = this.hexToDisplayValue(utils.numberToHex(gasLimit * parseInt(slow, 16)))
-    const slowFeeUSD = slowFee * etherUSD
-    // const slowFeeTime = !slowTime ? '?s' : slowTime < 60 ? slowTime + 's' : slowTime < 3600 ? slowTime / 60 + 'm' : slowTime / 3600 + 'h'
+    const slowFeeUSD = (slowFee * etherUSD).toFixed(2)
+    const slowFeeTime = this.timeDisplay(slowTime)
     const standardFee = this.hexToDisplayValue(utils.numberToHex(gasLimit * parseInt(standard, 16)))
-    const standardFeeUSD = standardFee * etherUSD
-    // const standardFeeTime = !standardTime ? '?s' : standardTime < 60 ? standardTime + 's' : standardTime < 3600 ? standardTime / 60 + 'm' : standardTime / 3600 + 'h'
+    const standardFeeUSD = (standardFee * etherUSD).toFixed(2)
+    const standardFeeTime = this.timeDisplay(standardTime)
     const fastFee = this.hexToDisplayValue(utils.numberToHex(gasLimit * parseInt(fast, 16)))
-    const fastFeeUSD = fastFee * etherUSD
-    // const fastFeeTime = !fastTime ? '?s' : fastTime < 60 ? fastTime + 's' : fastTime < 3600 ? fastTime / 60 + 'm' : fastTime / 3600 + 'h'
+    const fastFeeUSD = (fastFee * etherUSD).toFixed(2)
+    const fastFeeTime = this.timeDisplay(fastTime)
     const asapFee = this.hexToDisplayValue(utils.numberToHex(gasLimit * parseInt(asap, 16)))
-    const asapFeeUSD = asapFee * etherUSD
-    // const asapFeeTime = !asapTime ? '?s' : asapTime < 60 ? asapTime + 's' : asapTime < 3600 ? asapTime / 60 + 'm' : asapTime / 3600 + 'h'
+    const asapFeeUSD = (asapFee * etherUSD).toFixed(2)
+    const asapFeeTime = this.timeDisplay(asapTime)
     const customFee = this.hexToDisplayValue(utils.numberToHex(gasLimit * parseInt(this.state.hoverGasPriceCustom || data.gasPrice, 16)))
-    const customFeeUSD = customFee * etherUSD
-    // const customFeeTime = !customTime ? '?s' : customTime < 60 ? customTime + 's' : customTime < 3600 ? customTime / 60 + 'm' : asapTime / 3600 + 'h'
-    
+    const customFeeUSD = (customFee * etherUSD).toFixed(2)
+    const customFeeTime = this.timeDisplay(customTime)
+
     // console.log('-')
 
     // const height = mode === 'monitor' ? '145px' : '360px'
@@ -237,74 +339,140 @@ class TransactionRequest extends React.Component {
 
     const currentSymbol = this.store('main.networks', network.type, network.id, 'symbol') || 'Ξ'
 
-    let slideLevel, haloLevel, haloShadowLevel
+    let slideLevel, haloLevel, haloShadowLevel, feeTotal, feeTotalUSD, feeTime
 
+    const devHaloAdjust = -75
+    const haloLevels = {
+      slow: 148 + devHaloAdjust,
+      standard: 188 + devHaloAdjust,
+      fast: 228 + devHaloAdjust,
+      asap: 268 + devHaloAdjust,
+      custom: 308 + devHaloAdjust
+    }
+    const devAdjust = -294
     if (feeLevel === 'slow') {
-      slideLevel = '-10px'
-      haloShadowLevel = 'translateY(118px)'
+      slideLevel = 170 + devAdjust
+      haloShadowLevel = `translateY(${haloLevels.slow}px)`
+      feeTotal = slowFee
+      feeTotalUSD = slowFeeUSD
+      feeTime = slowFeeTime
     } else if (feeLevel === 'standard') {
-      slideLevel = '-50px'
-      haloShadowLevel = 'translateY(158px)'
+      slideLevel = 130 + devAdjust
+      haloShadowLevel = `translateY(${haloLevels.standard}px)`
+      feeTotal = standardFee
+      feeTotalUSD = standardFeeUSD
+      feeTime = standardFeeTime
     } else if (feeLevel === 'fast') {
-      slideLevel = '-90px'
-      haloShadowLevel = 'translateY(198px)'
+      slideLevel = 90 + devAdjust
+      haloShadowLevel = `translateY(${haloLevels.fast}px)`
+      feeTotal = fastFee
+      feeTotalUSD = fastFeeUSD
+      feeTime = fastFeeTime
     } else if (feeLevel === 'asap') {
-      slideLevel = '-130px'
-      haloShadowLevel = 'translateY(238px)'
+      slideLevel = 50 + devAdjust
+      haloShadowLevel = `translateY(${haloLevels.asap}px)`
+      feeTotal = asapFee
+      feeTotalUSD = asapFeeUSD
+      feeTime = asapFeeTime
     } else if (feeLevel === 'custom') {
-      slideLevel = '-170px'
-      haloShadowLevel = 'translateY(278px)'
+      slideLevel = 10 + devAdjust
+      haloShadowLevel = `translateY(${haloLevels.custom}px)`
+      feeTotal = customFee
+      feeTotalUSD = customFeeUSD
+      feeTime = customFeeTime
+      if (!customTime) {
+        if (feeTotal > asapFee) feeTime = asapFeeTime
+        if (feeTotal < asapFee) feeTime = fastFeeTime
+        if (feeTotal < fastFee) feeTime = standardFeeTime
+        if (feeTotal < standardFee) feeTime = slowFeeTime
+        if (feeTotal < slowFee) {
+          feeTime = slowFeeTime
+          feeTime.context = '>'
+        }
+      }
     }
 
-    let hoverLevel = this.state.hoverLevel
+    // console.log('feeTime', feeTime)
+    // console.log('slowFeeTime', slowFeeTime)
+    // console.log('standardFeeTime', standardFeeTime)
+    // console.log('fastFeeTime', fastFeeTime)
+    // console.log('asapFeeTime', asapFeeTime)
 
-    if (hoverLevel === 'slow') {
-      haloLevel = 'translateY(118px)'
-    } else if (hoverLevel === 'standard') {
-      haloLevel = 'translateY(158px)'
-    } else if (hoverLevel === 'fast') {
-      haloLevel = 'translateY(198px)'
-    } else if (hoverLevel === 'asap') {
-      haloLevel = 'translateY(238px)'
-    } else if (hoverLevel === 'custom') {
-      haloLevel = 'translateY(278px)'
+    let rocketHeight = 0
+    if (feeTime.sec >= asapFeeTime.sec) rocketHeight = 100
+    if (feeTime.sec >= fastFeeTime.sec) rocketHeight = 75
+    if (feeTime.sec >= standardFeeTime.sec) rocketHeight = 50
+    if (feeTime.sec >= slowFeeTime.sec) rocketHeight = 25
+ 
+    haloLevel = `translateY(${haloLevels[this.state.hoverLevel || feeLevel]}px)`
+
+    let txFeeStyle = {}
+    if (this.state.hoverLevel || this.state.hoverGwei) {
+      txFeeStyle = { transform: 'scale(1.04)', boxShadow: '0px 35px 50px -45px rgba(16, 44, 100, 0.3), 0px -35px 50px -45px rgba(16, 44, 100, 0.3)' }
     }
 
     return (
-      <div className={expanded ? 'txSection txFee txFeeExpanded' : 'txSection txFee'} onMouseDown={() => this.selectSection(0)}>
-        <div className='txFeeGwei' style={{ opacity: expanded ? 1 : 0 }}>
-          <div className='txFeeGweiValue'>
-            {this.state.hoverGwei || (this.state.hoverGasPrice ? parseInt(this.state.hoverGasPrice, 'hex') / 1000000000 : false) || (parseInt(data.gasPrice, 'hex') / 1000000000)}
+      <div ref={this.feeWrapperRef} style={txFeeStyle} className={expanded ? 'txSection txFee txFeeExpanded' : 'txSection txFee'} onMouseDown={() => this.selectSection(0)}>
+        <div className='txFeeTitle'>Fee</div>
+        <div className='txFeeUpdateRealtime'>
+          <div ref={this.feeUpdateRealtimeRef} className='txFeeUpdateRealtimeInner' />
+        </div>
+        
+        <div className='txFeeInputs'>
+          <div className='txFeeGwei' style={{ opacity: expanded ? 1 : 0 }}>
+            <div className='txFeeGweiValue'>
+              {this.state.hoverGwei || (this.state.hoverGasPrice ? parseInt(this.state.hoverGasPrice, 'hex') / 1000000000 : false) || (parseInt(data.gasPrice, 'hex') / 1000000000)}
+            </div>
+            <div className='txFeeGweiLabel'>
+              PRICE (GWEI)
+            </div>
           </div>
-          <div className='txFeeGweiLabel'>
-            GWEI
+          <div className='txFeeLimit' style={{ opacity: expanded ? 1 : 0 }}>
+            <div className='txFeeGweiValue'>
+              {parseInt(gasLimit, 'hex')}
+            </div>
+            <div className='txFeeGweiLabel'>
+              LIMIT (UNITS)
+            </div>
           </div>
         </div>
-        <div className='txFeeLimit' style={{ opacity: expanded ? 1 : 0 }}>
-          <div className='txFeeGweiValue'>
-            {parseInt(gasLimit, 'hex')}
+        <div className='txFeeSummary'>
+          <div className='txFeeTime' style={{ opacity: expanded ? 1 : 0 }}>
+            <div className='txFeeSummaryValue'>
+              {feeTime.context + feeTime.value + feeTime.unit}
+            </div>
+            <div className='txFeeSummaryLabel'>
+              TIME
+            </div>
           </div>
-          <div className='txFeeGweiLabel'>
-            LIMIT
-          </div>
-        </div>
-        <div className='txFeeTotal' style={{ opacity: expanded ? 1 : 0 }}>
-          <div className='txFeeGweiValue'>
-            {this.state.hoverGwei || (this.state.hoverGasPrice ? parseInt(this.state.hoverGasPrice, 'hex') / 1000000000 : false) || (parseInt(data.gasPrice, 'hex') / 1000000000)}
-          </div>
-          <div className='txFeeGweiLabel'>
-            TOTAl
+          <div className='txFeeTotal' style={{ opacity: expanded ? 1 : 0 }}>
+            <div className='txFeeSummaryValue'>
+              <span className=''>{currentSymbol}</span>
+              <span>{feeTotal}</span>
+              <span className='txFeeTotalUSD'>≈</span>
+              <span className='txFeeTotalUSD'>$</span>
+              <span className='txFeeTotalUSD'>{feeTotalUSD}</span>
+            </div>
+            <div className='txFeeSummaryLabel'>
+              MAX FEE
+            </div>
           </div>
         </div>
         <div className='customGasPriceBar'>
-          <div className='customGasPriceBarInner' style={{ background: this.state.hoverGasColor, width: ((this.state.hoverGasPercent * 100) + 5) + '%', transform: 'translateX(-50%)', left: '50%' }} />
+          <div className='customGasPriceBarInner' style={{ background: this.state.hoverGasColor, height: rocketHeight + '%' }}>
+            <div className='customGasPriceBarRocket' style={{ color: this.state.hoverGasColor }}>
+              {svg.rocket(21)}
+            </div>
+            <div className='customGasPriceBarStreak' style={{ background: this.state.hoverGasColor, left: '-2px' }} />
+            <div className='customGasPriceBarStreak' style={{ background: this.state.hoverGasColor, right: '-2px' }} />
+          </div>
         </div>
         <div className='networkFeeLabel' style={{ transform: expanded ? 'translateY(0px)' : 'translateY(-40px)' }}>Fee</div>
-        <div 
-          className='networkFeeSelectedHalo networkFeeSelectedHaloShadow' 
-          style={expanded ? { transform: haloShadowLevel, opacity: 1 } : { transform: 'translateY(-100px)', opacity: 0 } }
+        <div
+          className='networkFeeSelectedHalo networkFeeSelectedHaloShadow'
+          style={expanded ? { transform: `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
         />
-        <div className='networkFeeOptions' style={!expanded ? { transitionDelay: '0s', transform: `translateY(${slideLevel})` } : { transform: 'translateY(0px)' }}>
+        <div className='networkFeeOptions' style={!expanded ? { transitionDelay: '0s', transform: `translateY(${slideLevel + 50}px)` } : { transform: 'translateY(0px)' } }>
           <div
             className='networkFeeOption'
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.slow, 'slow') : null}
@@ -328,8 +496,8 @@ class TransactionRequest extends React.Component {
               </div>
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
-                <span className='networkFeeSymbolUSD'>{'$'}</span>
-                {network.id === '1' ? slowFeeUSD.toFixed(2) : '?'}
+                <span className='networkFeeSymbolUSD'>$</span>
+                {network.id === '1' ? slowFeeUSD : '?'}
               </div>
             </div>
           </div>
@@ -356,8 +524,8 @@ class TransactionRequest extends React.Component {
               </div>
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
-                <span className='networkFeeSymbolUSD'>{'$'}</span>
-                {network.id === '1' ? standardFeeUSD.toFixed(2) : '?'}
+                <span className='networkFeeSymbolUSD'>$</span>
+                {network.id === '1' ? standardFeeUSD : '?'}
               </div>
             </div>
           </div>
@@ -384,8 +552,8 @@ class TransactionRequest extends React.Component {
               </div>
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
-                <span className='networkFeeSymbolUSD'>{'$'}</span>
-                {network.id === '1' ? fastFeeUSD.toFixed(2) : '?'}
+                <span className='networkFeeSymbolUSD'>$</span>
+                {network.id === '1' ? fastFeeUSD : '?'}
               </div>
             </div>
           </div>
@@ -412,23 +580,24 @@ class TransactionRequest extends React.Component {
               </div>
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
-                <span className='networkFeeSymbolUSD'>{'$'}</span>
-                {network.id === '1' ? asapFeeUSD.toFixed(2) : '?'}
+                <span className='networkFeeSymbolUSD'>$</span>
+                {network.id === '1' ? asapFeeUSD : '?'}
               </div>
             </div>
           </div>
           <div
             className='networkFeeOption'
-            onMouseDown={expanded ? () => { 
-              this.setGasPrice(network.type, network.id, this.state.hoverGasPrice, 'custom') } : null}
+            onMouseDown={expanded ? () => {
+              this.setGasPrice(network.type, network.id, this.state.hoverGasPrice, 'custom')
+            } : null}
             onMouseMove={expanded ? e => {
               this.setState({ hoverLevel: 'custom' })
-              this.handleCustomPriceHover(e, true) 
+              this.handleCustomPriceHover(e, true)
             } : null}
             // onMouseMove={expanded ? e => this.handleCustomPriceHover(e) : null}
             onMouseLeave={expanded ? e => {
               this.setState({ hoverLevel: '' })
-              this.handleCustomPriceHoverReset() 
+              this.handleCustomPriceHoverReset()
             } : null}
           >
             <div className='networkFeeOptionBack' />
@@ -442,16 +611,24 @@ class TransactionRequest extends React.Component {
               </div>
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
-                <span className='networkFeeSymbolUSD'>{'$'}</span>
-                {network.id === '1' ? customFeeUSD.toFixed(2) : '?'}
+                <span className='networkFeeSymbolUSD'>$</span>
+                {network.id === '1' ? customFeeUSD : '?'}
               </div>
             </div>
           </div>
         </div>
-        <div 
-          className='networkFeeSelectedHalo' 
-          style={expanded ? { transform: haloLevel || haloShadowLevel, opacity: 1 } : { transform: 'translateY(-100px)', opacity: 0 } } 
-        />
+        <div
+          className='networkFeeSelectedHalo'
+          style={expanded ? { transform: haloLevel || haloShadowLevel, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
+        >
+          <div
+            ref={this.feeHaloClickRef}
+            className='networkFeeSelectedHaloClick'
+          />
+          <div className='customHaloMarker'>
+            <div className='customHaloMarkerInner' style={{ transform: `translateX(${this.state.hoverGasPercentOrigin * 308}px)` }} />
+          </div>
+        </div>
       </div>
     )
   }
