@@ -44,10 +44,10 @@ class Panel extends React.Component {
               <div className='panelMenuDataDivide' />
               <div className='panelMenuDataItem'>
                 {gasPrice}
-                <div className='svg'>{svg.gas(10)}</div>
+                <div className='svg'>{svg.gas(9)}</div>
               </div>
               <div className='panelMenuDataItem'>
-                <div className='usd'>{svg.usd(11)}</div>
+                <div className='usd'>{svg.usd(10.5)}</div>
                 <div>{this.store('external.rates.USD') ? Math.floor(this.store('external.rates.USD')) : ''}</div>
               </div>
             </div>

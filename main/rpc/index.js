@@ -139,6 +139,9 @@ const rpc = {
   setGasPrice (netType, netId, price, level, handlerId, cb) {
     accounts.setGasPrice(price, handlerId)
     store.setGasDefault(netType, netId, level, price)
+  },
+  setGasLimit (limit, handlerId, cb) {
+    accounts.setGasLimit(limit, handlerId)
   }
 }
 

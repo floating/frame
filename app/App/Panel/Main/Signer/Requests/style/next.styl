@@ -43,7 +43,6 @@
       justify-content center
       align-items center
       z-index 10
-      transition standard
 
     .txSectionNotice
       width 40px
@@ -90,7 +89,6 @@
       right 0
       bottom 0
       left 5px
-      transition standardSlow
       display flex
       text-align center
       justify-content center
@@ -133,15 +131,10 @@
     width 62px
     height 30px
     box-sizing border-box
-    // border-left 1px solid thick
-    // border-top-right-radius 3px
-    // border-bottom-right-radius 3px
-    // border-top-left-radius 15px
     border-top-right-radius 16px
     border-bottom-right-radius 16px
     border-bottom-left-radius 6px
     border-top-left-radius 6px
-    // color good
     background ghostC
     box-shadow 0px 3px 3px thick
     padding 8px
@@ -150,54 +143,70 @@
     font-size 10px
     font-weight 600
 
+  .networkFeeSelectedHaloClickwrap
+    z-index -1 !important
+
   .networkFeeSelectedHalo
-    height 36px
+    height 38px
     border-radius 19px
     position absolute 
-    top -1px
-    left 7px
-    right 7px
-    border 1px solid thick
+    top -2px
+    left 6px
+    right 6px
+    // border 1px solid doubleThick
     box-sizing border-box
     pointer-events none
-    z-index 50
+    z-index 5000000
+    box-shadow 0px 1px 5px thick
 
     .customHaloMarker
       position absolute
       top 0px
-      left 0px
+      left 72px
       bottom 0px
-      width 100%
+      right 72px
       z-index 200000000
-      overflow hidden
-      border-radius 16px
+
       .customHaloMarkerInner
         position absolute
-        top 0px
-        left 1px
-        bottom 0px
-        width 1px
-        background outerspace08
+        top -1px
+        left -3px
+        bottom -1px
+        width 8px
+        border-radius 4px
+        box-sizing border-box
+        border 3px solid rgba(255, 255, 255, 1)
+        box-shadow cardDrop, 0px 2px 2px thick
 
+        .customHaloMarkerLine
+          position absolute
+          top 0px
+          left 50%
+          bottom 0px
+          width 2px
+          border-radius 2px
+          margin-left -1px
+          background good
+          
     .networkFeeSelectedHaloClick
       position absolute
       top -1px
       left 0
       bottom 0
       right 0
-      z-index 2
+      z-index -10
       background spacewhite
       border-radius 19px
       opacity 0
 
   .networkFeeSelectedHaloShadow // Stays on currently selected fee
     background none
-    border 1px solid outerspace08 // 
+    border 2px solid outerspace08
     z-index 200001
     pointer-events none
     box-shadow none
-    transition standard
-
+    transition standardFast
+    box-shadow 0px 4px 10px thick
 
   .networkFeeOptions
     position absolute
@@ -209,22 +218,28 @@
     transform translateZ(0px)
     z-index 100
     border-top 1px solid thick
-    border-bottom 1px solid thick
+
+  .networkFeeOptionHover
+    .networkFeeOptionHoverInset
+      background highlight
+      box-shadow 0px 5px 40px 0px thick
 
   .networkFeeOption
     position relative
     height 30px
     width 100%
-    padding-bottom 10px
+    padding 5px 0px 5px 0px
+    border-radius 15px
     z-index 100
     transform translateZ(0px)
+    top -5px
 
-    .networkFeeOptionBack
+    .networkFeeOptionHoverInset
       position absolute 
-      top 0
+      top 5px
       left 0
       right 0
-      bottom 10px
+      bottom 5px
       border-radius 15px
       transform translateZ(0px)
 
@@ -247,15 +262,17 @@
     box-sizing border-box
     display flex
     justify-content center
-    font-size 13px
+    font-size 14px
     letter-spacing 0px
 
     .networkFeeTotalSection
       padding 0px 4px
 
     .networkFeeTotalETH
-      font-size 14px
-      margin-top 5px
+      font-size 16px
+      display flex
+      justify-content center
+      align-items center
 
      .networkFeeTotalUSD
        margin-top 6px
@@ -442,23 +459,51 @@
 
   .txFeeUpdateRealtime
     position absolute
-    top 65px
-    left 0px
+    top 0px
+    left 65px
     right 0px
-    bottom 85px
-    z-index 1
+    bottom 65px
+    z-index 100
     pointer-events none
-    opacity 0
-    background linear-gradient(90deg, good0, good, good, good0)
-    box-shadow 0px 2px 2px thin
+    z-index -2
+    color good
     overflow hidden
 
+
+
+  
     .txFeeUpdateRealtimeInner
       position absolute
-      top 0px
-      right 0px
-      bottom 0px
-      left 0px
+      top -200px
+      bottom -200px
+      right -200px
+      left -200px
+      color good
+      opacity 0.2
+      background-image url('./App/Panel/Main/Signer/Requests/style/wave.svg')
+      background-position 0px 0px
+
+      .txFeeUpdateRealtimeTitle
+        position absolute
+        top 0%
+        margin-top -9px
+        font-size 10px
+        padding-bottom 1px
+        left 80px
+        right 80px
+        border-radius 8px
+        // border-bottom-right-radius 16px
+        text-align center
+        color outerspace08
+        font-weight 500
+        text-transform uppercase
+        box-sizing border-box
+        z-index 40000
+        letter-spacing 2px
+        padding-left 2px
+        background rgba(255, 255, 255, 1)
+        box-shadow 0px 5px 5px doubleThick
+        display none
 
   .txFeeClose
     position absolute
@@ -515,7 +560,7 @@
       transition-delay 0.1s
 
       .txFeeGweiValue
-        width 122px
+        width 150px
         border-top-right-radius 6px
         border-bottom-right-radius 6px
 
@@ -527,24 +572,26 @@
       transition standard
 
       .txFeeGweiValue
-        width 180px
+        width 150px
         border-top-left-radius 6px
         border-bottom-left-radius 6px
 
   .txFeeSummary
     position absolute
-    left 78px
-    right 10px
-    bottom 2px
-    height 64px
-    display flex
-    justify-content space-between
-    align-items center
+    left 7px
+    right 7px
+    bottom 8px
+    height 53px
     transform translateY(100px)
-    opacity 0
+    opacity 1
+    border-top-left-radius 12px
+    border-top-right-radius 12px
+    border-bottom-left-radius 19px
+    border-bottom-right-radius 19px
+    border 1px solid thick
 
     .txFeeSummaryValue
-      font-size 19px
+      font-size 20px
       font-weight 400
       line-height 24px
       min-width 50px
@@ -552,6 +599,46 @@
       display flex
       justify-content center
 
+      .txFeeSummaryTotalUSD
+        font-size 17px
+        margin-top 1px
+
+      .txFeeSummaryTimeContext, .txFeeSummarySymbol, .txFeeSummaryEquivalentSymbol
+        font-size 16px
+        margin-top 1px
+        margin-left -1px
+
+      .txFeeSummaryUSDSymbol
+        font-size 13px
+        margin-top 1px
+        font-weight 600
+
+      .txFeeSummarySymbol
+        font-size 16px
+        margin-right 2px
+        font-weight 400
+        margin-top 0px
+        
+      .txFeeSummaryEquivalentSymbol
+        margin-left 2px
+
+      .txFeeSummaryUSDSymbol
+        margin-left 4px
+
+      .txFeeSummaryTimeValue
+        font-size 20px
+        margin 0px 1px 0px 0px
+        font-weight 400
+        min-width 12px
+        text-align right
+        letter-spacing -2px
+
+      .txFeeSummaryTimeUnit
+        font-size 14px
+        font-weight 500
+        margin-top 1px
+        margin-left 1px
+      
     .txFeeSummaryLabel
       font-size 10px
       font-weight 400
@@ -560,27 +647,36 @@
 
   .txFeeTotal
     padding 4px
-    border-radius 16px
     display flex
     justify-content center
     align-items center
     flex-direction column
     transition standard
+    border-left 1px solid thick
+    position absolute
+    top 8px
+    bottom 8px
+    right 10px
+    left 99px
+
 
   .txFeeTotalUSD
     font-size 16px
 
   .txFeeTime
-    padding 4px
-    border-radius 16px
     display flex
     justify-content center
     align-items center
     flex-direction column
     transition standard
+    width 79px
+    border-right 1px solid thick
+    position absolute
+    top 8px
+    bottom 8px
 
   .txFeeGweiValue
-    font-size 19px
+    font-size 22px
     font-weight 400
     background highlightest
     border-radius 16px
@@ -589,6 +685,19 @@
     display flex
     justify-content center
     align-items center
+
+    input 
+      background transparent
+      outline 0
+      border 0
+      height 100%
+      width 100%
+      text-align center
+      font-size 22px
+      font-weight 500
+      color outerspace08
+      font-family OpenSans, sans-serif
+      padding-bottom 3px
 
   .txFeeGweiLabel
     font-size 10px
@@ -618,7 +727,6 @@
     font-weight 400
     font-size 14px
     text-transform uppercase
-    transition standard
 
 .txFeeExpanded
   transform translateY(6px)
@@ -630,13 +738,16 @@
   border-radius 24px
 
   .customGasPriceBar
-    transition standardSlow
-    transform translate(0px, 0px) rotate(45deg)
+    transition standardSlower
+    transform translate(0px, 0px)
 
   .txFeeSummary
-    transition standardSlow
     transform translateY(0px)
     opacity 1
+
+  .txFeeSummaryHover     
+    background highlighter
+    box-shadow cardDrop, 0px 20px 25px -15px thick, 0px -25px 20px -15px thick
 
   .txFeeInputs
     transform translateY(0px)
@@ -647,16 +758,16 @@
 
 .customGasPriceBar
   position absolute
-  bottom 18px
-  left 9px
+  bottom 17px
+  left 78px
   width 40px
   height 14px
   display flex
   justify-content center
   align-items center
-  z-index 2000000000
+  z-index 2000000000000000
   transition standardFast
-  transform translate(-500px, 500px) rotate(15deg)
+  transform translate(0px, 500px) rotate(15deg)
 
   .customGasPriceBarInner
     width 2px

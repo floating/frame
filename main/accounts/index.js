@@ -424,9 +424,19 @@ class Accounts extends EventEmitter {
   }
 
   setGasPrice (price, handlerId) {
+    console.warn('VALIDATE GAS PRICE UPDATES')
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
       this.current().requests[handlerId].data.gasPrice = price
+      this.current().update()
+    }
+  }
+
+  setGasLimit (limit, handlerId) {
+    console.warn('VALIDATE GAS LIMIT UPDATES')
+    if (!this.current()) return // cb(new Error('No Account Selected'))
+    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      this.current().requests[handlerId].data.gas = limit
       this.current().update()
     }
   }

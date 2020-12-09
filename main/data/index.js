@@ -54,7 +54,7 @@ const onData = data => {
         fastTime: gas.fastTime,
         asap: ('0x' + gweiToWei(gas.asap).toString(16)),
         asapTime: gas.asapTime,
-        custom: store('main.networks.ethereum.1.gas.price.levels.custom') || ('0x' + (prices.standard * 100000000).toString(16)),
+        custom: store('main.networks.ethereum.1.gas.price.levels.custom') || ('0x' + gweiToWei(gas.standard).toString(16)),
         lastUpdate: gas.lastUpdate,
         quality: gas.quality,
         source: gas.source
