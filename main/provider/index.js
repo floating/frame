@@ -260,8 +260,6 @@ class Provider extends EventEmitter {
         if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
         const { lastUpdate, quality } = store('main.networks', network.type, network.id, 'gas.price')
         if (lastUpdate && (Date.now() - lastUpdate < 20 * 1000) && quality !== 'stale') {
-          // use curennt gas store values
-          console.log('Using current gas store as it is up to date... ')
           const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
           res({ result: levels[selected] })
         } else {

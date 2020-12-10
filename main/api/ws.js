@@ -5,6 +5,7 @@ const log = require('electron-log')
 const provider = require('../provider')
 const accounts = require('../accounts')
 const store = require('../store')
+const windows = require('../windows')
 
 const trusted = require('./trusted')
 const validPayload = require('./validPayload')
@@ -37,6 +38,8 @@ const handler = (socket, req) => {
         origin = 'frame-extension'
       }
     }
+    // Extension custom action for summoning Frame
+    if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.showTray()
     if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
