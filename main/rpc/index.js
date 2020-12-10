@@ -137,11 +137,11 @@ const rpc = {
     accounts.verifyAddress(true, cb)
   },
   setGasPrice (netType, netId, price, level, handlerId, cb) {
-    accounts.setGasPrice(price, handlerId)
+    accounts.setGasPrice(price, handlerId, cb)
     store.setGasDefault(netType, netId, level, price)
   },
   setGasLimit (limit, handlerId, cb) {
-    accounts.setGasLimit(limit, handlerId)
+    accounts.setGasLimit(limit, handlerId, cb)
   }
 }
 

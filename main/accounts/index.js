@@ -24,6 +24,8 @@ const notify = (title, body, action) => {
   }, 1000)
 }
 
+const FEE_MAX = 2 * 1e18
+
 class Accounts extends EventEmitter {
   constructor () {
     super()
@@ -423,21 +425,37 @@ class Accounts extends EventEmitter {
     }, 1000)
   }
 
-  setGasPrice (price, handlerId) {
+  setGasPrice (price, handlerId, cb) {
+    if (!price || isNaN(parseInt(price, 'hex')) || parseInt(price, 'hex') < 0) return cb(new Error('Invalid price'))
     console.warn('VALIDATE GAS PRICE UPDATES')
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      if (parseInt(price, 'hex') > 9999 * 1e9) price = '0x' + (9999 * 1e8).toString(16)
+      const gasLimit = this.current().requests[handlerId].data.gas
+      if (parseInt(price, 'hex') * parseInt(gasLimit, 'hex') > FEE_MAX) {
+        cb(new Error('Rejected: Operation would set fee over hard limit'))
+        price = '0x' + Math.ceil(FEE_MAX / parseInt(gasLimit, 'hex')).toString(16)
+      }
       this.current().requests[handlerId].data.gasPrice = price
       this.current().update()
+      cb()
     }
   }
 
-  setGasLimit (limit, handlerId) {
+  setGasLimit (limit, handlerId, cb) {
+    if (!limit || isNaN(parseInt(limit, 'hex')) || parseInt(limit, 'hex') < 0) return cb(new Error('Invalid limit'))
     console.warn('VALIDATE GAS LIMIT UPDATES')
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      if (parseInt(limit, 'hex') > 12.5e6) limit = '0x' + (12.5e6).toString(16)
+      const gasPrice = this.current().requests[handlerId].data.gasPrice
+      if (parseInt(limit, 'hex') * parseInt(gasPrice, 'hex') > FEE_MAX) {
+        cb(new Error('Rejected: Operation would set fee over hard limit'))
+        limit = '0x' + Math.ceil(FEE_MAX / parseInt(gasPrice, 'hex')).toString(16)
+      }
       this.current().requests[handlerId].data.gas = limit
       this.current().update()
+      cb()
     }
   }
 

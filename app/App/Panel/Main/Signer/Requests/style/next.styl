@@ -459,8 +459,8 @@
 
   .txFeeUpdateRealtime
     position absolute
-    top 0px
-    left 65px
+    top 65px
+    left 0px
     right 0px
     bottom 65px
     z-index 100
@@ -469,9 +469,6 @@
     color good
     overflow hidden
 
-
-
-  
     .txFeeUpdateRealtimeInner
       position absolute
       top -200px
@@ -634,9 +631,9 @@
         letter-spacing -2px
 
       .txFeeSummaryTimeUnit
-        font-size 14px
+        font-size 13px
         font-weight 500
-        margin-top 1px
+        margin-top 0px
         margin-left 1px
       
     .txFeeSummaryLabel
@@ -656,9 +653,14 @@
     position absolute
     top 8px
     bottom 8px
-    right 10px
-    left 99px
+    right 0px
+    left 95px
 
+  .txFeeTotalWarn
+    .txFeeSummaryTotalUSD
+      color bad
+    .txFeeSummaryUSDSymbol
+      color bad
 
   .txFeeTotalUSD
     font-size 16px
@@ -669,9 +671,10 @@
     align-items center
     flex-direction column
     transition standard
-    width 79px
+    width 69px
     border-right 1px solid thick
     position absolute
+    left 0
     top 8px
     bottom 8px
 
@@ -686,18 +689,22 @@
     justify-content center
     align-items center
 
+    ::selection
+      background: doubleThick
+
     input 
       background transparent
       outline 0
       border 0
-      height 100%
+      border-radius 16px
+      height 24px
+      padding 4px 4px 7px 4px
       width 100%
       text-align center
       font-size 22px
       font-weight 500
       color outerspace08
       font-family OpenSans, sans-serif
-      padding-bottom 3px
 
   .txFeeGweiLabel
     font-size 10px
@@ -748,6 +755,7 @@
   .txFeeSummaryHover     
     background highlighter
     box-shadow cardDrop, 0px 20px 25px -15px thick, 0px -25px 20px -15px thick
+    transition standardSlow
 
   .txFeeInputs
     transform translateY(0px)
@@ -759,7 +767,7 @@
 .customGasPriceBar
   position absolute
   bottom 17px
-  left 78px
+  left 71px
   width 40px
   height 14px
   display flex

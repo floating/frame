@@ -119,8 +119,9 @@ class Settings extends React.Component {
 
   discord () {
     return (
-      <div className='quitFrame'>
-        <div onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/pE5EXGXMeS')} className='quitFrameButton'>Need help? Join our Discord!</div>
+      <div className='discordInvite' onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
+        <div>Need help or have a request?</div>
+        <div className='discordLink'>Join our Discord!</div>
       </div>
     )
   }
@@ -237,7 +238,7 @@ class Settings extends React.Component {
           <div className='localSettingsTitle'>
             <div className='localSettingsTitleText'>Settings</div>
           </div>
-          <div className='signerPermission'  style={{ zIndex: 7 }}>
+          <div className='signerPermission' style={{ zIndex: 7 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
@@ -248,7 +249,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission'  style={{ zIndex: 6 }}>
+          <div className='signerPermission' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -267,7 +268,9 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              Summon Frame by pressing Alt+Space
+              <span>
+                Summon Frame by pressing <span className='keyCommand'> Alt+Space </span>
+              </span>
             </div>
           </div>
           {this.store('platform') === 'darwin' ? (
