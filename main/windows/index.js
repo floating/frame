@@ -115,12 +115,10 @@ const api = {
       }, 2000)
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) {
-      setTimeout(() => {
-        windows.tray.on('blur', _ => api.hideTray())
-        windows.tray.focus()
-      }, 1260)
-    }
+    setTimeout(() => {
+      windows.tray.on('blur', _ => store('main.autohide') ? api.hideTray(true) : null)
+      windows.tray.focus()
+    }, 1260)
     if (!openedAtLogin) {
       setTimeout(() => {
         if (windows && windows.tray) windows.tray.show()
@@ -173,10 +171,18 @@ const api = {
     api.create()
   },
   trayClick: () => {
+    if (this.recentAutohide) return
     const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
     showing ? api.hideTray() : api.showTray()
   },
-  hideTray: () => {
+  hideTray: (autohide) => {
+    if (autohide) {
+      this.recentAutohide = true
+      clearTimeout(this.recentAutohide)
+      this.recentAutohideTimeout = setTimeout(() => {
+        this.recentAutohide = false
+      }, 400)
+    }
     hideShow.current = 'hidden'
     if (hideShow.running) {
       hideShow.next = false

@@ -244,6 +244,7 @@ class Ledger extends Signer {
           log.error('Device Status: Cannot write to HID device')
         }
         if (err.message === 'Invalid sequence') this.invalid = true
+        if (err.message.indexOf('UNKNOWN_ERROR') > -1) this.status = 'Please reconnect this Ledger device'
         this.addresses = []
         this.update()
       }

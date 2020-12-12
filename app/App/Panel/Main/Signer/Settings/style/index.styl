@@ -113,11 +113,13 @@
 
   .keyCommand
     margin-left 2px
-    padding 0px 4px 2px 4px
-    font-weight 400
-    border-radius 4px
+    padding 1px 6px 2px 6px
+    font-weight 300
+    border-radius 5px
     font-size 12px
-    border 1px solid outerspace02
+    border 1px solid outerspace05
+    color outerspace
+    height 30px
 
   .nodeProviderStatus
     display flex
@@ -167,7 +169,7 @@
       width 16px
       border-radius 10px
       transition standard
-      background #f3f6fd
+      background highlight
       box-shadow 0px 6px 6px -2px rgba(0,20,60,0.15), 0px 1px 2px 0px rgba(0,20,60,0.05)
       transform translateZ(0)
 
@@ -175,6 +177,11 @@
     background good
     .signerPermissionToggleSwitch
       position absolute
-      left 22px
+      transform translateX(20px)
+
+  .signerPermissionToggle:hover
+    .signerPermissionToggleSwitch
+      background highlightest
+
 
 @import '../RenameAccount'

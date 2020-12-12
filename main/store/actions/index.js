@@ -146,6 +146,9 @@ module.exports = {
   setAltSpace: (u, v) => {
     u('main.shortcuts.altSpace', () => v)
   },
+  setAutohide: (u, v) => {
+    u('main.autohide', () => v)
+  },
   setGasPrices: (u, netType, netId, prices) => {
     u('main.networks', netType, netId, 'gas.price.levels', () => prices)
   },

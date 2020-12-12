@@ -28,8 +28,11 @@
     overflow hidden
     box-shadow cardDrop, 0px 2px 1px thin
     padding 0px 0px 0px 0px
-    transition standard
+    transition standard, 0s linear background
     transform translateZ(0)
+    
+  .localSettingsAddNetwork:hover
+    background highlighter
 
   .localSettingsWrapFadeTop
     position absolute
@@ -131,24 +134,26 @@
   color outerspace08
 
 .discordInvite:hover
-  background ghostF
+  .discordLink
+    position relative 
+    transform translateY(-2px)
+    color outerspace08
 
 .discordInvite
   margin 32px 8px 0px 8px 
-  font-size 12px
-  font-weight 400
-  height 32px
-  border-radius 16px
+  font-size 13px
+  font-weight 300
+  border-radius 20px
   display flex
   justify-content center
   align-items center
   width calc(100% - 16px)
-  background lowlight
-  color outerspace08
 
   .discordLink
     font-weight 600
     padding-left 5px
+    transition standardFast
+    transform translateY(0px)
 
 .quitFrame
   padding 10px

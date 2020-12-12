@@ -88,6 +88,7 @@ const initial = {
     }),
     launch: main('launch', false),
     reveal: main('reveal', false),
+    autohide: main('autohide', false),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),

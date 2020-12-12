@@ -39,7 +39,7 @@ const handler = (socket, req) => {
       }
     }
     // Extension custom action for summoning Frame
-    if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.showTray()
+    if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick(true)
     if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
