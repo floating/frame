@@ -242,7 +242,7 @@ class TransactionFee extends React.Component {
     limit = limit > 12.5e6 ? 12.5e6 : limit
     if (price === weiHexToGweiInt(this.props.req.data.gasPrice)) { // If the price is unchanged, adjust limit
       if (gweiToWei(price) * limit > FEE_MAX_TOTAL_ETH_WEI) limit = Math.floor(FEE_MAX_TOTAL_ETH_WEI / gweiToWei(price))
-    } else {// Adjust price, if price * limit is over fee max set price to highest possible
+    } else { // Adjust price, if price * limit is over fee max set price to highest possible
       if (gweiToWei(price) * limit > FEE_MAX_TOTAL_ETH_WEI) price = Math.floor(FEE_MAX_TOTAL_ETH_WEI / limit / 1e9)
     }
     return { price, limit }
@@ -284,7 +284,7 @@ class TransactionFee extends React.Component {
           { opacity: 1, transform: 'scale(1)' },
           { opacity: 0.5, transform: 'scale(2.5)' },
           { opacity: 0, transform: 'scale(3)' }
-        ], 
+        ],
         { duration: 700, iterations: 1, easing: 'ease-out' }
       )
     }
@@ -442,7 +442,7 @@ class TransactionFee extends React.Component {
                     e.preventDefault()
                     const { inputGwei } = this.state
                     const price = inputGwei - 1 < 0 ? 0 : inputGwei - 1
-                    this.setState({ inputGwei: price})
+                    this.setState({ inputGwei: price })
                     this.setGasPrice(network.type, network.id, gweiToWeiHex(price), 'custom')
                   }
                 }}
@@ -453,7 +453,7 @@ class TransactionFee extends React.Component {
                   this.handleCustomPriceHoverReset()
                   this.setState({ hoverGwei: 0, hoverLevel: '', gasPriceInputFocus: false })
                   setTimeout(() => {
-                    this.setState({ inputGwei: 0  })
+                    this.setState({ inputGwei: 0 })
                   }, 100)
                 }}
               />
@@ -481,13 +481,13 @@ class TransactionFee extends React.Component {
                     e.preventDefault()
                     const { inputLimit } = this.state
                     const limit = inputLimit + 1000 > 12.5e6 ? 12.5e6 : inputLimit + 1000
-                    this.setState({ inputLimit: limit }) 
+                    this.setState({ inputLimit: limit })
                     this.setGasLimit('0x' + parseInt(limit).toString(16))
                   } else if (e.key === 'ArrowDown') {
                     e.preventDefault()
                     const { inputLimit } = this.state
                     const limit = inputLimit - 1000 < 0 ? 0 : inputLimit - 1000
-                    this.setState({ inputLimit: limit }) 
+                    this.setState({ inputLimit: limit })
                     this.setGasLimit('0x' + parseInt(limit).toString(16))
                   }
                 }}
@@ -497,7 +497,7 @@ class TransactionFee extends React.Component {
                 onBlur={() => {
                   this.setState({ gasLimitInputFocus: false })
                   setTimeout(() => {
-                    this.setState({ inputLimit: 0  })
+                    this.setState({ inputLimit: 0 })
                   }, 100)
                 }}
               />

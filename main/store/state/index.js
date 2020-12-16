@@ -88,7 +88,7 @@ const initial = {
     }),
     launch: main('launch', false),
     reveal: main('reveal', false),
-    autohide: main('autohide', false),
+    autohide: main('autohide', true),
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
@@ -141,6 +141,7 @@ const initial = {
           local: 'direct'
         },
         1: {
+          alchemy: ['wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0', 'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'],
           infura: 'infura'
         },
         3: {
@@ -368,6 +369,7 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
   // Update safelow -> slow and trader -> asap
   if (initial.main.networks.ethereum[id].gas.price.selected === 'safelow') initial.main.networks.ethereum[id].gas.price.selected = 'slow'
   if (initial.main.networks.ethereum[id].gas.price.selected === 'trader') initial.main.networks.ethereum[id].gas.price.selected = 'asap'
+  if (initial.main.networks.ethereum[id].gas.price.selected === 'custom') initial.main.networks.ethereum[id].gas.price.selected = initial.main.networks.ethereum[id].gas.price.lastLevel || 'standard'
 })
 
 // If migrating from before this was a setting make it 'true' to grandfather behavior

@@ -60,7 +60,7 @@ const handler = (socket, req) => {
       })
     }
   })
-  socket.on('error', err => err) // Handle Error
+  socket.on('error', err => log.error(err))
   socket.on('close', _ => {
     Object.keys(subs).forEach(sub => {
       if (subs[sub].socket.id === socket.id) {

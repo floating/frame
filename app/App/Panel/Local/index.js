@@ -263,13 +263,13 @@ class Settings extends React.Component {
           {this.store('platform') === 'darwin' ? (
             <div className='signerPermission' style={{ zIndex: 6 }}>
               <div className='signerPermissionControls'>
-                <div className='signerPermissionOrigin'>Display Gas Price in Menubar</div>
+                <div className='signerPermissionOrigin'>Display Gas in Menubar</div>
                 <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
               </div>
               <div className='signerPermissionDetails'>
-                Show mainnet gas price (Gwei) in menubar 
+                Show mainnet gas price (Gwei) in menubar
               </div>
             </div>
           ) : null}
@@ -327,7 +327,7 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission' style={{ zIndex: 1 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Autohide</div>
+              <div className='signerPermissionOrigin'>Auto-hide</div>
               <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
                 <div className='signerPermissionToggleSwitch' />
               </div>

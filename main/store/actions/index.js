@@ -154,7 +154,11 @@ module.exports = {
   },
   setGasDefault: (u, netType, netId, level, price) => {
     u('main.networks', netType, netId, 'gas.price.selected', () => level)
-    if (level === 'custom') u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+    if (level === 'custom') {
+      u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+    } else {
+      u('main.networks', netType, netId, 'gas.price.lastLevel', () => level)
+    }
   },
   addNetwork: (u, net) => {
     const defaultNetwork = {

@@ -7,7 +7,8 @@ const Status = ({ client }) => {
   return (
     <div className='connectionOptionStatus'>
       <Indicator state={state} />
-      {state === 'syncing' && !isNaN(syncPercentage) ? (
+      {state === 'syncing' && 
+      !isNaN(syncPercentage) ? (
         <div className='connectionOptionStatusText'>{state} ({syncPercentage} %)</div>
       ) : (
         <div className='connectionOptionStatusText'>{state}</div>
