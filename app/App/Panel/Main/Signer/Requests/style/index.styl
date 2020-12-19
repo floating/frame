@@ -576,7 +576,6 @@
       justify-content center
       align-items center
       text-transform uppercase
-      letter-spacing 2px
       font-weight 400
       font-size 14px
       background highlight
@@ -584,6 +583,28 @@
       border-top-left-radius 16px
       border-top-right-radius 16px
       box-shadow 0px 1px 0px thick
+
+      .approveRequestHeaderTitle
+        text-align center
+        letter-spacing 2px
+
+      .approveRequestHeaderTag
+        position absolute
+        bottom -8px
+        left 100px
+        right 100px
+        height 16px
+        border-radius 8px
+        box-sizing border-box
+        padding-top 1px
+        font-size 10px
+        text-align center
+        font-weight 500
+        background good
+        color white
+
+      .approveRequestHeaderTagInvalid
+        background bad
 
       .approveRequestHeaderIcon
         width 40px
@@ -1349,9 +1370,9 @@ span
 // .txDetails:hover, .txStatus:hover
 //   background highlighter
 
-// .txDetailsShow
-//   opacity 1
-//   transform translateY(0px)
+.txDetailsShow
+  opacity 1
+  transform translateY(0px)
 
 .txStatus
   position absolute
@@ -1360,11 +1381,11 @@ span
   right 5px
   bottom 100px
   border-radius 16px
-  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
-  // box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
+  // box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
+  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
   text-align center
   box-sizing border-box
-  background rgba(255, 255, 255, 0.05)
+  // background rgba(255, 255, 255, 0.05)
   background highlight
   z-index 100000
   font-size 12px

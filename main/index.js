@@ -7,6 +7,8 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('enable-transparent-visuals', true)
 if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
+console.log('process.version', process.version)
+
 const log = require('electron-log')
 const path = require('path')
 

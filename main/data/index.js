@@ -19,6 +19,7 @@ const log = require('electron-log')
 const WebSocket = require('ws')
 
 const store = require('../store')
+const accounts = require('../accounts')
 
 let socket, reconnectTimer, connected
 
@@ -28,9 +29,9 @@ const reconnect = now => {
   reconnectTimer = setInterval(() => setUpSocket('reconnectTimer'), now ? 0 : 15 * 1000)
 }
 
-const onOpen = () => {
-  clearTimeout(reconnectTimer)
-}
+// const onOpen = () => {
+//   clearTimeout(reconnectTimer)
+// }
 
 // const weiToGwei = v => v / 1e9
 const gweiToWei = v => v * 1e9
@@ -59,6 +60,7 @@ const onData = data => {
         quality: gas.quality,
         source: gas.source
       })
+      accounts.checkBetterGasPrice()
     }
   } catch (e) {
     log.error('Frame Socket Data Error: ', e)
