@@ -156,7 +156,15 @@ app.on('ready', () => {
     if (altspace) {
       console.log('registering shortcut')
       globalShortcut.unregister('Alt+Space')
-      globalShortcut.register('Alt+Space', () => windows.trayClick())
+      let showing = false
+      globalShortcut.register('Alt+Space', () => {
+        showing = !showing
+        if (showing) {
+          windows.showFlow()
+        } else {
+          windows.hideFlow()
+        }
+      })
     } else {
       globalShortcut.unregister('Alt+Space')
     }

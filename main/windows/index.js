@@ -5,6 +5,9 @@ const log = require('electron-log')
 
 const store = require('../store')
 
+const dapp = require('./dapp')
+const winSession = e => e.sender.webContents.browserWindowOptions.session
+
 const dev = process.env.NODE_ENV === 'development'
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
@@ -30,6 +33,10 @@ const topRight = (window) => {
     x: Math.floor(screenSize.x + screenSize.width - windowSize[0]),
     y: screenSize.y
   }
+}
+
+const timeout = ms => {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 const detectMouse = () => {
@@ -169,6 +176,7 @@ const api = {
     })
     tray.on('click', api.trayClick)
     api.create()
+    api.flow()
   },
   trayClick: () => {
     if (this.recentAutohide) return
@@ -271,6 +279,50 @@ const api = {
   },
   quit: () => {
     app.quit()
+  },
+  close: (e) => {
+    const id = winSession(e)
+    if (windows[id]) {
+      windows[id].setClosable(true)
+      windows[id].close()
+    }
+    delete windows[id]
+  },
+  flow: () => {
+    windows.flow = new BrowserWindow({
+      id: 'flow',
+      width: 900,
+      height: 200,
+      frame: false,
+      transparent: true,
+      hasShadow: false,
+      show: false,
+      backgroundThrottling: false,
+      offscreen: true,
+      // icon: path.join(__dirname, './AppIcon.png'),
+      skipTaskbar: process.platform !== 'linux',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
+        disableBlinkFeatures: 'Auxclick',
+        enableRemoteModule: false,
+        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+        worldSafeExecuteJavaScript: true
+      }
+    })
+    windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
+    // windows.flow.setAlwaysOnTop(true)
+    if (dev) windows.flow.openDevTools()
+  },
+  showFlow: () => {
+    windows.flow.show()
+  },
+  hideFlow: () => {
+    windows.flow.hide()
+  },
+  openView: (ens, session) => {
+    dapp.openView(ens, session, windows)
   }
 }
 
@@ -285,10 +337,12 @@ if (dev) {
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) windows.tray.send('main:reload:style', name)
+    if (name.indexOf('css') > -1) windows.flow.send('main:reload:style', name)
   })
   app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       windows.tray.reload()
+      windows.flow.reload()
     })
   })
 }

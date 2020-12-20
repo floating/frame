@@ -1,0 +1,209 @@
+// Colors
+bg = #dadfea // #dce1e8
+v = #4e5758
+outerspace01 = rgba(33, 45, 46, 0.1)
+outerspace02 = rgba(33, 45, 46, 0.2)
+outerspace03 = rgba(33, 45, 46, 0.3)
+outerspace05 = rgba(33, 45, 46, 0.5)
+outerspace08 = rgba(33, 45, 46, 0.8)
+nebula = #3a4547
+outerspace = #212d2e
+outerspaceShade = #1c2526
+outerspaceLight = #29393a
+outerspacePulse = #395153
+outerspacePhase = rgba(30, 65, 70, 1)
+outerspacePhaseDark = rgba(20, 45, 50, 1)
+outerspaceShader = rgb(16, 36, 38) // rgb(24, 54, 56)
+outerspaceDark = #0b1819
+outerspaceDarker = #02090a
+spacewhite = rgba(247, 251, 255, 1)
+spacewhite07 = rgba(247, 251, 255, 0.7)
+spacewhite05 = rgba(247, 251, 255, 0.5)
+
+ghostA = rgba(252, 255, 255, 1)
+ghostB = rgba(248, 254, 255, 1)
+ghostC = rgba(244, 250, 255, 1)
+ghostD = rgba(240, 246, 255, 1)
+ghostE = rgba(237, 242, 253, 1)
+ghostF = rgba(235, 240, 250, 1)
+ghostG = rgba(232, 236, 248, 1)
+ghostH = rgba(227, 232, 245, 1)
+
+highlightest = rgba(243, 250, 255, 1)
+highlighter = rgba(240, 246, 255, 1)
+highlight = rgba(237, 242, 255, 1)
+lowlight = rgba(232, 236, 248, 1)
+lowerlight = rgba(227, 232, 250, 1)
+light = #eaf0f9
+lightShade = rgba(220, 224, 244, 1) // #d9e1ef
+thinner = rgba(16, 44, 180, .02)
+thin = rgba(16, 44, 180, .04)
+thick = rgba(16, 44, 180, .07)
+doubleThick = rgba(16, 44, 180, .14)
+tripleThick = rgba(16, 44, 180, .21)
+thick0 = rgba(16, 44, 180, 0)
+
+hardware = rgba(110, 230, 255, 1)
+smart = rgba(150, 255, 210, 1)
+smart04 = rgba(150, 255, 210, 0.4)
+smart02 = rgba(150, 255, 210, 0.2)
+smartShade = rgba(100, 205, 150, 1)
+hot = rgba(255, 150, 150, 1)
+
+shader = rgba(16, 44, 60, 0.7)
+
+oldPhase = #212d2e
+oldPhaseShade = #1c2526
+
+phase = rgba(18, 45, 56, 1)
+phaseLight = rgba(28, 60, 76, 1)
+phaseLighter = rgba(38, 70, 86, 1)
+phaseShade = rgba(8 , 20, 26, 1)
+
+good = rgb(0, 210, 180)
+goodShade = rgb(0, 190, 160)
+good0 = rgba(0, 210, 180, 0)
+good01 = rgba(0, 210, 180, 0.1)
+good02 = rgba(0, 210, 180, 0.2)
+good03 = rgba(0, 210, 180, 0.3)
+good04 = rgba(0, 210, 180, 0.4)
+good06 = rgba(0, 210, 180, 0.6)
+
+bad = rgb(250, 100, 155)
+bad01 = rgba(250, 100, 155, 0.1)
+bad04 = rgba(250, 100, 155, 0.4)
+bad06 = rgba(250, 100, 155, 0.6)
+badLight = rgb(255, 104, 159)
+badLighter = rgb(255, 107, 163)
+badShade = rgb(230, 80, 135)
+badDark = rgb(100, 0, 00)
+
+pendingHighlight = rgb(104, 121, 255)
+pending = rgb(94, 110, 255)
+pending02 = rgba(94, 110, 255, 0.4)
+pending01 = rgba(94, 110, 255, 0.2)
+pending04 = rgba(94, 110, 255, 0.4)
+pendingShade = rgb(74, 90, 235)
+pendingShader = rgb(64, 80, 225)
+
+// Shadows
+cardDrop = 0px 1px 1px rgba(0, 34, 32, 0.1)
+
+// Transistions
+standard = .32s cubic-bezier(.82,0,.12,1) all
+standardSlow = .64s cubic-bezier(.82,0,.12,1) all
+standardSlower = .96s cubic-bezier(.82,0,.12,1) all
+standardSlowest = 1.6s cubic-bezier(.82,0,.12,1) all
+standardFast = .16s cubic-bezier(.82,0,.12,1) all
+// 0.18s cubic-bezier(0.8, 1, 0.2, 1) all
+cubic = cubic-bezier(.82,0,.12,1)
+
+html, body
+  margin 0
+  border 0
+  font-family OpenSans
+  font-weight 300
+  -webkit-app-region no-drag
+  overflow hidden
+  color outerspace
+
+div
+  user-select none
+  cursor default
+
+::-webkit-scrollbar
+  width 0px
+  background transparent
+
+#flow
+  position absolute
+  top 20px
+  right 20px
+  bottom 20px
+  left 20px
+  border-radius 16px
+  background rgba(228, 232, 248, 0.1)
+  box-shadow 0px 9px 10px rgba(24, 24, 124, 0.1)
+
+  .bar
+    background rgba(238, 242, 248, 1)
+    position absolute 
+    height 60px
+    width 700px
+    top 50%
+    left 50%
+    margin-top -30px
+    margin-left -350px
+    border-radius 8px
+    box-shadow 0px 9px 10px rgba(24, 24, 124, 0.1)
+
+    input 
+      position absolute
+      top 0 
+      right 0
+      bottom 0
+      left 0
+      width 100%
+      height 100%
+      outline none
+      border none 
+      background transparent
+      padding 0px 20px
+      font-family Raleway, sans-serif
+      color outerspace08
+      font-size 28px
+    
+
+
+
+
+  // background rgba(228, 232, 248, 1)
+  // margin 0px
+  // border-radius 12px
+  // box-shadow 0px 1px 5px 1px rgba(33, 45, 46, 0.1), 0px 0px 0px 1px rgba(110, 120, 140, 0.2)
+  // overflow hidden
+
+//   #bar
+//     right 360px
+
+//   #bot
+//     left 5px
+//     right 360px
+
+//   #drop
+//     left 5px
+//     bottom 5px
+//     right 360px
+//     border-radius 3px
+
+//   #views
+//     right 360px
+//     bottom 5px
+//     left 5px
+//     border-bottom-right-radius 3px
+//     border-bottom-left-radius 3px
+
+//     .screen
+//       z-index 20000
+
+// .session
+//   position fixed
+//   top 0px
+//   right 15px
+//   height 37px
+//   font-weight 400
+//   border-bottom-left-radius 4px
+//   display flex
+//   justify-content center
+//   align-items center
+//   user-select none
+//   cursor default
+//   font-size 14px
+//   transition standard
+//   z-index 1000
+
+// .hidden
+//   visibility hidden
+
+// @import './App/Panel/style'
+// @import './App/Components/'

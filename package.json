@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.3.8",
+  "version": "0.4.0-next",
   "description": "System-wide web3",
   "main": "main",
   "build": {
@@ -28,8 +28,8 @@
   },
   "scripts": {
     "start": "npm run launch",
-    "bundle": "parcel build app/tray.html --public-url . -d bundle --target browser && parcel build app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
-    "watch": "parcel watch app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron --no-hmr & parcel watch app/tray.html --public-url . -d bundle --target browser --no-hmr",
+    "bundle": "parcel build app/tray.html --public-url . -d bundle --target browser && parcel build flow/flow.html --public-url . -d bundle --target browser && parcel build dapp/dapp.html --public-url . -d bundle --target browser && parcel build app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron && parcel build main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
+    "watch": "parcel watch app/bridge/index.js --public-url . -d bundle -o bridge.js --target electron --no-hmr & parcel watch app/tray.html --public-url . -d bundle --target browser --no-hmr & parcel watch flow/flow.html --public-url . -d bundle --target browser --no-hmr & parcel watch dapp/dapp.html --public-url . -d bundle --target browser --no-hmr && parcel watch main/dapps/server/inject/index.js --public-url . -d bundle -o inject.js --target browser",
     "dev": "npm run bundle && npm run launch:dev",
     "dev:traffic": "npm run bundle && npm run launch:dev:traffic",
     "inspect": "npm run bundle && npm run launch:inspect",
@@ -74,6 +74,7 @@
     "axios": "0.21.0",
     "babel-polyfill": "6.26.0",
     "bip39": "3.0.3",
+    "cheerio": "^1.0.0-rc.3",
     "conf": "7.1.2",
     "content-hash": "2.5.2",
     "cross-env": "7.0.3",
@@ -90,7 +91,9 @@
     "ethereumjs-wallet": "1.0.1",
     "extract-zip": "2.0.1",
     "fs-extra": "9.0.1",
+    "get-pixels": "3.3.2",
     "hdkey": "2.0.1",
+    "ipfs-core": "^0.3.1",
     "node-fetch": "2.6.1",
     "node-hid": "2.1.1",
     "query-string": "6.13.7",

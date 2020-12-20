@@ -33,3 +33,13 @@ ipcRenderer.on('main:flex', (...args) => {
 ipcRenderer.on('main:reload:style', (e, name, ok) => {
   window.postMessage(wrap({ method: 'reload', type: 'css', target: name }), '*')
 })
+
+ipcRenderer.on('main:location', (...args) => {
+  args.shift()
+  window.postMessage(wrap({ channel: 'location', args, source, method: 'event' }), '*')
+})
+
+ipcRenderer.on('main:dapp', (...args) => {
+  args.shift()
+  window.postMessage(wrap({ channel: 'dapp', args, source, method: 'event' }), '*')
+})

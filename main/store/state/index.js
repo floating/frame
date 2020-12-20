@@ -286,7 +286,18 @@ const initial = {
           }
         }
       }
-    })
+    }),
+    ipfs: {},
+    openDapps: [],
+    dapp: {
+      details: {},
+      map: {
+        added: [],
+        docked: []
+      },
+      storage: {},
+      removed: []
+    }
   }
 }
 

@@ -267,6 +267,74 @@ module.exports = {
       }
       return main
     })
+  },
+  // Flow
+  addDapp: (u, namehash, data, options = { docked: false, added: false }) => {
+    u(`main.dapp.details.${namehash}`, () => data)
+    u('main.dapp.map', map => {
+      if (options.docked && map.docked.length <= 10) {
+        map.docked.push(namehash)
+      } else {
+        map.added.unshift(namehash)
+      }
+      return map
+    })
+  },
+  setDappOpen: (u, ens, open) => {
+    u('main.openDapps', (dapps) => {
+      if (open) {
+        if (dapps.indexOf(ens) === -1) dapps.push(ens)
+      } else {
+        dapps = dapps.filter(e => e !== ens)
+      }
+      return dapps
+    })
+  },
+  removeDapp: (u, namehash) => {
+    u('main.dapp.details', (dapps) => {
+      dapps = { ...dapps }
+      delete dapps[namehash]
+      return dapps
+    })
+    u('main.dapp.map', map => {
+      let index = map.added.indexOf(namehash)
+      if (index !== -1) {
+        map.added.splice(index, 1)
+      } else {
+        index = map.docked.indexOf(namehash)
+        if (index !== -1) map.docked.splice(index, 1)
+      }
+      return map
+    })
+  },
+  moveDapp: (u, fromArea, fromIndex, toArea, toIndex) => {
+    u('main.dapp.map', map => {
+      const hash = map[fromArea][fromIndex]
+      map[fromArea].splice(fromIndex, 1)
+      map[toArea].splice(toIndex, 0, hash)
+      return map
+    })
+  },
+  updateDapp: (u, namehash, data) => {
+    // console.log('updateDapp', namehash, data)
+    u(`main.dapp.details.${namehash}`, (oldData) => {
+      return { ...oldData, ...data }
+    })
+  },
+  setDappStorage: (u, hash, state) => {
+    if (state) u(`main.dapp.storage.${hash}`, () => state)
+  },
+  expandDock: (u, expand) => {
+    u('dock.expand', (s) => expand)
+  },
+  pin: (u) => {
+    u('main.pin', pin => !pin)
+  },
+  saveAccount: (u, id) => {
+    u('main.save.account', () => id)
+  },
+  setIPFS: (u, ipfs) => {
+    u('main.ipfs', () => ipfs)
   }
   // __overwrite: (path, value) => u(path, () => value)
 }
