@@ -27,6 +27,8 @@ class Flex extends EventEmitter {
 
 const flex = new Flex()
 
+flex.setMaxListeners(128)
+
 const handlers = {}
 
 ipcMain.on('tray:flex:res', (sender, id, ...args) => {

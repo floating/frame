@@ -49,7 +49,7 @@ class ProviderRequest extends React.Component {
             <div className='approveTransactionPayload'>
               <div className='approveRequestHeader approveTransactionHeader'>
                 <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
-                <div className='approveRequestHeaderLabel'> {'Connection'}</div>
+                <div className='approveRequestHeaderLabel'> Connection</div>
               </div>
               <div className='requestProvider bounceIn'>
                 <div className={originClass}>{origin}</div>
@@ -59,10 +59,10 @@ class ProviderRequest extends React.Component {
           )}
         </div>
         <div className='requestApprove'>
-          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, false) }}>
+          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:giveAccess', this.props.req, false) }}>
             <div className='requestDeclineButton'>Decline</div>
           </div>
-          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, true) }}>
+          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:giveAccess', this.props.req, true) }}>
             <div className='requestSignButton'>Approve</div>
           </div>
         </div>

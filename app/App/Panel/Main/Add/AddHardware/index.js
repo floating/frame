@@ -52,7 +52,7 @@ class AddHardware extends React.Component {
             ) : (
               <div className='addAccountItemDevice'>
                 <div className='addAccountItemDeviceTitle'>
-                  {'No Devices Found'}
+                  No Devices Found
                 </div>
               </div>
             )}

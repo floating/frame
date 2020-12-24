@@ -403,8 +403,8 @@ class Signer extends React.Component {
 // <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
 //   {current ? (
 //     <div className='signerUnlock' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { pointerEvents: 'none' }}>
-//       <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
-//       <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+//       <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
+//       <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
 //     </div>
 //   ) : null}
 // </div>

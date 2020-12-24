@@ -30,7 +30,7 @@ class Account {
     this.requests = {}
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart, this.network)
     this.update(true)
-    store.observer(() => {
+    this.acctObs = store.observer(() => {
       if (this.smart && this.smart.actor && this.smart.actor.id && this.smart.actor.id !== this.id) {
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
         this.signer = undefined
@@ -178,7 +178,7 @@ class Account {
   }
 
   close () {
-    console.log('Account close needs to remove observers')
+    this.acctObs.remove()
   }
 
   signMessage (message, cb) {

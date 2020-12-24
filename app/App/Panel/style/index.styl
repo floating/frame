@@ -104,11 +104,12 @@
 
 .panelMenu
   position absolute
-  left 2px
-  right 2px
-  top 2px
-  height 40px
+  left 1px
+  right 1px
+  top 0px
+  height 45px
   padding 0px 5px 100px 5px
+  // background blue
   display flex
   justify-content space-between
   align-items center
@@ -153,12 +154,60 @@
     letter-spacing 1px
     font-weight bold
     color outerspace08
-    height 40px
     display flex
     justify-content center
     align-items center
-    margin-top -1px
+    // margin-top -1px
     font-weight 400
+    padding-right 8px
+    margin-right 8px
+    
+  .panelMenuData
+    position absolute
+    top 0px
+    width 100px
+    max-width 100px
+    left 50%
+    transition standard
+    letter-spacing 0px
+    text-transform uppercase
+    color outerspace08
+    display flex
+    justify-content center
+    align-items center
+    font-weight 500
+    font-size 11px
+    height 16px
+    border-radius 8px
+    transform translate(-50px, 14px)
+
+    .panelMenuDataDivide
+      position absolute
+      top 0
+      bottom 0
+      left 50%
+      width 1px
+      margin-left -1px
+      background doubleThick
+
+    .panelMenuDataItem
+      display flex
+      justify-content center
+      align-items center
+      padding 0px 5px 1px 5px
+
+      .svg
+        position relative
+        padding-left 3px
+        margin-top 1px
+
+      .usd
+        position relative
+        margin-right 0px
+        margin-top 1px
+
+    .panelMenuDataItem:last-child
+      margin-left 2px
 
   .panelDetailIndicator
     height 10px
@@ -218,13 +267,12 @@
   justify-content center
   align-items center
   transform translateZ(0)
-  font-size 14px
   margin 24px 10px 0px 10px
   background highlight
   padding 20px
   border-radius 16px
-  font-size 12px
-  font-weight 400
+  font-size 13px
+  font-weight 300
 
   @keyframes spin
     0% 

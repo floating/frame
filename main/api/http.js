@@ -56,7 +56,7 @@ const handler = (req, res) => {
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
         // Review
-        if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
+        if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
         res.writeHead(401, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ id: payload.id, jsonrpc: payload.jsonrpc, error }))
       } else {
@@ -116,10 +116,10 @@ provider.on('data', payload => {
   }
 })
 
-provider.on('data:accounts', (account, payload) => { // Make sure the subscription has access based on current account
+provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
-    const permissions = store('main.accounts', account, 'permissions') || {}
+    const permissions = store('main.addresses', account, 'permissions') || {}
     const perms = Object.keys(permissions).map(id => permissions[id])
     const allowed = perms.map(p => p.origin).indexOf(origin) > -1
     if (!allowed) payload.params.result = []

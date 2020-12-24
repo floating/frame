@@ -175,7 +175,7 @@ class AddRing extends React.Component {
                 if (network === 'ethereum:1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
               }}
             >
-              {'Add Keyring Account'}
+              Add Keyring Account
             </div>
             <div className='phaseItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='phaseItemOptionSetupFrames'>

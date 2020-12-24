@@ -125,12 +125,12 @@ class NetworkWrap extends React.Component {
             <div className='phaseHeader'>
               <div className='phaseHeaderText'>
                 <div className='phaseHeaderIcon'>{svg.ethereum(20)}</div>
-                {'Ethereum Networks'}
+                Ethereum Networks
               </div>
             </div>
           ) : (
             <div className='phaseHeader'>
-              {'Unknown Networks'}
+              Unknown Networks
             </div>
           )}
           {Object.keys(networks[type]).sort((a, b) => {

@@ -119,7 +119,7 @@ class AddPhrase extends React.Component {
                 if (this.store('main.currentNetwork.id') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
               }}
             >
-              {'Add Phrase Account'}
+              Add Phrase Account
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>

@@ -5,6 +5,7 @@ const log = require('electron-log')
 const provider = require('../provider')
 const accounts = require('../accounts')
 const store = require('../store')
+const windows = require('../windows')
 
 const trusted = require('./trusted')
 const validPayload = require('./validPayload')
@@ -37,11 +38,13 @@ const handler = (socket, req) => {
         origin = 'frame-extension'
       }
     }
+    // Extension custom action for summoning Frame
+    if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick(true)
     if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
     if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
       let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
       // review
-      if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4100 }
+      if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
       res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
     } else {
       provider.send(payload, response => {
@@ -57,7 +60,7 @@ const handler = (socket, req) => {
       })
     }
   })
-  socket.on('error', err => err) // Handle Error
+  socket.on('error', err => log.error(err))
   socket.on('close', _ => {
     Object.keys(subs).forEach(sub => {
       if (subs[sub].socket.id === socket.id) {
@@ -77,10 +80,10 @@ module.exports = server => {
     if (subscription) subscription.socket.send(JSON.stringify(payload))
   })
 
-  provider.on('data:accounts', (account, payload) => { // Make sure the subscription has access based on current account
+  provider.on('data:address', (address, payload) => { // Make sure the subscription has access based on current account
     const subscription = subs[payload.params.subscription]
     if (subscription) {
-      const permissions = store('main.accounts', account, 'permissions') || {}
+      const permissions = store('main.addresses', address, 'permissions') || {}
       const perms = Object.keys(permissions).map(id => permissions[id])
       const allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
       if (!allowed) payload.params.result = []

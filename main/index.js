@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -6,6 +6,8 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('enable-transparent-visuals', true)
 if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
+
+console.log('process.version', process.version)
 
 const log = require('electron-log')
 const path = require('path')
@@ -25,7 +27,7 @@ const store = require('./store')
 //     })
 //   })
 // })
-
+const data = require('./data')
 const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
@@ -63,7 +65,8 @@ const externalWhitelist = [
   'https://mainnet.aragon.org',
   'https://rinkeby.aragon.org',
   'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
-  'https://shop.trezor.io/?offer_id=10&aff_id=3270'
+  'https://shop.trezor.io/?offer_id=10&aff_id=3270',
+  'https://discord.gg/UH7NGqY'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
@@ -79,6 +82,14 @@ ipcMain.on('tray:resetAllSettings', () => {
 //   signers.removeAllSigners()
 //   accounts.removeAllAccounts()
 // })
+
+ipcMain.on('tray:speedTx', async (e, id) => {
+  try {
+    await accounts.speedTx(id)
+  } catch (e) {
+    console.log('tray:speedTx Error', e)
+  }
+})
 
 ipcMain.on('tray:clipboardData', (e, data) => {
   clipboard.writeText(data)
@@ -141,6 +152,16 @@ app.on('ready', () => {
     const appOrigin = path.resolve(__dirname, '../')
     const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
+  })
+  store.observer(() => {
+    const altspace = store('main.shortcuts.altSpace')
+    if (altspace) {
+      console.log('registering shortcut')
+      globalShortcut.unregister('Alt+Space')
+      globalShortcut.register('Alt+Space', () => windows.trayClick())
+    } else {
+      globalShortcut.unregister('Alt+Space')
+    }
   })
 })
 

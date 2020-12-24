@@ -143,15 +143,25 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
-  toggleexplorerWarning: (u) => {
+  toggleExplorerWarning: (u) => {
     u('main.mute.explorerWarning', v => !v)
+  },
+  setAltSpace: (u, v) => {
+    u('main.shortcuts.altSpace', () => v)
+  },
+  setAutohide: (u, v) => {
+    u('main.autohide', () => v)
   },
   setGasPrices: (u, netType, netId, prices) => {
     u('main.networks', netType, netId, 'gas.price.levels', () => prices)
   },
   setGasDefault: (u, netType, netId, level, price) => {
     u('main.networks', netType, netId, 'gas.price.selected', () => level)
-    if (level === 'custom') u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+    if (level === 'custom') {
+      u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+    } else {
+      u('main.networks', netType, netId, 'gas.price.lastLevel', () => level)
+    }
   },
   addNetwork: (u, net) => {
     const defaultNetwork = {
@@ -162,7 +172,7 @@ module.exports = {
       gas: {
         price: {
           selected: 'standard',
-          levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
         }
       },
       connection: {

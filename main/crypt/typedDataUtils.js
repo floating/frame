@@ -55,6 +55,7 @@ function encodeType (primaryType, types) {
 }
 
 function typeHash (primaryType, types) {
+  // console.log('encodeType(primaryType, types)', primaryType, types, Object.keys(encodeType(primaryType, types)))
   return ethUtil.keccak256(encodeType(primaryType, types))
 }
 

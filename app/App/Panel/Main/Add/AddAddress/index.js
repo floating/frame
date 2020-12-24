@@ -118,7 +118,7 @@ class AddPhrase extends React.Component {
                 this.adding()
               }}
             >
-              {'Add Address Account'}
+              Add Address Account
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>

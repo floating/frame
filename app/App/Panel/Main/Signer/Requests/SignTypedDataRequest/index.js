@@ -109,7 +109,7 @@ class TransactionRequest extends React.Component {
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
-                    <div className='approveRequestHeaderLabel'> {'Sign Message'}</div>
+                    <div className='approveRequestHeaderLabel'> Sign Message</div>
                   </div>
                   <div className='signTypedData'>
                     <div className='signTypedDataInner'>
@@ -131,10 +131,10 @@ class TransactionRequest extends React.Component {
           <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
         )}
         <div className='requestApprove'>
-          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
+          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) this.decline(this.props.req.handlerId, this.props.req) }}>
             <div className='requestDeclineButton'>Decline</div>
           </div>
-          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
+          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) this.approve(this.props.req.handlerId, this.props.req) }}>
             <div className='requestSignButton'>Sign</div>
           </div>
         </div>
