@@ -238,7 +238,7 @@ class Settings extends React.Component {
           <div className='localSettingsTitle'>
             <div className='localSettingsTitleText'>Settings</div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 8 }}>
+          <div className='signerPermission' style={{ zIndex: 9 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
@@ -249,7 +249,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 7 }}>
+          <div className='signerPermission' style={{ zIndex: 8 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -261,7 +261,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission' style={{ zIndex: 6 }}>
+            <div className='signerPermission' style={{ zIndex: 7 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionOrigin'>Display Gas in Menubar</div>
                 <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
@@ -273,7 +273,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission' style={{ zIndex: 5 }}>
+          <div className='signerPermission' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>
               <Dropdown
@@ -286,7 +286,7 @@ class Settings extends React.Component {
               Derive seperate sets of addresses based on use
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 4 }}>
+          <div className='signerPermission' style={{ zIndex: 5 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Type</div>
               <Dropdown
@@ -297,6 +297,19 @@ class Settings extends React.Component {
             </div>
             <div className='signerPermissionDetails'>
               {'Use Ledger\'s Legacy or Live derivation type'}
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 4 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
+              <Dropdown
+                syncValue={this.store('main.ledger.numLiveAccounts')}
+                onChange={(value) => link.send('tray:action', 'setNumLiveAccounts', value)}
+                options={[{ text: '10', value: 10 }, { text: '20', value: 20 }, { text: '30', value: 30 }, { text: '40', value: 40 }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Choose the number of accounts to query from the Ledger Live derivation'}
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 3 }}>
