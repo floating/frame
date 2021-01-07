@@ -147,7 +147,7 @@ module.exports = {
     u('main.mute.explorerWarning', v => !v)
   },
   setAltSpace: (u, v) => {
-    u('main.shortcuts.altSpace', () => v)
+    u('main.shortcuts.altSlash', () => v)
   },
   setAutohide: (u, v) => {
     u('main.autohide', () => v)

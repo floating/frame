@@ -83,9 +83,9 @@ const initial = {
       explorerWarning: main('mute.explorerWarning', false),
       signerRelockChange: main('mute.signerRelockChange', false)
     },
-    shortcuts: main('shortcuts', {
-      altSpace: true
-    }),
+    shortcuts: {
+      altSlash: main('shortcuts.altSlash', true)
+    },
     launch: main('launch', false),
     reveal: main('reveal', false),
     autohide: main('autohide', true),
