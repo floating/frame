@@ -322,7 +322,7 @@ class TransactionFee extends React.Component {
     gasData.custom.feeTime = this.timeDisplay(customTime, 'custom')
 
     const currentSymbol = this.store('main.networks', network.type, network.id, 'symbol') || 'Ξ'
-    let slideLevel, haloLevel, haloShadowLevel, feeTotal, feeTotalUSD, feeTime
+    let slideLevel, feeTotal, feeTotalUSD, feeTime
     const devHaloAdjust = -75
     const haloLevels = {
       slow: 148 + devHaloAdjust,
@@ -334,31 +334,31 @@ class TransactionFee extends React.Component {
     const devAdjust = -294
     if (feeLevel === 'slow') {
       slideLevel = 170 + devAdjust
-      haloShadowLevel = `translateY(${haloLevels.slow}px)`
+      // haloShadowLevel = `translateY(${haloLevels.slow}px)`
       feeTotal = gasData.slow.fee
       feeTotalUSD = gasData.slow.feeUSD
       feeTime = gasData.slow.feeTime
     } else if (feeLevel === 'standard') {
       slideLevel = 130 + devAdjust
-      haloShadowLevel = `translateY(${haloLevels.standard}px)`
+      // haloShadowLevel = `translateY(${haloLevels.standard}px)`
       feeTotal = gasData.standard.fee
       feeTotalUSD = gasData.standard.feeUSD
       feeTime = gasData.standard.feeTime
     } else if (feeLevel === 'fast') {
       slideLevel = 90 + devAdjust
-      haloShadowLevel = `translateY(${haloLevels.fast}px)`
+      // haloShadowLevel = `translateY(${haloLevels.fast}px)`
       feeTotal = gasData.fast.fee
       feeTotalUSD = gasData.fast.feeUSD
       feeTime = gasData.fast.feeTime
     } else if (feeLevel === 'asap') {
       slideLevel = 50 + devAdjust
-      haloShadowLevel = `translateY(${haloLevels.asap}px)`
+      // haloShadowLevel = `translateY(${haloLevels.asap}px)`
       feeTotal = gasData.asap.fee
       feeTotalUSD = gasData.asap.feeUSD
       feeTime = gasData.asap.feeTime
     } else if (feeLevel === 'custom') {
       slideLevel = 10 + devAdjust
-      haloShadowLevel = `translateY(${haloLevels.custom}px)`
+      // haloShadowLevel = `translateY(${haloLevels.custom}px)`
       feeTotal = gasData.custom.fee
       feeTotalUSD = gasData.custom.feeUSD
       feeTime = gasData.custom.feeTime
@@ -372,7 +372,7 @@ class TransactionFee extends React.Component {
       }
     }
 
-    haloLevel = `translateY(${haloLevels[this.state.hoverLevel || feeLevel]}px)`
+    const haloLevel = `translateY(${haloLevels[this.state.hoverLevel || feeLevel]}px)`
 
     const txFeeStyle = {}
     const optionsStyle = !expanded ? { transitionDelay: '0s', transform: `translateY(${slideLevel + 50}px)` } : { transform: 'translateY(0px)' }

@@ -21,7 +21,7 @@ const WebSocket = require('ws')
 const store = require('../store')
 const accounts = require('../accounts')
 
-let socket, reconnectTimer, connected
+let socket, reconnectTimer
 
 const reconnect = now => {
   log.info('Trying to reconnect to realtime')

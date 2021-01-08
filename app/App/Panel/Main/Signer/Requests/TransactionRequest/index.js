@@ -261,17 +261,17 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
                     <div className='approveRequestHeaderTitle'>Transaction</div>
                     {txMeta.replacement ? (
-                        txMeta.possible ? (
-                          <div className='approveRequestHeaderTag'>
-                            replacement
-                          </div>
-                        ) : (
-                          <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
-                            invalid duplicate
-                          </div>
-                        )
+                      txMeta.possible ? (
+                        <div className='approveRequestHeaderTag'>
+                          replacement
+                        </div>
+                      ) : (
+                        <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
+                          invalid duplicate
+                        </div>
                       )
-                    : null}
+                    )
+                      : null}
                   </div>
                   <div className='transactionValue'>
                     <div className='transactionTotals'>

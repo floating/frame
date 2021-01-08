@@ -1,3 +1,5 @@
+/* globals test, expect, beforeAll, afterAll, describe */
+
 const crypto = require('crypto')
 const fs = require('fs')
 const { remove } = require('fs-extra')

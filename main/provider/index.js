@@ -83,7 +83,7 @@ class Provider extends EventEmitter {
   getChainId (payload, res) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      const id = parseInt(response.result, 'hex').toString()
+      // const id = parseInt(response.result, 'hex').toString()
       if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })

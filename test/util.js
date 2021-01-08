@@ -1,3 +1,5 @@
+/* globals expect */
+
 const EventEmitter = require('events')
 const store = require('../main/store')
 

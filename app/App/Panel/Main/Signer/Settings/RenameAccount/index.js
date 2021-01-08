@@ -23,22 +23,24 @@ class RenameAccount extends React.Component {
     this.observer.remove()
   }
 
-  handleChange = (e) => this.setState({ value: e.target.value })
+  handleChange (e) {
+    this.setState({ value: e.target.value })
+  }
 
-  handleFocus = (e) => {
+  handleFocus (e) {
     if (e.target.value === this.accountName) this.setState({ value: '' })
   }
 
-  handleBlur = (e) => {
+  handleBlur (e) {
     if (e.target.value === '') this.setState({ value: this.accountName })
   }
 
-  handleSubmit = () => {
+  handleSubmit () {
     link.send('tray:renameAccount', this.accountId, this.state.value)
     this.props.onClose()
   }
 
-  handleCancel = () => {
+  handleCancel () {
     setTimeout(() => { this.setState({ value: this.accountName }) }, 250)
     this.props.onClose()
   }

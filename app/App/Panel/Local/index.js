@@ -164,8 +164,8 @@ class Settings extends React.Component {
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
     const networkOptions = []
-    Object.keys(networks).map(type => {
-      Object.keys(networks[type]).map(id => {
+    Object.keys(networks).forEach(type => {
+      Object.keys(networks[type]).forEach(id => {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
