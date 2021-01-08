@@ -94,7 +94,7 @@ const initial = {
     menubarGasPrice: main('menubarGasPrice', false),
     ledger: {
       derivation: main('ledger.derivation', 'legacy'),
-      numLiveAccounts: main('ledger.numLiveAccounts', 10)
+      liveAccountLimit: main('ledger.liveAccountLimit', 5)
     },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions

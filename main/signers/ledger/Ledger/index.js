@@ -32,12 +32,12 @@ class Ledger extends Signer {
     this.lastUse = Date.now()
     this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
-    this.numLiveAccounts = store('main.ledger.numLiveAccounts')
+    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.varObserver = store.observer(() => {
       if (
         this.derivation !== store('main.ledger.derivation') ||
-        this.numLiveAccounts !== store('main.ledger.numLiveAccounts') ||
+        this.liveAccountLimit !== store('main.ledger.liveAccountLimit') ||
         this.hardwareDerivation !== store('main.hardwareDerivation') ||
         this.network !== store('main.currentNetwork.id')
       ) {
@@ -108,7 +108,7 @@ class Ledger extends Signer {
     this.pauseLive = true
     this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
-    this.numLiveAccounts = store('main.ledger.numLiveAccounts')
+    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.status = 'loading'
     this.addresses = []
@@ -364,7 +364,7 @@ class Ledger extends Signer {
     let addresses = []
     this.status = 'Deriving Live Addresses'
     this.liveAddressesFound = 0
-    for (let i = 0; i < this.numLiveAccounts; i++) {
+    for (let i = 0; i < this.liveAccountLimit; i++) {
       if (this.pauseLive) {
         this.status = 'loading'
         addresses = []

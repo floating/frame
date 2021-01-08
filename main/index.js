@@ -158,7 +158,7 @@ app.on('ready', () => {
     if (altSlash) {
       globalShortcut.unregister('Alt+/')
       globalShortcut.register('Alt+/', () => windows.trayClick())
-    } else {       
+    } else {
       globalShortcut.unregister('Alt+/')
     }
   })

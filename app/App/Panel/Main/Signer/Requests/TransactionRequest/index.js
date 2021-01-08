@@ -149,7 +149,7 @@ class TransactionRequest extends React.Component {
     if (i > -1) {
       txMeta.replacement = true
       if (monitor[i].status === 'confirming' || monitor[i].status === 'confirmed') txMeta.possible = false
-    } 
+    }
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
@@ -270,7 +270,7 @@ class TransactionRequest extends React.Component {
                             invalid duplicate
                           </div>
                         )
-                      ) 
+                      )
                     : null}
                   </div>
                   <div className='transactionValue'>
