@@ -139,6 +139,18 @@ class TransactionRequest extends React.Component {
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
+
+    const txMeta = { replacement: false, possible: true }
+    const r = this.store('main.accounts', this.props.accountId, 'requests')
+    const requests = Object.keys(r || {}).map(key => r[key])
+    const monitor = requests.filter(req => req.mode === 'monitor')
+    const existingNonces = monitor.map(m => m.data.nonce)
+    const i = existingNonces.indexOf(this.props.req.data.nonce)
+    if (i > -1) {
+      txMeta.replacement = true
+      if (monitor[i].status === 'confirming' || monitor[i].status === 'confirmed') txMeta.possible = false
+    } 
+
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {req.type === 'transaction' ? (
@@ -193,7 +205,7 @@ class TransactionRequest extends React.Component {
                         </>
                       ) : null}
                     </div>
-                    <div className='txStatus' style={!req.tx && !error ? { top: '60px' } : {}}>
+                    <div className='txStatus' style={!req.tx && !error ? { bottom: '60px' } : {}}>
                       {success ? <div>Successful</div> : null}
                       <div className='txProgressNotice'>
                         <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
@@ -247,7 +259,19 @@ class TransactionRequest extends React.Component {
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
-                    <div className='approveRequestHeaderLabel'> Transaction</div>
+                    <div className='approveRequestHeaderTitle'>Transaction</div>
+                    {txMeta.replacement ? (
+                        txMeta.possible ? (
+                          <div className='approveRequestHeaderTag'>
+                            replacement
+                          </div>
+                        ) : (
+                          <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
+                            invalid duplicate
+                          </div>
+                        )
+                      ) 
+                    : null}
                   </div>
                   <div className='transactionValue'>
                     <div className='transactionTotals'>
@@ -308,12 +332,17 @@ class TransactionRequest extends React.Component {
         )}
         {!notice ? (
           <div className='requestApprove'>
-            <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(req.handlerId, req) }}>
+            <div
+              className='requestDecline' onMouseDown={() => {
+                console.log('declining tx', this.props.i)
+                if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
+              }}
+            >
               <div className='requestDeclineButton'>Decline</div>
             </div>
             <div
               className='requestSign' onMouseDown={() => {
-                if (this.state.allowInput) {
+                if (this.state.allowInput && this.props.onTop) {
                   if (feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) {
                     this.store.notify('gasFeeWarning', { req, feeUSD })
                   } else {

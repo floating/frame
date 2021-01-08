@@ -7,6 +7,8 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('enable-transparent-visuals', true)
 if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
+console.log('process.version', process.version)
+
 const log = require('electron-log')
 const path = require('path')
 
@@ -152,13 +154,12 @@ app.on('ready', () => {
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
   store.observer(() => {
-    const altspace = store('main.shortcuts.altSpace')
-    if (altspace) {
-      console.log('registering shortcut')
-      globalShortcut.unregister('Alt+Space')
-      globalShortcut.register('Alt+Space', () => windows.trayClick())
-    } else {
-      globalShortcut.unregister('Alt+Space')
+    const altSlash = store('main.shortcuts.altSlash')
+    if (altSlash) {
+      globalShortcut.unregister('Alt+/')
+      globalShortcut.register('Alt+/', () => windows.trayClick())
+    } else {       
+      globalShortcut.unregister('Alt+/')
     }
   })
 })
