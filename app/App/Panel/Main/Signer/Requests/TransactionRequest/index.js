@@ -161,11 +161,17 @@ class TransactionRequest extends React.Component {
       }
     }
 
+    const nonce = parseInt(req.data.nonce, 'hex') || ''
+
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
+              <div className={notice ? 'txNonce txNonceSet' : 'txNonce'}>
+                <div className='txNonceLabel'>Nonce</div>
+                <div className={nonce ? 'txNonceNumber' : 'txNonceNumber txNonceHidden'}>{nonce || 'TBD'}</div>
+              </div>
               {notice ? (
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
@@ -242,9 +248,6 @@ class TransactionRequest extends React.Component {
                       </div>
                     </div>
                     <TxBar req={req} />
-                    <div className='txNonce'>
-                      {parseInt(req.data.nonce, 'hex')}
-                    </div>
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
                     <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
@@ -274,12 +277,6 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'>
                       {svg.octicon('radio-tower', { height: 22 })}
                     </div>
-                    <div className='txNonce'>
-                      {parseInt(req.data.nonce || '0x', 'hex') || 'TBD'}
-                    </div>
-                    {/* <div className='approveRequestHeaderNonce'>
-                      {`#${parseInt(req.data.nonce || '0x0', 16) || 'TBD'}`}
-                    </div> */}
                     <div className='approveRequestHeaderTitle'>Transaction</div>
                     {txMeta.replacement ? (
                       txMeta.possible ? (

@@ -1202,7 +1202,7 @@ span
 
 .txNonce
   position absolute
-  top 13px
+  top 22px
   right 12px
   background highlighter
   height 16px
@@ -1214,13 +1214,46 @@ span
   align-items center
   font-size 12px
   font-weight 600
-  color tripleThick
   background highlighter
-  font-family Fira Code, monospaced
-  color tripleThick
+  color outerspace05
+  transition .32s cubic-bezier(.82,0,.12,1) width
+  z-index 999999999
+  overflow hidden
+
+  .txNonceNumber
+    position absolute 
+    top 1 
+    right 0
+    bottom 0
+    width 48px
+    text-align center
+    font-family Fira Code, monospaced
+    opacity 1
+    transition .64s cubic-bezier(.82,0,.12,1) opacity
+
+  .txNonceHidden
+    color tripleThick
+    opacity 0
+
+  .txNonceLabel
+    position absolute 
+    top 1px
+    right 48px
+    bottom 0px
+    width 68px
+    text-align center
+    font-size 10px
+    text-transform uppercase
+    border-right 1px solid thick
 
 .txNonce:hover
-  color outerspace05
+  width 120px
+
+  .txNonceHidden
+    opacity 1
+
+.txNonceSet
+  transform translate(1px, -9px)
 
 .monitorTop
   position absolute
