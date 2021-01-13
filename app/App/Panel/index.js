@@ -41,11 +41,11 @@ class Panel extends React.Component {
           </div>
           {type === 'ethereum' && id === '1' ? (
             <div className='panelMenuData'>
-              <div className='panelMenuDataDivide' />
               <div className='panelMenuDataItem'>
                 {gasPrice || '---'}
                 <div className='svg'>{svg.gas(9)}</div>
               </div>
+              <div className='panelMenuDataDivide' />
               <div className='panelMenuDataItem'>
                 <div className='usd'>{svg.usd(10.5)}</div>
                 <div>{this.store('external.rates.USD') ? Math.floor(this.store('external.rates.USD')) : '---'}</div>
