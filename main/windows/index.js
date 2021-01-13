@@ -83,7 +83,7 @@ const api = {
         worldSafeExecuteJavaScript: true
       }
     })
-    windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
+    windows.tray.loadURL(path.join('file://', __dirname, '/../../bundle/tray.html'))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
     windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>

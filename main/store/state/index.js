@@ -403,7 +403,7 @@ if (!initial.main.networks.ethereum['137']) {
       primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
       secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
     }
-  }  
+  }
 }
 
 module.exports = () => initial

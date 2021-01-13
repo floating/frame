@@ -161,9 +161,6 @@ class TransactionRequest extends React.Component {
       }
     }
 
-
-    console.log('txMeta', txMeta)
-
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {req.type === 'transaction' ? (
@@ -274,7 +271,7 @@ class TransactionRequest extends React.Component {
               ) : (
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> 
+                    <div className='approveRequestHeaderIcon'>
                       {svg.octicon('radio-tower', { height: 22 })}
                     </div>
                     <div className='txNonce'>
