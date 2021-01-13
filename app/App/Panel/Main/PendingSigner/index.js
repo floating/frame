@@ -32,12 +32,12 @@ class Pending extends React.Component {
   renderLoadingLive () {
     if (this.props.type === 'ledger' && this.props.status.toLowerCase() === 'deriving live addresses') {
       const liveAccountLimit = this.store('main.ledger.liveAccountLimit')
-      const stylePadding = liveAccountLimit > 20 ? 10 : 20
-      const styleWidth = liveAccountLimit > 10 ? 120 : 60
+      const styleWidth = liveAccountLimit === 20 ? 120 : liveAccountLimit === 40 ? 120 : 60
+      const marginTop = liveAccountLimit === 40 ? -8 : 0
       return (
-        <div className='loadingLiveAddresses' style={{ padding: stylePadding.toString().concat('px 20px'), width: styleWidth.toString().concat('px') }}>
+        <div className='loadingLiveAddresses' style={{ top: `${marginTop}px`, padding: `${20}px 20px`,width: `${styleWidth}px` }}>
           {[...Array(liveAccountLimit).keys()].map(i => i + 1).map(i => {
-            return <div key={'loadingLiveAddress' + i} className='loadingLiveAddress' style={{ opacity: i <= this.props.liveAddressesFound ? '1' : '0.3' }} />
+            return <div key={'loadingLiveAddress' + i} className='loadingLiveAddress' style={{ opacity: i <= this.props.liveAddressesFound ? '1' : '0.3'}} />
           })}
         </div>
       )

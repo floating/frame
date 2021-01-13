@@ -152,7 +152,9 @@ const initial = {
           infura: 'infuraRinkeby'
         },
         5: {
-          prylabs: 'https://goerli.prylabs.net'
+          prylabs: 'https://goerli.prylabs.net',
+          mudit: 'https://rpc.goerli.mudit.blog',
+          slockit: 'https://rpc.slock.it/goerli'
         },
         42: {
           infura: 'infuraKovan'
@@ -162,6 +164,9 @@ const initial = {
         },
         100: {
           poa: 'https://dai.poa.network'
+        },
+        137: {
+          matic: 'https://rpc-mainnet.maticvigil.com'
         }
       }
     },
@@ -377,5 +382,28 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
 if (main('mute', false) && get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
 
 initial.main._version = 4
+
+// delete initial.main.networks.ethereum['137']
+// Add new network presets if they don't exist
+// This is currently disabled becasue eth_syncing returns unauthorized method
+if (!initial.main.networks.ethereum['137']) {
+  initial.main.networks.ethereum['137'] = {
+    id: 137,
+    type: 'ethereum',
+    symbol: 'MATIC',
+    name: 'Matic',
+    explorer: 'https://explorer.matic.network',
+    gas: {
+      price: {
+        selected: 'standard',
+        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+      }
+    },
+    connection: {
+      primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
+      secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+    }
+  }  
+}
 
 module.exports = () => initial

@@ -68,7 +68,7 @@ const api = {
       frame: false,
       transparent: true,
       hasShadow: false,
-      show: false,
+      // show: false,
       backgroundThrottling: false,
       offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),

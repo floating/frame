@@ -619,6 +619,19 @@
         left 5px
         color outerspace08
 
+      .approveRequestHeaderNonce
+        width 80px
+        height 60px
+        display flex
+        justify-content flex-end
+        align-items center
+        z-index 10
+        transition standard
+        position absolute
+        border-radius 2px
+        right 10px
+        color outerspace08
+
       .approveRequestHeaderClose
         width 60px
         display flex
@@ -1176,7 +1189,7 @@
   font-family FiraCode, monospace
 
 .monitorArrow
-  padding-top 2px
+  padding-top 1px
 
 .monitorDeploy
   text-transform uppercase
@@ -1187,15 +1200,37 @@
 span
   padding 0px 3px 0px 0px
 
+.txNonce
+  position absolute
+  top 13px
+  right 12px
+  background highlighter
+  height 16px
+  width 48px
+  border-radius 16px
+  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
+  display flex
+  justify-content center
+  align-items center
+  font-size 12px
+  font-weight 600
+  color tripleThick
+  background highlighter
+  font-family Fira Code, monospaced
+  color tripleThick
+
+.txNonce:hover
+  color outerspace05
+
 .monitorTop
   position absolute
   z-index 1001
   top 0px
   left 53px
-  right 0px
+  right 53px
   height 40px
-  padding 13px 16px 3px 0px
-  font-size 16px
+  padding 14px 16px 3px 0px
+  font-size 14px
   text-transform none
   transition standardSlow
   overflow-wrap break-word
@@ -1236,7 +1271,7 @@ span
 
 .txAugment
   position absolute
-  top 100px
+  bottom 60px
   left 5px
   height 32px
   right 5px
@@ -1250,6 +1285,8 @@ span
   border-radius 16px
   background highlight
   box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
+  z-index 20000000009999
+  
 
   .txAugmentCancel
     position absolute
@@ -1382,13 +1419,11 @@ span
   bottom 100px
   border-radius 16px
   // box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
-  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
   text-align center
   box-sizing border-box
   // background rgba(255, 255, 255, 0.05)
-  background highlight
   z-index 100000
-  font-size 12px
+  font-size 14px
   font-weight 400
   text-transform uppercase
   letter-spacing 0.5px
@@ -1418,6 +1453,10 @@ span
     align-items center
     flex-direction column
     transition standard
+
+.txStatusError
+  top 30px
+  bottom 0px
 
 .txProgressSuccess
   position absolute
@@ -1482,7 +1521,6 @@ span
 
 .txProgressDetailError
   padding 0px 10px
-  font-size 12px
 
 .txStatusCompact
   bottom 60px

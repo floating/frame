@@ -173,13 +173,25 @@ class Accounts extends EventEmitter {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && this.current().requests[id]) {
             this.current().requests[id].tx.receipt = receiptRes.result
+            delete this.current().requests[id].tx.nullReceiptCount
             if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
               this.current().requests[id].status = 'confirming'
               this.current().requests[id].notice = 'Confirming'
               this.current().requests[id].completed = Date.now()
               const { hash } = this.current().requests[id].tx
               const h = hash.substr(0, 6) + '...' + hash.substr(hash.length - 4)
-              const body = `Transaction ${h} sucessful! Click for details`
+              const body = `Transaction ${h} sucessful! \n Click for details`
+
+              // Drop any other pending txs with same nonce
+              Object.keys(this.current().requests).forEach(k => {
+                const reqs = this.current().requests
+                if (reqs[k].status === 'verifying' && reqs[k].data.nonce === reqs[id].data.nonce) {
+                  this.current().requests[k].status = 'error'
+                  this.current().requests[k].notice = 'Dropped'
+                }
+              })
+
+              // If Frame is hidden, trigger native notification
               notify('Transaction Successful', body, () => {
                 const { type, id } = store('main.currentNetwork')
                 const explorer = store('main.networks', type, id, 'explorer')
@@ -191,10 +203,13 @@ class Accounts extends EventEmitter {
             resolve(blockHeight - receiptBlock)
           } else {
             if (receiptRes.result === null) {
-              this.current().requests[id].status = 'dropped'
-              this.current().requests[id].notice = 'Dropped'
-              this.current().requests[id].completed = Date.now()
-              reject(new Error('Trying to confirm but transaction has no receipt'))
+              this.current().requests[id].tx.nullReceiptCount = this.current().requests[id].tx.nullReceiptCount || 0
+              if (++this.current().requests[id].tx.nullReceiptCount > 6) {
+                this.current().requests[id].status = 'error'
+                this.current().requests[id].notice = 'Dropped'
+                this.current().requests[id].completed = Date.now()
+                reject(new Error('Trying to confirm but transaction has no receipt'))
+              }
             } else {
               reject(new Error('Trying to confirm but cannot find request'))
             }
@@ -367,7 +382,7 @@ class Accounts extends EventEmitter {
   declineRequest (handlerId) {
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'declined'
+      this.current().requests[handlerId].status = 'error'
       this.current().requests[handlerId].notice = 'Signature Declined'
       if (this.current().requests[handlerId].type === 'transaction') {
         this.current().requests[handlerId].mode = 'monitor'

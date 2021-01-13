@@ -308,8 +308,8 @@ class Settings extends React.Component {
                 options={[
                   { text: '5', value: 5 },
                   { text: '10', value: 10 },
-                  { text: '25', value: 25 },
-                  { text: '50', value: 50 }
+                  { text: '20', value: 20 },
+                  { text: '40', value: 40 }
                 ]}
               />
             </div>
@@ -339,7 +339,7 @@ class Settings extends React.Component {
             </div>
             <div className='signerPermissionDetails'>
               <span>
-                Summon Frame by pressing <span className='keyCommand'>Alt<span style={{ padding: '0px 1px' }}>+</span>/</span>
+                Summon Frame by pressing <span className='keyCommand'>{this.store('platform') === 'darwin' ? 'Option' : 'Alt'}<span style={{ padding: '0px 3px' }}>+</span>/</span>
               </span>
             </div>
           </div>

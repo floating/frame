@@ -96,7 +96,6 @@ class TransactionRequest extends React.Component {
                     } else if (status === 'error' || status === 'declined') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div>{svg.octicon('circle-slash', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )

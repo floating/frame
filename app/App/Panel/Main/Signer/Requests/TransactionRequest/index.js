@@ -131,25 +131,38 @@ class TransactionRequest extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     const feeUSD = fee * etherUSD
-    const height = mode === 'monitor' ? '185px' : '320px'
+    const height = req.status === 'error' ? '185px' : mode === 'monitor' ? '185px' : '320px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
-    // const statusClass = 'txStatus'
+    const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
-
-    const txMeta = { replacement: false, possible: true }
-    const r = this.store('main.accounts', this.props.accountId, 'requests')
-    const requests = Object.keys(r || {}).map(key => r[key])
-    const monitor = requests.filter(req => req.mode === 'monitor')
-    const existingNonces = monitor.map(m => m.data.nonce)
-    const i = existingNonces.indexOf(this.props.req.data.nonce)
-    if (i > -1) {
-      txMeta.replacement = true
-      if (monitor[i].status === 'confirming' || monitor[i].status === 'confirmed') txMeta.possible = false
+    const txMeta = { replacement: false, possible: true, notice: '' }
+    if (mode !== 'monitor') {
+      const r = this.store('main.accounts', this.props.accountId, 'requests')
+      const requests = Object.keys(r || {}).map(key => r[key])
+      const monitor = requests.filter(req => req.mode === 'monitor')
+      const existingNonces = monitor.filter(r => r.status !== 'error').map(m => m.data.nonce)
+      const i = existingNonces.indexOf(this.props.req.data.nonce)
+      if (i > -1) {
+        txMeta.replacement = true
+        console.log(monitor[i])
+        if (monitor[i].status === 'confirming' || monitor[i].status === 'confirmed') {
+          txMeta.possible = false
+          console.log('txMeta.possible', 'not possible becasue other tx is: ', monitor[i].status)
+        }
+        if (monitor[i].data.gasPrice <= req.data.gasPrice) {
+          txMeta.possible = false
+          txMeta.notice = 'gas price too low'
+          console.log('txMeta.possible', 'not possible becasue other tx is: ', txMeta.notice)
+        }
+      }
     }
+
+
+    console.log('txMeta', txMeta)
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
@@ -205,7 +218,7 @@ class TransactionRequest extends React.Component {
                         </>
                       ) : null}
                     </div>
-                    <div className='txStatus' style={!req.tx && !error ? { bottom: '60px' } : {}}>
+                    <div className={statusClass} style={!req.tx && !error ? { bottom: '60px' } : {}}>
                       {success ? <div>Successful</div> : null}
                       <div className='txProgressNotice'>
                         <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
@@ -232,11 +245,14 @@ class TransactionRequest extends React.Component {
                       </div>
                     </div>
                     <TxBar req={req} />
+                    <div className='txNonce'>
+                      {parseInt(req.data.nonce, 'hex')}
+                    </div>
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
                     <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
                       <div className='monitorValue'><span>Ξ</span>{value}</div>
-                      <div className='monitorArrow'>{svg.longArrow(14)}</div>
+                      <div className='monitorArrow'>{svg.longArrow(13)}</div>
                       {toAddress ? (
                         <div className='monitorTo'>
                           {toAddress.substring(0, 6)}
@@ -258,7 +274,15 @@ class TransactionRequest extends React.Component {
               ) : (
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
+                    <div className='approveRequestHeaderIcon'> 
+                      {svg.octicon('radio-tower', { height: 22 })}
+                    </div>
+                    <div className='txNonce'>
+                      {parseInt(req.data.nonce || '0x', 'hex') || 'TBD'}
+                    </div>
+                    {/* <div className='approveRequestHeaderNonce'>
+                      {`#${parseInt(req.data.nonce || '0x0', 16) || 'TBD'}`}
+                    </div> */}
                     <div className='approveRequestHeaderTitle'>Transaction</div>
                     {txMeta.replacement ? (
                       txMeta.possible ? (
@@ -267,7 +291,7 @@ class TransactionRequest extends React.Component {
                         </div>
                       ) : (
                         <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
-                          invalid duplicate
+                          {txMeta.notice || 'invalid duplicate'}
                         </div>
                       )
                     )
