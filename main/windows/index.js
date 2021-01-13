@@ -39,7 +39,7 @@ const detectMouse = () => {
   const bounds = display.bounds
   const minX = (area.width + area.x) - 2
   const center = (area.height + (area.y - bounds.y)) / 2
-  const margin = (area.height + (area.y - bounds.y)) / 8
+  const margin = ((area.height + (area.y - bounds.y)) / 2) - 5
   m1.y = m1.y - area.y
   const minY = center - margin
   const maxY = center + margin

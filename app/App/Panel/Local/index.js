@@ -240,6 +240,32 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission' style={{ zIndex: 8 }}>
             <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Summon</div>
+              <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Summon Frame by pressing <span className='keyCommand'>{this.store('platform') === 'darwin' ? 'Option' : 'Alt'}<span style={{ padding: '0px 3px' }}>+</span>/</span>
+              </span>
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 8 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Auto-hide</div>
+              <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Hide Frame on loss of focus
+              </span>
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 7 }}>
+            <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
                 <div className='signerPermissionToggleSwitch' />
@@ -249,7 +275,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 7 }}>
+          <div className='signerPermission' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -257,11 +283,11 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              {'Mouse to the middle of your display\'s right edge to reveal Frame'}
+              {'Mouse to your display\'s right edge to reveal Frame'}
             </div>
           </div>
           {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission' style={{ zIndex: 6 }}>
+            <div className='signerPermission' style={{ zIndex: 5 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionOrigin'>Display Gas in Menubar</div>
                 <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
@@ -273,7 +299,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission' style={{ zIndex: 5 }}>
+          <div className='signerPermission' style={{ zIndex: 4 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>
               <Dropdown
@@ -286,7 +312,7 @@ class Settings extends React.Component {
               Derive seperate sets of addresses based on use
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 4 }}>
+          <div className='signerPermission' style={{ zIndex: 3 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Type</div>
               <Dropdown
@@ -299,7 +325,7 @@ class Settings extends React.Component {
               {'Use Ledger\'s Legacy or Live derivation type'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 3 }}>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
               <Dropdown
@@ -317,7 +343,7 @@ class Settings extends React.Component {
               How many live accounts should we derive?
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
+          <div className='signerPermission' style={{ zIndex: 1 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lock Hot Signers on</div>
               <Dropdown
@@ -328,32 +354,6 @@ class Settings extends React.Component {
             </div>
             <div className='signerPermissionDetails'>
               When should Frame relock your hot signers?
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Summon Shortcut</div>
-              <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Summon Frame by pressing <span className='keyCommand'>{this.store('platform') === 'darwin' ? 'Option' : 'Alt'}<span style={{ padding: '0px 3px' }}>+</span>/</span>
-              </span>
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 1 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Auto-hide</div>
-              <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Hide Frame on loss of focus
-              </span>
             </div>
           </div>
           <div className='snipIt'>
