@@ -1208,7 +1208,7 @@ span
   height 16px
   width 48px
   border-radius 16px
-  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
+  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner, -8px 0px 8px highlightest
   display flex
   justify-content center
   align-items center
@@ -1217,7 +1217,7 @@ span
   background highlighter
   color outerspace05
   transition .32s cubic-bezier(.82,0,.12,1) width
-  z-index 999999999
+  z-index 9999
   overflow hidden
 
   .txNonceNumber
@@ -1369,9 +1369,9 @@ span
     transform scale(1.05)
     box-shadow 0px 4px 5px -2px thick, 0px 25px 25px -5px thick
   
-  .txAugmentCancel:active, .txAugmentSpeedUp:active, .txDetails:active
-    transform translateY(0px) scale(1)
-    box-shadow none
+  // .txAugmentCancel:active, .txAugmentSpeedUp:active, .txDetails:active
+  //   transform translateY(0px) scale(1)
+  //   box-shadow none
 
 .txAugmentHidden
   .txAugmentCancel
@@ -1940,3 +1940,4 @@ span
 
 
 @import './next'
+@import '../TransactionRequest/TxModule/style'

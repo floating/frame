@@ -43,6 +43,8 @@ export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
 
+export const setPanelView = (u, view) => u('panel.view', () => view)
+
 let trayInitial = true
 export const trayOpen = (u, open) => {
   u('tray.open', _ => open)

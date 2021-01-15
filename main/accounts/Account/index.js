@@ -75,6 +75,7 @@ class Account {
       this.update()
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')
+      windows.broadcast('main:action', 'setPanelView', 'default')
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {

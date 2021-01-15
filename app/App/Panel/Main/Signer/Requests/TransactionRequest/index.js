@@ -8,6 +8,8 @@ import TxBar from './TxBar'
 
 import TxFee from './TxFee'
 
+import TxModule from './TxModule'
+
 const FEE_WARNING_THRESHOLD_USD = 10
 
 class Time extends React.Component {
@@ -161,7 +163,8 @@ class TransactionRequest extends React.Component {
       }
     }
 
-    const nonce = parseInt(req.data.nonce, 'hex') || ''
+    let nonce = parseInt(req.data.nonce, 'hex')
+    if (isNaN(nonce)) nonce = 'TBD'
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
@@ -170,7 +173,7 @@ class TransactionRequest extends React.Component {
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'}>
                 <div className='txNonceLabel'>Nonce</div>
-                <div className={nonce ? 'txNonceNumber' : 'txNonceNumber txNonceHidden'}>{nonce || 'TBD'}</div>
+                <div className={nonce !== 'TBD' ? 'txNonceNumber' : 'txNonceNumber txNonceHidden'}>{nonce}</div>
               </div>
               {notice ? (
                 <div className='requestNotice'>
@@ -221,7 +224,7 @@ class TransactionRequest extends React.Component {
                         </>
                       ) : null}
                     </div>
-                    <div className={statusClass} style={!req.tx && !error ? { bottom: '60px' } : {}}>
+                    <div className={statusClass} style={!req.tx && !error && mode === 'monitor' ? { bottom: '60px' } : {}}>
                       {success ? <div>Successful</div> : null}
                       <div className='txProgressNotice'>
                         <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
@@ -304,27 +307,7 @@ class TransactionRequest extends React.Component {
                     <div className='transactionSubtitle'>Value</div>
                   </div>
                   <TxFee {...this.props} />
-                  {utils.toAscii(req.data.data || '0x') ? (
-                    <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
-                      <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
-                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
-                        <div className='transactionDataLabel'>View Data</div>
-                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 16 })}</div>
-                      </div>
-                      <div className='transactionDataBody'>
-                        <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
-                          {this.state.copiedData ? (
-                            <div className='transactionDataBodyCopied'>
-                              <div>Copied</div>
-                              {svg.octicon('clippy', { height: 20 })}
-                            </div>
-                          ) : req.data.data}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className='transactionData transactionNoData'>No Data</div>
-                  )}
+                  <TxModule top={172} req={req} />
                   {req.data.to ? (
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>

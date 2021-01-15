@@ -169,7 +169,8 @@ class TransactionFee extends React.Component {
       hoverGasPercent,
       hoverGasColor,
       hoverGasPrice,
-      hoverGasPriceCustom
+      hoverGasPriceCustom,
+      hoverGwei: gwei
     })
   }
 
@@ -181,6 +182,7 @@ class TransactionFee extends React.Component {
     if (!this.state.hoverGasPercent && !initial) return
     const rect = e.target.getBoundingClientRect()
     const x = e.clientX - rect.left - 66
+    this.setState({ hoverLevel: 'custom' })
     this.hoverBar((Math.round((x / (rect.width - 66 - 72)) * 100)) / 100, true)
   }
 
@@ -313,7 +315,7 @@ class TransactionFee extends React.Component {
     const { slowTime, standardTime, fastTime, asapTime, customTime } = gasLevels
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
     const etherRates = this.store('external.rates')
-    const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+    const etherUSD = network.id === '1' && etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const gasLimit = this.state.inputLimit || (this.state.gasLimitInputFocus ? 0 : parseInt(data.gas, 'hex'))
 
     const gasData = this.gasData(['slow', 'standard', 'fast', 'asap', 'custom'], gasLimit, etherUSD)
@@ -378,7 +380,7 @@ class TransactionFee extends React.Component {
     const optionsStyle = !expanded ? { transitionDelay: '0s', transform: `translateY(${slideLevel + 50}px)` } : { transform: 'translateY(0px)' }
     const marker = this.state.hoverGasPercentOrigin * (308 - 66 - 72)
     const gasPrice = weiToGwei(parseInt(data.gasPrice, 'hex'))
-    const gasLimitDisplay = this.state.pendingLimit || (this.state.gasLimitInputFocus ? (parseInt(data.gas, 'hex') || '') : parseInt(data.gas, 'hex'))
+    const gasLimitDisplay = this.state.pendingLimit || (this.state.gasLimitInputFocus ? (this.state.inputLimit || '') : parseInt(data.gas, 'hex'))
 
     // Adjust for any hover state
     if (this.state.hoverGwei || this.state.inputGwei) {
@@ -524,7 +526,7 @@ class TransactionFee extends React.Component {
               <span className='txFeeSummaryTotal'>{feeTotal}</span>
               <span className='txFeeSummaryEquivalentSymbol'>≈</span>
               <span className='txFeeSummaryUSDSymbol'>$</span>
-              <span className='txFeeSummaryTotalUSD'>{feeTotalUSD}</span>
+              <span className='txFeeSummaryTotalUSD'>{feeTotalUSD === '0.00' ? '?' : feeTotalUSD}</span>
             </div>
             <div className='txFeeSummaryLabel'>
               MAX FEE
