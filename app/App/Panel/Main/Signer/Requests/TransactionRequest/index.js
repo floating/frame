@@ -158,7 +158,7 @@ class TransactionRequest extends React.Component {
           txMeta.replacement = true
           if (monitorFilter[i].status === 'confirming' || monitorFilter[i].status === 'confirmed') {
             txMeta.possible = false
-            txMeta.notice = 'nonce already confirmed'
+            txMeta.notice = 'nonce used'
           } else if (parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')) {
             txMeta.possible = false
             txMeta.notice = 'gas price too low'
@@ -188,7 +188,7 @@ class TransactionRequest extends React.Component {
                           Cancel
                         </div>
                         <div
-                          className={req.tx ? 'txDetails txDetailsShow' : 'txDetails'}
+                          className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
                           onMouseDown={() => {
                             if (req && req.tx && req.tx.hash) {
                               if (this.store('main.mute.explorerWarning')) {

@@ -205,19 +205,19 @@
     z-index 200001
     pointer-events none
     box-shadow none
-    transition standardFast
+    transition standard, 0.1s linear opacity 0.1s
     box-shadow 0px 4px 10px thick
+    will-change opacity
 
   .networkFeeOptions
     position absolute
     left 0px
     right 0px
-    top 64px
+    top 56px
     padding-top 10px
     transition standard
     transform translateZ(0px)
     z-index 100
-    border-top 1px solid thick
 
   .networkFeeOptionHover
     .networkFeeOptionHoverInset
@@ -456,6 +456,7 @@
   left 3px
   right 3px
   padding 0px 0px
+  transition standard
 
   .txFeeUpdateRealtime
     position absolute
@@ -536,17 +537,20 @@
     flex-direction column
     display none
 
+
   .txFeeInputs
     position absolute
-    top 2px
-    right 9px
-    left 9px
-    height 60px
-    transition standard
+    top 7px
+    right 7px
+    left 7px
+    height 48px
+    transition standardSlow
     display flex
     justify-content space-between
     align-items center
     transform translateY(-200px)
+    transition-delay 0s
+    // background blue
 
     .txFeeGwei
       display flex
@@ -557,9 +561,9 @@
       transition-delay 0.1s
 
       .txFeeGweiValue
-        width 150px
-        border-top-right-radius 6px
-        border-bottom-right-radius 6px
+        width 152px
+        border-top-right-radius 4px
+        border-bottom-right-radius 4px
 
     .txFeeLimit
       display flex
@@ -569,28 +573,29 @@
       transition standard
 
       .txFeeGweiValue
-        width 150px
-        border-top-left-radius 6px
-        border-bottom-left-radius 6px
+        width 152px
+        border-top-left-radius 4px
+        border-bottom-left-radius 4px
 
   .txFeeSummary
     position absolute
     left 7px
     right 7px
     bottom 8px
-    height 53px
-    transform translateY(100px)
+    height 48px
+    transform translateY(1000px)
     opacity 1
-    border-top-left-radius 12px
-    border-top-right-radius 12px
-    border-bottom-left-radius 19px
-    border-bottom-right-radius 19px
+    border-top-left-radius 15px
+    border-top-right-radius 15px
+    border-bottom-left-radius 11px
+    border-bottom-right-radius 11px
     border 1px solid thick
+    transition standardSlow, 0s linear background 0s, 0s linear box-shadow 0s
 
     .txFeeSummaryValue
       font-size 20px
       font-weight 400
-      line-height 24px
+      line-height 20px
       min-width 50px
       text-align center
       display flex
@@ -637,7 +642,7 @@
         margin-left 1px
       
     .txFeeSummaryLabel
-      font-size 10px
+      font-size 11px
       font-weight 400
       letter-spacing 1px
       margin-left 1px
@@ -651,7 +656,7 @@
     transition standard
     border-left 1px solid thick
     position absolute
-    top 8px
+    top 10px
     bottom 8px
     right 0px
     left 95px
@@ -675,16 +680,17 @@
     border-right 1px solid thick
     position absolute
     left 0
-    top 8px
+    top 10px
     bottom 8px
 
   .txFeeGweiValue
     font-size 22px
     font-weight 400
     background highlightest
-    border-radius 16px
+    border-radius 11px
+
     height 32px
-    box-shadow 0px 2px 2px thin
+    box-shadow 0px 2px 2px thin, cardDrop
     display flex
     justify-content center
     align-items center
@@ -707,7 +713,7 @@
       font-family OpenSans, sans-serif
 
   .txFeeGweiLabel
-    font-size 10px
+    font-size 11px
     font-weight 400
     letter-spacing 1px
     margin-left 1px
@@ -736,29 +742,30 @@
     text-transform uppercase
 
 .txFeeExpanded
-  transform translateY(6px)
-  height 230px
-  left 0px
-  right 0px
+  transform translateY(-3px)
+  height 214px
+  left 3px
+  right 3px
   padding 110px 10px 0px 10px
   z-index 20000
-  border-radius 24px
+  border-radius 15px
 
   .customGasPriceBar
-    transition standardSlower
     transform translate(0px, 0px)
+    transition-delay 0.2s
 
   .txFeeSummary
     transform translateY(0px)
     opacity 1
+    transition-delay 0.1s
 
   .txFeeSummaryHover     
     background highlighter
     box-shadow cardDrop, 0px 20px 25px -15px thick, 0px -25px 20px -15px thick
-    transition standardSlow
 
   .txFeeInputs
     transform translateY(0px)
+    transition-delay 0.1s
 
   .networkFeeOptions
     left 10px
@@ -766,7 +773,7 @@
 
 .customGasPriceBar
   position absolute
-  bottom 17px
+  bottom 14px
   left 71px
   width 40px
   height 14px
@@ -774,8 +781,9 @@
   justify-content center
   align-items center
   z-index 2000000000000000
-  transition standardFast
-  transform translate(0px, 500px) rotate(15deg)
+  transition standard
+  transform translate(0px, 100px) rotate(0deg)
+  transition-delay 0s
 
   .customGasPriceBarInner
     width 2px

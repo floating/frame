@@ -92,7 +92,7 @@ ipcMain.on('tray:replaceTx', async (e, id, type) => {
 })
 
 ipcMain.on('tray:clipboardData', (e, data) => {
-  clipboard.writeText(data)
+  if (data) clipboard.writeText(data)
 })
 
 ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {

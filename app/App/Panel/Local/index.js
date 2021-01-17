@@ -340,7 +340,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              How many live accounts should we derive?
+              The number of live accounts to derive
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 1 }}>

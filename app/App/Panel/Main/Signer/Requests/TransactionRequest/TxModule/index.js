@@ -15,9 +15,11 @@ class TxData extends React.Component {
   }
 
   copyData (data) {
-    link.send('tray:clipboardData', data)
-    this.setState({ copiedData: true })
-    setTimeout(_ => this.setState({ copiedData: false }), 1000)
+    if (data) {
+      link.send('tray:clipboardData', data)
+      this.setState({ copiedData: true })
+      setTimeout(_ => this.setState({ copiedData: false }), 1000)
+    }
   }
   
   render () {
@@ -27,24 +29,32 @@ class TxData extends React.Component {
       <div className='txModuleMain'>
         <div className='txModuleTop'>
           {utils.toAscii(req.data.data || '0x') ? (
-            <div className={active ? 'txModuleTopData txModuleTopDataExpanded' : 'txModuleTopData'}>
-              <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
-              <div className='transactionDataLabel'>View Data</div>
-              <div className='transactionDataIndicator' onMouseDown={() => this.copyData(req.data.data)}>
-                {svg.octicon('clippy', { height: 20 })}
+            <div className='txModuleTop'>
+              <div className={active ? 'txModuleTopData txModuleTopDataExpanded' : 'txModuleTopData'}>
+                <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
+                <div className='transactionDataLabel'>View Data</div>
+                <div className='transactionDataIndicator' onMouseDown={() => this.copyData(req.data.data)}>
+                  {svg.octicon('clippy', { height: 20 })}
+                </div>
+              </div>
+              <div className='txModuleBody'>
+                <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
+                  {this.state.copiedData ? (
+                    <div className='txModuleDataBodyCopied'>
+                      <div>Copied</div>
+                      {svg.octicon('clippy', { height: 20 })}
+                    </div>
+                  ) : req.data.data}
+                </div>
               </div>
             </div>
-          ) : 'No Data '}
-        </div>
-        <div className='txModuleBody'>
-          <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
-            {this.state.copiedData ? (
-              <div className='txModuleDataBodyCopied'>
-                <div>Copied</div>
-                {svg.octicon('clippy', { height: 20 })}
+          ) : (
+            <div className='txModuleTop'>
+              <div className='txModuleTopData' style={{ justifyContent: 'center' }}>
+                No Data
               </div>
-            ) : req.data.data}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     )
@@ -62,21 +72,22 @@ class TxModule extends React.Component {
 
   mouseDetect (e) {
     if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
-      this.setState({ active: false })
-      document.removeEventListener('mousedown', this.mouseDetect)
+      this.setActive(false)
     }
   }
 
   setActive (active) {
+    if (!this.props.req || !this.props.req.data || !this.props.req.data.data) return 
     this.setState({ active })
     clearTimeout(this.expandActiveTimeout)
     if (active) {
       document.addEventListener('mousedown', this.mouseDetect.bind(this))
-      this.expandActiveTimeout = setTimeout(() => {
-        this.setState({ expandActive: true })
-      }, 600)
+      this.setState({ expandActive: true })
     } else {
-      this.setState({ expandActive: false })
+      document.removeEventListener('mousedown', this.mouseDetect)
+      this.expandActiveTimeout = setTimeout(() => {
+        this.setState({ expandActive: false })
+      }, 320)
     }
   }
 
@@ -88,6 +99,12 @@ class TxModule extends React.Component {
     } else {
       style.height = '30px'
       style.transform = `translateY(${this.props.top}px)`
+    }
+
+    if (this.state.expandActive) {
+      style.zIndex = '200000000'
+    } else {
+      style.zIndex = '20'
     }
 
     return (

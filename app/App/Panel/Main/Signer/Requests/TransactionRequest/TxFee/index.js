@@ -187,8 +187,8 @@ class TransactionFee extends React.Component {
   }
 
   handleCustomPriceHoverReset () {
-    const { data } = this.props.req
-    this.hoverBar(this.gasPriceToPercent(data.gasPrice))
+    // const { data } = this.props.req
+    // sthis.hoverBar(this.gasPriceToPercent(data.gasPrice))
     this.setState({
       hoverGasPrice: '',
       hoverGasPriceCustom: ''
@@ -325,7 +325,7 @@ class TransactionFee extends React.Component {
 
     const currentSymbol = this.store('main.networks', network.type, network.id, 'symbol') || 'Ξ'
     let slideLevel, feeTotal, feeTotalUSD, feeTime
-    const devHaloAdjust = -75
+    const devHaloAdjust = -84
     const haloLevels = {
       slow: 148 + devHaloAdjust,
       standard: 188 + devHaloAdjust,
@@ -333,7 +333,7 @@ class TransactionFee extends React.Component {
       asap: 268 + devHaloAdjust,
       custom: 308 + devHaloAdjust
     }
-    const devAdjust = -294
+    const devAdjust = -285
     if (feeLevel === 'slow') {
       slideLevel = 170 + devAdjust
       // haloShadowLevel = `translateY(${haloLevels.slow}px)`
@@ -695,7 +695,7 @@ class TransactionFee extends React.Component {
               this.handleCustomPriceHover(e, true)
             } : null}
             onMouseLeave={expanded ? e => {
-              this.setState({ hoverLevel: '' })
+              this.setState({ hoverLevel: '', hoverGwei: 0 })
               this.handleCustomPriceHoverReset()
             } : null}
           >

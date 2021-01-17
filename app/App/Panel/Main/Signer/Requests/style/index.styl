@@ -596,8 +596,8 @@
       .approveRequestHeaderTag
         position absolute
         bottom -8px
-        left 70px
-        right 70px
+        left 80px
+        right 80px
         height 16px
         border-radius 8px
         box-sizing border-box
@@ -1370,6 +1370,10 @@ span
     align-items center
     transform translateY(0px)
     z-index 900000000
+  
+  .txDetailsHide
+    pointer-events none 
+    opacity 0
 
   .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
     background highlighter
@@ -1446,10 +1450,6 @@ span
 
 // .txDetails:hover, .txStatus:hover
 //   background highlighter
-
-.txDetailsShow
-  opacity 1
-  transform translateY(0px)
 
 .txStatus
   position absolute
