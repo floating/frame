@@ -83,9 +83,10 @@ class TxModule extends React.Component {
   render () {
     const style = {}
     if (this.state.active) {
-      style.transform = `translateY(${3}px)`
       style.height = '324px'
+      style.transform = `translateY(${3}px)`
     } else {
+      style.height = '30px'
       style.transform = `translateY(${this.props.top}px)`
     }
 

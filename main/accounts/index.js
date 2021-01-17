@@ -125,7 +125,7 @@ class Accounts extends EventEmitter {
   checkBetterGasPrice () {
     const { id, type } = store('main.currentNetwork')
     const gas = store('main.networks', type, id, 'gas.price')
-    if (gas && this.current() && this.current().network === id) {
+    if (gas && this.current() && this.current().network === id && gas.selected !== 'custom') {
       Object.keys(this.current().requests).forEach(id => {
         const req = this.current().requests[id]
         if (req.type === 'transaction' && req.data.gasPrice) {
@@ -141,26 +141,40 @@ class Accounts extends EventEmitter {
     }
   }
 
-  // async cancelTx (id, hash) {
-  //   return new Promise((resolve, reject) => {
-  //   })
-  // }
-
-  async speedTx (id) {
+  async replaceTx (id, type) {
     return new Promise((resolve, reject) => {
       if (!this.current().requests[id]) return reject(new Error('Could not find request'))
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
+      const req = this.current().requests[id]
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
-      // console.log('speedTx', data)
-      // data.gasPrice = (parseInt(data.gasPrice, 16) * 1.2).toString(16)
-      // console.log(data)
-      proxyProvider.emit('send', {
+      const network = store('main.currentNetwork')
+      const { levels } = store('main.networks', network.type, network.id, 'gas.price')
+
+      // Set the gas default to asap
+      store.setGasDefault(network.type, network.id, 'asap', levels['asap'] )
+
+      const tx = {
         id: 1,
         jsonrpc: '2.0',
-        method: 'eth_sendTransaction',
-        params: [data]
-      }, res => {
+        method: 'eth_sendTransaction'
+      }
+
+      if (type === 'speed') {
+        tx.params = [data]
+      } else {
+        console.log('send cancel tx to ', this.current().getSelectedAddress())
+        tx.params = [{
+          from: this.current().getSelectedAddress(),
+          to: this.current().getSelectedAddress(),
+          value: '0x0',
+          nonce: data.nonce,
+          _origin: this.current().requests[id].origin
+        }]
+      }
+
+      proxyProvider.emit('send', tx, res => {
         if (res.error) return reject(new Error(res.error))
+        resolve()
       })
     })
   }

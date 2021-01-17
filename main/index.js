@@ -83,11 +83,11 @@ ipcMain.on('tray:resetAllSettings', () => {
 //   accounts.removeAllAccounts()
 // })
 
-ipcMain.on('tray:speedTx', async (e, id) => {
+ipcMain.on('tray:replaceTx', async (e, id, type) => {
   try {
-    await accounts.speedTx(id)
+    await accounts.replaceTx(id, type)
   } catch (e) {
-    console.log('tray:speedTx Error', e)
+    console.log('tray:replaceTx Error', e)
   }
 })
 

@@ -575,7 +575,6 @@
       display flex
       justify-content center
       align-items center
-      text-transform uppercase
       font-weight 400
       font-size 14px
       background highlight
@@ -583,16 +582,22 @@
       border-top-left-radius 16px
       border-top-right-radius 16px
       box-shadow 0px 1px 0px thick
+      text-transform uppercase
 
       .approveRequestHeaderTitle
         text-align center
         letter-spacing 2px
 
+      .approveRequestHeaderOrigin
+        font-size 10px
+        letter-spacing 0px
+        text-transform none
+
       .approveRequestHeaderTag
         position absolute
         bottom -8px
-        left 100px
-        right 100px
+        left 70px
+        right 70px
         height 16px
         border-radius 8px
         box-sizing border-box
@@ -1215,20 +1220,21 @@ span
   font-size 12px
   font-weight 600
   background highlighter
-  color outerspace05
-  transition .32s cubic-bezier(.82,0,.12,1) width
+  color tripleThick
+  transition .32s cubic-bezier(.82,0,.12,1) width, .64s cubic-bezier(.82,0,.12,1) all
   z-index 9999
   overflow hidden
 
   .txNonceNumber
     position absolute 
-    top 1 
+    top -1px
     right 0
-    bottom 0
+    bottom 0px
     width 48px
     text-align center
-    font-family Fira Code, monospaced
     opacity 1
+    font-weight 400
+    font-size 13px
     transition .64s cubic-bezier(.82,0,.12,1) opacity
 
   .txNonceHidden
@@ -1247,6 +1253,7 @@ span
     border-right 1px solid thick
 
 .txNonce:hover
+  color outerspace08
   width 120px
 
   .txNonceHidden

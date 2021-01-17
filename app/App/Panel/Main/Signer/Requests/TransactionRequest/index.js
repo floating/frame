@@ -142,25 +142,29 @@ class TransactionRequest extends React.Component {
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
     const txMeta = { replacement: false, possible: true, notice: '' }
-    if (mode !== 'monitor') {
+    // TODO
+    // if (signer locked) {
+    //   txMeta.possible = false
+    //   txMeta.notice = 'signer is locked'
+    // }
+    if (mode !== 'monitor' && req.data.nonce) {
       const r = this.store('main.accounts', this.props.accountId, 'requests')
       const requests = Object.keys(r || {}).map(key => r[key])
       const monitor = requests.filter(req => req.mode === 'monitor')
-      const existingNonces = monitor.filter(r => r.status !== 'error').map(m => m.data.nonce)
-      const i = existingNonces.indexOf(this.props.req.data.nonce)
-      if (i > -1) {
-        txMeta.replacement = true
-        console.log(monitor[i])
-        if (monitor[i].status === 'confirming' || monitor[i].status === 'confirmed') {
-          txMeta.possible = false
-          console.log('txMeta.possible', 'not possible becasue other tx is: ', monitor[i].status)
+      const monitorFilter = monitor.filter(r => r.status !== 'error')
+      const existingNonces = monitorFilter.map(m => m.data.nonce)
+      existingNonces.forEach((nonce, i) => {
+        if (req.data.nonce === nonce) {
+          txMeta.replacement = true
+          if (monitorFilter[i].status === 'confirming' || monitorFilter[i].status === 'confirmed') {
+            txMeta.possible = false
+            txMeta.notice = 'nonce already confirmed'
+          } else if (parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')) {
+            txMeta.possible = false
+            txMeta.notice = 'gas price too low'
+          }
         }
-        if (monitor[i].data.gasPrice <= req.data.gasPrice) {
-          txMeta.possible = false
-          txMeta.notice = 'gas price too low'
-          console.log('txMeta.possible', 'not possible becasue other tx is: ', txMeta.notice)
-        }
-      }
+      })
     }
 
     let nonce = parseInt(req.data.nonce, 'hex')
@@ -180,7 +184,9 @@ class TransactionRequest extends React.Component {
                   <div className='requestNoticeInner'>
                     {!error ? (
                       <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
-                        <div className='txAugmentCancel'>Cancel</div>
+                        <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
+                          Cancel
+                        </div>
                         <div
                           className={req.tx ? 'txDetails txDetailsShow' : 'txDetails'}
                           onMouseDown={() => {
@@ -195,11 +201,8 @@ class TransactionRequest extends React.Component {
                         >
                           View Details
                         </div>
-                        <div
-                          className='txAugmentSpeedUp' onMouseDown={() => {
-                            link.send('tray:speedTx', req.handlerId)
-                          }}
-                        >Speed Up
+                        <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
+                          Speed Up
                         </div>
                       </div>
                     ) : null}
@@ -280,11 +283,13 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'>
                       {svg.octicon('radio-tower', { height: 22 })}
                     </div>
-                    <div className='approveRequestHeaderTitle'>Transaction</div>
+                    <div className='approveRequestHeaderTitle'>
+                      <div>Transaction</div>
+                    </div>
                     {txMeta.replacement ? (
                       txMeta.possible ? (
                         <div className='approveRequestHeaderTag'>
-                          replacement
+                          valid replacement
                         </div>
                       ) : (
                         <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
