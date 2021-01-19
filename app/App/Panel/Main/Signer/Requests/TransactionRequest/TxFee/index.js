@@ -76,10 +76,10 @@ class TransactionFee extends React.Component {
       ) {
         this.gasCache = { slow, standard, fast, asap }
         this.feeUpdateRealtimeRef.current.animate([
-          { opacity: '0.2', backgroundPosition: '0px 0px', offset: 0 },
+          { opacity: '0.3', backgroundPosition: '0px 0px', offset: 0 },
           { opacity: '1', offset: 0.1 },
           { opacity: '1', offset: 0.9 },
-          { opacity: '0.2', backgroundPosition: '0px 60px', offset: 1 }
+          { opacity: '0.3', backgroundPosition: '0px 60px', offset: 1 }
         ], {
           duration: 2400,
           iterations: 1,
@@ -139,20 +139,21 @@ class TransactionFee extends React.Component {
     }
   }
 
-  barColor (percent) {
-    const low = [250, 100, 155]
-    const high = [250, 100, 155]
-    const w1 = percent * 3 > 1 ? 1 : percent * 3
-    const w2 = 1 - w1
-    return `rgba(${Math.round(high[0] * w1 + low[0] * w2)}, ${Math.round(high[1] * w1 + low[1] * w2)}, ${Math.round(high[2] * w1 + low[2] * w2)}, ${percent < 0.5 ? 0.5 : percent})`
-  }
+  // barColor (percent) {
+  //   const low = [250, 100, 155]
+  //   const high = [250, 100, 155]
+  //   const w1 = percent * 3 > 1 ? 1 : percent * 3
+  //   const w2 = 1 - w1
+  //   return `rgba(${Math.round(high[0] * w1 + low[0] * w2)}, ${Math.round(high[1] * w1 + low[1] * w2)}, ${Math.round(high[2] * w1 + low[2] * w2)}, ${percent < 0.5 ? 0.5 : percent})`
+  // }
 
   hoverBar (hoverGasPercent, isCustom) {
+    if (!hoverGasPercent) hoverGasPercent = this.gasPriceToPercent(this.props.req.data.gas)
     hoverGasPercent = hoverGasPercent > 1 ? 1 : (hoverGasPercent < 0 ? 0 : hoverGasPercent)
     const hoverGasPercentOrigin = hoverGasPercent
     const network = this.store('main.currentNetwork')
     const asap = this.store('main.networks', network.type, network.id, 'gas.price.levels.asap')
-    const slow = this.store('main.networks', network.type, network.id, 'gas.price.levels.slow')
+    // const slow = this.store('main.networks', network.type, network.id, 'gas.price.levels.slow')
     const top = parseInt(asap, 16) * 1.5
     const bottom = gweiToWei(1)
     let gwei = Math.round(weiToGwei(top * hoverGasPercent))
@@ -160,14 +161,14 @@ class TransactionFee extends React.Component {
     const hoverGasPrice = utils.numberToHex(gwei * 1000000000)
     hoverGasPercent = (hoverGasPrice / top) // + percentBuffer
     hoverGasPercent = (hoverGasPercent * 2) > 1 ? 1 : hoverGasPercent * 2
-    const diff = asap - slow
-    const adjustedGasPercent = hoverGasPrice / diff
-    const hoverGasColor = this.barColor(adjustedGasPercent)
+    // const diff = asap - slow
+    // const adjustedGasPercent = hoverGasPrice / diff
+    // const hoverGasColor = this.barColor(adjustedGasPercent)
     const hoverGasPriceCustom = isCustom ? hoverGasPrice : false
     this.setState({
       hoverGasPercentOrigin,
       hoverGasPercent,
-      hoverGasColor,
+      // hoverGasColor,
       hoverGasPrice,
       hoverGasPriceCustom,
       hoverGwei: gwei
@@ -281,14 +282,18 @@ class TransactionFee extends React.Component {
       })
     }
     if (this.feeHaloClickRef && this.feeHaloClickRef.current) {
-      this.feeHaloClickRef.current.animate(
-        [
-          { opacity: 1, transform: 'scale(1)' },
-          { opacity: 0.5, transform: 'scale(2.5)' },
-          { opacity: 0, transform: 'scale(3)' }
-        ],
-        { duration: 700, iterations: 1, easing: 'ease-out' }
-      )
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          this.feeHaloClickRef.current.animate(
+            [
+              { opacity: 0.7, transform: 'scale(1)' },
+              { opacity: 0.5, transform: 'scale(2.5)' },
+              { opacity: 0, transform: 'scale(3)' }
+            ],
+            { duration: 700, iterations: 1, easing: 'ease-out' }
+          )
+        })
+      }, 10)
     }
   }
 
@@ -333,7 +338,7 @@ class TransactionFee extends React.Component {
       asap: 268 + devHaloAdjust,
       custom: 308 + devHaloAdjust
     }
-    const devAdjust = -285
+    const devAdjust = -286
     if (feeLevel === 'slow') {
       slideLevel = 170 + devAdjust
       // haloShadowLevel = `translateY(${haloLevels.slow}px)`
@@ -377,7 +382,12 @@ class TransactionFee extends React.Component {
     const haloLevel = `translateY(${haloLevels[this.state.hoverLevel || feeLevel]}px)`
 
     const txFeeStyle = {}
-    const optionsStyle = !expanded ? { transitionDelay: '0s', transform: `translateY(${slideLevel + 50}px)` } : { transform: 'translateY(0px)' }
+    const optionsStyle = !expanded ? { 
+      transitionDelay: '0s', 
+      transform: `translateY(${slideLevel + 50}px)`
+    } : { 
+      transform: 'translateY(0px)'
+    }
     const marker = this.state.hoverGasPercentOrigin * (308 - 66 - 72)
     const gasPrice = weiToGwei(parseInt(data.gasPrice, 'hex'))
     const gasLimitDisplay = this.state.pendingLimit || (this.state.gasLimitInputFocus ? (this.state.inputLimit || '') : parseInt(data.gas, 'hex'))
@@ -534,12 +544,12 @@ class TransactionFee extends React.Component {
           </div>
         </div>
         <div className='customGasPriceBar'>
-          <div className='customGasPriceBarInner' style={{ background: this.state.hoverGasColor, height: rocketHeight + '%' }}>
-            <div className='customGasPriceBarRocket' style={{ color: this.state.hoverGasColor }}>
+          <div className='customGasPriceBarInner' style={{ height: rocketHeight + '%' }}>
+            <div className='customGasPriceBarRocket'>
               {svg.rocket(21)}
             </div>
-            <div className='customGasPriceBarStreak' style={{ background: this.state.hoverGasColor, left: '-2px' }} />
-            <div className='customGasPriceBarStreak' style={{ background: this.state.hoverGasColor, right: '-2px' }} />
+            <div className='customGasPriceBarStreak' style={{ left: '-2px' }} />
+            <div className='customGasPriceBarStreak' style={{ right: '-2px' }} />
           </div>
         </div>
         <div className='networkFeeLabel' style={{ transform: expanded ? 'translateY(0px)' : 'translateY(-40px)' }}>Fee</div>
@@ -551,6 +561,7 @@ class TransactionFee extends React.Component {
           <div
             ref={this.realtimeValues.slow}
             className={this.state.hoverLevel === 'slow' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
+            style={{ opacity: !expanded && feeLevel !== 'slow' ? 0 : 1 }}
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.slow, 'slow') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'slow', hoverGwei: parseInt(gasLevels.slow, 'hex') / 1000000000 })
@@ -562,6 +573,7 @@ class TransactionFee extends React.Component {
             } : null}
             onMouseLeave={expanded ? () => {
               this.setState({ hoverLevel: '', hoverGwei: 0 })
+              if (!this.state.gasPriceInputFocus) this.setState({ inputGwei: '' })
               this.handleCustomPriceHoverReset()
             } : null}
           >
@@ -584,6 +596,7 @@ class TransactionFee extends React.Component {
           <div
             ref={this.realtimeValues.standard}
             className={this.state.hoverLevel === 'standard' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
+            style={{ opacity: !expanded && feeLevel !== 'standard' ? 0 : 1 }}
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.standard, 'standard') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'standard', hoverGwei: parseInt(gasLevels.standard, 'hex') / 1000000000 })
@@ -595,6 +608,7 @@ class TransactionFee extends React.Component {
             } : null}
             onMouseLeave={expanded ? () => {
               this.setState({ hoverLevel: '', hoverGwei: 0 })
+              if (!this.state.gasPriceInputFocus) this.setState({ inputGwei: '' })
               this.handleCustomPriceHoverReset()
             } : null}
           >
@@ -617,6 +631,7 @@ class TransactionFee extends React.Component {
           <div
             ref={this.realtimeValues.fast}
             className={this.state.hoverLevel === 'fast' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
+            style={{ opacity: !expanded && feeLevel !== 'fast' ? 0 : 1 }}
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.fast, 'fast') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'fast', hoverGwei: parseInt(gasLevels.fast, 'hex') / 1000000000 })
@@ -628,6 +643,7 @@ class TransactionFee extends React.Component {
             } : null}
             onMouseLeave={expanded ? () => {
               this.setState({ hoverLevel: '', hoverGwei: 0 })
+              if (!this.state.gasPriceInputFocus) this.setState({ inputGwei: '' })
               this.handleCustomPriceHoverReset()
             } : null}
           >
@@ -650,6 +666,7 @@ class TransactionFee extends React.Component {
           <div
             ref={this.realtimeValues.asap}
             className={this.state.hoverLevel === 'asap' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
+            style={{ opacity: !expanded && feeLevel !== 'asap' ? 0 : 1 }}
             onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.asap, 'asap') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'asap', hoverGwei: parseInt(gasLevels.asap, 'hex') / 1000000000 })
@@ -661,6 +678,7 @@ class TransactionFee extends React.Component {
             } : null}
             onMouseLeave={expanded ? () => {
               this.setState({ hoverLevel: '', hoverGwei: 0 })
+              if (!this.state.gasPriceInputFocus) this.setState({ inputGwei: '' })
               this.handleCustomPriceHoverReset()
             } : null}
           >
@@ -696,6 +714,7 @@ class TransactionFee extends React.Component {
             } : null}
             onMouseLeave={expanded ? e => {
               this.setState({ hoverLevel: '', hoverGwei: 0 })
+              if (!this.state.gasPriceInputFocus) this.setState({ inputGwei: '' })
               this.handleCustomPriceHoverReset()
             } : null}
           >
@@ -727,7 +746,7 @@ class TransactionFee extends React.Component {
           </div>
         </div>
         <div
-          className='networkFeeSelectedHalo networkFeeSelectedHaloClickwrap'
+          className='networkFeeSelectedHaloClickwrap'
           style={expanded ? { transform: haloLevel || `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
         >
           <div

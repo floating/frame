@@ -270,6 +270,23 @@ module.exports = {
       }
       return main
     })
+  },
+  setTokens: (u, address, newTokens) => {
+    u('main.addresses', address, 'tokens', (tokens = {}) => {
+      tokens = {}
+      Object.keys(newTokens).forEach(tokenAddress => {
+        tokens.known = tokens.known || {}
+        tokens.known[tokenAddress] = newTokens[tokenAddress]
+      })
+      return tokens
+    })
+  }, 
+  omitToken: (u, address, omitToken) => {
+    u('main.addresses', address, 'tokens.omit', omit => {
+      omit = omit || []
+      if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
+      return omit
+    })
   }
   // __overwrite: (path, value) => u(path, () => value)
 }

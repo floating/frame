@@ -283,6 +283,39 @@ class Signer extends React.Component {
     this.store.accountPage(accountPage)
   }
 
+  renderBalances () {
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
+    if (current) {
+      const balance = this.store('balances', address)
+      const tokens = this.store('main.addresses', address, 'tokens') || {}
+      const known = tokens.known || {}
+      return (
+        <div className='signerBalances'>
+          <div className='signerBalance' key={'eth'}>
+            <span className='signerBalanceCurrency'>{currentSymbol}</span>
+            {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
+          </div>
+          {Object.keys(known).map(k => {
+            const token = known[k]
+            return (
+              <div className='signerBalance' key={k}>
+                <img src={token.logoURI} />
+                <span className='signerBalanceCurrency'>{token.symbol}</span>
+                {(balance === undefined ? '-.------' : token.displayBalance)}
+              </div>
+            )
+          })}
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+
   renderStatus () {
     // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
@@ -290,10 +323,7 @@ class Signer extends React.Component {
     const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    const balance = this.store('balances', address)
     if (!address) return null
-    const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -317,10 +347,7 @@ class Signer extends React.Component {
                 </div>
               </div>
               <div className='signerInfo'>
-                <div className='signerBalance'>
-                  <span className='signerBalanceCurrency'>{currentSymbol}</span>
-                  {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
-                </div>
+                {this.renderBalances()}
               </div>
             </div>
           </div>

@@ -8,6 +8,7 @@ const { shell, Notification } = require('electron')
 
 const crypt = require('../crypt')
 const store = require('../store')
+const tokens = require('../tokens')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')
@@ -46,6 +47,12 @@ class Accounts extends EventEmitter {
         const type = store('main.signers', id, 'type')
         if (!this.accounts[id]) this.add(signers[id].addresses, { type })
       })
+    })
+    windows.events.on('tray:show', () => {
+      this.tokenScan(true)
+    })
+    windows.events.on('tray:hide', () => {
+      this.stopTokenScan()
     })
   }
 
@@ -371,6 +378,7 @@ class Accounts extends EventEmitter {
   }
 
   close () {
+    tokens.stop()
     // usbDetect.stopMonitoring()
   }
 
@@ -513,6 +521,19 @@ class Accounts extends EventEmitter {
       this.current().update()
       cb()
     }
+  }
+
+  tokenScan (knownOnly) {
+    const address = this.getSelectedAddress()
+    if (!address) return console.log('token scan no address')
+    const addressTokens = store('main.addresses', address, 'tokens')
+    const omit = addressTokens && addressTokens.omit
+    const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})
+    tokens.scan(address, omit, known)
+  }
+
+  stopTokenScan () {
+    tokens.stop()
   }
 
   setGasLimit (limit, handlerId, cb) {

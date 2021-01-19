@@ -24,14 +24,21 @@ const rpc = {
   setSigner: (id, cb) => {
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
+    setTimeout(() => {
+      accounts.tokenScan()
+    }, 320)  
   },
   setSignerIndex: (index, cb) => {
     accounts.setSignerIndex(index, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
+    setTimeout(() => {
+      accounts.tokenScan()
+    }, 320)  
   },
   unsetSigner: (id, cb) => {
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
+    accounts.stopTokenScan()
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,

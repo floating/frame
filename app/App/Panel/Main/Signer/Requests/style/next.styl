@@ -8,7 +8,7 @@
   color outerspace08
   font-size 14px
   font-weight 400
-  transition standard
+  transition standardVibe
   border-radius 0px
   font-family OpenSans
   left 3px
@@ -50,7 +50,7 @@
       justify-content center
       align-items center
       z-index 10
-      transition standard
+      transition standardVibe
       color outerspace08
 
     .txSectionIndicator
@@ -60,7 +60,7 @@
       align-items center
       z-index 10
       transform rotate(-180deg)
-      transition standardSlow
+      transition standardVibe
 
   .txSectionLabelLeft
     position absolute
@@ -143,9 +143,6 @@
     font-size 10px
     font-weight 600
 
-  .networkFeeSelectedHaloClickwrap
-    z-index -1 !important
-
   .networkFeeSelectedHalo
     height 38px
     border-radius 19px
@@ -153,7 +150,6 @@
     top -2px
     left 6px
     right 6px
-    // border 1px solid doubleThick
     box-sizing border-box
     pointer-events none
     z-index 5000000
@@ -187,15 +183,28 @@
           border-radius 2px
           margin-left -1px
           background good
-          
+
+  .networkFeeSelectedHaloClickwrap
+    z-index 200 !important
+    height 38px
+    border-radius 19px
+    position absolute 
+    top -2px
+    left 6px
+    right 6px
+    box-sizing border-box
+    pointer-events none
+    z-index 5000000
+    box-shadow 0px 1px 5px doubleThick
+
     .networkFeeSelectedHaloClick
       position absolute
       top -1px
       left 0
       bottom 0
       right 0
-      z-index -10
-      background spacewhite
+      z-index 40000000000
+      background ghostD
       border-radius 19px
       opacity 0
 
@@ -205,7 +214,7 @@
     z-index 200001
     pointer-events none
     box-shadow none
-    transition standard, 0.1s linear opacity 0.1s
+    transition standardVibe, 0.1s linear opacity 0.1s
     box-shadow 0px 4px 10px thick
     will-change opacity
 
@@ -215,13 +224,14 @@
     right 0px
     top 56px
     padding-top 10px
-    transition standard
+    transition standardVibe
     transform translateZ(0px)
     z-index 100
+    background rgba(255, 255, 255, 0)
 
   .networkFeeOptionHover
     .networkFeeOptionHoverInset
-      background highlight
+      background ghostD
       box-shadow 0px 5px 40px 0px thick
 
   .networkFeeOption
@@ -233,6 +243,7 @@
     z-index 100
     transform translateZ(0px)
     top -5px
+    transition standardVibe
 
     .networkFeeOptionHoverInset
       position absolute 
@@ -352,7 +363,7 @@
     height 100%
     font-size 13px
     text-transform none
-    transition standard
+    transition standardVibe
     overflow-wrap break-word
     word-wrap break-word
     font-family FiraCode, monospace
@@ -391,7 +402,7 @@
 //   font-weight 400
 //   letter-spacing 1px
 //   text-transform uppercase
-//   transition standard
+//   transition standardVibe
 //   overflow hidden
 //   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
 //   border-radius 3px
@@ -425,7 +436,7 @@
 //     justify-content center
 //     align-items center
 //     z-index 10
-//     transition standard
+//     transition standardVibe
 
 //   .transactionDataNotice
 //     width 18px
@@ -433,7 +444,7 @@
 //     justify-content center
 //     align-items center
 //     z-index 10
-//     transition standard
+//     transition standardVibe
 //     color outerspace08
 
 //   .transactionDataIndicator
@@ -445,30 +456,35 @@
 //     margin-bottom 2px
 //     margin-right 6px
 //     transform rotate(-180deg)
-//     transition standardSlow
+//     transition standardVibeSlow
 
 .txFee
   background highlight
-  box-shadow cardDrop, 0px 2px 2px thin
+  box-shadow cardDrop // , 0px 2px 2px thin
   transform translateY(-162px)
   zIndex 1
   height 31px
   left 3px
   right 3px
   padding 0px 0px
-  transition standard
+  transition standardVibe
 
   .txFeeUpdateRealtime
     position absolute
-    top 65px
+    top 60px
     left 0px
     right 0px
-    bottom 65px
-    z-index 100
+    // bottom 65px
+    min-height 202px
+    z-index 1000000
     pointer-events none
-    z-index -2
+    z-index 20
     color good
     overflow hidden
+    transition standardVibe
+    background highlight
+    transform translateY(-100px)
+    border-radius 6px
 
     .txFeeUpdateRealtimeInner
       position absolute
@@ -477,7 +493,7 @@
       right -200px
       left -200px
       color good
-      opacity 0.2
+      opacity 0.3
       background-image url('./App/Panel/Main/Signer/Requests/style/wave.svg')
       background-position 0px 0px
 
@@ -544,12 +560,12 @@
     right 7px
     left 7px
     height 48px
-    transition standardSlow
+    transition standardVibe
     display flex
     justify-content space-between
     align-items center
-    transform translateY(-200px)
-    transition-delay 0s
+    // transform translateY(-200px)
+    // transition-delay 0s
     // background blue
 
     .txFeeGwei
@@ -557,7 +573,7 @@
       justify-content center
       align-items center
       flex-direction column
-      transition standard
+      transition standardVibe
       transition-delay 0.1s
 
       .txFeeGweiValue
@@ -570,7 +586,7 @@
       justify-content center
       align-items center
       flex-direction column
-      transition standard
+      transition standardVibe
 
       .txFeeGweiValue
         width 152px
@@ -581,16 +597,16 @@
     position absolute
     left 7px
     right 7px
-    bottom 8px
+    bottom 6px
     height 48px
-    transform translateY(1000px)
+    // transform translateY(1000px)
     opacity 1
     border-top-left-radius 15px
     border-top-right-radius 15px
     border-bottom-left-radius 11px
     border-bottom-right-radius 11px
     border 1px solid thick
-    transition standardSlow, 0s linear background 0s, 0s linear box-shadow 0s
+    // transition standardVibeSlow, 0s linear background 0s, 0s linear box-shadow 0s
 
     .txFeeSummaryValue
       font-size 20px
@@ -653,7 +669,7 @@
     justify-content center
     align-items center
     flex-direction column
-    transition standard
+    transition standardVibe
     border-left 1px solid thick
     position absolute
     top 10px
@@ -675,7 +691,7 @@
     justify-content center
     align-items center
     flex-direction column
-    transition standard
+    transition standardVibe
     width 69px
     border-right 1px solid thick
     position absolute
@@ -731,7 +747,7 @@
     display none // flex
     justify-content center
     align-items center
-    transition standard
+    transition standardVibe
     position absolute
     color outerspace08
     background ghostC
@@ -749,23 +765,19 @@
   padding 110px 10px 0px 10px
   z-index 20000
   border-radius 15px
+  box-shadow cardDrop, 0px 0px 4px 2px thick
 
   .customGasPriceBar
     transform translate(0px, 0px)
-    transition-delay 0.2s
+    transition slowRocket
 
-  .txFeeSummary
+  .txFeeUpdateRealtime
     transform translateY(0px)
-    opacity 1
-    transition-delay 0.1s
+  
 
   .txFeeSummaryHover     
     background highlighter
-    box-shadow cardDrop, 0px 20px 25px -15px thick, 0px -25px 20px -15px thick
-
-  .txFeeInputs
-    transform translateY(0px)
-    transition-delay 0.1s
+    box-shadow 0px 10px 5px -5px thick, 0px 0px 10px 0px thick  // , 0px -25px 20px -15px thick
 
   .networkFeeOptions
     left 10px
@@ -773,27 +785,30 @@
 
 .customGasPriceBar
   position absolute
-  bottom 14px
+  bottom 12px
   left 71px
   width 40px
   height 14px
   display flex
   justify-content center
   align-items center
-  z-index 2000000000000000
+  z-index 20
   transition standard
-  transform translate(0px, 100px) rotate(0deg)
-  transition-delay 0s
+  transition-dealy 0.32s
+  transform translate(0px, 52px) rotate(0deg)
 
   .customGasPriceBarInner
     width 2px
     height 2px
     border-radius 2px
     position relative
+    background rgb(250, 100, 155)
+
 
     .customGasPriceBarRocket
       position absolute
       transform translate(-9.5px, -21px)
+      color rgb(250, 100, 155)
 
     .customGasPriceBarStreak
       position absolute
@@ -802,6 +817,7 @@
       width 1px
       border-radius 2px
       opacity 0.7
+      background rgb(250, 100, 155)
 
     svg
       transform rotate(-45deg)

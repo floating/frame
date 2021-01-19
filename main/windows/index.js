@@ -3,6 +3,9 @@ const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
 const log = require('electron-log')
 
+const EventEmitter = require('events')
+const events = new EventEmitter()
+
 const store = require('../store')
 
 const dev = process.env.NODE_ENV === 'development'
@@ -202,6 +205,7 @@ const api = {
           windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
           windows.tray.hide()
+          events.emit('tray:hide')
         }
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
@@ -230,6 +234,7 @@ const api = {
       windows.tray.show()
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
+      events.emit('tray:show')
       setTimeout(() => {
         if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
@@ -271,7 +276,8 @@ const api = {
   },
   quit: () => {
     app.quit()
-  }
+  },
+  events
 }
 
 app.on('web-contents-created', (e, contents) => {

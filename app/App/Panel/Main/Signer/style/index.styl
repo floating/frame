@@ -422,7 +422,7 @@
       display flex
       text-align center
       flex-direction column
-      overflow hidden
+      // overflow hidden
       font-weight 300
 
       .signerStatusNotOk
@@ -570,19 +570,32 @@
         padding-top 0px
         text-align center
         transform translateZ(0)
-        overflow hidden
         transition standard
         opacity 0
         disply flex
 
-        .signerBalance
-          opacity 1
+        .signerBalances
+          background highlight
+          box-shadow 0px 10px 0px thin
 
-          .signerBalanceCurrency
-            margin-right 4px
-            font-size 16px
-            font-weight 600
+          .signerBalance
+            opacity 1
+            height 24px
+            display flex
+            justify-content center
+            align-items center
 
+            .signerBalanceCurrency
+              margin-right 8px
+              font-size 16px
+              font-weight 600
+
+            img
+              height 16px
+              width 16px
+              border-radius 8px
+              overflow hidden
+              margin-right 12px
 
     .addressSelect
       width 100%
