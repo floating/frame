@@ -1,5 +1,5 @@
 const { parentPort } = require('worker_threads')
-const log = require('electron-log')
+// const log = require('electron-log')
 const scan = require('./scan.js')
 
 parentPort.on('message', async (message = {}) => {

@@ -49,7 +49,9 @@ module.exports = {
   },
   giveAccess: (u, req, access) => {
     u('main.addresses', req.address, address => {
-      address = address || { permissions: {} }
+      address = address || { permissions: {}, tokens: {} }
+      address.permissions = address.permissions || {}
+      address.tokens = address.tokens || {}
       address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
       return address
     })
@@ -280,7 +282,7 @@ module.exports = {
       })
       return tokens
     })
-  }, 
+  },
   omitToken: (u, address, omitToken) => {
     u('main.addresses', address, 'tokens.omit', omit => {
       omit = omit || []

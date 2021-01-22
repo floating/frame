@@ -7,7 +7,7 @@ let tokenWorker, followTimer, setupTimer
 let scanning = false
 let stopped = true
 
-const setupWorker  = (initial) => {
+const setupWorker = (initial) => {
   clearTimeout(setupTimer)
   if (tokenWorker && tokenWorker.postMessage) tokenWorker.postMessage({ method: 'exit' })
   tokenWorker = new Worker(path.resolve(__dirname, 'worker.js'))
@@ -15,9 +15,11 @@ const setupWorker  = (initial) => {
     if (message.type === 'scan') {
       scanning = false
       store.setTokens(message.address, message.found)
-      if (!stopped) followTimer = setTimeout(() => {
-        scan(message.address, message.omit, Object.keys(message.found))
-      }, 15000)
+      if (!stopped) {
+        followTimer = setTimeout(() => {
+          scan(message.address, message.omit, Object.keys(message.found))
+        }, 15000)
+      }
     }
   })
   tokenWorker.on('error', code => {

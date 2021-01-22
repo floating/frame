@@ -569,25 +569,25 @@
         .signerBalances
           position absolute
           top 0px
-          left 40px
-          right 40px
+          left 60px
+          right 60px
           margin-right 0px
           box-shadow 0px 40px 20px -15px thick0
           height 26px
           overflow hidden
           border-radius 12px
-          transition standard
+          transition standardFast
           padding 1px 0px 2px 0px
           box-sizing border-box
           background highlighter
-          box-shadow 0px 2px 1px thin
+          box-shadow 0px 3px 2px thick
 
           .signerBalanceTotal
             position absolute
-            top 356px
+            top 353px
             left 0px
             right 0px
-            height 44px
+            height 47px
             z-index 20
             background highlighter
             font-size 14px
@@ -596,13 +596,14 @@
 
             .signerBalanceTotalText
               position absolute
-              background highlightest
-              left 3px
-              right 3px
-              bottom 3px
-              top -3px
-              box-shadow 0px 2px 10px doubleThick
-              border-radius 10px
+              background highlighter
+              left 0px
+              right 0px
+              bottom 0px
+              top 0px
+              box-shadow 0px -10px 10px -5px thick
+              border-top-left-radius 10px
+              border-top-right-radius 10px
               display flex
               justify-content space-between
               align-items center
@@ -616,23 +617,22 @@
             right 0px
             height 354px
             border-radius 12px
-            transition standard
+            transition standardFast
             z-index 2
             overflow-y scroll
             padding 0px
 
           .signerBalanceSliderInset
             position relative
-            // transform translateY(-30px)
-
+            
             .signerBalance
               position relative
               margin-left 0px
-              margin-right -82px
+              width 294px
               opacity 1
               height 26px
-              transition standard
-              border-bottom 1px solid thick
+              transition standardFast
+              border-bottom 1px solid doubleThick
               padding 10px
 
               .signerBalanceCurrency
@@ -669,11 +669,11 @@
                 top 11px
                 bottom 11px
                 left 73px
-                font-size 17px
+                font-size 18px
                 padding-top 1px
                 text-align center
-                border-left 1px solid thick
-                border-right 1px solid thick
+                border-left 1px solid doubleThick
+                border-right 1px solid doubleThick
                 font-family FiraCode
                 letter-spacing -0.5px
 
@@ -686,7 +686,7 @@
                 text-align center
                 font-size 13px
                 font-weight 400
-                transition standard
+                color outerspace07
 
           .signerBalance:last-child
             border-bottom none
@@ -717,12 +717,13 @@
           height 400px
           left 8px
           right 8px
-          box-shadow 0px 0px 60px 0px thick, 0px 40px 20px -15px doubleThick
+          box-shadow 0px 0px 60px 0px thick, 0px 50px 40px -30px doubleThick
           
           .signerBalanceSliderInset
             .signerBalance          
               margin-left 8px
               margin-right 8px
+
     .addressSelect
       width 100%
       height 31px

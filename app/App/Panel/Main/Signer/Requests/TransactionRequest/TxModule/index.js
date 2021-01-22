@@ -4,12 +4,10 @@ import utils from 'web3-utils'
 import svg from '../../../../../../../svg'
 import link from '../../../../../../../link'
 
-
-
 class TxData extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.state = { 
+    this.state = {
       copiedData: false
     }
   }
@@ -21,7 +19,7 @@ class TxData extends React.Component {
       setTimeout(_ => this.setState({ copiedData: false }), 1000)
     }
   }
-  
+
   render () {
     const { req, active } = this.props
 
@@ -65,7 +63,7 @@ class TxModule extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.moduleRef = React.createRef()
-    this.state = { 
+    this.state = {
       active: false
     }
   }
@@ -77,7 +75,7 @@ class TxModule extends React.Component {
   }
 
   setActive (active) {
-    if (!this.props.req || !this.props.req.data || !this.props.req.data.data) return 
+    if (!this.props.req || !this.props.req.data || !this.props.req.data.data) return
     this.setState({ active })
     clearTimeout(this.expandActiveTimeout)
     if (active) {
@@ -109,7 +107,7 @@ class TxModule extends React.Component {
 
     return (
       <div className='txModule' style={style} onMouseDown={() => this.setActive(true)} ref={this.moduleRef}>
-        <TxData {...this.props} {...this.state}/>
+        <TxData {...this.props} {...this.state} />
       </div>
     )
   }

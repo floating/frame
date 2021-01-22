@@ -152,13 +152,12 @@ class Accounts extends EventEmitter {
     return new Promise((resolve, reject) => {
       if (!this.current().requests[id]) return reject(new Error('Could not find request'))
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
-      const req = this.current().requests[id]
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
       const network = store('main.currentNetwork')
       const { levels } = store('main.networks', network.type, network.id, 'gas.price')
 
       // Set the gas default to asap
-      store.setGasDefault(network.type, network.id, 'asap', levels['asap'] )
+      store.setGasDefault(network.type, network.id, 'asap', levels.asap)
 
       const tx = {
         id: 1,

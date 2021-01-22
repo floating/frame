@@ -1,3 +1,5 @@
+/* globals fetch */
+
 const ethProvider = require('eth-provider')
 const log = require('electron-log')
 const { getTokensBalance } = require('@mycrypto/eth-scan')
@@ -20,18 +22,18 @@ const _provider = { // Until eth-scan supports EIP-1193
 const padLeft = (num, length) => {
   num = num.toString()
   while (num.length < length) num = '0' + num
-  return num 
+  return num
 }
 
 const padRight = (num, length) => {
   num = num.toString()
   while (num.length < length) num = num + '0'
-  return num 
+  return num
 }
 
 const scan = async (address, omitList = [], knownList) => {
   const found = {}
-  
+
   const omit = omitList.map(a => a.toLowerCase())
   const list = (knownList || tokenAddresses).map(a => a.toLowerCase()).filter(a => omit.indexOf(a) === -1)
 
@@ -63,9 +65,6 @@ const scan = async (address, omitList = [], knownList) => {
     })
   } catch (e) {
     log.error(e)
-    found[token].usdRate = 0
-    found[token].usdValue = 0
-    found[token].usdDisplayValue = '$0'
   }
   return found
 }

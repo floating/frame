@@ -1,3 +1,5 @@
+/* globals requestAnimationFrame */
+
 import React from 'react'
 import Restore from 'react-restore'
 import utils, { toHex } from 'web3-utils'
@@ -382,10 +384,10 @@ class TransactionFee extends React.Component {
     const haloLevel = `translateY(${haloLevels[this.state.hoverLevel || feeLevel]}px)`
 
     const txFeeStyle = {}
-    const optionsStyle = !expanded ? { 
-      transitionDelay: '0s', 
+    const optionsStyle = !expanded ? {
+      transitionDelay: '0s',
       transform: `translateY(${slideLevel + 50}px)`
-    } : { 
+    } : {
       transform: 'translateY(0px)'
     }
     const marker = this.state.hoverGasPercentOrigin * (308 - 66 - 72)

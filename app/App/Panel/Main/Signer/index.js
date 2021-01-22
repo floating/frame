@@ -15,24 +15,43 @@ import trezorLogo from './trezorLogo.png'
 class _Balances extends React.Component {
   constructor (...args) {
     super(...args)
+    this.moduleRef = React.createRef()
     this.state = {
       openActive: false,
       open: false,
       selected: 0,
       shadowTop: 0
-    }  
+    }
+    this.mD = this.mouseDetect.bind(this)
   }
+
+  mouseDetect (e) {
+    if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
+      this.setActive(false)
+    }
+  }
+
+  setActive (active) {
+    this.setState({ openActive: active })
+    this.openTimer = setTimeout(() => this.setState({ open: active }), 480)
+    if (active && !this.state.openActive) {
+      document.addEventListener('mousedown', this.mD)
+    } else {
+      document.removeEventListener('mousedown', this.mD)
+    }
+  }
+
   handleScroll (event) {
     this.setState({ shadowTop: event.target.scrollTop })
   }
+
   renderBalance (known, k, i) {
     const currentIndex = this.store('main.accounts', this.props.id, 'index')
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const balance = this.store('balances', address)
-    const { openActive } = this.state
     const token = known[k]
     return (
-      <div className='signerBalance' style={{ transitionDelay: openActive ? (i * 0.08) + 's' : '0s' }} key={k} onMouseDown={() => this.setState({ selected: i })}> 
+      <div className='signerBalance' key={k} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceLogo'>
           <img src={token.logoURI} />
         </div>
@@ -42,12 +61,13 @@ class _Balances extends React.Component {
         <div className='signerBalanceValue'>
           {(balance === undefined ? '-.------' : token.displayBalance)}
         </div>
-        <div className={'signerBalanceEquivalent'} style={(token.usdDisplayValue || '$0').length >= 10 ? { fontSize: '10px', top: '15px' } : {}}>
+        <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '$0').length >= 10 ? { fontSize: '10px', top: '15px' } : {}}>
           {token.usdDisplayValue}
         </div>
       </div>
     )
   }
+
   render () {
     const { open, openActive, selected, shadowTop } = this.state
     const currentIndex = this.store('main.accounts', this.props.id, 'index')
@@ -68,7 +88,7 @@ class _Balances extends React.Component {
           address: '0x',
           logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
           symbol: currentSymbol,
-          balance, 
+          balance,
           displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
           floatBalance: parseFloat(balance || 0).toFixed(6),
           usdRate: etherUSD,
@@ -83,42 +103,42 @@ class _Balances extends React.Component {
       })
       const offsetTop = (selected * 47) + 10
       return (
-        <div className={openActive ? 'signerBalances signerBalancesOpen' : 'signerBalances'} onMouseDown={() => {
-          clearTimeout(this.openTimer)
-          const o = !this.state.open
-          this.setState({ openActive: o })
-          this.openTimer = setTimeout(() => {
-            this.setState({ open: o })
-          }, 480)
-        }}>
-          <div className='signerBalanceSliderInset signerBalanceSliderDisplay' style={openActive && !open ? {
-            transition: '.48s cubic-bezier(.82,0,.12,1) all',
-            transform: `translateY(-${shadowTop}px)`
-          } : openActive && open ? {
-            transition: '0s cubic-bezier(.82,0,.12,1) all',
-            transform: `translateY(-${shadowTop}px)`
-          } 
-          : {
-            transition: '.48s cubic-bezier(.82,0,.12,1) all',
-            transform: `translateY(-${offsetTop}px)`
-          }}>
+        <div
+          ref={this.moduleRef} className={openActive ? 'signerBalances signerBalancesOpen' : 'signerBalances'} onMouseDown={() => {
+            clearTimeout(this.openTimer)
+            const o = !this.state.open
+            this.setActive(o)
+          }}
+        >
+          <div
+            className='signerBalanceSliderInset signerBalanceSliderDisplay' style={openActive && !open ? {
+              transition: '0.16s cubic-bezier(.82,0,.12,1) all',
+              transform: `translateY(-${shadowTop}px)`
+            } : openActive && open ? {
+              transition: '0s cubic-bezier(.82,0,.12,1) all',
+              transform: `translateY(-${shadowTop}px)`
+            } : {
+              transition: '0.16s cubic-bezier(.82,0,.12,1) all',
+              transform: `translateY(-${offsetTop}px)`
+            }}
+          >
             {knownList.map((k, i) => this.renderBalance(known, k, i))}
-          </div> 
-          <div className='signerBalanceSlider' onScroll={this.handleScroll.bind(this)}>
+          </div>
+          <div className='signerBalanceSlider' style={!open ? { pointerEvents: 'none' } : {}} onScroll={this.handleScroll.bind(this)}>
             <div className='signerBalanceSliderInset signerBalanceSliderShadow'>
               {knownList.map((k, i) => this.renderBalance(known, k, i))}
-            </div> 
+            </div>
           </div>
           <div className='signerBalanceTotal' onMouseDown={(e) => e.stopPropagation()}>
             <div className='signerBalanceTotalText'>
               <div>
-                {'Total'}
+                Total
               </div>
               <div>
                 {'$' + knownList.map(k => known[k].usdValue).reduce((a, b) => a + b, 0).toLocaleString()}
               </div>
             </div>
-          </div>  
+          </div>
           {knownList.length <= 1 ? (
             <div className='signerBalanceNoTokens'>
               No other token balances found
@@ -132,7 +152,6 @@ class _Balances extends React.Component {
   }
 }
 const Balances = Restore.connect(_Balances)
-
 
 class Signer extends React.Component {
   constructor (...args) {
