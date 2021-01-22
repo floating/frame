@@ -1,15 +1,16 @@
 const path = require('path')
 const { Worker } = require('worker_threads')
+const log = require('electron-log')
 const store = require('../store')
 
-let tokenWorker, followTimer
+let tokenWorker, followTimer, setupTimer
 let scanning = false
 let stopped = true
 
-
 const setupWorker  = (initial) => {
+  clearTimeout(setupTimer)
   if (tokenWorker && tokenWorker.postMessage) tokenWorker.postMessage({ method: 'exit' })
-  tokenWorker = new Worker(path.resolve(__dirname, './worker.js'))
+  tokenWorker = new Worker(path.resolve(__dirname, 'worker.js'))
   tokenWorker.on('message', message => {
     if (message.type === 'scan') {
       scanning = false
@@ -23,7 +24,9 @@ const setupWorker  = (initial) => {
     log.error(new Error(`Token worker error with exit code ${code}`))
   })
   tokenWorker.on('exit', code => {
-    setupWorker()
+    setupTimer = setTimeout(() => {
+      setupWorker()
+    }, 15000)
   })
   if (initial) tokenWorker.postMessage(initial)
 }

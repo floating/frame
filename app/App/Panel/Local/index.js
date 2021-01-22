@@ -238,7 +238,7 @@ class Settings extends React.Component {
           <div className='localSettingsTitle'>
             <div className='localSettingsTitleText'>Settings</div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 8 }}>
+          <div className='signerPermission' style={{ zIndex: 10 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Summon</div>
               <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
@@ -251,7 +251,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 8 }}>
+          <div className='signerPermission' style={{ zIndex: 9 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Auto-hide</div>
               <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
@@ -264,7 +264,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 7 }}>
+          <div className='signerPermission' style={{ zIndex: 8 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
@@ -275,7 +275,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 6 }}>
+          <div className='signerPermission' style={{ zIndex: 7 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -286,6 +286,17 @@ class Settings extends React.Component {
               {'Mouse to your display\'s right edge to reveal Frame'}
             </div>
           </div>
+          {/* <div className='signerPermission' style={{ zIndex: 6 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Show USD Value</div>
+              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleUSDValue')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              Show USD value of Ether and token balances
+            </div>
+          </div> */}
           {this.store('platform') === 'darwin' ? (
             <div className='signerPermission' style={{ zIndex: 5 }}>
               <div className='signerPermissionControls'>

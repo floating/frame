@@ -288,5 +288,8 @@ module.exports = {
       return omit
     })
   }
+  // toggleUSDValue: (u) => {
+  //   u('main.showUSDValue', show => !show)
+  // }
   // __overwrite: (path, value) => u(path, () => value)
 }

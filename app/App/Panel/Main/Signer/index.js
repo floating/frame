@@ -12,6 +12,128 @@ import trezorLogo from './trezorLogo.png'
 
 // TODO: Rename Signer component to Account
 
+class _Balances extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      openActive: false,
+      open: false,
+      selected: 0,
+      shadowTop: 0
+    }  
+  }
+  handleScroll (event) {
+    this.setState({ shadowTop: event.target.scrollTop })
+  }
+  renderBalance (known, k, i) {
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const balance = this.store('balances', address)
+    const { openActive } = this.state
+    const token = known[k]
+    return (
+      <div className='signerBalance' style={{ transitionDelay: openActive ? (i * 0.08) + 's' : '0s' }} key={k} onMouseDown={() => this.setState({ selected: i })}> 
+        <div className='signerBalanceLogo'>
+          <img src={token.logoURI} />
+        </div>
+        <div className='signerBalanceCurrency'>
+          {token.symbol}
+        </div>
+        <div className='signerBalanceValue'>
+          {(balance === undefined ? '-.------' : token.displayBalance)}
+        </div>
+        <div className={'signerBalanceEquivalent'} style={(token.usdDisplayValue || '$0').length >= 10 ? { fontSize: '10px', top: '15px' } : {}}>
+          {token.usdDisplayValue}
+        </div>
+      </div>
+    )
+  }
+  render () {
+    const { open, openActive, selected, shadowTop } = this.state
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+    if (current) {
+      const balance = this.store('balances', address)
+      const tokens = this.store('main.addresses', address, 'tokens') || {}
+      const etherRates = this.store('external.rates')
+      const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+      const known = Object.assign({}, tokens.known, {
+        default: {
+          chainId: 1,
+          name: 'Ether',
+          decimals: 18,
+          address: '0x',
+          logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
+          symbol: currentSymbol,
+          balance, 
+          displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
+          floatBalance: parseFloat(balance || 0).toFixed(6),
+          usdRate: etherUSD,
+          usdValue: Math.floor(parseFloat(balance) * etherUSD),
+          usdDisplayValue: '$' + Math.floor(parseFloat(balance) * etherUSD).toLocaleString()
+        }
+      })
+      const knownList = Object.keys(known).sort((a, b) => {
+        if (a === 'default') return -1
+        if (b === 'default') return 1
+        return known[a].usdValue > known[b].usdValue ? -1 : known[a].usdValue < known[b].usdValue ? 1 : 0
+      })
+      const offsetTop = (selected * 47) + 10
+      return (
+        <div className={openActive ? 'signerBalances signerBalancesOpen' : 'signerBalances'} onMouseDown={() => {
+          clearTimeout(this.openTimer)
+          const o = !this.state.open
+          this.setState({ openActive: o })
+          this.openTimer = setTimeout(() => {
+            this.setState({ open: o })
+          }, 480)
+        }}>
+          <div className='signerBalanceSliderInset signerBalanceSliderDisplay' style={openActive && !open ? {
+            transition: '.48s cubic-bezier(.82,0,.12,1) all',
+            transform: `translateY(-${shadowTop}px)`
+          } : openActive && open ? {
+            transition: '0s cubic-bezier(.82,0,.12,1) all',
+            transform: `translateY(-${shadowTop}px)`
+          } 
+          : {
+            transition: '.48s cubic-bezier(.82,0,.12,1) all',
+            transform: `translateY(-${offsetTop}px)`
+          }}>
+            {knownList.map((k, i) => this.renderBalance(known, k, i))}
+          </div> 
+          <div className='signerBalanceSlider' onScroll={this.handleScroll.bind(this)}>
+            <div className='signerBalanceSliderInset signerBalanceSliderShadow'>
+              {knownList.map((k, i) => this.renderBalance(known, k, i))}
+            </div> 
+          </div>
+          <div className='signerBalanceTotal' onMouseDown={(e) => e.stopPropagation()}>
+            <div className='signerBalanceTotalText'>
+              <div>
+                {'Total'}
+              </div>
+              <div>
+                {'$' + knownList.map(k => known[k].usdValue).reduce((a, b) => a + b, 0).toLocaleString()}
+              </div>
+            </div>
+          </div>  
+          {knownList.length <= 1 ? (
+            <div className='signerBalanceNoTokens'>
+              No other token balances found
+            </div>
+          ) : null}
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+}
+const Balances = Restore.connect(_Balances)
+
+
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
@@ -246,7 +368,7 @@ class Signer extends React.Component {
     const startIndex = this.store('selected.accountPage') * 5
     const highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
     const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     return (
       <div className='accountListWrap'>
         <div className='accountList' onMouseDown={e => e.stopPropagation()}>
@@ -283,39 +405,6 @@ class Signer extends React.Component {
     this.store.accountPage(accountPage)
   }
 
-  renderBalances () {
-    const currentIndex = this.store('main.accounts', this.props.id, 'index')
-    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
-    if (current) {
-      const balance = this.store('balances', address)
-      const tokens = this.store('main.addresses', address, 'tokens') || {}
-      const known = tokens.known || {}
-      return (
-        <div className='signerBalances'>
-          <div className='signerBalance' key={'eth'}>
-            <span className='signerBalanceCurrency'>{currentSymbol}</span>
-            {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
-          </div>
-          {Object.keys(known).map(k => {
-            const token = known[k]
-            return (
-              <div className='signerBalance' key={k}>
-                <img src={token.logoURI} />
-                <span className='signerBalanceCurrency'>{token.symbol}</span>
-                {(balance === undefined ? '-.------' : token.displayBalance)}
-              </div>
-            )
-          })}
-        </div>
-      )
-    } else {
-      return null
-    }
-  }
-
   renderStatus () {
     // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
@@ -347,7 +436,7 @@ class Signer extends React.Component {
                 </div>
               </div>
               <div className='signerInfo'>
-                {this.renderBalances()}
+                <Balances {...this.props} />
               </div>
             </div>
           </div>

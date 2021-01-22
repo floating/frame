@@ -86,6 +86,7 @@ const initial = {
     shortcuts: {
       altSlash: main('shortcuts.altSlash', true)
     },
+    // showUSDValue: main('showUSDValue', true),
     launch: main('launch', false),
     reveal: main('reveal', false),
     autohide: main('autohide', true),
@@ -175,7 +176,7 @@ const initial = {
         1: {
           id: 1,
           type: 'ethereum',
-          symbol: 'Ξ',
+          symbol: 'ETH',
           name: 'Mainnet',
           explorer: 'https://etherscan.io',
           gas: {
@@ -192,7 +193,7 @@ const initial = {
         3: {
           id: 3,
           type: 'ethereum',
-          symbol: 'Ξ',
+          symbol: 'ETH',
           name: 'Ropsten',
           explorer: 'https://ropsten.etherscan.io',
           gas: {
@@ -209,7 +210,7 @@ const initial = {
         4: {
           id: 4,
           type: 'ethereum',
-          symbol: 'Ξ',
+          symbol: 'ETH',
           name: 'Rinkeby',
           explorer: 'https://rinkeby.etherscan.io',
           gas: {
@@ -226,7 +227,7 @@ const initial = {
         5: {
           id: 5,
           type: 'ethereum',
-          symbol: 'Ξ',
+          symbol: 'ETH',
           name: 'Görli',
           explorer: 'https://goerli.etherscan.io',
           gas: {
@@ -243,7 +244,7 @@ const initial = {
         42: {
           id: 42,
           type: 'ethereum',
-          symbol: 'Ξ',
+          symbol: 'ETH',
           name: 'Kovan',
           explorer: 'https://kovan.etherscan.io',
           gas: {
@@ -369,9 +370,10 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
     } else if (id === 100) {
       initial.main.networks.ethereum[id].symbol = 'xDAI'
     } else {
-      initial.main.networks.ethereum[id].symbol = 'Ξ'
+      initial.main.networks.ethereum[id].symbol = 'ETH'
     }
   }
+  if (initial.main.networks.ethereum[id].symbol === 'Ξ') initial.main.networks.ethereum[id].symbol = 'ETH'
   // Update safelow -> slow and trader -> asap
   if (initial.main.networks.ethereum[id].gas.price.selected === 'safelow') initial.main.networks.ethereum[id].gas.price.selected = 'slow'
   if (initial.main.networks.ethereum[id].gas.price.selected === 'trader') initial.main.networks.ethereum[id].gas.price.selected = 'asap'
