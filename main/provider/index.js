@@ -270,13 +270,13 @@ class Provider extends EventEmitter {
           const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
           const prices = await response.json()
           store.setGasPrices(network.type, network.id, {
-            slow: ('0x' + (prices.safeLow * 100000000).toString(16)),
+            slow: ('0x' + (Math.round(prices.safeLow) * 100000000).toString(16)),
             slowTime: undefined,
-            standard: ('0x' + (prices.average * 100000000).toString(16)),
+            standard: ('0x' + (Math.round(prices.average) * 100000000).toString(16)),
             standardTime: undefined,
-            fast: ('0x' + (prices.fast * 100000000).toString(16)),
+            fast: ('0x' + (Math.round(prices.fast) * 100000000).toString(16)),
             fastTime: undefined,
-            asap: ('0x' + (prices.fastest * 100000000).toString(16)),
+            asap: ('0x' + (Math.round(prices.fastest) * 100000000).toString(16)),
             asapTime: undefined,
             custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16)),
             lastUpdate: Date.now(),
@@ -301,9 +301,9 @@ class Provider extends EventEmitter {
             const network = store('main.currentNetwork')
             if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
             store.setGasPrices(network.type, network.id, {
-              slow: response.result,
+              slow: '0x' + ((Math.round(parseInt(response.result, 16) / 1000000000) * 1000000000).toString(16)),
               slowTime: undefined,
-              standard: response.result,
+              standard: '0x' + ((Math.round(parseInt(response.result, 16) / 1000000000) * 1000000000).toString(16)),
               standardTime: undefined,
               fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
               fastTime: undefined,

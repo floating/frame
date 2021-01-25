@@ -33,6 +33,8 @@ export const notify = (u, type, data = {}) => {
   u('view.notifyData', _ => data)
 }
 
+export const clickGuard = (u, on) => u('view.clickGuard', () => on)
+
 export const toggleAddAccount = (u) => u('view.addAccount', show => !show)
 
 export const toggleAddNetwork = (u) => u('view.addNetwork', show => !show)

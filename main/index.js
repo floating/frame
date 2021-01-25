@@ -7,8 +7,6 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('enable-transparent-visuals', true)
 if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
-console.log('process.version', process.version)
-
 const log = require('electron-log')
 const path = require('path')
 
@@ -125,6 +123,10 @@ ipcMain.on('tray:openExplorer', (e, hash) => {
 ipcMain.on('tray:giveAccess', (e, req, access) => {
   store.giveAccess(req, access)
   accounts.removeRequest(req.handlerId)
+})
+
+ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
+  accounts.adjustNonce(handlerId, nonceAdjust)
 })
 
 ipcMain.on('tray:syncPath', (e, path, value) => {

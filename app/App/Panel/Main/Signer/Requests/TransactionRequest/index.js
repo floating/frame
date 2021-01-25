@@ -175,9 +175,20 @@ class TransactionRequest extends React.Component {
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
-              <div className={notice ? 'txNonce txNonceSet' : 'txNonce'}>
-                <div className='txNonceLabel'>Nonce</div>
-                <div className={nonce !== 'TBD' ? 'txNonceNumber' : 'txNonceNumber txNonceHidden'}>{nonce}</div>
+              <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={error || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
+                <div className='txNonceControl'>
+                  <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:updateNonce', req.handlerId, -1)}>
+                    {svg.octicon('chevron-down', { height: 14 })}
+                  </div>
+                  <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:updateNonce', req.handlerId, 1)}>
+                    {svg.octicon('chevron-up', { height: 14 })}
+                  </div>
+                  <div className='txNonceLabel'>Nonce</div>
+                </div>
+                <div className={nonce === 'TBD' || error ? 'txNonceNumber  txNonceHidden' : 'txNonceNumber'}>
+                  {nonce}
+                </div>
+                {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
               </div>
               {notice ? (
                 <div className='requestNotice'>

@@ -29,7 +29,8 @@ const initial = {
     notifyData: {},
     badge: '',
     addAccount: '', // Add view (needs to be merged into Phase)
-    addNetwork: false // Phase view (needs to be merged with Add)
+    addNetwork: false, // Phase view (needs to be merged with Add)
+    clickGuard: false
   },
   signers: {},
   tray: {

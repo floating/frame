@@ -32,11 +32,15 @@ class _Balances extends React.Component {
   }
 
   setActive (active) {
+    const { type, id } = this.store('main.currentNetwork')
+    if (type !== 'ethereum' || id !== '1') return
     this.setState({ openActive: active })
     this.openTimer = setTimeout(() => this.setState({ open: active }), 480)
     if (active && !this.state.openActive) {
+      this.store.clickGuard(true)
       document.addEventListener('mousedown', this.mD)
     } else {
+      this.store.clickGuard(false)
       document.removeEventListener('mousedown', this.mD)
     }
   }
@@ -58,10 +62,10 @@ class _Balances extends React.Component {
         <div className='signerBalanceCurrency'>
           {token.symbol}
         </div>
-        <div className='signerBalanceValue'>
+        <div className='signerBalanceValue' style={(token.displayBalance || '$0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
           {(balance === undefined ? '-.------' : token.displayBalance)}
         </div>
-        <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '$0').length >= 10 ? { fontSize: '10px', top: '15px' } : {}}>
+        <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '$0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}}>
           {token.usdDisplayValue}
         </div>
       </div>
@@ -131,10 +135,10 @@ class _Balances extends React.Component {
           </div>
           <div className='signerBalanceTotal' onMouseDown={(e) => e.stopPropagation()}>
             <div className='signerBalanceTotalText'>
-              <div>
+              <div className='signerBalanceTotalTitle'>
                 Total
               </div>
-              <div>
+              <div className='signerBalanceTotalValue'>
                 {'$' + knownList.map(k => known[k].usdValue).reduce((a, b) => a + b, 0).toLocaleString()}
               </div>
             </div>
@@ -516,6 +520,7 @@ class Signer extends React.Component {
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
+            {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             <div className='signerTop'>
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
               {this.renderStatus()}

@@ -47,15 +47,15 @@ const onData = data => {
       // If we havent recieved gas data in 60s, make sure we're connected
       staleTimer = setTimeout(() => setUpSocket('staleTimer'), 60 * 1000)
       store.setGasPrices('ethereum', '1', {
-        slow: ('0x' + gweiToWei(gas.slow).toString(16)),
+        slow: ('0x' + gweiToWei(Math.round(gas.slow)).toString(16)),
         slowTime: gas.slowTime,
-        standard: ('0x' + gweiToWei(gas.standard).toString(16)),
+        standard: ('0x' + gweiToWei(Math.round(gas.standard)).toString(16)),
         standardTime: gas.standardTime,
-        fast: ('0x' + gweiToWei(gas.fast).toString(16)),
+        fast: ('0x' + gweiToWei(Math.round(gas.fast)).toString(16)),
         fastTime: gas.fastTime,
-        asap: ('0x' + gweiToWei(gas.asap).toString(16)),
+        asap: ('0x' + gweiToWei(Math.round(gas.asap)).toString(16)),
         asapTime: gas.asapTime,
-        custom: store('main.networks.ethereum.1.gas.price.levels.custom') || ('0x' + gweiToWei(gas.standard).toString(16)),
+        custom: store('main.networks.ethereum.1.gas.price.levels.custom') || ('0x' + gweiToWei(Math.round(gas.standard)).toString(16)),
         lastUpdate: gas.lastUpdate,
         quality: gas.quality,
         source: gas.source

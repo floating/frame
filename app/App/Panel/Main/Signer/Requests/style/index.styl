@@ -739,9 +739,9 @@
     padding 0px 16px
     background highlightest
     border-radius 12px
-    height 24px
-    min-height 24px
-    max-height 24px
+    height 25px
+    min-height 25px
+    max-height 25px
       
   .transactionTotals
     display flex
@@ -1207,13 +1207,13 @@ span
 
 .txNonce
   position absolute
-  top 22px
+  top 20px
   right 12px
   background highlighter
-  height 16px
+  height 20px
   width 48px
   border-radius 16px
-  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner, -8px 0px 8px highlightest
+  box-shadow 0px 2px 1px thick
   display flex
   justify-content center
   align-items center
@@ -1221,9 +1221,18 @@ span
   font-weight 600
   background highlighter
   color tripleThick
-  transition .32s cubic-bezier(.82,0,.12,1) width, .64s cubic-bezier(.82,0,.12,1) all
+  transition standard
   z-index 9999
   overflow hidden
+
+  .txNonceMarker
+    position absolute
+    background thick
+    top 7px
+    right 7px
+    bottom 7px
+    width 34px
+    border-radius 6px
 
   .txNonceNumber
     position absolute 
@@ -1235,29 +1244,71 @@ span
     opacity 1
     font-weight 400
     font-size 13px
-    transition .64s cubic-bezier(.82,0,.12,1) opacity
+    display flex
+    justify-content center 
+    align-items center
 
   .txNonceHidden
     color tripleThick
     opacity 0
 
-  .txNonceLabel
+  .txNonceControl
     position absolute 
-    top 1px
+    top 0px
     right 48px
     bottom 0px
-    width 68px
-    text-align center
+    width 98px
+    display flex
+    justify-conent space-between
+
+  .txNonceButton
+    height 20px
+    width 22px
+    display flex
+    justify-content center 
+    align-items center
     font-size 10px
     text-transform uppercase
     border-right 1px solid thick
 
+  .txNonceButton:hover
+    background ghostA
+
+  .txNonceButtonLower 
+    padding 1px 0px 0px 4px
+
+  .txNonceButtonRaise
+    padding 0px 0px 1px 0px
+
+  // .txNonceLower
+  //   height 100%
+  //   width 22px
+  //   text-align center
+  //   font-size 10px
+  //   text-transform uppercase
+    
+  .txNonceLabel
+    height 100%
+    width 60px
+    text-align center
+    font-size 10px
+    text-transform uppercase
+    border-right 1px solid thick
+    display flex
+    justify-content center 
+    align-items center
+
 .txNonce:hover
-  color outerspace08
-  width 120px
+  color outerspace06
+  width 145px
+  background ghostC
+  box-shadow 0px 2px 1px thick, -8px 0px 8px highlightest, -8px 0px 8px highlightest
 
   .txNonceHidden
     opacity 1
+
+  .txNonceMarker
+    opacity 0
 
 .txNonceSet
   transform translate(1px, -9px)

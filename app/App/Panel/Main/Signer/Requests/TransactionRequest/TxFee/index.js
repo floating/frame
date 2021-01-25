@@ -1,5 +1,3 @@
-/* globals requestAnimationFrame */
-
 import React from 'react'
 import Restore from 'react-restore'
 import utils, { toHex } from 'web3-utils'
@@ -283,20 +281,20 @@ class TransactionFee extends React.Component {
         }
       })
     }
-    if (this.feeHaloClickRef && this.feeHaloClickRef.current) {
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          this.feeHaloClickRef.current.animate(
-            [
-              { opacity: 0.7, transform: 'scale(1)' },
-              { opacity: 0.5, transform: 'scale(2.5)' },
-              { opacity: 0, transform: 'scale(3)' }
-            ],
-            { duration: 700, iterations: 1, easing: 'ease-out' }
-          )
-        })
-      }, 10)
-    }
+    // if (this.feeHaloClickRef && this.feeHaloClickRef.current) {
+    //   setTimeout(() => {
+    //     requestAnimationFrame(() => {
+    //       this.feeHaloClickRef.current.animate(
+    //         [
+    //           { opacity: 0, transform: 'scale(1)' },
+    //           { opacity: 0.7, transform: 'scale(1)' },
+    //           { opacity: 0, transform: 'scale(1)' }
+    //         ],
+    //         { duration: 200, iterations: 1, easing: 'ease-out' }
+    //       )
+    //     })
+    //   }, 10)
+    // }
   }
 
   gasData (levels, gasLimit, etherUSD) {
@@ -557,7 +555,7 @@ class TransactionFee extends React.Component {
         <div className='networkFeeLabel' style={{ transform: expanded ? 'translateY(0px)' : 'translateY(-40px)' }}>Fee</div>
         <div
           className='networkFeeSelectedHalo networkFeeSelectedHaloShadow'
-          style={expanded ? { transform: `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
+          style={expandActive ? { transform: `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
         />
         <div className='networkFeeOptions' style={optionsStyle}>
           <div
@@ -739,7 +737,7 @@ class TransactionFee extends React.Component {
         </div>
         <div
           className='networkFeeSelectedHalo'
-          style={expanded ? { transform: haloLevel || `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
+          style={expandActive ? { transform: haloLevel || `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
         >
           <div className='customHaloMarker' style={this.state.hoverLevel === 'custom' ? { display: 'block' } : { display: 'none' }}>
             <div className='customHaloMarkerInner' style={{ transform: `translateX(${marker}px)` }}>
@@ -749,7 +747,7 @@ class TransactionFee extends React.Component {
         </div>
         <div
           className='networkFeeSelectedHaloClickwrap'
-          style={expanded ? { transform: haloLevel || `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
+          style={expandActive ? { transform: haloLevel || `translateY(${haloLevels[feeLevel]}px)`, opacity: 1 } : { transform: `translateY(${haloLevels[feeLevel] + slideLevel + 50}px)`, opacity: 0 }}
         >
           <div
             ref={this.feeHaloClickRef}

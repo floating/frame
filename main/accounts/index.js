@@ -522,6 +522,30 @@ class Accounts extends EventEmitter {
     }
   }
 
+  adjustNonce (handlerId, nonceAdjust) {
+    if (nonceAdjust !== 1 && nonceAdjust !== -1) return log.error('Invalid nonce adjustment', nonceAdjust)
+    if (!this.current()) return log.error('No account selected during nonce adjustement', nonceAdjust)
+    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      const nonce = this.current().requests[handlerId].data && this.current().requests[handlerId].data.nonce
+      if (nonce) {
+        const adjustedNonce = '0x' + (parseInt(nonce, 'hex') + nonceAdjust).toString(16)
+        this.current().requests[handlerId].data.nonce = adjustedNonce
+        this.current().update()
+      } else {
+        const { from } = this.current().requests[handlerId].data
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
+          if (res.result) {
+            this.current().requests[handlerId].data.nonce = nonce
+            const newNonce = parseInt(res.result, 'hex')
+            const adjustedNonce = '0x' + (nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16)
+            this.current().requests[handlerId].data.nonce = adjustedNonce
+            this.current().update()
+          }
+        })
+      }
+    }
+  }
+
   tokenScan (knownOnly) {
     const address = this.getSelectedAddress()
     if (!address) return console.log('token scan no address')

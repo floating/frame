@@ -139,6 +139,15 @@
       .transactionToAddressFull
         opacity  1
 
+  .clickGuard
+    position absolute
+    top 0
+    left 0
+    bottom 0
+    right 0
+    z-index 4000
+    border-radius 16px
+
   .signerTop
     position relative
     opacity 1
@@ -148,6 +157,7 @@
     background highlight
     transition standard
     margin-bottom 8px
+    z-index 9999000
     .transactionToAddress
       .transactionToAddressLarge
         svg
@@ -576,7 +586,7 @@
           height 26px
           overflow hidden
           border-radius 12px
-          transition standardFast
+          transition 0.1s ease-out all
           padding 1px 0px 2px 0px
           box-sizing border-box
           background highlighter
@@ -610,6 +620,14 @@
               padding-right 15px
               padding-left 15px
 
+              .signerBalanceTotalTitle
+                width 35px
+                text-align center
+
+              .signerBalanceTotalValue
+                width 70px
+                text-align center
+
           .signerBalanceSlider
             position absolute
             top 0px
@@ -617,7 +635,7 @@
             right 0px
             height 354px
             border-radius 12px
-            transition standardFast
+            transition 0.1s ease-out all
             z-index 2
             overflow-y scroll
             padding 0px
@@ -631,7 +649,7 @@
               width 294px
               opacity 1
               height 26px
-              transition standardFast
+              transition 0.1s ease-out all
               border-bottom 1px solid doubleThick
               padding 10px
 
@@ -640,11 +658,12 @@
                 left 23px
                 top 13px
                 bottom 4px
-                width 50px
+                width 60px
                 text-align center
                 font-size 13px
                 font-weight 400
                 letter-spacing 0px
+                // background blue
 
               .signerBalanceLogo
                 position absolute
@@ -665,10 +684,10 @@
 
               .signerBalanceValue
                 position absolute
-                right 80px
+                right 85px
                 top 11px
                 bottom 11px
-                left 73px
+                left 85px
                 font-size 18px
                 padding-top 1px
                 text-align center
@@ -676,13 +695,14 @@
                 border-right 1px solid doubleThick
                 font-family FiraCode
                 letter-spacing -0.5px
+                // background blue
 
               .signerBalanceEquivalent
                 position absolute
                 right 0px
                 top 13px
                 bottom 13px
-                width 80px
+                width 85px
                 text-align center
                 font-size 13px
                 font-weight 400
