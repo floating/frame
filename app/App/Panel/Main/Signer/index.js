@@ -7,8 +7,8 @@ import link from '../../../../link'
 import Requests from './Requests'
 import Settings from './Settings'
 
-import ledgerLogo from './ledgerLogo.png'
-import trezorLogo from './trezorLogo.png'
+// import ledgerLogo from './ledgerLogo.png'
+// import trezorLogo from './trezorLogo.png'
 
 // TODO: Rename Signer component to Account
 
