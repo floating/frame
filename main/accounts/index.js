@@ -456,7 +456,7 @@ class Accounts extends EventEmitter {
     log.info('setTxSigned', handlerId)
     if (!this.current()) return cb(new Error('No account selected'))
     if (this.current().requests[handlerId]) {
-      if (this.current().requests[handlerId].status === 'declined') {
+      if (this.current().requests[handlerId].status === 'declined' || this.current().requests[handlerId].status === 'error') {
         cb(new Error('Request already declined'))
       } else {
         this.current().requests[handlerId].status = 'sending'

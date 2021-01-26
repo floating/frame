@@ -50,8 +50,9 @@ class TransactionRequest extends React.Component {
     if (status === 'error') requestClass += ' signerRequestError'
     const mode = this.props.req.mode
     const height = mode === 'monitor' ? '80px' : '320px'
+    const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {type === 'sign' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>

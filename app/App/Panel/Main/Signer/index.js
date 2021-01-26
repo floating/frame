@@ -294,8 +294,8 @@ class Signer extends React.Component {
             <div className='signerImage'>
               {(_ => {
                 if (this.props.signer) {
-                  if (this.props.signer.type === 'ledger') return <img src={ledgerLogo} />
-                  if (this.props.signer.type === 'trezor') return <img className='trezorImage' src={trezorLogo} />
+                  if (this.props.signer.type === 'ledger') return svg.ledger(24)
+                  if (this.props.signer.type === 'trezor') return svg.trezor(20)
                   if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
                   if (this.props.signer.type === 'aragon') return svg.aragon(32)
                   return svg.octicon('plus', { height: 31 })
