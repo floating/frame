@@ -507,10 +507,9 @@ class Accounts extends EventEmitter {
 
   setGasPrice (price, handlerId, cb) {
     if (!price || isNaN(parseInt(price, 'hex')) || parseInt(price, 'hex') < 0) return cb(new Error('Invalid price'))
-    console.warn('VALIDATE GAS PRICE UPDATES')
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
-      if (parseInt(price, 'hex') > 9999 * 1e9) price = '0x' + (9999 * 1e8).toString(16)
+      if (parseInt(price, 'hex') > 9999 * 1e9) price = '0x' + (9999 * 1e9).toString(16)
       const gasLimit = this.current().requests[handlerId].data.gas
       if (parseInt(price, 'hex') * parseInt(gasLimit, 'hex') > FEE_MAX) {
         cb(new Error('Rejected: Operation would set fee over hard limit'))
