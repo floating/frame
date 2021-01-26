@@ -51,7 +51,7 @@ function encodeType (primaryType, types) {
     result += `${depType}(${types[depType].map(({ name, type }) => `${type} ${name}`).join(',')})`
   }
 
-  return result
+  return Buffer.from(result)
 }
 
 function typeHash (primaryType, types) {
@@ -76,7 +76,7 @@ function encodeData (primaryType, types, data) {
 
     if (field.type === 'string' || field.type === 'bytes') {
       encTypes.push('bytes32')
-      const valueHash = ethUtil.keccak256(value)
+      const valueHash = ethUtil.keccak256(Buffer.from(value))
       encValues.push(valueHash)
     } else if (types[field.type] !== undefined) {
       encTypes.push('bytes32')
