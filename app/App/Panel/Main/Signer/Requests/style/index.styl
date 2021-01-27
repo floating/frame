@@ -271,7 +271,6 @@
 
     .txProgressNoticeLoaderBars
       position absolute
-      background blue
       top 0
       right 0
       height 50px
@@ -311,9 +310,9 @@
 
     .requestCount
       background thin
-      width 30px
+      width 50px
       height 30px
-      border-radius 2px
+      border-radius 15px
       display flex
       justify-content center
       align-items center
@@ -576,8 +575,6 @@
       display flex
       justify-content center
       align-items center
-      text-transform uppercase
-      letter-spacing 2px
       font-weight 400
       font-size 14px
       background highlight
@@ -585,6 +582,34 @@
       border-top-left-radius 16px
       border-top-right-radius 16px
       box-shadow 0px 1px 0px thick
+      text-transform uppercase
+
+      .approveRequestHeaderTitle
+        text-align center
+        letter-spacing 2px
+
+      .approveRequestHeaderOrigin
+        font-size 10px
+        letter-spacing 0px
+        text-transform none
+
+      .approveRequestHeaderTag
+        position absolute
+        bottom -8px
+        left 80px
+        right 80px
+        height 16px
+        border-radius 8px
+        box-sizing border-box
+        padding-top 1px
+        font-size 10px
+        text-align center
+        font-weight 500
+        background good
+        color white
+
+      .approveRequestHeaderTagInvalid
+        background bad
 
       .approveRequestHeaderIcon
         width 40px
@@ -597,6 +622,19 @@
         position absolute
         border-radius 2px
         left 5px
+        color outerspace08
+
+      .approveRequestHeaderNonce
+        width 80px
+        height 60px
+        display flex
+        justify-content flex-end
+        align-items center
+        z-index 10
+        transition standard
+        position absolute
+        border-radius 2px
+        right 10px
         color outerspace08
 
       .approveRequestHeaderClose
@@ -701,9 +739,9 @@
     padding 0px 16px
     background highlightest
     border-radius 12px
-    height 24px
-    min-height 24px
-    max-height 24px
+    height 25px
+    min-height 25px
+    max-height 25px
       
   .transactionTotals
     display flex
@@ -717,20 +755,14 @@
     align-items center
 
   .networkFeeSymbol
-    font-size 16px
-    font-weight bold
+    position relative
+    font-size 12px
+    font-weight 600
     font-family FiraCode, sans-serif
-    padding 0px 8px 0px 0px
+    left -2px
+    top 1px
 
   .transactionTotalUSD
-    // margin-left 10px
-    // margin-top 2px
-    // padding 3px 10px
-    // font-size 20px
-    // border-radius 2px
-    // background highlight
-    // font-weight 300
-
     display flex
     justify-content center
     align-items center
@@ -782,32 +814,28 @@
 
   .transactionData
     position absolute
-    bottom 130px
     left 10px
     right 10px
-    top 190px
+    top 171px
+    height 32px
     z-index 2000
     display flex
     justify-content center
     align-items center
-    background highlight
     color outerspace08
     font-size 14px
     font-weight 400
     letter-spacing 1px
     text-transform uppercase
     transition standard
-    overflow hidden
-    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-    border-radius 16px
 
     .transactionDataHeader
       position absolute
       top 0
       left 0
       right 0
-      height 50px
-      border-bottom 1px solid thick
+      height 32px
+      border-radius 16px
       justify-content space-between
       display flex
       align-items center
@@ -815,6 +843,8 @@
       letter-spacing 1px
       font-weight 400
       z-index 10
+      background highlight
+      box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
 
       .transactionDataLabel
         display flex
@@ -824,7 +854,7 @@
         transition standard
 
       .transactionDataNotice
-        width 40px
+        width 32px
         display flex
         justify-content center
         align-items center
@@ -833,18 +863,26 @@
         color outerspace08
 
       .transactionDataIndicator
-        width 40px
-        display flex
-        justify-content center
-        align-items center
+        width 21px
+        height 21px
+        max-width 21px
+        max-height 21px
         z-index 10
         transform rotate(-180deg)
         transition standardSlow
+        border 2px solid thick
+        border-radius 16px
+        margin 4px
+
+        svg
+          position relative
+          top 3px
+          left 5px
 
   .transactionDataBody
     position absolute
     color outerspace08
-    top 50px
+    top 35px
     left 0
     right 0
     bottom 0
@@ -852,7 +890,13 @@
     padding 16px 14px
     user-select all
     overflow hidden
-    z-index 9
+    z-index 90
+    background highlighter
+    border-radius 12px
+    opacity 0
+    pointer-events none
+    transition standard
+    box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
 
     .transactionDataBodyCopied
       position absolute
@@ -884,25 +928,30 @@
       font-family FiraCode, monospace
       overflow-x hidden
       overlflow-y scroll
-
+      border-radius 6px
 
   .transactionDataSelected
     position absolute
-    bottom 10px
-    left 10px
-    right 10px
-    top 65px
+    left 5px
+    right 5px
+    top 43px
+    height 280px
 
     .transactionDataHeader
       .transactionDataIndicator
         transform rotate(0deg)
 
     .transactionDataBody
+      opacity 1
+      pointer-events auto
       .transactionDataBodyInner
         opacity 1
         top 0px
 
   .transactionNoData
+    // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+    background highlight
+    border-radius 16px
     box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
 
   .transactionTo
@@ -1145,7 +1194,7 @@
   font-family FiraCode, monospace
 
 .monitorArrow
-  padding-top 2px
+  padding-top 1px
 
 .monitorDeploy
   text-transform uppercase
@@ -1156,15 +1205,123 @@
 span
   padding 0px 3px 0px 0px
 
+.txNonce
+  position absolute
+  top 20px
+  right 12px
+  background highlighter
+  height 20px
+  width 48px
+  border-radius 16px
+  box-shadow 0px 2px 1px thick
+  display flex
+  justify-content center
+  align-items center
+  font-size 12px
+  font-weight 600
+  background highlighter
+  color tripleThick
+  transition standard
+  z-index 9999
+  overflow hidden
+
+  .txNonceMarker
+    position absolute
+    background thick
+    top 7px
+    right 7px
+    bottom 7px
+    width 34px
+    border-radius 6px
+
+  .txNonceNumber
+    position absolute 
+    top -1px
+    right 0
+    bottom 0px
+    width 48px
+    text-align center
+    opacity 1
+    font-weight 400
+    font-size 13px
+    display flex
+    justify-content center 
+    align-items center
+
+  .txNonceHidden
+    color tripleThick
+    opacity 0
+
+  .txNonceControl
+    position absolute 
+    top 0px
+    right 48px
+    bottom 0px
+    width 98px
+    display flex
+    justify-conent space-between
+
+  .txNonceButton
+    height 20px
+    width 22px
+    display flex
+    justify-content center 
+    align-items center
+    font-size 10px
+    text-transform uppercase
+    border-right 1px solid thick
+
+  .txNonceButton:hover
+    background ghostA
+
+  .txNonceButtonLower 
+    padding 1px 0px 0px 4px
+
+  .txNonceButtonRaise
+    padding 0px 0px 1px 0px
+
+  // .txNonceLower
+  //   height 100%
+  //   width 22px
+  //   text-align center
+  //   font-size 10px
+  //   text-transform uppercase
+    
+  .txNonceLabel
+    height 100%
+    width 60px
+    text-align center
+    font-size 10px
+    text-transform uppercase
+    border-right 1px solid thick
+    display flex
+    justify-content center 
+    align-items center
+
+.txNonce:hover
+  color outerspace06
+  width 145px
+  background ghostC
+  box-shadow 0px 2px 1px thick, -8px 0px 8px highlightest, -8px 0px 8px highlightest
+
+  .txNonceHidden
+    opacity 1
+
+  .txNonceMarker
+    opacity 0
+
+.txNonceSet
+  transform translate(1px, -9px)
+
 .monitorTop
   position absolute
   z-index 1001
   top 0px
   left 53px
-  right 0px
+  right 53px
   height 40px
-  padding 13px 16px 3px 0px
-  font-size 16px
+  padding 14px 16px 3px 0px
+  font-size 14px
   text-transform none
   transition standardSlow
   overflow-wrap break-word
@@ -1203,45 +1360,165 @@ span
   svg
     padding 0px 3px 0px 3px
 
-.txDetails
+.txAugment
   position absolute
-  top 59px
+  bottom 60px
   left 5px
+  height 32px
   right 5px
-  height 22px
   font-size 12px
+  display flex
+  justify-content space-between
+  align-items center
+  text-transform uppercase  
+  letter-spacing 0.2px
+  font-weight 500
+  border-radius 16px
+  background highlight
+  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
+  z-index 20000000009999
+  
+
+  .txAugmentCancel
+    position absolute
+    top 0px
+    left 0px
+    bottom 0px
+    border-radius 4px
+    border-top-left-radius 16px
+    border-bottom-left-radius 16px
+    right 72%
+    color bad
+    display flex
+    justify-content center
+    align-items center
+    transform translateY(0px)
+  
+  .txAugmentSpeedUp
+    position absolute
+    top 0px
+    right 0px
+    bottom 0px
+    border-radius 4px
+    border-top-right-radius 16px
+    border-bottom-right-radius 16px
+    left 72%
+    color good
+    display flex
+    justify-content center
+    align-items center
+    transform translateY(0px)
+
+  .txDetails
+    position absolute
+    top 0px
+    right 28%
+    left 28%
+    border-radius 4px
+    bottom 0px
+    display flex
+    justify-content center
+    align-items center
+    transform translateY(0px)
+    z-index 900000000
+  
+  .txDetailsHide
+    pointer-events none 
+    opacity 0
+
+  .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
+    background highlighter
+    transform scale(1.05)
+    box-shadow 0px 4px 5px -2px thick, 0px 25px 25px -5px thick
+  
+  // .txAugmentCancel:active, .txAugmentSpeedUp:active, .txDetails:active
+  //   transform translateY(0px) scale(1)
+  //   box-shadow none
+
+.txAugmentHidden
+  .txAugmentCancel
+    opacity 0
+    transition standard
+    background highlighter
+    transform translateY(-25px) scale(1.05)
+    box-shadow 0px 4px 5px -3px thick, 0px 35px 20px -5px thick
+  .txAugmentSpeedUp
+    opacity 0
+    background highlighter
+    transform translateY(-25px) scale(1.05)
+    transform translateY(-25px)   
+    transition standard
+  .txDetails
+    background none
+
+.txSuccessHash
+  position absolute
+  top 60px
+  left 5px
+  height 32px
+  width 199px
   display flex
   justify-content center
   align-items center
-  text-transform uppercase
-  letter-spacing 2px
-  margin-left 2px
   font-weight 500
-  background highlight
-  box-shadow 0px 2px 1px thick
-  border-radius 11px
-  transition standardFast
+  transition standardSlow
+  opacity 0
+  transform translateY(25px)
+  font-family Fira Code, monospace
+  overflow hidden
+  font-size 16px
+  padding-top 2px
+ 
+  svg
+    color outerspace08
+    padding 4px 5px 2px 5px
 
-.txDetails:hover, .txStatus:hover
-  background highlighter
+.txSuccessHashShow
+  opacity 1
+  transform translateY(0px)
+
+// .txDetails
+//   position absolute
+//   top 60px
+//   right 5px
+//   height 32px
+//   width 116px
+//   border-radius 16px
+//   font-size 12px
+//   display flex
+//   justify-content center
+//   align-items center
+//   text-transform uppercase
+//   letter-spacing 0.5px
+//   margin-left 0.5px
+//   font-weight 500
+//   background highlight
+//   box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
+//   transition standardSlow
+//   transition-delay 0.2s
+//   opacity 0
+//   transform translateY(-25px)
+
+// .txDetails:hover, .txStatus:hover
+//   background highlighter
 
 .txStatus
   position absolute
-  top 65px
+  top 63px
   left 5px
   right 5px
-  bottom 40px
+  bottom 100px
   border-radius 16px
-  box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thick, 0px -2px 6px thinner
+  // box-shadow 0px 2px 1px thick, 0px 8px 5px -5px thin, 0px -2px 6px thinner
   text-align center
   box-sizing border-box
-  background rgba(255, 255, 255, 0.05)
-  background highlight
+  // background rgba(255, 255, 255, 0.05)
   z-index 100000
-  font-size 12px
+  font-size 14px
   font-weight 400
   text-transform uppercase
-  letter-spacing 1px
+  letter-spacing 0.5px
+  margin-left 0.5px
   overflow hidden
   transition standard
   display flex
@@ -1268,15 +1545,66 @@ span
     flex-direction column
     transition standard
 
-    .txProgressDetailHash
-      font-size 16px
-      font-weight 400
-      letter-spacing 0px
-      font-family FiraCode, monospace
-      text-transform none
+.txStatusError
+  top 30px
+  bottom 0px
 
-      svg
-        padding 0px 2px 1px 2px
+.txProgressSuccess
+  position absolute
+  bottom 24px
+  height 32px
+  left 0px
+  right 4px
+  z-index 1000005
+  display flex
+  transition standard
+
+  .txProgressSuccessLine
+    position absolute 
+    top 5px
+    left 50%
+    width 2px
+    bottom 5px
+    background tripleThick
+
+  .txProgressSuccessItem
+    position relative
+    flex-grow 1
+    height 100%
+    display flex
+    align-items center
+    justify-content flex-start
+    width 50%
+    box-sizing border-box
+    padding 0px 8px 0px 8px
+
+    .txProgressSuccessItemValue
+      display flex
+      justify-content center
+      align-items center
+      font-size 14px
+      font-weight 600
+      font-family FiraCode, monospace
+      letter-spacing -0.5px
+
+    .txProgressSuccessItemLabel
+      font-size 8.5px
+      display flex
+      justify-content center
+      align-items center
+      font-weight 600
+      text-transform uppercase
+      padding 4px
+
+  .txProgressSuccessItem:last-child
+    border-right none
+
+.txSummary
+  display flex
+  justify-content center
+  align-items center
+  height 100%
+  width 100%
 
 .txProgressDetailExpand
   color outerspace05
@@ -1284,7 +1612,6 @@ span
 
 .txProgressDetailError
   padding 0px 10px
-  font-size 12px
 
 .txStatusCompact
   bottom 60px
@@ -1671,3 +1998,4 @@ span
 
 
 @import './next'
+@import '../TransactionRequest/TxModule/style'

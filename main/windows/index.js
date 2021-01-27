@@ -3,6 +3,9 @@ const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
 const path = require('path')
 const log = require('electron-log')
 
+const EventEmitter = require('events')
+const events = new EventEmitter()
+
 const store = require('../store')
 
 const dev = process.env.NODE_ENV === 'development'
@@ -39,7 +42,7 @@ const detectMouse = () => {
   const bounds = display.bounds
   const minX = (area.width + area.x) - 2
   const center = (area.height + (area.y - bounds.y)) / 2
-  const margin = (area.height + (area.y - bounds.y)) / 8
+  const margin = ((area.height + (area.y - bounds.y)) / 2) - 5
   m1.y = m1.y - area.y
   const minY = center - margin
   const maxY = center + margin
@@ -68,7 +71,7 @@ const api = {
       frame: false,
       transparent: true,
       hasShadow: false,
-      show: false,
+      // show: false,
       backgroundThrottling: false,
       offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),
@@ -83,7 +86,7 @@ const api = {
         worldSafeExecuteJavaScript: true
       }
     })
-    windows.tray.loadURL(`file://${__dirname}/../../bundle/tray.html`)
+    windows.tray.loadURL(path.join('file://', __dirname, '/../../bundle/tray.html'))
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
     windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
@@ -115,12 +118,10 @@ const api = {
       }, 2000)
     }
     if (dev) windows.tray.openDevTools()
-    if (!dev) {
-      setTimeout(() => {
-        windows.tray.on('blur', _ => api.hideTray())
-        windows.tray.focus()
-      }, 1260)
-    }
+    setTimeout(() => {
+      windows.tray.on('blur', _ => store('main.autohide') ? api.hideTray(true) : null)
+      windows.tray.focus()
+    }, 1260)
     if (!openedAtLogin) {
       setTimeout(() => {
         if (windows && windows.tray) windows.tray.show()
@@ -173,10 +174,18 @@ const api = {
     api.create()
   },
   trayClick: () => {
+    if (this.recentAutohide) return
     const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
     showing ? api.hideTray() : api.showTray()
   },
-  hideTray: () => {
+  hideTray: (autohide) => {
+    if (autohide) {
+      this.recentAutohide = true
+      clearTimeout(this.recentAutohide)
+      this.recentAutohideTimeout = setTimeout(() => {
+        this.recentAutohide = false
+      }, 400)
+    }
     hideShow.current = 'hidden'
     if (hideShow.running) {
       hideShow.next = false
@@ -196,6 +205,7 @@ const api = {
           windows.tray.setPosition(area.width + area.x, pos.y)
           windows.tray.emit('hide')
           windows.tray.hide()
+          events.emit('tray:hide')
         }
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
@@ -224,6 +234,7 @@ const api = {
       windows.tray.show()
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
+      events.emit('tray:show')
       setTimeout(() => {
         if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
         if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
@@ -265,7 +276,8 @@ const api = {
   },
   quit: () => {
     app.quit()
-  }
+  },
+  events
 }
 
 app.on('web-contents-created', (e, contents) => {

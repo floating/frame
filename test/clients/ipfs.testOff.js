@@ -1,3 +1,4 @@
+/* globals test, expect, beforeAll, afterAll, describe, jest */
 /**
  * @jest-environment node
  */

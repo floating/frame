@@ -49,7 +49,9 @@ module.exports = {
   },
   giveAccess: (u, req, access) => {
     u('main.addresses', req.address, address => {
-      address = address || { permissions: {} }
+      address = address || { permissions: {}, tokens: {} }
+      address.permissions = address.permissions || {}
+      address.tokens = address.tokens || {}
       address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
       return address
     })
@@ -131,6 +133,9 @@ module.exports = {
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
+  setLiveAccountLimit: (u, value) => {
+    u('main.ledger.liveAccountLimit', () => value)
+  },
   setHardwareDerivation: (u, value) => {
     u('main.hardwareDerivation', () => value)
   },
@@ -140,15 +145,25 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
-  toggleexplorerWarning: (u) => {
+  toggleExplorerWarning: (u) => {
     u('main.mute.explorerWarning', v => !v)
+  },
+  setAltSpace: (u, v) => {
+    u('main.shortcuts.altSlash', () => v)
+  },
+  setAutohide: (u, v) => {
+    u('main.autohide', () => v)
   },
   setGasPrices: (u, netType, netId, prices) => {
     u('main.networks', netType, netId, 'gas.price.levels', () => prices)
   },
   setGasDefault: (u, netType, netId, level, price) => {
     u('main.networks', netType, netId, 'gas.price.selected', () => level)
-    if (level === 'custom') u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+    if (level === 'custom') {
+      u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+    } else {
+      u('main.networks', netType, netId, 'gas.price.lastLevel', () => level)
+    }
   },
   addNetwork: (u, net) => {
     const defaultNetwork = {
@@ -159,7 +174,7 @@ module.exports = {
       gas: {
         price: {
           selected: 'standard',
-          levels: { safelow: '', standard: '', fast: '', trader: '', custom: '' }
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
         }
       },
       connection: {
@@ -257,6 +272,26 @@ module.exports = {
       }
       return main
     })
+  },
+  setTokens: (u, address, newTokens) => {
+    u('main.addresses', address, 'tokens', (tokens = {}) => {
+      tokens = {}
+      Object.keys(newTokens).forEach(tokenAddress => {
+        tokens.known = tokens.known || {}
+        tokens.known[tokenAddress] = newTokens[tokenAddress]
+      })
+      return tokens
+    })
+  },
+  omitToken: (u, address, omitToken) => {
+    u('main.addresses', address, 'tokens.omit', omit => {
+      omit = omit || []
+      if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
+      return omit
+    })
   }
+  // toggleUSDValue: (u) => {
+  //   u('main.showUSDValue', show => !show)
+  // }
   // __overwrite: (path, value) => u(path, () => value)
 }

@@ -9,7 +9,7 @@ class Bridge extends React.Component {
         <div className='badge' style={{ transform: 'translateY(0px)', height: '196px' }}>
           <div className='badgeInner'>
             <div className='badgeMessage'>
-              {'Your update is ready and will be installed next restart'}
+              Your update is ready and will be installed next restart
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>
@@ -29,7 +29,7 @@ class Bridge extends React.Component {
         <div className='badge' style={{ transform: 'translateY(0px)', height: '224px' }}>
           <div className='badgeInner'>
             <div className='badgeMessage'>
-              {'A new update is available, would you like to install it?'}
+              A new update is available, would you like to install it?
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>
@@ -37,7 +37,7 @@ class Bridge extends React.Component {
                   className='badgeInputInner' onMouseDown={() => {
                     link.send('tray:installAvailableUpdate', true, false)
                   }}
-                >{'Install Update'}
+                >Install Update
                 </div>
               </div>
             </div>
@@ -47,7 +47,7 @@ class Bridge extends React.Component {
                   className='badgeInputInner' onMouseDown={() => {
                     link.send('tray:installAvailableUpdate', false, false)
                   }}
-                >{'Remind Me Later'}
+                >Remind Me Later
                 </div>
               </div>
             </div>
@@ -57,7 +57,7 @@ class Bridge extends React.Component {
                   className='badgeInputInner badgeInputSmall' onMouseDown={() => {
                     link.send('tray:installAvailableUpdate', false, true)
                   }}
-                >{'Skip This Version'}
+                >Skip This Version
                 </div>
               </div>
             </div>

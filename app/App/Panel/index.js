@@ -27,6 +27,9 @@ class Panel extends React.Component {
     // const opacity = open ? '1' : '0'
     const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
     const { type, id } = this.store('main.currentNetwork')
+
+    let gasPrice = this.store('main.networks', type, id, 'gas.price.levels.standard')
+    if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)
     return (
       <div id='panel' style={{ transform, transition }}>
         <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
@@ -36,6 +39,19 @@ class Panel extends React.Component {
             </div>
             <div className='panelDetailText'>{this.store('main.networks', type, id, 'name')}</div>
           </div>
+          {type === 'ethereum' && id === '1' ? (
+            <div className='panelMenuData'>
+              <div className='panelMenuDataItem'>
+                {gasPrice || '---'}
+                <div className='svg'>{svg.gas(9)}</div>
+              </div>
+              <div className='panelMenuDataDivide' />
+              <div className='panelMenuDataItem'>
+                <div className='usd'>{svg.usd(10.5)}</div>
+                <div>{this.store('external.rates.USD') ? Math.floor(this.store('external.rates.USD')) : '---'}</div>
+              </div>
+            </div>
+          ) : null}
           <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onMouseDown={() => this.store.toggleSettings()}>
             <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
             <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>

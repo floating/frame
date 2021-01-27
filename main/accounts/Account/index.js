@@ -30,7 +30,7 @@ class Account {
     this.requests = {}
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart, this.network)
     this.update(true)
-    store.observer(() => {
+    this.acctObs = store.observer(() => {
       if (this.smart && this.smart.actor && this.smart.actor.id && this.smart.actor.id !== this.id) {
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
         this.signer = undefined
@@ -75,6 +75,7 @@ class Account {
       this.update()
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')
+      windows.broadcast('main:action', 'setPanelView', 'default')
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {
@@ -178,7 +179,7 @@ class Account {
   }
 
   close () {
-    console.log('Account close needs to remove observers')
+    this.acctObs.remove()
   }
 
   signMessage (message, cb) {

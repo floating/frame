@@ -1,0 +1,140 @@
+.txModule
+  position absolute
+  top 0
+  left 3px
+  right 3px
+  height 30px
+  z-index 20
+  font-family OpenSans
+  font-size 13px
+  font-weight 400
+  color outerspace08
+  transition standard
+  border-radius 15px
+  background ghostD
+  box-shadow cardDrop, 0px 2px 6px thick, 0px -2px 6px thick
+  position absolute
+  overflow hidden
+  transform translateY(0px) translateZ(0px)
+  will-change height
+  opacity 0.95
+  
+  .txModuleMain
+    height 324px
+
+  .txModuleTop
+    width 100%
+    height 30px
+    display flex
+
+  .txModuleTopData
+    position absolute
+    top 0
+    left 0
+    right 0
+    height 30px
+    border-radius 15px
+    display flex
+    align-items center
+    justify-content space-between
+    text-transform uppercase
+    letter-spacing 1px
+    font-weight 400
+    z-index 10
+    transition standard
+
+    .transactionDataLabel
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      transition standard
+      position absolute 
+      top 0
+      left 0
+      right 0
+      bottom 0
+
+    .transactionDataNotice
+      width 30px
+      display flex
+      justify-content center
+      align-items center
+      z-index 10
+      transition standard
+      color outerspace08
+
+    .transactionDataIndicator
+      height 30px
+      width 30px
+      position absolute 
+      top 0
+      right 0px
+      display flex
+      justify-content center
+      align-items center
+      z-index 20
+      transition standard
+      transform translate(25px, -70px)
+      
+      svg
+        position relative
+        top 0px
+        left 0px
+
+  .txModuleTopDataExpanded
+    transform translate(12px, 8px)
+    right 25px
+    .transactionDataIndicator
+      transform translateX(0px)
+
+  .txModuleBody
+    position absolute
+    color outerspace08
+    top 30px
+    left 0
+    right 0
+    bottom 0
+    display flex
+    padding 16px 16px
+    user-select all
+    overflow hidden
+    z-index 90
+    // background highlighter
+    // border-radius 12px
+    // opacity 0
+    // pointer-events none
+    // transition standard
+    // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+    // background blue
+
+    .txModuleDataBodyCopied
+      position absolute
+      top 0
+      left 0
+      right 0
+      bottom 0
+      display flex
+      justify-content center
+      align-items center
+      font-size 16px
+      letter-spacing 0px
+
+      svg
+        margin -3px 0px 0px 10px
+
+    .transactionDataBodyInner
+      position relative
+      max-width 100%
+      width 100%
+      height 100%
+      font-size 15px
+      text-transform none
+      transition standardSlow
+      overflow-wrap break-word
+      word-wrap break-word
+      font-family FiraCode, monospace
+      overflow-x hidden
+      overlflow-y scroll
+      border-radius 6px
+

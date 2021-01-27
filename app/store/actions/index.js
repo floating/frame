@@ -33,6 +33,8 @@ export const notify = (u, type, data = {}) => {
   u('view.notifyData', _ => data)
 }
 
+export const clickGuard = (u, on) => u('view.clickGuard', () => on)
+
 export const toggleAddAccount = (u) => u('view.addAccount', show => !show)
 
 export const toggleAddNetwork = (u) => u('view.addNetwork', show => !show)
@@ -42,6 +44,8 @@ export const updateBadge = (u, type) => u('view.badge', _ => type)
 export const toggleSettings = u => {
   u('panel.view', view => view === 'settings' ? 'default' : 'settings')
 }
+
+export const setPanelView = (u, view) => u('panel.view', () => view)
 
 let trayInitial = true
 export const trayOpen = (u, open) => {

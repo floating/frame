@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -25,7 +25,7 @@ const store = require('./store')
 //     })
 //   })
 // })
-
+require('./data')
 const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
@@ -57,13 +57,13 @@ const externalWhitelist = [
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
   'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
   'https://github.com/floating/frame/issues/new',
-  'https://gitter.im/framehq/general',
   'https://github.com/floating/frame/blob/master/LICENSE',
   'https://aragon.org',
   'https://mainnet.aragon.org',
   'https://rinkeby.aragon.org',
   'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
-  'https://shop.trezor.io/?offer_id=10&aff_id=3270'
+  'https://shop.trezor.io/?offer_id=10&aff_id=3270',
+  'https://discord.gg/UH7NGqY'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
@@ -80,8 +80,16 @@ ipcMain.on('tray:resetAllSettings', () => {
 //   accounts.removeAllAccounts()
 // })
 
+ipcMain.on('tray:replaceTx', async (e, id, type) => {
+  try {
+    await accounts.replaceTx(id, type)
+  } catch (e) {
+    console.log('tray:replaceTx Error', e)
+  }
+})
+
 ipcMain.on('tray:clipboardData', (e, data) => {
-  clipboard.writeText(data)
+  if (data) clipboard.writeText(data)
 })
 
 ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
@@ -116,6 +124,10 @@ ipcMain.on('tray:giveAccess', (e, req, access) => {
   accounts.removeRequest(req.handlerId)
 })
 
+ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
+  accounts.adjustNonce(handlerId, nonceAdjust)
+})
+
 ipcMain.on('tray:syncPath', (e, path, value) => {
   store.syncPath(path, value)
 })
@@ -141,6 +153,15 @@ app.on('ready', () => {
     const appOrigin = path.resolve(__dirname, '../')
     const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
+  })
+  store.observer(() => {
+    const altSlash = store('main.shortcuts.altSlash')
+    if (altSlash) {
+      globalShortcut.unregister('Alt+/')
+      globalShortcut.register('Alt+/', () => windows.trayClick())
+    } else {
+      globalShortcut.unregister('Alt+/')
+    }
   })
 })
 

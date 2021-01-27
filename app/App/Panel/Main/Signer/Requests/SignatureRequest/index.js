@@ -49,9 +49,10 @@ class TransactionRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
     const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '360px'
+    const height = mode === 'monitor' ? '80px' : '320px'
+    const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     return (
-      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
+      <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {type === 'sign' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
@@ -89,7 +90,7 @@ class TransactionRequest extends React.Component {
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
-                    <div className='approveRequestHeaderLabel'> {'Sign Message'}</div>
+                    <div className='approveRequestHeaderLabel'> Sign Message</div>
                   </div>
                   <div className='signValue'>
                     <div className='signValueInner'>{message}</div>
@@ -102,10 +103,10 @@ class TransactionRequest extends React.Component {
           <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
         )}
         <div className='requestApprove'>
-          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(this.props.req.handlerId, this.props.req) }}>
+          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) this.decline(this.props.req.handlerId, this.props.req) }}>
             <div className='requestDeclineButton'>Decline</div>
           </div>
-          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) this.approve(this.props.req.handlerId, this.props.req) }}>
+          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) this.approve(this.props.req.handlerId, this.props.req) }}>
             <div className='requestSignButton'>Sign</div>
           </div>
         </div>

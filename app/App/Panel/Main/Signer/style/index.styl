@@ -139,6 +139,15 @@
       .transactionToAddressFull
         opacity  1
 
+  .clickGuard
+    position absolute
+    top 0
+    left 0
+    bottom 0
+    right 0
+    z-index 4000
+    border-radius 16px
+
   .signerTop
     position relative
     opacity 1
@@ -148,6 +157,7 @@
     background highlight
     transition standard
     margin-bottom 8px
+    z-index 9999000
     .transactionToAddress
       .transactionToAddressLarge
         svg
@@ -211,14 +221,12 @@
         .signerImage
           position absolute
           top 14px
-          left 0
+          left 50%
           right 0
-          display flex
-          justify-content center
-          align-items center
+          width 24px
+          margin-left -12px
           opacity 1
           transition standardSlow
-          // padding-right 6px
 
           img
             height 28px
@@ -422,7 +430,7 @@
       display flex
       text-align center
       flex-direction column
-      overflow hidden
+      // overflow hidden
       font-weight 300
 
       .signerStatusNotOk
@@ -476,14 +484,6 @@
 
           .signerPinDelete
             left 0px
-
-      // .signerSettingsMenu
-      //   height 40px
-      //   // background blue
-      //   border-top 1px solid red
-      //   width 100%
-      //   display flex
-      //   justify-content center
 
     .signerAccounts
       position relative
@@ -562,45 +562,197 @@
         transform translateZ(0)
 
       .signerInfo
+        position relative
         font-size 16px
-        font-family FiraCode
         letter-spacing 0px
         position relative
         height 0px
         padding-top 0px
         text-align center
         transform translateZ(0)
-        overflow hidden
         transition standard
         opacity 0
-        disply flex
+        margin-top 2px
 
-        .signerBalance
-          opacity 1
+        .signerBalances
+          position absolute
+          top 0px
+          left 60px
+          right 60px
+          margin-right 0px
+          box-shadow 0px 40px 20px -15px thick0
+          height 26px
+          overflow hidden
+          border-radius 12px
+          transition 0.1s ease-out all
+          padding 1px 0px 2px 0px
+          box-sizing border-box
+          background highlighter
+          box-shadow 0px 3px 2px thick
 
-          .signerBalanceCurrency
-            margin-right 4px
-            font-size 16px
-            font-weight 600
+          .signerBalanceTotal
+            position absolute
+            top 353px
+            left 0px
+            right 0px
+            height 47px
+            z-index 20
+            background highlighter
+            font-size 14px
+            font-weight 400
+            color outerspace08
 
+            .signerBalanceTotalText
+              position absolute
+              background highlighter
+              left 0px
+              right 0px
+              bottom 0px
+              top 0px
+              box-shadow 0px -10px 10px -5px thick
+              border-top-left-radius 10px
+              border-top-right-radius 10px
+              display flex
+              justify-content space-between
+              align-items center
+              padding-right 15px
+              padding-left 15px
+
+              .signerBalanceTotalTitle
+                width 35px
+                text-align center
+
+              .signerBalanceTotalValue
+                width 70px
+                text-align center
+
+          .signerBalanceSlider
+            position absolute
+            top 0px
+            left 0px
+            right 0px
+            height 354px
+            border-radius 12px
+            transition 0.1s ease-out all
+            z-index 2
+            overflow-y scroll
+            padding 0px
+
+          .signerBalanceSliderInset
+            position relative
+            
+            .signerBalance
+              position relative
+              margin-left 0px
+              width 294px
+              opacity 1
+              height 26px
+              transition 0.1s ease-out all
+              border-bottom 1px solid doubleThick
+              padding 10px
+
+              .signerBalanceCurrency
+                position absolute
+                left 23px
+                top 13px
+                bottom 4px
+                width 60px
+                text-align center
+                font-size 13px
+                font-weight 400
+                letter-spacing 0px
+                // background blue
+
+              .signerBalanceLogo
+                position absolute
+                left 1px
+                top 10px
+                height 24px
+                width 24px
+                background ghostB
+                box-shadow 0px 0px 3px 2px thick
+                border-radius 12px
+
+                img
+                  height 20px
+                  width 20px
+                  border-radius 11px
+                  overflow hidden
+                  margin 2px
+
+              .signerBalanceValue
+                position absolute
+                right 85px
+                top 11px
+                bottom 11px
+                left 85px
+                font-size 18px
+                padding-top 1px
+                text-align center
+                border-left 1px solid doubleThick
+                border-right 1px solid doubleThick
+                font-family FiraCode
+                letter-spacing -0.5px
+                // background blue
+
+              .signerBalanceEquivalent
+                position absolute
+                right 0px
+                top 13px
+                bottom 13px
+                width 85px
+                text-align center
+                font-size 13px
+                font-weight 400
+                color outerspace07
+
+          .signerBalance:last-child
+            border-bottom none
+
+        .signerBalanceSliderDisplay
+          position absolute
+          top 0
+          left 0
+          right 0
+          transition none
+
+        .signerBalanceSliderShadow
+          position relative
+          opacity 0
+
+        .signerBalanceNoTokens
+          position absolute 
+          top 48px
+          left 0px
+          right 0px
+          height 200px
+          display flex
+          justify-content center
+          align-items center
+          color tripleThick
+          
+        .signerBalancesOpen
+          height 400px
+          left 8px
+          right 8px
+          box-shadow 0px 0px 60px 0px thick, 0px 50px 40px -30px doubleThick
+          
+          .signerBalanceSliderInset
+            .signerBalance          
+              margin-left 8px
+              margin-right 8px
 
     .addressSelect
       width 100%
       height 31px
-      // display flex
-      // justify-content center
       border-radius 6px
-      // transition standard
       position absolute
       bottom 0
       z-index 5
       transform translateZ(0px)
-      // pointer-events none
-      // background blue
 
       .addressSelectButton
         width 100%
-        // min-width 30px
         height 30px
         min-height 30px
         border-radius 6px
@@ -613,7 +765,6 @@
         box-sizing border-box
         color outerspace
         letter-spacing 1px
-        // background blue
 
         .addressSelectArrow
           // margin-top 5px
@@ -666,16 +817,13 @@
         opacity 1
         pointer-events auto
         .settingsMenuSelect
-          // background red
           position relative
           height 12px
           width 105px
           box-sizing border-box
-          // border 1px solid green
           .settingsMenuMark
             height 12px
             position absolute
-            // background blue
             transition standard
             .settingsMenuMarkLine
               position absolute
@@ -686,26 +834,17 @@
               right 7px
               border-radius 1px
         .settingsMenuItems
-          // background red
           box-sizing border-box
           height 33px
           width 105px
-          // border 1px solid red
           display flex
           .settingsMenuItem
             position relative
             box-sizing border-box
             z-index 1230
-            // background light
-            // border 1px solid lightShade
             width 35px
             height 33px
             color outerspace08
-            // margin 0px 4px 0px 4px
-            // border-radius 4px
-            // margin-bottom 4px
-            // box-shadow cardDrop
-            // border 1px solid red
             .settingsMenuItemIcon
               top 0
               right 0
@@ -843,7 +982,6 @@
       align-items center
 
       .signerMenuItems
-        // background blue
         height 25px
         display flex
         justify-content center
@@ -853,7 +991,6 @@
         .signerMenuItem
           height 30px
           width 40px
-          // background yellow
           display flex
           justify-content center
           align-items center
@@ -862,7 +999,6 @@
         height 10px
         width 80px
         position relative
-        // background orange
 
         .signerMenuSelectMarker
           position absolute
@@ -1073,7 +1209,6 @@
       .signerInfo
         opacity 1
         height 20px
-        padding-top 2px
     .signerNav
       .signerTypeDisconnected
         width 160px

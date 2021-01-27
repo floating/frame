@@ -25,7 +25,7 @@ class ProviderRequest extends React.Component {
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '360px'
+    const height = mode === 'monitor' ? '80px' : '320px'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         <div className='approveTransaction'>
@@ -49,7 +49,7 @@ class ProviderRequest extends React.Component {
             <div className='approveTransactionPayload'>
               <div className='approveRequestHeader approveTransactionHeader'>
                 <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
-                <div className='approveRequestHeaderLabel'> {'Connection'}</div>
+                <div className='approveRequestHeaderLabel'> Connection</div>
               </div>
               <div className='requestProvider bounceIn'>
                 <div className={originClass}>{origin}</div>
@@ -59,10 +59,10 @@ class ProviderRequest extends React.Component {
           )}
         </div>
         <div className='requestApprove'>
-          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, false) }}>
+          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:giveAccess', this.props.req, false) }}>
             <div className='requestDeclineButton'>Decline</div>
           </div>
-          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput) link.send('tray:giveAccess', this.props.req, true) }}>
+          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:giveAccess', this.props.req, true) }}>
             <div className='requestSignButton'>Approve</div>
           </div>
         </div>

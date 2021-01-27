@@ -32,10 +32,12 @@ class Ledger extends Signer {
     this.lastUse = Date.now()
     this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
+    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.varObserver = store.observer(() => {
       if (
         this.derivation !== store('main.ledger.derivation') ||
+        this.liveAccountLimit !== store('main.ledger.liveAccountLimit') ||
         this.hardwareDerivation !== store('main.hardwareDerivation') ||
         this.network !== store('main.currentNetwork.id')
       ) {
@@ -106,6 +108,7 @@ class Ledger extends Signer {
     this.pauseLive = true
     this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
+    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.status = 'loading'
     this.addresses = []
@@ -244,6 +247,7 @@ class Ledger extends Signer {
           log.error('Device Status: Cannot write to HID device')
         }
         if (err.message === 'Invalid sequence') this.invalid = true
+        if (err.message.indexOf('UNKNOWN_ERROR') > -1) this.status = 'Please reconnect this Ledger device'
         this.addresses = []
         this.update()
       }
@@ -360,7 +364,7 @@ class Ledger extends Signer {
     let addresses = []
     this.status = 'Deriving Live Addresses'
     this.liveAddressesFound = 0
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < this.liveAccountLimit; i++) {
       if (this.pauseLive) {
         this.status = 'loading'
         addresses = []

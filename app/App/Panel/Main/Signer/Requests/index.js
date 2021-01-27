@@ -94,7 +94,7 @@ class Requests extends React.Component {
       if (a.created < b.created) return 1
       return 0
     })
-    const monitorHeight = 185
+    const monitorHeight = 205
     let containNormal = normal.length ? (360 + (normal.length * 10)) : 160
     if (normal.length && monitor.length > 0) containNormal += 70
     const containMonitor = monitor.length * monitorHeight
@@ -112,8 +112,8 @@ class Requests extends React.Component {
       <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
         <div className={unlockClass} style={unlockStyle}>
           <div className='signerUnlockWrap'>
-            <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={::this.unlockChange} onKeyPress={e => this.keyPressUnlock(e)} />
-            <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit}>Unlock</div>
+            <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyPress={e => this.keyPressUnlock(e)} />
+            <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)}>Unlock</div>
           </div>
         </div>
         <div className='requestTitle'>
@@ -132,10 +132,10 @@ class Requests extends React.Component {
               const z = 2000 + i
               if (req.mode === 'normal') pos = ((normal.length - i) * 10)
               if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight)
-              if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} />
-              if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} />
-              if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} />
-              if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} />
+              if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} onTop={i === normal.length - 1} accountId={this.props.id} />
+              if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
+              if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
+              if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               return null
             })}
           </div>

@@ -7,10 +7,155 @@ import link from '../../../../link'
 import Requests from './Requests'
 import Settings from './Settings'
 
-import ledgerLogo from './ledgerLogo.png'
-import trezorLogo from './trezorLogo.png'
+// import ledgerLogo from './ledgerLogo.png'
+// import trezorLogo from './trezorLogo.png'
 
 // TODO: Rename Signer component to Account
+
+class _Balances extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.moduleRef = React.createRef()
+    this.state = {
+      openActive: false,
+      open: false,
+      selected: 0,
+      shadowTop: 0
+    }
+    this.mD = this.mouseDetect.bind(this)
+  }
+
+  mouseDetect (e) {
+    if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
+      this.setActive(false)
+    }
+  }
+
+  setActive (active) {
+    const { type, id } = this.store('main.currentNetwork')
+    if (type !== 'ethereum' || id !== '1') return
+    this.setState({ openActive: active })
+    this.openTimer = setTimeout(() => this.setState({ open: active }), 480)
+    if (active && !this.state.openActive) {
+      this.store.clickGuard(true)
+      document.addEventListener('mousedown', this.mD)
+    } else {
+      this.store.clickGuard(false)
+      document.removeEventListener('mousedown', this.mD)
+    }
+  }
+
+  handleScroll (event) {
+    this.setState({ shadowTop: event.target.scrollTop })
+  }
+
+  renderBalance (known, k, i) {
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const balance = this.store('balances', address)
+    const token = known[k]
+    return (
+      <div className='signerBalance' key={k} onMouseDown={() => this.setState({ selected: i })}>
+        <div className='signerBalanceLogo'>
+          <img src={token.logoURI} />
+        </div>
+        <div className='signerBalanceCurrency'>
+          {token.symbol}
+        </div>
+        <div className='signerBalanceValue' style={(token.displayBalance || '$0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
+          {(balance === undefined ? '-.------' : token.displayBalance)}
+        </div>
+        <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '$0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}}>
+          {token.usdDisplayValue}
+        </div>
+      </div>
+    )
+  }
+
+  render () {
+    const { open, openActive, selected, shadowTop } = this.state
+    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+    if (current) {
+      const balance = this.store('balances', address)
+      const tokens = this.store('main.addresses', address, 'tokens') || {}
+      const etherRates = this.store('external.rates')
+      const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+      const known = Object.assign({}, tokens.known, {
+        default: {
+          chainId: 1,
+          name: 'Ether',
+          decimals: 18,
+          address: '0x',
+          logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
+          symbol: currentSymbol,
+          balance,
+          displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
+          floatBalance: parseFloat(balance || 0).toFixed(6),
+          usdRate: etherUSD,
+          usdValue: Math.floor(parseFloat(balance) * etherUSD),
+          usdDisplayValue: '$' + Math.floor(parseFloat(balance) * etherUSD).toLocaleString()
+        }
+      })
+      const knownList = Object.keys(known).sort((a, b) => {
+        if (a === 'default') return -1
+        if (b === 'default') return 1
+        return known[a].usdValue > known[b].usdValue ? -1 : known[a].usdValue < known[b].usdValue ? 1 : 0
+      })
+      const offsetTop = (selected * 47) + 10
+      return (
+        <div
+          ref={this.moduleRef} className={openActive ? 'signerBalances signerBalancesOpen' : 'signerBalances'} onMouseDown={() => {
+            clearTimeout(this.openTimer)
+            const o = !this.state.open
+            this.setActive(o)
+          }}
+        >
+          <div
+            className='signerBalanceSliderInset signerBalanceSliderDisplay' style={openActive && !open ? {
+              transition: '0.16s cubic-bezier(.82,0,.12,1) all',
+              transform: `translateY(-${shadowTop}px)`
+            } : openActive && open ? {
+              transition: '0s cubic-bezier(.82,0,.12,1) all',
+              transform: `translateY(-${shadowTop}px)`
+            } : {
+              transition: '0.16s cubic-bezier(.82,0,.12,1) all',
+              transform: `translateY(-${offsetTop}px)`
+            }}
+          >
+            {knownList.map((k, i) => this.renderBalance(known, k, i))}
+          </div>
+          <div className='signerBalanceSlider' style={!open ? { pointerEvents: 'none' } : {}} onScroll={this.handleScroll.bind(this)}>
+            <div className='signerBalanceSliderInset signerBalanceSliderShadow'>
+              {knownList.map((k, i) => this.renderBalance(known, k, i))}
+            </div>
+          </div>
+          <div className='signerBalanceTotal' onMouseDown={(e) => e.stopPropagation()}>
+            <div className='signerBalanceTotalText'>
+              <div className='signerBalanceTotalTitle'>
+                Total
+              </div>
+              <div className='signerBalanceTotalValue'>
+                {'$' + knownList.map(k => known[k].usdValue).reduce((a, b) => a + b, 0).toLocaleString()}
+              </div>
+            </div>
+          </div>
+          {knownList.length <= 1 ? (
+            <div className='signerBalanceNoTokens'>
+              No other token balances found
+            </div>
+          ) : null}
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+}
+const Balances = Restore.connect(_Balances)
 
 class Signer extends React.Component {
   constructor (...args) {
@@ -149,8 +294,8 @@ class Signer extends React.Component {
             <div className='signerImage'>
               {(_ => {
                 if (this.props.signer) {
-                  if (this.props.signer.type === 'ledger') return <img src={ledgerLogo} />
-                  if (this.props.signer.type === 'trezor') return <img className='trezorImage' src={trezorLogo} />
+                  if (this.props.signer.type === 'ledger') return svg.ledger(24)
+                  if (this.props.signer.type === 'trezor') return svg.trezor(20)
                   if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
                   if (this.props.signer.type === 'aragon') return svg.aragon(32)
                   return svg.octicon('plus', { height: 31 })
@@ -246,7 +391,7 @@ class Signer extends React.Component {
     const startIndex = this.store('selected.accountPage') * 5
     const highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
     const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     return (
       <div className='accountListWrap'>
         <div className='accountList' onMouseDown={e => e.stopPropagation()}>
@@ -290,10 +435,7 @@ class Signer extends React.Component {
     const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    const balance = this.store('balances', address)
     if (!address) return null
-    const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
     return (
       <div className='signerStatus' key={this.props.status}>
         {this.props.status !== 'ok' ? (
@@ -317,10 +459,7 @@ class Signer extends React.Component {
                 </div>
               </div>
               <div className='signerInfo'>
-                <div className='signerBalance'>
-                  <span className='signerBalanceCurrency'>{currentSymbol}</span>
-                  {(balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}
-                </div>
+                <Balances {...this.props} />
               </div>
             </div>
           </div>
@@ -381,6 +520,7 @@ class Signer extends React.Component {
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
+            {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             <div className='signerTop'>
               <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
               {this.renderStatus()}
@@ -403,8 +543,8 @@ class Signer extends React.Component {
 // <div className='signerBot' style={open && this.props.signer && this.props.signer.status === 'locked' ? { height: '100px' } : {}}>
 //   {current ? (
 //     <div className='signerUnlock' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { pointerEvents: 'none' }}>
-//       <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={::this.unlockChange} />
-//       <div className='signerUnlockSubmit' onMouseDown={::this.unlockSubmit} >{'Unlock'}</div>
+//       <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
+//       <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
 //     </div>
 //   ) : null}
 // </div>
