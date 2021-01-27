@@ -156,7 +156,8 @@ const initial = {
         5: {
           prylabs: 'https://goerli.prylabs.net',
           mudit: 'https://rpc.goerli.mudit.blog',
-          slockit: 'https://rpc.slock.it/goerli'
+          slockit: 'https://rpc.slock.it/goerli',
+          infura: ['wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
         },
         42: {
           infura: 'infuraKovan'

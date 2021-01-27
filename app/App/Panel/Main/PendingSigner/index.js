@@ -35,7 +35,7 @@ class Pending extends React.Component {
       const styleWidth = liveAccountLimit === 20 ? 120 : liveAccountLimit === 40 ? 120 : 60
       const marginTop = liveAccountLimit === 40 ? -8 : 0
       return (
-        <div className='loadingLiveAddresses' style={{ top: `${marginTop}px`, padding: `${20}px 20px`, width: `${styleWidth}px` }}>
+        <div className='loadingLiveAddresses' style={{ top: `${marginTop}px`, padding: '20px', width: `${styleWidth}px` }}>
           {[...Array(liveAccountLimit).keys()].map(i => i + 1).map(i => {
             return <div key={'loadingLiveAddress' + i} className='loadingLiveAddress' style={{ opacity: i <= this.props.liveAddressesFound ? '1' : '0.3' }} />
           })}
