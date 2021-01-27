@@ -377,7 +377,7 @@ class Accounts extends EventEmitter {
   }
 
   close () {
-    tokens.stop()
+    tokens.kill()
     // usbDetect.stopMonitoring()
   }
 

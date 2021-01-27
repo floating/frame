@@ -57,7 +57,6 @@ const externalWhitelist = [
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
   'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
   'https://github.com/floating/frame/issues/new',
-  'https://gitter.im/framehq/general',
   'https://github.com/floating/frame/blob/master/LICENSE',
   'https://aragon.org',
   'https://mainnet.aragon.org',

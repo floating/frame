@@ -27,7 +27,7 @@ class Notify extends React.Component {
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '15px', marginBottom: '5px' }}>Need help?</div>
-              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://gitter.im/framehq/general' })}>come chat with us</span></div>
+              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>come chat with us</span></div>
             </div>
           </div>
         </div>

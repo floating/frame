@@ -1,5 +1,5 @@
 const path = require('path')
-const { Worker } = require('worker_threads')
+const { fork } = require('child_process')
 const log = require('electron-log')
 const store = require('../store')
 
@@ -9,8 +9,8 @@ let stopped = true
 
 const setupWorker = (initial) => {
   clearTimeout(setupTimer)
-  if (tokenWorker && tokenWorker.postMessage) tokenWorker.postMessage({ method: 'exit' })
-  tokenWorker = new Worker(path.resolve(__dirname, 'worker.js'))
+  if (tokenWorker && tokenWorker.kill) tokenWorker.kill()
+  tokenWorker = fork(path.resolve(__dirname, 'worker.js'))
   tokenWorker.on('message', message => {
     if (message.type === 'scan') {
       scanning = false
@@ -30,7 +30,7 @@ const setupWorker = (initial) => {
       setupWorker()
     }, 15000)
   })
-  if (initial) tokenWorker.postMessage(initial)
+  if (initial) tokenWorker.send(initial)
 }
 
 setupWorker()
@@ -41,8 +41,8 @@ const scan = (address, omitList = [], knownList) => {
   scanning = true
   stopped = false
   const message = { method: 'scan', args: [address, omitList, knownList] }
-  if (tokenWorker && tokenWorker.postMessage) {
-    tokenWorker.postMessage(message)
+  if (tokenWorker && tokenWorker.send) {
+    tokenWorker.send(message)
   } else {
     setupWorker(message)
   }
@@ -55,7 +55,7 @@ const stop = () => {
 
 const kill = () => {
   clearTimeout(followTimer)
-  if (tokenWorker && tokenWorker.postMessage) tokenWorker.postMessage({ method: 'exit' })
+  if (tokenWorker && tokenWorker.kill) tokenWorker.kill()
 }
 
 module.exports = { scan, stop, kill }
