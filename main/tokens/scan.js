@@ -8,7 +8,7 @@ const { tokens } = require('./tokens.json')
 const mainnetTokens = tokens.filter(t => t.chainId === 1)
 const tokenAddresses = mainnetTokens.map(t => t.address.toLowerCase())
 
-const provider = ethProvider()
+const provider = ethProvider('frame')
 
 const _provider = { // Until eth-scan supports EIP-1193
   call: async ({ to, data }) => {

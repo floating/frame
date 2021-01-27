@@ -294,6 +294,7 @@ class Provider extends EventEmitter {
         res({ error })
       }
     } else {
+      // Not mainnet
       this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, (response) => {
         if (response.result) {
           try {

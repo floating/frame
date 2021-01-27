@@ -168,7 +168,6 @@ class Accounts extends EventEmitter {
       if (type === 'speed') {
         tx.params = [data]
       } else {
-        console.log('send cancel tx to ', this.current().getSelectedAddress())
         tx.params = [{
           from: this.current().getSelectedAddress(),
           to: this.current().getSelectedAddress(),
@@ -512,8 +511,8 @@ class Accounts extends EventEmitter {
       if (parseInt(price, 'hex') > 9999 * 1e9) price = '0x' + (9999 * 1e9).toString(16)
       const gasLimit = this.current().requests[handlerId].data.gas
       if (parseInt(price, 'hex') * parseInt(gasLimit, 'hex') > FEE_MAX) {
-        cb(new Error('Rejected: Operation would set fee over hard limit'))
-        price = '0x' + Math.ceil(FEE_MAX / parseInt(gasLimit, 'hex')).toString(16)
+        log.warn('setGasPrice operation would set fee over hard limit')
+        price = '0x' + Math.floor(FEE_MAX / parseInt(gasLimit, 'hex')).toString(16)
       }
       this.current().requests[handlerId].data.gasPrice = price
       this.current().update()
@@ -534,7 +533,6 @@ class Accounts extends EventEmitter {
         const { from } = this.current().requests[handlerId].data
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
           if (res.result) {
-            this.current().requests[handlerId].data.nonce = nonce
             const newNonce = parseInt(res.result, 'hex')
             const adjustedNonce = '0x' + (nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16)
             this.current().requests[handlerId].data.nonce = adjustedNonce
@@ -560,14 +558,13 @@ class Accounts extends EventEmitter {
 
   setGasLimit (limit, handlerId, cb) {
     if (!limit || isNaN(parseInt(limit, 'hex')) || parseInt(limit, 'hex') < 0) return cb(new Error('Invalid limit'))
-    console.warn('VALIDATE GAS LIMIT UPDATES')
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
       if (parseInt(limit, 'hex') > 12.5e6) limit = '0x' + (12.5e6).toString(16)
       const gasPrice = this.current().requests[handlerId].data.gasPrice
       if (parseInt(limit, 'hex') * parseInt(gasPrice, 'hex') > FEE_MAX) {
-        cb(new Error('Rejected: Operation would set fee over hard limit'))
-        limit = '0x' + Math.ceil(FEE_MAX / parseInt(gasPrice, 'hex')).toString(16)
+        log.warn('setGasLimit operation would set fee over hard limit')
+        limit = '0x' + Math.floor(FEE_MAX / parseInt(gasPrice, 'hex')).toString(16)
       }
       this.current().requests[handlerId].data.gas = limit
       this.current().update()

@@ -1,19 +1,5 @@
 // Colect data about exchange rates and gas prices
 
-// const gasSync = async () => {
-//   const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
-//   const prices = await response.json()
-//   store.setGasPrices('ethereum', '1', {
-//     safelow: ('0x' + (prices.safeLow * 100000000).toString(16)),
-//     standard: ('0x' + (prices.average * 100000000).toString(16)),
-//     fast: ('0x' + (prices.fast * 100000000).toString(16)),
-//     trader: ('0x' + (prices.fastest * 100000000).toString(16)),
-//     custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16))
-//   })
-// }
-
-// gasSync()
-// setInterval(gasSync, 15 * 1000)
 const { powerMonitor } = require('electron')
 const log = require('electron-log')
 const WebSocket = require('ws')
@@ -28,12 +14,7 @@ const reconnect = now => {
   clearTimeout(reconnectTimer)
   reconnectTimer = setInterval(() => setUpSocket('reconnectTimer'), now ? 0 : 15 * 1000)
 }
-
-// const onOpen = () => {
-//   clearTimeout(reconnectTimer)
-// }
-
-// const weiToGwei = v => v / 1e9
+ v => v / 1e9
 const gweiToWei = v => v * 1e9
 
 let staleTimer
@@ -80,12 +61,10 @@ const onError = e => {
 }
 
 const setUpSocket = (reason) => {
-  // console.log('setUpSocket', reason)
   try {
     clearTimeout(reconnectTimer)
     socket = new WebSocket('wss://realtime.frame.sh')
     socket.on('message', onData)
-    // socket.on('open', onOpen)
     socket.on('close', onClose)
     socket.on('error', onError)
   } catch (e) {
