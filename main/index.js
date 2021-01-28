@@ -25,7 +25,7 @@ const store = require('./store')
 //     })
 //   })
 // })
-require('./data')
+const data = require('./data')
 const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
@@ -142,6 +142,7 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
+  data()
   menu()
   if (process.platform === 'darwin' || process.platform === 'win32') {
     windows.tray()

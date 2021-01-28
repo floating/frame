@@ -73,6 +73,9 @@ const setUpSocket = (reason) => {
   }
 }
 
-setUpSocket('initial')
-powerMonitor.on('resume', () => setUpSocket('resume'))
-powerMonitor.on('unlock-screen', () => setUpSocket('unlock-screen'))
+module.exports = () => {
+  setUpSocket('initial')
+  powerMonitor.on('resume', () => setUpSocket('resume'))
+  powerMonitor.on('unlock-screen', () => setUpSocket('unlock-screen'))
+}
+
