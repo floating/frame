@@ -123,7 +123,7 @@
     "@babel/preset-react": "7.12.10",
     "babel-eslint": "10.1.0",
     "cli-sleep": "1.0.1",
-    "electron": "11.2.1",
+    "electron": "9.4.2",
     "electron-builder": "22.9.1",
     "electron-notarize": "1.0.0",
     "ganache-cli": "6.12.2",
