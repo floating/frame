@@ -390,30 +390,5 @@ if (initial.main._version < 4) {
   initial.main._version = 4
 }
 
-// if (initial.main._version < 5) {
-  // Add new network presets if they don't exist
-  // This is currently disabled becasue eth_syncing returns unauthorized method
-  //
-  // if (!initial.main.networks.ethereum['137']) {
-  //   initial.main.networks.ethereum['137'] = {
-  //     id: 137,
-  //     type: 'ethereum',
-  //     symbol: 'MATIC',
-  //     name: 'Matic',
-  //     explorer: 'https://explorer.matic.network',
-  //     gas: {
-  //       price: {
-  //         selected: 'standard',
-  //         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-  //       }
-  //     },
-  //     connection: {
-  //       primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
-  //       secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-  //     }
-  //   }
-  // }
-// initial.main._version = 5
-// }
 
 module.exports = () => initial

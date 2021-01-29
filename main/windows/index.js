@@ -221,6 +221,7 @@ const api = {
       if (hideShow.running !== 'show') hideShow.next = 'show'
     } else {
       if (!windows.tray) return api.tray()
+      windows.tray.setPosition(0, 0)
       windows.tray.setAlwaysOnTop(true)
       hideShow.running = 'show'
       windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })

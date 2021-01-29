@@ -25,7 +25,7 @@ class Panel extends React.Component {
     const open = this.store('tray.open')
     const transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
     // const opacity = open ? '1' : '0'
-    const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.82,0,.12,1) all' : '0.16s cubic-bezier(.82,0,.12,1) all'
+    const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.72,0,.32,1) transform' : '0.12s cubic-bezier(.72,0,.32,1) transform'
     const { type, id } = this.store('main.currentNetwork')
 
     let gasPrice = this.store('main.networks', type, id, 'gas.price.levels.standard')
@@ -40,7 +40,7 @@ class Panel extends React.Component {
             <div className='panelDetailText'>{this.store('main.networks', type, id, 'name')}</div>
           </div>
           {type === 'ethereum' && id === '1' ? (
-            <div className='panelMenuData'>
+            <div className='panelMenuData' style={{ opacity: this.store('view.addAccount') ? 0 : 1 }}>
               <div className='panelMenuDataItem'>
                 {gasPrice || '---'}
                 <div className='svg'>{svg.gas(9)}</div>
