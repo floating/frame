@@ -80,6 +80,7 @@ const initial = {
     _version: main('_version', 0),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
+      welcomeWarning: main('mute.welcomeWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false),
       explorerWarning: main('mute.explorerWarning', false),
       signerRelockChange: main('mute.signerRelockChange', false)

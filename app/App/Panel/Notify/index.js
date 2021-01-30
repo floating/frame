@@ -3,6 +3,8 @@ import Restore from 'react-restore'
 import svg from '../../../svg'
 import link from '../../../link'
 
+import frameIcon from './FrameIcon.png'
+
 class Notify extends React.Component {
   intro () {
     return (
@@ -39,21 +41,25 @@ class Notify extends React.Component {
     return (
       <div className='notifyBoxWrap' style={this.store('view.notify') === 'mainnet' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyFrameIcon'>
+            <img src={frameIcon} />
+          </div>
           <div className='notifyTitle'>
-            Alpha Notice
+            Welcome to Frame!
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>Frame is still in alpha, be cautious using alpha versions of Frame on the mainnet and verify all transactions and account details on your signing device.</div>
-            <div className='notifyBodyLine'>Proceed only if you understand and accept these risks.</div>
+            <div className='notifyBodyLine'>Please read <span onMouseDown={() => {
+              link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')
+            }}>our license</span>. Users assume all risks while using Frame. Verify transactions and account details on a signing device with trusted display when possible.</div>
           </div>
           <div className='notifyInput'>
             <div
               className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
-                link.send('tray:action', 'muteAlphaWarning')
+                link.send('tray:action', 'muteWelcomeWarning')
                 this.store.notify()
               }}
             >
-              <div className='notifyInputOptionText'>Proceed</div>
+              <div className='notifyInputOptionText'>Let's go!</div>
             </div>
           </div>
         </div>
