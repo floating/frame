@@ -390,5 +390,4 @@ if (initial.main._version < 4) {
   initial.main._version = 4
 }
 
-
 module.exports = () => initial

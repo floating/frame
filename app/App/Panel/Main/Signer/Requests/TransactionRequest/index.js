@@ -177,10 +177,10 @@ class TransactionRequest extends React.Component {
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={error || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
                 <div className='txNonceControl'>
-                  <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:updateNonce', req.handlerId, -1)}>
+                  <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
                     {svg.octicon('chevron-down', { height: 14 })}
                   </div>
-                  <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:updateNonce', req.handlerId, 1)}>
+                  <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
                     {svg.octicon('chevron-up', { height: 14 })}
                   </div>
                   <div className='txNonceLabel'>Nonce</div>

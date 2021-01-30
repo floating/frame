@@ -6,11 +6,13 @@ const store = require('../store')
 let tokenWorker, followTimer, setupTimer
 let scanning = false
 let stopped = true
+let exited = false
 
 const setupWorker = (initial) => {
   clearTimeout(setupTimer)
   if (tokenWorker && tokenWorker.kill) tokenWorker.kill()
   tokenWorker = fork(path.resolve(__dirname, 'worker.js'))
+  exited = false
   tokenWorker.on('message', message => {
     if (message.type === 'scan') {
       scanning = false
@@ -22,12 +24,14 @@ const setupWorker = (initial) => {
       }
     }
   })
-  tokenWorker.on('error', code => {
-    log.error(new Error(`Token worker error with exit code ${code}`))
+  tokenWorker.on('error', err => {
+    if (err.code === 'ERR_IPC_CHANNEL_CLOSED') setupWorker()
+    log.error(new Error(`Token worker error with exit code ${err.code}`))
   })
   tokenWorker.on('exit', code => {
+    exited = true
     setupTimer = setTimeout(() => {
-      setupWorker()
+      if (!stopped) setupWorker()
     }, 15000)
   })
   if (initial) tokenWorker.send(initial)
@@ -37,6 +41,7 @@ setupWorker()
 
 const scan = (address, omitList = [], knownList) => {
   if (scanning) return console.log('Token scan: already scanning')
+  if (exited) setupWorker()
   clearTimeout(followTimer)
   scanning = true
   stopped = false
