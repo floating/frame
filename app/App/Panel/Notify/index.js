@@ -48,7 +48,7 @@ class Notify extends React.Component {
             Welcome to Frame!
           </div>
           <div className='notifySubtitle'>
-           System-wide web3
+            System-wide web3
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>Please read <span onMouseDown={() => {
