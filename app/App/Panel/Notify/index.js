@@ -47,10 +47,13 @@ class Notify extends React.Component {
           <div className='notifyTitle'>
             Welcome to Frame!
           </div>
+          <div className='notifySubtitle'>
+           System-wide web3
+          </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>Please read <span onMouseDown={() => {
               link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')
-            }}>our license</span>. Users assume all risks while using Frame. Verify transactions and account details on a signing device with trusted display when possible.</div>
+            }}>our license</span>. Users assume all risk while using Frame. Verify transactions and account details on a signing device when possible.</div>
           </div>
           <div className='notifyInput'>
             <div
