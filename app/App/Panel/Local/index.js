@@ -240,7 +240,7 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission' style={{ zIndex: 10 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Summon</div>
+              <div className='signerPermissionOrigin'>Summon Shortcut</div>
               <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -283,7 +283,7 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              {'Mouse to your display\'s right edge to reveal Frame'}
+              {'Mouse to your display\'s right edge to summon Frame'}
             </div>
           </div>
           {/* <div className='signerPermission' style={{ zIndex: 6 }}>

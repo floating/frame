@@ -145,6 +145,9 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
+  muteWelcomeWarning: (u) => {
+    u('main.mute.welcomeWarning', () => true)
+  },
   toggleExplorerWarning: (u) => {
     u('main.mute.explorerWarning', v => !v)
   },

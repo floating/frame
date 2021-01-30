@@ -14,7 +14,7 @@ const reconnect = now => {
   clearTimeout(reconnectTimer)
   reconnectTimer = setInterval(() => setUpSocket('reconnectTimer'), now ? 0 : 15 * 1000)
 }
- v => v / 1e9
+
 const gweiToWei = v => v * 1e9
 
 let staleTimer
@@ -73,6 +73,8 @@ const setUpSocket = (reason) => {
   }
 }
 
-setUpSocket('initial')
-powerMonitor.on('resume', () => setUpSocket('resume'))
-powerMonitor.on('unlock-screen', () => setUpSocket('unlock-screen'))
+module.exports = () => {
+  setUpSocket('initial')
+  powerMonitor.on('resume', () => setUpSocket('resume'))
+  powerMonitor.on('unlock-screen', () => setUpSocket('unlock-screen'))
+}
