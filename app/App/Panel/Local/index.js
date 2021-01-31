@@ -286,6 +286,20 @@ class Settings extends React.Component {
               {'Mouse to your display\'s right edge to summon Frame'}
             </div>
           </div>
+          <div className='signerPermission' style={{ zIndex: 6 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Adjustable Nonce</div>
+              <div className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => {
+                link.send('tray:action', 'toggleNonceAdjust')
+                if (!this.store('main.nonceAdjust')) this.store.notify('nonceWarning')
+              }}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Adds the ability to edit a transaction\'s nonce'}
+            </div>
+          </div>
           {/* <div className='signerPermission' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Show USD Value</div>

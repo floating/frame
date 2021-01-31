@@ -85,14 +85,11 @@
 
     .txSectionLabelLeftInner
       position absolute
-      top 0
+      top 6px
       right 0
       bottom 0
       left 5px
-      display flex
       text-align center
-      justify-content center
-      align-items center
 
       .gwei
         text-transform uppercase
@@ -100,6 +97,8 @@
         font-weight 600
         padding-left 2px
         letter-spacing 0px
+        position relative
+        top -1px
 
   .txSectionLabelTime
     border-radius 6px
@@ -541,21 +540,29 @@
 
   .txFeeHover
     position absolute
-    left 0px
-    top 0px
-    bottom 0px
-    right 0px
-    background linear-gradient(90deg, highlighter,  highlighter, highlighter0)
+    left 50%
+    top -4px
+    bottom 4px
+    width 186px
+    margin-left -93px
+    border-radius 4px
     z-index 4000
-    padding 6px 12px
+    padding 4px
+    box-sizing border-box
     opacity 0
     font-weight 400
-    font-size 14px
+    font-size 11px
+    letter-spacing 0.5px
     transition standardFast
-    pointer-events none
+    background ghostC
+    box-shadow 0px 3px 3px thick
+    text-align center
+    text-transform uppercase
+
 
   .txFeeHover:hover
-    opacity 0.95
+    top 4px
+    opacity 1
 
   .txFeeTitle
     position absolute

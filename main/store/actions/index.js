@@ -41,6 +41,7 @@ module.exports = {
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
+  toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
   clearPermissions: (u, address) => {
     u('main.addresses', address, address => {
       address.permissions = {}

@@ -16,20 +16,17 @@ class Notify extends React.Component {
           </div>
           <div className='introInstructions'>
             <div className='introInstructionList'>
-              <div>1. Connect your Ledger or Trezor</div>
-              <div>2. Select a connected device to use</div>
-              <div>3. Verify Frame is connected to Ethereum</div>
+              <div>Use the + or simply connect a Ledger or Trezor to poulate your accounts</div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '17px', marginBottom: '5px' }}>Now Frame is ready to use!</div>
               <div>Visit <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://frame.sh' })}>frame.sh</span> to try it out</div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div>{'If a dapp you\'re using does not automatically connect to Frame, use the'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>browser extension</span></div>
+              <div>{'If a dapp you\'re using does not automatically connect to Frame, use our'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>browser extension</span></div>
             </div>
             <div className='introInstructionItem' style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '15px', marginBottom: '5px' }}>Need help?</div>
-              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>come chat with us</span></div>
+              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>join our Discord!</span></div>
             </div>
           </div>
         </div>
@@ -51,9 +48,9 @@ class Notify extends React.Component {
             System-wide web3
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>Please read <span onMouseDown={() => {
-              link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE')
-            }}>our license</span>. Users assume all risk while using Frame. Verify transactions and account details on a signing device when possible.</div>
+            <div className='notifyBodyLine'>
+              Please read<span onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE') }}>our license</span>, use at your own risk, and verify transactions and account details on a signing device whenever possible.
+            </div>
           </div>
           <div className='notifyInput'>
             <div
@@ -121,6 +118,26 @@ class Notify extends React.Component {
           <div className='notifyInput'>
             <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
               <div className='notifyInputOptionText'>Ok</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  nonceWarning () {
+    return (
+      <div className='notifyBoxWrap' style={this.store('view.notify') === 'nonceWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          <div className='notifyTitle'>
+            Adjustable Nonce
+          </div>
+          <div className='notifyBody' style={{ padding: '20px 0px' }}>
+            Adjusting the nonce of a replacement transaction will convert it to a new transaction, use with caution
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+              <div className='notifyInputOptionText'>Got it!</div>
             </div>
           </div>
         </div>
@@ -329,6 +346,7 @@ class Notify extends React.Component {
         {this.contractData()}
         {this.hotAccountWarning()}
         {this.hotSignerMismatch()}
+        {this.nonceWarning()}
       </div>
     )
   }
