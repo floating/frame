@@ -119,7 +119,7 @@ class Settings extends React.Component {
 
   discord () {
     return (
-      <div className='discordInvite' onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
+      <div className='discordInvite' onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
         <div>Need help or have a request?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>

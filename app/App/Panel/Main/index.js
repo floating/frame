@@ -69,7 +69,7 @@ class Main extends React.Component {
                     <div className='getStartedPlus'><span>+</span></div>
                     below or connect a hardware signer to automatically populate your accounts
                   </span>
-                  <div className='discordInvite' style={{ margin: '0px' }} onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
+                  <div className='discordInvite' style={{ margin: '0px' }} onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
                     <div>Need help getting started?</div>
                     <div className='discordLink'>Join our Discord!</div>
                   </div>
