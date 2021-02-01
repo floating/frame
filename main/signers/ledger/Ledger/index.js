@@ -165,6 +165,7 @@ class Ledger extends Signer {
       await this.wait(1000)
       return await this.deriveAddresses()
     }
+    clearTimeout(this.derivingAddressesErrorTimeout)
     this.derivingAddresses = true
     try {
       // Derive addresses
@@ -179,7 +180,9 @@ class Ledger extends Signer {
       this.derivingAddresses = false
     } catch (e) {
       log.error(e)
-      this.derivingAddresses = false
+      this.derivingAddressesErrorTimeout = setTimeout(() => {
+        this.derivingAddresses = false
+      }, 4000)
     }
   }
 
