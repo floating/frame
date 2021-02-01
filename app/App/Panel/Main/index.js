@@ -7,7 +7,6 @@ import PendingSigner from './PendingSigner'
 import Add from './Add'
 
 import svg from '../../../svg'
-import link from '../../../link'
 
 let firstScroll = true
 
