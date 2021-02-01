@@ -421,7 +421,7 @@ class TransactionFee extends React.Component {
 
     return (
       <div ref={this.feeWrapperRef} style={txFeeStyle} className={expanded ? 'txSection txFee txFeeExpanded' : 'txSection txFee'} onMouseDown={() => this.selectSection(0)}>
-        <div className='txFeeHover' style={expanded ? { opacity: 0 } : {}}>Tx Fee</div>
+        <div className='txFeeHover' style={expanded ? { opacity: 0, pointerEvents: 'none' } : {}}>Adjust Gas Fee</div>
         <div className='txFeeUpdateRealtime'>
           <div ref={this.feeUpdateRealtimeRef} className='txFeeUpdateRealtimeInner'>
             <div className='txFeeUpdateRealtimeTitle'>Gas Data Update</div>
@@ -471,7 +471,7 @@ class TransactionFee extends React.Component {
               />
             </div>
             <div className='txFeeGweiLabel'>
-              PRICE (GWEI)
+              GAS PRICE (GWEI)
             </div>
           </div>
           <div className='txFeeLimit' style={{ opacity: expanded ? 1 : 0 }}>
@@ -515,7 +515,7 @@ class TransactionFee extends React.Component {
               />
             </div>
             <div className='txFeeGweiLabel'>
-              LIMIT (UNITS)
+              GAS LIMIT (UNITS)
             </div>
           </div>
         </div>

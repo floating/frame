@@ -74,7 +74,8 @@ class _Balances extends React.Component {
 
   render () {
     const { open, openActive, selected, shadowTop } = this.state
-    const currentIndex = this.store('main.accounts', this.props.id, 'index')
+    let currentIndex = this.store('main.accounts', this.props.id, 'index')
+    if (this.props.accountHighlight === 'active') currentIndex = this.props.highlightIndex
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
     const { type, id } = this.store('main.currentNetwork')
@@ -400,7 +401,13 @@ class Signer extends React.Component {
               i = startIndex + i
               const balance = this.store('balances', a)
               return (
-                <div key={i} className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'} onMouseDown={() => this.setSignerIndex(i)} onMouseEnter={() => this.setHighlight('active', i)} onMouseLeave={() => this.setHighlight('inactive', i)}>
+                <div
+                  key={i}
+                  className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'}
+                  onMouseDown={() => this.setSignerIndex(i)}
+                  onMouseEnter={() => this.setHighlight('active', i)}
+                  onMouseLeave={() => this.setHighlight('inactive', i)}
+                >
                   <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
                   <div className='accountListItemAddress'>{a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}</div>
                   <div className='accountListItemBalance'>{currentSymbol + ' ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
@@ -459,7 +466,7 @@ class Signer extends React.Component {
                 </div>
               </div>
               <div className='signerInfo'>
-                <Balances {...this.props} />
+                <Balances {...this.props} highlightIndex={this.state.highlightIndex} accountHighlight={this.state.accountHighlight} />
               </div>
             </div>
           </div>

@@ -192,7 +192,6 @@ class Accounts extends EventEmitter {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && this.current().requests[id]) {
             this.current().requests[id].tx.receipt = receiptRes.result
-            delete this.current().requests[id].tx.nullReceiptCount
             if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
               this.current().requests[id].status = 'confirming'
               this.current().requests[id].notice = 'Confirming'
@@ -220,18 +219,6 @@ class Accounts extends EventEmitter {
             const blockHeight = parseInt(res.result, 16)
             const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
             resolve(blockHeight - receiptBlock)
-          } else {
-            if (receiptRes.result === null) {
-              this.current().requests[id].tx.nullReceiptCount = this.current().requests[id].tx.nullReceiptCount || 0
-              if (++this.current().requests[id].tx.nullReceiptCount > 6) {
-                this.current().requests[id].status = 'error'
-                this.current().requests[id].notice = 'Dropped'
-                this.current().requests[id].completed = Date.now()
-                reject(new Error('Trying to confirm but transaction has no receipt'))
-              }
-            } else {
-              reject(new Error('Trying to confirm but cannot find request'))
-            }
           }
         })
       })

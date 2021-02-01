@@ -175,7 +175,7 @@ class TransactionRequest extends React.Component {
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             <div className='approveTransactionPayload'>
-              <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={error || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
+              <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
                 <div className='txNonceControl'>
                   <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
                     {svg.octicon('chevron-down', { height: 14 })}

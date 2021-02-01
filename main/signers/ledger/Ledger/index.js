@@ -166,16 +166,21 @@ class Ledger extends Signer {
       return await this.deriveAddresses()
     }
     this.derivingAddresses = true
-    // Derive addresses
-    if (this.derivation === 'legacy') {
-      addresses = await this._deriveLegacyAddresses()
-    } else {
-      addresses = await this._deriveLiveAddresses()
+    try {
+      // Derive addresses
+      if (this.derivation === 'legacy') {
+        addresses = await this._deriveLegacyAddresses()
+      } else {
+        addresses = await this._deriveLiveAddresses()
+      }
+      // Update signer
+      this.addresses = addresses
+      this.update()
+      this.derivingAddresses = false
+    } catch (e) {
+      log.error(e)
+      this.derivingAddresses = false
     }
-    // Update signer
-    this.addresses = addresses
-    this.update()
-    this.derivingAddresses = false
   }
 
   close () {
@@ -229,7 +234,7 @@ class Ledger extends Signer {
         clearTimeout(this._deviceStatus)
         if (++this.busyCount > 10) {
           this.busyCount = 0
-          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+          log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
           this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
           log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
