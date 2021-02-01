@@ -6,33 +6,33 @@ import link from '../../../link'
 import frameIcon from './FrameIcon.png'
 
 class Notify extends React.Component {
-  intro () {
-    return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'intro' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 22 })}</div>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-          <div className='notifyTitle'>
-            Getting Started
-          </div>
-          <div className='introInstructions'>
-            <div className='introInstructionList'>
-              <div>Use the + or simply connect a Ledger or Trezor to poulate your accounts</div>
-            </div>
-            <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div>Visit <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://frame.sh' })}>frame.sh</span> to try it out</div>
-            </div>
-            <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div>{'If a dapp you\'re using does not automatically connect to Frame, use our'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>browser extension</span></div>
-            </div>
-            <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '15px', marginBottom: '5px' }}>Need help?</div>
-              <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>join our Discord!</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // intro () {
+  //   return (
+  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'intro' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+  //       <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 22 })}</div>
+  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+  //         <div className='notifyTitle'>
+  //           Getting Started
+  //         </div>
+  //         <div className='introInstructions'>
+  //           <div className='introInstructionList'>
+  //             <div></div>
+  //           </div>
+  //           <div className='introInstructionItem' style={{ textAlign: 'center' }}>
+  //             <div></div>
+  //           </div>
+  //           <div className='introInstructionItem' style={{ textAlign: 'center' }}>
+  //             <div>{'If a dapp you\'re using does not automatically connect to Frame, use our'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>browser extension</span></div>
+  //           </div>
+  //           <div className='introInstructionItem' style={{ textAlign: 'center' }}>
+  //             <div style={{ fontSize: '15px', marginBottom: '5px' }}>Need help?</div>
+  //             <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>join our Discord!</span></div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   mainnet () {
     return (
@@ -49,7 +49,7 @@ class Notify extends React.Component {
           </div>
           <div className='notifyBody'>
             <div className='notifyBodyLine'>
-              Please read<span onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE') }}>our license</span>, use at your own risk, and verify transactions and account details on a signing device whenever possible.
+              Please read <span onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE') }}>our license</span>, use at your own risk and verify transactions and account details on a signing device whenever possible.
             </div>
           </div>
           <div className='notifyInput'>
@@ -337,7 +337,6 @@ class Notify extends React.Component {
       <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
         {this.mainnet()}
         {this.gasFeeWarning(this.store('view.notifyData'))}
-        {this.intro()}
         {this.rinkeby()}
         {this.openExternal(this.store('view.notifyData'))}
         {this.openExplorer(this.store('view.notifyData'))}

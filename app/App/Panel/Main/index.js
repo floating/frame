@@ -7,6 +7,7 @@ import PendingSigner from './PendingSigner'
 import Add from './Add'
 
 import svg from '../../../svg'
+import link from '../../../link'
 
 let firstScroll = true
 
@@ -63,15 +64,15 @@ class Main extends React.Component {
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
                   {`No ${this.store('main.networks', type, network, 'name')} Accounts Found`}
-                  <span className='getStarted' onMouseDown={() => this.store.notify('intro')}>Need help getting started?</span>
-                  <span className='featureBox'>
-                    <span className='featureBoxText'>
-                      FRAME
-                    </span>
-                    <span className='featureBoxSubtext'>
-                      {'v' + require('../../../../package.json').version}
-                    </span>
+                  <span className='getStarted'>
+                    Use the
+                    <div className='getStartedPlus'><span>+</span></div>
+                    below or connect a hardware signer to automatically populate your accounts
                   </span>
+                  <div className='discordInvite' style={{ margin: '0px' }} onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
+                    <div>Need help getting started?</div>
+                    <div className='discordLink'>Join our Discord!</div>
+                  </div>
                 </div>
               ) : null}
             </div>

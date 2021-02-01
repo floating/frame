@@ -289,10 +289,12 @@ class Settings extends React.Component {
           <div className='signerPermission' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Adjustable Nonce</div>
-              <div className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => {
-                link.send('tray:action', 'toggleNonceAdjust')
-                if (!this.store('main.nonceAdjust')) this.store.notify('nonceWarning')
-              }}>
+              <div
+                className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => {
+                  link.send('tray:action', 'toggleNonceAdjust')
+                  if (!this.store('main.nonceAdjust')) this.store.notify('nonceWarning')
+                }}
+              >
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
@@ -382,7 +384,7 @@ class Settings extends React.Component {
             </div>
           </div>
           <div className='snipIt'>
-            <div>Browser dapp doesn't support Frame natively?</div>
+            <div>Dapp doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
               <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
                 {svg.chrome(30)}
@@ -391,7 +393,7 @@ class Settings extends React.Component {
                 {svg.firefox(30)}
               </div>
             </div>
-            <div>Inject Frame with our browser extension!</div>
+            <div>Inject a connection with our browser extension!</div>
           </div>
           {this.discord()}
           {this.quit()}
