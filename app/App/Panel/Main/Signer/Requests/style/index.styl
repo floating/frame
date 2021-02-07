@@ -40,6 +40,10 @@
   animation-name bounceIn
 }
 
+.scaleIn {
+  animation scalein 600ms cubic !important
+}
+
 .loader,
 .loader:after {
   border-radius 100%
@@ -1122,6 +1126,9 @@
 
     .requestSignButton:hover:before
       background good
+
+  .requestQuickButton
+    animation scalein 800ms cubic !important
 
   .requestApproveDisabled
     pointer-events none
