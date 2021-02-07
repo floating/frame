@@ -61,11 +61,14 @@ const onError = e => {
   reconnectTimer = setInterval(() => setUpSocket('reconnectTimer -- onError'), 15 * 1000)
 }
 
+const onOpen = e => log.info('Connected to realtime')
+
 const setUpSocket = (reason) => {
   try {
     clearTimeout(reconnectTimer)
     if (socket && socket.close) socket.close()
     socket = new WebSocket('wss://realtime.frame.sh')
+    socket.on('open', onOpen)
     socket.on('message', onData)
     socket.on('close', onClose)
     socket.on('error', onError)
