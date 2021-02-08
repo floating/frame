@@ -22,7 +22,6 @@ class TxData extends React.Component {
 
   render () {
     const { req, active } = this.props
-
     return (
       <div className='txModuleMain'>
         <div className='txModuleTop'>
@@ -39,10 +38,46 @@ class TxData extends React.Component {
                 <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
                   {this.state.copiedData ? (
                     <div className='txModuleDataBodyCopied'>
-                      <div>Copied</div>
+                      <div>Copied Raw Data</div>
                       {svg.octicon('clippy', { height: 20 })}
                     </div>
-                  ) : req.data.data}
+                  ) : (
+                    <div>
+                      {req.decodedData ? (
+                        <div className='decodedDataContract'>
+                          <div className='dataUnverified'>unverified abi</div>
+                          <div className='dataSource'>{'abi source: ' + req.decodedData.source}</div>
+                          <div className='decodedDataContractTarget'>
+                            <div className='decodedDataSync decodedDataSyncLeft'>{svg.sync(20)}</div>
+                            <div className='decodedDataSync decodedDataSyncRight'>{svg.sync(20)}</div>
+                            <div className='decodedDataContractName'>
+                              {req.decodedData.contractName}
+                            </div>
+                            <div className='decodedDataContractMethod'>
+                              <div>{req.decodedData.method}</div>
+                            </div>
+                          </div>
+       
+                          {req.decodedData.args.map(a => {
+                            return (
+                              <div className='decodedDataContractArg'>
+                                <div className='overflowBox'>
+                                  {a.type.indexOf('[]') ? (
+                                    a.value.split(',').map(i => <div>{i}</div>)
+                                  ) : (
+                                    <div>{a.value}</div>
+                                  )}
+                                </div>
+                                <div className='decodedDataSubtitle'>{a.name + ' (' + a.type + ')'}</div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      ) : null}
+                      <div className='rawDataHeader'>{'Raw Data'}</div>
+                      <div>{req.data.data}</div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

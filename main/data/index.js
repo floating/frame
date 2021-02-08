@@ -51,7 +51,6 @@ const onData = data => {
 
 const onClose = () => {
   log.info('gasSocket Disconnect')
-  socket = null
   reconnect(true)
 }
 

@@ -353,23 +353,39 @@ class Provider extends EventEmitter {
     })
   }
 
+  // fillTx (rawTx, cb) {
+  //   const needs = {}
+  //   // if (!rawTx.nonce) needs.nonce = this.getNonce
+  //   if (!rawTx.gas) needs.gas = this.getGasEstimate
+  //   let count = 0
+  //   const list = Object.keys(needs)
+  //   const errors = []
+  //   if (list.length > 0) {
+  //     list.forEach(need => {
+  //       needs[need](rawTx, response => {
+  //         if (response.error) {
+  //           errors.push({ need, message: response.error.message })
+  //         } else {
+  //           rawTx[need] = response.result
+  //         }
+  //         if (++count === list.length) errors.length > 0 ? cb(errors[0]) : this.fillDone(rawTx, cb)
+  //       })
+  //     })
+  //   } else {
+  //     this.fillDone(rawTx, cb)
+  //   }
+  // }
+
   fillTx (rawTx, cb) {
-    const needs = {}
-    // if (!rawTx.nonce) needs.nonce = this.getNonce
-    if (!rawTx.gas) needs.gas = this.getGasEstimate
-    let count = 0
-    const list = Object.keys(needs)
-    const errors = []
-    if (list.length > 0) {
-      list.forEach(need => {
-        needs[need](rawTx, response => {
-          if (response.error) {
-            errors.push({ need, message: response.error.message })
-          } else {
-            rawTx[need] = response.result
-          }
-          if (++count === list.length) errors.length > 0 ? cb(errors[0]) : this.fillDone(rawTx, cb)
-        })
+    if (!rawTx.gas) {
+      this.getGasEstimate(rawTx, response => {
+        if (response.error) {
+          rawTx.gas = '0x0'
+          rawTx.warning = response.error.message
+        } else {
+          rawTx.gas = response.result
+        }
+        this.fillDone(rawTx, cb)
       })
     } else {
       this.fillDone(rawTx, cb)
@@ -386,7 +402,9 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin }, res)
+      const { warning } = rawTx
+      delete rawTx.warning
+      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin, warning }, res)
     })
   }
 

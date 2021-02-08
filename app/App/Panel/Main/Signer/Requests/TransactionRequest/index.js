@@ -81,6 +81,10 @@ class TransactionRequest extends React.Component {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
   }
 
+  removeWarning (reqId, req) {
+    link.rpc('removeRequestWarning', reqId, () => {}) // Move to link.send
+  }
+
   toggleDataView (id) {
     this.setState({ dataView: !this.state.dataView })
   }
@@ -174,6 +178,39 @@ class TransactionRequest extends React.Component {
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
+            {req.warning && status !== 'error' ? (
+              <div className='approveTransactionWarning'>
+                <div className='approveTransactionWarningOptions'>
+                  <div 
+                    className='approveTransactionWarningReject'
+                    onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
+                  >Reject</div>
+                  <div className='approveTransactionWarningPreview'
+                    onMouseEnter={() => {
+                      this.setState( { warningPreview: true } )
+                    }}
+                    onMouseMove={() => {
+                      this.setState( { warningPreview: true } )
+                    }}
+                    onMouseLeave={() => {
+                      this.setState( { warningPreview: false } )
+                    }}
+                  >
+                    Preview Tx</div>
+                  <div 
+                    className='approveTransactionWarningProceed'
+                    onMouseDown={() => this.removeWarning(this.props.req.handlerId)}
+                  >Proceed</div>
+                </div>
+                <div className='approveTransactionWarningFill' style={ this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
+                  <div className='approveTransactionWarningIcon'>
+                    {svg.alert(64)}
+                  </div>
+                  <div className='approveTransactionWarningTitle'>could not to estimate Gas</div>
+                  <div className='approveTransactionWarningMessage'>{req.warning}</div>
+                </div>
+              </div> 
+            ) : null}
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
                 <div className='txNonceControl'>

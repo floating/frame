@@ -129,6 +129,12 @@ class Accounts extends EventEmitter {
     return req
   }
 
+  removeRequestWarning (reqId) {
+    log.info('removeRequestWarning: ', reqId)
+    delete this.current().requests[reqId].warning
+    this.current().update()
+  }
+
   checkBetterGasPrice () {
     const { id, type } = store('main.currentNetwork')
     const gas = store('main.networks', type, id, 'gas.price')

@@ -91,6 +91,9 @@ const rpc = {
       provider.declineRequest(req)
     }
   },
+  removeRequestWarning (reqId) {
+    accounts.removeRequestWarning(reqId)
+  },
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
   },
