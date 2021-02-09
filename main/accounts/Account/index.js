@@ -82,7 +82,7 @@ class Account {
         const { to, data } = req.data
         const decodedData = await abi.decodeCalldata(to, data)
         if (this.requests[r.handlerId]) {
-          this.requests[r.handlerId].decodedData = decodedData 
+          this.requests[r.handlerId].decodedData = decodedData
           this.update()
         }
       }

@@ -181,38 +181,42 @@ class TransactionRequest extends React.Component {
             {req.warning && status !== 'error' ? (
               <div className='approveTransactionWarning'>
                 <div className='approveTransactionWarningOptions'>
-                  <div 
+                  <div
                     className='approveTransactionWarningReject'
                     onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
-                  >Reject</div>
-                  <div className='approveTransactionWarningPreview'
+                  >Reject
+                  </div>
+                  <div
+                    className='approveTransactionWarningPreview'
                     onMouseEnter={() => {
-                      this.setState( { warningPreview: true } )
+                      this.setState({ warningPreview: true })
                     }}
                     onMouseMove={() => {
-                      this.setState( { warningPreview: true } )
+                      this.setState({ warningPreview: true })
                     }}
                     onMouseLeave={() => {
-                      this.setState( { warningPreview: false } )
+                      this.setState({ warningPreview: false })
                     }}
                   >
-                    Preview</div>
-                  <div 
+                    Preview
+                  </div>
+                  <div
                     className='approveTransactionWarningProceed'
                     onMouseDown={() => this.removeWarning(this.props.req.handlerId)}
-                  >Proceed</div>
+                  >Proceed
+                  </div>
                 </div>
-                <div className='approveTransactionWarningFill' style={ this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
+                <div className='approveTransactionWarningFill' style={this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
                   <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
                     {svg.alert(32)}
                   </div>
                   <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
                     {svg.alert(32)}
                   </div>
-                  <div className='approveTransactionWarningTitle'>estimated to fail</div>
+                  <div className='approveTransactionWarningTitle'>predicted to fail</div>
                   <div className='approveTransactionWarningMessage'>{req.warning}</div>
                 </div>
-              </div> 
+              </div>
             ) : null}
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
@@ -276,10 +280,10 @@ class TransactionRequest extends React.Component {
                           <Time time={req.completed} />
                           <div className='txProgressSuccessItem'>
                             <div className='txProgressSuccessItemLabel'>
-                              Fee 
+                              Fee
                             </div>
                             <div className='txProgressSuccessItemValue'>
-                            <div style={{margin: '1px 1px 0px 3px', fontSize: '10px' }}>$</div>
+                              <div style={{ margin: '1px 1px 0px 3px', fontSize: '10px' }}>$</div>
                               {req.feeAtTime}
                             </div>
                           </div>

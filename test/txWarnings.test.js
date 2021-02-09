@@ -1,12 +1,13 @@
+/* global test */
 
 const provider = require('eth-provider')
 const frame = provider('frame')
 
 test('Deploy Contract', async done => {
   try {
-    const send = await frame.request({
+    await frame.request({
       method: 'eth_sendTransaction',
-      params:[{
+      params: [{
         value: '0x341a0691d617740',
         from: '0xb120c885f1527394c78d50e7c7da57defb24f612',
         to: '0x7a250d5630b4cf539739df2c5dacb4c659f2488d',

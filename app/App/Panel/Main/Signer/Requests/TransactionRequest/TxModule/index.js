@@ -56,13 +56,13 @@ class TxData extends React.Component {
                             <div>{req.decodedData.method}</div>
                           </div>
                         </div>
-      
+
                         {req.decodedData.args.map(a => {
                           return (
                             <div key={a.name} className='decodedDataContractArg'>
                               <div className='overflowBox'>
                                 {a.type.indexOf('[]') ? (
-                                  a.value.split(',').map(i => <div>{i}</div>)
+                                  a.value.split(',').map(i => <div key={i}>{i}</div>)
                                 ) : (
                                   <div>{a.value}</div>
                                 )}
@@ -73,7 +73,7 @@ class TxData extends React.Component {
                         })}
                       </div>
                     ) : null}
-                    <div className='rawDataHeader'>{'Raw Data'}</div>
+                    <div className='rawDataHeader'>Raw Data</div>
                     <div>{req.data.data}</div>
                   </div>
                 )}

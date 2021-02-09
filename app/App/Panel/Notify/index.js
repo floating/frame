@@ -155,7 +155,7 @@ class Notify extends React.Component {
           <div className='notifyBody'>
             {feeUSD ? (
               <>
-                <div className='notifyBodyLine'>{`The fee for this transaction is:`}</div>
+                <div className='notifyBodyLine'>The fee for this transaction is:</div>
                 <div className='notifyBodyLine notifyBodyPrice'>{`${parseFloat(feeUSD).toFixed(2)} USD`}</div>
               </>
             ) : (
