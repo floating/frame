@@ -10,7 +10,7 @@ import TxFee from './TxFee'
 
 import TxModule from './TxModule'
 
-const FEE_WARNING_THRESHOLD_USD = 10
+const FEE_WARNING_THRESHOLD_USD = 20
 
 class Time extends React.Component {
   constructor (...args) {
@@ -196,17 +196,20 @@ class TransactionRequest extends React.Component {
                       this.setState( { warningPreview: false } )
                     }}
                   >
-                    Preview Tx</div>
+                    Preview</div>
                   <div 
                     className='approveTransactionWarningProceed'
                     onMouseDown={() => this.removeWarning(this.props.req.handlerId)}
                   >Proceed</div>
                 </div>
                 <div className='approveTransactionWarningFill' style={ this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
-                  <div className='approveTransactionWarningIcon'>
-                    {svg.alert(64)}
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
+                    {svg.alert(32)}
                   </div>
-                  <div className='approveTransactionWarningTitle'>could not to estimate Gas</div>
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
+                    {svg.alert(32)}
+                  </div>
+                  <div className='approveTransactionWarningTitle'>estimated to fail</div>
                   <div className='approveTransactionWarningMessage'>{req.warning}</div>
                 </div>
               </div> 
@@ -397,7 +400,7 @@ class TransactionRequest extends React.Component {
             <div
               className='requestSign' onMouseDown={() => {
                 if (this.state.allowInput && this.props.onTop) {
-                  if (feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) {
+                  if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
                     this.store.notify('gasFeeWarning', { req, feeUSD })
                   } else {
                     this.approve(req.handlerId, req)

@@ -60,7 +60,7 @@ class TxData extends React.Component {
        
                           {req.decodedData.args.map(a => {
                             return (
-                              <div className='decodedDataContractArg'>
+                              <div key={a.name} className='decodedDataContractArg'>
                                 <div className='overflowBox'>
                                   {a.type.indexOf('[]') ? (
                                     a.value.split(',').map(i => <div>{i}</div>)

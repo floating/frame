@@ -51,11 +51,11 @@ const onData = data => {
 
 const onClose = () => {
   log.info('gasSocket Disconnect')
-  reconnect(true)
+  reconnect()
 }
 
 const onError = e => {
-  console.log('gasSocket error', e)
+  log.error('gasSocket error', e)
   clearTimeout(reconnectTimer)
   reconnectTimer = setInterval(() => setUpSocket('reconnectTimer -- onError'), 15 * 1000)
 }
@@ -63,6 +63,7 @@ const onError = e => {
 const onOpen = e => log.info('Connected to realtime')
 
 const setUpSocket = (reason) => {
+  log.info('setUpSocket', reason)
   try {
     clearTimeout(reconnectTimer)
     if (socket && socket.close) socket.close()

@@ -12,7 +12,7 @@ const hexToInt = v => parseInt(v, 'hex')
 const weiHexToGweiInt = v => hexToInt(v) / 1e9
 const gweiToWeiHex = v => intToHex(gweiToWei(v))
 
-const FEE_WARNING_THRESHOLD_USD = 10
+const FEE_WARNING_THRESHOLD_USD = 20
 const FEE_MAX_TOTAL_ETH_WEI = 2 * 1e18
 
 class TransactionFee extends React.Component {

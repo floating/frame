@@ -83,7 +83,8 @@ const initial = {
       welcomeWarning: main('mute.welcomeWarning', false),
       externalLinkWarning: main('mute.externalLinkWarning', false),
       explorerWarning: main('mute.explorerWarning', false),
-      signerRelockChange: main('mute.signerRelockChange', false)
+      signerRelockChange: main('mute.signerRelockChange', false),
+      gasFeeWarning: main('mute.gasFeeWarning', false)
     },
     shortcuts: {
       altSlash: main('shortcuts.altSlash', true)
