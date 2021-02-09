@@ -265,8 +265,7 @@ class TransactionRequest extends React.Component {
                     <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
                       {req && req.tx && req.tx.receipt ? (
                         <>
-                          <div className='txProgressSuccessLine' />
-                          <div className='txProgressSuccessItem' style={{ justifyContent: 'flex-end' }}>
+                          <div className='txProgressSuccessItem'>
                             <div className='txProgressSuccessItemLabel'>
                               In Block
                             </div>
@@ -275,6 +274,15 @@ class TransactionRequest extends React.Component {
                             </div>
                           </div>
                           <Time time={req.completed} />
+                          <div className='txProgressSuccessItem'>
+                            <div className='txProgressSuccessItemLabel'>
+                              Fee 
+                            </div>
+                            <div className='txProgressSuccessItemValue'>
+                            <div style={{margin: '1px 1px 0px 3px', fontSize: '10px' }}>$</div>
+                              {req.feeAtTime}
+                            </div>
+                          </div>
                         </>
                       ) : null}
                     </div>
