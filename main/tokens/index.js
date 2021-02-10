@@ -37,7 +37,7 @@ const setupWorker = (initial) => {
   if (initial) tokenWorker.send(initial)
 }
 
-setupWorker()
+setTimeout(() => setupWorker(), 3200)
 
 const scan = (address, omitList = [], knownList) => {
   if (scanning) return console.log('Token scan: already scanning')

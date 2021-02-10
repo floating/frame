@@ -154,11 +154,14 @@ class Notify extends React.Component {
           </div>
           <div className='notifyBody'>
             {feeUSD ? (
-              <div className='notifyBodyLine'>{`This transaction will cost ${parseFloat(feeUSD).toFixed(2)} USD in fees.`}</div>
+              <>
+                <div className='notifyBodyLine'>The fee for this transaction is:</div>
+                <div className='notifyBodyLine notifyBodyPrice'>{`${parseFloat(feeUSD).toFixed(2)} USD`}</div>
+              </>
             ) : (
               <div className='notifyBodyLine'>We were unable to determine this transaction's fee in USD.</div>
             )}
-            <div className='notifyBodyLine'>Are you sure you want to proceed?</div>
+            <div className='notifyBodyQuestion'>Are you sure you want to proceed?</div>
           </div>
           <div className='notifyInput'>
             <div
@@ -176,6 +179,14 @@ class Notify extends React.Component {
               }}
             >
               <div className='notifyInputOptionText'>Proceed</div>
+            </div>
+          </div>
+          <div className='notifyCheck' onMouseDown={() => link.send('tray:action', 'toggleGasFeeWarning')}>
+            <div className='notifyCheckBox'>
+              {this.store('main.mute.gasFeeWarning') ? svg.octicon('check', { height: 26 }) : null}
+            </div>
+            <div className='notifyCheckText'>
+              {'Don\'t show this warning again'}
             </div>
           </div>
         </div>

@@ -40,6 +40,9 @@
   animation-name bounceIn
 }
 
+.scaleIn
+  animation scalein 600ms cubic !important
+
 .loader,
 .loader:after {
   border-radius 100%
@@ -949,7 +952,6 @@
         top 0px
 
   .transactionNoData
-    // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
     background highlight
     border-radius 16px
     box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
@@ -1122,6 +1124,9 @@
 
     .requestSignButton:hover:before
       background good
+
+  .requestQuickButton
+    animation scalein 800ms cubic !important
 
   .requestApproveDisabled
     pointer-events none
@@ -1554,7 +1559,7 @@ span
   bottom 24px
   height 32px
   left 0px
-  right 4px
+  right 0px
   z-index 1000005
   display flex
   transition standard
@@ -1568,15 +1573,13 @@ span
     background tripleThick
 
   .txProgressSuccessItem
-    position relative
-    flex-grow 1
-    height 100%
+    position absolute
     display flex
     align-items center
-    justify-content flex-start
-    width 50%
+    justify-content center
     box-sizing border-box
-    padding 0px 8px 0px 8px
+    padding-top 1px
+    margin 5px 0px
 
     .txProgressSuccessItemValue
       display flex
@@ -1598,6 +1601,18 @@ span
 
   .txProgressSuccessItem:last-child
     border-right none
+
+  .txProgressSuccessItemLeft
+    left 0
+    width 130px
+  .txProgressSuccessItemCenter
+    right 113px
+    left 130px
+    border-left 2px solid thick
+  .txProgressSuccessItemRight
+    right 0
+    width 110px
+    border-left 2px solid thick
 
 .txSummary
   display flex

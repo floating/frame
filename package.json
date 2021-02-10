@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "System-wide web3",
   "main": "main",
   "build": {
@@ -66,6 +66,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@aragon/wrapper": "5.0.0",
+    "@ethersproject/abi": "5.0.12",
+    "@ethersproject/hash": "5.0.11",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "5.41.0",
     "@ledgerhq/hw-transport-node-hid": "5.41.0",
@@ -83,7 +85,7 @@
     "electron-positioner": "4.1.0",
     "electron-updater": "4.3.5",
     "eth-ens-namehash": "2.0.8",
-    "eth-provider": "0.5.3",
+    "eth-provider": "0.6.0",
     "eth-sig-util": "3.0.0",
     "ethereum-public-key-to-address": "0.0.5",
     "ethereumjs-abi": "0.6.8",

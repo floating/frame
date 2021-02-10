@@ -3,6 +3,7 @@ const hdKey = require('hdkey')
 const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
+const fetch = require('node-fetch')
 
 // const bip39 = require('bip39')
 
@@ -21,6 +22,7 @@ const gweiToWei = v => Math.ceil(v * 1e9)
 const intToHex = v => '0x' + v.toString(16)
 const hexToInt = v => parseInt(v, 'hex')
 const weiHexToGweiInt = v => hexToInt(v) / 1e9
+const weiIntToEthInt = v => v / 1e18
 const gweiToWeiHex = v => intToHex(gweiToWei(v))
 
 const notify = (title, body, action) => {
@@ -129,6 +131,14 @@ class Accounts extends EventEmitter {
     return req
   }
 
+  removeRequestWarning (reqId) {
+    log.info('removeRequestWarning: ', reqId)
+    if (this.current() && this.current().requests[reqId]) {
+      delete this.current().requests[reqId].warning
+      this.current().update()
+    }
+  }
+
   checkBetterGasPrice () {
     const { id, type } = store('main.currentNetwork')
     const gas = store('main.networks', type, id, 'gas.price')
@@ -192,6 +202,22 @@ class Accounts extends EventEmitter {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && this.current().requests[id]) {
             this.current().requests[id].tx.receipt = receiptRes.result
+            if (!this.current().requests[id].feeAtTime) {
+              const network = store('main.currentNetwork')
+              if (network.type === 'ethereum' && network.id === '1') {
+                fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
+                  if (res && res.message === 'OK' && res.result && res.result.ethusd) {
+                    const { gasUsed } = this.current().requests[id].tx.receipt
+                    const { gasPrice } = this.current().requests[id].data
+                    this.current().requests[id].feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(gasPrice)) * res.result.ethusd) * 100) / 100).toFixed(2)
+                    this.current().update()
+                  }
+                }).catch(e => console.log('Unable to fetch exchange rate', e))
+              } else {
+                this.current().requests[id].feeAtTime = (0).toFixed(2)
+                this.current().update()
+              }
+            }
             if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
               this.current().requests[id].status = 'confirming'
               this.current().requests[id].notice = 'Confirming'

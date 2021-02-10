@@ -17,7 +17,7 @@
   overflow hidden
   transform translateY(0px) translateZ(0px)
   will-change height
-  opacity 0.95
+  opacity 1
   
   .txModuleMain
     height 324px
@@ -100,13 +100,6 @@
     user-select all
     overflow hidden
     z-index 90
-    // background highlighter
-    // border-radius 12px
-    // opacity 0
-    // pointer-events none
-    // transition standard
-    // box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
-    // background blue
 
     .txModuleDataBodyCopied
       position absolute
@@ -138,3 +131,105 @@
       overlflow-y scroll
       border-radius 6px
 
+.decodedDataContract
+  padding 48px 10px 0px 10px
+  position relative
+  background highlightest
+  border-radius 16px
+  box-shadow 0px 24px 8px -12px thick
+  
+.dataUnverified
+  position absolute
+  color bad
+  top 16px
+  right 16px
+  font-size 11px
+  font-weight 600
+  font-family OpenSans, sans-serif
+  text-transform uppercase
+
+.dataSource
+  position absolute
+  top 16px
+  left 16px
+  font-size 11px
+  font-weight 600
+  font-family OpenSans, sans-serif
+  text-transform uppercase
+
+.decodedDataContractTarget
+  margin-bottom 15px
+  position relative
+  background ghostB
+  box-shadow 0px 16px 4px -12px thick
+  height 60px
+  padding 10px
+  box-sizing border-box
+  border-radius 35px
+  display flex
+  flex-direction column
+  align-items center
+  justify-content center
+
+  .decodedDataSync
+    position absolute
+    svg 
+      transform rotate(90deg)
+
+  .decodedDataSyncLeft
+    left 14px
+    top 20px
+    width 10px
+    overflow hidden
+    transform rotate(-10deg)
+    svg 
+      transform rotate(90deg) scaleX(-1)
+
+  .decodedDataSyncRight
+    right 14px
+    top 20px
+    width 10px
+    overflow hidden
+    transform rotate(190deg)
+    svg 
+      transform rotate(90deg)
+
+  .decodedDataContractName
+    text-align center
+    font-size 17px
+    font-family OpenSans, sans-serif
+    font-weight 300
+
+  .decodedDataContractMethod
+    text-align center
+    font-family OpenSans, sans-serif
+    font-weight bold
+    font-size 14px
+
+.decodedDataContractArg
+  text-align center
+  padding 10px 0px 10px 0px
+  margin 0px 10px 0px 10px
+  border-top 1px solid thick
+  font-size 17px
+
+.decodedDataSubtitle
+  font-size 12px
+  font-weight 400
+  font-family OpenSans, sans-serif
+
+.overflowBox
+  width 100%
+  height auto
+  overflow-x scroll
+  overflow-y hidden
+  word-wrap normal
+  margin-bottom -15px
+
+.rawDataHeader
+  font-family OpenSans, sans-serif
+  text-align center
+  font-size 16px
+  margin-top 20px
+  margin-bottom 5px
+  

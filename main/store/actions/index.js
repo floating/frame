@@ -152,6 +152,9 @@ module.exports = {
   toggleExplorerWarning: (u) => {
     u('main.mute.explorerWarning', v => !v)
   },
+  toggleGasFeeWarning: (u) => {
+    u('main.mute.gasFeeWarning', v => !v)
+  },
   setAltSpace: (u, v) => {
     u('main.shortcuts.altSlash', () => v)
   },

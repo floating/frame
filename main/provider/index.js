@@ -240,11 +240,7 @@ class Provider extends EventEmitter {
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
       if (response.error) return cb(response.error)
-      /// req.data.nonce = response.result
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
-      // console.log('added noce to req', req.data)
-      // const updatedReq = Object.assign({}, req)
-      // updatedReq.data = Object.assign({}, updatedReq.data, { nonce: response.result })
       this.signAndSend(updatedReq, cb)
     })
   }
@@ -331,18 +327,10 @@ class Provider extends EventEmitter {
   }
 
   getNonce (rawTx, res) {
-    if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.account === rawTx.from && this.nonce.current) {
-      let newNonce = utils.hexToNumber(this.nonce.current)
-      newNonce++
-      newNonce = utils.numberToHex(newNonce)
-      this.nonce = { age: Date.now(), current: newNonce }
-      res({ id: 1, jsonrpc: '2.0', result: this.nonce.current })
-    } else {
-      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
-        if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
-        res(response)
-      })
-    }
+    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
+      if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
+      res(response)
+    })
   }
 
   fillDone (fullTx, res) {
@@ -354,22 +342,15 @@ class Provider extends EventEmitter {
   }
 
   fillTx (rawTx, cb) {
-    const needs = {}
-    // if (!rawTx.nonce) needs.nonce = this.getNonce
-    if (!rawTx.gas) needs.gas = this.getGasEstimate
-    let count = 0
-    const list = Object.keys(needs)
-    const errors = []
-    if (list.length > 0) {
-      list.forEach(need => {
-        needs[need](rawTx, response => {
-          if (response.error) {
-            errors.push({ need, message: response.error.message })
-          } else {
-            rawTx[need] = response.result
-          }
-          if (++count === list.length) errors.length > 0 ? cb(errors[0]) : this.fillDone(rawTx, cb)
-        })
+    if (!rawTx.gas) {
+      this.getGasEstimate(rawTx, response => {
+        if (response.error) {
+          rawTx.gas = '0x0'
+          rawTx.warning = response.error.message
+        } else {
+          rawTx.gas = response.result
+        }
+        this.fillDone(rawTx, cb)
       })
     } else {
       this.fillDone(rawTx, cb)
@@ -386,7 +367,9 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin }, res)
+      const { warning } = rawTx
+      delete rawTx.warning
+      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin, warning }, res)
     })
   }
 

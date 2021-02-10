@@ -25,8 +25,8 @@ const onData = data => {
     if (data.status === 'ok' && data.mainnet && data.mainnet.gas) {
       const { gas } = data.mainnet
       clearTimeout(staleTimer)
-      // If we havent recieved gas data in 60s, make sure we're connected
-      staleTimer = setTimeout(() => setUpSocket('staleTimer'), 60 * 1000)
+      // If we havent recieved gas data in 90s, make sure we're connected
+      staleTimer = setTimeout(() => setUpSocket('staleTimer'), 90 * 1000)
       store.setGasPrices('ethereum', '1', {
         slow: ('0x' + gweiToWei(Math.round(gas.slow)).toString(16)),
         slowTime: gas.slowTime,
@@ -55,15 +55,20 @@ const onClose = () => {
 }
 
 const onError = e => {
-  console.log('gasSocket error', e)
+  log.error('gasSocket error', e)
   clearTimeout(reconnectTimer)
   reconnectTimer = setInterval(() => setUpSocket('reconnectTimer -- onError'), 15 * 1000)
 }
 
+const onOpen = e => log.info('Connected to realtime')
+
 const setUpSocket = (reason) => {
+  log.info('setUpSocket', reason)
   try {
     clearTimeout(reconnectTimer)
+    if (socket && socket.close) socket.close()
     socket = new WebSocket('wss://realtime.frame.sh')
+    socket.on('open', onOpen)
     socket.on('message', onData)
     socket.on('close', onClose)
     socket.on('error', onError)

@@ -10,7 +10,7 @@ import TxFee from './TxFee'
 
 import TxModule from './TxModule'
 
-const FEE_WARNING_THRESHOLD_USD = 10
+const FEE_WARNING_THRESHOLD_USD = 20
 
 class Time extends React.Component {
   constructor (...args) {
@@ -44,7 +44,7 @@ class Time extends React.Component {
   render () {
     const { time, label } = this.msToTime(this.state.time - this.props.time)
     return (
-      <div className='txProgressSuccessItem'>
+      <div className='txProgressSuccessItem txProgressSuccessItemRight'>
         <div className='txProgressSuccessItemValue'>
           {time}
         </div>
@@ -79,6 +79,10 @@ class TransactionRequest extends React.Component {
 
   decline (reqId, req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
+  }
+
+  removeWarning (reqId, req) {
+    link.rpc('removeRequestWarning', reqId, () => {}) // Move to link.send
   }
 
   toggleDataView (id) {
@@ -174,6 +178,46 @@ class TransactionRequest extends React.Component {
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
+            {req.warning && status !== 'error' ? (
+              <div className='approveTransactionWarning'>
+                <div className='approveTransactionWarningOptions'>
+                  <div
+                    className='approveTransactionWarningReject'
+                    onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
+                  >Reject
+                  </div>
+                  <div
+                    className='approveTransactionWarningPreview'
+                    onMouseEnter={() => {
+                      this.setState({ warningPreview: true })
+                    }}
+                    onMouseMove={() => {
+                      this.setState({ warningPreview: true })
+                    }}
+                    onMouseLeave={() => {
+                      this.setState({ warningPreview: false })
+                    }}
+                  >
+                    Preview
+                  </div>
+                  <div
+                    className='approveTransactionWarningProceed'
+                    onMouseDown={() => this.removeWarning(this.props.req.handlerId)}
+                  >Proceed
+                  </div>
+                </div>
+                <div className='approveTransactionWarningFill' style={this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
+                    {svg.alert(32)}
+                  </div>
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
+                    {svg.alert(32)}
+                  </div>
+                  <div className='approveTransactionWarningTitle'>predicted to fail</div>
+                  <div className='approveTransactionWarningMessage'>{req.warning}</div>
+                </div>
+              </div>
+            ) : null}
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
                 <div className='txNonceControl'>
@@ -225,8 +269,7 @@ class TransactionRequest extends React.Component {
                     <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
                       {req && req.tx && req.tx.receipt ? (
                         <>
-                          <div className='txProgressSuccessLine' />
-                          <div className='txProgressSuccessItem' style={{ justifyContent: 'flex-end' }}>
+                          <div className='txProgressSuccessItem txProgressSuccessItemLeft'>
                             <div className='txProgressSuccessItemLabel'>
                               In Block
                             </div>
@@ -235,6 +278,15 @@ class TransactionRequest extends React.Component {
                             </div>
                           </div>
                           <Time time={req.completed} />
+                          <div className='txProgressSuccessItem txProgressSuccessItemCenter'>
+                            <div className='txProgressSuccessItemLabel'>
+                              Fee
+                            </div>
+                            <div className='txProgressSuccessItemValue'>
+                              <div style={{ margin: '0px 1px 0px 0px', fontSize: '10px' }}>$</div>
+                              {req.feeAtTime}
+                            </div>
+                          </div>
                         </>
                       ) : null}
                     </div>
@@ -360,7 +412,7 @@ class TransactionRequest extends React.Component {
             <div
               className='requestSign' onMouseDown={() => {
                 if (this.state.allowInput && this.props.onTop) {
-                  if (feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) {
+                  if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
                     this.store.notify('gasFeeWarning', { req, feeUSD })
                   } else {
                     this.approve(req.handlerId, req)

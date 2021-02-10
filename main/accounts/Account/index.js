@@ -1,6 +1,8 @@
 const log = require('electron-log')
 const { isValidAddress } = require('ethereumjs-util')
 
+const abi = require('../../abi')
+
 // Provider Proxy
 const proxyProvider = require('../../provider/proxy')
 
@@ -67,7 +69,7 @@ class Account {
   }
 
   addRequest (req, res) {
-    const add = r => {
+    const add = async r => {
       this.requests[r.handlerId] = req
       this.requests[r.handlerId].mode = 'normal'
       this.requests[r.handlerId].created = Date.now()
@@ -76,6 +78,18 @@ class Account {
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')
       windows.broadcast('main:action', 'setPanelView', 'default')
+      if (req.type === 'transaction' && req && req.data && req.data.data) {
+        const { to, data } = req.data
+        try {
+          const decodedData = await abi.decodeCalldata(to, data)
+          if (this.requests[r.handlerId]) {
+            this.requests[r.handlerId].decodedData = decodedData
+            this.update()
+          }
+        } catch (e) {
+          log.warn(e)
+        }
+      }
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {
