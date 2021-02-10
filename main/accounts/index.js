@@ -133,8 +133,10 @@ class Accounts extends EventEmitter {
 
   removeRequestWarning (reqId) {
     log.info('removeRequestWarning: ', reqId)
-    delete this.current().requests[reqId].warning
-    this.current().update()
+    if (this.current() && this.current().requests[reqId]) {
+      delete this.current().requests[reqId].warning
+      this.current().update()
+    }
   }
 
   checkBetterGasPrice () {
