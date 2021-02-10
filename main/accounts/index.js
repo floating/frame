@@ -201,14 +201,20 @@ class Accounts extends EventEmitter {
           if (receiptRes.result && this.current().requests[id]) {
             this.current().requests[id].tx.receipt = receiptRes.result
             if (!this.current().requests[id].feeAtTime) {
-              fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
-                if (res && res.message === 'OK' && res.result && res.result.ethusd) {
-                  const { gasUsed } = this.current().requests[id].tx.receipt
-                  const { gasPrice } = this.current().requests[id].data
-                  this.current().requests[id].feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(gasPrice)) * res.result.ethusd) * 100) / 100)
-                  this.current().update()
-                }
-              }).catch(e => console.log('Unable to fetch exchange rate', e))
+              const network = store('main.currentNetwork')
+              if (network.type === 'ethereum' && network.id === '1') {
+                fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
+                  if (res && res.message === 'OK' && res.result && res.result.ethusd) {
+                    const { gasUsed } = this.current().requests[id].tx.receipt
+                    const { gasPrice } = this.current().requests[id].data
+                    this.current().requests[id].feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(gasPrice)) * res.result.ethusd) * 100) / 100).toFixed(2)
+                    this.current().update()
+                  }
+                }).catch(e => console.log('Unable to fetch exchange rate', e))
+              } else {
+                this.current().requests[id].feeAtTime = (0).toFixed(2)
+                this.current().update()
+              }
             }
             if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
               this.current().requests[id].status = 'confirming'

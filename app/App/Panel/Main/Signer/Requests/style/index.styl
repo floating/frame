@@ -1560,7 +1560,7 @@ span
   bottom 24px
   height 32px
   left 0px
-  right 4px
+  right 0px
   z-index 1000005
   display flex
   transition standard
@@ -1574,15 +1574,13 @@ span
     background tripleThick
 
   .txProgressSuccessItem
-    position relative
-    flex-grow 1
+    position absolute
     display flex
     align-items center
     justify-content center
     box-sizing border-box
-    padding 0px 8px 0px 8px
+    padding-top 1px
     margin 5px 0px
-    border-right 2px solid thin
 
     .txProgressSuccessItemValue
       display flex
@@ -1604,6 +1602,21 @@ span
 
   .txProgressSuccessItem:last-child
     border-right none
+
+  .txProgressSuccessItemLeft
+    left 0
+    width 130px
+  .txProgressSuccessItemCenter
+    right 113px
+    left 130px
+    // padding-right 3px
+    border-left 2px solid thick
+    // background blue
+    // border-left 2px solid thin
+  .txProgressSuccessItemRight
+    right 0
+    width 110px
+    border-left 2px solid thick
 
 .txSummary
   display flex

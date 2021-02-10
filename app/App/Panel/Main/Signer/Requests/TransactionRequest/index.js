@@ -44,7 +44,7 @@ class Time extends React.Component {
   render () {
     const { time, label } = this.msToTime(this.state.time - this.props.time)
     return (
-      <div className='txProgressSuccessItem'>
+      <div className='txProgressSuccessItem txProgressSuccessItemRight'>
         <div className='txProgressSuccessItemValue'>
           {time}
         </div>
@@ -269,7 +269,7 @@ class TransactionRequest extends React.Component {
                     <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
                       {req && req.tx && req.tx.receipt ? (
                         <>
-                          <div className='txProgressSuccessItem'>
+                          <div className='txProgressSuccessItem txProgressSuccessItemLeft'>
                             <div className='txProgressSuccessItemLabel'>
                               In Block
                             </div>
@@ -278,12 +278,12 @@ class TransactionRequest extends React.Component {
                             </div>
                           </div>
                           <Time time={req.completed} />
-                          <div className='txProgressSuccessItem'>
+                          <div className='txProgressSuccessItem txProgressSuccessItemCenter'>
                             <div className='txProgressSuccessItemLabel'>
                               Fee
                             </div>
                             <div className='txProgressSuccessItemValue'>
-                              <div style={{ margin: '1px 1px 0px 3px', fontSize: '10px' }}>$</div>
+                              <div style={{ margin: '0px 1px 0px 0px', fontSize: '10px' }}>$</div>
                               {req.feeAtTime}
                             </div>
                           </div>
