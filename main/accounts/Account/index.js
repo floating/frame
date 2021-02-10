@@ -87,7 +87,7 @@ class Account {
             this.update()
           }
         } catch (e) {
-          log.warn('Could not decode calldata', e)
+          log.warn(e)
         }
       }
     }

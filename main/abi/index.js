@@ -29,7 +29,7 @@ module.exports = {
         args: abiMethod.inputs.map((input, i) => ({ name: input.name, type: input.type, value: decoded[i].toString() }))
       }
     } else {
-      log.error('Unable to decode data', data)
+      throw new Error('Unable to decode data ' + JSON.stringify(data))
     }
   }
 }
