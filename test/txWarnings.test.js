@@ -3,7 +3,7 @@
 const provider = require('eth-provider')
 const frame = provider('frame')
 
-test('Deploy Contract', async done => {
+test('Failing Transaction (Mainnet)', async done => {
   try {
     await frame.request({
       method: 'eth_sendTransaction',
@@ -21,3 +21,22 @@ test('Deploy Contract', async done => {
   }
   frame.close()
 }, 30 * 1000)
+
+// test('Failing Transaction (Goerli)', async done => {
+//   try {
+//     await frame.request({ 
+//       method: 'eth_sendTransaction',
+//       params: [{
+//         value:'0x4f0c41d240a0000',
+//         from:'0x1a5cfbee61219d830bc277012519a30a8730783e',
+//         to:'0x7a250d5630b4cf539739df2c5dacb4c659f2488d',
+//         data:'0x7ff36ab50000000000000000000000000000000000000000000000004894258e83a4c02300000000000000000000000000000000000000000000000000000000000000800000000000000000000000001a5cfbee61219d830bc277012519a30a8730783e0000000000000000000000000000000000000000000000000000000060238e5f0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000b4fbf271143f4fbf7b91a5ded31805e42b2208d60000000000000000000000001f9840a85d5af5bf1d1700000000000000000000',
+//         chainId:'0x5',
+//         gasPrice:'0x4a817c800'
+//       }]
+//     })
+//   } catch (e) {
+//     done()
+//   }
+//   frame.close()
+// }, 30 * 1000)
