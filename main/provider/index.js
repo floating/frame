@@ -240,11 +240,7 @@ class Provider extends EventEmitter {
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
       if (response.error) return cb(response.error)
-      /// req.data.nonce = response.result
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
-      // console.log('added noce to req', req.data)
-      // const updatedReq = Object.assign({}, req)
-      // updatedReq.data = Object.assign({}, updatedReq.data, { nonce: response.result })
       this.signAndSend(updatedReq, cb)
     })
   }
