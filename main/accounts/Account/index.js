@@ -80,10 +80,14 @@ class Account {
       windows.broadcast('main:action', 'setPanelView', 'default')
       if (req.type === 'transaction' && req && req.data && req.data.data) {
         const { to, data } = req.data
-        const decodedData = await abi.decodeCalldata(to, data)
-        if (this.requests[r.handlerId]) {
-          this.requests[r.handlerId].decodedData = decodedData
-          this.update()
+        try {
+          const decodedData = await abi.decodeCalldata(to, data)
+          if (this.requests[r.handlerId]) {
+            this.requests[r.handlerId].decodedData = decodedData
+            this.update()
+          }
+        } catch (e) {
+          log.warn('Could not decode calldata', e)
         }
       }
     }

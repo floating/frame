@@ -397,7 +397,7 @@ if (initial.main._version < 4) {
 // State transition -> 5
 if (initial.main._version < 5) {
   // Do state transition
-  initial.main.networks.ethereum['137'] = {
+  initial.main.networks.ethereum[137] = {
     id: 137,
     type: 'ethereum',
     symbol: 'MATIC',
