@@ -85,7 +85,7 @@
     "electron-positioner": "4.1.0",
     "electron-updater": "4.3.5",
     "eth-ens-namehash": "2.0.8",
-    "eth-provider": "0.6.0",
+    "eth-provider": "0.6.1",
     "eth-sig-util": "3.0.0",
     "ethereum-public-key-to-address": "0.0.5",
     "ethereumjs-abi": "0.6.8",
