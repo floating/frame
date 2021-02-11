@@ -213,7 +213,7 @@ class TransactionRequest extends React.Component {
                   <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
                     {svg.alert(32)}
                   </div>
-                  <div className='approveTransactionWarningTitle'>predicted to fail</div>
+                  <div className='approveTransactionWarningTitle'>estimated to fail</div>
                   <div className='approveTransactionWarningMessage'>{req.warning}</div>
                 </div>
               </div>
@@ -284,7 +284,7 @@ class TransactionRequest extends React.Component {
                             </div>
                             <div className='txProgressSuccessItemValue'>
                               <div style={{ margin: '0px 1px 0px 0px', fontSize: '10px' }}>$</div>
-                              {req.feeAtTime}
+                              {req.feeAtTime || '?.??'}
                             </div>
                           </div>
                         </>

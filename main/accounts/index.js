@@ -202,6 +202,7 @@ class Accounts extends EventEmitter {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && this.current().requests[id]) {
             this.current().requests[id].tx.receipt = receiptRes.result
+            this.current().update()
             if (!this.current().requests[id].feeAtTime) {
               const network = store('main.currentNetwork')
               if (network.type === 'ethereum' && network.id === '1') {
@@ -214,7 +215,7 @@ class Accounts extends EventEmitter {
                   }
                 }).catch(e => console.log('Unable to fetch exchange rate', e))
               } else {
-                this.current().requests[id].feeAtTime = (0).toFixed(2)
+                this.current().requests[id].feeAtTime = '?.??'
                 this.current().update()
               }
             }

@@ -37,18 +37,20 @@ class TxData extends React.Component {
               <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
                 {this.state.copiedData ? (
                   <div className='txModuleDataBodyCopied'>
-                    <div>Copied Raw Data</div>
+                    <div>Copied Data</div>
                     {svg.octicon('clippy', { height: 20 })}
                   </div>
                 ) : (
                   <div>
+                    <div>{req.data.data}</div>
                     {req.decodedData ? (
                       <div className='decodedDataContract'>
+                        <div className='decodedDataContractArgHeader'>Contract Method</div>
                         <div className='dataUnverified'>unverified abi</div>
                         <div className='dataSource'>{'abi source: ' + req.decodedData.source}</div>
                         <div className='decodedDataContractTarget'>
-                          <div className='decodedDataSync decodedDataSyncLeft'>{svg.sync(20)}</div>
-                          <div className='decodedDataSync decodedDataSyncRight'>{svg.sync(20)}</div>
+                          <div className='decodedDataSync decodedDataSyncLeft'>{svg.sync(16)}</div>
+                          <div className='decodedDataSync decodedDataSyncRight'>{svg.sync(16)}</div>
                           <div className='decodedDataContractName'>
                             {req.decodedData.contractName}
                           </div>
@@ -56,7 +58,7 @@ class TxData extends React.Component {
                             <div>{req.decodedData.method}</div>
                           </div>
                         </div>
-
+                        <div className='decodedDataContractArgHeader'>Inputs</div>
                         {req.decodedData.args.map(a => {
                           return (
                             <div key={a.name} className='decodedDataContractArg'>
@@ -73,8 +75,6 @@ class TxData extends React.Component {
                         })}
                       </div>
                     ) : null}
-                    <div className='rawDataHeader'>Raw Data</div>
-                    <div>{req.data.data}</div>
                   </div>
                 )}
               </div>
