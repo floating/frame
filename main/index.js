@@ -4,8 +4,8 @@ app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
 app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
-app.commandLine.appendSwitch('enable-transparent-visuals', true)
-if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
+// app.commandLine.appendSwitch('enable-transparent-visuals', true)
+// if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
 const log = require('electron-log')
 const path = require('path')
@@ -144,11 +144,12 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 app.on('ready', () => {
   data()
   menu()
-  if (process.platform === 'darwin' || process.platform === 'win32') {
-    windows.tray()
-  } else {
-    setTimeout(windows.tray, 800)
-  }
+  windows.tray()
+  // if (process.platform === 'darwin' || process.platform === 'win32') {
+  //   windows.tray()
+  // } else {
+  //   setTimeout(windows.tray, 800)
+  // }
   if (app.dock) app.dock.hide()
   protocol.interceptFileProtocol('file', (req, cb) => {
     const appOrigin = path.resolve(__dirname, '../')

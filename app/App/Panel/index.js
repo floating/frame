@@ -23,7 +23,7 @@ class Panel extends React.Component {
 
   render () {
     const open = this.store('tray.open')
-    const transform = open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    const transform = open || true ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
     // const opacity = open ? '1' : '0'
     const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.72,0,.32,1) transform' : '0.12s cubic-bezier(.72,0,.32,1) transform'
     const { type, id } = this.store('main.currentNetwork')

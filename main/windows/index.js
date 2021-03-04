@@ -69,9 +69,10 @@ const api = {
       id: 'tray',
       width: 360,
       frame: false,
-      transparent: true,
-      hasShadow: false,
-      // show: false,
+      // transparent: true,
+      // hasShadow: false,
+      show: false,
+      backgroundColor: '#e4e8f8',
       backgroundThrottling: false,
       offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),
@@ -210,7 +211,7 @@ const api = {
         if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
         hideShow.running = false
         hideShow.next = false
-      }, 260)
+      }, 0)
     }
   },
   showTray: () => {
@@ -242,7 +243,7 @@ const api = {
         hideShow.running = false
         hideShow.next = false
         windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
-      }, 260)
+      }, 0)
     }
   },
   close: (e) => {
