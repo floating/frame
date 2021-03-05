@@ -22,16 +22,17 @@ class Panel extends React.Component {
   }
 
   render () {
-    const open = this.store('tray.open')
-    const transform = open || true ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)' // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
+    // const open = this.store('tray.open')
+    // console.log('tray open?', open)
+    const opacity = this.store('tray.initial') ? 0 : 1 // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
     // const opacity = open ? '1' : '0'
-    const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.72,0,.32,1) transform' : '0.12s cubic-bezier(.72,0,.32,1) transform'
+    // const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.72,0,.32,1) all' : '0.16s cubic-bezier(.72,0,.32,1) all'
     const { type, id } = this.store('main.currentNetwork')
 
     let gasPrice = this.store('main.networks', type, id, 'gas.price.levels.standard')
     if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)
     return (
-      <div id='panel' style={{ transform, transition }}>
+      <div id='panel' style={{ opacity }}>
         <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
           <div className='panelDetail'>
             <div className='panelDetailIndicator'>

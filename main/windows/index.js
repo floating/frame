@@ -15,7 +15,7 @@ let tray
 
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 
-const hideShow = { current: false, running: false, next: false }
+// const hideShow = { current: false, running: false, next: false }
 
 const showOnReady = true
 // let needReload = false
@@ -60,7 +60,7 @@ const detectMouse = () => {
     } else {
       detectMouse()
     }
-  }, 200)
+  }, 50)
 }
 
 const api = {
@@ -74,7 +74,7 @@ const api = {
       show: false,
       backgroundColor: '#e4e8f8',
       backgroundThrottling: false,
-      offscreen: true,
+      // offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
       webPreferences: {
@@ -115,7 +115,7 @@ const api = {
         tray.setContextMenu(menuShow)
       })
       setTimeout(() => {
-        windows.tray.on('focus', () => { if (hideShow.current === 'hidden') api.showTray() })
+        windows.tray.on('focus', () => api.showTray())
       }, 2000)
     }
     if (dev) windows.tray.openDevTools()
@@ -124,10 +124,9 @@ const api = {
       windows.tray.focus()
     }, 1260)
     if (!openedAtLogin) {
-      setTimeout(() => {
-        if (windows && windows.tray) windows.tray.show()
-        setTimeout(() => api.showTray(), process.platform === 'linux' ? 210 : 0)
-      }, 50)
+      windows.tray.webContents.once('did-finish-load', () => {
+        api.showTray()
+      })
     }
 
     setTimeout(() => {
@@ -176,7 +175,7 @@ const api = {
   },
   trayClick: () => {
     if (this.recentAutohide) return
-    const showing = hideShow.current ? hideShow.current === 'showing' : windows.tray.isVisible()
+    const showing = windows.tray.isVisible()
     showing ? api.hideTray() : api.showTray()
   },
   hideTray: (autohide) => {
@@ -187,64 +186,61 @@ const api = {
         this.recentAutohide = false
       }, 400)
     }
-    hideShow.current = 'hidden'
-    if (hideShow.running) {
-      hideShow.next = false
-      if (hideShow.running !== 'hide') hideShow.next = 'hide'
-    } else {
-      hideShow.running = 'hide'
+    // hideShow.current = 'hidden'
+    // if (hideShow.running) {
+    //   hideShow.next = false
+    //   if (hideShow.running !== 'hide') hideShow.next = 'hide'
+    // } else {
+      // hideShow.running = 'hide'
+    
+    if (windows && windows.tray) {
       windows.tray.send('main:action', 'trayOpen', false)
       setTimeout(() => {
-        if (windows && windows.tray) {
-          if (store('main.reveal')) detectMouse()
-          windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-          windows.tray.setAlwaysOnTop(false)
-          const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-          windows.tray.setResizable(true)
-          windows.tray.setSize(1, dev ? 740 : area.height)
-          const pos = topRight(windows.tray)
-          windows.tray.setPosition(area.width + area.x, pos.y)
-          windows.tray.emit('hide')
-          windows.tray.hide()
-          events.emit('tray:hide')
-        }
-        if (hideShow.next === 'show') setTimeout(() => api.showTray(), 0)
-        hideShow.running = false
-        hideShow.next = false
-      }, 0)
+        if (store('main.reveal')) detectMouse()
+        windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+        windows.tray.setAlwaysOnTop(false)
+        const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+        windows.tray.setResizable(true)
+        windows.tray.setSize(1, dev ? 740 : area.height)
+        const pos = topRight(windows.tray)
+        windows.tray.setPosition(area.width + area.x, pos.y)
+        windows.tray.emit('hide')
+        windows.tray.hide()
+        events.emit('tray:hide')
+      }, 160)
     }
+  // }
   },
   showTray: () => {
     clearTimeout(mouseTimeout)
-    hideShow.current = 'showing'
-    if (hideShow.running) {
-      hideShow.next = false
-      if (hideShow.running !== 'show') hideShow.next = 'show'
-    } else {
-      if (!windows.tray) return api.tray()
-      windows.tray.setPosition(0, 0)
-      windows.tray.setAlwaysOnTop(true)
-      hideShow.running = 'show'
-      windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-      windows.tray.setResizable(false) // Keeps height consistant
-      const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setSize(360, dev ? 740 : area.height)
-      const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
-      windows.tray.setPosition(pos.x, pos.y)
-      if (!glide) windows.tray.focus()
-      windows.tray.emit('show')
-      windows.tray.show()
+    // hideShow.current = 'showing'
+    // if (hideShow.running) {
+    //   hideShow.next = false
+    //   if (hideShow.running !== 'show') hideShow.next = 'show'
+    // } else {
+    if (!windows.tray) return api.tray()
+    windows.tray.setPosition(0, 0)
+    windows.tray.setAlwaysOnTop(true)
+    // hideShow.running = 'show'
+    windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    windows.tray.setResizable(false) // Keeps height consistant
+    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    windows.tray.setSize(358, dev ? 740 : area.height)
+    const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
+    windows.tray.setPosition(pos.x, pos.y)
+    if (!glide) windows.tray.focus()
+    windows.tray.emit('show')
+    windows.tray.show()
+    setTimeout(()=> {
       windows.tray.send('main:action', 'trayOpen', true)
       windows.tray.send('main:action', 'setSignerView', 'default')
-      events.emit('tray:show')
-      setTimeout(() => {
-        if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
-        if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
-        hideShow.running = false
-        hideShow.next = false
-        windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
-      }, 0)
-    }
+    }, 500)
+    events.emit('tray:show')
+    if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
+     // if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
+    // hideShow.running = false
+    // hideShow.next = false
+    windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
   },
   close: (e) => {
     const id = winId(e)
