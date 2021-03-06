@@ -9,10 +9,10 @@
   overflow hidden
 
   .signerVerifyResponse
-    background bad
+    background var(--bad)
     margin 20px 0px
     border-radius 6px
-    color spacewhite
+    color var(--spacewhite)
     font-size 16px
     padding 20px 40px
     font-weight 400
@@ -21,7 +21,7 @@
     text-align center
 
   .signerVerifyResponseSuccess
-    background good
+    background var(--good)
 
   .signerSlide
     position absolute
@@ -61,7 +61,7 @@
     left 10px
     height 4px
     border-radius 2px
-    background thin
+    background var(--thin)
 
   .signerSettingsTitle
     position relative
@@ -84,7 +84,7 @@
   left 20px
   height 4px
   border-radius 2px
-  background thin
+  background var(--thin)
 
 .signerPermission
   position relative
@@ -117,8 +117,8 @@
     font-weight 400
     border-radius 5px
     font-size 12px
-    border 1px solid outerspace05
-    color outerspace
+    border 1px solid var(--outerspace05)
+    color var(--outerspace)
     height 30px
 
   .nodeProviderStatus
@@ -131,7 +131,7 @@
     text-transform uppercase
     padding-left 8px
     padding-right 8px
-    background bad
+    background var(--bad)
     padding-bottom 1px
     font-weight 400
     color #f3f6fd
@@ -139,7 +139,7 @@
     transform translateZ(0)
 
   .nodeProviderConnected
-    background good
+    background var(--good)
     text-shadow 0px 1px 2px rgba(0, 50, 50, 0.2), 0px 1px 0px rgba(0, 50, 50, 0.2)
 
   .signerPermissionOrigin
@@ -153,7 +153,7 @@
 
   .signerPermissionToggle
     position relative
-    background bad
+    background var(--bad)
     height 20px
     width 40px
     border-radius 10px
@@ -169,19 +169,19 @@
       width 16px
       border-radius 10px
       transition standard
-      background highlight
+      background var(--highlight)
       box-shadow 0px 6px 6px -2px rgba(0,20,60,0.15), 0px 1px 2px 0px rgba(0,20,60,0.05)
       transform translateZ(0)
 
   .signerPermissionToggleOn
-    background good
+    background var(--good)
     .signerPermissionToggleSwitch
       position absolute
       transform translateX(20px)
 
   .signerPermissionToggle:hover
     .signerPermissionToggleSwitch
-      background highlightest
+      background var(--highlightest)
 
 
 @import '../RenameAccount'

@@ -24,37 +24,35 @@
     width 26px
     font-size 23px
     text-transform uppercase
-    background highlight
+    background var(--highlight)
     overflow hidden
-    box-shadow cardDrop, 0px 2px 1px thin
+    box-shadow cardDrop, 0px 2px 1px var(--thin)
     padding 0px 0px 0px 0px
     transition standard, 0s linear background
     transform translateZ(0)
     
   .localSettingsAddNetwork:hover
-    background highlighter
+    background var(--highlighter)
 
   .localSettingsWrapFadeTop
     position absolute
-    background red
     top 0
     left 0
     right 0
     height 140px
     pointer-events none
     z-index 5
-    background linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(228, 232, 248, 1) 70%)
+    background linear-gradient(0deg, var(--bg0) 0%, var(--bg) 70%)
 
   .localSettingsWrapFadeBot
     position absolute
-    background red
     bottom 0
     left 0
     right 0
     height 140px
     pointer-events none
     z-index 5
-    background linear-gradient(-180deg, rgba(255,255,255,0) 0%, rgba(228, 232, 248, 1) 70%)
+    background linear-gradient(-180deg, var(--bg0) 0%, var(--bg) 70%)
 
   .localSettingsWrap
     padding 100px 0px 100px 0px
@@ -71,7 +69,7 @@
     left 10px
     height 4px
     border-radius 2px
-    background thin
+    background var(--thin)
 
   .localSettingsTitle
     position relative
@@ -128,16 +126,16 @@
   text-transform uppercase
   font-weight 400
   letter-spacing 1px
-  color outerspace05
+  color var(--outerspace05)
 
 .viewLicense:hover
-  color outerspace08
+  color var(--outerspace08)
 
 .discordInvite:hover
   .discordLink
     position relative 
     transform translateY(-2px)
-    color outerspace08
+    color var(--outerspace08)
 
 .discordInvite
   margin 32px 8px 0px 8px 
@@ -170,11 +168,11 @@
     display flex
     justify-content center
     align-items center
-    background thin
+    background var(--thin)
     transition standard
 
   .quitFrameButton:hover
-    background thick
+    background var(--thick)
 
 .connectionTitle
   justify-content space-between
@@ -215,7 +213,7 @@
     .connectionOptionDetailsInset
       height 25px
       width 100%
-      color outerspace08
+      color var(--outerspace08)
       display flex
       justify-content space-between
       align-items center
@@ -241,11 +239,11 @@
             height 11px
             border-radius 5.5px
         .connectionOptionStatusIndicatorGood
-          background good
+          background var(--good)
         .connectionOptionStatusIndicatorBad
-          background bad
+          background var(--bad)
         .connectionOptionStatusIndicatorPending
-          background pending
+          background var(--pending)
 
         .connectionOptionStatusText
           height 20px
@@ -266,7 +264,7 @@
         justify-content center
         align-items center
         padding 0px 3px 0px 3px
-        background highlight
+        background var(--highlight)
         box-shadow cardDrop
 
         .signerOptionSetButton
@@ -278,7 +276,7 @@
           border-radius 10px
 
           svg
-            color outerspace
+            color var(--outerspace)
             opacity 0.3
             transition standardFast
             transform translateZ(0)
@@ -316,7 +314,7 @@
       width 30px
       height 4px
       border-radius 2px
-      background outerspace03
+      background var(--outerspace03)
       transition standard
       transform translateZ(0)
 
@@ -331,7 +329,7 @@
     align-items center
     flex-direction column
     transform translateZ(0)
-    color outerspace08
+    color var(--outerspace08)
 
   .appInfoLineReset
     font-size 12px
@@ -348,7 +346,7 @@
   bottom 0px
   .appInfoIcon
     .appInfoHandle
-      background outerspace08
+      background var(--outerspace08)
 
 .connectionCustomInput
   margin-top 0px
@@ -358,7 +356,7 @@
   position relative
   padding-top 0px
   transition standardFast
-  background thin
+  background var(--thin)
   border-radius 8px
   transform translateZ(0)
   z-index 20
@@ -378,7 +376,7 @@
     background transparent
     padding 10px
     font-weight 200
-    color outerspace
+    color var(--outerspace)
 
 .connectionCustomInputOn
   margin-top 10px
@@ -387,7 +385,7 @@
   opacity 1
 
 .connectionOptionOn
-  background lowlight
+  background var(--lowlight)
   margin -5px -15px
   padding 15px 15px
   .connectionOptionDetails

@@ -33,7 +33,7 @@
   left -50px
   height 1500px
   opacity 0.3
-  color spacewhite
+  color var(--spacewhite)
   // z-index 99999999999999
   pointer-events none
 
@@ -46,7 +46,7 @@
   left -50px
   height 1200px
   opacity 0.2
-  color spacewhite
+  color var(--spacewhite)
   // z-index 99999999999999
   pointer-events none
 
@@ -62,7 +62,7 @@
     padding 10px 15px
     margin 15px
     border-radius 3px
-    background white
+    background var(--spacewhite)
     font-size 14px
     font-weight bold
 
@@ -152,7 +152,7 @@
     font-size 10px
     letter-spacing 1px
     font-weight bold
-    color outerspace08
+    color var(--outerspace08)
     display flex
     justify-content center
     align-items center
@@ -170,7 +170,7 @@
     transition standard
     letter-spacing 0px
     text-transform uppercase
-    color outerspace08
+    color var(--outerspace08)
     display flex
     justify-content center
     align-items center
@@ -182,7 +182,7 @@
     .panelMenuDataDivide
       height 100%
       width 1px
-      background doubleThick
+      background var(--doubleThick)
 
     .panelMenuDataItem
       display flex
@@ -215,15 +215,15 @@
 
     .panelDetailIndicatorGood
       transition standardSlow
-      background good
+      background var(--good)
 
     .panelDetailIndicatorBad
       transition standardSlow
-      background bad
+      background var(--bad)
 
     .panelDetailIndicatorPending
       transition standardSlow
-      background pending
+      background var(--pending)
 
 .panelMenuAddMode
   transition standard
@@ -236,20 +236,20 @@
     opacity 0
     pointer-events none
     svg
-      color spacewhite
+      color var(--spacewhite)
   .panelDetailText
     transition standard
-    color spacewhite
+    color var(--spacewhite)
   .panelDetailIndicator
     .panelDetailIndicatorGood
       transition standardSlow
-      background smart
+      background var(--smart)
     .panelDetailIndicatorBad
       transition standardSlow
-      background hot
+      background var(--hot)
     .panelDetailIndicatorPending
       transition standardSlow
-      background hardware
+      background var(--hardware)
 
 .snipIt
   display flex
@@ -258,7 +258,7 @@
   align-items center
   transform translateZ(0)
   margin 24px 10px 0px 10px
-  background highlight
+  background var(--highlighter)
   padding 20px
   border-radius 16px
   font-size 13px
@@ -281,30 +281,30 @@
     justify-content center
     align-items center
     padding 20px
-    color outerspace08
+    color var(--outerspace08)
     .snipItBrowserExtensionIcon:hover
-      background highlightest
+      background var(--highlightest)
 
     .snipItBrowserExtensionIcon
       display flex
       justify-content center
       align-items center
-      background highlighter
+      background var(--highlighter)
       height 60px
       width 60px
-      border 1px solid thick
+      border 1px solid var(--thick)
       border-radius 16px
       margin 0px 5px
       box-shadow cardDrop // , 0px 4px 2px -3px rgba(0, 25, 35, 0.14)
 
-    .snipItSpinRight
-      svg
-        transform rotate(0deg)
-        animation spin 12s linear infinite 
-    .snipItSpinLeft
-      svg
-        transform rotate(0deg)
-        animation spinReverse 12s linear infinite 
+    // .snipItSpinRight
+    //   svg
+    //     transform rotate(0deg)
+    //     animation spin 12s linear infinite 
+    // .snipItSpinLeft
+    //   svg
+    //     transform rotate(0deg)
+    //     animation spinReverse 12s linear infinite 
 
 
 @import '../Main/style'

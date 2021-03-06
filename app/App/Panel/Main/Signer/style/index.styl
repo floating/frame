@@ -63,7 +63,7 @@
     right 0
     left 0
     bottom 3px
-    background lowlight
+    background var(--lowlight)
     z-index 40
     border-radius 16px
     z-index 3003
@@ -73,7 +73,7 @@
     z-index 3002
     border-radius 16px
     box-shadow 0px 0px 4px -1px rgba(6, 54, 52, 0.05), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
-    background lightShade
+    background var(--lightShade)
     padding-bottom 3px
 
   .transactionToAddress
@@ -98,7 +98,7 @@
       transition standard
 
       svg
-        color outerspace08
+        color var(--outerspace08)
         padding-top 2px
         padding-left 4px
         padding-right 4px
@@ -153,15 +153,15 @@
     opacity 1
     z-index 3030
     border-radius 16px
-    box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
-    background highlight
+    box-shadow 0px 2px 3px var(--thin), 0px 19px 9px -14px var(--thin) !important
+    background var(--highlight)
     transition standard
     margin-bottom 8px
     z-index 9999000
     .transactionToAddress
       .transactionToAddressLarge
         svg
-          color outerspace
+          color var(--outerspace)
 
     .signerNav
       position relative
@@ -184,9 +184,9 @@
         height 70px
         margin-left -55px
         z-index 3400
-        /// background linear-gradient(lowlight, lowlight)
-        // background linear-gradient(lowlight, highlighter)
-        // box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
+        /// background linear-gradient(var(--lowlight), var(--lowlight))
+        // background linear-gradient(var(--lowlight), var(--highlighter))
+        // box-shadow 0px 2px 3px var(--thin), 0px 19px 9px -14px var(--thin) !important
         border-bottom-left-radius 16px
         border-bottom-right-radius 16px
         transition standard
@@ -253,7 +253,7 @@
           line-height 10px
           font-weight 600
           letter-spacing 2px
-          color spacewhite
+          color var(--spacewhite)
           opacity 1
           transition standardSlow
           margin-left 2px
@@ -280,11 +280,11 @@
         overflow hidden
         transition .32s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow
         -webkit-app-region no-drag
-        background highlighter
+        background var(--highlighter)
         z-index 15
-        color outerspace
+        color var(--outerspace)
         transform translateZ(0)
-        // box-shadow 0px -5px 5px 5px thick, 0px 2px 2px 1px highlighter
+        // box-shadow 0px -5px 5px 5px var(--thick), 0px 2px 2px 1px var(--highlighter)
 
         display flex
         justify-content center
@@ -292,7 +292,7 @@
         overflow hidden
         transition .42s cubic-bezier(0.175, 0.885, 0.32, 1.275) all, 0.1s linear top, 0.1s linear bottom, 0.1s linear box-shadow, 0.1s linear opacity
         -webkit-app-region no-drag
-        box-shadow 0px 2px 2px thick
+        box-shadow 0px 2px 2px var(--thick)
 
         .signerDisconnectedTextOpen, .signerDisconnectedTextClose
           position absolute
@@ -311,24 +311,24 @@
           line-height 10px
           font-weight 600
           letter-spacing 2px
-          color outerspaceLight
+          color var(--outerspaceLight)
           transition standardFast
           opacity 0 !important
         //
         // .signerTypeDisconnectedImageBack
-        //   color outerspace05 //lowerlight
+        //   color var(--outerspace05) //var(--lowerlight)
         //   text-transform uppercase
         //   font-size 11px
         //   line-height 10px
         //   font-weight 300
         //   letter-spacing 1px
-        //   filter drop-shadow(0px 4px 1px doubleThick)
+        //   filter drop-shadow(0px 4px 1px var(--doubleThick))
         //   position absolute
         //   transition standardFast
         //   opacity 0
 
         .signerTypeDisconnectedImageFront
-          color outerspace08
+          color var(--outerspace08)
           text-transform uppercase
           font-size 11px
           line-height 10px
@@ -338,7 +338,7 @@
           margin-top 0px
           transition standardFast
           opacity 1
-          filter drop-shadow(0px 1px 1px thick)
+          filter drop-shadow(0px 1px 1px var(--thick))
 
         .signerTypeDisconnectedText
           text-transform uppercase
@@ -349,13 +349,13 @@
           letter-spacing 1px
           margin-left 1px
           transform translateY(0px)
-          color highlightest
+          color var(--highlightest)
           transition standardFast
-          text-shadow 0px 1px 1px tripleThick
+          text-shadow 0px 1px 1px var(--tripleThick)
 
       // .signerTypeDisconnected:hover
       //   .signerTypeDisconnectedImageFront
-      //     color highlighter
+      //     color var(--highlighter)
       // .signerDisconnectedTextOpen
       //   //margin-top -7px
       //   opacity 1 !important
@@ -375,7 +375,7 @@
         left 0px
         right 0px
         bottom 2px
-        background outerspaceDark
+        background var(--outerspaceDark)
         border-radius 16px
         display flex
         justify-content center
@@ -393,8 +393,9 @@
           left 0px
           right 0px
           bottom 2px
-          background outerspace
+          background var(--spacewhite) 
           border-radius 16px
+          color var(--outerspace)
           // border-top-right-radius 6px
           // border-bottom-left-radius 5px
           // border-bottom-right-radius 5px
@@ -460,7 +461,7 @@
           overflow hidden
           position relative
           border-radius 3px
-          box-shadow 0px 2px 3px thick0, 0px 4px 9px thick0 !important
+          box-shadow 0px 2px 3px var(--thick0), 0px 4px 9px var(--thick0) !important
 
           .signerPinDelete
             position absolute
@@ -472,13 +473,13 @@
             width 39px
             left -40px
             transition standard
-            border-right 1px solid thick
+            border-right 1px solid var(--thick)
 
         .signerPinSubmit
           margin-top 0px
           margin-bottom 0px
-          background highlighter
-          box-shadow 0px 2px 3px thick, 0px 5px 9px thick !important
+          background var(--highlighter)
+          box-shadow 0px 2px 3px var(--thick), 0px 5px 9px var(--thick) !important
           padding-left 40px
           width 100px
 
@@ -529,7 +530,7 @@
           display flex
           justify-content center
           align-items center
-          color white
+          color var(--spacewhite)
           transition standard
           opacity 0
           z-index 9
@@ -538,7 +539,7 @@
 
           svg
             transition standard
-            color outerspace
+            color var(--outerspace)
 
         .signerNameEdit:hover
           transition standard
@@ -580,15 +581,15 @@
           left 60px
           right 60px
           margin-right 0px
-          box-shadow 0px 40px 20px -15px thick0
+          box-shadow 0px 40px 20px -15px var(--thick0)
           height 26px
           overflow hidden
           border-radius 12px
           transition 0.1s ease-out all
           padding 1px 0px 2px 0px
           box-sizing border-box
-          background highlighter
-          box-shadow 0px 3px 2px thick
+          background var(--highlighter)
+          box-shadow 0px 3px 2px var(--thick)
 
           .signerBalanceTotal
             position absolute
@@ -597,19 +598,19 @@
             right 0px
             height 47px
             z-index 20
-            background highlighter
+            background var(--highlighter)
             font-size 14px
             font-weight 400
-            color outerspace08
+            color var(--outerspace08)
 
             .signerBalanceTotalText
               position absolute
-              background highlighter
+              background var(--highlighter)
               left 0px
               right 0px
               bottom 0px
               top 0px
-              box-shadow 0px -10px 10px -5px thick
+              box-shadow 0px -10px 10px -5px var(--thick)
               border-top-left-radius 10px
               border-top-right-radius 10px
               display flex
@@ -650,7 +651,7 @@
               opacity 1
               height 26px
               transition 0.1s ease-out all
-              border-bottom 1px solid doubleThick
+              border-bottom 1px solid var(--doubleThick)
               padding 10px
 
               .signerBalanceCurrency
@@ -671,8 +672,8 @@
                 top 10px
                 height 24px
                 width 24px
-                background ghostB
-                box-shadow 0px 0px 3px 2px thick
+                background var(--ghostB)
+                box-shadow 0px 0px 3px 2px var(--thick)
                 border-radius 12px
 
                 img
@@ -691,8 +692,8 @@
                 font-size 18px
                 padding-top 1px
                 text-align center
-                border-left 1px solid doubleThick
-                border-right 1px solid doubleThick
+                border-left 1px solid var(--doubleThick)
+                border-right 1px solid var(--doubleThick)
                 font-family FiraCode
                 letter-spacing -0.5px
                 // background blue
@@ -706,7 +707,7 @@
                 text-align center
                 font-size 13px
                 font-weight 400
-                color outerspace07
+                color var(--outerspace07)
 
           .signerBalance:last-child
             border-bottom none
@@ -731,7 +732,7 @@
           display flex
           justify-content center
           align-items center
-          color outerspace08
+          color var(--outerspace08)
           text-transform uppercase
           font-size 12px
           letter-spacing 0.5px
@@ -740,7 +741,7 @@
           height 400px
           left 8px
           right 8px
-          box-shadow 0px 0px 60px 0px thick, 0px 50px 40px -30px doubleThick
+          box-shadow 0px 0px 60px 0px var(--thick), 0px 50px 40px -30px var(--doubleThick)
           
           .signerBalanceSliderInset
             .signerBalance          
@@ -768,7 +769,7 @@
         justify-content center
         align-items center
         box-sizing border-box
-        color outerspace
+        color var(--outerspace)
         letter-spacing 1px
 
         .addressSelectArrow
@@ -787,14 +788,14 @@
     right 0
     // height 0px
     height 0px
-    background lowlight
+    background var(--lowlight)
     // height 40px
     z-index 3015
     transition standardFast
     border-bottom-left-radius 16px
     border-bottom-right-radius 16px
     overflow hidden
-    box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
+    box-shadow 0px 2px 3px var(--thin), 0px 19px 9px -14px var(--thin) !important
     transform translateZ(0)
 
     .accountList
@@ -808,7 +809,7 @@
       padding 15px 0px 10px 0px
 
       .settingsMenu
-        background linear-gradient(lowlight, highlight)
+        background linear-gradient(var(--lowlight), var(--highlighter))
         display flex
         justify-content center
         flex-direction column
@@ -849,7 +850,7 @@
             z-index 1230
             width 35px
             height 33px
-            color outerspace08
+            color var(--outerspace08)
             .settingsMenuItemIcon
               top 0
               right 0
@@ -859,10 +860,10 @@
               z-index 1234
               padding 10px 10px
           .settingsMenuItemSelected, .settingsMenuItem:hover
-            color outerspace
+            color var(--outerspace)
 
       .accountListItems
-        background lowlight
+        background var(--lowlight)
         height 280px
         min-height 280px
         width 100%
@@ -878,22 +879,22 @@
         pointer-events none
 
         .accountListItem
-          background lowlight
+          background var(--lowlight)
           width calc(100% - 40px)
           height 55px
           min-height 55px
-          border-bottom 1px solid thin
+          border-bottom 1px solid var(--thin)
           display flex
           justify-content space-between
           align-items center
           padding 0px 20px 0px 20px
           font-family FiraCode, monospace
-          color outerspace08
+          color var(--outerspace08)
           position relative
           z-index 4
 
           .accountListItemCheck
-            color outerspace01
+            color var(--outerspace01)
             margin-bottom 3px
 
           .accountListItemAddress
@@ -904,15 +905,15 @@
           border-bottom none
 
         .accountListItemSelected
-          background light
-          color outerspace
+          background var(--light)
+          color var(--outerspace)
           border-radius 6px
-          border-bottom 1px solid thick0
-          box-shadow 0px 2px 3px thin, 0px 19px 9px -14px thin !important
+          border-bottom 1px solid var(--thick0)
+          box-shadow 0px 2px 3px var(--thin), 0px 19px 9px -14px var(--thin) !important
           position relative
           z-index 10
           .accountListItemCheck
-            color outerspace
+            color var(--outerspace)
 
       .accountPageToggle
         padding-top 20px
@@ -956,7 +957,7 @@
           padding-left 1px
 
         .accountPageButton:hover
-          background highlight
+          background var(--highlight)
 
   .signerMid
     position absolute
@@ -972,7 +973,7 @@
     opacity 1
     transition standard, 0.1s linear background
     will-change transform
-    // background red // lowlight
+    // background red // var(--lowlight)
     // background blue
 
     > div
@@ -980,7 +981,7 @@
       opacity 0
 
     .signerMidMenu
-      background thin
+      background var(--thin)
       height 50px
       display flex
       flex-direction column
@@ -1021,7 +1022,7 @@
       align-items center
       font-size 12px
       height 40px
-      border-top 1px solid lightShade
+      border-top 1px solid var(--lightShade)
 
   .signerBot
     position absolute
@@ -1036,7 +1037,7 @@
     pointer-events none
     transition standard
     transform translateZ(0)
-    background linear-gradient(rgba(255, 255, 255, 0), highlight, highlight)
+    background linear-gradient(rgba(255, 255, 255, 0), var(--highlight), var(--highlight))
     overflow hidden
 
 
@@ -1058,7 +1059,7 @@
     bottom 0
     width 25px
     z-index 1
-    color spacewhite
+    color var(--spacewhite)
     flex-direction column
     opacity 0
     transition standard
@@ -1085,7 +1086,7 @@
         opacity 0
 
         svg
-          color outerspace
+          color var(--outerspace)
           opacity 1
           transform translateZ(0)
           will-change transform, opacity
@@ -1107,7 +1108,7 @@
     .signerSelectArrows
       .signerSelectArrow
         svg
-          color spacewhite
+          color var(--spacewhite)
 
   .signerSelectLeft
     left 0
@@ -1130,7 +1131,7 @@
   .trezorPhraseInput
     height 200px
     width 100%
-    background outerspace05
+    background var(--outerspace05)
     position relative
     display flex
     justify-content center
@@ -1151,7 +1152,7 @@
 
   .trezorPinWrap
     width 100%
-    background outerspace
+    background var(--outerspace)
     position relative
     display flex
     justify-content center
@@ -1175,7 +1176,7 @@
         align-items center
 
         svg
-          color spacewhite
+          color var(--spacewhite)
 
       .trezorPinInputButton:hover
         svg

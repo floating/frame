@@ -5,7 +5,7 @@
   bottom 0px
   height 48px
   z-index 2000
-  color outerspace08
+  color var(--outerspace08)
   font-size 14px
   font-weight 400
   transition standardVibe
@@ -15,7 +15,7 @@
   right 3px
   border-radius 15px
   height 30px
-  background ghostD
+  background var(--ghostD)
   box-shadow cardDrop
   position absolute
   overflow hidden
@@ -29,7 +29,7 @@
     left 0
     right 0
     height 50px
-    border-bottom 1px solid thick
+    border-bottom 1px solid var(--thick)
     justify-content space-between
     display flex
     align-items center
@@ -51,7 +51,7 @@
       align-items center
       z-index 10
       transition standardVibe
-      color outerspace08
+      color var(--outerspace08)
 
     .txSectionIndicator
       width 40px
@@ -69,9 +69,9 @@
     width 62px
     height 30px
     box-sizing border-box
-    // border-right 1px solid thick
-    background ghostC
-    box-shadow 0px 3px 3px thick
+    // border-right 1px solid var(--thick)
+    background var(--ghostC)
+    box-shadow 0px 3px 3px var(--thick)
     // border-top-left-radius 3px
     // border-bottom-left-radius 3px
     // border-top-right-radius 15px
@@ -106,8 +106,8 @@
     right 66px
     width 36px
     height 30px
-    background ghostC
-    box-shadow 0px 3px 3px thick
+    background var(--ghostC)
+    box-shadow 0px 3px 3px var(--thick)
     display flex
     text-align center
     justify-content center
@@ -134,8 +134,8 @@
     border-bottom-right-radius 16px
     border-bottom-left-radius 6px
     border-top-left-radius 6px
-    background ghostC
-    box-shadow 0px 3px 3px thick
+    background var(--ghostC)
+    box-shadow 0px 3px 3px var(--thick)
     padding 8px
     text-align center
     text-transform uppercase
@@ -152,7 +152,7 @@
     box-sizing border-box
     pointer-events none
     z-index 5000000
-    box-shadow 0px 1px 5px thick
+    box-shadow 0px 1px 5px var(--thick)
 
     .customHaloMarker
       position absolute
@@ -171,7 +171,7 @@
         border-radius 4px
         box-sizing border-box
         border 3px solid rgba(255, 255, 255, 1)
-        box-shadow cardDrop, 0px 2px 2px thick
+        box-shadow cardDrop, 0px 2px 2px var(--thick)
 
         .customHaloMarkerLine
           position absolute
@@ -181,7 +181,7 @@
           width 2px
           border-radius 2px
           margin-left -1px
-          background good
+          background var(--good)
 
   .networkFeeSelectedHaloClickwrap
     z-index 200 !important
@@ -194,7 +194,7 @@
     box-sizing border-box
     pointer-events none
     z-index 5000000
-    box-shadow 0px 1px 5px doubleThick
+    box-shadow 0px 1px 5px var(--doubleThick)
 
     .networkFeeSelectedHaloClick
       position absolute
@@ -203,18 +203,18 @@
       bottom 0
       right 0
       z-index 40000000000
-      background ghostD
+      background var(--ghostD)
       border-radius 19px
       opacity 0
 
   .networkFeeSelectedHaloShadow // Stays on currently selected fee
     background none
-    border 2px solid outerspace08
+    border 2px solid var(--outerspace08)
     z-index 200001
     pointer-events none
     box-shadow none
     // transition standardFast, 0.1s linear opacity 0.1s
-    box-shadow 0px 4px 10px thick
+    box-shadow 0px 4px 10px var(--thick)
     will-change opacity
 
   .networkFeeOptions
@@ -230,8 +230,8 @@
 
   .networkFeeOptionHover
     .networkFeeOptionHoverInset
-      background ghostD
-      box-shadow 0px 5px 40px 0px thick
+      background var(--ghostD)
+      box-shadow 0px 5px 40px 0px var(--thick)
 
   .networkFeeOption
     position relative
@@ -258,11 +258,11 @@
 
   // .networkFeeOption:hover
   //   .networkFeeOptionBack
-  //     background ghostC
+  //     background var(--ghostC)
 
   .networkFeeTotalWarn
     .networkFeeTotalUSD
-      color bad
+      color var(--bad)
 
   .networkFeeTotal
     position absolute
@@ -302,7 +302,7 @@
     // display flex
     // justify-content center
     // align-items center
-    // border-right 1px solid thick
+    // border-right 1px solid var(--thick)
 
   // .transactionTotals
   //   display flex
@@ -318,18 +318,18 @@
   //   font-size 14px
   //   border-radius 9px
   //   height 18px
-  //   background highlightest
+  //   background var(--highlightest)
   //   box-shadow cardDrop
   //   font-weight 400
   //   box-sizing border-box
 
   .transactionWarning
-    color bad
+    color var(--bad)
 
   .transactionFeeWarning
     margin-left 6px
     padding-bottom 8px
-    color bad
+    color var(--bad)
 
   .transactionFee
     .transactionTotals
@@ -342,7 +342,7 @@
 
 .txSectionBody
   position absolute
-  color outerspace08
+  color var(--outerspace08)
   top 50px
   left 0
   right 0
@@ -395,15 +395,15 @@
 //   display flex
 //   justify-content center
 //   align-items center
-//   background highlight
-//   color outerspace08
+//   background var(--highlighter)
+//   color var(--outerspace08)
 //   font-size 14px
 //   font-weight 400
 //   letter-spacing 1px
 //   text-transform uppercase
 //   transition standardVibe
 //   overflow hidden
-//   box-shadow 0px 2px 0px thick, 0px 8px 8px -2px thick, 0px 0px 10px -2px thick
+//   box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
 //   border-radius 3px
 
 .txData
@@ -419,7 +419,7 @@
 //   height 18px
 //   // width 170px
 //   // margin-left -90px
-//   // border-bottom 1px solid thick
+//   // border-bottom 1px solid var(--thick)
 //   justify-content space-between
 //   display flex
 //   align-items center
@@ -427,7 +427,7 @@
 //   letter-spacing 1px
 //   font-weight 400
 //   z-index 10
-//   background highlight
+//   background var(--highlighter)
 //   border-radius 9px
 
 //   .transactionDataLabel
@@ -444,7 +444,7 @@
 //     align-items center
 //     z-index 10
 //     transition standardVibe
-//     color outerspace08
+//     color var(--outerspace08)
 
 //   .transactionDataIndicator
 //   // width 22px
@@ -458,8 +458,8 @@
 //     transition standardVibeSlow
 
 .txFee
-  background highlight
-  box-shadow cardDrop // , 0px 2px 2px thin
+  background var(--highlight)
+  box-shadow cardDrop // , 0px 2px 2px var(--thin)
   transform translateY(-162px)
   zIndex 1
   height 31px
@@ -478,10 +478,10 @@
     z-index 1000000
     pointer-events none
     z-index 20
-    color good
+    color var(--good)
     overflow hidden
     transition standardVibe
-    background highlight
+    background var(--highlight)
     transform translateY(-100px)
     border-radius 6px
 
@@ -491,7 +491,7 @@
       bottom -200px
       right -200px
       left -200px
-      color good
+      color var(--good)
       opacity 0.3
       background-image url('./App/Panel/Main/Signer/Requests/style/wave.svg')
       background-position 0px 0px
@@ -507,7 +507,7 @@
         border-radius 8px
         // border-bottom-right-radius 16px
         text-align center
-        color outerspace08
+        color var(--outerspace08)
         font-weight 500
         text-transform uppercase
         box-sizing border-box
@@ -515,7 +515,7 @@
         letter-spacing 2px
         padding-left 2px
         background rgba(255, 255, 255, 1)
-        box-shadow 0px 5px 5px doubleThick
+        box-shadow 0px 5px 5px var(--doubleThick)
         display none
 
   .txFeeClose
@@ -532,11 +532,11 @@
     margin-left 6px
     font-weight 300
     font-size 9px
-    color outerspace03
+    color var(--outerspace03)
     transition standardFast
 
   .txFeeClose:hover
-    color outerspace05
+    color var(--outerspace05)
 
   .txFeeHover
     position absolute
@@ -554,8 +554,8 @@
     font-size 11px
     letter-spacing 0.5px
     transition standardFast
-    background ghostC
-    box-shadow 0px 3px 3px thick
+    background var(--ghostC)
+    box-shadow 0px 3px 3px var(--thick)
     text-align center
     text-transform uppercase
 
@@ -630,7 +630,7 @@
     border-top-right-radius 15px
     border-bottom-left-radius 11px
     border-bottom-right-radius 11px
-    border 1px solid thick
+    border 1px solid var(--thick)
     // transition standardVibeSlow, 0s linear background 0s, 0s linear box-shadow 0s
 
     .txFeeSummaryValue
@@ -697,7 +697,7 @@
     align-items center
     flex-direction column
     transition standardVibe
-    border-left 1px solid thick
+    border-left 1px solid var(--thick)
     position absolute
     top 10px
     bottom 8px
@@ -706,9 +706,9 @@
 
   .txFeeTotalWarn
     .txFeeSummaryTotalUSD
-      color bad
+      color var(--bad)
     .txFeeSummaryUSDSymbol
-      color bad
+      color var(--bad)
 
   .txFeeTotalUSD
     font-size 16px
@@ -720,7 +720,7 @@
     flex-direction column
     transition standardVibe
     width 69px
-    border-right 1px solid thick
+    border-right 1px solid var(--thick)
     position absolute
     left 0
     top 10px
@@ -729,17 +729,17 @@
   .txFeeGweiValue
     font-size 22px
     font-weight 400
-    background highlightest
+    background var(--highlightest)
     border-radius 11px
 
     height 32px
-    box-shadow 0px 2px 2px thin, cardDrop
+    box-shadow 0px 2px 2px var(--thin), cardDrop
     display flex
     justify-content center
     align-items center
 
     ::selection
-      background: doubleThick
+      background: var(--doubleThick)
 
     input 
       background transparent
@@ -752,7 +752,7 @@
       text-align center
       font-size 22px
       font-weight 500
-      color outerspace08
+      color var(--outerspace08)
       font-family OpenSans, sans-serif
 
   .txFeeGweiLabel
@@ -776,8 +776,8 @@
     align-items center
     transition standardVibe
     position absolute
-    color outerspace08
-    background ghostC
+    color var(--outerspace08)
+    background var(--ghostC)
     box-shadow cardDrop
     letter-spacing 2px
     font-weight 400
@@ -792,7 +792,7 @@
   padding 110px 10px 0px 10px
   z-index 20000
   border-radius 15px
-  box-shadow cardDrop, 0px 0px 4px 2px thick
+  box-shadow cardDrop, 0px 0px 4px 2px var(--thick)
 
   .customGasPriceBar
     transform translate(0px, 0px)
@@ -803,8 +803,8 @@
   
 
   .txFeeSummaryHover     
-    background highlighter
-    box-shadow 0px 10px 5px -5px thick, 0px 0px 10px 0px thick  // , 0px -25px 20px -15px thick
+    background var(--highlighter)
+    box-shadow 0px 10px 5px -5px var(--thick), 0px 0px 10px 0px var(--thick)  // , 0px -25px 20px -15px var(--thick)
 
   .networkFeeOptions
     left 10px
@@ -872,8 +872,8 @@
     font-size 12px
     text-transform uppercase
     font-weight 400
-    background ghostD
-    box-shadow cardDrop, 0px 4px 6px thin, 0px -2px 6px thin
+    background var(--ghostD)
+    box-shadow cardDrop, 0px 4px 6px var(--thin), 0px -2px 6px var(--thin)
 
     .approveTransactionWarningReject
       position absolute 
@@ -884,7 +884,7 @@
       padding 8px
       text-align center
       box-sizing border-box
-      color bad
+      color var(--bad)
 
     .approveTransactionWarningPreview
       position absolute 
@@ -899,8 +899,8 @@
       transition standard
 
     .approveTransactionWarningPreview:hover
-      background ghostC
-      box-shadow 0px 4px 6px thick
+      background var(--ghostC)
+      box-shadow 0px 4px 6px var(--thick)
     
     .approveTransactionWarningProceed
       position absolute 
@@ -911,7 +911,7 @@
       padding 8px
       text-align center
       box-sizing border-box
-      color good
+      color var(--good)
 
   .approveTransactionWarningFill
     position absolute 
@@ -919,7 +919,7 @@
     right 0px
     left 0px
     bottom 0px
-    background highlight
+    background var(--highlight)
     transition standard
     border-bottom-left-radius 16px
     border-bottom-right-radius 16px
@@ -932,7 +932,7 @@
       display flex
       justify-content center
       align-items center
-      color doubleThick
+      color var(--doubleThick)
 
     .approveTransactionWarningIconLeft
       left 0
@@ -971,7 +971,7 @@
       justify-content center
       font-family FiraCode, mono-spaced
       transition standard
-      background ghostD
-      box-shadow 0px 3px 6px thick
+      background var(--ghostD)
+      box-shadow 0px 3px 6px var(--thick)
       border-radius 8px
       overflow hidden

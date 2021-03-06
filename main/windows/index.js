@@ -195,19 +195,18 @@ const api = {
     
     if (windows && windows.tray) {
       windows.tray.send('main:action', 'trayOpen', false)
-      setTimeout(() => {
-        if (store('main.reveal')) detectMouse()
-        windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-        windows.tray.setAlwaysOnTop(false)
-        const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-        windows.tray.setResizable(true)
-        windows.tray.setSize(1, dev ? 740 : area.height)
-        const pos = topRight(windows.tray)
-        windows.tray.setPosition(area.width + area.x, pos.y)
-        windows.tray.emit('hide')
-        windows.tray.hide()
-        events.emit('tray:hide')
-      }, 160)
+      if (store('main.reveal')) detectMouse()
+      windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      windows.tray.setAlwaysOnTop(false)
+      const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+      windows.tray.setResizable(true)
+      // windows.tray.setSize(1, dev ? 740 : area.height)
+      const pos = topRight(windows.tray)
+      windows.tray.setPosition(area.width + area.x, pos.y)
+      windows.tray.emit('hide')
+      windows.tray.hide()
+      events.emit('tray:hide')
+      // windows.tray.setOpacity(0)
     }
   // }
   },
@@ -231,10 +230,8 @@ const api = {
     if (!glide) windows.tray.focus()
     windows.tray.emit('show')
     windows.tray.show()
-    setTimeout(()=> {
-      windows.tray.send('main:action', 'trayOpen', true)
-      windows.tray.send('main:action', 'setSignerView', 'default')
-    }, 500)
+    // windows.tray.send('main:action', 'trayOpen', true)
+    // windows.tray.send('main:action', 'setSignerView', 'default')    
     events.emit('tray:show')
     if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
      // if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
