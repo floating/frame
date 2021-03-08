@@ -240,6 +240,19 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission' style={{ zIndex: 10 }}>
             <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Dark mode</div>
+              <div className={this.store('main.colorway') === 'dark' ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setColorway', this.store('main.colorway') === 'dark' ? 'light' : 'dark')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Set colorway
+              </span>
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 10 }}>
+            <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Summon Shortcut</div>
               <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
                 <div className='signerPermissionToggleSwitch' />

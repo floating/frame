@@ -78,6 +78,7 @@ const initial = {
   platform: process.platform,
   main: {
     _version: main('_version', 0),
+    colorway: 'light',
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
       welcomeWarning: main('mute.welcomeWarning', false),

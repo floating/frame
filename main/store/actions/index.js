@@ -296,7 +296,12 @@ module.exports = {
       if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
       return omit
     })
-  }
+  },
+  setColorway: (u, colorway) => {
+    u('main.colorway', () => {
+      return colorway
+    })
+  },
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
   // }
