@@ -231,27 +231,6 @@ class Signer extends React.Component {
     )
   }
 
-  renderArrows () {
-    return (
-      <>
-        <div className='signerSelect signerSelectLeft'>
-          <div className='signerSelectArrows'>
-            <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
-            <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
-            <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
-          </div>
-        </div>
-        <div className='signerSelect signerSelectRight'>
-          <div className='signerSelectArrows'>
-            <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
-            <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
-            <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 18 })}</div>
-          </div>
-        </div>
-      </>
-    )
-  }
-
   typeClick () {
     if (this.props.status === 'ok') {
       this.select()
@@ -265,51 +244,35 @@ class Signer extends React.Component {
 
   renderType () {
     let innerClass = 'signerInner'
-    if (this.state.typeActive) innerClass += ' signerInnerActive'
+    // if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
-    if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
+    // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     const inSettings = this.store('selected.view') === 'settings'
     return (
       <div className='signerType'>
-        <div
-          className='addressSelect' onMouseDown={e => {
-            e.stopPropagation()
-            this.store.toggleShowAccounts()
-          }}
-        >
-          <div className='addressSelectButton'>
-            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-            <div className='addressSelectText'>Addresses</div>
-            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
-          </div>
-        </div>
-        {this.state.openHover ? this.renderArrows('up') : null}
-        {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
+        
+        {/* {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
           <div className='signerTypeDisconnected' onMouseDown={this.typeClick.bind(this)} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
           </div>
-        ) : null}
-        <div className={innerClass} onMouseDown={this.typeClick.bind(this)} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-          <div className='signerInset'>
-            <div className='signerImage'>
-              {(_ => {
-                if (this.props.signer) {
-                  if (this.props.signer.type === 'ledger') return svg.ledger(24)
-                  if (this.props.signer.type === 'trezor') return svg.trezor(20)
-                  if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
-                  if (this.props.signer.type === 'aragon') return svg.aragon(32)
-                  return svg.octicon('plus', { height: 31 })
-                } else {
-                  return null
-                }
-              })()}
-            </div>
-            <div className='signerText'>{this.props.signer ? (
-              this.props.signer.type === 'ring' || this.props.signer.type === 'seed' ? 'hot' : this.props.signer.type
-            ) : 'no signer'}
-            </div>
-          </div>
+        ) : null} */}
+        <div className='signerImage'>
+          {(_ => {
+            if (this.props.signer) {
+              if (this.props.signer.type === 'ledger') return svg.ledger(24)
+              if (this.props.signer.type === 'trezor') return svg.trezor(20)
+              if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
+              if (this.props.signer.type === 'aragon') return svg.aragon(32)
+              return svg.octicon('plus', { height: 31 })
+            } else {
+              return svg.logo(24)
+            }
+          })()}
+        </div>
+        <div className='signerText'>{this.props.signer ? (
+          this.props.signer.type === 'ring' || this.props.signer.type === 'seed' ? 'hot' : this.props.signer.type
+        ) : 'no signer'}
         </div>
       </div>
     )
@@ -443,35 +406,41 @@ class Signer extends React.Component {
     if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
     if (!address) return null
-    return (
-      <div className='signerStatus' key={this.props.status}>
-        {this.props.status !== 'ok' ? (
-          <div className='signerStatusNotOk'>{status}</div>
-        ) : (
-          <div className='signerAccounts' style={{ width: '100%' }}>
-            <div key={address + currentIndex} className='signerAccount' style={{ minWidth: 'calc(100%)' }}>
-              <div className='signerName'>
-                <div className='signerNameText'>
-                  {this.props.name}
-                  <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
-                </div>
-              </div>
-              <div className='signerAddress'>
-                <div className='transactionToAddress'>
-                  <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
-                  <div className='transactionToAddressFull'>
-                    {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
-                    <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />
-                  </div>
-                </div>
-              </div>
-              <div className='signerInfo'>
-                <Balances {...this.props} highlightIndex={this.state.highlightIndex} accountHighlight={this.state.accountHighlight} />
-              </div>
+    return this.props.status !== 'ok' ? (
+      <div className='signerStatusNotOk'>{status}</div>
+    ) : (
+      <>
+        <div className='signerName'>
+          <div className='signerNameText'>
+            {this.props.name}
+            <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
+          </div>
+        </div>
+        <div className='signerAddress'>
+          <div className='transactionToAddress'>
+            <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+            <div className='transactionToAddressFull'>
+              {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+              <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />
             </div>
           </div>
-        )}
-      </div>
+        </div>
+        <div
+          className='addressSelect' onMouseDown={e => {
+            e.stopPropagation()
+            this.store.toggleShowAccounts()
+          }}
+        >
+          <div className='addressSelectButton'>
+            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
+            <div className='addressSelectText'>Addresses</div>
+            <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
+          </div>
+        </div>
+        <div className='signerInfo'>
+          <Balances {...this.props} highlightIndex={this.state.highlightIndex} accountHighlight={this.state.accountHighlight} />
+        </div>
+      </>
     )
   }
 
@@ -528,8 +497,31 @@ class Signer extends React.Component {
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
-            <div className='signerTop'>
-              <div className='signerNav'> {this.renderMenu()} {this.renderType()} </div>
+            <div className='signerTop'  onMouseDown={this.typeClick.bind(this)} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+              {this.state.openHover ? (
+              <>
+                <div className='signerSelect signerSelectLeft'>
+                  <div className='signerSelectArrows'>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                  </div>
+                </div>
+                <div className='signerSelect signerSelectRight'>
+                  <div className='signerSelectArrows'>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
+                  </div>
+                </div>
+              </>
+              ) : null}
+              {this.renderType()} 
+              {/* {this.renderMenu()} */}
               {this.renderStatus()}
             </div>
             {current ? this.renderAccountList() : null}
@@ -539,7 +531,7 @@ class Signer extends React.Component {
                 <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
               </div>
             ) : null}
-            <div className='signerBot' />
+            {/* <div className='signerBot' /> */}
           </div>
         </div>
       </div>

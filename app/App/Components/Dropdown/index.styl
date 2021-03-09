@@ -3,13 +3,12 @@
   display flex
   align-items flex-start
   height 26px
-  z-index 99999999999999
-  cursor pointer
+  z-index 99999999999999999
 
 .dropdown
-  border-radius 13px
   letter-spacing 1px
-  height 26px
+  height 28px
+  border-radius 14px
   font-weight 400
   width 125px
   font-size 13px
@@ -20,9 +19,14 @@
   padding 0px 0px 0px 0px
   transition standard, 0s linear background
   transform translateZ(0)
+  z-index 99999999999
+  pointer-events auto
+  cursor pointer
+  box-shadow 0px 5px 8px -1px var(--thin) // 0px 2px 0px var(--thin), 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+  // background blue
 
-.dropdown:hover
-  background var(--highlighter)
+// .dropdown:hover
+//   background var(--highlighter)
 
 .dropdownExpanded
   padding 18px 0px 18px 0px
@@ -31,19 +35,24 @@
 .dropdownItems
   transition standard
   transform translateZ(0)
+  // cursor pointer
 
 .dropdownItem
   display flex
   align-items center
-  height 26px
-  min-height 26px
+  height 28px
+  min-height 28px
   width calc(100% - 20px)
   box-sizing border-box
   transform translateZ(0)
-  margin 0px 10px 0px 10px
-  overflow hidden
+  margin 0px 9px 0px 9px
+  overflow hiddens
   position relative
   z-index 99999999999999
+  cursor pointer
+
+  div 
+    pointer-events none
 
   &::before, &::after
     pointer-events: none

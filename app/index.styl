@@ -217,18 +217,21 @@ cubic = cubic-bezier(.82,0,.12,1)
   --thick0 rgba(16, 44, 180, 0)
 
 .dark
-  --bg rgba(28, 32, 40, 1)  // #dadfea // #dce1e8
-  --bg0 rgba(28, 32, 36, 0)  // #dadfea // #dce1e8
+  --bg rgba(18, 22, 30, 1)  // #dadfea // #dce1e8
+  --bg0 rgba(18, 22, 30, 0)  // #dadfea // #dce1e8
   --v #4e5758
-  --outerspace01 rgba(251, 251, 255, 0.1)
-  --outerspace02 rgba(251, 251, 255, 0.2)
-  --outerspace03 rgba(251, 251, 255, 0.3)
-  --outerspace05 rgba(251, 251, 255, 0.5)
-  --outerspace06 rgba(251, 251, 255, 0.6)
-  --outerspace07 rgba(251, 251, 255, 0.7)
-  --outerspace08 rgba(251, 251, 255, 0.8)
+  --outerspace01 rgba(247, 251, 255, 0.11)
+  --outerspace02 rgba(247, 251, 255, 0.22)
+  --outerspace03 rgba(247, 251, 255, 0.33)
+  --outerspace04 rgba(247, 251, 255, 0.44)
+  --outerspace05 rgba(247, 251, 255, 0.55)
+  --outerspace06 rgba(247, 251, 255, 0.66)
+  --outerspace07 rgba(247, 251, 255, 0.77)
+  --outerspace08 rgba(247, 251, 255, 0.88)
+  --outerspace09 rgba(247, 251, 255, 0.99)
+  --outerspace rgba(247, 251, 255, 1)
   --nebula #3a4547
-  --outerspace rgba(251, 251, 255, 1)
+  
   // --outerspaceShade #1c2526
   --outerspaceLight #29393a
   --outerspacePulse #395153
@@ -250,24 +253,25 @@ cubic = cubic-bezier(.82,0,.12,1)
   // --ghostG rgba(232, 236, 248, 1)
   // --ghostH rgba(227, 232, 245, 1)
 
-  --highlightest rgba(38, 42, 50, 1) 
-  --highlighter rgba(36, 40, 48, 1) 
-  --highlight rgba(34, 38, 46, 1) 
-  --light rgba(32, 36, 44, 1) 
-  --lowlight rgba(30, 34, 42, 1) 
-  --lowerlight rgba(28, 32, 40, 1) 
-  --lightShade rgba(18, 22, 30, 1)  // #d9e1ef
+  --highlightest rgba(38, 42, 46, 1) 
+  --highlighter rgba(36, 40, 44, 1) 
+  --highlight rgba(34, 38, 42, 1) 
+  --light rgba(32, 36, 40, 1) 
+  --lowlight rgba(30, 34, 38, 1) 
+  --lowerlight rgba(28, 32, 36, 1) 
+  --lightShade rgba(24, 28, 34, 1)  // #d9e1ef
+  // --lightDark rgba(18, 22, 30, 1)
 
 
-  --thinner rgba(0, 0, 10, .08)
-  --thin rgba(0, 0, 10, .1)
-  --thick rgba(0, 0, 10, .13)
-  --doubleThick rgba(0, 0, 10, .17)
-  --tripleThick rgba(0, 0, 10, .27)
+  --thinner rgba(0, 0, 10, .1)
+  --thin rgba(0, 0, 10, .2)
+  --thick rgba(0, 0, 10, .3)
+  --doubleThick rgba(0, 0, 10, .4)
+  --tripleThick rgba(0, 0, 10, .5)
   --thick0 rgba(0, 0, 10, 0)
 
-  --overlayA rgba(150, 100, 255, 0.8) 
-  --overlayB rgba(250, 50, 105, 0.9)
+  --overlayA rgba(150, 100, 255, 1) 
+  --overlayB rgba(250, 50, 105, 1)
 
 html, body
   margin 0
@@ -277,7 +281,7 @@ html, body
   -webkit-app-region no-drag
   overflow hidden
   color var(--outerspace)
-  background var(--bg)
+  background var(--lightShade)
 
 div
   user-select none
@@ -297,7 +301,7 @@ div
   z-index 1500
   // background-blend-mode screen
   pointer-events none
-  opacity 0.05
+  opacity 0.06
 
 #panel
   // background rgba(228, 232, 248, 1)

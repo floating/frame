@@ -170,182 +170,70 @@ class Settings extends React.Component {
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
+      <div className={this.store('panel.view') !== 'connections' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
         <div className='localSettingsWrapFadeBot' />
         <div className='localSettingsWrap'>
-          <div className='localSettingsTitle'>
-            <div className='localSettingsTitleText'>Settings</div>
+          <div className='localSettingsTitle connectionTitle' style={{ zIndex: 3 }}>
+            <div className='localSettingsTitleText'>Connection</div>
+            <div className='localSettingsAddNetwork' onMouseDown={() => this.store.toggleAddNetwork()}>{svg.broadcast(16)}</div>
+            <Dropdown
+              syncValue={type + ':' + id}
+              onChange={(network) => this.selectNetwork(network)}
+              options={networkOptions}
+            />
           </div>
-          <div className='signerPermission' style={{ zIndex: 10 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Dark mode</div>
-              <div className={this.store('main.colorway') === 'dark' ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setColorway', this.store('main.colorway') === 'dark' ? 'light' : 'dark')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Set colorway
-              </span>
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 10 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Summon Shortcut</div>
-              <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Summon Frame by pressing <span className='keyCommand'>{this.store('platform') === 'darwin' ? 'Option' : 'Alt'}<span style={{ padding: '0px 3px' }}>+</span>/</span>
-              </span>
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 9 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Auto-hide</div>
-              <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Hide Frame on loss of focus
-              </span>
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 8 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Run on Startup</div>
-              <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              Run Frame when your computer starts
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 7 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Glide</div>
-              <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              {'Mouse to your display\'s right edge to summon Frame'}
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 6 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Adjustable Nonce</div>
-              <div
-                className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => {
-                  link.send('tray:action', 'toggleNonceAdjust')
-                  if (!this.store('main.nonceAdjust')) this.store.notify('nonceWarning')
-                }}
-              >
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              {'Adds the ability to edit a transaction\'s nonce'}
-            </div>
-          </div>
-          {/* <div className='signerPermission' style={{ zIndex: 6 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Show USD Value</div>
-              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleUSDValue')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              Show USD value of Ether and token balances
-            </div>
-          </div> */}
-          {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission' style={{ zIndex: 5 }}>
-              <div className='signerPermissionControls'>
-                <div className='signerPermissionOrigin'>Display Gas in Menubar</div>
-                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
+            <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+              <div className='connectionOptionToggle'>
+                <div className='signerPermissionOrigin'>Primary</div>
+                <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
               </div>
-              <div className='signerPermissionDetails'>
-                Show mainnet gas price (Gwei) in menubar
+              <div className='connectionOptionDetails'>
+                <div className='connectionOptionDetailsInset'>
+                  {this.status('primary')}
+                  <Dropdown
+                    syncValue={type + ':' + id + ':' + connection.primary.current}
+                    onChange={preset => {
+                      const [type, id, value] = preset.split(':')
+                      link.send('tray:action', 'selectPrimary', type, id, value)
+                    }}
+                    options={presets}
+                  />
+                </div>
               </div>
-            </div>
-          ) : null}
-          <div className='signerPermission' style={{ zIndex: 4 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Hardware Derivation</div>
-              <Dropdown
-                syncValue={this.store('main.hardwareDerivation')}
-                onChange={(value) => link.send('tray:action', 'setHardwareDerivation', value)}
-                options={[{ text: 'Mainnet', value: 'mainnet' }, { text: 'Testnet', value: 'testnet' }]}
-              />
-            </div>
-            <div className='signerPermissionDetails'>
-              Derive seperate sets of addresses based on use
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 3 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Ledger Type</div>
-              <Dropdown
-                syncValue={this.store('main.ledger.derivation')}
-                onChange={(value) => link.send('tray:action', 'setLedgerDerivation', value)}
-                options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
-              />
-            </div>
-            <div className='signerPermissionDetails'>
-              {'Use Ledger\'s Legacy or Live derivation type'}
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
-              <Dropdown
-                syncValue={this.store('main.ledger.liveAccountLimit')}
-                onChange={(value) => link.send('tray:action', 'setLiveAccountLimit', value)}
-                options={[
-                  { text: '5', value: 5 },
-                  { text: '10', value: 10 },
-                  { text: '20', value: 20 },
-                  { text: '40', value: 40 }
-                ]}
-              />
-            </div>
-            <div className='signerPermissionDetails'>
-              The number of live accounts to derive
+              <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+                <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
+              </div>
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 1 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Lock Hot Signers on</div>
-              <Dropdown
-                syncValue={this.store('main.accountCloseLock')}
-                onChange={(value) => link.send('tray:action', 'setAccountCloseLock', value)}
-                options={[{ text: 'Close', value: true }, { text: 'Quit', value: false }]}
-              />
-            </div>
-            <div className='signerPermissionDetails'>
-              When should Frame relock your hot signers?
-            </div>
-          </div>
-          <div className='snipIt'>
-            <div>Dapp doesn't support Frame natively?</div>
-            <div className='snipItBrowserExtensionIcons'>
-              <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
-                {svg.chrome(30)}
+            <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+              <div className='connectionOptionToggle'>
+                <div className='signerPermissionOrigin'>Secondary</div>
+                <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
+                  <div className='signerPermissionToggleSwitch' />
+                </div>
               </div>
-              <div className='snipItBrowserExtensionIcon snipItSpinRight' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
-                {svg.firefox(30)}
+              <div className='connectionOptionDetails'>
+                <div className='connectionOptionDetailsInset'>
+                  {this.status('secondary')}
+                  <Dropdown
+                    syncValue={type + ':' + id + ':' + connection.secondary.current}
+                    onChange={preset => {
+                      const [type, id, value] = preset.split(':')
+                      link.send('tray:action', 'selectSecondary', type, id, value)
+                    }}
+                    options={presets}
+                  />
+                </div>
+              </div>
+              <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+                <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
               </div>
             </div>
-            <div>Inject a connection with our browser extension!</div>
           </div>
           {this.discord()}
           {this.quit()}

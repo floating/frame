@@ -1,12 +1,16 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../svg'
+import link from '../../link'
 
 import Main from './Main'
 import Local from './Local'
+import Connections from './Connections'
 import Notify from './Notify'
 import Phase from './Phase'
 import Badge from './Badge'
+
+import Dropdown from '../Components/Dropdown'
 
 // import DevTools from 'restore-devtools'
 // <DevTools />
@@ -21,6 +25,11 @@ class Panel extends React.Component {
     }
   }
 
+  selectNetwork (network) {
+    const [type, id] = network.split(':')
+    if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
+  }
+
   render () {
     // const open = this.store('tray.open')
     // console.log('tray open?', open)
@@ -31,14 +40,34 @@ class Panel extends React.Component {
 
     let gasPrice = this.store('main.networks', type, id, 'gas.price.levels.standard')
     if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)
+    const networks = this.store('main.networks')
+    const networkOptions = []
+    Object.keys(networks).forEach(type => {
+      Object.keys(networks[type]).forEach(id => {
+        networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
+      })
+    })
+
     return (
       <div id='panel' style={{ opacity }}>
-        <div className={this.store('view.addAccount') ? 'panelMenu panelMenuAddMode' : 'panelMenu'}>
-          <div className='panelDetail'>
+        <div className='panelMenu'>
+          <div className='panelMenuItem panelMenuItemAccounts' onMouseDown={() => this.store.setPanelView('default')}>
             <div className='panelDetailIndicator'>
               {this.indicator(this.store('main.networks', type, id, 'connection'))}
             </div>
-            <div className='panelDetailText'>{this.store('main.networks', type, id, 'name')}</div>
+          </div>
+          <div className='panelMenuItemNetwork'>
+            <Dropdown
+              syncValue={type + ':' + id}
+              onChange={(network) => this.selectNetwork(network)}
+              options={networkOptions}
+            />
+          </div>
+          <div className='panelMenuItem panelMenuItemConnections' onMouseDown={() => this.store.setPanelView('connections')}>
+            {svg.broadcast(15)}
+          </div>
+          <div className='panelMenuItem panelMenuItemSettings' onMouseDown={() => this.store.setPanelView('settings')}>
+            {svg.octicon('settings', { height: 18 })}
           </div>
           {type === 'ethereum' && id === '1' ? (
             <div className='panelMenuData' style={{ opacity: this.store('view.addAccount') ? 0 : 1 }}>
@@ -53,13 +82,9 @@ class Panel extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='panelMenuItem' style={this.store('panel.view') !== 'default' ? { transform: 'rotate(180deg)' } : {}} onMouseDown={() => this.store.toggleSettings()}>
-            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
-            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
-            <span className='panelMenuIconArrow'>{svg.octicon('chevron-right', { height: 14 })}</span>
-          </div>
         </div>
         <Local />
+        <Connections />
         <Main />
         <Notify />
         <Phase />
