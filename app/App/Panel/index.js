@@ -19,7 +19,11 @@ class Panel extends React.Component {
   indicator (connection) {
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
-      return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
+      if (this.store('selected.current')) {
+        return <div className='panelDetailIndicatorInner panelDetailIndicatorGood' />
+      } else {
+        return <div className='panelDetailIndicatorInner panelDetailIndicatorWaiting' />
+      }
     } else {
       return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
     }

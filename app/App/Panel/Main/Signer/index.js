@@ -467,8 +467,10 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 48 : initial.height - 3
-      style.transform = open ? `translateY(-${initial.top - 44}px)` : 'translateY(0px)'
+      style.height = open ? panelHeight - 82 : initial.height - 3
+      let top = initial.top - 74
+      if (initial.top > 0) top = top * -1
+      style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0
@@ -526,7 +528,7 @@ class Signer extends React.Component {
             </div>
             {current ? this.renderAccountList() : null}
             {current ? (
-              <div className='signerMid' style={open ? { top: '170px' } : { pointerEvents: 'none' }}>
+              <div className='signerMid' style={open ? { top: '130px' } : { pointerEvents: 'none' }}>
                 <Settings id={this.props.id} />
                 <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
               </div>

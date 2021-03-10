@@ -170,25 +170,10 @@ class Settings extends React.Component {
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
-        <div className='localSettingsWrapFadeTop' />
-        <div className='localSettingsWrapFadeBot' />
+      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrap'>
           <div className='localSettingsTitle'>
             <div className='localSettingsTitleText'>Settings</div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 10 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Dark mode</div>
-              <div className={this.store('main.colorway') === 'dark' ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setColorway', this.store('main.colorway') === 'dark' ? 'light' : 'dark')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Set colorway
-              </span>
-            </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 10 }}>
             <div className='signerPermissionControls'>
@@ -278,6 +263,21 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
+          <div className='signerPermission' style={{ zIndex: 10 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Colorway</div>
+              <Dropdown
+                syncValue={this.store('main.colorway')}
+                onChange={(value) => link.send('tray:action', 'setColorway', value)}
+                options={[{ text: 'Dark', value: 'dark' }, { text: 'Light', value: 'light' }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Set Frame's visual theme
+              </span>
+            </div>
+          </div>
           <div className='signerPermission' style={{ zIndex: 4 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>

@@ -230,14 +230,16 @@ const api = {
     if (!glide) windows.tray.focus()
     windows.tray.emit('show')
     windows.tray.show()
-    // windows.tray.send('main:action', 'trayOpen', true)
-    // windows.tray.send('main:action', 'setSignerView', 'default')    
     events.emit('tray:show')
     if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
+    windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
+    // windows.tray.send('main:action', 'trayOpen', true)
+    // windows.tray.send('main:action', 'setSignerView', 'default')    
+    
      // if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
     // hideShow.running = false
     // hideShow.next = false
-    windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
+    
   },
   close: (e) => {
     const id = winId(e)

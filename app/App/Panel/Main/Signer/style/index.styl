@@ -77,68 +77,87 @@
     background var(--lowlight)
     padding-bottom 3px
 
-  .transactionToAddress
+  .signerAddress
     font-size 12px
-    font-family firaCode
-    position relative
-    height 30px
-    width 100%
-    -webkit-app-region no-drag
+    font-family FiraCode
+    letter-spacing 0px
+    position absolute
+    bottom 7px
+    left 10px 
+    right 10px
+    border-radius 12px
+    height 21px
+    // width 100%
+    transform translateZ(0)
+    // background blue
+    display flex
+    justify-content center
+    align-items center
+    border 1px solid var(--thick)
+    // background red
+    
+    .transactionToAddress
+      font-size 12px
+      font-family firaCode
+      position relative
+      height 30px
+      width 100%
+      -webkit-app-region no-drag
 
-    .transactionToAddressLarge
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
-      display flex
-      justify-content center
-      align-items center
-      font-size 20px
-      opacity 1
-      transition standard
-
-      svg
-        color var(--outerspace08)
-        padding-top 2px
-        padding-left 4px
-        padding-right 4px
-
-    .transactionToAddressFull
-      position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
-      display flex
-      justify-content center
-      align-items center
-      font-size 13px
-      opacity 0
-      transition standard
-
-      input
-        position absolute
-        top -3px
-        left -3px
-        display block
-        width calc(100% + 6px)
-        height calc(100% + 6px)
-        border none
-        outline none
-        overflow hidden
-        opacity 0
-        cursor default
-
-      svg
-        padding-left 5px
-        padding-bottom 1px
-
-  .transactionToAddress:hover
       .transactionToAddressLarge
-        opacity 0
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display flex
+        justify-content center
+        align-items center
+        font-size 16px
+        opacity 1
+        transition standard
+
+        svg
+          color var(--outerspace08)
+          padding-top 2px
+          padding-left 4px
+          padding-right 4px
+
       .transactionToAddressFull
-        opacity  1
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display flex
+        justify-content center
+        align-items center
+        font-size 12px
+        opacity 0
+        transition standard
+
+        input
+          position absolute
+          top -3px
+          left -3px
+          display block
+          width calc(100% + 6px)
+          height calc(100% + 6px)
+          border none
+          outline none
+          overflow hidden
+          opacity 0
+          cursor default
+
+        svg
+          padding-left 5px
+          padding-bottom 1px
+
+    .transactionToAddress:hover
+        .transactionToAddressLarge
+          opacity 0
+        .transactionToAddressFull
+          opacity  1
 
   .clickGuard
     position absolute
@@ -157,7 +176,7 @@
 
     transition standard
     z-index 9999000
-    height 100px
+    height 88px
 
     .transactionToAddress
       .transactionToAddressLarge
@@ -569,21 +588,7 @@
         transition standard
         opacity 1
 
-    .signerAddress
-      font-size 12px
-      font-family FiraCode
-      letter-spacing 0px
-      position absolute
-      bottom 0
-      height 39px
-      width 100%
-      transform translateZ(0)
-      // background blue
-      display flex
-      justify-content center
-      align-items center
-      border-top 1px solid var(--doubleThick)
-      // background red
+    
 
     .signerInfo
       position relative
@@ -780,6 +785,7 @@
       bottom 0
       z-index 5
       transform translateZ(0px)
+      display none
 
       .addressSelectButton
         width 100%
@@ -1113,7 +1119,7 @@
         opacity 0
 
         svg
-          color var(--outerspace)
+          color var(--ghostG)
           opacity 1
           transform translateZ(0)
           will-change transform, opacity
@@ -1137,6 +1143,7 @@
       .signerSelectArrow:nth-child(5)
         animation-delay 0.36s
         margin-top 40px
+        display none
 
   .signerSelectDown
     transform rotate(180deg)
@@ -1146,10 +1153,10 @@
           color var(--spacewhite)
 
   .signerSelectLeft
-    left 0px
+    left 3px
 
   .signerSelectRight
-    right 0px
+    right 3px
 
   .signerSelectDown.signerSelectLeft
     left -50px

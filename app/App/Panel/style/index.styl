@@ -244,6 +244,10 @@
       transition standardSlow
       background var(--good)
 
+    .panelDetailIndicatorWaiting
+      transition standardSlow
+      background var(--moon)
+
     .panelDetailIndicatorBad
       transition standardSlow
       background var(--bad)
@@ -252,31 +256,31 @@
       transition standardSlow
       background var(--pending)
 
-.panelMenuAddMode
-  transition standard
-  z-index 10000
-  .panelDetail
-    transition standardSlowest
-    margin-left calc(50% - 50px)
-  .panelMenuItem
-    transition standard
-    opacity 0
-    pointer-events none
-    svg
-      color var(--spacewhite)
-  .panelDetailText
-    transition standard
-    color var(--spacewhite)
-  .panelDetailIndicator
-    .panelDetailIndicatorGood
-      transition standardSlow
-      background var(--smart)
-    .panelDetailIndicatorBad
-      transition standardSlow
-      background var(--hot)
-    .panelDetailIndicatorPending
-      transition standardSlow
-      background var(--hardware)
+// .panelMenuAddMode
+//   transition standard
+//   z-index 10000
+//   .panelDetail
+//     transition standardSlowest
+//     margin-left calc(50% - 50px)
+//   .panelMenuItem
+//     transition standard
+//     opacity 0
+//     pointer-events none
+//     svg
+//       color var(--spacewhite)
+//   .panelDetailText
+//     transition standard
+//     color var(--spacewhite)
+//   .panelDetailIndicator
+//     .panelDetailIndicatorGood
+//       transition standardSlow
+//       background var(--smart)
+//     .panelDetailIndicatorBad
+//       transition standardSlow
+//       background var(--hot)
+//     .panelDetailIndicatorPending
+//       transition standardSlow
+//       background var(--hardware)
 
 .snipIt
   display flex
@@ -340,3 +344,4 @@
 @import '../Phase/style'
 @import '../Badge/style'
 @import '../Connections/style'
+@import './card.styl'
