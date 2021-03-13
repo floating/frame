@@ -264,7 +264,7 @@ class Signer extends React.Component {
               if (this.props.signer.type === 'trezor') return svg.trezor(20)
               if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
               if (this.props.signer.type === 'aragon') return svg.aragon(32)
-              return svg.octicon('plus', { height: 31 })
+              return svg.logo(24)
             } else {
               return svg.logo(24)
             }
@@ -416,7 +416,7 @@ class Signer extends React.Component {
             <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
           </div>
         </div>
-        <div className='signerAddress'>
+        <div className={open ? 'signerAddress signerAddressActive' : 'signerAddress'}>
           <div className='transactionToAddress'>
             <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
             <div className='transactionToAddressFull'>
@@ -467,22 +467,23 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 82 : initial.height - 3
-      let top = initial.top - 74
-      if (initial.top > 0) top = top * -1
+      style.height = open ? panelHeight - 79 - 67 : initial.height - 3
+      let top = (initial.top - 76) * -1
       style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0
       style.pointerEvents = 'none'
-      style.transition = '0.48s cubic-bezier(.82,0,.12,1) all'
+      style.transition = '360ms cubic-bezier(.82,0,.12,1) all'
       if (this.store('selected.open')) {
         // Not open, but another signer is
         style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
         style.opacity = 0
         style.pointerEvents = 'none'
       } else {
+        // style.transition = '400ms linear all'
         style.transform = 'translate(0px, 0px)'
+        // style.transitionDelay = '400ms'
         style.opacity = 1
       }
     } else {
@@ -500,9 +501,9 @@ class Signer extends React.Component {
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             <div className='signerTop'  onMouseDown={this.typeClick.bind(this)} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-              {this.state.openHover ? (
+              {this.state.openHover && false ? (
               <>
-                <div className='signerSelect signerSelectLeft'>
+                <div className='signerSelectArrowWrap signerSelectLeft'>
                   <div className='signerSelectArrows'>
                     <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
                     <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
@@ -511,7 +512,7 @@ class Signer extends React.Component {
                     <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
                   </div>
                 </div>
-                <div className='signerSelect signerSelectRight'>
+                <div className='signerSelectArrowWrap signerSelectRight'>
                   <div className='signerSelectArrows'>
                     <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
                     <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
@@ -523,16 +524,24 @@ class Signer extends React.Component {
               </>
               ) : null}
               {this.renderType()} 
+              <div className='signerSelect'>
+                <div className='signerSelectIconWrap'>
+                  <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                    {svg.chevron(23)}
+                  </div>
+                </div>
+              </div>
               {/* {this.renderMenu()} */}
               {this.renderStatus()}
             </div>
             {current ? this.renderAccountList() : null}
-            {current ? (
-              <div className='signerMid' style={open ? { top: '130px' } : { pointerEvents: 'none' }}>
-                <Settings id={this.props.id} />
-                <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
-              </div>
-            ) : null}
+            <div className={current ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
+                hello
+            </div>
+            <div className={current ? 'signerMid cardShow' : 'signerMid cardHide'} style={open ? { } : { pointerEvents: 'none' }}>
+              <Settings id={this.props.id} />
+              <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
+            </div>
             {/* <div className='signerBot' /> */}
           </div>
         </div>

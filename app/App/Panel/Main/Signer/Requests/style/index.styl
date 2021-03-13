@@ -233,7 +233,7 @@
     right 100px
     margin-top 50px
     height 20px
-    border-radius 16px
+    border-radius 12px
     display flex
     justify-content center
     align-items center
@@ -398,12 +398,12 @@
     padding-bottom 10px
     justify-content space-between
     box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
-    border-radius 16px
+    border-radius 12px
     height 380px
     display flex
     justify-content center
     transition standard
-    background var(--lowlight)
+    background var(--ghostC)
     z-index 2000
     color var(--outerspace08)
     tranform translateZ(0)
@@ -416,7 +416,7 @@
     right 0px
     bottom 0px
     z-index 9999999999999
-    border-radius 16px
+    border-radius 12px
     pointer-events none
     overflow hidden
     .requestSheen
@@ -457,7 +457,7 @@
 
   .signerRequestMonitor
     align-items center
-    background var(--highlighter)
+    background var(--ghostD)
     svg
       color var(--outerspace08)
     .approveTransactionPayload
@@ -470,8 +470,8 @@
     height 100%
     width 100%
     transform translateZ(0px)
-    background linear-gradient(var(--highlight), var(--lowlight), var(--highlight))
-    border-radius 16px
+    background linear-gradient(var(--ghostD), var(--ghostB), var(--ghostD))
+    border-radius 12px
     overflow hidden
 
     .requestNoticeInner
@@ -501,7 +501,7 @@
         background var(--thin)
         height 20px
         padding 0px 20px 0px 22px
-        border-radius 16px
+        border-radius 12px
         letter-spacing 2px
         font-weight 500
         display flex
@@ -580,7 +580,7 @@
       align-items center
       font-weight 400
       font-size 14px
-      background var(--highlight)
+      background var(--ghostD)
       color var(--outerspace08)
       border-top-left-radius 16px
       border-top-right-radius 16px
@@ -740,7 +740,7 @@
     font-family FiraCode, sans-serif
     margin 2px 8px 0px 0px 
     padding 0px 16px
-    background var(--highlightest)
+    background var(--ghostE)
     border-radius 12px
     height 25px
     min-height 25px
@@ -774,7 +774,7 @@
     font-family FiraCode, sans-serif
     margin 2px 0px 0px 8px 
     padding 0px 16px
-    background var(--highlightest)
+    background var(--ghostE)
     border-radius 12px
     height 24px
     min-height 24px
@@ -838,7 +838,7 @@
       left 0
       right 0
       height 32px
-      border-radius 16px
+      border-radius 12px
       justify-content space-between
       display flex
       align-items center
@@ -846,7 +846,7 @@
       letter-spacing 1px
       font-weight 400
       z-index 10
-      background var(--highlighter)
+      background var(--ghostD)
       box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
 
       .transactionDataLabel
@@ -874,7 +874,7 @@
         transform rotate(-180deg)
         transition standardSlow
         border 2px solid var(--thick)
-        border-radius 16px
+        border-radius 12px
         margin 4px
 
         svg
@@ -894,7 +894,7 @@
     user-select all
     overflow hidden
     z-index 90
-    background var(--highlighter)
+    background var(--ghostD)
     border-radius 12px
     opacity 0
     pointer-events none
@@ -952,8 +952,8 @@
         top 0px
 
   .transactionNoData
-    background var(--highlight)
-    border-radius 16px
+    background var(--ghostD)
+    border-radius 12px
     box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
 
   .transactionTo
@@ -1049,7 +1049,7 @@
     align-items center
     font-weight 400
     border-top 1px solid var(--thick)
-    background var(--highlight)
+    background var(--ghostD)
 
     .requestDecline
       position relative
@@ -1214,17 +1214,17 @@ span
   position absolute
   top 20px
   right 12px
-  background var(--highlighter)
+  background var(--ghostD)
   height 20px
   width 48px
-  border-radius 16px
+  border-radius 12px
   box-shadow 0px 2px 1px var(--thick)
   display flex
   justify-content center
   align-items center
   font-size 12px
   font-weight 600
-  background var(--highlighter)
+  background var(--ghostD)
   color var(--outerspace05)
   transition standard
   z-index 9999
@@ -1307,7 +1307,7 @@ span
   color var(--outerspace08)
   width 145px
   background var(--ghostC)
-  box-shadow 0px 2px 1px var(--thick), -8px 0px 8px var(--highlightest), -8px 0px 8px var(--highlightest)
+  box-shadow 0px 2px 1px var(--thick), -8px 0px 8px var(--ghostE), -8px 0px 8px var(--ghostE)
 
   .txNonceHidden
     opacity 1
@@ -1378,8 +1378,8 @@ span
   text-transform uppercase  
   letter-spacing 0.2px
   font-weight 500
-  border-radius 16px
-  background var(--highlight)
+  border-radius 12px
+  background var(--ghostD)
   box-shadow 0px 2px 1px var(--thick), 0px 8px 5px -5px var(--thin), 0px -2px 6px var(--thinner)
   z-index 20000000009999
   
@@ -1432,7 +1432,7 @@ span
     opacity 0
 
   .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
-    background var(--highlighter)
+    background var(--ghostD)
     transform scale(1.05)
     box-shadow 0px 4px 5px -2px var(--thick), 0px 25px 25px -5px var(--thick)
   
@@ -1444,12 +1444,12 @@ span
   .txAugmentCancel
     opacity 0
     transition standard
-    background var(--highlighter)
+    background var(--ghostD)
     transform translateY(-25px) scale(1.05)
     box-shadow 0px 4px 5px -3px var(--thick), 0px 35px 20px -5px var(--thick)
   .txAugmentSpeedUp
     opacity 0
-    background var(--highlighter)
+    background var(--ghostD)
     transform translateY(-25px) scale(1.05)
     transform translateY(-25px)   
     transition standard
@@ -1488,7 +1488,7 @@ span
 //   right 5px
 //   height 32px
 //   width 116px
-//   border-radius 16px
+//   border-radius 12px
 //   font-size 12px
 //   display flex
 //   justify-content center
@@ -1505,7 +1505,7 @@ span
 //   transform translateY(-25px)
 
 // .txDetails:hover, .txStatus:hover
-//   background var(--highlighter)
+//   background var(--ghostD)
 
 .txStatus
   position absolute
@@ -1513,7 +1513,7 @@ span
   left 5px
   right 5px
   bottom 100px
-  border-radius 16px
+  border-radius 12px
   // box-shadow 0px 2px 1px var(--thick), 0px 8px 5px -5px var(--thin), 0px -2px 6px var(--thinner)
   text-align center
   box-sizing border-box
@@ -1702,8 +1702,8 @@ span
             background red
             margin-top -6px
             margin-left -6px
-            border-radius 16px
-            background var(--highlight)
+            border-radius 12px
+            background var(--ghostD)
 
           .txProgressStepCenter
             position absolute
@@ -1754,7 +1754,7 @@ span
           z-index 1007
           height 16px
           width 16px
-          border-radius 16px 
+          border-radius 12px 
           overflow hidden
           animation spin 0.7s infinite linear
           position absolute
@@ -1778,7 +1778,7 @@ span
             height calc(100% - 4px)
             width calc(100% - 4px)
             border-radius 18px
-            background var(--highlighter)
+            background var(--ghostD)
             top 2px
             left 2px
 
@@ -1839,11 +1839,11 @@ span
 .confirmBar
   position absolute
   z-index 1001
-  background var(--highlight)
+  background var(--ghostD)
   height 60px
   width 310px
   bottom 10px
-  border-radius 16px
+  border-radius 12px
   overflow hidden
   font-size 12px
   font-weight bold
@@ -1886,9 +1886,9 @@ span
     height 120px
     transform rotate(45deg)
     top -29px
-    border-radius 16px
-    background var(--highlightest)
-    border-radius 16px
+    border-radius 12px
+    background var(--ghostE)
+    border-radius 12px
     box-shadow 5px -5px 40px var(--thick)
   .confirmBarSent
     z-index 1202
@@ -1899,12 +1899,12 @@ span
     position absolute
     width 120px
     height 120px
-    background var(--highlighter)
+    background var(--ghostD)
     box-shadow 5px -5px 40px var(--thick)
     transform rotate(45deg)
     top -29px
     margin-left -60px
-    border-radius 16px
+    border-radius 12px
 
 .confirmBarDropBottom
   box-shadow cardDrop, 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)

@@ -6,8 +6,8 @@ import link from '../../link'
 import Main from './Main'
 import Local from './Local'
 import Connections from './Connections'
-import Notify from './Notify'
-import Phase from './Phase'
+// import Notify from './Notify'
+// import Phase from './Phase'
 import Badge from './Badge'
 
 import Dropdown from '../Components/Dropdown'
@@ -51,10 +51,15 @@ class Panel extends React.Component {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
-
+    let markLeft = 14
+    if (this.store('panel.view') === 'connections') markLeft = 290
+    if (this.store('panel.view') === 'settings') markLeft = 326
     return (
       <div id='panel' style={{ opacity }}>
         <div className='panelMenu'>
+          <div className='panelMenuMarker'>
+            <div className='panelMenuMark' style={{ transform: `translateX(${markLeft}px)` }} />
+          </div>
           <div className='panelMenuItem panelMenuItemAccounts' onMouseDown={() => this.store.setPanelView('default')}>
             <div className='panelDetailIndicator'>
               {this.indicator(this.store('main.networks', type, id, 'connection'))}
@@ -90,9 +95,14 @@ class Panel extends React.Component {
         <Local />
         <Connections />
         <Main />
-        <Notify />
-        <Phase />
         <Badge />
+        <div className='appMenu'>
+          <div className='appMenuItem'>
+            <div className='appMenuItemButton'>
+              {svg.cpu(18)}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

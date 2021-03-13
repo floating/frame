@@ -52,7 +52,7 @@ class Main extends React.Component {
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
     return (
-      <div className={this.store('panel.view') !== 'default' ? 'main cardHide' : 'main cardShow'}>
+      <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
         <Add />
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>

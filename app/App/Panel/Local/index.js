@@ -53,13 +53,13 @@ class Settings extends React.Component {
     return false
   }
 
-  customSecondaryFocus () {
-    if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
-  }
+  // customSecondaryFocus () {
+  //   if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
+  // }
 
-  customSecondaryBlur () {
-    if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  }
+  // customSecondaryBlur () {
+  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
+  // }
 
   customPrimaryFocus () {
     if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })

@@ -8,8 +8,7 @@
   justify-content center
   flex-direction column
   transition standardFast
-  transform translateZ(0)
-
+  transform translateZ(0)  
   .localSettingsAddNetwork
     position absolute
     right 145px
@@ -24,7 +23,7 @@
     width 26px
     font-size 23px
     text-transform uppercase
-    background var(--highlight)
+    background var(--ghostD)
     overflow hidden
     box-shadow cardDrop, 0px 2px 1px var(--thin)
     padding 0px 0px 0px 0px
@@ -33,7 +32,7 @@
     cursor pointer
     
   .localSettingsAddNetwork:hover
-    background var(--highlighter)
+    background var(--ghostD)
 
   .localSettingsWrapFadeTop
     position absolute
@@ -43,7 +42,7 @@
     height 140px
     pointer-events none
     z-index 5
-    // background linear-gradient(0deg, var(--bg0) 0%, var(--light) 70%)
+    // background linear-gradient(0deg, var(--bg0) 0%, var(--ghostC) 70%)
 
   .localSettingsWrapFadeBot
     position absolute
@@ -53,7 +52,7 @@
     height 140px
     pointer-events none
     z-index 5
-    // background linear-gradient(-180deg, var(--bg0) 0%, var(--light) 70%)
+    // background linear-gradient(-180deg, var(--bg0) 0%, var(--ghostC) 70%)
 
   .localSettingsWrap
     padding 60px 0px 100px 0px
@@ -137,7 +136,7 @@
   .discordLink
     position relative 
     transform translateY(-2px)
-    color var(--outerspace08)
+    // color var(--outerspace08)
 
 .discordInvite
   margin 32px 8px 0px 8px 
@@ -185,7 +184,7 @@
   width 100%
   align-items space-between
   transition standard
-  border-radius 16px
+  border-radius 12px
   margin 0px -15px -15px -15px
   padding 0px 15px 15px 15px
   // overflow hidden
@@ -266,7 +265,7 @@
         justify-content center
         align-items center
         padding 0px 3px 0px 3px
-        background var(--highlight)
+        background var(--ghostD)
         box-shadow cardDrop
 
         .signerOptionSetButton

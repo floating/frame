@@ -1,17 +1,15 @@
 @import '../Signer/style'
 @import '../PendingSigner/style'
 
-.main
+.card
   position absolute
   top 0px
   right 0px
   bottom 0px
   left 0px
-  transition standardFast
-
-.mainHidden
-  right 100%
-  left -100%
+  // transition standardFast
+  opacity 1
+  transition 5s linear all
 
 #panelScroll
   position absolute
@@ -34,8 +32,8 @@
 
   #panelWrap
     width 100%
-    padding-top 74px
-    padding-bottom 74px
+    padding-top 76px
+    padding-bottom 68px
     will-change scroll-position
 
     .noSigners

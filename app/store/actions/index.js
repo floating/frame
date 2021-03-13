@@ -5,10 +5,11 @@ export const syncMain = (u, main) => u('main', _ => main)
 
 export const setSigner = (u, signer) => {
   u('selected.current', _ => signer.id)
-  setTimeout(_ => {
-    u('selected.minimized', _ => false)
-    u('selected.open', _ => true)
-  }, 50)
+  u('selected.minimized', _ => false)
+  u('selected.open', _ => true)
+  // setTimeout(_ => {
+    
+  // }, 50)
 }
 
 export const setSettingsView = (u, index, subindex = 0) => {
