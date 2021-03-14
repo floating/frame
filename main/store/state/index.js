@@ -97,6 +97,10 @@ const initial = {
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
+    lattice: {
+      password: main('lattice.password', ''),
+      endpoint: main('lattice.endpoint', 'https://signing.gridpl.us')
+    },
     ledger: {
       derivation: main('ledger.derivation', 'legacy'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)

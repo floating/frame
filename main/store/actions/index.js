@@ -131,6 +131,12 @@ module.exports = {
       return addresses
     })
   },
+  setLatticePassword:  (u, value) => {
+    u('main.lattice.password', () => value)
+  },
+  setLatticeDeviceID:  (u, value) => {
+    u('main.lattice.deviceID', () => value)
+  },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },

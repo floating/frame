@@ -44,6 +44,8 @@ const rpc = {
   // unsetSigner: signers.unsetSigner,
   trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
   trezorPhrase: (id, phrase, cb) => signers.trezorPhrase(id, phrase, cb),
+  latticePair: (id, pin, cb) => signers.latticePair(id, pin, cb),
+  latticeConnect: (connectOpts, cb) => signers.latticeConnect(connectOpts, cb),
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),
   connectionStatus: (cb) => {
@@ -96,6 +98,11 @@ const rpc = {
   },
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
+  },
+  addLatticeAccount (addresses, cb) {
+    if (!utils.isAddress(addresses[0])) return cb(new Error('Invalid Address'))
+    accounts.add([addresses[0]], { type: 'Lattice' })
+    cb(null, {status: 'ok'})
   },
   createFromAddress (address, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
