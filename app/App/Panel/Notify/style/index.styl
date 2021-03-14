@@ -14,7 +14,7 @@
   opacity 1
   
   ::selection
-    background good02 // #ffb7b7
+    background var(--good02) // #ffb7b7
 
   .notifyBox:before
     content ''
@@ -23,12 +23,12 @@
     bottom 3px
     left 0
     position absolute
-    border-radius 16px
-    background highlight
+    border-radius 12px
+    background var(--ghostD)
     z-index 2
 
   .notifyBoxWrap
-    border-radius 16px
+    border-radius 12px
     box-sizing border-box
     position absolute
     top 5px
@@ -37,7 +37,7 @@
     width calc(100% - 10px)
     transition standard
     box-shadow 0px -1px 4px -1px rgba(6, 54, 52, 0.15), 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
-    background lowerlight
+    background var(--lowerlight)
     display flex
     justify-content center
     align-items center
@@ -48,7 +48,7 @@
       position absolute
       top 0px
       right 0px
-      color outerspace
+      color var(--outerspace)
       z-index 3
       height 40px
       width 40px
@@ -58,40 +58,73 @@
 
     .notifyBox
       padding 55px 20px 60px 20px
-      border-top 1px solid lightShade
-      border-bottom 1px solid lightShade
+      border-top 1px solid var(--ghostB)
+      border-bottom 1px solid var(--ghostB)
       min-width calc(100% - 40px)
       overflow hidden
       
       .notifyTitle
-        font-size 32px
+        font-size 24px
         position relative
         z-index 3
-        margin-bottom 32px
+        margin-bottom 40px
+
+      .notifySubtitle
+        font-size 16px
+        position relative
+        z-index 3
+        margin-bottom 24px
+
+      .notifyFrameIcon
+        height 96px 
+        width 100%
+        position relative
+        z-index 4
+        display flex
+        justify-content center
+        align-items center
+        margin-top -40px
+        margin-bottom 40px
+
+        img
+          width 96px
+          height 96px
+          border-radius 24px
+          box-shadow 0px 30px 24px -10px var(--doubleThick)
 
       .notifyBody
-        font-size 17px
+        font-size 16px
         position relative
         z-index 3
-        padding-bottom 10px
-        padding-top 10px
+        padding 10px
         word-break break-word
 
+        span 
+          text-decoration underline
+          margin-right -3px
+
         .notifyBodyHash
-          font-size 17px
+          font-size 14px
           font-family FiraCode, monospace
-          background thin
+          background var(--thin)
           letter-spacing 2px
           line-height 20px
           // margin-left 4px
-          box-shadow inset 0px 2px 14px thin
+          box-shadow inset 0px 2px 14px var(--thin)
           padding 18px
-          border-radius 16px
+          border-radius 12px
           margin-top 10px
-          border 1px solid highlighter
-          text-shadow 0px 2px 0px thick
+          border 1px solid var(--ghostD)
+          text-shadow 0px 2px 0px var(--thick)
           min-height 58px
           max-height 58px
+
+        .notifyBodyPrice
+          margin-top 4px
+          font-size 23px
+
+        .notifyBodyQuestion
+          padding-top 40px
 
       .notifyCheck
         display flex
@@ -110,10 +143,10 @@
           height 32px
           min-width 32px
           min-height 32px
-          border-radius 16px
-          background highlightest
-          border 1px solid white
-          box-shadow cardDrop, 0px 2px 1px thick, 0px 0px 7px 2px thin
+          border-radius 12px
+          background var(--ghostE)
+          border 1px solid var(--spacewhite)
+          box-shadow cardDrop, 0px 2px 1px var(--thick), 0px 0px 7px 2px var(--thin)
           margin-right 10px
           box-sizing border-box
           display flex
@@ -144,7 +177,7 @@
           justify-content center
           align-items center
           box-sizing border-box
-          background lightShade
+          background var(--ghostB)
           height 40px
           font-weight 300
           padding-top 1px
@@ -160,7 +193,7 @@
             padding-bottom 2px
 
         .notifyInputOption:hover:before
-          background highlighter
+          background var(--ghostE)
 
         .notifyInputDeny:before
           content ''
@@ -169,7 +202,7 @@
           left 0
           right 0
           bottom 2px
-          background highlight
+          background var(--ghostD)
           z-index 2
           border-top-left-radius 19px
           border-bottom-left-radius 19px
@@ -185,7 +218,7 @@
           left 0
           right 0
           bottom 2px
-          background highlight
+          background var(--ghostD)
           z-index 2
           border-top-right-radius 19px
           border-bottom-right-radius 19px
@@ -201,7 +234,7 @@
           left 0
           right 0
           bottom 2px
-          background highlight
+          background var(--ghostD)
           z-index 2
           border-radius 19px
 
@@ -220,13 +253,13 @@
       text-align cleft
       line-height 18px
       font-weight 300
-      color outerspace08
+      color var(--outerspace08)
 
       .introInstructionItem
         margin-bottom 20px
         padding 0px 20px
         span
-          color pending
+          color var(--pending)
           text-decoration none
 
       .introInstructionList
@@ -234,8 +267,8 @@
         border-radius 6px
         padding 16px
         font-weight 400
-        background pending
-        color spacewhite
+        background var(--pending)
+        color var(--spacewhite)
         div
           font-size 14px
           line-height 26px

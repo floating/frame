@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const cheerio = require('cheerio')
 
 const store = require('../store')
-const ipfs = require('../ipfs')
+// const ipfs = require('../ipfs')
 const windows = require('../windows')
 
 const server = require('./server')

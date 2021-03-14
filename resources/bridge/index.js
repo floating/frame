@@ -21,6 +21,7 @@ window.addEventListener('message', e => {
 }, false)
 
 ipcRenderer.on('main:action', (...args) => {
+  console.log('main:action', ...args)
   args.shift()
   window.postMessage(wrap({ channel: 'action', args, source, method: 'event' }), '*')
 })

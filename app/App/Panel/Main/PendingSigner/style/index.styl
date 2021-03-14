@@ -2,11 +2,11 @@
   position relative
   height 70px
   width calc(100% - 20px)
-  box-shadow 0px 7px 6px -5px outerspace03, 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
-  background outerspace // lightShade
+  box-shadow 0px 7px 6px -5px var(--outerspace03), 0px 1px 2px 0px rgba(6, 54, 82, 0.15), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
+  background var(--outerspace) // var(--ghostB)
   // background linear-gradient(136deg, #084851, #2b353e)
   margin 10px 10px 10px 10px
-  border-radius 16px
+  border-radius 12px
   z-index 99999999
   transition standard
   will-change transform
@@ -20,8 +20,8 @@
     bottom 3px
     left 0px
     background linear-gradient(136deg, #084851, #2b353e) // light
-    border-radius 16px
-    color spacewhite
+    border-radius 12px
+    color var(--spacewhite)
     overflow hidden
 
     .pendingSignerTop
@@ -35,7 +35,7 @@
       .loadingLiveAddresses
         position absolute
         top 0
-        right 00px
+        right 0px
         bottom 0
         width 60px
         display flex
@@ -50,7 +50,7 @@
           height 6px
           width 6px
           border-radius 1px
-          background spacewhite
+          background var(--spacewhite)
           margin 5px 0px 0px 5px
 
       .pendingSignerLogo
@@ -68,13 +68,13 @@
         flex-direction column
         padding-right 13px
 
-        .pendingSignerType
-          text-transform uppercase
-          line-height 15px
-          font-size 14px
-          font-weight 600
-          letter-spacing 1px
-          margin-bottom 4px
+        // .pendingSignerType
+        //   text-transform uppercase
+        //   line-height 15px
+        //   font-size 14px
+        //   font-weight 600
+        //   letter-spacing 1px
+        //   margin-bottom 4px
 
         .pendingSignerStatus
           font-size 11px
@@ -100,7 +100,7 @@
         align-items center
         background rgba(0, 50, 50, 0.7)
         height 36px
-        border-radius 16px
+        border-radius 12px
         margin-top 10px
         width calc(100% - 40px)
         overflow hidden
@@ -121,7 +121,7 @@
           outline 0
           border 0
           background transparent
-          color spacewhite
+          color var(--spacewhite)
           letter-spacing 4px
 
       .trezorPinWrap
@@ -151,7 +151,7 @@
           font-size 13px
           // text-transform uppercase
           padding-bottom 2px
-          // box-shadow 0px 2px 3px thick0, 0px 4px 9px thick0 !important
+          // box-shadow 0px 2px 3px var(--thick0), 0px 4px 9px var(--thick0) !important
           background rgba(0, 110, 140, 0.2)
           box-shadow 0px 2px 1px rgba(0, 50, 50, 0.5)
 
@@ -166,10 +166,10 @@
             left -40px
             border-radius 60px
             transition standard
-            background outerspace05
+            background var(--outerspace05)
 
           .signerPinDelete:hover
-            background outerspace08
+            background var(--outerspace08)
 
         .signerPinSubmit
           margin-top 10px

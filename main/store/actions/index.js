@@ -41,6 +41,7 @@ module.exports = {
   setLaunch: (u, launch) => u('main.launch', _ => launch),
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
+  toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
   clearPermissions: (u, address) => {
     u('main.addresses', address, address => {
       address.permissions = {}
@@ -49,7 +50,9 @@ module.exports = {
   },
   giveAccess: (u, req, access) => {
     u('main.addresses', req.address, address => {
-      address = address || { permissions: {} }
+      address = address || { permissions: {}, tokens: {} }
+      address.permissions = address.permissions || {}
+      address.tokens = address.tokens || {}
       address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
       return address
     })
@@ -131,6 +134,9 @@ module.exports = {
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
+  setLiveAccountLimit: (u, value) => {
+    u('main.ledger.liveAccountLimit', () => value)
+  },
   setHardwareDerivation: (u, value) => {
     u('main.hardwareDerivation', () => value)
   },
@@ -140,11 +146,17 @@ module.exports = {
   muteAlphaWarning: (u) => {
     u('main.mute.alphaWarning', () => true)
   },
+  muteWelcomeWarning: (u) => {
+    u('main.mute.welcomeWarning', () => true)
+  },
   toggleExplorerWarning: (u) => {
     u('main.mute.explorerWarning', v => !v)
   },
+  toggleGasFeeWarning: (u) => {
+    u('main.mute.gasFeeWarning', v => !v)
+  },
   setAltSpace: (u, v) => {
-    u('main.shortcuts.altSpace', () => v)
+    u('main.shortcuts.altSlash', () => v)
   },
   setAutohide: (u, v) => {
     u('main.autohide', () => v)
@@ -335,6 +347,32 @@ module.exports = {
   },
   setIPFS: (u, ipfs) => {
     u('main.ipfs', () => ipfs)
-  }
+  },
+  // Tokens
+  setTokens: (u, address, newTokens) => {
+    u('main.addresses', address, 'tokens', (tokens = {}) => {
+      tokens = {}
+      Object.keys(newTokens).forEach(tokenAddress => {
+        tokens.known = tokens.known || {}
+        tokens.known[tokenAddress] = newTokens[tokenAddress]
+      })
+      return tokens
+    })
+  },
+  omitToken: (u, address, omitToken) => {
+    u('main.addresses', address, 'tokens.omit', omit => {
+      omit = omit || []
+      if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
+      return omit
+    })
+  },
+  setColorway: (u, colorway) => {
+    u('main.colorway', () => {
+      return colorway
+    })
+  },
+  // toggleUSDValue: (u) => {
+  //   u('main.showUSDValue', show => !show)
+  // }
   // __overwrite: (path, value) => u(path, () => value)
 }

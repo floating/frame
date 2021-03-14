@@ -42,8 +42,8 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
   }
 
   // Style calculations
-  const height = (options.length * 26) + 'px'
-  const marginTop = (-26 * index) + 'px'
+  const height = (options.length * 28) + 'px'
+  const marginTop = (-28 * index) + 'px'
 
   className = className || ''
 

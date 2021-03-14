@@ -83,7 +83,7 @@ class Provider extends EventEmitter {
   getChainId (payload, res) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      const id = parseInt(response.result, 'hex').toString()
+      // const id = parseInt(response.result, 'hex').toString()
       if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     })
@@ -236,11 +236,11 @@ class Provider extends EventEmitter {
   }
 
   approveRequest (req, cb) {
+    log.info('approveRequest', req)
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
       if (response.error) return cb(response.error)
-      const updatedReq = Object.assign({}, req)
-      updatedReq.data = Object.assign({}, updatedReq.data, { nonce: response.result })
+      const updatedReq = accounts.updateNonce(req.handlerId, response.result)
       this.signAndSend(updatedReq, cb)
     })
   }
@@ -266,13 +266,13 @@ class Provider extends EventEmitter {
           const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
           const prices = await response.json()
           store.setGasPrices(network.type, network.id, {
-            slow: ('0x' + (prices.safeLow * 100000000).toString(16)),
+            slow: ('0x' + (Math.round(prices.safeLow) * 100000000).toString(16)),
             slowTime: undefined,
-            standard: ('0x' + (prices.average * 100000000).toString(16)),
+            standard: ('0x' + (Math.round(prices.average) * 100000000).toString(16)),
             standardTime: undefined,
-            fast: ('0x' + (prices.fast * 100000000).toString(16)),
+            fast: ('0x' + (Math.round(prices.fast) * 100000000).toString(16)),
             fastTime: undefined,
-            asap: ('0x' + (prices.fastest * 100000000).toString(16)),
+            asap: ('0x' + (Math.round(prices.fastest) * 100000000).toString(16)),
             asapTime: undefined,
             custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16)),
             lastUpdate: Date.now(),
@@ -290,6 +290,7 @@ class Provider extends EventEmitter {
         res({ error })
       }
     } else {
+      // Not mainnet
       this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, (response) => {
         if (response.result) {
           try {
@@ -297,9 +298,9 @@ class Provider extends EventEmitter {
             const network = store('main.currentNetwork')
             if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
             store.setGasPrices(network.type, network.id, {
-              slow: response.result,
+              slow: '0x' + ((Math.round(parseInt(response.result, 16) / 1000000000) * 1000000000).toString(16)),
               slowTime: undefined,
-              standard: response.result,
+              standard: '0x' + ((Math.round(parseInt(response.result, 16) / 1000000000) * 1000000000).toString(16)),
               standardTime: undefined,
               fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
               fastTime: undefined,
@@ -326,18 +327,10 @@ class Provider extends EventEmitter {
   }
 
   getNonce (rawTx, res) {
-    if (this.nonce.age && Date.now() - this.nonce.age < 30 * 1000 && this.nonce.account === rawTx.from && this.nonce.current) {
-      let newNonce = utils.hexToNumber(this.nonce.current)
-      newNonce++
-      newNonce = utils.numberToHex(newNonce)
-      this.nonce = { age: Date.now(), current: newNonce }
-      res({ id: 1, jsonrpc: '2.0', result: this.nonce.current })
-    } else {
-      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
-        if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
-        res(response)
-      })
-    }
+    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
+      if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
+      res(response)
+    })
   }
 
   fillDone (fullTx, res) {
@@ -349,22 +342,15 @@ class Provider extends EventEmitter {
   }
 
   fillTx (rawTx, cb) {
-    const needs = {}
-    // if (!rawTx.nonce) needs.nonce = this.getNonce
-    if (!rawTx.gas) needs.gas = this.getGasEstimate
-    let count = 0
-    const list = Object.keys(needs)
-    const errors = []
-    if (list.length > 0) {
-      list.forEach(need => {
-        needs[need](rawTx, response => {
-          if (response.error) {
-            errors.push({ need, message: response.error.message })
-          } else {
-            rawTx[need] = response.result
-          }
-          if (++count === list.length) errors.length > 0 ? cb(errors[0]) : this.fillDone(rawTx, cb)
-        })
+    if (!rawTx.gas) {
+      this.getGasEstimate(rawTx, response => {
+        if (response.error) {
+          rawTx.gas = '0x0'
+          rawTx.warning = response.error.message
+        } else {
+          rawTx.gas = response.result
+        }
+        this.fillDone(rawTx, cb)
       })
     } else {
       this.fillDone(rawTx, cb)
@@ -381,7 +367,9 @@ class Provider extends EventEmitter {
       if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
       const handlerId = uuid()
       this.handlers[handlerId] = res
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin }, res)
+      const { warning } = rawTx
+      delete rawTx.warning
+      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin, warning }, res)
     })
   }
 

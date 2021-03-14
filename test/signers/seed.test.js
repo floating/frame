@@ -1,3 +1,5 @@
+/* globals test, expect, beforeAll, afterAll, describe */
+
 const bip39 = require('bip39')
 const hot = require('../../main/signers/hot')
 const { remove } = require('fs-extra')

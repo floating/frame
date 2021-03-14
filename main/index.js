@@ -4,8 +4,8 @@ app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
 app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
-app.commandLine.appendSwitch('enable-transparent-visuals', true)
-if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
+// app.commandLine.appendSwitch('enable-transparent-visuals', true)
+// if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
 const log = require('electron-log')
 const path = require('path')
@@ -57,7 +57,6 @@ const externalWhitelist = [
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
   'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
   'https://github.com/floating/frame/issues/new',
-  'https://gitter.im/framehq/general',
   'https://github.com/floating/frame/blob/master/LICENSE',
   'https://aragon.org',
   'https://mainnet.aragon.org',
@@ -81,16 +80,16 @@ ipcMain.on('tray:resetAllSettings', () => {
 //   accounts.removeAllAccounts()
 // })
 
-ipcMain.on('tray:speedTx', async (e, id) => {
+ipcMain.on('tray:replaceTx', async (e, id, type) => {
   try {
-    await accounts.speedTx(id)
+    await accounts.replaceTx(id, type)
   } catch (e) {
-    console.log('tray:speedTx Error', e)
+    console.log('tray:replaceTx Error', e)
   }
 })
 
 ipcMain.on('tray:clipboardData', (e, data) => {
-  clipboard.writeText(data)
+  if (data) clipboard.writeText(data)
 })
 
 ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
@@ -125,6 +124,10 @@ ipcMain.on('tray:giveAccess', (e, req, access) => {
   accounts.removeRequest(req.handlerId)
 })
 
+ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
+  accounts.adjustNonce(handlerId, nonceAdjust)
+})
+
 ipcMain.on('tray:syncPath', (e, path, value) => {
   store.syncPath(path, value)
 })
@@ -137,14 +140,18 @@ ipcMain.on('tray:updateRestart', () => {
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
+ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
+
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
+  data()
   menu()
-  if (process.platform === 'darwin' || process.platform === 'win32') {
-    windows.tray()
-  } else {
-    setTimeout(windows.tray, 800)
-  }
+  windows.tray()
+  // if (process.platform === 'darwin' || process.platform === 'win32') {
+  //   windows.tray()
+  // } else {
+  //   setTimeout(windows.tray, 800)
+  // }
   if (app.dock) app.dock.hide()
   protocol.interceptFileProtocol('file', (req, cb) => {
     const appOrigin = path.resolve(__dirname, '../')
@@ -152,21 +159,39 @@ app.on('ready', () => {
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
   store.observer(() => {
-    const altspace = store('main.shortcuts.altSpace')
-    if (altspace) {
-      console.log('registering shortcut')
-      globalShortcut.unregister('Alt+Space')
-      let showing = false
-      globalShortcut.register('Alt+Space', () => {
-        showing = !showing
-        if (showing) {
-          windows.showFlow()
-        } else {
-          windows.hideFlow()
-        }
-      })
+    // console.log('registering shortcut')
+
+    // globalShortcut.unregister('Alt+Space')
+    // let showing = false
+    // globalShortcut.register('Alt+Space', () => {
+    //   showing = !showing
+    //   if (showing) {
+    //     windows.showFlow()
+    //   } else {
+    //     windows.hideFlow()
+    //   }
+    // })
+
+    // const altspace = store('main.shortcuts.altSpace')
+    // if (altspace) {
+    //   console.log('registering shortcut')
+    //   globalShortcut.unregister('Alt+Space')
+    //   let showing = false
+    //   globalShortcut.register('Alt+Space', () => {
+    //     showing = !showing
+    //     if (showing) {
+    //       windows.showFlow()
+    //     } else {
+    //       windows.hideFlow()
+    //     }
+    //   })
+    // }
+    const altSlash = store('main.shortcuts.altSlash')
+    if (altSlash) {
+      globalShortcut.unregister('Alt+/')
+      globalShortcut.register('Alt+/', () => windows.trayClick())
     } else {
-      globalShortcut.unregister('Alt+Space')
+      globalShortcut.unregister('Alt+/')
     }
   })
 })

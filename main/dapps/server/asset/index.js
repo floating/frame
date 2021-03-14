@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const cheerio = require('cheerio')
 
-const ipfs = require('../../../ipfs')
+// const ipfs = require('../../../ipfs')
 
 const resolve = require('../resolve')
 const storage = require('../storage')

@@ -14,7 +14,7 @@
   opacity 1
 
   ::selection
-    background good // #ffb7b7
+    background var(--good) // #ffb7b7
 
   .phaseClose:hover
     transition linear 0.6s all
@@ -32,7 +32,7 @@
     left 0px
     right 0px
     bottom 1px
-    background outerspacePhase
+    background var(--outerspacePhase)
     z-index 2
     border-radius 20px
     pointer-events auto
@@ -53,10 +53,10 @@
     display flex
     justify-content center
     align-items center
-    color spacewhite
+    color var(--foreverwhite)
     transform translate(0px, -250px) scale(0)
     transition-delay 0s
-    background outerspacePhaseDark /// rgba(0, 105, 105, 1)
+    background var(--outerspacePhaseDark) // rgba(0, 105, 105, 1)
     box-shadow 0px 3px 2px 0px rgba(0, 10, 20, 1), 0px 0px 5px 0px rgba(10, 30, 30, 1)
     border-radius 20px
     border-top 1px solid rgba(0, 105, 105, 1)
@@ -91,7 +91,7 @@
     z-index 10
     pointer-events none
     transition standardSlow
-    background outerspaceDark
+    background var(--outerspaceDark)
 
   .phaseShadeActive
     pointer-events auto
@@ -110,7 +110,7 @@
     pointer-events none
     transition standardSlow
     transition-delay 0.00s
-    background linear-gradient(45deg, pending04, good04)
+    background linear-gradient(45deg, var(--pending04), var(--good04))
 
   .phaseShadeForwardActive
     opacity 0.80
@@ -132,11 +132,11 @@
       display flex
       justify-content center
       align-items center
-      background highlight
+      background var(--ghostD)
       pointer-events auto
       transition standardSlow
       z-index 4
-      color outerspace08
+      color var(--outerspace08)
       transform rotate(-1deg)
       box-shadow 0px 0px 4px -1px rgba(6, 54, 52, 0.05), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
 
@@ -145,11 +145,11 @@
         transition standardSlower
         font-size 30px
         margin 0px 0px 2px 1px
-        color outerspace08
+        color var(--outerspace08)
         transform rotate(1deg)
 
     .phaseTriggerActive
-      background phase
+      background var(--phase)
       box-shadow 0px 8px 7px -5px rgba(5, 5, 45, 0.4)
       .phaseTriggerIcon
         color white
@@ -163,13 +163,13 @@
     opacity 0
     transform scale(2)
     position absolute
-    background phaseShade
+    background var(--phaseShade)
     color rgba(5, 5, 45, 0.4)
     top 56px
     right 10px
     bottom 10px
     left 10px
-    border-radius 16px
+    border-radius 12px
     transition standardSlow
     z-index 9000000002
     box-shadow 0px 50px 20px -20px rgba(0, 0, 0, 0.8), 0px 0px 10px 0px rgba(5, 5, 35, 0.5)
@@ -179,13 +179,13 @@
 
     .phaseMainInner
       position absolute
-      background phase
+      background var(--phase)
       color white
       top 0px
       right 0px
       bottom 2px
       left 0px
-      border-radius 16px
+      border-radius 12px
       z-index 1
       overflow-y scroll
       overflow-x hidden
@@ -273,7 +273,7 @@
       width calc(100%)
       margin 10px 0px 0px 0px
       border-radius 6px
-      background outerspaceShader
+      background var(--outerspaceShader)
       box-shadow 0px 35px 40px -20px rgba(5, 25, 35, 1)
       display flex
       justify-content center
@@ -294,12 +294,12 @@
         left 0
         right 0
         height 12px
-        background hardware
+        background var(--hardware)
         z-index 1
 
       .phaseItemWrap
         width 100%
-        background outerspaceLight
+        background var(--outerspaceLight)
         border-radius 6px
         padding 0px 0px 10px 0px
         z-index 2
@@ -322,13 +322,13 @@
         margin-top 10px
 
         .phaseItemIconHardware
-          color hardware
+          color var(--hardware)
 
         .phaseItemIconHot
-          color hot
+          color var(--hot)
 
         .phaseItemIconSmart
-          color smart
+          color var(--smart)
 
         .phaseItemIcon
           position relative
@@ -351,13 +351,13 @@
           // padding-bottom 3px
 
         .phaseItemIconHexHardware
-          background hardware
+          background var(--hardware)
 
         .phaseItemIconHexHot
-          background hot
+          background var(--hot)
 
         .phaseItemIconHexSmart
-          background smart
+          background var(--smart)
 
       .phaseItemBreak
         position relative
@@ -662,7 +662,7 @@
         border-radius 6px
 
       .phaseItemHardware
-        background hardware
+        background var(--hardware)
 
       .phaseItemSmart
         background rgb(150, 255, 210)

@@ -9,7 +9,7 @@ class ProviderRequest extends React.Component {
     this.state = { allowInput: false }
     setTimeout(() => {
       this.setState({ allowInput: true })
-    }, 2000)
+    }, 200)
   }
 
   render () {
@@ -25,7 +25,7 @@ class ProviderRequest extends React.Component {
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '360px'
+    const height = mode === 'monitor' ? '80px' : '320px'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         <div className='approveTransaction'>
@@ -34,14 +34,14 @@ class ProviderRequest extends React.Component {
               {(_ => {
                 if (status === 'pending') {
                   return (
-                    <div className='requestNoticeInner bounceIn'>
+                    <div className='requestNoticeInner scaleIn'>
                       <div><div className='loader' /></div>
                     </div>
                   )
                 } else if (status === 'success') {
-                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('check', { height: 80 })}</div>
+                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('check', { height: 80 })}</div>
                 } else if (status === 'error' || status === 'declined') {
-                  return <div className='requestNoticeInner bounceIn'>{svg.octicon('circle-slash', { height: 80 })}</div>
+                  return <div className='requestNoticeInner scaleIn'>{svg.octicon('circle-slash', { height: 80 })}</div>
                 }
               })()}
             </div>
@@ -51,7 +51,7 @@ class ProviderRequest extends React.Component {
                 <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
                 <div className='approveRequestHeaderLabel'> Connection</div>
               </div>
-              <div className='requestProvider bounceIn'>
+              <div className='requestProvider scaleIn'>
                 <div className={originClass}>{origin}</div>
                 <div className='requestProviderSub'>wants to connect</div>
               </div>
@@ -60,10 +60,10 @@ class ProviderRequest extends React.Component {
         </div>
         <div className='requestApprove'>
           <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:giveAccess', this.props.req, false) }}>
-            <div className='requestDeclineButton'>Decline</div>
+            <div className='requestDeclineButton requestQuickButton'>Decline</div>
           </div>
           <div className='requestSign' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:giveAccess', this.props.req, true) }}>
-            <div className='requestSignButton'>Approve</div>
+            <div className='requestSignButton requestQuickButton'>Approve</div>
           </div>
         </div>
       </div>

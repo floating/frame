@@ -32,10 +32,12 @@ class Ledger extends Signer {
     this.lastUse = Date.now()
     this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
+    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.varObserver = store.observer(() => {
       if (
         this.derivation !== store('main.ledger.derivation') ||
+        this.liveAccountLimit !== store('main.ledger.liveAccountLimit') ||
         this.hardwareDerivation !== store('main.hardwareDerivation') ||
         this.network !== store('main.currentNetwork.id')
       ) {
@@ -106,6 +108,7 @@ class Ledger extends Signer {
     this.pauseLive = true
     this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
+    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.hardwareDerivation = store('main.hardwareDerivation')
     this.status = 'loading'
     this.addresses = []
@@ -162,17 +165,25 @@ class Ledger extends Signer {
       await this.wait(1000)
       return await this.deriveAddresses()
     }
+    clearTimeout(this.derivingAddressesErrorTimeout)
     this.derivingAddresses = true
-    // Derive addresses
-    if (this.derivation === 'legacy') {
-      addresses = await this._deriveLegacyAddresses()
-    } else {
-      addresses = await this._deriveLiveAddresses()
+    try {
+      // Derive addresses
+      if (this.derivation === 'legacy') {
+        addresses = await this._deriveLegacyAddresses()
+      } else {
+        addresses = await this._deriveLiveAddresses()
+      }
+      // Update signer
+      this.addresses = addresses
+      this.update()
+      this.derivingAddresses = false
+    } catch (e) {
+      log.error(e)
+      this.derivingAddressesErrorTimeout = setTimeout(() => {
+        this.derivingAddresses = false
+      }, 4000)
     }
-    // Update signer
-    this.addresses = addresses
-    this.update()
-    this.derivingAddresses = false
   }
 
   close () {
@@ -226,7 +237,7 @@ class Ledger extends Signer {
         clearTimeout(this._deviceStatus)
         if (++this.busyCount > 10) {
           this.busyCount = 0
-          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+          log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
           this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
           log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
@@ -361,7 +372,7 @@ class Ledger extends Signer {
     let addresses = []
     this.status = 'Deriving Live Addresses'
     this.liveAddressesFound = 0
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < this.liveAccountLimit; i++) {
       if (this.pauseLive) {
         this.status = 'loading'
         addresses = []

@@ -65,7 +65,7 @@ Frame is a web3 interface that lets you sign data, manage accounts, run your own
   ```
 
 ### Related
-  - [Frame Chat](https://gitter.im/framehq/general) - Feel free to drop in and ask questions!
+  - [Frame Chat](https://discord.gg/UH7NGqY) - Feel free to drop in and ask questions!
   - [Frame Browser Extension](https://github.com/floating/frame-extension) - Use Frame with any web dapp
   - [eth-provider](https://github.com/floating/eth-provider) - A universal Ethereum provider
   - [Restore](https://github.com/floating/restore) - A predictable and observable state container for React apps
@@ -76,6 +76,6 @@ Frame is a web3 interface that lets you sign data, manage accounts, run your own
     <a href="https://frame.sh">Website</a> ⁃
     <a href="https://medium.com/@framehq">Blog</a> ⁃
     <a href="https://twitter.com/frame_eth">Twitter</a> ⁃
-    <a href="https://gitter.im/framehq/general">Chat</a>
+    <a href="https://discord.gg/UH7NGqY">Chat</a>
   </h5>
 </h2>

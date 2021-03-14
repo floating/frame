@@ -3,46 +3,56 @@
   display flex
   align-items flex-start
   height 26px
-  z-index 99999999999999
+  z-index 99999999999999999
 
 .dropdown
-  border-radius 13px
   letter-spacing 1px
-  height 26px
+  height 28px
+  border-radius 14px
   font-weight 400
   width 125px
   font-size 13px
   text-transform uppercase
-  background highlight
+  background var(--ghostD)
   overflow hidden
   box-shadow cardDrop
   padding 0px 0px 0px 0px
-  transition standard, 0s linear background
+  transition var(--standardFast), 0s linear background
   transform translateZ(0)
+  z-index 99999999999
+  pointer-events auto
+  cursor pointer
+  box-shadow 0px 4px 6px -1px var(--thin) // 0px 2px 0px var(--thin), 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+  // background blue
 
-.dropdown:hover
-  background highlighter
+// .dropdown:hover
+//   background var(--ghostD)
 
 .dropdownExpanded
   padding 18px 0px 18px 0px
-  box-shadow 0px 4px 10px thick, 0px 5px 14px -2px thick
+  box-shadow 0px 5px 8px -1px var(--thick) // 0px 4px 10px var(--thick), 0px 5px 14px -2px var(--thick)
 
 .dropdownItems
-  transition standard
+  transition var(--standardFast)
   transform translateZ(0)
+  // cursor pointer
 
 .dropdownItem
   display flex
   align-items center
-  height 26px
-  min-height 26px
+  height 28px
+  min-height 28px
   width calc(100% - 20px)
   box-sizing border-box
   transform translateZ(0)
-  margin 0px 10px 0px 10px
+  margin 0px 9px 0px 9px
   overflow hidden
   position relative
   z-index 99999999999999
+  cursor pointer
+
+  div 
+    pointer-events none
 
   &::before, &::after
     pointer-events: none

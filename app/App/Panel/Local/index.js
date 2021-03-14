@@ -53,13 +53,13 @@ class Settings extends React.Component {
     return false
   }
 
-  customSecondaryFocus () {
-    if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
-  }
+  // customSecondaryFocus () {
+  //   if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
+  // }
 
-  customSecondaryBlur () {
-    if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  }
+  // customSecondaryBlur () {
+  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
+  // }
 
   customPrimaryFocus () {
     if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
@@ -119,7 +119,7 @@ class Settings extends React.Component {
 
   discord () {
     return (
-      <div className='discordInvite' onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
+      <div className='discordInvite' onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
         <div>Need help or have a request?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
@@ -164,79 +164,42 @@ class Settings extends React.Component {
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
     const networkOptions = []
-    Object.keys(networks).map(type => {
-      Object.keys(networks[type]).map(id => {
+    Object.keys(networks).forEach(type => {
+      Object.keys(networks[type]).forEach(id => {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'settings' ? 'localSettings localSettingsHidden' : 'localSettings'} onMouseDown={e => this.expandNetwork(e, false)}>
-        <div className='localSettingsWrapFadeTop' />
-        <div className='localSettingsWrapFadeBot' />
+      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrap'>
-          <div className='localSettingsTitle connectionTitle' style={{ zIndex: 3 }}>
-            <div className='localSettingsTitleText'>Connection</div>
-            <div className='localSettingsAddNetwork' onMouseDown={() => this.store.toggleAddNetwork()}>{svg.broadcast(16)}</div>
-            <Dropdown
-              syncValue={type + ':' + id}
-              onChange={(network) => this.selectNetwork(network)}
-              options={networkOptions}
-            />
-          </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
-            <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-              <div className='connectionOptionToggle'>
-                <div className='signerPermissionOrigin'>Primary</div>
-                <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
-                  <div className='signerPermissionToggleSwitch' />
-                </div>
-              </div>
-              <div className='connectionOptionDetails'>
-                <div className='connectionOptionDetailsInset'>
-                  {this.status('primary')}
-                  <Dropdown
-                    syncValue={type + ':' + id + ':' + connection.primary.current}
-                    onChange={preset => {
-                      const [type, id, value] = preset.split(':')
-                      link.send('tray:action', 'selectPrimary', type, id, value)
-                    }}
-                    options={presets}
-                  />
-                </div>
-              </div>
-              <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-                <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
-              </div>
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 1 }}>
-            <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-              <div className='connectionOptionToggle'>
-                <div className='signerPermissionOrigin'>Secondary</div>
-                <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
-                  <div className='signerPermissionToggleSwitch' />
-                </div>
-              </div>
-              <div className='connectionOptionDetails'>
-                <div className='connectionOptionDetailsInset'>
-                  {this.status('secondary')}
-                  <Dropdown
-                    syncValue={type + ':' + id + ':' + connection.secondary.current}
-                    onChange={preset => {
-                      const [type, id, value] = preset.split(':')
-                      link.send('tray:action', 'selectSecondary', type, id, value)
-                    }}
-                    options={presets}
-                  />
-                </div>
-              </div>
-              <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-                <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
-              </div>
-            </div>
-          </div>
           <div className='localSettingsTitle'>
             <div className='localSettingsTitleText'>Settings</div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 10 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Summon Shortcut</div>
+              <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Summon Frame by pressing <span className='keyCommand'>{this.store('platform') === 'darwin' ? 'Option' : 'Alt'}<span style={{ padding: '0px 3px' }}>+</span>/</span>
+              </span>
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 9 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Auto-hide</div>
+              <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Hide Frame on loss of focus
+              </span>
+            </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 8 }}>
             <div className='signerPermissionControls'>
@@ -257,11 +220,38 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              {'Mouse to the middle of your display\'s right edge to reveal Frame'}
+              {'Mouse to your display\'s right edge to summon Frame'}
             </div>
           </div>
+          <div className='signerPermission' style={{ zIndex: 6 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Adjustable Nonce</div>
+              <div
+                className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => {
+                  link.send('tray:action', 'toggleNonceAdjust')
+                  if (!this.store('main.nonceAdjust')) this.store.notify('nonceWarning')
+                }}
+              >
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Adds the ability to edit a transaction\'s nonce'}
+            </div>
+          </div>
+          {/* <div className='signerPermission' style={{ zIndex: 6 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Show USD Value</div>
+              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleUSDValue')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='signerPermissionDetails'>
+              Show USD value of Ether and token balances
+            </div>
+          </div> */}
           {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission' style={{ zIndex: 6 }}>
+            <div className='signerPermission' style={{ zIndex: 5 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionOrigin'>Display Gas in Menubar</div>
                 <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
@@ -273,7 +263,22 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission' style={{ zIndex: 5 }}>
+          <div className='signerPermission' style={{ zIndex: 10 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Colorway</div>
+              <Dropdown
+                syncValue={this.store('main.colorway')}
+                onChange={(value) => link.send('tray:action', 'setColorway', value)}
+                options={[{ text: 'Dark', value: 'dark' }, { text: 'Light', value: 'light' }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              <span>
+                Set Frame's visual theme
+              </span>
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 4 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Hardware Derivation</div>
               <Dropdown
@@ -286,7 +291,7 @@ class Settings extends React.Component {
               Derive seperate sets of addresses based on use
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 4 }}>
+          <div className='signerPermission' style={{ zIndex: 3 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Ledger Type</div>
               <Dropdown
@@ -299,7 +304,25 @@ class Settings extends React.Component {
               {'Use Ledger\'s Legacy or Live derivation type'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 3 }}>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
+              <Dropdown
+                syncValue={this.store('main.ledger.liveAccountLimit')}
+                onChange={(value) => link.send('tray:action', 'setLiveAccountLimit', value)}
+                options={[
+                  { text: '5', value: 5 },
+                  { text: '10', value: 10 },
+                  { text: '20', value: 20 },
+                  { text: '40', value: 40 }
+                ]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              The number of live accounts to derive
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 1 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lock Hot Signers on</div>
               <Dropdown
@@ -312,34 +335,8 @@ class Settings extends React.Component {
               When should Frame relock your hot signers?
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Summon Shortcut</div>
-              <div className={this.store('main.shortcuts.altSpace') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSpace'))}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Summon Frame by pressing <span className='keyCommand'>Alt<span style={{ padding: '0px 1px' }}>+</span>Space</span>
-              </span>
-            </div>
-          </div>
-          <div className='signerPermission' style={{ zIndex: 1 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Auto-hide</div>
-              <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='signerPermissionDetails'>
-              <span>
-                Hide Frame on loss of focus
-              </span>
-            </div>
-          </div>
           <div className='snipIt'>
-            <div>Browser dapp doesn't support Frame natively?</div>
+            <div>Dapp doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
               <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
                 {svg.chrome(30)}
@@ -348,7 +345,7 @@ class Settings extends React.Component {
                 {svg.firefox(30)}
               </div>
             </div>
-            <div>Inject Frame with our browser extension!</div>
+            <div>Inject a connection with our browser extension!</div>
           </div>
           {this.discord()}
           {this.quit()}

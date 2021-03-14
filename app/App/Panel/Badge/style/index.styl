@@ -5,8 +5,8 @@
   top 0px
   left 0px
   bottom 3px
-  background pending
-  border-radius 16px
+  background var(--pending)
+  border-radius 12px
   z-index 9
 
 .badge
@@ -15,19 +15,19 @@
   bottom 13px
   left 10px
   transform translateY(300px)
-  background pendingShade
-  border-radius 16px
+  background var(--pendingShader)
+  border-radius 12px
   z-index 999999999999
   transition standard
   font-weight 300
   padding-bottom 15px
-  box-shadow 0px 18px 20px -10px shader
+  box-shadow 0px 18px 20px -10px  var(--shader)
   height 196px
 
   .badgeMessage, .badgeInput
     position relative
     z-index 10
-    color spacewhite
+    color var(--spacewhite)
 
   .badgeMessage
     height 120px
@@ -51,7 +51,7 @@
       align-items center
 
       .badgeInputInner
-        background pendingShade
+        background var(--pendingShade)
         height 33px
         width calc(80% - 2px)
         display flex
@@ -63,9 +63,10 @@
         font-weight 400
         letter-spacing 1px
         margin-left 1px
+        cursor pointer
 
       .badgeInputInner:hover
-        background pendingShader
+        background var(--pendingShader)
 
       .badgeInputSmall
         font-size 11px

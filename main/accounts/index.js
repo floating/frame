@@ -3,11 +3,13 @@ const hdKey = require('hdkey')
 const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
+const fetch = require('node-fetch')
 
 // const bip39 = require('bip39')
 
 const crypt = require('../crypt')
 const store = require('../store')
+const tokens = require('../tokens')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')
@@ -15,13 +17,19 @@ const proxyProvider = require('../provider/proxy')
 const Account = require('./Account')
 const windows = require('../windows')
 
+// const weiToGwei = v => Math.ceil(v / 1e9)
+const gweiToWei = v => Math.ceil(v * 1e9)
+const intToHex = v => '0x' + v.toString(16)
+const hexToInt = v => parseInt(v, 'hex')
+const weiHexToGweiInt = v => hexToInt(v) / 1e9
+const weiIntToEthInt = v => v / 1e18
+const gweiToWeiHex = v => intToHex(gweiToWei(v))
+
 const notify = (title, body, action) => {
   const notification = { title, body }
   const note = new Notification(notification)
   note.on('click', action)
-  setTimeout(() => {
-    note.show()
-  }, 1000)
+  setTimeout(() => note.show(), 1000)
 }
 
 const FEE_MAX = 2 * 1e18
@@ -41,6 +49,12 @@ class Accounts extends EventEmitter {
         const type = store('main.signers', id, 'type')
         if (!this.accounts[id]) this.add(signers[id].addresses, { type })
       })
+    })
+    windows.events.on('tray:show', () => {
+      this.tokenScan(true)
+    })
+    windows.events.on('tray:hide', () => {
+      this.stopTokenScan()
     })
   }
 
@@ -109,24 +123,73 @@ class Accounts extends EventEmitter {
     return this.accounts[this._current]
   }
 
-  // async cancelTx (id, hash) {
-  //   return new Promise((resolve, reject) => {
-  //   })
-  // }
+  updateNonce (reqId, nonce) {
+    log.info('Update Nonce: ', reqId, nonce)
+    const req = this.current().requests[reqId]
+    if (req.type === 'transaction') req.data.nonce = nonce
+    this.current().update()
+    return req
+  }
 
-  async speedTx (id) {
+  removeRequestWarning (reqId) {
+    log.info('removeRequestWarning: ', reqId)
+    if (this.current() && this.current().requests[reqId]) {
+      delete this.current().requests[reqId].warning
+      this.current().update()
+    }
+  }
+
+  checkBetterGasPrice () {
+    const { id, type } = store('main.currentNetwork')
+    const gas = store('main.networks', type, id, 'gas.price')
+    if (gas && this.current() && this.current().network === id && gas.selected !== 'custom') {
+      Object.keys(this.current().requests).forEach(id => {
+        const req = this.current().requests[id]
+        if (req.type === 'transaction' && req.data.gasPrice) {
+          const setPrice = weiHexToGweiInt(req.data.gasPrice)
+          const currentPrice = weiHexToGweiInt(gas.levels[gas.selected])
+          if (isNaN(setPrice) || isNaN(currentPrice)) return
+          if (currentPrice < setPrice) {
+            req.data.gasPrice = gweiToWeiHex(currentPrice)
+            this.current().update()
+          }
+        }
+      })
+    }
+  }
+
+  async replaceTx (id, type) {
     return new Promise((resolve, reject) => {
       if (!this.current().requests[id]) return reject(new Error('Could not find request'))
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
-      data.gasPrice = (parseInt(data.gasPrice, 16) * 1.2).toString(16)
-      proxyProvider.emit('send', {
+      const network = store('main.currentNetwork')
+      const { levels } = store('main.networks', network.type, network.id, 'gas.price')
+
+      // Set the gas default to asap
+      store.setGasDefault(network.type, network.id, 'asap', levels.asap)
+
+      const tx = {
         id: 1,
         jsonrpc: '2.0',
-        method: 'eth_sendTransaction',
-        params: [data]
-      }, res => {
+        method: 'eth_sendTransaction'
+      }
+
+      if (type === 'speed') {
+        tx.params = [data]
+      } else {
+        tx.params = [{
+          from: this.current().getSelectedAddress(),
+          to: this.current().getSelectedAddress(),
+          value: '0x0',
+          nonce: data.nonce,
+          _origin: this.current().requests[id].origin
+        }]
+      }
+
+      proxyProvider.emit('send', tx, res => {
         if (res.error) return reject(new Error(res.error))
+        resolve()
       })
     })
   }
@@ -139,11 +202,42 @@ class Accounts extends EventEmitter {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && this.current().requests[id]) {
             this.current().requests[id].tx.receipt = receiptRes.result
+            this.current().update()
+            if (!this.current().requests[id].feeAtTime) {
+              const network = store('main.currentNetwork')
+              if (network.type === 'ethereum' && network.id === '1') {
+                fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
+                  if (res && res.message === 'OK' && res.result && res.result.ethusd) {
+                    const { gasUsed } = this.current().requests[id].tx.receipt
+                    const { gasPrice } = this.current().requests[id].data
+                    this.current().requests[id].feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(gasPrice)) * res.result.ethusd) * 100) / 100).toFixed(2)
+                    this.current().update()
+                  }
+                }).catch(e => console.log('Unable to fetch exchange rate', e))
+              } else {
+                this.current().requests[id].feeAtTime = '?.??'
+                this.current().update()
+              }
+            }
             if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
               this.current().requests[id].status = 'confirming'
               this.current().requests[id].notice = 'Confirming'
               this.current().requests[id].completed = Date.now()
-              notify('Transaction Successful', this.current().requests[id].tx.hash, () => {
+              const { hash } = this.current().requests[id].tx
+              const h = hash.substr(0, 6) + '...' + hash.substr(hash.length - 4)
+              const body = `Transaction ${h} sucessful! \n Click for details`
+
+              // Drop any other pending txs with same nonce
+              Object.keys(this.current().requests).forEach(k => {
+                const reqs = this.current().requests
+                if (reqs[k].status === 'verifying' && reqs[k].data.nonce === reqs[id].data.nonce) {
+                  this.current().requests[k].status = 'error'
+                  this.current().requests[k].notice = 'Dropped'
+                }
+              })
+
+              // If Frame is hidden, trigger native notification
+              notify('Transaction Successful', body, () => {
                 const { type, id } = store('main.currentNetwork')
                 const explorer = store('main.networks', type, id, 'explorer')
                 shell.openExternal(explorer + '/tx/' + hash)
@@ -152,8 +246,6 @@ class Accounts extends EventEmitter {
             const blockHeight = parseInt(res.result, 16)
             const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
             resolve(blockHeight - receiptBlock)
-          } else {
-            reject(new Error('Trying to confirm but missing a result or request..'))
           }
         })
       })
@@ -171,7 +263,8 @@ class Accounts extends EventEmitter {
           try {
             confirmations = await this.confirmations(id, hash)
           } catch (e) {
-            log.warn(e)
+            log.error(e)
+            clearTimeout(monitorTimer)
             return
           }
           this.current().requests[id].tx.confirmations = confirmations
@@ -183,8 +276,8 @@ class Accounts extends EventEmitter {
             clearTimeout(monitorTimer)
           }
         }
-        // setTimeout(() => monitor(), 3000)
-        // const monitorTimer = setInterval(monitor, 15000)
+        setTimeout(() => monitor(), 3000)
+        const monitorTimer = setInterval(monitor, 15000)
       } else if (newHeadRes.result) {
         const headSub = newHeadRes.result
         const handler = async payload => {
@@ -194,7 +287,8 @@ class Accounts extends EventEmitter {
             try {
               confirmations = await this.confirmations(id, hash)
             } catch (e) {
-              log.warn(e)
+              log.error(e)
+              proxyProvider.removeListener('data', handler)
               return
             }
             this.current().requests[id].tx.confirmations = confirmations
@@ -204,9 +298,7 @@ class Accounts extends EventEmitter {
               this.current().requests[id].notice = 'Confirmed'
               this.current().update()
               proxyProvider.removeListener('data', handler)
-              proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, unsubRes => {
-                // TODO: Handle Error
-              })
+              proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] })
             }
           }
         }
@@ -298,6 +390,7 @@ class Accounts extends EventEmitter {
   }
 
   close () {
+    tokens.kill()
     // usbDetect.stopMonitoring()
   }
 
@@ -307,7 +400,7 @@ class Accounts extends EventEmitter {
   }
 
   addRequest (req, res) {
-    log.info('addRequest', req)
+    log.info('addRequest', JSON.stringify(req))
     if (!this.current() || this.current().requests[req.handlerId]) return // If no current signer or the request already exists
     this.current().addRequest(req, res)
   }
@@ -323,7 +416,7 @@ class Accounts extends EventEmitter {
   declineRequest (handlerId) {
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'declined'
+      this.current().requests[handlerId].status = 'error'
       this.current().requests[handlerId].notice = 'Signature Declined'
       if (this.current().requests[handlerId].type === 'transaction') {
         this.current().requests[handlerId].mode = 'monitor'
@@ -376,7 +469,7 @@ class Accounts extends EventEmitter {
     log.info('setTxSigned', handlerId)
     if (!this.current()) return cb(new Error('No account selected'))
     if (this.current().requests[handlerId]) {
-      if (this.current().requests[handlerId].status === 'declined') {
+      if (this.current().requests[handlerId].status === 'declined' || this.current().requests[handlerId].status === 'error') {
         cb(new Error('Request already declined'))
       } else {
         this.current().requests[handlerId].status = 'sending'
@@ -427,14 +520,13 @@ class Accounts extends EventEmitter {
 
   setGasPrice (price, handlerId, cb) {
     if (!price || isNaN(parseInt(price, 'hex')) || parseInt(price, 'hex') < 0) return cb(new Error('Invalid price'))
-    console.warn('VALIDATE GAS PRICE UPDATES')
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
-      if (parseInt(price, 'hex') > 9999 * 1e9) price = '0x' + (9999 * 1e8).toString(16)
+      if (parseInt(price, 'hex') > 9999 * 1e9) price = '0x' + (9999 * 1e9).toString(16)
       const gasLimit = this.current().requests[handlerId].data.gas
       if (parseInt(price, 'hex') * parseInt(gasLimit, 'hex') > FEE_MAX) {
-        cb(new Error('Rejected: Operation would set fee over hard limit'))
-        price = '0x' + Math.ceil(FEE_MAX / parseInt(gasLimit, 'hex')).toString(16)
+        log.warn('setGasPrice operation would set fee over hard limit')
+        price = '0x' + Math.floor(FEE_MAX / parseInt(gasLimit, 'hex')).toString(16)
       }
       this.current().requests[handlerId].data.gasPrice = price
       this.current().update()
@@ -442,16 +534,51 @@ class Accounts extends EventEmitter {
     }
   }
 
+  adjustNonce (handlerId, nonceAdjust) {
+    if (nonceAdjust !== 1 && nonceAdjust !== -1) return log.error('Invalid nonce adjustment', nonceAdjust)
+    if (!this.current()) return log.error('No account selected during nonce adjustement', nonceAdjust)
+    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      const nonce = this.current().requests[handlerId].data && this.current().requests[handlerId].data.nonce
+      if (nonce) {
+        const adjustedNonce = '0x' + (parseInt(nonce, 'hex') + nonceAdjust).toString(16)
+        this.current().requests[handlerId].data.nonce = adjustedNonce
+        this.current().update()
+      } else {
+        const { from } = this.current().requests[handlerId].data
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
+          if (res.result) {
+            const newNonce = parseInt(res.result, 'hex')
+            const adjustedNonce = '0x' + (nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16)
+            this.current().requests[handlerId].data.nonce = adjustedNonce
+            this.current().update()
+          }
+        })
+      }
+    }
+  }
+
+  tokenScan (knownOnly) {
+    const address = this.getSelectedAddress()
+    if (!address) return // log.info('token scan no address')
+    const addressTokens = store('main.addresses', address, 'tokens')
+    const omit = addressTokens && addressTokens.omit
+    const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})
+    tokens.scan(address, omit, known)
+  }
+
+  stopTokenScan () {
+    tokens.stop()
+  }
+
   setGasLimit (limit, handlerId, cb) {
     if (!limit || isNaN(parseInt(limit, 'hex')) || parseInt(limit, 'hex') < 0) return cb(new Error('Invalid limit'))
-    console.warn('VALIDATE GAS LIMIT UPDATES')
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
       if (parseInt(limit, 'hex') > 12.5e6) limit = '0x' + (12.5e6).toString(16)
       const gasPrice = this.current().requests[handlerId].data.gasPrice
       if (parseInt(limit, 'hex') * parseInt(gasPrice, 'hex') > FEE_MAX) {
-        cb(new Error('Rejected: Operation would set fee over hard limit'))
-        limit = '0x' + Math.ceil(FEE_MAX / parseInt(gasPrice, 'hex')).toString(16)
+        log.warn('setGasLimit operation would set fee over hard limit')
+        limit = '0x' + Math.floor(FEE_MAX / parseInt(gasPrice, 'hex')).toString(16)
       }
       this.current().requests[handlerId].data.gas = limit
       this.current().update()

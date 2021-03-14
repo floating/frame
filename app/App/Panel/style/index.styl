@@ -15,15 +15,14 @@
   top 0
   right 0
   bottom 0
-  left 2px
+  left 0px
   -webkit-app-region no-drag
   display flex
   flex-direction column
   justify-content center
   align-items center
-  transition standardFast
-  transform translate3d(370px, 0px, 0px)
-  will-change transform
+  transition var(--standardFast)
+  transform translate3d(0px, 0px, 0px)
 
 .panelSwoop
   position absolute
@@ -34,7 +33,7 @@
   left -50px
   height 1500px
   opacity 0.3
-  color spacewhite
+  color var(--spacewhite)
   // z-index 99999999999999
   pointer-events none
 
@@ -47,7 +46,7 @@
   left -50px
   height 1200px
   opacity 0.2
-  color spacewhite
+  color var(--spacewhite)
   // z-index 99999999999999
   pointer-events none
 
@@ -63,7 +62,7 @@
     padding 10px 15px
     margin 15px
     border-radius 3px
-    background white
+    background var(--spacewhite)
     font-size 14px
     font-weight bold
 
@@ -104,26 +103,49 @@
 
 .panelMenu
   position absolute
-  left 1px
-  right 1px
+  left 0px
+  right 0px
   top 0px
-  height 45px
-  padding 0px 5px 100px 5px
+  height 67px
+  // padding 0px 9px 0px 9px
   // background blue
   display flex
   justify-content space-between
   align-items center
   -webkit-app-region no-drag
-  z-index 10000
+  z-index 100000000000
   opacity 1
   transform translate3d(0, 0, 0)
   // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
-  pointer-events none
-  transition standard
+  // pointer-events none
+  transition var(--standardFast)
+  background var(--ghostB095)
+  border-bottom 1px solid var(--thin)
+  box-shadow 0px 4px 6px -1px var(--thin)
+  // box-shadow inset 0px -8px 8px var(--thick)
+  border-bottom-left-radius 12px
+  border-bottom-right-radius 12px
+
+  .panelMenuMarker
+    position absolute
+    left 0px
+    right 0px
+    bottom 8px
+    height 3px
+    // background var(--thin)
+
+    .panelMenuMark
+      width 19px
+      height 3px
+      background var(--outerspace)
+      transform translateX(14px)
+      border-radius 2px
+      transition var(--standard)
 
   .panelMenuItem
-    width 40px
-    height 40px
+    height 27px
+    width 28px
+    border-radius 14px
     display flex
     justify-content center
     align-items center
@@ -131,16 +153,34 @@
     transition standard
     pointer-events auto
     transform translate3d(0, 0, 0)
+    background var(--ghostE)
+    position absolute
+    box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+    cursor pointer
+    padding-top 1px
+    // top 20px
+    //background blue
+    *
+      pointer-events none
+
+  .panelMenuItemAccounts
+    left 9px
+   
     svg
-      color outerspace
-      transform translate3d(0, 0, 0)
+      transform rotate(90deg)
 
-    .panelMenuIconArrow
-      margin 0px 0px 1px 1px
-      min-width 5px
-      max-width 5px
-      transform translate3d(0, 0, 0)
+  .panelMenuItemNetwork
+    position absolute
+    left 45px
+    
+  .panelMenuItemConnections
+    right 45px
 
+  .panelMenuItemSettings
+    right 9px
+    svg
+      transform rotate(90deg)
+       
   .panelDetail
     display flex
     align-items center
@@ -153,7 +193,7 @@
     font-size 10px
     letter-spacing 1px
     font-weight bold
-    color outerspace08
+    color var(--outerspace08)
     display flex
     justify-content center
     align-items center
@@ -164,50 +204,47 @@
     
   .panelMenuData
     position absolute
-    top 0px
-    width 100px
-    max-width 100px
-    left 50%
+    top 21px
+    right 80px
+    left 176px
+    // width 100px //00px
+    // max-width 100px
+    // left 50%
+    // background blue
     transition standard
     letter-spacing 0px
     text-transform uppercase
-    color outerspace08
+    color var(--outerspace08)
     display flex
     justify-content center
     align-items center
     font-weight 500
     font-size 11px
-    height 16px
-    border-radius 8px
-    transform translate(-50px, 14px)
+    height 26px
+    // border-radius 13px
+    // transform translate(-50px, 14px)
+    // background blue
+    // display none
 
     .panelMenuDataDivide
-      position absolute
-      top 0
-      bottom 0
-      left 50%
+      height 100%
       width 1px
-      margin-left -1px
-      background doubleThick
+      background var(--doubleThick)
 
     .panelMenuDataItem
       display flex
       justify-content center
-      align-items center
       padding 0px 5px 1px 5px
 
       .svg
         position relative
-        padding-left 3px
-        margin-top 1px
+        margin-left 4px
+        margin-top 4px
+        margin-right 3px
 
       .usd
         position relative
-        margin-right 0px
-        margin-top 1px
-
-    .panelMenuDataItem:last-child
-      margin-left 2px
+        margin-top 3px
 
   .panelDetailIndicator
     height 10px
@@ -225,41 +262,99 @@
 
     .panelDetailIndicatorGood
       transition standardSlow
-      background good
+      background var(--good)
+
+    .panelDetailIndicatorWaiting
+      transition standardSlow
+      background var(--moon)
 
     .panelDetailIndicatorBad
       transition standardSlow
-      background bad
+      background var(--bad)
 
     .panelDetailIndicatorPending
       transition standardSlow
-      background pending
+      background var(--pending)
 
-.panelMenuAddMode
-  transition standard
-  z-index 10000
-  .panelDetail
-    transition standardSlowest
-    margin-left calc(50% - 50px)
-  .panelMenuItem
-    transition standard
-    opacity 0
-    pointer-events none
-    svg
-      color spacewhite
-  .panelDetailText
-    transition standard
-    color spacewhite
-  .panelDetailIndicator
-    .panelDetailIndicatorGood
-      transition standardSlow
-      background smart
-    .panelDetailIndicatorBad
-      transition standardSlow
-      background hot
-    .panelDetailIndicatorPending
-      transition standardSlow
-      background hardware
+// .panelMenuAddMode
+//   transition standard
+//   z-index 10000
+//   .panelDetail
+//     transition standardSlowest
+//     margin-left calc(50% - 50px)
+//   .panelMenuItem
+//     transition standard
+//     opacity 0
+//     pointer-events none
+//     svg
+//       color var(--spacewhite)
+//   .panelDetailText
+//     transition standard
+//     color var(--spacewhite)
+//   .panelDetailIndicator
+//     .panelDetailIndicatorGood
+//       transition standardSlow
+//       background var(--smart)
+//     .panelDetailIndicatorBad
+//       transition standardSlow
+//       background var(--hot)
+//     .panelDetailIndicatorPending
+//       transition standardSlow
+//       background var(--hardware)
+
+.appMenu
+  position absolute
+  left 0px
+  right 0px
+  bottom 0px
+  height 67px
+  // padding 0px 9px 0px 9px
+  // background blue
+  display flex
+  justify-content space-between
+  align-items center
+  -webkit-app-region no-drag
+  z-index 100000000000
+  opacity 1
+  transform translate3d(0, 0, 0)
+  // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
+  transition var(--standardFast)
+  background var(--ghostB095)
+  // border-top 1px solid var(--thin)
+  box-shadow 0px -4px 10px var(--thick)
+  border-top-left-radius 12px
+  border-top-right-radius 12px
+
+  .appMenuItem
+    cursor pointer
+    // background blue
+    height 67px
+    min-width 40px
+    display flex
+    align-items center
+    border-right 1px solid thin
+
+    .appMenuItemButton
+      height 27px
+      width 28px
+      border-radius 14px
+      display flex
+      justify-content center
+      align-items center
+      -webkit-app-region no-drag
+      transition standard
+      pointer-events auto
+      transform translate3d(0, 0, 0)
+      background var(--ghostE)
+      position absolute
+      box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+      cursor pointer
+      padding-top 1px
+      margin 10px
+
+      *
+        pointer-events none
+
 
 .snipIt
   display flex
@@ -268,9 +363,9 @@
   align-items center
   transform translateZ(0)
   margin 24px 10px 0px 10px
-  background highlight
+  background var(--ghostC)
   padding 20px
-  border-radius 16px
+  border-radius 12px
   font-size 13px
   font-weight 300
 
@@ -291,34 +386,36 @@
     justify-content center
     align-items center
     padding 20px
-    color outerspace08
+    color var(--outerspace08)
     .snipItBrowserExtensionIcon:hover
-      background highlightest
+      background var(--ghostE)
 
     .snipItBrowserExtensionIcon
       display flex
       justify-content center
       align-items center
-      background highlighter
+      background var(--ghostD)
       height 60px
       width 60px
-      border 1px solid thick
-      border-radius 16px
+      border 1px solid var(--thick)
+      border-radius 12px
       margin 0px 5px
       box-shadow cardDrop // , 0px 4px 2px -3px rgba(0, 25, 35, 0.14)
 
-    .snipItSpinRight
-      svg
-        transform rotate(0deg)
-        animation spin 12s linear infinite 
-    .snipItSpinLeft
-      svg
-        transform rotate(0deg)
-        animation spinReverse 12s linear infinite 
+    // .snipItSpinRight
+    //   svg
+    //     transform rotate(0deg)
+    //     animation spin 12s linear infinite 
+    // .snipItSpinLeft
+    //   svg
+    //     transform rotate(0deg)
+    //     animation spinReverse 12s linear infinite 
 
 
 @import '../Main/style'
 @import '../Local/style'
 @import '../Notify/style'
-@import '../Phase/style'
+// @import '../Phase/style'
 @import '../Badge/style'
+@import '../Networks/style'
+@import './card.styl'

@@ -25,9 +25,6 @@ export default (state, cb) => {
   link.send('tray:ready') // turn on api
 
   const etherRates = () => {
-    // fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD').then(res => res.json()).then(res => {
-    //   if (res) store.updateExternalRates(res)
-    // }).catch(e => console.log('Unable to fetch exchange rate', e))
     fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
       if (res && res.message === 'OK' && res.result && res.result.ethusd) {
         store.updateExternalRates({ USD: res.result.ethusd })

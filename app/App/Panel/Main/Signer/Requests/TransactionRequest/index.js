@@ -8,7 +8,9 @@ import TxBar from './TxBar'
 
 import TxFee from './TxFee'
 
-const FEE_WARNING_THRESHOLD_USD = 10
+import TxModule from './TxModule'
+
+const FEE_WARNING_THRESHOLD_USD = 20
 
 class Time extends React.Component {
   constructor (...args) {
@@ -42,7 +44,7 @@ class Time extends React.Component {
   render () {
     const { time, label } = this.msToTime(this.state.time - this.props.time)
     return (
-      <div className='txProgressSuccessItem'>
+      <div className='txProgressSuccessItem txProgressSuccessItemRight'>
         <div className='txProgressSuccessItemValue'>
           {time}
         </div>
@@ -77,6 +79,10 @@ class TransactionRequest extends React.Component {
 
   decline (reqId, req) {
     link.rpc('declineRequest', req, () => {}) // Move to link.send
+  }
+
+  removeWarning (reqId, req) {
+    link.rpc('removeRequestWarning', reqId, () => {}) // Move to link.send
   }
 
   toggleDataView (id) {
@@ -131,27 +137,113 @@ class TransactionRequest extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     const feeUSD = fee * etherUSD
-    const height = mode === 'monitor' ? '185px' : '320px'
+    const height = req.status === 'error' ? '185px' : mode === 'monitor' ? '185px' : '320px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
-    // const statusClass = 'txStatus'
+    const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
+    const txMeta = { replacement: false, possible: true, notice: '' }
+    // TODO
+    // if (signer locked) {
+    //   txMeta.possible = false
+    //   txMeta.notice = 'signer is locked'
+    // }
+    if (mode !== 'monitor' && req.data.nonce) {
+      const r = this.store('main.accounts', this.props.accountId, 'requests')
+      const requests = Object.keys(r || {}).map(key => r[key])
+      const monitor = requests.filter(req => req.mode === 'monitor')
+      const monitorFilter = monitor.filter(r => r.status !== 'error')
+      const existingNonces = monitorFilter.map(m => m.data.nonce)
+      existingNonces.forEach((nonce, i) => {
+        if (req.data.nonce === nonce) {
+          txMeta.replacement = true
+          if (monitorFilter[i].status === 'confirming' || monitorFilter[i].status === 'confirmed') {
+            txMeta.possible = false
+            txMeta.notice = 'nonce used'
+          } else if (parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')) {
+            txMeta.possible = false
+            txMeta.notice = 'gas price too low'
+          }
+        }
+      })
+    }
+
+    let nonce = parseInt(req.data.nonce, 'hex')
+    if (isNaN(nonce)) nonce = 'TBD'
+
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
+            {req.warning && status !== 'error' ? (
+              <div className='approveTransactionWarning'>
+                <div className='approveTransactionWarningOptions'>
+                  <div
+                    className='approveTransactionWarningReject'
+                    onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
+                  >Reject
+                  </div>
+                  <div
+                    className='approveTransactionWarningPreview'
+                    onMouseEnter={() => {
+                      this.setState({ warningPreview: true })
+                    }}
+                    onMouseMove={() => {
+                      this.setState({ warningPreview: true })
+                    }}
+                    onMouseLeave={() => {
+                      this.setState({ warningPreview: false })
+                    }}
+                  >
+                    Preview
+                  </div>
+                  <div
+                    className='approveTransactionWarningProceed'
+                    onMouseDown={() => this.removeWarning(this.props.req.handlerId)}
+                  >Proceed
+                  </div>
+                </div>
+                <div className='approveTransactionWarningFill' style={this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
+                    {svg.alert(32)}
+                  </div>
+                  <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
+                    {svg.alert(32)}
+                  </div>
+                  <div className='approveTransactionWarningTitle'>estimated to fail</div>
+                  <div className='approveTransactionWarningMessage'>{req.warning}</div>
+                </div>
+              </div>
+            ) : null}
             <div className='approveTransactionPayload'>
+              <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
+                <div className='txNonceControl'>
+                  <div className='txNonceButton txNonceButtonLower' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, -1)}>
+                    {svg.octicon('chevron-down', { height: 14 })}
+                  </div>
+                  <div className='txNonceButton txNonceButtonRaise' onMouseDown={() => link.send('tray:adjustNonce', req.handlerId, 1)}>
+                    {svg.octicon('chevron-up', { height: 14 })}
+                  </div>
+                  <div className='txNonceLabel'>Nonce</div>
+                </div>
+                <div className={nonce === 'TBD' || error ? 'txNonceNumber  txNonceHidden' : 'txNonceNumber'}>
+                  {nonce}
+                </div>
+                {nonce === 'TBD' || error ? <div className='txNonceMarker' /> : null}
+              </div>
               {notice ? (
                 <div className='requestNotice'>
                   <div className='requestNoticeInner'>
                     {!error ? (
                       <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
-                        <div className='txAugmentCancel'>Cancel</div>
+                        <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
+                          Cancel
+                        </div>
                         <div
-                          className={req.tx ? 'txDetails txDetailsShow' : 'txDetails'}
+                          className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
                           onMouseDown={() => {
                             if (req && req.tx && req.tx.hash) {
                               if (this.store('main.mute.explorerWarning')) {
@@ -164,11 +256,8 @@ class TransactionRequest extends React.Component {
                         >
                           View Details
                         </div>
-                        <div
-                          className='txAugmentSpeedUp' onMouseDown={() => {
-                            link.send('tray:speedTx', req.handlerId)
-                          }}
-                        >Speed Up
+                        <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
+                          Speed Up
                         </div>
                       </div>
                     ) : null}
@@ -180,8 +269,7 @@ class TransactionRequest extends React.Component {
                     <div className={success ? 'txProgressSuccess' : 'txProgressSuccess txProgressHidden'}>
                       {req && req.tx && req.tx.receipt ? (
                         <>
-                          <div className='txProgressSuccessLine' />
-                          <div className='txProgressSuccessItem' style={{ justifyContent: 'flex-end' }}>
+                          <div className='txProgressSuccessItem txProgressSuccessItemLeft'>
                             <div className='txProgressSuccessItemLabel'>
                               In Block
                             </div>
@@ -190,10 +278,19 @@ class TransactionRequest extends React.Component {
                             </div>
                           </div>
                           <Time time={req.completed} />
+                          <div className='txProgressSuccessItem txProgressSuccessItemCenter'>
+                            <div className='txProgressSuccessItemLabel'>
+                              Fee
+                            </div>
+                            <div className='txProgressSuccessItemValue'>
+                              <div style={{ margin: '0px 1px 0px 0px', fontSize: '10px' }}>$</div>
+                              {req.feeAtTime || '?.??'}
+                            </div>
+                          </div>
                         </>
                       ) : null}
                     </div>
-                    <div className='txStatus' style={!req.tx && !error ? { top: '60px' } : {}}>
+                    <div className={statusClass} style={!req.tx && !error && mode === 'monitor' ? { bottom: '60px' } : {}}>
                       {success ? <div>Successful</div> : null}
                       <div className='txProgressNotice'>
                         <div className={success || (mode === 'monitor' && status !== 'verifying') ? 'txProgressNoticeBars txProgressNoticeHidden' : 'txProgressNoticeBars'}>
@@ -224,7 +321,7 @@ class TransactionRequest extends React.Component {
                     <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
                       <div className='monitorValue'><span>Ξ</span>{value}</div>
-                      <div className='monitorArrow'>{svg.longArrow(14)}</div>
+                      <div className='monitorArrow'>{svg.longArrow(13)}</div>
                       {toAddress ? (
                         <div className='monitorTo'>
                           {toAddress.substring(0, 6)}
@@ -246,8 +343,24 @@ class TransactionRequest extends React.Component {
               ) : (
                 <>
                   <div className='approveRequestHeader approveTransactionHeader'>
-                    <div className='approveRequestHeaderIcon'> {svg.octicon('radio-tower', { height: 22 })}</div>
-                    <div className='approveRequestHeaderLabel'> Transaction</div>
+                    <div className='approveRequestHeaderIcon'>
+                      {svg.octicon('radio-tower', { height: 22 })}
+                    </div>
+                    <div className='approveRequestHeaderTitle'>
+                      <div>Transaction</div>
+                    </div>
+                    {txMeta.replacement ? (
+                      txMeta.possible ? (
+                        <div className='approveRequestHeaderTag'>
+                          valid replacement
+                        </div>
+                      ) : (
+                        <div className='approveRequestHeaderTag approveRequestHeaderTagInvalid'>
+                          {txMeta.notice || 'invalid duplicate'}
+                        </div>
+                      )
+                    )
+                      : null}
                   </div>
                   <div className='transactionValue'>
                     <div className='transactionTotals'>
@@ -262,27 +375,7 @@ class TransactionRequest extends React.Component {
                     <div className='transactionSubtitle'>Value</div>
                   </div>
                   <TxFee {...this.props} />
-                  {utils.toAscii(req.data.data || '0x') ? (
-                    <div className={this.state.dataView ? 'transactionData transactionDataSelected' : 'transactionData'}>
-                      <div className='transactionDataHeader' onMouseDown={() => this.toggleDataView()}>
-                        <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
-                        <div className='transactionDataLabel'>View Data</div>
-                        <div className='transactionDataIndicator'>{svg.octicon('chevron-down', { height: 16 })}</div>
-                      </div>
-                      <div className='transactionDataBody'>
-                        <div className='transactionDataBodyInner' onMouseDown={() => this.copyData(req.data.data)}>
-                          {this.state.copiedData ? (
-                            <div className='transactionDataBodyCopied'>
-                              <div>Copied</div>
-                              {svg.octicon('clippy', { height: 20 })}
-                            </div>
-                          ) : req.data.data}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className='transactionData transactionNoData'>No Data</div>
-                  )}
+                  <TxModule top={172} req={req} />
                   {req.data.to ? (
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>
@@ -308,13 +401,18 @@ class TransactionRequest extends React.Component {
         )}
         {!notice ? (
           <div className='requestApprove'>
-            <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput) this.decline(req.handlerId, req) }}>
+            <div
+              className='requestDecline' onMouseDown={() => {
+                console.log('declining tx', this.props.i)
+                if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
+              }}
+            >
               <div className='requestDeclineButton'>Decline</div>
             </div>
             <div
               className='requestSign' onMouseDown={() => {
-                if (this.state.allowInput) {
-                  if (feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) {
+                if (this.state.allowInput && this.props.onTop) {
+                  if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
                     this.store.notify('gasFeeWarning', { req, feeUSD })
                   } else {
                     this.approve(req.handlerId, req)

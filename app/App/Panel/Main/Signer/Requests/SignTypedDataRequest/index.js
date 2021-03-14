@@ -69,7 +69,7 @@ class TransactionRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
     const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '360px'
+    const height = mode === 'monitor' ? '80px' : '320px'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         {type === 'signTypedData' ? (
@@ -96,7 +96,6 @@ class TransactionRequest extends React.Component {
                     } else if (status === 'error' || status === 'declined') {
                       return (
                         <div key={status} className='requestNoticeInner bounceIn'>
-                          <div>{svg.octicon('circle-slash', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )

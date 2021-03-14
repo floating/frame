@@ -19,30 +19,34 @@ class Flow extends React.Component {
       input: ''
     }
   }
-  componentDidMount(){
-    this.input.current.focus()
-  }
-  trigger () {
-    link.rpc('flowCommand', this.state, (err, sres) => {
-      console.log(err, res)
-    })
-  }
+  // componentDidMount(){
+  //   this.input.current.focus()
+  // }
+  // trigger () {
+  //   link.rpc('flowCommand', this.state, (err, sres) => {
+  //     console.log(err, res)
+  //   })
+  // }
   render () {
     return (
-      <div ref={this.input} className='bar'>
-        <input
-          onChange={(e) => {
-            this.setState({ input: e.target.value })
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              e.target.blur()
-              this.trigger()
-            }
-          }} 
-        />
-      </div>
+      // <div ref={this.input} className='bar'>
+      //   <input
+      //     onChange={(e) => {
+      //       this.setState({ input: e.target.value })
+      //     }}
+      //     onKeyDown={(e) => {
+      //       if (e.key === 'Enter') {
+      //         e.preventDefault()
+      //         e.target.blur()
+      //         this.trigger()
+      //       }
+      //     }} 
+      //   />
+      // </div>
+      // <div className='flow'>
+      //   {'flow'}
+      // </div>
+      'helelo'
     )
   }
 }

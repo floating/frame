@@ -9,7 +9,7 @@ const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
 const ens = require('../ens')
-const ipfs = require('../ipfs')
+// const ipfs = require('../ipfs')
 const dapps = require('../dapps')
 
 const { resolveName } = require('../accounts/aragon')
@@ -27,14 +27,21 @@ const rpc = {
   setSigner: (id, cb) => {
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
+    setTimeout(() => {
+      accounts.tokenScan()
+    }, 320)
   },
   setSignerIndex: (index, cb) => {
     accounts.setSignerIndex(index, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
+    setTimeout(() => {
+      accounts.tokenScan()
+    }, 320)
   },
   unsetSigner: (id, cb) => {
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
+    accounts.stopTokenScan()
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
@@ -86,6 +93,9 @@ const rpc = {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
+  },
+  removeRequestWarning (reqId) {
+    accounts.removeRequestWarning(reqId)
   },
   addAragon (account, cb) {
     accounts.addAragon(account, cb)

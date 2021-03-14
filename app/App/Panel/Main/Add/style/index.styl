@@ -21,7 +21,7 @@
   z-index 10
   pointer-events none
   transition standardSlow
-  background outerspaceDarker
+  background var(--outerspaceDarker)
 
 .addAccountShadeActive
   pointer-events auto
@@ -40,7 +40,7 @@
   pointer-events none
   transition standardSlow
   transition-delay 0.00s
-  background linear-gradient(45deg, pending04, good04)
+  background linear-gradient(45deg, var(--pending04), var(--good04))
 
 .addAccountShadeForwardActive
   opacity 0.61
@@ -62,27 +62,27 @@
     display flex
     justify-content center
     align-items center
-    background highlight
+    background var(--ghostD)
     pointer-events auto
     transition standardSlow
     z-index 4
-    color outerspace08
+    color var(--outerspace08)
     transform rotate(-1deg)
-    box-shadow 0px 0px 4px -1px rgba(6, 54, 52, 0.05), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
+    box-shadow 0px 4px 4px -1px var(--thick), 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
 
     .addAccountTriggerIcon
       z-index 3
       transition standardSlower
       font-size 30px
       margin 0px 0px 2px 1px
-      color outerspace08
+      color var(--outerspace08)
       transform rotate(1deg)
 
   .addAccountTriggerActive
-    background phase
+    background var(--phase)
     box-shadow 0px 8px 7px -5px rgba(5, 5, 45, 0.4)
     .addAccountTriggerIcon
-      color white
+      color var(--foreverwhite)
       transform rotate(406deg)
 
 .addAccountInterfaceActive
@@ -93,7 +93,7 @@
   opacity 0
   transform scale(2)
   position absolute
-  background phaseShade
+  background var(--phaseShade)
   color rgba(5, 5, 45, 0.4)
   top 40px
   right 10px
@@ -110,8 +110,8 @@
 
   .addAccountMainInner
     position absolute
-    background phase
-    color white
+    background var(--phase)
+    color var(--foreverwhite)
     top 0px
     right 0px
     bottom 3px
@@ -188,7 +188,7 @@
     width calc(100%)
     margin 20px 0px 0px 0px
     border-radius 18px
-    background outerspaceShader
+    background var(--outerspaceShader)
     box-shadow 0px 35px 40px -20px rgba(5, 25, 35, 1), 0px 0px 15px 0px rgba(5, 15, 35, 1)
     display flex
     justify-content center
@@ -209,13 +209,13 @@
       left 0
       right 0
       bottom 0
-      background hardware
+      background var(--hardware)
       z-index 1
 
     .addAccountItemWrap
       width 100%
-      background phaseLight
-      border-radius 16px
+      background var(--phaseLight)
+      border-radius 12px
       padding 0px 0px 10px 0px
       z-index 2
       box-shadow 0px 0px 40px -20px rgba(5, 25, 35, 0.6)
@@ -236,10 +236,10 @@
       margin-top 10px
 
       .addAccountItemIconHardware
-        color hardware
+        color var(--hardware)
 
       .addAccountItemIconHot
-        color hot
+        color var(--hot)
 
       .addAccountItemIconMock
         color rgb(205, 170, 255)
@@ -248,7 +248,7 @@
         margin-top 2px
 
       .addAccountItemIconSmart
-        color smart
+        color var(--smart)
 
       .addAccountItemIcon
         position relative
@@ -271,16 +271,16 @@
         // padding-bottom 3px
 
       .addAccountItemIconHexHardware
-        background hardware
+        background var(--hardware)
 
       .addAccountItemIconHexHot
-        background hot
+        background var(--hot)
 
       .addAccountItemIconHexMock
         background rgb(205, 170, 255)
 
       .addAccountItemIconHexSmart
-        background smart
+        background var(--smart)
 
     .addAccountItemBreak
       position relative
@@ -483,7 +483,7 @@
         background transparent
         border none
         outline none
-        color white
+        color var(--foreverwhite)
         text-align center
         font-size 13px
         letter-spacing 4px
@@ -530,7 +530,7 @@
         background transparent
         border none
         outline none
-        color white
+        color var(--foreverwhite)
         text-align center
         font-size 20px
         // letter-spacing 3px
@@ -555,7 +555,7 @@
         background transparent
         border none
         outline none
-        color white
+        color var(--foreverwhite)
         text-align center
         font-size 15px
         line-height 20px
@@ -580,11 +580,11 @@
       left -40px
       right -40px
       height 4px
-      background white
+      background var(--foreverwhite)
       border-radius 6px
 
     .addAccountItemHardware
-      background hardware
+      background var(--hardware)
 
     .addAccountItemSmart
       background rgb(150, 255, 210)

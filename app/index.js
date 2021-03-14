@@ -18,9 +18,13 @@ window.eval = global.eval = () => { throw new Error(`This app does not support w
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
-  if (!store('main.mute.alphaWarning')) store.notify('mainnet')
+  if (!store('main.mute.welcomeWarning')) store.notify('mainnet')
+  store.observer(() => {
+    document.body.className = store('main.colorway')
+  })
   const Frame = Restore.connect(Panel, store)
   ReactDOM.render(<Frame />, document.getElementById('frame'))
 })
 document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
 document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))
+
