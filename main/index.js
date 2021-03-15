@@ -140,6 +140,8 @@ ipcMain.on('tray:updateRestart', () => {
 
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
+ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
+
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
   data()
@@ -157,6 +159,33 @@ app.on('ready', () => {
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
   store.observer(() => {
+    // console.log('registering shortcut')
+
+    // globalShortcut.unregister('Alt+Space')
+    // let showing = false
+    // globalShortcut.register('Alt+Space', () => {
+    //   showing = !showing
+    //   if (showing) {
+    //     windows.showFlow()
+    //   } else {
+    //     windows.hideFlow()
+    //   }
+    // })
+
+    // const altspace = store('main.shortcuts.altSpace')
+    // if (altspace) {
+    //   console.log('registering shortcut')
+    //   globalShortcut.unregister('Alt+Space')
+    //   let showing = false
+    //   globalShortcut.register('Alt+Space', () => {
+    //     showing = !showing
+    //     if (showing) {
+    //       windows.showFlow()
+    //     } else {
+    //       windows.hideFlow()
+    //     }
+    //   })
+    // }
     const altSlash = store('main.shortcuts.altSlash')
     if (altSlash) {
       globalShortcut.unregister('Alt+/')

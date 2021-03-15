@@ -645,7 +645,7 @@ class Settings extends React.Component {
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'connections' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
+      <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='localSettingsWrapFadeTop' />
         <div className='localSettingsWrapFadeBot' />
         <div className='localSettingsWrap'>

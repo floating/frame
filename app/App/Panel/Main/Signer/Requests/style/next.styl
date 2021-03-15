@@ -8,7 +8,7 @@
   color var(--outerspace08)
   font-size 14px
   font-weight 400
-  transition standardVibe
+  transition var(--standardVibe)
   border-radius 0px
   font-family OpenSans
   left 3px
@@ -50,7 +50,7 @@
       justify-content center
       align-items center
       z-index 10
-      transition standardVibe
+      transition var(--standardVibe)
       color var(--outerspace08)
 
     .txSectionIndicator
@@ -60,7 +60,7 @@
       align-items center
       z-index 10
       transform rotate(-180deg)
-      transition standardVibe
+      transition var(--standardVibe)
 
   .txSectionLabelLeft
     position absolute
@@ -213,7 +213,7 @@
     z-index 200001
     pointer-events none
     box-shadow none
-    // transition standardFast, 0.1s linear opacity 0.1s
+    // transition var(--standardFast), 0.1s linear opacity 0.1s
     box-shadow 0px 4px 10px var(--thick)
     will-change opacity
 
@@ -223,7 +223,7 @@
     right 0px
     top 56px
     padding-top 10px
-    transition standardVibe
+    transition var(--standardVibe)
     transform translateZ(0px)
     z-index 100
     background rgba(255, 255, 255, 0)
@@ -242,7 +242,7 @@
     z-index 100
     transform translateZ(0px)
     top -5px
-    transition standardVibe
+    transition var(--standardVibe)
 
     .networkFeeOptionHoverInset
       position absolute 
@@ -362,7 +362,7 @@
     height 100%
     font-size 13px
     text-transform none
-    transition standardVibe
+    transition var(--standardVibe)
     overflow-wrap break-word
     word-wrap break-word
     font-family FiraCode, monospace
@@ -401,7 +401,7 @@
 //   font-weight 400
 //   letter-spacing 1px
 //   text-transform uppercase
-//   transition standardVibe
+//   transition var(--standardVibe)
 //   overflow hidden
 //   box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
 //   border-radius 3px
@@ -435,7 +435,7 @@
 //     justify-content center
 //     align-items center
 //     z-index 10
-//     transition standardVibe
+//     transition var(--standardVibe)
 
 //   .transactionDataNotice
 //     width 18px
@@ -443,7 +443,7 @@
 //     justify-content center
 //     align-items center
 //     z-index 10
-//     transition standardVibe
+//     transition var(--standardVibe)
 //     color var(--outerspace08)
 
 //   .transactionDataIndicator
@@ -455,7 +455,7 @@
 //     margin-bottom 2px
 //     margin-right 6px
 //     transform rotate(-180deg)
-//     transition standardVibeSlow
+//     transition var(--standardVibe)Slow
 
 .txFee
   background var(--ghostD)
@@ -466,7 +466,7 @@
   left 3px
   right 3px
   padding 0px 0px
-  // transition standardVibe
+  // transition var(--standardVibe)
 
   .txFeeUpdateRealtime
     position absolute
@@ -480,7 +480,7 @@
     z-index 20
     color var(--good)
     overflow hidden
-    transition standardVibe
+    transition var(--standardVibe)
     background var(--ghostD)
     transform translateY(-100px)
     border-radius 6px
@@ -533,7 +533,7 @@
     font-weight 300
     font-size 9px
     color var(--outerspace03)
-    transition standardFast
+    transition var(--standardFast)
 
   .txFeeClose:hover
     color var(--outerspace05)
@@ -553,7 +553,7 @@
     font-weight 400
     font-size 11px
     letter-spacing 0.5px
-    transition standardFast
+    transition var(--standardFast)
     background var(--ghostC)
     box-shadow 0px 3px 3px var(--thick)
     text-align center
@@ -585,7 +585,7 @@
     right 7px
     left 7px
     height 48px
-    transition standardFast
+    transition var(--standardFast)
     display flex
     justify-content space-between
     align-items center
@@ -598,7 +598,7 @@
       justify-content center
       align-items center
       flex-direction column
-      transition standardFast
+      transition var(--standardFast)
       // transition-delay 0.1s
 
       .txFeeGweiValue
@@ -611,7 +611,7 @@
       justify-content center
       align-items center
       flex-direction column
-      transition standardFast
+      transition var(--standardFast)
 
       .txFeeGweiValue
         width 152px
@@ -631,7 +631,6 @@
     border-bottom-left-radius 11px
     border-bottom-right-radius 11px
     border 1px solid var(--thick)
-    // transition standardVibeSlow, 0s linear background 0s, 0s linear box-shadow 0s
 
     .txFeeSummaryValue
       font-size 20px
@@ -696,7 +695,7 @@
     justify-content center
     align-items center
     flex-direction column
-    transition standardVibe
+    transition var(--standardVibe)
     border-left 1px solid var(--thick)
     position absolute
     top 10px
@@ -718,7 +717,7 @@
     justify-content center
     align-items center
     flex-direction column
-    transition standardVibe
+    transition var(--standardVibe)
     width 69px
     border-right 1px solid var(--thick)
     position absolute
@@ -774,7 +773,7 @@
     display none // flex
     justify-content center
     align-items center
-    transition standardVibe
+    transition var(--standardVibe)
     position absolute
     color var(--outerspace08)
     background var(--ghostC)

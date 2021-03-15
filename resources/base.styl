@@ -1,0 +1,239 @@
+@font-face
+  font-family 'OpenSans'
+  font-weight 200
+  src url('./fonts/OpenSans/OpenSans-Light.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-style normal
+  font-weight 300
+  src url('./fonts/OpenSans/OpenSans-Regular.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-weight 400
+  src url('./fonts/OpenSans/OpenSans-SemiBold.ttf')
+
+@font-face
+  font-family 'OpenSans'
+  font-style bold
+  font-weight 600
+  src url('./fonts/OpenSans/OpenSans-Bold.ttf')
+
+@font-face
+  font-family 'FiraCode'
+  font-weight 300
+  src url('./fonts/FiraCode/FiraCode-Retina.ttf')
+
+body
+  // Shadows
+  --cardDrop 0px 1px 1px rgba(0, 34, 32, 0.1)
+
+  // Transistions
+  --standardFast .16s cubic-bezier(.82,0,.12,1) all
+  --standard .32s cubic-bezier(.82,0,.12,1) all
+  --standardVibe .48s cubic-bezier(.82,0,.12,1) all
+  --standardSlow .64s cubic-bezier(.82,0,.12,1) all
+  --standardSlower .96s cubic-bezier(.82,0,.12,1) all
+  --standardSlowest 1.6s cubic-bezier(.82,0,.12,1) all
+  --slowRocket 2.4s cubic-bezier(.52,0,.12,1) all
+
+  --cubic cubic-bezier(.82,0,.12,1)
+
+.frameOverlay
+  position absolute
+  top 0 
+  right 0
+  bottom 0 
+  left 0
+  background linear-gradient(-45deg, var(--overlayA) 0%, var(--overlayB) 70%)
+  z-index 9999999999999999
+  // background-blend-mode screen
+  pointer-events none
+  opacity 0.08
+  // pointer-events none
+
+.light, .dark
+  --hardware rgba(110, 230, 255, 1)
+  --smart rgba(150, 255, 210, 1)
+  --smart04 rgba(150, 255, 210, 0.4)
+  --smart02 rgba(150, 255, 210, 0.2)
+  --smartShade rgba(100, 205, 150, 1)
+  --hot rgba(255, 150, 150, 1)
+
+  --shader rgba(16, 44, 60, 0.7)
+  // --oldPhase #212d2e
+  // --oldPhaseShade #1c2526
+  --phase rgba(18, 45, 56, 1)
+  --phaseLight rgba(28, 60, 76, 1)
+  // --phaseLighter rgba(38, 70, 86, 1)
+  --phaseShade rgba(8 , 20, 26, 1)
+
+  --goodLight rgb(0, 220, 200)
+  --good rgb(0, 210, 190)
+  --goodShade rgb(0, 190, 160)
+  --good0 rgba(0, 210, 180, 0)
+  --good01 rgba(0, 210, 180, 0.1)
+  --good02 rgba(0, 210, 180, 0.2)
+  --good03 rgba(0, 210, 180, 0.3)
+  --good04 rgba(0, 210, 180, 0.4)
+  --good06 rgba(0, 210, 180, 0.6)
+
+  --bad rgb(250, 100, 155)
+  // --bad01 rgba(250, 100, 155, 0.1)
+  --bad04 rgba(250, 100, 155, 0.4)
+  --bad06 rgba(250, 100, 155, 0.6)
+
+
+  --overlayA rgba(150, 100, 205, 1) 
+  --overlayB rgba(250, 100, 105, 1)
+  // --badLight rgb(255, 104, 159)
+  // --badLighter rgb(255, 107, 163)
+  // --badShade rgb(230, 80, 135)
+  // --badDark rgb(100, 0, 00)
+
+  // --pendingHighlight rgb(104, 121, 255)
+  --pending rgb(94, 110, 255)
+  // --pending02 rgba(94, 110, 255, 0.4)
+  // --pending01 rgba(94, 110, 255, 0.2)
+  --pending04 rgba(94, 110, 255, 0.4)
+  --pendingShade rgb(74, 90, 235)
+  --pendingShader rgb(64, 80, 225)
+
+  --foreverwhite rgba(247, 251, 255, 1)
+
+  // // Shadows
+  // --cardDrop 0px 1px 1px rgba(0, 34, 32, 0.1)
+
+  // // Transistions
+  // --standard .32s cubic-bezier(.82,0,.12,1) all
+  // --standardVibe .48s cubic-bezier(.82,0,.12,1) all
+  // --standardSlow .64s cubic-bezier(.82,0,.12,1) all
+  // --standardSlower .96s cubic-bezier(.82,0,.12,1) all
+  // --standardSlowest 1.6s cubic-bezier(.82,0,.12,1) all
+  // --standardFast .16s cubic-bezier(.82,0,.12,1) all
+
+  // --slowRocket 2.4s cubic-bezier(.52,0,.12,1) all
+  // // 0.18s cubic-bezier(0.8, 1, 0.2, 1) all
+  // --cubic cubic-bezier(.82,0,.12,1)
+
+.light
+  --bg rgba(228, 232, 248, 1) // #dadfea // #dce1e8
+  --bg0 rgba(228, 232, 248, 0)
+  --v #4e5758
+  --outerspace01 rgba(33, 45, 46, 0.1)
+  --outerspace02 rgba(33, 45, 46, 0.2)
+  --outerspace03 rgba(33, 45, 46, 0.3)
+  --outerspace05 rgba(33, 45, 46, 0.5)
+  --outerspace06 rgba(33, 45, 46, 0.6)
+  --outerspace07 rgba(33, 45, 46, 0.7)
+  --outerspace08 rgba(33, 45, 46, 0.8)
+  --nebula #3a4547
+  --outerspace #212d2e
+  // --outerspaceShade #1c2526
+  --outerspaceLight #29393a
+  --outerspacePulse #395153
+  --outerspacePhase rgba(30, 65, 70, 1)
+  // --outerspacePhaseDark rgba(20, 45, 50, 1)
+  --outerspaceShader rgb(16, 36, 38) // rgb(24, 54, 56)
+  --outerspaceDark #0b1819
+  // --outerspaceDarker #02090a
+  --spacewhite rgba(247, 251, 255, 1)
+  // --spacewhite07 rgba(247, 251, 255, 0.7)
+  // --spacewhite05 rgba(247, 251, 255, 0.5)
+
+  --ghostA rgba(220, 228, 238, 1)
+  --ghostB rgba(225, 233, 243, 1)
+  --ghostB095 rgba(232, 240, 250, 0.95)
+  --ghostC rgba(236, 242, 253, 1)
+  --ghostD rgba(240, 246, 255, 1)
+  --ghostE rgba(244, 250, 255, 1)
+  --ghostF rgba(248, 254, 255, 1)
+  --ghostG rgba(252, 255, 255, 1)
+
+  --moon rgba(108, 119, 222, 1)
+
+
+  // --ghostA rgba(17, 20, 28, 1) 
+  // --ghostB rgba(23, 27, 35, 1) 
+  // --ghostC rgba(28, 33, 42, 1) 
+  // --ghostD rgba(34, 38, 49, 1) 
+  // --ghostE rgba(41, 42, 56, 1)
+  // --ghostF rgba(47, 45, 63, 1)
+  // --ghostG rgba(53, 53, 70, 1)
+
+
+
+  // --ghostG rgba(232, 236, 248, 1)
+  // --ghostH rgba(227, 232, 245, 1)
+
+  --highlightest rgba(243, 250, 255, 1)
+  --highlighter rgba(240, 246, 255, 1)
+  // --highlighter0 rgba(240, 246, 255, 0)
+  --highlight rgba(237, 242, 255, 1)
+  --lowlight rgba(232, 236, 248, 1)
+  --lowerlight rgba(227, 232, 250, 1)
+  --light #eaf0f9
+  --lightShade rgba(220, 224, 244, 1) // #d9e1ef
+  --thinner rgba(16, 44, 180, .02)
+  --thin rgba(16, 44, 180, .04)
+  --thick rgba(16, 44, 180, .07)
+  --doubleThick rgba(16, 44, 180, .14)
+  --tripleThick rgba(16, 44, 180, .21)
+  --thick0 rgba(16, 44, 180, 0)
+
+.dark
+  --bg rgba(18, 22, 30, 1)  // #dadfea // #dce1e8
+  --bg0 rgba(18, 22, 30, 0)  // #dadfea // #dce1e8
+  --v #4e5758
+  --outerspace01 rgba(247, 251, 255, 0.11)
+  --outerspace02 rgba(247, 251, 255, 0.22)
+  --outerspace03 rgba(247, 251, 255, 0.33)
+  --outerspace04 rgba(247, 251, 255, 0.44)
+  --outerspace05 rgba(247, 251, 255, 0.55)
+  --outerspace06 rgba(247, 251, 255, 0.66)
+  --outerspace07 rgba(247, 251, 255, 0.77)
+  --outerspace08 rgba(247, 251, 255, 0.88)
+  --outerspace09 rgba(247, 251, 255, 0.99)
+  --outerspace rgba(247, 251, 255, 1)
+  --nebula #3a4547
+  
+  // --outerspaceShade #1c2526
+  --outerspaceLight #29393a
+  --outerspacePulse #395153
+  --outerspacePhase rgba(30, 65, 70, 1)
+  // --outerspacePhaseDark rgba(20, 45, 50, 1)
+  --outerspaceShader rgb(16, 36, 38) // rgb(24, 54, 56)
+  --outerspaceDark #0b1819
+  // --outerspaceDarker #02090a
+  --spacewhite rgba(38, 42, 50, 1) 
+  // --spacewhite07 rgba(247, 251, 255, 0.7)
+  // --spacewhite05 rgba(247, 251, 255, 0.5)
+
+  --ghostA rgba(17, 20, 25, 1) 
+  --ghostB rgba(23, 27, 32, 1) 
+  --ghostB095 rgba(23, 27, 32, 0.95) 
+  --ghostC rgba(26, 31, 39, 1) 
+  --ghostD rgba(32, 36, 45, 1) 
+  --ghostE rgba(38, 40, 52, 1)
+  --ghostF rgba(47, 45, 60, 1)
+  --ghostG rgba(53, 53, 68, 1)
+  // --ghostG rgba(232, 236, 248, 1)
+  // --ghostH rgba(227, 232, 245, 1)
+
+  --highlightest rgba(38, 42, 46, 1) 
+  --highlighter rgba(36, 40, 44, 1) 
+  --highlight rgba(34, 38, 42, 1) 
+  --light rgba(32, 36, 40, 1) 
+  --lowlight rgba(30, 34, 38, 1) 
+  --lowerlight rgba(28, 32, 36, 1) 
+  --lightShade rgba(24, 28, 34, 1)  // #d9e1ef
+  // --lightDark rgba(18, 22, 30, 1)
+  --thinner rgba(0, 0, 10, .1)
+  --thin rgba(0, 0, 10, .2)
+  --thick rgba(0, 0, 10, .3)
+  --doubleThick rgba(0, 0, 10, .4)
+  --tripleThick rgba(0, 0, 10, .5)
+  --thick0 rgba(0, 0, 10, 0)
+
+  --moon rgba(242, 168, 59, 1)

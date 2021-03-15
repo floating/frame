@@ -5,6 +5,7 @@ const contentHash = require('content-hash')
 
 // Frame modules
 const provider = require('../provider')
+const store = require('../store')
 
 // Local modules
 const interfaces = require('./artifacts/interfaces')
@@ -81,10 +82,10 @@ exports.resolveContent = async (name) => {
   // Decode output and return the content hash in text format
   const decodedOutput = codec.decodeOutput(interfaces.resolver, 'contenthash', output)
   const hash = contentHash.decode(decodedOutput[0])
-  const type = contentHash.getCodec(decodedOutput[0])
-  if (type === 'ipfs-ns') return `ipfs://${hash}`
-  if (type === 'swarm-ns') return `bzz://${hash}`
-  return null
+  // const type = contentHash.getCodec(decodedOutput[0])
+  // if (type === 'ipfs-ns') return `ipfs://${hash}`
+  // if (type === 'swarm-ns') return `bzz://${hash}`
+  return hash
 }
 
 /* PRIVATE */
@@ -93,7 +94,7 @@ const getResolverAddress = async (name) => {
   const hash = namehash.hash(name)
 
   // Get registry contract address for selected network
-  const networkId = provider.connection.network
+  const networkId = store('main.currentNetwork.id')
   const registryAddress = registryAddresses[networkId]
 
   // Encode function input

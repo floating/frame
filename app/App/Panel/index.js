@@ -5,7 +5,7 @@ import link from '../../link'
 
 import Main from './Main'
 import Local from './Local'
-import Connections from './Connections'
+import Networks from './Networks'
 // import Notify from './Notify'
 // import Phase from './Phase'
 import Badge from './Badge'
@@ -27,6 +27,23 @@ class Panel extends React.Component {
     } else {
       return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
     }
+  }
+  componentDidMount () {
+    console.log('did mount')
+    document.addEventListener('keydown', (event) => {
+      console.log('event ky', event.key, this.store('panel.view'))
+      const view = this.store('panel.view')
+      if (event.key === 'ArrowRight') {
+        if (view === 'networks') this.store.setPanelView('settings')
+        if (view === 'settings') this.store.setPanelView('default')
+        if (view === 'default') this.store.setPanelView('networks')
+      } else if (event.key === 'ArrowLeft') {
+        if (view === 'networks') this.store.setPanelView('default')
+        if (view === 'settings') this.store.setPanelView('networks')
+        if (view === 'default') this.store.setPanelView('settings')
+      }
+      // const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
+    })
   }
 
   selectNetwork (network) {
@@ -52,7 +69,7 @@ class Panel extends React.Component {
       })
     })
     let markLeft = 14
-    if (this.store('panel.view') === 'connections') markLeft = 290
+    if (this.store('panel.view') === 'networks') markLeft = 290
     if (this.store('panel.view') === 'settings') markLeft = 326
     return (
       <div id='panel' style={{ opacity }}>
@@ -72,7 +89,7 @@ class Panel extends React.Component {
               options={networkOptions}
             />
           </div>
-          <div className='panelMenuItem panelMenuItemConnections' onMouseDown={() => this.store.setPanelView('connections')}>
+          <div className='panelMenuItem panelMenuItemConnections' onMouseDown={() => this.store.setPanelView('networks')}>
             {svg.broadcast(15)}
           </div>
           <div className='panelMenuItem panelMenuItemSettings' onMouseDown={() => this.store.setPanelView('settings')}>
@@ -93,12 +110,12 @@ class Panel extends React.Component {
           ) : null}
         </div>
         <Local />
-        <Connections />
+        <Networks />
         <Main />
         <Badge />
         <div className='appMenu'>
           <div className='appMenuItem'>
-            <div className='appMenuItemButton'>
+            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleFlow')}>
               {svg.cpu(18)}
             </div>
           </div>

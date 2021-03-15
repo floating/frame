@@ -8,6 +8,9 @@ const events = new EventEmitter()
 
 const store = require('../store')
 
+const dapp = require('./dapp')
+const winSession = e => e.sender.webContents.browserWindowOptions.session
+
 const dev = process.env.NODE_ENV === 'development'
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
@@ -33,6 +36,21 @@ const topRight = (window) => {
     x: Math.floor(screenSize.x + screenSize.width - windowSize[0]),
     y: screenSize.y
   }
+}
+
+const center = (window) => {
+  // pinArea ||
+  const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+  const screenSize = area
+  const windowSize = window.getSize()
+  return {
+    x: Math.floor(((screenSize.x + screenSize.width) - (screenSize.width / 2)) - (windowSize[0] / 2)),
+    y: Math.floor(((screenSize.y + screenSize.height) - (screenSize.height / 2)) - (windowSize[1] / 2))
+  }
+}
+
+const timeout = ms => {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 const detectMouse = () => {
@@ -172,6 +190,7 @@ const api = {
     })
     tray.on('click', api.trayClick)
     api.create()
+    api.flow()
   },
   trayClick: () => {
     if (this.recentAutohide) return
@@ -274,6 +293,77 @@ const api = {
   quit: () => {
     app.quit()
   },
+  close: (e) => {
+    const id = winSession(e)
+    if (windows[id]) {
+      windows[id].setClosable(true)
+      windows[id].close()
+    }
+    delete windows[id]
+  },
+  flow: () => {
+    windows.flow = new BrowserWindow({
+      id: 'flow',
+      width: 600,
+      height: 400,
+      frame: false,
+      // transparent: true,
+      // hasShadow: false,
+      show: false,
+      backgroundThrottling: false,
+      offscreen: true,
+      // icon: path.join(__dirname, './AppIcon.png'),
+      skipTaskbar: process.platform !== 'linux',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
+        disableBlinkFeatures: 'Auxclick',
+        enableRemoteModule: false,
+        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+        worldSafeExecuteJavaScript: true
+      }
+    })
+    windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
+    // windows.flow.setAlwaysOnTop(true)
+    if (dev) windows.flow.openDevTools()
+  },
+  showFlow: () => {
+    // clearTimeout(mouseTimeout)
+    // hideShow.current = 'showing'
+    // if (hideShow.running) {
+    //   hideShow.next = false
+    //   if (hideShow.running !== 'show') hideShow.next = 'show'
+    // } else {
+    // if (!windows.tray) return api.tray()
+    // windows.flow.setPosition(0, 0)
+    windows.flow.setAlwaysOnTop(true)
+    // hideShow.running = 'show'
+    windows.flow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    windows.flow.setResizable(false) // Keeps height consistant
+    // const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    // windows.tray.setSize(358, dev ? 740 : area.height)
+    const {x, y} = center(windows.flow) // windows.tray.positioner.calculate('topRight')
+    windows.flow.setPosition(x, y)
+    // if (!glide) windows.tray.focus()
+    // windows.flow.emit('show')
+    windows.flow.show()
+    windows.flow.focus()
+    windows.flow.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
+  },
+  hideFlow: () => {
+    windows.flow.hide()
+  },
+  toggleFlow: () => {
+    if (windows.flow.isVisible()) {
+      api.hideFlow()
+    } else {
+      api.showFlow()
+    }
+  },
+  openView: (ens, session) => {
+    dapp.openView(ens, session, windows)
+  },
   events
 }
 
@@ -288,10 +378,12 @@ if (dev) {
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) windows.tray.send('main:reload:style', name)
+    if (name.indexOf('css') > -1) windows.flow.send('main:reload:style', name)
   })
   app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       windows.tray.reload()
+      windows.flow.reload()
     })
   })
 }
