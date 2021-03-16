@@ -112,6 +112,16 @@ class Accounts extends EventEmitter {
     log.info('Account not found, creating account')
     this.accounts[id] = new Account({ id, addresses, index: 0, network, created: -1, options }, this)
   }
+  addLattice (id, addresses, options = {}, cb = () => {}) {
+    id = `Lattice-${id}`;
+    if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
+    const network = store('main.currentNetwork.id')
+    const account = store('main.accounts', id)
+    if (account && account.network === network) return cb(null, account) // Account already exists...
+    log.info('Account not found, creating account')
+    this.accounts[id] = new Account({ id, addresses, index: 0, network, created: -1, options }, this)
+    cb(null, this.accounts[id].summary())
+  }
 
   rename (id, name) { this.accounts[id].rename(name) }
 

@@ -4,20 +4,17 @@ const windows = require('../../windows')
 const LatticeDevice = require('./Lattice')
 
 module.exports = (signers) => ({
-    close: (device) => {
-        if (signers[device.deviceID]) signers[device.deviceID].close()
-        delete signers[device.deviceID]
-    },
-    open: (device, cb) => {
-        const signer = new LatticeDevice(device);
-
-        signer.open((accounts, isPaired) => {
-
-            signers.signers[device.deviceID] = signer;
-            signers.add(signer);
-            cb(accounts, isPaired)
-        });
-
+    // close: (device) => {
+    //     const signerId = `Lattice-${device.deviceID}`;
+    //     if (signers[signerId]) signers[signerId].close()
+    //     delete signers[signerId]
+    // },
+    open: async (device) => {
+        const signer = new LatticeDevice(device, signers);
+        // signers.signers[`Lattice-${device.deviceID}`] = signer;
+        const response = await signer.open();
+        signers.add(signer);
+        return response;
     }
 })
 //flex.on('ready', () => {

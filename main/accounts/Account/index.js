@@ -211,7 +211,7 @@ class Account {
     }
   }
 
-  signTypedData (typedData, cb) {
+  signTypedData (index, typedData, cb) {
     if (!typedData) return cb(new Error('No data to sign'))
     if (typeof (typedData) !== 'object') return cb(new Error('Data to sign has the wrong format'))
     if (this.signer) {
@@ -227,7 +227,7 @@ class Account {
     }
   }
 
-  signTransaction (rawTx, cb) {
+  signTransaction (index, rawTx, cb) {
     this._validateTransaction(rawTx, (err) => {
       if (err) return cb(err)
 
