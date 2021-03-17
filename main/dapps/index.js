@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const cheerio = require('cheerio')
 
 const store = require('../store')
-// const ipfs = require('../ipfs')
+const ipfs = require('../ipfs')
 const windows = require('../windows')
 
 const server = require('./server')
@@ -99,6 +99,7 @@ class Dapps {
   }
 
   async add (domain, options, cb) {
+    console.log('adding dapp')
     // Resolve ENS name
     let namehash
     try {
@@ -118,6 +119,8 @@ class Dapps {
     // Resolve content
     const content = await ens.resolveContent(domain)
 
+    console.log('content', content)
+
     // If content available -> store dapp
     if (content) {
       const cid = content
@@ -125,6 +128,7 @@ class Dapps {
       store.addDapp(namehash, { domain, cid, pinned: false }, options)
       // Get Dapp Icon
       try {
+        console.log(ipfs)
         const index = await ipfs.getFile(`${cid}/index.html`)
         const $ = cheerio.load(index.content.toString('utf8'))
         let favicon = ''
@@ -150,7 +154,7 @@ class Dapps {
       } catch (e) {
         log.error(e)
         store.removeDapp(namehash)
-        return cb(new Error('Could not resolve dapp: ' + e.message))
+        console.log(new Error('Could not resolve dapp: ' + e.message))
       }
     // Else -> throw
     } else {

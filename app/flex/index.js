@@ -1,7 +1,7 @@
 // Access browser specific libraries from the main process
 // Helpful when only a browser library is avliable...
 // or when a particular Chrome API like web-bluetooth may be a more stable option cross platform
-import link from '../link'
+import link from '../../resources/link'
 
 // Flexed Libs
 // import Ledger from './ledger'

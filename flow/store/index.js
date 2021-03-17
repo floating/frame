@@ -9,9 +9,9 @@
 
 import EventEmitter from 'events'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
+// import utils from 'web3-utils'
 
-import link from '../link'
+import link from '../../resources/link'
 import * as actions from './actions'
 
 export default (state, cb) => {

@@ -167,17 +167,17 @@
 .slideUp-enter
   opacity 0
   margin-top -200px
-  transition standardSlow
+  transition var(--standardSlow)
 
 .slideUp-enter.slideUp-enter-active
   opacity 1
   margin-top 0px
-  transition standardSlow
+  transition var(--standardSlow)
   transition-delay 0.32s
 
 .slideUp-leave
   opacity 1
-  transition standardSlow
+  transition var(--standardSlow)
 
 .slideUp-leave.slideUp-leave-active
   opacity 0
@@ -200,7 +200,7 @@
     display flex
     justify-content space-between
     align-items center
-    transition standard
+    transition var(--standard)
 
     .txProgressNoticeBarDeadzone
       width 17px
@@ -287,7 +287,7 @@
   left 0
   z-index 200
   padding 0px 0px 64px 0px
-  transition standardSlow
+  transition var(--standardSlow)
   overflow-y scroll
   overflow-x hidden
   transform translateZ(0)
@@ -346,7 +346,7 @@
      position relative
      display flex
      flex-direction column
-     transition standard
+     transition var(--standard)
      transition-delay 1s
      tranform translateZ(0)
 
@@ -363,7 +363,7 @@
       display flex
       justify-content center
       align-items center
-      transition standard
+      transition var(--standard)
       tranform translateZ(0)
       color var(--doubleThick)
 
@@ -382,7 +382,7 @@
       line-height 10px
       font-weight 600
       letter-spacing 2px
-      transition standard
+      transition var(--standard)
       color var(--outerspace08)
 
   .signerRequestItems
@@ -402,7 +402,7 @@
     height 380px
     display flex
     justify-content center
-    transition standard
+    transition var(--standard)
     background var(--ghostC)
     z-index 2000
     color var(--outerspace08)
@@ -621,7 +621,7 @@
         justify-content center
         align-items center
         z-index 10
-        transition standard
+        transition var(--standard)
         position absolute
         border-radius 2px
         left 5px
@@ -634,7 +634,7 @@
         justify-content flex-end
         align-items center
         z-index 10
-        transition standard
+        transition var(--standard)
         position absolute
         border-radius 2px
         right 10px
@@ -646,7 +646,7 @@
         justify-content center
         align-items center
         z-index 10
-        transition standard
+        transition var(--standard)
         opacity 0
 
     .approveTransactionPayload
@@ -830,7 +830,7 @@
     font-weight 400
     letter-spacing 1px
     text-transform uppercase
-    transition standard
+    transition var(--standard)
 
     .transactionDataHeader
       position absolute
@@ -854,7 +854,7 @@
         justify-content center
         align-items center
         z-index 10
-        transition standard
+        transition var(--standard)
 
       .transactionDataNotice
         width 32px
@@ -862,7 +862,7 @@
         justify-content center
         align-items center
         z-index 10
-        transition standard
+        transition var(--standard)
         color var(--outerspace08)
 
       .transactionDataIndicator
@@ -872,7 +872,7 @@
         max-height 21px
         z-index 10
         transform rotate(-180deg)
-        transition standardSlow
+        transition var(--standardSlow)
         border 2px solid var(--thick)
         border-radius 12px
         margin 4px
@@ -898,7 +898,7 @@
     border-radius 12px
     opacity 0
     pointer-events none
-    transition standard
+    transition var(--standard)
     box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
 
     .transactionDataBodyCopied
@@ -925,7 +925,7 @@
       height 100%
       font-size 15px
       text-transform none
-      transition standardSlow
+      transition var(--standardSlow)
       overflow-wrap break-word
       word-wrap break-word
       font-family FiraCode, monospace
@@ -987,7 +987,7 @@
         align-items center
         font-size 20px
         opacity 1
-        transition standard
+        transition var(--standard)
 
         svg
           color var(--outerspace08)
@@ -1006,7 +1006,7 @@
         align-items center
         font-size 12px
         opacity 0
-        transition standard
+        transition var(--standard)
         font-weight bold
 
     .transactionToAddress:hover
@@ -1071,7 +1071,7 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      transition standard
+      transition var(--standard)
       letter-spacing 2px
       padding-left 2px
       padding-bottom 10px
@@ -1107,7 +1107,7 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      transition standard
+      transition var(--standard)
       letter-spacing 2px
       padding-left 2px
       padding-bottom 10px
@@ -1226,7 +1226,7 @@ span
   font-weight 600
   background var(--ghostD)
   color var(--outerspace05)
-  transition standard
+  transition var(--standard)
   z-index 9999
   overflow hidden
 
@@ -1328,7 +1328,7 @@ span
   padding 14px 16px 3px 0px
   font-size 14px
   text-transform none
-  transition standardSlow
+  transition var(--standardSlow)
   overflow-wrap break-word
   word-wrap break-word
   overflow-x hidden
@@ -1347,7 +1347,7 @@ span
   right 12px
   font-size 12px
   text-transform none
-  transition standardSlow
+  transition var(--standardSlow)
   overflow-wrap break-word
   word-wrap break-word
   text-transform uppercase
@@ -1443,7 +1443,7 @@ span
 .txAugmentHidden
   .txAugmentCancel
     opacity 0
-    transition standard
+    transition var(--standard)
     background var(--ghostD)
     transform translateY(-25px) scale(1.05)
     box-shadow 0px 4px 5px -3px var(--thick), 0px 35px 20px -5px var(--thick)
@@ -1452,7 +1452,7 @@ span
     background var(--ghostD)
     transform translateY(-25px) scale(1.05)
     transform translateY(-25px)   
-    transition standard
+    transition var(--standard)
   .txDetails
     background none
 
@@ -1466,7 +1466,7 @@ span
   justify-content center
   align-items center
   font-weight 500
-  transition standardSlow
+  transition var(--standardSlow)
   opacity 0
   transform translateY(25px)
   font-family Fira Code, monospace
@@ -1499,7 +1499,7 @@ span
 //   font-weight 500
 //   background highlight
 //   box-shadow 0px 2px 1px var(--thick), 0px 8px 5px -5px var(--thick), 0px -2px 6px var(--thinner)
-//   transition standardSlow
+//   transition var(--standardSlow)
 //   transition-delay 0.2s
 //   opacity 0
 //   transform translateY(-25px)
@@ -1525,13 +1525,13 @@ span
   letter-spacing 0.5px
   margin-left 0.5px
   overflow hidden
-  transition standard
+  transition var(--standard)
   display flex
   justify-content center
   align-items center
 
   .txProgressNoticeHidden
-    transition standard
+    transition var(--standard)
     transform translateY(-25px)
     opacity 0
     pointer-events none
@@ -1548,7 +1548,7 @@ span
     justify-content center
     align-items center
     flex-direction column
-    transition standard
+    transition var(--standard)
 
 .txStatusError
   top 30px
@@ -1562,7 +1562,7 @@ span
   right 0px
   z-index 1000005
   display flex
-  transition standard
+  transition var(--standard)
 
   .txProgressSuccessLine
     position absolute 
@@ -1640,7 +1640,7 @@ span
   border-bottom-left-radius 16px
   border-bottom-right-radius 16px
   overflow hidden
-  transition standard
+  transition var(--standard)
 
   .txProgress
     .txProgressBack
@@ -1683,7 +1683,7 @@ span
             width 40px
             height 40px
             box-sizing border-box
-            transition standard
+            transition var(--standard)
             transform translateZ(0px)
           .txProgressStepIconHidden
             transform translateY(-50px)
@@ -1727,7 +1727,7 @@ span
       bottom 0
       left 0
       z-index 1001
-      transition standard
+      transition var(--standard)
 
       .txProgressSlide
         position absolute
@@ -1736,7 +1736,7 @@ span
         bottom 0
         left 0
         z-index 1001
-        transition standardSlow
+        transition var(--standardSlow)
         pointer-events none
 
         .txProgressTail
@@ -1747,7 +1747,7 @@ span
           height 2px
           margin-top -1px
           background var(--nebula)
-          transition standard
+          transition var(--standard)
 
         .txProgressLoading
           position absolute
@@ -1803,30 +1803,30 @@ span
 
 .txBarSuccess
   .txProgressTail
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--good) !important
   .txProgressLoadingBox
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--good)  !important
   .txProgressLoadingDot
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--good)  !important
   .txProgressStepCenterOn
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--good)  !important
 
 .txBarError
   .txProgressTail
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--bad) !important
   .txProgressLoadingBox
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--bad) !important
   .txProgressLoadingDot
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--bad) !important
   .txProgressStepCenterOn
-    transition standardSlow
+    transition var(--standardSlow)
     background var(--bad) !important
 
 
@@ -1834,7 +1834,7 @@ span
   height 50px
   .txStep
     transform translateY(0px)
-    transition standard
+    transition var(--standard)
 
 .confirmBar
   position absolute
@@ -1939,7 +1939,7 @@ span
   justify-content flex-end
   transform translateY(0px)
   height 3px
-  transition standard
+  transition var(--standard)
   font-size 12px
   font-weight 400
   text-transform uppercase
@@ -1953,7 +1953,7 @@ span
     min-height 100px
     height 0
     width 100%
-    transition standard
+    transition var(--standard)
     padding-bottom 10px
   .signerUnlockInput
     height 40px

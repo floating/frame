@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
 import _store from './store'
-import link from './link'
+import link from '../resources/link'
 
 import App from './App'
 

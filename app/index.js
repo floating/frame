@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 
 import Panel from './App/Panel'
 
-import link from './link'
+import link from '../resources/link'
 import _store from './store'
 
 import './flex'

@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import svg from '../../../../svg'
-import link from '../../../../link'
+import link from '../../../../../resources/link'
 
 class Pending extends React.Component {
   constructor (...args) {

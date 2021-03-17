@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../svg'
-import link from '../../link'
+import link from '../../../resources/link'
 
 import Main from './Main'
 import Local from './Local'
@@ -68,9 +68,9 @@ class Panel extends React.Component {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
-    let markLeft = 14
-    if (this.store('panel.view') === 'networks') markLeft = 290
-    if (this.store('panel.view') === 'settings') markLeft = 326
+    let markLeft = 6
+    if (this.store('panel.view') === 'networks') markLeft = 282
+    if (this.store('panel.view') === 'settings') markLeft = 318
     return (
       <div id='panel' style={{ opacity }}>
         <div className='panelMenu'>

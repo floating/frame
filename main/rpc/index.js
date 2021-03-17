@@ -8,9 +8,10 @@ const signers = require('../signers')
 const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
-const ens = require('../ens')
-// const ipfs = require('../ipfs')
 const dapps = require('../dapps')
+const ens = require('../ens')
+const ipfs = require('../ipfs')
+
 
 const { resolveName } = require('../accounts/aragon')
 
@@ -164,20 +165,27 @@ const rpc = {
     await dapps.launch(command.input, (err, res) => {
       if (err || res) console.log(err, res)
     })
+  },
+  addDapp (domain, options, cb) {
+    if (!(domain.endsWith('.eth') || domain.endsWith('.xyz'))) domain += '.eth'
+    dapps.add(domain, options, cb)
+  },
+  removeDapp (domain, cb) {
+    dapps.remove(domain, cb)
+  },
+  moveDapp (fromArea, fromIndex, toArea, toIndex, cb) {
+    dapps.move(fromArea, fromIndex, toArea, toIndex, cb)
+  },
+  launchDapp (domain, cb) {
+    dapps.launch(domain, cb)
+  },
+  openDapp (domain, options, cb) {
+    if (domain.endsWith('.eth')) {
+      dapps.add(domain, options, cb)
+    } else {
+      console.log('input needs to be ens name')
+    }
   }
-  // addDapp (domain, options, cb) {
-  //   if (!(domain.endsWith('.eth') || domain.endsWith('.xyz'))) domain += '.eth'
-  //   dapps.add(domain, options, cb)
-  // },
-  // removeDapp (domain, cb) {
-  //   dapps.remove(domain, cb)
-  // },
-  // moveDapp (fromArea, fromIndex, toArea, toIndex, cb) {
-  //   dapps.move(fromArea, fromIndex, toArea, toIndex, cb)
-  // },
-  // launchDapp (domain, cb) {
-  //   dapps.launch(domain, cb)
-  // }
 }
 
 const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v

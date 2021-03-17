@@ -8,7 +8,7 @@
   bottom 0
   top 0px
   width 360px
-  transition standard
+  transition var(--standard)
 
 #panel
   position absolute
@@ -106,12 +106,13 @@
   left 0px
   right 0px
   top 0px
-  height 67px
-  // padding 0px 9px 0px 9px
+  height 59px
+  padding-top 21px
+  box-sizing border-box
   // background blue
   display flex
   justify-content space-between
-  align-items center
+  // align-items center
   -webkit-app-region no-drag
   z-index 100000000000
   opacity 1
@@ -119,7 +120,7 @@
   // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
   // pointer-events none
   transition var(--standardFast)
-  background var(--ghostB095)
+  background var(--ghostC)
   border-bottom 1px solid var(--thin)
   box-shadow 0px 4px 6px -1px var(--thin)
   // box-shadow inset 0px -8px 8px var(--thick)
@@ -128,19 +129,21 @@
 
   .panelMenuMarker
     position absolute
-    left 0px
-    right 0px
-    bottom 8px
-    height 3px
-    // background var(--thin)
+    left 8px
+    right 8px
+    top 10px
+    height 4px
+    background var(--thick)
+    border-radius 2px
 
     .panelMenuMark
-      width 19px
-      height 3px
+      width 20px
+      height 4px
       background var(--outerspace)
       transform translateX(14px)
       border-radius 2px
       transition var(--standard)
+      margin-left -1px
 
   .panelMenuItem
     height 27px
@@ -150,7 +153,7 @@
     justify-content center
     align-items center
     -webkit-app-region no-drag
-    transition standard
+    transition var(--standard)
     pointer-events auto
     transform translate3d(0, 0, 0)
     background var(--ghostE)
@@ -185,10 +188,10 @@
     display flex
     align-items center
     margin-left 0%
-    transition standardSlow
+    transition var(--standardSlow)
 
   .panelDetailText
-    transition standard
+    transition var(--standard)
     text-transform uppercase
     font-size 10px
     letter-spacing 1px
@@ -211,7 +214,7 @@
     // max-width 100px
     // left 50%
     // background blue
-    transition standard
+    transition var(--standard)
     letter-spacing 0px
     text-transform uppercase
     color var(--outerspace08)
@@ -261,45 +264,45 @@
       border-radius 100%
 
     .panelDetailIndicatorGood
-      transition standardSlow
+      transition var(--standardSlow)
       background var(--good)
 
     .panelDetailIndicatorWaiting
-      transition standardSlow
+      transition var(--standardSlow)
       background var(--moon)
 
     .panelDetailIndicatorBad
-      transition standardSlow
+      transition var(--standardSlow)
       background var(--bad)
 
     .panelDetailIndicatorPending
-      transition standardSlow
+      transition var(--standardSlow)
       background var(--pending)
 
 // .panelMenuAddMode
-//   transition standard
+//   transition var(--standard)
 //   z-index 10000
 //   .panelDetail
-//     transition standardSlowest
+//     transition var(--standardSlowest)
 //     margin-left calc(50% - 50px)
 //   .panelMenuItem
-//     transition standard
+//     transition var(--standard)
 //     opacity 0
 //     pointer-events none
 //     svg
 //       color var(--spacewhite)
 //   .panelDetailText
-//     transition standard
+//     transition var(--standard)
 //     color var(--spacewhite)
 //   .panelDetailIndicator
 //     .panelDetailIndicatorGood
-//       transition standardSlow
+//       transition var(--standardSlow)
 //       background var(--smart)
 //     .panelDetailIndicatorBad
-//       transition standardSlow
+//       transition var(--standardSlow)
 //       background var(--hot)
 //     .panelDetailIndicatorPending
-//       transition standardSlow
+//       transition var(--standardSlow)
 //       background var(--hardware)
 
 .appMenu
@@ -307,7 +310,7 @@
   left 0px
   right 0px
   bottom 0px
-  height 67px
+  height 48px
   // padding 0px 9px 0px 9px
   // background blue
   display flex
@@ -342,7 +345,7 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      transition standard
+      transition var(--standard)
       pointer-events auto
       transform translate3d(0, 0, 0)
       background var(--ghostE)

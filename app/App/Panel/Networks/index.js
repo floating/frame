@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../link'
+import link from '../../../../resources/link'
 import svg from '../../../svg'
 // import Client from '../Client'
 
@@ -13,7 +13,7 @@ import Dropdown from '../../Components/Dropdown'
 // import Restore from 'react-restore'
 
 // import svg from '../../../../svg'
-// import link from '../../../../link'
+// import link from '../../../../../resources/link'
 
 class _Network extends React.Component {
   constructor (props, context) {

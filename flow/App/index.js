@@ -1,6 +1,7 @@
+import { LinkExternal } from '@githubprimer/octicons-react';
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../link'
+import link from '../../resources/link'
 
 // import Main from './Main'
 // import Local from './Local'
@@ -46,7 +47,98 @@ class Flow extends React.Component {
       // <div className='flow'>
       //   {'flow'}
       // </div>
-      'helelo'
+      <div className='dapps'>
+        <div className='dappWrap'>
+          <div className='dapp' onMouseDown={() => link.rpc('openDapp', 'matt.eth', (err) => {
+            console.log('err', err)
+          })}>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              matt.eth
+            </div>
+          </div>
+          <div className='dapp'  onMouseDown={() => link.rpc('openDapp', 'frame.eth', (err) => {
+            console.log('err', err)
+          })}>
+          <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              frame.eth
+            </div>
+          </div>
+          <div className='dapp'>
+          <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Aragon
+            </div>
+          </div>
+          <div className='dapp'>
+          <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Compound
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Dapp 1
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Dapp 2
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Wallet
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Wallet
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Wallet
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Wallet
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Wallet
+            </div>
+          </div>
+          <div className='dapp'>
+            <div className='dappIcon'>
+            </div>
+            <div className='dappName'>
+              Wallet
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 }

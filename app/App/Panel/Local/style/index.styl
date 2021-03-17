@@ -27,7 +27,7 @@
     overflow hidden
     box-shadow cardDrop, 0px 2px 1px var(--thin)
     padding 0px 0px 0px 0px
-    transition standard, 0s linear background
+    transition var(--standard), 0s linear background
     transform translateZ(0)
     cursor pointer
     
@@ -170,7 +170,7 @@
     justify-content center
     align-items center
     background var(--thin)
-    transition standard
+    transition var(--standard)
 
   .quitFrameButton:hover
     background var(--thick)
@@ -183,7 +183,7 @@
 .connectionOption
   width 100%
   align-items space-between
-  transition standard
+  transition var(--standard)
   border-radius 12px
   margin 0px -15px -15px -15px
   padding 0px 15px 15px 15px
@@ -200,7 +200,7 @@
 
   .connectionOptionDetails
     height 0px
-    transition standard
+    transition var(--standard)
     transition-delay 0ms, 0ms
     transition-property height, opacity
     opacity 0
@@ -208,7 +208,7 @@
     z-index 40
     position relative
     margin-top 0px
-    transition standard
+    transition var(--standard)
     pointer-events none
 
     .connectionOptionDetailsInset
@@ -297,13 +297,13 @@
   right 0
   font-size 14px
   font-weight 300
-  transition standard
+  transition var(--standard)
   transform translateZ(0)
   padding 15px
   z-index 20
 
   .appInfoIcon
-    transition standard
+    transition var(--standard)
     height 30px
     display flex
     justify-content center
@@ -316,7 +316,7 @@
       height 4px
       border-radius 2px
       background var(--outerspace03)
-      transition standard
+      transition var(--standard)
       transform translateZ(0)
 
   .appInfoLine
@@ -324,7 +324,7 @@
     left 0
     right 0
     height 30px
-    transition standard
+    transition var(--standard)
     display flex
     justify-content center
     align-items center

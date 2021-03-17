@@ -98,6 +98,7 @@
     "get-pixels": "3.3.2",
     "hdkey": "2.0.1",
     "ipfs-core": "0.5.4",
+    "ipfs-http-client": "49.0.4",
     "node-fetch": "2.6.1",
     "node-hid": "2.1.1",
     "query-string": "6.14.1",

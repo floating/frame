@@ -304,8 +304,8 @@ const api = {
   flow: () => {
     windows.flow = new BrowserWindow({
       id: 'flow',
-      width: 600,
-      height: 400,
+      width: 520,
+      height: 330,
       frame: false,
       // transparent: true,
       // hasShadow: false,

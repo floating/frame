@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import svg from '../../../../svg'
-import link from '../../../../link'
+import link from '../../../../../resources/link'
 
 import Requests from './Requests'
 import Settings from './Settings'
@@ -467,8 +467,8 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 79 - 67 : initial.height - 3
-      let top = (initial.top - 76) * -1
+      style.height = open ? panelHeight - 66 - 48 : initial.height - 3
+      let top = (initial.top - 66) * -1
       style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is

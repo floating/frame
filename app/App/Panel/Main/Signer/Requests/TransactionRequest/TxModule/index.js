@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
 import svg from '../../../../../../../svg'
-import link from '../../../../../../../link'
+import link from '../../../../../../../../resources/link'
 
 class TxData extends React.Component {
   constructor (props, context) {

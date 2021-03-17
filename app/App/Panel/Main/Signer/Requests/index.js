@@ -6,7 +6,7 @@ import ProviderRequest from './ProviderRequest'
 import TransactionRequest from './TransactionRequest'
 import SignatureRequest from './SignatureRequest'
 
-import link from '../../../../../link'
+import link from '../../../../../../resources/link'
 import SignTypedDataRequest from './SignTypedDataRequest'
 
 class Requests extends React.Component {

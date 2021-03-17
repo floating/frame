@@ -16,6 +16,47 @@ div
   width 0px
   background transparent
 
+
+.dapps
+  width 520px
+  height 330px
+  overflow-y scroll
+  overflow-x hidden
+  background var(--ghostC)
+
+  .dappWrap
+    padding 0px 10px 10px 0px
+    display flex
+    flex-wrap wrap
+    margin 0px 0px 100px 0px
+
+    .dapp
+      width 80px
+      height 110px 
+      min-width 80px
+      min-height 110px
+      margin 20px 0px 0px 20px
+
+      .dappIcon
+        width 80px
+        height 80px 
+        min-width 80px
+        min-height 80px 
+        background var(--ghostD)
+        border-radius 12px
+        cursor pointer
+
+      .dappName
+        width 80px
+        height 30px 
+        min-width 80px
+        min-height 30px 
+        display flex
+        justify-content center
+        align-items center
+        cursor pointer
+        font-size 14px
+
 // #flow
 //   position absolute
 //   top 20px
@@ -100,7 +141,7 @@ div
 //   user-select none
 //   cursor default
 //   font-size 14px
-//   transition standard
+//   transition var(--standard)
 //   z-index 1000
 
 // .hidden

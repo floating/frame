@@ -91,10 +91,10 @@ reverseCardDrop = 0px 1px 1px rgba(0, 34, 32, 0.1)
 // Transistions
 standard = .32s cubic-bezier(.82,0,.12,1) all
 standardSlow = .64s cubic-bezier(.82,0,.12,1) all
-standardSlower = .96s cubic-bezier(.82,0,.12,1) all
+var(--standardSlower) = .96s cubic-bezier(.82,0,.12,1) all
 standardSlowest = 1.6s cubic-bezier(.82,0,.12,1) all
 standardFast = .16s cubic-bezier(.82,0,.12,1) all
-standardFaster = .08s cubic-bezier(.82,0,.12,1) all
+var(--standardFaster) = .08s cubic-bezier(.82,0,.12,1) all
 // 0.18s cubic-bezier(0.8, 1, 0.2, 1) all
 cubic = cubic-bezier(.82,0,.12,1)
 
@@ -213,7 +213,7 @@ body
       left 0px
       right 0px
       bottom 0px
-      transition standard
+      transition var(--standard)
       z-index 150
       border-radius 6px
       // border-bottom-left-radius 4px
@@ -233,7 +233,7 @@ body
       right 0px
       bottom 0px
       z-index 100
-      transition standard
+      transition var(--standard)
       border-radius 6px
       background linear-gradient(180deg, highlight 0%, thick 100%)
       display flex
@@ -271,7 +271,7 @@ body
       right 0px
       bottom 0px
       z-index 1000
-      transition standard
+      transition var(--standard)
       border-radius 6px
 
       .view

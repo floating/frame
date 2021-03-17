@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../link'
+import link from '../../../../../../resources/link'
 
 import RenameAccount from './RenameAccount'
 
