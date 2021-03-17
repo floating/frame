@@ -100,7 +100,7 @@ const initial = {
     lattice: {
       deviceID: main('lattice.deviceID', ''),
       password: main('lattice.password', ''),
-      endpoint: main('lattice.endpoint', 'http://lattice-connect.public.dappnode:3000')
+      endpoint: main('lattice.endpoint', 'https://signing.gridpl.us')
     },
     ledger: {
       derivation: main('ledger.derivation', 'legacy'),
