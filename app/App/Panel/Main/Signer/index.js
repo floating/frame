@@ -9,6 +9,7 @@ import Settings from './Settings'
 
 // import ledgerLogo from './ledgerLogo.png'
 // import trezorLogo from './trezorLogo.png'
+import gridPlusLogo from "../../main/Add/addHardwareLattice/grid.png";
 
 // TODO: Rename Signer component to Account
 
@@ -295,10 +296,12 @@ class Signer extends React.Component {
             <div className='signerImage'>
               {(_ => {
                 if (this.props.signer) {
+                  console.log(this.props.signer.type);
                   if (this.props.signer.type === 'ledger') return svg.ledger(24)
                   if (this.props.signer.type === 'trezor') return svg.trezor(20)
                   if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
                   if (this.props.signer.type === 'aragon') return svg.aragon(32)
+                  if (this.props.signer.type === 'lattice') return <img src={gridPlusLogo} height={32} width={32} />
                   return svg.octicon('plus', { height: 31 })
                 } else {
                   return null

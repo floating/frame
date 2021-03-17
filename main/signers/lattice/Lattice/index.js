@@ -47,7 +47,7 @@ class Lattice extends Signer {
         clientConfig['privKey'] = password;
 
         this.client = new Client(clientConfig);
-        this.type = 'Lattice'
+        this.type = 'lattice'
         this.network = store('main.currentNetwork.id')
         this.status = 'loading'
         this.index = 0

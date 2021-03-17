@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import link from '../../../../../link'
-import svg from '../../../../../svg'
+import svg from '../../../../../svg' //TODO: get gridplus svg
 import gridLogo from "./grid.png";
 
 class AddHardwareLattice extends React.Component {
@@ -48,13 +48,13 @@ class AddHardwareLattice extends React.Component {
 
     blurActive() {
         const formInput = this.currentForm()
-        if (formInput) formInput.current.blur()
+        if (formInput && formInput.current) formInput.current.blur()
     }
 
     focusActive() {
         setTimeout(() => {
             const formInput = this.currentForm()
-            if (formInput) formInput.current.focus()
+            if (formInput && formInput.current) formInput.current.focus()
         }, 500)
     }
 
@@ -62,20 +62,6 @@ class AddHardwareLattice extends React.Component {
         this.blurActive()
         this.setState({index: ++this.state.index})
         this.focusActive()
-    }
-
-
-    addAccounts(accounts) {
-        link.rpc('addLatticeAccount', this.state.deviceID, accounts, (err, status) => {
-            if (err) {
-                this.setState({status: err, error: true})
-            } else {
-                this.setState({status: status.status, error: false})
-                setTimeout(() => {
-                    this.store.toggleAddAccount()
-                }, 2000)
-            }
-        });
     }
 
     connectToLattice() {
@@ -89,7 +75,9 @@ class AddHardwareLattice extends React.Component {
                 this.setState({status: 'Pairing Device', error: false})
             } else if (accounts && accounts.length > 0) {
                 this.setState({status: 'Adding Accounts', index: 2, error: false})
-                // this.addAccounts(accounts);
+                setTimeout(() => {
+                    this.store.toggleAddAccount()
+                }, 2000)
             } else if (!err && isPaired === typeof 'undefined') {
                 this.setState({status: 'ok', index: 2, error: true})
             }
@@ -104,7 +92,9 @@ class AddHardwareLattice extends React.Component {
                 this.setState({status: err, error: true})
             } else if(accounts.length > 0) {
                 this.setState({status: 'Adding Accounts', index:2, error: false})
-                this.addAccounts(accounts)
+                setTimeout(() => {
+                    this.store.toggleAddAccount()
+                }, 2000)
             }
         })
     }
@@ -114,24 +104,6 @@ class AddHardwareLattice extends React.Component {
         return s.charAt(0).toUpperCase() + s.slice(1)
     }
 
-
-    accountSort(a, b) {
-        const accounts = this.store('main.accounts')
-        a = accounts[a].created
-        b = accounts[b].created
-        if (a === -1 && b !== -1) return -1
-        if (a !== -1 && b === -1) return 1
-        if (a > b) return -1
-        if (a < b) return 1
-        return 0
-    }
-
-    // accountFilter(id) {
-    //     // Need to migrate accounts to use network type
-    //     const network = this.store('main.currentNetwork.id')
-    //     const account = this.store('main.accounts', id)
-    //     return account.network === network
-    // }
 
     restart() {
         this.setState({adding: false, index: 0, pairCode: ''})

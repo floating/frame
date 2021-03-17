@@ -45,13 +45,6 @@ const rpc = {
   trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
   trezorPhrase: (id, phrase, cb) => signers.trezorPhrase(id, phrase, cb),
   latticePair(id, pin, cb) {
-    // signers.latticePair(id, pin).then(result => {
-    //   accounts.setSigner(id, )
-    //   provider.accountsChanged(accounts.getSelectedAddresses())
-    //   setTimeout(() => {
-    //     accounts.tokenScan()
-    //   }, 320)
-    // }).catch(cb)
     signers.latticePair(id, pin).then(result => cb(null, result)).catch(cb);
   },
   latticeConnect(connectOpts, cb) {
@@ -110,9 +103,7 @@ const rpc = {
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
   },
-  addLatticeAccount (id, addresses, cb) {
-    accounts.addLattice(id, addresses, { type: 'Lattice' }, cb)
-  },
+
   createFromAddress (address, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.add([address], { type: 'Address' })
