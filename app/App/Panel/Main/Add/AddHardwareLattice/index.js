@@ -4,8 +4,7 @@ import Restore from 'react-restore'
 import link from '../../../../../link'
 import svg from '../../../../../svg'
 import gridLogo from "./grid.png";
-const {v5: uuid} = require('uuid')
-const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
+
 class AddHardwareLattice extends React.Component {
     constructor(...args) {
         super(...args)
@@ -90,7 +89,7 @@ class AddHardwareLattice extends React.Component {
                 this.setState({status: 'Pairing Device', error: false})
             } else if (accounts && accounts.length > 0) {
                 this.setState({status: 'Adding Accounts', index: 2, error: false})
-                this.addAccounts(accounts);
+                // this.addAccounts(accounts);
             } else if (!err && isPaired === typeof 'undefined') {
                 this.setState({status: 'ok', index: 2, error: true})
             }
@@ -99,6 +98,7 @@ class AddHardwareLattice extends React.Component {
 
 
     pairToLattice() {
+        this.next();
         link.rpc('latticePair', this.state.deviceID, this.state.pairCode, (err, accounts) => {
             if (err) {
                 this.setState({status: err, error: true})

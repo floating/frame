@@ -1,91 +1,26 @@
-const log = require('electron-log')
-const flex = require('../../flex')
-const windows = require('../../windows')
+const store = require('../../store')
 const LatticeDevice = require('./Lattice')
 
+const openConnect = async (device, signers) => {
+    const signer = new LatticeDevice(device, signers);
+    // signers.signers[`Lattice-${device.deviceID}`] = signer;
+    const response = await signer.open();
+    signers.add(signer);
+    return response;
+}
+
 module.exports = (signers) => ({
-    // close: (device) => {
-    //     const signerId = `Lattice-${device.deviceID}`;
-    //     if (signers[signerId]) signers[signerId].close()
-    //     delete signers[signerId]
-    // },
+    scan: () => {
+        const deviceID = store('main.lattice.deviceID');
+        if (deviceID) {
+            openConnect({deviceID}, signers)
+        }
+    },
+    pair: async () => {
+
+    },
     open: async (device) => {
-        const signer = new LatticeDevice(device, signers);
-        // signers.signers[`Lattice-${device.deviceID}`] = signer;
-        const response = await signer.open();
-        signers.add(signer);
-        return response;
+        return await openConnect(device, signers)
+
     }
 })
-//flex.on('ready', () => {
-//     flex.on('lattice:connect', device => {
-//       log.info(':: lattice Scan - Connected Device')
-//       close(device)
-//       signers[device.id] = new LatticeDevice(device, api)
-//     })
-//     flex.on('lattice:disconnect', device => {
-//       log.info(':: lattice Scan - Disconnected Device')
-//       close(device)
-//     })
-//     flex.on('lattice:update', device => {
-//       log.info(':: lattice Scan - Updated Device')
-//       if (signers[device.id]) signers[device.id].update(device)
-//     })
-//   })
-// module.exports = (signers, api) => {
-//   log.info(' ')
-//   log.info('lattice BLE Scaner Started...')
-//   flex.on('lattice:scan:failed', err => {
-//     if (err) log.error(err)
-//     setTimeout(() => {
-//       flex.synthetic('lattice.scan', (err, res) => console.log(err, res))
-//     }, 5000)
-//   })
-//   // ipcMain.on('bluetooth-select-device', (devices) => {
-//   //   console.log('bluetooth-select-device')
-//   //   console.log(devices)
-//   // })
-//   const scan = () => {
-//     log.info('lattice BLE Scan Started')
-//     flex.rpc('lattice.current', (err, current) => {
-//       if (err) return log.error(err)
-//       console.log('lattice.current')
-//       log.info('We found some BLE signers...', current)
-//
-//       // Remove all signers no longer connected
-//       Object.keys(signers).forEach(id => {
-//         if (signers.type === 'latticeBLE' && !current[id]) {
-//           log.info('Removing BLE lattice: ', id)
-//           signers[id].close()
-//           delete signers[id]
-//         }
-//       })
-//       // Add all newly added signers
-//       Object.keys(current).forEach(id => {
-//         if (signers[id]) {
-//           signers[id].deviceStatus()
-//           return log.info('Updating lattice: ', id)
-//         }
-//         let lattice
-//         log.info('Adding New lattice: ', id)
-//         try {
-//           lattice = new lattice(current[id], api)
-//         } catch (e) {
-//           return log.error(e)
-//         }
-//         log.info('  > lattice Created: ', id)
-//         signers[id] = lattice
-//       })
-//       log.info(' ')
-//     })
-//   }
-//
-//   // Do initial pair in chome and then use noble?
-//
-//   flex.on('ready', () => {
-//     flex.synthetic('lattice.scan', (err, res) => console.log(err, res))
-//     flex.on('lattice:device:added', scan)
-//     flex.on('lattice:device:removed', scan)
-//     scan()
-//   })
-// }

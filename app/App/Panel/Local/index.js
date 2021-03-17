@@ -14,7 +14,8 @@ class Settings extends React.Component {
     this.networkType = context.store('main.currentNetwork.type')
     const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    this.state = { localShake: {}, primaryCustom, secondaryCustom, resetConfirm: false, expandNetwork: false }
+    const latticeEndpoint = context.store('main.lattice.endpoint');
+    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint , resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
       if (this.network !== id || this.networkType !== type) {
@@ -52,6 +53,14 @@ class Settings extends React.Component {
     if (location.startsWith('https://') || location.startsWith('http://')) return true
     return false
   }
+  //
+  // latticeFocus () {
+  //   if (this.state.latticeEndpoint === this.customMessage) this.setState({ secondaryCustom: '' })
+  // }
+  //
+  // latticeBlur () {
+  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
+  // }
 
   customSecondaryFocus () {
     if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
@@ -85,6 +94,14 @@ class Settings extends React.Component {
     this.setState({ secondaryCustom: value })
     const { type, id } = this.store('main.currentNetwork')
     this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom), 1000)
+  }
+
+  inputLattice (e) {
+    e.preventDefault()
+    clearTimeout(this.inputLatticeTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ latticeEndpoint: value })
+    this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpoint', this.state.latticeEndpoint), 1000)
   }
 
   localShake (key) {
@@ -163,6 +180,12 @@ class Settings extends React.Component {
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+    let latticePresets = {
+      'default': 'https://signing.gridpl.us:3000',
+      'dappnode': 'http://lattice-connext.public.dappnode:3000'
+    }
+    latticePresets = Object.keys(latticePresets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
+
     const networkOptions = []
     Object.keys(networks).forEach(type => {
       Object.keys(networks[type]).forEach(id => {
@@ -174,7 +197,7 @@ class Settings extends React.Component {
         <div className='localSettingsWrapFadeTop' />
         <div className='localSettingsWrapFadeBot' />
         <div className='localSettingsWrap'>
-          <div className='localSettingsTitle connectionTitle' style={{ zIndex: 3 }}>
+          <div className='localSettingsTitle connectionTitle' style={{ zIndex: 4 }}>
             <div className='localSettingsTitleText'>Connection</div>
             <div className='localSettingsAddNetwork' onMouseDown={() => this.store.toggleAddNetwork()}>{svg.broadcast(16)}</div>
             <Dropdown
@@ -183,7 +206,7 @@ class Settings extends React.Component {
               options={networkOptions}
             />
           </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
+          <div className='signerPermission' style={{ zIndex: 3 }}>
             <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
                 <div className='signerPermissionOrigin'>Primary</div>
@@ -209,7 +232,7 @@ class Settings extends React.Component {
               </div>
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 1 }}>
+          <div className='signerPermission' style={{ zIndex: 2 }}>
             <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
               <div className='connectionOptionToggle'>
                 <div className='signerPermissionOrigin'>Secondary</div>
@@ -232,6 +255,28 @@ class Settings extends React.Component {
               </div>
               <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
                 <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
+              </div>
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 1}}>
+            <div className='connectionOption connectionOptionOn'>
+              <div className='connectionOptionToggle'>
+                <div className='signerPermissionOrigin'>Lattice</div>
+              </div>
+              <div className='connectionOptionDetails'>
+                {/*<div className='connectionOptionDetailsInset'>*/}
+                {/*  <Dropdown*/}
+                {/*    syncValue={this.state.latticeEndpoint}*/}
+                {/*    onChange={preset => {*/}
+                {/*      console.log(preset);*/}
+                {/*      link.send('tray:action', 'setLatticeEndpoint', latticePresets[preset])*/}
+                {/*    }}*/}
+                {/*    options={latticePresets}*/}
+                {/*  />*/}
+                {/*</div>*/}
+              </div>
+              <div className='connectionCustomInput connectionCustomInputOn'>
+                <input tabIndex='-1' value={this.state.latticeEndpoint} onChange={e => this.inputLattice(e)} />
               </div>
             </div>
           </div>

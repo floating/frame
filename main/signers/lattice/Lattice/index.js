@@ -6,19 +6,20 @@ const EthereumTx = require('ethereumjs-tx')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const crypto = require('crypto');
-const {bufferToHex} = require("ethereumjs-util");
-const {concatSig} = require("eth-sig-util");
 const promisify = require('util').promisify;
 const HARDENED_OFFSET = 0x80000000;
-const flatten = a => "0x" + a.reduce((r, s) => r + s.slice(2), "");
-const encodeSignature = ([v, r, s]) => flatten([r, s, v]);
 const clientConfig = {
     name: 'Frame',
     crypto: crypto,
     privKey: null,
     timeout: 30000
 }
-
+function humanReadable(str) {
+    for (let i = 0; i < str.length; i++)
+        if (str.charCodeAt(i) < 0x0020 || str.charCodeAt(i) > 0x007f)
+            return false;
+    return true;
+}
 const networks = {
     1: "mainnet",
     3: "ropsten",
@@ -34,9 +35,10 @@ class Lattice extends Signer {
         log.info('Setting up Lattice device')
         this.device = device
         this.id = this.getId();
-
-        this.baseUrl = store('main.lattice.endpoint');
-        clientConfig['baseUrl'] = device.baseUrl;
+        this.features = {
+            'ascii' : true
+        }
+        clientConfig['baseUrl'] = store('main.lattice.endpoint');
         let password = store('main.lattice.password')
         if (!password) {
             password = crypto.randomBytes(32).toString('hex');
@@ -49,9 +51,13 @@ class Lattice extends Signer {
         this.network = store('main.currentNetwork.id')
         this.status = 'loading'
         this.index = 0
-        // this.open().then(response => {
-        //     windows.broadcast('main:action', 'addSigner', this.summary())
-        // }).catch(err => console.log(err))
+        this.varObserver = store.observer(() => {
+            if (
+                this.network !== store('main.currentNetwork.id')
+            ) {
+                this.reset()
+            }
+        })
 
     }
 
@@ -68,6 +74,7 @@ class Lattice extends Signer {
 
             if (hasActiveWallet) {
                 await this.getDeviceAddress();
+                store.setLatticeDeviceID(this.device.deviceID);
                 this.update();
             }
 
@@ -173,10 +180,11 @@ class Lattice extends Signer {
         store.updateSigner(this.summary())
     }
 
-    reset() {
+    async reset () {
         this.network = store('main.currentNetwork.id')
         this.status = 'loading'
         this.addresses = []
+        await this.getDeviceAddress()
         this.update()
     }
 
@@ -194,6 +202,11 @@ class Lattice extends Signer {
     // Standard Methods
     async signMessage(index, message, cb) {
 
+        const asciiMessage = utils.hexToAscii(message)
+        if (humanReadable(asciiMessage)) {
+            message = asciiMessage;
+        }
+
         try {
             const data = {
                 protocol: 'signPersonal',
@@ -208,7 +221,6 @@ class Lattice extends Signer {
 
             const result = await clientSign(signOpts);
             let v = (result.sig.v[0] - 28).toString(16)
-            // let v = (result.sig.v[0] - 28);
             if (v.length < 2) v = '0' + v
             const signature = '0x' + result.sig.r + result.sig.s + v
 
@@ -219,17 +231,16 @@ class Lattice extends Signer {
     }
 
     async signTransaction(index, rawTx, cb) {
-
         try {
             if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
             const unsignedTxn = {
-                nonce: this.normalize(rawTx.nonce),
-                gasPrice: this.normalize(rawTx.gasPrice),
-                gasLimit: this.normalize(rawTx.gas),
-                to: this.normalize(rawTx.to),
-                value: this.normalize(rawTx.value),
-                data: this.normalize(rawTx.data),
-                chainId: networks[utils.hexToNumber(rawTx.chainId)], //might have to
+                nonce: utils.hexToNumber(rawTx.nonce),
+                gasPrice: utils.hexToNumber(rawTx.gasPrice),
+                gasLimit: utils.hexToNumber(rawTx.gas),
+                to: rawTx.to,
+                value: rawTx.value,
+                data: rawTx.data,
+                chainId: rawTx.chainId,
                 useEIP155: true,
                 signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index],
             }
@@ -248,7 +259,7 @@ class Lattice extends Signer {
                 to: this.hexToBuffer(rawTx.to),
                 value: this.hexToBuffer(rawTx.value),
                 data: this.hexToBuffer(rawTx.data),
-                v: this.hexToBuffer(result.sig.v),
+                v: result.sig.v[0],
                 r: this.hexToBuffer(result.sig.r),
                 s: this.hexToBuffer(result.sig.s)
             }, {chain: parseInt(rawTx.chainId)})

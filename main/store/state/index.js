@@ -98,8 +98,9 @@ const initial = {
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
     lattice: {
+      deviceID: main('lattice.deviceID', ''),
       password: main('lattice.password', ''),
-      endpoint: main('lattice.endpoint', 'https://signing.gridpl.us')
+      endpoint: main('lattice.endpoint', 'http://lattice-connect.public.dappnode:3000')
     },
     ledger: {
       derivation: main('ledger.derivation', 'legacy'),

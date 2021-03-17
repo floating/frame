@@ -227,7 +227,8 @@ class Account {
     }
   }
 
-  signTransaction (index, rawTx, cb) {
+  signTransaction (rawTx, cb) {
+    // if(index === typeof 'object' && cb === typeof 'undefined' && typeof rawTx === 'function') cb = rawTx; rawTx = index; index = 0;
     this._validateTransaction(rawTx, (err) => {
       if (err) return cb(err)
 

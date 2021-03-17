@@ -134,6 +134,9 @@ module.exports = {
   setLatticePassword:  (u, value) => {
     u('main.lattice.password', () => value)
   },
+  setLatticeEndpoint:  (u, value) => {
+    u('main.lattice.endpoint', () => value)
+  },
   setLatticeDeviceID:  (u, value) => {
     u('main.lattice.deviceID', () => value)
   },

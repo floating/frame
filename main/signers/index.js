@@ -10,6 +10,8 @@ class Signers extends EventEmitter {
     constructor() {
         super()
         this.signers = []
+        this.lattice = lattice(this);
+        this.lattice.scan();
         hot.scan(this)
         ledger.scan(this)
         trezorConnect.scan(this)
