@@ -9,8 +9,6 @@ import Settings from './Settings'
 
 // import ledgerLogo from './ledgerLogo.png'
 // import trezorLogo from './trezorLogo.png'
-import gridPlusLogo from "../../Main/Add/AddHardwareLattice/grid.png";
-
 // TODO: Rename Signer component to Account
 
 class _Balances extends React.Component {
@@ -293,13 +291,14 @@ class Signer extends React.Component {
         ) : null}
         <div className={innerClass} onMouseDown={this.typeClick.bind(this)} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
           <div className='signerInset'>
-            <div className='signerImage'>
+            <div className={`signerImage signerImage-${this.props.type}`}>
               {(_ => {
                 if (this.props.signer) {
                   if (this.props.signer.type === 'ledger') return svg.ledger(24)
                   if (this.props.signer.type === 'trezor') return svg.trezor(20)
                   if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
                   if (this.props.signer.type === 'aragon') return svg.aragon(32)
+                  if (this.props.signer.type === 'lattice') return svg.lattice(32)
                   return svg.octicon('plus', { height: 31 })
                 } else {
                   return null

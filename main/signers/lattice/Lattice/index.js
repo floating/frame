@@ -38,6 +38,8 @@ class Lattice extends Signer {
         this.features = {
             'ascii' : true
         }
+
+
         clientConfig['baseUrl'] = store('main.lattice.endpoint');
         let password = store('main.lattice.password')
         if (!password) {
@@ -60,6 +62,8 @@ class Lattice extends Signer {
             }
         })
 
+        this.deviceStatus()
+
     }
 
     getId() {
@@ -74,9 +78,8 @@ class Lattice extends Signer {
             const hasActiveWallet = await clientPair(pin);
 
             if (hasActiveWallet) {
-                await this.getDeviceAddress();
+                await this.deriveAddresses();
                 store.setLatticeDeviceID(this.device.deviceID);
-                this.update();
             }
 
             return this.addresses;
@@ -95,8 +98,7 @@ class Lattice extends Signer {
                 const isPaired = await clientConnect(this.device.deviceID);
 
                 if (isPaired) {
-                    await this.getDeviceAddress();
-                    this.update();
+                    await this.deriveAddresses();
                 }
                 return [this.addresses, isPaired];
             }
@@ -106,12 +108,17 @@ class Lattice extends Signer {
     }
 
     close() {
-        clearTimeout(this.interval)
+        if (this._pollStatus) clearTimeout(this._pollStatus)
+        this.varObserver.remove()
         this.closed = true
+        store.removeSigner(this.id)
         super.close()
     }
+    async wait (time) {
+        return new Promise(resolve => setTimeout(resolve, time))
+    }
+    async deriveAddresses() {
 
-    async getDeviceAddress() {
         try {
             const req = {
                 currency: 'ETH',
@@ -124,12 +131,59 @@ class Lattice extends Signer {
             const result = await getAddresses(req);
             this.status = 'ok';
             this.addresses = result;
+            this.update()
             return result;
         } catch (err) {
             //no active wallet return nothing
             return [];
         }
+
     }
+
+
+    pollStatus (interval = 21 * 1000) { // Detect sleep/wake
+        clearTimeout(this._pollStatus)
+        this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
+    }
+
+    async deviceStatus () {
+        this.pollStatus()
+        if (this.deviceStatusActive || this.verifyActive) return
+        this.deviceStatusActive = true
+        try {
+            // If signer has no addresses, try deriving them
+            if (!this.addresses.length) await this.deriveAddresses()
+            this.deviceStatusActive = false
+        } catch (err) {
+            log.error(err)
+            log.error(err.message)
+            const deviceBusy = (
+                err.message.startsWith('cannot open device with path') ||
+                err.message === 'Device access is paused' ||
+                err.message === 'Invalid channel' ||
+                err.message === 'DisconnectedDevice'
+            )
+            if (deviceBusy) { // Device is busy, try again
+                if (++this.busyCount > 10) {
+                    this.busyCount = 0
+                    log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
+                } else {
+                    this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
+                    log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
+                }
+            } else {
+                this.status = err.message
+                //TODO: handle anything specific to the lattice here.
+                this.addresses = []
+                store.removeSigner(this.getId());
+                this.update()
+            }
+            this.deviceStatusActive = false
+        }
+    }
+
+
+
 
     // This verifyAddress signature is no longer current
     async verifyAddress(index, current, display, cb = () => {
@@ -144,7 +198,7 @@ class Lattice extends Signer {
         }
         this.verifyActive = true
         try {
-            const result = await this.getDeviceAddress()
+            const result = await this.deriveAddresses()
             if (result && !result.length) {
                 return cb(null, false)
             }
@@ -174,7 +228,7 @@ class Lattice extends Signer {
         this.requests = {} // TODO Decline these requests before clobbering them
         windows.broadcast('main:action', 'updateSigner', this.summary())
         cb(null, this.summary())
-        this.getDeviceAddress()
+        this.deriveAddresses()
     }
 
     update() {
@@ -190,8 +244,8 @@ class Lattice extends Signer {
         this.network = store('main.currentNetwork.id')
         this.status = 'loading'
         this.addresses = []
-        await this.getDeviceAddress()
-        this.update()
+        windows.broadcast('main:action', 'updateSigner', this.summary())
+        await this.deriveAddresses()
     }
 
     normalize(hex) {

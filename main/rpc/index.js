@@ -45,10 +45,10 @@ const rpc = {
   trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
   trezorPhrase: (id, phrase, cb) => signers.trezorPhrase(id, phrase, cb),
   latticePair(id, pin, cb) {
-    signers.latticePair(id, pin).then(result => cb(null, result)).catch(cb);
+    signers.latticePair(id, pin).then(result => cb(null, result)).catch(err => cb(err));
   },
   latticeConnect(connectOpts, cb) {
-    signers.latticeConnect(connectOpts).then((result) => cb(null, result)).catch(cb)
+    signers.latticeConnect(connectOpts).then((result) => cb(null, result)).catch(err => cb(err))
   },
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),

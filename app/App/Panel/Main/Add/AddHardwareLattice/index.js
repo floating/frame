@@ -3,7 +3,6 @@ import Restore from 'react-restore'
 
 import link from '../../../../../link'
 import svg from '../../../../../svg' //TODO: get gridplus svg
-import gridLogo from "./grid.png";
 
 class AddHardwareLattice extends React.Component {
     constructor(...args) {
@@ -68,7 +67,9 @@ class AddHardwareLattice extends React.Component {
         link.rpc('latticeConnect', {
             deviceID: this.state.deviceID,
         }, (err, response = []) => {
-
+            if (err || !response || response && response.length === 0) {
+                return this.setState({status: err, index: 2, error: true})
+            }
             const [accounts, isPaired] = response;
             if (!isPaired) {
                 this.next();
@@ -77,7 +78,7 @@ class AddHardwareLattice extends React.Component {
                 this.setState({status: 'Adding Accounts', index: 2, error: false})
                 setTimeout(() => {
                     this.store.toggleAddAccount()
-                }, 2000)
+                }, 1000)
             } else if (!err && isPaired === typeof 'undefined') {
                 this.setState({status: 'ok', index: 2, error: true})
             }
@@ -128,7 +129,7 @@ class AddHardwareLattice extends React.Component {
                     <div className='addAccountItemTop'>
                         <div className='addAccountItemIcon'>
                             <div className='addAccountItemIconType addAccountItemIconSmart'
-                                 style={{paddingTop: '6px'}}>{<img src={gridLogo} height={30} width={30}/>}</div>
+                                 style={{paddingTop: '6px'}}>{svg.lattice(32)}</div>
                             <div className='addAccountItemIconHex addAccountItemIconHexSmart'/>
                         </div>
                         <div className='addAccountItemTopTitle'>Lattice</div>
