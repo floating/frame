@@ -39,40 +39,37 @@ class Signers extends EventEmitter {
 
     async latticePair(id, pin) {
 
-        try{
+        try {
             const signer = this.get(`Lattice-${id}`);
             if (signer && signer.setPin) {
-                try{
+                try {
                     const result = await signer.setPin(pin);
 
                     return result;
-                }catch(err) {
+                } catch (err) {
                     return new Error(err);
                 }
             } else {
                 return new Error('Could not pair');
             }
-        }catch(err){
+        } catch (err) {
             return new Error(err);
         }
     }
 
     async latticeConnect(connectOpts) {
-        try{
-            const signer = lattice(this);
-            if (signer && signer.open) {
-                try{
-                    const response = await signer.open(connectOpts);
+        const signer = lattice(this);
+        if (signer && signer.open) {
+            try {
 
-                    return response;
-                }catch(err){
-                    return new Error(err);
-                }
-            } else {
-                return new Error("signer issues");
+                const response = await signer.open(connectOpts);
+
+                return response;
+            } catch (err) {
+                throw new Error('could not connect to lattice')
             }
-        }catch(err) {
-            return new Error('could not connect to lattice')
+        } else {
+            throw new Error('signer library issue')
         }
     }
 

@@ -51,6 +51,7 @@ class Lattice extends Signer {
         this.network = store('main.currentNetwork.id')
         this.status = 'loading'
         this.index = 0
+
         this.varObserver = store.observer(() => {
             if (
                 this.network !== store('main.currentNetwork.id')
@@ -81,7 +82,7 @@ class Lattice extends Signer {
             return this.addresses;
         } catch (err) {
 
-            return new Error(err);
+            throw new Error(err);
         }
     }
 
@@ -125,7 +126,8 @@ class Lattice extends Signer {
             this.addresses = result;
             return result;
         } catch (err) {
-            return new Error(err);
+            //no active wallet return nothing
+            return [];
         }
     }
 
@@ -143,10 +145,14 @@ class Lattice extends Signer {
         this.verifyActive = true
         try {
             const result = await this.getDeviceAddress()
+            if (result && !result.length) {
+                return cb(null, false)
+            }
             const address = result[index].toLowerCase();
             current = current.toLowerCase()
             if (address !== current) {
                 log.error(new Error('Address does not match device'))
+                this.reset();
                 this.signers.remove(this.id)
                 cb(new Error('Address does not match device'))
             } else {
@@ -168,7 +174,7 @@ class Lattice extends Signer {
         this.requests = {} // TODO Decline these requests before clobbering them
         windows.broadcast('main:action', 'updateSigner', this.summary())
         cb(null, this.summary())
-        this.verifyAddress()
+        this.getDeviceAddress()
     }
 
     update() {
@@ -239,7 +245,7 @@ class Lattice extends Signer {
                 gasLimit: utils.hexToNumber(rawTx.gas),
                 to: rawTx.to,
                 value: rawTx.value,
-                data: rawTx.data,
+                data: rawTx.data || "0x",
                 chainId: rawTx.chainId,
                 useEIP155: true,
                 signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index],
