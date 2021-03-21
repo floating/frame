@@ -20,13 +20,6 @@ function humanReadable(str) {
             return false;
     return true;
 }
-const networks = {
-    1: "mainnet",
-    3: "ropsten",
-    4: "rinkeby",
-    42: "kovan",
-    5: "goerli"
-}
 
 class Lattice extends Signer {
     constructor(device, signers) {
@@ -35,11 +28,6 @@ class Lattice extends Signer {
         log.info('Setting up Lattice device')
         this.device = device
         this.id = this.getId();
-        this.features = {
-            'ascii' : true
-        }
-
-
         clientConfig['baseUrl'] = store('main.lattice.endpoint');
         let password = store('main.lattice.password')
         if (!password) {
@@ -81,11 +69,9 @@ class Lattice extends Signer {
                 await this.deriveAddresses();
                 store.setLatticeDeviceID(this.device.deviceID);
             }
-
             return this.addresses;
         } catch (err) {
-
-            throw new Error(err);
+            return new Error(err);
         }
     }
 
@@ -152,32 +138,9 @@ class Lattice extends Signer {
         this.deviceStatusActive = true
         try {
             // If signer has no addresses, try deriving them
-            if (!this.addresses.length) await this.deriveAddresses()
+            await this.deriveAddresses()
             this.deviceStatusActive = false
         } catch (err) {
-            log.error(err)
-            log.error(err.message)
-            const deviceBusy = (
-                err.message.startsWith('cannot open device with path') ||
-                err.message === 'Device access is paused' ||
-                err.message === 'Invalid channel' ||
-                err.message === 'DisconnectedDevice'
-            )
-            if (deviceBusy) { // Device is busy, try again
-                if (++this.busyCount > 10) {
-                    this.busyCount = 0
-                    log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-                } else {
-                    this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
-                    log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
-                }
-            } else {
-                this.status = err.message
-                //TODO: handle anything specific to the lattice here.
-                this.addresses = []
-                store.removeSigner(this.getId());
-                this.update()
-            }
             this.deviceStatusActive = false
         }
     }
