@@ -131,11 +131,20 @@ module.exports = {
       return addresses
     })
   },
+  setLatticeSuffix:  (u, value) => {
+    u('main.lattice.suffix', () => value)
+  },
   setLatticePassword:  (u, value) => {
     u('main.lattice.password', () => value)
   },
   setLatticeEndpoint:  (u, value) => {
     u('main.lattice.endpoint', () => value)
+  },
+  setLatticeEndpointMode:  (u, value) => {
+    u('main.lattice.endpointMode', () => value)
+  },
+  setLatticeAccountLimit:  (u, value) => {
+    u('main.lattice.accountLimit', () => value)
   },
   setLatticeDeviceID:  (u, value) => {
     u('main.lattice.deviceID', () => value)

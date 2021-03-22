@@ -69,7 +69,7 @@ class Signers extends EventEmitter {
                 throw new Error('could not connect to lattice')
             }
         } else {
-            throw new Error('signer library issue')
+            return new Error('signer library issue')
         }
     }
 

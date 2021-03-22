@@ -28,7 +28,11 @@ class Lattice extends Signer {
         log.info('Setting up Lattice device')
         this.device = device
         this.id = this.getId();
+        this.accountLimit = store('main.lattice.accountLimit')
         clientConfig['baseUrl'] = store('main.lattice.endpoint');
+        const frameSuffix = store('main.lattice.suffix');
+        if (frameSuffix) clientConfig['name'] = `Frame-${frameSuffix}`;
+
         let password = store('main.lattice.password')
         if (!password) {
             password = crypto.randomBytes(32).toString('hex');
@@ -109,7 +113,7 @@ class Lattice extends Signer {
             const req = {
                 currency: 'ETH',
                 startPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, 0],
-                n: 4,
+                n: this.accountLimit,
                 skipCache: true
             };
             const getAddresses = promisify(this.client.getAddresses).bind(this.client);
