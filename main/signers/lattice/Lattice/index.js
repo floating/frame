@@ -247,7 +247,7 @@ class Lattice extends Signer {
             const clientSign = promisify(this.client.sign).bind(this.client);
 
             const result = await clientSign(signOpts);
-            let v = (result.sig.v[0] - 28).toString(16)
+            let v = result.sig.v.toString(16)
             if (v.length < 2) v = '0' + v
             const signature = '0x' + result.sig.r + result.sig.s + v
 
