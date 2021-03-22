@@ -326,6 +326,7 @@ const api = {
     })
     windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
     // windows.flow.setAlwaysOnTop(true)
+    windows.flow.on('blur', () => api.hideFlow())
     if (dev) windows.flow.openDevTools()
   },
   showFlow: () => {

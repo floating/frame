@@ -99,7 +99,6 @@ class Dapps {
   }
 
   async add (domain, options, cb) {
-    console.log('adding dapp')
     // Resolve ENS name
     let namehash
     try {
@@ -125,6 +124,7 @@ class Dapps {
     if (content) {
       const cid = content
       // const { type, hash: cid } = content
+      await ipfs.pin(cid)
       store.addDapp(namehash, { domain, cid, pinned: false }, options)
       // Get Dapp Icon
       try {

@@ -3,7 +3,7 @@ const peers = require('./peers.json')
 
 
 const { globSource } = IpfsHttpClient
-const ipfs = IpfsHttpClient()
+// const ipfs = IpfsHttpClient()
 
 
 // if there is an ipfs endpoint in the store use that otherwise use pylon
@@ -117,6 +117,11 @@ const surface = {
     if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
     if (files[0].path !== path || files.length !== 1) throw new Error(`Path ${path} could not be found`)
     return files[0]
+  },
+  pin: async (cid) => {
+    if (!node) throw new Error('IPFS is not running')
+    const result = await node.pin.add(cid)
+    return result
   }
 }
 module.exports = surface

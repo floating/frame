@@ -30,24 +30,21 @@ class Flow extends React.Component {
   // }
   render () {
     return (
-      // <div ref={this.input} className='bar'>
-      //   <input
-      //     onChange={(e) => {
-      //       this.setState({ input: e.target.value })
-      //     }}
-      //     onKeyDown={(e) => {
-      //       if (e.key === 'Enter') {
-      //         e.preventDefault()
-      //         e.target.blur()
-      //         this.trigger()
-      //       }
-      //     }} 
-      //   />
-      // </div>
-      // <div className='flow'>
-      //   {'flow'}
-      // </div>
       <div className='dapps'>
+        <div ref={this.input} className='bar'>
+          <input
+            onChange={(e) => {
+              this.setState({ input: e.target.value })
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                e.target.blur()
+                this.trigger()
+              }
+            }} 
+          />
+        </div>
         <div className='dappWrap'>
           <div className='dapp' onMouseDown={() => link.rpc('openDapp', 'matt.eth', (err) => {
             console.log('err', err)
