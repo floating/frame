@@ -286,7 +286,7 @@ class Lattice extends Signer {
                 to: this.hexToBuffer(rawTx.to),
                 value: this.hexToBuffer(rawTx.value),
                 data: this.hexToBuffer(rawTx.data),
-                v: result.sig.v,
+                v: result.sig.v[0],
                 r: this.hexToBuffer(result.sig.r),
                 s: this.hexToBuffer(result.sig.s)
             }, {chain: parseInt(rawTx.chainId)})
