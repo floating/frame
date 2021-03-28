@@ -15,6 +15,9 @@ const BASE_PATH_LEGACY_TEST = '44\'/1\'/0\'/'
 const BASE_PATH_LIVE = '44\'/60\'/'
 const BASE_PATH_LIVE_TEST = '44\'/1\'/'
 
+const BASE_PATH_STANDARD = `44\'/60\'/0\'/0/`
+const BASE_PATH_STANDARD_TEST = `44\'/1\'/0\'/0/`
+
 class Ledger extends Signer {
   constructor (devicePath, signers, scan) {
     super()
@@ -53,6 +56,12 @@ class Ledger extends Signer {
         return (BASE_PATH_LEGACY + i)
       } else {
         return (BASE_PATH_LEGACY_TEST + i)
+      }
+    } else if (this.derivation === 'standard') {
+      if (store('main.hardwareDerivation') === 'mainnet') {
+        return (BASE_PATH_STANDARD + i)
+      } else {
+        return (BASE_PATH_STANDARD_TEST + i)
       }
     } else {
       if (store('main.hardwareDerivation') === 'mainnet') {
@@ -171,6 +180,8 @@ class Ledger extends Signer {
       // Derive addresses
       if (this.derivation === 'legacy') {
         addresses = await this._deriveLegacyAddresses()
+      } else if (this.derivation === 'standard') {
+        addresses = await this._deriveStandardAddresses()
       } else {
         addresses = await this._deriveLiveAddresses()
       }
@@ -399,6 +410,27 @@ class Ledger extends Signer {
           path = BASE_PATH_LEGACY
         } else {
           path = BASE_PATH_LEGACY_TEST
+        }
+        const result = await this.getAddress(path, false, true)
+        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
+          if (err) reject(err)
+          else resolve(addresses)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    }
+    return new Promise(executor)
+  }
+
+  _deriveStandardAddresses () {
+    const executor = async (resolve, reject) => {
+      try {
+        let path
+        if (store('main.hardwareDerivation') === 'mainnet') {
+          path = BASE_PATH_STANDARD
+        } else {
+          path = BASE_PATH_STANDARD_TEST
         }
         const result = await this.getAddress(path, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
