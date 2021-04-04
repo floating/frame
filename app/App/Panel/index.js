@@ -113,13 +113,23 @@ class Panel extends React.Component {
         <Networks />
         <Main />
         <Badge />
-        {/* <div className='appMenu'>
+        <div className='appMenu'>
           <div className='appMenuItem'>
             <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleFlow')}>
               {svg.cpu(18)}
             </div>
           </div>
-        </div> */}
+          <div className='appMenuItem'>
+            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleDash', 'signers')}>
+              {svg.fingerprint(18)}
+            </div>
+          </div>
+          <div className='appMenuItem'>
+            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleDash', 'networks')}>
+              {svg.save(18)}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

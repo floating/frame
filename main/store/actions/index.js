@@ -371,6 +371,11 @@ module.exports = {
       return colorway
     })
   },
+  // Dashboard
+  setDashType: (u, type) => {
+    // console.log('set dash type', type)
+    u('dash.type', () => type)
+  }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
   // }

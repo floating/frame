@@ -46,7 +46,7 @@ class Flow extends React.Component {
           />
         </div>
         <div className='dappWrap'>
-          <div className='dapp' onMouseDown={() => link.rpc('openDapp', 'matt.eth', (err) => {
+          <div className='dapp' onMouseDown={() => link.rpc('openDapp', 'matt.eth', {}, (err) => {
             console.log('err', err)
           })}>
             <div className='dappIcon'>
@@ -55,7 +55,7 @@ class Flow extends React.Component {
               matt.eth
             </div>
           </div>
-          <div className='dapp'  onMouseDown={() => link.rpc('openDapp', 'frame.eth', (err) => {
+          <div className='dapp'  onMouseDown={() => link.rpc('openDapp', 'frame.eth', {}, (err) => {
             console.log('err', err)
           })}>
           <div className='dappIcon'>

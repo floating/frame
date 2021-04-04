@@ -17,6 +17,12 @@ const main = (path, def) => {
 }
 
 const initial = {
+  dash: {
+    type: 'signers'
+  },
+  tray: {},
+  flow: {},
+  dapps: {},
   panel: {
     show: false,
     view: 'default'

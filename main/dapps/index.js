@@ -99,6 +99,7 @@ class Dapps {
   }
 
   async add (domain, options, cb) {
+    // console.log('dapps.add', domain, options, cb)
     // Resolve ENS name
     let namehash
     try {

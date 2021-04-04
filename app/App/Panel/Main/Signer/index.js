@@ -260,13 +260,13 @@ class Signer extends React.Component {
         <div className='signerImage'>
           {(_ => {
             if (this.props.signer) {
-              if (this.props.signer.type === 'ledger') return svg.ledger(24)
-              if (this.props.signer.type === 'trezor') return svg.trezor(20)
-              if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
+              if (this.props.signer.type === 'ledger') return svg.ledger(30)
+              if (this.props.signer.type === 'trezor') return svg.trezor(30)
+              if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(26)
               if (this.props.signer.type === 'aragon') return svg.aragon(32)
-              return svg.logo(24)
+              return svg.logo(30)
             } else {
-              return svg.logo(24)
+              return svg.logo(30)
             }
           })()}
         </div>
@@ -418,7 +418,7 @@ class Signer extends React.Component {
         </div>
         <div className={open ? 'signerAddress signerAddressActive' : 'signerAddress'}>
           <div className='transactionToAddress'>
-            <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+            <div className='transactionToAddressLarge'>{address.substring(0, 8)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 6)}</div>
             <div className='transactionToAddressFull'>
               {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
               <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />
@@ -500,7 +500,7 @@ class Signer extends React.Component {
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
-            <div className='signerTop'  onMouseDown={this.typeClick.bind(this)} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+            <div className='signerTop' onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {this.state.openHover && false ? (
               <>
                 <div className='signerSelectArrowWrap signerSelectLeft'>
@@ -524,10 +524,10 @@ class Signer extends React.Component {
               </>
               ) : null}
               {this.renderType()} 
-              <div className='signerSelect'>
+              <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>
                 <div className='signerSelectIconWrap'>
                   <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    {svg.chevron(23)}
+                    {svg.chevron(24)}
                   </div>
                 </div>
               </div>
@@ -536,7 +536,13 @@ class Signer extends React.Component {
             </div>
             {current ? this.renderAccountList() : null}
             <div className={current ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
-                hello
+              <div className='accountMenuLeft'>
+                <div className='accountMenuItem'>{svg.checklist(20)}</div>
+                <div className='accountMenuItem'>{svg.gear(20)}</div>
+              </div>
+              <div className='accountMenuRight'>
+                <div className='accountMenuItem'>{svg.octicon('gear', { height: 20 })}</div>
+              </div>
             </div>
             <div className={current ? 'signerMid cardShow' : 'signerMid cardHide'} style={open ? { } : { pointerEvents: 'none' }}>
               <Settings id={this.props.id} />

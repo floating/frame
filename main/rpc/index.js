@@ -159,6 +159,7 @@ const rpc = {
   },
   // flow
   async flowCommand (command, cb) {
+    // console.log('flowCommand', command, cb)
     await dapps.add(command.input, {}, (err, res) => {
       if (err || res) console.log(err, res)
     })
@@ -168,6 +169,7 @@ const rpc = {
   },
   addDapp (domain, options, cb) {
     if (!(domain.endsWith('.eth') || domain.endsWith('.xyz'))) domain += '.eth'
+    // console.log('addDapp', domain, options, cb)
     dapps.add(domain, options, cb)
   },
   removeDapp (domain, cb) {
@@ -181,6 +183,7 @@ const rpc = {
   },
   openDapp (domain, options, cb) {
     if (domain.endsWith('.eth')) {
+      // console.log(' RPC openDapp ', domain, options, cb)
       dapps.add(domain, options, cb)
     } else {
       console.log('input needs to be ens name')

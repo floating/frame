@@ -102,7 +102,8 @@ const api = {
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
         preload: path.resolve(__dirname, '../../bundle/bridge.js'),
-        worldSafeExecuteJavaScript: true
+        worldSafeExecuteJavaScript: true,
+        backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
     windows.tray.loadURL(path.join('file://', __dirname, '/../../bundle/tray.html'))
@@ -191,6 +192,7 @@ const api = {
     tray.on('click', api.trayClick)
     api.create()
     api.flow()
+    api.dash()
   },
   trayClick: () => {
     if (this.recentAutohide) return
@@ -321,7 +323,8 @@ const api = {
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
         preload: path.resolve(__dirname, '../../bundle/bridge.js'),
-        worldSafeExecuteJavaScript: true
+        worldSafeExecuteJavaScript: true,
+        backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
     windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
@@ -338,6 +341,7 @@ const api = {
     // } else {
     // if (!windows.tray) return api.tray()
     // windows.flow.setPosition(0, 0)
+    // console.log('showFlow')
     windows.flow.setAlwaysOnTop(true)
     // hideShow.running = 'show'
     windows.flow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
@@ -362,6 +366,73 @@ const api = {
       api.showFlow()
     }
   },
+  dash: () => {
+    windows.dash = new BrowserWindow({
+      id: 'dash',
+      width: 720,
+      height: 530,
+      frame: false,
+      // transparent: true,
+      // hasShadow: false,
+      show: false,
+      backgroundThrottling: false,
+      offscreen: true,
+      // icon: path.join(__dirname, './AppIcon.png'),
+      skipTaskbar: process.platform !== 'linux',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
+        disableBlinkFeatures: 'Auxclick',
+        enableRemoteModule: false,
+        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+        worldSafeExecuteJavaScript: true,
+        backgroundThrottling: false // Allows repaint when window is hidden
+      }
+    })
+    windows.dash.loadURL(`file://${__dirname}/../../bundle/dash.html`)
+    // windows.flow.setAlwaysOnTop(true)
+    // windows.dash.on('blur', () => api.hideDash())
+    if (dev) windows.dash.openDevTools()
+  },
+  showDash: (type) => {
+    // clearTimeout(mouseTimeout)
+    // hideShow.current = 'showing'
+    // if (hideShow.running) {
+    //   hideShow.next = false
+    //   if (hideShow.running !== 'show') hideShow.next = 'show'
+    // } else {
+    // if (!windows.tray) return api.tray()
+    // windows.flow.setPosition(0, 0)
+    console.log('send type to dash window', type)
+    store.setDashType(type)
+    setTimeout(() => {
+      windows.dash.setAlwaysOnTop(true)
+      // hideShow.running = 'show'
+      windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      windows.dash.setResizable(false) // Keeps height consistant
+      const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+      windows.dash.setSize(358, dev ? 740 - 110 : area.height - 110)
+      const {x, y} = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
+      windows.dash.setPosition(x - 383, y + 55)
+      // if (!glide) windows.tray.focus()
+      // windows.flow.emit('show')
+      windows.dash.show()
+      windows.dash.focus()
+      windows.dash.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
+    }, 10)
+  },
+  hideDash: () => {
+    windows.dash.hide()
+    store.setDashType()
+  },
+  toggleDash: (type) => {
+    if (windows.dash.isVisible()) {
+      api.hideDash()
+    } else {
+      api.showDash(type)
+    }
+  },
   openView: (ens, session) => {
     dapp.openView(ens, session, windows)
   },
@@ -378,13 +449,17 @@ if (dev) {
   const path = require('path')
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
-    if (name.indexOf('css') > -1) windows.tray.send('main:reload:style', name)
-    if (name.indexOf('css') > -1) windows.flow.send('main:reload:style', name)
+    if (name.indexOf('css') > -1) {
+      windows.tray.send('main:reload:style', name)
+      windows.flow.send('main:reload:style', name)
+      windows.dash.send('main:reload:style', name)
+    }
   })
   app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       windows.tray.reload()
       windows.flow.reload()
+      windows.dash.reload()
     })
   })
 }
@@ -414,5 +489,12 @@ ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectEleme
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
 store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
+store.observer(_ => api.broadcast('main:action', 'syncDash', store('dash')))
+// console.log(store)
+// store.api.feed((state, actions) => {
+//   actions.forEach(action => {
+//     console.log(action.updates)
+//   })
+// })
 
 module.exports = api
