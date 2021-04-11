@@ -412,9 +412,9 @@ const api = {
       windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.dash.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.dash.setSize(358, dev ? 740 - 110 : area.height - 110)
+      windows.dash.setSize(360, dev ? 740 - 120 : area.height - 120)
       const {x, y} = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
-      windows.dash.setPosition(x - 383, y + 55)
+      windows.dash.setPosition(x - 380, y + 60)
       // if (!glide) windows.tray.focus()
       // windows.flow.emit('show')
       windows.dash.show()
@@ -484,17 +484,30 @@ ipcMain.on('tray:mouseout', () => {
   }
 })
 
+// ipcMain.on('tray:focus', () => {
+//   if (windows.tray && windows.tray.focus) {
+//     // app.focus({ steal: true })
+//     windows.tray.focus()
+//   }
+// })
+
 ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
-store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
+// store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
 store.observer(_ => api.broadcast('main:action', 'syncDash', store('dash')))
+store.observer(_ => api.broadcast('main:action', 'syncPanel', store('panel')))
 // console.log(store)
-// store.api.feed((state, actions) => {
-//   actions.forEach(action => {
-//     console.log(action.updates)
-//   })
-// })
+store.api.feed((state, actions) => {
+  actions.forEach(action => {
+    action.updates.forEach(update => {
+      // console.log(update)
+      api.broadcast('main:action', 'pathSync', update.path, update.value)
+    })
+    
+   //  console.log(action.updates)
+  })
+})
 
 module.exports = api

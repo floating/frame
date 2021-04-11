@@ -32,9 +32,42 @@
 
   #panelWrap
     width 100%
-    padding-top 66px
-    padding-bottom 48px
+    padding-top 134px
+    padding-bottom 128px
     will-change scroll-position
+
+    .panelHeader
+      // background blue
+      position absolute
+      left 0
+      right 0
+      top 59px 
+      height 70px
+      background var(--ghostB)
+      z-index 20000000000
+      transition var(--standardFast)
+      
+      .panelHeaderTitle
+        position absolute 
+        left 0
+        top 0
+        bottom 0
+        font-size 20px
+        padding 14px 14px
+
+      .panelHeaderUpdate
+        position absolute 
+        right 20px
+        top 20px 
+        bottom 0
+        // background red
+        // padding 18px
+        cursor pointer
+        height 20px
+        width 40px
+        border-radius 10px
+        background red
+
 
     .noSigners
       width 100%

@@ -20,15 +20,15 @@ class Requests extends React.Component {
     this.unlockInput = React.createRef()
   }
 
-  trezorPin (num) {
-    this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
-    if (this.tPin.length === 4) {
-      link.rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
-        if (err) throw new Error(err)
-      })
-      this.tPin = ''
-    }
-  }
+  // trezorPin (num) {
+  //   this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
+  //   if (this.tPin.length === 4) {
+  //     link.rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
+  //       if (err) throw new Error(err)
+  //     })
+  //     this.tPin = ''
+  //   }
+  // }
 
   minimize () {
     this.setState({ minimized: true })
@@ -44,25 +44,25 @@ class Requests extends React.Component {
     }
   }
 
-  unlockChange (e) {
-    this.setState({ unlockInput: e.target.value })
-  }
+  // unlockChange (e) {
+  //   this.setState({ unlockInput: e.target.value })
+  // }
 
-  unlockSubmit (e) {
-    link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
-      if (err) {
-        this.setState({ unlockHeadShake: true })
-        setTimeout(() => this.setState({ unlockHeadShake: false }), 1010)
-      }
-    })
-  }
+  // unlockSubmit (e) {
+  //   link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
+  //     if (err) {
+  //       this.setState({ unlockHeadShake: true })
+  //       setTimeout(() => this.setState({ unlockHeadShake: false }), 1010)
+  //     }
+  //   })
+  // }
 
-  keyPressUnlock (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      this.unlockSubmit()
-    }
-  }
+  // keyPressUnlock (e) {
+  //   if (e.key === 'Enter') {
+  //     e.preventDefault()
+  //     this.unlockSubmit()
+  //   }
+  // }
 
   componentDidMount () {
     setTimeout(() => {
@@ -104,18 +104,8 @@ class Requests extends React.Component {
     const open = current && this.store('selected.open')
     // let minimized = this.store('selected.minimized')
 
-    let unlockClass = 'signerUnlockRequest'
-    if (this.state.unlockHeadShake) unlockClass += ' headShake'
-    const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '110px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(0px)', height: '0px', opacity: 0.3 }
-
     return (
       <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
-        <div className={unlockClass} style={unlockStyle}>
-          <div className='signerUnlockWrap'>
-            <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyPress={e => this.keyPressUnlock(e)} />
-            <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)}>Unlock</div>
-          </div>
-        </div>
         <div className='requestTitle'>
           <div>Requests</div>
           <div className='requestCount'>{normal.length}</div>

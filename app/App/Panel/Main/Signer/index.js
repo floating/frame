@@ -7,8 +7,283 @@ import link from '../../../../../resources/link'
 import Requests from './Requests'
 import Settings from './Settings'
 
+import SignerModule from './Modules/Signer'
+
 // import ledgerLogo from './ledgerLogo.png'
 // import trezorLogo from './trezorLogo.png'
+
+// needs to render and then report height
+
+// {
+//   name: 'verify address on signer' // list of nfts owned by address (postpone?)
+// }
+
+// signer panel will be where you remove signers and accounts
+
+
+
+// const modules = {
+
+// }
+
+
+// class Requests extends React.Component {
+
+// }
+
+
+
+
+class _Verify extends React.Component {
+  constructor (props, context) {
+    super(props, context)
+    this.moduleRef = React.createRef()
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.moduleRef && this.moduleRef.current) {
+        link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
+      }
+    })
+    this.state = {
+      verifyAddressSuccess: false,
+      verifyAddressResponse: ''
+    }
+  }
+  componentDidMount () {
+    this.resizeObserver.observe(this.moduleRef.current)
+    console.log('!!!Verify---', this.moduleRef.current.clientHeight)
+    link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+  } 
+  render () {
+    // console.log(this.props)
+    // const { module, index } = this.props
+    // const { top, height } = module
+    // const style = { transform: `translateY(${top}px)`, zIndex: 10000 - index, height }
+    // const i = 1
+    // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
+    const signerType = this.store('main.accounts', this.props.id, 'signer.type')
+    const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
+    return (
+      <div ref={this.moduleRef} style={{ padding: '20px' }}>
+        <div className='signerSettingsTitle'>Verify Address</div>
+        <div className='signerPermission'>
+          <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
+          {this.state.verifyAddressResponse ? (
+            <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
+          ) : null}
+        </div>
+        <div className='quitFrame'>
+          <div onMouseDown={() => this.verifyAddress()} className='quitFrameButton'>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
+        </div>
+      </div>
+    )
+
+  }
+}
+
+const Verify = Restore.connect(_Verify)
+
+
+class Req extends React.Component {
+  constructor (props, context) {
+    super(props, context)
+    this.moduleRef = React.createRef()
+    console.log('NEW REZISE OBSERVEF')
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.moduleRef && this.moduleRef.current) {
+        link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
+      }
+    })
+    this.state = {
+      lines: Array.from(Array(Math.round(Math.random() * 10)).keys())
+    }
+    setInterval(() => {
+      this.setState({
+        lines: Array.from(Array(Math.round(Math.random() * 10)).keys())
+      })
+    }, 7000)
+  }
+  componentDidMount () {
+    this.resizeObserver.observe(this.moduleRef.current)
+    if (this.moduleRef && this.moduleRef.current) {
+      link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+    }
+    // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+  } 
+  // componentWillUnmount () {
+  //   this.props.unregisterModule(this.props.index, this.moduleRef)
+  // }
+  render () {
+    // console.log(this.props)
+    // const { module, index } = this.props
+    // const { top, height } = module
+    // const style = { transform: `translateY(${top}px)`, zIndex: 10000 - index, height }
+    return (
+      <div ref={this.moduleRef} style={{ padding: '20px' }}>
+        {this.props.id}
+        {this.state.lines.map((i) => {
+          return (
+            <div className='cardShow'>{`Account Module: ${0} - Line: ${i}`}</div>
+          )
+        })}
+      </div>
+    )
+  }
+}
+
+// account module is position absolute and with a translateX 
+class _AccountMain extends React.Component {
+  // constructor (props, context) {
+  //   // console.log(context)
+  //   super(props, context)
+  //   // this.resizeObserver = new ResizeObserver(() => )
+  //   this.state = { 
+  //     slideHeight: 0
+  //   }
+  //   // this.moduleRefs = []
+  //   context.store.observer(() => { 
+  //     const modules = context.store('views.tray.account.defaultModules') // modules per account in future
+  //     // Make refs
+  //     if (this.moduleRefs.length < modules.length) {
+  //       this.resizeObserver.disconnect()
+  //       this.moduleRefs = modules.map(() => React.createRef())
+  //     }
+  //   })
+    
+  // }
+  // componentDidMount () {
+
+  // }
+  // reportModule () {
+
+  // }
+  // computePositions () {
+  //   this.resizeObserver.disconnect()
+  //   const modulePositions = []
+  //   let slideHeight = 0
+  //   this.moduleRefs.forEach((ref, i) => {
+  //     modulePositions[i] = {}
+  //     modulePositions[i].top = slideHeight
+  //     modulePositions[i].height = ref && ref.current ? ref.current.clientHeight + 1 : 0
+  //     slideHeight += modulePositions[i].height
+  //   })
+  // }
+  renderModule (id, module, top, index) {
+    console.log(id, module, top, index)
+    const style = { 
+      transform: `translateY(${top}px)`, 
+      zIndex: 10000 - index, 
+      height: module.height + 1 
+    }
+    return (
+      <div className='accountModule' style={style}>
+        <div className='accountModuleInner cardShow' style={{ amimationDelay: (index * 0.1) + 's'}}>
+          {
+            id === 'signer' ? <SignerModule 
+              id={id} 
+              accountId={this.props.id} 
+              status={this.props.status} 
+              signer={this.props.signer} 
+            /> :
+            id === 'requests' ? <Requests 
+              id={this.props.id} 
+              addresses={this.props.addresses} 
+              minimized={this.props.minimized} 
+              status={this.props.status} 
+              signer={this.props.signer} 
+            /> :
+            id === 'verify' ? <Verify id={id} /> :
+            <Req id={id} {...module} />
+          }
+        </div>  
+      </div>
+    )
+  }
+  render () {
+    const accountModules = this.store('panel.account.modules')
+    const accountModuleOrder = this.store('panel.account.moduleOrder')
+    let slideHeight = 0
+    const modules = accountModuleOrder.map((id, i) => {
+      const module = accountModules[id]
+      slideHeight += module.height
+      return this.renderModule(id, module, slideHeight - module.height, i)
+    })
+    console.log('slideHeight', slideHeight)
+    return (
+      <div className='accountMain'>
+        <div className='accountMainSlide' style={{ height: slideHeight + 'px'}}>
+          {modules}
+        </div>
+      </div>
+    )
+  }
+}
+
+const AccountMain = Restore.connect(_AccountMain)
+
+// 
+
+
+{/* <Module 
+index={0}
+registerModule={this.registerModule.bind(this)}
+module={this.state.modules[0] || { index: 0, top: 0 }}
+>
+<div className='accountModuleContent'>
+  {lines.map((i) => {
+    return (
+      <div className='cardShow'>{`Account Module: ${0} - Line: ${i}`}</div>
+    )
+  })}
+</div>
+</Module>
+<Module 
+index={1}
+registerModule={this.registerModule.bind(this)}
+module={this.state.modules[1] || { index: 1, top: 0 }}
+>
+<div className='accountModuleContent'>
+  {`Account Module: ${1}`}
+</div>
+</Module>
+<Module
+index={2}
+registerModule={this.registerModule.bind(this)}
+module={this.state.modules[2] || { index: 2, top: 0 }}
+// removeModule={this.registerModule.bind(this)}
+>
+<div className='accountModuleContent'>
+  {`Account Module: ${2}`}
+</div>
+</Module>
+<Module 
+index={3}
+registerModule={this.registerModule.bind(this)}
+module={this.state.modules[3] || { index: 3, top: 0 }}
+
+>
+<div className='accountModuleContent'>
+  {`Account Module: ${3}`}
+</div>
+</Module>
+<Module 
+index={4}
+registerModule={this.registerModule.bind(this)}
+module={this.state.modules[4] || { index: 4, top: 0 }}
+>
+<div className='accountModuleContent'>
+  {`Account Module: ${4}`}
+</div>
+</Module>
+<Module 
+index={5}
+registerModule={this.registerModule.bind(this)}
+module={this.state.modules[5] || { index: 5, top: 0 }}
+>
+<div className='accountModuleContent'>
+  {`Account Module: ${5}`}
+</div>
+</Module> */}
+
 
 // TODO: Rename Signer component to Account
 
@@ -257,16 +532,16 @@ class Signer extends React.Component {
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
           </div>
         ) : null} */}
-        <div className='signerImage'>
+        <div className='signerSelectIconWrap'>
           {(_ => {
             if (this.props.signer) {
-              if (this.props.signer.type === 'ledger') return svg.ledger(30)
-              if (this.props.signer.type === 'trezor') return svg.trezor(30)
-              if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(26)
-              if (this.props.signer.type === 'aragon') return svg.aragon(32)
-              return svg.logo(30)
+              if (this.props.signer.type === 'ledger') return svg.ledger(20)
+              if (this.props.signer.type === 'trezor') return svg.trezor(20)
+              if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(16)
+              if (this.props.signer.type === 'aragon') return svg.aragon(22)
+              return svg.logo(20)
             } else {
-              return svg.logo(30)
+              return svg.logo(20)
             }
           })()}
         </div>
@@ -418,7 +693,7 @@ class Signer extends React.Component {
         </div>
         <div className={open ? 'signerAddress signerAddressActive' : 'signerAddress'}>
           <div className='transactionToAddress'>
-            <div className='transactionToAddressLarge'>{address.substring(0, 8)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 6)}</div>
+            <div className='transactionToAddressLarge'>{address.substring(0, 8)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 6)}</div>
             <div className='transactionToAddressFull'>
               {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
               <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />
@@ -467,8 +742,8 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 66 - 48 : initial.height - 3
-      let top = (initial.top - 66) * -1
+      style.height = open ? panelHeight - 62 - 48 : initial.height - 3
+      let top = (initial.top - 62) * -1
       style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
@@ -500,7 +775,7 @@ class Signer extends React.Component {
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
-            <div className='signerTop' onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+            <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {this.state.openHover && false ? (
               <>
                 <div className='signerSelectArrowWrap signerSelectLeft'>
@@ -534,14 +809,15 @@ class Signer extends React.Component {
               {/* {this.renderMenu()} */}
               {this.renderStatus()}
             </div>
+            {current ?  <AccountMain id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} /> : null}
             {current ? this.renderAccountList() : null}
-            <div className={current ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
+            <div className={open ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
               <div className='accountMenuLeft'>
                 <div className='accountMenuItem'>{svg.checklist(20)}</div>
-                <div className='accountMenuItem'>{svg.gear(20)}</div>
+                <div className='accountMenuItem'>{svg.inventory(20)}</div>
               </div>
               <div className='accountMenuRight'>
-                <div className='accountMenuItem'>{svg.octicon('gear', { height: 20 })}</div>
+                <div className='accountMenuItem'>{svg.gear(20)}</div>
               </div>
             </div>
             <div className={current ? 'signerMid cardShow' : 'signerMid cardHide'} style={open ? { } : { pointerEvents: 'none' }}>
