@@ -84,10 +84,10 @@ const textColor = (r, g, b) => { // http://alienryderflex.com/hsp.html
 const surface = {
   openView: (ens, session, windows) => {
     windows.tray.blur()
-  
+
     let existingWindow
     let dappViews = 0
-  
+
     Object.keys(windows).forEach(window => {
       if (windows[window].dapp) {
         dappViews++
@@ -96,18 +96,18 @@ const surface = {
         }
       }
     })
-  
+
     if (existingWindow) {
       existingWindow.restore()
       existingWindow.focus()
       return
     }
-  
+
     const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 32
     const width = area.width - 444 > height ? height : area.width - 444
-  
+
     windows[session] = new BrowserWindow({
       session,
       x: 40,
@@ -133,9 +133,9 @@ const surface = {
         preload: path.resolve(__dirname, '../../../bundle/bridge.js')
       }
     })
-  
+
     windows[session].dapp = { ens }
-  
+
     // windows[session].positioner = new Positioner(windows[session])
     const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
     const offset = dappViews * 48
@@ -144,7 +144,7 @@ const surface = {
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../../bundle/dapp.html`)
     const namehash = hash(ens)
-  
+
     windows[session].webContents.on('did-finish-load', async () => {
       // windows[session].webContents.openDevTools()
       const dapp = Object.assign({}, store(`main.dapp.details.${namehash}`))
@@ -158,7 +158,7 @@ const surface = {
       delete windows[session]
       store.setDappOpen(ens, false)
     })
-  
+
     const loadApp = hidden => {
       const view = new BrowserView({
         webPreferences: {
@@ -178,10 +178,10 @@ const surface = {
       view.webContents.loadURL(url)
       return view
     }
-  
+
     const dapp = store(`main.dapp.details.${namehash}`)
     if (dapp.color) return loadApp()
-  
+
     // If Frame hasn't collected color data for dapp, do that first
     let tempView = loadApp(true)
     tempView.webContents.on('did-finish-load', async () => {

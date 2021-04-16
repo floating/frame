@@ -1,15 +1,14 @@
 const { hash } = require('eth-ens-namehash')
 
 const store = require('../../../store')
-const ens = require('../../../ens')
+const nebula = require('nebula')()
 
 const resolve = {
-  // app: url => (new URL(url)).pathname.split('/')[1],
-  cid: async (app) => {
+  rootCid: async (app) => {
     const cid = store(`main.dapp.details.${hash(app)}.cid`)
     if (cid) return cid
-    const content = await ens.resolveContent(app)
-    return content.hash
+    const record = await nebula.resolve(app)
+    return record.dapp.files
   }
 }
 

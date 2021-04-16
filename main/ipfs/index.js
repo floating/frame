@@ -11,7 +11,7 @@ let node
 
 const connect = async () => {
   try {
-    node = IpfsHttpClient()
+    node = IpfsHttpClient({ port: 5002 })
     // const connectPeers = async () => {
     //   // const peers = await ens.resolvePeers('frame.eth')
     //   for (const peer of peers) {
@@ -22,10 +22,10 @@ const connect = async () => {
     // const id = await node.id()
     // console.log(id)
   } catch (e) {
-    // destryo ipfs instance... 
+    // destryo ipfs instance...
 
     node = null
-    
+
     console.error(e)
     // ipfs.destroy()
     setTimeout(() => connect(), 15 * 1000)

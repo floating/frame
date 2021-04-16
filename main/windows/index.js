@@ -213,7 +213,7 @@ const api = {
     //   if (hideShow.running !== 'hide') hideShow.next = 'hide'
     // } else {
       // hideShow.running = 'hide'
-    
+
     if (windows && windows.tray) {
       windows.tray.send('main:action', 'trayOpen', false)
       if (store('main.reveal')) detectMouse()
@@ -255,12 +255,12 @@ const api = {
     if (windows && windows.tray && windows.tray.focus && !glide) windows.tray.focus()
     windows.tray.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
     // windows.tray.send('main:action', 'trayOpen', true)
-    // windows.tray.send('main:action', 'setSignerView', 'default')    
-    
+    // windows.tray.send('main:action', 'setSignerView', 'default')
+
      // if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
     // hideShow.running = false
     // hideShow.next = false
-    
+
   },
   close: (e) => {
     const id = winId(e)
@@ -330,7 +330,7 @@ const api = {
     windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
     // windows.flow.setAlwaysOnTop(true)
     windows.flow.on('blur', () => api.hideFlow())
-    if (dev) windows.flow.openDevTools()
+    // if (dev) windows.flow.openDevTools()
   },
   showFlow: () => {
     // clearTimeout(mouseTimeout)
@@ -393,7 +393,7 @@ const api = {
     windows.dash.loadURL(`file://${__dirname}/../../bundle/dash.html`)
     // windows.flow.setAlwaysOnTop(true)
     // windows.dash.on('blur', () => api.hideDash())
-    if (dev) windows.dash.openDevTools()
+    // if (dev) windows.dash.openDevTools()
   },
   showDash: (type) => {
     // clearTimeout(mouseTimeout)
