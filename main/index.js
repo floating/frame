@@ -13,6 +13,7 @@ const path = require('path')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store')
+const dapps = require('./dapps')
 
 // log.transports.file.level = 'info'
 
@@ -142,6 +143,11 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 
 ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 ipcMain.on('tray:toggleDash', (e, type) => windows.toggleDash(type))
+
+ipcMain.on('tray:launchDapp', async (e, domain) => {
+  await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+  await dapps.launch(domain, console.error)
+})
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
