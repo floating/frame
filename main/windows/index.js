@@ -330,7 +330,7 @@ const api = {
     windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
     // windows.flow.setAlwaysOnTop(true)
     windows.flow.on('blur', () => api.hideFlow())
-    if (dev) windows.flow.openDevTools()
+    // if (dev) windows.flow.openDevTools()
   },
   showFlow: () => {
     // clearTimeout(mouseTimeout)
@@ -393,7 +393,7 @@ const api = {
     windows.dash.loadURL(`file://${__dirname}/../../bundle/dash.html`)
     // windows.flow.setAlwaysOnTop(true)
     // windows.dash.on('blur', () => api.hideDash())
-    if (dev) windows.dash.openDevTools()
+    //if (dev) windows.dash.openDevTools()
   },
   showDash: (type) => {
     // clearTimeout(mouseTimeout)

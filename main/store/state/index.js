@@ -23,10 +23,11 @@ const initial = {
     account: {
       moduleOrder: [
         'signer',
+        'launcher',
         'requests',
-        'activity',
         'balances',
         'inventory',
+        'activity',
         'permissions',
         'verify'
       ],
@@ -50,6 +51,9 @@ const initial = {
           height: 100
         },
         verify: { // verify address on signer
+          height: 100
+        },
+        launcher: {
           height: 100
         }
       }

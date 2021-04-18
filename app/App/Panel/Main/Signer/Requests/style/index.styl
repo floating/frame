@@ -280,26 +280,26 @@
       width 50px
 
 .signerRequests
-  position absolute
-  top 10px
-  right 0
-  bottom 0
-  left 0
+  // position absolute
+  // top 0px
+  // right 0
+  // bottom 0
+  // left 0
   z-index 200
   padding 0px 0px 64px 0px
   transition var(--standardSlow)
-  overflow-y scroll
-  overflow-x hidden
+  // overflow-y scroll
+  // overflow-x hidden
   transform translateZ(0)
 
   .requestTitle:before
     content ''
     position absolute
     bottom -2px
-    right 10px
-    left 10px
-    height 4px
-    border-radius 2px
+    right 6px
+    left 6px
+    height 2px
+    border-radius 1px
     background var(--thin)
 
   .requestTitle
@@ -307,14 +307,19 @@
     display flex
     align-items flex-end
     justify-content space-between
-    height 40px
-    font-size 22px
+    height 26px
+    font-size 13px
     padding 0px 10px 10px 10px
+    text-transform uppercase
+    letter-spacing 4px
+    font-weight 600
+    // background bluen
+    // font-family 'Railway'
 
     .requestCount
       background var(--thin)
       width 50px
-      height 30px
+      height 20px
       border-radius 15px
       display flex
       justify-content center

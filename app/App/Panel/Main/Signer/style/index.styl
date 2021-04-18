@@ -91,7 +91,7 @@
 
     .accountMain
       position absolute
-      top 63px
+      top 55px
       left 0
       right 0
       bottom 0
@@ -100,6 +100,8 @@
       overflow-y scroll
       overflow-x hidden
       transform translate3d(0, 0, 0)
+      padding-top 13px
+      z-index 2000
 
       .accountMainSlide
         position relative 
@@ -110,40 +112,6 @@
         // overflow hidden
         // background red
 
-      .accountModule
-        position absolute 
-        top 0
-        left 0
-        right 0
-        // border-bottom 1px solid var(--ghostA)
-        // background var(--ghostC)
-        transform translate3d(0, 0, 0)
-        transition var(--standardVibe) // , 0s linear height // 0.05s linear allheight // // , height 1s linear
-        // box-shadow 0px 10px 10px var(--ghostA)
-        // padding 0px 1px 0px 1px
-        overflow hidden
-
-        .accountModuleInner
-          position absolute
-          position absolute 
-          top 0
-          left 5px
-          right 5px
-          bottom 5px
-          // margin 2px
-          border-radius 6px
-          background var(--ghostD)
-          // transition 0.05s linear all // var(--standard)
-          // margin-bottom 2px
-          overflow hidden
-
-          .accountModuleContent
-            padding 10px 10px 13px 10px
-
-            div
-              padding 10px 0px
-              // border-bottom 1px solid var(--ghostA)
-      
   .signerAddress
     font-size 10px
     font-family FiraCode
@@ -182,7 +150,7 @@
         display flex
         justify-content center
         align-items center
-        font-size 14px
+        font-size 16px
         opacity 1
         transition var(--standard)
 
@@ -252,13 +220,14 @@
   .signerTop
     position relative
     opacity 1
-    z-index 3030
-    // border-radius 6px
+    z-index 3030000
+    border-radius 9px
     transition var(--standard)
     z-index 9999000
     height 63px
     background var(--ghostB)
-    // box-shadow 0px 4px 6px -1px var(--thick)
+    margin 0px 5px 0px 5px
+    box-shadow 0px 4px 6px -1px var(--thick)
 
     div
       z-index 3004
@@ -292,25 +261,29 @@
       height 63px
       // background blue
       box-sizing border-box
-      padding 12px
+      // 
       z-index 300000
-      // background blue
       // background blu
+      border-top-right-radius 8px
+      border-bottom-right-radius 8px
       
       .signerSelectIconWrap
-        position relative
-        background var(--ghostD)
+        // position relative
+        // background var(--ghostD)
         // box-shadow 0px 4px 6px -1px var(--thin)
-        width 40px
-        height 39px
-        border-radius 14px
+        width 100%
+        height 100%
+        
+        // border-radius 14px
         // padding 3px 8px
         transform rotate(0deg)
         
         box-sizing border-box
-        padding 8px
+        padding 18px 15px 0px 19px
         cursor pointer
+        // background blue
         // background red
+        border-left 1px solid var(--ghostA)
 
         div, svg
           pointer-events none
@@ -336,6 +309,9 @@
       //   transform translateZ(0)
       //   will-change transform, opacity
       //   opacity 0
+
+    .signerSelect:hover
+      background var(--ghostD)
 
     .signerType
       position absolute 
@@ -723,7 +699,7 @@
         padding-bottom 0px
         position relative
         transition var(--standard)
-        font-size 22px
+        font-size 18px
         display flex
         justify-content center
         align-items center
@@ -763,8 +739,6 @@
         transition var(--standard)
         opacity 1
 
-    
-
     .signerInfo
       position relative
       font-size 16px
@@ -778,179 +752,6 @@
       opacity 0
       margin-top 2px
       display none
-
-      .signerBalances
-        position absolute
-        top 0px
-        left 60px
-        right 60px
-        margin-right 0px
-        box-shadow 0px 40px 20px -15px var(--thick0)
-        height 26px
-        overflow hidden
-        border-radius 12px
-        transition 0.1s ease-out all
-        padding 1px 0px 2px 0px
-        box-sizing border-box
-        background var(--ghostD)
-        box-shadow 0px 3px 2px var(--thick)
-
-        .signerBalanceTotal
-          position absolute
-          top 353px
-          left 0px
-          right 0px
-          height 47px
-          z-index 20
-          background var(--ghostD)
-          font-size 14px
-          font-weight 400
-          color var(--outerspace08)
-
-          .signerBalanceTotalText
-            position absolute
-            background var(--ghostD)
-            left 0px
-            right 0px
-            bottom 0px
-            top 0px
-            box-shadow 0px -10px 10px -5px var(--thick)
-            border-top-left-radius 10px
-            border-top-right-radius 10px
-            display flex
-            justify-content space-between
-            align-items center
-            padding-right 15px
-            padding-left 15px
-
-            .signerBalanceTotalTitle
-              width 35px
-              text-align center
-
-            .signerBalanceTotalValue
-              width 70px
-              text-align center
-
-        .signerBalanceSlider
-          position absolute
-          top 0px
-          left 0px
-          right 0px
-          height 354px
-          border-radius 12px
-          transition 0.1s ease-out all
-          z-index 2
-          overflow-y scroll
-          padding 0px
-
-        .signerBalanceSliderInset
-          position relative
-          transform translate3d(0, 0, 0)
-          will-change transform
-          
-          .signerBalance
-            position relative
-            margin-left 0px
-            width 294px
-            opacity 1
-            height 26px
-            transition 0.1s ease-out all
-            border-bottom 1px solid var(--doubleThick)
-            padding 10px
-
-            .signerBalanceCurrency
-              position absolute
-              left 23px
-              top 13px
-              bottom 4px
-              width 60px
-              text-align center
-              font-size 13px
-              font-weight 400
-              letter-spacing 0px
-              // background blue
-
-            .signerBalanceLogo
-              position absolute
-              left 1px
-              top 10px
-              height 24px
-              width 24px
-              background var(--ghostB)
-              box-shadow 0px 0px 3px 2px var(--thick)
-              border-radius 12px
-
-              img
-                height 20px
-                width 20px
-                border-radius 11px
-                overflow hidden
-                margin 2px
-
-            .signerBalanceValue
-              position absolute
-              right 85px
-              top 11px
-              bottom 11px
-              left 85px
-              font-size 18px
-              padding-top 1px
-              text-align center
-              border-left 1px solid var(--doubleThick)
-              border-right 1px solid var(--doubleThick)
-              font-family FiraCode
-              letter-spacing -0.5px
-              // background blue
-
-            .signerBalanceEquivalent
-              position absolute
-              right 0px
-              top 13px
-              bottom 13px
-              width 85px
-              text-align center
-              font-size 13px
-              font-weight 400
-              color var(--outerspace07)
-
-        .signerBalance:last-child
-          border-bottom none
-
-      .signerBalanceSliderDisplay
-        position absolute
-        top 0
-        left 0
-        right 0
-        transition none
-
-      .signerBalanceSliderShadow
-        position relative
-        opacity 0
-
-      .signerBalanceNoTokens
-        position absolute 
-        top 78px
-        left 0px
-        right 0px
-        height 200px
-        display flex
-        justify-content center
-        align-items center
-        color var(--outerspace08)
-        text-transform uppercase
-        font-size 12px
-        letter-spacing 0.5px
-        
-      .signerBalancesOpen
-        height 400px
-        left 8px
-        right 8px
-        box-shadow 0px 0px 60px 0px var(--thick), 0px 50px 40px -30px var(--doubleThick)
-        
-        .signerBalanceSliderInset
-          .signerBalance          
-            margin-left 8px
-            margin-right 8px
 
     .addressSelect
       width 100%
@@ -1565,6 +1366,63 @@
         pointer-events none
         transform translateY(50px)
 
+.accountModule
+  position absolute 
+  top 0
+  left 0
+  right 0
+  // border-bottom 1px solid var(--ghostA)
+  // background var(--ghostC)
+  transform translate3d(0, 0, 0)
+  transition var(--standardVibe) // , 0s linear height // 0.05s linear allheight // // , height 1s linear
+  // box-shadow 0px 10px 10px var(--ghostA)
+  padding 0px 0px 0px 0px
+  overflow hidden
+
+  .accountModuleInner
+    position absolute
+    top 0
+    left 5px
+    right 5px
+    bottom 5px
+    // margin 2px
+    border-radius 8px
+    background var(--ghostB)
+    // transition 0.05s linear all // var(--standard)
+    // margin-bottom 2px
+    overflow hidden
+
+    // .accountModuleContent
+    //   padding 2px 2px 5px 2px
+
+    div
+      padding 0px 0px
+      // border-bottom 1px solid var(--ghostA)
+      
+    .moduleHeader
+      font-size 12px
+      text-transform uppercase
+      font-weight bold
+      letter-spacing 2px
+      padding 11px
+      border-bottom 1px solid var(--ghostA)
+      text-align center
+
+    .moduleMain
+      padding 8px
+
+.signerVerifyText
+  font-size 12px
+  text-transform uppercase
+  // font-weight bold
+  letter-spacing 2px
+  // padding 11px
+  border-bottom 1px solid var(--ghostA)
+  text-align center
+  display flex
+  padding 33px
 
 @import '../Settings/style'
 @import '../Requests/style'
+@import '../Balances/style'
+@import '../Launcher/style'

@@ -4,10 +4,21 @@ import Restore from 'react-restore'
 import svg from '../../../../svg'
 import link from '../../../../../resources/link'
 
-import Requests from './Requests'
-import Settings from './Settings'
+import Default from './Default'
 
-import SignerModule from './Modules/Signer'
+import Activity from './Activity'
+import Balances from './Balances'
+import Inventory from './Inventory'
+import Launcher from './Launcher'
+import Permissions from './Permissions'
+import Requests from './Requests'
+import SignerModule from './Signer'
+import Verify from './Verify'
+
+
+// import Settings from './Settings'
+
+
 
 // import ledgerLogo from './ledgerLogo.png'
 // import trezorLogo from './trezorLogo.png'
@@ -34,101 +45,102 @@ import SignerModule from './Modules/Signer'
 
 
 
-class _Verify extends React.Component {
-  constructor (props, context) {
-    super(props, context)
-    this.moduleRef = React.createRef()
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
-      }
-    })
-    this.state = {
-      verifyAddressSuccess: false,
-      verifyAddressResponse: ''
-    }
-  }
-  componentDidMount () {
-    this.resizeObserver.observe(this.moduleRef.current)
-    console.log('!!!Verify---', this.moduleRef.current.clientHeight)
-    link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
-  } 
-  render () {
-    // console.log(this.props)
-    // const { module, index } = this.props
-    // const { top, height } = module
-    // const style = { transform: `translateY(${top}px)`, zIndex: 10000 - index, height }
-    // const i = 1
-    // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
-    const signerType = this.store('main.accounts', this.props.id, 'signer.type')
-    const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
-    return (
-      <div ref={this.moduleRef} style={{ padding: '20px' }}>
-        <div className='signerSettingsTitle'>Verify Address</div>
-        <div className='signerPermission'>
-          <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
-          {this.state.verifyAddressResponse ? (
-            <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
-          ) : null}
-        </div>
-        <div className='quitFrame'>
-          <div onMouseDown={() => this.verifyAddress()} className='quitFrameButton'>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
-        </div>
-      </div>
-    )
+// class _Verify extends React.Component {
+//   constructor (props, context) {
+//     super(props, context)
+//     this.moduleRef = React.createRef()
+//     this.resizeObserver = new ResizeObserver(() => {
+//       if (this.moduleRef && this.moduleRef.current) {
+//         link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
+//       }
+//     })
+//     this.state = {
+//       verifyAddressSuccess: false,
+//       verifyAddressResponse: ''
+//     }
+//   }
+//   componentDidMount () {
+//     this.resizeObserver.observe(this.moduleRef.current)
+//     link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+//   } 
+//   render () {
+//     // console.log(this.props)
+//     // const { module, index } = this.props
+//     // const { top, height } = module
+//     // const style = { transform: `translateY(${top}px)`, zIndex: 10000 - index, height }
+//     // const i = 1
+//     // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
+//     const signerType = this.store('main.accounts', this.props.id, 'signer.type')
+//     const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
+//     return (
+//       <div ref={this.moduleRef} style={{ padding: '20px' }}>
+//         <div className='signerSettingsTitle'>Verify Address</div>
+//         <div className='signerPermission'>
+//           <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
+//           {this.state.verifyAddressResponse ? (
+//             <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
+//           ) : null}
+//         </div>
+//         <div className='quitFrame'>
+//           <div onMouseDown={() => this.verifyAddress()} className='quitFrameButton'>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
+//         </div>
+//       </div>
+//     )
 
-  }
-}
+//   }
+// }
 
-const Verify = Restore.connect(_Verify)
+// const Verify = Restore.connect(_Verify)
 
 
-class Req extends React.Component {
-  constructor (props, context) {
-    super(props, context)
-    this.moduleRef = React.createRef()
-    console.log('NEW REZISE OBSERVEF')
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
-      }
-    })
-    this.state = {
-      lines: Array.from(Array(Math.round(Math.random() * 10)).keys())
-    }
-    setInterval(() => {
-      this.setState({
-        lines: Array.from(Array(Math.round(Math.random() * 10)).keys())
-      })
-    }, 7000)
-  }
-  componentDidMount () {
-    this.resizeObserver.observe(this.moduleRef.current)
-    if (this.moduleRef && this.moduleRef.current) {
-      link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
-    }
-    // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
-  } 
-  // componentWillUnmount () {
-  //   this.props.unregisterModule(this.props.index, this.moduleRef)
-  // }
-  render () {
-    // console.log(this.props)
-    // const { module, index } = this.props
-    // const { top, height } = module
-    // const style = { transform: `translateY(${top}px)`, zIndex: 10000 - index, height }
-    return (
-      <div ref={this.moduleRef} style={{ padding: '20px' }}>
-        {this.props.id}
-        {this.state.lines.map((i) => {
-          return (
-            <div className='cardShow'>{`Account Module: ${0} - Line: ${i}`}</div>
-          )
-        })}
-      </div>
-    )
-  }
-}
+// class Module extends React.Component {
+//   constructor (props, context) {
+//     super(props, context)
+//     this.moduleRef = React.createRef()
+//     this.resizeObserver = new ResizeObserver(() => {
+//       if (this.moduleRef && this.moduleRef.current) {
+//         link.send('tray:action', 'updateAccountModule', props.id, { height: this.moduleRef.current.clientHeight })
+//       }
+//     })
+//   }
+//   componentDidMount () {
+//     this.resizeObserver.observe(this.moduleRef.current)
+//     // if (this.moduleRef && this.moduleRef.current) {
+//     //   link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+//     // }
+//     // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+//   } 
+//   // componentWillUnmount () {
+//   //   this.props.unregisterModule(this.props.index, this.moduleRef)
+//   // }
+//   render () {
+//     // console.log(this.props)
+//     // const { module, index } = this.props
+//     // const { top, height } = module
+//     // const style = { transform: `translateY(${top}px)`, zIndex: 10000 - index, height }
+//     return (
+//       <div ref={this.moduleRef}>
+//         <div className='moduleHeader'>{this.props.id}</div>
+//         <div className='moduleMain'>
+//           <div className='cardShow'>{`Account Module line }`}</div>
+//         </div>
+//       </div>
+//     )
+//   }
+// }
+
+// class Activity extends Module {
+//   render (
+
+//   )
+// }
+
+// const { SignerModule } = modules
+
+
+// import React from 'react'
+// import Restore from 'react-restore'
+// import link from '../../../../../../../resources/link'
 
 // account module is position absolute and with a translateX 
 class _AccountMain extends React.Component {
@@ -168,31 +180,59 @@ class _AccountMain extends React.Component {
   //   })
   // }
   renderModule (id, module, top, index) {
-    console.log(id, module, top, index)
-    const style = { 
+    // console.log(id, module, top, index)
+    let hidden = false
+    let style = { 
       transform: `translateY(${top}px)`, 
       zIndex: 10000 - index, 
-      height: module.height + 1 
+      height: module.height + 1 ,
+      opacity: 1
+    }
+    //  && !this.props.signer) hidden = true
+    if (hidden) {
+      style = { 
+        transform: `translateY(${top}px)`, 
+        zIndex: 10000 - index, 
+        height: 0,
+        opacity: 0,
+        overflow: 'hidden'
+      }
     }
     return (
       <div className='accountModule' style={style}>
-        <div className='accountModuleInner cardShow' style={{ amimationDelay: (index * 0.1) + 's'}}>
+        <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
           {
             id === 'signer' ? <SignerModule 
-              id={id} 
-              accountId={this.props.id} 
-              status={this.props.status} 
-              signer={this.props.signer} 
+              moduleId={id} 
             /> :
             id === 'requests' ? <Requests 
-              id={this.props.id} 
+              _id={id}
+              id={this.props.id}
               addresses={this.props.addresses} 
               minimized={this.props.minimized} 
               status={this.props.status} 
               signer={this.props.signer} 
             /> :
-            id === 'verify' ? <Verify id={id} /> :
-            <Req id={id} {...module} />
+            id === 'verify' ? <Verify 
+              moduleId={id}
+            /> :
+            id === 'activity' ? <Activity 
+              moduleId={id} 
+            /> :
+            id === 'launcher' ? <Launcher 
+              moduleId={id} 
+            /> :
+            id === 'inventory' ? <Inventory 
+              moduleId={id} 
+            /> :
+            id === 'permissions' ? <Permissions
+              moduleId={id} 
+            /> :
+            id === 'balances' ? <Balances
+              moduleId={id} 
+              {...this.props}
+            /> :
+            <Default moduleId={id}  />
           }
         </div>  
       </div>
@@ -207,7 +247,6 @@ class _AccountMain extends React.Component {
       slideHeight += module.height
       return this.renderModule(id, module, slideHeight - module.height, i)
     })
-    console.log('slideHeight', slideHeight)
     return (
       <div className='accountMain'>
         <div className='accountMainSlide' style={{ height: slideHeight + 'px'}}>
@@ -287,151 +326,151 @@ module={this.state.modules[5] || { index: 5, top: 0 }}
 
 // TODO: Rename Signer component to Account
 
-class _Balances extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.moduleRef = React.createRef()
-    this.state = {
-      openActive: false,
-      open: false,
-      selected: 0,
-      shadowTop: 0
-    }
-    this.mD = this.mouseDetect.bind(this)
-  }
+// class _Balances extends React.Component {
+//   constructor (...args) {
+//     super(...args)
+//     this.moduleRef = React.createRef()
+//     this.state = {
+//       openActive: false,
+//       open: false,
+//       selected: 0,
+//       shadowTop: 0
+//     }
+//     this.mD = this.mouseDetect.bind(this)
+//   }
 
-  mouseDetect (e) {
-    if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
-      this.setActive(false)
-    }
-  }
+//   mouseDetect (e) {
+//     if (this.moduleRef && this.moduleRef.current && !this.moduleRef.current.contains(e.target)) {
+//       this.setActive(false)
+//     }
+//   }
 
-  setActive (active) {
-    const { type, id } = this.store('main.currentNetwork')
-    if (type !== 'ethereum' || id !== '1') return
-    this.setState({ openActive: active })
-    this.openTimer = setTimeout(() => this.setState({ open: active }), 480)
-    if (active && !this.state.openActive) {
-      this.store.clickGuard(true)
-      document.addEventListener('mousedown', this.mD)
-    } else {
-      this.store.clickGuard(false)
-      document.removeEventListener('mousedown', this.mD)
-    }
-  }
+//   setActive (active) {
+//     const { type, id } = this.store('main.currentNetwork')
+//     if (type !== 'ethereum' || id !== '1') return
+//     this.setState({ openActive: active })
+//     this.openTimer = setTimeout(() => this.setState({ open: active }), 480)
+//     if (active && !this.state.openActive) {
+//       this.store.clickGuard(true)
+//       document.addEventListener('mousedown', this.mD)
+//     } else {
+//       this.store.clickGuard(false)
+//       document.removeEventListener('mousedown', this.mD)
+//     }
+//   }
 
-  handleScroll (event) {
-    this.setState({ shadowTop: event.target.scrollTop })
-  }
+//   handleScroll (event) {
+//     this.setState({ shadowTop: event.target.scrollTop })
+//   }
 
-  renderBalance (known, k, i) {
-    const currentIndex = this.store('main.accounts', this.props.id, 'index')
-    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    const balance = this.store('balances', address)
-    const token = known[k]
-    return (
-      <div className='signerBalance' key={k} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceLogo'>
-          <img src={token.logoURI} />
-        </div>
-        <div className='signerBalanceCurrency'>
-          {token.symbol}
-        </div>
-        <div className='signerBalanceValue' style={(token.displayBalance || '$0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
-          {(balance === undefined ? '-.------' : token.displayBalance)}
-        </div>
-        <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '$0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}}>
-          {token.usdDisplayValue}
-        </div>
-      </div>
-    )
-  }
+//   renderBalance (known, k, i) {
+//     const currentIndex = this.store('main.accounts', this.props.id, 'index')
+//     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+//     const balance = this.store('balances', address)
+//     const token = known[k]
+//     return (
+//       <div className='signerBalance' key={k} onMouseDown={() => this.setState({ selected: i })}>
+//         <div className='signerBalanceLogo'>
+//           <img src={token.logoURI} />
+//         </div>
+//         <div className='signerBalanceCurrency'>
+//           {token.symbol}
+//         </div>
+//         <div className='signerBalanceValue' style={(token.displayBalance || '$0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
+//           {(balance === undefined ? '-.------' : token.displayBalance)}
+//         </div>
+//         <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '$0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}}>
+//           {token.usdDisplayValue}
+//         </div>
+//       </div>
+//     )
+//   }
 
-  render () {
-    const { open, openActive, selected, shadowTop } = this.state
-    let currentIndex = this.store('main.accounts', this.props.id, 'index')
-    if (this.props.accountHighlight === 'active') currentIndex = this.props.highlightIndex
-    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
-    if (current) {
-      const balance = this.store('balances', address)
-      const tokens = this.store('main.addresses', address, 'tokens') || {}
-      const etherRates = this.store('external.rates')
-      const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-      const known = Object.assign({}, tokens.known, {
-        default: {
-          chainId: 1,
-          name: 'Ether',
-          decimals: 18,
-          address: '0x',
-          logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
-          symbol: currentSymbol,
-          balance,
-          displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
-          floatBalance: parseFloat(balance || 0).toFixed(6),
-          usdRate: etherUSD,
-          usdValue: Math.floor(parseFloat(balance) * etherUSD),
-          usdDisplayValue: '$' + Math.floor(parseFloat(balance) * etherUSD).toLocaleString()
-        }
-      })
-      const knownList = Object.keys(known).sort((a, b) => {
-        if (a === 'default') return -1
-        if (b === 'default') return 1
-        return known[a].usdValue > known[b].usdValue ? -1 : known[a].usdValue < known[b].usdValue ? 1 : 0
-      })
-      const offsetTop = (selected * 47) + 10
-      return (
-        <div
-          ref={this.moduleRef} className={openActive ? 'signerBalances signerBalancesOpen' : 'signerBalances'} onMouseDown={() => {
-            clearTimeout(this.openTimer)
-            const o = !this.state.open
-            this.setActive(o)
-          }}
-        >
-          <div
-            className='signerBalanceSliderInset signerBalanceSliderDisplay' style={openActive && !open ? {
-              transition: '0.16s cubic-bezier(.82,0,.12,1) all',
-              transform: `translateY(-${shadowTop}px)`
-            } : openActive && open ? {
-              transition: '0s cubic-bezier(.82,0,.12,1) all',
-              transform: `translateY(-${shadowTop}px)`
-            } : {
-              transition: '0.16s cubic-bezier(.82,0,.12,1) all',
-              transform: `translateY(-${offsetTop}px)`
-            }}
-          >
-            {knownList.map((k, i) => this.renderBalance(known, k, i))}
-          </div>
-          <div className='signerBalanceSlider' style={!open ? { pointerEvents: 'none' } : {}} onScroll={this.handleScroll.bind(this)}>
-            <div className='signerBalanceSliderInset signerBalanceSliderShadow'>
-              {knownList.map((k, i) => this.renderBalance(known, k, i))}
-            </div>
-          </div>
-          <div className='signerBalanceTotal' onMouseDown={(e) => e.stopPropagation()}>
-            <div className='signerBalanceTotalText'>
-              <div className='signerBalanceTotalTitle'>
-                Total
-              </div>
-              <div className='signerBalanceTotalValue'>
-                {'$' + knownList.map(k => known[k].usdValue).reduce((a, b) => a + b, 0).toLocaleString()}
-              </div>
-            </div>
-          </div>
-          {knownList.length <= 1 ? (
-            <div className='signerBalanceNoTokens'>
-              No other token balances found
-            </div>
-          ) : null}
-        </div>
-      )
-    } else {
-      return null
-    }
-  }
-}
-const Balances = Restore.connect(_Balances)
+//   render () {
+//     const { open, openActive, selected, shadowTop } = this.state
+//     let currentIndex = this.store('main.accounts', this.props.id, 'index')
+//     if (this.props.accountHighlight === 'active') currentIndex = this.props.highlightIndex
+//     const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+//     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+//     const { type, id } = this.store('main.currentNetwork')
+//     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+//     if (current) {
+//       const balance = this.store('balances', address)
+//       const tokens = this.store('main.addresses', address, 'tokens') || {}
+//       const etherRates = this.store('external.rates')
+//       const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+//       const known = Object.assign({}, tokens.known, {
+//         default: {
+//           chainId: 1,
+//           name: 'Ether',
+//           decimals: 18,
+//           address: '0x',
+//           logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
+//           symbol: currentSymbol,
+//           balance,
+//           displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
+//           floatBalance: parseFloat(balance || 0).toFixed(6),
+//           usdRate: etherUSD,
+//           usdValue: Math.floor(parseFloat(balance) * etherUSD),
+//           usdDisplayValue: '$' + Math.floor(parseFloat(balance) * etherUSD).toLocaleString()
+//         }
+//       })
+//       const knownList = Object.keys(known).sort((a, b) => {
+//         if (a === 'default') return -1
+//         if (b === 'default') return 1
+//         return known[a].usdValue > known[b].usdValue ? -1 : known[a].usdValue < known[b].usdValue ? 1 : 0
+//       })
+//       const offsetTop = (selected * 47) + 10
+//       return (
+//         <div
+//           ref={this.moduleRef} className={openActive ? 'signerBalances signerBalancesOpen' : 'signerBalances'} onMouseDown={() => {
+//             clearTimeout(this.openTimer)
+//             const o = !this.state.open
+//             this.setActive(o)
+//           }}
+//         >
+//           <div
+//             className='signerBalanceSliderInset signerBalanceSliderDisplay' style={openActive && !open ? {
+//               transition: '0.16s cubic-bezier(.82,0,.12,1) all',
+//               transform: `translateY(-${shadowTop}px)`
+//             } : openActive && open ? {
+//               transition: '0s cubic-bezier(.82,0,.12,1) all',
+//               transform: `translateY(-${shadowTop}px)`
+//             } : {
+//               transition: '0.16s cubic-bezier(.82,0,.12,1) all',
+//               transform: `translateY(-${offsetTop}px)`
+//             }}
+//           >
+//             {knownList.map((k, i) => this.renderBalance(known, k, i))}
+//           </div>
+//           <div className='signerBalanceSlider' style={!open ? { pointerEvents: 'none' } : {}} onScroll={this.handleScroll.bind(this)}>
+//             <div className='signerBalanceSliderInset signerBalanceSliderShadow'>
+//               {knownList.map((k, i) => this.renderBalance(known, k, i))}
+//             </div>
+//           </div>
+//           <div className='signerBalanceTotal' onMouseDown={(e) => e.stopPropagation()}>
+//             <div className='signerBalanceTotalText'>
+//               <div className='signerBalanceTotalTitle'>
+//                 Total
+//               </div>
+//               <div className='signerBalanceTotalValue'>
+//                 {'$' + knownList.map(k => known[k].usdValue).reduce((a, b) => a + b, 0).toLocaleString()}
+//               </div>
+//             </div>
+//           </div>
+//           {knownList.length <= 1 ? (
+//             <div className='signerBalanceNoTokens'>
+//               No other token balances found
+//             </div>
+//           ) : null}
+//         </div>
+//       )
+//     } else {
+//       return null
+//     }
+//   }
+// }
+/// const Balances = Restore.connect(_Balances)
 
 class Signer extends React.Component {
   constructor (...args) {
@@ -487,7 +526,7 @@ class Signer extends React.Component {
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({ top: bounds.top, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
+      this.store.initialSignerPos({ top: bounds.top - 63, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
@@ -712,9 +751,9 @@ class Signer extends React.Component {
             <div className='addressSelectArrow'>{svg.octicon('chevron-down', { height: 16 })}</div>
           </div>
         </div>
-        <div className='signerInfo'>
+        {/* <div className='signerInfo'>
           <Balances {...this.props} highlightIndex={this.state.highlightIndex} accountHighlight={this.state.accountHighlight} />
-        </div>
+        </div> */}
       </>
     )
   }
@@ -742,17 +781,17 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 62 - 48 : initial.height - 3
-      let top = (initial.top - 62) * -1
+      style.height = open ? panelHeight - 62 - 2 : initial.height - 3
+      let top = (initial.top) * -1
       style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
       style.opacity = 0
       style.pointerEvents = 'none'
-      style.transition = '360ms cubic-bezier(.82,0,.12,1) all'
+      style.transition = '300ms cubic-bezier(.82,0,.12,1) all'
       if (this.store('selected.open')) {
         // Not open, but another signer is
-        style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -100px)'
+        style.transform = this.props.index > this.store('selected.position.initial.index') ? 'translate(0px, 100px)' : 'translate(0px, -20px)'
         style.opacity = 0
         style.pointerEvents = 'none'
       } else {
@@ -802,7 +841,7 @@ class Signer extends React.Component {
               <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>
                 <div className='signerSelectIconWrap'>
                   <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    {svg.chevron(24)}
+                    {svg.chevron(26)}
                   </div>
                 </div>
               </div>
@@ -811,7 +850,7 @@ class Signer extends React.Component {
             </div>
             {current ?  <AccountMain id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} /> : null}
             {current ? this.renderAccountList() : null}
-            <div className={open ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
+            {/* <div className={open ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
               <div className='accountMenuLeft'>
                 <div className='accountMenuItem'>{svg.checklist(20)}</div>
                 <div className='accountMenuItem'>{svg.inventory(20)}</div>
@@ -823,7 +862,7 @@ class Signer extends React.Component {
             <div className={current ? 'signerMid cardShow' : 'signerMid cardHide'} style={open ? { } : { pointerEvents: 'none' }}>
               <Settings id={this.props.id} />
               <Requests id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} />
-            </div>
+            </div> */}
             {/* <div className='signerBot' /> */}
           </div>
         </div>

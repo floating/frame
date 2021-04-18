@@ -10,14 +10,19 @@ import link from '../../../../../../resources/link'
 import SignTypedDataRequest from './SignTypedDataRequest'
 
 class Requests extends React.Component {
-  constructor (...args) {
-    super(...args)
+  constructor (props, context) {
+    super(props, context)
     this.state = {
       minimized: false,
-      unlockInput: '',
-      unlockHeadShake: false
+      // unlockInput: '',
+      // unlockHeadShake: false
     }
-    this.unlockInput = React.createRef()
+    this.moduleRef = React.createRef()
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.moduleRef && this.moduleRef.current) {
+        link.send('tray:action', 'updateAccountModule', props._id, { height: this.moduleRef.current.clientHeight })
+      }
+    })
   }
 
   // trezorPin (num) {
@@ -65,6 +70,10 @@ class Requests extends React.Component {
   // }
 
   componentDidMount () {
+    this.resizeObserver.observe(this.moduleRef.current)
+    if (this.moduleRef && this.moduleRef.current) {
+      link.send('tray:action', 'updateAccountModule', this.props._id, { height: this.moduleRef.current.clientHeight })
+    }
     setTimeout(() => {
       const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
       const open = current && this.store('selected.open')
@@ -73,6 +82,11 @@ class Requests extends React.Component {
       }
     }, 100)
   }
+
+  // componentDidMount () {
+    
+  //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+  // } 
 
   render () {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
@@ -105,11 +119,12 @@ class Requests extends React.Component {
     // let minimized = this.store('selected.minimized')
 
     return (
-      <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
-        <div className='requestTitle'>
+      <div ref={this.moduleRef} className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
+        {/* <div className='requestTitle'>
           <div>Requests</div>
           <div className='requestCount'>{normal.length}</div>
-        </div>
+        </div> */}
+        <div className='moduleHeader'>{'Requests'}</div>  
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
             <div key='noReq' style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>No Pending Requests</div>
