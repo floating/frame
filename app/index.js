@@ -28,6 +28,3 @@ link.rpc('getState', (err, state) => {
 // document.addEventListener('mouseover', e => link.send('tray:focus'))
 document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
 document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))
-
-window.launchDapp = () => link.send('tray:launchDapp', 'matt.eth')
-
