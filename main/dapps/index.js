@@ -5,6 +5,7 @@ const crypto = require('crypto')
 
 const cheerio = require('cheerio')
 
+const resolve = require('./server/resolve')
 const store = require('../store')
 const ipfs = require('../ipfs')
 const windows = require('../windows')
@@ -24,7 +25,6 @@ const mock = {
   }
 }
 
-const ens = electron.app ? require('../ens') : mock.ens
 // const shell = electron.shell ? electron.shell : mock.shell
 
 class Dapps {
@@ -51,6 +51,9 @@ class Dapps {
       {
         name: 'matoken.eth',
         options: { docked: false }
+      },
+      {
+        name: 'matt.eth'
       }
     ]
     // this.observer = store.observer(() => {
@@ -98,7 +101,7 @@ class Dapps {
     })
   }
 
-  async add (domain, options, cb) {
+  async add (domain, options, cb = () => {}) {
     // console.log('dapps.add', domain, options, cb)
     // Resolve ENS name
     let namehash
@@ -109,7 +112,6 @@ class Dapps {
     }
     // Check if already added
     if (store(`main.dapp.details.${namehash}`)) {
-      console.log(store(`main.dapp.details.${namehash}`))
       // store.removeDapp(namehash)
       // store.addDapp()
       // store.addDapp(namehash, { domain, type, hash, pinned: false })
@@ -117,45 +119,40 @@ class Dapps {
     }
 
     // Resolve content
-    const content = await ens.resolveContent(domain)
-
-    console.log('content', content)
+    const contentCid = await resolve.rootCid(domain)
 
     // If content available -> store dapp
-    if (content) {
-      const cid = content
-      // const { type, hash: cid } = content
-      await ipfs.pin(cid)
-      store.addDapp(namehash, { domain, cid, pinned: false }, options)
+    if (contentCid) {
+      store.addDapp(namehash, { domain, cid: contentCid, pinned: false }, options)
       // Get Dapp Icon
       try {
-        console.log(ipfs)
-        const index = await ipfs.getFile(`${cid}/index.html`)
-        const $ = cheerio.load(index.content.toString('utf8'))
-        let favicon = ''
-        $('link').each((i, link) => {
-          if ($(link).attr('rel') === 'icon' || $(link).attr('rel') === 'shortcut icon') {
-            favicon = favicon || $(link).attr('href')
-          }
-        })
-        if (favicon.startsWith('./')) favicon = favicon.substring(2)
-        let icon
-        // const file = await ipfs.getFile(`${cid}/${favicon || 'favicon.ico'}`)
-        // if (file) {
-        //   icon = {
-        //     cid: file.cid.toString(),
-        //     path: file.path,
-        //     name: file.name,
-        //     content: Buffer.from(file.content).toString('base64')
+        // const index = await ipfs.getFile(`${contentCid}/index.html`)
+
+        // const $ = cheerio.load(index.content.toString('utf8'))
+        // let favicon = ''
+        // $('link').each((i, link) => {
+        //   if ($(link).attr('rel') === 'icon' || $(link).attr('rel') === 'shortcut icon') {
+        //     favicon = favicon || $(link).attr('href')
         //   }
-        // }
-        store.updateDapp(namehash, { icon })
-        this._pin(cid)
+        // })
+        // if (favicon.startsWith('./')) favicon = favicon.substring(2)
+        // let icon
+        // // const file = await ipfs.getFile(`${cid}/${favicon || 'favicon.ico'}`)
+        // // if (file) {
+        // //   icon = {
+        // //     cid: file.cid.toString(),
+        // //     path: file.path,
+        // //     name: file.name,
+        // //     content: Buffer.from(file.content).toString('base64')
+        // //   }
+        // // }
+        // store.updateDapp(namehash, { icon })
+        this._pin(contentCid)
         cb(null)
       } catch (e) {
         log.error(e)
         store.removeDapp(namehash)
-        console.log(new Error('Could not resolve dapp: ' + e.message))
+        cb(new Error('Could not resolve dapp: ' + e.message))
       }
     // Else -> throw
     } else {
@@ -192,24 +189,11 @@ class Dapps {
   }
 
   async _pin (cid) {
-    // if (!ipfs return cb(new Error('IPFS client not running'))
-    try {
-      await ipfs.pin(cid)
-      // const namehash = hash()
-      // const dapps = store('main.dapp.details')
-      Object.keys(store('main.dapp.details')).some(namehash => {
-        const dappCID = store('main.dapp.details', namehash, 'cid')
-        if (cid === dappCID) {
-          store.updateDapp(namehash, { pinned: true })
-          return true
-        } else {
-          return false
-        }
-      })
-    } catch (e) {
-      log.error(e)
-      // Retry Pin
-    }
+    await ipfs.pin(cid)
+
+    const dapp = Object.entries(store('main.dapp.details')).find(([namehash, dapp]) => dapp.cid === cid)
+
+    return dapp && !!store.updateDapp(dapp[0], { pinned: true })
   }
 
   _updateHashes () {

@@ -52,7 +52,7 @@ module.exports = server => {
       // check for app server
     } else {
       const { app, session } = qs.parse(req.url.split('?')[1])
-      const hash = resolve.cid(app)
+      const hash = resolve.rootCid(app)
       if (sessions.verify(app, session) && req.headers.origin === 'http://localhost:8421') {
         s.id = uuid()
         connections[app] = connections[app] || []

@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const cheerio = require('cheerio')
 
-// const ipfs = require('../../../ipfs')
+const ipfs = require('../../../ipfs')
 
 const resolve = require('../resolve')
 const storage = require('../storage')
@@ -18,22 +18,23 @@ const error = (res, code, message) => {
 
 module.exports = {
   stream: async (res, app, path) => { // Stream assets from IPFS back to the client
-    // if (!ipfs( return error(res, 404, 'IPFS client not running')
     let file
-    // console.log(`get file: ${await resolve.cid(app)}${path}`)
+    const cid = await resolve.rootCid(app)
+
     try {
-      file = await ipfs.getFile(`${await resolve.cid(app)}${path}`)
+      file = await ipfs.getFile(`${cid}${path}`)
       if (!file) throw new Error('Asset not found')
     } catch (e) {
       // console.error('   ---   ' + e.message)
       error(res, 404, e.message)
     }
+
     if (file) {
       res.setHeader('content-type', getType(path))
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
       res.writeHead(200)
-      res.write(file.content.toString())
+      res.write(file.content)
       res.end()
     }
 
@@ -52,7 +53,8 @@ module.exports = {
   },
   dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
-    const cid = await resolve.cid(app)
+    const cid = await resolve.rootCid(app)
+
     const index = await ipfs.getFile(`${cid}/index.html`)
     res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
     res.setHeader('Access-Control-Allow-Origin', '*')
