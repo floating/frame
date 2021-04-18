@@ -30,17 +30,16 @@ class Settings extends React.Component {
   appInfo () {
     return (
       <div className='appInfo'>
-        <div className='appInfoIcon'><div className='appInfoHandle' /></div>
+        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../../package.json').version}</div>
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <span className='appInfoLineResetConfirm'>
-              Are you sure? <span onMouseDown={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span onMouseDown={() => this.setState({ resetConfirm: false })}>No</span>
+              Are you sure you want to reset everything? <span className='pointer' onMouseDown={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onMouseDown={() => this.setState({ resetConfirm: false })}>No</span>
             </span>
           ) : (
-            <span onMouseDown={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
+            <span className='pointer' onMouseDown={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
           )}
         </div>
-        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../../package.json').version}</div>
       </div>
     )
   }
@@ -171,10 +170,10 @@ class Settings extends React.Component {
     })
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
+        <div className='panelHeader' style={{ zIndex: 50, pointerEvents: 'none' }}>
+          <div className='panelHeaderTitle'>Settings</div>
+        </div>
         <div className='localSettingsWrap'>
-          <div className='localSettingsTitle'>
-            <div className='localSettingsTitleText'>Settings</div>
-          </div>
           <div className='signerPermission' style={{ zIndex: 10 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Summon Shortcut</div>
@@ -350,8 +349,8 @@ class Settings extends React.Component {
           {this.discord()}
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
+          {this.appInfo()}
         </div>
-        {this.appInfo()}
       </div>
     )
   }

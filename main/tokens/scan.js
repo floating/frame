@@ -59,6 +59,7 @@ const scan = async (address, omitList = [], knownList) => {
     Object.keys(rates).forEach(token => {
       if (found[token]) {
         found[token].usdRate = rates[token].usd || 0
+        found[token].usdDisplayRate = '$' + (found[token].usdRate).toLocaleString()
         found[token].usdValue = Math.floor(found[token].floatBalance * found[token].usdRate)
         found[token].usdDisplayValue = '$' + Math.floor(found[token].usdValue).toLocaleString()
       }

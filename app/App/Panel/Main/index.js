@@ -7,6 +7,7 @@ import PendingSigner from './PendingSigner'
 import Add from './Add'
 
 import svg from '../../../svg'
+import link from '../../../../resources/link'
 
 let firstScroll = true
 
@@ -51,15 +52,21 @@ class Main extends React.Component {
     const untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
+    const open = current && this.store('selected.open')
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
-        <Add />
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
-              <div className='localSettingsTitle'>
-                <div className='localSettingsTitleText'>Accounts</div>
-                <div className='localSettingsTitleText'>Update</div>
+              <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none' } : { opacity: 1, transform: 'translateY(0px)' }}>
+                <div className='panelHeaderTitle'>Accounts</div>
+                <div className='panelHeaderUpdate' onMouseDown={() => {
+                  link.send('tray:toggleDash', 'signers')
+                }}>
+                  <div className='panelHeaderUpdateToggle'>
+                    {'+|-'}
+                  </div>
+                </div>
               </div>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
               {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />)}

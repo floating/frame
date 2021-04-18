@@ -1,0 +1,158 @@
+.balancesBlock
+  margin-bottom 60px
+  box-sizing border-box
+
+.signerBalanceTotal
+  position relative
+  // bottom 0px
+  // left 0px
+  // right 0px
+  height 49px
+  width 100%
+  z-index 200000
+  // background var(--ghostD)
+  font-size 14px
+  font-weight 400
+  // color var(--outerspace08)
+
+  .signerBalanceShowAll
+    position absolute
+    background var(--ghostD)
+    left 11px
+    bottom 11px
+    top 11px
+    width 90px
+    border-radius 16px
+    cursor pointer
+    z-index 4000
+    display flex
+    justify-content center
+    align-items center
+    box-shadow 0px 1px 3px var(--ghostZ)
+
+  .signerBalanceTotalText
+    position absolute
+    // background var(--ghostD)
+    left 11px
+    right 11px
+    bottom 0px
+    top 0px
+    display flex
+    justify-content flex-end
+    align-items center
+
+    .signerBalanceTotalLabel
+      margin-right 10px
+      margin-top 3px
+      text-transform uppercase
+      font-size 12px
+      letter-spacing 1px
+      color var(--outerspace02)
+
+
+    .signerBalanceTotalValue
+      color var(--good06)
+      font-size 16px
+  
+.signerBalance
+  position relative
+  margin-left 0px
+  width 100%
+  opacity 1
+  height 60px
+  transition 0.1s ease-out all
+  border-bottom 1px solid var(--doubleThick)
+
+  .signerBalanceCurrency
+    position absolute
+    left 52px
+    top 11px
+    bottom 4px
+    text-align center
+    font-size 17px
+    font-weight 400
+    letter-spacing 0px
+    font-family FiraCode
+
+  .signerBalanceName
+    position absolute
+    left 52px
+    bottom 11px
+    font-size 12px
+    font-weight 400
+    color var(--outerspace05)
+
+  .signerBalanceLogo
+    position absolute
+    left 11px
+    top 15px
+    height 30px
+    width 30px
+    background  var(--foreverwhite) // var(--ghostB)
+    box-shadow 0px 0px 3px 2px var(--thick)
+    border-radius 15px
+    padding 5px
+    img
+      height 24px
+      width 24px
+      border-radius 12px
+      overflow hidden
+      position absolute
+      top 3px
+      left 3px
+
+  .signerBalanceValue
+    position absolute
+    right 11px
+    top 11px
+    font-size 17px
+    text-align center
+    // border-left 1px solid var(--doubleThick)
+    // border-right 1px solid var(--doubleThick)
+    font-family FiraCode
+    letter-spacing -0.5px
+    // background blue
+
+  .signerBalanceEquivalent
+    position absolute
+    right 11px
+    bottom 11px
+    font-size 12px
+    font-weight 400
+    color var(--good06)
+
+.signerBalance:last-child
+  border-bottom none
+
+.signerBalanceSliderDisplay
+  position absolute
+  top 0
+  left 0
+  right 0
+  transition none
+
+.signerBalanceSliderShadow
+  position relative
+  opacity 0
+
+.signerBalanceNoTokens
+  height 48px
+  display flex
+  justify-content center
+  align-items center
+  color var(--outerspace08)
+  text-transform uppercase
+  font-size 12px
+  letter-spacing 0.5px
+  border-bottom 1px solid var(--doubleThick)
+  
+// .signerBalancesOpen
+//   height 400px
+//   left 8px
+//   right 8px
+//   box-shadow 0px 0px 60px 0px var(--thick), 0px 50px 40px -30px var(--doubleThick)
+  
+//   .signerBalanceSliderInset
+//     .signerBalance          
+//       margin-left 8px
+//       margin-right 8px

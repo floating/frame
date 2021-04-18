@@ -10,25 +10,30 @@ import link from '../../../../../../resources/link'
 import SignTypedDataRequest from './SignTypedDataRequest'
 
 class Requests extends React.Component {
-  constructor (...args) {
-    super(...args)
+  constructor (props, context) {
+    super(props, context)
     this.state = {
       minimized: false,
-      unlockInput: '',
-      unlockHeadShake: false
+      // unlockInput: '',
+      // unlockHeadShake: false
     }
-    this.unlockInput = React.createRef()
+    this.moduleRef = React.createRef()
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.moduleRef && this.moduleRef.current) {
+        link.send('tray:action', 'updateAccountModule', props._id, { height: this.moduleRef.current.clientHeight })
+      }
+    })
   }
 
-  trezorPin (num) {
-    this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
-    if (this.tPin.length === 4) {
-      link.rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
-        if (err) throw new Error(err)
-      })
-      this.tPin = ''
-    }
-  }
+  // trezorPin (num) {
+  //   this.tPin = this.tPin ? this.tPin + num.toString() : num.toString()
+  //   if (this.tPin.length === 4) {
+  //     link.rpc('trezorPin', this.props.id, this.tPin, (err, status) => {
+  //       if (err) throw new Error(err)
+  //     })
+  //     this.tPin = ''
+  //   }
+  // }
 
   minimize () {
     this.setState({ minimized: true })
@@ -44,27 +49,31 @@ class Requests extends React.Component {
     }
   }
 
-  unlockChange (e) {
-    this.setState({ unlockInput: e.target.value })
-  }
+  // unlockChange (e) {
+  //   this.setState({ unlockInput: e.target.value })
+  // }
 
-  unlockSubmit (e) {
-    link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
-      if (err) {
-        this.setState({ unlockHeadShake: true })
-        setTimeout(() => this.setState({ unlockHeadShake: false }), 1010)
-      }
-    })
-  }
+  // unlockSubmit (e) {
+  //   link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err, result) => {
+  //     if (err) {
+  //       this.setState({ unlockHeadShake: true })
+  //       setTimeout(() => this.setState({ unlockHeadShake: false }), 1010)
+  //     }
+  //   })
+  // }
 
-  keyPressUnlock (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      this.unlockSubmit()
-    }
-  }
+  // keyPressUnlock (e) {
+  //   if (e.key === 'Enter') {
+  //     e.preventDefault()
+  //     this.unlockSubmit()
+  //   }
+  // }
 
   componentDidMount () {
+    this.resizeObserver.observe(this.moduleRef.current)
+    if (this.moduleRef && this.moduleRef.current) {
+      link.send('tray:action', 'updateAccountModule', this.props._id, { height: this.moduleRef.current.clientHeight })
+    }
     setTimeout(() => {
       const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
       const open = current && this.store('selected.open')
@@ -73,6 +82,11 @@ class Requests extends React.Component {
       }
     }, 100)
   }
+
+  // componentDidMount () {
+    
+  //   // link.send('tray:action', 'updateAccountModule', this.props.id, { height: this.moduleRef.current.clientHeight })
+  // } 
 
   render () {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
@@ -104,22 +118,13 @@ class Requests extends React.Component {
     const open = current && this.store('selected.open')
     // let minimized = this.store('selected.minimized')
 
-    let unlockClass = 'signerUnlockRequest'
-    if (this.state.unlockHeadShake) unlockClass += ' headShake'
-    const unlockStyle = open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1, height: '110px', transfrom: 'translateY(0px)' } : { pointerEvents: 'none', transfrom: 'translateY(0px)', height: '0px', opacity: 0.3 }
-
     return (
-      <div className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
-        <div className={unlockClass} style={unlockStyle}>
-          <div className='signerUnlockWrap'>
-            <input className='signerUnlockInput' ref={this.unlockInput} type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyPress={e => this.keyPressUnlock(e)} />
-            <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)}>Unlock</div>
-          </div>
-        </div>
-        <div className='requestTitle'>
+      <div ref={this.moduleRef} className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
+        {/* <div className='requestTitle'>
           <div>Requests</div>
           <div className='requestCount'>{normal.length}</div>
-        </div>
+        </div> */}
+        <div className='moduleHeader'>{'Requests'}</div>  
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
             <div key='noReq' style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>No Pending Requests</div>

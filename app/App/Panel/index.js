@@ -121,7 +121,7 @@ class Panel extends React.Component {
           </div>
           <div className='appMenuItem'>
             <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleDash', 'signers')}>
-              {svg.fingerprint(18)}
+              {svg.inventory(18)}
             </div>
           </div>
           <div className='appMenuItem'>

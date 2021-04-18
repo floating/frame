@@ -1,4 +1,7 @@
+const panelActions = require('./panel')
+
 module.exports = {
+  ...panelActions,
   // setSync: (u, key, payload) => u(key, () => payload),
   selectNetwork: (u, type, id) => {
     const reset = { status: 'loading', connected: false, type: '', network: '' }

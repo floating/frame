@@ -17,16 +17,53 @@ const main = (path, def) => {
 }
 
 const initial = {
+  panel: { // Panel view
+    show: false,
+    view: 'default',
+    account: {
+      moduleOrder: [
+        'signer',
+        'launcher',
+        'requests',
+        'balances',
+        'inventory',
+        'activity',
+        'permissions',
+        'verify'
+      ],
+      modules: {
+        signer: { // is hidden unless the signer needs something
+          height: 110 // initial height 
+        },
+        requests: { // current requests
+          height: 400
+        },
+        activity: { // recent txs -- expand to see more
+          height: 100
+        },
+        balances: { // eth and erc-20 tokens -- expand to see all 
+          height: 100
+        },
+        inventory: { // list of nfts owned by address (postpone?)
+          height: 100
+        },
+        permissions: { // permission activity log -- expand to edit permissions
+          height: 100
+        },
+        verify: { // verify address on signer
+          height: 100
+        },
+        launcher: {
+          height: 100
+        }
+      }
+    }
+  },
   dash: {
     type: 'signers'
   },
-  tray: {},
   flow: {},
   dapps: {},
-  panel: {
-    show: false,
-    view: 'default'
-  },
   view: {
     current: '',
     list: [],

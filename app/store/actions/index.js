@@ -1,7 +1,14 @@
 import { v4 } from 'uuid'
 import { URL } from 'url'
 
-export const syncMain = (u, main) => u('main', _ => main)
+// export const syncMain = (u, main) => u('main', _ => main)
+
+export const pathSync = (u, path, value) => u(path, () => value)
+
+// export const syncPanel = (u, panel) => u('panel', _ => panel)
+
+
+// Convert to synthetic actions
 
 export const setSigner = (u, signer) => {
   u('selected.current', _ => signer.id)

@@ -15,8 +15,10 @@ export default (state, cb) => {
   store.api.feed((state, actions, obscount) => {
     actions.forEach(action => {
       action.updates.forEach(update => {
+        console.log(update)
         if (update.path.startsWith('main')) return
-        link.send('tray:syncPath', update.path, update.value)
+        if (update.path.startsWith('panel')) return
+        // link.send('tray:syncPath', update.path, update.value)
       })
     })
   })
