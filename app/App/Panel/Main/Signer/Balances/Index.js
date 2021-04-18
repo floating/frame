@@ -39,13 +39,13 @@ class Balances extends React.Component {
           {token.symbol}
         </div>
         <div className='signerBalanceName'>
-          {token.name}
+          {token.name + ` - ${token.usdDisplayRate} `}
         </div>
         <div className='signerBalanceValue' style={(token.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
           {(balance === undefined ? '-.------' : token.displayBalance)}
         </div>
         <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}}>
-          {'~' + token.usdDisplayValue}
+          {token.usdDisplayValue}
         </div>
       </div>
     )
@@ -74,6 +74,7 @@ class Balances extends React.Component {
         displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
         floatBalance: parseFloat(balance || 0).toFixed(6),
         usdRate: etherUSD,
+        usdDisplayRate: '$' + (etherUSD).toLocaleString(),
         usdValue: Math.floor(parseFloat(balance) * etherUSD),
         usdDisplayValue: '$' + Math.floor(parseFloat(balance) * etherUSD).toLocaleString()
       }

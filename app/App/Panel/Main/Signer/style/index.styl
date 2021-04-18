@@ -216,16 +216,19 @@
   //   z-index 40
   //   border-radius 12px
   //   z-index 3003
+  .signerTop:hover
+    .signerSelect
+      background var(--ghostB)
 
   .signerTop
     position relative
     opacity 1
     z-index 3030000
     border-radius 9px
-    transition var(--standard)
+    transition var(--standard), background 0s linear
     z-index 9999000
     height 63px
-    background var(--ghostB)
+    background var(--ghostA)
     margin 0px 5px 0px 5px
     box-shadow 0px 4px 6px -1px var(--thick)
 
@@ -268,47 +271,21 @@
       border-bottom-right-radius 8px
       
       .signerSelectIconWrap
-        // position relative
-        // background var(--ghostD)
-        // box-shadow 0px 4px 6px -1px var(--thin)
         width 100%
         height 100%
-        
-        // border-radius 14px
-        // padding 3px 8px
         transform rotate(0deg)
-        
         box-sizing border-box
         padding 18px 15px 0px 19px
         cursor pointer
-        // background blue
-        // background red
-        border-left 1px solid var(--ghostA)
+        border-left 1px solid var(--ghostZ)
 
         div, svg
           pointer-events none
 
   
       .signerSelectIcon
-        // position absolute
-        // top 0
-        // right 0
-        // bottom 0
-        // left 0
-        // border-radius 16px
-        // padding 2px 4px 0px 3px
         transition var(--standard)
         pointer-events none
-
-      // .signerSelectIconWrap:hover .signerSelectIcon
-      //   animation-duration 2.4s
-      //   animation-name arrowSlideSingle
-      //   animation-iteration-count infinite
-      //   animation-fill-mode none
-      //   animation-play-state running
-      //   transform translateZ(0)
-      //   will-change transform, opacity
-      //   opacity 0
 
     .signerSelect:hover
       background var(--ghostD)
@@ -318,11 +295,6 @@
       // position relative
       top 0px
       left 0px
-      // background blue
-      // display flex
-      // justify-content center
-      // align-items center
-
       width 63px
       height 63px
 
@@ -341,7 +313,7 @@
       box-sizing border-box
       padding 12px
       z-index 300000
-      border-right 1px solid var(--ghostA)
+      border-right 1px solid var(--ghostZ)
       // background blue
       .signerSelectIconWrap
         // position relative
@@ -1405,7 +1377,7 @@
       font-weight bold
       letter-spacing 2px
       padding 11px
-      border-bottom 1px solid var(--ghostA)
+      border-bottom 1px solid var(--ghostZ)
       text-align center
 
     .moduleMain
@@ -1417,7 +1389,7 @@
   // font-weight bold
   letter-spacing 2px
   // padding 11px
-  border-bottom 1px solid var(--ghostA)
+  border-bottom 1px solid var(--ghostZ)
   text-align center
   display flex
   padding 33px

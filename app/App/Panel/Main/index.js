@@ -58,7 +58,7 @@ class Main extends React.Component {
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
-              <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none', opacity: 0 , transform: 'translateY(-90px)'} : { opacity: 1, transform: 'translateY(0px)' }}>
+              <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none' } : { opacity: 1, transform: 'translateY(0px)' }}>
                 <div className='panelHeaderTitle'>Accounts</div>
                 <div className='panelHeaderUpdate' onMouseDown={() => {
                   link.send('tray:toggleDash', 'signers')

@@ -367,7 +367,7 @@
   align-items center
   transform translateZ(0)
   margin 24px 10px 0px 10px
-  background var(--ghostC)
+  background var(--ghostB)
   padding 20px
   border-radius 12px
   font-size 13px
@@ -391,6 +391,7 @@
     align-items center
     padding 20px
     color var(--outerspace08)
+    
     .snipItBrowserExtensionIcon:hover
       background var(--ghostE)
 
@@ -405,6 +406,10 @@
       border-radius 12px
       margin 0px 5px
       box-shadow cardDrop // , 0px 4px 2px -3px rgba(0, 25, 35, 0.14)
+      cursor pointer
+
+      *
+        pointer-events none
 
     // .snipItSpinRight
     //   svg
@@ -417,7 +422,6 @@
 
 
 @import '../Main/style'
-@import '../Local/style'
 @import '../Notify/style'
 // @import '../Phase/style'
 @import '../Badge/style'

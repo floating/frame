@@ -526,7 +526,7 @@ class Signer extends React.Component {
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({ top: bounds.top - 63, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
+      this.store.initialSignerPos({ top: bounds.top - 59, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
@@ -781,8 +781,8 @@ class Signer extends React.Component {
       style.right = 0
       style.zIndex = '1000000000000'
       const panelHeight = document.body.offsetHeight
-      style.height = open ? panelHeight - 62 - 2 : initial.height - 3
-      let top = (initial.top) * -1
+      style.height = open ? panelHeight - 62 - 3 : initial.height - 3
+      let top = (initial.top - 3) * -1
       style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
@@ -815,28 +815,6 @@ class Signer extends React.Component {
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-              {this.state.openHover && false ? (
-              <>
-                <div className='signerSelectArrowWrap signerSelectLeft'>
-                  <div className='signerSelectArrows'>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                  </div>
-                </div>
-                <div className='signerSelectArrowWrap signerSelectRight'>
-                  <div className='signerSelectArrows'>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                    <div className='signerSelectArrow'>{svg.octicon('chevron-up', { height: 14 })}</div>
-                  </div>
-                </div>
-              </>
-              ) : null}
               {this.renderType()} 
               <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>
                 <div className='signerSelectIconWrap'>
