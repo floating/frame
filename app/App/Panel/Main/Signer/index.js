@@ -257,7 +257,7 @@ class _AccountMain extends React.Component {
     })
     return (
       <div className='accountMain'>
-        <div className='accountMainSlide' style={{ height: slideHeight + 1 + 'px'}}>
+        <div className='accountMainSlide' style={{ height: slideHeight + 41 + 'px'}}>
           {modules}
         </div>
       </div>

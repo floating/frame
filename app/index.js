@@ -20,7 +20,10 @@ link.rpc('getState', (err, state) => {
   const store = _store(state)
   if (!store('main.mute.welcomeWarning')) store.notify('mainnet')
   store.observer(() => {
-    document.body.className = store('main.colorway')
+    document.body.className = 'clip ' + store('main.colorway')
+    setTimeout(() => {
+      document.body.className = store('main.colorway')
+    }, 100)
   })
   const Frame = Restore.connect(Panel, store)
   ReactDOM.render(<Frame />, document.getElementById('frame'))

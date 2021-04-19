@@ -12,6 +12,12 @@ import link from '../../../../resources/link'
 let firstScroll = true
 
 class Main extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      dashboard: false
+    }
+  }
   reportScroll () {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
@@ -61,11 +67,11 @@ class Main extends React.Component {
               <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none', opacity: 0 } : { opacity: 1, transform: 'translateY(0px)' }}>
                 <div className='panelHeaderTitle'>Accounts</div>
                 <div className='panelHeaderUpdate' onMouseDown={() => {
+                  this.setState({ dashboard: !this.state.dashboard })
                   link.send('tray:toggleDash', 'signers')
                 }}>
-                  <div className='panelHeaderUpdateToggle'>
-                    {'+|-'}
-                  </div>
+                  <div className='panelHeaderUpdateToggle' style={this.state.dashboard ? { transform: 'translateX(12px)' } : { transform: 'translateX(0px)' }} />
+                  <div className='panelHeaderUpdateOn' />
                 </div>
               </div>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
