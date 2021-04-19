@@ -7,7 +7,7 @@
   // bottom 0px
   // left 0px
   // right 0px
-  height 49px
+  height 40px
   width 100%
   z-index 200000
   // background var(--ghostD)
@@ -18,17 +18,18 @@
   .signerBalanceShowAll
     position absolute
     background var(--ghostD)
-    left 11px
-    bottom 11px
-    top 11px
+    left 5px
+    bottom 5px
+    top 5px
     width 90px
-    border-radius 16px
+    border-radius 7px
     cursor pointer
     z-index 4000
     display flex
     justify-content center
     align-items center
-    box-shadow 0px 1px 3px var(--ghostZ)
+    font-size 12px
+    // box-shadow 0px 1px 3px var(--ghostZ)
 
   .signerBalanceTotalText
     position absolute
@@ -49,10 +50,9 @@
       letter-spacing 1px
       color var(--outerspace02)
 
-
     .signerBalanceTotalValue
-      color var(--good06)
       font-size 16px
+      color var(--outerspace05)
   
 .signerBalance
   position relative
@@ -82,6 +82,9 @@
     font-weight 400
     color var(--outerspace05)
 
+  .signerBalanceCurrentPrice
+    color var(--outerspace08)
+
   .signerBalanceLogo
     position absolute
     left 11px
@@ -92,6 +95,7 @@
     box-shadow 0px 0px 3px 2px var(--thick)
     border-radius 15px
     padding 5px
+    
     img
       height 24px
       width 24px
@@ -119,7 +123,7 @@
     bottom 11px
     font-size 12px
     font-weight 400
-    color var(--good06)
+    color var(--outerspace05)
 
 .signerBalance:last-child
   border-bottom none
