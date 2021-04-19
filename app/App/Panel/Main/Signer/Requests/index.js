@@ -109,10 +109,10 @@ class Requests extends React.Component {
       return 0
     })
     const monitorHeight = 205
-    let containNormal = normal.length ? (360 + (normal.length * 10)) : 160
+    let containNormal = normal.length ? (360 + (normal.length * 10)) : 52
     if (normal.length && monitor.length > 0) containNormal += 70
     const containMonitor = monitor.length * monitorHeight
-    const containHeight = containNormal + containMonitor + 10
+    const containHeight = containNormal + containMonitor
 
     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
     const open = current && this.store('selected.open')
@@ -124,7 +124,6 @@ class Requests extends React.Component {
           <div>Requests</div>
           <div className='requestCount'>{normal.length}</div>
         </div> */}
-        <div className='moduleHeader'>{'Requests'}</div>  
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
             <div key='noReq' style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>No Pending Requests</div>

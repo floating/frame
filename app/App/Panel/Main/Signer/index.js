@@ -8,6 +8,7 @@ import Default from './Default'
 
 import Activity from './Activity'
 import Balances from './Balances'
+import Gas from './Gas'
 import Inventory from './Inventory'
 import Launcher from './Launcher'
 import Permissions from './Permissions'
@@ -185,7 +186,7 @@ class _AccountMain extends React.Component {
     let style = { 
       transform: `translateY(${top}px)`, 
       zIndex: 10000 - index, 
-      height: module.height + 1 ,
+      height: module.height,
       opacity: 1
     }
     //  && !this.props.signer) hidden = true
@@ -198,11 +199,18 @@ class _AccountMain extends React.Component {
         overflow: 'hidden'
       }
     }
+
+    let moduleClass = ''
+    if (index === 0) moduleClass = ' transparentModule'
+
     return (
-      <div className='accountModule' style={style}>
+      <div className={'accountModule' + moduleClass} style={style}>
         <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
           {
             id === 'signer' ? <SignerModule 
+              moduleId={id} 
+            /> :
+            id === 'gas' ? <Gas 
               moduleId={id} 
             /> :
             id === 'requests' ? <Requests 
@@ -243,13 +251,13 @@ class _AccountMain extends React.Component {
     const accountModuleOrder = this.store('panel.account.moduleOrder')
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
-      const module = accountModules[id]
-      slideHeight += module.height
-      return this.renderModule(id, module, slideHeight - module.height, i)
+      const module = accountModules[id] || { height: 0 }
+      slideHeight += module.height + 5
+      return this.renderModule(id, module, slideHeight - module.height - 5, i)
     })
     return (
       <div className='accountMain'>
-        <div className='accountMainSlide' style={{ height: slideHeight + 'px'}}>
+        <div className='accountMainSlide' style={{ height: slideHeight + 41 + 'px'}}>
           {modules}
         </div>
       </div>

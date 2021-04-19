@@ -22,10 +22,10 @@ const initial = {
     view: 'default',
     account: {
       moduleOrder: [
-        'signer',
         'launcher',
         'requests',
         'balances',
+        'gas',
         'inventory',
         'activity',
         'permissions',
@@ -54,6 +54,9 @@ const initial = {
           height: 100
         },
         launcher: {
+          height: 100
+        },
+        gas: {
           height: 100
         }
       }
