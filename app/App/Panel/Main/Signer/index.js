@@ -8,6 +8,7 @@ import Default from './Default'
 
 import Activity from './Activity'
 import Balances from './Balances'
+import Gas from './Gas'
 import Inventory from './Inventory'
 import Launcher from './Launcher'
 import Permissions from './Permissions'
@@ -205,6 +206,9 @@ class _AccountMain extends React.Component {
             id === 'signer' ? <SignerModule 
               moduleId={id} 
             /> :
+            id === 'gas' ? <Gas 
+              moduleId={id} 
+            /> :
             id === 'requests' ? <Requests 
               _id={id}
               id={this.props.id}
@@ -243,7 +247,7 @@ class _AccountMain extends React.Component {
     const accountModuleOrder = this.store('panel.account.moduleOrder')
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
-      const module = accountModules[id]
+      const module = accountModules[id] || { height: 0 }
       slideHeight += module.height
       return this.renderModule(id, module, slideHeight - module.height, i)
     })

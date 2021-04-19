@@ -25,7 +25,7 @@ const padLeft = (num, length) => {
   return num
 }
 
-const padRight = (num, length) => {
+const padRight = (num = '', length) => {
   num = num.toString()
   while (num.length < length) num = num + '0'
   return num
@@ -59,9 +59,11 @@ const scan = async (address, omitList = [], knownList) => {
     Object.keys(rates).forEach(token => {
       if (found[token]) {
         found[token].usdRate = rates[token].usd || 0
-        found[token].usdDisplayRate = '$' + (found[token].usdRate).toLocaleString()
-        found[token].usdValue = Math.floor(found[token].floatBalance * found[token].usdRate)
-        found[token].usdDisplayValue = '$' + Math.floor(found[token].usdValue).toLocaleString()
+        const usdRateString = rates[token].usd.toString()
+        found[token].usdDisplayRate = '$' + (parseInt(usdRateString.split('.')[0])).toLocaleString() + '.' + padRight(usdRateString.split('.')[1], 2)
+        found[token].usdValue = Math.floor(found[token].floatBalance * found[token].usdRate * 100) / 100
+        const usdValueString = found[token].usdValue.toString()
+        found[token].usdDisplayValue = '$' + (parseInt(usdValueString.split('.')[0])).toLocaleString() + '.' + padRight(usdValueString.split('.')[1], 2)
       }
     })
   } catch (e) {
