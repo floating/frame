@@ -1,17 +1,25 @@
 const IpfsHttpClient = require('ipfs-http-client')
-const peers = require('./peers.json')
-
-
-const { globSource } = IpfsHttpClient
-// const ipfs = IpfsHttpClient()
-
 
 // if there is an ipfs endpoint in the store use that otherwise use pylon
 let node
 
 const connect = async () => {
   try {
-    node = IpfsHttpClient({ port: 5002 })
+    // TODO: use nebula for this or make it configurable somewhere
+    const endpointConfig = process.env.NODE_ENV === 'production'
+      ? {
+          host: 'ipfs.nebula.land',
+          port: 443,
+          protocol: 'https'
+        }
+      : {
+          host: 'localhost',
+          port: 5001,
+          protocol: 'http'
+        }
+
+    node = IpfsHttpClient(endpointConfig)
+
     // const connectPeers = async () => {
     //   // const peers = await ens.resolvePeers('frame.eth')
     //   for (const peer of peers) {
@@ -29,14 +37,7 @@ const connect = async () => {
     console.error(e)
     // ipfs.destroy()
     setTimeout(() => connect(), 15 * 1000)
-    return
   }
-
-  console.log('~~~~~~~~~~~')
-  console.log('')
-  console.log('IPFS is READY')
-  console.log('')
-  console.log('~~~~~~~~~~~')
 
   // const connectPeers = async () => {
   //   // const peers = await ens.resolvePeers('frame.eth')
@@ -100,6 +101,7 @@ const surface = {
   get: async path => {
     if (!node) throw new Error('IPFS is not running')
     const files = []
+
     for await (const file of node.get(path)) {
       if (!file || !file.content) continue
       let content = Buffer.from('')
@@ -115,7 +117,6 @@ const surface = {
     console.log('ipfs getFile 0', path)
     const files = await surface.get(path)
     if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
-    if (files[0].path !== path || files.length !== 1) throw new Error(`Path ${path} could not be found`)
     return files[0]
   },
   pin: async (cid) => {
