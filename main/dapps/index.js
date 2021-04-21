@@ -137,15 +137,15 @@ class Dapps {
         // })
         // if (favicon.startsWith('./')) favicon = favicon.substring(2)
         // let icon
-        // // const file = await ipfs.getFile(`${cid}/${favicon || 'favicon.ico'}`)
-        // // if (file) {
-        // //   icon = {
-        // //     cid: file.cid.toString(),
-        // //     path: file.path,
-        // //     name: file.name,
-        // //     content: Buffer.from(file.content).toString('base64')
-        // //   }
-        // // }
+        // const file = await ipfs.getFile(`${contentCid}/${favicon || 'favicon.ico'}`)
+        // if (file) {
+        //   icon = {
+        //     cid: file.cid.toString(),
+        //     path: file.path,
+        //     name: file.name,
+        //     content: Buffer.from(file.content).toString('base64')
+        //   }
+        // }
         // store.updateDapp(namehash, { icon })
         this._pin(contentCid)
         cb(null)

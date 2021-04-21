@@ -6,19 +6,12 @@ let node
 const connect = async () => {
   try {
     // TODO: use nebula for this or make it configurable somewhere
-    const endpointConfig = process.env.NODE_ENV === 'production'
-      ? {
-          host: 'ipfs.nebula.land',
-          port: 443,
-          protocol: 'https'
-        }
-      : {
-          host: 'localhost',
-          port: 5001,
-          protocol: 'http'
-        }
-
-    node = IpfsHttpClient(endpointConfig)
+    // const endpointConfig = process.env.NODE_ENV === 'production'
+    node = IpfsHttpClient({
+      host: 'ipfs.nebula.land',
+      port: 443,
+      protocol: 'https'
+    })
 
     // const connectPeers = async () => {
     //   // const peers = await ens.resolvePeers('frame.eth')

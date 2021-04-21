@@ -331,7 +331,6 @@ module.exports = {
     })
   },
   updateDapp: (u, namehash, data) => {
-    // console.log('updateDapp', namehash, data)
     u(`main.dapp.details.${namehash}`, (oldData) => {
       return { ...oldData, ...data }
     })

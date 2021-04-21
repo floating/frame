@@ -105,18 +105,19 @@ const surface = {
 
     const url = `http://localhost:8421/?dapp=${ens}:${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    const height = area.height - 32
+    const height = area.height - 160
     const width = area.width - 444 > height ? height : area.width - 444
 
     windows[session] = new BrowserWindow({
       session,
-      x: 40,
+      x: 20,
       y: 0,
       width,
       height,
       show: false,
       frame: false,
       titleBarStyle: 'hiddenInset',
+      // backgroundColor: '#fff',
       // minimizable: false,
       // maximizable: false,
       // closable: false,
@@ -139,7 +140,7 @@ const surface = {
     // windows[session].positioner = new Positioner(windows[session])
     const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
     const offset = dappViews * 48
-    windows[session].setPosition(pos.x - 444 - offset, pos.y + 16)
+    windows[session].setPosition(pos.x - 444 - offset, pos.y + 80)
     if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../../bundle/dapp.html`)
@@ -147,10 +148,11 @@ const surface = {
 
     windows[session].webContents.on('did-finish-load', async () => {
       // windows[session].webContents.openDevTools()
-      const dapp = Object.assign({}, store(`main.dapp.details.${namehash}`))
-      dapp.url = url
-      dapp.ens = ens
-      windows[session].send('main:dapp', dapp)
+      // const dapp = Object.assign({}, store(`main.dapp.details.${namehash}`))
+      // dapp.url = url
+      // dapp.ens = ens
+      // dapp.namehash = namehash
+      windows[session].send('main:dapp', namehash)
       store.setDappOpen(ens, true)
     })
     windows[session].show()
@@ -188,7 +190,6 @@ const surface = {
       await timeout(200)
       const color = await getColor(tempView)
       store.updateDapp(namehash, { color })
-      windows[session].send('main:dapp', store(`main.dapp.details.${namehash}`))
       loadApp()
       setTimeout(() => {
         // tempView.destroy()
