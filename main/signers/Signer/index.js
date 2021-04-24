@@ -58,12 +58,12 @@ class Signer extends EventEmitter {
     }
   }
 
-  setIndex (i, cb) {
-    this.index = i
-    this.requests = {} // TODO Decline these requests before clobbering them
-    // windows.broadcast('main:action', 'updateSigner', this.summary())
-    cb(null, this.summary())
-  }
+  // setIndex (i, cb) {
+  //   this.index = i
+  //   this.requests = {} // TODO Decline these requests before clobbering them
+  //   // windows.broadcast('main:action', 'updateSigner', this.summary())
+  //   cb(null, this.summary())
+  // }
 
   open () {
     // windows.broadcast('main:action', 'addSigner', this.summary())

@@ -29,7 +29,7 @@ module.exports = async origin => {
   if (origin === 'frame-extension') return true
   const account = accounts.current()
   if (!account) return
-  const address = account.addresses[account.index]
+  const address = account.address // es[account.index]
   if (!address) return
   const permissions = store('main.addresses', address, 'permissions') || {}
   const perms = Object.keys(permissions).map(id => permissions[id])

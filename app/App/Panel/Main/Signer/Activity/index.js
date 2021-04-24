@@ -22,10 +22,9 @@ class Balances extends React.Component {
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'recent activity'}</div>  
-        <div style={{ padding: '80px', display: 'flex', justifyContent: 'center' }}>
-          {'recent activity'}
-        </div>
-        
+        <div style={{ padding: '60px', display: 'flex', justifyContent: 'center' }}>
+          {'Coming Soon'}
+        </div>  
       </div>
     )
   }

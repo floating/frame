@@ -58,7 +58,7 @@ class Add extends React.Component {
                       <AddHardware index={2} type='trezor' />
                       <div className='addAccountHeader'><div style={{ marginRight: '10px' }}>{svg.lightbulb(12)}</div><div>Smart Accounts</div></div>
                       <AddAragon index={3} />
-                      <div className='addAccountHeader'><div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(13)}</div><div>Hot Accounts</div></div>
+                      <div className='addAccountHeader'><div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(18)}</div><div>Hot Accounts</div></div>
                       <AddPhrase index={4} />
                       <AddRing index={5} />
                       <div className='addAccountHeader'><div style={{ margin: '-3px 10px 0px 0px' }}>{svg.handshake(23)}</div><div>Nonsigning Accounts</div></div>

@@ -15,7 +15,7 @@ export default (state, cb) => {
   store.api.feed((state, actions, obscount) => {
     actions.forEach(action => {
       action.updates.forEach(update => {
-        console.log(update)
+        // console.log(update)
         if (update.path.startsWith('main')) return
         if (update.path.startsWith('panel')) return
         // link.send('tray:syncPath', update.path, update.value)
@@ -51,24 +51,24 @@ export default (state, cb) => {
   }
 
   store.observer(() => {
-    monitor = []
-    if (store('selected.current')) {
-      const account = store('main.accounts', store('selected.current'))
-      if (account) {
-        if (store('selected.showAccounts')) { // When viewing accounts, refresh them all
-          const startIndex = store('selected.accountPage') * 5
-          if (account.addresses.length) monitor = account.addresses.slice(startIndex, startIndex + 10)
-        } else {
-          monitor = [account.addresses[account.index]]
-        }
-      } else {
-        const accounts = store('main.accounts')
-        monitor = Object.keys(accounts).map(id => {
-          const account = accounts[id]
-          return account.addresses[account.index]
-        })
-      }
-    }
+    monitor = [store('selected.current')]
+    // if (store('selected.current')) {
+    //   const account = store('main.newAccounts', store('selected.current'))
+    //   // if (account) {
+    //   //   // if (store('selected.showAccounts')) { // When viewing accounts, refresh them all
+    //   //   //   const startIndex = store('selected.accountPage') * 5
+    //   //   //   if (account.addresses.length) monitor = account.addresses.slice(startIndex, startIndex + 10)
+    //   //   // } else {
+    //   //   //   monitor = [account.addresses[account.index]]
+    //   //   // }
+    //   // } else {
+    //   //   const accounts = store('main.newAccounts')
+    //   //   monitor = Object.keys(accounts).map(id => {
+    //   //     const account = accounts[id]
+    //   //     return account.addresses[account.index]
+    //   //   })
+    //   // }
+    // }
     refreshBalances()
   })
 

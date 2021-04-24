@@ -43,13 +43,14 @@ class Accounts extends EventEmitter {
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
-    store.observer(() => {
-      const signers = store('main.signers')
-      Object.keys(signers).forEach(id => {
-        const type = store('main.signers', id, 'type')
-        if (!this.accounts[id]) this.add(signers[id].addresses, { type })
-      })
-    })
+    // Create accounts from new signers
+    // store.observer(() => {
+    //   const signers = store('main.signers')
+    //   Object.keys(signers).forEach(id => {
+    //     const type = store('main.signers', id, 'type')
+    //     if (!this.accounts[id]) this.add(signers[id].addresses, { type })
+    //   })
+    // })
     windows.events.on('tray:show', () => {
       this.tokenScan(true)
     })
@@ -316,15 +317,15 @@ class Accounts extends EventEmitter {
     })
     cb(null, signerSummary)
   }
-
+  // Set Current Account
   setSigner (id, cb) {
-    this.accounts[id].setIndex(this.accounts[id].index, err => {
-      if (err) return cb(err)
-      this._current = id
-      const summary = this.current().summary()
-      cb(null, summary)
-      windows.broadcast('main:action', 'setSigner', summary)
-    })
+    this._current = id
+    const summary = this.current().summary()
+    cb(null, summary)
+    windows.broadcast('main:action', 'setSigner', summary)
+    // this.accounts[id].setIndex(this.accounts[id].index, err => {
+    //   if (err) return cb(err)
+    // })
   }
 
   unsetSigner (cb) {

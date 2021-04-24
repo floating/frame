@@ -14,6 +14,7 @@ import Launcher from './Launcher'
 import Permissions from './Permissions'
 import Requests from './Requests'
 import SignerModule from './Signer'
+import SignerStatus from './SignerStatus'
 import Verify from './Verify'
 
 
@@ -207,8 +208,9 @@ class _AccountMain extends React.Component {
       <div className={'accountModule' + moduleClass} style={style}>
         <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
           {
-            id === 'signer' ? <SignerModule 
+            id === 'signer' ? <SignerStatus 
               moduleId={id} 
+              signer={this.props.signer}
             /> :
             id === 'gas' ? <Gas 
               moduleId={id} 
@@ -571,6 +573,15 @@ class Signer extends React.Component {
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
     // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     const inSettings = this.store('selected.view') === 'settings'
+
+    let accountIndicatorClass = 'accountIndicator'
+    if (this.props.signer) {
+      if (this.props.signer.status === 'locked') {
+        accountIndicatorClass += ' accountIndicatorLocked'
+      } else if (this.props.signer.status === 'ok') {
+        accountIndicatorClass += ' accountIndicatorGood'
+      }
+    }
     return (
       <div className='signerType'>
         
@@ -579,23 +590,25 @@ class Signer extends React.Component {
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
           </div>
         ) : null} */}
+
+        <div className={accountIndicatorClass} />
+        <div className='accountGrabber'>
+          {svg.grab(35)}
+        </div>
         <div className='signerSelectIconWrap'>
           {(_ => {
-            if (this.props.signer) {
-              if (this.props.signer.type === 'ledger') return svg.ledger(20)
-              if (this.props.signer.type === 'trezor') return svg.trezor(20)
-              if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(16)
-              if (this.props.signer.type === 'aragon') return svg.aragon(22)
-              return svg.logo(20)
-            } else {
-              return svg.logo(20)
-            }
+            const type = this.props.lastSignerType 
+            if (type === 'ledger') return svg.ledger(20)
+            if (type === 'trezor') return svg.trezor(20)
+            if (type === 'seed' || type === 'ring') return svg.flame(24)
+            if (type === 'aragon') return svg.aragon(28)
+            return svg.logo(20)
           })()}
         </div>
-        <div className='signerText'>{this.props.signer ? (
+        {/* <div className='signerText'>{this.props.signer ? (
           this.props.signer.type === 'ring' || this.props.signer.type === 'seed' ? 'hot' : this.props.signer.type
         ) : 'no signer'}
-        </div>
+        </div> */}
       </div>
     )
   }
@@ -672,62 +685,62 @@ class Signer extends React.Component {
     )
   }
 
-  renderAccountList () {
-    const index = this.store('main.accounts', this.props.id, 'index')
-    const startIndex = this.store('selected.accountPage') * 5
-    const highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
-    const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
-    return (
-      <div className='accountListWrap'>
-        <div className='accountList' onMouseDown={e => e.stopPropagation()}>
-          <div className='accountListItems'>
-            {this.store('main.accounts', this.props.id, 'addresses').slice(startIndex, startIndex + 5).map((a, i) => {
-              i = startIndex + i
-              const balance = this.store('balances', a)
-              return (
-                <div
-                  key={i}
-                  className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'}
-                  onMouseDown={() => this.setSignerIndex(i)}
-                  onMouseEnter={() => this.setHighlight('active', i)}
-                  onMouseLeave={() => this.setHighlight('inactive', i)}
-                >
-                  <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
-                  <div className='accountListItemAddress'>{a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}</div>
-                  <div className='accountListItemBalance'>{currentSymbol + ' ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
-                </div>
-              )
-            })}
-          </div>
-          <div className='accountPageToggle'>
-            <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>{svg.octicon('chevron-left', { height: 18 })}</div>
-            <div className='accountPageCurrent'>{this.store('selected.accountPage') + 1}</div>
-            <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
-          </div>
-          {this.renderSettingsMenu()}
-        </div>
-      </div>
-    )
-  }
+  // renderAccountList () {
+  //   const index = this.store('main.accounts', this.props.id, 'index')
+  //   const startIndex = this.store('selected.accountPage') * 5
+  //   const highlight = (this.state.accountHighlight === 'inactive') ? index : this.state.highlightIndex
+  //   const { type, id } = this.store('main.currentNetwork')
+  //   const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+  //   return (
+  //     <div className='accountListWrap'>
+  //       <div className='accountList' onMouseDown={e => e.stopPropagation()}>
+  //         <div className='accountListItems'>
+  //           {this.store('main.accounts', this.props.id, 'addresses').slice(startIndex, startIndex + 5).map((a, i) => {
+  //             i = startIndex + i
+  //             const balance = this.store('balances', a)
+  //             return (
+  //               <div
+  //                 key={i}
+  //                 className={i === highlight ? 'accountListItem accountListItemSelected' : 'accountListItem'}
+  //                 onMouseDown={() => this.setSignerIndex(i)}
+  //                 onMouseEnter={() => this.setHighlight('active', i)}
+  //                 onMouseLeave={() => this.setHighlight('inactive', i)}
+  //               >
+  //                 <div className='accountListItemCheck'>{svg.octicon('check', { height: 27 })}</div>
+  //                 <div className='accountListItemAddress'>{a ? a.substring(0, 6) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{a ? a.substr(a.length - 4) : ''}</div>
+  //                 <div className='accountListItemBalance'>{currentSymbol + ' ' + (balance === undefined ? '-.------' : parseFloat(balance).toFixed(6))}</div>
+  //               </div>
+  //             )
+  //           })}
+  //         </div>
+  //         <div className='accountPageToggle'>
+  //           <div className='accountPageButton accountPageButtonLeft' onMouseDown={() => this.updateAccountPage('<')}>{svg.octicon('chevron-left', { height: 18 })}</div>
+  //           <div className='accountPageCurrent'>{this.store('selected.accountPage') + 1}</div>
+  //           <div className='accountPageButton accountPageButtonRight' onMouseDown={() => this.updateAccountPage('>')}>{svg.octicon('chevron-right', { height: 18 })}</div>
+  //         </div>
+  //         {this.renderSettingsMenu()}
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
-  updateAccountPage (d) {
-    let accountPage = this.store('selected.accountPage')
-    accountPage = d === '<' ? accountPage - 1 : accountPage + 1
-    const max = Math.ceil((this.store('main.accounts', this.props.id, 'addresses').length / 5) - 1)
-    if (accountPage < 0) accountPage = 0
-    if (accountPage > max) accountPage = max
-    this.store.accountPage(accountPage)
-  }
+  // updateAccountPage (d) {
+  //   let accountPage = this.store('selected.accountPage')
+  //   accountPage = d === '<' ? accountPage - 1 : accountPage + 1
+  //   const max = Math.ceil((this.store('main.accounts', this.props.id, 'addresses').length / 5) - 1)
+  //   if (accountPage < 0) accountPage = 0
+  //   if (accountPage > max) accountPage = max
+  //   this.store.accountPage(accountPage)
+  // }
 
   renderStatus () {
     // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
-    let currentIndex = this.store('main.accounts', this.props.id, 'index')
-    const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
-    if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    if (!address) return null
+    // let currentIndex = this.store('main.accounts', this.props.id, 'index')
+    // const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
+    // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
+    const address = this.store('main.accounts', this.props.id, 'address')
+    if (!address) return 'no address'
     return this.props.status !== 'ok' ? (
       <div className='signerStatusNotOk'>{status}</div>
     ) : (
@@ -835,7 +848,7 @@ class Signer extends React.Component {
               {this.renderStatus()}
             </div>
             {current ?  <AccountMain id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} /> : null}
-            {current ? this.renderAccountList() : null}
+            {/* {current ? this.renderAccountList() : null} */}
             {/* <div className={open ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
               <div className='accountMenuLeft'>
                 <div className='accountMenuItem'>{svg.checklist(20)}</div>

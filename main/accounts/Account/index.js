@@ -18,18 +18,21 @@ const capitalize = (s) => {
 }
 
 class Account {
-  constructor ({ id, type, index, name, created, addresses, network, smart, options = {} }, accounts) {
-    this.accounts = accounts
-    this.id = id
-    this.index = index || 0
-    this.status = 'ok'
+  constructor ({ id, type, lastSignerType, index, name, created, address, addresses, network, smart, options = {} }, accounts) {
+    this.accounts = accounts // Accounts module
+    this.id = id // Account ID
+    // this.index = index || 0
+    this.status = 'ok' // Current Status
     this.name = name || capitalize(options.type) + ' Account'
-    this.type = type || options.type
+    // this.type = type || options.type
+    this.lastSignerType = lastSignerType || options.type
     this.created = created
-    this.addresses = addresses || ['0x']
+    // this.addresses = addresses || ['0x']
+    this.address = address || '0x' //  || ['0x']
     this.smart = smart
-    this.network = network || store('main.currentNetwork.id')
+    // this.network = network || store('main.currentNetwork.id')
     this.requests = {}
+    this.signer = {}
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart, this.network)
     this.update(true)
     this.acctObs = store.observer(() => {
@@ -37,9 +40,14 @@ class Account {
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
         this.signer = undefined
       }
-      const updatedSigner = store('main.signers', this.id)
+      const updatedSigner = this.findSigner(this.address) // store('main.signers', this.id)
       if (this.signer && this.signer.status === 'locked' && updatedSigner && updatedSigner.status === 'ok') this.verifyAddress()
-      this.signer = updatedSigner
+      
+      if (updatedSigner) {
+        this.signer = updatedSigner
+        this.lastSignerType = this.signer.type || this.lastSignerType 
+      }
+      
       this.smart = this.signer ? undefined : this.smart
       this.update()
     })
@@ -52,6 +60,26 @@ class Account {
         this.update()
       })
     }
+  }
+
+  findSigner (address) {
+    address = address.toLowerCase()
+    const availiableSigners = []
+    const signers = store('main.signers')
+    Object.keys(signers).forEach(id => {
+      if (signers[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
+        availiableSigners.push(signers[id])
+      }
+    })
+    availiableSigners.sort((a, b) => (!a.locked && !b.locked) ? 0 : !b.locked ? 1 : -1)
+    const foundSigner = availiableSigners[0]
+    return foundSigner || {}
+    // if (foundSigner) {
+    //   // const verified = this.newVerifyAddress(foundSigner)
+    //   // console.log('signer verified? ', verified)
+    //   return verified ? foundSigner : undefined
+    // }
+    return undefined
   }
 
   resError (error, payload, res) {
@@ -117,32 +145,83 @@ class Account {
     }
   }
 
-  verifyAddress (display, cb = () => {}) {
+  // newVerifyAddress (signerId, display, cb = () => {}) {
+  //   if (this.smart && this.smart.actor && this.smart.actor.signer && signers.get(this.smart.actor.signer.id) && signers.get(this.smart.actor.signer.id).verifyAddress) {
+  //     const s = signers.get(this.smart.actor.signer.id)
+  //     const index = s.addresses.indexOf(this.address)
+  //     if (index > -1) {
+  //       s.verifyAddress(index, this.address, display, cb)
+  //     } else {
+  //       log.info('NEW: Could not find address in signer')
+  //       cb(new Error('NEW: Could not find address in signer'))
+  //     }
+  //   } else if (this.signer && signers.get(signerId) && signers.get(signerId).verifyAddress) {
+  //     const s = signers.get(signerId)
+  //     const index = s.addresses.indexOf(this.address)
+  //     if (index > -1) {
+  //       s.verifyAddress(index, this.address, display, cb)
+  //     } else {
+  //       log.info('NEW: Could not find address in signer')
+  //       cb(new Error('NEW: Could not find address in signer'))
+  //     }
+  //   } else {
+  //     log.info('NEW: No signer active to verify address')
+  //     cb(new Error('NEW: No signer active to verify address'))
+  //   }
+  // }
+
+
+  verifyAddress (signerId, display, cb = () => {}) {
     if (this.smart && this.smart.actor && this.smart.actor.signer && signers.get(this.smart.actor.signer.id) && signers.get(this.smart.actor.signer.id).verifyAddress) {
-      signers.get(this.smart.actor.signer.id).verifyAddress(this.index, this.smart.actor.addresses[this.index], display, cb)
-    } else if (this.signer && signers.get(this.signer.id) && signers.get(this.signer.id).verifyAddress) {
-      signers.get(this.signer.id).verifyAddress(this.index, this.addresses[this.index], display, cb)
+      const s = signers.get(this.smart.actor.signer.id)
+      const index = s.addresses.indexOf(this.address)
+      if (index > -1) {
+        s.verifyAddress(index, this.address, display, cb)
+      } else {
+        log.info('Could not find address in signer')
+        cb(new Error('Could not find address in signer'))
+      }
+    } else if (this.signer && signers.get(signerId) && signers.get(signerId).verifyAddress) {
+      const s = signers.get(signerId)
+      const index = s.addresses.indexOf(this.address)
+      if (index > -1) {
+        s.verifyAddress(index, this.address, display, cb)
+      } else {
+        log.info('Could not find address in signer')
+        cb(new Error('Could not find address in signer'))
+      }
     } else {
       log.info('No signer active to verify address')
       cb(new Error('No signer active to verify address'))
     }
   }
 
+  // verifyAddress (display, cb = () => {}) {
+  //   if (this.smart && this.smart.actor && this.smart.actor.signer && signers.get(this.smart.actor.signer.id) && signers.get(this.smart.actor.signer.id).verifyAddress) {
+  //     signers.get(this.smart.actor.signer.id).verifyAddress(this.index, this.smart.actor.addresses[this.index], display, cb)
+  //   } else if (this.signer && signers.get(this.signer.id) && signers.get(this.signer.id).verifyAddress) {
+  //     signers.get(this.signer.id).verifyAddress(this.index, this.addresses[this.index], display, cb)
+  //   } else {
+  //     log.info('No signer active to verify address')
+  //     cb(new Error('No signer active to verify address'))
+  //   }
+  // }
+
   getSelectedAddresses () {
-    return [this.addresses[this.index]]
+    return [this.address]
   }
 
   getSelectedAddress () {
-    return this.addresses[this.index]
+    return this.address
   }
 
-  setIndex (i, cb) {
-    this.index = i
-    this.requests = {} // TODO Decline these requests before clobbering them
-    this.update()
-    cb(null, this.summary())
-    this.verifyAddress()
-  }
+  // setIndex (i, cb) {
+  //   this.index = i
+  //   this.requests = {} // TODO Decline these requests before clobbering them
+  //   this.update()
+  //   cb(null, this.summary())
+  //   this.verifyAddress()
+  // }
 
   summary () {
     const update = JSON.parse(JSON.stringify({
@@ -151,7 +230,9 @@ class Account {
       network: this.network,
       name: this.name,
       type: this.type,
-      addresses: this.addresses,
+      lastSignerType: this.lastSignerType,
+      // addresses: this.addresses,
+      address: this.address,
       status: this.status,
       signer: this.signer,
       smart: this.smart,
@@ -183,7 +264,7 @@ class Account {
   }
 
   getAccounts (cb) {
-    const account = this.addresses[this.index]
+    const account = this.address // es[this.index]
     if (cb) cb(null, account ? [account] : [])
     return account ? [account] : []
   }
@@ -232,7 +313,14 @@ class Account {
       if (err) return cb(err)
 
       if (this.signer) {
-        signers.get(this.signer.id).signTransaction(this.index, rawTx, cb)
+        const s = signers.get(this.signer.id)
+        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address.toLowerCase())
+        if (index > -1) {
+          s.signTransaction(index, rawTx, cb)
+        } else {
+          cb(new Error(`Signer cannot sign for this address`))
+        }
+
       } else if (this.smart) {
         if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
           signers.get(this.smart.actor.account.id).signTransaction(this.smart.actor.index, rawTx, cb)

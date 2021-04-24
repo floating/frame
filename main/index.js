@@ -8,6 +8,8 @@ app.commandLine.appendSwitch('force-color-profile', 'srgb')
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
+// console.log(app.getPath('userData'))
+
 const log = require('electron-log')
 const path = require('path')
 

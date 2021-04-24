@@ -22,6 +22,7 @@ const initial = {
     view: 'default',
     account: {
       moduleOrder: [
+        'signer',
         'launcher',
         'requests',
         'balances',
@@ -33,28 +34,28 @@ const initial = {
       ],
       modules: {
         signer: { // is hidden unless the signer needs something
-          height: 110 // initial height 
+          height: 0 // initial height 
         },
         requests: { // current requests
-          height: 400
+          height: 0
         },
         activity: { // recent txs -- expand to see more
-          height: 100
+          height: 0
         },
         balances: { // eth and erc-20 tokens -- expand to see all 
-          height: 100
+          height: 0
         },
         inventory: { // list of nfts owned by address (postpone?)
-          height: 100
+          height: 0
         },
         permissions: { // permission activity log -- expand to edit permissions
-          height: 100
+          height: 0
         },
         verify: { // verify address on signer
-          height: 100
+          height: 0
         },
         launcher: {
-          height: 100
+          height: 0
         },
         gas: {
           height: 100
@@ -459,7 +460,7 @@ if (initial.main._version < 5) {
     id: 137,
     type: 'ethereum',
     symbol: 'MATIC',
-    name: 'Matic',
+    name: 'Polygon',
     explorer: 'https://explorer.matic.network',
     gas: {
       price: {
@@ -474,6 +475,49 @@ if (initial.main._version < 5) {
   }
 
   initial.main._version = 5
+}
+
+
+// initial.main._version = 5
+// State transition -> 6
+if (initial.main._version < 6) {
+  const newAccounts = {}
+  const nameCount = {}
+  let { accounts, addresses } = initial.main
+  accounts = JSON.parse(JSON.stringify(accounts))
+  addresses = JSON.parse(JSON.stringify(addresses))
+  Object.keys(addresses).forEach(address => {
+    address = address.toLowerCase()
+    const matchingAccounts = []
+    Object.keys(accounts).forEach(id => {
+      if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address.toLowerCase()) > -1) {
+        matchingAccounts.push(id)
+      }
+    })
+    if (matchingAccounts.length > 0) {
+      const primaryAccount = matchingAccounts.sort((a, b) => {
+        return accounts[a].addresses.length === accounts[b].addresses.length ? 0 : accounts[a].addresses.length > accounts[b].addresses.length ? -1 : 1
+      })
+      newAccounts[address] = Object.assign({}, accounts[primaryAccount[0]])
+      nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
+      nameCount[newAccounts[address].name]++
+      const count = nameCount[newAccounts[address].name]
+      if (count > 0) newAccounts[address].name = newAccounts[address].name + ' ' + count
+      newAccounts[address].address = address
+      delete newAccounts[address].index
+      delete newAccounts[address].addresses
+      newAccounts[address].id = address
+      newAccounts[address].network = '1'
+      newAccounts[address].lastSignerType = newAccounts[address].type
+      // delete newAccounts[address].type
+      delete newAccounts[address].network
+      delete newAccounts[address].signer
+      newAccounts[address] = Object.assign({}, newAccounts[address], addresses[address] || { tokens: {}, permissions: {}})
+    }
+
+  })
+  initial.main.accounts = newAccounts
+  initial.main._version = 6
 }
 
 module.exports = () => initial

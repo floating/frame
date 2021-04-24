@@ -111,19 +111,19 @@ class HotSigner extends Signer {
   }
 
   signMessage (index, message, cb) {
-    if (this.network !== store('main.currentNetwork.id')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
+    if (this.network !== store('main.currentNetwork.id')) console.log(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
     const payload = { method: 'signMessage', params: { index, message } }
     this._callWorker(payload, cb)
   }
 
   signTypedData (index, typedData, cb) {
-    if (this.network !== store('main.currentNetwork.id')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
+    if (this.network !== store('main.currentNetwork.id')) console.log(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
     const payload = { method: 'signTypedData', params: { index, typedData } }
     this._callWorker(payload, cb)
   }
 
   signTransaction (index, rawTx, cb) {
-    if (this.network !== store('main.currentNetwork.id')) return cb(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
+    if (this.network !== store('main.currentNetwork.id')) console.log(new Error(`Signer is locked to network ${this.network} and we are on network ${store('main.currentNetwork.id')}`))
     const payload = { method: 'signTransaction', params: { index, rawTx } }
     this._callWorker(payload, cb)
   }
