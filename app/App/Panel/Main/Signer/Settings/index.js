@@ -109,7 +109,7 @@ class Settings extends React.Component {
     const id = this.store('selected.current')
     // const currentIndex = this.store('main.accounts', id, 'index')
     const address = this.store('main.accounts', this.props.id, 'address')
-    const permissions = this.store('main.addresses', address, 'permissions') || {}
+    const permissions = this.store('main.accounts', address, 'permissions') || {}
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>Dapp Permissions</div>

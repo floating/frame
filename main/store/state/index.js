@@ -1,5 +1,7 @@
 const { v5: uuidv5 } = require('uuid')
 
+const log = require('electron-log')
+
 const persist = require('../persist')
 
 const get = (path, obj = persist.get('main')) => {
@@ -477,7 +479,6 @@ if (initial.main._version < 5) {
   initial.main._version = 5
 }
 
-
 // initial.main._version = 5
 // State transition -> 6
 if (initial.main._version < 6) {
@@ -487,10 +488,13 @@ if (initial.main._version < 6) {
   accounts = JSON.parse(JSON.stringify(accounts))
   addresses = JSON.parse(JSON.stringify(addresses))
   Object.keys(addresses).forEach(address => {
+    const hasPermissions = addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
+    const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
+    if (!hasPermissions && !hasTokens) return log.info(`Address ${address} did not have any permissions or tokens`)
     address = address.toLowerCase()
     const matchingAccounts = []
     Object.keys(accounts).forEach(id => {
-      if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address.toLowerCase()) > -1) {
+      if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
         matchingAccounts.push(id)
       }
     })
@@ -500,23 +504,23 @@ if (initial.main._version < 6) {
       })
       newAccounts[address] = Object.assign({}, accounts[primaryAccount[0]])
       nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
-      nameCount[newAccounts[address].name]++
       const count = nameCount[newAccounts[address].name]
-      if (count > 0) newAccounts[address].name = newAccounts[address].name + ' ' + count
+      if (count > 0) newAccounts[address].name = newAccounts[address].name + ' ' + (count + 1)
+      nameCount[newAccounts[address].name]++
       newAccounts[address].address = address
-      delete newAccounts[address].index
-      delete newAccounts[address].addresses
       newAccounts[address].id = address
-      newAccounts[address].network = '1'
       newAccounts[address].lastSignerType = newAccounts[address].type
-      // delete newAccounts[address].type
+      delete newAccounts[address].type
       delete newAccounts[address].network
       delete newAccounts[address].signer
-      newAccounts[address] = Object.assign({}, newAccounts[address], addresses[address] || { tokens: {}, permissions: {}})
+      delete newAccounts[address].index
+      delete newAccounts[address].addresses
+      newAccounts[address] = Object.assign({}, newAccounts[address], { tokens: {}, permissions: {} }, addresses[address])
     }
 
   })
   initial.main.accounts = newAccounts
+  delete initial.main.addresses
   initial.main._version = 6
 }
 

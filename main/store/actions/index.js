@@ -46,13 +46,13 @@ module.exports = {
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
   clearPermissions: (u, address) => {
-    u('main.addresses', address, address => {
+    u('main.accounts', address, address => {
       address.permissions = {}
       return address
     })
   },
   giveAccess: (u, req, access) => {
-    u('main.addresses', req.address, address => {
+    u('main.accounts', req.address, address => {
       address = address || { permissions: {}, tokens: {} }
       address.permissions = address.permissions || {}
       address.tokens = address.tokens || {}
@@ -61,7 +61,7 @@ module.exports = {
     })
   },
   toggleAccess: (u, address, handlerId) => {
-    u('main.addresses', address, address => {
+    u('main.accounts', address, address => {
       address.permissions[handlerId].provider = !address.permissions[handlerId].provider
       return address
     })
@@ -127,7 +127,7 @@ module.exports = {
       })
       return accounts
     })
-    u('main.addresses', addresses => {
+    u('main.accounts', addresses => {
       Object.keys(addressesToMove).forEach(id => {
         addresses[id] = addressesToMove[id]
       })
@@ -352,7 +352,7 @@ module.exports = {
   },
   // Tokens
   setTokens: (u, address, newTokens) => {
-    u('main.addresses', address, 'tokens', (tokens = {}) => {
+    u('main.accounts', address, 'tokens', (tokens = {}) => {
       tokens = {}
       Object.keys(newTokens).forEach(tokenAddress => {
         tokens.known = tokens.known || {}
@@ -362,7 +362,7 @@ module.exports = {
     })
   },
   omitToken: (u, address, omitToken) => {
-    u('main.addresses', address, 'tokens.omit', omit => {
+    u('main.accounts', address, 'tokens.omit', omit => {
       omit = omit || []
       if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
       return omit

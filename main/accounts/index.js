@@ -561,7 +561,7 @@ class Accounts extends EventEmitter {
   tokenScan (knownOnly) {
     const address = this.getSelectedAddress()
     if (!address) return // log.info('token scan no address')
-    const addressTokens = store('main.addresses', address, 'tokens')
+    const addressTokens = store('main.accounts', address, 'tokens')
     const omit = addressTokens && addressTokens.omit
     const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})
     tokens.scan(address, omit, known)

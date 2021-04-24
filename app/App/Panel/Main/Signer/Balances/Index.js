@@ -60,7 +60,7 @@ class Balances extends React.Component {
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     const balance = this.store('balances', address.toLowerCase())
-    const tokens = this.store('main.addresses', address, 'tokens') || {}
+    const tokens = this.store('main.accounts', address, 'tokens') || {}
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const known = Object.assign({}, tokens.known, {
