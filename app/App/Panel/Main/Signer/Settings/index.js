@@ -107,9 +107,8 @@ class Settings extends React.Component {
     const i = 0
     const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     const id = this.store('selected.current')
-    const currentIndex = this.store('main.accounts', id, 'index')
-    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    const permissions = this.store('main.addresses', address, 'permissions') || {}
+    const address = this.store('main.accounts', this.props.id, 'address')
+    const permissions = this.store('main.accounts', address, 'permissions') || {}
     return (
       <div className='signerSlide' style={{ transform }}>
         <div className='signerSettingsTitle'>Dapp Permissions</div>

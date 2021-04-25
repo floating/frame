@@ -18,6 +18,7 @@ class Main extends React.Component {
       dashboard: false
     }
   }
+
   reportScroll () {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
@@ -43,19 +44,20 @@ class Main extends React.Component {
   }
 
   render () {
-    const accounts = {}
+    const accounts = this.store('main.accounts')
     const network = this.store('main.currentNetwork.id')
     const type = this.store('main.currentNetwork.type')
-    Object.keys(this.store('main.accounts')).forEach(id => {
-      const account = this.store('main.accounts', id)
-      if (account.network === network) accounts[id] = account
-    })
-    const signers = {}
-    Object.keys(this.store('main.signers')).forEach(id => {
-      const signer = this.store('main.signers', id)
-      if (signer.network === network) signers[id] = signer
-    })
-    const untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
+    // Object.keys(this.store('main.accounts')).forEach(id => {
+    //   const account = this.store('main.accounts', id)
+    //   if (account.network === network) accounts[id] = account
+    // })
+    // const signers = {}
+    // Object.keys(this.store('main.signers')).forEach(id => {
+    //   const signer = this.store('main.signers', id)
+    //   if (signer.network === network) signers[id] = signer
+    // })
+
+    const untethered = [] // Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')
@@ -75,8 +77,10 @@ class Main extends React.Component {
                 </div>
               </div>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
-              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />)}
-              {Object.keys(accounts).length === 0 && Object.keys(signers).length === 0 ? (
+              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
+                return <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+              })}
+              {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
                   {`No ${this.store('main.networks', type, network, 'name')} Accounts Found`}

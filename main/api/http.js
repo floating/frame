@@ -119,7 +119,7 @@ provider.on('data', payload => {
 provider.on('data:address', (account, payload) => { // Make sure the subscription has access based on current account
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
-    const permissions = store('main.addresses', account, 'permissions') || {}
+    const permissions = store('main.accounts', account, 'permissions') || {}
     const perms = Object.keys(permissions).map(id => permissions[id])
     const allowed = perms.map(p => p.origin).indexOf(origin) > -1
     if (!allowed) payload.params.result = []

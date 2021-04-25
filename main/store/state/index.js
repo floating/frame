@@ -1,5 +1,7 @@
 const { v5: uuidv5 } = require('uuid')
 
+const log = require('electron-log')
+
 const persist = require('../persist')
 
 const get = (path, obj = persist.get('main')) => {
@@ -32,29 +34,26 @@ const initial = {
         'verify'
       ],
       modules: {
-        signer: { // is hidden unless the signer needs something
-          height: 110 // initial height 
+        requests: {
+          height: 0
         },
-        requests: { // current requests
-          height: 400
+        activity: {
+          height: 0
         },
-        activity: { // recent txs -- expand to see more
-          height: 100
+        balances: {
+          height: 0
         },
-        balances: { // eth and erc-20 tokens -- expand to see all 
-          height: 100
+        inventory: {
+          height: 0
         },
-        inventory: { // list of nfts owned by address (postpone?)
-          height: 100
+        permissions: {
+          height: 0
         },
-        permissions: { // permission activity log -- expand to edit permissions
-          height: 100
-        },
-        verify: { // verify address on signer
-          height: 100
+        verify: {
+          height: 0
         },
         launcher: {
-          height: 100
+          height: 0
         },
         gas: {
           height: 100
@@ -366,10 +365,10 @@ const initial = {
 // ]
 
 // Remove permissions granted to unknown origins
-Object.keys(initial.main.addresses).forEach(address => {
-  address = initial.main.addresses[address]
-  if (address && address.permissions) {
-    delete address.permissions[uuidv5('Unknown', uuidv5.DNS)]
+Object.keys(initial.main.accounts).forEach(id => {
+  const account = initial.main.accounts[id]
+  if (account && account.permissions) {
+    delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
   }
 })
 
@@ -459,7 +458,7 @@ if (initial.main._version < 5) {
     id: 137,
     type: 'ethereum',
     symbol: 'MATIC',
-    name: 'Matic',
+    name: 'Polygon',
     explorer: 'https://explorer.matic.network',
     gas: {
       price: {
@@ -474,6 +473,75 @@ if (initial.main._version < 5) {
   }
 
   initial.main._version = 5
+}
+
+
+const moveOldAccountsToNewAddresses = () => {
+  const addressesToMove = {}
+  const accounts = JSON.parse(JSON.stringify(initial.main.accounts))
+  Object.keys(accounts).forEach(id => {
+    if (id.startsWith('0x')) {
+      addressesToMove[id] = accounts[id]
+      delete accounts[id]
+    }
+  })
+  initial.main.accounts = accounts
+  Object.keys(addressesToMove).forEach(id => {
+    initial.main.addresses[id] = addressesToMove[id]
+  })
+}
+
+// State transition -> 6
+if (initial.main._version < 6) {
+
+  // Before the v6 state migration
+  // If users have very old state they will first need to do an older account migration
+  moveOldAccountsToNewAddresses()
+
+  // Once this is complete they can now do the current account migration
+
+  const newAccounts = {}
+  const nameCount = {}
+  let { accounts, addresses } = initial.main
+  accounts = JSON.parse(JSON.stringify(accounts))
+  addresses = JSON.parse(JSON.stringify(addresses))
+  Object.keys(addresses).forEach(address => {
+    const hasPermissions = addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
+    const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
+    if (!hasPermissions && !hasTokens) return log.info(`Address ${address} did not have any permissions or tokens`)
+    address = address.toLowerCase()
+    const matchingAccounts = []
+    Object.keys(accounts).forEach(id => {
+      if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
+        matchingAccounts.push(id)
+      }
+    })
+    if (matchingAccounts.length > 0) {
+      const primaryAccount = matchingAccounts.sort((a, b) => {
+        return accounts[a].addresses.length === accounts[b].addresses.length ? 0 : accounts[a].addresses.length > accounts[b].addresses.length ? -1 : 1
+      })
+      newAccounts[address] = Object.assign({}, accounts[primaryAccount[0]])
+      nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
+      const count = nameCount[newAccounts[address].name]
+      if (count > 0) newAccounts[address].name = newAccounts[address].name + ' ' + (count + 1)
+      nameCount[newAccounts[address].name]++
+      newAccounts[address].address = address
+      newAccounts[address].id = address
+      newAccounts[address].lastSignerType = newAccounts[address].type
+      delete newAccounts[address].type
+      delete newAccounts[address].network
+      delete newAccounts[address].signer
+      delete newAccounts[address].index
+      delete newAccounts[address].addresses
+      newAccounts[address] = Object.assign({}, newAccounts[address], { tokens: {}, permissions: {} }, addresses[address])
+    }
+
+  })
+  initial.main.accounts = newAccounts
+  delete initial.main.addresses
+
+  // Set state version so they never do this migration again
+  initial.main._version = 6
 }
 
 module.exports = () => initial

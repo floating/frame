@@ -1,0 +1,82 @@
+.signerStatus
+  position absolute
+  z-index 20000000000
+  top 58px
+  left 5px
+  right 5px
+  transform translateY(0px)
+  opacity 1
+  pointer-events auto
+  transition var(--standardSlow)
+
+  .signerStatusTop
+    position relative
+    height 10px
+
+    .signerStatusTopArrow
+      background var(--ghostC)
+      width 20px
+      height 20px 
+      border-top-left-radius 3px
+      transform rotate(45deg)
+      position absolute
+      top 0px
+      left 24px
+      box-shadow -4px -4px 6px -2px var(--ghostA) // , 0px 10px 20px var(--ghostZ)
+
+  .signerStatusMain
+    background var(--ghostC)
+    border-radius 8px
+    box-shadow 0px 0px 10px var(--ghostZ), 0px 10px 20px var(--ghostZ)
+    padding 20px
+
+
+.signerStatusHidden
+  transform translateY(-40px)
+  opacity 0
+  pointer-events none
+
+.signerUnlockWrap
+  display flex
+  align-items center
+  flex-direction column
+  transform translateY(0px)
+  width 100%
+
+  .signerUnlockHeader
+    padding-bottom 20px
+    text-transform uppercase
+    font-size 12px
+    font-weight 400
+
+  .signerUnlockInput
+    height 40px
+    width 100%
+    padding-bottom 0px
+    border 0
+    outline 0
+    background var(--ghostF)
+    font-size 20px
+    letter-spacing 6px
+    display flex
+    justify-content center
+    align-items center
+    text-align center
+    border-radius 20px
+    color var(--outerspace08)
+    box-shadow cardDrop, 0px 2px 0px var(--thin), 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+  
+  .signerUnlockSubmit
+    height 30px
+    background var(--ghostF)
+    font-size 12px
+    margin 10px 0px 0px 0px
+    width 140px
+    border-radius 15px
+    display flex
+    justify-content center
+    align-items center
+    color var(--outerspace08)
+    font-weight 600
+    box-shadow cardDrop, 0px 10px 10px var(--ghostB), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
+

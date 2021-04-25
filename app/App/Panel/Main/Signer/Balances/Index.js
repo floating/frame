@@ -26,8 +26,7 @@ class Balances extends React.Component {
   //   this.resizeObserver.disconnect()
   // }
   renderBalance (known, k, i) {
-    const currentIndex = this.store('main.accounts', this.props.id, 'index')
-    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
+    const address = this.store('main.accounts', this.props.id, 'address')
     const balance = this.store('balances', address)
     const token = known[k]
     return (
@@ -52,15 +51,11 @@ class Balances extends React.Component {
     )
   }
   render () {
-    const { open, openActive, selected, shadowTop } = this.state
-    let currentIndex = this.store('main.accounts', this.props.id, 'index')
-    if (this.props.accountHighlight === 'active') currentIndex = this.props.highlightIndex
-    const address = this.store('main.accounts', this.props.id, 'addresses', currentIndex)
-    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
+    const address = this.store('main.accounts', this.props.id, 'address')
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
-    const balance = this.store('balances', address)
-    const tokens = this.store('main.addresses', address, 'tokens') || {}
+    const balance = this.store('balances', address.toLowerCase())
+    const tokens = this.store('main.accounts', address, 'tokens') || {}
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const known = Object.assign({}, tokens.known, {
@@ -76,8 +71,8 @@ class Balances extends React.Component {
         floatBalance: parseFloat(balance || 0).toFixed(6),
         usdRate: etherUSD,
         usdDisplayRate: '$' + (Math.floor(etherUSD * 100) / 100).toLocaleString(),
-        usdValue: Math.floor((parseFloat(balance) * etherUSD) * 100) / 100,
-        usdDisplayValue: '$' + (Math.floor((parseFloat(balance) * etherUSD) * 100) / 100).toLocaleString()
+        usdValue: Math.floor((parseFloat(balance || 0) * etherUSD) * 100) / 100,
+        usdDisplayValue: '$' + (Math.floor((parseFloat(balance || 0) * etherUSD) * 100) / 100).toLocaleString()
       }
     })
     let knownList = Object.keys(known).sort((a, b) => {

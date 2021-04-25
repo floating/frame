@@ -280,16 +280,9 @@
       width 50px
 
 .signerRequests
-  // position absolute
-  // top 0px
-  // right 0
-  // bottom 0
-  // left 0
   z-index 200
   padding 0px 0px 64px 0px
   transition var(--standardSlow)
-  // overflow-y scroll
-  // overflow-x hidden
   transform translateZ(0)
 
   .requestTitle:before
@@ -313,8 +306,6 @@
     text-transform uppercase
     letter-spacing 4px
     font-weight 600
-    // background bluen
-    // font-family 'Railway'
 
     .requestCount
       background var(--thin)
@@ -473,7 +464,6 @@
     height 100%
     width 100%
     transform translateZ(0px)
-    background linear-gradient(var(--ghostD), var(--ghostB), var(--ghostD))
     border-radius 12px
     overflow hidden
 
@@ -1288,13 +1278,6 @@ span
   .txNonceButtonRaise
     padding 0px 0px 1px 0px
 
-  // .txNonceLower
-  //   height 100%
-  //   width 22px
-  //   text-align center
-  //   font-size 10px
-  //   text-transform uppercase
-    
   .txNonceLabel
     height 100%
     width 60px
@@ -1439,10 +1422,6 @@ span
     transform scale(1.05)
     box-shadow 0px 4px 5px -2px var(--thick), 0px 25px 25px -5px var(--thick)
   
-  // .txAugmentCancel:active, .txAugmentSpeedUp:active, .txDetails:active
-  //   transform translateY(0px) scale(1)
-  //   box-shadow none
-
 .txAugmentHidden
   .txAugmentCancel
     opacity 0
@@ -1517,10 +1496,8 @@ span
   right 5px
   bottom 100px
   border-radius 12px
-  // box-shadow 0px 2px 1px var(--thick), 0px 8px 5px -5px var(--thin), 0px -2px 6px var(--thinner)
   text-align center
   box-sizing border-box
-  // background rgba(255, 255, 255, 0.05)
   z-index 100000
   font-size 14px
   font-weight 400
@@ -1948,46 +1925,7 @@ span
   text-transform uppercase
   letter-spacing 3px
   height 100px
-  .signerUnlockWrap
-    display flex
-    align-items center
-    flex-direction column
-    transform translateY(0px)
-    min-height 100px
-    height 0
-    width 100%
-    transition var(--standard)
-  .signerUnlockInput
-    height 40px
-    width calc(100% - 30px)
-    margin 20px 0px 0px 0px
-    padding-bottom 0px
-    border 0
-    outline 0
-    background var(--ghostF)
-    font-size 20px
-    letter-spacing 6px
-    display flex
-    justify-content center
-    align-items center
-    text-align center
-    border-radius 20px
-    color var(--outerspace08)
-    box-shadow cardDrop, 0px 2px 0px var(--thin), 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
-  .signerUnlockSubmit
-    height 30px
-    background var(--ghostF)
-    font-size 12px
-    margin 10px 0px 0px 0px
-    padding 0px 40px 0px 44px
-    border-radius 15px
-    display flex
-    justify-content center
-    align-items center
-    color var(--outerspace08)
-    font-weight 600
-    box-shadow cardDrop, 0px 10px 10px var(--ghostB), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
-
+  
 .simpleJson
   font-size 14px
 

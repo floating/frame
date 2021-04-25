@@ -77,8 +77,9 @@ class Requests extends React.Component {
     setTimeout(() => {
       const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
       const open = current && this.store('selected.open')
-      if (open && this.props.signer && this.props.signer.status === 'locked' && this.unlockInput) {
-        this.unlockInput.current.focus()
+      if (open && this.props.signer && this.unlockInput) {
+        const signer = this.store('main.signers', this.props.signer)
+        if (signer.status === 'locked') this.unlockInput.current.focus()
       }
     }, 100)
   }

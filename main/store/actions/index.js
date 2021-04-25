@@ -46,22 +46,13 @@ module.exports = {
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
   clearPermissions: (u, address) => {
-    u('main.addresses', address, address => {
+    u('main.accounts', address, address => {
       address.permissions = {}
       return address
     })
   },
-  giveAccess: (u, req, access) => {
-    u('main.addresses', req.address, address => {
-      address = address || { permissions: {}, tokens: {} }
-      address.permissions = address.permissions || {}
-      address.tokens = address.tokens || {}
-      address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-      return address
-    })
-  },
   toggleAccess: (u, address, handlerId) => {
-    u('main.addresses', address, address => {
+    u('main.accounts', address, address => {
       address.permissions[handlerId].provider = !address.permissions[handlerId].provider
       return address
     })
@@ -115,24 +106,6 @@ module.exports = {
   resetClient: (u, client, on) => {
     const data = { on: false, state: 'off', latest: false, installed: false, version: null }
     u(`main.clients.${client}`, () => data)
-  },
-  moveOldAccountsToNewAddresses: (u, signer) => {
-    const addressesToMove = {}
-    u('main.accounts', accounts => {
-      Object.keys(accounts).forEach(id => {
-        if (id.startsWith('0x')) {
-          addressesToMove[id] = accounts[id]
-          delete accounts[id]
-        }
-      })
-      return accounts
-    })
-    u('main.addresses', addresses => {
-      Object.keys(addressesToMove).forEach(id => {
-        addresses[id] = addressesToMove[id]
-      })
-      return addresses
-    })
   },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
@@ -352,7 +325,7 @@ module.exports = {
   },
   // Tokens
   setTokens: (u, address, newTokens) => {
-    u('main.addresses', address, 'tokens', (tokens = {}) => {
+    u('main.accounts', address, 'tokens', (tokens = {}) => {
       tokens = {}
       Object.keys(newTokens).forEach(tokenAddress => {
         tokens.known = tokens.known || {}
@@ -362,7 +335,7 @@ module.exports = {
     })
   },
   omitToken: (u, address, omitToken) => {
-    u('main.addresses', address, 'tokens.omit', omit => {
+    u('main.accounts', address, 'tokens.omit', omit => {
       omit = omit || []
       if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
       return omit

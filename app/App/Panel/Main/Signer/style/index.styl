@@ -281,9 +281,8 @@
       // position relative
       top 0px
       left 0px
-      width 63px
+      width 80px
       height 63px
-
       // margin 0px 30px
       
       // background red
@@ -295,12 +294,40 @@
       // border-bottom-right-radius 16px
       transition var(--standard)
       -webkit-app-region no-drag
-      padding 12px
       box-sizing border-box
-      padding 12px
+      // padding 12px
       z-index 300000
-      border-right 1px solid var(--ghostA)
-      // background blue
+
+      .accountGrabber
+        position absolute
+        top 15px 
+        bottom 2px
+        left 58px
+        color var(--ghostX)
+        cursor grab
+
+        svg
+          position relative
+          left -7px
+          
+        svg, div
+          pointer-events none
+
+      .accountIndicator
+        position absolute 
+        background var(--ghostY)
+        top 16px
+        left 6px
+        bottom 15px
+        width 3px
+        border-radius 2px
+      
+      .accountIndicatorGood
+        background var(--good)
+
+      .accountIndicatorLocked
+        background var(--moon)
+
       .signerSelectIconWrap
         // position relative
         // background var(--ghostD)
@@ -309,12 +336,26 @@
         // height 39px
         // border-radius 14px
         // transform rotate(0deg)
+        // background blue
+        position absolute
+        top 0
+        left 12px
+        right 23px
+        bottom 0px
+
         
-        box-sizing border-box
-        padding 8px
+        // box-sizing border-box
+        // padding 10px
         cursor pointer
+        // margin-left 6px
         // background red
         // box-shadow 0px 4px 6px -1px var(--thin)
+        // display flex
+        // padding 19px 9px
+        // color var(--good)
+        display flex
+        justify-content center
+        align-items center
 
         div, svg
           pointer-events none
@@ -1396,3 +1437,4 @@
 @import '../Settings/style'
 @import '../Requests/style'
 @import '../Launcher/style'
+@import '../SignerStatus/style'

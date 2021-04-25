@@ -178,7 +178,7 @@ const api = {
   tray: () => {
     tray = new Tray(path.join(__dirname, process.platform === 'darwin' ? './IconTemplate.png' : './Icon.png'))
     // tray.setHighlightMode('never')
-    if (this.gasObserver) this.gasObserver.close()
+    if (this.gasObserver) this.gasObserver.remove()
     this.gasObserver = store.observer(() => {
       let title = ''
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {

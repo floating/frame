@@ -27,6 +27,7 @@ const dapps = require('./dapps')
 //     })
 //   })
 // })
+
 const data = require('./data')
 const accounts = require('./accounts')
 const launch = require('./launch')
@@ -122,8 +123,7 @@ ipcMain.on('tray:openExplorer', (e, hash) => {
 })
 
 ipcMain.on('tray:giveAccess', (e, req, access) => {
-  store.giveAccess(req, access)
-  accounts.removeRequest(req.handlerId)
+  accounts.setAccess(req, access)
 })
 
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {

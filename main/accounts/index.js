@@ -43,13 +43,15 @@ class Accounts extends EventEmitter {
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
-    store.observer(() => {
-      const signers = store('main.signers')
-      Object.keys(signers).forEach(id => {
-        const type = store('main.signers', id, 'type')
-        if (!this.accounts[id]) this.add(signers[id].addresses, { type })
-      })
-    })
+    // TODO: Replace
+    // Create accounts from new signers
+    // store.observer(() => {
+    //   const signers = store('main.signers')
+    //   Object.keys(signers).forEach(id => {
+    //     const type = store('main.signers', id, 'type')
+    //     if (!this.accounts[id]) this.add(signers[id].addresses, { type })
+    //   })
+    // })
     windows.events.on('tray:show', () => {
       this.tokenScan(true)
     })
@@ -316,21 +318,18 @@ class Accounts extends EventEmitter {
     })
     cb(null, signerSummary)
   }
-
+  // Set Current Account
   setSigner (id, cb) {
-    this.accounts[id].setIndex(this.accounts[id].index, err => {
-      if (err) return cb(err)
-      this._current = id
-      const summary = this.current().summary()
-      cb(null, summary)
-      windows.broadcast('main:action', 'setSigner', summary)
-    })
+    this._current = id
+    const summary = this.current().summary()
+    cb(null, summary)
+    windows.broadcast('main:action', 'setSigner', summary)
   }
 
   unsetSigner (cb) {
     const s = this.current()
     this._current = null
-    const summary = { id: '', type: '', accounts: [], status: '', index: 0 }
+    const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
     setTimeout(() => { // Clear signer requests when unset
@@ -397,6 +396,12 @@ class Accounts extends EventEmitter {
   setSignerIndex (index, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     this.current().setIndex(index, cb)
+  }
+
+  setAccess (req, access) {
+    if (this.current() && this.current().setAccess) {
+      this.current().setAccess(req, access)
+    }
   }
 
   addRequest (req, res) {
@@ -559,8 +564,8 @@ class Accounts extends EventEmitter {
 
   tokenScan (knownOnly) {
     const address = this.getSelectedAddress()
-    if (!address) return // log.info('token scan no address')
-    const addressTokens = store('main.addresses', address, 'tokens')
+    if (!address) return
+    const addressTokens = store('main.accounts', address, 'tokens')
     const omit = addressTokens && addressTokens.omit
     const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})
     tokens.scan(address, omit, known)

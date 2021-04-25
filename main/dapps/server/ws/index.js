@@ -28,12 +28,10 @@ module.exports = server => {
       // const session = crypto.randomBytes(6).toString('hex')
       s.on('message', (data, cb) => {
         try {
-          console.log('hi here')
           const message = JSON.parse(data)
           const app = ens(message.app)
           const session = crypto.randomBytes(6).toString('hex')
           sessions.add(app, session)
-          console.log('responding with', JSON.stringify({ id: message.id, app, session }))
           if (s.readyState !== WebSocket.OPEN) throw new Error('Socket Not Open')
           s.send(JSON.stringify({ id: message.id, app, session }))
         } catch (e) {

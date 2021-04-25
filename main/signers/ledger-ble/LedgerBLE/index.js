@@ -87,14 +87,6 @@ class LedgerBLE extends Signer {
     })
   }
 
-  setIndex (i, cb) {
-    this.index = i
-    this.requests = {} // TODO Decline these requests before clobbering them
-    windows.broadcast('main:action', 'updateSigner', this.summary())
-    cb(null, this.summary())
-    this.verifyAddress()
-  }
-
   lookupAccounts (cb) {
     flex.rpc('ledger.ethereumGetAddress', this.id, this.basePath(), false, (err, result) => {
       if (err) return cb(err)
