@@ -208,10 +208,6 @@ class _AccountMain extends React.Component {
       <div className={'accountModule' + moduleClass} style={style}>
         <div className='accountModuleInner cardShow' style={{ animationDelay: (index * 0.1) + 's'}}>
           {
-            id === 'signer' ? <SignerStatus 
-              moduleId={id} 
-              signer={this.props.signer}
-            /> :
             id === 'gas' ? <Gas 
               moduleId={id} 
             /> :
@@ -831,11 +827,15 @@ class Signer extends React.Component {
         style.transitionDelay = '0s'
       }
     }
+
+    const signer = this.store('main.signers', this.props.signer)
+
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
+            <SignerStatus open={open} signer={this.props.signer}/>
             <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {this.renderType()} 
               <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>
@@ -848,7 +848,7 @@ class Signer extends React.Component {
               {/* {this.renderMenu()} */}
               {this.renderStatus()}
             </div>
-            {current ?  <AccountMain id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} /> : null}
+            {current ? <AccountMain id={this.props.id} addresses={this.props.addresses} minimized={minimized} status={this.props.status} signer={this.props.signer} /> : null}
             {/* {current ? this.renderAccountList() : null} */}
             {/* <div className={open ? 'accountMenu cardShow' : 'accountMenu cardHide'} >
               <div className='accountMenuLeft'>

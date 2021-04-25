@@ -1,35 +1,57 @@
 .signerStatus
+  position absolute
+  z-index 20000000000
+  top 58px
+  left 5px
+  right 5px
+  transform translateY(0px)
+  opacity 1
+  pointer-events auto
+  transition var(--standardSlow)
+
   .signerStatusTop
     position relative
     height 10px
 
     .signerStatusTopArrow
       background var(--ghostC)
-      width 14px
-      height 14px 
-      border-radius 4px
+      width 20px
+      height 20px 
+      border-top-left-radius 3px
       transform rotate(45deg)
       position absolute
-      top 4px
-      left 22px
+      top 0px
+      left 24px
+      box-shadow -4px -4px 6px -2px var(--ghostA) // , 0px 10px 20px var(--ghostZ)
 
   .signerStatusMain
     background var(--ghostC)
     border-radius 8px
+    box-shadow 0px 0px 10px var(--ghostZ), 0px 10px 20px var(--ghostZ)
+    padding 20px
+
+
+.signerStatusHidden
+  transform translateY(-40px)
+  opacity 0
+  pointer-events none
 
 .signerUnlockWrap
   display flex
   align-items center
   flex-direction column
   transform translateY(0px)
-  min-height 100px
-  height 0
   width 100%
-  transition var(--standard)
+
+  .signerUnlockHeader
+    padding-bottom 20px
+    text-transform uppercase
+    font-size 12px
+    font-weight 400
 
   .signerUnlockInput
     height 40px
-    width calc(100% - 30px)
+    width 100%
     padding-bottom 0px
     border 0
     outline 0

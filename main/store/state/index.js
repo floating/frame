@@ -24,7 +24,6 @@ const initial = {
     view: 'default',
     account: {
       moduleOrder: [
-        'signer',
         'launcher',
         'requests',
         'balances',

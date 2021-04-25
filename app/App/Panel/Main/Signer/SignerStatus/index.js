@@ -6,19 +6,19 @@ import svg from '../../../../../svg'
 class SignerStatus extends React.Component {
   constructor (...args) {
     super(...args)
-    this.moduleRef = React.createRef()
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
-      }
-    })
+    // this.moduleRef = React.createRef()
+    // this.resizeObserver = new ResizeObserver(() => {
+    //   if (this.moduleRef && this.moduleRef.current) {
+    //     link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+    //   }
+    // })
     this.state = {
       expand: false
     }
   }
-  componentDidMount () {
-    this.resizeObserver.observe(this.moduleRef.current)
-  } 
+  // componentDidMount () {
+  //   this.resizeObserver.observe(this.moduleRef.current)
+  // } 
   unlockChange (e) {
     this.setState({ unlockInput: e.target.value })
   }
@@ -57,21 +57,24 @@ class SignerStatus extends React.Component {
 
   render () {
     const signer = this.props.signer ? this.store('main.signers', this.props.signer) : null
-    return (
-      <div ref={this.moduleRef}>
-        <div className='signerStatus' style={signer && signer.status === 'locked' ? {  } : {  }}>
+    // signer.status === 'locked'
+    // console.log('signer, signer.status', signer, signer.status)
+    return signer ? (
+      <div>
+        <div className={this.props.open && signer && signer.status === 'locked' ? 'signerStatus' : 'signerStatus signerStatusHidden' }>
           <div className='signerStatusTop'>
           <div className='signerStatusTopArrow' />
           </div>
           <div className='signerStatusMain'>
-            <div className='signerUnlockWrap' style={open && signer && signer.status === 'locked' ? { opacity: 1 } : { }}>
+            <div className='signerUnlockWrap'>
+              <div className='signerUnlockHeader'>The signer for this account is locked</div>
               <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
               <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
             </div>
           </div>
         </div> 
       </div>
-    )
+    ) : null
   }
 }
 
