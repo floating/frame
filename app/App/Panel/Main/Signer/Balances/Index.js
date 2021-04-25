@@ -26,7 +26,6 @@ class Balances extends React.Component {
   //   this.resizeObserver.disconnect()
   // }
   renderBalance (known, k, i) {
-    // const currentIndex = this.store('main.accounts', this.props.id, 'index')
     const address = this.store('main.accounts', this.props.id, 'address')
     const balance = this.store('balances', address)
     const token = known[k]
@@ -52,11 +51,7 @@ class Balances extends React.Component {
     )
   }
   render () {
-    // const { open, openActive, selected, shadowTop } = this.state
-    // let currentIndex = this.store('main.accounts', this.props.id, 'index')
-    // if (this.props.accountHighlight === 'active') currentIndex = this.props.highlightIndex
     const address = this.store('main.accounts', this.props.id, 'address')
-    // const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
     const { type, id } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     const balance = this.store('balances', address.toLowerCase())

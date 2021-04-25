@@ -563,7 +563,7 @@ class Signer extends React.Component {
   }
 
   renderType () {
-    let innerClass = 'signerInner'
+    // let innerClass = 'signerInner'
     // if (this.state.typeActive) innerClass += ' signerInnerActive'
     if (this.state.typeShake) innerClass += ' headShake'
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'

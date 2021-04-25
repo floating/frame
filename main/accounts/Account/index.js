@@ -19,30 +19,29 @@ const capitalize = (s) => {
 
 class Account {
   constructor ({ id, type, lastSignerType, permissions, tokens, name, created, address, addresses, network, smart, options = {} }, accounts) {
-    this.accounts = accounts // Accounts module
+    this.accounts = accounts // Parent Accounts Module
     this.id = id // Account ID
     this.status = 'ok' // Current Status
     this.name = name || capitalize(options.type) + ' Account'
-    // this.type = type || options.type
     this.lastSignerType = lastSignerType || options.type
     this.created = created
-    // this.addresses = addresses || ['0x']
-    this.address = address || '0x' //  || ['0x']
+    this.address = address ? address.toLowerCase() : '0x'
     this.smart = smart
     this.permissions = permissions
     this.tokens = tokens
-    // this.network = network || store('main.currentNetwork.id')
     this.requests = {}
-    this.signer = ''
+    this.signer = '' // Matched Signer ID
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart, this.network)
     this.update(true)
     this.acctObs = store.observer(() => {
       if (this.smart && this.smart.actor && this.smart.actor.id && this.smart.actor.id !== this.id) {
-        // update this to refrences only the actors id
+        // We should update this to only the actor's id
         this.smart.actor.account = store('main.accounts', this.smart.actor.id)
         this.signer = undefined
       }
-      const updatedSigner = this.findSigner(this.address) // store('main.signers', this.id)
+
+      // When signer data changes in any way this will rerun to make sure we're matched correctly
+      const updatedSigner = this.findSigner(this.address)
 
       if (updatedSigner) {
         this.signer = updatedSigner.id
@@ -68,7 +67,6 @@ class Account {
   }
 
   findSigner (address) {
-    address = address.toLowerCase()
     const availiableSigners = []
     const signers = store('main.signers')
     Object.keys(signers).forEach(id => {
@@ -76,19 +74,13 @@ class Account {
         availiableSigners.push(signers[id])
       }
     })
-    availiableSigners.sort((a, b) => (!a.locked && !b.locked) ? 0 : !b.locked ? 1 : -1)
+    availiableSigners.sort((a, b) => a.status === 'ok' ? -1 : b.status === 'ok' ? -1 : 0)
     const foundSigner = availiableSigners[0]
-    return foundSigner || {}
-    // if (foundSigner) {
-    //   // const verified = this.newVerifyAddress(foundSigner)
-    //   // console.log('signer verified? ', verified)
-    //   return verified ? foundSigner : undefined
-    // }
-    return undefined
+    return foundSigner
   }
 
-  setAccess (req, access) { // Permissions are now handle by the account and need to included in `update`
-    if (req.address === this.address)  {
+  setAccess (req, access) { // Permissions are now handle by the account and need to be included in `update`
+    if (req.address.toLowerCase() === this.address)  {
       this.permissions = this.permissions || {}
       this.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
     }
@@ -97,7 +89,7 @@ class Account {
     this.update()
   }
 
-  updateTokens (tokens) { // Tokens are now handle by the account and need to included in `update`
+  updateTokens (tokens) { // Tokens are now handle by the account and need to be included in `update`
     this.tokens = tokens
     this.update()
   }
@@ -165,32 +157,6 @@ class Account {
     }
   }
 
-  // newVerifyAddress (signerId, display, cb = () => {}) {
-  //   if (this.smart && this.smart.actor && this.smart.actor.signer && signers.get(this.smart.actor.signer.id) && signers.get(this.smart.actor.signer.id).verifyAddress) {
-  //     const s = signers.get(this.smart.actor.signer.id)
-  //     const index = s.addresses.indexOf(this.address)
-  //     if (index > -1) {
-  //       s.verifyAddress(index, this.address, display, cb)
-  //     } else {
-  //       log.info('NEW: Could not find address in signer')
-  //       cb(new Error('NEW: Could not find address in signer'))
-  //     }
-  //   } else if (this.signer && signers.get(signerId) && signers.get(signerId).verifyAddress) {
-  //     const s = signers.get(signerId)
-  //     const index = s.addresses.indexOf(this.address)
-  //     if (index > -1) {
-  //       s.verifyAddress(index, this.address, display, cb)
-  //     } else {
-  //       log.info('NEW: Could not find address in signer')
-  //       cb(new Error('NEW: Could not find address in signer'))
-  //     }
-  //   } else {
-  //     log.info('NEW: No signer active to verify address')
-  //     cb(new Error('NEW: No signer active to verify address'))
-  //   }
-  // }
-
-
   verifyAddress (display, cb = () => {}) {
     if (this.smart && this.smart.actor && this.smart.actor.signer && signers.get(this.smart.actor.signer) && signers.get(this.smart.actor.signer).verifyAddress) {
       const s = signers.get(this.smart.actor.signer)
@@ -198,7 +164,6 @@ class Account {
       if (index > -1) {
         s.verifyAddress(index, this.address, display, cb)
       } else {
-        log.info('smart verify Address')
         log.info('Could not find address in signer')
         cb(new Error('Could not find address in signer'))
       }
@@ -209,7 +174,6 @@ class Account {
       if (index > -1) {
         s.verifyAddress(index, this.address, display, cb)
       } else {
-        log.info('Verify Address (not smart)')
         log.info('Could not find address in signer')
         cb(new Error('Could not find address in signer'))
       }
@@ -232,9 +196,7 @@ class Account {
       id: this.id,
       network: this.network,
       name: this.name,
-      type: this.type,
       lastSignerType: this.lastSignerType,
-      // addresses: this.addresses,
       address: this.address,
       status: this.status,
       signer: this.signer,
@@ -287,13 +249,13 @@ class Account {
     if (this.signer) {
       const s = signers.get(this.signer)
       if (!s) return cb(new Error(`Cannot find signer for this account`))
-      const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address.toLowerCase())
+      const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
       s.signMessage(index, message, cb)
     } else if (this.smart) {
       if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
         const s = signers.get(this.smart.actor.account.signer)
         if (!s) return cb(new Error(`Cannot find signer for this account`))
-        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address.toLowerCase())
+        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         s.signMessage(index, message, cb)
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
@@ -309,13 +271,13 @@ class Account {
     if (this.signer) {
       const s = signers.get(this.signer)
       if (!s) return cb(new Error(`Cannot find signer for this account`))
-      const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address.toLowerCase())
+      const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
       s.signTypedData(index, typedData, cb)
     } else if (this.smart) {
       if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
         const s = signers.get(this.smart.actor.account.signer)
         if (!s) return cb(new Error(`Cannot find signer for this account`))
-        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address.toLowerCase())
+        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         s.signTypedData(index, typedData, cb)
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
@@ -332,7 +294,7 @@ class Account {
       if (this.signer) {
         const s = signers.get(this.signer)
         if (!s) return cb(new Error(`Cannot find signer for this account`))
-        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address.toLowerCase())
+        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         if (index > -1) {
           s.signTransaction(index, rawTx, cb)
         } else {

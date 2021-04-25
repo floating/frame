@@ -459,10 +459,8 @@ let network = store('main.currentNetwork.id')
 store.observer(() => {
   if (network !== store('main.currentNetwork.id')) {
     network = store('main.currentNetwork.id')
-    // accounts.unsetSigner()
     provider.chainChanged(network)
     provider.networkChanged(network)
-    // provider.accountsChanged([])
   }
 })
 

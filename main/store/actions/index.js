@@ -51,15 +51,6 @@ module.exports = {
       return address
     })
   },
-  // giveAccess: (u, req, access) => {
-  //   u('main.accounts', req.address, account => {
-  //     account.permissions = account.permissions || {}
-  //     account.tokens = account.tokens || {}
-  //     account.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-  //     console.log('UPDTED ACCOUNT INS GIVE ACCESS', account)
-  //     return account
-  //   })
-  // },
   toggleAccess: (u, address, handlerId) => {
     u('main.accounts', address, address => {
       address.permissions[handlerId].provider = !address.permissions[handlerId].provider
@@ -80,7 +71,6 @@ module.exports = {
     })
   },
   updateAccount: (u, updatedAccount, add) => {
-    // console.log('updateAccount', updatedAccount)
     u('main.accounts', updatedAccount.id, account => {
       if (account) return updatedAccount // Account exists
       if (add) return updatedAccount // Account is new and should be added
@@ -116,24 +106,6 @@ module.exports = {
   resetClient: (u, client, on) => {
     const data = { on: false, state: 'off', latest: false, installed: false, version: null }
     u(`main.clients.${client}`, () => data)
-  },
-  moveOldAccountsToNewAddresses: (u, signer) => {
-    const addressesToMove = {}
-    u('main.accounts', accounts => {
-      Object.keys(accounts).forEach(id => {
-        if (id.startsWith('0x')) {
-          addressesToMove[id] = accounts[id]
-          delete accounts[id]
-        }
-      })
-      return accounts
-    })
-    u('main.accounts', addresses => {
-      Object.keys(addressesToMove).forEach(id => {
-        addresses[id] = addressesToMove[id]
-      })
-      return addresses
-    })
   },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)

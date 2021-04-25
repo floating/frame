@@ -34,25 +34,22 @@ const initial = {
         'verify'
       ],
       modules: {
-        signer: { // is hidden unless the signer needs something
-          height: 0 // initial height 
-        },
-        requests: { // current requests
+        requests: {
           height: 0
         },
-        activity: { // recent txs -- expand to see more
+        activity: {
           height: 0
         },
-        balances: { // eth and erc-20 tokens -- expand to see all 
+        balances: {
           height: 0
         },
-        inventory: { // list of nfts owned by address (postpone?)
+        inventory: {
           height: 0
         },
-        permissions: { // permission activity log -- expand to edit permissions
+        permissions: {
           height: 0
         },
-        verify: { // verify address on signer
+        verify: {
           height: 0
         },
         launcher: {
@@ -478,9 +475,31 @@ if (initial.main._version < 5) {
   initial.main._version = 5
 }
 
-// initial.main._version = 5
+
+const moveOldAccountsToNewAddresses = () => {
+  const addressesToMove = {}
+  const accounts = JSON.parse(JSON.stringify(initial.main.accounts))
+  Object.keys(accounts).forEach(id => {
+    if (id.startsWith('0x')) {
+      addressesToMove[id] = accounts[id]
+      delete accounts[id]
+    }
+  })
+  initial.main.accounts = accounts
+  Object.keys(addressesToMove).forEach(id => {
+    initial.main.addresses[id] = addressesToMove[id]
+  })
+}
+
 // State transition -> 6
 if (initial.main._version < 6) {
+
+  // Before the v6 state migration
+  // If users have very old state they will first need to do an older account migration
+  moveOldAccountsToNewAddresses()
+
+  // Once this is complete they can now do the current account migration
+
   const newAccounts = {}
   const nameCount = {}
   let { accounts, addresses } = initial.main
@@ -520,6 +539,8 @@ if (initial.main._version < 6) {
   })
   initial.main.accounts = newAccounts
   delete initial.main.addresses
+
+  // Set state version so they never do this migration again
   initial.main._version = 6
 }
 

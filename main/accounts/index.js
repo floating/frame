@@ -43,6 +43,7 @@ class Accounts extends EventEmitter {
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
+    // TODO: Replace
     // Create accounts from new signers
     // store.observer(() => {
     //   const signers = store('main.signers')
@@ -323,15 +324,12 @@ class Accounts extends EventEmitter {
     const summary = this.current().summary()
     cb(null, summary)
     windows.broadcast('main:action', 'setSigner', summary)
-    // this.accounts[id].setIndex(this.accounts[id].index, err => {
-    //   if (err) return cb(err)
-    // })
   }
 
   unsetSigner (cb) {
     const s = this.current()
     this._current = null
-    const summary = { id: '', type: '', accounts: [], status: '', index: 0 }
+    const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
     setTimeout(() => { // Clear signer requests when unset
@@ -566,7 +564,7 @@ class Accounts extends EventEmitter {
 
   tokenScan (knownOnly) {
     const address = this.getSelectedAddress()
-    if (!address) return // log.info('token scan no address')
+    if (!address) return
     const addressTokens = store('main.accounts', address, 'tokens')
     const omit = addressTokens && addressTokens.omit
     const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})

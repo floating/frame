@@ -22,7 +22,6 @@ class Gas extends React.Component {
   render () {
     const { type, id } = this.store('main.currentNetwork')
     const levels = this.store('main.networks', type, id, 'gas.price.levels') || {}
-    // console.log(levels)
     return (
       <div ref={this.moduleRef} className='gasBlock'>
         <div className='gasItem'>

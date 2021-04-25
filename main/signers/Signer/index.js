@@ -11,7 +11,6 @@ class Signer extends EventEmitter {
   constructor () {
     super()
     this.addresses = []
-    this.index = 0
     this.requests = {}
   }
 
@@ -20,7 +19,7 @@ class Signer extends EventEmitter {
   }
 
   fingerprint () {
-    if (this.network && this.addresses && this.addresses.length) return crypt.stringToKey(this.network + this.addresses.join()).toString('hex')
+    if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
   }
 
   getCoinbase (cb) {
@@ -53,17 +52,9 @@ class Signer extends EventEmitter {
       type: this.type,
       addresses: this.addresses,
       status: this.status,
-      network: this.network,
       liveAddressesFound: this.liveAddressesFound || 0
     }
   }
-
-  // setIndex (i, cb) {
-  //   this.index = i
-  //   this.requests = {} // TODO Decline these requests before clobbering them
-  //   // windows.broadcast('main:action', 'updateSigner', this.summary())
-  //   cb(null, this.summary())
-  // }
 
   open () {
     // windows.broadcast('main:action', 'addSigner', this.summary())
