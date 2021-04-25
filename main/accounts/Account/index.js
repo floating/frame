@@ -170,7 +170,6 @@ class Account {
     } else if (this.signer && signers.get(this.signer) && signers.get(this.signer).verifyAddress) {
       const s = signers.get(this.signer)
       const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
-      console.log('here', s.addresses, this.address, index)
       if (index > -1) {
         s.verifyAddress(index, this.address, display, cb)
       } else {
