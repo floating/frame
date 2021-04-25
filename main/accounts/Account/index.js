@@ -165,7 +165,7 @@ class Account {
       if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
       const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
       if (index > -1) {
-        s.verifyAddress(index, actingAccount.address, display, cb)
+        actingSigner.verifyAddress(index, actingAccount.address, display, cb)
       } else {
         log.info('Could not find address in signer')
         cb(new Error('Could not find address in signer'))
