@@ -365,10 +365,10 @@ const initial = {
 // ]
 
 // Remove permissions granted to unknown origins
-Object.keys(initial.main.addresses).forEach(address => {
-  address = initial.main.addresses[address]
-  if (address && address.permissions) {
-    delete address.permissions[uuidv5('Unknown', uuidv5.DNS)]
+Object.keys(initial.main.accounts).forEach(id => {
+  const account = initial.main.accounts[id]
+  if (account && account.permissions) {
+    delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
   }
 })
 
