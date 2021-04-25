@@ -532,7 +532,7 @@ class Signer extends React.Component {
   select () {
     if (this.store('selected.current') === this.props.id) {
       link.rpc('unsetSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
-      if (this.props.signer && this.store('main.accountCloseLock')) link.rpc('lockSigner', this.props.signer.id, (err, status) => { if (err) return console.log(err) })
+      if (this.props.signer && this.store('main.accountCloseLock')) link.rpc('lockSigner', this.props.signer, (err, status) => { if (err) return console.log(err) })
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
@@ -572,13 +572,14 @@ class Signer extends React.Component {
     if (this.state.typeShake) innerClass += ' headShake'
     if (this.store('selected.view') === 'settings') innerClass += ' signerTypeSettings'
     // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
-    const inSettings = this.store('selected.view') === 'settings'
+    // const inSettings = this.store('selected.view') === 'settings'
 
     let accountIndicatorClass = 'accountIndicator'
     if (this.props.signer) {
-      if (this.props.signer.status === 'locked') {
+      const signer = this.store('main.signers', this.props.signer)
+      if (signer.status === 'locked') {
         accountIndicatorClass += ' accountIndicatorLocked'
-      } else if (this.props.signer.status === 'ok') {
+      } else if (signer.status === 'ok') {
         accountIndicatorClass += ' accountIndicatorGood'
       }
     }

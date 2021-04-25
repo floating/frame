@@ -130,7 +130,7 @@ class Provider extends EventEmitter {
       try {
         signed = '0x' + signed.substring(4)
         const actor = accounts.current().smart && accounts.current().smart.actor
-        address = accounts.get(actor.id).addresses[actor.index]
+        address = accounts.get(actor.id).address
       } catch (e) {
         return cb(new Error('Could not resolve message or actor for smart accoount'))
       }

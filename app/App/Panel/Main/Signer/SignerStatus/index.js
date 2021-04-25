@@ -24,7 +24,7 @@ class SignerStatus extends React.Component {
   }
 
   unlockSubmit (e) {
-    link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, () => {})
+    link.rpc('unlockSigner', this.props.signer, this.state.unlockInput, () => {})
   }
 
   trezorPin (num) {
@@ -32,7 +32,7 @@ class SignerStatus extends React.Component {
   }
 
   submitPin () {
-    link.rpc('trezorPin', this.props.signer.id, this.state.tPin, () => {})
+    link.rpc('trezorPin', this.props.signer, this.state.tPin, () => {})
     this.setState({ tPin: '' })
   }
 
@@ -56,15 +56,15 @@ class SignerStatus extends React.Component {
   }
 
   render () {
-    // console.log(this.props.signer)
+    const signer = this.props.signer ? this.store('main.signers', this.props.signer) : null
     return (
       <div ref={this.moduleRef}>
-        <div className='signerStatus' style={this.props.signer && this.props.signer.status === 'locked' ? {  } : {  }}>
+        <div className='signerStatus' style={signer && signer.status === 'locked' ? {  } : {  }}>
           <div className='signerStatusTop'>
           <div className='signerStatusTopArrow' />
           </div>
           <div className='signerStatusMain'>
-            <div className='signerUnlockWrap' style={open && this.props.signer && this.props.signer.status === 'locked' ? { opacity: 1 } : { }}>
+            <div className='signerUnlockWrap' style={open && signer && signer.status === 'locked' ? { opacity: 1 } : { }}>
               <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
               <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
             </div>

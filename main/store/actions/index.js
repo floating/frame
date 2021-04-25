@@ -51,15 +51,15 @@ module.exports = {
       return address
     })
   },
-  giveAccess: (u, req, access) => {
-    u('main.accounts', req.address, address => {
-      address = address || { permissions: {}, tokens: {} }
-      address.permissions = address.permissions || {}
-      address.tokens = address.tokens || {}
-      address.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
-      return address
-    })
-  },
+  // giveAccess: (u, req, access) => {
+  //   u('main.accounts', req.address, account => {
+  //     account.permissions = account.permissions || {}
+  //     account.tokens = account.tokens || {}
+  //     account.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
+  //     console.log('UPDTED ACCOUNT INS GIVE ACCESS', account)
+  //     return account
+  //   })
+  // },
   toggleAccess: (u, address, handlerId) => {
     u('main.accounts', address, address => {
       address.permissions[handlerId].provider = !address.permissions[handlerId].provider
@@ -80,6 +80,7 @@ module.exports = {
     })
   },
   updateAccount: (u, updatedAccount, add) => {
+    // console.log('updateAccount', updatedAccount)
     u('main.accounts', updatedAccount.id, account => {
       if (account) return updatedAccount // Account exists
       if (add) return updatedAccount // Account is new and should be added

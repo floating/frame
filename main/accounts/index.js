@@ -400,6 +400,12 @@ class Accounts extends EventEmitter {
     this.current().setIndex(index, cb)
   }
 
+  setAccess (req, access) {
+    if (this.current() && this.current().setAccess) {
+      this.current().setAccess(req, access)
+    }
+  }
+
   addRequest (req, res) {
     log.info('addRequest', JSON.stringify(req))
     if (!this.current() || this.current().requests[req.handlerId]) return // If no current signer or the request already exists

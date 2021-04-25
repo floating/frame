@@ -17,9 +17,24 @@ class Verify extends React.Component {
       verifyAddressResponse: ''
     }
   }
+
+  verifyAddress () {
+    link.rpc('verifyAddress', (err, res) => {
+      if (err) {
+        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: err })
+      } else {
+        this.setState({ verifyAddressSuccess: true, verifyAddressResponse: 'Address matched!' })
+      }
+      setTimeout(() => {
+        this.setState({ verifyAddressSuccess: false, verifyAddressResponse: '' })
+      }, 5000)
+    })
+  }
+
   componentDidMount () {
     this.resizeObserver.observe(this.moduleRef.current)
   } 
+
   render () {
     const signerType = this.store('main.accounts', this.props.id, 'signer.type')
     const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'

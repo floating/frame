@@ -7,7 +7,6 @@ let trayInitial = true
 
 module.exports = {
   updateAccountModule: (u, id, update) => {
-    console.log('calling updateAccountModule', id, update)
     u('panel.account.modules', id, module => {
       return Object.assign(module, update)
     })
