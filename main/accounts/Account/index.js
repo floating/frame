@@ -18,7 +18,7 @@ const capitalize = (s) => {
 }
 
 class Account {
-  constructor ({ id, type, lastSignerType, permissions, tokens, name, created, address, addresses, network, smart, options = {} }, accounts) {
+  constructor ({ id, lastSignerType, permissions, tokens, name, created, address, smart, options = {} }, accounts) {
     this.accounts = accounts // Parent Accounts Module
     this.id = id // Account ID
     this.status = 'ok' // Current Status
@@ -27,19 +27,17 @@ class Account {
     this.created = created
     this.address = address ? address.toLowerCase() : '0x'
     this.smart = smart
+    // Update actor to just store actor's address
+    if (this.smart && this.smart.actor && this.smart.actor.address) {
+      this.smart.actor = this.smart.actor.address.toLowerCase()
+    }
     this.permissions = permissions
     this.tokens = tokens
     this.requests = {}
     this.signer = '' // Matched Signer ID
-    if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart, this.network)
+    if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
     this.update(true)
     this.acctObs = store.observer(() => {
-      if (this.smart && this.smart.actor && this.smart.actor.id && this.smart.actor.id !== this.id) {
-        // We should update this to only the actor's id
-        this.smart.actor.account = store('main.accounts', this.smart.actor.id)
-        this.signer = undefined
-      }
-
       // When signer data changes in any way this will rerun to make sure we're matched correctly
       const updatedSigner = this.findSigner(this.address)
 
@@ -158,11 +156,14 @@ class Account {
   }
 
   verifyAddress (display, cb = () => {}) {
-    if (this.smart && this.smart.actor && this.smart.actor.signer && signers.get(this.smart.actor.signer) && signers.get(this.smart.actor.signer).verifyAddress) {
-      const s = signers.get(this.smart.actor.signer)
-      const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
+    if (this.smart && this.smart.actor) {
+      const actingAccount = this.accounts.get(this.smart.actor)
+      if (!actingAccount) return cb(new Error('Could not find acting account', this.smart.actor))
+      const actingSigner = signers.get(actingAccount.signer)
+      if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
+      const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
       if (index > -1) {
-        s.verifyAddress(index, this.address, display, cb)
+        s.verifyAddress(index, actingAccount.address, display, cb)
       } else {
         log.info('Could not find address in signer')
         cb(new Error('Could not find address in signer'))
@@ -252,12 +253,14 @@ class Account {
       if (index === -1) cb(new Error(`Signer cannot sign for this address`))
       s.signMessage(index, message, cb)
     } else if (this.smart) {
-      if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-        const s = signers.get(this.smart.actor.account.signer)
-        if (!s) return cb(new Error(`Cannot find signer for this acting account`))
-        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.smart.actor.account.address)
-        if (index === -1) cb(new Error(`Acting signer cannot sign for this address`))
-        s.signMessage(index, message, cb)
+      if (this.smart && this.smart.actor) {
+        const actingAccount = this.accounts.get(this.smart.actor)
+        if (!actingAccount) return cb(new Error('Could not find acting account', this.smart.actor))
+        const actingSigner = signers.get(actingAccount.signer)
+        if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
+        const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
+        if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find address in signer`))
+        actingSigner.signMessage(index, message, cb)
       } else {
         cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
       }
@@ -275,16 +278,14 @@ class Account {
       const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
       if (index === -1) cb(new Error(`Signer cannot sign for this address`))
       s.signTypedData(index, typedData, cb)
-    } else if (this.smart) {
-      if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-        const s = signers.get(this.smart.actor.account.signer)
-        if (!s) return cb(new Error(`Cannot find signer for this acting account`))
-        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.smart.actor.account.address)
-        if (index === -1) cb(new Error(`Acting signer cannot sign for this address`))
-        s.signTypedData(index, typedData, cb)
-      } else {
-        cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
-      }
+    } else if (this.smart && this.smart.actor) {
+      const actingAccount = this.accounts.get(this.smart.actor)
+      if (!actingAccount) return cb(new Error('Could not find acting account', this.smart.actor))
+      const actingSigner = signers.get(actingAccount.signer)
+      if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
+      const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
+      if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find acting address in signer`, actingAccount.address))
+      actingSigner.signTypedData(index, typedData, cb)
     } else {
       cb(new Error('No signer found for this account'))
     }
@@ -293,23 +294,20 @@ class Account {
   signTransaction (rawTx, cb) {
     this._validateTransaction(rawTx, (err) => {
       if (err) return cb(err)
-
       if (this.signer) {
         const s = signers.get(this.signer)
         if (!s) return cb(new Error(`Cannot find signer for this account`))
         const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         if (index === -1) cb(new Error(`Signer cannot sign for this address`))
         s.signTransaction(index, rawTx, cb)
-      } else if (this.smart) {
-        if (this.smart.actor && this.smart.actor.account && this.smart.actor.account.signer) {
-          const s = signers.get(this.smart.actor.account.signer)
-          if (!s) return cb(new Error(`Cannot find signer for this account`))
-          const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.smart.actor.account.address)
-          if (index === -1) cb(new Error(`Signer cannot sign for this address`))
-          s.signTransaction(index, rawTx, cb)
-        } else {
-          cb(new Error(`Agent's (${this.smart.agent}) signer is not ready`))
-        }
+      } else if (this.smart && this.smart.actor) {
+        const actingAccount = this.accounts.get(this.smart.actor)
+        if (!actingAccount) return cb(new Error('Could not find acting account', this.smart.actor))
+        const actingSigner = signers.get(actingAccount.signer)
+        if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
+        const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
+        if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find acting address in signer`, actingAccount.address))
+        actingSigner.signTypedData(index, rawTx, cb)
       } else {
         cb(new Error('No signer found for this account'))
       }

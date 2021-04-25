@@ -578,6 +578,16 @@ class Signer extends React.Component {
       } else if (signer.status === 'ok') {
         accountIndicatorClass += ' accountIndicatorGood'
       }
+    } else if (this.props.smart) {
+      const actingAccount = this.store('main.accounts', this.props.smart.actor)
+      if (!actingAccount) return
+      const actingSigner = this.store('main.signers', actingAccount.signer)
+      if (!actingSigner) return
+      if (actingSigner.status === 'locked') {
+        accountIndicatorClass += ' accountIndicatorLocked'
+      } else if (actingSigner.status === 'ok') {
+        accountIndicatorClass += ' accountIndicatorGood'
+      }
     }
     return (
       <div className='signerType'>

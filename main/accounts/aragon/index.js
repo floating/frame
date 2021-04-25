@@ -68,11 +68,10 @@ const resolveName = (name) => {
 }
 
 class Aragon {
-  constructor ({ name, apps, dao, agent, actor, ens }, network) {
+  constructor ({ name, apps, dao, agent, actor, ens }) {
     this.dao = dao
     this.agent = agent
-    this.actor = actor
-    this.network = network
+    this.actor = actor // Actor is now just the acting accounts address
     store.observer(() => this.setup())
   }
 
@@ -80,7 +79,7 @@ class Aragon {
     const { type, id } = store('main.currentNetwork')
     const connection = store('main.networks', type, id, 'connection')
     const status = [connection.primary.status, connection.secondary.status]
-    if (status.indexOf('connected') > -1 && this.network === id && !this.wrap && !this.inSetup) {
+    if (status.indexOf('connected') > -1 && !this.wrap && !this.inSetup) {
       setTimeout(() => {
         log.info('\n ** Setting Up Aragon DAO:', this.dao)
         this.inSetup = true
@@ -112,7 +111,7 @@ class Aragon {
     }
     tx.value = tx.value || '0x'
     tx.data = tx.data || '0x'
-    this.wrap.calculateTransactionPath(this.actor.address, this.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
+    this.wrap.calculateTransactionPath(this.actor, this.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
       const newTx = result[0]
       delete newTx.nonce
       newTx.chainId = tx.chainId
@@ -132,7 +131,7 @@ class Aragon {
     this.aragon((err, wrap) => {
       if (err) return cb(err)
       const params = ['0x' + utils.keccak(message).toString('hex')]
-      wrap.calculateTransactionPath(this.smart.actor.address, this.smart.agent, 'presignHash', params).then(result => {
+      wrap.calculateTransactionPath(this.actor, this.agent, 'presignHash', params).then(result => {
         log.warn('Trying to sign as Aragon DAO...', result)
       }).catch(cb)
     })
