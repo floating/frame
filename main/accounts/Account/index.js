@@ -47,6 +47,8 @@ class Account {
         if (updatedSigner.status === 'ok') this.verifyAddress((err, verified) => {
           if (err || !verified) this.signer = ''
         })
+      } else {
+        this.signer = ''
       }
       
       this.smart = this.signer ? undefined : this.smart
