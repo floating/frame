@@ -16,11 +16,16 @@ link.rpc('getState', (err, state) => {
   const store = _store(state)
   window.store = store
   store.observer(() => {
-    console.log('run observer')
-    document.body.className = store('main.colorway')
+    document.body.className = 'clip ' + store('main.colorway')
+    setTimeout(() => {
+      document.body.className = store('main.colorway')
+    }, 100)
   })
   const Flow = Restore.connect(App, store)
   ReactDOM.render(<Flow />, document.getElementById('flow'))
 })
+
+document.addEventListener('contextmenu', e => link.send('dash:contextmenu', e.clientX, e.clientY))
+
 // document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
 // document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))

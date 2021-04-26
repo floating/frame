@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import utils, { toHex } from 'web3-utils'
-import svg from '../../../../../../../svg'
+import svg from '../../../../../../../../resources/svg'
 import link from '../../../../../../../../resources/link'
 
 // const weiToETH = v => Math.ceil(v / 1e18)

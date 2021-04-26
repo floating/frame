@@ -200,6 +200,7 @@ const api = {
     showing ? api.hideTray() : api.showTray()
   },
   hideTray: (autohide) => {
+    api.hideDash()
     if (autohide) {
       this.recentAutohide = true
       clearTimeout(this.recentAutohide)
@@ -490,22 +491,20 @@ ipcMain.on('tray:mouseout', () => {
 //   }
 // })
 
+// TODO: Make this universal
 ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
+ipcMain.on('dash:contextmenu', (e, x, y) => { if (dev) windows.dash.inspectElement(x, y) })
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
 // store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
 store.observer(_ => api.broadcast('main:action', 'syncDash', store('dash')))
 store.observer(_ => api.broadcast('main:action', 'syncPanel', store('panel')))
-// console.log(store)
 store.api.feed((state, actions) => {
   actions.forEach(action => {
     action.updates.forEach(update => {
-      // console.log(update)
       api.broadcast('main:action', 'pathSync', update.path, update.value)
     })
-    
-   //  console.log(action.updates)
   })
 })
 

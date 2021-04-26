@@ -19,6 +19,9 @@ export default (state, cb) => {
   // console.log('state...', state)
   const store = Restore.create(state, actions)
   store.events = new EventEmitter()
+  link.on('action', (action, ...args) => { 
+    if (store[action]) store[action](...args) 
+  })
 
   // Feed for relaying state updates
   // store.api.feed((state, actions, obscount) => {
@@ -30,7 +33,7 @@ export default (state, cb) => {
   //   })
   // })
 
-  link.on('action', (action, ...args) => { if (store[action]) store[action](...args) })
+
   // link.send('tray:ready') // turn on api
 
   // const etherRates = () => {

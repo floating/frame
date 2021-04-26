@@ -82,7 +82,7 @@
     position relative
     z-index 3002
     // border-radius 6px
-    overflow hidden
+    // overflow hidden
     // box-shadow 0px 0px 3px -1px rgba(6, 4, 2, 1) // , 0px 1px 1px 0px rgba(6, 54, 122, 0.1), 0 0px 100px -50px rgba(6, 24, 52, .4), cardDrop
     // background var(--ghostB)
     padding-bottom 3px
@@ -95,7 +95,6 @@
       left 0
       right 0
       bottom 0
-      // background blue // var(--ghostC)
       z-index 9000000000000
       overflow-y scroll
       overflow-x hidden
@@ -117,40 +116,38 @@
     font-family FiraCode
     letter-spacing 0px
     position absolute
-    bottom 7px
-    left 0px 
-    right 0px
+    top 10px
+    left 61px
+    right 80px
     padding-top 0px
     // border-radius 12px
-    height 22px
+    height 30px
     // width 100%
     transform translateZ(0)
-    // background blue
-    display flex
-    justify-content center
-    align-items center
+    // 
+    // display flex
+    // justify-content center
+    // align-items center
     // border-top 1px solid var(--thick)
     // border-bottom 1px solid var(--thick)
-    // background red
     
     .transactionToAddress
       font-size 10px
       font-family firaCode
       position relative
-      height 30px
       width 100%
       -webkit-app-region no-drag
 
       .transactionToAddressLarge
         position absolute
-        top 0
+        top 12px
         right 0
         bottom 0
         left 0
         display flex
-        justify-content center
+        justify-content flex-start
         align-items center
-        font-size 16px
+        font-size 19px
         opacity 1
         transition var(--standard)
 
@@ -173,22 +170,22 @@
         opacity 0
         transition var(--standard)
 
-        input
-          position absolute
-          top -3px
-          left -3px
-          display block
-          width calc(100% + 6px)
-          height calc(100% + 6px)
-          border none
-          outline none
-          overflow hidden
-          opacity 0
-          cursor default
+        // input
+        //   position absolute
+        //   top -3px
+        //   left -3px
+        //   display block
+        //   width calc(100% + 6px)
+        //   height calc(100% + 6px)
+        //   border none
+        //   outline none
+        //   overflow hidden
+        //   opacity 0
+        //   cursor default
 
-        svg
-          padding-left 5px
-          padding-bottom 1px
+        // svg
+        //   padding-left 5px
+        //   padding-bottom 1px
 
     .signerAddressActive
       .transactionToAddressLarge
@@ -241,20 +238,20 @@
       // position relative
       top 0px
       right 0px
-      // background blue
+      // 
       // display flex
       // justify-content center
       // align-items center
-      width 63px
+      width 60px
       // margin 0px 30px
       height 63px
-      // background blue
+      // 
       box-sizing border-box
       // 
       z-index 300000
       // background blu
-      border-top-right-radius 8px
-      border-bottom-right-radius 8px
+      border-radius 8px
+      // border-bottom-right-radius 8px
       
       .signerSelectIconWrap
         width 100%
@@ -263,11 +260,11 @@
         box-sizing border-box
         padding 18px 15px 0px 19px
         cursor pointer
-        border-left 1px solid var(--ghostA)
+        transform translateX(-2px)
+        // border-left 1px solid var(--ghostA)
 
         div, svg
           pointer-events none
-
   
       .signerSelectIcon
         transition var(--standard)
@@ -276,9 +273,44 @@
     .signerSelect:hover
       background var(--ghostD)
 
+    .accountGrabber
+      position absolute
+      top 0px 
+      bottom 2px
+      right 58px
+      width 19px
+      color var(--ghostX)
+      cursor grab
+      z-index 5000000000000000
+      padding-top 15px
+
+      svg
+        position relative
+        left -8px
+        
+      svg, div
+        pointer-events none
+
+    .accountGrabber:active
+      cursor grabbing
+
+    .accountIndicator
+      position absolute 
+      background var(--ghostY)
+      top 16px
+      left 6px
+      bottom 15px
+      width 3px
+      border-radius 2px
+    
+    .accountIndicatorGood
+      background var(--good)
+
+    .accountIndicatorLocked
+      background var(--moon)
+
     .signerType
       position absolute 
-      // position relative
       top 0px
       left 0px
       width 80px
@@ -298,36 +330,6 @@
       // padding 12px
       z-index 300000
 
-      .accountGrabber
-        position absolute
-        top 15px 
-        bottom 2px
-        left 58px
-        color var(--ghostX)
-        cursor grab
-
-        svg
-          position relative
-          left -7px
-          
-        svg, div
-          pointer-events none
-
-      .accountIndicator
-        position absolute 
-        background var(--ghostY)
-        top 16px
-        left 6px
-        bottom 15px
-        width 3px
-        border-radius 2px
-      
-      .accountIndicatorGood
-        background var(--good)
-
-      .accountIndicatorLocked
-        background var(--moon)
-
       .signerSelectIconWrap
         // position relative
         // background var(--ghostD)
@@ -336,7 +338,6 @@
         // height 39px
         // border-radius 14px
         // transform rotate(0deg)
-        // background blue
         position absolute
         top 0
         left 12px
@@ -360,7 +361,14 @@
         div, svg
           pointer-events none
 
+      // .signerIconHot
+      //   color var(--hot)
 
+      // .signerIconHardware
+      //   color var(--hardware)
+
+      // .signerIconSmart
+      //   color var(--smart)
 
       // .signerGlow
       //   position absolute
@@ -399,7 +407,6 @@
         margin-left -9px
         opacity 1
         transition var(--standardSlow)
-        // background blue
 
         img
           height 38px
@@ -678,31 +685,30 @@
     //   box-sizing border-box
 
     .signerName
+      position absolute
+      bottom 12px
+      left 63px
       overflow hidden
       display flex
       justify-content center
       align-items center
-      height 34px
-      margin-left 54px
-      margin-right 64px
       transform translateZ(0)
       z-index 3004
-      position relative
-      padding-top 4px
-      // background purple
 
       .signerNameText
         position relative
         font-weight 300
-        padding-left 5px
-        padding-bottom 0px
+        // padding-left 5px
+        // padding-bottom 0px
         position relative
         transition var(--standard)
-        font-size 18px
+        font-size 12px
         display flex
         justify-content center
         align-items center
         z-index 10
+        font-weight 500
+        // background red
 
       .signerNameEdit
         position absolute
@@ -985,10 +991,8 @@
     z-index 9999003
     height 40px
     background var(--ghostC)
-    // background blue
     //animation-timing-function: cubic-bezier(0.1, -0.6, 0.2, 0)
     // background red // var(--ghostB)
-    // background blue
     box-shadow 0px 4px 6px -1px var(--thick)
     animation-delay 0.2s
     .accountMenuLeft
@@ -997,7 +1001,6 @@
       left 0px
       bottom 0px
       display flex
-      // background blue
       .accountMenuItem
         border-right 1px solid var(--thick)
       .accountMenuItem:first-child
@@ -1008,7 +1011,6 @@
       top 0px
       right 0px
       bottom 0px
-      // background blue
       .accountMenuItem
         border-left 1px solid var(--thick)
       .accountMenuItem:last-child
@@ -1044,10 +1046,8 @@
     will-change transform
     background var(--ghostC)
     z-index 9999003
-    // background blue
     //animation-timing-function: cubic-bezier(0.1, -0.6, 0.2, 0)
     // background red // var(--ghostB)
-    // background blue
     box-shadow 0px 4px 6px -1px var(--thick)
     animation-delay 0.4s
 
@@ -1139,17 +1139,13 @@
     opacity 1
     transition var(--standard)
     transition-delay 0.64s
-    // background blue
-    // background var(--thick)
     
-
     .signerSelectArrows
       height 50px
       width 16px
       // border-radius 25px
       position relative
-      // background blue
-
+      
       .signerSelectArrow
         position absolute
         top 0
