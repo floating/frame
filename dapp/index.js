@@ -1,4 +1,4 @@
-// import svg from '../app/svg'
+// import svg from '../app/../resources/svg'
 // import Native from './Native'
 
 // link.on('location', location => {

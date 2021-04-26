@@ -87,10 +87,10 @@ class _Signers extends React.Component {
             {hotSigners.length ? hotSigners.map(signer => {
               return (
                 <div className='signer'>
-                  <div>{signer.type + ' Signer'}</div>
-                  <div>{'type: ' + signer.type}</div>
+                  <div className='signerType'>{'Signer Name'}</div>
+                  <div className='signerType'>{signer.type + ' Signer'}</div>
+                  <div>{'hardware'}</div>
                   <div>{'status: ' + signer.status}</div>
-                  <div>{'accounts: ' + signer.addresses.length}</div>
                   <div>{'Add accounts from this signer'}</div>
                 </div>
               )

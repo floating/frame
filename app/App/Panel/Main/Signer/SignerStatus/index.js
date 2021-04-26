@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
-import svg from '../../../../../svg'
+import svg from '../../../../../../resources/svg'
 
 class SignerStatus extends React.Component {
   constructor (...args) {

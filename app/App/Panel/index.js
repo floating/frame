@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../svg'
+import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 import Main from './Main'

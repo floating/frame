@@ -26,8 +26,8 @@ const initial = {
       moduleOrder: [
         'launcher',
         'requests',
-        'balances',
         'gas',
+        'balances',
         'inventory',
         'activity',
         'permissions',
