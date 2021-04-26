@@ -1,8 +1,9 @@
 /* globals fetch */
 
+const nebula = require('../nebula')
 const ethProvider = require('eth-provider')
 const log = require('electron-log')
-const { getTokensBalance } = require('@mycrypto/eth-scan')
+const getTokenBalances = require('./balance')
 const { tokens } = require('./tokens.json')
 
 const mainnetTokens = tokens.filter(t => t.chainId === 1)
@@ -10,13 +11,8 @@ const tokenAddresses = mainnetTokens.map(t => t.address.toLowerCase())
 
 const provider = ethProvider('frame', { name: 'tokenWorker' })
 
-const _provider = { // Until eth-scan supports EIP-1193
-  call: async ({ to, data }) => {
-    return await provider.request({
-      method: 'eth_call',
-      params: [{ to, data }, 'latest']
-    })
-  }
+async function chainId () {
+  return parseInt(await provider.request({ method: 'eth_chainId' }))
 }
 
 const padLeft = (num, length) => {
@@ -31,27 +27,39 @@ const padRight = (num = '', length) => {
   return num
 }
 
-const scan = async (address, omitList = [], knownList) => {
-  const found = {}
+async function getTokenList (chainId) {
+  //const tokenListRecord = await nebula.resolve('tokens.matt.eth')
+  //const tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
 
+  const tokenList = await nebula.ipfs.getJson('bafybeibmgaqwhvah5nrknqcck6wrbbl7dnyhgcssoqpryetlpqild5i6pe')
+
+  return tokenList.tokens.filter(t => t.chainId === chainId)
+}
+
+const scan = async (address, omitList = [], knownList) => {
   const omit = omitList.map(a => a.toLowerCase())
   const list = (knownList || tokenAddresses).map(a => a.toLowerCase()).filter(a => omit.indexOf(a) === -1)
 
-  const tokensBalance = await getTokensBalance(_provider, address, list)
+  const chain = await chainId()
+  const tokens = await getTokenList(chain)
+  const tokenBalances = await getTokenBalances(chain, address, tokens)
 
-  Object.keys(tokensBalance).forEach(async token => {
-    const index = tokensBalance[token] ? tokenAddresses.indexOf(token) : -1
-    if (index > -1) {
-      found[token] = mainnetTokens[index]
-      found[token].balance = tokensBalance[token].toString()
-      const d = found[token].decimals
-      const s = padLeft(tokensBalance[token], d + 1)
-      const p = s.length - d
-      found[token].displayBalance = parseInt(s.substring(0, p)).toLocaleString() + '.' + padRight(s.substring(p, d > 7 ? 7 : d), 2)
-      found[token].floatBalance = s.substring(0, p) + '.' + padRight(s.substring(p, d > 7 ? 7 : d), 2)
-      found[token].usdRate = 0
+  const found = Object.entries(tokenBalances).reduce((found, [symbol, balance]) => {
+    if (balance.isZero()) return found
+
+    const token = tokens.find(t => t.symbol === symbol)
+
+    if (token) {
+      found[symbol] = { ...token }
+      found[symbol].balance = balance
+      found[symbol].displayBalance = balance.toString()
+      found[symbol].usdRate = 0
+      found[symbol].usdValue = 0
+      found[symbol].usdDisplayValue = '$0.00'
     }
-  })
+
+    return found
+  }, {})
 
   try {
     const _rates = await fetch(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${Object.keys(found).join(',')}&vs_currencies=usd`)
@@ -69,6 +77,7 @@ const scan = async (address, omitList = [], knownList) => {
   } catch (e) {
     log.error(e)
   }
+
   return found
 }
 
