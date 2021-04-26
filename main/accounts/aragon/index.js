@@ -61,7 +61,6 @@ const resolveName = (name) => {
         resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.currentNetwork.id') })
       })
     } catch (e) {
-      // TODO: If setup fails disable account fo current network
       reject(e)
     }
   }
@@ -83,10 +82,8 @@ class Aragon {
     if (status.indexOf('connected') > -1 && !this.wrap && !this.inSetup) {
       setTimeout(() => {
         log.info('\n ** Setting Up Aragon DAO:', this.dao)
-        console.log('here 1')
         this.inSetup = true
         this.provider = require('../../provider')
-        console.log('here 2')
         let options
         try {
           options = {
@@ -94,16 +91,14 @@ class Aragon {
             apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress() }
           }
         } catch (e) {
-          console.log('here ERROR', e)
+          console.log('TODO: If Aragon smart account setup fails disable it for current network', e)
           return 
         }
-        console.log('here 4')
         const wrap = new Wrapper(this.dao, options)
         wrap.init().then(() => {
           this.wrap = wrap
           this.inSetup = false
         }).catch(err => {
-          console.log('WRAP INIT ERROR', err)
           log.error(err)
           this.inSetup = false
         })
