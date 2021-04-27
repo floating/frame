@@ -6,6 +6,14 @@ import link from '../../../../../../resources/link'
 
 import BigNumber from 'bignumber.js'
 
+function formatBalance (balance, decimals = 8) {
+  return balance
+    ? new Intl.NumberFormat('us-US', {
+        maximumFractionDigits: decimals
+      }).format(balance)
+    : '-.------'
+}
+
 function formatUsdRate (rate, decimals = 6) {
   return new Intl.NumberFormat('us-US', {
     style: 'currency',
@@ -40,11 +48,10 @@ class Balances extends React.Component {
   // }
 
   renderBalance (known, k, i) {
-    const address = this.store('main.accounts', this.props.id, 'address')
-    const balance = this.store('balances', address)
     const token = known[k]
 
     const tokenBalance = BigNumber(token.balance || 0)
+    const displayBalance = formatBalance(tokenBalance)
     const tokenUsdRate = BigNumber(token.usdRate)
 
     const price = formatUsdRate(tokenUsdRate)
@@ -62,8 +69,8 @@ class Balances extends React.Component {
           <span>{token.name + ' -'}</span>
           <span className='signerBalanceCurrentPrice'>{price}</span>
         </div>
-        <div className='signerBalanceValue' style={(token.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
-          {(balance === undefined ? '-.------' : token.displayBalance)}
+        <div className='signerBalanceValue' style={(displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
+          {displayBalance}
         </div>
         <div className='signerBalanceEquivalent'>
           {totalValue}
@@ -93,12 +100,7 @@ class Balances extends React.Component {
         logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
         symbol: currentSymbol,
         balance,
-        displayBalance: balance === undefined ? '-.------' : '' + parseFloat(balance).toFixed(6).toLocaleString(),
-        floatBalance: parseFloat(balance || 0).toFixed(6),
-        usdRate: etherUSD,
-        usdDisplayRate: '$' + (Math.floor(etherUSD * 100) / 100).toLocaleString(),
-        usdValue: Math.floor((parseFloat(balance || 0) * etherUSD) * 100) / 100,
-        usdDisplayValue: '$' + (Math.floor((parseFloat(balance || 0) * etherUSD) * 100) / 100).toLocaleString()
+        usdRate: etherUSD
       }
     })
     let knownList = Object.keys(known).sort((a, b) => {

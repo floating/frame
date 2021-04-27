@@ -50,7 +50,6 @@ const scan = async (address, omitList = [], knownList) => {
       found[symbol] = {
         ...token,
         balance,
-        displayBalance: balance.toString(),
         usdRate: rate.usd
       }
     }
