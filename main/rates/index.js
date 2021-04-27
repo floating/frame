@@ -1,52 +1,86 @@
 const fetch = require('node-fetch')
+const BigNumber = require('bignumber.js')
 
-// Get rates for symbols and store them
+const noData = {
+  usdRate: BigNumber(0),
+  usdDisplayRate: '$0.00'
+}
 
+// symbol -> coinId
+let allCoins = {}
+const coinRates = {}
+const watched = []
 
-const rates = await _rates.json()
-Object.keys(rates).forEach(token => {
-  if (found[token]) {
-    found[token].usdRate = rates[token].usd || 0
-    const usdRateString = rates[token].usd.toString()
-    found[token].usdDisplayRate = '$' + (parseInt(usdRateString.split('.')[0])).toLocaleString() + '.' + padRight(usdRateString.split('.')[1], 2)
-    found[token].usdValue = Math.floor(found[token].floatBalance * found[token].usdRate * 100) / 100
-    const usdValueString = found[token].usdValue.toString()
-    found[token].usdDisplayValue = '$' + (parseInt(usdValueString.split('.')[0])).toLocaleString() + '.' + padRight(usdValueString.split('.')[1], 2)
+function createRate (quote) {
+  return {
+    usdRate: BigNumber(quote.usd),
+    usdDisplayRate: new Intl.NumberFormat('us-US', {
+      style: 'currency',
+      currency: 'usd',
+      maximumFractionDigits: 8
+    }).format(quote.usd)
   }
+}
+
+async function loadCoins () {
+  try {
+    const coins = await (await fetch('https://api.coingecko.com/api/v3/coins/list')).json()
+
+    allCoins = coins.reduce((coinMapping, coin) => {
+      coinMapping[coin.symbol.toLowerCase()] = coin.id
+      return coinMapping
+    }, {})
+  } catch (e) {
+    console.error('unable to load coin data', e)
+  }
+}
+
+async function loadRates (symbols = Object.keys(allCoins)) {
+  const lookup = symbols.reduce((mapping, symbol) => {
+    const s = symbol.toLowerCase()
+    mapping[allCoins[s]] = s
+    return mapping
+  }, {})
+
+  try {
+    const ids = Object.keys(lookup).join(',')
+    const ratesResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`)
+    const quotes = await ratesResponse.json()
+
+    Object.entries(quotes).forEach(([id, quote]) => {
+      const symbol = lookup[id]
+      coinRates[symbol] = createRate(quote)
+    })
+  } catch (e) {
+    console.error('unable to load latest rates', e)
+  }
+}
+
+loadCoins().then(() => {
+  setInterval(loadCoins, 1000 * 60 * 60) // update master coin list once an hour
+
+  //loadRates()
+  setInterval(() => loadRates(watched), 1000 * 1)
 })
 
-const watched = []
-const add = (symbol) => {
-  const id = symbolMapsymbolMap[symbol]
-  if (coinList[id]) watched.push(id)
+function get (symbols) {
+  const data = symbols.reduce((rates, symbol) => {
+    rates[symbol] = coinRates[symbol.toLowerCase()] || noData
+    return rates
+  }, {})
+
+  return data
 }
 
-const symbolMap = {}
-const coinList = {}
-const symbolToId = (symbol) => symbolMap[symbol]
-const idToSymbol = (id) => coinList[id] ? coinList[id].symbol : undefined
-const getCoins = () => {
-  // Fetch this once at the beginning 
-  const _coins = await fetch(`https://api.coingecko.com/api/v3/coins/list`)
-  const coins = await _coins.json()
-  coins.forEach(coin => {
-    coinList[coin.id] = coin
-    symbolMap[coin.symbol] = coin.id
-  })
+const rates = {
+  get,
+  add: function (symbols) {
+    // add symbols to watch and return the latest rates
+    const newSymbols = symbols.filter(s => !watched.includes(s))
+    watched.push(...newSymbols)
+
+    return get(symbols)
+  }
 }
 
-
-setInterval(() => {
-  const lookup = watched.map(coin => coin.id)
-  // const _rates = await fetch(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${Object.keys(found).join(',')}&vs_currencies=usd`)
-  // https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
-
-  // const _rates = await fetch(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${Object.keys(found).join(',')}&vs_currencies=usd`)
-
-  const _rates = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${lookup.join(',')}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`)
-  const rates = await _rates.json()
-
-
-
-
-}, 15 * 1000)
+module.exports = rates
