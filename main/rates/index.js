@@ -2,8 +2,7 @@ const fetch = require('node-fetch')
 const BigNumber = require('bignumber.js')
 
 const noData = {
-  usdRate: BigNumber(0),
-  usdDisplayRate: '$0.00'
+  usd: BigNumber(0)
 }
 
 // symbol -> coinId
@@ -13,12 +12,7 @@ const watched = []
 
 function createRate (quote) {
   return {
-    usdRate: BigNumber(quote.usd),
-    usdDisplayRate: new Intl.NumberFormat('us-US', {
-      style: 'currency',
-      currency: 'usd',
-      maximumFractionDigits: 8
-    }).format(quote.usd)
+    usd: BigNumber(quote.usd)
   }
 }
 

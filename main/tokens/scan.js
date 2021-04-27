@@ -45,19 +45,14 @@ const scan = async (address, omitList = [], knownList) => {
     const token = tokens.find(t => t.symbol === symbol)
 
     if (token) {
-      found[symbol] = { ...token }
-      found[symbol].balance = balance
-      found[symbol].displayBalance = balance.toString()
-      found[symbol].usdRate = 0
-
       const rate = rates.add([symbol])[symbol]
-      found[symbol].usdDisplayRate = rate.usdDisplayRate
-      found[symbol].usdValue = balance.times(rate.usdRate)
-      found[symbol].usdDisplayValue = new Intl.NumberFormat('us-US', {
-        style: 'currency',
-        currency: 'usd',
-        maximumFractionDigits: 8
-      }).format(found[symbol].usdValue.toNumber())
+
+      found[symbol] = {
+        ...token,
+        balance,
+        displayBalance: balance.toString(),
+        usdRate: rate.usd
+      }
     }
 
     return found

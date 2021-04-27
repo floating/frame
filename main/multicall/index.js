@@ -10,7 +10,7 @@ const contractAddresses = {
 
 function chainConfig (chainId) {
   return {
-    rpcUrl: 'http://0.0.0.0:1248', // Frame websocket
+    rpcUrl: 'http://0.0.0.0:1248', // Frame
     multicallAddress: contractAddresses[chainId]
   }
 }

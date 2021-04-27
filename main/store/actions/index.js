@@ -331,6 +331,7 @@ module.exports = {
         tokens.known = tokens.known || {}
         tokens.known[tokenAddress] = newTokens[tokenAddress]
       })
+
       return tokens
     })
   },

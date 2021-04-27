@@ -7,7 +7,6 @@ export const pathSync = (u, path, value) => u(path, () => value)
 
 // export const syncPanel = (u, panel) => u('panel', _ => panel)
 
-
 // Convert to synthetic actions
 
 export const setSigner = (u, signer) => {
@@ -15,7 +14,7 @@ export const setSigner = (u, signer) => {
   u('selected.minimized', _ => false)
   u('selected.open', _ => true)
   // setTimeout(_ => {
-    
+
   // }, 50)
 }
 

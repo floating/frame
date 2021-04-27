@@ -2,7 +2,7 @@
 
 import EventEmitter from 'events'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
+import BigNumber from 'bignumber.js'
 
 import link from '../../resources/link'
 import * as actions from './actions'
@@ -44,7 +44,7 @@ export default (state, cb) => {
     monitor.forEach(address => {
       link.rpc('providerSend', { jsonrpc: '2.0', method: 'eth_getBalance', params: [address, 'latest'], id: 1 }, res => {
         if (res.error) return
-        const balance = utils.fromWei(utils.hexToNumberString(res.result))
+        const balance = BigNumber(res.result).shiftedBy(-18)
         if (store('balances', address) !== balance) store.setBalance(address, balance)
       })
     })

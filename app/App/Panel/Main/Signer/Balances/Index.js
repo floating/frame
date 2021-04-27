@@ -1,6 +1,18 @@
+/* globals ResizeObserver */
+
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
+
+import BigNumber from 'bignumber.js'
+
+function formatUsdRate (rate, decimals = 6) {
+  return new Intl.NumberFormat('us-US', {
+    style: 'currency',
+    currency: 'usd',
+    maximumFractionDigits: decimals
+  }).format(rate)
+}
 
 class Balances extends React.Component {
   constructor (...args) {
@@ -19,16 +31,25 @@ class Balances extends React.Component {
       expand: false
     }
   }
+
   componentDidMount () {
     this.resizeObserver.observe(this.moduleRef.current)
-  } 
+  }
   // componentWillUnmount () {
   //   this.resizeObserver.disconnect()
   // }
+
   renderBalance (known, k, i) {
     const address = this.store('main.accounts', this.props.id, 'address')
     const balance = this.store('balances', address)
     const token = known[k]
+
+    const tokenBalance = BigNumber(token.balance || 0)
+    const tokenUsdRate = BigNumber(token.usdRate)
+
+    const price = formatUsdRate(tokenUsdRate)
+    const totalValue = formatUsdRate(tokenBalance.times(tokenUsdRate))
+
     return (
       <div className='signerBalance' key={k} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceLogo'>
@@ -39,17 +60,18 @@ class Balances extends React.Component {
         </div>
         <div className='signerBalanceName'>
           <span>{token.name + ' -'}</span>
-          <span className='signerBalanceCurrentPrice'>{token.usdDisplayRate}</span>
+          <span className='signerBalanceCurrentPrice'>{price}</span>
         </div>
         <div className='signerBalanceValue' style={(token.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
           {(balance === undefined ? '-.------' : token.displayBalance)}
         </div>
         <div className='signerBalanceEquivalent'>
-          {token.usdDisplayValue}
+          {totalValue}
         </div>
       </div>
     )
   }
+
   render () {
     const address = this.store('main.accounts', this.props.id, 'address')
     const { type, id } = this.store('main.currentNetwork')
@@ -82,9 +104,10 @@ class Balances extends React.Component {
     })
     if (!this.state.expand) knownList = knownList.slice(0, 5)
     // const offsetTop = (selected * 47) + 10
+    
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader'>{'account balances'}</div>        
+        <div className='moduleHeader'>'account balances'</div>
         {knownList.map((k, i) => this.renderBalance(known, k, i))}
         {knownList.length <= 1 && this.state.expand ? (
           <div className='signerBalanceNoTokens'>
@@ -93,7 +116,7 @@ class Balances extends React.Component {
         ) : null}
         <div className='signerBalanceTotal'>
           <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
-            {this.state.expand ? 'Show Less' :  'Show All'}
+            {this.state.expand ? 'Show Less' : 'Show All'}
           </div>
           <div className='signerBalanceTotalText'>
             <div className='signerBalanceTotalLabel'>

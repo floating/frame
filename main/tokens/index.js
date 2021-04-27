@@ -16,7 +16,9 @@ const setupWorker = (initial) => {
   tokenWorker.on('message', message => {
     if (message.type === 'scan') {
       scanning = false
+
       store.setTokens(message.address, message.found)
+
       if (!stopped) {
         followTimer = setTimeout(() => {
           scan(message.address, message.omit, Object.keys(message.found))
