@@ -35,6 +35,20 @@ async function loadCoins () {
   }
 }
 
+async function fetchRates (ids) {
+  // have to batch the ids to avoid making the URL too large
+  const batches = Object.keys([...Array(Math.ceil(ids.length / 500))])
+    .map(batch => ids.slice((batch * 500), (batch * 500) + 500))
+
+  const responses = await Promise.all(batches.map(batch => {
+    const batchIds = batch.join(',')
+    return fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${batchIds}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`)
+      .then(response => response.json())
+  }))
+
+  return Object.assign({}, ...responses)
+}
+
 async function loadRates (symbols = Object.keys(allCoins)) {
   const lookup = symbols.reduce((mapping, symbol) => {
     const s = symbol.toLowerCase()
@@ -43,9 +57,7 @@ async function loadRates (symbols = Object.keys(allCoins)) {
   }, {})
 
   try {
-    const ids = Object.keys(lookup).join(',')
-    const ratesResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`)
-    const quotes = await ratesResponse.json()
+    const quotes = await fetchRates(Object.keys(lookup))
 
     Object.entries(quotes).forEach(([id, quote]) => {
       const symbol = lookup[id]
@@ -59,8 +71,8 @@ async function loadRates (symbols = Object.keys(allCoins)) {
 loadCoins().then(() => {
   setInterval(loadCoins, 1000 * 60 * 60) // update master coin list once an hour
 
-  //loadRates()
-  setInterval(() => loadRates(watched), 1000 * 1)
+  loadRates()
+  setInterval(() => loadRates(watched), 1000 * 10) // update rates every 10 seconds
 })
 
 function get (symbols) {

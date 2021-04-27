@@ -1,5 +1,3 @@
-/* globals fetch */
-
 const ethProvider = require('eth-provider')
 
 // TODO: use cross chain provider
@@ -13,7 +11,6 @@ const nebula = require('nebula')(
   'https://ipfs.nebula.land', ethProvider(ethNode)
 )
 
-const log = require('electron-log')
 const getTokenBalances = require('./balance')
 const rates = require('../rates')
 const { tokens } = require('./tokens.json')
@@ -31,13 +28,10 @@ async function getTokenList (chainId) {
   const tokenListRecord = await nebula.resolve('tokens.matt.eth')
   const tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
 
-  // const tokenList = await nebula.ipfs.getJson('bafybeibmgaqwhvah5nrknqcck6wrbbl7dnyhgcssoqpryetlpqild5i6pe')
-
   return tokenList.tokens.filter(t => t.chainId === chainId)
 }
 
 const scan = async (address, omitList = [], knownList) => {
-  console.log(' scannning .... ')
   const omit = omitList.map(a => a.toLowerCase())
   const list = (knownList || tokenAddresses).map(a => a.toLowerCase()).filter(a => omit.indexOf(a) === -1)
 
