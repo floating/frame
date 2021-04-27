@@ -75,9 +75,13 @@ class Balances extends React.Component {
   render () {
     const address = this.store('main.accounts', this.props.id, 'address')
     const { type, id } = this.store('main.currentNetwork')
+
+    // TODO: how to set main network symbol
     const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+
     const balance = this.store('balances', address.toLowerCase())
     const tokens = this.store('main.accounts', address, 'tokens') || {}
+
     const etherRates = this.store('external.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const known = Object.assign({}, tokens.known, {
@@ -103,17 +107,26 @@ class Balances extends React.Component {
       return known[a].usdValue > known[b].usdValue ? -1 : known[a].usdValue < known[b].usdValue ? 1 : 0
     })
     if (!this.state.expand) knownList = knownList.slice(0, 5)
-    // const offsetTop = (selected * 47) + 10
-    
+
+    const totalValue = Object.values(known)
+      .map(coin => BigNumber(coin.usdRate).times(BigNumber(coin.balance)))
+      .reduce((a, b) => a.plus(b), BigNumber(0))
+
+    const totalDisplayValue = formatUsdRate(totalValue, 2)
+
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader'>'account balances'</div>
+        <div className='moduleHeader'>account balances</div>
         {knownList.map((k, i) => this.renderBalance(known, k, i))}
-        {knownList.length <= 1 && this.state.expand ? (
-          <div className='signerBalanceNoTokens'>
-            No other token balances found
-          </div>
-        ) : null}
+        {
+          knownList.length <= 1 && this.state.expand
+            ? (
+              <div className='signerBalanceNoTokens'>
+                No other token balances found
+              </div>
+              )
+            : null
+          }
         <div className='signerBalanceTotal'>
           <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
             {this.state.expand ? 'Show Less' : 'Show All'}
@@ -123,7 +136,7 @@ class Balances extends React.Component {
               {'Total: '}
             </div>
             <div className='signerBalanceTotalValue'>
-              {'$' + knownList.map(k => known[k].usdValue).reduce((a, b) => a + b, 0).toLocaleString()}
+              {totalDisplayValue}
             </div>
           </div>
         </div>

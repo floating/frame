@@ -326,13 +326,12 @@ module.exports = {
   // Tokens
   setTokens: (u, address, newTokens) => {
     u('main.accounts', address, 'tokens', (tokens = {}) => {
-      tokens = {}
-      Object.keys(newTokens).forEach(tokenAddress => {
-        tokens.known = tokens.known || {}
-        tokens.known[tokenAddress] = newTokens[tokenAddress]
-      })
+      const known = Object.entries(newTokens).reduce((knownTokens, [symbol, token]) => {
+        knownTokens[symbol] = token
+        return knownTokens
+      }, {})
 
-      return tokens
+      return { known }
     })
   },
   omitToken: (u, address, omitToken) => {
