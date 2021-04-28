@@ -232,7 +232,8 @@ class _AccountMain extends React.Component {
               moduleId={id} 
             /> :
             id === 'permissions' ? <Permissions
-              moduleId={id} 
+              moduleId={id}
+              id={this.props.id}
             /> :
             id === 'balances' ? <Balances
               moduleId={id} 

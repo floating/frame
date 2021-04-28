@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
-import Signer from './Signer'
+import Account from './Account'
 import PendingSigner from './PendingSigner'
 import Add from './Add'
 
@@ -78,7 +78,7 @@ class Main extends React.Component {
               </div>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
               {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
-                return <Signer key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
               })}
               {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
