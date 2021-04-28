@@ -343,10 +343,6 @@ module.exports = {
 
       const updates = { ...balances, ...updatedBalances }
 
-      console.log({ balances })
-
-      console.log({ updates })
-
       return updates
     })
   },

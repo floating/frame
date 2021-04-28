@@ -22,6 +22,38 @@ function formatUsdRate (rate, decimals = 6) {
   }).format(rate)
 }
 
+function balance (rawBalance) {
+  const balance = BigNumber(rawBalance.balance || 0)
+  const usdRate = BigNumber(rawBalance.usdRate)
+  const totalValue = balance.times(usdRate)
+
+  return {
+    ...rawBalance,
+    displayBalance: formatBalance(balance),
+    price: formatUsdRate(usdRate),
+    totalValue,
+    displayValue: formatUsdRate(totalValue)
+  }
+}
+
+function getBalances (chainId, defaultSymbol, rawBalances) {
+  const mainBalance = rawBalances[defaultSymbol]
+  const tokenBalances = Object.values(rawBalances).filter(b => Number(b.chainId) === Number(chainId))
+
+  const balances = [mainBalance].concat(tokenBalances)
+    .filter(Boolean)
+    .map(balance)
+    .sort((a, b) => {
+      if (a.symbol === defaultSymbol) return -1
+      if (b.symbol === defaultSymbol) return 1
+      return a.totalValue.minus(b.totalValue).toNumber()
+    })
+
+  const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
+
+  return { balances, totalDisplayValue: formatUsdRate(totalValue, 2) }
+}
+
 class Balances extends React.Component {
   constructor (...args) {
     super(...args)
@@ -48,13 +80,6 @@ class Balances extends React.Component {
   // }
 
   renderBalance (symbol, balanceInfo, i) {
-    const tokenBalance = BigNumber(balanceInfo.balance || 0)
-    const displayBalance = formatBalance(tokenBalance)
-    const tokenUsdRate = BigNumber(balanceInfo.usdRate)
-
-    const price = formatUsdRate(tokenUsdRate)
-    const totalValue = formatUsdRate(tokenBalance.times(tokenUsdRate))
-
     return (
       <div className='signerBalance' key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceLogo'>
@@ -65,13 +90,13 @@ class Balances extends React.Component {
         </div>
         <div className='signerBalanceName'>
           <span>{balanceInfo.name + ' -'}</span>
-          <span className='signerBalanceCurrentPrice'>{price}</span>
+          <span className='signerBalanceCurrentPrice'>{balanceInfo.price}</span>
         </div>
-        <div className='signerBalanceValue' style={(displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
-          {displayBalance}
+        <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
+          {balanceInfo.displayBalance}
         </div>
         <div className='signerBalanceEquivalent'>
-          {totalValue}
+          {balanceInfo.displayValue}
         </div>
       </div>
     )
@@ -79,50 +104,22 @@ class Balances extends React.Component {
 
   render () {
     const address = this.store('main.accounts', this.props.id, 'address')
-    const { type, id } = this.store('main.currentNetwork')
+    const { type, id: chainId } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
+    const storedBalances = this.store('main.accounts', address, 'balances') || {}
 
-    // TODO: how to set main network symbol
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+    let { balances, totalDisplayValue } = getBalances(chainId, currentSymbol.toLowerCase(), storedBalances)
 
-    //console.log({ currentSymbol })
-
-    const balances = this.store('main.accounts', address, 'balances') || {}
-
-    //console.log({ balances })
-
-    // const etherRates = this.store('external.rates')
-    // const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
-    // const known = Object.assign({}, tokens.known, {
-    //   default: {
-    //     chainId: 1,
-    //     name: 'Ether',
-    //     decimals: 18,
-    //     address: '0x',
-    //     logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
-    //     symbol: currentSymbol,
-    //     balance,
-    //     usdRate: etherUSD
-    //   }
-    // })
-    // let knownList = Object.keys(known).sort((a, b) => {
-    //   if (a === 'default') return -1
-    //   if (b === 'default') return 1
-    //   return known[a].usdValue > known[b].usdValue ? -1 : known[a].usdValue < known[b].usdValue ? 1 : 0
-    // })
-    // if (!this.state.expand) knownList = knownList.slice(0, 5)
-
-    const totalValue = Object.values(balances)
-      .map(coin => BigNumber(coin.usdRate).times(BigNumber(coin.balance)))
-      .reduce((a, b) => a.plus(b), BigNumber(0))
-
-    const totalDisplayValue = formatUsdRate(totalValue, 2)
+    if (!this.state.expand) {
+      balances = balances.slice(0, 5)
+    }
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>account balances</div>
-        {Object.entries(balances).map(([symbol, balance], i) => this.renderBalance(symbol, balance, i))}
+        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i))}
         {
-          Object.entries(balances).length <= 1 && this.state.expand
+          balances.length <= 1 && this.state.expand
             ? (
               <div className='signerBalanceNoTokens'>
                 No other token balances found

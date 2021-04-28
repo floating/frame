@@ -13,6 +13,7 @@ const setupWorker = (initial) => {
   if (tokenWorker && tokenWorker.kill) tokenWorker.kill()
   tokenWorker = fork(path.resolve(__dirname, 'worker.js'))
   exited = false
+
   tokenWorker.on('message', message => {
     if (message.type === 'scan') {
       scanning = false
