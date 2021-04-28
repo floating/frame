@@ -17,7 +17,7 @@ const setupWorker = (initial) => {
     if (message.type === 'scan') {
       scanning = false
 
-      store.setTokens(message.address, message.found)
+      store.setBalances(message.address, message.found)
 
       if (!stopped) {
         followTimer = setTimeout(() => {

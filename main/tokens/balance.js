@@ -16,7 +16,7 @@ async function getTokenBalances (chainId, address, tokens) {
 
   const balances = Object.entries(results.transformed)
     .reduce((balances, [key, balance]) => {
-      const symbol = key.split('_')[0]
+      const symbol = key.split('_')[0].toLowerCase()
       balances[symbol] = balance
 
       return balances

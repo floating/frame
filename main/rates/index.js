@@ -43,10 +43,11 @@ async function fetchRates (ids) {
   return Object.assign({}, ...responses)
 }
 
-async function loadRates (symbols = Object.keys(allCoins)) {
+async function loadRates () {
+  const symbols = watched.length > 0 ? watched : ['eth'] //Object.keys(allCoins)
+
   const lookup = symbols.reduce((mapping, symbol) => {
-    const s = symbol.toLowerCase()
-    mapping[allCoins[s]] = s
+    mapping[allCoins[symbol]] = symbol
     return mapping
   }, {})
 
@@ -66,7 +67,7 @@ loadCoins().then(() => {
   setInterval(loadCoins, 1000 * 60 * 60) // update master coin list once an hour
 
   loadRates()
-  setInterval(() => loadRates(watched), 1000 * 10) // update rates every 10 seconds
+  setInterval(() => loadRates(), 1000 * 10) // update rates every 10 seconds
 })
 
 function get (symbols) {
@@ -81,11 +82,14 @@ function get (symbols) {
 const rates = {
   get,
   add: function (symbols) {
+    const lowerCaseSymbols = symbols.map(s => s.toLowerCase())
+
     // add symbols to watch and return the latest rates
-    const newSymbols = symbols.filter(s => !watched.includes(s))
+    const newSymbols = lowerCaseSymbols.filter(s => !watched.includes(s))
+
     watched.push(...newSymbols)
 
-    return get(symbols)
+    return get(lowerCaseSymbols)
   }
 }
 

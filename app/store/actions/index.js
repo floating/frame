@@ -33,8 +33,6 @@ export const panelRequest = (u, request) => {
   u('panel.show', v => true)
 }
 
-export const setBalance = (u, account, balance) => u('balances', account.toLowerCase(), b => balance)
-
 export const notify = (u, type, data = {}) => {
   u('view.notify', _ => type)
   u('view.notifyData', _ => data)
