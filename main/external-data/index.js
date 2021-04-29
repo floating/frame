@@ -17,10 +17,6 @@ function createWorker (address) {
     if (message.type === 'rates') {
       store.setRates(message.rates)
     }
-
-    if (message.type === 'log') {
-      log[message.level](message.msg)
-    }
   })
 
   scanWorker.on('error', err => {
@@ -32,7 +28,7 @@ function createWorker (address) {
 
   scanWorker.on('exit', code => {
     log.warn(`scan worker exited with code ${code}, restarting worker`)
-    setTimeout(() => scan(address), 15000)
+    setTimeout(() => scan(address), 1000 * 5)
   })
 
   return scanWorker
