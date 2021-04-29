@@ -10,8 +10,7 @@ const BigNumber = require('bignumber.js')
 
 const crypt = require('../crypt')
 const store = require('../store')
-const tokens = require('../tokens')
-const rates = require('../rates')
+const dataScanner = require('../external-data')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')
@@ -409,7 +408,7 @@ class Accounts extends EventEmitter {
   }
 
   close () {
-    tokens.kill()
+    dataScanner.kill()
     // usbDetect.stopMonitoring()
   }
 
@@ -602,10 +601,9 @@ class Accounts extends EventEmitter {
 
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getBalance', params: [address, 'latest'] }, res => {
           const balance = BigNumber(res.result).shiftedBy(-nativeCoin.decimals)
-          const rate = rates.add([symbol])[symbol]
 
           store.setBalance(address, symbol, {
-            ...nativeCoin, balance: balance.toString(), usdRate: rate ? rate.usd.toString() : '0'
+            ...nativeCoin, balance: balance.toString()
           })
         })
       }
@@ -617,7 +615,7 @@ class Accounts extends EventEmitter {
     // const omit = addressTokens && addressTokens.omit
     // const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})
 
-    tokens.scan(address)
+    dataScanner.scan(address)
   }
 
   stopBalanceScan () {
@@ -626,7 +624,7 @@ class Accounts extends EventEmitter {
       this.coinScanner = null
     }
 
-    tokens.stop()
+    dataScanner.stop()
   }
 
   setGasLimit (limit, handlerId, cb) {

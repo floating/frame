@@ -7,8 +7,7 @@ const noData = {
 
 // symbol -> coinId
 let allCoins = {}
-const coinRates = {}
-const watched = []
+const watched = ['eth', 'xdai']
 
 function createRate (quote) {
   return {
@@ -44,9 +43,7 @@ async function fetchRates (ids) {
 }
 
 async function loadRates () {
-  const symbols = watched.length > 0 ? watched : ['eth'] //Object.keys(allCoins)
-
-  const lookup = symbols.reduce((mapping, symbol) => {
+  const lookup = watched.reduce((mapping, symbol) => {
     mapping[allCoins[symbol]] = symbol
     return mapping
   }, {})
@@ -54,33 +51,20 @@ async function loadRates () {
   try {
     const quotes = await fetchRates(Object.keys(lookup))
 
-    Object.entries(quotes).forEach(([id, quote]) => {
+    return Object.entries(quotes).reduce((rates, [id, quote]) => {
       const symbol = lookup[id]
-      coinRates[symbol] = createRate(quote)
-    })
+      rates[symbol] = createRate(quote)
+
+      return rates
+    }, {})
   } catch (e) {
     console.error('unable to load latest rates', e)
   }
 }
 
-loadCoins().then(() => {
-  setInterval(loadCoins, 1000 * 60 * 60) // update master coin list once an hour
-
-  loadRates()
-  setInterval(() => loadRates(), 1000 * 10) // update rates every 10 seconds
-})
-
-function get (symbols) {
-  const data = symbols.reduce((rates, symbol) => {
-    rates[symbol] = coinRates[symbol.toLowerCase()] || noData
-    return rates
-  }, {})
-
-  return data
-}
-
 const rates = {
-  get,
+  loadCoins,
+  loadRates,
   add: function (symbols) {
     const lowerCaseSymbols = symbols.map(s => s.toLowerCase())
 
@@ -88,8 +72,6 @@ const rates = {
     const newSymbols = lowerCaseSymbols.filter(s => !watched.includes(s))
 
     watched.push(...newSymbols)
-
-    return get(lowerCaseSymbols)
   }
 }
 

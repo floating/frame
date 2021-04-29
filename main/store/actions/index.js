@@ -323,6 +323,9 @@ module.exports = {
   setIPFS: (u, ipfs) => {
     u('main.ipfs', () => ipfs)
   },
+  setRates: (u, rates) => {
+    u('external.rates', (existingRates = {}) => rates)
+  },
   setBalance: (u, address, symbol, balance) => {
     u('main.accounts', address, 'balances', (balances = {}) => {
       const updates = {

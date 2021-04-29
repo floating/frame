@@ -45,12 +45,11 @@ async function scan (address, omit = [], knownList) {
     const token = tokens.find(t => t.symbol === symbol)
 
     if (token) {
-      const rate = rates.add([symbol])[symbol]
+      rates.add([symbol])
 
       found[symbol] = {
         ...token,
-        balance,
-        usdRate: rate.usd
+        balance
       }
     }
 

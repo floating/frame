@@ -22,9 +22,9 @@ function formatUsdRate (rate, decimals = 6) {
   }).format(rate)
 }
 
-function balance (rawBalance) {
+function balance (rawBalance, rate) {
   const balance = BigNumber(rawBalance.balance || 0)
-  const usdRate = BigNumber(rawBalance.usdRate)
+  const usdRate = BigNumber(rate)
   const totalValue = balance.times(usdRate)
 
   return {
@@ -36,13 +36,19 @@ function balance (rawBalance) {
   }
 }
 
-function getBalances (chainId, defaultSymbol, rawBalances) {
+function getBalances (chainId, defaultSymbol, rawBalances, rates) {
   const mainBalance = rawBalances[defaultSymbol]
   const tokenBalances = Object.values(rawBalances).filter(b => Number(b.chainId) === Number(chainId))
 
   const balances = [mainBalance].concat(tokenBalances)
     .filter(Boolean)
-    .map(balance)
+    .map(rawBalance => {
+      const rate = rates[rawBalance.symbol] || {}
+      console.log({ rates, symbol: balance.symbol, rate})
+      const usdRate = rate.usd || 0
+
+      return balance(rawBalance, usdRate)
+    })
     .sort((a, b) => {
       if (a.symbol === defaultSymbol) return -1
       if (b.symbol === defaultSymbol) return 1
@@ -108,7 +114,14 @@ class Balances extends React.Component {
     const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
     const storedBalances = this.store('main.accounts', address, 'balances') || {}
 
-    let { balances, totalDisplayValue } = getBalances(chainId, currentSymbol.toLowerCase(), storedBalances)
+    const rates = this.store('external.rates')
+
+    let { balances, totalDisplayValue } = getBalances(
+      chainId,
+      currentSymbol.toLowerCase(),
+      storedBalances,
+      rates
+    )
 
     if (!this.state.expand) {
       balances = balances.slice(0, 5)
