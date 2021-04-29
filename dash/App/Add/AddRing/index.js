@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
+import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 class AddRing extends React.Component {
   constructor (...args) {
@@ -151,8 +151,7 @@ class AddRing extends React.Component {
   }
 
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     const { type, id } = this.store('main.currentNetwork')
     const network = type + ':' + id
     return (
@@ -160,14 +159,15 @@ class AddRing extends React.Component {
         <div className='addAccountItemBar addAccountItemHot' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconHot' style={{ marginTop: '2px' }}>{svg.octicon('key', { height: 23 })}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconHot' style={{ marginTop: '2px' }}>{svg.octicon('key', { height: 23 })}</div>
+                <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+              </div>
+              <div className='addAccountItemTopTitle'>Keyring</div>
             </div>
-            <div className='addAccountItemTopTitle'>Keyring</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='addAccountItemSummary'>A keyring account lets you to add individual private keys to an account</div>
           </div>
-          <div className='addAccountItemSummary'>A keyring account lets you to add individual private keys to an account</div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {
@@ -235,7 +235,7 @@ class AddRing extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary' />
+          <div className='addAccountItemFooter' />
         </div>
       </div>
     )

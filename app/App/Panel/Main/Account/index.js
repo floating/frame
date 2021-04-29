@@ -232,7 +232,8 @@ class _AccountMain extends React.Component {
               moduleId={id} 
             /> :
             id === 'permissions' ? <Permissions
-              moduleId={id} 
+              moduleId={id}
+              id={this.props.id}
             /> :
             id === 'balances' ? <Balances
               moduleId={id} 
@@ -478,7 +479,7 @@ module={this.state.modules[5] || { index: 5, top: 0 }}
 // }
 /// const Balances = Restore.connect(_Balances)
 
-class Signer extends React.Component {
+class Account extends React.Component {
   constructor (...args) {
     super(...args)
     this.locked = false
@@ -739,6 +740,10 @@ class Signer extends React.Component {
     // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
     const address = this.store('main.accounts', this.props.id, 'address')
     if (!address) return 'no address'
+
+    let requests = this.store('main.accounts', this.props.id, 'requests') || {}
+    requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
+
     return this.props.status !== 'ok' ? (
       <div className='signerStatusNotOk'>{status}</div>
     ) : (
@@ -751,11 +756,14 @@ class Signer extends React.Component {
         </div>
         <div className={'signerAddress'}>
           <div className='transactionToAddress'>
-            <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 6)}</div>
+            <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
             <div className='transactionToAddressFull'>
               {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
             </div>
           </div>
+        </div>
+        <div className={requests.length > 0 ? 'accountNotificationBadge accountNotificationBadgeActive' : 'accountNotificationBadge'}>
+          {requests.length}
         </div>
         {/* <div
           className='addressSelect' onMouseDown={e => {
@@ -884,4 +892,4 @@ class Signer extends React.Component {
 //   ) : null}
 // </div>
 
-export default Restore.connect(Signer)
+export default Restore.connect(Account)

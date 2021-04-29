@@ -1,145 +1,222 @@
-import { LinkExternal } from '@githubprimer/octicons-react';
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../resources/link'
 
-// import Main from './Main'
-// import Local from './Local'
-// import Notify from './Notify'
-// import Phase from './Phase'
-// import Badge from './Badge'
+import AddHardware from './Add/AddHardware'
+import AddAragon from './Add/AddAragon'
+import AddPhrase from './Add/AddPhrase'
+import AddRing from './Add/AddRing'
+import AddAddress from './Add/AddAddress'
 
-// import DevTools from 'restore-devtools'
-// <DevTools />
-
-
-class _Signers extends React.Component {
-  render () {
-    const hardwareSigners = Object.keys(this.store('main.signers')).map(s => {
-      const signer = this.store('main.signers', s)
-      if (
-        signer.type === 'ledger' || 
-        signer.type === 'trezor' ||
-        signer.type === 'lattice'
-      ) {
-        return signer
-      } else {
-        return false
-      }
-    }).filter(s => s)
-    const hotSigners = Object.keys(this.store('main.signers')).map(s => {
-      const signer = this.store('main.signers', s)
-      if (
-        signer.type === 'seed' || 
-        signer.type === 'ring'
-      ) {
-        return signer
-      } else {
-        return false
-      }
-    }).filter(s => s)
+class AddAccounts extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      view: 'default'
+    }
+  }
+  renderAddNonsigning () {
     return (
-      <div className='signers'>
-        <div className='signersTop'>
-          Accounts & Signers
+      <div className='addAccounts cardShow'>
+       <AddAddress />          
+      </div>
+    )
+  }
+  renderAddKeystore () {
+    return (
+      <div className='addAccounts cardShow'>
+        <AddRing />
+      </div>
+    )
+  }
+  renderAddSeed () {
+    return (
+      <div className='addAccounts cardShow'>
+       <AddPhrase />
+      </div>
+    )
+  }
+  renderAddTrezor () {
+    return (
+      <div className='addAccounts cardShow'>
+       <AddHardware type={'trezor'} />
+      </div>
+    )
+  }
+  renderAddLedger () {
+    return (
+      <div className='addAccounts cardShow'>
+       <AddHardware type={'ledger'} />
+      </div>
+    )
+  }
+  renderAddLattice () {
+    return (
+      <div className='addAccounts cardShow'>
+       {'Add Lattice'}
+      </div>
+    )
+  }
+  renderAddGnosis () {
+    return (
+      <div className='addAccounts cardShow'>
+       {'Add Gnosis'}
+      </div>
+    )
+  }
+  renderAddAragon () {
+    return (
+      <div className='addAccounts cardShow'>
+       <AddAragon />
+      </div>
+    )
+  }
+  renderDefault () {
+    return (
+      <div className='addAccounts cardShow'>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
+        {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Wallet</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'trezor' })}>Trezor Wallet</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>Grid+ Lattice1</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore.json</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>Non-signing Account</div>
+      </div>
+    )
+  }
+  render () {
+    const view = this.state.view
+    if (view === 'default') {
+      return this.renderDefault()
+    } else if (view === 'aragon')  {
+      return this.renderAddAragon()
+    // } else if (view === 'gnosis')  {
+    //   return this.renderAddGnosis()
+    } else if (view === 'ledger')  {
+      return this.renderAddLedger()
+    } else if (view === 'trezor')  {
+      return this.renderAddTrezor()
+    } else if (view === 'lattice')  {
+      return this.renderAddLattice()
+    } else if (view === 'seed')  {
+      return this.renderAddSeed()
+    } else if (view === 'keystore')  {
+      return this.renderAddKeystore()
+    } else if (view === 'nonsigning')  {
+      return this.renderAddNonsigning()
+    } else {
+      return 'Cannot find ' + view
+    }
+  }
+}
+
+class Signer extends React.Component {
+  status () {
+    if (this.props.status === 'ok') {
+      return (
+        <div className='signerStatus'>
+          <div className='signerStatusText'>{'ready'}</div>
+          <div className='signerStatusIndicator signerStatusIndicatorReady'></div>
         </div>
-        <div className='signersMid'>
-          <div className='newAccount'>
-            Add New Account
-          </div>
-          <div className='addAccounts'>
-            <div>Add New...</div>
-            <div>Aragon DAO</div>
-            <div>Gnosis Safe</div>
-            <div>Ledger Wallet</div>
-            <div>Trezor Wallet</div>
-            <div>Grid+ Lattice1</div>
-            <div>Seed Phrase</div>
-            <div>Keystore.json</div>
-            <div>Non-signing Account</div>
-          </div>
-          <br/>
-          <div>Connected Signers</div>
-          <div className='signersHeader'>
-            Hardware Signers
-          </div>
-          <div className='signersList'>
-            {hardwareSigners.length ? hardwareSigners.map(signer => {
-              return (
-                <div className='signer'>
-                  <div>{signer.type + ' Signer'}</div>
-                  <div>{'type: ' + signer.type}</div>
-                  <div>{'status: ' + signer.status}</div>
-                  <div>{'accounts: ' + signer.addresses.length}</div>
-                  <div>{'Add/remove accounts from this signer'}</div>
-                </div>
-              )
-            }) : (
-              <div className='signer'>
-                {'No hardware signers'}
-              </div>
-            )}
-          </div>
-          <div className='signersHeader'>
-            Hot Signers
-          </div>
-          <div className='signersList'>
-            {hotSigners.length ? hotSigners.map(signer => {
-              return (
-                <div className='signer'>
-                  <div className='signerType'>{'Signer Name'}</div>
-                  <div className='signerType'>{signer.type + ' Signer'}</div>
-                  <div>{'hardware'}</div>
-                  <div>{'status: ' + signer.status}</div>
-                  <div>{'Add accounts from this signer'}</div>
-                </div>
-              )
-            }) : (
-              <div className='signer'>
-                {'No hot signers'}
-              </div>
-            )}
-          </div>
+      )
+    } else if (this.props.status === 'locked') {
+      return (
+        <div className='signerStatus'>
+          <div className='signerStatusText'>{'locked'}</div>
+          <div className='signerStatusIndicator signerStatusIndicatorLocked'></div>
         </div>
-        <div className='signersBot'>
-          Signer Dashboard
+      )
+    } else {
+      return (
+        <div className='signerStatus'>
+          <div className='signerStatusText'>{this.props.status}</div>
+          <div className='signerStatusIndicator'></div>
         </div>
+      )
+    }
+  }
+  render () {
+    return (
+      <div className='signer'>
+        <div className='signerName'>{'Signer Name'}</div>
+        <div className='signerType'>{this.props.type + ' Signer'}</div>
+        {this.status()}
+        <div className='signerAccounts'>{'Add accounts from this signer'}</div>
       </div>
     )
   }
 }
 
-const Signers = Restore.connect(_Signers)
-
-class Flow extends React.Component {
+class Dash extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.input = React.createRef()
     this.state = {
-      input: ''
+      showAddAccounts: false
     }
   }
-  // componentDidMount(){
-  //   this.input.current.focus()
-  // }
-  // trigger () {
-  //   link.rpc('flowCommand', this.state, (err, sres) => {
-  //     console.log(err, res)
-  //   })
-  // }
   render () {
-    return (
+      const hardwareSigners = Object.keys(this.store('main.signers')).map(s => {
+        const signer = this.store('main.signers', s)
+        if (
+          signer.type === 'ledger' || 
+          signer.type === 'trezor' ||
+          signer.type === 'lattice'
+        ) {
+          return signer
+        } else {
+          return false
+        }
+      }).filter(s => s)
+      const hotSigners = Object.keys(this.store('main.signers')).map(s => {
+        const signer = this.store('main.signers', s)
+        if (
+          signer.type === 'seed' || 
+          signer.type === 'ring'
+        ) {
+          return signer
+        } else {
+          return false
+        }
+      }).filter(s => s)
+      return (
       <div className='dash'>
-        {this.store('dash.type') === 'signers' ? (
-          <Signers />
-        ) : this.store('dash.type') === 'networks' ? (
-          <div>
-            show networks
+        {this.state.showAddAccounts ? <AddAccounts /> : null}
+        <div className='newAccount' onMouseDown={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
+          Add New Accounts
+        </div>
+        <div className='signers'>
+          <div className='signersMid'>
+            <div className='signersHeader'>
+              Hardware Signers
+            </div>
+            <div className='signersList'>
+              {hardwareSigners.length ? (
+                hardwareSigners.map(signer => <Signer {...signer} />)
+              ) : (
+                <div className='noSigners'>
+                  {'No hardware signers detected'}
+                </div>
+              )}
+            </div>
+            <div className='signersHeader'>
+              Hot Signers
+            </div>
+            <div className='signersList'>
+              {hotSigners.length ? (
+                hotSigners.map(signer => <Signer {...signer} />)
+              ) : (
+                <div className='noSigners'>
+                  {'No hot signers detected'}
+                </div>
+              )}
+            </div>
           </div>
-        ) : null}
+        </div>
       </div>
     )
   }
 }
 
-export default Restore.connect(Flow)
+export default Restore.connect(Dash)

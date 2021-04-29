@@ -3,3 +3,6 @@
 
 export const pathSync = (u, path, value) => u(path, () => value)
 
+export const notify = (u, ...args) => {
+  console.log('notify action', ...args)
+}

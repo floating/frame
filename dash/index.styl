@@ -24,81 +24,175 @@ div
   overflow-x hidden
   background var(--ghostZ)
 
+  .addAccounts
+    position absolute
+    top 100px
+    left 0
+    right 0
+    bottom 0
+    background var(--ghostB)
+    z-index 4000
+    overflow-y scroll
+    overflow-x hidden
+
+    .accountTypeSelect
+      height 60px
+      width 320px
+      background black
+      border-radius 8px
+      margin 20px
+      display flex
+      justify-content center
+      align-items center
+      cursor pointer
+
+  .newAccount
+    height 64px
+    width 310px
+    background var(--ghostB) // var(--ghostE) 0%, var(--ghostG) 70%)
+    border-radius 12px
+    display flex
+    justify-content center
+    align-items center
+    margin 20px
+    box-shadow 0px 9px 3px outerspace
+    cursor pointer
+    font-size 20px
+    font-weight 100
+
   .signers
     width 100%
     height 100%
 
-    .signersTop
-      position absolute
-      top 0
-      right 0
-      left 0
-      background var(--ghostA)
+    // .signersTop
+    //   position absolute
+    //   top 0
+    //   right 0
+    //   left 0
+    //   background var(--ghostA)
+    //   height 40px
+    //   display none
+
+    // .signersMid
+      // position absolute
+      // top 0px
+      // right 0
+      // left 0
+      // bottom 0px
+      // overflow-x hidden
+      // overflow-y scroll
+      // padding 4px
+      
+    .signersHeader
       height 40px
-      display none
+      width 100%
+      display flex
+      align-items center
+      padding-left 8px
+      padding-top 16px
+      font-size 19px
+      font-weight 100
 
-    .signersMid
-      position absolute
-      top 0px
-      right 0
-      left 0
-      bottom 0px
-      overflow-x hidden
-      overflow-y scroll
-      padding 4px
-        
-      .newAccount
-        height 64px
-        width 310px
-        background var(--ghostB) // var(--ghostE) 0%, var(--ghostG) 70%)
-        border-radius 12px
-        display flex
-        justify-content center
-        align-items center
-        margin 20px
-        box-shadow 0px 9px 3px outerspace
-        cursor pointer
-        font-size 20px
-        // text-transform uppercase
-        // font-size 16px
-        font-weight 100
-        // letter-spacing 1px
+    .noSigners
+      position relative
+      width 348px
+      height 30px
+      overflow hidden
+      background var(--ghostC)
+      box-sizing border-box
+      margin 4px
+      border-radius 8px
+      display flex
+      justify-content center
+      align-items center
+      font-size 12px
+      font-weight 400
+      text-transform uppercase
 
-      .signersHeader
-        height 40px
-        width 100%
-        // background blue
-        display flex
-        justify-content center
-        align-items center
+    .signersList
+      display flex
+      flex-wrap wrap
 
-      .signersList
-        display flex
-        flex-wrap wrap
+      .signer
+        position relative
+        width 348px
+        height 100px
+        overflow hidden
+        background var(--ghostB)
+        box-sizing border-box
+        margin 4px
+        border-radius 8px
 
-        .signer
-          width 348px
-          height 130px
-          overflow hidden
-          background var(--ghostB)
-          box-sizing border-box
-          margin 4px
+        .signerName
+          position absolute
+          top 8px
+          left 8px
+
+        .signerType
+          position absolute
+          top 30px
+          left 0
+          font-size 12px
+          text-transform uppercase
+          font-weight 400
+          padding 5px 10px
+
+        // .signerStatus
+        //   position absolute
+        //   top 8px
+        //   right 8px
+        //   font-size 12px
+        //   text-transform uppercase
+        //   font-weight 400
+
+        .signerStatusIndicator
+          position absolute
+          top 12px
+          right 12px
+          font-size 12px
+          text-transform uppercase
+          font-weight 400
+          background var(--ghostE)
+          width 10px
+          height 10px
+          border-radius 5px
+          // box-shadow 0px 0px 5px bleu
+
+        .signerStatusIndicatorLocked
+          background var(--moon)
+
+        .signerStatusIndicatorReady
+          background var(--good)
+
+        .signerStatusText
+          position absolute
+          top 8px
+          right 32px
+          font-size 12px
+          text-transform uppercase
+          font-weight 400
+    
+        .signerAccounts
+          position absolute
+          bottom 8px
+          right 8px
+          left 8px
+          padding 8px
+          text-align center
+          background var(--ghostC)
           border-radius 8px
+          font-size 12px
+          text-transform uppercase
+          font-weight 400
 
-          .signerType
-            font-size 12px
-            text-transform uppercase
-            font-weight 400
-            padding 5px 10px
-
-    .signersBot
-      position absolute
-      bottom 0
-      right 0
-      left 0
-      height 40px
-      background var(--ghostB)
-      display none
+    // .signersBot
+    //   position absolute
+    //   bottom 0
+    //   right 0
+    //   left 0
+    //   height 40px
+    //   background var(--ghostB)
+    //   display none
 
 
 
@@ -251,5 +345,5 @@ div
 // .hidden
 //   visibility hidden
 
-// @import './App/Panel/style'
+@import './App/Add/style'
 // @import './App/Components/'

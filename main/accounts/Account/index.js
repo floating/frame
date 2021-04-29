@@ -85,8 +85,8 @@ class Account {
       this.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
     }
     this.update()
-    if (this.requests[req.handlerId] && this.requests[req.handlerId].res) {
-      this.requests[req.handlerId].res()
+    if (this.requests[req.handlerId]) {
+      if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()
       delete this.requests[req.handlerId]
     }
   }
