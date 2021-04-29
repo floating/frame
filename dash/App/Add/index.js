@@ -3,7 +3,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import { Transition } from 'react-transition-group'
-import svg from '../../../../../resources/svg'
+import svg from '../../../resources/svg'
 
 import AddHardware from './AddHardware'
 import AddAragon from './AddAragon'

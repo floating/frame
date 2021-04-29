@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
+import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 class AddPhrase extends React.Component {
   constructor (...args) {
@@ -97,21 +97,21 @@ class AddPhrase extends React.Component {
   }
 
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemMock' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconMock' style={{ marginTop: '2px' }}>{svg.mask(24)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexMock' />
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconMock' style={{ marginTop: '2px' }}>{svg.mask(24)}</div>
+                <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
+              </div>
+              <div className='addAccountItemTopTitle'>Address</div>
             </div>
-            <div className='addAccountItemTopTitle'>Address</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='addAccountItemSummary'>An address account represents an address but cannot sign for it</div>
           </div>
-          <div className='addAccountItemSummary'>An address account represents an address but cannot sign for it</div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {

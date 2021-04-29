@@ -143,7 +143,6 @@ ipcMain.on('tray:updateRestart', () => {
 ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain', store('main')))
 
 ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
-ipcMain.on('tray:toggleDash', (e, type) => windows.toggleDash(type))
 
 ipcMain.on('tray:launchDapp', async (e, domain) => {
   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })

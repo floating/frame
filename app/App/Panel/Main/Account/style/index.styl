@@ -218,6 +218,30 @@
     div
       z-index 3004
 
+    .accountNotificationBadge
+      position absolute
+      top 15px
+      right 88px
+      height 32px
+      width 32px
+      border-radius 16px
+      background var(--ghostA)
+      display flex
+      justify-content center
+      align-items center
+      font-size 16px
+      font-weight 400
+      font-family FiraCode
+      background var(--good)
+      color var(--ghostA)
+      transition standard
+      opacity 0      
+
+    .accountNotificationBadgeActive
+      background var(--good)
+      color var(--ghostA)
+      opacity 1
+
     .transactionToAddress
       .transactionToAddressLarge
         svg
@@ -275,14 +299,14 @@
 
     .accountGrabber
       position absolute
-      top 0px 
-      bottom 2px
+      top 5px 
+      bottom 5px
       right 58px
       width 19px
       color var(--ghostX)
       cursor grab
       z-index 5000000000000000
-      padding-top 15px
+      padding-top 9px
 
       svg
         position relative
@@ -1427,6 +1451,22 @@
   text-align center
   display flex
   padding 33px
+
+.signerVerifyResponse
+  background var(--bad)
+  margin 20px 0px
+  border-radius 6px
+  color var(--spacewhite)
+  font-size 16px
+  padding 20px 40px
+  font-weight 400
+  display flex
+  justify-content center
+  text-align center
+
+.signerVerifyResponseSuccess
+  background var(--good)
+
 
 @import '../Balances/style'
 @import '../Gas/style'

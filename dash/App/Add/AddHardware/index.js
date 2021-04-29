@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import svg from '../../../../../../resources/svg'
+import svg from '../../../../resources/svg'
 
 class AddHardware extends React.Component {
   constructor (...args) {
@@ -13,6 +13,8 @@ class AddHardware extends React.Component {
   render () {
     const accounts = this.store('main.accounts')
     const signers = this.store('main.signers')
+
+    // this tethered check is out of date
     let tethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) > -1)
     let untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     const isType = id => this.store('main.signers', id, 'type') === this.props.type
@@ -20,18 +22,19 @@ class AddHardware extends React.Component {
     tethered = tethered.filter(isType.bind(this)).map(toDevice.bind(this))
     untethered = untethered.filter(isType.bind(this)).map(toDevice.bind(this))
     return (
-      <div className='addAccountItem' style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
+      <div className='addAccountItem addAccountItemAdding'>
         <div className='addAccountItemBar addAccountItemHardware' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconHardware'>{this.props.type === 'ledger' ? svg.ledger(20) : svg.trezor(16)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconHardware'>{this.props.type === 'ledger' ? svg.ledger(20) : svg.trezor(16)}</div>
+                <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
+              </div>
+              <div className='addAccountItemTopTitle'>{this.deviceName}</div>
             </div>
-            <div className='addAccountItemTopTitle'>{this.deviceName}</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           </div>
-          <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           <div className='addAccountItemDevices'>
             {untethered.length || tethered.length ? (
               untethered.map((signer, i) => {

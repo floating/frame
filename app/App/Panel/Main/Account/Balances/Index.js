@@ -35,10 +35,9 @@ class Balances extends React.Component {
           <img src={token.logoURI} />
         </div>
         <div className='signerBalanceCurrency'>
-          {token.symbol}
+          <span>{token.symbol}</span><span className='signerBalanceCurrencySmall'>{token.name}</span>
         </div>
         <div className='signerBalanceName'>
-          <span>{token.name + ' -'}</span>
           <span className='signerBalanceCurrentPrice'>{token.usdDisplayRate}</span>
         </div>
         <div className='signerBalanceValue' style={(token.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>

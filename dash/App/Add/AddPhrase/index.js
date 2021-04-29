@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
+import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 class AddPhrase extends React.Component {
   constructor (...args) {
@@ -97,26 +97,27 @@ class AddPhrase extends React.Component {
   }
 
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemHot' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
+                <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+              </div>
+              <div className='addAccountItemTopTitle'>Phrase</div>
             </div>
-            <div className='addAccountItemTopTitle'>Phrase</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
           </div>
-          <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {
+                console.log('ACCOUNT ADDING ')
                 this.adding()
-                if (this.store('main.currentNetwork.id') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+                setTimeout(() => this.store.notify('hotAccountWarning'), 800)
               }}
             >
               Add Phrase Account

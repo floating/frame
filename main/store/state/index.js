@@ -62,7 +62,8 @@ const initial = {
     }
   },
   dash: {
-    type: 'signers'
+    type: 'signers',
+    showing: false
   },
   flow: {},
   dapps: {},

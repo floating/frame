@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
+import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 class AddAragon extends React.Component {
   constructor (...args) {
@@ -142,21 +142,21 @@ class AddAragon extends React.Component {
   }
 
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     return (
-      <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
+      <div className={itemClass}>
         <div className='addAccountItemBar addAccountItemSmart' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
+                <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
+              </div>
+              <div className='addAccountItemTopTitle'>Aragon</div>
             </div>
-            <div className='addAccountItemTopTitle'>Aragon</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
           </div>
-          <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
           <div className='addAccountItemOption'>
             <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
               <div className='addAccountItemDeviceTitle'>Add Aragon Account</div>
