@@ -235,7 +235,7 @@ class AddRing extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary' />
+          <div className='addAccountItemFooter' />
         </div>
       </div>
     )

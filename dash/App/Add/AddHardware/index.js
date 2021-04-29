@@ -28,7 +28,11 @@ class AddHardware extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHardware'>{this.props.type === 'ledger' ? svg.ledger(20) : svg.trezor(16)}</div>
+                {this.props.type === 'ledger' ? (
+                  <div className='addAccountItemIconType addAccountItemIconLedger'>{svg.ledger(22)}</div>
+                ) : (
+                  <div className='addAccountItemIconType addAccountItemIconTrezor'>{svg.trezor(22)}</div>
+                )}
                 <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
               </div>
               <div className='addAccountItemTopTitle'>{this.deviceName}</div>
@@ -61,7 +65,7 @@ class AddHardware extends React.Component {
             )}
           </div>
           <div
-            className='addAccountItemSummary' onMouseDown={() => {
+            className='addAccountItemFooter' onMouseDown={() => {
               const open = url => this.store.notify('openExternal', { url })
               if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
               if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')

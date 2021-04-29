@@ -222,15 +222,20 @@
     height 100%
     background var(--ghostB)
     border-radius 6px
-    padding 0px 0px 10px 0px
+    // padding 0px 0px 10px 0px
     z-index 2
     box-shadow 0px 0px 40px -20px rgba(5, 25, 35, 0.6)
     display flex
-    justify-content space-between
+    justify-content center
     align-items center
     flex-direction column
+    position relative
 
   .addAccountItemTopType
+    position absolute
+    top 0
+    left 0
+    right 0
     display flex
     justify-content flex-start
     align-items center
@@ -239,11 +244,18 @@
     text-transform uppercase
     letter-spacing 3px
     font-weight 300
+    // background red
+    width 100%
     // margin-top 10px
     // background blue
 
-    // .addAccountItemIconHardware
-    //   color var(--hardware)
+    .addAccountItemIconLedger
+      position relative
+      top -2px
+
+    .addAccountItemIconTrezor
+      position relative
+      top -4px
 
     // .addAccountItemIconHot
     //   color var(--hot)
@@ -265,11 +277,10 @@
       display flex
       justify-content center
       align-items center
-      margin-right 10px
       color var(--outerspace08)
       // background blue
       border-radius 5px
-      margin 5px
+      margin 12px 9px
       background var(--ghostD)
 
     .addAccountItemIconHex
@@ -280,7 +291,7 @@
       height 45px
       opacity 1
       position absolute
-      border-radius 5px
+      border-radius 8px
       display none
       // background var(--ghostD)
       // padding-bottom 3px
@@ -309,28 +320,62 @@
     content ''
     position absolute
     top 0px
-    left 5px
-    right 5px
+    left 8px
+    right 8px
     height 4px
     border-radius 2px
     background var(--ghostA)
 
   .addAccountItemSummary
-    position relative
     display flex
     align-items center
     justify-content center
     z-index 9999999
     line-height 22px
     font-size 11px
-    // width calc(100% - 40px)
     text-transform uppercase
     letter-spacing 1px
-    padding 20px 20px 0px 20px
+    padding 8px 20px 0px 20px
     text-align justify
     text-align-last center-justify
     min-height 22px
+    width 100%
+    min-width 100%
+    box-sizing border-box
+    position absolute
+    top 71px
+    left 0
+    right 0
 
+  .addAccountItemFooter:before
+    content ''
+    position absolute
+    top 0px
+    left 8px
+    right 8px
+    height 4px
+    border-radius 2px
+    background var(--ghostA)
+
+  .addAccountItemFooter
+    display flex
+    align-items center
+    justify-content center
+    z-index 9999999
+    line-height 22px
+    font-size 11px
+    text-transform uppercase
+    letter-spacing 1px
+    padding 8px 20px 0px 20px
+    text-align justify
+    text-align-last center-justify
+    min-height 22px
+    box-sizing border-box
+    position absolute
+    bottom 8px
+    left 8px
+    right 8px
+  
   .addAccountItemDevices
     width calc(100% - 20px)
     font-size 12px
@@ -403,7 +448,7 @@
 
   .addAccountItemOptionSetup
     position absolute
-    top 0
+    top 40px
     right 0
     bottom 0
     left 0

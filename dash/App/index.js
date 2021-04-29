@@ -78,7 +78,7 @@ class AddAccounts extends React.Component {
         {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Wallet</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'trezor' })}>Trezor Wallet</div>
-        {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>Grid+ Lattice1</div> */}
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>Grid+ Lattice1</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore.json</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>Non-signing Account</div>
@@ -97,14 +97,16 @@ class AddAccounts extends React.Component {
       return this.renderAddLedger()
     } else if (view === 'trezor')  {
       return this.renderAddTrezor()
-    // } else if (view === 'lattice')  {
-    //   return this.renderAddLattice()
+    } else if (view === 'lattice')  {
+      return this.renderAddLattice()
     } else if (view === 'seed')  {
       return this.renderAddSeed()
     } else if (view === 'keystore')  {
       return this.renderAddKeystore()
     } else if (view === 'nonsigning')  {
       return this.renderAddNonsigning()
+    } else {
+      return 'Cannot find ' + view
     }
   }
 }
