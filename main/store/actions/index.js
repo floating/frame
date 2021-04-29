@@ -323,15 +323,30 @@ module.exports = {
   setIPFS: (u, ipfs) => {
     u('main.ipfs', () => ipfs)
   },
+  setRates: (u, rates) => {
+    u('external.rates', (existingRates = {}) => rates)
+  },
+  setBalance: (u, address, symbol, balance) => {
+    u('main.accounts', address, 'balances', (balances = {}) => {
+      const updates = {
+        ...balances,
+        [symbol]: balance
+      }
+
+      return updates
+    })
+  },
   // Tokens
-  setTokens: (u, address, newTokens) => {
-    u('main.accounts', address, 'tokens', (tokens = {}) => {
-      tokens = {}
-      Object.keys(newTokens).forEach(tokenAddress => {
-        tokens.known = tokens.known || {}
-        tokens.known[tokenAddress] = newTokens[tokenAddress]
-      })
-      return tokens
+  setBalances: (u, address, newBalances) => {
+    u('main.accounts', address, 'balances', (balances = {}) => {
+      const updatedBalances = Object.entries(newBalances).reduce((acc, [symbol, token]) => {
+        acc[symbol] = token
+        return acc
+      }, {})
+
+      const updates = { ...balances, ...updatedBalances }
+
+      return updates
     })
   },
   omitToken: (u, address, omitToken) => {

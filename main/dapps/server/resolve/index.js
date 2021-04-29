@@ -1,7 +1,7 @@
 const { hash } = require('eth-ens-namehash')
 
 const store = require('../../../store')
-const nebula = require('nebula')('https://ipfs.nebula.land')
+const nebula = require('../../../nebula')
 
 const resolve = {
   rootCid: async (app) => {

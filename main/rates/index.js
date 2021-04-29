@@ -1,52 +1,78 @@
 const fetch = require('node-fetch')
+const BigNumber = require('bignumber.js')
 
-// Get rates for symbols and store them
+const noData = {
+  usd: BigNumber(0)
+}
 
+// symbol -> coinId
+let allCoins = {}
+const watched = ['eth', 'xdai']
 
-const rates = await _rates.json()
-Object.keys(rates).forEach(token => {
-  if (found[token]) {
-    found[token].usdRate = rates[token].usd || 0
-    const usdRateString = rates[token].usd.toString()
-    found[token].usdDisplayRate = '$' + (parseInt(usdRateString.split('.')[0])).toLocaleString() + '.' + padRight(usdRateString.split('.')[1], 2)
-    found[token].usdValue = Math.floor(found[token].floatBalance * found[token].usdRate * 100) / 100
-    const usdValueString = found[token].usdValue.toString()
-    found[token].usdDisplayValue = '$' + (parseInt(usdValueString.split('.')[0])).toLocaleString() + '.' + padRight(usdValueString.split('.')[1], 2)
+function createRate (quote) {
+  return {
+    usd: BigNumber(quote.usd)
   }
-})
-
-const watched = []
-const add = (symbol) => {
-  const id = symbolMapsymbolMap[symbol]
-  if (coinList[id]) watched.push(id)
 }
 
-const symbolMap = {}
-const coinList = {}
-const symbolToId = (symbol) => symbolMap[symbol]
-const idToSymbol = (id) => coinList[id] ? coinList[id].symbol : undefined
-const getCoins = () => {
-  // Fetch this once at the beginning 
-  const _coins = await fetch(`https://api.coingecko.com/api/v3/coins/list`)
-  const coins = await _coins.json()
-  coins.forEach(coin => {
-    coinList[coin.id] = coin
-    symbolMap[coin.symbol] = coin.id
-  })
+async function loadCoins () {
+  try {
+    const coins = await (await fetch('https://api.coingecko.com/api/v3/coins/list')).json()
+
+    allCoins = coins.reduce((coinMapping, coin) => {
+      coinMapping[coin.symbol.toLowerCase()] = coin.id
+      return coinMapping
+    }, {})
+  } catch (e) {
+    console.error('unable to load coin data', e)
+  }
 }
 
+async function fetchRates (ids) {
+  // have to batch the ids to avoid making the URL too large
+  const batches = Object.keys([...Array(Math.ceil(ids.length / 500))])
+    .map(batch => ids.slice((batch * 500), (batch * 500) + 500))
 
-setInterval(() => {
-  const lookup = watched.map(coin => coin.id)
-  // const _rates = await fetch(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${Object.keys(found).join(',')}&vs_currencies=usd`)
-  // https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
+  const responses = await Promise.all(batches.map(batch => {
+    const batchIds = batch.join(',')
+    return fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${batchIds}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`)
+      .then(response => response.json())
+  }))
 
-  // const _rates = await fetch(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${Object.keys(found).join(',')}&vs_currencies=usd`)
+  return Object.assign({}, ...responses)
+}
 
-  const _rates = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${lookup.join(',')}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`)
-  const rates = await _rates.json()
+async function loadRates () {
+  const lookup = watched.reduce((mapping, symbol) => {
+    mapping[allCoins[symbol]] = symbol
+    return mapping
+  }, {})
 
+  try {
+    const quotes = await fetchRates(Object.keys(lookup))
 
+    return Object.entries(quotes).reduce((rates, [id, quote]) => {
+      const symbol = lookup[id]
+      rates[symbol] = createRate(quote)
 
+      return rates
+    }, {})
+  } catch (e) {
+    console.error('unable to load latest rates', e)
+  }
+}
 
-}, 15 * 1000)
+const rates = {
+  loadCoins,
+  loadRates,
+  add: function (symbols) {
+    const lowerCaseSymbols = symbols.map(s => s.toLowerCase())
+
+    // add symbols to watch and return the latest rates
+    const newSymbols = lowerCaseSymbols.filter(s => !watched.includes(s))
+
+    watched.push(...newSymbols)
+  }
+}
+
+module.exports = rates

@@ -4,12 +4,13 @@ const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
 const fetch = require('node-fetch')
+const BigNumber = require('bignumber.js')
 
 // const bip39 = require('bip39')
 
 const crypt = require('../crypt')
 const store = require('../store')
-const tokens = require('../tokens')
+const dataScanner = require('../external-data')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')
@@ -24,6 +25,23 @@ const hexToInt = v => parseInt(v, 'hex')
 const weiHexToGweiInt = v => hexToInt(v) / 1e9
 const weiIntToEthInt = v => v / 1e18
 const gweiToWeiHex = v => intToHex(gweiToWei(v))
+
+// TODO: move this into its own module
+
+const chainCoins = {
+  1: {
+    name: 'Ether',
+    logoURI: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880',
+    symbol: 'eth',
+    decimals: 18
+  },
+  100: {
+    name: 'xDai',
+    logoURI: 'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492',
+    symbol: 'xdai',
+    decimals: 18
+  }
+}
 
 const notify = (title, body, action) => {
   const notification = { title, body }
@@ -53,10 +71,10 @@ class Accounts extends EventEmitter {
     //   })
     // })
     windows.events.on('tray:show', () => {
-      this.tokenScan(true)
+      this.balanceScan()
     })
     windows.events.on('tray:hide', () => {
-      this.stopTokenScan()
+      this.stopBalanceScan()
     })
   }
 
@@ -318,6 +336,7 @@ class Accounts extends EventEmitter {
     })
     cb(null, signerSummary)
   }
+
   // Set Current Account
   setSigner (id, cb) {
     this._current = id
@@ -389,7 +408,7 @@ class Accounts extends EventEmitter {
   }
 
   close () {
-    tokens.kill()
+    dataScanner.kill()
     // usbDetect.stopMonitoring()
   }
 
@@ -562,17 +581,50 @@ class Accounts extends EventEmitter {
     }
   }
 
-  tokenScan (knownOnly) {
+  balanceScan () {
     const address = this.getSelectedAddress()
     if (!address) return
-    const addressTokens = store('main.accounts', address, 'tokens')
-    const omit = addressTokens && addressTokens.omit
-    const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})
-    tokens.scan(address, omit, known)
+
+    this.coinScan(address)
+    this.coinScanner = setInterval(() => this.coinScan(address), 1000 * 15)
+
+    this.tokenScan(address, true)
   }
 
-  stopTokenScan () {
-    tokens.stop()
+  coinScan (address) {
+    proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_chainId' }, res => {
+      const chainId = parseInt(res.result)
+      const nativeCoin = chainCoins[chainId]
+
+      if (nativeCoin) {
+        const symbol = nativeCoin.symbol.toLowerCase()
+
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getBalance', params: [address, 'latest'] }, res => {
+          const balance = BigNumber(res.result).shiftedBy(-nativeCoin.decimals)
+
+          store.setBalance(address, symbol, {
+            ...nativeCoin, balance: balance.toString()
+          })
+        })
+      }
+    })
+  }
+
+  tokenScan (address, knownOnly) {
+    // const addressTokens = store('main.accounts', address, 'tokens')
+    // const omit = addressTokens && addressTokens.omit
+    // const known = addressTokens && knownOnly && Object.keys(addressTokens.known || {})
+
+    dataScanner.scan(address)
+  }
+
+  stopBalanceScan () {
+    if (this.coinScanner) {
+      clearInterval(this.coinScanner)
+      this.coinScanner = null
+    }
+
+    dataScanner.stop()
   }
 
   setGasLimit (limit, handlerId, cb) {
