@@ -1,23 +1,30 @@
 const scanTokens = require('./scan')
 const rates = require('../rates')
+const log = require('electron-log')
 
-function log (msg, level = 'info') {
-  process.send({ type: 'log', level, msg })
-}
+log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
+
+let tokenScanner, ratesScanner, coinScanner, heartbeat
 
 function tokenScan (address) {
   scanTokens(address)
     .then(found => process.send({ type: 'tokens', found }))
-    .catch(err => log(err, 'error'))
+    .catch(log.error)
 }
 
 function ratesScan () {
   rates.loadRates()
     .then(loadedRates => process.send({ type: 'rates', rates: loadedRates }))
-    .catch(err => log(err, 'error'))
+    .catch(log.error)
 }
 
-let tokenScanner, ratesScanner, coinScanner
+function resetHeartbeat () {
+  clearTimeout(heartbeat)
+
+  log.debug('received heartbeat')
+
+  heartbeat = setTimeout(() => process.kill(process.pid, 'SIGHUP'), 60 * 1000)
+}
 
 const messageHandler = {
   start: function (address) {
@@ -44,4 +51,9 @@ const messageHandler = {
   }
 }
 
-process.on('message', message => messageHandler[message.command](...message.args))
+process.on('message', message => {
+  // resetHeartbeat()
+
+  const args = message.args || []
+  messageHandler[message.command](...args)
+})
