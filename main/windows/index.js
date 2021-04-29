@@ -200,7 +200,7 @@ const api = {
     showing ? api.hideTray() : api.showTray()
   },
   hideTray: (autohide) => {
-    api.hideDash()
+    store.toggleDash('hide')
     if (autohide) {
       this.recentAutohide = true
       clearTimeout(this.recentAutohide)
@@ -395,7 +395,7 @@ const api = {
     // windows.flow.setAlwaysOnTop(true)
     // windows.dash.on('blur', () => api.hideDash())
   },
-  showDash: (type) => {
+  showDash: () => {
     // clearTimeout(mouseTimeout)
     // hideShow.current = 'showing'
     // if (hideShow.running) {
@@ -404,8 +404,8 @@ const api = {
     // } else {
     // if (!windows.tray) return api.tray()
     // windows.flow.setPosition(0, 0)
-    console.log('send type to dash window', type)
-    store.setDashType(type)
+    // console.log('send type to dash window', type)
+    //store.setDashType(type)
     setTimeout(() => {
       windows.dash.setAlwaysOnTop(true)
       // hideShow.running = 'show'
@@ -420,17 +420,18 @@ const api = {
       windows.dash.show()
       windows.dash.focus()
       windows.dash.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
+      if (dev) windows.dash.openDevTools()
     }, 10)
   },
   hideDash: () => {
-    windows.dash.hide()
-    store.setDashType()
+    if (windows.dash && windows.dash.isVisible()) windows.dash.hide()
+    // store.setDashType()
   },
-  toggleDash: (type) => {
+  toggleDash: () => {
     if (windows.dash.isVisible()) {
       api.hideDash()
     } else {
-      api.showDash(type)
+      api.showDash()
     }
   },
   openView: (ens, session) => {
@@ -497,9 +498,19 @@ ipcMain.on('dash:contextmenu', (e, x, y) => { if (dev) windows.dash.inspectEleme
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
+
+store.observer(_ => {
+  if (store('dash.showing')) {
+    api.showDash()
+  } else {
+    api.hideDash()
+  }
+})
+
+
 // store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
-store.observer(_ => api.broadcast('main:action', 'syncDash', store('dash')))
-store.observer(_ => api.broadcast('main:action', 'syncPanel', store('panel')))
+// store.observer(_ => api.broadcast('main:action', 'syncDash', store('dash')))
+// store.observer(_ => api.broadcast('main:action', 'syncPanel', store('panel')))
 store.api.feed((state, actions) => {
   actions.forEach(action => {
     action.updates.forEach(update => {

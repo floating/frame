@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
+import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 class AddPhrase extends React.Component {
   constructor (...args) {
@@ -10,7 +10,7 @@ class AddPhrase extends React.Component {
     this.state = {
       index: 0,
       adding: false,
-      address: '',
+      phrase: '',
       password: '',
       status: '',
       error: false
@@ -54,7 +54,7 @@ class AddPhrase extends React.Component {
 
   create () {
     this.setState({ index: ++this.state.index })
-    link.rpc('createFromAddress', this.state.address, (err, signer) => {
+    link.rpc('createFromPhrase', this.state.phrase, this.state.password, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
@@ -67,7 +67,7 @@ class AddPhrase extends React.Component {
   }
 
   restart () {
-    this.setState({ index: 0, adding: false, address: '', password: '', success: false })
+    this.setState({ index: 0, adding: false, phrase: '', password: '', success: false })
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)
@@ -97,35 +97,44 @@ class AddPhrase extends React.Component {
   }
 
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
-        <div className='addAccountItemBar addAccountItemMock' />
+        <div className='addAccountItemBar addAccountItemHot' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div className='addAccountItemIconType addAccountItemIconMock' style={{ marginTop: '2px' }}>{svg.mask(24)}</div>
-              <div className='addAccountItemIconHex addAccountItemIconHexMock' />
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
+                <div className='addAccountItemIconHex addAccountItemIconHexHot' />
+              </div>
+              <div className='addAccountItemTopTitle'>Phrase</div>
             </div>
-            <div className='addAccountItemTopTitle'>Address</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
           </div>
-          <div className='addAccountItemSummary'>An address account represents an address but cannot sign for it</div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {
                 this.adding()
+                setTimeout(() => this.store.notify('hotAccountWarning'), 800)
               }}
             >
-              Add Address Account
+              Add Phrase Account
             </div>
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>input address</div>
+                  <div className='addAccountItemOptionTitle'>seed phrase</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
+                    <textarea tabIndex='-1' value={this.state.phrase} ref={this.forms[0]} onChange={e => this.onChange('phrase', e)} onFocus={e => this.onFocus('phrase', e)} onBlur={e => this.onBlur('phrase', e)} onKeyPress={e => this.keyPress(e)} />
+                  </div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
+                </div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>create password</div>
+                  <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
+                    <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
+                    <input type='password' tabIndex='-1' value={this.state.password} ref={this.forms[1]} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
                 </div>
@@ -136,7 +145,7 @@ class AddPhrase extends React.Component {
               </div>
             </div>
           </div>
-          <div className='addAccountItemSummary' />
+          <div className='addAccountItemFooter' />
         </div>
       </div>
     )

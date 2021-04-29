@@ -365,7 +365,10 @@ module.exports = {
   setDashType: (u, type) => {
     // console.log('set dash type', type)
     u('dash.type', () => type)
-  }
+  },
+  toggleDash: (u, force) => {
+    u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
+  },
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
   // }
