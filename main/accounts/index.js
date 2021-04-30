@@ -547,8 +547,7 @@ class Accounts extends EventEmitter {
 
   remove (address = '') {
     address = address.toLowerCase()
-    // if current account unset it first... 
-    // windows.broadcast('main:action', 'unsetSigner')
+    windows.broadcast('main:action', 'unsetSigner')
     if (this.accounts[address]) this.accounts[address].close()
     store.removeAccount(address)
     delete this.accounts[address]

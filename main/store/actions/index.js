@@ -45,16 +45,21 @@ module.exports = {
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
+  setPermission: (u, address, permission) => {
+    u('main.permissions', address, (permissions = {}) => {
+      permissions[permission.handlerId] = permission
+      return permissions
+    })
+  },
   clearPermissions: (u, address) => {
-    u('main.accounts', address, address => {
-      address.permissions = {}
-      return address
+    u('main.permissions', address, () => {
+      return {}
     })
   },
   toggleAccess: (u, address, handlerId) => {
-    u('main.accounts', address, address => {
-      address.permissions[handlerId].provider = !address.permissions[handlerId].provider
-      return address
+    u('main.permissions', address, permissions => {
+      permissions[handlerId].provider = !permissions[handlerId].provider
+      return permissions
     })
   },
   setAccountCloseLock: (u, value) => {

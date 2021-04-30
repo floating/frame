@@ -83,7 +83,7 @@ module.exports = server => {
   provider.on('data:address', (address, payload) => { // Make sure the subscription has access based on current account
     const subscription = subs[payload.params.subscription]
     if (subscription) {
-      const permissions = store('main.accounts', address, 'permissions') || {}
+      const permissions = store('main.permissions', address) || {}
       const perms = Object.keys(permissions).map(id => permissions[id])
       const allowed = perms.map(p => p.origin).indexOf(subscription.origin) > -1
       if (!allowed) payload.params.result = []

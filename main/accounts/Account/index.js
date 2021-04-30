@@ -18,7 +18,7 @@ const capitalize = (s) => {
 }
 
 class Account {
-  constructor ({ lastSignerType, permissions, tokens, name, created, address, smart, options = {} }, accounts) {
+  constructor ({ lastSignerType, tokens, name, created, address, smart, options = {} }, accounts) {
     address = address ? address.toLowerCase() : '0x'
     this.accounts = accounts // Parent Accounts Module
     this.id = address // Account ID
@@ -32,8 +32,7 @@ class Account {
     if (this.smart && this.smart.actor && this.smart.actor.address) {
       this.smart.actor = this.smart.actor.address.toLowerCase()
     }
-    this.permissions = permissions
-    this.tokens = tokens
+    this.tokens = tokens || {}
     this.requests = {}
     this.signer = '' // Matched Signer ID
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
@@ -81,12 +80,10 @@ class Account {
     return foundSigner
   }
 
-  setAccess (req, access) { // Permissions are now handle by the account and need to be included in `update`
+  setAccess (req, access) { // Permissions are not handle by the account
     if (req.address.toLowerCase() === this.address)  {
-      this.permissions = this.permissions || {}
-      this.permissions[req.handlerId] = { handlerId: req.handlerId, origin: req.origin, provider: access }
+      store.setPermission(this.address, { handlerId: req.handlerId, origin: req.origin, provider: access })
     }
-    this.update()
     if (this.requests[req.handlerId]) {
       if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()
       delete this.requests[req.handlerId]
@@ -208,7 +205,7 @@ class Account {
       signer: this.signer,
       smart: this.smart,
       requests: this.requests,
-      permissions: this.permissions,
+      // permissions: this.permissions,
       tokens: this.tokens,
       created: this.created
     }))

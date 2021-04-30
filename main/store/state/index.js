@@ -149,7 +149,8 @@ const initial = {
       liveAccountLimit: main('ledger.liveAccountLimit', 5)
     },
     accounts: main('accounts', {}),
-    addresses: main('addresses', {}), // New persisted address permissions
+    addresses: main('addresses', {}), // Should be removed after 0.5 release
+    permissions: main('permissions', {}),
     signers: {},
     savedSigners: {},
     updater: {
@@ -507,12 +508,19 @@ if (initial.main._version < 6) {
   accounts = JSON.parse(JSON.stringify(accounts))
   addresses = JSON.parse(JSON.stringify(addresses))
   Object.keys(addresses).forEach(address => {
-    const hasPermissions = addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
-    const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
-    if (!hasPermissions && !hasTokens) return log.info(`Address ${address} did not have any permissions or tokens`)
+    // Normalize address case
+    addresses[address.toLowerCase()] = addresses[address]
     address = address.toLowerCase()
+
+    const hasPermissions = addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
+    // const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
+    if (!hasPermissions) return log.info(`Address ${address} did not have any permissions or tokens`)
+
+    // Copy Account permissions
+    initial.main.permissions[address] = addresses[address] && addresses[address].permissions ? Object.assign({}, addresses[address].permissions) : {}
+
     const matchingAccounts = []
-    Object.keys(accounts).forEach(id => {
+    Object.keys(accounts).sort((a, b) => accounts[a].created > accounts[b].created ? 1 : -1).forEach(id => {
       if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
         matchingAccounts.push(id)
       }
@@ -523,9 +531,8 @@ if (initial.main._version < 6) {
       })
       newAccounts[address] = Object.assign({}, accounts[primaryAccount[0]])
       nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
-      const count = nameCount[newAccounts[address].name]
-      if (count > 0) newAccounts[address].name = newAccounts[address].name + ' ' + (count + 1)
       nameCount[newAccounts[address].name]++
+      if (nameCount[newAccounts[address].name] > 1) newAccounts[address].name = newAccounts[address].name + ' ' + nameCount[newAccounts[address].name]
       newAccounts[address].address = address
       newAccounts[address].id = address
       newAccounts[address].lastSignerType = newAccounts[address].type
@@ -534,10 +541,14 @@ if (initial.main._version < 6) {
       delete newAccounts[address].signer
       delete newAccounts[address].index
       delete newAccounts[address].addresses
-      newAccounts[address] = Object.assign({}, newAccounts[address], { tokens: {}, permissions: {} }, addresses[address])
+      newAccounts[address].tokens = addresses[address] && addresses[address].tokens ? addresses[address].tokens : {}
+      newAccounts[address] = Object.assign({}, newAccounts[address])
     }
 
   })
+  initial.main.backup = initial.main.backup || {}
+  initial.main.dataBackup.accounts = Object.assign({}, initial.main.accounts)
+  initial.main.dataBackup.addresses = Object.assign({}, initial.main.addresses)
   initial.main.accounts = newAccounts
   delete initial.main.addresses
 
