@@ -220,11 +220,11 @@ const initial = {
           poa: 'https://dai.poa.network'
         },
         137: {
-          matic: 'https://rpc-mainnet.maticvigil.com'
+          matic: ['wss://rpc-mainnet.maticvigil.com/ws/v1/852d3148d4d2880682d0c12ba514e7106406316d', 'https://rpc-mainnet.maticvigil.com/v1/852d3148d4d2880682d0c12ba514e7106406316d', 'https://rpc-mainnet.maticvigil.com']
         }
       }
     },
-    networks: main('networks', {
+    networks: {
       ethereum: {
         1: {
           id: 1,
@@ -344,9 +344,26 @@ const initial = {
             primary: { on: true, current: 'poa', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           }
+        },
+        137: {
+          id: 137,
+          type: 'ethereum',
+          symbol: 'MATIC',
+          name: 'Polygon',
+          explorer: 'https://explorer.matic.network',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          }
         }
       }
-    }),
+    },
     ipfs: {},
     openDapps: [],
     dapp: {

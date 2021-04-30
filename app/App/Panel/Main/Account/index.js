@@ -566,7 +566,7 @@ class Account extends React.Component {
   renderSignerIndicator () {
     let accountIndicatorClass = 'accountIndicator'
     if (this.props.signer) {
-      const signer = this.store('main.signers', this.props.signer)
+      const signer = this.store('main.signers', this.props.signer) || {}
       if (signer.status === 'locked') {
         accountIndicatorClass += ' accountIndicatorLocked'
       } else if (signer.status === 'ok') {

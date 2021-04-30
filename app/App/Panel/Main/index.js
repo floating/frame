@@ -64,7 +64,10 @@ class Main extends React.Component {
                 <div className='panelHeaderUpdate' onMouseDown={() => {
                   link.send('tray:action', 'toggleDash')
                 }}>
-                  <div className='panelHeaderUpdateToggle' style={this.store('dash.showing') ? { transform: 'translateX(12px)' } : { transform: 'translateX(0px)' }} />
+                  <div className='panelHeaderUpdateToggle' style={this.store('dash.showing') ? { transform: 'translateX(10px)' } : { transform: 'translateX(0px)' }}>
+                    {svg.diff(14)}
+                    {svg.people(22)}
+                  </div>
                   <div className='panelHeaderUpdateOn' />
                 </div>
               </div>

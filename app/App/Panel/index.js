@@ -95,7 +95,7 @@ class Panel extends React.Component {
           <div className='panelMenuItem panelMenuItemSettings' onMouseDown={() => this.store.setPanelView('settings')}>
             {svg.octicon('settings', { height: 18 })}
           </div>
-          {type === 'ethereum' && id === '1' ? (
+          {type === 'ethereum' ? (
             <div className='panelMenuData' style={{ opacity: this.store('view.addAccount') ? 0 : 1 }}>
               <div className='panelMenuDataItem'>
                 {gasPrice || '---'}
