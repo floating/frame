@@ -547,8 +547,8 @@ if (initial.main._version < 6) {
 
   })
   initial.main.backup = initial.main.backup || {}
-  initial.main.dataBackup.accounts = Object.assign({}, initial.main.accounts)
-  initial.main.dataBackup.addresses = Object.assign({}, initial.main.addresses)
+  initial.main.backup.accounts = Object.assign({}, initial.main.accounts)
+  initial.main.backup.addresses = Object.assign({}, initial.main.addresses)
   initial.main.accounts = newAccounts
   delete initial.main.addresses
 
