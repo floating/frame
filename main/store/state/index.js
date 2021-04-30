@@ -545,4 +545,8 @@ if (initial.main._version < 6) {
   initial.main._version = 6
 }
 
+// Object.keys(initial.main.accounts).forEach(k => {
+//   if (!initial.main.accounts[k].permissions) delete initial.main.accounts[k]
+// })
+
 module.exports = () => initial

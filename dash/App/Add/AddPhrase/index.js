@@ -58,10 +58,10 @@ class AddPhrase extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        this.setState({ status: 'Successful', error: false })
-        setTimeout(() => {
-          this.store.toggleAddAccount()
-        }, 2000)
+        this.setState({ status: 'Successful', error: false, createdSignerId: signer.id })
+        // setTimeout(() => {
+        //   this.store.toggleAddAccount()
+        // }, 2000)
       }
     })
   }
@@ -98,6 +98,13 @@ class AddPhrase extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+
+    let signer
+
+    if (this.state.createdSignerId) {
+      signer = this.store('main.signers', this.state.createdSignerId)
+    }
+
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemHot' />
@@ -139,8 +146,37 @@ class AddPhrase extends React.Component {
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                  {signer ? (
+                      <>
+                        <div>{`new signer name is ${signer.name}`} </div>
+                        <div>{`rename and pick accounts you want to add`} </div>
+                        {signer.addresses.map(address => {
+                          let addressClass = 'signerAddress'
+                          const account = this.store('main.accounts', address.toLowerCase())
+                          if (account) addressClass += ' signerAddressAdded'
+                          return (
+                            <div className={addressClass} onMouseDown={() => {
+                              if (this.store('main.accounts', address.toLowerCase())) {
+                                link.rpc('removeAccount', address, {}, () => {
+                                  // console.log('Removed account ', address)
+                                })
+                              } else {
+                                link.rpc('createAccount', address, { type: 'Seed'}, () => {
+                                  // console.log('Added account ', address)
+                                })
+                              }
+                            }}>
+                              {address.substr(0, 6) + '...' + address.substr(0, 5)}
+                            </div>
+                          )
+                        })}
+                      </>
+                    ) : (
+                      <>
+                        <div className='phaseItemOptionTitle'>{this.state.status}</div>
+                        {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                      </>
+                  )} 
                 </div>
               </div>
             </div>

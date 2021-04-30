@@ -18,14 +18,15 @@ const capitalize = (s) => {
 }
 
 class Account {
-  constructor ({ id, lastSignerType, permissions, tokens, name, created, address, smart, options = {} }, accounts) {
+  constructor ({ lastSignerType, permissions, tokens, name, created, address, smart, options = {} }, accounts) {
+    address = address ? address.toLowerCase() : '0x'
     this.accounts = accounts // Parent Accounts Module
-    this.id = id // Account ID
+    this.id = address // Account ID
     this.status = 'ok' // Current Status
     this.name = name || capitalize(options.type) + ' Account'
     this.lastSignerType = lastSignerType || options.type
-    this.created = created
-    this.address = address ? address.toLowerCase() : '0x'
+    this.created = created 
+    this.address = address
     this.smart = smart
     // Update actor to just store actor's address
     if (this.smart && this.smart.actor && this.smart.actor.address) {
@@ -55,15 +56,16 @@ class Account {
 
       this.update()
     })
-    if (this.created === -1 || !this.created) {
-      log.info('Account has no creation height, fetching')
-      this.getBlockHeight((err, height) => {
-        if (err) return log.error('getBlockHeight Error', err)
+
+    this.accounts.getMainnetBlockHeight((err, height) => {
+      if (err) return log.error('getBlockHeight Error', err)
+      if (this.created === -1 || !this.created || this.created > height) {
+        log.info('Account has no or invalid creation height, fetching')
         log.info('Account creation being set to current height: ', height)
         this.created = height
         this.update()
-      })
-    }
+      }
+    })
   }
 
   findSigner (address) {
@@ -102,13 +104,13 @@ class Account {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error: error.message })
   }
 
-  getBlockHeight (cb) {
-    if (!proxyProvider.ready) return setTimeout(() => this.getBlockHeight(cb), 1000)
-    proxyProvider.emit('send', { id: '1', jsonrpc: '2.0', method: 'eth_blockNumber' }, (res) => {
-      if (res.error || !res.result) return cb(new Error('Unable to get current block height: ' + res.error.message))
-      cb(null, res.result)
-    })
-  }
+  // getBlockHeight (cb) {
+  //   if (!proxyProvider.ready) return setTimeout(() => this.getBlockHeight(cb), 1000)
+  //   proxyProvider.emit('send', { id: '1', jsonrpc: '2.0', method: 'eth_blockNumber' }, (res) => {
+  //     if (res.error || !res.result) return cb(new Error('Unable to get current block height: ' + res.error.message))
+  //     cb(null, res.result)
+  //   })
+  // }
 
   addRequest (req, res) {
     const add = async r => {

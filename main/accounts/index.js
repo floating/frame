@@ -5,6 +5,7 @@ const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
 const fetch = require('node-fetch')
 const BigNumber = require('bignumber.js')
+const provider = require('eth-provider')
 
 // const bip39 = require('bip39')
 
@@ -50,6 +51,9 @@ const notify = (title, body, action) => {
   setTimeout(() => note.show(), 1000)
 }
 
+// Until omniconnect, mainnet connection 
+const mainnetProvider =  provider('wss://mainnet.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b')
+
 const FEE_MAX = 2 * 1e18
 
 class Accounts extends EventEmitter {
@@ -61,15 +65,6 @@ class Accounts extends EventEmitter {
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
     })
-    // TODO: Replace
-    // Create accounts from new signers
-    // store.observer(() => {
-    //   const signers = store('main.signers')
-    //   Object.keys(signers).forEach(id => {
-    //     const type = store('main.signers', id, 'type')
-    //     if (!this.accounts[id]) this.add(signers[id].addresses, { type })
-    //   })
-    // })
     windows.events.on('tray:show', () => {
       this.balanceScan()
     })
@@ -123,14 +118,31 @@ class Accounts extends EventEmitter {
     cb(null, this.accounts[account.id].summary())
   }
 
-  add (addresses, options = {}, cb = () => {}) {
-    if (addresses.length === 0) return cb(new Error('No addresses, will not add account'))
-    const network = store('main.currentNetwork.id')
-    const id = this.fingerprint(network, addresses)
-    const account = store('main.accounts', id)
-    if (account && account.network === network) return cb(null, account) // Account already exists...
+  async add (address = '', options = {}, cb = () => {}) {
+    if (!address) return cb(new Error('No address, will not add account'))
+    address = address.toLowerCase()
+    // const network = store('main.currentNetwork.id')
+    // const id = this.fingerprint(network, addresses)
+    const account = store('main.accounts', address)
+    if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
-    this.accounts[id] = new Account({ id, addresses, index: 0, network, created: -1, options }, this)
+    let blockNumber = -1
+    try {
+      blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
+    } catch (e) {
+      log.err(e)
+    }
+    this.accounts[address] = new Account({ address, created: blockNumber, options }, this)
+  }
+
+  async getMainnetBlockHeight (cb) {
+    let blockNumber = -1
+    try {
+      blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
+    } catch (e) {
+      log.err(e)
+    }
+    return blockNumber
   }
 
   rename (id, name) { this.accounts[id].rename(name) }
@@ -533,13 +545,13 @@ class Accounts extends EventEmitter {
     }
   }
 
-  remove (id) {
-    windows.broadcast('main:action', 'unsetSigner')
-    setTimeout(() => {
-      if (this.accounts[id]) this.accounts[id].close()
-      store.removeAccount(id)
-      delete this.accounts[id]
-    }, 1000)
+  remove (address = '') {
+    address = address.toLowerCase()
+    // if current account unset it first... 
+    // windows.broadcast('main:action', 'unsetSigner')
+    if (this.accounts[address]) this.accounts[address].close()
+    store.removeAccount(address)
+    delete this.accounts[address]
   }
 
   setGasPrice (price, handlerId, cb) {

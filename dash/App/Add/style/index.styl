@@ -366,10 +366,10 @@
     font-size 11px
     text-transform uppercase
     letter-spacing 1px
-    padding 8px 20px 0px 20px
+    // padding 8px 20px 0px 20px
     text-align justify
     text-align-last center-justify
-    min-height 22px
+    min-height 40px
     box-sizing border-box
     position absolute
     bottom 8px
@@ -414,41 +414,46 @@
       text-align center
 
   .addAccountItemOption
-    width calc(100% - 20px)
-    height 40px
+    position absolute 
+    top 120px
+    left 0
+    right 0
+    bottom 60px
     line-height 22px
     font-size 14px
     text-transform uppercase
-    letter-spacing 3px
-    display flex
-    align-items center
-    justify-content center
-    margin-top 12px
-    border-radius 4px
+    // background red
+    // letter-spacing 3px
+    // display flex
+    // align-items center
+    // justify-content center
+    // margin-top 12px
+    // border-radius 8px
     transition var(--standardSlow)
-    position relative
+    // position relative
     overflow hidden
     font-weight 400
+    // background blue
 
-  .addAccountItemOptionIntro
-    position absolute
-    top 0
-    right 0
-    bottom 0
-    left 0
-    display flex
-    align-items center
-    justify-content center
-    transition var(--standardSlow)
-    flex-direction column
-    background var(--ghostA)
+  // .addAccountItemOptionIntro
+  //   position absolute
+  //   top 0
+  //   right 0
+  //   bottom 0
+  //   left 0
+  //   display flex
+  //   align-items center
+  //   justify-content center
+  //   transition var(--standardSlow)
+  //   flex-direction column
+  //   background var(--ghostA)
 
-  .addAccountItemOptionIntro:hover
-    background rgba(5, 25, 35, 0.3)
+  // .addAccountItemOptionIntro:hover
+  //   background rgba(5, 25, 35, 0.3)
 
   .addAccountItemOptionSetup
     position absolute
-    top 40px
+    top 0px
     right 0
     bottom 0
     left 0
@@ -466,22 +471,31 @@
       .addAccountItemOptionSetupFrame
         display flex
         align-items center
-        justify-content center
+        // justify-content center
         flex-direction column
         transition var(--standardSlow)
         width 10%
+        overflow-y scroll
+        // background red
+
+                // .addressList
+        // .signerAddress
+        //   color blue
+
+        .signerAddressAdded
+          color var(--good)
 
         .addAccountItemOptionTitle
-          display flex
-          justify-content center
-          align-items center
+          // display flex
+          // justify-content center
+          // align-items center
           text-align center
           font-size 14px
           // height 50px
-          width 100%
-          padding 20px 40px
+         //  width 100%
+          // padding 20px 40px
           font-weight 500
-          letter-spacing 1px
+          //letter-spacing 1px
           box-sizing border-box
 
   .addAccountItemOptionSubmit
@@ -560,14 +574,18 @@
 
   .addAccountItemOptionInputPhrase
     width calc(100% - 20px)
-    border-radius 6px
-    height 80px
+    border-radius 8px
+    height 142px
     padding 0px 0px
-    margin 0px 10px 20px 10px
+    margin 10px 10px 20px 10px
     position relative
     overflow hidden
     background var(--ghostA)
     transform translate3d(0, 0, 0)
+    // display flex
+    // justify-content center
+    // align-items center
+    // text-align center
 
     .addAccountItemOptionSubtitle
       position absolute
@@ -629,7 +647,7 @@
       resize none
 
     textarea::selection
-      background rgba(5, 25, 35, 1)
+      background var(--ghostX04)
 
   .addAccountItemOptionInputPassword
     input
@@ -658,7 +676,7 @@
 
 .addAccountItemAdding
   .addAccountItemOption
-    height 225px
+    // height 225px
   .addAccountItemOptionIntro
     opacity 0
     pointer-events none

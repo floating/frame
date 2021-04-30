@@ -53,6 +53,7 @@ class Main extends React.Component {
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')
+    const sortedAccounts = Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b))
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
@@ -68,7 +69,7 @@ class Main extends React.Component {
                 </div>
               </div>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
-              {Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b)).map((id, i) => {
+              {sortedAccounts.map((id, i) => {
                 return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
               })}
               {Object.keys(accounts).length === 0 ? (

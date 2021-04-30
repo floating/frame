@@ -70,11 +70,14 @@ module.exports = {
       return dontRemind
     })
   },
+  setBlockNumber: (u, network, id, blockNumber) => {
+    u('main.networks', network, id, 'blockNumber', () => blockNumber)
+  },
   updateAccount: (u, updatedAccount, add) => {
     u('main.accounts', updatedAccount.id, account => {
-      if (account) return updatedAccount // Account exists
-      if (add) return updatedAccount // Account is new and should be added
-      return account
+      // if (account) return updatedAccount // Account exists
+      // if (add) return updatedAccount // Account is new and should be added
+      return updatedAccount
     })
   },
   removeAccount: (u, id) => {

@@ -101,9 +101,14 @@ const rpc = {
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
   },
-  createFromAddress (address, cb) {
+  createAccount (address, options, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
-    accounts.add([address], { type: 'Address' })
+    accounts.add(address, options)
+    cb()
+  },
+  removeAccount (address, options, cb) {
+    if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
+    accounts.remove(address)
     cb()
   },
   createFromPhrase (phrase, password, cb) {
