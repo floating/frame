@@ -479,7 +479,7 @@ ipcMain.on('tray:ready', () => {
 })
 
 ipcMain.on('tray:mouseout', () => {
-  if (glide) {
+  if (glide && !store('dash.showing')) {
     glide = false
     api.hideTray()
   }
