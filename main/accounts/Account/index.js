@@ -6,6 +6,8 @@ const abi = require('../../abi')
 // Provider Proxy
 const proxyProvider = require('../../provider/proxy')
 
+const nebula = require('../../nebula')
+
 const signers = require('../../signers')
 const windows = require('../../windows')
 const store = require('../../store')
@@ -18,7 +20,7 @@ const capitalize = (s) => {
 }
 
 class Account {
-  constructor ({ lastSignerType, tokens, name, created, address, smart, options = {} }, accounts) {
+  constructor ({ lastSignerType, tokens, name, ensName, created, address, smart, options = {} }, accounts) {
     address = address ? address.toLowerCase() : '0x'
     this.accounts = accounts // Parent Accounts Module
     this.id = address // Account ID
@@ -28,6 +30,7 @@ class Account {
     this.created = created 
     this.address = address
     this.smart = smart
+    this.ensName = ensName
     // Update actor to just store actor's address
     if (this.smart && this.smart.actor && this.smart.actor.address) {
       this.smart.actor = this.smart.actor.address.toLowerCase()
@@ -65,6 +68,19 @@ class Account {
         this.update()
       }
     })
+
+    this.lookupAddress() // We need to recheck this on every network change... 
+  }
+
+  async lookupAddress () {
+    try {
+      this.ensName = await nebula.ens.lookupAddress(this.address)
+      this.update()
+    } catch (e) {
+      log.error('lookupAddress Error:', e)
+      this.ensName = ''
+      this.update()
+    }
   }
 
   findSigner (address) {
@@ -205,6 +221,7 @@ class Account {
       signer: this.signer,
       smart: this.smart,
       requests: this.requests,
+      ensName: this.ensName,
       // permissions: this.permissions,
       tokens: this.tokens,
       created: this.created

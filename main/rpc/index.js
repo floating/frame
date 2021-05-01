@@ -26,19 +26,20 @@ const rpc = {
   // Review
   // getSigners: signers.getSigners,
   setSigner: (id, cb) => {
+    store.toggleDash('hide')
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
     setTimeout(() => {
       accounts.balanceScan()
     }, 320)
   },
-  setSignerIndex: (index, cb) => {
-    accounts.setSignerIndex(index, cb)
-    provider.accountsChanged(accounts.getSelectedAddresses())
-    setTimeout(() => {
-      accounts.balanceScan()
-    }, 320)
-  },
+  // setSignerIndex: (index, cb) => {
+  //   accounts.setSignerIndex(index, cb)
+  //   provider.accountsChanged(accounts.getSelectedAddresses())
+  //   setTimeout(() => {
+  //     accounts.balanceScan()
+  //   }, 320)
+  // },
   unsetSigner: (id, cb) => {
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())

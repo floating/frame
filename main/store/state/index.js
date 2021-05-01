@@ -31,7 +31,8 @@ const initial = {
         'inventory',
         'activity',
         'permissions',
-        'verify'
+        'verify',
+        'settings'
       ],
       modules: {
         requests: {
