@@ -11,7 +11,7 @@ const addPermissionRequest = (address, origin) => {
   return new Promise((resolve, reject) => {
     const handlerId = uuidv5(origin, uuidv5.DNS)
     accounts.addRequest({ handlerId, type: 'access', origin, address }, () => {
-      const permissions = store('main.accounts', address, 'permissions') || {}
+      const permissions = store('main.permissions', address) || {}
       const perms = Object.keys(permissions).map(id => permissions[id])
       const permIndex = perms.map(p => p.origin).indexOf(origin)
       if (perms[permIndex] && perms[permIndex].provider) {
@@ -31,7 +31,7 @@ module.exports = async origin => {
   if (!account) return
   const address = account.address
   if (!address) return
-  const permissions = store('main.accounts', address, 'permissions') || {}
+  const permissions = store('main.permissions', address) || {}
   const perms = Object.keys(permissions).map(id => permissions[id])
   const permIndex = perms.map(p => p.origin).indexOf(origin)
   if (permIndex === -1) {

@@ -7,7 +7,7 @@ let trayInitial = true
 
 module.exports = {
   updateAccountModule: (u, id, update) => {
-    u('panel.account.modules', id, module => {
+    u('panel.account.modules', id, (module = {}) => {
       return Object.assign(module, update)
     })
   },
@@ -18,6 +18,7 @@ module.exports = {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
   },
+
   setSettingsView: (u, index, subindex = 0) => {
     u('selected.settings.viewIndex', () => index)
     u('selected.settings.subIndex', () => subindex)

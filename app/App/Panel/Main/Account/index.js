@@ -16,6 +16,7 @@ import Requests from './Requests'
 import SignerModule from './Signer'
 import SignerStatus from './SignerStatus'
 import Verify from './Verify'
+import Settings from './Settings'
 
 
 // import Settings from './Settings'
@@ -238,6 +239,9 @@ class _AccountMain extends React.Component {
             id === 'balances' ? <Balances
               moduleId={id} 
               {...this.props}
+            /> :
+            id === 'settings' ? <Settings
+              moduleId={id}
             /> :
             <Default moduleId={id}  />
           }
@@ -566,7 +570,7 @@ class Account extends React.Component {
   renderSignerIndicator () {
     let accountIndicatorClass = 'accountIndicator'
     if (this.props.signer) {
-      const signer = this.store('main.signers', this.props.signer)
+      const signer = this.store('main.signers', this.props.signer) || {}
       if (signer.status === 'locked') {
         accountIndicatorClass += ' accountIndicatorLocked'
       } else if (signer.status === 'ok') {
@@ -732,14 +736,30 @@ class Account extends React.Component {
   //   this.store.accountPage(accountPage)
   // }
 
+  getAddressSize () {
+    const ensName = this.store('main.accounts', this.props.id, 'ensName')
+    if (ensName) {
+      if (ensName.length <= 13) {
+        return 18
+      } else {
+        let size = 18 - (ensName.length - 13)
+        if (size < 8) size = 8
+        return size
+      }
+    } else {
+      return 20
+    }
+  }
+
   renderStatus () {
     // let open = current && this.store('selected.open')
     // TODO: Set Signer Name
     // let currentIndex = this.store('main.accounts', this.props.id, 'index')
     // const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-    const address = this.store('main.accounts', this.props.id, 'address')
-    if (!address) return 'no address'
+    let address = this.store('main.accounts', this.props.id, 'address')
+    address = address || '0x'
+    let ensName = this.store('main.accounts', this.props.id, 'ensName')
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
@@ -749,14 +769,18 @@ class Account extends React.Component {
     ) : (
       <>
         <div className='signerName'>
-          <div className='signerNameText'>
+          <div className={!ensName ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
             {this.props.name}
             <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
           </div>
         </div>
         <div className={'signerAddress'}>
           <div className='transactionToAddress'>
-            <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
+            {ensName ? (
+              <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
+            ) : (
+              <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
+            )}
             <div className='transactionToAddressFull'>
               {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
             </div>

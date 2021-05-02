@@ -1,6 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../resources/link'
+import svg from '../../resources/svg'
+
+import Signer from './Signer'
 
 import AddHardware from './Add/AddHardware'
 import AddAragon from './Add/AddAragon'
@@ -111,43 +114,6 @@ class AddAccounts extends React.Component {
   }
 }
 
-class Signer extends React.Component {
-  status () {
-    if (this.props.status === 'ok') {
-      return (
-        <div className='signerStatus'>
-          <div className='signerStatusText'>{'ready'}</div>
-          <div className='signerStatusIndicator signerStatusIndicatorReady'></div>
-        </div>
-      )
-    } else if (this.props.status === 'locked') {
-      return (
-        <div className='signerStatus'>
-          <div className='signerStatusText'>{'locked'}</div>
-          <div className='signerStatusIndicator signerStatusIndicatorLocked'></div>
-        </div>
-      )
-    } else {
-      return (
-        <div className='signerStatus'>
-          <div className='signerStatusText'>{this.props.status}</div>
-          <div className='signerStatusIndicator'></div>
-        </div>
-      )
-    }
-  }
-  render () {
-    return (
-      <div className='signer'>
-        <div className='signerName'>{'Signer Name'}</div>
-        <div className='signerType'>{this.props.type + ' Signer'}</div>
-        {this.status()}
-        <div className='signerAccounts'>{'Add accounts from this signer'}</div>
-      </div>
-    )
-  }
-}
-
 class Dash extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -193,7 +159,7 @@ class Dash extends React.Component {
             </div>
             <div className='signersList'>
               {hardwareSigners.length ? (
-                hardwareSigners.map(signer => <Signer {...signer} />)
+                hardwareSigners.map(signer => <Signer key={signer.id} {...signer} />)
               ) : (
                 <div className='noSigners'>
                   {'No hardware signers detected'}
@@ -205,7 +171,7 @@ class Dash extends React.Component {
             </div>
             <div className='signersList'>
               {hotSigners.length ? (
-                hotSigners.map(signer => <Signer {...signer} />)
+                hotSigners.map(signer => <Signer key={signer.id} {...signer} />)
               ) : (
                 <div className='noSigners'>
                   {'No hot signers detected'}

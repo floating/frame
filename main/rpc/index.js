@@ -26,19 +26,20 @@ const rpc = {
   // Review
   // getSigners: signers.getSigners,
   setSigner: (id, cb) => {
+    store.toggleDash('hide')
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
     setTimeout(() => {
       accounts.balanceScan()
     }, 320)
   },
-  setSignerIndex: (index, cb) => {
-    accounts.setSignerIndex(index, cb)
-    provider.accountsChanged(accounts.getSelectedAddresses())
-    setTimeout(() => {
-      accounts.balanceScan()
-    }, 320)
-  },
+  // setSignerIndex: (index, cb) => {
+  //   accounts.setSignerIndex(index, cb)
+  //   provider.accountsChanged(accounts.getSelectedAddresses())
+  //   setTimeout(() => {
+  //     accounts.balanceScan()
+  //   }, 320)
+  // },
   unsetSigner: (id, cb) => {
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
@@ -101,9 +102,14 @@ const rpc = {
   addAragon (account, cb) {
     accounts.addAragon(account, cb)
   },
-  createFromAddress (address, cb) {
+  createAccount (address, options, cb) {
     if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
-    accounts.add([address], { type: 'Address' })
+    accounts.add(address, options)
+    cb()
+  },
+  removeAccount (address, options, cb) {
+    if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
+    accounts.remove(address)
     cb()
   },
   createFromPhrase (phrase, password, cb) {

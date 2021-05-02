@@ -23,9 +23,8 @@ class Balances extends React.Component {
     // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
     // const id = this.store('selected.current')
     // const address = this.store('main.accounts', this.props.id, 'address')
-    const permissions = this.store('main.accounts', this.props.id, 'permissions') || {}
-    console.log(permissions)
-
+    const permissions = this.store('main.permissions', this.props.id) || {}
+    
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Account Permissions'}</div>  

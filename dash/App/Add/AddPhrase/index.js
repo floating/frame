@@ -1,6 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import Signer from '../../Signer'
+
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
@@ -58,10 +60,10 @@ class AddPhrase extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        this.setState({ status: 'Successful', error: false })
-        setTimeout(() => {
-          this.store.toggleAddAccount()
-        }, 2000)
+        this.setState({ status: 'Successful', error: false, createdSignerId: signer.id })
+        // setTimeout(() => {
+        //   this.store.toggleAddAccount()
+        // }, 2000)
       }
     })
   }
@@ -98,6 +100,13 @@ class AddPhrase extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+
+    let signer
+
+    if (this.state.createdSignerId) {
+      signer = this.store('main.signers', this.state.createdSignerId)
+    }
+
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar addAccountItemHot' />
@@ -139,8 +148,13 @@ class AddPhrase extends React.Component {
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                  {signer ? <Signer key={signer.id} {...signer} />
+                  : (
+                    <>
+                      <div className='phaseItemOptionTitle'>{this.state.status}</div>
+                      {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                    </>
+                  )} 
                 </div>
               </div>
             </div>

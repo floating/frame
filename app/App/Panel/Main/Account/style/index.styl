@@ -133,9 +133,10 @@
     
     .transactionToAddress
       font-size 10px
-      font-family firaCode
+      // font-family firaCode
       position relative
       width 100%
+      font-weight 100
       -webkit-app-region no-drag
 
       .transactionToAddressLarge
@@ -147,15 +148,21 @@
         display flex
         justify-content flex-start
         align-items center
-        font-size 19px
+        font-size 18px
+        letter-spacing -1px
         opacity 1
         transition var(--standard)
+        font-weight 200
+        // color var(--outerspace08)
 
         svg
           color var(--outerspace08)
           padding-top 2px
           padding-left 4px
           padding-right 4px
+
+      .transactionToAddressENS
+        transform translateY(10px)
 
       .transactionToAddressFull
         position absolute
@@ -220,22 +227,21 @@
 
     .accountNotificationBadge
       position absolute
-      top 15px
-      right 88px
+      top 14px
+      right 60px
       height 32px
       width 32px
+      z-index 400000
       border-radius 16px
-      background var(--ghostA)
       display flex
       justify-content center
       align-items center
       font-size 16px
       font-weight 400
       font-family FiraCode
-      background var(--good)
       color var(--ghostA)
       transition standard
-      opacity 0      
+      border 1px solid var(--ghostA)  
 
     .accountNotificationBadgeActive
       background var(--good)
@@ -266,7 +272,7 @@
       // display flex
       // justify-content center
       // align-items center
-      width 60px
+      width 90px
       // margin 0px 30px
       height 63px
       // 
@@ -282,7 +288,7 @@
         height 100%
         transform rotate(0deg)
         box-sizing border-box
-        padding 18px 15px 0px 19px
+        padding 18px 15px 0px 49px
         cursor pointer
         transform translateX(-2px)
         // border-left 1px solid var(--ghostA)
@@ -295,13 +301,13 @@
         pointer-events none
 
     .signerSelect:hover
-      background var(--ghostD)
+      background linear-gradient(90deg, var(--ghostC0), var(--ghostC))
 
     .accountGrabber
       position absolute
       top 5px 
       bottom 5px
-      right 58px
+      right 110px
       width 19px
       color var(--ghostX)
       cursor grab
@@ -711,7 +717,7 @@
     .signerName
       position absolute
       bottom 12px
-      left 63px
+      left 62px
       overflow hidden
       display flex
       justify-content center
@@ -732,7 +738,11 @@
         align-items center
         z-index 10
         font-weight 500
+        color var(--outerspace08)
         // background red
+
+      .signerNameTextENS
+        opacity 0
 
       .signerNameEdit
         position absolute
@@ -1470,7 +1480,7 @@
 
 @import '../Balances/style'
 @import '../Gas/style'
-@import '../Settings/style'
+// @import '../Settings/style'
 @import '../Requests/style'
 @import '../Launcher/style'
 @import '../SignerStatus/style'

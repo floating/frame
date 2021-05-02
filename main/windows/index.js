@@ -139,7 +139,7 @@ const api = {
     }
     if (dev) windows.tray.openDevTools()
     setTimeout(() => {
-      windows.tray.on('blur', _ => store('main.autohide') ? api.hideTray(true) : null)
+      windows.tray.on('blur', _ => store('main.autohide') && !store('dash.showing') ? api.hideTray(true) : null)
       windows.tray.focus()
     }, 1260)
     if (!openedAtLogin) {
@@ -427,13 +427,13 @@ const api = {
     if (windows.dash && windows.dash.isVisible()) windows.dash.hide()
     // store.setDashType()
   },
-  toggleDash: () => {
-    if (windows.dash.isVisible()) {
-      api.hideDash()
-    } else {
-      api.showDash()
-    }
-  },
+  // toggleDash: () => {
+  //   if (windows.dash.isVisible()) {
+  //     api.hideDash()
+  //   } else {
+  //     api.showDash()
+  //   }
+  // },
   openView: (ens, session) => {
     dapp.openView(ens, session, windows)
   },
@@ -479,7 +479,7 @@ ipcMain.on('tray:ready', () => {
 })
 
 ipcMain.on('tray:mouseout', () => {
-  if (glide) {
+  if (glide && !store('dash.showing')) {
     glide = false
     api.hideTray()
   }
