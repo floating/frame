@@ -6,6 +6,7 @@ import svg from '../../resources/svg'
 import Signer from './Signer'
 
 import AddHardware from './Add/AddHardware'
+import AddHardwareLattice from './Add/AddHardwareLattice'
 import AddAragon from './Add/AddAragon'
 import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
@@ -56,7 +57,7 @@ class AddAccounts extends React.Component {
   renderAddLattice () {
     return (
       <div className='addAccounts cardShow'>
-       {'Add Lattice'}
+       <AddHardwareLattice type={'lattice'} />
       </div>
     )
   }

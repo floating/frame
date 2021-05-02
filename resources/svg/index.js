@@ -1,6 +1,8 @@
 import React from 'react'
 import Octicon, { getIconByName } from '@githubprimer/octicons-react'
 
+import gridPlusLogo from './grid.png'
+
 module.exports = {
   logo: size => {
     return (
@@ -396,6 +398,13 @@ module.exports = {
         <svg viewBox='0 0 24 24' width={size + 'px'} height={size + 'px'}>
           <path fill='currentColor' fillRule='evenodd' d='M8.854 11.646l5.792-5.792a.5.5 0 01.854.353v11.586a.5.5 0 01-.854.353l-5.792-5.792a.5.5 0 010-.708z' />
         </svg>
+      </div>
+    )
+  },
+  lattice: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <img src={gridPlusLogo} height={size} width={size} />
       </div>
     )
   },

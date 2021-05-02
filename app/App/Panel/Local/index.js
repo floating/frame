@@ -14,9 +14,9 @@ class Settings extends React.Component {
     this.networkType = context.store('main.currentNetwork.type')
     const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    const latticeEndpoint = context.store('main.lattice.endpoint');
-    const latticeEndpointMode = context.store('main.lattice.endpointMode');
-    const latticeSuffix = context.store('main.lattice.suffix');
+    const latticeEndpoint = context.store('main.lattice.endpoint')
+    const latticeEndpointMode = context.store('main.lattice.endpointMode')
+    const latticeSuffix = context.store('main.lattice.suffix')
     this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeSuffix, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')

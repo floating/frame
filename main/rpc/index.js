@@ -9,9 +9,8 @@ const launch = require('../launch')
 const provider = require('../provider')
 const store = require('../store')
 const dapps = require('../dapps')
-const ens = require('../ens')
-const ipfs = require('../ipfs')
-
+// const ens = require('../ens')
+// const ipfs = require('../ipfs')
 
 const { resolveName } = require('../accounts/aragon')
 
@@ -49,10 +48,10 @@ const rpc = {
   // unsetSigner: signers.unsetSigner,
   trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
   trezorPhrase: (id, phrase, cb) => signers.trezorPhrase(id, phrase, cb),
-  latticePair(id, pin, cb) {
-    signers.latticePair(id, pin).then(result => cb(null, result)).catch(err => cb(err));
+  latticePair (id, pin, cb) {
+    signers.latticePair(id, pin).then(result => cb(null, result)).catch(err => cb(err))
   },
-  latticeConnect(connectOpts, cb) {
+  latticeConnect (connectOpts, cb) {
     signers.latticeConnect(connectOpts).then((result) => cb(null, result)).catch(err => cb(err))
   },
   launchStatus: launch.status,
