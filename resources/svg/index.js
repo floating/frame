@@ -381,5 +381,23 @@ module.exports = {
       </div>
     )
   },
+  check: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 24 24' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' fillRule='evenodd' d='M21.03 5.72a.75.75 0 010 1.06l-11.5 11.5a.75.75 0 01-1.072-.012l-5.5-5.75a.75.75 0 111.084-1.036l4.97 5.195L19.97 5.72a.75.75 0 011.06 0z' />
+        </svg>
+      </div>
+    )
+  },
+  triangleLeft: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 24 24' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' fillRule='evenodd' d='M8.854 11.646l5.792-5.792a.5.5 0 01.854.353v11.586a.5.5 0 01-.854.353l-5.792-5.792a.5.5 0 010-.708z' />
+        </svg>
+      </div>
+    )
+  },
   octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }

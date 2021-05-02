@@ -521,7 +521,7 @@ if (initial.main._version < 6) {
   // Once this is complete they can now do the current account migration
 
   const newAccounts = {}
-  const nameCount = {}
+  // const nameCount = {}
   let { accounts, addresses } = initial.main
   accounts = JSON.parse(JSON.stringify(accounts))
   addresses = JSON.parse(JSON.stringify(addresses))
@@ -548,9 +548,9 @@ if (initial.main._version < 6) {
         return accounts[a].addresses.length === accounts[b].addresses.length ? 0 : accounts[a].addresses.length > accounts[b].addresses.length ? -1 : 1
       })
       newAccounts[address] = Object.assign({}, accounts[primaryAccount[0]])
-      nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
-      nameCount[newAccounts[address].name]++
-      if (nameCount[newAccounts[address].name] > 1) newAccounts[address].name = newAccounts[address].name + ' ' + nameCount[newAccounts[address].name]
+      // nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
+      // nameCount[newAccounts[address].name]++
+      // if (nameCount[newAccounts[address].name] > 1) newAccounts[address].name = newAccounts[address].name + ' ' + nameCount[newAccounts[address].name]
       newAccounts[address].address = address
       newAccounts[address].id = address
       newAccounts[address].lastSignerType = newAccounts[address].type
