@@ -14,7 +14,10 @@ class Settings extends React.Component {
     this.networkType = context.store('main.currentNetwork.type')
     const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    this.state = { localShake: {}, primaryCustom, secondaryCustom, resetConfirm: false, expandNetwork: false }
+    const latticeEndpoint = context.store('main.lattice.endpoint');
+    const latticeEndpointMode = context.store('main.lattice.endpointMode');
+    const latticeSuffix = context.store('main.lattice.suffix');
+    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeSuffix, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
       if (this.network !== id || this.networkType !== type) {
@@ -51,6 +54,14 @@ class Settings extends React.Component {
     if (location.startsWith('https://') || location.startsWith('http://')) return true
     return false
   }
+  //
+  // latticeFocus () {
+  //   if (this.state.latticeEndpoint === this.customMessage) this.setState({ secondaryCustom: '' })
+  // }
+  //
+  // latticeBlur () {
+  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
+  // }
 
   // customSecondaryFocus () {
   //   if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
@@ -84,6 +95,22 @@ class Settings extends React.Component {
     this.setState({ secondaryCustom: value })
     const { type, id } = this.store('main.currentNetwork')
     this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom), 1000)
+  }
+
+  inputLatticeEndpoint (e) {
+    e.preventDefault()
+    clearTimeout(this.inputLatticeTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ latticeEndpoint: value })
+    this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpoint', this.state.latticeEndpoint), 1000)
+  }
+
+  inputLatticeSuffix (e) {
+    e.preventDefault()
+    clearTimeout(this.inputLatticeSuffixTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ latticeSuffix: value })
+    this.inputLatticeSuffixTimeout = setTimeout(() => link.send('tray:action', 'setLatticeSuffix', this.state.latticeSuffix), 1000)
   }
 
   localShake (key) {
@@ -162,6 +189,12 @@ class Settings extends React.Component {
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+    let latticePresets = {
+      'default': 'https://signing.gridpl.us',
+      'custom': ''
+    }
+    latticePresets = Object.keys(latticePresets).map((el, i) => ({ text: el, value: latticePresets[el]}))
+
     const networkOptions = []
     Object.keys(networks).forEach(type => {
       Object.keys(networks[type]).forEach(id => {
@@ -322,6 +355,63 @@ class Settings extends React.Component {
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 1 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Lattice Accounts</div>
+              <Dropdown
+                syncValue={this.store('main.lattice.accountLimit')}
+                onChange={(value) => link.send('tray:action', 'setLatticeAccountLimit', value)}
+                options={[
+                  { text: '1', value: 1 },
+                  { text: '2', value: 2 },
+                  { text: '3', value: 3 },
+                  { text: '4', value: 4 },
+                  { text: '5', value: 5 },
+                  { text: '6', value: 6 },
+                  { text: '7', value: 7 },
+                  { text: '8', value: 8 },
+                  { text: '9', value: 9 },
+                  { text: '10', value: 10 }
+                ]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              The number of lattice accounts to derive
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: 0 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Lattice Relay</div>
+              <Dropdown
+                  syncValue={this.store('main.lattice.endpointMode')}
+                  onChange={(value) => {
+
+                    let newState = {
+                      latticeEndpointMode: value
+                    }
+
+                    if (value === 'default') {
+                      link.send('tray:action', 'setLatticeEndpoint', latticePresets['default'])
+                    }
+                    link.send('tray:action', 'setLatticeEndpointMode', value)
+                    this.setState(newState)
+                  }}
+                  options={[{ text: 'Default', value: 'default' }, { text: 'Custom', value: 'custom' }]}
+              />
+            </div>
+            <div className={this.state.latticeEndpointMode === 'custom' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <input tabIndex='-1' placeholder={'Custom Relay'} value={this.state.latticeEndpoint} onChange={e => this.inputLatticeEndpoint(e)} />
+            </div>
+          </div>
+          <div className='signerPermission' style={{ zIndex: -1 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionOrigin'>Lattice Frame Suffix</div>
+            </div>
+            <div className='connectionCustomInput connectionCustomInputOn'>
+              <input placeholder={'Lattice Suffix'} tabIndex='-2' value={this.state.latticeSuffix} onChange={e => this.inputLatticeSuffix(e)} />
+            </div>
+          </div>
+
+          <div className='signerPermission' style={{ zIndex: -2 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lock Hot Signers on</div>
               <Dropdown
