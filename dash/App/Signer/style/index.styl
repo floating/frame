@@ -39,7 +39,7 @@
     left 10px
     font-size 12px
     text-transform uppercase
-    font-weight 300
+    font-weight 400
     letter-spacing 1px
 
   // .signerStatus
@@ -84,42 +84,49 @@
     left 0
     right 0
     bottom 0
-    height 30px
+    height 20px
     display flex
     justify-content space-between
     align-items center
     // background white
-        // background pink
     font-size 14px
     font-weight 300
     display flex
     justify-content center
     align-items center
     // height 40px
-    padding 8px 16px
+    padding 8px 16px 10px 16px
 
     .signerBottomPages
-      background var(--ghostD)
-      margin 0px 4px
+      // background var(--ghostD)
+      // margin 0px 8px
       border-radius 8px
-      padding 6px 10px
+      // padding 6px 10px
       font-size 12px
       font-weight 400
+      width 56px
+      text-align center
 
     .signerBottomPageBack
       background var(--ghostD)
-      border-radius 8px
-      padding 2px 2px 2px 0px
+      padding 2px 1px 2px 2px
+      height 24px
+      width 24px
+      border-radius 12px
       cursor pointer
+      box-sizing border-box
       *
         pointer-events none
 
     .signerBottomPageNext
       background var(--ghostD)
       transform rotate(180deg)
-      padding 2px 2px 2px 0px
-      border-radius 8px
+      padding 2px 2px 2px 1px
+      height 24px
+      width 24px
+      border-radius 12px
       cursor pointer
+      box-sizing border-box
       *
         pointer-events none
 

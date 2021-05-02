@@ -70,7 +70,7 @@ class Signer extends React.Component {
         <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
           const added = this.store('main.accounts', address.toLowerCase())
           return (
-            <div className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onMouseDown={() => {
+            <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onMouseDown={() => {
               if (this.store('main.accounts', address.toLowerCase())) {
                 link.rpc('removeAccount', address, {}, () => {
                   // console.log('Removed account ', address)
@@ -82,7 +82,7 @@ class Signer extends React.Component {
               }
             }}>
               <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
-              <div className='signerAccountAddress'>{address.substr(0, 9)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(0, 8)}</div>
+              <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
               <div className='signerAccountCheck'>{svg.check(22)}</div>
             </div>
           )

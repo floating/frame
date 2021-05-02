@@ -1,6 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import Signer from '../../Signer'
+
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
@@ -146,36 +148,12 @@ class AddPhrase extends React.Component {
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  {signer ? (
-                      <>
-                        <div>{`new signer name is ${signer.name}`} </div>
-                        <div>{`rename and pick accounts you want to add`} </div>
-                        {signer.addresses.map(address => {
-                          let addressClass = 'signerAddress'
-                          const account = this.store('main.accounts', address.toLowerCase())
-                          if (account) addressClass += ' signerAddressAdded'
-                          return (
-                            <div className={addressClass} onMouseDown={() => {
-                              if (this.store('main.accounts', address.toLowerCase())) {
-                                link.rpc('removeAccount', address, {}, () => {
-                                  // console.log('Removed account ', address)
-                                })
-                              } else {
-                                link.rpc('createAccount', address, { type: 'Seed'}, () => {
-                                  // console.log('Added account ', address)
-                                })
-                              }
-                            }}>
-                              {address.substr(0, 6) + '...' + address.substr(0, 5)}
-                            </div>
-                          )
-                        })}
-                      </>
-                    ) : (
-                      <>
-                        <div className='phaseItemOptionTitle'>{this.state.status}</div>
-                        {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
-                      </>
+                  {signer ? <Signer key={signer.id} {...signer} />
+                  : (
+                    <>
+                      <div className='phaseItemOptionTitle'>{this.state.status}</div>
+                      {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                    </>
                   )} 
                 </div>
               </div>

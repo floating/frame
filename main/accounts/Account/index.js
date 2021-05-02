@@ -70,6 +70,7 @@ class Account {
     })
 
     this.lookupAddress() // We need to recheck this on every network change... 
+    this.update()
   }
 
   async lookupAddress () {
