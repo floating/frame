@@ -7,7 +7,6 @@ const noData = {
 
 // symbol -> coinId
 let allCoins = {}
-const watched = ['eth', 'xdai']
 
 function createRate (quote) {
   return {
@@ -42,8 +41,8 @@ async function fetchRates (ids) {
   return Object.assign({}, ...responses)
 }
 
-async function loadRates () {
-  const lookup = watched.reduce((mapping, symbol) => {
+async function loadRates (symbols) {
+  const lookup = symbols.reduce((mapping, symbol) => {
     mapping[allCoins[symbol]] = symbol
     return mapping
   }, {})
@@ -64,15 +63,7 @@ async function loadRates () {
 
 const rates = {
   loadCoins,
-  loadRates,
-  add: function (symbols) {
-    const lowerCaseSymbols = symbols.map(s => s.toLowerCase())
-
-    // add symbols to watch and return the latest rates
-    const newSymbols = lowerCaseSymbols.filter(s => !watched.includes(s))
-
-    watched.push(...newSymbols)
-  }
+  loadRates
 }
 
 module.exports = rates

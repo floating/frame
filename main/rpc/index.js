@@ -29,7 +29,7 @@ const rpc = {
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
     setTimeout(() => {
-      accounts.balanceScan()
+      accounts.scanSelectedAddress()
     }, 320)
   },
   // setSignerIndex: (index, cb) => {
@@ -42,7 +42,7 @@ const rpc = {
   unsetSigner: (id, cb) => {
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
-    accounts.balanceScan()
+    accounts.scanSelectedAddress()
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,

@@ -11,7 +11,8 @@ const nebula = require('nebula')(
   'https://ipfs.nebula.land', ethProvider(ethNode)
 )
 
-const getTokenBalances = require('./balance')
+const getTokenBalances = require('./tokens')
+const coins = require('./coins')
 const rates = require('../rates')
 
 const provider = ethProvider('frame', { name: 'tokenWorker' })
@@ -35,9 +36,10 @@ async function scan (address, omit = [], knownList) {
   const chain = await chainId()
   const tokens = await getTokenList(chain)
 
-  const tokenBalances = await getTokenBalances(chain, address, tokens)
+  const coinBalances = (await coins(provider).getCoinBalances(chain, address))
+  const foundTokens = await getTokenBalances(chain, address, tokens)
 
-  const found = Object.entries(tokenBalances).reduce((found, [sym, balance]) => {
+  const tokenBalances = Object.entries(foundTokens).reduce((found, [sym, balance]) => {
     const symbol = sym.toLowerCase()
 
     if (balance.isZero() || symbolsToOmit.includes(symbol)) return found
@@ -45,8 +47,6 @@ async function scan (address, omit = [], knownList) {
     const token = tokens.find(t => t.symbol === symbol)
 
     if (token) {
-      rates.add([symbol])
-
       found[symbol] = {
         ...token,
         balance
@@ -56,7 +56,7 @@ async function scan (address, omit = [], knownList) {
     return found
   }, {})
 
-  return found
+  return { ...coinBalances, ...tokenBalances }
 }
 
 module.exports = scan

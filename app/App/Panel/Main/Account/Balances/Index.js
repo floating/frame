@@ -14,7 +14,7 @@ function formatBalance (balance, decimals = 8) {
     : '-.------'
 }
 
-function formatUsdRate (rate, decimals = 6) {
+function formatUsdRate (rate, decimals = 2) {
   return new Intl.NumberFormat('us-US', {
     style: 'currency',
     currency: 'usd',
@@ -44,7 +44,6 @@ function getBalances (chainId, defaultSymbol, rawBalances, rates) {
     .filter(Boolean)
     .map(rawBalance => {
       const rate = rates[rawBalance.symbol] || {}
-      console.log({ rates, symbol: balance.symbol, rate})
       const usdRate = rate.usd || 0
 
       return balance(rawBalance, usdRate)
@@ -52,7 +51,8 @@ function getBalances (chainId, defaultSymbol, rawBalances, rates) {
     .sort((a, b) => {
       if (a.symbol === defaultSymbol) return -1
       if (b.symbol === defaultSymbol) return 1
-      return a.totalValue.minus(b.totalValue).toNumber()
+      console.log({ a: a.totalValue, b: b.totalValue, tot: b.totalValue.minus(a.totalValue).toNumber() })
+      return b.totalValue.minus(a.totalValue).toNumber()
     })
 
   const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
