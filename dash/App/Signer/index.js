@@ -71,7 +71,11 @@ class Signer extends React.Component {
           <div className='signerName'>{'Signer Name'}</div>
           {this.status()}
         </div>
-        {this.props.type === 'lattice' && this.props.status === 'pairing' ? (
+        {this.props.status === 'loading' ? (
+          <div className='signerLoading'>
+            <div className='signerLoadingLoader' />
+          </div>
+        ) : this.props.type === 'lattice' && this.props.status === 'pairing' ? (
           <div className='signerLatticePair'>
             <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
             <div className='signerLatticePairInput'>

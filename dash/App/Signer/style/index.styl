@@ -265,5 +265,37 @@
       .signerAccountCheck
         color var(--good)
 
-    .signerAccount:last-child
+    .signerAccountlast-child
       border-bottom none
+
+.signerLoading
+  height 100px
+  display flex
+  justify-content center
+  align-items center
+
+.signerLoadingLoader, .signerLoadingLoaderafter
+  border-radius 50%
+  width 50px
+  height 50px
+
+.signerLoadingLoader
+  margin 60px auto
+  font-size 10px
+  position relative
+  text-indent -9999em
+  border-top 3px solid var(--ghostZ)
+  border-right 3px solid var(--ghostZ)
+  border-bottom 3px solid var(--ghostZ)
+  border-left 3px solid var(--good)
+  transform translateZ(0)
+  animation load8 0.5s infinite linear
+
+@keyframes load8
+  0%
+    -webkit-transform rotate(0deg)
+    transform rotate(0deg)
+
+  100%
+    -webkit-transform rotate(360deg)
+    transform rotate(360deg)

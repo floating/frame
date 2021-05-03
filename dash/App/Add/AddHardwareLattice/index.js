@@ -106,6 +106,7 @@ class AddHardwareLattice extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Lattice</div>
             </div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
             <div className='addAccountItemSummary'>Grid+ Lattice1</div>
           </div>
           <div className='addAccountItemOption'>

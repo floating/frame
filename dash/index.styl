@@ -26,7 +26,7 @@ div
 
   .addAccounts
     position absolute
-    top 100px
+    top 0px
     left 0
     right 0
     bottom 0
@@ -34,6 +34,23 @@ div
     z-index 4000
     overflow-y scroll
     overflow-x hidden
+
+    .addAccountsHeader
+      height 100px
+
+      .addAccountsHeaderClose
+        position absolute
+        top 15px
+        right 14px
+        padding 10px
+        border-radius 8px
+        cursor pointer
+
+        *
+          pointer-events none
+
+      .addAccountsHeaderClose:hover
+        background var(--ghostC)
 
     .accountTypeSelect
       height 60px

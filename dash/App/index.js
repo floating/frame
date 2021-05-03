@@ -22,42 +22,42 @@ class AddAccounts extends React.Component {
   renderAddNonsigning () {
     return (
       <div className='addAccounts cardShow'>
-       <AddAddress />          
+       <AddAddress close={this.props.close} />          
       </div>
     )
   }
   renderAddKeystore () {
     return (
       <div className='addAccounts cardShow'>
-        <AddRing />
+        <AddRing close={this.props.close} />
       </div>
     )
   }
   renderAddSeed () {
     return (
       <div className='addAccounts cardShow'>
-       <AddPhrase />
+       <AddPhrase close={this.props.close} />
       </div>
     )
   }
   renderAddTrezor () {
     return (
       <div className='addAccounts cardShow'>
-       <AddHardware type={'trezor'} />
+       <AddHardware type={'trezor'} close={this.props.close} />
       </div>
     )
   }
   renderAddLedger () {
     return (
       <div className='addAccounts cardShow'>
-       <AddHardware type={'ledger'} />
+       <AddHardware type={'ledger'} close={this.props.close} />
       </div>
     )
   }
   renderAddLattice () {
     return (
       <div className='addAccounts cardShow'>
-       <AddHardwareLattice type={'lattice'} />
+       <AddHardwareLattice type={'lattice'} close={this.props.close} />
       </div>
     )
   }
@@ -71,13 +71,17 @@ class AddAccounts extends React.Component {
   renderAddAragon () {
     return (
       <div className='addAccounts cardShow'>
-       <AddAragon />
+       <AddAragon close={this.props.close} />
       </div>
     )
   }
   renderDefault () {
     return (
       <div className='addAccounts cardShow'>
+        <div className='addAccountsHeader'>
+          <div className='addAccountsHeaderTitle'>What type of account would you like to add?</div>
+          <div className='addAccountsHeaderClose' onMouseDown={() => this.props.close()}>x</div>
+        </div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
         {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Wallet</div>
@@ -85,7 +89,7 @@ class AddAccounts extends React.Component {
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>Grid+ Lattice1</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore.json</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>Non-signing Account</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>A Non-signing Account</div>
       </div>
     )
   }
@@ -149,7 +153,7 @@ class Dash extends React.Component {
       }).filter(s => s)
       return (
       <div className='dash'>
-        {this.state.showAddAccounts ? <AddAccounts /> : null}
+        {this.state.showAddAccounts ? <AddAccounts close={() => this.setState({ showAddAccounts: false })} /> : null}
         <div className='newAccount' onMouseDown={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
           Add New Accounts
         </div>
