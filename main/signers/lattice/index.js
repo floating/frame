@@ -1,28 +1,20 @@
-const windows = require('../../windows')
-
 const store = require('../../store')
 const LatticeDevice = require('./Lattice')
 
-const openConnect = async (device, signers) => {
-  const signer = new LatticeDevice(device, signers)
-  // signers.signers[`Lattice-${device.deviceID}`] = signer;
-  windows.broadcast('main:action', 'addSigner', signer.summary())
-  const response = await signer.open()
-  signers.add(signer)
-  return response
-}
+module.exports = {
+  scan: (signers) => {
+    // Look for all lattice signers stored in main... 
+    store.observer(() => {
+      console.log('LATTICE SCANNER')
+      const lattice = store('main.lattice') || {}
+      Object.keys(lattice).forEach(async deviceId => {
+        if (!deviceId) return console.log('nodevice id', deviceId)
+        console.log('FOUND A LATTICE that isn\'t a signer yet,  deviceID = ', deviceId)
+        if (store('main.signers', deviceId)) return console.log('signer already exists', store('main.signers', deviceId))
+        const signer = new LatticeDevice(deviceId, signers)
+        signers.add(signer)
 
-module.exports = (signers) => ({
-  scan: () => {
-    const deviceID = store('main.lattice.deviceID')
-    if (deviceID) {
-      openConnect({ deviceID }, signers)
-    }
-  },
-  pair: async () => {
-
-  },
-  open: async (device) => {
-    return await openConnect(device, signers)
+      })
+    })
   }
-})
+}

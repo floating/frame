@@ -358,7 +358,7 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lattice Accounts</div>
               <Dropdown
-                syncValue={this.store('main.lattice.accountLimit')}
+                syncValue={this.store('main.latticeSettings.accountLimit')}
                 onChange={(value) => link.send('tray:action', 'setLatticeAccountLimit', value)}
                 options={[
                   { text: '1', value: 1 },

@@ -6,12 +6,14 @@ const ledger = require('./ledger')
 const trezorConnect = require('./trezor-connect')
 const lattice = require('./lattice')
 
+const store = require('../store')
+
 class Signers extends EventEmitter {
   constructor () {
     super()
     this.signers = []
-    this.lattice = lattice(this)
-    this.lattice.scan()
+    // this.lattice = lattice(this)
+    lattice.scan(this)
     hot.scan(this)
     ledger.scan(this)
     trezorConnect.scan(this)
@@ -39,11 +41,11 @@ class Signers extends EventEmitter {
 
   async latticePair (id, pin) {
     try {
-      const signer = this.get(`Lattice-${id}`)
-      if (signer && signer.setPin) {
+      const signer = this.get(id)
+      if (signer && signer.setPair) {
+        console.log('signer has setPair', Boolean(signer.setPair))
         try {
-          const result = await signer.setPin(pin)
-
+          const result = await signer.setPair(pin)
           return result
         } catch (err) {
           return new Error(err)
@@ -56,6 +58,21 @@ class Signers extends EventEmitter {
     }
   }
 
+  async createLattice (deviceId) {
+    if (deviceId) {
+      store.updateLattice(deviceId, { 
+        deviceId, 
+        baseUrl: 'https://signing.gridpl.us',
+        endpointMode: 'default',
+        suffix: '' 
+      })    
+      return { id: 'lattice-' + deviceId}
+    } else {
+      throw new Error('No Device ID')
+    }
+  }
+
+
   async latticeConnect (connectOpts) {
     const signer = lattice(this)
     if (signer && signer.open) {
@@ -64,10 +81,10 @@ class Signers extends EventEmitter {
 
         return response
       } catch (err) {
-        throw new Error('could not connect to lattice')
+        throw new Error('Could not connect to lattice', err)
       }
     } else {
-      return new Error('signer library issue')
+      return new Error('Lattice, no signer or signer not open')
     }
   }
 

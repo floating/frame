@@ -4,6 +4,8 @@ import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg' // TODO: get gridplus svg
 
+import Signer from '../../Signer'
+
 class AddHardwareLattice extends React.Component {
   constructor (...args) {
     super(...args)
@@ -12,7 +14,7 @@ class AddHardwareLattice extends React.Component {
       index: 0,
       status: '',
       error: false,
-      deviceID: '',
+      deviceId: '',
       pairCode: ''
     }
     this.forms = [React.createRef(), React.createRef(), React.createRef()]
@@ -63,38 +65,12 @@ class AddHardwareLattice extends React.Component {
     this.focusActive()
   }
 
-  connectToLattice () {
-    link.rpc('latticeConnect', {
-      deviceID: this.state.deviceID
-    }, (err, response = []) => {
-      if (err || !response || response.length === 0) {
-        return this.setState({ status: err, index: 2, error: true })
-      }
-      const [accounts, isPaired] = response
-      if (!isPaired) {
-        this.next()
-        this.setState({ status: 'Pairing Device', error: false })
-      } else if (accounts && accounts.length > 0) {
-        this.setState({ status: 'Adding Accounts', index: 2, error: false })
-        setTimeout(() => {
-          this.store.toggleAddAccount()
-        }, 1000)
-      } else if (!err && isPaired === typeof 'undefined') {
-        this.setState({ status: 'ok', index: 2, error: true })
-      }
-    })
-  }
-
-  pairToLattice () {
-    this.next()
-    link.rpc('latticePair', this.state.deviceID, this.state.pairCode, (err, accounts) => {
+  createLattice () {
+    link.rpc('createLattice', this.state.deviceId, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
-      } else if (accounts.length > 0) {
-        this.setState({ status: 'Adding Accounts', index: 2, error: false })
-        setTimeout(() => {
-          this.store.toggleAddAccount()
-        }, 2000)
+      } else {
+        this.setState({ status: 'Successful', error: false, createdSignerId: signer.id })
       }
     })
   }
@@ -112,86 +88,61 @@ class AddHardwareLattice extends React.Component {
     this.focusActive()
   }
 
-  adding () {
-    this.setState({ adding: true })
-    this.focusActive()
-  }
-
   render () {
-    let itemClass = 'addAccountItem addAccountItemSmart'
-    if (this.state.adding) itemClass += ' addAccountItemAdding'
+    let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+    let signer
+    if (this.state.createdSignerId) {
+      signer = this.store('main.signers', this.state.createdSignerId)
+    }
+
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
         <div className='addAccountItemBar' />
         <div className='addAccountItemWrap'>
           <div className='addAccountItemTop'>
-            <div className='addAccountItemIcon'>
-              <div
-                className='addAccountItemIconType addAccountItemIconSmart'
-                style={{ paddingTop: '6px' }}
-              >{svg.lattice(32)}
+            <div className='addAccountItemTopType'>
+              <div className='addAccountItemIcon'>
+                <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.lattice(24)}</div>
               </div>
-              <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
+              <div className='addAccountItemTopTitle'>Lattice</div>
             </div>
-            <div className='addAccountItemTopTitle'>Lattice</div>
-            <div className='addAccountItemTopTitle' />
+            <div className='addAccountItemSummary'>Grid+ Lattice1</div>
           </div>
-          <div className='addAccountItemSummary'>Unlock your Lattice to get started</div>
           <div className='addAccountItemOption'>
-            <div className='addAccountItemOptionIntro' onMouseDown={() => this.adding()}>
-              <div className='addAccountItemDeviceTitle'>Add Lattice</div>
-            </div>
             <div
               className='addAccountItemOptionSetup'
               style={{ transform: `translateX(-${100 * this.state.index}%)` }}
             >
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>enter device id</div>
+                  <div className='addAccountItemOptionTitle'>Enter device id</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex='-1' ref={this.forms[0]} value={this.state.deviceID}
-                      onChange={e => this.onChange('deviceID', e)}
-                      onFocus={e => this.onFocus('deviceID', e)}
-                      onBlur={e => this.onBlur('deviceID', e)} onKeyPress={e => {
-                        if (e.key === 'Enter') this.connectToLattice()
+                      tabIndex='-1' ref={this.forms[0]} value={this.state.deviceId}
+                      onChange={e => this.onChange('deviceId', e)}
+                      onFocus={e => this.onFocus('deviceId', e)}
+                      onBlur={e => this.onBlur('deviceId', e)} onKeyPress={e => {
+                        if (e.key === 'Enter') this.createLattice()
                       }}
                     />
                   </div>
                   <div
                     className='addAccountItemOptionSubmit'
-                    onMouseDown={() => this.connectToLattice()}
-                  >Next
+                    onMouseDown={() => {
+                      this.createLattice()
+                      this.next()
+                    }}
+                  >Create
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>enter generated passcode</div>
-                  <div className='addAccountItemOptionInputPhrase'>
-                    <input
-                      tabIndex='1' ref={this.forms[1]} value={this.state.pairCode}
-                      onChange={e => this.onChange('pairCode', e)}
-                      onFocus={e => this.onFocus('pairCode', e)}
-                      onBlur={e => this.onBlur('pairCode', e)} onKeyPress={e => {
-                        if (e.key === 'Enter') this.pairToLattice()
-                      }}
-                    />
-                  </div>
-                  <div
-                    className='addAccountItemOptionSubmit'
-                    onMouseDown={() => this.pairToLattice()}
-                  >Pair
-                  </div>
-                </div>
-                <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? (
-                    <div
-                      className='addAccountItemOptionSubmit'
-                      onMouseDown={() => this.restart()}
-                    >
-                      try again
-                    </div>
-                  ) : null}
+                  {signer ? <Signer key={signer.id} {...signer} />
+                  : (
+                    <>
+                      <div className='phaseItemOptionTitle'>{this.state.status}</div>
+                      {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                    </>
+                  )} 
                 </div>
               </div>
             </div>

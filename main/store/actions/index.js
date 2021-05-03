@@ -115,23 +115,14 @@ module.exports = {
     const data = { on: false, state: 'off', latest: false, installed: false, version: null }
     u(`main.clients.${client}`, () => data)
   },
-  setLatticeSuffix:  (u, value) => {
-    u('main.lattice.suffix', () => value)
+  setLatticeConfig: (u, id, key, value) => {
+    u('main.lattice', id, key, () => value)
   },
-  setLatticePassword:  (u, value) => {
-    u('main.lattice.password', () => value)
+  updateLattice: (u, deviceId, update) => {
+    if (deviceId && update) u('main.lattice', deviceId, (current = {}) => Object.assign(current, update))
   },
-  setLatticeEndpoint:  (u, value) => {
-    u('main.lattice.endpoint', () => value)
-  },
-  setLatticeEndpointMode:  (u, value) => {
-    u('main.lattice.endpointMode', () => value)
-  },
-  setLatticeAccountLimit:  (u, value) => {
-    u('main.lattice.accountLimit', () => value)
-  },
-  setLatticeDeviceID:  (u, value) => {
-    u('main.lattice.deviceID', () => value)
+  setLatticeAccountLimit: (u, limit) => {
+    u('main.latticeSettings.accountLimit', () => limit)
   },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)

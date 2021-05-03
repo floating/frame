@@ -12,7 +12,6 @@ document.addEventListener('drop', e => e.preventDefault())
 window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main')
-  console.log('initial state', state)
   const store = _store(state)
   window.store = store
   store.observer(() => {

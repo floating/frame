@@ -9,7 +9,8 @@ class Signer extends React.Component {
     super(...args)
     this.state = {
       page: 0,
-      addressLimit: 4
+      addressLimit: 4,
+      latticePairCode: ''
     }
   }
   status () {
@@ -46,6 +47,16 @@ class Signer extends React.Component {
     this.setState({ page })
   }
 
+  pairToLattice () {
+    link.rpc('latticePair', this.props.id, this.state.latticePairCode, (err, accounts) => {
+      if (err) {
+        this.setState({ status: err, error: true })
+      } else {
+        this.setState({ status: 'Adding Accounts', index: 2, error: false }) 
+      }
+    })
+  }
+
   render () {
     const signer = this.store('main.signers', this.props.id)
     const { page, addressLimit } = this.state
@@ -60,39 +71,65 @@ class Signer extends React.Component {
           <div className='signerName'>{'Signer Name'}</div>
           {this.status()}
         </div>
-        <div className='signerAccountsTitle'>
-          <span>{'Add & Remove Accounts'}</span>
-          <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
-            <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
-            <span>{'active'}</span> 
-          </span>
-        </div>
-        <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
-          const added = this.store('main.accounts', address.toLowerCase())
-          return (
-            <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onMouseDown={() => {
-              if (this.store('main.accounts', address.toLowerCase())) {
-                link.rpc('removeAccount', address, {}, () => {
-                  // console.log('Removed account ', address)
-                })
-              } else {
-                link.rpc('createAccount', address, { type: signer.type }, () => {
-                  // console.log('Added account ', address)
-                })
-              }
-            }}>
-              <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
-              <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
-              <div className='signerAccountCheck'>{svg.check(22)}</div>
+        {this.props.type === 'lattice' && this.props.status === 'pairing' ? (
+          <div className='signerLatticePair'>
+            <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
+            <div className='signerLatticePairInput'>
+              <div className=''>
+                <input
+                  tabIndex='1' value={this.state.pairCode}
+                  onChange={e => this.setState({ latticePairCode: e.target.value })}
+                  // onFocus={e => this.onFocus('pairCode', e)}
+                  // onBlur={e => this.onBlur('pairCode', e)} 
+                  onKeyPress={e => {
+                    if (e.key === 'Enter') this.pairToLattice()
+                  }}
+                />
+              </div>
+              <div>
+              </div>
             </div>
-          )
-        })}</div>
-        <div className='signerBottom'>
-          <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>{svg.triangleLeft(20)}</div>
-          <div className='signerBottomPages'>{(page + 1) + ' / ' + Math.ceil(signer.addresses.length / addressLimit)}</div>
-          <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
-        </div>
-        
+            <div
+              onMouseDown={() => this.pairToLattice()}
+              className='signerLatticePairSubmit'
+            >Pair</div>
+          </div>
+        ) : (
+          <>
+            <div className='signerAccountsTitle'>
+              <span>{'Add & Remove Accounts'}</span>
+              <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
+                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
+                <span>{'active'}</span> 
+              </span>
+            </div>
+            <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
+              const added = this.store('main.accounts', address.toLowerCase())
+              return (
+                <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onMouseDown={() => {
+                  if (this.store('main.accounts', address.toLowerCase())) {
+                    link.rpc('removeAccount', address, {}, () => {
+                      // console.log('Removed account ', address)
+                    })
+                  } else {
+                    link.rpc('createAccount', address, { type: signer.type }, () => {
+                      // console.log('Added account ', address)
+                    })
+                  }
+                }}>
+                  <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
+                  <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
+                  <div className='signerAccountCheck'>{svg.check(22)}</div>
+                </div>
+              )
+            })}</div>
+            <div className='signerBottom'>
+              <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>{svg.triangleLeft(20)}</div>
+              <div className='signerBottomPages'>{(page + 1) + ' / ' + Math.ceil(signer.addresses.length / addressLimit)}</div>
+              <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
+            </div>
+          </>
+        )}
       </div>
     )
   }
