@@ -5,7 +5,6 @@ module.exports = {
   scan: (signers) => {
     // Look for all lattice signers stored in main... 
     store.observer(() => {
-      console.log('LATTICE SCANNER')
       const lattice = store('main.lattice') || {}
       Object.keys(lattice).forEach(async deviceId => {
         if (!deviceId) return console.log('nodevice id', deviceId)

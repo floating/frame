@@ -43,7 +43,6 @@ class Signers extends EventEmitter {
     try {
       const signer = this.get(id)
       if (signer && signer.setPair) {
-        console.log('signer has setPair', Boolean(signer.setPair))
         try {
           const result = await signer.setPair(pin)
           return result
