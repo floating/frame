@@ -167,7 +167,7 @@ class AddRing extends React.Component {
             <div className='addAccountItemTopTitle'>Keyring</div>
             <div className='addAccountItemTopTitle' />
           </div>
-          <div className='addAccountItemSummary'>A keyring account lets you to add individual private keys to an account</div>
+          <div className='addAccountItemSummary'>A keyring account lets you add individual private keys to an account</div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {
