@@ -9,17 +9,17 @@ import BigNumber from 'bignumber.js'
 function formatBalance (balance, decimals = 8) {
   return balance
     ? new Intl.NumberFormat('us-US', {
-        maximumFractionDigits: decimals
-      }).format(balance)
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 8
+      }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
     : '-.------'
 }
 
 function formatUsdRate (rate, decimals = 2) {
   return new Intl.NumberFormat('us-US', {
     style: 'currency',
-    currency: 'usd',
-    maximumFractionDigits: decimals
-  }).format(rate)
+    currency: 'usd'
+  }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
 function balance (rawBalance, rate) {
@@ -27,9 +27,11 @@ function balance (rawBalance, rate) {
   const usdRate = BigNumber(rate)
   const totalValue = balance.times(usdRate)
 
+  const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
+
   return {
     ...rawBalance,
-    displayBalance: formatBalance(balance),
+    displayBalance: formatBalance(balance, balanceDecimals),
     price: formatUsdRate(usdRate),
     totalValue,
     displayValue: formatUsdRate(totalValue)
@@ -51,7 +53,6 @@ function getBalances (chainId, defaultSymbol, rawBalances, rates) {
     .sort((a, b) => {
       if (a.symbol === defaultSymbol) return -1
       if (b.symbol === defaultSymbol) return 1
-      console.log({ a: a.totalValue, b: b.totalValue, tot: b.totalValue.minus(a.totalValue).toNumber() })
       return b.totalValue.minus(a.totalValue).toNumber()
     })
 
@@ -111,7 +112,7 @@ class Balances extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'address')
     const { type, id: chainId } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
-    const storedBalances = this.store('main.accounts', address, 'balances') || {}
+    const storedBalances = this.store('main.balances', address) || {}
 
     const rates = this.store('external.rates')
 
@@ -121,6 +122,7 @@ class Balances extends React.Component {
       storedBalances,
       rates
     )
+
 
     if (!this.state.expand) {
       balances = balances.slice(0, 5)

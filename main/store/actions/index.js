@@ -341,13 +341,14 @@ module.exports = {
     u('main.ipfs', () => ipfs)
   },
   setRates: (u, rates) => {
-    u('external.rates', (existingRates = {}) => rates)
+    u('external.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
-  setBalance: (u, address, symbol, balance) => {
-    u('main.accounts', address, 'balances', (balances = {}) => {
+  setBalance: (u, address, key, balance) => {
+    // key could be a symbol or a contract address
+    u('main.balances', address, (balances = {}) => {
       const updates = {
         ...balances,
-        [symbol]: balance
+        [key]: balance
       }
 
       return updates
@@ -355,15 +356,13 @@ module.exports = {
   },
   // Tokens
   setBalances: (u, address, newBalances) => {
-    u('main.accounts', address, 'balances', (balances = {}) => {
-      const updatedBalances = Object.entries(newBalances).reduce((acc, [symbol, token]) => {
-        acc[symbol] = token
+    u('main.balances', address, (balances = {}) => {
+      const updatedBalances = Object.entries(newBalances).reduce((acc, [key, token]) => {
+        acc[key] = token
         return acc
       }, {})
 
-      const updates = { ...balances, ...updatedBalances }
-
-      return updates
+      return { ...balances, ...updatedBalances }
     })
   },
   omitToken: (u, address, omitToken) => {

@@ -7,7 +7,7 @@ const store = require('../store')
 let activeAddress
 let trackedAddresses = []
 
-let scanWorker, allAddressScan, trackedAddressScan, coinScan, ratesScan
+let scanWorker, allAddressScan, trackedAddressScan, coinScan
 
 function createWorker () {
   if (scanWorker) {
@@ -17,6 +17,8 @@ function createWorker () {
   scanWorker = fork(path.resolve(__dirname, 'worker.js'))
 
   scanWorker.on('message', message => {
+    log.debug('received message from scan worker: ', message)
+
     if (message.type === 'tokens') {
       store.setBalances(message.address, message.found)
       updateRates(Object.keys(message.found))
@@ -54,7 +56,7 @@ function sendCommandToWorker (command, args = []) {
 }
 
 function startScan (fn, interval) {
-  fn()
+  setTimeout(fn, 0)
   return setInterval(fn, interval)
 }
 
@@ -109,7 +111,7 @@ function start (addresses = [], omitList = [], knownList) {
 function stop () {
   log.info('stopping external data worker')
 
-  [allAddressScan, trackedAddressScan, coinScan, ratesScan]
+  [allAddressScan, trackedAddressScan, coinScan]
       .forEach(scanner => { if (scanner) clearInterval(scanner) })
 }
 
