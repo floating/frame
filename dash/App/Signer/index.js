@@ -68,7 +68,12 @@ class Signer extends React.Component {
       <div className='signer'>
         <div className='signerTop'>
           <div className='signerType'>{this.props.type + ' Signer'}</div>
-          <div className='signerName'>{'Signer Name'}</div>
+          <div className='signerName'>
+            {'Signer Name'}
+            <div className='signerNameUpdate'>
+              {svg.save(14)}
+            </div>
+          </div>
           {this.status()}
         </div>
         {this.props.status === 'loading' ? (
