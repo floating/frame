@@ -102,6 +102,7 @@ class Settings extends React.Component {
     clearTimeout(this.inputLatticeTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ latticeEndpoint: value })
+    // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpoint', this.state.latticeEndpoint), 1000)
   }
 
@@ -110,6 +111,7 @@ class Settings extends React.Component {
     clearTimeout(this.inputLatticeSuffixTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ latticeSuffix: value })
+    // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeSuffixTimeout = setTimeout(() => link.send('tray:action', 'setLatticeSuffix', this.state.latticeSuffix), 1000)
   }
 
@@ -382,7 +384,7 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lattice Relay</div>
               <Dropdown
-                  syncValue={this.store('main.lattice.endpointMode')}
+                  syncValue={this.store('main.latticeSettings.endpointMode')}
                   onChange={(value) => {
 
                     let newState = {

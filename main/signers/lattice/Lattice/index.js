@@ -112,9 +112,8 @@ class Lattice extends Signer {
   }
 
   async deriveAddresses () {
-    console.log('deriveAddresses')
+    // TODO: Move these settings to be device spectifc
     const accountLimit = store('main.latticeSettings.accountLimit')
-    console.log('deriveAddress accountLimit', accountLimit)
     try {
       const req = {
         currency: 'ETH',
@@ -122,11 +121,8 @@ class Lattice extends Signer {
         n: accountLimit,
         skipCache: true
       }
-      console.log('deriveAddresses 1')
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
-      console.log('deriveAddresses 2')
       const result = await getAddresses(req)
-      console.log('deriveAddresses 3')
       this.status = 'ok'
       this.addresses = result
       this.update()
@@ -138,7 +134,7 @@ class Lattice extends Signer {
     }
   }
 
-  pollStatus (interval = 64 * 1000) { // Detect sleep/wake
+  pollStatus (interval = 21 * 1000) { // Detect sleep/wake
     clearTimeout(this._pollStatus)
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
