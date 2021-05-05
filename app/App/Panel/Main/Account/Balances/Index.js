@@ -26,7 +26,6 @@ function balance (rawBalance, rate) {
   const balance = BigNumber(rawBalance.balance || 0)
   const usdRate = BigNumber(rate)
   const totalValue = balance.times(usdRate)
-
   const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
 
   return {
@@ -45,8 +44,8 @@ function getBalances (chainId, defaultSymbol, rawBalances, rates) {
   const balances = [mainBalance].concat(tokenBalances)
     .filter(Boolean)
     .map(rawBalance => {
-      const rate = rates[rawBalance.symbol] || {}
-      const usdRate = rate.usd || 0
+      const rate = rates[rawBalance.address || rawBalance.symbol] || {}
+      const usdRate = (rate.usd ? rate.usd.price : 0)
 
       return balance(rawBalance, usdRate)
     })
@@ -122,7 +121,6 @@ class Balances extends React.Component {
       storedBalances,
       rates
     )
-
 
     if (!this.state.expand) {
       balances = balances.slice(0, 5)

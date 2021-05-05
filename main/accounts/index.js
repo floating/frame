@@ -575,11 +575,7 @@ class Accounts extends EventEmitter {
   }
 
   scanSelectedAddress () {
-    const address = this.getSelectedAddress()
-
-    if (address) {
-      dataScanner.setActiveAddress(address)
-    }
+    dataScanner.setActiveAddress(this.getSelectedAddress())
   }
 
   stopExternalDataScan () {

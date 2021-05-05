@@ -23,18 +23,20 @@ function ratesScan (symbols) {
 function resetHeartbeat () {
   clearTimeout(heartbeat)
 
-  heartbeat = setTimeout(() => process.kill(process.pid, 'SIGHUP'), 60 * 1000)
+  heartbeat = setTimeout(() => {
+    log.warn('no heartbeat received in 60 seconds, worker exiting')
+    process.kill(process.pid, 'SIGHUP')
+  }, 60 * 1000)
 }
 
 const messageHandler = {
   updateCoins: rates.loadCoins,
   updateRates: ratesScan,
-  updateTokenBalances: tokenScan
+  updateTokenBalances: tokenScan,
+  heartbeat: resetHeartbeat
 }
 
 process.on('message', message => {
-  resetHeartbeat()
-
   log.debug(`received message: ${message.command} [${message.args}]`)
 
   const args = message.args || []

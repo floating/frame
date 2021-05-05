@@ -13,7 +13,6 @@ const nebula = require('nebula')(
 
 const getTokenBalances = require('./tokens')
 const coins = require('./coins')
-const rates = require('../rates')
 
 const provider = ethProvider('frame', { name: 'tokenWorker' })
 
@@ -27,7 +26,7 @@ async function getTokenList (chainId) {
 
   return tokenList.tokens
     .filter(t => t.chainId === chainId)
-    .map(t => ({ ...t, symbol: t.symbol.toLowerCase() }))
+    .map(t => ({ ...t, address: t.address.toLowerCase() }))
 }
 
 async function scan (address, omit = [], knownList) {
@@ -39,15 +38,15 @@ async function scan (address, omit = [], knownList) {
   const coinBalances = (await coins(provider).getCoinBalances(chain, address))
   const foundTokens = await getTokenBalances(chain, address, tokens)
 
-  const tokenBalances = Object.entries(foundTokens).reduce((found, [sym, balance]) => {
-    const symbol = sym.toLowerCase()
+  const tokenBalances = Object.entries(foundTokens).reduce((found, [addr, balance]) => {
+    const address = addr.toLowerCase()
+    const token = tokens.find(t => t.address === address)
+    const symbol = token.symbol.toLowerCase()
 
     if (balance.isZero() || symbolsToOmit.includes(symbol)) return found
 
-    const token = tokens.find(t => t.symbol === symbol)
-
     if (token) {
-      found[symbol] = {
+      found[address] = {
         ...token,
         balance
       }

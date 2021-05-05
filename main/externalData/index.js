@@ -7,7 +7,7 @@ const store = require('../store')
 let activeAddress
 let trackedAddresses = []
 
-let scanWorker, allAddressScan, trackedAddressScan, coinScan
+let scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan
 
 function createWorker () {
   if (scanWorker) {
@@ -32,6 +32,8 @@ function createWorker () {
   scanWorker.on('error', err => {
     if (err.code === 'ERR_IPC_CHANNEL_CLOSED') {
       console.error('scan worker IPC channel closed! restarting worker')
+
+      kill()
       setTimeout(restart, 1000 * 5)
     }
 
@@ -40,6 +42,8 @@ function createWorker () {
 
   scanWorker.on('exit', code => {
     log.warn(`scan worker exited with code ${code}, restarting worker`)
+
+    kill()
     setTimeout(restart, 1000 * 5)
   })
 
@@ -60,6 +64,7 @@ function startScan (fn, interval) {
   return setInterval(fn, interval)
 }
 
+const sendHeartbeat = () => sendCommandToWorker('heartbeat')
 const updateCoinUniverse = () => sendCommandToWorker('updateCoins')
 const updateRates = symbols => sendCommandToWorker('updateRates', [symbols])
 const updateTrackedTokens = () => { if (activeAddress) { sendCommandToWorker('updateTokenBalances', [[activeAddress]]) } }
@@ -84,13 +89,17 @@ function start (addresses = [], omitList = [], knownList) {
   addAddresses(addresses)
 
   if (scanWorker) {
-    log.warn('external data worker already scanning!')
+    log.warn('external data worker already scanning')
     return
   }
 
   log.info('starting external data scanner')
 
   scanWorker = createWorker()
+
+  if (!heartbeat) {
+    heartbeat = startScan(sendHeartbeat, 1000 * 20)
+  }
 
   if (!coinScan) {
     // update list of known coins/tokens every 10 minutes
@@ -109,10 +118,15 @@ function start (addresses = [], omitList = [], knownList) {
 }
 
 function stop () {
-  log.info('stopping external data worker')
+  log.info('stopping external data worker');
 
-  [allAddressScan, trackedAddressScan, coinScan]
-      .forEach(scanner => { if (scanner) clearInterval(scanner) })
+  [heartbeat, allAddressScan, trackedAddressScan, coinScan]
+    .forEach(scanner => { if (scanner) clearInterval(scanner) })
+
+  heartbeat = null
+  allAddressScan = null
+  trackedAddressScan = null
+  coinScan = null
 }
 
 function restart () {
