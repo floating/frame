@@ -65,7 +65,7 @@ class Signer extends React.Component {
     const activeAccounts = signer.addresses.filter(a => this.store('main.accounts', a.toLowerCase()))
 
     return (
-      <div className='signer'>
+      <div className='signer' style={{ zIndex: 1000 - this.props.index }}>
         <div className='signerTop'>
           <div className='signerType'>{this.props.type + ' Signer'}</div>
           <div className='signerName'>
@@ -108,8 +108,8 @@ class Signer extends React.Component {
             <div className='signerAccountsTitle'>
               <span>{'Add & Remove Accounts'}</span>
               <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
-                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
                 <span>{'active'}</span> 
+                <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
               </span>
             </div>
             <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
@@ -139,6 +139,20 @@ class Signer extends React.Component {
             </div>
           </>
         )}
+        <div className='signerDrawer' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
+          <div className='showControls'>
+            {this.state.showControls ? 'hide' : 'settings'}
+          </div>
+          <div className='showControlsLine' />
+        </div>
+        {this.state.showControls ? (
+          <div className='signerControls cardShow'>
+            <div className='signerControlOption'>Deactivte Accounts</div>
+            <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
+              link.send('dash:removeSigner', this.props.id)
+            }}>Remove Signer</div>
+            </div>
+        ) : null}
       </div>
     )
   }

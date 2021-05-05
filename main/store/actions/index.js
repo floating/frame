@@ -121,6 +121,14 @@ module.exports = {
   updateLattice: (u, deviceId, update) => {
     if (deviceId && update) u('main.lattice', deviceId, (current = {}) => Object.assign(current, update))
   },
+  removeLattice: (u, deviceId) => {
+    if (deviceId) {
+      u('main.lattice', (lattice = {}) => {
+        delete lattice[deviceId]
+        return lattice
+      })
+    }
+  },
   setLatticeAccountLimit: (u, limit) => {
     u('main.latticeSettings.accountLimit', () => limit)
   },

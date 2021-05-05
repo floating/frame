@@ -148,6 +148,7 @@ class AddHardwareLattice extends React.Component {
               </div>
             </div>
           </div>
+          <div className='addAccountItemFooter' />
         </div>
       </div>
     )

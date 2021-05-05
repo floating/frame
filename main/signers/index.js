@@ -47,6 +47,7 @@ class Signers extends EventEmitter {
           const result = await signer.setPair(pin)
           return result
         } catch (err) {
+          log.error('latticePair Error', err)
           return new Error(err)
         }
       } else {

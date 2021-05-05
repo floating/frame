@@ -23,6 +23,7 @@ class Lattice extends Signer {
     this.signers = signers
 
     this.id = 'lattice-' + deviceId
+    this.deviceId = deviceId
     this.type = 'lattice'
     this.status = 'loading'
 
@@ -30,7 +31,7 @@ class Lattice extends Signer {
     this.baseUrl = ''
     this.privKey = ''
 
-    store.observer(() => {
+    this.latticeObs = store.observer(() => {
       this.config = store('main.lattice', deviceId) || {}
       if (!this.config.privKey) {
         store.updateLattice(deviceId, { privKey: crypto.randomBytes(32).toString('hex') })
@@ -71,6 +72,7 @@ class Lattice extends Signer {
       if (hasActiveWallet) await this.deriveAddresses()
       return this.addresses
     } catch (err) {
+      log.error('Lattice setPair Error', err)
       return new Error(err)
     }
   }
@@ -85,20 +87,23 @@ class Lattice extends Signer {
           await this.deriveAddresses()
         } else {
           this.status = 'pairing'
+          this.update()
         }
       } else {
         return new Error('No deviceId')
       }
     } catch (err) {
+      log.error('Lattice Open Error', err)
       return new Error(err)
     }
   }
 
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
-    this.varObserver.remove()
+    this.latticeObs.remove()
     this.closed = true
     store.removeSigner(this.id)
+    store.removeLattice(this.deviceId)
     super.close()
   }
 
@@ -107,21 +112,27 @@ class Lattice extends Signer {
   }
 
   async deriveAddresses () {
+    console.log('deriveAddresses')
+    const accountLimit = store('main.latticeSettings.accountLimit')
+    console.log('deriveAddress accountLimit', accountLimit)
     try {
       const req = {
         currency: 'ETH',
         startPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, 0],
-        n: store('main.latticeSettings.accountLimit'),
+        n: accountLimit,
         skipCache: true
       }
+      console.log('deriveAddresses 1')
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
+      console.log('deriveAddresses 2')
       const result = await getAddresses(req)
+      console.log('deriveAddresses 3')
       this.status = 'ok'
       this.addresses = result
       this.update()
       return result
     } catch (err) {
-      // no active wallet return nothing
+      this.status = 'locked'
       this.update()
       return []
     }
@@ -138,8 +149,7 @@ class Lattice extends Signer {
     this.deviceStatusActive = true
     try {
       // If signer has no addresses, try deriving them
-      if (!this.paired) await this.open()
-      await this.deriveAddresses()
+      await this.open()
       this.deviceStatusActive = false
     } catch (err) {
       this.deviceStatusActive = false
