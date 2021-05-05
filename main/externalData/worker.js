@@ -10,14 +10,14 @@ function tokenScan (addresses) {
   addresses.forEach(address => {
     scanTokens(address)
       .then(found => process.send({ type: 'tokens', address, found }))
-      .catch(log.error)
+      .catch(err => log.error('token scan error', err))
   })
 }
 
 function ratesScan (symbols) {
   rates.loadRates(symbols)
     .then(loadedRates => process.send({ type: 'rates', rates: loadedRates }))
-    .catch(log.error)
+    .catch(err => log.error('rates scan error', err))
 }
 
 function resetHeartbeat () {
