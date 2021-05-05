@@ -26,7 +26,7 @@ div
 
   .addAccounts
     position absolute
-    top 100px
+    top 0px
     left 0
     right 0
     bottom 0
@@ -34,6 +34,23 @@ div
     z-index 4000
     overflow-y scroll
     overflow-x hidden
+
+    .addAccountsHeader
+      height 100px
+
+      .addAccountsHeaderClose
+        position absolute
+        top 15px
+        right 14px
+        padding 10px
+        border-radius 8px
+        cursor pointer
+
+        *
+          pointer-events none
+
+      .addAccountsHeaderClose:hover
+        background var(--ghostC)
 
     .accountTypeSelect
       height 60px
@@ -47,18 +64,26 @@ div
       cursor pointer
 
   .newAccount
-    height 64px
-    width 310px
+    height 40px
+    // width 310px
     background var(--ghostB) // var(--ghostE) 0%, var(--ghostG) 70%)
-    border-radius 12px
+    border-radius 24px
     display flex
     justify-content center
     align-items center
-    margin 20px
+    margin 40px
     box-shadow 0px 9px 3px outerspace
     cursor pointer
-    font-size 20px
-    font-weight 100
+    font-size 15px
+    font-weight 500
+    background var(--good)
+    color var(--goodDark)
+    text-transform uppercase
+    border-bottom 3px solid var(--goodShade)
+    box-shadow 0px 0px 12px var(--good02), 0px 24px 12px -14px var(--ghostY)
+    padding-top 1px
+    box-sizing border-box
+    
 
   .signers
     width 100%
@@ -84,23 +109,26 @@ div
       // padding 4px
       
     .signersHeader
-      height 40px
-      width 100%
+      width calc(100% - 24px)
       display flex
       align-items center
-      padding-left 8px
-      padding-top 16px
-      font-size 19px
+      padding 12px 4px 11px 4px
+      font-size 18px
       font-weight 100
+      border-bottom 1px solid var(--ghostY)
+      border-top 1px solid var(--ghostY)
+      // background var(--ghostY)
+      margin 0px 12px 10px 12px
+      box-sizing border-box
 
     .noSigners
       position relative
-      width 348px
-      height 30px
+      width 100%
+      height 48px
       overflow hidden
-      background var(--ghostC)
+      background var(--ghostA)
       box-sizing border-box
-      margin 4px
+      margin 0px 10px 40px 10px
       border-radius 8px
       display flex
       justify-content center

@@ -128,7 +128,17 @@ class Pending extends React.Component {
           <div className='pendingSignerTop'>
             {this.renderLoadingLive()}
             <div className='pendingSignerLogo'>
-              {this.props.type === 'ledger' ? <div style={{ marginTop: '4px' }}>{svg.ledger(25)}</div> : svg.trezor(25)}
+              {this.props.type === 'ledger' && (
+                <div style={{ marginTop: '4px' }}>
+                  {svg.ledger(25)}
+                </div>
+              )}
+              {this.props.type === 'trezor' && (
+                svg.trezor(25)
+              )}
+              {this.props.type === 'lattice' && (
+                svg.lattice(25)
+              )}
             </div>
             <div className='pendingSignerText'>
               <div className='pendingSignerType'>{this.props.type + ' Found'}</div>

@@ -610,6 +610,7 @@ class Account extends React.Component {
           if (type === 'trezor') return <div className='signerSelectIconWrap signerIconHardware'>{svg.trezor(20)}</div>
           if (type === 'seed' || type === 'ring') return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
           if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
+          if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
           return <div className='signerSelectIconWrap'>{svg.logo(20)}</div>
         })()}
       </div>

@@ -1,11 +1,11 @@
 .signer
   position relative
-  width 348px
+  width 100%
   // height 300px
   overflow hidden
-  background var(--ghostB)
+  background var(--ghostA)
   box-sizing border-box
-  margin 4px
+  margin 0px 10px 40px 10px
   border-radius 8px
 
   .signerTop
@@ -14,18 +14,40 @@
 
   .signerName
     position absolute
-    top 30px
+    top 9px
     left 4px
-    right 4px
-    height 36px
-    border-radius 18px
+    height 28px
+    padding 0px 9px
+    border-radius 8px
     // text-align center
     // border-top 1px solid var(--ghostZ)
     // border-bottom 1px solid var(--ghostZ)
-    background var(--ghostA)
     display flex
-    justify-content center
+    // justify-content center
     align-items center
+    box-sizing border-box
+
+    .signerNameUpdate
+      position absolute
+      width 28px
+      height 28px
+      // background red
+      right -34px
+      color var(--good)
+      display flex
+      align-items center
+      cursor pointer
+      pointer-events none
+      opacity 0
+      *
+        pointer-events none
+
+  .signerNameFocused
+    background var(--ghostZ)
+    .signerNameUpdate
+      opacity 1
+      
+
 
   .signerType
     // position absolute
@@ -35,9 +57,9 @@
     // text-transform uppercase
     // font-weight 400
     position absolute
-    top 6px
-    left 10px
-    font-size 12px
+    top 38px
+    left 14px
+    font-size 10px
     text-transform uppercase
     font-weight 400
     letter-spacing 1px
@@ -52,8 +74,8 @@
 
   .signerStatusIndicator
     position absolute
-    top 10px
-    right 10px
+    top 18px
+    right 18px
     font-size 12px
     text-transform uppercase
     font-weight 400
@@ -71,8 +93,8 @@
 
   .signerStatusText
     position absolute
-    top 6px
-    right 30px
+    top 15px
+    right 45px
     font-size 12px
     text-transform uppercase
     font-weight 400
@@ -108,7 +130,7 @@
       text-align center
 
     .signerBottomPageBack
-      background var(--ghostD)
+      background var(--ghostC)
       padding 2px 1px 2px 2px
       height 24px
       width 24px
@@ -119,7 +141,7 @@
         pointer-events none
 
     .signerBottomPageNext
-      background var(--ghostD)
+      background var(--ghostC)
       transform rotate(180deg)
       padding 2px 2px 2px 1px
       height 24px
@@ -130,11 +152,101 @@
       *
         pointer-events none
 
+  .signerDrawer
+    position relative
+    height 40px
+
+    .showControls
+      position absolute
+      height 20px
+      border-radius 10px
+      border 1px solid var(--ghostZ)
+      background var(--ghostA)
+      z-index 2
+      top 9px
+      left 50%
+      width 100px
+      margin-left -50px
+      font-size 10px
+      display flex
+      justify-content center
+      align-items center
+      text-transform uppercase
+      cursor pointer
+      color var(--outerspace02)
+      transition var(--standardFast)
+
+    .showControls:hover
+      background var(--ghostB)
+      color var(--outerspace)
+
+    .showControlsLine
+      height 1px
+      position absolute 
+      top 50%
+      left 0
+      right 0
+      background var(--ghostZ)
+      z-index 1
+      margin-top -1px
+
+  .signerControls
+    padding-top 10px
+
+    .signerControlOption
+      height 40px
+      background var(--ghostB)
+      margin 0px 10px 10px 10px
+      border-radius 8px
+      display flex
+      justify-content center
+      align-items center
+      font-size 14px
+      cursor pointer
+
+      *
+        pointer-events none
+
+    .signerControlOptionImportant
+      color var(--bad)
+
+  .signerLatticePair
+    height 200px
+
+    .signerLatticePairTitle
+      height 40px
+      display flex
+      justify-content center
+      align-items center
+      font-size 17px
+      font-weight 200
+      text-transform none
+
+    .signerLatticePairInput
+      background var(--ghostC)
+      height 60px
+      border-radius 8px
+      margin 10px 0px 20px 0px
+
+    .signerLatticePairSubmit
+      width 100px
+      height 30px
+      display flex
+      justify-content center
+      align-items center
+      background var(--ghostC)
+      border-radius 15px
+      position relative
+      left 50%
+      margin-left -50px
+      cursor pointer
+      *
+        pointer-events none
 
   .signerAccountsTitle
     // background pink
-    font-size 13px
-    font-weight 400
+    font-size 12px
+    font-weight 300
     display flex
     justify-content space-between
     align-items center
@@ -142,19 +254,33 @@
     padding 0px 12px 4px 12px
 
   .signerAccountsTitleActive
-    font-weight 600
     text-transform uppercase
     font-size 10px
+    font-weight 600
+    letter-spacing 1px
     display flex
     justify-content space-between
     align-items center
+    color var(--outerspace)
 
     .signerAccountsTitleActiveCount
-      font-size 14px
-      padding-right 4px
+      font-size 13px
+      margin-left 5px
+      font-weight 400
+      margin-top -1px
+      height 24px
+      width 24px
+      border-radius 12px
+      box-sizing border-box
+      display flex
+      justify-content center
+      align-items center
+      padding-left 1px
+      background var(--ghostZ)
 
   .signerAccountsTitleActiveOn
-    color var(--good)
+    .signerAccountsTitleActiveCount
+      color var(--good)
 
   .signerAccounts
     //position absolute
@@ -178,8 +304,8 @@
       margin 4px 6px
       width calc(100% - 12px)
       position relative
-      border-bottom 1px solid var(--ghostC)
-      background var(--ghostD)
+      border-bottom 1px solid var(--ghostB)
+      background var(--ghostC)
       border-radius 12px
       box-shadow 0px 2px 3px var(--ghostZ)
       cursor pointer
@@ -226,12 +352,45 @@
         display flex
         justify-content center
         align-items center
-        color var(--ghostA)
+        color var(--ghostZ)
 
     .signerAccountAdded
       color var(--good)
       .signerAccountCheck
         color var(--good)
 
-    .signerAccount:last-child
+    .signerAccountlast-child
       border-bottom none
+
+.signerLoading
+  height 60px
+  display flex
+  justify-content center
+  align-items center
+  padding-bottom 20px
+
+.signerLoadingLoader, .signerLoadingLoaderafter
+  border-radius 50%
+  width 50px
+  height 50px
+
+.signerLoadingLoader
+  margin 60px auto
+  font-size 10px
+  position relative
+  text-indent -9999em
+  border-top 3px solid var(--ghostZ)
+  border-right 3px solid var(--ghostZ)
+  border-bottom 3px solid var(--ghostZ)
+  border-left 3px solid var(--good)
+  transform translateZ(0)
+  animation load8 0.5s infinite linear
+
+@keyframes load8
+  0%
+    -webkit-transform rotate(0deg)
+    transform rotate(0deg)
+
+  100%
+    -webkit-transform rotate(360deg)
+    transform rotate(360deg)

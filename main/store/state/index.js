@@ -145,6 +145,10 @@ const initial = {
     accountCloseLock: main('accountCloseLock', false),
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
+    lattice: main('lattice', {}),
+    latticeSettings: {
+      accountLimit: main('latticeSettings.accountLimit', 4)
+    },
     ledger: {
       derivation: main('ledger.derivation', 'legacy'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)

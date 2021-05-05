@@ -4,11 +4,16 @@ const log = require('electron-log')
 const hot = require('./hot')
 const ledger = require('./ledger')
 const trezorConnect = require('./trezor-connect')
+const lattice = require('./lattice')
+
+const store = require('../store')
 
 class Signers extends EventEmitter {
   constructor () {
     super()
     this.signers = []
+    // this.lattice = lattice(this)
+    lattice.scan(this)
     hot.scan(this)
     ledger.scan(this)
     trezorConnect.scan(this)
@@ -31,6 +36,55 @@ class Signers extends EventEmitter {
       cb(null, { status: 'ok' })
     } else {
       cb(new Error('Set phrase not avaliable...'))
+    }
+  }
+
+  async latticePair (id, pin) {
+    try {
+      const signer = this.get(id)
+      if (signer && signer.setPair) {
+        try {
+          const result = await signer.setPair(pin)
+          return result
+        } catch (err) {
+          log.error('latticePair Error', err)
+          return new Error(err)
+        }
+      } else {
+        return new Error('Could not pair')
+      }
+    } catch (err) {
+      return new Error(err)
+    }
+  }
+
+  async createLattice (deviceId) {
+    if (deviceId) {
+      store.updateLattice(deviceId, { 
+        deviceId, 
+        baseUrl: 'https://signing.gridpl.us',
+        endpointMode: 'default',
+        suffix: '' 
+      })    
+      return { id: 'lattice-' + deviceId}
+    } else {
+      throw new Error('No Device ID')
+    }
+  }
+
+
+  async latticeConnect (connectOpts) {
+    const signer = lattice(this)
+    if (signer && signer.open) {
+      try {
+        const response = await signer.open(connectOpts)
+
+        return response
+      } catch (err) {
+        throw new Error('Could not connect to lattice', err)
+      }
+    } else {
+      return new Error('Lattice, no signer or signer not open')
     }
   }
 

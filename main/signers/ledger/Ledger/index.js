@@ -15,8 +15,8 @@ const BASE_PATH_LEGACY_TEST = '44\'/1\'/0\'/'
 const BASE_PATH_LIVE = '44\'/60\'/'
 const BASE_PATH_LIVE_TEST = '44\'/1\'/'
 
-const BASE_PATH_STANDARD = `44\'/60\'/0\'/0/`
-const BASE_PATH_STANDARD_TEST = `44\'/1\'/0\'/0/`
+const BASE_PATH_STANDARD = '44\'/60\'/0\'/0/'
+const BASE_PATH_STANDARD_TEST = '44\'/1\'/0\'/0/'
 
 class Ledger extends Signer {
   constructor (devicePath, signers, scan) {

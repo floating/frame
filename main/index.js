@@ -100,7 +100,6 @@ ipcMain.on('tray:installAvailableUpdate', (e, install, dontRemind) => {
 })
 
 ipcMain.on('tray:removeAccount', (e, id) => {
-  signers.remove(id)
   accounts.remove(id)
 })
 
@@ -108,7 +107,7 @@ ipcMain.on('tray:renameAccount', (e, id, name) => {
   accounts.rename(id, name)
 })
 
-ipcMain.on('tray:removeSigner', (e, id) => {
+ipcMain.on('dash:removeSigner', (e, id) => {
   signers.remove(id)
 })
 

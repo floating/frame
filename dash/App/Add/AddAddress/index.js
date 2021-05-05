@@ -110,6 +110,7 @@ class AddPhrase extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Address</div>
             </div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
             <div className='addAccountItemSummary'>An address account represents an address but cannot sign for it</div>
           </div>
           <div className='addAccountItemOption'>

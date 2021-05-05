@@ -115,6 +115,23 @@ module.exports = {
     const data = { on: false, state: 'off', latest: false, installed: false, version: null }
     u(`main.clients.${client}`, () => data)
   },
+  setLatticeConfig: (u, id, key, value) => {
+    u('main.lattice', id, key, () => value)
+  },
+  updateLattice: (u, deviceId, update) => {
+    if (deviceId && update) u('main.lattice', deviceId, (current = {}) => Object.assign(current, update))
+  },
+  removeLattice: (u, deviceId) => {
+    if (deviceId) {
+      u('main.lattice', (lattice = {}) => {
+        delete lattice[deviceId]
+        return lattice
+      })
+    }
+  },
+  setLatticeAccountLimit: (u, limit) => {
+    u('main.latticeSettings.accountLimit', () => limit)
+  },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
