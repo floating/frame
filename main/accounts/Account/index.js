@@ -88,6 +88,7 @@ class Account {
     const availiableSigners = []
     const signers = store('main.signers')
     Object.keys(signers).forEach(id => {
+      if (!signers[id] || !id) return
       if (signers[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
         availiableSigners.push(signers[id])
       }

@@ -119,6 +119,7 @@ class AddPhrase extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Phrase</div>
             </div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
             <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
           </div>
           <div className='addAccountItemOption'>

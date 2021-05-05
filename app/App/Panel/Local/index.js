@@ -14,9 +14,9 @@ class Settings extends React.Component {
     this.networkType = context.store('main.currentNetwork.type')
     const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    const latticeEndpoint = context.store('main.lattice.endpoint')
-    const latticeEndpointMode = context.store('main.lattice.endpointMode')
-    const latticeSuffix = context.store('main.lattice.suffix')
+    const latticeEndpoint = context.store('main.latticeSettings.endpoint')
+    const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
+    const latticeSuffix = context.store('main.latticeSettings.suffix')
     this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeSuffix, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
@@ -102,6 +102,7 @@ class Settings extends React.Component {
     clearTimeout(this.inputLatticeTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ latticeEndpoint: value })
+    // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpoint', this.state.latticeEndpoint), 1000)
   }
 
@@ -110,6 +111,7 @@ class Settings extends React.Component {
     clearTimeout(this.inputLatticeSuffixTimeout)
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ latticeSuffix: value })
+    // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeSuffixTimeout = setTimeout(() => link.send('tray:action', 'setLatticeSuffix', this.state.latticeSuffix), 1000)
   }
 
@@ -358,7 +360,7 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lattice Accounts</div>
               <Dropdown
-                syncValue={this.store('main.lattice.accountLimit')}
+                syncValue={this.store('main.latticeSettings.accountLimit')}
                 onChange={(value) => link.send('tray:action', 'setLatticeAccountLimit', value)}
                 options={[
                   { text: '1', value: 1 },
@@ -382,7 +384,7 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lattice Relay</div>
               <Dropdown
-                  syncValue={this.store('main.lattice.endpointMode')}
+                  syncValue={this.store('main.latticeSettings.endpointMode')}
                   onChange={(value) => {
 
                     let newState = {

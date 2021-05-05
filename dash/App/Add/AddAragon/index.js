@@ -151,10 +151,10 @@ class AddAragon extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
-                <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
               </div>
               <div className='addAccountItemTopTitle'>Aragon</div>
             </div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
             <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
           </div>
           <div className='addAccountItemOption'>

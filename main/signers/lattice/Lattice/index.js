@@ -1,19 +1,15 @@
-const windows = require('../../../windows')
+const crypto = require('crypto')
 const log = require('electron-log')
 const utils = require('web3-utils')
-const Client = require('gridplus-sdk').Client
 const EthereumTx = require('ethereumjs-tx')
+const { Client } = require('gridplus-sdk')
+const { promisify } = require('util')
+
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const crypto = require('crypto')
-const promisify = require('util').promisify
+
 const HARDENED_OFFSET = 0x80000000
-const clientConfig = {
-  name: 'Frame',
-  crypto: crypto,
-  privKey: null,
-  timeout: 30000
-}
+
 function humanReadable (str) {
   for (let i = 0; i < str.length; i++) {
     if (str.charCodeAt(i) < 0x0020 || str.charCodeAt(i) > 0x007f) { return false }
@@ -22,83 +18,92 @@ function humanReadable (str) {
 }
 
 class Lattice extends Signer {
-  constructor (device, signers) {
+  constructor (deviceId, signers) { 
     super()
     this.signers = signers
-    log.info('Setting up Lattice device')
-    this.device = device
-    this.id = this.getId()
-    this.accountLimit = store('main.lattice.accountLimit')
-    clientConfig.baseUrl = store('main.lattice.endpoint')
-    const frameSuffix = store('main.lattice.suffix')
-    if (frameSuffix) clientConfig.name = `Frame-${frameSuffix}`
 
-    let password = store('main.lattice.password')
-    if (!password) {
-      password = crypto.randomBytes(32).toString('hex')
-      store.setLatticePassword(password)
-    }
-    clientConfig.privKey = password
-
-    this.client = new Client(clientConfig)
+    this.id = 'lattice-' + deviceId
+    this.deviceId = deviceId
     this.type = 'lattice'
-    this.network = store('main.currentNetwork.id')
     this.status = 'loading'
-    this.index = 0
 
-    this.varObserver = store.observer(() => {
-      if (
-        this.network !== store('main.currentNetwork.id')
-      ) {
-        this.reset()
+    this.suffix = ''
+    this.baseUrl = ''
+    this.privKey = ''
+
+    this.latticeObs = store.observer(() => {
+      this.config = store('main.lattice', deviceId) || {}
+      if (!this.config.privKey) {
+        store.updateLattice(deviceId, { privKey: crypto.randomBytes(32).toString('hex') })
+      } else {
+        if (
+          this.suffix !== this.config.suffix ||
+          this.baseUrl !== this.config.baseUrl ||
+          this.privKey !== this.config.privKey
+        ) {
+          this.client = this.createClient()
+        }
       }
     })
 
+    this.client = this.createClient()
+    
+    this.update()
     this.deviceStatus()
   }
 
-  getId () {
-    return this.fingerprint() || 'Lattice-' + this.device.deviceID
+  createClient () {
+    const { suffix, baseUrl, privKey } = this.config
+    const clientConfig = {
+      name: suffix ? `Frame-${suffix}` : 'Frame',
+      crypto: crypto,
+      privKey: null,
+      timeout: 30000,
+      baseUrl,
+      privKey
+    }
+    return new Client(clientConfig)
   }
 
-  async setPin (pin) {
+  async setPair (pin) {
     try {
       const clientPair = promisify(this.client.pair).bind(this.client)
-
       const hasActiveWallet = await clientPair(pin)
-
-      if (hasActiveWallet) {
-        await this.deriveAddresses()
-        store.setLatticeDeviceID(this.device.deviceID)
-      }
+      if (hasActiveWallet) await this.deriveAddresses()
       return this.addresses
     } catch (err) {
+      log.error('Lattice setPair Error', err)
       return new Error(err)
     }
   }
 
   async open () {
     try {
-      if (this.device.deviceID) {
+      if (this.config.deviceId) {
         const clientConnect = promisify(this.client.connect).bind(this.client)
-
-        const isPaired = await clientConnect(this.device.deviceID)
-
-        if (isPaired) {
+        this.paired = await clientConnect(this.config.deviceId)
+        if (this.paired) {
+          this.status = 'addresses'
           await this.deriveAddresses()
+        } else {
+          this.status = 'pairing'
+          this.update()
         }
-        return [this.addresses, isPaired]
+      } else {
+        return new Error('No deviceId')
       }
     } catch (err) {
+      log.error('Lattice Open Error', err)
       return new Error(err)
     }
   }
 
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
-    this.varObserver.remove()
+    this.latticeObs.remove()
     this.closed = true
     store.removeSigner(this.id)
+    store.removeLattice(this.deviceId)
     super.close()
   }
 
@@ -107,22 +112,24 @@ class Lattice extends Signer {
   }
 
   async deriveAddresses () {
+    // TODO: Move these settings to be device spectifc
+    const accountLimit = store('main.latticeSettings.accountLimit')
     try {
       const req = {
         currency: 'ETH',
         startPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, 0],
-        n: this.accountLimit,
+        n: accountLimit,
         skipCache: true
       }
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
-
       const result = await getAddresses(req)
       this.status = 'ok'
       this.addresses = result
       this.update()
       return result
     } catch (err) {
-      // no active wallet return nothing
+      this.status = 'locked'
+      this.update()
       return []
     }
   }
@@ -138,7 +145,7 @@ class Lattice extends Signer {
     this.deviceStatusActive = true
     try {
       // If signer has no addresses, try deriving them
-      await this.deriveAddresses()
+      await this.open()
       this.deviceStatusActive = false
     } catch (err) {
       this.deviceStatusActive = false
@@ -183,20 +190,7 @@ class Lattice extends Signer {
     }
   }
 
-  setIndex (i, cb) {
-    this.index = i
-    this.requests = {} // TODO Decline these requests before clobbering them
-    windows.broadcast('main:action', 'updateSigner', this.summary())
-    cb(null, this.summary())
-    this.deriveAddresses()
-  }
-
   update () {
-    const id = this.getId()
-    if (this.id !== id) { // Singer address representation changed
-      store.removeSigner(this.id)
-      this.id = id
-    }
     store.updateSigner(this.summary())
   }
 
@@ -204,7 +198,6 @@ class Lattice extends Signer {
     this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []
-    windows.broadcast('main:action', 'updateSigner', this.summary())
     await this.deriveAddresses()
   }
 
@@ -264,10 +257,7 @@ class Lattice extends Signer {
         signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
       }
 
-      const signOpts = {
-        currency: 'ETH',
-        data: unsignedTxn
-      }
+      const signOpts = { currency: 'ETH', data: unsignedTxn }
       const clientSign = promisify(this.client.sign).bind(this.client)
       const result = await clientSign(signOpts)
 

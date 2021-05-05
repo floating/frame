@@ -37,6 +37,7 @@ class AddHardware extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>{this.deviceName}</div>
             </div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
             <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           </div>
           <div className='addAccountItemDevices'>

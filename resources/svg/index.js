@@ -404,7 +404,18 @@ module.exports = {
   lattice: size => {
     return (
       <div style={{ width: size + 'px', height: size + 'px' }}>
-        <img src={gridPlusLogo} height={size} width={size} />
+        <svg viewBox='0 0 448 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M416 32H32A32 32 0 0 0 0 64v384a32 32 0 0 0 32 32h384a32 32 0 0 0 32-32V64a32 32 0 0 0-32-32zm-32 64v128H256V96zm-192 0v128H64V96zM64 416V288h128v128zm192 0V288h128v128z' />
+        </svg>
+      </div>
+    )
+  },
+  close: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 24 24' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' fillRule='evenodd' d='M5.72 5.72a.75.75 0 011.06 0L12 10.94l5.22-5.22a.75.75 0 111.06 1.06L13.06 12l5.22 5.22a.75.75 0 11-1.06 1.06L12 13.06l-5.22 5.22a.75.75 0 01-1.06-1.06L10.94 12 5.72 6.78a.75.75 0 010-1.06z' />
+        </svg>
       </div>
     )
   },

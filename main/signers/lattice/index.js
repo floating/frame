@@ -1,28 +1,18 @@
-const windows = require('../../windows')
-
+const log = require('electron-log')
 const store = require('../../store')
 const LatticeDevice = require('./Lattice')
 
-const openConnect = async (device, signers) => {
-  const signer = new LatticeDevice(device, signers)
-  // signers.signers[`Lattice-${device.deviceID}`] = signer;
-  windows.broadcast('main:action', 'addSigner', signer.summary())
-  const response = await signer.open()
-  signers.add(signer)
-  return response
-}
-
-module.exports = (signers) => ({
-  scan: () => {
-    const deviceID = store('main.lattice.deviceID')
-    if (deviceID) {
-      openConnect({ deviceID }, signers)
-    }
-  },
-  pair: async () => {
-
-  },
-  open: async (device) => {
-    return await openConnect(device, signers)
+module.exports = {
+  scan: (signers) => {
+    store.observer(() => {
+      const lattice = store('main.lattice') || {}
+      Object.keys(lattice).forEach(async deviceId => {
+        if (!deviceId) return
+        log.info('Found a Lattice that isn\'t a signer, deviceId ', deviceId)
+        if (store('main.signers', deviceId)) return console.log('signer already exists', store('main.signers', deviceId))
+        const signer = new LatticeDevice(deviceId, signers)
+        signers.add(signer)
+      })
+    })
   }
-})
+}

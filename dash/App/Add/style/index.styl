@@ -231,6 +231,20 @@
     flex-direction column
     position relative
 
+  .addAccountItemClose
+    position absolute
+    top 15px
+    right 14px
+    padding 10px
+    border-radius 8px
+    cursor pointer
+
+    *
+      pointer-events none
+
+  .addAccountItemClose:hover
+    background var(--ghostC)
+  
   .addAccountItemTopType
     position absolute
     top 0
@@ -466,7 +480,6 @@
       display flex
       width 1000%
       height 100%
-      // background var(--ghostA)
 
       .addAccountItemOptionSetupFrame
         display flex
@@ -476,7 +489,11 @@
         transition var(--standardSlow)
         width 10%
         overflow-y scroll
-        // background red
+        background var(--ghost)
+        height 100%
+        display flex
+        justify-content center
+        align-items center
 
                 // .addressList
         // .signerAddress
