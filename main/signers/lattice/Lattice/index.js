@@ -23,6 +23,7 @@ class Lattice extends Signer {
     this.signers = signers
 
     this.id = 'lattice-' + deviceId
+    this.deviceId = deviceId
     this.type = 'lattice'
     this.status = 'loading'
 
@@ -30,7 +31,7 @@ class Lattice extends Signer {
     this.baseUrl = ''
     this.privKey = ''
 
-    store.observer(() => {
+    this.latticeObs = store.observer(() => {
       this.config = store('main.lattice', deviceId) || {}
       if (!this.config.privKey) {
         store.updateLattice(deviceId, { privKey: crypto.randomBytes(32).toString('hex') })
@@ -71,6 +72,7 @@ class Lattice extends Signer {
       if (hasActiveWallet) await this.deriveAddresses()
       return this.addresses
     } catch (err) {
+      log.error('Lattice setPair Error', err)
       return new Error(err)
     }
   }
@@ -85,20 +87,23 @@ class Lattice extends Signer {
           await this.deriveAddresses()
         } else {
           this.status = 'pairing'
+          this.update()
         }
       } else {
         return new Error('No deviceId')
       }
     } catch (err) {
+      log.error('Lattice Open Error', err)
       return new Error(err)
     }
   }
 
   close () {
     if (this._pollStatus) clearTimeout(this._pollStatus)
-    this.varObserver.remove()
+    this.latticeObs.remove()
     this.closed = true
     store.removeSigner(this.id)
+    store.removeLattice(this.deviceId)
     super.close()
   }
 
@@ -107,11 +112,13 @@ class Lattice extends Signer {
   }
 
   async deriveAddresses () {
+    // TODO: Move these settings to be device spectifc
+    const accountLimit = store('main.latticeSettings.accountLimit')
     try {
       const req = {
         currency: 'ETH',
         startPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, 0],
-        n: store('main.latticeSettings.accountLimit'),
+        n: accountLimit,
         skipCache: true
       }
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
@@ -121,13 +128,13 @@ class Lattice extends Signer {
       this.update()
       return result
     } catch (err) {
-      // no active wallet return nothing
+      this.status = 'locked'
       this.update()
       return []
     }
   }
 
-  pollStatus (interval = 64 * 1000) { // Detect sleep/wake
+  pollStatus (interval = 21 * 1000) { // Detect sleep/wake
     clearTimeout(this._pollStatus)
     this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
   }
@@ -138,8 +145,7 @@ class Lattice extends Signer {
     this.deviceStatusActive = true
     try {
       // If signer has no addresses, try deriving them
-      if (!this.paired) await this.open()
-      await this.deriveAddresses()
+      await this.open()
       this.deviceStatusActive = false
     } catch (err) {
       this.deviceStatusActive = false

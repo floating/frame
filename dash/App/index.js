@@ -164,7 +164,7 @@ class Dash extends React.Component {
             </div>
             <div className='signersList'>
               {hardwareSigners.length ? (
-                hardwareSigners.map(signer => <Signer key={signer.id} {...signer} />)
+                hardwareSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
               ) : (
                 <div className='noSigners'>
                   {'No hardware signers detected'}
@@ -176,7 +176,7 @@ class Dash extends React.Component {
             </div>
             <div className='signersList'>
               {hotSigners.length ? (
-                hotSigners.map(signer => <Signer key={signer.id} {...signer} />)
+                hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
               ) : (
                 <div className='noSigners'>
                   {'No hot signers detected'}
