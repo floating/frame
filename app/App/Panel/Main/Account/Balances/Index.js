@@ -9,27 +9,28 @@ import BigNumber from 'bignumber.js'
 function formatBalance (balance, decimals = 8) {
   return balance
     ? new Intl.NumberFormat('us-US', {
-        maximumFractionDigits: decimals
-      }).format(balance)
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 8
+      }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
     : '-.------'
 }
 
-function formatUsdRate (rate, decimals = 6) {
+function formatUsdRate (rate, decimals = 2) {
   return new Intl.NumberFormat('us-US', {
     style: 'currency',
-    currency: 'usd',
-    maximumFractionDigits: decimals
-  }).format(rate)
+    currency: 'usd'
+  }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
 function balance (rawBalance, rate) {
   const balance = BigNumber(rawBalance.balance || 0)
   const usdRate = BigNumber(rate)
   const totalValue = balance.times(usdRate)
+  const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
 
   return {
     ...rawBalance,
-    displayBalance: formatBalance(balance),
+    displayBalance: formatBalance(balance, balanceDecimals),
     price: formatUsdRate(usdRate),
     totalValue,
     displayValue: formatUsdRate(totalValue)
@@ -43,16 +44,15 @@ function getBalances (chainId, defaultSymbol, rawBalances, rates) {
   const balances = [mainBalance].concat(tokenBalances)
     .filter(Boolean)
     .map(rawBalance => {
-      const rate = rates[rawBalance.symbol] || {}
-      console.log({ rates, symbol: balance.symbol, rate})
-      const usdRate = rate.usd || 0
+      const rate = rates[rawBalance.address || rawBalance.symbol] || {}
+      const usdRate = (rate.usd ? rate.usd.price : 0)
 
       return balance(rawBalance, usdRate)
     })
     .sort((a, b) => {
       if (a.symbol === defaultSymbol) return -1
       if (b.symbol === defaultSymbol) return 1
-      return a.totalValue.minus(b.totalValue).toNumber()
+      return b.totalValue.minus(a.totalValue).toNumber()
     })
 
   const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
@@ -111,7 +111,7 @@ class Balances extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'address')
     const { type, id: chainId } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
-    const storedBalances = this.store('main.accounts', address, 'balances') || {}
+    const storedBalances = this.store('main.balances', address) || {}
 
     const rates = this.store('external.rates')
 

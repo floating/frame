@@ -6,7 +6,7 @@ function balanceCalls (owner, tokens) {
   return tokens.map(token => ({
     target: token.address,
     call: ['balanceOf(address)(uint256)', owner],
-    returns: [[`${token.symbol.toUpperCase()}_BALANCE`, val => new BigNumber(val).shiftedBy(-token.decimals)]]
+    returns: [[`${token.address.toUpperCase()}_BALANCE`, val => new BigNumber(val).shiftedBy(-token.decimals)]]
   }))
 }
 
@@ -16,8 +16,8 @@ async function getTokenBalances (chainId, address, tokens) {
 
   const balances = Object.entries(results.transformed)
     .reduce((balances, [key, balance]) => {
-      const symbol = key.split('_')[0].toLowerCase()
-      balances[symbol] = balance
+      const address = key.split('_')[0].toLowerCase()
+      balances[address] = balance
 
       return balances
     }, {})
