@@ -1,4 +1,5 @@
 const ethProvider = require('eth-provider')
+const log = require('electron-log')
 
 // TODO: use cross chain provider
 // const nebula = require('../nebula')
@@ -21,8 +22,15 @@ async function chainId () {
 }
 
 async function getTokenList (chainId) {
-  const tokenListRecord = await nebula.resolve('tokens.matt.eth')
-  const tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
+  let tokenList
+
+  try {
+    const tokenListRecord = await nebula.resolve('tokens.matt.eth')
+    tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
+  } catch (e) {
+    log.warn('could not load token list, using default', e)
+    tokenList = require('./default-tokens.json')
+  }
 
   return tokenList.tokens
     .filter(t => t.chainId === chainId)
