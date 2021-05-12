@@ -51,7 +51,7 @@ Frame is a web3 interface that lets you sign data, manage accounts, run your own
 › npm install
 
 # Run
-› npm run alpha
+› npm run prod
 ```
 
 **On Windows:** Run `npm install --global --production windows-build-tools` as administrator **before** running the demo. You can find more info about this here: https://github.com/felixrieseberg/windows-build-tools.

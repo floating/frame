@@ -98,8 +98,11 @@ const initial = {
     hardwareDerivation: main('hardwareDerivation', 'mainnet'),
     menubarGasPrice: main('menubarGasPrice', false),
     ledger: {
-      derivation: main('ledger.derivation', 'legacy'),
+      derivation: main('ledger.derivation', 'live'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)
+    },
+    trezor: {
+      derivation: main('trezor.derivation', 'standard')
     },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // New persisted address permissions
@@ -401,7 +404,7 @@ if (initial.main._version < 5) {
     id: 137,
     type: 'ethereum',
     symbol: 'MATIC',
-    name: 'Matic',
+    name: 'Polygon',
     explorer: 'https://explorer.matic.network',
     gas: {
       price: {
@@ -416,6 +419,15 @@ if (initial.main._version < 5) {
   }
 
   initial.main._version = 5
+}
+
+// State transition for derevation paths 
+if (initial.main._version < 6) {
+  if (initial.main.hardwareDerivation === 'testnet') {
+    initial.main.ledger.derivation = 'testnet'
+    initial.main.trezor.derivation = 'testnet'
+  }
+  initial.main._version = 6
 }
 
 module.exports = () => initial
