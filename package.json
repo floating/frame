@@ -49,6 +49,7 @@
     "launch:hot": "cross-env NODE_ENV=production WITH_HOT=true electron ./main",
     "launch:dev": "cross-env NODE_ENV=development electron ./main --inspect",
     "launch:dev:traffic": "cross-env NODE_ENV=development LOG_TRAFFIC=true electron ./main",
+    "launch:dev:worker": "cross-env NODE_ENV=development LOG_WORKER=true electron ./main",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./main",
     "prod": "npm run bundle && npm run launch",
     "hot": "npm run bundle && npm run launch:hot",

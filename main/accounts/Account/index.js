@@ -6,7 +6,7 @@ const abi = require('../../abi')
 // Provider Proxy
 const proxyProvider = require('../../provider/proxy')
 
-const nebula = require('../../nebula')
+const nebula = require('../../nebula')()
 
 const signers = require('../../signers')
 const windows = require('../../windows')
@@ -27,7 +27,7 @@ class Account {
     this.status = 'ok' // Current Status
     this.name = name || capitalize(options.type) + ' Account'
     this.lastSignerType = lastSignerType || options.type
-    this.created = created 
+    this.created = created
     this.address = address
     this.smart = smart
     this.ensName = ensName
@@ -53,7 +53,7 @@ class Account {
       } else {
         this.signer = ''
       }
-      
+
       this.smart = this.signer ? undefined : this.smart
 
       this.update()
@@ -69,7 +69,7 @@ class Account {
       }
     })
 
-    this.lookupAddress() // We need to recheck this on every network change... 
+    this.lookupAddress() // We need to recheck this on every network change...
     this.update()
   }
 

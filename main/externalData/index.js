@@ -17,7 +17,9 @@ function createWorker () {
   scanWorker = fork(path.resolve(__dirname, 'worker.js'))
 
   scanWorker.on('message', message => {
-    log.debug('received message from scan worker: ', message)
+    if (process.env.LOG_WORKER) {
+      log.debug('received message from scan worker: ', message)
+    }
 
     if (message.type === 'tokens') {
       store.setBalances(message.address, message.found)

@@ -22,9 +22,9 @@ function formatUsdRate (rate, decimals = 2) {
   }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
-function balance (rawBalance, rate) {
+function balance (rawBalance, quote = {}) {
   const balance = BigNumber(rawBalance.balance || 0)
-  const usdRate = BigNumber(rate)
+  const usdRate = BigNumber(quote.price || 0)
   const totalValue = balance.times(usdRate)
   const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
 
@@ -32,6 +32,7 @@ function balance (rawBalance, rate) {
     ...rawBalance,
     displayBalance: formatBalance(balance, balanceDecimals),
     price: formatUsdRate(usdRate),
+    priceChange: BigNumber(quote['24hrChange'] || 0).toFixed(2),
     totalValue,
     displayValue: formatUsdRate(totalValue)
   }
@@ -45,9 +46,8 @@ function getBalances (chainId, defaultSymbol, rawBalances, rates) {
     .filter(Boolean)
     .map(rawBalance => {
       const rate = rates[rawBalance.address || rawBalance.symbol] || {}
-      const usdRate = (rate.usd ? rate.usd.price : 0)
 
-      return balance(rawBalance, usdRate)
+      return balance(rawBalance, rate.usd)
     })
     .sort((a, b) => {
       if (a.symbol === defaultSymbol) return -1
@@ -96,6 +96,7 @@ class Balances extends React.Component {
         </div>
         <div className='signerBalanceName'>
           <span className='signerBalanceCurrentPrice'>{balanceInfo.price}</span>
+          <span className='signerBalanceCurrentPrice'>{balanceInfo.priceChange}%</span>
         </div>
         <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
           {balanceInfo.displayBalance}

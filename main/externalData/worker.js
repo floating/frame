@@ -3,6 +3,7 @@ const rates = require('../rates')
 const log = require('electron-log')
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
+log.transports.console.level = process.env.LOG_WORKER ? 'debug' : false
 
 let heartbeat
 
