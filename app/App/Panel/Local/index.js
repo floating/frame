@@ -314,48 +314,50 @@ class Settings extends React.Component {
           </div>
           <div className='signerPermission' style={{ zIndex: 4 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Hardware Derivation</div>
+              <div className='signerPermissionOrigin'>Trezor Derivation</div>
               <Dropdown
-                syncValue={this.store('main.hardwareDerivation')}
-                onChange={(value) => link.send('tray:action', 'setHardwareDerivation', value)}
-                options={[{ text: 'Mainnet', value: 'mainnet' }, { text: 'Testnet', value: 'testnet' }]}
+                syncValue={this.store('main.trezor.derivation')}
+                onChange={(value) => link.send('tray:action', 'setTrezorDerivation', value)}
+                options={[{ text: 'Standard', value: 'standard' }, { text: 'Legacy', value: 'legacy' }, { text: 'Testnet', value: 'testnet' }]}
               />
             </div>
             <div className='signerPermissionDetails'>
-              Derive seperate sets of addresses based on use
+              {'Derivation path for connected Trezor devices'}
             </div>
           </div>
           <div className='signerPermission' style={{ zIndex: 3 }}>
             <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Ledger Type</div>
+              <div className='signerPermissionOrigin'>Ledger Derivation</div>
               <Dropdown
                 syncValue={this.store('main.ledger.derivation')}
                 onChange={(value) => link.send('tray:action', 'setLedgerDerivation', value)}
-                options={[{ text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }, { text: 'Standard', value: 'standard' }]}
+                options={[{ text: 'Live', value: 'live' }, { text: 'Legacy', value: 'legacy' }, { text: 'Standard', value: 'standard' }, { text: 'Testnet', value: 'testnet' }]}
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'Use Ledger\'s Legacy or Live derivation type'}
+              {'Derivation path for connected Ledger devices'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 2 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
-              <Dropdown
-                syncValue={this.store('main.ledger.liveAccountLimit')}
-                onChange={(value) => link.send('tray:action', 'setLiveAccountLimit', value)}
-                options={[
-                  { text: '5', value: 5 },
-                  { text: '10', value: 10 },
-                  { text: '20', value: 20 },
-                  { text: '40', value: 40 }
-                ]}
-              />
+          {this.store('main.ledger.derivation') === 'live' ? (
+            <div className='signerPermission' style={{ zIndex: 2 }}>
+              <div className='signerPermissionControls'>
+                <div className='signerPermissionOrigin'>Ledger Live Accounts</div>
+                <Dropdown
+                  syncValue={this.store('main.ledger.liveAccountLimit')}
+                  onChange={(value) => link.send('tray:action', 'setLiveAccountLimit', value)}
+                  options={[
+                    { text: '5', value: 5 },
+                    { text: '10', value: 10 },
+                    { text: '20', value: 20 },
+                    { text: '40', value: 40 }
+                  ]}
+                />
+              </div>
+              <div className='signerPermissionDetails'>
+                The number of live accounts to derive
+              </div>
             </div>
-            <div className='signerPermissionDetails'>
-              The number of live accounts to derive
-            </div>
-          </div>
+          ) : null}
           <div className='signerPermission' style={{ zIndex: 1 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionOrigin'>Lattice Accounts</div>

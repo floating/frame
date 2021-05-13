@@ -150,8 +150,11 @@ const initial = {
       accountLimit: main('latticeSettings.accountLimit', 4)
     },
     ledger: {
-      derivation: main('ledger.derivation', 'legacy'),
+      derivation: main('ledger.derivation', 'live'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)
+    },
+    trezor: {
+      derivation: main('trezor.derivation', 'standard')
     },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
@@ -499,6 +502,14 @@ if (initial.main._version < 5) {
   initial.main._version = 5
 }
 
+// State transition for derevation paths -> 6
+if (initial.main._version < 6) {
+  if (initial.main.hardwareDerivation === 'testnet') {
+    initial.main.ledger.derivation = 'testnet'
+    initial.main.trezor.derivation = 'testnet'
+  }
+  initial.main._version = 6
+}
 
 const moveOldAccountsToNewAddresses = () => {
   const addressesToMove = {}
@@ -515,8 +526,8 @@ const moveOldAccountsToNewAddresses = () => {
   })
 }
 
-// State transition -> 6
-if (initial.main._version < 6) {
+// State transition -> 7
+if (initial.main._version < 7) {
 
   // Before the v6 state migration
   // If users have very old state they will first need to do an older account migration
@@ -575,11 +586,7 @@ if (initial.main._version < 6) {
   delete initial.main.addresses
 
   // Set state version so they never do this migration again
-  initial.main._version = 6
+  initial.main._version = 7
 }
-
-// Object.keys(initial.main.accounts).forEach(k => {
-//   if (!initial.main.accounts[k].permissions) delete initial.main.accounts[k]
-// })
 
 module.exports = () => initial

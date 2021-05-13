@@ -135,6 +135,9 @@ module.exports = {
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
+  setTrezorDerivation: (u, value) => {
+    u('main.trezor.derivation', () => value)
+  },
   setLiveAccountLimit: (u, value) => {
     u('main.ledger.liveAccountLimit', () => value)
   },
