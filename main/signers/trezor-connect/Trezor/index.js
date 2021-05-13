@@ -7,6 +7,11 @@ const flex = require('../../../flex')
 const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
+// Base Paths
+const BASE_PATH_STANDARD = 'm/44\'/60\'/0\'/0'
+const BASE_PATH_LEGACY = 'm/44\'/60\'/0'
+const BASE_PATH_TESTNET = 'm/44\'/1\'/0\'/0'
+
 class Trezor extends Signer {
   constructor (device, signers) {
     super()
@@ -17,8 +22,16 @@ class Trezor extends Signer {
     this.type = 'trezor'
     this.status = 'loading'
     this.network = store('main.currentNetwork.id')
-    this.hardwareDerivation = store('main.hardwareDerivation')
-    this.basePath = () => this.hardwareDerivation === 'mainnet' ? 'm/44\'/60\'/0\'/0' : 'm/44\'/1\'/0\'/0'
+    this.derivationPath = store('main.trezor.derivation')
+    this.basePath = () => {
+      if (this.derivationPath === 'testnet') {
+        return BASE_PATH_TESTNET
+      } else if (this.derivationPath === 'legacy')  {
+        return BASE_PATH_LEGACY
+      } else {
+        return BASE_PATH_STANDARD
+      }
+    }
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
@@ -28,9 +41,9 @@ class Trezor extends Signer {
         this.deviceStatus()
       }
     })
-    this.hardwareDerivationObserver = store.observer(() => {
-      if (this.hardwareDerivation !== store('main.hardwareDerivation')) {
-        this.hardwareDerivation = store('main.hardwareDerivation')
+    this.derivationPathObserver = store.observer(() => {
+      if (this.derivationPath !== store('main.trezor.derivation')) {
+        this.derivationPath = store('main.trezor.derivation')
         this.reset()
         this.deviceStatus()
       }
@@ -84,7 +97,7 @@ class Trezor extends Signer {
 
   close () {
     this.networkObserver.remove()
-    this.hardwareDerivationObserver.remove()
+    this.derivationPathObserver.remove()
     this.closed = true
     store.removeSigner(this.id)
     super.close()

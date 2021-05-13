@@ -258,33 +258,9 @@ class Provider extends EventEmitter {
         const chain = parseInt(rawTx.chainId, 'hex').toString()
         const network = store('main.currentNetwork')
         if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
-        const { lastUpdate, quality } = store('main.networks', network.type, network.id, 'gas.price')
-        if (lastUpdate && (Date.now() - lastUpdate < 20 * 1000) && quality !== 'stale') {
-          const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
-          res({ result: levels[selected] })
-        } else {
-          const response = await fetch('https://ethgasstation.info/api/ethgasAPI.json?api-key=603385e34e3f823a2bdb5ee2883e2b9e63282869438a4303a5e5b4b3f999')
-          const prices = await response.json()
-          store.setGasPrices(network.type, network.id, {
-            slow: ('0x' + (Math.round(prices.safeLow) * 100000000).toString(16)),
-            slowTime: undefined,
-            standard: ('0x' + (Math.round(prices.average) * 100000000).toString(16)),
-            standardTime: undefined,
-            fast: ('0x' + (Math.round(prices.fast) * 100000000).toString(16)),
-            fastTime: undefined,
-            asap: ('0x' + (Math.round(prices.fastest) * 100000000).toString(16)),
-            asapTime: undefined,
-            custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || ('0x' + (prices.average * 100000000).toString(16)),
-            lastUpdate: Date.now(),
-            quality: 'medium',
-            source: {
-              name: 'EthGasStation',
-              url: 'https://ethgasstation.info'
-            }
-          })
-          const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
-          res({ result: levels[selected] })
-        }
+        const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
+        if (!levels[selected]) throw new Error('Unable to determine gas')
+        res({ result: levels[selected] })
       } catch (error) {
         log.error(error)
         res({ error })
