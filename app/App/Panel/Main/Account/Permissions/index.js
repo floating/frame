@@ -24,19 +24,21 @@ class Balances extends React.Component {
     // const id = this.store('selected.current')
     // const address = this.store('main.accounts', this.props.id, 'address')
     const permissions = this.store('main.permissions', this.props.id) || {}
+    let permissionList = Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1)
+    if (!this.state.expand) permissionList = permissionList.slice(0, 3)
     
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Account Permissions'}</div>  
         <div className='moduleMain'>
-          {Object.keys(permissions).length === 0 ? (
+          {permissionList.length === 0 ? (
             <div className='signerPermission'>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionOrigin'>No Permissions Set</div>
               </div>
             </div>
           ) : (
-            Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1).map(o => {
+            permissionList.map(o => {
               return (
                 <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:action', 'toggleAccess', this.props.id, o)}>
                   <div className='signerPermissionControls'>
@@ -49,8 +51,17 @@ class Balances extends React.Component {
               )
             })
           )}
-          <div className='quitFrame'>
-            <div onMouseDown={() => link.send('tray:action', 'clearPermissions', address)} className='quitFrameButton'>Clear All Permissions</div>
+          {this.state.expand ? (
+            <div className='quitFrame'>
+              <div onMouseDown={() => {
+                link.send('tray:action', 'clearPermissions', this.props.id)
+              }} className='quitFrameButton'>Clear All Permissions</div>
+            </div>
+          ) : null}
+        </div>
+        <div className='moduleFooter'>
+          <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
+            {this.state.expand ? 'Show Less' : 'Show All'}
           </div>
         </div>
       </div>

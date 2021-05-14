@@ -379,7 +379,8 @@ class TransactionRequest extends React.Component {
                   {req.data.to ? (
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>
-                        <div className='transactionToAddressLarge'>{req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {req.data.to.substr(req.data.to.length - 11)}</div>
+                        <div className='transactionToAddressLarge'>
+                          {req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {req.data.to.substr(req.data.to.length - 11)}</div>
                         <div className='transactionToAddressFull'>
                           {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : req.data.to}
                           <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={req.data.to} readOnly />

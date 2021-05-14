@@ -116,89 +116,113 @@
     font-family FiraCode
     letter-spacing 0px
     position absolute
-    top 10px
-    left 61px
-    right 80px
+    top 0px
+    left 0px
+    bottom 0px
+    right 0px
     padding-top 0px
-    // border-radius 12px
-    height 30px
-    // width 100%
     transform translateZ(0)
-    // 
-    // display flex
-    // justify-content center
-    // align-items center
-    // border-top 1px solid var(--thick)
-    // border-bottom 1px solid var(--thick)
-    
-    .transactionToAddress
-      font-size 10px
-      // font-family firaCode
-      position relative
-      width 100%
-      font-weight 100
-      -webkit-app-region no-drag
 
-      .transactionToAddressLarge
+    .transactionToAddressLargeWrap
+      position absolute
+      top 12px
+      left 61px
+      height 40px
+      width 140px
+      cursor pointer
+      z-index 5
+
+    .transactionToAddressLarge
+      position absolute
+      top 0px
+      left 0px
+      right 0px
+      bottom 0px
+      display flex
+      justify-content flex-start
+      align-items flex-start
+      font-size 18px
+      letter-spacing -1px
+      opacity 1
+      font-weight 200
+      pointer-events none
+
+      svg
+        color var(--outerspace08)
+        padding-top 2px
+        padding-left 4px
+        padding-right 4px
+
+    .transactionToAddressCopy
+      display flex
+      justify-content center
+      align-items center
+      font-size 8px
+      letter-spacing 1px
+      opacity 1
+      pointer-events none
+      text-transform uppercase
+      font-weight 400
+      letter-spacing 1px
+      font-family OpenSans, sans-serif
+      color var(--outerspace08)
+      border-radius 10px
+      transform translateY(0px)
+      bottom 30px
+      opacity 0
+
+    .transactionToAddressFull
+      position absolute
+      top 0px
+      right 0
+      bottom 0
+      left 0
+      display flex
+      justify-content center
+      align-items center
+      font-size 13px
+      pointer-events none
+      z-index 8
+
+      .transactionToAddressFullCopied
         position absolute
-        top 12px
-        right 0
-        bottom 0
-        left 0
-        display flex
-        justify-content flex-start
-        align-items center
-        font-size 18px
-        letter-spacing -1px
-        opacity 1
-        transition var(--standard)
-        font-weight 200
-        // color var(--outerspace08)
+        right 18px
+        top 24px
 
         svg
-          color var(--outerspace08)
-          padding-top 2px
-          padding-left 4px
-          padding-right 4px
+          position relative
+          top -1px
+          margin-left 22px
 
-      .transactionToAddressENS
-        transform translateY(10px)
+    .transactionToAddressENS
+      transform translateY(10px)
 
-      .transactionToAddressFull
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
-        display flex
-        justify-content center
-        align-items center
-        font-size 10px
-        opacity 0
-        transition var(--standard)
+      // input
+      //   position absolute
+      //   top -3px
+      //   left -3px
+      //   display block
+      //   width calc(100% + 6px)
+      //   height calc(100% + 6px)
+      //   border none
+      //   outline none
+      //   overflow hidden
+      //   opacity 0
+      //   cursor default
 
-        // input
-        //   position absolute
-        //   top -3px
-        //   left -3px
-        //   display block
-        //   width calc(100% + 6px)
-        //   height calc(100% + 6px)
-        //   border none
-        //   outline none
-        //   overflow hidden
-        //   opacity 0
-        //   cursor default
+      // svg
+      //   padding-left 5px
+      //   padding-bottom 1px
+    .transactionToAddressFullHidden
+      opacity 0
+      // background green
 
-        // svg
-        //   padding-left 5px
-        //   padding-bottom 1px
 
-    .signerAddressActive
-      .transactionToAddressLarge
-        opacity 0
-      .transactionToAddressFull
-        opacity  1
+    // .signerAddressActive
+    //   .transactionToAddressLarge
+    //     opacity 0
+    //   .transactionToAddressFull
+    //     opacity  1
 
   .clickGuard
     position absolute
