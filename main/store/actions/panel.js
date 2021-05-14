@@ -70,7 +70,7 @@ module.exports = {
   toggleDataView: (u, id) => {
     u('selected.requests', id, 'viewData', view => !view)
   },
-  updateExternalRates: (u, rates) => u('external.rates', () => rates),
+  updateExternalRates: (u, rates) => u('main.rates', () => rates),
   resetSigner: u => {
     u('selected.view', _ => 'default')
     u('selected.showAccounts', _ => false)

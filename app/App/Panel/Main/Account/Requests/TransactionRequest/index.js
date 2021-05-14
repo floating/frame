@@ -132,7 +132,7 @@ class TransactionRequest extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-    const etherRates = this.store('external.rates')
+    const etherRates = this.store('main.rates')
     const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))

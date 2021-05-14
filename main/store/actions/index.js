@@ -352,7 +352,7 @@ module.exports = {
     u('main.ipfs', () => ipfs)
   },
   setRates: (u, rates) => {
-    u('external.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
+    u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
   setBalance: (u, address, key, balance) => {
     // key could be a symbol or a contract address

@@ -408,7 +408,7 @@ module={this.state.modules[5] || { index: 5, top: 0 }}
 //     if (current) {
 //       const balance = this.store('balances', address)
 //       const tokens = this.store('main.accounts', address, 'tokens') || {}
-//       const etherRates = this.store('external.rates')
+//       const etherRates = this.store('main.rates')
 //       const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
 //       const known = Object.assign({}, tokens.known, {
 //         default: {
