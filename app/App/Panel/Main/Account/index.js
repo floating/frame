@@ -222,6 +222,7 @@ class _AccountMain extends React.Component {
             /> :
             id === 'verify' ? <Verify 
               moduleId={id}
+              id={this.props.id}
             /> :
             id === 'activity' ? <Activity 
               moduleId={id} 

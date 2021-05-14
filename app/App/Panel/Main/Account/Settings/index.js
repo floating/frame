@@ -22,8 +22,13 @@ class Balances extends React.Component {
     return (
       <div ref={this.moduleRef}>
         <div className='moduleHeader'>{'Account Settings'}</div>  
-        <div style={{ padding: '60px', display: 'flex', justifyContent: 'center' }}>
-          {'Coming Soon'}
+        <div style={{ padding: '60px' }}>
+          <div>Remove Signer</div>
+          <div>if smart account...</div>
+          <div>Acting Address</div>
+          <div>Display DAO Address (or ens lookup)</div>
+          <div>IPFS gateway URL with input</div>
+          <div>When it is a smart contract display if the account works on current network (Catch smart accounts setup errors and disable smart account on that network, reinitialize on network change)</div>
         </div>
       </div>
     )

@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
@@ -15,10 +16,33 @@ class SignerStatus extends React.Component {
     this.state = {
       expand: false
     }
+    // this.statusRef = React.createRef()
   }
+
+  // clickListener (event) {
+  //   console.log('found a clikc')
+  //   const statusRef = ReactDOM.findDOMNode(this.statusRef.current)
+  //   if (statusRef && statusRef.contains(event.target)) {
+  //     console.log('inside statu ref')
+  //     this.setState({ hideStatus: false })
+  //   } else  {
+  //     console.log('outside statu ref')
+  //     this.setState({ hideStatus: true })
+  //   }
+  //   // if (!element.contains(event.target)) { // or use: event.target.closest(selector) === null
+  //   //   element.style.display = 'none'
+  //   //   removeClickListener()
+  //   // }
+  // }
+
   // componentDidMount () {
-  //   this.resizeObserver.observe(this.moduleRef.current)
+  //   document.addEventListener('mousedown', this.clickListener.bind(this))
   // } 
+
+  // componentWillUnmount () {
+  //   document.removeEventListener('mousedown', this.clickListener.bind(this))
+  // }
+
   unlockChange (e) {
     this.setState({ unlockInput: e.target.value })
   }
@@ -59,22 +83,24 @@ class SignerStatus extends React.Component {
     const signer = this.props.signer ? this.store('main.signers', this.props.signer) : null
     // signer.status === 'locked'
     // console.log('signer, signer.status', signer, signer.status)
-    return signer ? (
+    return (
       <div>
-        <div className={this.props.open && signer && signer.status === 'locked' ? 'signerStatus' : 'signerStatus signerStatusHidden' }>
-          <div className='signerStatusTop'>
-          <div className='signerStatusTopArrow' />
-          </div>
-          <div className='signerStatusMain'>
-            <div className='signerUnlockWrap'>
-              <div className='signerUnlockHeader'>The signer for this account is locked</div>
-              <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
-              <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
+        {signer && this.props.open && signer && signer.status === 'locked' ? (
+          <div className='signerStatus' ref={this.statusRef}>
+            <div className='signerStatusTop'>
+              <div className='signerStatusTopArrow' />
+            </div>
+            <div className='signerStatusMain'>
+              <div className='signerUnlockWrap'>
+                <div className='signerUnlockHeader'>The signer for this account is locked</div>
+                <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
+                <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
+              </div>
             </div>
           </div>
-        </div> 
+        ) : null}
       </div>
-    ) : null
+    )
   }
 }
 

@@ -1461,6 +1461,25 @@
       border-bottom 1px solid var(--ghostA)
       text-align center
 
+    .moduleMid
+      padding-bottom 20px
+
+    .moduleFooterAction
+      position absolute
+      bottom 0px
+      padding 10px 0px
+      width 100%
+      cursor pointer
+      text-align center
+      font-size 12px
+      text-transform uppercase
+      background var(--ghostB)
+      border-top 1px solid var(--ghostA)
+      
+    .moduleFooterAction:hover
+      background var(--ghostD)
+
+
     // .moduleMain
     //   padding 8px
 
@@ -1481,22 +1500,24 @@
   // font-weight bold
   letter-spacing 2px
   // padding 11px
-  border-bottom 1px solid var(--ghostA)
   text-align center
   display flex
-  padding 33px
-
+  padding 33px 33px 43px 33px
+  
 .signerVerifyResponse
   background var(--bad)
-  margin 20px 0px
-  border-radius 6px
-  color var(--spacewhite)
+  border-radius 8px
+  color var(--outerspace)
   font-size 16px
-  padding 20px 40px
+  padding 20px
   font-weight 400
   display flex
   justify-content center
   text-align center
+  position relative
+  box-sizing border-box
+  width calc(100% - 20px)
+  margin 0px 10px 65px 10px
 
 .signerVerifyResponseSuccess
   background var(--good)
