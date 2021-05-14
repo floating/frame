@@ -19,16 +19,34 @@ class Balances extends React.Component {
     this.resizeObserver.observe(this.moduleRef.current)
   } 
   render () {
+    const account = this.store('main.accounts', this.props.id)
     return (
       <div ref={this.moduleRef}>
         <div className='moduleHeader'>{'Account Settings'}</div>  
-        <div style={{ padding: '60px' }}>
-          <div>Remove Signer</div>
-          <div>if smart account...</div>
-          <div>Acting Address</div>
-          <div>Display DAO Address (or ens lookup)</div>
-          <div>IPFS gateway URL with input</div>
-          <div>Is smart account active on this network?</div>
+        <div className='moduleMain moduleMainSettings'>  
+          {account.smart ? (
+            <>
+              <div>DAO Exists on this chain: ?</div>
+              <div>{account.smart.type}</div>
+              <div>{account.name}</div>
+              <div>Status: {account.status}</div>
+              <div>Acting Account: {account.smart.actor}</div>
+              <div>DAO Address: {account.smart.dao}</div>
+              <div>IPFS Gateway: {'https://ipfs.aragon.org'}</div>
+              <div>Last Signer: {account.lastSignerType}</div>
+              <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
+              <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
+            </>
+          ) : (
+            <>
+              <div>{account.name}</div>
+              <div>Status: {account.status}</div>
+              <div>Last Signer: {account.lastSignerType}</div>
+              <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
+              <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
+            </>
+          )}
+          <div className='moduleButton'>Remove This Account</div>
         </div>
       </div>
     )

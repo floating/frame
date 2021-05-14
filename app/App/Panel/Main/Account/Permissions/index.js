@@ -28,9 +28,9 @@ class Balances extends React.Component {
     if (!this.state.expand) permissionList = permissionList.slice(0, 3)
     
     return (
-      <div ref={this.moduleRef} className='balancesBlock'>
+      <div ref={this.moduleRef}>
         <div className='moduleHeader'>{'Account Permissions'}</div>  
-        <div className='moduleMain'>
+        <div className='moduleMain moduleMainPermissions'>
           {permissionList.length === 0 ? (
             <div className='signerPermission'>
               <div className='signerPermissionControls'>
@@ -60,7 +60,7 @@ class Balances extends React.Component {
           ) : null}
         </div>
         <div className='moduleFooter'>
-          <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
+          <div className='moduleFooterAction' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
             {this.state.expand ? 'Show Less' : 'Show All'}
           </div>
         </div>

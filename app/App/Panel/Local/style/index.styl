@@ -65,17 +65,19 @@
   content ''
   position absolute
   bottom -2px
-  right 20px
-  left 20px
-  height 4px
-  border-radius 2px
-  background var(--thin)
+  right 0px
+  left 0px
+  height 1px
+  background var(--ghostA)
+
+.signerPermission:last-child:before
+  background transparent
 
 .signerPermission
   position relative
   justify-content space-between
-  padding 10px 20px
-  font-size 18px
+  padding 10px 1px 8px 1px
+  font-size 15px
   font-weight 200
   transform translateZ(0)
   z-index 1
@@ -136,6 +138,7 @@
     text-align left
     white-space nowrap
     font-weight 300
+    margin-top 2px
 
   .signerPermissionToggle
     position relative
