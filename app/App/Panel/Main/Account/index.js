@@ -243,6 +243,7 @@ class _AccountMain extends React.Component {
             /> :
             id === 'settings' ? <Settings
               moduleId={id}
+              id={this.props.id}
             /> :
             <Default moduleId={id}  />
           }

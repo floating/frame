@@ -97,7 +97,7 @@ class Balances extends React.Component {
       }
     }
     return (
-      <div className='signerBalance' key={symbol} onMouseDown={() => this.setState({ selected: i })}>
+      <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceLogo'>
           <img src={balanceInfo.logoURI} />
         </div>
@@ -135,6 +135,8 @@ class Balances extends React.Component {
       rates
     )
 
+    const balancesLength = balances.length
+
     if (!this.state.expand) {
       balances = balances.slice(0, 5)
     }
@@ -153,9 +155,11 @@ class Balances extends React.Component {
             : null
           }
         <div className='signerBalanceTotal'>
-          <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
-            {this.state.expand ? 'Show Less' : 'Show All'}
-          </div>
+          {balancesLength > 5 ? (
+            <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
+              {this.state.expand ? 'Show Less' : 'Show All'}
+            </div>
+          ) : null}
           <div className='signerBalanceTotalText'>
             <div className='signerBalanceTotalLabel'>
               {'Total: '}

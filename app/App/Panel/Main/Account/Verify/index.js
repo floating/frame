@@ -44,7 +44,7 @@ class Verify extends React.Component {
         <div className='moduleMid'>
           <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
           {this.state.verifyAddressResponse ? (
-            <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse cardShow'}>{this.state.verifyAddressResponse}</div>
+            <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
           ) : null}
         </div>
         <div className='moduleFooterAction' onMouseDown={() => this.verifyAddress()}>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>

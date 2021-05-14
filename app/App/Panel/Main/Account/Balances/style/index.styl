@@ -22,7 +22,7 @@
     bottom 5px
     top 5px
     width 90px
-    border-radius 7px
+    border-radius 4px
     cursor pointer
     z-index 4000
     display flex
@@ -56,17 +56,17 @@
   
 .signerBalance
   position relative
-  margin-left 0px
-  width 100%
+  margin-left 16px
+  width calc(100% - 32px)
   opacity 1
   height 60px
   transition 0.1s ease-out all
-  border-bottom 1px solid var(--doubleThick)
+  border-bottom 1px solid var(--ghostA)
 
   .signerBalanceCurrency
     position absolute
-    left 51px
-    top 10px
+    left 41px
+    top 11px
     bottom 32px
     display flex
     align-items center
@@ -84,8 +84,8 @@
 
   .signerBalancePrice
     position absolute
-    left 51px
-    bottom 10px
+    left 41px
+    bottom 11px
     font-size 13px
     font-weight 400
     color var(--outerspace05)
@@ -106,7 +106,7 @@
 
   .signerBalanceLogo
     position absolute
-    left 10px
+    left 0px
     top 15px
     height 30px
     width 30px
@@ -125,8 +125,8 @@
 
   .signerBalanceValue
     position absolute
-    right 10px
-    top 10px
+    right 0px
+    top 11px
     font-size 17px
     text-align center
     // border-left 1px solid var(--doubleThick)
@@ -136,14 +136,22 @@
 
   .signerBalanceEquivalent
     position absolute
-    right 10px
-    bottom 10px
+    right 0px
+    bottom 11px
     font-size 13px
     font-weight 400
     color var(--outerspace05)
 
 .signerBalance:last-child
   border-bottom none
+
+.signerBalanceBase
+  // border 1px solid var(--ghostA)
+  // width calc(100% - px)
+  margin-top 2px
+  // border-radius 8px
+  // background var(--ghostC)
+  // box-shadow 0px 4px 5px var(--ghostA)
 
 .signerBalanceSliderDisplay
   position absolute
@@ -165,7 +173,7 @@
   text-transform uppercase
   font-size 12px
   letter-spacing 0.5px
-  border-bottom 1px solid var(--doubleThick)
+  border-bottom 1px solid var(--ghostA)
   
 // .signerBalancesOpen
 //   height 400px
