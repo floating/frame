@@ -1,4 +1,4 @@
-const IpfsHttpClient = require('ipfs-http-client')
+const { create } = require('ipfs-http-client')
 
 // if there is an ipfs endpoint in the store use that otherwise use pylon
 let node
@@ -7,7 +7,7 @@ const connect = async () => {
   try {
     // TODO: use nebula for this or make it configurable somewhere
     // const endpointConfig = process.env.NODE_ENV === 'production'
-    node = IpfsHttpClient({
+    node = create({
       host: 'ipfs.nebula.land',
       port: 443,
       protocol: 'https'

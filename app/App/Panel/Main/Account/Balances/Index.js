@@ -86,6 +86,7 @@ class Balances extends React.Component {
   // }
 
   renderBalance (symbol, balanceInfo, i) {
+    if (i !== 0 && balanceInfo.totalValue.toNumber() < 0.02) return null
     const change = parseFloat(balanceInfo.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
@@ -107,7 +108,7 @@ class Balances extends React.Component {
         <div className='signerBalancePrice'>
           <span className='signerBalanceCurrentPrice'>{balanceInfo.price}</span>
           <span className={priceChangeClass}>
-            <span>{balanceInfo.priceChange}%</span>
+            <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange}%</span>
           </span>
         </div>
         <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
