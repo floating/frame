@@ -22,7 +22,7 @@ class Balances extends React.Component {
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Account Inventory'}</div>  
-        <div style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
+        <div className='moduleComingSoon'>
           {'Coming Soon'}
         </div>
       </div>

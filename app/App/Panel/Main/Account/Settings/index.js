@@ -23,12 +23,13 @@ class Balances extends React.Component {
     return (
       <div ref={this.moduleRef}>
         <div className='moduleHeader'>{'Account Settings'}</div>  
-        <div className='moduleMain moduleMainSettings'>  
+        <div className='moduleMain moduleMainSettings'> 
+          <div>{account.name}</div> 
           {account.smart ? (
             <>
+              <div>SMART ACCOUNT INFO</div>
+              <div>Smart account type: {account.smart.type}</div>
               <div>DAO Exists on this chain: ?</div>
-              <div>{account.smart.type}</div>
-              <div>{account.name}</div>
               <div>Status: {account.status}</div>
               <div>Acting Account: {account.smart.actor}</div>
               <div>DAO Address: {account.smart.dao}</div>
@@ -36,17 +37,19 @@ class Balances extends React.Component {
               <div>Last Signer: {account.lastSignerType}</div>
               <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
               <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
-            </>
-          ) : (
-            <>
-              <div>{account.name}</div>
-              <div>Status: {account.status}</div>
-              <div>Last Signer: {account.lastSignerType}</div>
-              <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
               <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
             </>
-          )}
-          <div className='moduleButton'>Remove This Account</div>
+          ) : null}
+          <div>Status: {account.status}</div>
+          <div>Last Signer: {account.lastSignerType}</div>
+          <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
+          <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
+          <div>Account Added at block: {parseInt(account.created, 'hex')}</div>
+          <div className='moduleButton' onMouseDown={() => {
+            link.rpc('removeAccount', this.props.id, {}, () => {
+              // console.log('Removed account ', address)
+            })
+          }}>Remove This Account</div>
         </div>
       </div>
     )
