@@ -5,7 +5,6 @@ const nebula = require('../../../nebula')()
 
 const resolve = {
   rootCid: async (app) => {
-    console.log('resolve rootCid', app)
     const cid = store(`main.dapp.details.${hash(app)}.cid`)
     if (cid) return cid
     const record = await nebula.resolve(app)

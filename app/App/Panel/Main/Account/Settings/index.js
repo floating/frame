@@ -28,7 +28,7 @@ class Balances extends React.Component {
           <div>Acting Address</div>
           <div>Display DAO Address (or ens lookup)</div>
           <div>IPFS gateway URL with input</div>
-          <div>When it is a smart contract display if the account works on current network (Catch smart accounts setup errors and disable smart account on that network, reinitialize on network change)</div>
+          <div>Is smart account active on this network?</div>
         </div>
       </div>
     )
