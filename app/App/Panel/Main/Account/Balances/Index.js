@@ -86,6 +86,16 @@ class Balances extends React.Component {
   // }
 
   renderBalance (symbol, balanceInfo, i) {
+    const change = parseFloat(balanceInfo.priceChange)
+    const direction = change < 0 ? -1 : change > 0 ? 1 : 0
+    let priceChangeClass = 'signerBalanceCurrentPriceChange'
+    if (direction !== 0) {
+      if (direction === 1) {
+        priceChangeClass += ' signerBalanceCurrentPriceChangeUp'
+      } else {
+        priceChangeClass += ' signerBalanceCurrentPriceChangeDown'
+      }
+    }
     return (
       <div className='signerBalance' key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceLogo'>
@@ -94,9 +104,11 @@ class Balances extends React.Component {
         <div className='signerBalanceCurrency'>
           <span>{symbol.toUpperCase()}</span><span className='signerBalanceCurrencySmall'>{balanceInfo.name}</span>
         </div>
-        <div className='signerBalanceName'>
+        <div className='signerBalancePrice'>
           <span className='signerBalanceCurrentPrice'>{balanceInfo.price}</span>
-          <span className='signerBalanceCurrentPrice'>{balanceInfo.priceChange}%</span>
+          <span className={priceChangeClass}>
+            <span>{balanceInfo.priceChange}%</span>
+          </span>
         </div>
         <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
           {balanceInfo.displayBalance}
@@ -114,7 +126,7 @@ class Balances extends React.Component {
     const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
     const storedBalances = this.store('main.balances', address) || {}
 
-    const rates = this.store('external.rates')
+    const rates = this.store('main.rates')
 
     let { balances, totalDisplayValue } = getBalances(
       chainId,

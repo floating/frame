@@ -82,7 +82,7 @@ class _Balances extends React.Component {
     if (current) {
       const balance = this.store('balances', address)
       const tokens = this.store('main.addresses', address, 'tokens') || {}
-      const etherRates = this.store('external.rates')
+      const etherRates = this.store('main.rates')
       const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
       const known = Object.assign({}, tokens.known, {
         default: {

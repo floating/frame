@@ -36,18 +36,18 @@ class Verify extends React.Component {
   } 
 
   render () {
-    const signerType = this.store('main.accounts', this.props.id, 'signer.type')
+    const signerType = this.store('main.accounts', this.props.id, 'lastSignerType')
     const signerKind = (signerType === 'seed' || signerType === 'ring') ? 'hot' : 'device'
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Verify Address'}</div>  
-        <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
-        {this.state.verifyAddressResponse ? (
-          <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
-        ) : null}
-        <div className='quitFrame'>
-          <div onMouseDown={() => this.verifyAddress()} className='quitFrameButton'>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
+        <div className='moduleMid'>
+          <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
+          {this.state.verifyAddressResponse ? (
+            <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse cardShow'}>{this.state.verifyAddressResponse}</div>
+          ) : null}
         </div>
+        <div className='moduleFooterAction' onMouseDown={() => this.verifyAddress()}>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
       </div>
     )
   }

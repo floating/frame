@@ -222,6 +222,7 @@ class _AccountMain extends React.Component {
             /> :
             id === 'verify' ? <Verify 
               moduleId={id}
+              id={this.props.id}
             /> :
             id === 'activity' ? <Activity 
               moduleId={id} 
@@ -408,7 +409,7 @@ module={this.state.modules[5] || { index: 5, top: 0 }}
 //     if (current) {
 //       const balance = this.store('balances', address)
 //       const tokens = this.store('main.accounts', address, 'tokens') || {}
-//       const etherRates = this.store('external.rates')
+//       const etherRates = this.store('main.rates')
 //       const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
 //       const known = Object.assign({}, tokens.known, {
 //         default: {
@@ -492,18 +493,26 @@ class Account extends React.Component {
       accountHighlight: 'default',
       highlightIndex: 0,
       unlockInput: '',
-      openHover: false
+      openHover: false,
+      addressHover: false
     }
   }
 
   componentDidMount () {
     if (this.props.index === 0) this.props.resetScroll()
+    window.addEventListener('scroll', this.onScroll.bind(this), true)
   }
 
-  copyAddress (e) {
-    e.preventDefault()
-    e.target.select()
-    document.execCommand('Copy')
+  componentWillUnmount () {
+    window.removeEventListener('scroll', this.onScroll.bind(this), true)
+  }
+  
+  onScroll () {
+    this.setState({ addressHover: false}) 
+  }
+
+  copyAddress () {
+    link.send('tray:clipboardData', this.props.id)
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
@@ -765,31 +774,51 @@ class Account extends React.Component {
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
 
+    const { id } = this.store('main.currentNetwork')
+    const showENS = ensName && id === '1'
+
     return this.props.status !== 'ok' ? (
       <div className='signerStatusNotOk'>{status}</div>
     ) : (
       <>
-        <div className='signerName'>
-          <div className={!ensName ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
-            {this.props.name}
-            <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
+        {!this.state.addressHover ? (
+          <div className='signerName'>
+            <div className={!showENS ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
+              {this.props.name}
+              <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
+            </div>
           </div>
-        </div>
+        ) : null}
         <div className={'signerAddress'}>
-          <div className='transactionToAddress'>
-            {ensName ? (
-              <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
-            ) : (
-              <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
-            )}
-            <div className='transactionToAddressFull'>
-              {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+          <div className='transactionToAddress'
+            onMouseEnter={() => {
+              this.setState({ addressHover: true })
+            }}
+            onMouseLeave={() => {
+              this.setState({ addressHover: false })
+            }}
+            onMouseDown={this.copyAddress.bind(this)}
+          >
+            <div className='transactionToAddressLargeWrap'>
+              {this.state.addressHover ? (
+                <div className='transactionToAddressLarge transactionToAddressCopy'>copy address</div>
+              ) : showENS ? (
+                <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
+              ) : (
+                <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
+              )
+              }
+            </div>
+            <div className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}>
+              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
             </div>
           </div>
         </div>
-        <div className={requests.length > 0 ? 'accountNotificationBadge accountNotificationBadgeActive' : 'accountNotificationBadge'}>
-          {requests.length}
-        </div>
+        {!this.state.addressHover ? (
+          <div className={requests.length > 0 ? 'accountNotificationBadge accountNotificationBadgeActive' : 'accountNotificationBadge'}>
+            {requests.length}
+          </div>
+        ) : null}
         {/* <div
           className='addressSelect' onMouseDown={e => {
             e.stopPropagation()
@@ -870,18 +899,22 @@ class Account extends React.Component {
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             <SignerStatus open={open} signer={this.props.signer}/>
             <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
-              {this.renderType()} 
-              {this.renderSignerIndicator()} 
-              <div className='accountGrabber'>
-                {svg.grab(35)}
-              </div>
-              <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>
-                <div className='signerSelectIconWrap'>
-                  <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    {svg.chevron(26)}
+              {!this.state.addressHover ? this.renderType() : null} 
+              {!this.state.addressHover ? this.renderSignerIndicator() : null} 
+              {!this.state.addressHover ? (
+                <>
+                  <div className='accountGrabber'>
+                    {svg.grab(35)}
                   </div>
-                </div>
-              </div>
+                  <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>
+                    <div className='signerSelectIconWrap'>
+                      <div className='signerSelectIcon' style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                        {svg.chevron(26)}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : null}
               {/* {this.renderMenu()} */}
               {this.renderStatus()}
             </div>

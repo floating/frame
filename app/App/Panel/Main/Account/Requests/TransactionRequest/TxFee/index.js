@@ -319,7 +319,7 @@ class TransactionFee extends React.Component {
     const gasLevels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
     const { slowTime, standardTime, fastTime, asapTime, customTime } = gasLevels
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
-    const etherRates = this.store('external.rates')
+    const etherRates = this.store('main.rates')
     const etherUSD = network.id === '1' && etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
     const gasLimit = this.state.inputLimit || (this.state.gasLimitInputFocus ? 0 : parseInt(data.gas, 'hex'))
 

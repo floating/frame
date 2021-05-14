@@ -23,41 +23,44 @@ class Gas extends React.Component {
     const { type, id } = this.store('main.currentNetwork')
     const levels = this.store('main.networks', type, id, 'gas.price.levels') || {}
     return (
-      <div ref={this.moduleRef} className='gasBlock'>
-        <div className='gasItem'>
+      <div ref={this.moduleRef}>
+        <div className='moduleHeader'>{'Gas Prices'}</div>  
+        <div className='gasBlock'>
+          <div className='gasItem'>
+            <div className='gasGwei'>
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.slow, 16))}</span>
+              <span className='gasGweiLabel'>{'GWEI'}</span>
+            </div>
+            <div className='gasLevel'>
+              {'Slow'}
+            </div>
+          </div>
+          <div className='gasItem'>
+            <div className='gasGwei'>
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.standard, 16))}</span>
+              <span className='gasGweiLabel'>{'GWEI'}</span>
+            </div>
+            <div className='gasLevel'>
+              {'Medium'}
+            </div>
+          </div>
+          <div className='gasItem'>
+            <div className='gasGwei'>
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.fast, 16))}</span>
+              <span className='gasGweiLabel'>{'GWEI'}</span>
+            </div>
+            <div className='gasLevel'>
+              {'Fast'}
+            </div>
+          </div>
+          <div className='gasItem'>
           <div className='gasGwei'>
-            <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.slow, 16))}</span>
-            <span className='gasGweiLabel'>{'GWEI'}</span>
-          </div>
-          <div className='gasLevel'>
-            {'Slow'}
-          </div>
-        </div>
-        <div className='gasItem'>
-          <div className='gasGwei'>
-            <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.standard, 16))}</span>
-            <span className='gasGweiLabel'>{'GWEI'}</span>
-          </div>
-          <div className='gasLevel'>
-            {'Medium'}
-          </div>
-        </div>
-        <div className='gasItem'>
-          <div className='gasGwei'>
-            <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.fast, 16))}</span>
-            <span className='gasGweiLabel'>{'GWEI'}</span>
-          </div>
-          <div className='gasLevel'>
-            {'Fast'}
-          </div>
-        </div>
-        <div className='gasItem'>
-         <div className='gasGwei'>
-            <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.asap, 16))}</span>
-            <span className='gasGweiLabel'>{'GWEI'}</span>
-          </div>
-          <div className='gasLevel'>
-            {'ASAP'}
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.asap, 16))}</span>
+              <span className='gasGweiLabel'>{'GWEI'}</span>
+            </div>
+            <div className='gasLevel'>
+              {'ASAP'}
+            </div>
           </div>
         </div>
       </div>

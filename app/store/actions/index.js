@@ -87,7 +87,7 @@ export const toggleDataView = (u, id) => {
   u('selected.requests', id, 'viewData', view => !view)
 }
 
-export const updateExternalRates = (u, rates) => u('external.rates', () => rates)
+export const updateExternalRates = (u, rates) => u('main.rates', () => rates)
 
 export const resetSigner = u => {
   u('selected.view', _ => 'default')
