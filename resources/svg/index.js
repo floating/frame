@@ -419,5 +419,32 @@ module.exports = {
       </div>
     )
   },
+  wallet: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 512 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M461.2 128H80c-8.84 0-16-7.16-16-16s7.16-16 16-16h384c8.84 0 16-7.16 16-16 0-26.51-21.49-48-48-48H64C28.65 32 0 60.65 0 96v320c0 35.35 28.65 64 64 64h397.2c28.02 0 50.8-21.53 50.8-48V176c0-26.47-22.78-48-50.8-48zM416 336c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32' />
+        </svg>
+      </div>
+    )
+  },
+  plug: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 384 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' fillRule='evenodd' d='M320,32a32,32,0,0,0-64,0v96h64Zm48,128H16A16,16,0,0,0,0,176v32a16,16,0,0,0,16,16H32v32A160.07,160.07,0,0,0,160,412.8V512h64V412.8A160.07,160.07,0,0,0,352,256V224h16a16,16,0,0,0,16-16V176A16,16,0,0,0,368,160ZM128,32a32,32,0,0,0-64,0v96h64Z' />
+        </svg>
+      </div>
+    )
+  },
+  lock: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 448 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' fillRule='evenodd'  d='M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z' />
+        </svg>
+      </div>
+    )
+  },
   octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }

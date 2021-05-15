@@ -192,7 +192,7 @@ class _Network extends React.Component {
         <div className='signerPermission' style={{ zIndex: 2 }}>
           <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>Primary</div>
+              <div className='signerPermissionSetting'>Primary</div>
               <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -218,7 +218,7 @@ class _Network extends React.Component {
         <div className='signerPermission' style={{ zIndex: 1 }}>
           <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
             <div className='connectionOptionToggle'>
-              <div className='signerPermissionOrigin'>Secondary</div>
+              <div className='signerPermissionSetting'>Secondary</div>
               <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
@@ -756,7 +756,7 @@ export default Restore.connect(Settings)
 // </div>
 
 // <div className='signerPermission' onMouseDown={_ => this.store.runLocalNode()}>
-//   <div className='signerPermissionOrigin'>{'Run Local Node'}</div>
+//   <div className='signerPermissionSetting'>{'Run Local Node'}</div>
 //   <div className={this.store('local.node.run') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
 //     <div className='signerPermissionToggleSwitch' />
 //   </div>
@@ -765,7 +765,7 @@ export default Restore.connect(Settings)
 /* <div className='signerPermission'>
   <div className={this.store('main..connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
     <div className='connectionOptionToggle'>
-      <div className='signerPermissionOrigin'>Local</div>
+      <div className='signerPermissionSetting'>Local</div>
       <div className={this.store('main..connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'primary')}>
         <div className='signerPermissionToggleSwitch' />
       </div>

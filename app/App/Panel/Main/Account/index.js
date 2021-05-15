@@ -495,7 +495,8 @@ class Account extends React.Component {
       highlightIndex: 0,
       unlockInput: '',
       openHover: false,
-      addressHover: false
+      addressHover: false,
+      hideSignerStatus: true
     }
   }
 
@@ -571,8 +572,9 @@ class Account extends React.Component {
       this.select()
       this.setState({ typeActive: true })
       setTimeout(() => this.setState({ typeActive: false }), 110)
+      setTimeout(() => this.setState({ hideSignerStatus: false }), 800)
     } else {
-      this.setState({ typeShake: true })
+      this.setState({ typeShake: true, hideSignerStatus: true })
       setTimeout(() => this.setState({ typeShake: false }), 1010)
     }
   }
@@ -608,7 +610,7 @@ class Account extends React.Component {
     // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     // const inSettings = this.store('selected.view') === 'settings'
     return (
-      <div className='signerType'>
+      <div className='signerType' onMouseDown={() => this.hideSignerStatus(!this.state.hideSignerStatus)}>
         {/* {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
           <div className='signerTypeDisconnected' onMouseDown={this.typeClick.bind(this)} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>
@@ -623,6 +625,13 @@ class Account extends React.Component {
           if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
           return <div className='signerSelectIconWrap'>{svg.logo(20)}</div>
         })()}
+        {this.props.signer ? (
+          this.store('main.signers', this.props.signer, 'status') === 'locked' ? (
+            <div className='signerTypeStatusBadge signerTypeStatusBadgeLocked'>{svg.lock(8)}</div>
+          ) : null
+        ) : (
+          <div className='signerTypeStatusBadge signerTypeStatusBadgeDisconnected'>{svg.plug(10)}</div>
+        )}
       </div>
     )
   }
@@ -811,7 +820,7 @@ class Account extends React.Component {
               }
             </div>
             <div className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}>
-              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
             </div>
           </div>
         </div>
@@ -837,6 +846,10 @@ class Account extends React.Component {
         </div> */}
       </>
     )
+  }
+
+  hideSignerStatus (value) {
+    this.setState({ hideSignerStatus: value })
   }
 
   render () {
@@ -898,7 +911,9 @@ class Account extends React.Component {
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
-            <SignerStatus open={open} signer={this.props.signer}/>
+            {!this.state.hideSignerStatus ? (
+              <SignerStatus open={open} signer={this.props.signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
+            ) : null}
             <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {!this.state.addressHover ? this.renderType() : null} 
               {!this.state.addressHover ? this.renderSignerIndicator() : null} 

@@ -16,7 +16,7 @@ class SignerStatus extends React.Component {
     this.state = {
       expand: false
     }
-    // this.statusRef = React.createRef()
+    this.statusRef = React.createRef()
   }
 
   // clickListener (event) {
@@ -79,28 +79,33 @@ class SignerStatus extends React.Component {
     )
   }
 
+  componentDidMount () {
+    setTimeout(() => {
+      document.addEventListener('mousedown', (e) => {
+        if (this.props.open && this.statusRef && this.statusRef.current && !this.statusRef.current.contains(e.target)) {
+          this.props.hideSignerStatus(true)
+        }
+      })
+    }, 100)
+  }
+
   render () {
     const signer = this.props.signer ? this.store('main.signers', this.props.signer) : null
-    // signer.status === 'locked'
-    // console.log('signer, signer.status', signer, signer.status)
-    return (
-      <div>
-        {signer && this.props.open && signer && signer.status === 'locked' ? (
-          <div className='signerStatus' ref={this.statusRef}>
-            <div className='signerStatusTop'>
-              <div className='signerStatusTopArrow' />
-            </div>
-            <div className='signerStatusMain'>
-              <div className='signerUnlockWrap'>
-                <div className='signerUnlockHeader'>The signer for this account is locked</div>
-                <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
-                <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
-              </div>
-            </div>
+
+    return signer && this.props.open && signer && signer.status === 'locked' ? (
+      <div className='signerStatus' ref={this.statusRef}>
+        <div className='signerStatusTop'>
+          <div className='signerStatusTopArrow' />
+        </div>
+        <div className='signerStatusMain'>
+          <div className='signerUnlockWrap'>
+            <div className='signerUnlockHeader'>The signer for this account is locked</div>
+            <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
+            <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
           </div>
-        ) : null}
+        </div>
       </div>
-    )
+    ) : null
   }
 }
 

@@ -65,7 +65,7 @@ class Main extends React.Component {
                   link.send('tray:action', 'toggleDash')
                 }}>
                   <div className={!this.store('dash.showing') ? 'panelHeaderUpdateToggle' : 'panelHeaderUpdateToggle panelHeaderUpdateToggleOn'}>
-                    {svg.checklist(18)}
+                    {'+'}
                   </div>
                   <div className='panelHeaderUpdateOn' />
                 </div>

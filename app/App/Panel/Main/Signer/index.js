@@ -460,7 +460,7 @@ class Signer extends React.Component {
                 <div className='transactionToAddress'>
                   <div className='transactionToAddressLarge'>{address.substring(0, 10)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
                   <div className='transactionToAddressFull'>
-                    {this.state.copied ? <span>{'Address Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+                    {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
                     <input tabIndex='-1' onMouseDown={e => this.copyAddress(e)} value={address} readOnly />
                   </div>
                 </div>

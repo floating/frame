@@ -160,7 +160,7 @@ class Dash extends React.Component {
         <div className='signers'>
           <div className='signersMid'>
             <div className='signersHeader'>
-              Hardware Signers
+              Your Hardware Signers
             </div>
             <div className='signersList'>
               {hardwareSigners.length ? (
@@ -172,7 +172,7 @@ class Dash extends React.Component {
               )}
             </div>
             <div className='signersHeader'>
-              Hot Signers
+              Your Hot Signers
             </div>
             <div className='signersList'>
               {hotSigners.length ? (
