@@ -24,7 +24,7 @@ class Launcher extends React.Component {
       <div ref={this.moduleRef} className='launcher'>
         <div className='launcherTiles'>
           <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'matt.eth') }>
-            {svg.ruby(24)}
+            {svg.wallet(15)}
           </div>
         </div>
       </div>

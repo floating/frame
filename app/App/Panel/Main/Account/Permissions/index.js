@@ -29,7 +29,7 @@ class Balances extends React.Component {
     
     return (
       <div ref={this.moduleRef}>
-        <div className='moduleHeader'>{'Account Permissions'}</div>  
+        <div className='moduleHeader'>{'Permissions'}</div>  
         <div className='moduleMain moduleMainPermissions'>
           {permissionList.length === 0 ? (
             <div className='signerPermission'>

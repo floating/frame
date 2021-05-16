@@ -6,7 +6,7 @@ import link from '../../../resources/link'
 import Main from './Main'
 import Local from './Local'
 import Networks from './Networks'
-// import Notify from './Notify'
+import Notify from './Notify'
 // import Phase from './Phase'
 import Badge from './Badge'
 
@@ -58,6 +58,11 @@ class Panel extends React.Component {
     // const opacity = open ? '1' : '0'
     // const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.72,0,.32,1) all' : '0.16s cubic-bezier(.72,0,.32,1) all'
     const { type, id } = this.store('main.currentNetwork')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+
+    const rates = this.store('main.rates')
+    const rateSymbol = currentSymbol.toLowerCase()
+    const baseTokenRate = Math.floor(rates[rateSymbol] && rates[rateSymbol].usd && rates[rateSymbol].usd.price) || '---' // this.store('main.rates.USD') ? Math.floor(this.store('main.rates.USD')) : '---'
 
     let gasPrice = this.store('main.networks', type, id, 'gas.price.levels.standard')
     if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)
@@ -104,11 +109,12 @@ class Panel extends React.Component {
               <div className='panelMenuDataDivide' />
               <div className='panelMenuDataItem'>
                 <div className='usd'>{svg.usd(10.5)}</div>
-                <div>{this.store('main.rates.USD') ? Math.floor(this.store('main.rates.USD')) : '---'}</div>
+                <div>{baseTokenRate}</div>
               </div>
             </div>
           ) : null}
         </div>
+        <Notify />
         <Local />
         <Networks />
         <Main />

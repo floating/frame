@@ -1,13 +1,22 @@
+@keyframes fadeInDown
+  0%
+    opacity 0
+    transform translate3d(0, -20px, 0)
+  100%
+    opacity 1
+    transform translate3d(0, 0, 0)
+
 .signerStatus
   position absolute
   z-index 20000000000
   top 58px
   left 5px
   right 5px
-  transform translateY(0px)
-  opacity 1
   pointer-events auto
-  transition var(--standardSlow)
+  animation-name fadeInDown
+  // animation-delay 400ms
+  animation-duration 800ms
+  animation-timing-function cubic-bezier(.82,0,.12,1)
 
   .signerStatusTop
     position relative

@@ -80,7 +80,7 @@
   font-size 15px
   font-weight 200
   transform translateZ(0)
-  z-index 1
+  z-index 2000
 
   .signerPermissionControls
     display flex
@@ -94,9 +94,10 @@
     position relative
     justify-content space-between
     transform translateZ(0)
-    font-size 14px
-    padding 5px 0px 0px 0px
+    font-size 12px
+    padding 8px 0px 0px 1px
     z-index 20
+    font-weight 300
 
   .keyCommand
     margin-left 2px
@@ -140,6 +141,18 @@
     font-weight 300
     margin-top 2px
 
+  .signerPermissionSetting
+    background transparent
+    width 250px
+    direction rtl
+    text-overflow ellipsis
+    overflow hidden
+    text-align left
+    white-space nowrap
+    font-weight 100
+    margin-top 2px
+    font-size 18px
+
   .signerPermissionToggle
     position relative
     background var(--bad)
@@ -159,7 +172,7 @@
       width 16px
       border-radius 10px
       transition var(--standard)
-      background var(--ghostD)
+      background var(--ghostC)
       // box-shadow 0px 6px 6px -2px rgba(0,20,60,0.15), 0px 1px 2px 0px rgba(0,20,60,0.05)
       transform translateZ(0)
       box-shadow 0px 3px 3px 0px var(--tripleThick) 

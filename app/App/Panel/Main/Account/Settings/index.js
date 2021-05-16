@@ -22,7 +22,7 @@ class Balances extends React.Component {
     const account = this.store('main.accounts', this.props.id)
     return (
       <div ref={this.moduleRef}>
-        <div className='moduleHeader'>{'Account Settings'}</div>  
+        <div className='moduleHeader'>{'Settings'}</div>  
         <div className='moduleMain moduleMainSettings'> 
           <div>{account.name}</div> 
           {account.smart ? (
