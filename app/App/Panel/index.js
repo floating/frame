@@ -62,7 +62,7 @@ class Panel extends React.Component {
 
     const rates = this.store('main.rates')
     const rateSymbol = currentSymbol.toLowerCase()
-    const baseTokenRate = Math.floor(rates[rateSymbol] && rates[rateSymbol].usd && rates[rateSymbol].usd.price) || '---' // this.store('main.rates.USD') ? Math.floor(this.store('main.rates.USD')) : '---'
+    const baseRate = rates[rateSymbol] && rates[rateSymbol].usd ? Math.floor(rates[rateSymbol].usd.price).toLocaleString() : '---' // this.store('main.rates.USD') ? Math.floor(this.store('main.rates.USD')) : '---'
 
     let gasPrice = this.store('main.networks', type, id, 'gas.price.levels.standard')
     if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)
@@ -109,7 +109,7 @@ class Panel extends React.Component {
               <div className='panelMenuDataDivide' />
               <div className='panelMenuDataItem'>
                 <div className='usd'>{svg.usd(10.5)}</div>
-                <div>{baseTokenRate}</div>
+                <div>{baseRate}</div>
               </div>
             </div>
           ) : null}

@@ -218,13 +218,13 @@ const api = {
     if (windows && windows.tray) {
       windows.tray.send('main:action', 'trayOpen', false)
       if (store('main.reveal')) detectMouse()
-      windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-      windows.tray.setAlwaysOnTop(false)
-      const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.tray.setResizable(true)
+      // windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+      // windows.tray.setAlwaysOnTop(false)
+      // const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+      // windows.tray.setResizable(true)
       // windows.tray.setSize(1, dev ? 740 : area.height)
-      const pos = topRight(windows.tray)
-      windows.tray.setPosition(area.width + area.x, pos.y)
+      // const pos = topRight(windows.tray)
+      // windows.tray.setPosition(area.width + area.x, pos.y)
       windows.tray.emit('hide')
       windows.tray.hide()
       events.emit('tray:hide')

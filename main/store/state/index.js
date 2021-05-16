@@ -26,7 +26,7 @@ const initial = {
       moduleOrder: [
         'launcher',
         'requests',
-        'activity',
+        // 'activity',
         'gas',
         'balances',
         'inventory',
@@ -159,8 +159,8 @@ const initial = {
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
-    balances: main('balances', {}),
-    rates: main('rates', {}),
+    balances: {}, // main('balances', {}),
+    rates: {}, // main('rates', {}),
     signers: {},
     savedSigners: {},
     updater: {
@@ -215,11 +215,11 @@ const initial = {
           infura: 'infuraRinkeby'
         },
         5: {
-          prylabs: 'https://goerli.prylabs.net',
+          infura: ['wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'],
           mudit: 'https://rpc.goerli.mudit.blog',
           slockit: 'https://rpc.slock.it/goerli',
-          infura: ['wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b', 'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b']
-        },
+          prylabs: 'https://goerli.prylabs.net'
+         },
         42: {
           infura: 'infuraKovan'
         },
@@ -321,23 +321,23 @@ const initial = {
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           }
         },
-        74: {
-          id: 74,
-          type: 'ethereum',
-          symbol: 'EIDI',
-          name: 'IDChain',
-          explorer: 'https://explorer.idchain.one',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
-          connection: {
-            primary: { on: true, current: 'idchain', status: 'loading', connected: false, type: '', network: '', custom: '' },
-            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
-        },
+        // 74: {
+        //   id: 74,
+        //   type: 'ethereum',
+        //   symbol: 'EIDI',
+        //   name: 'IDChain',
+        //   explorer: 'https://explorer.idchain.one',
+        //   gas: {
+        //     price: {
+        //       selected: 'standard',
+        //       levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        //     }
+        //   },
+        //   connection: {
+        //     primary: { on: true, current: 'idchain', status: 'loading', connected: false, type: '', network: '', custom: '' },
+        //     secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        //   }
+        // },
         100: {
           id: 100,
           type: 'ethereum',

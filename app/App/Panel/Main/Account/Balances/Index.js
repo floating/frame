@@ -3,6 +3,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
+import svg from '../../../../../../resources/svg'
 
 import BigNumber from 'bignumber.js'
 
@@ -17,8 +18,8 @@ function formatBalance (balance, decimals = 8) {
 
 function formatUsdRate (rate, decimals = 2) {
   return new Intl.NumberFormat('us-US', {
-    style: 'currency',
-    currency: 'usd'
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
   }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
@@ -106,7 +107,7 @@ class Balances extends React.Component {
           <span>{symbol.toUpperCase()}</span><span className='signerBalanceCurrencySmall'>{balanceInfo.name}</span>
         </div>
         <div className='signerBalancePrice'>
-          <span className='signerBalanceCurrentPrice'>{balanceInfo.price}</span>
+          <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balanceInfo.price}</span>
           <span className={priceChangeClass}>
             <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange}%</span>
           </span>
@@ -115,7 +116,7 @@ class Balances extends React.Component {
           {balanceInfo.displayBalance}
         </div>
         <div className='signerBalanceEquivalent'>
-          {balanceInfo.displayValue}
+          {svg.usd(10)}{balanceInfo.displayValue}
         </div>
       </div>
     )
@@ -167,7 +168,7 @@ class Balances extends React.Component {
               {'Total: '}
             </div>
             <div className='signerBalanceTotalValue'>
-              {totalDisplayValue}
+            {svg.usd(11)}{totalDisplayValue}
             </div>
           </div>
         </div>
