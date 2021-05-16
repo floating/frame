@@ -4,16 +4,10 @@
 
 .signerBalanceTotal
   position relative
-  // bottom 0px
-  // left 0px
-  // right 0px
-  height 30px
+  height 44px
   width 100%
   z-index 200000
-  // background var(--ghostD)
   font-size 14px
-  font-weight 400
-  // color var(--outerspace08)
 
   .signerBalanceShowAll
     position absolute
@@ -29,7 +23,6 @@
     justify-content center
     align-items center
     font-size 12px
-    // box-shadow 0px 1px 3px var(--ghostZ)
 
   .signerBalanceTotalText
     position absolute
@@ -44,15 +37,21 @@
 
     .signerBalanceTotalLabel
       margin-right 10px
-      margin-top 3px
+      margin-top 2px
       text-transform uppercase
       font-size 12px
       letter-spacing 1px
-      color var(--outerspace02)
+      color var(--outerspace06)
 
     .signerBalanceTotalValue
-      font-size 16px
-      color var(--outerspace05)
+      font-size 17px
+      color var(--outerspace06)
+      font-family FiraCode, monospace
+      letter-spacing -1px
+      font-size 17px
+      text-align center
+      display flex
+      align-items center
   
 .signerBalance
   position relative
@@ -62,43 +61,45 @@
   height 60px
   transition 0.1s ease-out all
   border-bottom 1px solid var(--ghostA)
+  font-family FiraCode, monospace
+  letter-spacing -0.5px
 
   .signerBalanceCurrency
     position absolute
     left 41px
     top 11px
-    bottom 32px
+    font-size 17px
+    text-align center
     display flex
     align-items center
-    font-weight 400
-    letter-spacing 0px
-    font-family FiraCode
 
   .signerBalanceCurrencySmall
-    font-size 11px
+    font-size 12px
     line-height 8px
     margin-left 3px
-    color var(--outerspace03)
+    color var(--outerspace06)
     position relative
-    top 1px
+    top 0px
 
   .signerBalancePrice
     position absolute
     left 41px
     bottom 11px
     font-size 13px
-    font-weight 400
-    color var(--outerspace05)
+    color var(--outerspace06)
+    display flex
+    align-items center
 
   .signerBalanceCurrentPrice
-    color var(--outerspace07)
+    display flex
+    align-items center
+    color var(--outerspace06)
 
   .signerBalanceCurrentPriceChange
     margin-left 4px
-    color var(--outerspace05)
-    font-size 10px
-    position relative
-    bottom 1px
+    color var(--outerspace06)
+    font-size 12px
+    margin-top 1px
 
   .signerBalanceCurrentPriceChangeUp
     color var(--good)
@@ -134,15 +135,16 @@
     // border-left 1px solid var(--doubleThick)
     // border-right 1px solid var(--doubleThick)
     font-family FiraCode
-    letter-spacing -0.5px
+    letter-spacing -1px
 
   .signerBalanceEquivalent
     position absolute
     right 0px
     bottom 11px
     font-size 13px
-    font-weight 400
-    color var(--outerspace05)
+    color var(--outerspace06)
+    display flex
+    align-items center
 
 .signerBalance:last-child
   border-bottom none
@@ -174,7 +176,6 @@
   color var(--outerspace08)
   text-transform uppercase
   font-size 12px
-  letter-spacing 0.5px
   border-bottom 1px solid var(--ghostA)
   
 // .signerBalancesOpen

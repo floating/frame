@@ -1,47 +1,53 @@
 .gasBlock
   position relative
   display flex
+  // background blue
+  padding 12px 0px
 
   .gasItem
     position relative
     width 25%
     min-width 25%
     max-width 25%
-    height 80px
-    border-right 1px solid var(--ghostZ)
+    border-right 1px solid var(--ghostA)
 
     .gasLevel
-      position absolute
-      bottom 0px
-      left 0
-      right 0
-      height 22px
       font-size 10px
       display flex
-      justify-content center
-      align-items center
+      flex-direction column
       text-align center
       font-weight 600
       text-transform uppercase
+      margin 4px 0px 2px -2px
       letter-spacing 2px
-      margin-left -2px
-      border-top 1px solid var(--ghostZ)
 
+      .gasLevelTime
+        display flex
+        justify-content center
+        align-items center
+        font-size 10px
+        font-weight 600
+        color var(--outerspace05)
+        margin-left -3px
+        letter-spacing 0px
+        margin-top 2px
+        display none
+
+        .timeUnit
+          font-size 7px
+          margin-left 1px
+          margin-right -2px
+          
+        
     .gasGwei
-      position absolute
-      bottom 0
-      left 0
-      right 0
-      bottom 32px
       display flex
       justify-content center
       align-items center
       text-align center
       flex-direction column
-
+  
       .gasGweiNum
         font-size 24px
-        line-height 24px
         font-family 'FiraCode', monospace
 
       .gasGweiLabel
@@ -49,4 +55,6 @@
         letter-spacing 1px
         font-weight 600
         color var(--outerspace05)
-      
+
+.gasItem:last-child
+  border-right none

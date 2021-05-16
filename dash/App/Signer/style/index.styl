@@ -10,11 +10,11 @@
 
   .signerTop
     position relative
-    height 72px
+    height 42px
 
   .signerName
     position absolute
-    top 9px
+    top 6px
     left 4px
     height 28px
     padding 0px 9px
@@ -57,8 +57,8 @@
     // text-transform uppercase
     // font-weight 400
     position absolute
-    top 38px
-    left 14px
+    top 13px
+    right 42px
     font-size 10px
     text-transform uppercase
     font-weight 400
@@ -74,7 +74,7 @@
 
   .signerStatusIndicator
     position absolute
-    top 18px
+    top 16px
     right 18px
     font-size 12px
     text-transform uppercase
@@ -92,14 +92,25 @@
     background var(--good)
 
   .signerStatusText
-    position absolute
-    top 15px
-    right 45px
+    padding 8px 32px
+    margin 0px 8px 8px 8px
+    border-radius 8px
     font-size 12px
     text-transform uppercase
-    font-weight 400
+    text-align center
+    font-weight 600
     letter-spacing 1px
+    background var(--ghostB)
+    color var(--outerspace)
 
+  .signerStatusError
+    color var(--bad)
+
+  .signerStatusIssue
+    color var(--moon)
+
+  .signerStatusReady
+    color var(--good)
 
   .signerBottom
     // position absolute
@@ -278,10 +289,6 @@
       padding-left 1px
       background var(--ghostB)
 
-  .signerAccountsTitleActiveOn
-    .signerAccountsTitleActiveCount
-      color var(--good)
-
   .signerAccounts
     //position absolute
     bottom 30px
@@ -300,13 +307,16 @@
 
     .signerAccount
       display flex
-      height 24px
+      height 26px
       margin 4px 6px
       width calc(100% - 12px)
       position relative
       // border-bottom 1px solid var(--ghostB)
       background var(--ghostB)
-      border-radius 12px
+      color var(--outerspace)
+      border-radius 13px
+      border 1px solid var(--ghostZ)
+      box-sizing border-box
       // box-shadow 0px 9px 5px var(--ghostZ)
       cursor pointer
       *
@@ -355,9 +365,9 @@
         color var(--ghostZ)
 
     .signerAccountAdded
-      color var(--good)
+      border 1px solid var(--outerspace)
       .signerAccountCheck
-        color var(--good)
+        color var(--outerspace)
 
     .signerAccountlast-child
       border-bottom none
@@ -367,7 +377,7 @@
   display flex
   justify-content center
   align-items center
-  padding-bottom 20px
+  padding 20px
 
 .signerLoadingLoader, .signerLoadingLoaderafter
   border-radius 50%

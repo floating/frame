@@ -13,27 +13,41 @@ class Signer extends React.Component {
       latticePairCode: ''
     }
   }
+
   status () {
     if (this.props.status === 'ok') {
       return (
         <div className='signerStatus'>
-          <div className='signerStatusText'>{'ready'}</div>
           <div className='signerStatusIndicator signerStatusIndicatorReady'></div>
         </div>
       )
     } else if (this.props.status === 'locked') {
       return (
         <div className='signerStatus'>
-          <div className='signerStatusText'>{'locked'}</div>
           <div className='signerStatusIndicator signerStatusIndicatorLocked'></div>
         </div>
       )
     } else {
       return (
         <div className='signerStatus'>
-          <div className='signerStatusText'>{this.props.status}</div>
           <div className='signerStatusIndicator'></div>
         </div>
+      )
+    }
+  }
+
+  statusText () {
+    if (this.props.status === 'ok') {
+      return (
+        <div className='signerStatusText signerStatusReady'>{'ready to use'}</div>
+      )
+    } else if (this.props.status === 'locked') {
+      return (
+        <div className='signerStatusText signerStatusIssue'>{'locked'}</div>
+      )
+    } else {
+      return (
+        <div className='signerStatusText'>{this.props.status}</div>
       )
     }
   }
@@ -76,6 +90,7 @@ class Signer extends React.Component {
           </div>
           {this.status()}
         </div>
+        {this.statusText()}
         {this.props.status === 'loading' ? (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />

@@ -19,6 +19,12 @@ class Gas extends React.Component {
   componentDidMount () {
     this.resizeObserver.observe(this.moduleRef.current)
   } 
+  renderFeeTime (time) {
+    if (!time) return <>?<span className='timeUnit'>?</span></>
+    if (time < 60) return <><span className='timeUnit'>~</span>{time}<span className='timeUnit'>s</span></>
+    if (time < 3600) return <><span className='timeUnit'>~</span>{Math.round(time / 60)}<span className='timeUnit'>m</span></>
+    return <><span className='timeUnit'>~</span>{Math.round(time / 3600)}<span className='timeUnit'>h</span></>
+  }
   render () {
     const { type, id } = this.store('main.currentNetwork')
     const levels = this.store('main.networks', type, id, 'gas.price.levels') || {}
@@ -32,7 +38,8 @@ class Gas extends React.Component {
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
-              {'Slow'}
+              <div>{'Slow'}</div>
+              <div className='gasLevelTime'>{this.renderFeeTime(levels.slowTime)}</div>
             </div>
           </div>
           <div className='gasItem'>
@@ -41,7 +48,8 @@ class Gas extends React.Component {
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
-              {'Medium'}
+              <div>{'Medium'}</div>
+              <div className='gasLevelTime'>{this.renderFeeTime(levels.standardTime)}</div>
             </div>
           </div>
           <div className='gasItem'>
@@ -50,7 +58,8 @@ class Gas extends React.Component {
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
-              {'Fast'}
+              <div>{'Fast'}</div>
+              <div className='gasLevelTime'>{this.renderFeeTime(levels.fastTime)}</div>
             </div>
           </div>
           <div className='gasItem'>
@@ -59,7 +68,8 @@ class Gas extends React.Component {
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
-              {'ASAP'}
+              <div>{'ASAP'}</div>
+              <div className='gasLevelTime'>{this.renderFeeTime(levels.asapTime)}</div>
             </div>
           </div>
         </div>
