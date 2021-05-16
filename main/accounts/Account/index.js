@@ -98,13 +98,16 @@ class Account {
     return foundSigner
   }
 
-  setAccess (req, access) { // Permissions are not handle by the account
+  setAccess (req, access) {
+
     if (req.address.toLowerCase() === this.address)  {
+      // Permissions do no live inside the account summary
       store.setPermission(this.address, { handlerId: req.handlerId, origin: req.origin, provider: access })
     }
     if (this.requests[req.handlerId]) {
       if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()
       delete this.requests[req.handlerId]
+      this.update()
     }
   }
 

@@ -6,7 +6,7 @@ import link from '../../../resources/link'
 import Main from './Main'
 import Local from './Local'
 import Networks from './Networks'
-// import Notify from './Notify'
+import Notify from './Notify'
 // import Phase from './Phase'
 import Badge from './Badge'
 
@@ -114,6 +114,7 @@ class Panel extends React.Component {
             </div>
           ) : null}
         </div>
+        <Notify />
         <Local />
         <Networks />
         <Main />

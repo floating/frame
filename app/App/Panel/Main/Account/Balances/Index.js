@@ -144,17 +144,18 @@ class Balances extends React.Component {
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader'>account balances</div>
+        <div className='moduleHeader'>balances</div>
+        {balances.length === 0 ? (
+          <div className='signerBalanceNoTokens'>
+            Loading...
+          </div>
+        ) : null}
         {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i))}
-        {
-          balances.length <= 1 && this.state.expand
-            ? (
-              <div className='signerBalanceNoTokens'>
-                No other token balances found
-              </div>
-              )
-            : null
-          }
+        {balances.length <= 1 && this.state.expand ? (
+          <div className='signerBalanceNoTokens'>
+            No other token balances found
+          </div>
+        ) : null}
         <div className='signerBalanceTotal'>
           {balancesLength > 5 ? (
             <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
