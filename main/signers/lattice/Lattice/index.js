@@ -78,10 +78,13 @@ class Lattice extends Signer {
     try {
       if (this.config.deviceId) {
         if (!this.client) throw new Error('Client not ready during open')
+        this.status = 'connecting'
+        this.update()
         const clientConnect = promisify(this.client.connect).bind(this.client)
         this.paired = await clientConnect(this.config.deviceId)
         if (this.paired) {
           this.status = 'addresses'
+          this.update()
           await this.deriveAddresses()
         } else {
           this.status = 'pairing'
