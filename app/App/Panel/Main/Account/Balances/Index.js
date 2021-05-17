@@ -143,18 +143,15 @@ class Balances extends React.Component {
       balances = balances.slice(0, 5)
     }
 
+    const fullScan = this.store('main.fullScan', address)
+
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>balances</div>
-        {balances.length === 0 ? (
-          <div className='signerBalanceNoTokens'>
-            Loading...
-          </div>
-        ) : null}
         {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i))}
-        {balances.length <= 1 && this.state.expand ? (
-          <div className='signerBalanceNoTokens'>
-            No other token balances found
+        {balances.length === 0 || !fullScan ? (
+          <div className='moduleLoading'>
+            <div className='moduleLoadingLoader' />
           </div>
         ) : null}
         <div className='signerBalanceTotal'>
@@ -168,7 +165,7 @@ class Balances extends React.Component {
               {'Total: '}
             </div>
             <div className='signerBalanceTotalValue'>
-            {svg.usd(11)}{totalDisplayValue}
+              {svg.usd(11)}{balances.length > 0 && fullScan ? totalDisplayValue : '---.--'}
             </div>
           </div>
         </div>
