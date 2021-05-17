@@ -10,7 +10,7 @@ let heartbeat
 function tokenScan (addresses) {
   addresses.forEach(address => {
     scanTokens(address)
-      .then(found => process.send({ type: 'tokens', address, found }))
+      .then(found => process.send({ type: 'tokens', address, found, fullScan: true }))
       .catch(err => log.error('token scan error', err))
   })
 }
@@ -43,3 +43,5 @@ process.on('message', message => {
   const args = message.args || []
   messageHandler[message.command](...args)
 })
+
+process.send({ type: 'ready' })

@@ -6,37 +6,9 @@ import link from '../../../../resources/link'
 import frameIcon from './FrameIcon.png'
 
 class Notify extends React.Component {
-  // intro () {
-  //   return (
-  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'intro' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-  //       <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 22 })}</div>
-  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-  //         <div className='notifyTitle'>
-  //           Getting Started
-  //         </div>
-  //         <div className='introInstructions'>
-  //           <div className='introInstructionList'>
-  //             <div></div>
-  //           </div>
-  //           <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-  //             <div></div>
-  //           </div>
-  //           <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-  //             <div>{'If a dapp you\'re using does not automatically connect to Frame, use our'} <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>browser extension</span></div>
-  //           </div>
-  //           <div className='introInstructionItem' style={{ textAlign: 'center' }}>
-  //             <div style={{ fontSize: '15px', marginBottom: '5px' }}>Need help?</div>
-  //             <div><span onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/issues/new' })}>Open an issue</span> or <span onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>join our Discord!</span></div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
   mainnet () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'mainnet' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+      <div className='notifyBoxWrap'>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyFrameIcon'>
             <img src={frameIcon} />
@@ -67,67 +39,67 @@ class Notify extends React.Component {
     )
   }
 
-  rinkeby () {
-    return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-          <div className='notifyTitle'>
-            Parity 💔 Rinkeby
-          </div>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>Unfortunately, Parity does not support the Rinkeby testnet.</div>
-            <div className='notifyBodyLine'>Please select another Ethereum client or use the secondary connection.</div>
-          </div>
-          <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>OK</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // rinkeby () {
+  //   return (
+  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+  //       <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+  //         <div className='notifyTitle'>
+  //           Parity 💔 Rinkeby
+  //         </div>
+  //         <div className='notifyBody'>
+  //           <div className='notifyBodyLine'>Unfortunately, Parity does not support the Rinkeby testnet.</div>
+  //           <div className='notifyBodyLine'>Please select another Ethereum client or use the secondary connection.</div>
+  //         </div>
+  //         <div className='notifyInput'>
+  //           <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+  //             <div className='notifyInputOptionText'>OK</div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
-  ipfsAlreadyRunning () {
-    return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>IPFS daemon is already running on this machine.</div>
-          </div>
-          <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>Ok</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // ipfsAlreadyRunning () {
+  //   return (
+  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'ipfsAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+  //       <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+  //         <div className='notifyBody'>
+  //           <div className='notifyBodyLine'>IPFS daemon is already running on this machine.</div>
+  //         </div>
+  //         <div className='notifyInput'>
+  //           <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+  //             <div className='notifyInputOptionText'>Ok</div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
-  parityAlreadyRunning () {
-    return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-          <div className='notifyBody'>
-            <div className='notifyBodyLine'>Parity is already running on this machine.</div>
-          </div>
-          <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>Ok</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // parityAlreadyRunning () {
+  //   return (
+  //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'parityAlreadyRunning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+  //       <div className='notifyClose' onMouseDown={() => this.store.notify()}>{svg.octicon('x', { height: 18 })}</div>
+  //       <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+  //         <div className='notifyBody'>
+  //           <div className='notifyBodyLine'>Parity is already running on this machine.</div>
+  //         </div>
+  //         <div className='notifyInput'>
+  //           <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+  //             <div className='notifyInputOptionText'>Ok</div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   nonceWarning () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'nonceWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+      <div className='notifyBoxWrap'>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             Adjustable Nonce
@@ -147,7 +119,7 @@ class Notify extends React.Component {
 
   gasFeeWarning ({ req = {}, feeUSD = 0 }) {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'gasFeeWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+      <div className='notifyBoxWrap'>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             Gas Fee Warning
@@ -266,7 +238,7 @@ class Notify extends React.Component {
 
   openExternal ({ url }) {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExternal' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+      <div className='notifyBoxWrap'>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             Open External Link
@@ -298,7 +270,7 @@ class Notify extends React.Component {
 
   openExplorer ({ hash }) {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'openExplorer' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+      <div className='notifyBoxWrap'>
         <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
           <div className='notifyTitle'>
             Open Block Explorer
@@ -343,22 +315,59 @@ class Notify extends React.Component {
     )
   }
 
-  render () { // Instead of mounting all of these we should use a transition to mount and animate on demand
-    return (
-      <div className={this.store('view.notify') ? 'notify notifyOn' : 'notify'} onMouseDown={() => this.store.notify()}>
-        {this.mainnet()}
-        {this.gasFeeWarning(this.store('view.notifyData'))}
-        {this.rinkeby()}
-        {this.openExternal(this.store('view.notifyData'))}
-        {this.openExplorer(this.store('view.notifyData'))}
-        {this.ipfsAlreadyRunning()}
-        {this.parityAlreadyRunning()}
-        {this.contractData()}
-        {this.hotAccountWarning()}
-        {this.hotSignerMismatch()}
-        {this.nonceWarning()}
-      </div>
-    )
+  render () {
+    const notify = this.store('view.notify')
+    if (notify === 'mainnet') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.mainnet()}
+        </div>
+      )
+    } else if (notify === 'nonceWarning') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.nonceWarning()}
+        </div>
+      )
+    } else if (notify === 'gasFeeWarning') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.gasFeeWarning(this.store('view.notifyData'))}
+        </div>
+      )
+    } else if (notify === 'contractData') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.contractData()}
+        </div>
+      )
+    } else if (notify === 'hotAccountWarning') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.hotAccountWarning()}
+        </div>
+      )
+    } else if (notify === 'hotSignerMismatch') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.hotSignerMismatch()}
+        </div>
+      )
+    } else if (notify === 'openExternal') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.openExternal(this.store('view.notifyData'))}
+        </div>
+      )
+    } else if (notify === 'openExplorer') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.openExplorer(this.store('view.notifyData'))}
+        </div>
+      )
+    } else {
+      return null
+    }
   }
 }
 

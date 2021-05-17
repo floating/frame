@@ -11,18 +11,25 @@
 
   .signerBalanceShowAll
     position absolute
-    background var(--ghostD)
-    left 5px
-    bottom 5px
-    top 5px
+    left 16px
+    top 7px
+    height 30px
     width 90px
-    border-radius 4px
+    border-radius 30px
     cursor pointer
     z-index 4000
     display flex
     justify-content center
     align-items center
-    font-size 12px
+    font-size 11px
+    font-weight 500
+    padding 0px 10px
+    letter-spacing 1px
+    background var(--ghostC)
+    text-transform uppercase
+
+  .signerBalanceShowAll:hover
+    background var(--ghostD)
 
   .signerBalanceTotalText
     position absolute
@@ -177,7 +184,42 @@
   text-transform uppercase
   font-size 12px
   border-bottom 1px solid var(--ghostA)
-  
+
+.moduleLoading
+  height 40px
+  display flex
+  justify-content center
+  align-items center
+  padding 20px
+  border-bottom 1px solid var(--ghostA)
+  margin 0px 16px
+
+.moduleLoadingLoader
+  border-radius 50%
+  width 30px
+  height 30px
+
+.moduleLoadingLoader
+  margin 30px auto
+  font-size 10px
+  position relative
+  text-indent -9999em
+  border-top 3px solid var(--ghostZ)
+  border-right 3px solid var(--ghostZ)
+  border-bottom 3px solid var(--ghostZ)
+  border-left 3px solid var(--good)
+  transform translateZ(0)
+  animation load 0.5s infinite linear
+
+@keyframes load
+  0%
+    -webkit-transform rotate(0deg)
+    transform rotate(0deg)
+
+  100%
+    -webkit-transform rotate(360deg)
+    transform rotate(360deg)
+
 // .signerBalancesOpen
 //   height 400px
 //   left 8px

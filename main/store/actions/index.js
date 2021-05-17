@@ -366,7 +366,7 @@ module.exports = {
     })
   },
   // Tokens
-  setBalances: (u, address, newBalances) => {
+  setBalances: (u, address, newBalances, fullScan) => {
     u('main.balances', address, (balances = {}) => {
       const updatedBalances = Object.entries(newBalances).reduce((acc, [key, token]) => {
         acc[key] = token
@@ -375,6 +375,11 @@ module.exports = {
 
       return { ...balances, ...updatedBalances }
     })
+    if (fullScan) { 
+      setTimeout(() => {
+        u('main.fullScan', address, () => true)
+      }, 1000)
+    }
   },
   omitToken: (u, address, omitToken) => {
     u('main.accounts', address, 'tokens.omit', omit => {

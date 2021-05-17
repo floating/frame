@@ -4,14 +4,15 @@
   right 0px
   left 0px
   bottom 0px
-  z-index 999999999999
-  pointer-events none
+  z-index 9999999999999999
+  pointer-events auto
   transition var(--standard)
   display flex
   justify-content center
   align-items center
   text-align center
   opacity 1
+  background var(--ghostX09)
   
   ::selection
     background var(--good02) // #ffb7b7
@@ -24,20 +25,20 @@
     left 0
     position absolute
     border-radius 12px
-    background var(--ghostD)
+    background var(--ghostZ)
     z-index 2
 
   .notifyBoxWrap
     border-radius 12px
     box-sizing border-box
     position absolute
-    top 20px
-    bottom 20px
-    left calc(100% + 95px)
-    width calc(100% - 10px)
+    top 100px
+    bottom 100px
+    left 5px
+    right 5px
     transition var(--standard)
-    box-shadow 0px 0px 0px 90px var(--ghostA)
-    background var(--ghostA)
+    box-shadow 0px 0px 30px 0px var(--ghostX)
+
     display flex
     justify-content center
     align-items center
@@ -58,8 +59,8 @@
 
     .notifyBox
       padding 55px 20px 60px 20px
-      border-top 1px solid var(--ghostB)
-      border-bottom 1px solid var(--ghostB)
+      border-top 1px solid var(--ghostA)
+      border-bottom 1px solid var(--ghostA)
       min-width calc(100% - 40px)
       overflow hidden
       
@@ -90,7 +91,7 @@
           width 96px
           height 96px
           border-radius 24px
-          box-shadow 0px 30px 24px -10px var(--doubleThick)
+          // box-shadow 0px 30px 24px -10px var(--doubleThick)
 
       .notifyBody
         font-size 16px
@@ -106,16 +107,16 @@
         .notifyBodyHash
           font-size 14px
           font-family FiraCode, monospace
-          background var(--thin)
+          background var(--ghostB)
           letter-spacing 2px
           line-height 20px
           // margin-left 4px
-          box-shadow inset 0px 2px 14px var(--thin)
+          box-shadow inset 0px 2px 14px var(--ghostB)
           padding 18px
           border-radius 12px
           margin-top 10px
-          border 1px solid var(--ghostD)
-          text-shadow 0px 2px 0px var(--thick)
+          border 1px solid var(--ghostC)
+          text-shadow 0px 2px 0px var(--ghostB)
           min-height 58px
           max-height 58px
 
@@ -143,18 +144,24 @@
           min-width 32px
           min-height 32px
           border-radius 16px
-          background var(--ghostE)
-          border 1px solid var(--spacewhite)
-          box-shadow cardDrop, 0px 2px 1px var(--thick), 0px 0px 7px 2px var(--thin)
+          background var(--ghostC)
+          border 1px solid var(--ghostZ)
+          box-shadow cardDrop, 0px 2px 1px var(--ghostA), 0px 0px 7px 2px var(--ghostB)
           margin-right 10px
           box-sizing border-box
           display flex
           position relative
           justify-content center
           align-items center
+          cursor pointer
+          *
+            pointer-events none
 
           svg 
             height 22px
+
+        .notifyCheckBox:hover
+          background var(--ghostD)
 
         .notifyCheckText
           text-align left
@@ -176,15 +183,18 @@
           justify-content center
           align-items center
           box-sizing border-box
-          background var(--ghostB)
+          background var(--ghostA)
           height 40px
           font-weight 300
           padding-top 1px
-          box-shadow 0px 8px 30px -10px rgba(6, 54, 52, 0.25)
+          box-shadow cardDrop, 0px 2px 1px var(--ghostA), 0px 0px 7px 2px var(--ghostB)
           text-transform uppercase
           font-size 14px
           font-weight 400
           letter-spacing 1px
+          cursor pointer
+          *
+            pointer-events none
 
           .notifyInputOptionText
             position relative
@@ -192,7 +202,7 @@
             padding-bottom 2px
 
         .notifyInputOption:hover:before
-          background var(--ghostE)
+          background var(--ghostC)
 
         .notifyInputDeny:before
           content ''
@@ -201,7 +211,7 @@
           left 0
           right 0
           bottom 2px
-          background var(--ghostD)
+          background var(--ghostB)
           z-index 2
           border-top-left-radius 19px
           border-bottom-left-radius 19px
@@ -217,7 +227,7 @@
           left 0
           right 0
           bottom 2px
-          background var(--ghostD)
+          background var(--ghostB)
           z-index 2
           border-top-right-radius 19px
           border-bottom-right-radius 19px
@@ -233,7 +243,7 @@
           left 0
           right 0
           bottom 2px
-          background var(--ghostD)
+          background var(--ghostC)
           z-index 2
           border-radius 19px
 
@@ -271,6 +281,3 @@
         div
           font-size 14px
           line-height 26px
-
-.notifyOn
-  pointer-events auto

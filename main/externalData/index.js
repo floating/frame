@@ -21,8 +21,10 @@ function createWorker () {
       log.debug('received message from scan worker: ', message)
     }
 
+    if (message.type === 'ready') updateRates(['eth', 'xdai', 'matic'])
+
     if (message.type === 'tokens') {
-      store.setBalances(message.address, message.found)
+      store.setBalances(message.address, message.found, message.fullScan)
       updateRates(Object.keys(message.found))
     }
 
@@ -85,10 +87,11 @@ function addAddresses (addresses) {
 function setActiveAddress (address) {
   addAddresses([address])
   activeAddress = address
+  updateTrackedTokens()
 }
 
 function start (addresses = [], omitList = [], knownList) {
-  addAddresses(addresses)
+  // addAddresses(addresses) // Scan beomces too heavy with many accounts added
 
   if (scanWorker) {
     log.warn('external data worker already scanning')
