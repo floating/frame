@@ -12,6 +12,7 @@ class Signer extends React.Component {
       addressLimit: 4,
       latticePairCode: ''
     }
+    this.loadingStatus = ['loading', 'connecting', 'addresses']
   }
 
   status () {
@@ -44,6 +45,10 @@ class Signer extends React.Component {
     } else if (this.props.status === 'locked') {
       return (
         <div className='signerStatusText signerStatusIssue'>{'locked'}</div>
+      )
+    } else if (this.props.status === 'addresses') {
+      return (
+        <div className='signerStatusText'>{'getting addresses'}</div>
       )
     } else {
       return (
@@ -91,7 +96,7 @@ class Signer extends React.Component {
           {this.status()}
         </div>
         {this.statusText()}
-        {this.props.status === 'loading' ? (
+        {this.loadingStatus.indexOf(this.props.status) > -1 ? (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />
           </div>

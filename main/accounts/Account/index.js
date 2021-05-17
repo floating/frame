@@ -38,6 +38,7 @@ class Account {
     this.tokens = tokens || {}
     this.requests = {}
     this.signer = '' // Matched Signer ID
+    this.signerStatus = ''
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
     this.update(true)
     this.acctObs = store.observer(() => {
@@ -45,11 +46,14 @@ class Account {
       const updatedSigner = this.findSigner(this.address)
 
       if (updatedSigner) {
-        this.signer = updatedSigner.id
-        this.lastSignerType = updatedSigner.type || this.lastSignerType
-        if (updatedSigner.status === 'ok') this.verifyAddress(false, (err, verified) => {
-          if (!err && !verified) this.signer = ''
-        })
+        if (this.signer !== updatedSigner.id || this.signerStatus !== updatedSigner.status) {
+          this.signer = updatedSigner.id
+          this.lastSignerType = updatedSigner.type || this.lastSignerType
+          this.signerStatus = updatedSigner.status
+          if (updatedSigner.status === 'ok') this.verifyAddress(false, (err, verified) => {
+            if (!err && !verified) this.signer = ''
+          })
+        }
       } else {
         this.signer = ''
       }

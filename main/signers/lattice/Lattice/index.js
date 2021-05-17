@@ -45,9 +45,7 @@ class Lattice extends Signer {
         }
       }
     })
-
-    this.client = this.createClient()
-    
+  
     this.update()
     this.deviceStatus()
   }
@@ -57,7 +55,6 @@ class Lattice extends Signer {
     const clientConfig = {
       name: suffix ? `Frame-${suffix}` : 'Frame',
       crypto: crypto,
-      privKey: null,
       timeout: 30000,
       baseUrl,
       privKey
@@ -80,10 +77,14 @@ class Lattice extends Signer {
   async open () {
     try {
       if (this.config.deviceId) {
+        if (!this.client) throw new Error('Client not ready during open')
+        this.status = 'connecting'
+        this.update()
         const clientConnect = promisify(this.client.connect).bind(this.client)
         this.paired = await clientConnect(this.config.deviceId)
         if (this.paired) {
           this.status = 'addresses'
+          this.update()
           await this.deriveAddresses()
         } else {
           this.status = 'pairing'
@@ -121,6 +122,7 @@ class Lattice extends Signer {
         n: accountLimit,
         skipCache: true
       }
+      if (!this.client) throw new Error('Client not ready during deriveAddresse')
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
       const result = await getAddresses(req)
       this.status = 'ok'
@@ -140,7 +142,7 @@ class Lattice extends Signer {
   }
 
   async deviceStatus () {
-    this.pollStatus()
+    // this.pollStatus() // Unscheduled requets reult in errors
     if (this.deviceStatusActive || this.verifyActive) return
     this.deviceStatusActive = true
     try {
@@ -153,8 +155,7 @@ class Lattice extends Signer {
   }
 
   // This verifyAddress signature is no longer current
-  async verifyAddress (index, current, display, cb = () => {
-  }) {
+  async verifyAddress (index, current, display, cb = () => {}) {
     if (this.verifyActive) {
       log.info('verifyAddress Called but it\'s already active')
       return cb(new Error('verifyAddress Called but it\'s already active'))
@@ -195,7 +196,6 @@ class Lattice extends Signer {
   }
 
   async reset () {
-    this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []
     await this.deriveAddresses()
@@ -244,7 +244,7 @@ class Lattice extends Signer {
 
   async signTransaction (index, rawTx, cb) {
     try {
-      if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
+      if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
       const unsignedTxn = {
         nonce: utils.hexToNumber(rawTx.nonce),
         gasPrice: utils.hexToNumber(rawTx.gasPrice),

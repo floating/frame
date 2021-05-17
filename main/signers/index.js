@@ -1,5 +1,6 @@
 const EventEmitter = require('events')
 const log = require('electron-log')
+const crypto = require('crypto')
 
 const hot = require('./hot')
 const ledger = require('./ledger')
@@ -64,7 +65,8 @@ class Signers extends EventEmitter {
         deviceId, 
         baseUrl: 'https://signing.gridpl.us',
         endpointMode: 'default',
-        suffix: '' 
+        suffix: '',
+        privKey: crypto.randomBytes(32).toString('hex')  
       })    
       return { id: 'lattice-' + deviceId}
     } else {
