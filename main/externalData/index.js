@@ -7,7 +7,7 @@ const store = require('../store')
 let activeAddress
 let trackedAddresses = []
 
-let scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan, rateScan
+let scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan, rateScan, inventoryScan
 
 function createWorker () {
   if (scanWorker) {
@@ -30,6 +30,10 @@ function createWorker () {
 
     if (message.type === 'rates') {
       store.setRates(message.rates)
+    }
+
+    if (message.type === 'inventory') {
+      store.setInventory(message.address, message.inventory)
     }
   })
 
@@ -74,6 +78,10 @@ const updateRates = symbols => sendCommandToWorker('updateRates', [symbols])
 const updateTrackedTokens = () => { if (activeAddress) { sendCommandToWorker('updateTokenBalances', [[activeAddress]]) } }
 const updateAllTokens = () => sendCommandToWorker('updateTokenBalances', [trackedAddresses])
 
+const updateInventory = () => { 
+  if (activeAddress) { sendCommandToWorker('updateInventory', [[activeAddress]]) } 
+}
+
 function addAddresses (addresses) {
   trackedAddresses = [...trackedAddresses].concat(addresses).reduce((all, addr) => {
     if (addr && !all.includes(addr)) {
@@ -88,6 +96,7 @@ function setActiveAddress (address) {
   addAddresses([address])
   activeAddress = address
   updateTrackedTokens()
+  updateInventory()
 }
 
 function start (addresses = [], omitList = [], knownList) {
@@ -126,6 +135,11 @@ function start (addresses = [], omitList = [], knownList) {
     const ethereum = store('main.networks.ethereum')
     const baseRates = Object.keys(ethereum).map(n => ethereum[n].symbol && ethereum[n].symbol.toLowerCase()).filter(s => s)
     rateScan = startScan(() => updateRates([...new Set(baseRates)]), 1000 * 15)
+  }
+
+  if (!inventoryScan) {
+    // update inventory
+    inventoryScan = startScan(() => updateInventory(), 1000 * 60)
   }
 }
 
