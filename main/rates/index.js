@@ -28,7 +28,8 @@ function loadCoins () {
   // }
   symbolMapping = {
     eth: 'ethereum',
-    xdai: 'xdai'
+    xdai: 'xdai',
+    matic: 'matic'
   }
 }
 

@@ -7,7 +7,7 @@ const store = require('../store')
 let activeAddress
 let trackedAddresses = []
 
-let scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan
+let scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan, rateScan
 
 function createWorker () {
   if (scanWorker) {
@@ -91,7 +91,7 @@ function setActiveAddress (address) {
 }
 
 function start (addresses = [], omitList = [], knownList) {
-  // addAddresses(addresses) // Scan beomces too heavy with many accounts added
+  // addAddresses(addresses) // Scan becomes too heavy with many accounts added
 
   if (scanWorker) {
     log.warn('external data worker already scanning')
@@ -119,6 +119,13 @@ function start (addresses = [], omitList = [], knownList) {
   if (!trackedAddressScan) {
     // update tokens for the active account every 15 seconds
     trackedAddressScan = startScan(updateTrackedTokens, 1000 * 15)
+  }
+
+  if (!rateScan) {
+    // update base rates
+    const ethereum = store('main.networks.ethereum')
+    const baseRates = Object.keys(ethereum).map(n => ethereum[n].symbol && ethereum[n].symbol.toLowerCase()).filter(s => s)
+    rateScan = startScan(() => updateRates([...new Set(baseRates)]), 1000 * 15)
   }
 }
 
