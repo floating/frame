@@ -18,7 +18,9 @@ const compareVersions = (a, b) => {
 const checkErr = (err) => log.error('Error checking latest version:', err)
 const options = { host: 'api.github.com', path: '/repos/floating/frame/releases', headers: { 'User-Agent': 'request' } }
 
-// autoUpdater.allowPrerelease = true
+const prereleaseTrack = true
+
+autoUpdater.allowPrerelease = prereleaseTrack
 autoUpdater.autoDownload = false
 
 autoUpdater.on('error', err => {
@@ -78,7 +80,7 @@ const updater = {
       res.on('data', chunk => { rawData += chunk })
       res.on('end', () => {
         try {
-          const releases = JSON.parse(rawData).filter(r => !r.prerelease)
+          const releases = JSON.parse(rawData).filter(r => (!r.prerelease || prereleaseTrack))
           if (releases && releases[0] && releases[0].tag_name && !updater.notified[releases[0].tag_name]) {
             const newVersion = releases[0].tag_name.charAt(0) === 'v' ? releases[0].tag_name.substr(1) : releases[0].tag_name
             if (compareVersions(newVersion, version) === 1) {
