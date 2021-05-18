@@ -211,6 +211,7 @@ class _AccountMain extends React.Component {
           {
             id === 'gas' ? <Gas 
               moduleId={id} 
+              id={this.props.id}
             /> :
             id === 'requests' ? <Requests 
               _id={id}
@@ -226,12 +227,15 @@ class _AccountMain extends React.Component {
             /> :
             id === 'activity' ? <Activity 
               moduleId={id} 
+              id={this.props.id}
             /> :
             id === 'launcher' ? <Launcher 
-              moduleId={id} 
+              moduleId={id}
+              id={this.props.id} 
             /> :
             id === 'inventory' ? <Inventory 
               moduleId={id} 
+              id={this.props.id}
             /> :
             id === 'permissions' ? <Permissions
               moduleId={id}

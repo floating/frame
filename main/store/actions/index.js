@@ -363,6 +363,10 @@ module.exports = {
   setRates: (u, rates) => {
     u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
+  // Inventory
+  setInventory: (u, address, inventory) => {
+    u('main.inventory', address, () => inventory)
+  },
   setBalance: (u, address, key, balance) => {
     // key could be a symbol or a contract address
     u('main.balances', address, (balances = {}) => {

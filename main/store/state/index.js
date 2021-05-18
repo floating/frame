@@ -164,6 +164,7 @@ const initial = {
     permissions: main('permissions', {}),
     balances: {}, // main('balances', {}),
     rates: {}, // main('rates', {}),
+    inventory: {}, // main('rates', {}),
     signers: {},
     savedSigners: {},
     updater: {
