@@ -20,18 +20,23 @@ class Balances extends React.Component {
   } 
   render () {
     const inventory = this.store('main.inventory', this.props.id)
+    const collections = Object.keys(inventory || {})
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Inventory'}</div>  
         <div className='moduleMain'>
-          {Object.keys(inventory).map(k => {
+          {collections.length ? collections.map(k => {
             return (
               <div className='inventoryCollection'>
                 <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
                 <div className='inventoryCollectionCount'>{Object.keys(inventory[k].assets).length}</div>
               </div>
             )
-          })}
+          }) : inventory ? (
+            <div className='inventoryNotFound'>No Items Found</div>
+          ) : (
+            <div className='inventoryNotFound'>Loading Items..</div>
+          )}
         </div>
       </div>
     )
