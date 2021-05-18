@@ -27,23 +27,14 @@ class Lattice extends Signer {
     this.type = 'lattice'
     this.status = 'loading'
 
-    this.suffix = ''
-    this.baseUrl = ''
-    this.privKey = ''
-
     this.latticeObs = store.observer(() => {
-      this.config = store('main.lattice', deviceId) || {}
-      if (!this.config.privKey) {
-        store.updateLattice(deviceId, { privKey: crypto.randomBytes(32).toString('hex') })
-      } else {
-        if (
-          this.suffix !== this.config.suffix ||
-          this.baseUrl !== this.config.baseUrl ||
-          this.privKey !== this.config.privKey
-        ) {
-          this.client = this.createClient()
-        }
+      this.createClient()
+
+      if (this.accountLimit !== store('main.latticeSettings.accountLimit')) {
+        this.accountLimit = store('main.latticeSettings.accountLimit')
+        this.open()
       }
+
     })
   
     this.update()
@@ -51,15 +42,43 @@ class Lattice extends Signer {
   }
 
   createClient () {
-    const { suffix, baseUrl, privKey } = this.config
-    const clientConfig = {
-      name: suffix ? `Frame-${suffix}` : 'Frame',
-      crypto: crypto,
-      timeout: 30000,
-      baseUrl,
-      privKey
+    let endpointMode, baseUrl, suffix, privKey
+    endpointMode = store('main.latticeSettings.endpointMode')
+    if (endpointMode === 'custom') {
+      baseUrl = store('main.latticeSettings.endpointCustom')
+    } else {
+      baseUrl = 'https://signing.gridpl.us'
     }
-    return new Client(clientConfig)
+    suffix = store('main.latticeSettings.suffix')
+    privKey = store('main.lattice', this.deviceId, 'privKey')
+
+    if (
+      this.endpointMode !== endpointMode ||
+      this.suffix !== suffix ||
+      this.baseUrl !== baseUrl ||
+      this.privKey !== privKey
+    ) {
+      this.endpointMode = endpointMode
+      this.suffix = suffix
+      this.baseUrl = baseUrl
+      this.privKey = privKey
+      console.log('creating client with', {
+        name: suffix ? `Frame-${suffix}` : 'Frame',
+        timeout: 30000,
+        baseUrl,
+        privKey
+      })
+      this.client = new Client({
+        name: suffix ? `Frame-${suffix}` : 'Frame',
+        crypto: crypto,
+        timeout: 30000,
+        baseUrl,
+        privKey
+      })
+      this.status = 'disconnected'
+      this.update()
+      this.deviceStatus()
+    }
   }
 
   async setPair (pin) {
@@ -76,12 +95,12 @@ class Lattice extends Signer {
 
   async open () {
     try {
-      if (this.config.deviceId) {
+      if (this.deviceId) {
         if (!this.client) throw new Error('Client not ready during open')
         this.status = 'connecting'
         this.update()
         const clientConnect = promisify(this.client.connect).bind(this.client)
-        this.paired = await clientConnect(this.config.deviceId)
+        this.paired = await clientConnect(this.deviceId)
         if (this.paired) {
           this.status = 'addresses'
           this.update()
@@ -94,6 +113,8 @@ class Lattice extends Signer {
         return new Error('No deviceId')
       }
     } catch (err) {
+      this.status = 'disconnected'
+      this.update()
       log.error('Lattice Open Error', err)
       return new Error(err)
     }
@@ -130,7 +151,7 @@ class Lattice extends Signer {
       this.update()
       return result
     } catch (err) {
-      this.status = 'locked'
+      this.status = err.message
       this.update()
       return []
     }
@@ -142,8 +163,8 @@ class Lattice extends Signer {
   }
 
   async deviceStatus () {
-    // this.pollStatus() // Unscheduled requets reult in errors
-    if (this.deviceStatusActive || this.verifyActive) return
+    // this.pollStatus() // Unscheduled requets result in errors
+    if (this.deviceStatusActive) return
     this.deviceStatusActive = true
     try {
       // If signer has no addresses, try deriving them

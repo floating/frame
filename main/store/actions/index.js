@@ -132,6 +132,15 @@ module.exports = {
   setLatticeAccountLimit: (u, limit) => {
     u('main.latticeSettings.accountLimit', () => limit)
   },
+  setLatticeEndpointMode: (u, mode) => {
+    u('main.latticeSettings.endpointMode', () => mode)
+  },
+  setLatticeEndpointCustom: (u, url) => {
+    u('main.latticeSettings.endpointCustom', () => url)
+  },
+  setLatticeSuffix: (u, suffix) => {
+    u('main.latticeSettings.suffix', () => suffix)
+  },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
