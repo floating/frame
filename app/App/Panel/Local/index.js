@@ -14,7 +14,7 @@ class Settings extends React.Component {
     this.networkType = context.store('main.currentNetwork.type')
     const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    const latticeEndpoint = context.store('main.latticeSettings.endpoint')
+    const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
     const latticeSuffix = context.store('main.latticeSettings.suffix')
     this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeSuffix, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
@@ -103,7 +103,7 @@ class Settings extends React.Component {
     const value = e.target.value.replace(/\s+/g, '')
     this.setState({ latticeEndpoint: value })
     // TODO: Update to target specific Lattice device rather than global
-    this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpoint', this.state.latticeEndpoint), 1000)
+    this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
   }
 
   inputLatticeSuffix (e) {
@@ -191,11 +191,6 @@ class Settings extends React.Component {
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
-    let latticePresets = {
-      'default': 'https://signing.gridpl.us',
-      'custom': ''
-    }
-    latticePresets = Object.keys(latticePresets).map((el, i) => ({ text: el, value: latticePresets[el]}))
 
     const networkOptions = []
     Object.keys(networks).forEach(type => {
@@ -388,16 +383,8 @@ class Settings extends React.Component {
               <Dropdown
                   syncValue={this.store('main.latticeSettings.endpointMode')}
                   onChange={(value) => {
-
-                    let newState = {
-                      latticeEndpointMode: value
-                    }
-
-                    if (value === 'default') {
-                      link.send('tray:action', 'setLatticeEndpoint', latticePresets['default'])
-                    }
                     link.send('tray:action', 'setLatticeEndpointMode', value)
-                    this.setState(newState)
+                    this.setState({ latticeEndpointMode: value })
                   }}
                   options={[{ text: 'Default', value: 'default' }, { text: 'Custom', value: 'custom' }]}
               />

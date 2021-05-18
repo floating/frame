@@ -12,7 +12,6 @@ class Signer extends React.Component {
       addressLimit: 4,
       latticePairCode: ''
     }
-    this.loadingStatus = ['loading', 'connecting', 'addresses']
   }
 
   status () {
@@ -96,11 +95,7 @@ class Signer extends React.Component {
           {this.status()}
         </div>
         {this.statusText()}
-        {this.loadingStatus.indexOf(this.props.status) > -1 ? (
-          <div className='signerLoading'>
-            <div className='signerLoadingLoader' />
-          </div>
-        ) : this.props.type === 'lattice' && this.props.status === 'pairing' ? (
+        {this.props.type === 'lattice' && this.props.status === 'pairing' ? (
           <div className='signerLatticePair'>
             <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
             <div className='signerLatticePairInput'>
@@ -123,7 +118,7 @@ class Signer extends React.Component {
               className='signerLatticePairSubmit'
             >Pair</div>
           </div>
-        ) : (
+        ) : this.props.status === 'ok' || this.props.status === 'locked' ? (
           <>
             <div className='signerAccountsTitle'>
               <span>{'Add & Remove Accounts'}</span>
@@ -158,6 +153,10 @@ class Signer extends React.Component {
               <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
             </div>
           </>
+        ) : (
+          <div className='signerLoading'>
+            <div className='signerLoadingLoader' />
+          </div>
         )}
         <div className='signerDrawer' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
           <div className='showControls'>

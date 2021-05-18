@@ -147,7 +147,10 @@ const initial = {
     menubarGasPrice: main('menubarGasPrice', false),
     lattice: main('lattice', {}),
     latticeSettings: {
-      accountLimit: main('latticeSettings.accountLimit', 4)
+      accountLimit: main('latticeSettings.accountLimit', 4),
+      endpointMode: main('latticeSettings.endpointMode', 'default'),
+      endpointCustom: main('latticeSettings.endpointCustom', ''),
+      suffix: main('latticeSettings.suffix', '')
     },
     ledger: {
       derivation: main('ledger.derivation', 'live'),
