@@ -62,12 +62,6 @@ class Lattice extends Signer {
       this.suffix = suffix
       this.baseUrl = baseUrl
       this.privKey = privKey
-      console.log('creating client with', {
-        name: suffix ? `Frame-${suffix}` : 'Frame',
-        timeout: 30000,
-        baseUrl,
-        privKey
-      })
       this.client = new Client({
         name: suffix ? `Frame-${suffix}` : 'Frame',
         crypto: crypto,
