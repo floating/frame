@@ -24,12 +24,13 @@ class Balances extends React.Component {
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Inventory'}</div>  
-        <div className='moduleMain'>
+        <div>
           {collections.length ? collections.map(k => {
             return (
               <div className='inventoryCollection'>
                 <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
                 <div className='inventoryCollectionCount'>{Object.keys(inventory[k].assets).length}</div>
+                <div className='inventoryCollectionLine' />
               </div>
             )
           }) : inventory ? (

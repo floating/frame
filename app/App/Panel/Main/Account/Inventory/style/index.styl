@@ -1,11 +1,28 @@
 .inventoryCollection
+  position relative
   display flex
   justify-content space-between
-  padding-bottom 16px
+  padding 16px
   font-size 14px
   cursor pointer
+  margin 2px 0px
+  border-radius 8px
+
   *
     pointer-events none
+
+  .inventoryCollectionLine
+    position absolute
+    top 0
+    left 16px
+    right 16px
+    bottom -1px
+    border-bottom 1px solid var(--ghostA)
+
+  .inventoryCollectionName
+    display flex
+    justify-content center
+    align-items center
 
   .inventoryCollectionCount
     width 48px
@@ -17,10 +34,12 @@
     border-radius 12px
     font-size 16px
 
+.inventoryCollection:hover
+  background var(--ghostC)
+  
 .inventoryCollection:last-child
-  display flex
-  justify-content space-between
-  padding-bottom 0px
+  .inventoryCollectionLine
+    border-bottom none
 
 .inventoryNotFound
   display flex
