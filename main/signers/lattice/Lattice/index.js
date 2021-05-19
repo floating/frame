@@ -107,7 +107,7 @@ class Lattice extends Signer {
         return new Error('No deviceId')
       }
     } catch (err) {
-      this.status = 'disconnected'
+      this.status = err
       this.update()
       log.error('Lattice Open Error', err)
       return new Error(err)
@@ -145,8 +145,10 @@ class Lattice extends Signer {
       this.update()
       return result
     } catch (err) {
-      this.status = err.message
+      this.status = 'loading'
       this.update()
+      log.error(err)
+      setTimeout(() => this.deriveAddresses(), 3000)
       return []
     }
   }
@@ -157,14 +159,15 @@ class Lattice extends Signer {
   }
 
   async deviceStatus () {
-    // this.pollStatus() // Unscheduled requets result in errors
-    if (this.deviceStatusActive) return
+    this.pollStatus() // Simultaneous requests result in errors
+    if (this.deviceStatusActive || this.status === 'ok') return
     this.deviceStatusActive = true
     try {
-      // If signer has no addresses, try deriving them
       await this.open()
       this.deviceStatusActive = false
     } catch (err) {
+      this.status = 'disconnected'
+      this.update()
       this.deviceStatusActive = false
     }
   }
