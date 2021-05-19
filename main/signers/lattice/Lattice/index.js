@@ -163,7 +163,6 @@ class Lattice extends Signer {
     if (this.deviceStatusActive || this.status === 'ok') return
     this.deviceStatusActive = true
     try {
-      // If signer has no addresses, try deriving them
       await this.open()
       this.deviceStatusActive = false
     } catch (err) {
