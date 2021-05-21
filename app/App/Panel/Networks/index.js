@@ -60,8 +60,7 @@ class _Network extends React.Component {
     }
  }
 
-  status (layer) {
-    const { type, id } = this.store('main.currentNetwork')
+  status (type, id, layer) {
     const connection = this.store('main.networks', type, id, 'connection', layer)
     let status = connection.status
     const current = connection.current
@@ -71,6 +70,8 @@ class _Network extends React.Component {
       if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
     }
     if (status === 'connected' && !connection.network) status = 'loading'
+    if (!this.store('main.networks', type, id, 'on')) status = 'off'
+
     return (
       <div className='connectionOptionStatus'>
         {this.indicator(status)}
@@ -115,6 +116,13 @@ class _Network extends React.Component {
 
     return (
       <div className='network'>
+        <div className='phaseNetworkLine' onMouseDown={() => {
+          link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
+        }}>
+          <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
+            <div className='signerPermissionToggleSwitch' />
+          </div>
+        </div>
         <div className='phaseNetworkLine'>
           {changed ? (
             <div
@@ -199,7 +207,7 @@ class _Network extends React.Component {
             </div>
             <div className='connectionOptionDetails'>
               <div className='connectionOptionDetailsInset'>
-                {this.status('primary')}
+                {this.status(type, id, 'primary')}
                 <Dropdown
                   syncValue={type + ':' + id + ':' + connection.primary.current}
                   onChange={preset => {
@@ -225,7 +233,7 @@ class _Network extends React.Component {
             </div>
             <div className='connectionOptionDetails'>
               <div className='connectionOptionDetailsInset'>
-                {this.status('secondary')}
+                {this.status(type, id, 'secondary')}
                 <Dropdown
                   syncValue={type + ':' + id + ':' + connection.secondary.current}
                   onChange={preset => {
@@ -601,6 +609,7 @@ class Settings extends React.Component {
               explorer={networks[type][id].explorer} 
               type={type} 
               connection={networks[type][id].connection}
+              on={networks[type][id].on}
             />
           })}
         </div>

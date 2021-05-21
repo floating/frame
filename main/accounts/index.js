@@ -417,6 +417,12 @@ class Accounts extends EventEmitter {
     }
   }
 
+  addChain (req, added) {
+    if (this.current() && this.current().addChain) {
+      this.current().addChain(req, added)
+    }
+  }
+
   addRequest (req, res) {
     log.info('addRequest', JSON.stringify(req))
     if (!this.current() || this.current().requests[req.handlerId]) return // If no current signer or the request already exists

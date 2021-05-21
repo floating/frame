@@ -51,10 +51,26 @@
   z-index 99999999999999
   cursor pointer
 
-  div 
+  * 
     pointer-events none
 
   &::before, &::after
     pointer-events: none
     content: ''
     flex: 1
+
+  .dropdownItemIndicator
+    position absolute
+    right 0px
+    top 12px
+    height 5px
+    width 5px
+    border-radius 2.5px
+    background var(--ghostB)
+
+  .dropdownItemIndicatorBad
+    background var(--bad)
+
+  .dropdownItemIndicatorGood
+    background var(--good)
+    

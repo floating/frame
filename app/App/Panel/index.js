@@ -28,23 +28,24 @@ class Panel extends React.Component {
       return <div className='panelDetailIndicatorInner panelDetailIndicatorBad' />
     }
   }
-  componentDidMount () {
-    console.log('did mount')
-    document.addEventListener('keydown', (event) => {
-      console.log('event ky', event.key, this.store('panel.view'))
-      const view = this.store('panel.view')
-      if (event.key === 'ArrowRight') {
-        if (view === 'networks') this.store.setPanelView('settings')
-        if (view === 'settings') this.store.setPanelView('default')
-        if (view === 'default') this.store.setPanelView('networks')
-      } else if (event.key === 'ArrowLeft') {
-        if (view === 'networks') this.store.setPanelView('default')
-        if (view === 'settings') this.store.setPanelView('networks')
-        if (view === 'default') this.store.setPanelView('settings')
-      }
-      // const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
-    })
-  }
+  
+  // componentDidMount () {
+  //   console.log('did mount')
+  //   document.addEventListener('keydown', (event) => {
+  //     console.log('event ky', event.key, this.store('panel.view'))
+  //     const view = this.store('panel.view')
+  //     if (event.key === 'ArrowRight') {
+  //       if (view === 'networks') this.store.setPanelView('settings')
+  //       if (view === 'settings') this.store.setPanelView('default')
+  //       if (view === 'default') this.store.setPanelView('networks')
+  //     } else if (event.key === 'ArrowLeft') {
+  //       if (view === 'networks') this.store.setPanelView('default')
+  //       if (view === 'settings') this.store.setPanelView('networks')
+  //       if (view === 'default') this.store.setPanelView('settings')
+  //     }
+  //     // const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
+  //   })
+  // }
 
   selectNetwork (network) {
     const [type, id] = network.split(':')
@@ -70,7 +71,13 @@ class Panel extends React.Component {
     const networkOptions = []
     Object.keys(networks).forEach(type => {
       Object.keys(networks[type]).forEach(id => {
-        networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
+        const net = networks[type][id]
+        const status = [net.connection.primary.status, net.connection.secondary.status]
+        networkOptions.push({ 
+          text: net.name, 
+          value: type + ':' + id,
+          indicator: status.indexOf('connected') > -1 ? 'good' : 'bad'
+        })
       })
     })
     let markLeft = 6

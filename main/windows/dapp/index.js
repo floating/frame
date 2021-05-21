@@ -103,7 +103,7 @@ const surface = {
       return
     }
 
-    const url = `http://localhost:8421/?dapp=${ens}:${session}`
+    const url = `http://${ens}.localhost:8421/?session=${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 160
     const width = area.width - 444 > height ? height : area.width - 444

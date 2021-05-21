@@ -6,9 +6,11 @@ const log = require('electron-log')
 
 const store = require('../store')
 
-class Nodes extends EventEmitter {
-  constructor () {
+class ChainConnection extends EventEmitter {
+  constructor (type, chainId) {
     super()
+    this.type = type
+    this.chainId = chainId
     this.primary = {
       status: 'off',
       network: '',
@@ -21,28 +23,37 @@ class Nodes extends EventEmitter {
       type: '',
       connected: false
     }
+
     this.observer = store.observer(() => {
-      const { type, id } = store('main.currentNetwork')
-      this.connect(store('main.networks', type, id, 'connection'))
+      const connection = store('main.networks', type, chainId, 'connection')
+      if (connection) this.connect(connection)
     })
   }
 
   update (priority) {
-    const currentNetwork = store('main.currentNetwork')
     if (priority === 'primary') {
       const { status, connected, type, network } = this.primary
       const details = { status, connected, type, network }
       log.info('    Updating primary connection to status, ', details)
-      store.setPrimary(currentNetwork.type, currentNetwork.id, details)
+      store.setPrimary(this.type, this.chainId, details)
     } else if (priority === 'secondary') {
       const { status, connected, type, network } = this.secondary
       const details = { status, connected, type, network }
       log.info('    Updating secondary connection to status, ', details)
-      store.setSecondary(currentNetwork.type, currentNetwork.id, details)
+      store.setSecondary(this.type, this.chainId, details)
     }
   }
 
-  getNetwork (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'net_version', params: [], id: 1 }, cb) }
+  getNetwork (provider, cb) { 
+    provider.sendAsync({ jsonrpc: '2.0', method: 'eth_chainId', params: [], id: 1 }, (err, response) => {
+      try {
+        response.result = !err && response && !response.error ? parseInt(response.result, 'hex').toString() : ''
+        cb(err, response)
+      } catch (e) {
+        cb(e)
+      }
+    }) 
+  }
 
   getNodeType (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) }
 
@@ -75,11 +86,10 @@ class Nodes extends EventEmitter {
           this.update('secondary')
         }
       } else {
-        const { type, id } = store('main.currentNetwork')
-        const connection = store('main.networks', type, id, 'connection')
+        const connection = store('main.networks', this.type, this.chainId, 'connection')
         const { secondary } = connection
-        const presets = store('main.networkPresets', type)
-        const currentPresets = Object.assign({}, presets.default, presets[id])
+        const presets = store('main.networkPresets', this.type)
+        const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
         const target = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
         if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== target) {
           log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
@@ -95,7 +105,7 @@ class Nodes extends EventEmitter {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
               this.secondary.network = !err && response && !response.error ? response.result : ''
-              if (this.secondary.network && this.secondary.network !== store('main.currentNetwork.id')) {
+              if (this.secondary.network && this.secondary.network !== this.chainId) {
                 this.secondary.connected = false
                 this.secondary.type = ''
                 this.secondary.status = 'network mismatch'
@@ -118,7 +128,7 @@ class Nodes extends EventEmitter {
             this.emit('close')
           })
           this.secondary.provider.on('status', status => {
-            if (status === 'connected' && this.secondary.network && this.secondary.network !== store('main.currentNetwork.id')) {
+            if (status === 'connected' && this.secondary.network && this.secondary.network !== this.chainId) {
               this.secondary.connected = false
               this.secondary.type = ''
               this.secondary.status = 'network mismatch'
@@ -148,11 +158,10 @@ class Nodes extends EventEmitter {
 
     if (connection.primary.on) {
       log.info('    Primary connection: ON')
-      const { type, id } = store('main.currentNetwork')
-      const connection = store('main.networks', type, id, 'connection')
+      const connection = store('main.networks', this.type, this.chainId, 'connection')
       const { primary } = connection
-      const presets = store('main.networkPresets', type)
-      const currentPresets = Object.assign({}, presets.default, presets[id])
+      const presets = store('main.networkPresets', this.type)
+      const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
       const target = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
       if (!this.primary.provider || this.primary.currentPrimaryTarget !== target) {
         log.info('    Creating primary connection becasue it didn\'t exist or the target changed')
@@ -168,7 +177,7 @@ class Nodes extends EventEmitter {
           log.info('    Primary connection connected')
           this.getNetwork(this.primary.provider, (err, response) => {
             this.primary.network = !err && response && !response.error ? response.result : ''
-            if (this.primary.network && this.primary.network !== store('main.currentNetwork.id')) {
+            if (this.primary.network && this.primary.network !== this.chainId) {
               this.primary.connected = false
               this.primary.type = ''
               this.primary.status = 'network mismatch'
@@ -191,7 +200,7 @@ class Nodes extends EventEmitter {
           this.emit('close')
         })
         this.primary.provider.on('status', status => {
-          if (status === 'connected' && this.primary.network && this.primary.network !== store('main.currentNetwork.id')) {
+          if (status === 'connected' && this.primary.network && this.primary.network !== this.chainId) {
             this.primary.connected = false
             this.primary.type = ''
             this.primary.status = 'network mismatch'
@@ -224,12 +233,13 @@ class Nodes extends EventEmitter {
   }
 
   send (payload, res) {
-    if (this.primary.provider && this.primary.connected && this.primary.network === store('main.currentNetwork.id')) {
+    // Verify the payload chainId matches
+    if (this.primary.provider && this.primary.connected) { // && this.primary.network === store('main.currentNetwork.id')) {
       this.primary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
       })
-    } else if (this.secondary.provider && this.secondary.connected && this.secondary.network === store('main.currentNetwork.id')) {
+    } else if (this.secondary.provider && this.secondary.connected) { //  && this.secondary.network === store('main.currentNetwork.id')) {
       this.secondary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
@@ -240,4 +250,37 @@ class Nodes extends EventEmitter {
   }
 }
 
-module.exports = new Nodes()
+class Chains extends EventEmitter {
+  constructor () {
+    super()
+    this.connections = {}
+    store.observer(() => {
+      const networks = store('main.networks')
+      Object.keys(networks).forEach(type => {
+        this.connections[type] = this.connections[type] || {}
+        Object.keys(networks[type]).forEach(chainId => {
+          const chainConfig = networks[type][chainId]
+          if (chainConfig.on && !this.connections[type][chainId]) {
+            this.connections[type][chainId] = new ChainConnection(type, chainId)
+          } else if (!chainConfig.on && this.connections[type][chainId]) {
+            // this.connections[type][chainId].close()
+            delete this.connections[type][chainId]
+          }
+        })
+      })
+    })
+  }
+  send (payload, res) {
+    const { type, id } = store('main.currentNetwork')
+    if (this.connections[type] && this.connections[type][id]) {
+      this.connections[type][id].send(payload, res)
+    } else {
+      log.error(`Connection for chain ${payload.chainId} did not exist for send`)
+    }
+    // this.connect(store('main.networks', type, id, 'connection'))
+    // store('main.networks', type, chainId, 'connection')
+  }
+}
+
+
+module.exports = new Chains()
