@@ -76,7 +76,7 @@ class Panel extends React.Component {
         networkOptions.push({ 
           text: net.name, 
           value: type + ':' + id,
-          indicator: status.indexOf('connected') > -1 ? 'good' : 'bad'
+          indicator: net.on && status.indexOf('connected') > -1 ? 'good' : 'bad'
         })
       })
     })

@@ -67,11 +67,11 @@ div
     height 40px
     // width 310px
     background var(--ghostB) // var(--ghostE) 0%, var(--ghostG) 70%)
-    border-radius 24px
+    border-radius 8px
     display flex
     justify-content center
     align-items center
-    margin 40px
+    margin 64px 32px
     box-shadow 0px 9px 3px outerspace
     cursor pointer
     font-size 15px
@@ -79,8 +79,8 @@ div
     background var(--good)
     color var(--goodDark)
     text-transform uppercase
-    border-bottom 3px solid var(--goodShade)
-    box-shadow 0px 0px 12px var(--good02), 0px 24px 12px -14px var(--ghostY)
+    border-bottom 2px solid var(--goodShade)
+    box-shadow 0px 24px 12px -8px var(--ghostX)
     padding-top 1px
     box-sizing border-box
     
@@ -109,17 +109,20 @@ div
       // padding 4px
       
     .signersHeader
-      width calc(100% - 24px)
+      width calc(100% - 16px)
       display flex
+      justify-content center
       align-items center
-      padding 12px 4px 11px 4px
-      font-size 18px
-      font-weight 100
-      border-bottom 1px solid var(--ghostY)
-      border-top 1px solid var(--ghostY)
-      // background var(--ghostY)
-      margin 0px 12px 10px 12px
+      // padding 12px 4px 11px 4px
+      height 32px
+      border-radius 8px
+      margin 0px 8px 32px 8px
       box-sizing border-box
+      font-size 11px
+      text-transform uppercase
+      letter-spacing 1px
+      font-weight 300
+      background var(--ghostY)
 
     .noSigners
       position relative

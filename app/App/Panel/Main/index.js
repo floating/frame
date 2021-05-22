@@ -61,7 +61,7 @@ class Main extends React.Component {
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none', opacity: 0 } : { opacity: 1, transform: 'translateY(0px)' }}>
                 <div className='panelHeaderTitle'>Accounts</div>
-                <div className={true ? 'panelHeaderUpdate panelHeaderUpdateNotify' : 'panelHeaderUpdate'} onMouseDown={() => {
+                <div className={!this.store('dash.showing') ? 'panelHeaderUpdate panelHeaderUpdateNotify' : 'panelHeaderUpdate'} onMouseDown={() => {
                   link.send('tray:action', 'toggleDash')
                 }}>
                   <div className='panelHeaderUpdateInner'>
