@@ -8,7 +8,7 @@ const fetch = require('node-fetch')
 const proxy = require('./proxy')
 
 const store = require('../store')
-const nodes = require('../nodes')
+const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
@@ -21,7 +21,7 @@ class Provider extends EventEmitter {
     this.handlers = {}
     this.nonce = {}
     this.connected = false
-    this.connection = nodes
+    this.connection = chains
     this.connection.on('connect', () => { this.connected = true })
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))

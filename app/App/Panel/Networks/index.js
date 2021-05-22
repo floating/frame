@@ -116,10 +116,21 @@ class _Network extends React.Component {
 
     return (
       <div className='network'>
-        <div className='phaseNetworkLine' onMouseDown={() => {
-          link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
-        }}>
-          <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
+        <div className='networkActive'>
+          <div className='networkName'>
+            <input
+              value={this.state.name} spellCheck='false'
+              onChange={(e) => {
+                this.setState({ name: e.target.value })
+              }}
+              onBlur={(e) => {
+                if (e.target.value === '') this.setState({ name: this.props.name })
+              }}
+            />
+          </div>
+          <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
+            link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
+          }}>
             <div className='signerPermissionToggleSwitch' />
           </div>
         </div>
@@ -151,17 +162,6 @@ class _Network extends React.Component {
             </div>
           )
           )}
-          <div className='phaseNetworkName'>
-            <input
-              value={this.state.name} spellCheck='false'
-              onChange={(e) => {
-                this.setState({ name: e.target.value })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ name: this.props.name })
-              }}
-            />
-          </div>
           <div className='phaseNetworkSymbol'>
             <input
               value={this.state.symbol} spellCheck='false'
@@ -743,7 +743,7 @@ class Settings extends React.Component {
     return (
       <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='panelHeader' style={{ zIndex: 50, pointerEvents: 'none' }}>
-          <div className='panelHeaderTitle'>Networks</div>
+          <div className='panelHeaderTitle'>Chains</div>
         </div>
         <div className='localSettingsWrap'>
           {this.renderConnections()}

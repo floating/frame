@@ -121,9 +121,8 @@ class Signer extends React.Component {
         ) : this.props.status === 'ok' || this.props.status === 'locked' ? (
           <>
             <div className='signerAccountsTitle'>
-              <span>{'Add & Remove Accounts'}</span>
               <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
-                <span>{'active'}</span> 
+                <span>{'active accounts'}</span> 
                 <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
               </span>
             </div>

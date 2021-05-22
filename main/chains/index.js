@@ -25,8 +25,8 @@ class ChainConnection extends EventEmitter {
     }
 
     this.observer = store.observer(() => {
-      const connection = store('main.networks', type, chainId, 'connection')
-      if (connection) this.connect(connection)
+      const chain = store('main.networks', type, chainId)
+      if (chain) this.connect(chain)
     })
   }
 
@@ -57,9 +57,10 @@ class ChainConnection extends EventEmitter {
 
   getNodeType (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) }
 
-  connect (connection) {
+  connect (chain) {
+    const connection = chain.connection
     log.info(' ')
-    log.info('Connection has been updated')
+    log.info('Connection has been updated', connection)
     if (this.network !== connection.network) {
       if (this.primary.provider) this.primary.provider.close()
       if (this.secondary.provider) this.secondary.provider.close()
@@ -72,7 +73,7 @@ class ChainConnection extends EventEmitter {
     }
 
     // Secondary connection is on
-    if (connection.secondary.on) {
+    if (chain.on && connection.secondary.on) {
       log.info('    Secondary connection: ON')
       if (connection.primary.on && connection.primary.status === 'connected') {
         // Connection is on Standby
@@ -156,7 +157,7 @@ class ChainConnection extends EventEmitter {
       }
     }
 
-    if (connection.primary.on) {
+    if (chain.on && connection.primary.on) {
       log.info('    Primary connection: ON')
       const connection = store('main.networks', this.type, this.chainId, 'connection')
       const { primary } = connection
@@ -227,6 +228,11 @@ class ChainConnection extends EventEmitter {
     }
   }
 
+  close () {
+    if (this.observer) this.observer.remove()
+
+  }
+
   resError (error, payload, res) {
     if (typeof error === 'string') error = { message: error, code: -1 }
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
@@ -263,7 +269,7 @@ class Chains extends EventEmitter {
           if (chainConfig.on && !this.connections[type][chainId]) {
             this.connections[type][chainId] = new ChainConnection(type, chainId)
           } else if (!chainConfig.on && this.connections[type][chainId]) {
-            // this.connections[type][chainId].close()
+            this.connections[type][chainId].close()
             delete this.connections[type][chainId]
           }
         })
