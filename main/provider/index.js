@@ -8,7 +8,7 @@ const fetch = require('node-fetch')
 const proxy = require('./proxy')
 
 const store = require('../store')
-const nodes = require('../nodes')
+const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
@@ -21,7 +21,7 @@ class Provider extends EventEmitter {
     this.handlers = {}
     this.nonce = {}
     this.connected = false
-    this.connection = nodes
+    this.connection = chains
     this.connection.on('connect', () => { this.connected = true })
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
@@ -403,6 +403,34 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${version}` })
   }
 
+  addEthereumChain (payload, res) {
+    if (!payload.params[0]) return this.resError('addChain request missing params', payload, res)
+
+    const id = payload.params[0].chainId
+    const type = 'ethereum'
+    const name = payload.params[0].chainName
+    const explorer = payload.params[0].blockExplorerUrls ? payload.params[0].blockExplorerUrls[0] : ''
+    const symbol = payload.params[0].nativeCurrency ? payload.params[0].nativeCurrency.symbol : ''
+    const rpcUrl = payload.params[0].rpcUrls ? payload.params[0].rpcUrls[0] : ''
+
+    const handlerId = uuid()
+    this.handlers[handlerId] = res
+    accounts.addRequest({ 
+      handlerId, 
+      type: 'addChain',
+      chain : {
+        id,
+        type,
+        name,
+        explorer,
+        symbol,
+        rpcUrl
+      }, 
+      account: accounts.getAccounts()[0], 
+      origin: payload._origin
+    }, res)
+  }
+
   sendAsync (payload, cb) {
     this.send(payload, res => {
       if (res.error) return cb(new Error(res.error))
@@ -423,6 +451,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3') return this.signTypedData(payload, res)
+    if (payload.method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
     // Delete custom data
     delete payload._origin
     this.connection.send(payload, res)
@@ -445,3 +474,30 @@ proxy.ready = true
 provider.on('data', data => proxy.emit('data', data))
 
 module.exports = provider
+
+// setTimeout(() => {
+//   provider.send({
+//     id: 1,
+//     jsonrpc: '2.0',
+//     method: 'wallet_addEthereumChain',
+//     _origin: 'Frame',
+//     params: [
+//       {
+//         chainId: '0x64',
+//         chainName: 'xDAI Chain',
+//         rpcUrls: ['https://dai.poa.network'],
+//         iconUrls: [
+//           'https://xdaichain.com/fake/example/url/xdai.svg',
+//           'https://xdaichain.com/fake/example/url/xdai.png'
+//         ],
+//         nativeCurrency: {
+//           name: 'xDAI',
+//           symbol: 'xDAI',
+//           decimals: 18
+//         }
+//       }
+//     ]
+//   }, (err, res) => {
+//     console.log('Callback from provider.send wallet_addEthereumChain', err, res)
+//   })
+// }, 9000)

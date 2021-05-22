@@ -54,9 +54,8 @@ module.exports = {
   dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
     const cid = await resolve.rootCid(app)
-
     const index = await ipfs.getFile(`${cid}/index.html`)
-    res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
+    // res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
     res.writeHead(200)

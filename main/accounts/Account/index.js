@@ -115,6 +115,24 @@ class Account {
     }
   }
 
+  addChain (req, added) {
+    const { chain } = req
+    if (added) {
+      store.addNetwork({
+        id: chain.id,
+        type: chain.type,
+        name: chain.name,
+        explorer: chain.explorer,
+        symbol: chain.symbol
+      })
+    }
+    if (this.requests[req.handlerId]) {
+      if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()
+      delete this.requests[req.handlerId]
+      this.update()
+    }
+  }
+
   updateTokens (tokens) { // Tokens are now handle by the account and need to be included in `update`
     this.tokens = tokens
     this.update()

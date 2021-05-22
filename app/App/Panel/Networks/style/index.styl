@@ -5,6 +5,47 @@
   margin 0px 0px 16px 0px
   box-shadow 0px 18px 70px -32px rgba(30, 40, 80, 0.2)
 
+  .networkActive
+    position relative
+    display flex
+    justify-content space-between
+    align-items space-between
+    width 100%
+    padding 0px 16px
+    box-sizing border-box
+
+      
+    .networkName
+      position relative
+      width 200px
+      height 50px
+      
+      input 
+        font-size 22px
+        text-align left
+        font-weight 100
+        padding-bottom 10px
+
+    .signerPermissionToggle
+      margin-top 8px
+      height 24px
+      width 50px
+      border-radius 12px
+
+      .signerPermissionToggleSwitch
+        position absolute
+        top 2px
+        left 2px
+        bottom 2px
+        width 20px
+        border-radius 10px
+
+    .signerPermissionToggleOn
+      background var(--good)
+      .signerPermissionToggleSwitch
+        position absolute
+        transform translateX(26px)
+
   .phaseNetworkLine
     position relative
     height 84px
@@ -292,7 +333,7 @@
   // padding 0px 15px 15px 15px
   // overflow hidden
   transform translateZ(0)
-  padding 0px 15px 0px 15px
+  padding 0px 16px 0px 16px
 
   .connectionOptionToggle
     width 100%
@@ -487,7 +528,7 @@
 .connectionOptionOn
   background var(--ghostB)
   margin 0px -5px
-  padding 15px
+  padding 16px
   .connectionOptionDetails
     height 25px
     opacity 1

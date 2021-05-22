@@ -7,8 +7,8 @@ const resolve = {
   rootCid: async (app) => {
     const cid = store(`main.dapp.details.${hash(app)}.cid`)
     if (cid) return cid
-    const record = await nebula.resolve(app)
-    return record.dapp.files
+    const resolved = await nebula.resolve(app)
+    return resolved.record.content
   }
 }
 

@@ -41,6 +41,13 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
     }
   }
 
+  const indicator = (option) => {
+    let indicatorClass = 'dropdownItemIndicator'
+    if (option.indicator === 'good') indicatorClass += ' dropdownItemIndicatorGood'
+    if (option.indicator === 'bad') indicatorClass += ' dropdownItemIndicatorBad'
+    return <div className={indicatorClass} />
+  }
+
   // Style calculations
   const height = (options.length * 28) + 'px'
   const marginTop = (-28 * index) + 'px'
@@ -57,7 +64,10 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
       >
         <div className={`dropdownItems ${id}`} style={expanded ? {} : { marginTop }}>
           {options.map((option, index) => {
-            return <div key={option.text + index} className={`dropdownItem ${id}`} onMouseDown={() => handleSelect(index)}>{option.text}</div>
+            return <div key={option.text + index} className={`dropdownItem ${id}`} onMouseDown={() => handleSelect(index)}>
+              {option.text}
+              {indicator(option)}
+            </div>
           })}
         </div>
       </div>

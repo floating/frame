@@ -34,7 +34,7 @@ class Gas extends React.Component {
         <div className='gasBlock'>
           <div className='gasItem'>
             <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.slow, 16))}</span>
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.slow, 16)) || '?'}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
@@ -44,7 +44,7 @@ class Gas extends React.Component {
           </div>
           <div className='gasItem'>
             <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.standard, 16))}</span>
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.standard, 16)) || '?'}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
@@ -54,7 +54,7 @@ class Gas extends React.Component {
           </div>
           <div className='gasItem'>
             <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.fast, 16))}</span>
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.fast, 16)) || '?'}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
@@ -64,7 +64,7 @@ class Gas extends React.Component {
           </div>
           <div className='gasItem'>
           <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.asap, 16))}</span>
+              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.asap, 16)) || '?'}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>

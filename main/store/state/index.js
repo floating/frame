@@ -255,7 +255,8 @@ const initial = {
           connection: {
             primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
+          },
+          on: true
         },
         3: {
           id: 3,
@@ -272,7 +273,8 @@ const initial = {
           connection: {
             primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
+          },
+          on: false
         },
         4: {
           id: 4,
@@ -289,7 +291,8 @@ const initial = {
           connection: {
             primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
+          },
+          on: false
         },
         5: {
           id: 5,
@@ -306,7 +309,8 @@ const initial = {
           connection: {
             primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
+          },
+          on: false
         },
         42: {
           id: 42,
@@ -323,7 +327,8 @@ const initial = {
           connection: {
             primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
+          },
+          on: false
         },
         // 74: {
         //   id: 74,
@@ -357,7 +362,8 @@ const initial = {
           connection: {
             primary: { on: true, current: 'poa', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
+          },
+          on: false
         },
         137: {
           id: 137,
@@ -374,7 +380,8 @@ const initial = {
           connection: {
             primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-          }
+          },
+          on: false
         }
       }
     },
@@ -593,6 +600,16 @@ if (initial.main._version < 7) {
 
   // Set state version so they never do this migration again
   initial.main._version = 7
+}
+
+// State transition -> 8
+if (initial.main._version < 8) {
+  
+  Object.keys(initial.main.networks.ethereum).forEach(chainId => {
+    initial.main.networks.ethereum[chainId].on = chainId === '1' || chainId === initial.main.currentNetwork.id ? true : false
+  })
+
+  initial.main._version = 8
 }
 
 module.exports = () => initial

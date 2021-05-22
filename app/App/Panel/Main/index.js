@@ -61,13 +61,15 @@ class Main extends React.Component {
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none', opacity: 0 } : { opacity: 1, transform: 'translateY(0px)' }}>
                 <div className='panelHeaderTitle'>Accounts</div>
-                <div className='panelHeaderUpdate' onMouseDown={() => {
+                <div className={!this.store('dash.showing') ? 'panelHeaderUpdate panelHeaderUpdateNotify' : 'panelHeaderUpdate'} onMouseDown={() => {
                   link.send('tray:action', 'toggleDash')
                 }}>
-                  <div className={!this.store('dash.showing') ? 'panelHeaderUpdateToggle' : 'panelHeaderUpdateToggle panelHeaderUpdateToggleOn'}>
-                    {'+'}
+                  <div className='panelHeaderUpdateInner'>
+                    <div className={!this.store('dash.showing') ? 'panelHeaderUpdateToggle' : 'panelHeaderUpdateToggle panelHeaderUpdateToggleOn'}>
+                      {'+'}
+                    </div>
+                    <div className='panelHeaderUpdateOn' />
                   </div>
-                  <div className='panelHeaderUpdateOn' />
                 </div>
               </div>
               {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}

@@ -60,8 +60,7 @@ class _Network extends React.Component {
     }
  }
 
-  status (layer) {
-    const { type, id } = this.store('main.currentNetwork')
+  status (type, id, layer) {
     const connection = this.store('main.networks', type, id, 'connection', layer)
     let status = connection.status
     const current = connection.current
@@ -71,6 +70,8 @@ class _Network extends React.Component {
       if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
     }
     if (status === 'connected' && !connection.network) status = 'loading'
+    if (!this.store('main.networks', type, id, 'on')) status = 'off'
+
     return (
       <div className='connectionOptionStatus'>
         {this.indicator(status)}
@@ -115,6 +116,76 @@ class _Network extends React.Component {
 
     return (
       <div className='network'>
+        <div className='networkActive'>
+          <div className='networkName'>
+            <input
+              value={this.state.name} spellCheck='false'
+              onChange={(e) => {
+                this.setState({ name: e.target.value })
+              }}
+              onBlur={(e) => {
+                if (e.target.value === '') this.setState({ name: this.props.name })
+              }}
+            />
+          </div>
+          <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
+            link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
+          }}>
+            <div className='signerPermissionToggleSwitch' />
+          </div>
+        </div>
+        <div className='signerPermission' style={{ zIndex: 2 }}>
+          <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+            <div className='connectionOptionToggle'>
+              <div className='signerPermissionSetting'>Primary</div>
+              <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='connectionOptionDetails'>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(type, id, 'primary')}
+                <Dropdown
+                  syncValue={type + ':' + id + ':' + connection.primary.current}
+                  onChange={preset => {
+                    const [type, id, value] = preset.split(':')
+                    link.send('tray:action', 'selectPrimary', type, id, value)
+                  }}
+                  options={presets}
+                />
+              </div>
+            </div>
+            <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
+            </div>
+          </div>
+        </div>
+        <div className='signerPermission' style={{ zIndex: 1 }}>
+          <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+            <div className='connectionOptionToggle'>
+              <div className='signerPermissionSetting'>Secondary</div>
+              <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
+                <div className='signerPermissionToggleSwitch' />
+              </div>
+            </div>
+            <div className='connectionOptionDetails'>
+              <div className='connectionOptionDetailsInset'>
+                {this.status(type, id, 'secondary')}
+                <Dropdown
+                  syncValue={type + ':' + id + ':' + connection.secondary.current}
+                  onChange={preset => {
+                    const [type, id, value] = preset.split(':')
+                    link.send('tray:action', 'selectSecondary', type, id, value)
+                  }}
+                  options={presets}
+                />
+              </div>
+            </div>
+            <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
+              <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
+            </div>
+          </div>
+        </div>
         <div className='phaseNetworkLine'>
           {changed ? (
             <div
@@ -143,17 +214,6 @@ class _Network extends React.Component {
             </div>
           )
           )}
-          <div className='phaseNetworkName'>
-            <input
-              value={this.state.name} spellCheck='false'
-              onChange={(e) => {
-                this.setState({ name: e.target.value })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ name: this.props.name })
-              }}
-            />
-          </div>
           <div className='phaseNetworkSymbol'>
             <input
               value={this.state.symbol} spellCheck='false'
@@ -187,58 +247,6 @@ class _Network extends React.Component {
                 if (e.target.value === '') this.setState({ explorer: this.props.explorer })
               }}
             />
-          </div>
-        </div>
-        <div className='signerPermission' style={{ zIndex: 2 }}>
-          <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionSetting'>Primary</div>
-              <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.status('primary')}
-                <Dropdown
-                  syncValue={type + ':' + id + ':' + connection.primary.current}
-                  onChange={preset => {
-                    const [type, id, value] = preset.split(':')
-                    link.send('tray:action', 'selectPrimary', type, id, value)
-                  }}
-                  options={presets}
-                />
-              </div>
-            </div>
-            <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-              <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
-            </div>
-          </div>
-        </div>
-        <div className='signerPermission' style={{ zIndex: 1 }}>
-          <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionSetting'>Secondary</div>
-              <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.status('secondary')}
-                <Dropdown
-                  syncValue={type + ':' + id + ':' + connection.secondary.current}
-                  onChange={preset => {
-                    const [type, id, value] = preset.split(':')
-                    link.send('tray:action', 'selectSecondary', type, id, value)
-                  }}
-                  options={presets}
-                />
-              </div>
-            </div>
-            <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-              <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
-            </div>
           </div>
         </div>
       </div>
@@ -601,6 +609,7 @@ class Settings extends React.Component {
               explorer={networks[type][id].explorer} 
               type={type} 
               connection={networks[type][id].connection}
+              on={networks[type][id].on}
             />
           })}
         </div>
@@ -734,7 +743,7 @@ class Settings extends React.Component {
     return (
       <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
         <div className='panelHeader' style={{ zIndex: 50, pointerEvents: 'none' }}>
-          <div className='panelHeaderTitle'>Networks</div>
+          <div className='panelHeaderTitle'>Chains</div>
         </div>
         <div className='localSettingsWrap'>
           {this.renderConnections()}

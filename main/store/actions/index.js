@@ -14,6 +14,9 @@ module.exports = {
       return { type, id }
     })
   },
+  activateNetwork: (u, type, chainId, active) => {
+    u('main.networks', type, chainId, 'on', () => active)
+  },
   selectPrimary: (u, netType, netId, value) => {
     u('main.networks', netType, netId, 'connection.primary.current', () => value)
   },
@@ -201,7 +204,8 @@ module.exports = {
         presets: { local: 'direct' },
         primary: { on: true, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
         secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-      }
+      },
+      on: true
     }
     u('main.networks', networks => {
       try {
@@ -276,7 +280,14 @@ module.exports = {
     })
   },
   removeNetwork: (u, net) => {
+    // Cannot delete mainnet
+    if (net.type === 'ethereum' && net.id === '1') return
     u('main', main => {
+      // If deleting a network that the user is currently on, move them to mainnet
+      if (net.type === main.currentNetwork.type && net.id === main.currentNetwork.id) {
+        main.currentNetwork.type = 'ethereum'
+        main.currentNetwork.id = '1'
+      }
       let netCount = 0
       Object.keys(main.networks[net.type]).forEach(id => {
         netCount++
