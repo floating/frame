@@ -107,8 +107,8 @@ class Lattice extends Signer {
         return new Error('No deviceId')
       }
     } catch (err) {
+      if (err === 'Error from device: Invalid Request') return log.warn('Lattice: Invalid Request')
       this.status = err
-      if (err === 'Error from device: Invalid Request') log.warn('Lattice: Invalid Request')
       this.update()
       log.error('Lattice Open Error', err)
       return new Error(err)
