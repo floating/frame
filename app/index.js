@@ -18,7 +18,7 @@ window.eval = global.eval = () => { throw new Error(`This app does not support w
 link.rpc('getState', (err, state) => {
   if (err) return console.error('Could not get initial state from main.')
   const store = _store(state)
-  if (!store('main.mute.welcomeWarning')) store.notify('mainnet')
+  // if (!store('main.mute.betaDisclosure')) store.notify('betaDisclosure')
   store.observer(() => {
     document.body.className = 'clip ' + store('main.colorway')
     setTimeout(() => {

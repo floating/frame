@@ -73,11 +73,13 @@ class Panel extends React.Component {
       Object.keys(networks[type]).forEach(id => {
         const net = networks[type][id]
         const status = [net.connection.primary.status, net.connection.secondary.status]
-        networkOptions.push({ 
-          text: net.name, 
-          value: type + ':' + id,
-          indicator: net.on && status.indexOf('connected') > -1 ? 'good' : 'bad'
-        })
+        if (net.on) {
+          networkOptions.push({ 
+            text: net.name, 
+            value: type + ':' + id,
+            indicator: net.on && status.indexOf('connected') > -1 ? 'good' : 'bad'
+          })
+        }
       })
     })
     let markLeft = 6

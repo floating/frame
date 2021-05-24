@@ -39,6 +39,44 @@ class Notify extends React.Component {
     )
   }
 
+  betaDisclosure () {
+    return (
+      <div className='notifyBoxWrap'>
+        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+          {/* <div className='notifyFrameIcon'>
+            <img src={frameIcon} />
+          </div> */}
+          <div className='notifyTitle'>
+            Welcome to the Frame!
+          </div>
+          <div className='÷'>
+            <div className='notifyBodyLine'>
+              We are excited to welcome you to the next iteration of Frame. 
+              Please be advised, being on the beta track is likely to be more unstable.
+              Use hardware singers rather than hot signers for high value accounts.
+              Verify transactions and account details on you signing device whenever possible.
+              Please read 
+              <span onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE') }}>
+                our license
+              </span>
+              , use Frame at your own risk and be sure to send us any feedback you have!
+            </div>
+          </div>
+          <div className='notifyInput'>
+            <div
+              className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
+                // link.send('tray:action', 'muteBetaDisclosure')
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Let's go!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // rinkeby () {
   //   return (
   //     <div className='notifyBoxWrap' style={this.store('view.notify') === 'rinkeby' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
@@ -321,6 +359,12 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           {this.mainnet()}
+        </div>
+      )
+    } else if (notify === 'betaDisclosure') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.betaDisclosure()}
         </div>
       )
     } else if (notify === 'nonceWarning') {

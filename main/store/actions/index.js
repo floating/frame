@@ -24,9 +24,11 @@ module.exports = {
     u('main.networks', netType, netId, 'connection.secondary.current', () => value)
   },
   setPrimaryCustom: (u, netType, netId, target) => {
+    if (!netType || !netId) return
     u('main.networks', netType, netId, 'connection.primary.custom', () => target)
   },
   setSecondaryCustom: (u, netType, netId, target) => {
+    if (!netType || !netId) return
     u('main.networks', netType, netId, 'connection.secondary.custom', () => target)
   },
   toggleConnection: (u, netType, netId, node, on) => {

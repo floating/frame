@@ -242,7 +242,7 @@ class Signer extends React.Component {
           </div>
           <div className='signerType'>{this.props.type}</div>
           <div className='signerName'>
-            {'Signer Name'}
+            {this.props.name}
             <div className='signerNameUpdate'>
               {svg.save(14)}
             </div>

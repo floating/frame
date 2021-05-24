@@ -61,6 +61,41 @@ class _Network extends React.Component {
     }
  }
 
+  okProtocol (location) {
+    if (location === 'injected') return true
+    if (location.endsWith('.ipc')) return true
+    if (location.startsWith('wss://') || location.startsWith('ws://')) return true
+    if (location.startsWith('https://') || location.startsWith('http://')) return true
+    return false
+  }
+
+  inputPrimaryCustom (e) {
+    e.preventDefault()
+    clearTimeout(this.customPrimaryInputTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ primaryCustom: value })
+    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', this.props.type, this.props.id, this.state.primaryCustom), 1000)
+  }
+
+  inputSecondaryCustom (e) {
+    e.preventDefault()
+    clearTimeout(this.customSecondaryInputTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ secondaryCustom: value })
+    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', this.props.type, this.props.id, this.state.secondaryCustom), 1000)
+  }
+
+  localShake (key) {
+    const localShake = Object.assign({}, this.state.localShake)
+    localShake[key] = true
+    this.setState({ localShake })
+    setTimeout(() => {
+      const localShake = Object.assign({}, this.state.localShake)
+      localShake[key] = false
+      this.setState({ localShake })
+    }, 1010)
+  }
+
   status (type, id, layer) {
     const connection = this.store('main.networks', type, id, 'connection', layer)
     let status = connection.status
@@ -97,6 +132,15 @@ class _Network extends React.Component {
 
   customSecondaryBlur () {
     if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
+  }
+
+
+  customPrimaryFocus () {
+    if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
+  }
+
+  customPrimaryBlur () {
+    if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
   }
 
   render () {
@@ -483,13 +527,13 @@ class Settings extends React.Component {
     }
   }
 
-  okProtocol (location) {
-    if (location === 'injected') return true
-    if (location.endsWith('.ipc')) return true
-    if (location.startsWith('wss://') || location.startsWith('ws://')) return true
-    if (location.startsWith('https://') || location.startsWith('http://')) return true
-    return false
-  }
+  // okProtocol (location) {
+  //   if (location === 'injected') return true
+  //   if (location.endsWith('.ipc')) return true
+  //   if (location.startsWith('wss://') || location.startsWith('ws://')) return true
+  //   if (location.startsWith('https://') || location.startsWith('http://')) return true
+  //   return false
+  // }
 
   // customSecondaryFocus () {
   //   if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
@@ -499,42 +543,42 @@ class Settings extends React.Component {
   //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
   // }
 
-  customPrimaryFocus () {
-    if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
-  }
+  // customPrimaryFocus () {
+  //   if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
+  // }
 
-  customPrimaryBlur () {
-    if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
-  }
+  // customPrimaryBlur () {
+  //   if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
+  // }
 
-  inputPrimaryCustom (e) {
-    e.preventDefault()
-    clearTimeout(this.customPrimaryInputTimeout)
-    const value = e.target.value.replace(/\s+/g, '')
-    this.setState({ primaryCustom: value })
-    const { type, id } = this.store('main.currentNetwork')
-    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom), 1000)
-  }
+  // inputPrimaryCustom (e) {
+  //   e.preventDefault()
+  //   clearTimeout(this.customPrimaryInputTimeout)
+  //   const value = e.target.value.replace(/\s+/g, '')
+  //   this.setState({ primaryCustom: value })
+  //   const { type, id } = this.store('main.currentNetwork')
+  //   this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom), 1000)
+  // }
 
-  inputSecondaryCustom (e) {
-    e.preventDefault()
-    clearTimeout(this.customSecondaryInputTimeout)
-    const value = e.target.value.replace(/\s+/g, '')
-    this.setState({ secondaryCustom: value })
-    const { type, id } = this.store('main.currentNetwork')
-    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom), 1000)
-  }
+  // inputSecondaryCustom (e) {
+  //   e.preventDefault()
+  //   clearTimeout(this.customSecondaryInputTimeout)
+  //   const value = e.target.value.replace(/\s+/g, '')
+  //   this.setState({ secondaryCustom: value })
+  //   const { type, id } = this.store('main.currentNetwork')
+  //   this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom), 1000)
+  // }
 
-  localShake (key) {
-    const localShake = Object.assign({}, this.state.localShake)
-    localShake[key] = true
-    this.setState({ localShake })
-    setTimeout(() => {
-      const localShake = Object.assign({}, this.state.localShake)
-      localShake[key] = false
-      this.setState({ localShake })
-    }, 1010)
-  }
+  // localShake (key) {
+  //   const localShake = Object.assign({}, this.state.localShake)
+  //   localShake[key] = true
+  //   this.setState({ localShake })
+  //   setTimeout(() => {
+  //     const localShake = Object.assign({}, this.state.localShake)
+  //     localShake[key] = false
+  //     this.setState({ localShake })
+  //   }, 1010)
+  // }
 
   // status (layer) {
   //   const { type, id } = this.store('main.currentNetwork')
@@ -609,7 +653,7 @@ class Settings extends React.Component {
     return nets
   }
 
-  renderConnections () {
+  renderConnections (layer) {
     // const { type, id } = this.store('main.currentNetwork')
     // const networkPresets = this.store('main.networkPresets', type)
     // let presets = networkPresets[id] || {}
@@ -625,6 +669,8 @@ class Settings extends React.Component {
         <div key={type}>
           {Object.keys(networks[type]).sort((a, b) => {
             return parseInt(a) - parseInt(b)
+          }).filter(id => {
+            return networks[type][id].layer === layer
           }).map(id => {
             return <Network 
               key={type + id} 
@@ -771,7 +817,21 @@ class Settings extends React.Component {
           <div className='panelHeaderTitle'>Chains</div>
         </div>
         <div className='localSettingsWrap'>
-          {this.renderConnections()}
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Mainnet</div>
+          </div>
+          {this.renderConnections('mainnet')}
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Sidechains</div>
+          </div>
+          {this.renderConnections('sidechain')}
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Testnets</div>
+          </div>
+          {this.renderConnections('testnet')}
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Add a Chain</div>
+          </div>
           {this.renderAddNetwork()}
           {this.discord()}
         </div>

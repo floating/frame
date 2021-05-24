@@ -49,6 +49,7 @@ class Signer extends EventEmitter {
   summary () {
     return {
       id: this.id,
+      name: this.name || this.type + ' signer',
       type: this.type,
       addresses: this.addresses,
       status: this.status,

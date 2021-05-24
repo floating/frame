@@ -105,18 +105,25 @@ class ChainConnection extends EventEmitter {
           this.secondary.provider.on('connect', () => {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
-              this.secondary.network = !err && response && !response.error ? response.result : ''
-              if (this.secondary.network && this.secondary.network !== this.chainId) {
-                this.secondary.connected = false
-                this.secondary.type = ''
-                this.secondary.status = 'network mismatch'
+              if (err) {
+                this.primary.connected = false
+                this.primary.type = ''
+                this.primary.status = 'error'
                 this.update('secondary')
               } else {
-                this.secondary.status = 'connected'
-                this.secondary.connected = true
-                this.secondary.type = ''
-                this.update('secondary')
-                this.emit('connect')
+                this.secondary.network = !err && response && !response.error ? response.result : ''
+                if (this.secondary.network && this.secondary.network !== this.chainId) {
+                  this.secondary.connected = false
+                  this.secondary.type = ''
+                  this.secondary.status = 'chain mismatch'
+                  this.update('secondary')
+                } else {
+                  this.secondary.status = 'connected'
+                  this.secondary.connected = true
+                  this.secondary.type = ''
+                  this.update('secondary')
+                  this.emit('connect')
+                }
               }
             })
           })
@@ -132,7 +139,7 @@ class ChainConnection extends EventEmitter {
             if (status === 'connected' && this.secondary.network && this.secondary.network !== this.chainId) {
               this.secondary.connected = false
               this.secondary.type = ''
-              this.secondary.status = 'network mismatch'
+              this.secondary.status = 'chain mismatch'
               this.update('secondary')
             } else {
               this.primary.status = status
@@ -177,18 +184,25 @@ class ChainConnection extends EventEmitter {
         this.primary.provider.on('connect', () => {
           log.info('    Primary connection connected')
           this.getNetwork(this.primary.provider, (err, response) => {
-            this.primary.network = !err && response && !response.error ? response.result : ''
-            if (this.primary.network && this.primary.network !== this.chainId) {
+            if (err) {
               this.primary.connected = false
               this.primary.type = ''
-              this.primary.status = 'network mismatch'
+              this.primary.status = 'error'
               this.update('primary')
             } else {
-              this.primary.status = 'connected'
-              this.primary.connected = true
-              this.primary.type = ''
-              this.update('primary')
-              this.emit('connect')
+              this.primary.network = !err && response && !response.error ? response.result : ''
+              if (this.primary.network && this.primary.network !== this.chainId) {
+                this.primary.connected = false
+                this.primary.type = ''
+                this.primary.status = 'chain mismatch'
+                this.update('primary')
+              } else {
+                this.primary.status = 'connected'
+                this.primary.connected = true
+                this.primary.type = ''
+                this.update('primary')
+                this.emit('connect')
+              }
             }
           })
         })
@@ -204,7 +218,7 @@ class ChainConnection extends EventEmitter {
           if (status === 'connected' && this.primary.network && this.primary.network !== this.chainId) {
             this.primary.connected = false
             this.primary.type = ''
-            this.primary.status = 'network mismatch'
+            this.primary.status = 'chain mismatch'
             this.update('primary')
           } else {
             this.primary.status = status

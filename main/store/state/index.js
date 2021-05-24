@@ -132,7 +132,8 @@ const initial = {
       externalLinkWarning: main('mute.externalLinkWarning', false),
       explorerWarning: main('mute.explorerWarning', false),
       signerRelockChange: main('mute.signerRelockChange', false),
-      gasFeeWarning: main('mute.gasFeeWarning', false)
+      gasFeeWarning: main('mute.gasFeeWarning', false),
+      betaDisclosure: main('mute.betaDisclosure', false)
     },
     shortcuts: {
       altSlash: main('shortcuts.altSlash', true)
@@ -243,6 +244,7 @@ const initial = {
         1: {
           id: 1,
           type: 'ethereum',
+          layer: 'mainnet',
           symbol: 'ETH',
           name: 'Mainnet',
           explorer: 'https://etherscan.io',
@@ -261,6 +263,7 @@ const initial = {
         3: {
           id: 3,
           type: 'ethereum',
+          layer: 'testnet',
           symbol: 'ETH',
           name: 'Ropsten',
           explorer: 'https://ropsten.etherscan.io',
@@ -279,6 +282,7 @@ const initial = {
         4: {
           id: 4,
           type: 'ethereum',
+          layer: 'testnet',
           symbol: 'ETH',
           name: 'Rinkeby',
           explorer: 'https://rinkeby.etherscan.io',
@@ -297,6 +301,7 @@ const initial = {
         5: {
           id: 5,
           type: 'ethereum',
+          layer: 'testnet',
           symbol: 'ETH',
           name: 'Görli',
           explorer: 'https://goerli.etherscan.io',
@@ -315,6 +320,7 @@ const initial = {
         42: {
           id: 42,
           type: 'ethereum',
+          layer: 'testnet',
           symbol: 'ETH',
           name: 'Kovan',
           explorer: 'https://kovan.etherscan.io',
@@ -350,6 +356,7 @@ const initial = {
         100: {
           id: 100,
           type: 'ethereum',
+          layer: 'sidechain',
           symbol: 'xDAI',
           name: 'xDai',
           explorer: 'https://blockscout.com/poa/xdai',
@@ -368,6 +375,7 @@ const initial = {
         137: {
           id: 137,
           type: 'ethereum',
+          layer: 'sidechain',
           symbol: 'MATIC',
           name: 'Polygon',
           explorer: 'https://explorer.matic.network',
@@ -670,6 +678,22 @@ if (initial.main._version < 8) {
   })
 
   initial.main._version = 8
+}
+
+// State transition -> 9
+if (initial.main._version < 9) {
+  
+  Object.keys(initial.main.networks.ethereum).forEach(chainId => {
+    if (chainId === '1') {
+      initial.main.networks.ethereum[chainId].layer = 'mainnet'
+    } else if (chainId === '100' || chainId === '137') {
+      initial.main.networks.ethereum[chainId].layer = 'sidechain'
+    } else {
+      initial.main.networks.ethereum[chainId].layer = 'testnet'
+    }
+  })
+
+  initial.main._version = 9
 }
 
 module.exports = () => initial
