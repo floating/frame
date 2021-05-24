@@ -60,7 +60,7 @@ class ChainConnection extends EventEmitter {
   connect (chain) {
     const connection = chain.connection
     log.info(' ')
-    log.info('Connection has been updated', connection)
+    log.info(this.type + ':' + this.chainId + '\'s connection has been updated')
     if (this.network !== connection.network) {
       if (this.primary.provider) this.primary.provider.close()
       if (this.secondary.provider) this.secondary.provider.close()

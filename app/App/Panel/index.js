@@ -65,7 +65,7 @@ class Panel extends React.Component {
     const rateSymbol = currentSymbol.toLowerCase()
     const baseRate = rates[rateSymbol] && rates[rateSymbol].usd ? Math.floor(rates[rateSymbol].usd.price).toLocaleString() : '---' // this.store('main.rates.USD') ? Math.floor(this.store('main.rates.USD')) : '---'
 
-    let gasPrice = this.store('main.networks', type, id, 'gas.price.levels.standard')
+    let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.standard')
     if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)
     const networks = this.store('main.networks')
     const networkOptions = []

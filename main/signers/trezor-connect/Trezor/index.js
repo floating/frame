@@ -21,7 +21,6 @@ class Trezor extends Signer {
     this.id = this.getId()
     this.type = 'trezor'
     this.status = 'loading'
-    this.network = store('main.currentNetwork.id')
     this.derivationPath = store('main.trezor.derivation')
     this.basePath = () => {
       if (this.derivationPath === 'testnet') {
@@ -35,12 +34,6 @@ class Trezor extends Signer {
     this.getPath = (i = 0) => this.basePath() + '/' + i
     this.handlers = {}
     this.deviceStatus()
-    this.networkObserver = store.observer(() => {
-      if (this.network !== store('main.currentNetwork.id')) {
-        this.reset()
-        this.deviceStatus()
-      }
-    })
     this.derivationPathObserver = store.observer(() => {
       if (this.derivationPath !== store('main.trezor.derivation')) {
         this.derivationPath = store('main.trezor.derivation')
@@ -48,6 +41,9 @@ class Trezor extends Signer {
         this.deviceStatus()
       }
     })
+    setTimeout(() => {
+      this.deviceStatus()
+    }, 2000)
   }
 
   getId () {
@@ -55,6 +51,7 @@ class Trezor extends Signer {
   }
 
   update () {
+    if (this.closed) return
     const id = this.getId()
     if (this.id !== id) { // Singer address representation changed
       store.removeSigner(this.id)
@@ -64,7 +61,6 @@ class Trezor extends Signer {
   }
 
   reset () {
-    this.network = store('main.currentNetwork.id')
     this.status = 'loading'
     this.addresses = []
     this.update()
@@ -73,6 +69,7 @@ class Trezor extends Signer {
   deviceStatus () {
     this.lookupAddresses((err, addresses) => {
       if (err) {
+        if (err === 'Device call in progress') return
         this.status = 'loading'
         if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.version.join('.')})`
         if (err === 'ui-device_bootloader_mode') this.status = 'Device in Bootloader Mode'
@@ -96,7 +93,6 @@ class Trezor extends Signer {
   }
 
   close () {
-    this.networkObserver.remove()
     this.derivationPathObserver.remove()
     this.closed = true
     store.removeSigner(this.id)
@@ -138,7 +134,7 @@ class Trezor extends Signer {
         }
       } else {
         const address = result.address ? result.address.toLowerCase() : ''
-        const current = this.addresses[index].toLowerCase()
+        const current = this.addresses[index] ? this.addresses[index].toLowerCase() : ''
         log.info('Frame has the current address as: ' + current)
         log.info('Trezor is reporting: ' + address)
         if (address !== current) {
@@ -213,7 +209,7 @@ class Trezor extends Signer {
   }
 
   signTransaction (index, rawTx, cb) {
-    if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
+    if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
     const trezorTx = {
       nonce: this.normalize(rawTx.nonce),
       gasPrice: this.normalize(rawTx.gasPrice),

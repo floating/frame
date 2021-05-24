@@ -155,7 +155,7 @@ class Accounts extends EventEmitter {
 
   checkBetterGasPrice () {
     const { id, type } = store('main.currentNetwork')
-    const gas = store('main.networks', type, id, 'gas.price')
+    const gas = store('main.networksMeta', type, id, 'gas.price')
     if (gas && this.current() && this.current().network === id && gas.selected !== 'custom') {
       Object.keys(this.current().requests).forEach(id => {
         const req = this.current().requests[id]
@@ -178,7 +178,7 @@ class Accounts extends EventEmitter {
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
       const network = store('main.currentNetwork')
-      const { levels } = store('main.networks', network.type, network.id, 'gas.price')
+      const { levels } = store('main.networksMeta', network.type, network.id, 'gas.price')
 
       // Set the gas default to asap
       store.setGasDefault(network.type, network.id, 'asap', levels.asap)

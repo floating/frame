@@ -56,7 +56,8 @@ class _Network extends React.Component {
       primaryCustom, 
       secondaryCustom, 
       resetConfirm: false, 
-      expandNetwork: false 
+      expandNetwork: false,
+      showDetails: false 
     }
  }
 
@@ -128,127 +129,151 @@ class _Network extends React.Component {
               }}
             />
           </div>
-          <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
-            link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
-          }}>
-            <div className='signerPermissionToggleSwitch' />
-          </div>
-        </div>
-        <div className='signerPermission' style={{ zIndex: 2 }}>
-          <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionSetting'>Primary</div>
-              <div className={connection.primary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.status(type, id, 'primary')}
-                <Dropdown
-                  syncValue={type + ':' + id + ':' + connection.primary.current}
-                  onChange={preset => {
-                    const [type, id, value] = preset.split(':')
-                    link.send('tray:action', 'selectPrimary', type, id, value)
-                  }}
-                  options={presets}
-                />
-              </div>
-            </div>
-            <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-              <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
-            </div>
-          </div>
-        </div>
-        <div className='signerPermission' style={{ zIndex: 1 }}>
-          <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-            <div className='connectionOptionToggle'>
-              <div className='signerPermissionSetting'>Secondary</div>
-              <div className={connection.secondary.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
-                <div className='signerPermissionToggleSwitch' />
-              </div>
-            </div>
-            <div className='connectionOptionDetails'>
-              <div className='connectionOptionDetailsInset'>
-                {this.status(type, id, 'secondary')}
-                <Dropdown
-                  syncValue={type + ':' + id + ':' + connection.secondary.current}
-                  onChange={preset => {
-                    const [type, id, value] = preset.split(':')
-                    link.send('tray:action', 'selectSecondary', type, id, value)
-                  }}
-                  options={presets}
-                />
-              </div>
-            </div>
-            <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-              <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
-            </div>
-          </div>
-        </div>
-        <div className='phaseNetworkLine'>
-          {changed ? (
-            <div
-              className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
-                const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer }
-                const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer }
-                this.setState({ submitted: true })
-                link.send('tray:action', 'updateNetwork', net, newNet)
-                setTimeout(() => this.setState({ submitted: false }), 1600)
-              }}
-            >
-              {svg.save(16)}
-            </div>
-          ) : (this.state.submitted ? (
-            <div className='phaseNetworkSubmit phaseNetworkSubmitted'>
-              {svg.octicon('check', { height: 22 })}
-            </div>
+          {this.props.id === '1' ? (
+            <div className='mainnetToggleLock' />
           ) : (
-            <div
-              className='phaseNetworkSubmit phaseNetworkRemove' onMouseDown={() => {
-                const { id, name, type, explorer } = this.props
-                link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
-              }}
-            >
-              {svg.trash(16)}
+            <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
+              link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
+            }}>
+              <div className='signerPermissionToggleSwitch' />
             </div>
-          )
           )}
-          <div className='phaseNetworkSymbol'>
-            <input
-              value={this.state.symbol} spellCheck='false'
-              onChange={(e) => {
-                if (e.target.value.length > 8) return e.preventDefault()
-                this.setState({ symbol: e.target.value })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ symbol: this.props.symbol })
-              }}
-            />
-          </div>
-          <div className='phaseNetworkId'>
-            <input
-              value={this.state.id} spellCheck='false'
-              onChange={(e) => {
-                this.setState({ id: e.target.value })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ id: this.props.id })
-              }}
-            />
-          </div>
-          <div className='phaseNetworkExplorer'>
-            <input
-              value={this.state.explorer} spellCheck='false'
-              onChange={(e) => {
-                this.setState({ explorer: e.target.value })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ explorer: this.props.explorer })
-              }}
-            />
-          </div>
         </div>
+        {this.props.on ? (
+          <div className='connectionLevels'>
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
+              <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+                <div className='connectionOptionToggle'>
+                  <div className='signerPermissionSetting'>Primary</div>
+                  <div className={connection.primary.on ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn' : 'signerPermissionToggleSmall'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'primary')}>
+                    <div className='signerPermissionToggleSwitch' />
+                  </div>
+                </div>
+                {connection.primary.on ? (
+                  <>
+                    <div className='connectionOptionDetails cardShow'>
+                      <div className='connectionOptionDetailsInset'>
+                        {this.status(type, id, 'primary')}
+                        <Dropdown
+                          syncValue={type + ':' + id + ':' + connection.primary.current}
+                          onChange={preset => {
+                            const [type, id, value] = preset.split(':')
+                            link.send('tray:action', 'selectPrimary', type, id, value)
+                          }}
+                          options={presets}
+                        />
+                      </div>
+                    </div>
+                    <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn cardShow' : 'connectionCustomInput'}>
+                      <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
+            <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 1 }}>
+              <div className={connection.secondary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
+                <div className='connectionOptionToggle'>
+                  <div className='signerPermissionSetting'>Secondary</div>
+                  <div className={connection.secondary.on ? 'signerPermissionToggleSmall signerPermissionToggleSmallOn' : 'signerPermissionToggleSmall'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', type, id, 'secondary')}>
+                    <div className='signerPermissionToggleSwitch' />
+                  </div>
+                </div>
+                {connection.secondary.on ? (
+                  <>
+                    <div className='connectionOptionDetails cardShow'>
+                      <div className='connectionOptionDetailsInset'>
+                        {this.status(type, id, 'secondary')}
+                        <Dropdown
+                          syncValue={type + ':' + id + ':' + connection.secondary.current}
+                          onChange={preset => {
+                            const [type, id, value] = preset.split(':')
+                            link.send('tray:action', 'selectSecondary', type, id, value)
+                          }}
+                          options={presets}
+                        />
+                      </div>
+                    </div>
+                    <div className={connection.secondary.current === 'custom' && connection.secondary.on ? 'connectionCustomInput connectionCustomInputOn cardShow' : 'connectionCustomInput'}>
+                      <input tabIndex='-1' value={this.state.secondaryCustom} onFocus={() => this.customSecondaryFocus()} onBlur={() => this.customSecondaryBlur()} onChange={e => this.inputSecondaryCustom(e)} />
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {/* <div className='signerDrawer' onMouseDown={() => this.setState({ showDetails: !this.state.showDetails })}>
+          <div className='showControls'>
+            {this.state.showDetails ? 'hide' : 'details'}
+          </div>
+          <div className='showControlsLine' />
+        </div> */}
+        {this.state.showDetails ? (
+          <div className='phaseNetworkLine'>
+            {changed ? (
+              <div
+                className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
+                  const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer }
+                  const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer }
+                  this.setState({ submitted: true })
+                  link.send('tray:action', 'updateNetwork', net, newNet)
+                  setTimeout(() => this.setState({ submitted: false }), 1600)
+                }}
+              >
+                {svg.save(16)}
+              </div>
+            ) : (this.state.submitted ? (
+              <div className='phaseNetworkSubmit phaseNetworkSubmitted'>
+                {svg.octicon('check', { height: 22 })}
+              </div>
+            ) : (
+              <div
+                className='phaseNetworkSubmit phaseNetworkRemove' onMouseDown={() => {
+                  const { id, name, type, explorer } = this.props
+                  link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+                }}
+              >
+                {svg.trash(16)}
+              </div>
+            )
+            )}
+            <div className='phaseNetworkSymbol'>
+              <input
+                value={this.state.symbol} spellCheck='false'
+                onChange={(e) => {
+                  if (e.target.value.length > 8) return e.preventDefault()
+                  this.setState({ symbol: e.target.value })
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === '') this.setState({ symbol: this.props.symbol })
+                }}
+              />
+            </div>
+            <div className='phaseNetworkId'>
+              <input
+                value={this.state.id} spellCheck='false'
+                onChange={(e) => {
+                  this.setState({ id: e.target.value })
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === '') this.setState({ id: this.props.id })
+                }}
+              />
+            </div>
+            <div className='phaseNetworkExplorer'>
+              <input
+                value={this.state.explorer} spellCheck='false'
+                onChange={(e) => {
+                  this.setState({ explorer: e.target.value })
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === '') this.setState({ explorer: this.props.explorer })
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
     )
   }

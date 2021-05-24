@@ -258,7 +258,7 @@ class Provider extends EventEmitter {
         const chain = parseInt(rawTx.chainId, 'hex').toString()
         const network = store('main.currentNetwork')
         if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
-        const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
+        const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
         if (!levels[selected]) throw new Error('Unable to determine gas')
         res({ result: levels[selected] })
       } catch (error) {
@@ -282,10 +282,10 @@ class Provider extends EventEmitter {
               fastTime: undefined,
               asap: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
               asapTime: undefined,
-              custom: store('main.networks', network.type, network.id, 'gas.price.levels.custom') || response.result,
+              custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
               customTime: undefined
             })
-            const { levels, selected } = store('main.networks', network.type, network.id, 'gas.price')
+            const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
             res({ result: levels[selected] })
           } catch (error) {
             log.error(error)
