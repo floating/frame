@@ -146,10 +146,11 @@ class Lattice extends Signer {
       this.update()
       return result
     } catch (err) {
+      if (err === 'Error from device: Invalid Request') return log.warn('Lattice: Invalid Request')
       this.status = 'loading'
       this.update()
       log.error(err)
-      setTimeout(() => this.deriveAddresses(), 3000)
+      setTimeout(() => this.deriveAddresses(), 6000)
       return []
     }
   }

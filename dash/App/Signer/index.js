@@ -9,7 +9,7 @@ class Signer extends React.Component {
     super(...args)
     this.state = {
       page: 0,
-      addressLimit: 4,
+      addressLimit: 5,
       latticePairCode: '',
       tPin: ''
     }
@@ -275,12 +275,12 @@ class Signer extends React.Component {
           </div>
         ) : this.props.status === 'ok' || this.props.status === 'locked' ? (
           <>
-            <div className='signerAccountsTitle'>
+            {/* <div className='signerAccountsTitle'>
               <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
                 <span>{'active accounts'}</span> 
                 <span className='signerAccountsTitleActiveCount'>{activeAccounts.length}</span> 
               </span>
-            </div>
+            </div> */}
             <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
               const added = this.store('main.accounts', address.toLowerCase())
               return (
