@@ -102,7 +102,7 @@
 
   .signerStatusText
     padding 8px 32px
-    margin 0px 8px 16px 8px
+    margin 0px 8px 8px 8px
     border-radius 8px
     font-size 12px
     text-transform uppercase
@@ -271,7 +271,7 @@
     justify-content center
     align-items center
     // height 40px
-    padding 0px 12px 4px 12px
+    padding 0px 12px 0px 12px
 
   .signerAccountsTitleActive
     text-transform uppercase
@@ -307,7 +307,7 @@
     text-align center
     
     // border-radius 8px
-    font-size 12px
+    font-size 11px
     // text-transform uppercase
     font-weight 400
     // height 204px
@@ -324,7 +324,7 @@
       background var(--ghostB)
       color var(--outerspace)
       border-radius 13px
-      border 1px solid var(--ghostZ)
+      border 1px solid rgba(0, 0, 0, 0)
       box-sizing border-box
       // box-shadow 0px 9px 5px var(--ghostZ)
       cursor pointer
@@ -347,12 +347,11 @@
         justify-content center
         align-items center
         position absolute
-        top 0
         left 30px
-        bottom 0
+        bottom 1px
         right 40px
         font-weight 200
-        font-size 15px
+        font-size 14px
         letter-spacing 1px
         // background blue
         overflow hidden
@@ -374,9 +373,9 @@
         color var(--ghostZ)
 
     .signerAccountAdded
-      border 1px solid var(--outerspace)
+      border 1px solid var(--good)
       .signerAccountCheck
-        color var(--outerspace)
+        color var(--good)
 
     .signerAccountlast-child
       border-bottom none

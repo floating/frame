@@ -244,7 +244,12 @@ class ChainConnection extends EventEmitter {
 
   close () {
     if (this.observer) this.observer.remove()
-
+    if (this.primary.provider) this.primary.provider.close()
+    if (this.secondary.provider) this.secondary.provider.close()
+    this.primary = { status: 'loading', network: '', type: '', connected: false }
+    this.secondary = { status: 'loading', network: '', type: '', connected: false }
+    this.update('primary')
+    this.update('secondary')
   }
 
   resError (error, payload, res) {
