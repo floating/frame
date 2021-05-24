@@ -614,7 +614,10 @@ class Account extends React.Component {
     // if (!this.props.signer || (this.props.signer && this.props.signer.status === 'initial')) innerClass += ' signerInnerDisconnected'
     // const inSettings = this.store('selected.view') === 'settings'
     return (
-      <div className='signerType' onMouseDown={() => this.hideSignerStatus(!this.state.hideSignerStatus)}>
+      <div className='signerType' onMouseDown={() => {
+        this.hideSignerStatus(!this.state.hideSignerStatus)
+        link.send('tray:action', 'toggleDash')
+      }}>
         {/* {!this.props.signer || (this.props.signer && this.props.signer.status === 'initial') ? (
           <div className='signerTypeDisconnected' onMouseDown={this.typeClick.bind(this)} style={inSettings ? { transform: 'translateY(-30px)' } : {}} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
             <div className='signerTypeDisconnectedImageFront'>{svg.logo(24)}</div>

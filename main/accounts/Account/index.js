@@ -283,10 +283,6 @@ class Account {
     return account ? [account] : []
   }
 
-  open () {
-    windows.broadcast('main:action', 'addSigner', this.summary())
-  }
-
   close () {
     this.acctObs.remove()
   }

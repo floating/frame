@@ -33,14 +33,12 @@ class Ledger extends Signer {
     this.coinbase = '0x'
     this.handlers = {}
     this.lastUse = Date.now()
-    this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
     this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.varObserver = store.observer(() => {
       if (
         this.derivation !== store('main.ledger.derivation') ||
-        this.liveAccountLimit !== store('main.ledger.liveAccountLimit') ||
-        this.network !== store('main.currentNetwork.id')
+        this.liveAccountLimit !== store('main.ledger.liveAccountLimit')
       ) {
         this.reset()
       }
@@ -100,7 +98,6 @@ class Ledger extends Signer {
 
   reset () {
     this.pauseLive = true
-    this.network = store('main.currentNetwork.id')
     this.derivation = store('main.ledger.derivation')
     this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     this.status = 'loading'
@@ -305,7 +302,7 @@ class Ledger extends Signer {
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
-      if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
+      if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
       const tx = new EthereumTx(rawTx, { chain: parseInt(rawTx.chainId) })
       tx.raw[6] = Buffer.from([rawTx.chainId]) // v
       tx.raw[7] = Buffer.from([]) // r

@@ -1,5 +1,4 @@
 @import '../Account/style'
-@import '../PendingSigner/style'
 
 .card
   position absolute
@@ -33,7 +32,7 @@
   #panelWrap
     width 100%
     padding-top 67px
-    padding-bottom 128px
+    padding-bottom 67px
     will-change scroll-position
 
     .noSigners
@@ -71,7 +70,7 @@
           position relative
           top 4px
           border 2px solid var(--spacewhite)
-          width 22px
+          width 43px
           height 22px
           border-radius 11px
           text-align center
@@ -210,6 +209,21 @@
       background var(--good)
 
   .panelHeaderUpdateNotify
+    background linear-gradient(
+      135deg,
+      var(--ghostX),
+      var(--ghostX),
+      var(--goodUp),
+      var(--good),
+      var(--goodUp),
+      var(--ghostX),
+      var(--ghostX)
+    )
+    background-size 1000% 100%
+    background-position 0 50%
+    animation moveGradient 4s infinite reverse ease-in
+
+  .panelHeaderUpdateIssue // Notify
     // background linear-gradient(
     //   60deg,
     //   hsl(224, 85%, 66%),
@@ -233,7 +247,6 @@
     )
     background-size 1000% 100%
     background-position 0 50%
-    // border-radius calc(2 * var(--border-width))
     animation moveGradient 4s infinite reverse ease-in
 
 @keyframes moveGradient

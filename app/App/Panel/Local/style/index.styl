@@ -76,7 +76,7 @@
 .signerPermission
   position relative
   justify-content space-between
-  padding 10px 1px 8px 1px
+  padding 12px 1px 8px 1px
   font-size 15px
   font-weight 200
   transform translateZ(0)
@@ -150,7 +150,6 @@
     text-align left
     white-space nowrap
     font-weight 100
-    margin-top 2px
     font-size 18px
 
 .signerPermissionToggle
@@ -173,7 +172,6 @@
     border-radius 10px
     transition var(--standard)
     background var(--ghostC)
-    // box-shadow 0px 6px 6px -2px rgba(0,20,60,0.15), 0px 1px 2px 0px rgba(0,20,60,0.05)
     transform translateZ(0)
     box-shadow 0px 3px 3px 0px var(--tripleThick) 
     pointer-events none
@@ -187,4 +185,41 @@
 .signerPermissionToggle:hover
   .signerPermissionToggleSwitch
     background var(--ghostE)
+
+.signerPermissionToggleSmall
+  position relative
+  background var(--bad)
+  height 14px
+  width 30px
+  border-radius 10px
+  transition var(--standard)
+  transform translateZ(0)
+  margin-top 2px
+  margin-right 4px
+  cursor pointer
+
+  .signerPermissionToggleSwitch
+    position absolute
+    top 2px
+    left 2px
+    bottom 2px
+    width 10px
+    border-radius 10px
+    transition var(--standard)
+    background var(--ghostC)
+    transform translateZ(0)
+    box-shadow 0px 3px 3px 0px var(--tripleThick) 
+    pointer-events none
+
+.signerPermissionToggleSmallOn
+  background var(--good)
+
+  .signerPermissionToggleSwitch
+    position absolute
+    transform translateX(16px)
+
+.signerPermissionToggleSmall:hover
+  .signerPermissionToggleSwitch
+    background var(--ghostE)
+
 

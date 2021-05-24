@@ -33,7 +33,7 @@ class TransactionFee extends React.Component {
     this.gasCache = {}
     context.store.observer(() => {
       const network = context.store('main.currentNetwork')
-      const { slow, standard, fast, asap } = context.store('main.networks', network.type, network.id, 'gas.price.levels')
+      const { slow, standard, fast, asap } = context.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
       let changed = false
 
       if (this.gasCache.slow !== slow && this.state.selectedIndex === 0) {
@@ -152,8 +152,8 @@ class TransactionFee extends React.Component {
     hoverGasPercent = hoverGasPercent > 1 ? 1 : (hoverGasPercent < 0 ? 0 : hoverGasPercent)
     const hoverGasPercentOrigin = hoverGasPercent
     const network = this.store('main.currentNetwork')
-    const asap = this.store('main.networks', network.type, network.id, 'gas.price.levels.asap')
-    // const slow = this.store('main.networks', network.type, network.id, 'gas.price.levels.slow')
+    const asap = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels.asap')
+    // const slow = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels.slow')
     const top = parseInt(asap, 16) * 1.5
     const bottom = gweiToWei(1)
     let gwei = Math.round(weiToGwei(top * hoverGasPercent))
@@ -198,13 +198,13 @@ class TransactionFee extends React.Component {
 
   gasPriceToPercent (price) {
     const network = this.store('main.currentNetwork')
-    const asap = this.store('main.networks', network.type, network.id, 'gas.price.levels.asap')
+    const asap = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels.asap')
     return parseInt(price) / (parseInt(asap, 16) * 1.5)
   }
 
   renderFeeLabel (current, expanded, currentGas) {
     const network = this.store('main.currentNetwork')
-    const levels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
+    const levels = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
     const price = levels[current]
     return (
       <div className='txSectionLabelLeft'>
@@ -272,7 +272,7 @@ class TransactionFee extends React.Component {
     const { price } = this.checkGasMax(gasPrice, hexToInt(this.props.req.data.gas))
     this.setState({ inputGwei: price })
     const network = this.store('main.currentNetwork')
-    const feeLevel = this.store('main.networks', network.type, network.id, 'gas.price.selected')
+    const feeLevel = this.store('main.networksMeta', network.type, network.id, 'gas.price.selected')
     if (gweiToWeiHex(price) && (gweiToWeiHex(price) !== this.props.req.data.gasPrice || level !== feeLevel)) {
       link.rpc('setGasPrice', netType, netId, gweiToWeiHex(price), level, this.props.req.handlerId, e => {
         if (e) {
@@ -299,7 +299,7 @@ class TransactionFee extends React.Component {
 
   gasData (levels, gasLimit, etherUSD) {
     const network = this.store('main.currentNetwork')
-    const gasLevels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
+    const gasLevels = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
     const feeData = {}
     levels.forEach(level => {
       feeData[level] = {}
@@ -315,8 +315,8 @@ class TransactionFee extends React.Component {
     const expandActive = this.state.expandActive
     const { data } = this.props.req
     const network = this.store('main.currentNetwork')
-    let feeLevel = this.store('main.networks', network.type, network.id, 'gas.price.selected')
-    const gasLevels = this.store('main.networks', network.type, network.id, 'gas.price.levels')
+    let feeLevel = this.store('main.networksMeta', network.type, network.id, 'gas.price.selected')
+    const gasLevels = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
     const { slowTime, standardTime, fastTime, asapTime, customTime } = gasLevels
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
     const etherRates = this.store('main.rates')

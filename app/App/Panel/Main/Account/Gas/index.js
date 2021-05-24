@@ -27,7 +27,7 @@ class Gas extends React.Component {
   }
   render () {
     const { type, id } = this.store('main.currentNetwork')
-    const levels = this.store('main.networks', type, id, 'gas.price.levels') || {}
+    const levels = this.store('main.networksMeta', type, id, 'gas.price.levels') || {}
     return (
       <div ref={this.moduleRef}>
         <div className='moduleHeader'>{'Gas Prices'}</div>  

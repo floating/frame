@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
 import Account from './Account'
-import PendingSigner from './PendingSigner'
 
 import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
@@ -72,18 +71,16 @@ class Main extends React.Component {
                   </div>
                 </div>
               </div>
-              {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)}
+              {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {
                 return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
               })}
               {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
                   <div className='introLogo'>{svg.logo(70)}</div>
-                  {`No ${this.store('main.networks', type, network, 'name')} Accounts Found`}
+                  {`No Accounts Found`}
                   <span className='getStarted'>
-                    Use the
-                    <div className='getStartedPlus'><span>+</span></div>
-                    below or connect a hardware signer to automatically populate your accounts
+                    Add accounts using <div className='getStartedPlus'><span>+</span></div> above
                   </span>
                   <div className='discordInvite' style={{ margin: '0px' }} onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
                     <div>Need help getting started?</div>

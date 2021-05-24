@@ -178,14 +178,14 @@ module.exports = {
     u('main.autohide', () => v)
   },
   setGasPrices: (u, netType, netId, prices) => {
-    u('main.networks', netType, netId, 'gas.price.levels', () => prices)
+    u('main.networksMeta', netType, netId, 'gas.price.levels', () => prices)
   },
   setGasDefault: (u, netType, netId, level, price) => {
-    u('main.networks', netType, netId, 'gas.price.selected', () => level)
+    u('main.networksMeta', netType, netId, 'gas.price.selected', () => level)
     if (level === 'custom') {
-      u('main.networks', netType, netId, 'gas.price.levels.custom', () => price)
+      u('main.networksMeta', netType, netId, 'gas.price.levels.custom', () => price)
     } else {
-      u('main.networks', netType, netId, 'gas.price.lastLevel', () => level)
+      u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
   addNetwork: (u, net) => {

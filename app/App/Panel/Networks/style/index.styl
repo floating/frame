@@ -1,35 +1,37 @@
 .network
   background var(--ghostA)
-  padding 16px 0px
-  border-radius 8px
+  border-radius 12px
   margin 0px 0px 16px 0px
-  box-shadow 0px 18px 70px -32px rgba(30, 40, 80, 0.2)
+  box-shadow 0px 18px 70px -32px var(--ghostY)
 
   .networkActive
     position relative
     display flex
-    justify-content space-between
     align-items space-between
     width 100%
-    padding 0px 16px
     box-sizing border-box
+    height 60px
 
-      
     .networkName
-      position relative
-      width 200px
-      height 50px
-      
+      position absolute
+      left 0px
+      right 74px
+      top 0px
+      bottom 0px
+
       input 
-        font-size 22px
+        font-size 20px
         text-align left
         font-weight 100
-        padding-bottom 10px
+        padding-left 16px
 
     .signerPermissionToggle
-      margin-top 8px
-      height 24px
-      width 50px
+      position absolute
+      right 16px
+      top 0
+      margin-top 22px
+      height 20px
+      width 40px
       border-radius 12px
 
       .signerPermissionToggleSwitch
@@ -37,14 +39,14 @@
         top 2px
         left 2px
         bottom 2px
-        width 20px
+        width 16px
         border-radius 10px
 
     .signerPermissionToggleOn
       background var(--good)
       .signerPermissionToggleSwitch
         position absolute
-        transform translateX(26px)
+        transform translateX(20px)
 
   .phaseNetworkLine
     position relative
@@ -77,8 +79,8 @@
     font-size 16px
     font-weight 100
     color var(--outerspace)
-    border-bottom 1px solid var(--thick)
     font-weight 100
+    font-family OpenSans, sans-serif
 
     div 
       z-index 3
@@ -197,7 +199,7 @@
     // background linear-gradient(-180deg, var(--bg0) 0%, var(--ghostC) 70%)
 
   .localSettingsWrap
-    padding 100px 16px 100px 16px
+    padding 80px 16px 80px 16px
     overflow-x hidden
     overflow-y scroll
     position relative
@@ -319,21 +321,23 @@
   .quitFrameButton:hover
     background var(--ghostY)
 
+.connectionLevels
+  padding-bottom 5px
+
 .connectionTitle
   justify-content space-between
   height 26px
   max-height 26px
 
 .connectionOption
-  // width 100%
   align-items space-between
   transition var(--standard)
-  border-radius 8px
-  // margin 0px -15px -15px -15px
-  // padding 0px 15px 15px 15px
-  // overflow hidden
   transform translateZ(0)
-  padding 0px 16px 0px 16px
+  padding 8px 16px
+  margin 4px 8px
+  border-radius 8px
+  transform scale(1)
+  background var(--ghostB)
 
   .connectionOptionToggle
     width 100%
@@ -344,17 +348,17 @@
     transform translateZ(0)
 
   .connectionOptionDetails
-    height 0px
     transition var(--standard)
     transition-delay 0ms, 0ms
     transition-property height, opacity
-    opacity 0
+    opacity 1
     transform translateZ(0)
     z-index 40
     position relative
     margin-top 0px
     transition var(--standard)
     pointer-events none
+    padding 8px 0px
 
     .connectionOptionDetailsInset
       height 25px
@@ -525,14 +529,26 @@
   height 35px
   opacity 1
 
-.connectionOptionOn
-  background var(--ghostB)
-  margin 0px -5px
-  padding 16px
-  .connectionOptionDetails
-    height 25px
-    opacity 1
-    transition-delay 0ms, 30ms
-    transition-property height, opacity
-    margin-top 5px
-    pointer-events auto
+.signerPermissionNetwork
+   padding 0
+
+.mainnetToggleLock
+  position absolute
+  right 16px
+  top 0
+  margin-top 22px
+  height 20px
+  width 40px
+  border-radius 12px
+  background var(--ghostC)
+
+// .connectionOptionOn
+//   background var(--ghostB)
+//   // height 60px
+//   // margin 0px -5px
+//   // transform scale(1.05)
+//   // .connectionOptionDetails
+//   //   opacity 1
+//   //   transition-delay 0ms, 30ms
+//   //   transition-property height, opacity
+//   //   pointer-events auto

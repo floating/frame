@@ -248,10 +248,6 @@ class Signer extends React.Component {
             </div>
           </div>
           {this.status()}
-          <div className='signerInterface'>
-            {this.renderTrezorPin(this.props.type === 'trezor' && this.props.status === 'Need Pin')}
-            {this.renderTrezorPhrase(this.props.type === 'trezor' && this.props.status === 'Enter Passphrase')}
-          </div>
         </div>
         {this.statusText()}
         {this.props.type === 'lattice' && this.props.status === 'pairing' ? (
@@ -311,6 +307,11 @@ class Signer extends React.Component {
               <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
             </div>
           </>
+        ) : this.props.type === 'trezor' && (this.props.status === 'Need Pin' || this.props.status === 'Enter Passphrase') ? (
+          <div className='signerInterface'>
+            {this.renderTrezorPin(this.props.type === 'trezor' && this.props.status === 'Need Pin')}
+            {this.renderTrezorPhrase(this.props.type === 'trezor' && this.props.status === 'Enter Passphrase')}
+          </div> 
         ) : (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />
