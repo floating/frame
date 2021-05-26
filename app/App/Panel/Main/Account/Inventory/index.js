@@ -47,7 +47,6 @@ class Balances extends React.Component {
                       b = inventory[k].assets[b].tokenId
                       return a < b ? -1 : b > a ? 1 : 0
                     }).map(id => {
-                      console.log(inventory[k].assets[id])
                       const { tokenId, name, img } = inventory[k].assets[id]
                       return (
                         <div className='inventoryCollectionItem'>
