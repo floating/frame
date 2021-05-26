@@ -41,13 +41,15 @@ class Verify extends React.Component {
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>{'Verify Address'}</div>  
-        <div className='moduleMid'>
+        <div className='moduleMain'>
           <div className='signerVerifyText'>Verify that the address displayed in Frame is correct</div>
           {this.state.verifyAddressResponse ? (
             <div className={this.state.verifyAddressSuccess ? 'signerVerifyResponse signerVerifyResponseSuccess cardShow' : 'signerVerifyResponse'}>{this.state.verifyAddressResponse}</div>
           ) : null}
+          <div className='moduleButton' onMouseDown={() => this.verifyAddress()}>
+            {signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}
+          </div>
         </div>
-        <div className='moduleFooterAction' onMouseDown={() => this.verifyAddress()}>{signerKind === 'hot' ? 'Verify Address' : 'Verify Address on Device'}</div>
       </div>
     )
   }

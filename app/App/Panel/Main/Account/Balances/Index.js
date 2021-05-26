@@ -65,11 +65,14 @@ class Balances extends React.Component {
   constructor (...args) {
     super(...args)
     this.moduleRef = React.createRef()
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
-      }
-    })
+    if (!this.props.expanded) {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.moduleRef && this.moduleRef.current) {
+          link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+        }
+      })
+    }
+
     this.state = {
       openActive: false,
       open: false,
@@ -80,11 +83,12 @@ class Balances extends React.Component {
   }
 
   componentDidMount () {
-    this.resizeObserver.observe(this.moduleRef.current)
+    if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
   }
-  // componentWillUnmount () {
-  //   this.resizeObserver.disconnect()
-  // }
+
+  componentWillUnmount () {
+    if (this.resizeObserver) this.resizeObserver.disconnect()
+  }
 
   renderBalance (symbol, balanceInfo, i) {
     if (i !== 0 && balanceInfo.totalValue.toNumber() < 0.02) return null
@@ -139,7 +143,7 @@ class Balances extends React.Component {
 
     const balancesLength = balances.length
 
-    if (!this.state.expand) {
+    if (!this.props.expanded) {
       balances = balances.slice(0, 5)
     }
 
@@ -155,9 +159,9 @@ class Balances extends React.Component {
           </div>
         ) : null}
         <div className='signerBalanceTotal'>
-          {balancesLength > 5 ? (
-            <div className='signerBalanceShowAll' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
-              {this.state.expand ? 'Show Less' : 'Show All'}
+          {balancesLength > 5 && !this.props.expanded ? (
+            <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+              {svg.expand(17)}
             </div>
           ) : null}
           <div className='signerBalanceTotalText'>

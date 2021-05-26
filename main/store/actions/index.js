@@ -15,6 +15,15 @@ module.exports = {
     })
   },
   activateNetwork: (u, type, chainId, active) => {
+    if (!active) {
+      u('main.currentNetwork', (current) => {
+        if (current.type === type && current.id === chainId) {
+          return { type: 'ethereum', id: '1' }
+        } else {
+          return current
+        }
+      })
+    }
     u('main.networks', type, chainId, 'on', () => active)
   },
   selectPrimary: (u, netType, netId, value) => {

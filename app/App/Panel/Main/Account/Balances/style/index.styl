@@ -11,25 +11,29 @@
 
   .signerBalanceShowAll
     position absolute
-    left 16px
+    left 10px
     top 7px
     height 30px
-    width 90px
-    border-radius 30px
+    width 30px
+    border-radius 4px
     cursor pointer
     z-index 4000
     display flex
     justify-content center
     align-items center
-    font-size 11px
+    font-size 10px
     font-weight 500
-    padding 0px 10px
     letter-spacing 1px
-    background var(--ghostC)
     text-transform uppercase
+    color var(--outerspace05)
+
+    *
+      pointer-events none
 
   .signerBalanceShowAll:hover
     background var(--ghostD)
+    color var(--outerspace)
+    // color var(--good)
 
   .signerBalanceTotalText
     position absolute

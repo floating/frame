@@ -1,23 +1,32 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
+import svg from '../../../../../../resources/svg'
 
 class Balances extends React.Component {
   constructor (...args) {
     super(...args)
     this.moduleRef = React.createRef()
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.moduleRef && this.moduleRef.current) {
-        link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
-      }
-    })
+    if (!this.props.expanded) {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.moduleRef && this.moduleRef.current) {
+          link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+        }
+      })
+    }
     this.state = {
       expand: false
     }
   }
+
   componentDidMount () {
-    this.resizeObserver.observe(this.moduleRef.current)
-  } 
+    if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
+  }
+
+  componentWillUnmount () {
+    if (this.resizeObserver) this.resizeObserver.disconnect()
+  }
+
   render () {
     const i = 0
     // const transform = viewIndex === i ? 'translateX(0)' : viewIndex > i ? 'translateX(-100%)' : 'translateX(100%)'
@@ -59,9 +68,9 @@ class Balances extends React.Component {
             </div>
           ) : null}
         </div>
-        <div className='moduleFooter'>
-          <div className='moduleFooterAction' onMouseDown={() => this.setState({ expand: !this.state.expand })}>
-            {this.state.expand ? 'Show Less' : 'Show All'}
+        <div className='signerBalanceTotal'>
+          <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+            {svg.expand(17)}
           </div>
         </div>
       </div>
