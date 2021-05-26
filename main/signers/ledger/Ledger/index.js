@@ -206,7 +206,6 @@ class Ledger extends Signer {
       // If signer has no addresses, try deriving them
       if (!this.addresses.length) await this.deriveAddresses()
       const { address } = await this.getAddress(this.getPath(0), false, true)
-      this.busyCount = 0
       if (address !== this.coinbase || this.status !== 'ok') {
         this.coinbase = address
         this.deviceStatus()
@@ -215,6 +214,8 @@ class Ledger extends Signer {
       if (!this.addresses.length) {
         this.status = 'loading'
         this.deriveAddresses()
+      } else {
+        this.busyCount = 0
       }
       this.update()
       this.deviceStatusActive = false

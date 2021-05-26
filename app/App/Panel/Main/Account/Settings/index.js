@@ -45,7 +45,7 @@ class Balances extends React.Component {
           <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
           <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
           <div>Account Added at block: {parseInt(account.created, 'hex')}</div>
-          <div className='moduleButton' onMouseDown={() => {
+          <div className='moduleButton moduleButtonBad' onMouseDown={() => {
             link.rpc('removeAccount', this.props.id, {}, () => {
               // console.log('Removed account ', address)
             })

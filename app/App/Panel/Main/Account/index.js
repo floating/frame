@@ -147,6 +147,12 @@ import Settings from './Settings'
 
 // account module is position absolute and with a translateX 
 class _AccountMain extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      expandedModule: ''
+    }
+  }
   // constructor (props, context) {
   //   // console.log(context)
   //   super(props, context)
@@ -182,7 +188,7 @@ class _AccountMain extends React.Component {
   //     slideHeight += modulePositions[i].height
   //   })
   // }
-  renderModule (id, module, top, index) {
+  renderModule (id, module, top, index, expandModule, expanded) {
     // console.log(id, module, top, index)
     let hidden = false
     let style = { 
@@ -212,6 +218,8 @@ class _AccountMain extends React.Component {
             id === 'gas' ? <Gas 
               moduleId={id} 
               id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'requests' ? <Requests 
               _id={id}
@@ -220,36 +228,56 @@ class _AccountMain extends React.Component {
               minimized={this.props.minimized} 
               status={this.props.status} 
               signer={this.props.signer} 
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'verify' ? <Verify 
               moduleId={id}
               id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'activity' ? <Activity 
               moduleId={id} 
               id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'launcher' ? <Launcher 
               moduleId={id}
               id={this.props.id} 
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'inventory' ? <Inventory 
               moduleId={id} 
               id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'permissions' ? <Permissions
               moduleId={id}
               id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'balances' ? <Balances
               moduleId={id} 
               {...this.props}
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
             id === 'settings' ? <Settings
               moduleId={id}
               id={this.props.id}
+              expandModule={expandModule}
+              expanded={expanded}
             /> :
-            <Default moduleId={id}  />
+            <Default 
+              moduleId={id}
+              expandModule={expandModule}
+              expanded={expanded}
+            />
           }
         </div>  
       </div>
@@ -262,12 +290,32 @@ class _AccountMain extends React.Component {
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 5
-      return this.renderModule(id, module, slideHeight - module.height - 5, i)
+      return this.renderModule(id, module, slideHeight - module.height - 5, i, id => {
+        this.setState({ expandedModule: id }) 
+      })
     })
     return (
       <div className='accountMain'>
-        <div className='accountMainSlide' style={{ height: slideHeight + 41 + 'px'}}>
-          {modules}
+        {this.state.expandedModule ? (
+          <div 
+            className='accountsModuleExpand cardShow' 
+            style={{ pointerEvents: this.state.expandedModule ? 'auto' : 'none' }}
+            onMouseDown={() => this.setState({ expandedModule: false })}
+          >
+            <div className='moduleExpanded' onMouseDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}>
+              {this.renderModule(this.state.expandedModule, { height: '100%' }, 0, 0, id => {
+                this.setState({ expandedModule: id }) 
+              }, true)}
+            </div>
+          </div>
+        ) : null}
+        <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
+          <div className='accountMainSlide' style={{ height: slideHeight + 41 + 'px' }}>
+            {modules}
+          </div>
         </div>
       </div>
     )
