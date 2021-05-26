@@ -33,7 +33,6 @@ class Balances extends React.Component {
         <div className='moduleHeader'>{'Inventory'}</div>  
         <div>
           {collections.length ? collections.map(k => {
-            console.log()
             return (
               <div className='inventoryCollection' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
                 <div className='inventoryCollectionTop'>
