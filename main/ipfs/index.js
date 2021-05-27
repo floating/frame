@@ -13,7 +13,7 @@ const connect = async () => {
       protocol: 'https'
     })
 
-    // const connectPeers = async () => {
+    // const connectPeers = async () => {n
     //   // const peers = await ens.resolvePeers('frame.eth')
     //   for (const peer of peers) {
     //     await node.swarm.connect(peer)
