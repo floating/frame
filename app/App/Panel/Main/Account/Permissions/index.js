@@ -60,19 +60,21 @@ class Balances extends React.Component {
               )
             })
           )}
-          {this.state.expand ? (
+          {this.props.expanded ? (
             <div className='quitFrame'>
               <div onMouseDown={() => {
                 link.send('tray:action', 'clearPermissions', this.props.id)
-              }} className='quitFrameButton'>Clear All Permissions</div>
+              }} className='moduleButton'>Clear All Permissions</div>
             </div>
           ) : null}
         </div>
-        <div className='signerBalanceTotal'>
-          <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
-            {svg.expand(17)}
+        {!this.props.expanded ? (
+          <div className='signerBalanceTotal'>
+            <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+              {svg.expand(17)}
+            </div>
           </div>
-        </div>
+        ) : null }
       </div>
     )
   }

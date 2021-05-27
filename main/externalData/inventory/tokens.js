@@ -9,7 +9,7 @@ const chainMapping = {
   3: 'ropsten',
   4: 'rinkeby',
   5: 'goerli',
-  42: 'kovan'
+  42: 'kovan',
   56: 'bsc',
   65: 'okex-testnet',
   66: 'okex',
@@ -89,19 +89,17 @@ function defaultTokens (chainId) {
 async function getTokenList (chainId) {
   log.debug(`loading token list for chainId=${chainId}`)
 
-  const tokenList = await tokenListSources.reduce(async (tokens, source) => {
-    let loaded = (await tokens)
+  let tokenList = []
 
-    if (loaded.length === 0) {
-      log.debug(`loading tokens from ${source.name}`)
+  await Promise.all(tokenListSources.map(async (source) => {
+    log.debug(`loading tokens from ${source.name}`)
 
-      loaded = await source.list(chainId)
+    const loaded = await source.list(chainId)
 
-      log.info(`loaded ${loaded.length} tokens from ${source.name}`)
-    }
+    log.info(`loaded ${loaded.length} tokens from ${source.name}`)
 
-    return loaded
-  }, [])
+    tokenList = tokenList.concat(loaded)
+  }))
 
   return withLowerCaseAddresses(tokenList)
 }
