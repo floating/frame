@@ -1,5 +1,4 @@
-/* globals jest */
-
+/* globals jest beforeAll it */
 
 const mockNebula = {
   resolve: jest.fn(),
