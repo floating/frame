@@ -6,15 +6,24 @@ const nebula = require('../../nebula')('tokenWorker')
 // https://github.com/sushiswap/default-token-list/tree/master/src/tokens
 const chainMapping = {
   1: 'mainnet',
+  3: 'ropsten',
+  4: 'rinkeby',
   5: 'goerli',
+  42: 'kovan'
   56: 'bsc',
+  65: 'okex-testnet',
+  66: 'okex',
   97: 'bsc-testnet',
   100: 'xdai',
+  128: 'heco',
   137: 'matic',
   250: 'fantom',
+  256: 'heco-testnet',
+  1287: 'moonbase',
   4002: 'fantom-testnet',
   43113: 'fuji',
   43114: 'avalanche',
+  80001: 'matic-testnet',
   1666600000: 'harmony',
   1666700000: 'harmony-testnet'
 }
