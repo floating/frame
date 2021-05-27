@@ -1,28 +1,12 @@
 const log = require('electron-log')
 const provider = require('eth-provider')()
 
-const nebula = require('../nebula')('tokenWorker')
+const getTokenList = require('./inventory/tokens')
 const getTokenBalances = require('./tokens')
 const coins = require('./coins')
 
 async function chainId () {
   return parseInt(await provider.request({ method: 'eth_chainId' }))
-}
-
-async function getTokenList (chainId) {
-  let tokenList
-
-  try {
-    const tokenListRecord = await nebula.resolve('tokens.matt.eth')
-    tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
-  } catch (e) {
-    log.warn('could not load token list, using default', e)
-    tokenList = require('./default-tokens.json')
-  }
-
-  return tokenList.tokens
-    .filter(t => t.chainId === chainId)
-    .map(t => ({ ...t, address: t.address.toLowerCase() }))
 }
 
 async function scan (address, omit = [], knownList) {
