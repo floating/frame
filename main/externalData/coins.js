@@ -16,26 +16,27 @@ const chainCoins = {
   }
 }
 
+function lookupChainCoin (chainId) {
+  // default to eth for any chain that doesn't have its own coin
+  return chainCoins[chainId] || chainCoins[1]
+}
+
 module.exports = function (eth) {
   return {
     getCoinBalances: async function (chainId, address) {
-      const nativeCoin = chainCoins[chainId]
+      const nativeCoin = lookupChainCoin(chainId)
 
-      if (nativeCoin) {
-        const symbol = nativeCoin.symbol.toLowerCase()
-        const rawBalance = await eth.request({ method: 'eth_getBalance', params: [address, 'latest'] })
+      const symbol = nativeCoin.symbol.toLowerCase()
+      const rawBalance = await eth.request({ method: 'eth_getBalance', params: [address, 'latest'] })
 
-        const balance = BigNumber(rawBalance).shiftedBy(-nativeCoin.decimals)
+      const balance = BigNumber(rawBalance).shiftedBy(-nativeCoin.decimals)
 
-        return {
-          [symbol]: {
-            ...nativeCoin,
-            balance
-          }
+      return {
+        [symbol]: {
+          ...nativeCoin,
+          balance
         }
       }
-
-      return {}
     }
   }
 }
