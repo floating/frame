@@ -224,7 +224,7 @@ const initial = {
           mudit: 'https://rpc.goerli.mudit.blog',
           slockit: 'https://rpc.slock.it/goerli',
           prylabs: 'https://goerli.prylabs.net'
-         },
+        },
         42: {
           infura: 'infuraKovan'
         },
@@ -672,7 +672,7 @@ if (initial.main._version < 7) {
 
 // State transition -> 8
 if (initial.main._version < 8) {
-  
+
   Object.keys(initial.main.networks.ethereum).forEach(chainId => {
     initial.main.networks.ethereum[chainId].on = chainId === '1' || chainId === initial.main.currentNetwork.id ? true : false
   })
@@ -682,7 +682,7 @@ if (initial.main._version < 8) {
 
 // State transition -> 9
 if (initial.main._version < 9) {
-  
+
   Object.keys(initial.main.networks.ethereum).forEach(chainId => {
     if (chainId === '1') {
       initial.main.networks.ethereum[chainId].layer = 'mainnet'

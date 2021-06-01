@@ -41,7 +41,8 @@ function balance (rawBalance, quote = {}) {
 
 function getBalances (chainId, defaultSymbol, rawBalances, rates) {
   const mainBalance = rawBalances[defaultSymbol]
-  const tokenBalances = Object.values(rawBalances).filter(b => Number(b.chainId) === Number(chainId))
+  const tokenBalances = Object.values(rawBalances)
+    .filter(b => Number(b.chainId) === Number(chainId) && b.symbol !== defaultSymbol)
 
   const balances = [mainBalance].concat(tokenBalances)
     .filter(Boolean)
@@ -130,7 +131,7 @@ class Balances extends React.Component {
     const address = this.store('main.accounts', this.props.id, 'address')
     const { type, id: chainId } = this.store('main.currentNetwork')
     const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
-    const storedBalances = this.store('main.balances', address) || {}
+    const storedBalances = this.store('main.balances', chainId, address) || {}
 
     const rates = this.store('main.rates')
 

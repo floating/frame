@@ -34,6 +34,7 @@ module.exports = function (eth) {
       return {
         [symbol]: {
           ...nativeCoin,
+          chainId,
           balance
         }
       }
