@@ -1,4 +1,3 @@
-const log = require('electron-log')
 const provider = require('eth-provider')()
 
 const getTokenList = require('./inventory/tokens')
@@ -17,7 +16,7 @@ async function scan (address, omit = [], knownList) {
 
   const coinBalances = (await coins(provider).getCoinBalances(chain, address))
   // Emit progress asap, needs better pattern
-  process.send({ type: 'tokens', address, found: coinBalances })
+  process.send({ type: 'tokens', netId: chain, address, found: coinBalances })
   const foundTokens = await getTokenBalances(chain, address, tokens)
 
   const tokenBalances = Object.entries(foundTokens).reduce((found, [addr, balance]) => {

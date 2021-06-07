@@ -44,7 +44,7 @@ class ChainConnection extends EventEmitter {
     }
   }
 
-  getNetwork (provider, cb) { 
+  getNetwork (provider, cb) {
     provider.sendAsync({ jsonrpc: '2.0', method: 'eth_chainId', params: [], id: 1 }, (err, response) => {
       try {
         response.result = !err && response && !response.error ? parseInt(response.result, 'hex').toString() : ''
@@ -52,7 +52,7 @@ class ChainConnection extends EventEmitter {
       } catch (e) {
         cb(e)
       }
-    }) 
+    })
   }
 
   getNodeType (provider, cb) { provider.sendAsync({ jsonrpc: '2.0', method: 'web3_clientVersion', params: [], id: 1 }, cb) }
@@ -295,6 +295,7 @@ class Chains extends EventEmitter {
       })
     })
   }
+
   send (payload, res) {
     const { type, id } = store('main.currentNetwork')
     if (this.connections[type] && this.connections[type][id]) {
@@ -306,6 +307,5 @@ class Chains extends EventEmitter {
     // store('main.networks', type, chainId, 'connection')
   }
 }
-
 
 module.exports = new Chains()

@@ -8,10 +8,23 @@ log.transports.console.level = process.env.LOG_WORKER ? 'debug' : false
 
 let heartbeat
 
+function groupByChainId (tokens) {
+  return Object.entries(tokens).reduce((grouped, [symbol, token]) => {
+    grouped[token.chainId] = { ...(grouped[token.chainId] || {}), [symbol]: token }
+    return grouped
+  }, {})
+}
+
 function tokenScan (addresses) {
   addresses.forEach(address => {
     scanTokens(address)
-      .then(found => process.send({ type: 'tokens', address, found, fullScan: true }))
+      .then(foundTokens => {
+        const grouped = groupByChainId(foundTokens)
+
+        Object.entries(grouped).forEach(([netId, found]) => {
+          process.send({ type: 'tokens', netId, address, found, fullScan: true })
+        })
+      })
       .catch(err => log.error('token scan error', err))
   })
 }
@@ -25,7 +38,7 @@ function ratesScan (symbols) {
 function inventoryScan (addresses) {
   addresses.forEach(address => {
     inventory(address)
-      .then(inventory  => process.send({ type: 'inventory', address, inventory }))
+      .then(inventory => process.send({ type: 'inventory', address, inventory }))
       .catch(err => log.error('inventory scan error', err))
   })
 }

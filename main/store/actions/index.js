@@ -389,9 +389,9 @@ module.exports = {
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
   },
-  setBalance: (u, address, key, balance) => {
+  setBalance: (u, netId, address, key, balance) => {
     // key could be a symbol or a contract address
-    u('main.balances', address, (balances = {}) => {
+    u('main.balances', netId, address, (balances = {}) => {
       const updates = {
         ...balances,
         [key]: balance
@@ -401,8 +401,8 @@ module.exports = {
     })
   },
   // Tokens
-  setBalances: (u, address, newBalances, fullScan) => {
-    u('main.balances', address, (balances = {}) => {
+  setBalances: (u, netId, address, newBalances, fullScan) => {
+    u('main.balances', netId, address, (balances = {}) => {
       const updatedBalances = Object.entries(newBalances).reduce((acc, [key, token]) => {
         acc[key] = token
         return acc
@@ -410,7 +410,7 @@ module.exports = {
 
       return { ...balances, ...updatedBalances }
     })
-    if (fullScan) { 
+    if (fullScan) {
       setTimeout(() => {
         u('main.fullScan', address, () => true)
       }, 1000)

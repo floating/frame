@@ -7,7 +7,7 @@ const store = require('../store')
 let activeAddress
 let trackedAddresses = []
 
-let scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan, rateScan, inventoryScan
+let observer, scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan, rateScan, inventoryScan
 
 function createWorker () {
   if (scanWorker) {
@@ -24,7 +24,7 @@ function createWorker () {
     if (message.type === 'ready') updateRates(['eth', 'xdai', 'matic'])
 
     if (message.type === 'tokens') {
-      store.setBalances(message.address, message.found, message.fullScan)
+      store.setBalances(message.netId, message.address, message.found, message.fullScan)
       updateRates(Object.keys(message.found))
     }
 
@@ -72,14 +72,30 @@ function startScan (fn, interval) {
   return setInterval(fn, interval)
 }
 
+function scanActiveData () {
+  if (trackedAddressScan) {
+    clearInterval(trackedAddressScan)
+  }
+
+  if (inventoryScan) {
+    clearInterval(inventoryScan)
+  }
+
+  // update tokens for the active account every 15 seconds
+  trackedAddressScan = startScan(updateTrackedTokens, 1000 * 15)
+
+  // update inventory for the active account every 60 seconds
+  inventoryScan = startScan(() => updateInventory(), 1000 * 60)
+}
+
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
 const updateCoinUniverse = () => sendCommandToWorker('updateCoins')
 const updateRates = symbols => sendCommandToWorker('updateRates', [symbols])
 const updateTrackedTokens = () => { if (activeAddress) { sendCommandToWorker('updateTokenBalances', [[activeAddress]]) } }
 const updateAllTokens = () => sendCommandToWorker('updateTokenBalances', [trackedAddresses])
 
-const updateInventory = () => { 
-  if (activeAddress) { sendCommandToWorker('updateInventory', [[activeAddress]]) } 
+const updateInventory = () => {
+  if (activeAddress) { sendCommandToWorker('updateInventory', [[activeAddress]]) }
 }
 
 function addAddresses (addresses) {
@@ -95,11 +111,19 @@ function addAddresses (addresses) {
 function setActiveAddress (address) {
   addAddresses([address])
   activeAddress = address
-  updateTrackedTokens()
-  updateInventory()
+
+  scanActiveData()
 }
 
 function start (addresses = [], omitList = [], knownList) {
+  observer = store.observer(() => {
+    const { id } = store('main.currentNetwork')
+
+    log.debug(`changed scanning network to chainId: ${id}`)
+
+    scanActiveData()
+  })
+
   // addAddresses(addresses) // Scan becomes too heavy with many accounts added
 
   if (scanWorker) {
@@ -125,26 +149,18 @@ function start (addresses = [], omitList = [], knownList) {
     allAddressScan = startScan(updateAllTokens, 1000 * 60 * 5)
   }
 
-  if (!trackedAddressScan) {
-    // update tokens for the active account every 15 seconds
-    trackedAddressScan = startScan(updateTrackedTokens, 1000 * 15)
-  }
-
   if (!rateScan) {
     // update base rates
     const ethereum = store('main.networks.ethereum')
     const baseRates = Object.keys(ethereum).map(n => ethereum[n].symbol && ethereum[n].symbol.toLowerCase()).filter(s => s)
     rateScan = startScan(() => updateRates([...new Set(baseRates)]), 1000 * 15)
   }
-
-  if (!inventoryScan) {
-    // update inventory
-    inventoryScan = startScan(() => updateInventory(), 1000 * 60)
-  }
 }
 
 function stop () {
-  log.info('stopping external data worker');
+  log.info('stopping external data worker')
+
+  observer.remove();
 
   [heartbeat, allAddressScan, trackedAddressScan, coinScan]
     .forEach(scanner => { if (scanner) clearInterval(scanner) })

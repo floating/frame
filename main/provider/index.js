@@ -3,7 +3,6 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
-const fetch = require('node-fetch')
 
 const proxy = require('./proxy')
 
@@ -252,50 +251,17 @@ class Provider extends EventEmitter {
     return rawTx
   }
 
-  async getGasPrice (rawTx, res) {
-    if (rawTx.chainId === '0x1') {
-      try {
-        const chain = parseInt(rawTx.chainId, 'hex').toString()
-        const network = store('main.currentNetwork')
-        if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
-        const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
-        if (!levels[selected]) throw new Error('Unable to determine gas')
-        res({ result: levels[selected] })
-      } catch (error) {
-        log.error(error)
-        res({ error })
-      }
-    } else {
-      // Not mainnet
-      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, (response) => {
-        if (response.result) {
-          try {
-            const chain = parseInt(rawTx.chainId, 'hex').toString()
-            const network = store('main.currentNetwork')
-            if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
-            store.setGasPrices(network.type, network.id, {
-              slow: '0x' + ((Math.round(parseInt(response.result, 16) / 1000000000) * 1000000000).toString(16)),
-              slowTime: undefined,
-              standard: '0x' + ((Math.round(parseInt(response.result, 16) / 1000000000) * 1000000000).toString(16)),
-              standardTime: undefined,
-              fast: '0x' + ((Math.round(parseInt(response.result, 16) * 2 / 1000000000) * 1000000000).toString(16)),
-              fastTime: undefined,
-              asap: '0x' + ((Math.round(parseInt(response.result, 16) * 4 / 1000000000) * 1000000000).toString(16)),
-              asapTime: undefined,
-              custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
-              customTime: undefined
-            })
-            const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
-            res({ result: levels[selected] })
-          } catch (error) {
-            log.error(error)
-            res({ error })
-          }
-        } else {
-          res(response)
-        }
-      })
-    }
+  getGasPrice (rawTx, res) {
+    const chain = parseInt(rawTx.chainId, 'hex').toString()
+    const network = store('main.currentNetwork')
+
+    if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
+
+    const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
+
+    if (!levels[selected]) throw new Error('Unable to determine gas')
+
+    return levels[selected]
   }
 
   getGasEstimate (rawTx, res) {
@@ -310,11 +276,12 @@ class Provider extends EventEmitter {
   }
 
   fillDone (fullTx, res) {
-    this.getGasPrice(fullTx, response => {
-      if (response.error) return res({ need: 'gasPrice', message: response.error.message })
-      fullTx.gasPrice = response.result
+    try {
+      fullTx.gasPrice = this.getGasPrice(fullTx)
       res(null, fullTx)
-    })
+    } catch (e) {
+      return res({ need: 'gasPrice', message: e })
+    }
   }
 
   fillTx (rawTx, cb) {
@@ -415,8 +382,8 @@ class Provider extends EventEmitter {
 
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({ 
-      handlerId, 
+    accounts.addRequest({
+      handlerId,
       type: 'addChain',
       chain : {
         id,
@@ -425,8 +392,8 @@ class Provider extends EventEmitter {
         explorer,
         symbol,
         rpcUrl
-      }, 
-      account: accounts.getAccounts()[0], 
+      },
+      account: accounts.getAccounts()[0],
       origin: payload._origin
     }, res)
   }
