@@ -13,19 +13,22 @@ let socket, reconnectTimer
 store.observer(() => {
   const network = store('main.currentNetwork')
 
-  chains.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, response => {
-    if (response.result) {
-      const price = parseInt(response.result, 16) / 1000000000
+  if (network.id.toString() !== '1') {
+    // mainnet gas prices use a websocket callback (see onData() below)
+    chains.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, response => {
+      if (response.result) {
+        const price = parseInt(response.result, 16) / 1000000000
 
-      setGasPrices(network.type, network.id, {
-        slow: price,
-        standard: price,
-        fast: price * 2,
-        asap: price * 4,
-        custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
-      })
-    }
-  })
+        setGasPrices(network.type, network.id, {
+          slow: price,
+          standard: price,
+          fast: price * 2,
+          asap: price * 4,
+          custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
+        })
+      }
+    })
+  }
 })
 
 function setGasPrices (network, chainId, gas) {
