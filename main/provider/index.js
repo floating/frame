@@ -3,7 +3,6 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
-const fetch = require('node-fetch')
 
 const proxy = require('./proxy')
 
@@ -415,8 +414,8 @@ class Provider extends EventEmitter {
 
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({ 
-      handlerId, 
+    accounts.addRequest({
+      handlerId,
       type: 'addChain',
       chain : {
         id,
@@ -425,8 +424,8 @@ class Provider extends EventEmitter {
         explorer,
         symbol,
         rpcUrl
-      }, 
-      account: accounts.getAccounts()[0], 
+      },
+      account: accounts.getAccounts()[0],
       origin: payload._origin
     }, res)
   }

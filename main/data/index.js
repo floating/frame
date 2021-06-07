@@ -6,8 +6,44 @@ const WebSocket = require('ws')
 
 const store = require('../store')
 const accounts = require('../accounts')
+const chains = require('../chains')
 
 let socket, reconnectTimer
+
+store.observer(() => {
+  const network = store('main.currentNetwork')
+
+  chains.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, response => {
+    if (response.result) {
+      const price = parseInt(response.result, 16) / 1000000000
+
+      setGasPrices(network.type, network.id, {
+        slow: price,
+        standard: price,
+        fast: price * 2,
+        asap: price * 4,
+        custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
+      })
+    }
+  })
+})
+
+function setGasPrices (network, chainId, gas) {
+  store.setGasPrices(network, chainId, {
+    slow: ('0x' + gweiToWei(Math.round(gas.slow)).toString(16)),
+    slowTime: gas.slowTime,
+    standard: ('0x' + gweiToWei(Math.round(gas.standard)).toString(16)),
+    standardTime: gas.standardTime,
+    fast: ('0x' + gweiToWei(Math.round(gas.fast)).toString(16)),
+    fastTime: gas.fastTime,
+    asap: ('0x' + gweiToWei(Math.round(gas.asap)).toString(16)),
+    asapTime: gas.asapTime,
+    custom: store('main.networksMeta', network, chainId, 'gas.price.levels.custom') || ('0x' + gweiToWei(Math.round(gas.standard)).toString(16)),
+    lastUpdate: gas.lastUpdate,
+    quality: gas.quality,
+    source: gas.source
+  })
+}
 
 const reconnect = now => {
   log.info('Trying to reconnect to realtime')
@@ -27,20 +63,9 @@ const onData = data => {
       clearTimeout(staleTimer)
       // If we havent recieved gas data in 90s, make sure we're connected
       staleTimer = setTimeout(() => setUpSocket('staleTimer'), 90 * 1000)
-      store.setGasPrices('ethereum', '1', {
-        slow: ('0x' + gweiToWei(Math.round(gas.slow)).toString(16)),
-        slowTime: gas.slowTime,
-        standard: ('0x' + gweiToWei(Math.round(gas.standard)).toString(16)),
-        standardTime: gas.standardTime,
-        fast: ('0x' + gweiToWei(Math.round(gas.fast)).toString(16)),
-        fastTime: gas.fastTime,
-        asap: ('0x' + gweiToWei(Math.round(gas.asap)).toString(16)),
-        asapTime: gas.asapTime,
-        custom: store('main.networksMeta.ethereum.1.gas.price.levels.custom') || ('0x' + gweiToWei(Math.round(gas.standard)).toString(16)),
-        lastUpdate: gas.lastUpdate,
-        quality: gas.quality,
-        source: gas.source
-      })
+
+      setGasPrices('ethereum', '1', gas)
+
       accounts.checkBetterGasPrice()
     }
   } catch (e) {
