@@ -252,20 +252,14 @@ class Provider extends EventEmitter {
   }
 
   getGasPrice (rawTx, res) {
-    console.log('get gas price!')
     const chain = parseInt(rawTx.chainId, 'hex').toString()
     const network = store('main.currentNetwork')
-
-    console.log({ chain, network })
 
     if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
 
     const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
 
-    console.log(levels, { selected })
     if (!levels[selected]) throw new Error('Unable to determine gas')
-
-    console.log('determined gas to be:', levels[selected])
 
     return levels[selected]
   }
