@@ -311,15 +311,14 @@
     display flex
     justify-content center
     align-items center
-    background var(--ghostA)
+    background var(--ghostB)
     transition var(--standardFast)
     cursor pointer
     * 
       pointer-events none
 
-
   .quitFrameButton:hover
-    background var(--ghostB)
+    background var(--ghostC)
 
 .connectionLevels
   padding-bottom 5px
@@ -541,6 +540,12 @@
   width 40px
   border-radius 12px
   background var(--ghostC)
+  display flex
+  justify-content center
+  align-items center
+
+  svg
+    color var(--ghostG)
 
 .networkBreak
   padding 32px 16px 0px 16px
@@ -548,8 +553,8 @@
   font-size 11px
   text-transform uppercase
   letter-spacing 2px
-  font-weight 400
-  color var(--ghostF)
+  font-weight 600
+  color var(--outerspace03)
   
 // .connectionOptionOn
 //   background var(--ghostB)

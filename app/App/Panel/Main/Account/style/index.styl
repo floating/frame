@@ -265,7 +265,7 @@
     position relative
     opacity 1
     z-index 3030000
-    border-radius 9px
+    border-radius 8px
     transition var(--standard), background 0s linear
     z-index 9999000
     height 63px
@@ -331,7 +331,7 @@
       // 
       z-index 300000
       // background blu
-      border-radius 8px
+      border-radius 16px
       // border-bottom-right-radius 8px
       
       .signerSelectIconWrap
@@ -1491,6 +1491,7 @@
   // margin 2px
   border-radius 8px
   background var(--ghostB)
+  box-shadow 0px 2px 2px var(--ghostX)
   // transition 0.05s linear all // var(--standard)
   // margin-bottom 2px
   overflow hidden
@@ -1513,7 +1514,7 @@
     
   .moduleHeader
     position relative
-    font-size 10px
+    font-size 11px
     text-transform uppercase
     font-weight bold
     letter-spacing 2px
@@ -1533,8 +1534,8 @@
   .moduleButton
     width 100%
     height 40px
-    border 1px solid var(--ghostF)
-    border-radius 5px
+    background var(--ghostC)
+    border-radius 8px
     color var(--outerspace)
     display flex
     justify-content center
@@ -1546,33 +1547,21 @@
     cursor pointer
     box-sizing border-box
     text-transform uppercase
+    box-shadow 0px 2px 2px var(--ghostA)
 
     *
       pointer-events none
 
   .moduleButton:hover
-    border 1px solid var(--outerspace)
+    background var(--ghostD)
+    box-shadow 0px 4px 6px var(--ghostA)
 
   .moduleButtonBad
-    width 100%
-    height 40px
-    border 1px solid var(--bad06)
-    border-radius 5px
     color var(--bad)
-    display flex
-    justify-content center
-    align-items center
-    font-weight 400
-    font-size 13px
-    margin-top 20px
-    margin-bottom 1px
-    cursor pointer
-    box-sizing border-box
-    text-transform uppercase
 
-  .moduleButtonBad:hover
-    border 1px solid var(--bad)
-    background var(--bad01)
+  //.moduleButtonBad:hover
+    // border 1px solid var(--bad)
+    /// background var(--bad01)
 
   .moduleMain
     padding 16px
@@ -1585,7 +1574,7 @@
     box-sizing border-box
 
   .moduleMainSettings
-    font-size 10px
+    font-size 11px
     text-transform uppercase
     font-weight 400
 
@@ -1632,12 +1621,13 @@
     // background blue
 
 .signerVerifyText
-  font-size 13px
+  font-size 15px
   text-align center
   display flex
   justify-content center
   align-items center
   height 70px
+  padding 0px 30px
   
 .signerVerifyResponse
   background var(--bad)

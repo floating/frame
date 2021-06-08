@@ -225,6 +225,9 @@ const initial = {
           slockit: 'https://rpc.slock.it/goerli',
           prylabs: 'https://goerli.prylabs.net'
         },
+        10: {
+          optimism: ['wss://ws-mainnet.optimism.io', 'https://mainnet.optimism.io']
+        },
         42: {
           infura: 'infuraKovan'
         },
@@ -313,6 +316,25 @@ const initial = {
           },
           connection: {
             primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          },
+          on: false
+        },
+        10: {
+          id: 10,
+          type: 'ethereum',
+          layer: 'rollup',
+          symbol: 'ETH',
+          name: 'Optimism',
+          explorer: 'https://optimistic.etherscan.io',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: false
@@ -694,6 +716,35 @@ if (initial.main._version < 9) {
   })
 
   initial.main._version = 9
+}
+
+// State transition -> 10
+if (initial.main._version < 10) {
+  
+  if (!initial.main.networks.ethereum[10]) {
+    
+    initial.main.networks.ethereum[10] = {
+      id: 10,
+      type: 'ethereum',
+      layer: 'rollup',
+      symbol: 'ETH',
+      name: 'Optimism',
+      explorer: 'https://optimistic.etherscan.io',
+      gas: {
+        price: {
+          selected: 'standard',
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
+      },
+      connection: {
+        primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
+        secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+      },
+      on: false
+    }
+  }
+
+  initial.main._version = 10
 }
 
 module.exports = () => initial

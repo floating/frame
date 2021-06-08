@@ -287,7 +287,39 @@ class Chains extends EventEmitter {
           const chainConfig = networks[type][chainId]
           if (chainConfig.on && !this.connections[type][chainId]) {
             this.connections[type][chainId] = new ChainConnection(type, chainId)
+
+            this.connections[type][chainId].on('connect', (...args) => {
+              const current = store('main.currentNetwork')
+              if (current.type === type && current.id === chainId) {
+                this.emit('connect', ...args)
+              }
+            })
+
+            this.connections[type][chainId].on('close', (...args) => {
+              const current = store('main.currentNetwork')
+              if (current.type === type && current.id === chainId) {
+                this.emit('close', ...args)
+              }
+            })
+
+            this.connections[type][chainId].on('data', (...args) => {
+              const current = store('main.currentNetwork')
+              console.log('chainData', this.type, this.chainId, ...args)
+              console.log('currentNetwork', current.type, current.id)
+              if (current.type === type && current.id === chainId) {
+                this.emit('data', ...args)
+              }
+            })
+
+            this.connections[type][chainId].on('error', (...args) => {
+              const current = store('main.currentNetwork')
+              if (current.type === type && current.id === chainId) {
+                this.emit('error', ...args)
+              }
+            })
+
           } else if (!chainConfig.on && this.connections[type][chainId]) {
+            this.connections[type][chainId].removeAllListeners()
             this.connections[type][chainId].close()
             delete this.connections[type][chainId]
           }

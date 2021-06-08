@@ -83,7 +83,7 @@ Frame also has a browser extension for injecting a Frame-connected [EIP-1193](ht
     <br>
     <a href="https://frame.sh">Website</a> ⁃
     <a href="https://medium.com/@framehq">Blog</a> ⁃
-    <a href="https://twitter.com/frame_eth">Twitter</a> ⁃
+    <a href="https://twitter.com/0xFrame">Twitter</a> ⁃
     <a href="https://discord.gg/UH7NGqY">Chat</a>
   </h5>
 </h2>

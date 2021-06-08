@@ -183,7 +183,7 @@ class Signer extends React.Component {
   statusText () {
     if (this.props.status === 'ok') {
       return (
-        <div className='signerStatusText signerStatusReady'>{'ready to use'}</div>
+        <div className='signerStatusText signerStatusReady'>{'ready to sign'}</div>
       )
     } else if (this.props.status === 'locked') {
       return (
@@ -250,14 +250,14 @@ class Signer extends React.Component {
           {this.status()}
         </div>
         {this.statusText()}
-        {this.props.type === 'lattice' && this.props.status === 'pairing' ? (
+        {this.props.type === 'lattice' && this.props.status === 'pair' ? (
           <div className='signerLatticePair'>
             <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
             <div className='signerLatticePairInput'>
               <div className=''>
                 <input
-                  tabIndex='1' value={this.state.pairCode}
-                  onChange={e => this.setState({ latticePairCode: e.target.value })}
+                  tabIndex='1' value={this.state.latticePairCode}
+                  onChange={e => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
                   // onFocus={e => this.onFocus('pairCode', e)}
                   // onBlur={e => this.onBlur('pairCode', e)} 
                   onKeyPress={e => {
@@ -297,7 +297,7 @@ class Signer extends React.Component {
                 }}>
                   <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
                   <div className='signerAccountAddress'>{address.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {address.substr(address.length - 10)}</div>
-                  <div className='signerAccountCheck'>{svg.check(22)}</div>
+                  <div className='signerAccountCheck' />
                 </div>
               )
             })}</div>
