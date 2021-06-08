@@ -317,8 +317,8 @@ class Signer extends React.Component {
             <div className='signerLoadingLoader' />
           </div>
         )}
-        <div className='signerDrawer' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-          <div className='showControls'>
+        <div className='signerDrawer'>
+          <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
             {this.state.showControls ? 'hide' : 'settings'}
           </div>
           <div className='showControlsLine' />

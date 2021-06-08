@@ -283,6 +283,7 @@
   z-index 200
   transition var(--standardSlow)
   transform translateZ(0)
+  padding 20px 0px 20px 0px
 
   .requestTitle:before
     content ''
@@ -386,16 +387,17 @@
     right 0px
     padding-bottom 10px
     justify-content space-between
-    box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
-    border-radius 8px
+    // box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
+    border-radius 16px
     height 380px
     display flex
     justify-content center
     transition var(--standard)
     background var(--ghostC)
     z-index 2000
-    color var(--outerspace08)
+    color var(--outerspace)
     tranform translateZ(0)
+    overflow hidden
 
   .requestOverlay
     display none
@@ -728,7 +730,7 @@
     font-family FiraCode, sans-serif
     margin 2px 8px 0px 0px 
     padding 0px 16px
-    background var(--ghostE)
+    background var(--ghostF)
     border-radius 12px
     height 25px
     min-height 25px
@@ -1202,17 +1204,16 @@ span
   position absolute
   top 20px
   right 12px
-  background var(--ghostD)
+  background var(--ghostE)
   height 20px
   width 48px
   border-radius 12px
-  box-shadow 0px 2px 1px var(--thick)
+  box-shadow 0px 2px 1px var(--ghostC)
   display flex
   justify-content center
   align-items center
   font-size 12px
   font-weight 600
-  background var(--ghostD)
   color var(--outerspace05)
   transition var(--standard)
   z-index 9999
@@ -1220,7 +1221,7 @@ span
 
   .txNonceMarker
     position absolute
-    background var(--thick)
+    background var(--ghostD)
     top 7px
     right 7px
     bottom 7px
@@ -1242,7 +1243,7 @@ span
     align-items center
 
   .txNonceHidden
-    color var(--tripleThick)
+    color var(--ghostC)
     opacity 0
 
   .txNonceControl
@@ -1262,10 +1263,10 @@ span
     align-items center
     font-size 10px
     text-transform uppercase
-    border-right 1px solid var(--thick)
+    border-right 1px solid var(--ghostC)
 
   .txNonceButton:hover
-    background var(--ghostZ)
+    background var(--ghostF)
 
   .txNonceButtonLower 
     padding 1px 0px 0px 4px
@@ -1287,8 +1288,8 @@ span
 .txNonce:hover
   color var(--outerspace08)
   width 145px
-  background var(--ghostC)
-  box-shadow 0px 2px 1px var(--thick), -8px 0px 8px var(--ghostE), -8px 0px 8px var(--ghostE)
+  background var(--ghostF)
+  box-shadow 0px 2px 8px var(--ghostC), -16px 0px 16px var(--ghostE)
 
   .txNonceHidden
     opacity 1
@@ -1359,12 +1360,11 @@ span
   text-transform uppercase  
   letter-spacing 0.2px
   font-weight 500
-  border-radius 12px
-  background var(--ghostD)
-  box-shadow 0px 2px 1px var(--thick), 0px 8px 5px -5px var(--thin), 0px -2px 6px var(--thinner)
+  border-radius 16px
+  background var(--ghostE)
+  box-shadow 0px 2px 2px var(--ghostC)
   z-index 20000000009999
   
-
   .txAugmentCancel
     position absolute
     top 0px
@@ -1379,6 +1379,9 @@ span
     justify-content center
     align-items center
     transform translateY(0px)
+    cursor pointer
+    *
+      pointer-events none
   
   .txAugmentSpeedUp
     position absolute
@@ -1394,6 +1397,9 @@ span
     justify-content center
     align-items center
     transform translateY(0px)
+    cursor pointer
+    *
+      pointer-events none
 
   .txDetails
     position absolute
@@ -1407,13 +1413,16 @@ span
     align-items center
     transform translateY(0px)
     z-index 900000000
+    cursor pointer
+    *
+      pointer-events none
   
   .txDetailsHide
     pointer-events none 
     opacity 0
 
   .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
-    background var(--ghostD)
+    background var(--ghostF)
     transform scale(1.05)
     box-shadow 0px 4px 5px -2px var(--thick), 0px 25px 25px -5px var(--thick)
   
@@ -1633,7 +1642,7 @@ span
         right 0
         height 2px
         margin-top -1px
-        background var(--thick)
+        background var(--ghostB)
         z-index 982
 
       .txProgressSteps
@@ -1693,7 +1702,7 @@ span
             background var(--thick)
 
           .txProgressStepCenterOn
-            background var(--nebula)
+            background var(--outerspace)
 
     .txProgressFront
       position absolute
@@ -1721,7 +1730,7 @@ span
           right 0
           height 2px
           margin-top -1px
-          background var(--nebula)
+          background var(--outerspace)
           transition var(--standard)
 
         .txProgressLoading
@@ -1745,7 +1754,7 @@ span
             right 0
             width 50%
             height 50%
-            background var(--nebula)
+            background var(--outerspace)
 
           .txProgressLoadingCenter
             position absolute
@@ -1765,7 +1774,7 @@ span
             border-radius 18px
             top 4px
             left 4px
-            background var(--nebula)
+            background var(--outerspace)
 
   .txBarSheen
     position absolute

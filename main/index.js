@@ -168,6 +168,13 @@ app.on('ready', () => {
     const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
     if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
   })
+  store.observer(_ => {
+    if (store('dash.showing')) {
+      windows.showDash()
+    } else {
+      windows.hideDash()
+    }
+  })
   store.observer(() => {
     // console.log('registering shortcut')
 

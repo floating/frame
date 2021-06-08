@@ -143,9 +143,10 @@ const api = {
       windows.tray.focus()
     }, 1260)
     if (!openedAtLogin) {
-      windows.tray.webContents.once('did-finish-load', () => {
-        api.showTray()
-      })
+      api.showTray()
+      // windows.tray.webContents.once('did-finish-load', () => {
+      //   api.showTray()
+      // })
     }
 
     setTimeout(() => {
@@ -498,15 +499,6 @@ ipcMain.on('dash:contextmenu', (e, x, y) => { if (dev) windows.dash.inspectEleme
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
-
-store.observer(_ => {
-  if (store('dash.showing')) {
-    api.showDash()
-  } else {
-    api.hideDash()
-  }
-})
-
 
 // store.observer(_ => api.broadcast('main:action', 'syncMain', store('main')))
 // store.observer(_ => api.broadcast('main:action', 'syncDash', store('dash')))
