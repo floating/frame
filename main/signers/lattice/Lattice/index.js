@@ -38,7 +38,6 @@ class Lattice extends Signer {
     })
   
     this.update()
-    this.deviceStatus()
   }
 
   createClient () {
@@ -71,12 +70,13 @@ class Lattice extends Signer {
       })
       this.status = 'disconnected'
       this.update()
-      this.deviceStatus()
     }
   }
 
   async setPair (pin) {
     try {
+      this.status = 'pairing'
+      this.update()
       const clientPair = promisify(this.client.pair).bind(this.client)
       const hasActiveWallet = await clientPair(pin)
       if (hasActiveWallet) await this.deriveAddresses()
@@ -91,23 +91,35 @@ class Lattice extends Signer {
     try {
       if (this.deviceId) {
         if (!this.client) throw new Error('Client not ready during open')
-        this.status = 'connecting'
-        this.update()
+        if (this.status !== 'pair') {
+          this.status = 'connecting'
+          this.update()
+        }
         const clientConnect = promisify(this.client.connect).bind(this.client)
         this.paired = await clientConnect(this.deviceId)
+        
         if (this.paired) {
-          this.status = 'addresses'
-          this.update()
+          if (this.addresses.length === 0) {
+            this.status = 'addresses'
+            this.update()
+          }
           await this.deriveAddresses()
         } else {
-          this.status = 'pairing'
+          this.status = 'pair'
           this.update()
         }
       } else {
         return new Error('No deviceId')
       }
     } catch (err) {
+      if (typeof err !== 'string') err = err.message
       if (err === 'Error from device: Invalid Request') return log.warn('Lattice: Invalid Request')
+      if (err === 'Error from device: Device Busy') return log.warn('Lattice: Device Busy')
+      try {
+        err = err.replace('Error from device: ', '')
+      } catch (e) {
+        log.error(e)
+      }
       this.status = err
       this.update()
       log.error('Lattice Open Error', err)
@@ -147,6 +159,7 @@ class Lattice extends Signer {
       return result
     } catch (err) {
       if (err === 'Error from device: Invalid Request') return log.warn('Lattice: Invalid Request')
+      if (err === 'Error from device: Device Busy') return log.warn('Lattice: Device Busy')
       this.status = 'loading'
       this.update()
       log.error(err)
@@ -155,24 +168,34 @@ class Lattice extends Signer {
     }
   }
 
-  pollStatus (interval = 21 * 1000) { // Detect sleep/wake
-    clearTimeout(this._pollStatus)
-    this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
-  }
+  // pollStatus (interval = 5 * 1000) { // Detect sleep/wake
+  //   clearTimeout(this._pollStatus)
+  //   this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
+  // }
 
-  async deviceStatus () {
-    this.pollStatus() // Simultaneous requests result in errors
-    if (this.deviceStatusActive || this.status === 'ok') return
-    this.deviceStatusActive = true
-    try {
-      await this.open()
-      this.deviceStatusActive = false
-    } catch (err) {
-      this.status = 'disconnected'
-      this.update()
-      this.deviceStatusActive = false
-    }
-  }
+  // async deviceStatus () {
+  //   this.pollStatus()
+  //   this.deviceStatusActive = true
+  //   try {
+  //     const clientConnect = promisify(this.client.connect).bind(this.client)
+  //     await clientConnect()
+  //     const wallet = this.client.getActiveWallet()
+  //     if (!wallet) {
+  //       console.log('No wallet')
+  //     } else if (wallet.id !== (this.wallet && this.wallet.id)) {
+  //       this.wallet = wallet
+  //       console.log('Wallet is different')
+  //     } else {
+  //       console.log('Wallet is same')
+  //     }
+  //     this.deviceStatusActive = false
+  //   } catch (err) {
+  //     console.log(err)
+  //     this.status = 'disconnected'
+  //     this.update()
+  //     this.deviceStatusActive = false
+  //   }
+  // }
 
   // This verifyAddress signature is no longer current
   async verifyAddress (index, current, display, cb = () => {}) {
@@ -187,6 +210,10 @@ class Lattice extends Signer {
     this.verifyActive = true
     try {
       const result = await this.deriveAddresses()
+      if (!result) {
+        log.info('No result from derive addresses')
+        return cb(new Error('No result from derive addresses'))
+      }
       if (result && !result.length) {
         return cb(null, false)
       }

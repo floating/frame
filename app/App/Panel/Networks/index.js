@@ -174,7 +174,7 @@ class _Network extends React.Component {
             />
           </div>
           {this.props.id === '1' ? (
-            <div className='mainnetToggleLock' />
+            <div className='mainnetToggleLock'>{svg.lock(9)}</div>
           ) : (
             <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
               link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
@@ -821,6 +821,10 @@ class Settings extends React.Component {
             <div className='networkBreakLayer'>Mainnet</div>
           </div>
           {this.renderConnections('mainnet')}
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Rollups</div>
+          </div>
+          {this.renderConnections('rollup')}
           <div className='networkBreak'>
             <div className='networkBreakLayer'>Sidechains</div>
           </div>

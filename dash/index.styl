@@ -30,21 +30,33 @@ div
     left 0
     right 0
     bottom 0
-    background var(--ghostB)
+    background var(--ghostA)
     z-index 4000
     overflow-y scroll
     overflow-x hidden
 
     .addAccountsHeader
-      height 100px
+      .addAccountsHeaderTitle
+        margin-top 70px
+        margin-bottom 40px
+        font-size 14px
+        height 50px
+        display flex
+        justify-content center
+        align-items center
 
       .addAccountsHeaderClose
         position absolute
         top 15px
         right 14px
-        padding 10px
         border-radius 8px
         cursor pointer
+        background var(--ghostB)
+        width 30px
+        height 30px
+        display flex
+        justify-content center
+        align-items center
 
         *
           pointer-events none
@@ -55,7 +67,7 @@ div
     .accountTypeSelect
       height 60px
       width 320px
-      background var(--ghostD)
+      background var(--ghostC)
       border-radius 8px
       margin 20px
       display flex
@@ -64,10 +76,11 @@ div
       cursor pointer
 
   .newAccount
-    height 40px
+    height 60px
+    position relative
     // width 310px
-    background var(--ghostB) // var(--ghostE) 0%, var(--ghostG) 70%)
-    border-radius 8px
+    background var(--ghostB)
+    border-radius 30px
     display flex
     justify-content center
     align-items center
@@ -75,15 +88,28 @@ div
     box-shadow 0px 9px 3px outerspace
     cursor pointer
     font-size 15px
-    font-weight 500
-    background var(--good)
-    color var(--goodDark)
+    font-weight 300
     text-transform uppercase
-    border-bottom 2px solid var(--goodShade)
-    box-shadow 0px 24px 12px -8px var(--ghostX)
-    padding-top 1px
+    box-shadow 0px 4px 2px 0px var(--ghostX)
+    padding-top 0px
+    padding-left 30px
     box-sizing border-box
+    letter-spacing 2px
+
+    .newAccountIcon
+      position absolute
+      top 0
+      left 0
+      bottom 1px
+      width 64px
+      font-size 30px
+      display flex
+      justify-content center
+      align-items center
+      font-weight 200
     
+  .newAccount:hover
+    background var(--ghostC)
 
   .signers
     width 100%
