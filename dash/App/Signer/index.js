@@ -226,8 +226,12 @@ class Signer extends React.Component {
 
     const activeAccounts = signer.addresses.filter(a => this.store('main.accounts', a.toLowerCase()))
 
+    let signerClass = 'signer'
+    if (this.props.status === 'ok') signerClass += ' signerOk'
+    if (this.props.status === 'locked') signerClass += ' signerLocked'
+
     return (
-      <div className='signer' style={{ zIndex: 1000 - this.props.index }}>
+      <div className={signerClass} style={{ zIndex: 1000 - this.props.index }}>
         <div className='signerTop'>
           <div className='signerIcon'>
           {(_ => {
@@ -290,7 +294,8 @@ class Signer extends React.Component {
                       // console.log('Removed account ', address)
                     })
                   } else {
-                    link.rpc('createAccount', address, { type: signer.type }, () => {
+                    link.rpc('createAccount', address, { type: signer.type }, (e) => {
+                      console.log('add account error ', e)
                       // console.log('Added account ', address)
                     })
                   }

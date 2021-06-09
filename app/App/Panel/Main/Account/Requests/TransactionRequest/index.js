@@ -404,7 +404,6 @@ class TransactionRequest extends React.Component {
           <div className='requestApprove'>
             <div
               className='requestDecline' onMouseDown={() => {
-                console.log('declining tx', this.props.i)
                 if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
               }}
             >

@@ -204,7 +204,7 @@ class Settings extends React.Component {
           <div className='panelHeaderTitle'>Settings</div>
         </div>
         <div className='localSettingsWrap'>
-          <div className='signerPermission' style={{ zIndex: 214 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Summon Shortcut</div>
               <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
@@ -217,7 +217,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 213 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 213 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Auto-hide</div>
               <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
@@ -230,7 +230,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 212 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 212 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Run on Startup</div>
               <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
@@ -241,7 +241,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 210 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -249,10 +249,10 @@ class Settings extends React.Component {
               </div>
             </div>
             <div className='signerPermissionDetails'>
-              {'Mouse to your display\'s right edge to summon Frame'}
+              {'Mouse to display\'s right edge to summon Frame'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 209 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Adjustable Nonce</div>
               <div
@@ -268,7 +268,7 @@ class Settings extends React.Component {
               {'Adds the ability to edit a transaction\'s nonce'}
             </div>
           </div>
-          {/* <div className='signerPermission' style={{ zIndex: 6 }}>
+          {/* <div className='signerPermission localSetting' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Show USD Value</div>
               <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleUSDValue')}>
@@ -280,7 +280,7 @@ class Settings extends React.Component {
             </div>
           </div> */}
           {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission' style={{ zIndex: 208 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Display Gas in Menubar</div>
                 <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
@@ -292,7 +292,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission' style={{ zIndex: 207 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Colorway</div>
               <Dropdown
@@ -307,7 +307,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 206 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Trezor Derivation</div>
               <Dropdown
@@ -320,7 +320,7 @@ class Settings extends React.Component {
               {'Derivation path for connected Trezor devices'}
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 205 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Ledger Derivation</div>
               <Dropdown
@@ -334,7 +334,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.store('main.ledger.derivation') === 'live' ? (
-            <div className='signerPermission' style={{ zIndex: 204 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Ledger Live Accounts</div>
                 <Dropdown
@@ -353,7 +353,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission' style={{ zIndex: 203 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Accounts</div>
               <Dropdown
@@ -369,7 +369,7 @@ class Settings extends React.Component {
               The number of lattice accounts to derive
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 202 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 202 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Relay</div>
               <Dropdown
@@ -385,7 +385,7 @@ class Settings extends React.Component {
               <input tabIndex='-1' placeholder={'Custom Relay'} value={this.state.latticeEndpoint} onChange={e => this.inputLatticeEndpoint(e)} />
             </div>
           </div>
-          <div className='signerPermission' style={{ zIndex: 201 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 201 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Frame Suffix</div>
             </div>
@@ -394,7 +394,7 @@ class Settings extends React.Component {
             </div>
           </div>
 
-          <div className='signerPermission' style={{ zIndex: 200 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 200 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lock Hot Signers on</div>
               <Dropdown
@@ -431,21 +431,21 @@ class Settings extends React.Component {
 
 export default Restore.connect(Settings)
 
-// <div className='signerPermission'>
+// <div className='signerPermission localSetting'>
 //   <div>{provider.url}</div>
 //   <div className={this.store('node.provider') ? 'nodeProviderStatus nodeProviderConnected' : 'nodeProviderStatus'}>
 //     {this.store('node.provider') ? 'connected' : 'disconnected'}
 //   </div>
 // </div>
 
-// <div className='signerPermission' onMouseDown={_ => this.store.runLocalNode()}>
+// <div className='signerPermission localSetting' onMouseDown={_ => this.store.runLocalNode()}>
 //   <div className='signerPermissionSetting'>{'Run Local Node'}</div>
 //   <div className={this.store('local.node.run') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
 //     <div className='signerPermissionToggleSwitch' />
 //   </div>
 // </div>
 
-/* <div className='signerPermission'>
+/* <div className='signerPermission localSetting'>
   <div className={this.store('main..connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
     <div className='connectionOptionToggle'>
       <div className='signerPermissionSetting'>Local</div>

@@ -49,7 +49,6 @@ const api = {
     return files
   },
   getFile: async path => {
-    console.log('ipfs getFile', path)
     const files = await api.get(path)
     if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
     if (files[0].path !== path || files.length !== 1) throw new Error(`Path ${path} could not be found`)
@@ -68,7 +67,6 @@ const start = async () => {
     }
     await connectPeers()
     const id = await node.id()
-    console.log(id)
   } catch (e) {
     // destryo ipfs instance... 
     
@@ -77,12 +75,6 @@ const start = async () => {
     setTimeout(() => start(), 15 * 1000)
     return
   }
-
-  console.log('~~~~~~~~~~~')
-  console.log('')
-  console.log('IPFS is READY')
-  console.log('')
-  console.log('~~~~~~~~~~~')
 
   // const connectPeers = async () => {
   //   // const peers = await ens.resolvePeers('frame.eth')

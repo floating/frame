@@ -9,6 +9,31 @@
   z-index 200000
   font-size 14px
 
+  .moduleLoadingSmall
+    position absolute
+    left 0
+    top 1px
+    bottom 0
+    padding 0px 10px
+    display flex
+    justify-content center
+    align-items center
+    
+  .moduleLoadingSmallLoader
+    border-radius 50%
+    width 16px
+    height 16px
+    margin 16px auto
+    font-size 10px
+    position relative
+    text-indent -9999em
+    border-top 3px solid var(--ghostZ)
+    border-right 3px solid var(--ghostZ)
+    border-bottom 3px solid var(--ghostZ)
+    border-left 3px solid var(--good)
+    transform translateZ(0)
+    animation load 0.5s infinite linear
+
   .signerBalanceShowAll
     position absolute
     left 10px
@@ -56,10 +81,10 @@
 
     .signerBalanceTotalValue
       font-size 17px
-      color var(--outerspace06)
+      color var(--outerspace08)
       font-family FiraCode, monospace
       letter-spacing -1px
-      font-size 17px
+      font-size 15px
       text-align center
       display flex
       align-items center
@@ -202,8 +227,6 @@
   border-radius 50%
   width 30px
   height 30px
-
-.moduleLoadingLoader
   margin 30px auto
   font-size 10px
   position relative

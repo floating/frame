@@ -69,7 +69,10 @@ class Balances extends React.Component {
     if (!this.props.expanded) {
       this.resizeObserver = new ResizeObserver(() => {
         if (this.moduleRef && this.moduleRef.current) {
-          link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+          clearTimeout(this.resizeTimer)
+          this.resizeTimer = setTimeout(() => {
+            link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: this.moduleRef.current.clientHeight })
+          }, 100)
         }
       })
     }
@@ -154,13 +157,12 @@ class Balances extends React.Component {
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader'>balances</div>
         {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i))}
-        {balances.length === 0 || !fullScan ? (
-          <div className='moduleLoading'>
-            <div className='moduleLoadingLoader' />
-          </div>
-        ) : null}
         <div className='signerBalanceTotal'>
-          {balancesLength > 5 && !this.props.expanded ? (
+          {balancesLength === 0 || !fullScan ? (
+            <div className='moduleLoadingSmall'>
+              <div className='moduleLoadingSmallLoader' />
+            </div>
+          ) : balancesLength > 5 && !this.props.expanded ? (
             <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
               {svg.expand(17)}
             </div>

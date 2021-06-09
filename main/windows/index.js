@@ -14,7 +14,7 @@ const winSession = e => e.sender.webContents.browserWindowOptions.session
 const dev = process.env.NODE_ENV === 'development'
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
-let tray
+let tray, trayReady
 
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 
@@ -90,7 +90,7 @@ const api = {
       // transparent: true,
       // hasShadow: false,
       show: false,
-      backgroundColor: '#e4e8f8',
+      backgroundColor: 'rgba(20, 20, 19, 1)', //'#e4e8f8',
       backgroundThrottling: false,
       // offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),
@@ -143,10 +143,9 @@ const api = {
       windows.tray.focus()
     }, 1260)
     if (!openedAtLogin) {
-      api.showTray()
-      // windows.tray.webContents.once('did-finish-load', () => {
-      //   api.showTray()
-      // })
+      windows.tray.webContents.once('did-finish-load', () => {
+        api.showTray()
+      })
     }
 
     setTimeout(() => {
@@ -377,6 +376,7 @@ const api = {
       // transparent: true,
       // hasShadow: false,
       show: false,
+      backgroundColor: 'rgba(20, 20, 19, 1)',
       backgroundThrottling: false,
       offscreen: true,
       // icon: path.join(__dirname, './AppIcon.png'),
@@ -397,6 +397,7 @@ const api = {
     // windows.dash.on('blur', () => api.hideDash())
   },
   showDash: () => {
+    if (!trayReady) return
     // clearTimeout(mouseTimeout)
     // hideShow.current = 'showing'
     // if (hideShow.running) {
@@ -477,6 +478,12 @@ if (dev) {
 ipcMain.on('tray:quit', api.quit)
 ipcMain.on('tray:ready', () => {
   if (showOnReady) windows.tray.send('main:action', 'trayOpen', true)
+  trayReady = true
+  if (store('dash.showing')) {
+    setTimeout(() => {
+      api.showDash()
+    }, 300)
+  }
 })
 
 ipcMain.on('tray:mouseout', () => {
