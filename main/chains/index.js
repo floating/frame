@@ -304,8 +304,6 @@ class Chains extends EventEmitter {
 
             this.connections[type][chainId].on('data', (...args) => {
               const current = store('main.currentNetwork')
-              console.log('chainData', this.type, this.chainId, ...args)
-              console.log('currentNetwork', current.type, current.id)
               if (current.type === type && current.id === chainId) {
                 this.emit('data', ...args)
               }

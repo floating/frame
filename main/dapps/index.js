@@ -61,8 +61,6 @@ class Dapps {
     //   if (ipfs.id) {
     //     console.log('Got IPFS update')
     //     this._updatePins()
-    //     console.log('IPFS IS READYYYyyyy now')
-    //     console.log(ipfs)
     //     const ethCon = store.observer(() => {
     //       const connection = store('main.connection')
     //       const status = [connection.local.status, connection.secondary.status]
@@ -213,7 +211,6 @@ class Dapps {
     Object.entries(store('main.dapp.details')).forEach(async ([namehash, dapp]) => {
       const ipfsState = store('main.clients.ipfs.state')
       if (ipfsState === 'ready' && !dapp.pinned) {
-        console.log('Pinning', dapp.domain)
         this._pin(dapp.cid)
       }
     })

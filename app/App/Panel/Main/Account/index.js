@@ -680,13 +680,13 @@ class Account extends React.Component {
           if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
           return <div className='signerSelectIconWrap'>{svg.logo(20)}</div>
         })()}
-        {this.props.signer ? (
+        {/* this.props.signer ? (
           this.store('main.signers', this.props.signer, 'status') === 'locked' ? (
             <div className='signerTypeStatusBadge signerTypeStatusBadgeLocked'>{svg.lock(8)}</div>
           ) : null
         ) : (
           <div className='signerTypeStatusBadge signerTypeStatusBadgeDisconnected'>{svg.plug(10)}</div>
-        )}
+        )*/}
       </div>
     )
   }

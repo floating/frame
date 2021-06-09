@@ -70,8 +70,8 @@
     height 30px
     box-sizing border-box
     // border-right 1px solid var(--thick)
-    background var(--ghostC)
-    box-shadow 0px 3px 3px var(--thick)
+    background var(--ghostE)
+    box-shadow 0px 3px 3px var(--ghostC)
     // border-top-left-radius 3px
     // border-bottom-left-radius 3px
     // border-top-right-radius 15px
@@ -107,7 +107,7 @@
     width 36px
     height 30px
     background var(--ghostC)
-    box-shadow 0px 3px 3px var(--thick)
+    box-shadow 0px 3px 3px var(--ghostC)
     display flex
     text-align center
     justify-content center
@@ -134,8 +134,8 @@
     border-bottom-right-radius 16px
     border-bottom-left-radius 6px
     border-top-left-radius 6px
-    background var(--ghostC)
-    box-shadow 0px 3px 3px var(--thick)
+    background var(--ghostE)
+    box-shadow 0px 3px 3px var(--ghostC)
     padding 8px
     text-align center
     text-transform uppercase
@@ -152,7 +152,7 @@
     box-sizing border-box
     pointer-events none
     z-index 5000000
-    box-shadow 0px 1px 5px var(--thick)
+    // box-shadow 0px 1px 5px var(--thick)
 
     .customHaloMarker
       position absolute
@@ -167,20 +167,20 @@
         top -1px
         left -6px
         bottom -1px
-        width 8px
-        border-radius 4px
+        width 6px
+        border-radius 3px
         box-sizing border-box
         // border 3px solid var(--spacewhite)
-        box-shadow cardDrop, 0px 2px 2px var(--thick)
+        // box-shadow cardDrop, 0px 2px 2px var(--thick)
 
         .customHaloMarkerLine
           position absolute
           top 0px
           left 50%
           bottom 0px
-          width 6px
-          border-radius 3px
-          margin-left -4px
+          width 4px
+          border-radius 4px
+          margin-left -6px
           background var(--good)
 
   .networkFeeSelectedHaloClickwrap
@@ -194,7 +194,7 @@
     box-sizing border-box
     pointer-events none
     z-index 5000000
-    box-shadow 0px 1px 5px var(--doubleThick)
+    // box-shadow 0px 1px 5px var(--doubleThick)
 
     .networkFeeSelectedHaloClick
       position absolute
@@ -209,12 +209,12 @@
 
   .networkFeeSelectedHaloShadow // Stays on currently selected fee
     background none
-    border 2px solid var(--outerspace08)
+    border 2px solid var(--good)
     z-index 200001
     pointer-events none
     box-shadow none
     // transition var(--standardFast), 0.1s linear opacity 0.1s
-    box-shadow 0px 4px 10px var(--thick)
+    // box-shadow 0px 4px 10px var(--thick)
     will-change opacity
 
   .networkFeeOptions
@@ -230,8 +230,8 @@
 
   .networkFeeOptionHover
     .networkFeeOptionHoverInset
-      background var(--ghostD)
-      box-shadow 0px 5px 40px 0px var(--thick)
+      background var(--ghostC)
+      // box-shadow 0px 5px 40px 0px var(--thick)
 
   .networkFeeOption
     position relative
@@ -243,6 +243,9 @@
     transform translateZ(0px)
     top -5px
     transition var(--standardVibe)
+    cursor pointer
+    *
+      pointer-events none
 
     .networkFeeOptionHoverInset
       position absolute 
@@ -562,7 +565,7 @@
 
   .txFeeHover:hover
     top 4px
-    opacity 1
+    // opacity 1
 
   .txFeeTitle
     position absolute
@@ -625,10 +628,7 @@
     height 48px
     // transform translateY(1000px)
     opacity 1
-    border-top-left-radius 15px
-    border-top-right-radius 15px
-    border-bottom-left-radius 11px
-    border-bottom-right-radius 11px
+    border-radius 11px
     border 1px solid var(--thick)
 
     .txFeeSummaryValue
@@ -785,8 +785,8 @@
 .txFeeExpanded
   transform translateY(-3px)
   height 214px
-  left 3px
-  right 3px
+  left 0px
+  right 0px
   padding 110px 10px 0px 10px
   z-index 20000
   border-radius 15px
@@ -800,8 +800,9 @@
     transform translateY(0px)
   
   .txFeeSummaryHover     
-    background var(--ghostD)
-    box-shadow 0px 10px 5px -5px var(--thick), 0px 0px 10px 0px var(--thick)  // , 0px -25px 20px -15px var(--thick)
+    // background var(--outerspace)
+    background var(--ghostE)
+    // box-shadow 0px 10px 5px -5px var(--thick), 0px 0px 10px 0px var(--thick)  // , 0px -25px 20px -15px var(--thick)
 
   .networkFeeOptions
     left 10px

@@ -61,22 +61,22 @@
   left 100%
   right -100%
 
-.signerPermission:before
-  content ''
-  position absolute
-  bottom -2px
-  right 0px
-  left 0px
-  height 1px
-  background var(--ghostA)
+// .signerPermission:before
+//   content ''
+//   position absolute
+//   bottom -2px
+//   right 0px
+//   left 0px
+//   height 1px
+//   background var(--ghostA)
 
-.signerPermission:last-child:before
-  background transparent
+// .signerPermission:last-child:before
+//   background transparent
 
 .signerPermission
   position relative
   justify-content space-between
-  padding 12px 1px 8px 1px
+  padding 12px 0px 0px 0px 
   font-size 15px
   font-weight 200
   transform translateZ(0)
@@ -95,7 +95,7 @@
     justify-content space-between
     transform translateZ(0)
     font-size 13px
-    padding 8px 0px 0px 1px
+    padding 10px 0px 0px 1px
     z-index 20
     font-weight 300
 
@@ -152,6 +152,12 @@
     font-weight 100
     font-size 18px
 
+.localSetting
+  background var(--ghostA)
+  border-radius 12px
+  margin-bottom 6px
+  padding 12px
+
 .signerPermissionToggle
   position relative
   background var(--bad)
@@ -160,7 +166,7 @@
   border-radius 10px
   transition var(--standard)
   transform translateZ(0)
-  margin-top 2px
+  margin-top 4px
   cursor pointer
 
   .signerPermissionToggleSwitch

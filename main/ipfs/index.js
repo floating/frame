@@ -107,7 +107,6 @@ const surface = {
     return files
   },
   getFile: async path => {
-    console.log('ipfs getFile 0', path)
     const files = await surface.get(path)
     if (files.length > 1) throw new Error(`Path ${path} is a directory, use .get() to return all files`)
     return files[0]

@@ -64,7 +64,7 @@ const initial = {
   },
   dash: {
     type: 'signers',
-    showing: false
+    showing: true
   },
   flow: {},
   dapps: {},
@@ -242,7 +242,7 @@ const initial = {
         }
       }
     },
-    networks: {
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
@@ -414,7 +414,7 @@ const initial = {
           on: false
         }
       }
-    },
+    }),
     networksMeta: {
       ethereum: {
         1: {

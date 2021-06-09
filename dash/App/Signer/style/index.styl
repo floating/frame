@@ -56,8 +56,6 @@
     .signerNameUpdate
       opacity 1
       
-
-
   .signerType
     // position absolute
     // top 6px
@@ -68,7 +66,7 @@
     position absolute
     top 24px
     right 44px
-    font-size 10px
+    font-size 11px
     text-transform uppercase
     font-weight 400
     letter-spacing 1px
@@ -371,12 +369,12 @@
 
       .signerAccountCheck
         position absolute
-        top 8px
-        right 8px
+        top 9px
+        right 10px
         bottom 0
-        width 8px
-        height 8px
-        border-radius 4px
+        width 6px
+        height 6px
+        border-radius 3px
         display flex
         justify-content center
         align-items center
@@ -391,6 +389,22 @@
 
     .signerAccountlast-child
       border-bottom none
+
+.signerOk
+  .signerAccounts
+    .signerAccountAdded
+      border 2px solid var(--good)
+      .signerAccountCheck
+        color var(--good)
+        background var(--good)
+
+.signerLocked
+  .signerAccounts
+    .signerAccountAdded
+      border 2px solid var(--moon)
+      .signerAccountCheck
+        color var(--moon)
+        background var(--moon)
 
 .signerLoading
   height 60px

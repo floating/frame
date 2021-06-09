@@ -146,7 +146,7 @@
     height 32px
     width 66px
     border-radius 16px
-    background var(--ghostB)
+    background var(--ghostX)
     display flex
     justify-content center
     align-items center
@@ -154,27 +154,25 @@
     font-size 26px
     font-weight 300
     overflow hidden
-    box-shadow 0px 2px 2px var(--ghostZ)
-    background var(--ghostY)
     background-position 0 100%
-
+    
     .panelHeaderUpdateInner
       position absolute 
       top 2px
       right 2px
       bottom 2px
       left 2px
-      background var(--ghostB)
-      border-radius 15px
+      background var(--ghostX)
+      border-radius 14px
 
     .panelHeaderUpdateToggle
       position absolute 
       height 28px
       width 55px
-      border-radius 15px
+      border-radius 14px
       left 0px
       background var(--ghostE)
-      box-shadow 0px 3px 3px rgba(0, 0, 0, 0.2)
+      // box-shadow 0px 3px 3px var(--ghostY)
       z-index 10
       transition var(--standardFast)
       cursor pointer
@@ -198,24 +196,19 @@
       color var(--good)
       transform translateX(7px)
 
-    .panelHeaderUpdateOn
-      position absolute 
-      width 48px
-      top 1px
-      left 1px
-      bottom 1px
-      border-radius 24px
-      z-index 8
-      background var(--good)
+  .panelHeaderUpdateOn
+    background var(--good)
 
   .panelHeaderUpdateNotify
     background linear-gradient(
       135deg,
       var(--ghostX),
       var(--ghostX),
-      var(--goodUp),
+      var(--ghostX),
       var(--good),
-      var(--goodUp),
+      var(--good),
+      var(--good),
+      var(--ghostX),
       var(--ghostX),
       var(--ghostX)
     )
@@ -239,9 +232,11 @@
       135deg,
       var(--ghostX),
       var(--ghostX),
-      var(--moonUp),
+      var(--ghostX),
       var(--moon),
-      var(--moonUp),
+      var(--moon),
+      var(--moon),
+      var(--ghostX),
       var(--ghostX),
       var(--ghostX)
     )
