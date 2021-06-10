@@ -155,14 +155,17 @@ class Balances extends React.Component {
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader'>balances</div>
+        <div className='moduleHeader'>
+          <span>balances</span>
+          {balancesLength === 0 || !fullScan ? (
+            <div className='moduleHeaderLoading'>
+              <div className='moduleHeaderLoadingLoader' />
+            </div>
+          ) : null}
+        </div>
         {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i))}
         <div className='signerBalanceTotal'>
-          {balancesLength === 0 || !fullScan ? (
-            <div className='moduleLoadingSmall'>
-              <div className='moduleLoadingSmallLoader' />
-            </div>
-          ) : balancesLength > 5 && !this.props.expanded ? (
+          {balancesLength > 5 && !this.props.expanded ? (
             <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
               {svg.expand(17)}
             </div>

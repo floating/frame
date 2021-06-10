@@ -1523,6 +1523,31 @@
     text-align center
     box-sizing border-box
 
+    .moduleHeaderLoading
+      position absolute
+      right 6px
+      top 1px
+      bottom 0
+      // padding 0px 10px
+      display flex
+      justify-content center
+      align-items center
+      
+    .moduleHeaderLoadingLoader
+      border-radius 50%
+      width 12px
+      height 12px
+      margin 12px auto
+      font-size 10px
+      position relative
+      text-indent -9999em
+      border-top 3px solid var(--ghostZ)
+      border-right 3px solid var(--ghostZ)
+      border-bottom 3px solid var(--ghostZ)
+      border-left 3px solid var(--good)
+      transform translateZ(0)
+      animation load 0.5s infinite linear
+
   .moduleComingSoon
     padding 14px 0px 20px 0px
     display flex

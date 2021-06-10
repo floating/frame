@@ -191,7 +191,7 @@ const api = {
     })
     tray.on('click', api.trayClick)
     api.create()
-    api.flow()
+    // api.flow()
     api.dash()
   },
   trayClick: () => {
@@ -304,35 +304,35 @@ const api = {
     }
     delete windows[id]
   },
-  flow: () => {
-    windows.flow = new BrowserWindow({
-      id: 'flow',
-      width: 520,
-      height: 330,
-      frame: false,
-      // transparent: true,
-      // hasShadow: false,
-      show: false,
-      backgroundThrottling: false,
-      offscreen: true,
-      // icon: path.join(__dirname, './AppIcon.png'),
-      skipTaskbar: process.platform !== 'linux',
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        sandbox: true,
-        disableBlinkFeatures: 'Auxclick',
-        enableRemoteModule: false,
-        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
-        worldSafeExecuteJavaScript: true,
-        backgroundThrottling: false // Allows repaint when window is hidden
-      }
-    })
-    windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
-    // windows.flow.setAlwaysOnTop(true)
-    windows.flow.on('blur', () => api.hideFlow())
-    // if (dev) windows.flow.openDevTools()
-  },
+  // flow: () => {
+  //   windows.flow = new BrowserWindow({
+  //     id: 'flow',
+  //     width: 520,
+  //     height: 330,
+  //     frame: false,
+  //     // transparent: true,
+  //     // hasShadow: false,
+  //     show: false,
+  //     backgroundThrottling: false,
+  //     offscreen: true,
+  //     // icon: path.join(__dirname, './AppIcon.png'),
+  //     skipTaskbar: process.platform !== 'linux',
+  //     webPreferences: {
+  //       nodeIntegration: false,
+  //       contextIsolation: true,
+  //       sandbox: true,
+  //       disableBlinkFeatures: 'Auxclick',
+  //       enableRemoteModule: false,
+  //       preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+  //       worldSafeExecuteJavaScript: true,
+  //       backgroundThrottling: false // Allows repaint when window is hidden
+  //     }
+  //   })
+  //   windows.flow.loadURL(`file://${__dirname}/../../bundle/flow.html`)
+  //   // windows.flow.setAlwaysOnTop(true)
+  //   windows.flow.on('blur', () => api.hideFlow())
+  //   // if (dev) windows.flow.openDevTools()
+  // },
   showFlow: () => {
     // clearTimeout(mouseTimeout)
     // hideShow.current = 'showing'
@@ -360,13 +360,13 @@ const api = {
   hideFlow: () => {
     windows.flow.hide()
   },
-  toggleFlow: () => {
-    if (windows.flow.isVisible()) {
-      api.hideFlow()
-    } else {
-      api.showFlow()
-    }
-  },
+  // toggleFlow: () => {
+  //   if (windows.flow.isVisible()) {
+  //     api.hideFlow()
+  //   } else {
+  //     api.showFlow()
+  //   }
+  // },
   dash: () => {
     windows.dash = new BrowserWindow({
       id: 'dash',

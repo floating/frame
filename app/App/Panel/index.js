@@ -128,7 +128,7 @@ class Panel extends React.Component {
         <Networks />
         <Main />
         <Badge />
-        <div className='appMenu'>
+        {/* <div className='appMenu'>
           <div className='appMenuItem'>
             <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleFlow')}>
               {svg.cpu(18)}
@@ -144,7 +144,7 @@ class Panel extends React.Component {
               {svg.save(18)}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     )
   }

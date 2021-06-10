@@ -330,7 +330,11 @@ class Signer extends React.Component {
         </div>
         {this.state.showControls ? (
           <div className='signerControls cardShow'>
-            <div className='signerControlOption'>Deactivte Accounts</div>
+            <div className='signerControlOption'>Hide empty accounts</div>
+            <div className='signerControlOption'>Deactivte empty Accounts</div>
+            <div className='signerControlOption'>Deactivte all Accounts</div>
+            <div className='signerControlOption'>Reload Signer</div>
+            <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div>
             <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
               link.send('dash:removeSigner', this.props.id)
             }}>Remove Signer</div>
