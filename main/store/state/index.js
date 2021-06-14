@@ -226,7 +226,7 @@ const initial = {
           prylabs: 'https://goerli.prylabs.net'
         },
         10: {
-          optimism: ['wss://ws-mainnet.optimism.io', 'https://mainnet.optimism.io']
+          optimism: ['https://mainnet.optimism.io']
         },
         42: {
           infura: 'infuraKovan'
@@ -238,7 +238,7 @@ const initial = {
           poa: 'https://dai.poa.network'
         },
         137: {
-          matic: ['wss://rpc-mainnet.maticvigil.com/ws/v1/852d3148d4d2880682d0c12ba514e7106406316d', 'https://rpc-mainnet.maticvigil.com/v1/852d3148d4d2880682d0c12ba514e7106406316d', 'https://rpc-mainnet.maticvigil.com']
+          matic: ['https://rpc-mainnet.maticvigil.com/v1/852d3148d4d2880682d0c12ba514e7106406316d', 'https://rpc-mainnet.maticvigil.com']
         }
       }
     },
@@ -720,9 +720,9 @@ if (initial.main._version < 9) {
 
 // State transition -> 10
 if (initial.main._version < 10) {
-  
+
   if (!initial.main.networks.ethereum[10]) {
-    
+
     initial.main.networks.ethereum[10] = {
       id: 10,
       type: 'ethereum',
