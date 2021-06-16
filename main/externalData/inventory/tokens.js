@@ -37,10 +37,6 @@ const tokenListSources = [
   {
     name: 'nebula',
     list: nebulaTokens
-  },
-  {
-    name: 'default',
-    list: defaultTokens
   }
 ]
 
@@ -74,34 +70,34 @@ async function nebulaTokens (chainId) {
     const tokenListRecord = await nebula.resolve('tokens.matt.eth')
     tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
   } catch (e) {
-    log.warn('could not load token list from Nebula', e)
-    tokenList = []
+    log.warn('could not load token list from Nebula, using default list', e)
+    tokenList = require('./default-tokens.json').tokens
   }
 
   return tokensForChain(tokenList, chainId)
 }
 
-function defaultTokens (chainId) {
-  const tokenList = require('./default-tokens.json')
-  return tokensForChain(tokenList.tokens, chainId)
-}
-
 async function getTokenList (chainId) {
   log.debug(`loading token list for chainId=${chainId}`)
 
-  let tokenList = []
-
-  await Promise.all(tokenListSources.map(async (source) => {
+  const tokenList = await tokenListSources.reduce(async (tokens, source) => {
     log.debug(`loading tokens from ${source.name}`)
 
-    const loaded = await source.list(chainId)
+    const previouslyLoaded = await tokens
+    const loaded = withLowerCaseAddresses(await source.list(chainId))
 
     log.info(`loaded ${loaded.length} tokens from ${source.name}`)
 
-    tokenList = tokenList.concat(loaded)
-  }))
+    loaded.forEach(token => {
+      if (!(token.address in previouslyLoaded)) {
+        previouslyLoaded[token.address] = token
+      }
+    })
 
-  return withLowerCaseAddresses(tokenList)
+    return loaded
+  }, {})
+
+  return Object.values(tokenList)
 }
 
 module.exports = getTokenList
