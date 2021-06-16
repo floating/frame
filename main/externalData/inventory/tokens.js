@@ -41,7 +41,7 @@ const tokenListSources = [
 ]
 
 const tokensForChain = (tokens, chainId) => tokens.filter(t => t.chainId === chainId)
-const withLowerCaseAddress = token => ({ ...token, address: token.address.toLowerCase() })
+const withLowerCaseAddresses = tokens => tokens.map(t => ({ ...t, address: t.address.toLowerCase() }))
 
 async function sushiSwapTokens (chainId) {
   const chain = chainMapping[chainId]
@@ -84,13 +84,13 @@ async function getTokenList (chainId) {
     log.debug(`loading tokens from ${source.name}`)
 
     const previouslyLoaded = await tokens
-    const loaded = await source.list(chainId)
+    const loaded = withLowerCaseAddresses(await source.list(chainId))
 
     log.info(`loaded ${loaded.length} tokens from ${source.name}`)
 
     loaded.forEach(token => {
       if (!(token.address in previouslyLoaded)) {
-        previouslyLoaded[token.address] = withLowerCaseAddress(token)
+        previouslyLoaded[token.address] = token
       }
     })
 
