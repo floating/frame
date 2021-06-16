@@ -37,15 +37,11 @@ const tokenListSources = [
   {
     name: 'nebula',
     list: nebulaTokens
-  },
-  {
-    name: 'default',
-    list: defaultTokens
   }
 ]
 
 const tokensForChain = (tokens, chainId) => tokens.filter(t => t.chainId === chainId)
-const withLowerCaseAddresses = tokens => tokens.map(t => ({ ...t, address: t.address.toLowerCase() }))
+const withLowerCaseAddress = token => ({ ...token, address: token.address.toLowerCase() })
 
 async function sushiSwapTokens (chainId) {
   const chain = chainMapping[chainId]
@@ -74,34 +70,34 @@ async function nebulaTokens (chainId) {
     const tokenListRecord = await nebula.resolve('tokens.matt.eth')
     tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
   } catch (e) {
-    log.warn('could not load token list from Nebula', e)
-    tokenList = []
+    log.warn('could not load token list from Nebula, using default list', e)
+    tokenList = require('./default-tokens.json').tokens
   }
 
   return tokensForChain(tokenList, chainId)
 }
 
-function defaultTokens (chainId) {
-  const tokenList = require('./default-tokens.json')
-  return tokensForChain(tokenList.tokens, chainId)
-}
-
 async function getTokenList (chainId) {
   log.debug(`loading token list for chainId=${chainId}`)
 
-  let tokenList = []
-
-  await Promise.all(tokenListSources.map(async (source) => {
+  const tokenList = await tokenListSources.reduce(async (tokens, source) => {
     log.debug(`loading tokens from ${source.name}`)
 
+    const previouslyLoaded = await tokens
     const loaded = await source.list(chainId)
 
     log.info(`loaded ${loaded.length} tokens from ${source.name}`)
 
-    tokenList = tokenList.concat(loaded)
-  }))
+    loaded.forEach(token => {
+      if (!(token.address in previouslyLoaded)) {
+        previouslyLoaded[token.address] = withLowerCaseAddress(token)
+      }
+    })
 
-  return withLowerCaseAddresses(tokenList)
+    return loaded
+  }, {})
+
+  return Object.values(tokenList)
 }
 
 module.exports = getTokenList
