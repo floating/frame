@@ -199,7 +199,7 @@
     // background linear-gradient(-180deg, var(--bg0) 0%, var(--ghostC) 70%)
 
   .localSettingsWrap
-    padding 120px 6px 120px 6px
+    padding 120px 6px 60px 6px
     overflow-x hidden
     overflow-y scroll
     position relative
@@ -467,7 +467,6 @@
   .appInfoLine
     left 0
     right 0
-    height 64px
     transition var(--standard)
     display flex
     justify-content center
@@ -477,7 +476,9 @@
     color var(--outerspace08)
 
   .appInfoLineReset
-    font-size 12px
+    margin-top 24px
+    margin-left 4px
+    font-size 11px
     font-weight 600
     color var(--outerspace05)
     
@@ -490,6 +491,7 @@
         margin-left 5px
 
   .appInfoLineVersion
+    height 64px
     font-family FiraCode, monospace
 
 .connectionCustomInput
@@ -500,7 +502,7 @@
   position relative
   padding-top 0px
   transition var(--standardFast)
-  background var(--thin)
+  background var(--ghostA)
   border-radius 8px
   transform translateZ(0)
   z-index 20
@@ -555,6 +557,32 @@
   letter-spacing 2px
   font-weight 600
   color var(--outerspace03)
+
+.networkBreak:first-child
+  padding 0px 16px 0px 16px
+
+.networkAdd
+  padding 32px 0px 16px 0px
+
+  .networkAddButton
+    font-size 14px
+    height 48px
+    background var(--ghostB)
+    text-align center
+    border-radius 24px
+    padding 15px
+    box-sizing border-box
+    text-transform uppercase
+    font-weight 400
+    letter-spacing 2px
+    cursor pointer
+    *
+      pointer-events none
+    
+  .networkAddButton:hover
+    background var(--ghostC)
+    color var(--good)
+    
   
 // .connectionOptionOn
 //   background var(--ghostB)

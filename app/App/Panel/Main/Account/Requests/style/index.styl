@@ -283,7 +283,9 @@
   z-index 200
   transition var(--standardSlow)
   transform translateZ(0)
-  padding 20px 0px 20px 0px
+  overflow hidden
+
+  // padding 20px 0px 20px 0p
 
   .requestTitle:before
     content ''
@@ -338,30 +340,35 @@
     tranform translateZ(0)
 
    .requestContainer
-     width calc(100% - 20px)
+     width 100%
      position relative
      display flex
      flex-direction column
      tranform translateZ(0)
 
     .noRequests
-      height 42px
+      height 32px
+      min-height 32px
       font-size 11px
       text-transform uppercase
       font-weight bold
       letter-spacing 2px
+      padding-left 2px
       display flex
       justify-content center
       align-items center
       transition var(--standard)
       tranform translateZ(0)
       color var(--outerspace05)
+      border-radius 16px
+      margin 17px 34px
+      background var(--ghostY)
 
     .recentRequests
       position absolute
       top 1px
-      left 3px
-      right 0px
+      left 11px
+      right 11px
       height 20px
       pointer-events none
       justify-content space-between
@@ -388,16 +395,30 @@
     padding-bottom 10px
     justify-content space-between
     // box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
-    border-radius 16px
-    height 380px
+    border-radius 8px
+    height 40px
     display flex
     justify-content center
     transition var(--standard)
-    background var(--ghostC)
     z-index 2000
     color var(--outerspace)
     tranform translateZ(0)
     overflow hidden
+    background var(--ghostB)
+    box-shadow 0px 2px 10px var(--ghostZ)
+
+    .requestMeta
+      position absolute
+      display flex
+      align-items center
+      justify-content space-between
+      height 40px
+      left 0
+      right 0
+      top 0
+      font-size 11px
+      padding 0px 12px 0px 11px //  10px 10px
+      font-weight 500
 
   .requestOverlay
     display none
@@ -448,7 +469,7 @@
 
   .signerRequestMonitor
     align-items center
-    background var(--ghostD)
+    background var(--ghostB)
     svg
       color var(--outerspace09)
     .approveTransactionPayload
@@ -546,7 +567,11 @@
       letter-spacing 1px
 
   .approveTransaction
+    position relative
+    top 40px
     width 100%
+    height 100%
+    border-top 1px solid var(--ghostA)
 
     .approveTransactionIcon
       width 100%
@@ -570,11 +595,9 @@
       align-items center
       font-weight 400
       font-size 14px
-      background var(--ghostD)
+      background var(--ghostC)
       color var(--outerspace08)
-      border-top-left-radius 8px
-      border-top-right-radius 8px
-      box-shadow 0px 1px 0px var(--thick)
+      border-radius 8px
       text-transform uppercase
 
       .approveRequestHeaderTitle
@@ -730,7 +753,7 @@
     font-family FiraCode, sans-serif
     margin 2px 8px 0px 0px 
     padding 0px 16px
-    background var(--ghostF)
+    background var(--ghostD)
     border-radius 12px
     height 25px
     min-height 25px
@@ -764,7 +787,7 @@
     font-family FiraCode, sans-serif
     margin 2px 0px 0px 8px 
     padding 0px 16px
-    background var(--ghostE)
+    background var(--ghostD)
     border-radius 12px
     height 24px
     min-height 24px
@@ -1026,8 +1049,7 @@
     right 0
     bottom 0
     height 60px
-    border-bottom-left-radius 8px
-    border-bottom-right-radius 8px
+    border-radius 8px
     font-size 14px
     text-transform uppercase
     -webkit-app-region no-drag
@@ -1038,16 +1060,16 @@
     justify-content space-around
     align-items center
     font-weight 400
-    border-top 1px solid var(--thick)
-    background var(--ghostD)
+    background var(--ghostC)
 
     .requestDecline
       position relative
       width 50%
       height 100%
-      border-right 1px solid var(--thick)
+      border-right 1px solid var(--ghostB)
       overflow hidden
       position relative
+      // background blue
 
     .requestDeclineButton
       position absolute
@@ -1061,10 +1083,12 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      transition var(--standard)
       letter-spacing 2px
       padding-left 2px
       padding-bottom 10px
+      cursor pointer
+      *
+        pointer-events none
 
     .requestDeclineButton:before
       content ''
@@ -1097,10 +1121,16 @@
       justify-content center
       align-items center
       -webkit-app-region no-drag
-      transition var(--standard)
       letter-spacing 2px
       padding-left 2px
       padding-bottom 10px
+      cursor pointer
+      *
+        pointer-events none
+
+    // .requestSignButton:hover
+    //   background var(--ghostD)
+
 
     .requestSignButton:before
       content ''
@@ -1361,8 +1391,8 @@ span
   letter-spacing 0.2px
   font-weight 500
   border-radius 16px
-  background var(--ghostE)
-  box-shadow 0px 2px 2px var(--ghostC)
+  background var(--ghostC)
+  box-shadow 0px 2px 2px var(--ghostZ)
   z-index 20000000009999
   
   .txAugmentCancel
@@ -1422,9 +1452,9 @@ span
     opacity 0
 
   .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
-    background var(--ghostF)
+    background var(--ghostD)
     transform scale(1.05)
-    box-shadow 0px 4px 5px -2px var(--thick), 0px 25px 25px -5px var(--thick)
+    box-shadow 0px 4px 5px -2px var(--ghostY)
   
 .txAugmentHidden
   .txAugmentCancel
@@ -1554,7 +1584,7 @@ span
     left 50%
     width 2px
     bottom 5px
-    background var(--tripleThick)
+    // background var(--ghostX)
 
   .txProgressSuccessItem
     position absolute
@@ -1592,11 +1622,11 @@ span
   .txProgressSuccessItemCenter
     right 113px
     left 130px
-    border-left 2px solid var(--thick)
+    border-left 2px solid var(--ghostA)
   .txProgressSuccessItemRight
     right 0
     width 110px
-    border-left 2px solid var(--thick)
+    border-left 2px solid var(--ghostA)
 
 .txSummary
   display flex

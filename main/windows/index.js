@@ -12,6 +12,8 @@ const dapp = require('./dapp')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
 
 const dev = process.env.NODE_ENV === 'development'
+const fullheight = !!process.env.FULL_HEIGHT
+
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
 let tray, trayReady
@@ -246,7 +248,7 @@ const api = {
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistant
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    windows.tray.setSize(358, dev ? 740 : area.height)
+    windows.tray.setSize(358, dev && !fullheight ? 740 : area.height)
     const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) windows.tray.focus()
@@ -414,7 +416,7 @@ const api = {
       windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.dash.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.dash.setSize(360, dev ? 740 - 120 : area.height - 120)
+      windows.dash.setSize(360, dev && !fullheight ? 740 - 120 : area.height - 120)
       const {x, y} = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
       windows.dash.setPosition(x - 380, y + 60)
       // if (!glide) windows.tray.focus()
@@ -454,14 +456,14 @@ if (dev) {
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) {
       windows.tray.send('main:reload:style', name)
-      windows.flow.send('main:reload:style', name)
+      // windows.flow.send('main:reload:style', name)
       windows.dash.send('main:reload:style', name)
     }
   })
   app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
       windows.tray.reload()
-      windows.flow.reload()
+      // windows.flow.reload()
       windows.dash.reload()
     })
   })

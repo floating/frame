@@ -209,7 +209,7 @@ class _AccountMain extends React.Component {
     }
 
     let moduleClass = ''
-    if (index === 0) moduleClass = ' transparentModule'
+    if (id === 'launcher' || id === 'requests') moduleClass = ' transparentModule'
 
     return (
       <div className={'accountModule' + moduleClass} style={style}>
@@ -286,8 +286,10 @@ class _AccountMain extends React.Component {
   render () {
     const accountModules = this.store('panel.account.modules')
     const accountModuleOrder = this.store('panel.account.moduleOrder')
+    const chainId = this.store('main.currentNetwork.id')
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
+      if (chainId !== '1' && id === 'inventory') return undefined
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 5
       return this.renderModule(id, module, slideHeight - module.height - 5, i, id => {
@@ -966,7 +968,7 @@ class Account extends React.Component {
         <div className={signerClass} style={style} ref={ref => { if (ref) this.signer = ref }}>
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
-            {!this.state.hideSignerStatus ? (
+            {!this.state.hideSignerStatus && open ? (
               <SignerStatus open={open} signer={this.props.signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
             ) : null}
             <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>

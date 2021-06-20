@@ -71,7 +71,7 @@ class Balances extends React.Component {
         {!this.props.expanded ? (
           <div className='signerBalanceTotal'>
             <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
-              {svg.expand(17)}
+              <span>More</span>
             </div>
           </div>
         ) : null }

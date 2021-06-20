@@ -238,7 +238,7 @@ const initial = {
           poa: 'https://dai.poa.network'
         },
         137: {
-          matic: ['https://rpc-mainnet.maticvigil.com/v1/852d3148d4d2880682d0c12ba514e7106406316d', 'https://rpc-mainnet.maticvigil.com']
+          matic: ['https://rpc-mainnet.maticvigil.com/v1/852d3148d4d2880682d0c12ba514e7106406316d']
         }
       }
     },

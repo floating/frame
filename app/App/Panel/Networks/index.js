@@ -602,7 +602,7 @@ class Settings extends React.Component {
   discord () {
     return (
       <div className='discordInvite' onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
-        <div>Need help or have a request?</div>
+        <div>Need help?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
     )
@@ -689,113 +689,6 @@ class Settings extends React.Component {
     return nets
   }
 
-  renderAddNetwork () {
-    const changedNewNetwork = (
-      this.state.newNetworkId !== this.newNetworkIdDefault ||
-      this.state.newNetworkName !== this.newNetworkNameDefault ||
-      this.state.newNetworkExplorer !== this.newNetworkExplorerDefault ||
-      this.state.newNetworkSymbol !== this.newNetworkSymbolDefault
-    )
-
-    const newNetworkReady = (
-      this.state.newNetworkId !== this.newNetworkIdDefault && this.state.newNetworkId !== '' &&
-      this.state.newNetworkName !== this.newNetworkNameDefault && this.state.newNetworkName !== '' &&
-      this.state.newNetworkExplorer !== this.newNetworkExplorerDefault && this.state.newNetworkExplorer !== ''
-    )
-
-    return (
-      <div className='network'>
-        <div className='phaseNetworkLine'>
-          {changedNewNetwork && newNetworkReady ? (
-            <div
-              className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
-                const net = {
-                  id: this.state.newNetworkId,
-                  name: this.state.newNetworkName,
-                  type: this.state.newNetworkType,
-                  explorer: this.state.newNetworkExplorer,
-                  symbol: this.state.newNetworkSymbol
-                }
-                link.send('tray:action', 'addNetwork', net)
-                this.setState({
-                  newNetworkId: this.newNetworkIdDefault,
-                  newNetworkName: this.newNetworkNameDefault,
-                  newNetworkExplorer: this.newNetworkExplorerDefault,
-                  newNetworkSymbol: this.newNetworkSymbolDefault
-                })
-              }}
-            >
-              {svg.save(16)}
-            </div>
-          ) : (
-            <div className='phaseNetworkSubmit'>
-              {svg.octicon('plus', { height: 17 })}
-            </div>
-          )}
-          <div className='phaseNetworkName'>
-            <input
-              value={this.state.newNetworkName} spellCheck='false'
-              onChange={(e) => {
-                this.setState({ newNetworkName: e.target.value })
-              }}
-              onFocus={(e) => {
-                if (e.target.value === this.newNetworkNameDefault) this.setState({ newNetworkName: '' })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ newNetworkName: this.newNetworkNameDefault })
-              }}
-            />
-          </div>
-          <div className='phaseNetworkId'>
-            <input
-              value={this.state.newNetworkId} spellCheck='false'
-              onChange={(e) => {
-                if (Number(parseInt(e.target.value)) || e.target.value === '') {
-                  this.setState({ newNetworkId: e.target.value })
-                }
-              }}
-              onFocus={(e) => {
-                if (e.target.value === this.newNetworkIdDefault) this.setState({ newNetworkId: '' })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ newNetworkId: this.newNetworkIdDefault })
-              }}
-            />
-          </div>
-          <div className='phaseNetworkSymbol'>
-            <input
-              value={this.state.newNetworkSymbol} spellCheck='false'
-              onChange={(e) => {
-                if (e.target.value.length > 8) return e.preventDefault()
-                this.setState({ newNetworkSymbol: e.target.value })
-              }}
-              onFocus={(e) => {
-                if (e.target.value === this.newNetworkSymbolDefault) this.setState({ newNetworkSymbol: '' })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ newNetworkSymbol: this.newNetworkSymbolDefault })
-              }}
-            />
-          </div>
-          <div className='phaseNetworkExplorer'>
-            <input
-              value={this.state.newNetworkExplorer} spellCheck='false'
-              onChange={(e) => {
-                this.setState({ newNetworkExplorer: e.target.value })
-              }}
-              onFocus={(e) => {
-                if (e.target.value === this.newNetworkExplorerDefault) this.setState({ newNetworkExplorer: '' })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault })
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   render () {
     const { type, id } = this.store('main.currentNetwork')
     const networks = this.store('main.networks')
@@ -833,10 +726,12 @@ class Settings extends React.Component {
             <div className='networkBreakLayer'>Testnets</div>
           </div>
           {this.renderConnections('testnet')}
-          <div className='networkBreak'>
-            <div className='networkBreakLayer'>Add a Chain</div>
+          <div className='networkAdd'>
+          <div 
+            className='networkAddButton'
+            onMouseDown={() => this.store.notify('addChain')}
+          >Add a new chain</div>
           </div>
-          {this.renderAddNetwork()}
           {this.discord()}
         </div>
       </div>

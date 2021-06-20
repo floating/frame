@@ -52,6 +52,7 @@ const handler = (req, res) => {
       const input = Buffer.concat(body).toString()
       const payload = validPayload(input)
       if (!payload) return console.warn('Invalid Payload', input)
+      payload._origin = origin
       if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }

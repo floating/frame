@@ -107,15 +107,18 @@
         z-index 2001
 
         .moduleExpanded
-          background var(--ghostB)
+          // background var(--ghostB)
           position absolute
           top 55px
-          left 5px
-          right 5px
+          left 0px
+          right 0px
           bottom 45px
           z-index 20000
           border-radius 8px
           box-shadow 0px 0px 12px var(--ghostX)
+          
+          .accountModuleInner
+            overflow-y scroll
 
       .accountMainScroll
         position absolute
@@ -1472,12 +1475,12 @@
 .accountModule
   position absolute 
   top 0
-  left 0
-  right 0
+  left 5px
+  right 5px
   // border-bottom 1px solid var(--ghostA)
   // background var(--ghostC)
   transform translate3d(0, 0, 0)
-  transition var(--standardVibe) // , 0s linear height // 0.05s linear allheight // // , height 1s linear
+  transition var(--standardFast) // , 0s linear height // 0.05s linear allheight // // , height 1s linear
   // box-shadow 0px 10px 10px var(--ghostA)
   // padding 0px 0px 0px 0px
   // overflow hidden
@@ -1485,13 +1488,15 @@
 .accountModuleInner
   position absolute
   top 0
-  left 5px
-  right 5px
+  left 0px
+  right 0px
   bottom 0px
   // margin 2px
   border-radius 8px
   background var(--ghostB)
-  box-shadow 0px 2px 2px var(--ghostX)
+  // box-shadow 0px 2px 2px var(--ghostX)
+  box-shadow 0px 2px 6px var(--ghostZ)
+  transform translate3d(0, 0, 0)
   // transition 0.05s linear all // var(--standard)
   // margin-bottom 2px
   overflow hidden
@@ -1547,6 +1552,12 @@
       border-left 3px solid var(--good)
       transform translateZ(0)
       animation load 0.5s infinite linear
+
+  .moduleHeader:before
+    background none
+
+  .moduleHeaderBorderless
+    border-bottom none
 
   .moduleComingSoon
     padding 14px 0px 20px 0px
@@ -1643,6 +1654,8 @@
     background transparent
     overflow-y scroll
     overflow-x hidden
+    box-shadow none
+    transform translate3d(0, 0, 0)
     // background blue
 
 .signerVerifyText

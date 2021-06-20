@@ -137,7 +137,7 @@ class TransactionRequest extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     const feeUSD = fee * etherUSD
-    const height = req.status === 'error' ? '185px' : mode === 'monitor' ? '185px' : '320px'
+    const height = req.status === 'error' ? '200px' : mode === 'monitor' ? '200px' : '330px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
@@ -176,6 +176,10 @@ class TransactionRequest extends React.Component {
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
+        <div className='requestMeta'>
+          <div className='requestMetaChain' style={{ textTransform: 'uppercase' }}>{this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'name')}</div>
+          <div className='requestMetaOrigin'>{req.origin}</div>
+        </div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             {req.warning && status !== 'error' ? (

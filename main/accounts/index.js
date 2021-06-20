@@ -114,6 +114,7 @@ class Accounts extends EventEmitter {
     } catch (e) {
       log.err(e)
     }
+    log.info('Account creation blockNumber', blockNumber)
     this.accounts[address] = new Account({ address, created: blockNumber, options }, this)
   }
 
@@ -442,11 +443,12 @@ class Accounts extends EventEmitter {
     if (this.current().requests[handlerId]) {
       this.current().requests[handlerId].status = 'error'
       this.current().requests[handlerId].notice = 'Signature Declined'
-      if (this.current().requests[handlerId].type === 'transaction') {
-        this.current().requests[handlerId].mode = 'monitor'
-      } else {
-        setTimeout(() => this.removeRequest(handlerId), 3300)
-      }
+      this.current().requests[handlerId].mode = 'monitor'
+      setTimeout(() => this.removeRequest(handlerId), 8000)
+      // if (this.current().requests[handlerId].type === 'transaction') {
+      // } else {
+      //   setTimeout(() => this.removeRequest(handlerId), 3300)
+      // }
       this.current().update()
     }
   }
@@ -480,6 +482,7 @@ class Accounts extends EventEmitter {
           if (this.current() && this.current().requests[handlerId]) {
             this.current().requests[handlerId].mode = 'monitor'
             this.current().update()
+            setTimeout(() => this.removeRequest(handlerId), 8000)
           }
         }, 1500)
       } else {

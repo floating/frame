@@ -13,6 +13,12 @@ const chainCoins = {
     logoURI: 'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492',
     symbol: 'xdai',
     decimals: 18
+  },
+  137: {
+    name: 'Matic',
+    logoURI: '',
+    symbol: 'MATIC',
+    decimals: 18
   }
 }
 

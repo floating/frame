@@ -5,6 +5,8 @@ import link from '../../../../resources/link'
 
 import frameIcon from './FrameIcon.png'
 
+import AddChain from './AddChain'
+
 class Notify extends React.Component {
   mainnet () {
     return (
@@ -407,6 +409,12 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           {this.openExplorer(this.store('view.notifyData'))}
+        </div>
+      )
+    } else if (notify === 'addChain') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <AddChain />
         </div>
       )
     } else {

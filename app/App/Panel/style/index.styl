@@ -119,8 +119,8 @@
   // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
   // pointer-events none
   transition var(--standardFast)
-  background var(--ghostB)
-  border-bottom 1px solid var(--doubleThick)
+  background var(--ghostA)
+  border-bottom 1px solid var(--ghostY)
   // box-shadow 0px 4px 6px -1px var(--thin)
   // box-shadow inset 0px -8px 8px var(--thick)
   //border-bottom-left-radius 12px
@@ -155,16 +155,16 @@
     transition none
     pointer-events auto
     transform translate3d(0, 0, 0)
-    background var(--ghostE)
+    background var(--ghostD)
     position absolute
-    box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+    // box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
     cursor pointer
 
     *
       pointer-events none
 
   .panelMenuItem:hover
-    background var(--ghostF)
+    background var(--ghostE)
 
   .panelMenuItemAccounts
     left 9px
@@ -221,7 +221,7 @@
     .panelMenuDataDivide
       height 100%
       width 1px
-      background var(--doubleThick)
+      background var(--ghostY)
 
     .panelMenuDataItem
       display flex
@@ -355,7 +355,7 @@
   align-items center
   transform translateZ(0)
   margin 24px 0px 0px 0px
-  background var(--ghostB)
+  background var(--ghostA)
   padding 20px 10px
   border-radius 12px
   font-size 13px
@@ -384,13 +384,13 @@
     color var(--outerspace08)
     
     .snipItBrowserExtensionIcon:hover
-      background var(--ghostE)
+      background var(--ghostD)
 
     .snipItBrowserExtensionIcon
       display flex
       justify-content center
       align-items center
-      background var(--ghostD)
+      background var(--ghostC)
       height 60px
       width 60px
       border 1px solid var(--thick)
