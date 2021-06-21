@@ -330,7 +330,7 @@ class TransactionFee extends React.Component {
 
     const currentSymbol = this.store('main.networks', network.type, network.id, 'symbol') || 'Ξ'
     let slideLevel, feeTotal, feeTotalUSD, feeTime
-    const devHaloAdjust = -84
+    const devHaloAdjust = -68
     const haloLevels = {
       slow: 148 + devHaloAdjust,
       standard: 188 + devHaloAdjust,
@@ -338,7 +338,7 @@ class TransactionFee extends React.Component {
       asap: 268 + devHaloAdjust,
       custom: 308 + devHaloAdjust
     }
-    const devAdjust = -286
+    const devAdjust = -301
     if (feeLevel === 'slow') {
       slideLevel = 170 + devAdjust
       // haloShadowLevel = `translateY(${haloLevels.slow}px)`
@@ -388,7 +388,7 @@ class TransactionFee extends React.Component {
     } : {
       transform: 'translateY(0px)'
     }
-    const marker = this.state.hoverGasPercentOrigin * (308 - 66 - 72)
+    const marker = (this.state.hoverGasPercentOrigin * 210) + 5
     const gasPrice = weiToGwei(parseInt(data.gasPrice, 'hex'))
     const gasLimitDisplay = this.state.pendingLimit || (this.state.gasLimitInputFocus ? (this.state.inputLimit || '') : parseInt(data.gas, 'hex'))
 

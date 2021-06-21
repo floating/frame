@@ -21,7 +21,7 @@ class ChainRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
     const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '320px'
+    const height = mode === 'monitor' ? '80px' : '340px'
     const chain = this.props.req.chain
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>

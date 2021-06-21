@@ -17,6 +17,7 @@ class SignerStatus extends React.Component {
       expand: false
     }
     this.statusRef = React.createRef()
+    this.inputRef = React.createRef()
   }
 
   // clickListener (event) {
@@ -86,13 +87,14 @@ class SignerStatus extends React.Component {
           this.props.hideSignerStatus(true)
         }
       })
+      this.inputRef.current.focus()
     }, 100)
   }
 
   render () {
     const signer = this.props.signer ? this.store('main.signers', this.props.signer) : null
 
-    return signer && this.props.open && signer && signer.status === 'locked' ? (
+    return signer && signer && signer.status === 'locked' ? (
       <div className='signerStatus' ref={this.statusRef}>
         <div className='signerStatusTop'>
           <div className='signerStatusTopArrow' />
@@ -100,7 +102,12 @@ class SignerStatus extends React.Component {
         <div className='signerStatusMain'>
           <div className='signerUnlockWrap'>
             <div className='signerUnlockHeader'>The signer for this account is locked</div>
-            <input className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} />
+            <input ref={this.inputRef} className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                this.unlockSubmit()
+              }
+            }} />
             <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
           </div>
         </div>

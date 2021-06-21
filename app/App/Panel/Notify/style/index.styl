@@ -12,7 +12,6 @@
   align-items center
   text-align center
   opacity 1
-  background var(--ghostX09)
   
   ::selection
     background var(--good02) // #ffb7b7
@@ -32,17 +31,14 @@
     border-radius 12px
     box-sizing border-box
     position absolute
-    top 128px
-    bottom 128px
+    top 64px
+    bottom 64px
     left 5px
     right 5px
     transition var(--standard)
-    background var(--ghostC)
-    // box-shadow 0px 0px 30px 0px var(--ghostX)
-
-    display flex
-    justify-content center
-    align-items center
+    background var(--ghostB)
+    overflow-y scroll
+    overflow-x hidden
     text-align center
     opacity 1
 
@@ -59,10 +55,9 @@
       align-items center
 
     .notifyBox
-      padding 55px 20px 60px 20px
       border-top 1px solid var(--ghostA)
       border-bottom 1px solid var(--ghostA)
-      min-width calc(100% - 40px)
+      min-width calc(100% - 16px)
       overflow hidden
       
       .notifyTitle
@@ -100,6 +95,8 @@
         z-index 3
         padding 10px
         word-break break-word
+        width 100%
+        box-sizing border-box
 
         span 
           text-decoration underline
@@ -282,3 +279,5 @@
         div
           font-size 14px
           line-height 26px
+
+@import '../AddChain/style'

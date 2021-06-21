@@ -3,7 +3,9 @@ import { URL } from 'url'
 
 // export const syncMain = (u, main) => u('main', _ => main)
 
-export const pathSync = (u, path, value) => u(path, () => value)
+export const pathSync = (u, path, value) => {
+  u(path, () => value)
+}
 
 // export const syncPanel = (u, panel) => u('panel', _ => panel)
 

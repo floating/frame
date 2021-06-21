@@ -110,11 +110,15 @@ class Requests extends React.Component {
       if (a.created < b.created) return 1
       return 0
     })
-    const monitorHeight = 205
-    let containNormal = normal.length ? (360 + (normal.length * 10)) : 42
-    if (normal.length && monitor.length > 0) containNormal += 70
-    const containMonitor = monitor.length * monitorHeight
-    const containHeight = containNormal + containMonitor
+    const monitorHeight = 220
+    let containNormal = normal.length ? (360 + (normal.length * 10)) : 26
+    // if (normal.length && monitor.length > 0) {
+    //   containNormal += 50
+    // } else if (monitor.length > 0) {
+    //   containNormal += 50
+    // }
+    const containMonitor = (monitor.length * monitorHeight) + 20
+    const containHeight = containNormal + containMonitor + 40
 
     const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
     const open = current && this.store('selected.open')
@@ -129,15 +133,15 @@ class Requests extends React.Component {
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
             <div key='noReq' style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>No Pending Requests</div>
-            <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal - 15}px)` }}>
+            <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal +  40}px)` }}>
               <span>Recent Transactions</span>
               <span>{monitor.length}</span>
             </div>
             {normal.concat(monitor).map((req, i) => {
               let pos = 0
               const z = 2000 + i
-              if (req.mode === 'normal') pos = ((normal.length - i) * 10)
-              if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight)
+              if (req.mode === 'normal') pos = (((normal.length - 1) - i) * 10) + 34
+              if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight) + 55
               if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} onTop={i === normal.length - 1} accountId={this.props.id} />
               if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
