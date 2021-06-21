@@ -49,10 +49,13 @@ class Balances extends React.Component {
           ) : (
             permissionList.map(o => {
               return (
-                <div className='signerPermission' key={o} onMouseDown={_ => link.send('tray:action', 'toggleAccess', this.props.id, o)}>
+                <div className='signerPermission' key={o}>
                   <div className='signerPermissionControls'>
                     <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
-                    <div className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
+                    <div 
+                      className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
+                      onMouseDown={_ => link.send('tray:action', 'toggleAccess', this.props.id, o)}
+                    >
                       <div className='signerPermissionToggleSwitch' />
                     </div>
                   </div>

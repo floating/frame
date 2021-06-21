@@ -25,7 +25,7 @@ class ProviderRequest extends React.Component {
     if (origin.length > 28) originClass = 'requestProviderOrigin requestProviderOrigin18'
     if (origin.length > 36) originClass = 'requestProviderOrigin requestProviderOrigin12'
     const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '320px'
+    const height = mode === 'monitor' ? '80px' : '340px'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         <div className='approveTransaction'>
