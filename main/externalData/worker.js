@@ -1,6 +1,7 @@
 const scanTokens = require('./scan')
 const rates = require('./rates')
 const inventory = require('./inventory')
+const icons = require('./icons')
 const log = require('electron-log')
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
@@ -35,6 +36,12 @@ function ratesScan (symbols) {
     .catch(err => log.error('rates scan error', err))
 }
 
+function iconScan (symbols) {
+  icons(symbols)
+    .then(loadedIcons => process.send({ type: 'icons', icons: loadedIcons }))
+    .catch(err => log.error('icon scan error', err))
+}
+
 function inventoryScan (addresses) {
   addresses.forEach(address => {
     inventory(address)
@@ -55,6 +62,7 @@ function resetHeartbeat () {
 const messageHandler = {
   updateCoins: rates.loadCoins,
   updateRates: ratesScan,
+  updateIcons: iconScan,
   updateTokenBalances: tokenScan,
   updateInventory: inventoryScan,
   heartbeat: resetHeartbeat

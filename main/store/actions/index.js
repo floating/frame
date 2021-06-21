@@ -199,6 +199,9 @@ module.exports = {
       u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
+  setIcon: (u, netType, netId, iconUri) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency.icon', () => iconUri)
+  },
   addNetwork: (u, net) => {
     const defaultNetwork = {
       id: 0,
