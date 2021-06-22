@@ -976,7 +976,7 @@ class Account extends React.Component {
               {!this.state.addressHover ? this.renderSignerIndicator() : null} 
               {!this.state.addressHover ? (
                 <>
-                  <div className='accountGrabber'>
+                  <div className='accountGrabber' style={open ? { opacity: 0, pointerEvents: 'none' } : {}}>
                     {svg.grab(35)}
                   </div>
                   <div className='signerSelect' onMouseDown={this.typeClick.bind(this)}>

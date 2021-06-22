@@ -8,27 +8,32 @@ const store = require('../store')
 const accounts = require('../accounts')
 const chains = require('../chains')
 
-let socket, reconnectTimer
+let socket, reconnectTimer, gasTimer
 
-store.observer(() => {
+const getCurrentChainGas = () => {
   const network = store('main.currentNetwork')
+  chains.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, response => {
+    if (response.result) {
+      const price = parseInt(response.result, 16) / 1000000000
+      setGasPrices(network.type, network.id, {
+        slow: price,
+        standard: price,
+        fast: price,
+        asap: Math.round((price + 1) * 1.2),
+        custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
+      })
+    }
+  })
+}
 
-  if (network.id.toString() !== '1') {
-    // mainnet gas prices use a websocket callback (see onData() below)
-    chains.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, response => {
-      if (response.result) {
-        const price = parseInt(response.result, 16) / 1000000000
-
-        setGasPrices(network.type, network.id, {
-          slow: price,
-          standard: price,
-          fast: price * 2,
-          asap: price * 4,
-          custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
-        })
-      }
-    })
-  }
+chains.on('connect', () => {
+  store.observer(() => {
+    clearTimeout(gasTimer)
+    const network = store('main.currentNetwork')
+    if (network.id === '1') return // mainnet gas prices use a websocket callback (see onData() below)
+    getCurrentChainGas()
+    gasTimer = setInterval(getCurrentChainGas, 10 * 1000)
+  })
 })
 
 function setGasPrices (network, chainId, gas) {
