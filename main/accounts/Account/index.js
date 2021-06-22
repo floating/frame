@@ -312,7 +312,7 @@ class Account {
     }
   }
 
-  signTypedData (index, typedData, cb) {
+  signTypedData (typedData, cb) {
     if (!typedData) return cb(new Error('No data to sign'))
     if (typeof (typedData) !== 'object') return cb(new Error('Data to sign has the wrong format'))
     if (this.signer) {
