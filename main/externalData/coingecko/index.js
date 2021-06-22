@@ -3,7 +3,6 @@ const log = require('electron-log')
 
 const apiVersion = process.env.COIN_GECKO_API_VERSION || 'v3'
 const baseUrl = `https://api.coingecko.com/api/${apiVersion}`
-//${path}${batchIds}&vs_currencies=${vsCurrencies}&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`
 
 async function handleJsonResponse (response) {
   const body = await response.json()
@@ -13,41 +12,59 @@ async function handleJsonResponse (response) {
   return body
 }
 
-async function price () {
+async function call (path, params = {}) {
+  const queryStr = Object.entries(params).map(param => param.join('=')).join('&')
+  const url = `${path}${queryStr ? '?' + queryStr : ''}`
 
+  log.debug(`loading coingecko data from ${url}`)
+
+  return fetch(url).then(handleJsonResponse)
 }
 
-async function tokenPrice () {
+async function coinPrices (ids, currencies = ['usd']) {
+  const queryParams = {
+    ids: ids.join(','),
+    vs_currencies: currencies.join(','),
+    include_market_cap: 'true',
+    include_24hr_vol: 'true',
+    include_24hr_change: 'true'
+  }
 
+  return call(`${baseUrl}/simple/price`, queryParams)
+}
+
+async function tokenPrices (addresses, currencies = ['usd']) {
+  const queryParams = {
+    contract_addresses: addresses.join(','),
+    vs_currencies: currencies.join(','),
+    include_market_cap: 'true',
+    include_24hr_vol: 'true',
+    include_24hr_change: 'true'
+  }
+
+  return call(`${baseUrl}/simple/token_price/ethereum`, queryParams)
 }
 
 async function getCoin (id) {
-  const url = `${baseUrl}/coins/${id}`
-
-  log.debug(`loading coin data from ${url}`)
-
-  return fetch(url).then(handleJsonResponse)
+  return call(`${baseUrl}/coins/${id}`)
 }
 
 async function listCoins () {
-  const url = `${baseUrl}/coins/list`
-
-  log.debug(`loading coin list from ${url}`)
-
-  return fetch(url).then(handleJsonResponse)
+  return call(`${baseUrl}/coins/list`)
 }
 
 async function listMarkets (ids, vsCurrency = 'usd') {
-  const url = `${baseUrl}/coins/markets?vs_currency=${vsCurrency}&ids=${ids.join(',')}`
+  const queryParams = {
+    vs_currency: vsCurrency,
+    ids: ids.join(',')
+  }
 
-  log.debug(`loading coin markets from ${url}`)
-
-  return fetch(url).then(handleJsonResponse)
+  return call(`${baseUrl}/coins/markets`, queryParams)
 }
 
 module.exports = {
-  price,
-  tokenPrice,
+  coinPrices,
+  tokenPrices,
   getCoin,
   listCoins,
   listMarkets

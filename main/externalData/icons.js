@@ -11,15 +11,19 @@ async function loadCoinData (allCoins, symbol) {
       .filter(coin => coin.symbol.toLowerCase() === symbol.toLowerCase())
       .map(coin => coin.id)
 
-    const referenceData = await coingecko.listMarkets(ids)
+    if (ids.length > 0) {
+      const referenceData = await coingecko.listMarkets(ids)
 
-    const coin = referenceData.sort(byMarketCap)[0]
+      const sorted = referenceData.sort(byMarketCap)
+      const coin = sorted.length > 0 ? sorted[0] : { id: '' }
 
-    return await coingecko.getCoin(coin.id)
+      return await coingecko.getCoin(coin.id)
+    }
   } catch (e) {
     log.error(`could not load coin data for ${symbol}`, e)
-    return { image: {} }
   }
+
+  return {}
 }
 
 async function getIcons (symbols) {
@@ -29,8 +33,9 @@ async function getIcons (symbols) {
 
   for (const symbol of symbols) {
     const coinData = await loadCoinData(allCoins, symbol)
+    const image = coinData.image || {}
 
-    icons[symbol] = coinData.image.small || coinData.image.thumb
+    icons[symbol] = image.small || image.thumb
   }
 
   return icons

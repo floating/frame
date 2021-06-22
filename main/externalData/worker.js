@@ -31,7 +31,7 @@ function tokenScan (addresses) {
 }
 
 function ratesScan (symbols) {
-  rates.loadRates(symbols)
+  rates(symbols)
     .then(loadedRates => process.send({ type: 'rates', rates: loadedRates }))
     .catch(err => log.error('rates scan error', err))
 }
@@ -60,7 +60,6 @@ function resetHeartbeat () {
 }
 
 const messageHandler = {
-  updateCoins: rates.loadCoins,
   updateRates: ratesScan,
   updateIcons: iconScan,
   updateTokenBalances: tokenScan,

@@ -1,11 +1,18 @@
 const provider = require('eth-provider')()
+const BigNumber = require('bignumber.js')
 
 const getTokenList = require('./inventory/tokens')
 const getTokenBalances = require('./tokens')
-const coins = require('./coins')
 
 async function chainId () {
   return parseInt(await provider.request({ method: 'eth_chainId' }))
+}
+
+async function getNativeCoinBalance (address) {
+  const rawBalance = await provider.request({ method: 'eth_getBalance', params: [address, 'latest'] })
+
+  // TODO how to shift the balance, are all coins the same?
+  return BigNumber(rawBalance).shiftedBy(-18)
 }
 
 async function scan (address, omit = [], knownList) {
@@ -14,9 +21,10 @@ async function scan (address, omit = [], knownList) {
   const chain = await chainId()
   const tokens = await getTokenList(chain)
 
-  const coinBalances = (await coins(provider).getCoinBalances(chain, address))
   // Emit progress asap, needs better pattern
-  process.send({ type: 'tokens', netId: chain, address, found: coinBalances })
+  const coinBalance = await getNativeCoinBalance(address)
+  process.send({ type: 'coinBalance', netId: chain, address, coinBalance: coinBalance })
+
   const foundTokens = await getTokenBalances(chain, address, tokens)
 
   const tokenBalances = Object.entries(foundTokens).reduce((found, [addr, balance]) => {
@@ -36,7 +44,7 @@ async function scan (address, omit = [], knownList) {
     return found
   }, {})
 
-  return { ...coinBalances, ...tokenBalances }
+  return tokenBalances
 }
 
 module.exports = scan

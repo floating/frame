@@ -3,13 +3,13 @@ const log = require('electron-log')
 const { fork } = require('child_process')
 
 const store = require('../store')
-const icons = require('./icons')
 
 let activeAddress
 let trackedAddresses = []
+let networkCurrencies = []
 
 let currentNetworkObserver, allNetworksObserver
-let scanWorker, heartbeat, allAddressScan, trackedAddressScan, coinScan, rateScan, inventoryScan
+let scanWorker, heartbeat, allAddressScan, trackedAddressScan, baseRateScan, inventoryScan
 
 function createWorker () {
   if (scanWorker) {
@@ -23,11 +23,25 @@ function createWorker () {
       log.debug('received message from scan worker: ', message)
     }
 
-    if (message.type === 'ready') updateRates(['eth', 'xdai', 'matic'])
+    if (message.type === 'coinBalance') {
+      const symbol = store('main.networks.ethereum', message.netId).symbol.toLowerCase()
+      const balance = {
+        chainId: message.netId,
+        symbol,
+        balance: message.coinBalance
+      }
+
+      store.setBalance(message.netId, message.address, symbol, balance)
+    }
 
     if (message.type === 'tokens') {
       store.setBalances(message.netId, message.address, message.found, message.fullScan)
-      updateRates(Object.keys(message.found))
+
+      const tokenSymbols = Object.keys(message.found).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
+
+      if (tokenSymbols.length > 0) {
+        updateRates(tokenSymbols)
+      }
     }
 
     if (message.type === 'rates') {
@@ -35,12 +49,19 @@ function createWorker () {
     }
 
     if (message.type === 'icons') {
-      Object.entries(message.icons)
-        .forEach(([symbol, iconUri]) => {
-          Object.entries(store('main.networksMeta.ethereum'))
-            .filter(([networkId, network]) => network.nativeCurrency.symbol.toLowerCase() === symbol.toLowerCase())
-            .forEach(([networkId, network]) => store.setIcon('ethereum', networkId, iconUri))
+      const networks = Object.entries(store('main.networksMeta.ethereum'))
+
+      for (const symbol in message.icons) {
+        const networksWithSymbol = networks
+          .filter(([networkId, network]) => {
+            const networkSymbol = network.nativeCurrency.symbol || ''
+            return networkSymbol.toLowerCase() === symbol.toLowerCase()
+          })
+
+        networksWithSymbol.forEach(([networkId, network]) => {
+          store.setIcon('ethereum', networkId, message.icons[symbol])
         })
+      }
     }
 
     if (message.type === 'inventory') {
@@ -83,6 +104,14 @@ function startScan (fn, interval) {
   return setInterval(fn, interval)
 }
 
+function scanNetworkCurrencyRates () {
+  if (baseRateScan) {
+    clearInterval(baseRateScan)
+  }
+
+  baseRateScan = startScan(() => updateRates(networkCurrencies), 1000 * 15)
+}
+
 function scanActiveData () {
   if (trackedAddressScan) {
     clearInterval(trackedAddressScan)
@@ -100,7 +129,6 @@ function scanActiveData () {
 }
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
-const updateCoinUniverse = () => sendCommandToWorker('updateCoins')
 const updateRates = symbols => sendCommandToWorker('updateRates', [symbols])
 const updateIcons = symbols => sendCommandToWorker('updateIcons', [symbols])
 const updateTrackedTokens = () => { if (activeAddress) { sendCommandToWorker('updateTokenBalances', [[activeAddress]]) } }
@@ -108,6 +136,16 @@ const updateAllTokens = () => sendCommandToWorker('updateTokenBalances', [tracke
 
 const updateInventory = () => {
   if (activeAddress) { sendCommandToWorker('updateInventory', [[activeAddress]]) }
+}
+
+const networksWithoutIcons = (networkSymbols, network) => {
+  const symbol = network.nativeCurrency.symbol
+
+  if (network.nativeCurrency.icon || networkSymbols.includes(symbol)) {
+    return networkSymbols
+  }
+
+  return [symbol, ...networkSymbols]
 }
 
 function addAddresses (addresses) {
@@ -128,35 +166,6 @@ function setActiveAddress (address) {
 }
 
 function start (addresses = [], omitList = [], knownList) {
-  currentNetworkObserver = store.observer(() => {
-    const { id } = store('main.currentNetwork')
-
-    log.debug(`changed scanning network to chainId: ${id}`)
-
-    scanActiveData()
-  })
-
-  allNetworksObserver = store.observer(() => {
-    const networks = store('main.networksMeta.ethereum')
-
-    // update icons for any networks that don't have them
-    const needIcons = Object.values(networks)
-      .reduce((networkSymbols, network) => {
-        if (!network.nativeCurrency.icon && !networkSymbols.includes(network.nativeCurrency.symbol)) {
-          return [network.nativeCurrency.symbol, ...networkSymbols]
-        }
-
-        return networkSymbols
-      }, [])
-
-      console.log({ needIcons })
-
-    updateIcons(needIcons)
-
-  })
-
-  // addAddresses(addresses) // Scan becomes too heavy with many accounts added
-
   if (scanWorker) {
     log.warn('external data worker already scanning')
     return
@@ -166,41 +175,59 @@ function start (addresses = [], omitList = [], knownList) {
 
   scanWorker = createWorker()
 
+  currentNetworkObserver = store.observer(() => {
+    const { id } = store('main.currentNetwork')
+
+    log.debug(`changed scanning network to chainId: ${id}`)
+
+    scanActiveData()
+  })
+
+  allNetworksObserver = store.observer(() => {
+    const networks = store('main.networks.ethereum')
+    const networkMeta = store('main.networksMeta.ethereum')
+
+    const symbols = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
+
+    // update icons for any networks that don't have them
+    const needIcons = Object.values(networkMeta).reduce(networksWithoutIcons, [])
+
+    if (symbols.some(sym => !networkCurrencies.includes(sym))) {
+      networkCurrencies = [...symbols]
+      scanNetworkCurrencyRates()
+    }
+
+    if (needIcons.length > 0) {
+      updateIcons(needIcons)
+    }
+  })
+
+  // addAddresses(addresses) // Scan becomes too heavy with many accounts added
+
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
-  }
-
-  if (!coinScan) {
-    // update list of known coins/tokens every 10 minutes
-    coinScan = startScan(updateCoinUniverse, 1000 * 60 * 10)
   }
 
   if (!allAddressScan) {
     // update tokens for all accounts (even inactive) every 5 minutes
     allAddressScan = startScan(updateAllTokens, 1000 * 60 * 5)
   }
-
-  if (!rateScan) {
-    // update base rates
-    const ethereum = store('main.networks.ethereum')
-    const baseRates = Object.keys(ethereum).map(n => ethereum[n].symbol && ethereum[n].symbol.toLowerCase()).filter(s => s)
-    rateScan = startScan(() => updateRates([...new Set(baseRates)]), 1000 * 15)
-  }
 }
 
 function stop () {
   log.info('stopping external data worker')
 
-  currentNetworkObserver.remove();
+  currentNetworkObserver.remove()
   allNetworksObserver.remove();
 
-  [heartbeat, allAddressScan, trackedAddressScan, coinScan]
+  [heartbeat, allAddressScan, trackedAddressScan, baseRateScan, inventoryScan]
     .forEach(scanner => { if (scanner) clearInterval(scanner) })
 
   heartbeat = null
   allAddressScan = null
   trackedAddressScan = null
-  coinScan = null
+  baseRateScan = null
+  inventoryScan = null
 }
 
 function restart () {
