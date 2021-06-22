@@ -199,8 +199,8 @@ module.exports = {
       u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
-  setIcon: (u, netType, netId, iconUri) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency.icon', () => iconUri)
+  setNetworkMeta: (u, netType, netId, meta) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency', () => meta)
   },
   addNetwork: (u, net) => {
     const defaultNetwork = {
@@ -393,12 +393,14 @@ module.exports = {
     u('main.inventory', address, () => inventory)
   },
   setBalance: (u, netId, address, key, balance) => {
-    // key could be a symbol or a contract address
+    // key could be 'native' or a contract address
     u('main.balances', netId, address, (balances = {}) => {
       const updates = {
         ...balances,
         [key]: balance
       }
+
+      console.log({ updates })
 
       return updates
     })

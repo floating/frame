@@ -9,7 +9,7 @@ let trackedAddresses = []
 let networkCurrencies = []
 
 let currentNetworkObserver, allNetworksObserver
-let scanWorker, heartbeat, allAddressScan, trackedAddressScan, baseRateScan, inventoryScan
+let scanWorker, heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan
 
 function createWorker () {
   if (scanWorker) {
@@ -23,18 +23,25 @@ function createWorker () {
       log.debug('received message from scan worker: ', message)
     }
 
-    if (message.type === 'coinBalance') {
-      const symbol = store('main.networks.ethereum', message.netId).symbol.toLowerCase()
-      const balance = {
-        chainId: message.netId,
-        symbol,
-        balance: message.coinBalance
-      }
-
-      store.setBalance(message.netId, message.address, symbol, balance)
+    if (message.type === 'chainBalance') {
+      store.setBalance(message.netId, message.address, 'native', message.balance)
     }
 
-    if (message.type === 'tokens') {
+    if (message.type === 'nativeCurrencyData') {
+      for (const symbol in message.currencyData) {
+        const currencyData = message.currencyData[symbol]
+        const networkIds = Object.entries(store('main.networks.ethereum'))
+          .filter(([networkId, network]) => network.symbol.toLowerCase() === symbol)
+          .map(([networkId, network]) => networkId)
+
+        networkIds.forEach(networkId => {
+          const existingData = store('main.networksMeta.ethereum', networkId, 'nativeCurrency')
+          store.setNetworkMeta('ethereum', networkId, { ...existingData, ...currencyData })
+        })
+      }
+    }
+
+    if (message.type === 'tokenBalances') {
       store.setBalances(message.netId, message.address, message.found, message.fullScan)
 
       const tokenSymbols = Object.keys(message.found).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
@@ -105,11 +112,11 @@ function startScan (fn, interval) {
 }
 
 function scanNetworkCurrencyRates () {
-  if (baseRateScan) {
-    clearInterval(baseRateScan)
+  if (nativeCurrencyScan) {
+    clearInterval(nativeCurrencyScan)
   }
 
-  baseRateScan = startScan(() => updateRates(networkCurrencies), 1000 * 15)
+  nativeCurrencyScan = startScan(() => updateNativeCurrencyData(networkCurrencies), 1000 * 15)
 }
 
 function scanActiveData () {
@@ -121,8 +128,8 @@ function scanActiveData () {
     clearInterval(inventoryScan)
   }
 
-  // update tokens for the active account every 15 seconds
-  trackedAddressScan = startScan(updateTrackedTokens, 1000 * 15)
+  // update balances for the active account every 15 seconds
+  trackedAddressScan = startScan(updateActiveBalances, 1000 * 15)
 
   // update inventory for the active account every 60 seconds
   inventoryScan = startScan(() => updateInventory(), 1000 * 60)
@@ -130,9 +137,14 @@ function scanActiveData () {
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
 const updateRates = symbols => sendCommandToWorker('updateRates', [symbols])
-const updateIcons = symbols => sendCommandToWorker('updateIcons', [symbols])
-const updateTrackedTokens = () => { if (activeAddress) { sendCommandToWorker('updateTokenBalances', [[activeAddress]]) } }
+const updateNativeCurrencyData = symbols => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateAllTokens = () => sendCommandToWorker('updateTokenBalances', [trackedAddresses])
+const updateActiveBalances = () => {
+  if (activeAddress) {
+    sendCommandToWorker('updateChainBalance', [activeAddress])
+    sendCommandToWorker('updateTokenBalances', [[activeAddress]])
+  }
+}
 
 const updateInventory = () => {
   if (activeAddress) { sendCommandToWorker('updateInventory', [[activeAddress]]) }
@@ -198,7 +210,7 @@ function start (addresses = [], omitList = [], knownList) {
     }
 
     if (needIcons.length > 0) {
-      updateIcons(needIcons)
+      // updateIcons(needIcons)
     }
   })
 
@@ -220,13 +232,13 @@ function stop () {
   currentNetworkObserver.remove()
   allNetworksObserver.remove();
 
-  [heartbeat, allAddressScan, trackedAddressScan, baseRateScan, inventoryScan]
+  [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
     .forEach(scanner => { if (scanner) clearInterval(scanner) })
 
   heartbeat = null
   allAddressScan = null
   trackedAddressScan = null
-  baseRateScan = null
+  nativeCurrencyScan = null
   inventoryScan = null
 }
 

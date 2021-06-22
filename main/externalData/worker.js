@@ -1,8 +1,9 @@
-const scanTokens = require('./scan')
+const log = require('electron-log')
+
+const balances = require('./balances')
 const rates = require('./rates')
 const inventory = require('./inventory')
-const icons = require('./icons')
-const log = require('electron-log')
+const loadStaticData = require('./staticData')
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
 log.transports.console.level = process.env.LOG_WORKER ? 'debug' : false
@@ -16,18 +17,24 @@ function groupByChainId (tokens) {
   }, {})
 }
 
-function tokenScan (addresses) {
+function tokenBalanceScan (addresses) {
   addresses.forEach(address => {
-    scanTokens(address)
+    balances.getTokenBalances(address)
       .then(foundTokens => {
         const grouped = groupByChainId(foundTokens)
 
         Object.entries(grouped).forEach(([netId, found]) => {
-          process.send({ type: 'tokens', netId, address, found, fullScan: true })
+          process.send({ type: 'tokenBalances', netId, address, found, fullScan: true })
         })
       })
       .catch(err => log.error('token scan error', err))
   })
+}
+
+function chainBalanceScan (address) {
+  balances.getNativeCurrencyBalance(address)
+    .then(balance => process.send({ type: 'chainBalance', ...balance }))
+    .catch(err => log.error('chain balance scan error', err))
 }
 
 function ratesScan (symbols) {
@@ -36,10 +43,10 @@ function ratesScan (symbols) {
     .catch(err => log.error('rates scan error', err))
 }
 
-function iconScan (symbols) {
-  icons(symbols)
-    .then(loadedIcons => process.send({ type: 'icons', icons: loadedIcons }))
-    .catch(err => log.error('icon scan error', err))
+function nativeCurrencyScan (symbols) {
+  loadStaticData(symbols)
+    .then(currencyData => process.send({ type: 'nativeCurrencyData', currencyData }))
+    .catch(err => log.error('native currency scan error', err))
 }
 
 function inventoryScan (addresses) {
@@ -61,8 +68,9 @@ function resetHeartbeat () {
 
 const messageHandler = {
   updateRates: ratesScan,
-  updateIcons: iconScan,
-  updateTokenBalances: tokenScan,
+  updateNativeCurrencyData: nativeCurrencyScan,
+  updateChainBalance: chainBalanceScan,
+  updateTokenBalances: tokenBalanceScan,
   updateInventory: inventoryScan,
   heartbeat: resetHeartbeat
 }
