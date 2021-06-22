@@ -423,6 +423,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            symbol: 'eth'
           }
         },
         3: {
@@ -431,6 +434,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            symbol: 'eth'
           }
         },
         4: {
@@ -439,6 +445,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            symbol: 'eth'
           }
         },
         5: {
@@ -447,6 +456,20 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            symbol: 'eth'
+          }
+        },
+        10: {
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          nativeCurrency: {
+            symbol: 'eth'
           }
         },
         42: {
@@ -455,6 +478,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            symbol: 'eth'
           }
         },
         100: {
@@ -463,6 +489,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            symbol: 'xdai'
           }
         },
         137: {
@@ -471,6 +500,9 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
+          },
+          nativeCurrency: {
+            symbol: 'matic'
           }
         }
       }

@@ -8,7 +8,6 @@ config.json
 dist
 release
 test/.userData
-scratch
 .vscode
 .parcel-cache
 scripts
