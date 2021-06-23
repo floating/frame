@@ -1,7 +1,81 @@
 const log = require('electron-log')
 
 const migrations = {
-  5: initial=> { // Add Polygon to persisted networks
+  4: initial => {
+    // If persisted state still has main.gasPrice, move gas settings into networks
+    const gasPrice = initial.main.gasPrice // ('gasPrice', false)
+
+    if (gasPrice) {
+      Object.keys(gasPrice).forEach(network => {
+        // Prerelease versions of 0.3.2 used 'normal' instead of 'standard'
+        if (gasPrice[network].default === 'normal') gasPrice[network].default = 'standard'
+        // For each network with gasPrices, copy over default and custom level
+        if (initial.main.networks.ethereum[network] && initial.main.networks.ethereum[network].gas) {
+          initial.main.networks.ethereum[network].gas.price.selected = gasPrice[network].default
+          initial.main.networks.ethereum[network].gas.price.levels.custom = gasPrice[network].levels.custom
+        }
+      })
+    }
+
+    // If persisted state state still has main.connection, move connection settings into networks
+    const connection = initial.main.connection // main('connection', false)
+    if (connection) {
+      // Copy all local connection settings to new connection object
+      if (connection.local && connection.local.settings) {
+        Object.keys(connection.local.settings).forEach(id => {
+          if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection) {
+            // Copy local custom endpoint to new connection object
+            if (connection.local.settings[id].options) initial.main.networks.ethereum[id].connection.primary.custom = connection.local.settings[id].options.custom
+            // Copy local current selection to new connection object
+            let current = connection.local.settings[id].current
+            if (current === 'direct') current = 'local'
+            if (current) initial.main.networks.ethereum[id].connection.primary.current = current
+          }
+        })
+      }
+      // Copy all secondary connection settings to new connection object
+      if (connection.secondary && connection.secondary.settings) {
+        Object.keys(connection.secondary.settings).forEach(id => {
+          if (connection.secondary.settings[id] && initial.main.networks.ethereum[id] && initial.main.networks.ethereum[id].connection) {
+            // Copy all secondary connection settings to new connection object
+            if (connection.secondary.settings[id].options) initial.main.networks.ethereum[id].connection.secondary.custom = connection.secondary.settings[id].options.custom
+            // Copy local current selection to new connection object
+            let current = connection.secondary.settings[id].current
+            if (current === 'direct') current = 'local'
+            if (current) initial.main.networks.ethereum[id].connection.secondary.current = current
+          }
+        })
+      }
+      // Copy primary/secondary on/off
+      Object.keys(initial.main.networks.ethereum).forEach(id => {
+        initial.main.networks.ethereum[id].connection.primary.on = connection.local.on
+        initial.main.networks.ethereum[id].connection.secondary.on = connection.secondary.on
+      })
+      initial.main.currentNetwork.id = connection.network + '' || initial.main.currentNetwork.id || '1'
+    }
+
+    Object.keys(initial.main.networks.ethereum).forEach(id => {
+      // Earlier versions of v0.3.3 did not include symbols
+      if (!initial.main.networks.ethereum[id].symbol) {
+        if (id === 74) {
+          initial.main.networks.ethereum[id].symbol = 'EIDI'
+        } else if (id === 100) {
+          initial.main.networks.ethereum[id].symbol = 'xDAI'
+        } else {
+          initial.main.networks.ethereum[id].symbol = 'ETH'
+        }
+      }
+      if (initial.main.networks.ethereum[id].symbol === 'Ξ') initial.main.networks.ethereum[id].symbol = 'ETH'
+      // Update safelow -> slow and trader -> asap
+      if (initial.main.networks.ethereum[id].gas.price.selected === 'safelow') initial.main.networks.ethereum[id].gas.price.selected = 'slow'
+      if (initial.main.networks.ethereum[id].gas.price.selected === 'trader') initial.main.networks.ethereum[id].gas.price.selected = 'asap'
+      if (initial.main.networks.ethereum[id].gas.price.selected === 'custom') initial.main.networks.ethereum[id].gas.price.selected = initial.main.networks.ethereum[id].gas.price.lastLevel || 'standard'
+    })
+
+    // If migrating from before this was a setting make it 'true' to grandfather behavior
+    if (initial.main.mute && initial.main.accountCloseLock === undefined) initial.main.accountCloseLock = true
+  },
+  5: initial => { // Add Polygon to persisted networks
     initial.main.networks.ethereum[137] = {
       id: 137,
       type: 'ethereum',
@@ -123,7 +197,7 @@ const migrations = {
 
     return initial
   },
-  10: initial=> {  // Add Optimisim to persisted networks
+  10: initial => {  // Add Optimisim to persisted networks
     if (!initial.main.networks.ethereum[10]) {
 
       initial.main.networks.ethereum[10] = {
