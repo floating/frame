@@ -1,6 +1,7 @@
 const path = require('path')
 const electron = require('electron')
 const Conf = require('conf')
+const log = require('electron-log')
 
 const migrations = require('../migrations')
 
@@ -18,7 +19,8 @@ class PersistStore extends Conf {
   }
 
   set (path, value) {
-    path = `main.__.${migrations.latest()}.${path}`
+    log.info('Setting state version', migrations.latest)
+    path = `main.__.${migrations.latest}.${path}`
     super.set(path, value)
   }
 }

@@ -24,12 +24,14 @@ const migrations = {
   },
   12: state => {
     state.main.colorway = 'dark'
-    state.main._version = 12
     return state
   },
   13: state => {
     state.main.colorway = 'dark'
-    state.main._version = 13
+    return state
+  },
+  14: state => {
+    state.main.colorway = 'light'
     return state
   }
 }
@@ -39,9 +41,10 @@ module.exports = {
   apply: state => {
     Object.keys(migrations).sort().forEach(version => {
       if (state.main._version < version) state = migrations[version](state)
+      state.main._version = version
     })
     return state
   },
   // Return version number of latest known migration
-  latest: () => Math.max(...Object.keys(migrations)) 
+  latest: Math.max(...Object.keys(migrations))
 }

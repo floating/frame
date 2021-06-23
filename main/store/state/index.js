@@ -13,7 +13,7 @@ const latestStateVersion = () => {
   }
 
   // valid states are less than or equal to the latest migration we know about 
-  const versions = Object.keys(state.__).filter(v => v <= migrations.latest()).sort()
+  const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort()
   
   if (versions.length === 0) {
     log.info('Persisted state: returning base state')
