@@ -42,9 +42,9 @@ function createWorker () {
     }
 
     if (message.type === 'tokenBalances') {
-      store.setBalances(message.netId, message.address, message.found, message.fullScan)
+      store.setBalances(message.netId, message.address, message.balances, message.fullScan)
 
-      const tokenSymbols = Object.keys(message.found).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
+      const tokenSymbols = Object.keys(message.balances).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
 
       if (tokenSymbols.length > 0) {
         updateRates(tokenSymbols)
