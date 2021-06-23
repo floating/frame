@@ -400,8 +400,6 @@ module.exports = {
         [key]: balance
       }
 
-      console.log({ updates })
-
       return updates
     })
   },

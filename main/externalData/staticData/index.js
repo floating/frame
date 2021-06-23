@@ -17,6 +17,8 @@ async function loadCoinData (allCoins, symbol) {
       const sorted = referenceData.sort(byMarketCap)
       const coin = sorted.length > 0 ? sorted[0] : { name: '' }
 
+      if (coin.name === 'Ethereum') coin.name = 'Ether'
+
       return coin
     }
   } catch (e) {
@@ -38,12 +40,13 @@ async function load (symbols) {
       data[symbol] = {
         icon: coinData.image,
         name: coinData.name,
-        usdRate: coinData.current_price
+        usd: {
+          price: coinData.current_price || 0,
+          '24hrChange': coinData.price_change_percentage_24h || 0
+        }
       }
     }
   }
-
-  console.log({ data })
 
   return data
 }

@@ -132,8 +132,9 @@ class TransactionRequest extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-    const etherRates = this.store('main.rates')
-    const etherUSD = etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+    const layer = this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'layer')
+    const nativeCurrency = this.store('main.networksMeta.ethereum', parseInt(req.data.chainId, 'hex'), 'nativeCurrency')
+    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     const feeUSD = fee * etherUSD
@@ -144,7 +145,7 @@ class TransactionRequest extends React.Component {
     // if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
     const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'Ξ'
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     const txMeta = { replacement: false, possible: true, notice: '' }
     // TODO
     // if (signer locked) {
@@ -372,9 +373,7 @@ class TransactionRequest extends React.Component {
                         <span className='transactionSymbol'>{currentSymbol}</span>
                         <span>{value}</span>
                       </div>
-                      {id === '1' ? (
-                        <div className='transactionTotalUSD'>{'$' + (value * etherUSD).toFixed(2)}</div>
-                      ) : null}
+                      <div className='transactionTotalUSD'>{'$' + (value * etherUSD).toFixed(2)}</div>
                     </div>
                     <div className='transactionSubtitle'>Value</div>
                   </div>

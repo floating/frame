@@ -53,17 +53,19 @@ class Panel extends React.Component {
   }
 
   render () {
-    // const open = this.store('tray.open')
-    // console.log('tray open?', open)
     const opacity = this.store('tray.initial') ? 0 : 1 // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
-    // const opacity = open ? '1' : '0'
-    // const transition = this.store('tray.initial') ? '0.64s cubic-bezier(.72,0,.32,1) all' : '0.16s cubic-bezier(.72,0,.32,1) all'
     const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
 
-    const rates = this.store('main.rates')
-    const rateSymbol = currentSymbol.toLowerCase()
-    const baseRate = rates[rateSymbol] && rates[rateSymbol].usd ? Math.floor(rates[rateSymbol].usd.price).toLocaleString() : '---' // this.store('main.rates.USD') ? Math.floor(this.store('main.rates.USD')) : '---'
+    const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
+
+    const chainLayer = this.store('main.networks', type, id, 'layer')
+    const baseRate = chainLayer === 'testnet' ? 'TEST' : 
+      nativeCurrency && nativeCurrency.usd ? (
+        nativeCurrency.usd.price < 100 ? 
+          (Math.round(nativeCurrency.usd.price * 100) / 100).toFixed(2)
+        :
+          Math.floor(nativeCurrency.usd.price).toLocaleString()
+    ) : '---'
 
     let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.standard')
     if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)

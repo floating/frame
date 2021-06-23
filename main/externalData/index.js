@@ -24,7 +24,7 @@ function createWorker () {
     }
 
     if (message.type === 'chainBalance') {
-      store.setBalance(message.netId, message.address, 'native', message.balance)
+      store.setBalance(message.chainId, message.address, 'native', message.balance)
     }
 
     if (message.type === 'nativeCurrencyData') {
@@ -150,15 +150,6 @@ const updateInventory = () => {
   if (activeAddress) { sendCommandToWorker('updateInventory', [[activeAddress]]) }
 }
 
-const networksWithoutIcons = (networkSymbols, network) => {
-  const symbol = network.nativeCurrency.symbol
-
-  if (network.nativeCurrency.icon || networkSymbols.includes(symbol)) {
-    return networkSymbols
-  }
-
-  return [symbol, ...networkSymbols]
-}
 
 function addAddresses (addresses) {
   trackedAddresses = [...trackedAddresses].concat(addresses).reduce((all, addr) => {
@@ -197,21 +188,14 @@ function start (addresses = [], omitList = [], knownList) {
 
   allNetworksObserver = store.observer(() => {
     const networks = store('main.networks.ethereum')
-    const networkMeta = store('main.networksMeta.ethereum')
 
     const symbols = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
-
-    // update icons for any networks that don't have them
-    const needIcons = Object.values(networkMeta).reduce(networksWithoutIcons, [])
 
     if (symbols.some(sym => !networkCurrencies.includes(sym))) {
       networkCurrencies = [...symbols]
       scanNetworkCurrencyRates()
     }
 
-    if (needIcons.length > 0) {
-      // updateIcons(needIcons)
-    }
   })
 
   // addAddresses(addresses) // Scan becomes too heavy with many accounts added

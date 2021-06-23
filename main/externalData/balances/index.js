@@ -13,7 +13,7 @@ async function getNativeCurrencyBalance (address) {
   const balance = { balance: BigNumber(rawBalance).shiftedBy(-18) }
 
   // TODO how to shift the balance, are all coins the same?
-  return { address, balance }
+  return { address, balance, chainId: await chainId() }
 }
 
 function balanceCalls (owner, tokens) {

@@ -319,8 +319,10 @@ class TransactionFee extends React.Component {
     const gasLevels = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
     const { slowTime, standardTime, fastTime, asapTime, customTime } = gasLevels
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
-    const etherRates = this.store('main.rates')
-    const etherUSD = network.id === '1' && etherRates && etherRates.USD ? parseFloat(etherRates.USD) : 0
+    const req = this.props.req
+    const layer = this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'layer')
+    const nativeCurrency = this.store('main.networksMeta.ethereum', parseInt(req.data.chainId, 'hex'), 'nativeCurrency')
+    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const gasLimit = this.state.inputLimit || (this.state.gasLimitInputFocus ? 0 : parseInt(data.gas, 'hex'))
 
     const gasData = this.gasData(['slow', 'standard', 'fast', 'asap', 'custom'], gasLimit, etherUSD)
@@ -536,7 +538,7 @@ class TransactionFee extends React.Component {
               <span className='txFeeSummaryTotal'>{feeTotal}</span>
               <span className='txFeeSummaryEquivalentSymbol'>≈</span>
               <span className='txFeeSummaryUSDSymbol'>$</span>
-              <span className='txFeeSummaryTotalUSD'>{feeTotalUSD === '0.00' ? '?' : feeTotalUSD}</span>
+              <span className='txFeeSummaryTotalUSD'>{feeTotalUSD}</span>
             </div>
             <div className='txFeeSummaryLabel'>
               MAX FEE
@@ -589,7 +591,7 @@ class TransactionFee extends React.Component {
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
                 <span className='networkFeeSymbolUSD'>$</span>
-                {network.id === '1' ? gasData.slow.feeUSD : '?'}
+                {gasData.slow.feeUSD}
               </div>
             </div>
           </div>
@@ -624,7 +626,7 @@ class TransactionFee extends React.Component {
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
                 <span className='networkFeeSymbolUSD'>$</span>
-                {network.id === '1' ? gasData.standard.feeUSD : '?'}
+                {gasData.standard.feeUSD}
               </div>
             </div>
           </div>
@@ -659,7 +661,7 @@ class TransactionFee extends React.Component {
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
                 <span className='networkFeeSymbolUSD'>$</span>
-                {network.id === '1' ? gasData.fast.feeUSD : '?'}
+                {gasData.fast.feeUSD}
               </div>
             </div>
           </div>
@@ -694,7 +696,7 @@ class TransactionFee extends React.Component {
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
                 <span className='networkFeeSymbolUSD'>$</span>
-                {network.id === '1' ? gasData.asap.feeUSD : '?'}
+                {gasData.asap.feeUSD}
               </div>
             </div>
           </div>
@@ -730,7 +732,7 @@ class TransactionFee extends React.Component {
               <div className='networkFeeTotalSection networkFeeTotalApprox'>≈</div>
               <div className='networkFeeTotalSection networkFeeTotalUSD'>
                 <span className='networkFeeSymbolUSD'>$</span>
-                {network.id === '1' ? gasData.custom.feeUSD : '?'}
+                {gasData.custom.feeUSD}
               </div>
             </div>
           </div>
