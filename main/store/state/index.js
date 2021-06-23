@@ -163,20 +163,6 @@ const initial = {
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
-    /*
-      balances: {
-        [chainId]: {
-          [address]: {
-            native: {
-              balance: <chain's native coin balance>,
-            },
-            tokens: {
-              [contract address]: { ... }
-            }
-          }
-        }
-      }
-    */
     balances: {},
     rates: {}, // main('rates', {}),
     inventory: {}, // main('rates', {}),
