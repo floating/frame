@@ -230,7 +230,7 @@ module.exports = {
     state.main._version = state.main._version || 0
     Object.keys(migrations).sort((a, b) => a - b).forEach(version => {
       if (state.main._version < version) {
-        console.log('applying state migration ', version)
+        log.info('Applying state migration: ' + version)
         state = migrations[version](state)
         state.main._version = version
       }
