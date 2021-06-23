@@ -9,7 +9,7 @@ class PersistStore extends Conf {
   constructor (options) {
     options = { configName: 'config', ...options }
     let defaultCwd = __dirname
-    // for dev if (electron && electron.app) defaultCwd = electron.app.getPath('userData')
+    if (electron && electron.app) defaultCwd = electron.app.getPath('userData')
     if (options.cwd) {
       options.cwd = path.isAbsolute(options.cwd) ? options.cwd : path.join(defaultCwd, options.cwd)
     } else {

@@ -13,8 +13,8 @@ const latestStateVersion = () => {
   }
 
   // valid states are less than or equal to the latest migration we know about 
-  const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort()
-  
+  const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
+
   if (versions.length === 0) {
     log.info('Persisted state: returning base state')
     return state
@@ -263,7 +263,7 @@ const initial = {
         }
       }
     },
-    networks: main('networks', {
+    networks: main('networks', { 
       ethereum: {
         1: {
           id: 1,
@@ -608,170 +608,170 @@ if (main('mute', false) && get('accountCloseLock') === undefined) initial.main.a
 
 
 
-// State transition -> 5
-if (initial.main._version < 5) {
-  // Do state transition
-  initial.main.networks.ethereum[137] = {
-    id: 137,
-    type: 'ethereum',
-    symbol: 'MATIC',
-    name: 'Polygon',
-    explorer: 'https://explorer.matic.network',
-    gas: {
-      price: {
-        selected: 'standard',
-        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-      }
-    },
-    connection: {
-      primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
-      secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-    }
-  }
+// // State transition -> 5
+// if (initial.main._version < 5) {
+//   // Do state transition
+//   initial.main.networks.ethereum[137] = {
+//     id: 137,
+//     type: 'ethereum',
+//     symbol: 'MATIC',
+//     name: 'Polygon',
+//     explorer: 'https://explorer.matic.network',
+//     gas: {
+//       price: {
+//         selected: 'standard',
+//         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+//       }
+//     },
+//     connection: {
+//       primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
+//       secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+//     }
+//   }
 
-  initial.main._version = 5
-}
+//   initial.main._version = 5
+// }
 
-// State transition for derevation paths -> 6
-if (initial.main._version < 6) {
-  if (initial.main.hardwareDerivation === 'testnet') {
-    initial.main.ledger.derivation = 'testnet'
-    initial.main.trezor.derivation = 'testnet'
-  }
-  initial.main._version = 6
-}
+// // State transition for derevation paths -> 6
+// if (initial.main._version < 6) {
+//   if (initial.main.hardwareDerivation === 'testnet') {
+//     initial.main.ledger.derivation = 'testnet'
+//     initial.main.trezor.derivation = 'testnet'
+//   }
+//   initial.main._version = 6
+// }
 
-const moveOldAccountsToNewAddresses = () => {
-  const addressesToMove = {}
-  const accounts = JSON.parse(JSON.stringify(initial.main.accounts))
-  Object.keys(accounts).forEach(id => {
-    if (id.startsWith('0x')) {
-      addressesToMove[id] = accounts[id]
-      delete accounts[id]
-    }
-  })
-  initial.main.accounts = accounts
-  Object.keys(addressesToMove).forEach(id => {
-    initial.main.addresses[id] = addressesToMove[id]
-  })
-}
+// const moveOldAccountsToNewAddresses = () => {
+//   const addressesToMove = {}
+//   const accounts = JSON.parse(JSON.stringify(initial.main.accounts))
+//   Object.keys(accounts).forEach(id => {
+//     if (id.startsWith('0x')) {
+//       addressesToMove[id] = accounts[id]
+//       delete accounts[id]
+//     }
+//   })
+//   initial.main.accounts = accounts
+//   Object.keys(addressesToMove).forEach(id => {
+//     initial.main.addresses[id] = addressesToMove[id]
+//   })
+// }
 
-// State transition -> 7
-if (initial.main._version < 7) {
+// // State transition -> 7
+// if (initial.main._version < 7) {
 
-  // Before the v6 state migration
-  // If users have very old state they will first need to do an older account migration
-  moveOldAccountsToNewAddresses()
+//   // Before the v6 state migration
+//   // If users have very old state they will first need to do an older account migration
+//   moveOldAccountsToNewAddresses()
 
-  // Once this is complete they can now do the current account migration
+//   // Once this is complete they can now do the current account migration
 
-  const newAccounts = {}
-  // const nameCount = {}
-  let { accounts, addresses } = initial.main
-  accounts = JSON.parse(JSON.stringify(accounts))
-  addresses = JSON.parse(JSON.stringify(addresses))
-  Object.keys(addresses).forEach(address => {
-    // Normalize address case
-    addresses[address.toLowerCase()] = addresses[address]
-    address = address.toLowerCase()
+//   const newAccounts = {}
+//   // const nameCount = {}
+//   let { accounts, addresses } = initial.main
+//   accounts = JSON.parse(JSON.stringify(accounts))
+//   addresses = JSON.parse(JSON.stringify(addresses))
+//   Object.keys(addresses).forEach(address => {
+//     // Normalize address case
+//     addresses[address.toLowerCase()] = addresses[address]
+//     address = address.toLowerCase()
 
-    const hasPermissions = addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
-    // const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
-    if (!hasPermissions) return log.info(`Address ${address} did not have any permissions or tokens`)
+//     const hasPermissions = addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
+//     // const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
+//     if (!hasPermissions) return log.info(`Address ${address} did not have any permissions or tokens`)
 
-    // Copy Account permissions
-    initial.main.permissions[address] = addresses[address] && addresses[address].permissions ? Object.assign({}, addresses[address].permissions) : {}
+//     // Copy Account permissions
+//     initial.main.permissions[address] = addresses[address] && addresses[address].permissions ? Object.assign({}, addresses[address].permissions) : {}
 
-    const matchingAccounts = []
-    Object.keys(accounts).sort((a, b) => accounts[a].created > accounts[b].created ? 1 : -1).forEach(id => {
-      if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
-        matchingAccounts.push(id)
-      }
-    })
-    if (matchingAccounts.length > 0) {
-      const primaryAccount = matchingAccounts.sort((a, b) => {
-        return accounts[a].addresses.length === accounts[b].addresses.length ? 0 : accounts[a].addresses.length > accounts[b].addresses.length ? -1 : 1
-      })
-      newAccounts[address] = Object.assign({}, accounts[primaryAccount[0]])
-      // nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
-      // nameCount[newAccounts[address].name]++
-      // if (nameCount[newAccounts[address].name] > 1) newAccounts[address].name = newAccounts[address].name + ' ' + nameCount[newAccounts[address].name]
-      newAccounts[address].address = address
-      newAccounts[address].id = address
-      newAccounts[address].lastSignerType = newAccounts[address].type
-      delete newAccounts[address].type
-      delete newAccounts[address].network
-      delete newAccounts[address].signer
-      delete newAccounts[address].index
-      delete newAccounts[address].addresses
-      newAccounts[address].tokens = addresses[address] && addresses[address].tokens ? addresses[address].tokens : {}
-      newAccounts[address] = Object.assign({}, newAccounts[address])
-    }
+//     const matchingAccounts = []
+//     Object.keys(accounts).sort((a, b) => accounts[a].created > accounts[b].created ? 1 : -1).forEach(id => {
+//       if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
+//         matchingAccounts.push(id)
+//       }
+//     })
+//     if (matchingAccounts.length > 0) {
+//       const primaryAccount = matchingAccounts.sort((a, b) => {
+//         return accounts[a].addresses.length === accounts[b].addresses.length ? 0 : accounts[a].addresses.length > accounts[b].addresses.length ? -1 : 1
+//       })
+//       newAccounts[address] = Object.assign({}, accounts[primaryAccount[0]])
+//       // nameCount[newAccounts[address].name] = nameCount[newAccounts[address].name] || 0
+//       // nameCount[newAccounts[address].name]++
+//       // if (nameCount[newAccounts[address].name] > 1) newAccounts[address].name = newAccounts[address].name + ' ' + nameCount[newAccounts[address].name]
+//       newAccounts[address].address = address
+//       newAccounts[address].id = address
+//       newAccounts[address].lastSignerType = newAccounts[address].type
+//       delete newAccounts[address].type
+//       delete newAccounts[address].network
+//       delete newAccounts[address].signer
+//       delete newAccounts[address].index
+//       delete newAccounts[address].addresses
+//       newAccounts[address].tokens = addresses[address] && addresses[address].tokens ? addresses[address].tokens : {}
+//       newAccounts[address] = Object.assign({}, newAccounts[address])
+//     }
 
-  })
-  initial.main.backup = initial.main.backup || {}
-  initial.main.backup.accounts = Object.assign({}, initial.main.accounts)
-  initial.main.backup.addresses = Object.assign({}, initial.main.addresses)
-  initial.main.accounts = newAccounts
-  delete initial.main.addresses
+//   })
+//   initial.main.backup = initial.main.backup || {}
+//   initial.main.backup.accounts = Object.assign({}, initial.main.accounts)
+//   initial.main.backup.addresses = Object.assign({}, initial.main.addresses)
+//   initial.main.accounts = newAccounts
+//   delete initial.main.addresses
 
-  // Set state version so they never do this migration again
-  initial.main._version = 7
-}
+//   // Set state version so they never do this migration again
+//   initial.main._version = 7
+// }
 
-// State transition -> 8
-if (initial.main._version < 8) {
+// // State transition -> 8
+// if (initial.main._version < 8) {
 
-  Object.keys(initial.main.networks.ethereum).forEach(chainId => {
-    initial.main.networks.ethereum[chainId].on = chainId === '1' || chainId === initial.main.currentNetwork.id ? true : false
-  })
+//   Object.keys(initial.main.networks.ethereum).forEach(chainId => {
+//     initial.main.networks.ethereum[chainId].on = chainId === '1' || chainId === initial.main.currentNetwork.id ? true : false
+//   })
 
-  initial.main._version = 8
-}
+//   initial.main._version = 8
+// }
 
 // State transition -> 9
-if (initial.main._version < 9) {
+// if (initial.main._version < 9) {
 
-  Object.keys(initial.main.networks.ethereum).forEach(chainId => {
-    if (chainId === '1') {
-      initial.main.networks.ethereum[chainId].layer = 'mainnet'
-    } else if (chainId === '100' || chainId === '137') {
-      initial.main.networks.ethereum[chainId].layer = 'sidechain'
-    } else {
-      initial.main.networks.ethereum[chainId].layer = 'testnet'
-    }
-  })
+//   Object.keys(initial.main.networks.ethereum).forEach(chainId => {
+//     if (chainId === '1') {
+//       initial.main.networks.ethereum[chainId].layer = 'mainnet'
+//     } else if (chainId === '100' || chainId === '137') {
+//       initial.main.networks.ethereum[chainId].layer = 'sidechain'
+//     } else {
+//       initial.main.networks.ethereum[chainId].layer = 'testnet'
+//     }
+//   })
 
-  initial.main._version = 9
-}
+//   initial.main._version = 9
+// }
 
-// State transition -> 10
-if (initial.main._version < 10) {
+// // State transition -> 10
+// if (initial.main._version < 10) {
 
-  if (!initial.main.networks.ethereum[10]) {
+//   if (!initial.main.networks.ethereum[10]) {
 
-    initial.main.networks.ethereum[10] = {
-      id: 10,
-      type: 'ethereum',
-      layer: 'rollup',
-      symbol: 'ETH',
-      name: 'Optimism',
-      explorer: 'https://optimistic.etherscan.io',
-      gas: {
-        price: {
-          selected: 'standard',
-          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-        }
-      },
-      connection: {
-        primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
-        secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-      },
-      on: false
-    }
-  }
+//     initial.main.networks.ethereum[10] = {
+//       id: 10,
+//       type: 'ethereum',
+//       layer: 'rollup',
+//       symbol: 'ETH',
+//       name: 'Optimism',
+//       explorer: 'https://optimistic.etherscan.io',
+//       gas: {
+//         price: {
+//           selected: 'standard',
+//           levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+//         }
+//       },
+//       connection: {
+//         primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
+//         secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+//       },
+//       on: false
+//     }
+//   }
 
-  initial.main._version = 10
-}
+//   initial.main._version = 10
+// }
 
 module.exports = () => migrations.apply(initial)
