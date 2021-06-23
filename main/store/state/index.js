@@ -8,7 +8,7 @@ const migrations = require('../migrations')
 const latestStateVersion = () => {
   const state = persist.get('main')
   if (!state || !state.__) {
-    log.info('Persisted state: returning base state')
+    // log.info('Persisted state: returning base state')
     return state 
   }
 
@@ -16,12 +16,12 @@ const latestStateVersion = () => {
   const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
 
   if (versions.length === 0) {
-    log.info('Persisted state: returning base state')
+    // log.info('Persisted state: returning base state')
     return state
   }
 
   const latest = versions[versions.length - 1]
-  log.info('Persisted state: returning latest state version: ', latest)
+  // log.info('Persisted state: returning latest state version: ', latest)
   return state.__[latest].main
 }
 
