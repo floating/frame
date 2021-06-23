@@ -64,7 +64,7 @@ async function getTokenBalances (address, omit = [], knownTokens) {
     return found
   }, {})
 
-  return tokenBalances
+  return { networkId: chain, balances: tokenBalances }
 }
 
 module.exports = {

@@ -10,22 +10,11 @@ log.transports.console.level = process.env.LOG_WORKER ? 'debug' : false
 
 let heartbeat
 
-function groupByChainId (tokens) {
-  return Object.entries(tokens).reduce((grouped, [symbol, token]) => {
-    grouped[token.chainId] = { ...(grouped[token.chainId] || {}), [symbol]: token }
-    return grouped
-  }, {})
-}
-
 function tokenBalanceScan (addresses) {
   addresses.forEach(address => {
     balances.getTokenBalances(address)
       .then(foundTokens => {
-        const grouped = groupByChainId(foundTokens)
-
-        Object.entries(grouped).forEach(([netId, found]) => {
-          process.send({ type: 'tokenBalances', netId, address, found, fullScan: true })
-        })
+        process.send({ type: 'tokenBalances', netId: foundTokens.networkId, address, balances: foundTokens.balances, fullScan: true })
       })
       .catch(err => log.error('token scan error', err))
   })
