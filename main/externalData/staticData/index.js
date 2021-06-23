@@ -1,4 +1,4 @@
-const coingecko = require('./coingecko')
+const coingecko = require('../coingecko')
 const log = require('electron-log')
 
 function byMarketCap (coin1, coin2) {
@@ -15,9 +15,11 @@ async function loadCoinData (allCoins, symbol) {
       const referenceData = await coingecko.listMarkets(ids)
 
       const sorted = referenceData.sort(byMarketCap)
-      const coin = sorted.length > 0 ? sorted[0] : { id: '' }
+      const coin = sorted.length > 0 ? sorted[0] : { name: '' }
 
-      return await coingecko.getCoin(coin.id)
+      if (coin.name === 'Ethereum') coin.name = 'Ether'
+
+      return coin
     }
   } catch (e) {
     log.error(`could not load coin data for ${symbol}`, e)
@@ -26,19 +28,27 @@ async function loadCoinData (allCoins, symbol) {
   return {}
 }
 
-async function getIcons (symbols) {
-  const icons = {}
+async function load (symbols) {
+  const data = {}
 
   const allCoins = await coingecko.listCoins()
 
   for (const symbol of symbols) {
     const coinData = await loadCoinData(allCoins, symbol)
-    const image = coinData.image || {}
 
-    icons[symbol] = image.small || image.thumb
+    if (coinData.name) {
+      data[symbol] = {
+        icon: coinData.image,
+        name: coinData.name,
+        usd: {
+          price: coinData.current_price || 0,
+          '24hrChange': coinData.price_change_percentage_24h || 0
+        }
+      }
+    }
   }
 
-  return icons
+  return data
 }
 
-module.exports = getIcons
+module.exports = load

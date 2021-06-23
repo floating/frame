@@ -39,29 +39,6 @@ function balance (rawBalance, quote = {}) {
   }
 }
 
-function getBalances (chainId, defaultSymbol, rawBalances, rates, chainLayer) {
-  const mainBalance = rawBalances[defaultSymbol]
-  const tokenBalances = Object.values(rawBalances)
-    .filter(b => Number(b.chainId) === Number(chainId) && b.symbol !== defaultSymbol)
-
-  const balances = [mainBalance].concat(tokenBalances)
-    .filter(Boolean)
-    .map(rawBalance => {
-      const rate = rates[rawBalance.address || rawBalance.symbol] || {}
-
-      return balance(rawBalance, chainLayer === 'testnet' ? 0 : rate.usd)
-    })
-    .sort((a, b) => {
-      if (a.symbol === defaultSymbol) return -1
-      if (b.symbol === defaultSymbol) return 1
-      return b.totalValue.minus(a.totalValue).toNumber()
-    })
-
-  const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
-
-  return { balances, totalDisplayValue: formatUsdRate(totalValue, 0) }
-}
-
 class Balances extends React.Component {
   constructor (...args) {
     super(...args)
@@ -93,6 +70,43 @@ class Balances extends React.Component {
   componentWillUnmount () {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
+
+  getBalances (chainId, defaultSymbol, rawBalances, rates, chainLayer) {
+    const mainBalance = rawBalances[defaultSymbol]
+    const tokenBalances = Object.values(rawBalances)
+      .filter(b => Number(b.chainId) === Number(chainId) && b.symbol !== defaultSymbol)
+
+    const balances = [mainBalance].concat(tokenBalances)
+      .filter(Boolean)
+      .map(rawBalance => {
+        const rate = rates[rawBalance.address || rawBalance.symbol] || {}
+
+        return balance(rawBalance, chainLayer === 'testnet' ? 0 : rate.usd)
+      })
+      .sort((a, b) => {
+        return b.totalValue.minus(a.totalValue).toNumber()
+      })
+
+    const nativeCurrency = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
+
+    if (nativeCurrency) {
+      const rawNativeCurrency = {
+        balance: this.store('main.balances', chainId, this.store('selected.current'), 'native.balance'), 
+        chainId,
+        decimals: 18,
+        logoURI: nativeCurrency.icon,
+        name: nativeCurrency.name,
+        symbol: this.store('main.networks.ethereum', chainId, 'symbol')
+      }
+      const nativeBalance = balance(rawNativeCurrency, chainLayer === 'testnet' ? { price: 0 } : nativeCurrency.usd)
+      balances.unshift(nativeBalance)
+    }
+
+    const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
+
+    return { balances, totalDisplayValue: formatUsdRate(totalValue, 0) }
+  }
+
 
   renderBalance (symbol, balanceInfo, i) {
     const change = parseFloat(balanceInfo.priceChange)
@@ -141,7 +155,7 @@ class Balances extends React.Component {
 
     const rates = this.store('main.rates')
 
-    let { balances, totalDisplayValue } = getBalances(
+    let { balances, totalDisplayValue } = this.getBalances(
       chainId,
       currentSymbol.toLowerCase(),
       storedBalances,

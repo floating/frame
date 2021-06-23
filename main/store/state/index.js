@@ -163,7 +163,7 @@ const initial = {
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
-    balances: {}, // main('balances', {}),
+    balances: {},
     rates: {}, // main('rates', {}),
     inventory: {}, // main('rates', {}),
     signers: {},
@@ -423,9 +423,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'eth'
           }
         },
         3: {
@@ -434,9 +431,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'eth'
           }
         },
         4: {
@@ -445,9 +439,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'eth'
           }
         },
         5: {
@@ -456,9 +447,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'eth'
           }
         },
         10: {
@@ -467,9 +455,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'eth'
           }
         },
         42: {
@@ -478,9 +463,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'eth'
           }
         },
         100: {
@@ -489,9 +471,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'xdai'
           }
         },
         137: {
@@ -500,9 +479,6 @@ const initial = {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
             }
-          },
-          nativeCurrency: {
-            symbol: 'matic'
           }
         }
       }
