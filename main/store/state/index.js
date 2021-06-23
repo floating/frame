@@ -3,8 +3,29 @@ const { v5: uuidv5 } = require('uuid')
 const log = require('electron-log')
 
 const persist = require('../persist')
+const migrations = require('../migrations')
 
-const get = (path, obj = persist.get('main')) => {
+const latestStateVersion = () => {
+  const state = persist.get('main')
+  if (!state || !state.__) {
+    log.info('Persisted state: returning base state')
+    return state 
+  }
+
+  // valid states are less than or equal to the latest migration we know about 
+  const versions = Object.keys(state.__).filter(v => v <= migrations.latest()).sort()
+  
+  if (versions.length === 0) {
+    log.info('Persisted state: returning base state')
+    return state
+  }
+
+  const latest = versions[versions.length - 1]
+  log.info('Persisted state: returning latest state version: ', latest)
+  return state.__[latest].main
+}
+
+const get = (path, obj = latestStateVersion()) => {
   path.split('.').some((key, i) => {
     if (typeof obj !== 'object') { obj = undefined } else { obj = obj[key] }
     return obj === undefined // Stop navigating the path if we get to undefined value
@@ -497,11 +518,6 @@ const initial = {
   }
 }
 
-// New perist pattern, persist these paths
-// const syncPaths = [
-//   'main.networks'
-// ]
-
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.accounts).forEach(id => {
   const account = initial.main.accounts[id]
@@ -583,11 +599,14 @@ Object.keys(initial.main.networks.ethereum).forEach(id => {
 // If migrating from before this was a setting make it 'true' to grandfather behavior
 if (main('mute', false) && get('accountCloseLock') === undefined) initial.main.accountCloseLock = true
 
-// State transition -> 4
-if (initial.main._version < 4) {
-  // Do state transition
-  initial.main._version = 4
-}
+// // State transition -> 4
+// if (initial.main._version < 4) {
+//   // Do state transition
+//   initial.main._version = 4
+// }
+
+
+
 
 // State transition -> 5
 if (initial.main._version < 5) {
@@ -755,4 +774,4 @@ if (initial.main._version < 10) {
   initial.main._version = 10
 }
 
-module.exports = () => initial
+module.exports = () => migrations.apply(initial)
