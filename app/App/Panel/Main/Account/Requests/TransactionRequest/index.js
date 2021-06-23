@@ -175,10 +175,16 @@ class TransactionRequest extends React.Component {
     let nonce = parseInt(req.data.nonce, 'hex')
     if (isNaN(nonce)) nonce = 'TBD'
 
+    let metaChainClass = 'requestMetaChain'
+    if (layer === 'testnet') metaChainClass += ' requestMetaChainTestnet'
+    if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
+    if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
+    if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
+
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <div className='requestMeta'>
-          <div className='requestMetaChain' style={{ textTransform: 'uppercase' }}>{this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'name')}</div>
+          <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'name')}</div>
           <div className='requestMetaOrigin'>{req.origin}</div>
         </div>
         {req.type === 'transaction' ? (

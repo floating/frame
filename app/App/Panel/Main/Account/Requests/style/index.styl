@@ -409,16 +409,62 @@
 
     .requestMeta
       position absolute
-      display flex
-      align-items center
-      justify-content space-between
       height 40px
       left 0
       right 0
       top 0
-      font-size 11px
-      padding 0px 12px 0px 11px //  10px 10px
-      font-weight 500
+      font-size 10px
+      font-weight 600
+
+      .requestMetaChain
+        position absolute
+        top 5px
+        left 5px
+        bottom 17px
+        background var(--ghostE)
+        color var(--outerspace)
+        display flex
+        align-items center
+        padding 0px 15px 0px 15px
+        padding-bottom 1px
+        border-radius 4px
+        letter-spacing 1.5px
+        z-index 3
+
+      .requestMetaChainMainnet
+        background var(--good) // var(--ghostF)
+        color var(--goodOver)
+
+      .requestMetaChainSidechain
+        background var(--pending) // var(--ghostF)
+        color var(--pendingOver)
+
+      .requestMetaChainRollup
+        background var(--moon) // var(--ghostF)
+        color var(--moonOver)
+
+      .requestMetaChainTestnet
+        background var(--bad) // var(--ghostF)
+        color var(--badOver)
+
+      .requestMetaOrigin
+        position absolute
+        top 0px
+        right 0px
+        bottom 12px
+        left 0
+        display flex
+        // font-size 10px
+        font-weight 400
+        align-items center
+        background var(--ghostA)
+        display flex
+        align-items center
+        justify-content flex-end
+        padding 0px 15px 0px 15px
+        padding-bottom 2px
+        border-radius 8px
+        z-index 2
 
   .requestOverlay
     display none
