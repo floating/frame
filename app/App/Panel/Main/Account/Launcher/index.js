@@ -36,7 +36,7 @@ class Launcher extends React.Component {
   componentDidMount () {
     this.resizeObserver.observe(this.moduleRef.current)
     document.addEventListener('keydown', this.h.bind(this))
-  } 
+  }
   componentWillUnmount () {
     link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: 0 })
     document.removeEventListener('keydown', this.h.bind(this))
@@ -53,6 +53,9 @@ class Launcher extends React.Component {
               {svg.wallet(15)}
             </div>
             <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', '1inch.eth') }>
+              {svg.wallet(15)}
+            </div>
+            <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'sushi.frame.eth')}>
               {svg.wallet(15)}
             </div>
           </div>
