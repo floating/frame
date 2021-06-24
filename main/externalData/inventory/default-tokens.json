@@ -15927,14 +15927,6 @@
     },
     {
       "chainId": 1,
-      "address": "0x0e69d0a2bbb30abcb7e5cfea0e4fde19c00a8d47",
-      "name": "Carlive Chain",
-      "symbol": "IOV",
-      "decimals": 8,
-      "logoURI": "https://assets.coingecko.com/coins/images/5339/thumb/carlive-chain.png?1547738870"
-    },
-    {
-      "chainId": 1,
       "address": "0x555d051538c7a13712f1f590fa6b4c176ca4529f",
       "name": "iOWN Token",
       "symbol": "IOWN",

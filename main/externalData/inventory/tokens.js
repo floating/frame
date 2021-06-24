@@ -67,10 +67,10 @@ async function nebulaTokens (chainId) {
   let tokenList
 
   try {
-    const tokenListRecord = await nebula.resolve('tokens.matt.eth')
-    tokenList = await nebula.ipfs.getJson(tokenListRecord.record.content)
+    const tokenListRecord = await nebula.resolve('tokens.frame.eth')
+    tokenList = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
   } catch (e) {
-    log.warn('could not load token list from Nebula, using default list', e)
+    log.warn('Could not load token list from Nebula, using default list', e)
     tokenList = require('./default-tokens.json').tokens
   }
 

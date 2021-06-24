@@ -19,7 +19,7 @@ class PersistStore extends Conf {
   }
 
   set (path, value) {
-    log.info('Setting state version', migrations.latest)
+    // log.info('Setting state version', migrations.latest)
     path = `main.__.${migrations.latest}.${path}`
     super.set(path, value)
   }

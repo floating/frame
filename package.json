@@ -113,7 +113,7 @@
     "hdkey": "2.0.1",
     "ipfs-core": "0.8.0",
     "ipfs-http-client": "50.1.2",
-    "nebula": "0.0.3",
+    "nebula": "0.0.4",
     "node-fetch": "2.6.1",
     "node-hid": "2.1.1",
     "query-string": "7.0.1",
