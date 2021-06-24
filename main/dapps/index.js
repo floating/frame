@@ -54,7 +54,11 @@ class Dapps {
       },
       {
         name: 'matt.eth'
-      }
+      },
+      {
+        name: 'sushi.frame.eth',
+        options: { docked: true }
+      },
     ]
     // this.observer = store.observer(() => {
     //   const ipfs = store('main.ipfs')
