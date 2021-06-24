@@ -246,52 +246,46 @@ module.exports = {
     })
   },
   updateNetwork: (u, net, newNet) => {
-    u('main', main => {
-      try {
-        if (
-          typeof (parseInt(net.id)) !== 'number' ||
-          typeof (net.type) !== 'string' ||
-          typeof (net.name) !== 'string' ||
-          typeof (net.explorer) !== 'string' ||
-          typeof (net.symbol) !== 'string' ||
-          ['ethereum'].indexOf(net.type) === -1
-        ) {
-          throw new Error('Invalid network settings')
-        }
-        if (
-          typeof (parseInt(newNet.id)) !== 'number' ||
-          typeof (newNet.type) !== 'string' ||
-          typeof (newNet.name) !== 'string' ||
-          typeof (newNet.explorer) !== 'string' ||
-          typeof (newNet.symbol) !== 'string' ||
-          ['ethereum'].indexOf(newNet.type) === -1
-        ) {
-          throw new Error('Invalid new network settings')
-        }
-      } catch (e) {
-        console.error(e)
-        return main
+    try {
+      if (
+        typeof (parseInt(net.id)) !== 'number' ||
+        typeof (net.type) !== 'string' ||
+        typeof (net.name) !== 'string' ||
+        typeof (net.explorer) !== 'string' ||
+        typeof (net.symbol) !== 'string' ||
+        typeof (net.layer) !== 'string' ||
+        ['ethereum'].indexOf(net.type) === -1
+      ) {
+        throw new Error('Invalid network settings')
       }
-      if (main.networks[newNet.type][newNet.id]) {
-        if (net.type === newNet.type && net.id === newNet.id) {
-          // Update data.without changing connection..
-          Object.assign(main.networks[newNet.type][newNet.id], newNet)
-        }
-        return main
-      } // Network already exists, don't overwrite, notify user
-      const existingNet = Object.assign({}, main.networks[net.type][net.id])
-      if (main.networks[net.type]) delete main.networks[net.type][net.id]
-      if (!main.networks[newNet.type]) main.networks[newNet.type] = {}
-      const updateNetwork = Object.assign(existingNet, newNet)
-      main.networks[newNet.type][newNet.id] = updateNetwork
-      if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's being changed
-        const reset = { status: 'loading', connected: false, type: '', network: '' }
-        main.currentNetwork = { type: newNet.type, id: newNet.id }
-        main.networks[newNet.type][newNet.id].primary = Object.assign({}, main.networks[newNet.type][newNet.id].primary, reset)
-        main.networks[newNet.type][newNet.id].secondary = Object.assign({}, main.networks[newNet.type][newNet.id].secondary, reset)
+      if (
+        typeof (parseInt(newNet.id)) !== 'number' ||
+        typeof (newNet.type) !== 'string' ||
+        typeof (newNet.name) !== 'string' ||
+        typeof (newNet.explorer) !== 'string' ||
+        typeof (newNet.symbol) !== 'string' ||
+        typeof (newNet.layer) !== 'string' ||
+        ['ethereum'].indexOf(newNet.type) === -1
+      ) {
+        throw new Error('Invalid new network settings')
       }
-      return main
-    })
+      u('main', main => {
+        const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
+        
+        delete main.networks[net.type][net.id]
+        main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
+
+        const { type, id } = main.currentNetwork
+        if (net.type === type && net.id === id) {
+          main.currentNetwork.type = updatedNetwork.type
+          main.currentNetwork.id = updatedNetwork.id
+        }
+        
+        return main
+      })
+    } catch (e) {
+      console.error(e)
+    }
   },
   removeNetwork: (u, net) => {
     // Cannot delete mainnet

@@ -69,6 +69,7 @@ async function nebulaTokens (chainId) {
   try {
     const tokenListRecord = await nebula.resolve('tokens.frame.eth')
     tokenList = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
+    tokenList = tokenList.filter(t => t.name.toLowerCase() !== 'carlive chain') // Update tokens.frame.eth
   } catch (e) {
     log.warn('Could not load token list from Nebula, using default list', e)
     tokenList = require('./default-tokens.json').tokens

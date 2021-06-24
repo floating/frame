@@ -33,7 +33,7 @@ function balance (rawBalance, quote = {}) {
     ...rawBalance,
     displayBalance: formatBalance(balance, balanceDecimals),
     price: formatUsdRate(usdRate),
-    priceChange: BigNumber(quote['24hrChange'] || 0).toFixed(2),
+    priceChange: BigNumber(quote['change24hr'] || 0).toFixed(2),
     totalValue,
     displayValue: formatUsdRate(totalValue, 0)
   }

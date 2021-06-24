@@ -74,6 +74,8 @@ const migrations = {
 
     // If migrating from before this was a setting make it 'true' to grandfather behavior
     if (initial.main.mute && initial.main.accountCloseLock === undefined) initial.main.accountCloseLock = true
+
+    return initial
   },
   5: initial => { // Add Polygon to persisted networks
     initial.main.networks.ethereum[137] = {
@@ -186,6 +188,8 @@ const migrations = {
     Object.keys(initial.main.networks.ethereum).forEach(chainId => {
       if (chainId === '1') {
         initial.main.networks.ethereum[chainId].layer = 'mainnet'
+      } else if (chainId === '10') {
+        initial.main.networks.ethereum[chainId].layer = 'rollup'
       } else if (chainId === '100' || chainId === '137') {
         initial.main.networks.ethereum[chainId].layer = 'sidechain'
       } else if (chainId === '3' || chainId === '4' || chainId === '5' || chainId === '42') {
@@ -198,27 +202,25 @@ const migrations = {
     return initial
   },
   10: initial => {  // Add Optimisim to persisted networks
-    if (!initial.main.networks.ethereum[10]) {
-
-      initial.main.networks.ethereum[10] = {
-        id: 10,
-        type: 'ethereum',
-        layer: 'rollup',
-        symbol: 'ETH',
-        name: 'Optimism',
-        explorer: 'https://optimistic.etherscan.io',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
-          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-        },
-        on: false
-      }
+    // if (!initial.main.networks.ethereum[10]) {
+    initial.main.networks.ethereum[10] = {
+      id: 10,
+      type: 'ethereum',
+      layer: 'rollup',
+      symbol: 'ETH',
+      name: 'Optimism',
+      explorer: 'https://optimistic.etherscan.io',
+      gas: {
+        price: {
+          selected: 'standard',
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
+      },
+      connection: {
+        primary: { on: true, current: 'optimism', status: 'loading', connected: false, type: '', network: '', custom: '' },
+        secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+      },
+      on: false
     }
     return initial
   }
@@ -229,7 +231,7 @@ module.exports = {
   apply: state => {
     state.main._version = state.main._version || 0
     Object.keys(migrations).sort((a, b) => a - b).forEach(version => {
-      if (state.main._version < version) {
+      if (parseInt(state.main._version) < version) {
         log.info('Applying state migration: ' + version)
         state = migrations[version](state)
         state.main._version = version

@@ -42,7 +42,7 @@ async function load (symbols) {
         name: coinData.name,
         usd: {
           price: coinData.current_price || 0,
-          '24hrChange': coinData.price_change_percentage_24h || 0
+          change24hr: coinData.price_change_percentage_24h || 0
         }
       }
     }
