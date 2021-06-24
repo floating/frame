@@ -3,7 +3,8 @@
   display flex
   align-items flex-start
   height 26px
-  z-index 99999999999999999
+  z-index 99999999999
+  color var(--outerspace)
 
 .dropdown
   letter-spacing 1px
@@ -15,11 +16,10 @@
   text-transform uppercase
   background var(--ghostC)
   overflow hidden
-  box-shadow cardDrop
   padding 0px 0px 0px 0px
   transition var(--standardFast), 0s linear background
   transform translateZ(0)
-  z-index 99999999999
+  z-index 99999999999999999
   pointer-events auto
   cursor pointer
   // box-shadow 5px 5px 20px 0px var(--tripleThick) 
@@ -28,6 +28,12 @@
 
 // .dropdown:hover
 //   background var(--ghostD)
+
+.darkerDrop
+  background var(--ghostB)
+  .dropdownItem
+    .dropdownItemIndicator
+      background var(--ghostA)
 
 .dropdownExpanded
   padding 18px 0px 18px 0px

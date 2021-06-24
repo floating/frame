@@ -12,7 +12,7 @@ function createRate (quote) {
   return {
     usd: {
       price: BigNumber(quote.usd || 0),
-      '24hrChange': BigNumber(quote.usd_24h_change || 0)
+      change24hr: BigNumber(quote.usd_24h_change || 0)
     }
   }
 }

@@ -6,7 +6,7 @@ const findIndex = (options, value) => {
   return index >= 0 ? index : null
 }
 
-const Dropdown = ({ options, syncValue, initialValue, style, className, onChange }) => {
+const Dropdown = ({ options, syncValue, initialValue, style, className, onChange, customClass = '' }) => {
   // Get index for passed value(s)
   const syncIndex = findIndex(options, syncValue)
   const initialIndex = findIndex(options, initialValue)
@@ -58,7 +58,7 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
   return (
     <div className={`dropdownWrap ${id}`}>
       <div
-        className={expanded ? `dropdown dropdownExpanded ${className} ${id}` : `dropdown ${className} ${id}`}
+        className={expanded ? `dropdown dropdownExpanded ${className} ${id} ${customClass}` : `dropdown ${className} ${id} ${customClass}`}
         style={expanded ? { ...style, height } : { ...style }}
         onMouseDown={(e) => { setExpanded(!expanded) }}
       >

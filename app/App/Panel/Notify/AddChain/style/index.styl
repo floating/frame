@@ -58,6 +58,7 @@
   padding 0px 0px 5px 10px
   text-align left
   width 100%
+  letter-spacing 0.5px
 
 .chainLayers
   width 100%
@@ -75,11 +76,12 @@
   height 42px
   border-radius 8px
   box-sizing border-box
-  padding 10px
+  padding 8px
   cursor pointer
   width calc(50% - 2.5px)
   box-sizing border-box
   font-weight 300
+  border 2px solid transparent
   * 
     pointer-events none
 
@@ -87,28 +89,44 @@
   background var(--ghostD)
   color var(--good)
 
+.chainLayerOptionOn
+  color var(--good)
+  border 2px solid var(--good)
+
+.chainLayerOptionOn:hover
+  background var(--ghostD)
+  color var(--good)
+
 .addChainSubmit
   background var(--ghostE)
   width 100%
   margin-top 25px
-  height 64px
+  margin-bottom 25px
+  height 48px
   border-radius 8px
   box-sizing border-box
   padding 13px
   text-align center
-  cursor pointer
   margin-bottom 5px
   display flex
   justify-content center
   align-items center
-  font-size 18px
+  font-size 15px
   text-transform uppercase
-  * 
-    pointer-events none
+  opacity 0.5
 
   svg
     margin-right 10px
 
-.addChainSubmit:hover
+// .addChainSubmit:hover
+//   background var(--ghostE)
+//   color var(--good)
+
+.addChainSubmitEnabled
   background var(--ghostE)
   color var(--good)
+  opacity 1
+  cursor pointer
+  * 
+    pointer-events none
+    

@@ -33,7 +33,7 @@ class _Network extends React.Component {
         this.setState({ primaryCustom, secondaryCustom })
       }
     })
-    const { id, name, type, explorer, symbol } = this.props
+    const { id, name, type, explorer, symbol, layer } = this.props
     // this.state = { }
     this.newNetworkIdDefault = 'ID'
     this.newNetworkNameDefault = 'New Network'
@@ -46,6 +46,7 @@ class _Network extends React.Component {
       explorer, 
       type, 
       symbol, 
+      layer,
       submitted: false, 
       newNetworkId: this.newNetworkIdDefault,
       newNetworkName: this.newNetworkNameDefault,
@@ -57,7 +58,7 @@ class _Network extends React.Component {
       secondaryCustom, 
       resetConfirm: false, 
       expandNetwork: false,
-      showDetails: false 
+      showControls: false
     }
  }
 
@@ -149,7 +150,8 @@ class _Network extends React.Component {
       this.props.name !== this.state.name ||
       this.props.symbol !== this.state.symbol ||
       this.props.explorer !== this.state.explorer ||
-      this.props.type !== this.state.type
+      this.props.type !== this.state.type || 
+      this.props.layer !== this.state.layer
     )
     const { id, type, connection } = this.props
 
@@ -158,6 +160,11 @@ class _Network extends React.Component {
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+
+    const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.standard'), 'hex') / 1e9) || '---'
+    const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '---'
+    const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '---'
+    const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '---'
 
     return (
       <div className='network'>
@@ -253,37 +260,43 @@ class _Network extends React.Component {
           </div>
           <div className='showControlsLine' />
         </div> */}
-        {this.state.showDetails ? (
-          <div className='phaseNetworkLine'>
-            {changed ? (
-              <div
-                className='phaseNetworkSubmit phaseNetworkSubmitEnabled' onMouseDown={() => {
-                  const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer }
-                  const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer }
-                  this.setState({ submitted: true })
-                  link.send('tray:action', 'updateNetwork', net, newNet)
-                  setTimeout(() => this.setState({ submitted: false }), 1600)
-                }}
-              >
-                {svg.save(16)}
-              </div>
-            ) : (this.state.submitted ? (
-              <div className='phaseNetworkSubmit phaseNetworkSubmitted'>
-                {svg.octicon('check', { height: 22 })}
-              </div>
-            ) : (
-              <div
-                className='phaseNetworkSubmit phaseNetworkRemove' onMouseDown={() => {
-                  const { id, name, type, explorer } = this.props
-                  link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
-                }}
-              >
-                {svg.trash(16)}
-              </div>
-            )
-            )}
-            <div className='phaseNetworkSymbol'>
+
+        {this.props.on && false ? (
+          <div className='chainData'>
+            <div>{`Gas Price ${gas}`}</div>
+            <div>{`Block Height ${1234}`}</div>
+            <div>{`1 ${symbol} = $${price.toLocaleString()} ${change24hr > 0 ? '+' : change24hr < 0 ? '-' : ''} ${Math.abs(change24hr).toFixed(2)}%`}</div>
+          </div>
+        ) : null}
+
+        {/* <div className='chainShow' onMouseDown={() => {
+          this.setState({ showControls: !this.state.showControls })
+        }}>
+          show more
+        </div> */}
+
+        <div className='signerDrawer'>
+          <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
+            {this.state.showControls ? 'hide' : 'more'}
+          </div>
+          <div className='showControlsLine' />
+        </div>
+
+        {this.state.showControls ? (
+          <div className='chainConfig cardShow'>  
+            <div className='chainConfigRow'>  
               <input
+                className='chainIdInput'
+                value={this.state.id} spellCheck='false'
+                onChange={(e) => {
+                  this.setState({ id: e.target.value })
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === '') this.setState({ id: this.props.id })
+                }}
+              />
+              <input
+                className='chainSymbolInput'
                 value={this.state.symbol} spellCheck='false'
                 onChange={(e) => {
                   if (e.target.value.length > 8) return e.preventDefault()
@@ -293,19 +306,21 @@ class _Network extends React.Component {
                   if (e.target.value === '') this.setState({ symbol: this.props.symbol })
                 }}
               />
-            </div>
-            <div className='phaseNetworkId'>
-              <input
-                value={this.state.id} spellCheck='false'
-                onChange={(e) => {
-                  this.setState({ id: e.target.value })
-                }}
-                onBlur={(e) => {
-                  if (e.target.value === '') this.setState({ id: this.props.id })
-                }}
+              <Dropdown
+                syncValue={this.state.layer}
+                onChange={layer => this.setState({ layer })}
+                options={this.props.layer === 'mainnet' ? [
+                  { text: 'mainnet', value: 'mainnet'}
+                ] : [
+                  { text: 'rollup', value: 'rollup'}, 
+                  { text: 'sidechain', value: 'sidechain'}, 
+                  { text: 'testnet', value: 'testnet'}, 
+                  { text: 'other', value: 'other'}
+                ]}
+                customClass='darkerDrop'
               />
             </div>
-            <div className='phaseNetworkExplorer'>
+            <div className='chainConfigRow'>
               <input
                 value={this.state.explorer} spellCheck='false'
                 onChange={(e) => {
@@ -318,6 +333,42 @@ class _Network extends React.Component {
             </div>
           </div>
         ) : null}
+
+        {this.state.showControls ? (
+          <div className='chainMore cardShow'>
+            <div
+              className='moduleButton moduleButtonBad' onMouseDown={() => {
+                const { id, name, type, explorer } = this.props
+                link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+              }}
+            >
+              {svg.trash(13)} 
+              <span>remove chain</span>
+            </div>
+          </div>
+        ) : null}
+
+        {changed ? (
+          <div className='chainConfigSave cardShow'>
+            <div
+              className='moduleButton moduleButtonGood' onMouseDown={() => {
+                const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer, layer: this.props.layer }
+                const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer, layer: this.state.layer }
+                this.setState({ submitted: true })
+                link.send('tray:action', 'updateNetwork', net, newNet)
+                setTimeout(() => this.setState({ submitted: false }), 1600)
+              }}>
+                {svg.save(11)} <span> save changes</span>
+              </div>
+            </div>
+          ) : (this.state.submitted ? (
+            <div className='chainConfigSave'>
+              <div className='moduleButton'>
+                {svg.octicon('check', { height: 22 })}
+              </div>
+            </div>
+          ) : null
+        )}
       </div>
     )
   }
@@ -670,6 +721,7 @@ class Settings extends React.Component {
           {Object.keys(networks[type]).sort((a, b) => {
             return parseInt(a) - parseInt(b)
           }).filter(id => {
+            if (!networks[type][id].layer && layer === 'other') return true
             return networks[type][id].layer === layer
           }).map(id => {
             return <Network 
@@ -680,6 +732,7 @@ class Settings extends React.Component {
               explorer={networks[type][id].explorer} 
               type={type} 
               connection={networks[type][id].connection}
+              layer={networks[type][id].layer}
               on={networks[type][id].on}
             />
           })}
@@ -726,6 +779,10 @@ class Settings extends React.Component {
             <div className='networkBreakLayer'>Testnets</div>
           </div>
           {this.renderConnections('testnet')}
+          <div className='networkBreak'>
+            <div className='networkBreakLayer'>Other</div>
+          </div>
+          {this.renderConnections('other')}
           <div className='networkAdd'>
           <div 
             className='networkAddButton'

@@ -21,11 +21,11 @@ class AddChain extends React.Component {
       newNetworkRPCSecondary: this.newNetworkRPCDefault,
       newNetworkSymbol: this.newNetworkSymbolDefault,
       newNetworkType: this.newNetworkType,
+      newNetworkLayer: 'other',
       localShake: {}, 
       resetConfirm: false, 
       expandNetwork: false 
     }
-
   }
 
   render () {
@@ -36,7 +36,6 @@ class AddChain extends React.Component {
       this.state.newNetworkSymbol !== this.newNetworkSymbolDefault ||
       this.state.newNetworkRPCPrimary !== this.newNetworkRPCDefault ||
       this.state.newNetworkRPCSecondary !== this.newNetworkRPCDefault
-
     )
 
     const newNetworkReady = (
@@ -129,7 +128,7 @@ class AddChain extends React.Component {
               </div>
             </div>
 
-            <div className='chainRow'>
+            {/* <div className='chainRow'>
               <div className='chainRpc'>
                 <div className='chainInputLabel'>Primary Endpoint</div>
                 <input
@@ -167,50 +166,64 @@ class AddChain extends React.Component {
                   }}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className='chainRow'>
               <div className='chainLayers'>
                 <div className='chainInputLabel'>Chain Type</div>
                 <div className='chainLayerOptions'>
-                  <div className='chainLayerOption'>Rollup</div>
-                  <div className='chainLayerOption'>Sidechain</div>
-                  <div className='chainLayerOption'>Testnet</div>
-                  <div className='chainLayerOption'>Other</div>
+                  <div 
+                    className={this.state.newNetworkLayer === 'rollup' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
+                    onMouseDown={() => this.setState({ newNetworkLayer: 'rollup' })}
+                  >Rollup</div>
+                  <div 
+                    className={this.state.newNetworkLayer === 'sidechain' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
+                    onMouseDown={() => this.setState({ newNetworkLayer: 'sidechain' })}
+                  >Sidechain</div>
+                  <div 
+                    className={this.state.newNetworkLayer === 'testnet' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
+                    onMouseDown={() => this.setState({ newNetworkLayer: 'testnet' })}
+                  >Testnet</div>
+                  <div 
+                    className={this.state.newNetworkLayer === 'other' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
+                    onMouseDown={() => this.setState({ newNetworkLayer: 'other' })}
+                  >Other</div>
                 </div>
               </div>
             </div>
 
             <div className='chainRow'>
-              <div className='addChainSubmit'>
-                {changedNewNetwork && newNetworkReady ? (
-                  <div
-                    className='chainSubmit chainSubmitEnabled' onMouseDown={() => {
-                      const net = {
-                        id: this.state.newNetworkId,
-                        name: this.state.newNetworkName,
-                        type: this.state.newNetworkType,
-                        explorer: this.state.newNetworkExplorer,
-                        symbol: this.state.newNetworkSymbol
-                      }
-                      link.send('tray:action', 'addNetwork', net)
-                      this.setState({
-                        newNetworkId: this.newNetworkIdDefault,
-                        newNetworkName: this.newNetworkNameDefault,
-                        newNetworkExplorer: this.newNetworkExplorerDefault,
-                        newNetworkSymbol: this.newNetworkSymbolDefault
-                      })
-                    }}
-                  >
-                    {svg.save(16)}
-                  </div>
-                ) : (
-                  <div className='chainSubmit'>
-                    {svg.octicon('plus', { height: 17 })}
-                  </div>
-                )}
-                Add Chain
-              </div>
+              {changedNewNetwork && newNetworkReady ? (
+                <div 
+                  className='addChainSubmit addChainSubmitEnabled' 
+                  onMouseDown={() => {
+                    const net = {
+                      id: this.state.newNetworkId,
+                      name: this.state.newNetworkName,
+                      type: this.state.newNetworkType,
+                      explorer: this.state.newNetworkExplorer,
+                      symbol: this.state.newNetworkSymbol,
+                      layer: this.state.newNetworkLayer
+                    }
+                    link.send('tray:action', 'addNetwork', net)
+                    this.setState({
+                      newNetworkId: this.newNetworkIdDefault,
+                      newNetworkName: this.newNetworkNameDefault,
+                      newNetworkExplorer: this.newNetworkExplorerDefault,
+                      newNetworkSymbol: this.newNetworkSymbolDefault,
+                      newNetworkLayer: 'other'
+                    })
+                  }}
+                >
+                  {svg.octicon('plus', { height: 17 })} Add Chain
+                </div>
+              ) : (
+                <div 
+                  className='addChainSubmit' 
+                >
+                  {svg.octicon('plus', { height: 17 })} Fill in Chain
+                </div>
+              )}
             </div>
           </div>
         </div>

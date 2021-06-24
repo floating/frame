@@ -22,7 +22,7 @@
       input 
         font-size 20px
         text-align left
-        font-weight 100
+        font-weight 300
         padding-left 16px
 
     .signerPermissionToggle
@@ -322,6 +322,8 @@
 
 .connectionLevels
   padding-bottom 5px
+  position relative
+  z-index 999999999
 
 .connectionTitle
   justify-content space-between
@@ -594,3 +596,87 @@
 //   //   transition-delay 0ms, 30ms
 //   //   transition-property height, opacity
 //   //   pointer-events auto
+
+
+.chainConfig
+  padding 24px 8px
+  position relative
+  z-index 99999999
+
+  .chainConfigRow
+    position relative
+    display flex
+    justify-content space-between
+    margin-bottom 8px
+    
+    .chainIdInput
+      width 80px
+
+    .chainSymbolInput
+      width 102px
+      text-transform uppercase
+
+    input
+      position relative
+      height 28px
+      background var(--ghostZ05)
+      border-radius 8px
+      box-sizing border-box
+      font-size 13px
+      font-weight 400
+
+  .chainConfigRow:last-child
+    margin-bottom 0px
+    
+.chainData
+  padding 10px
+
+.chainConfigSave
+  cursor pointer
+  padding 8px
+
+.chainMore
+  cursor pointer
+  padding 8px
+
+.signerDrawer
+  position relative
+  height 40px
+  // background blue
+
+  .showControls
+    position absolute
+    height 20px
+    border-radius 12px
+    border 1px solid var(--ghostZ)
+    background var(--ghostA)
+    z-index 2
+    top 9px
+    left 50%
+    width 100px
+    margin-left -50px
+    padding-bottom 2px
+    letter-spacing 1px
+    font-size 11px
+    display flex
+    justify-content center
+    align-items center
+    text-transform uppercase
+    cursor pointer
+    color var(--outerspace03)
+    transition var(--standardFast)
+    font-weight 400
+
+  .showControls:hover
+    background var(--ghostC)
+    color var(--outerspace)
+
+  .showControlsLine
+    height 1px
+    position absolute 
+    top 50%
+    left 0
+    right 0
+    background var(--ghostZ)
+    z-index 1
+    margin-top 0px
