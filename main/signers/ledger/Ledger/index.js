@@ -1,5 +1,6 @@
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx')
+const { Transaction } = require('@ethereumjs/tx')
+const Common = require('@ethereumjs/common').default
 const log = require('electron-log')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
@@ -304,14 +305,16 @@ class Ledger extends Signer {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
-      const tx = new EthereumTx(rawTx, { chain: parseInt(rawTx.chainId) })
+      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
+      rawTx.gasLimit = rawTx.gas // gas must be gasLimit in new ethereum tx
+      const tx = Transaction.fromTxData(rawTx, { common })
       tx.raw[6] = Buffer.from([rawTx.chainId]) // v
       tx.raw[7] = Buffer.from([]) // r
       tx.raw[8] = Buffer.from([]) // s
       const rawTxHex = tx.serialize().toString('hex')
       const result = await eth.signTransaction(this.getPath(index), rawTxHex)
       this.busyCount = 0
-      const _tx = new EthereumTx({
+      const _tx = Transaction.fromTxData({
         nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
         gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
         gasLimit: Buffer.from(this.normalize(rawTx.gas), 'hex'),
@@ -321,7 +324,7 @@ class Ledger extends Signer {
         v: Buffer.from(this.normalize(result.v), 'hex'),
         r: Buffer.from(this.normalize(result.r), 'hex'),
         s: Buffer.from(this.normalize(result.s), 'hex')
-      }, { chain: parseInt(rawTx.chainId) })
+      }, { common })
       cb(null, '0x' + _tx.serialize().toString('hex'))
       this.releaseDevice()
     } catch (err) {
