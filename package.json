@@ -79,6 +79,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@aragon/wrapper": "5.0.0",
+    "@ethereumjs/tx": "3.2.1",
     "@ethersproject/abi": "5.3.1",
     "@ethersproject/hash": "5.3.0",
     "@githubprimer/octicons-react": "8.5.0",

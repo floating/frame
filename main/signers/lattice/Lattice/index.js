@@ -1,7 +1,8 @@
 const crypto = require('crypto')
 const log = require('electron-log')
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx')
+const { Transaction } = require('@ethereumjs/tx')
+const Common = require('@ethereumjs/common').default
 const { Client } = require('gridplus-sdk')
 const { promisify } = require('util')
 
@@ -308,7 +309,8 @@ class Lattice extends Signer {
       const clientSign = promisify(this.client.sign).bind(this.client)
       const result = await clientSign(signOpts)
 
-      const tx = new EthereumTx({
+      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
+      const tx = Transaction.fromTxData({
         nonce: this.hexToBuffer(rawTx.nonce),
         gasPrice: this.hexToBuffer(rawTx.gasPrice),
         gasLimit: this.hexToBuffer(rawTx.gas),
@@ -318,7 +320,7 @@ class Lattice extends Signer {
         v: result.sig.v[0],
         r: this.hexToBuffer(result.sig.r),
         s: this.hexToBuffer(result.sig.s)
-      }, { chain: parseInt(rawTx.chainId) })
+      }, { common })
       return cb(null, '0x' + tx.serialize().toString('hex'))
     } catch (err) {
       return cb(new Error(err))

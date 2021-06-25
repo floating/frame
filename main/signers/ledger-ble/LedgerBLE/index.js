@@ -1,6 +1,7 @@
 const log = require('electron-log')
 const utils = require('web3-utils')
-const EthereumTx = require('ethereumjs-tx')
+const { Transaction } = require('@ethereumjs/tx')
+const Common = require('@ethereumjs/common').default
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const windows = require('../../../windows')
@@ -225,7 +226,8 @@ class LedgerBLE extends Signer {
     }
     flex.rpc('ledger.ethereumSignTransaction', this.id, this.getPath(), trezorTx, (err, result) => {
       if (err) return cb(err.message)
-      const tx = new EthereumTx({
+      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
+      const tx = Transaction.fromTxData({
         nonce: this.hexToBuffer(rawTx.nonce),
         gasPrice: this.hexToBuffer(rawTx.gasPrice),
         gasLimit: this.hexToBuffer(rawTx.gas),
@@ -235,7 +237,7 @@ class LedgerBLE extends Signer {
         v: this.hexToBuffer(result.v),
         r: this.hexToBuffer(result.r),
         s: this.hexToBuffer(result.s)
-      }, { chain: parseInt(rawTx.chainId) })
+      }, { common })
       cb(null, '0x' + tx.serialize().toString('hex'))
     })
   }
