@@ -271,6 +271,12 @@ module.exports = {
       }
       u('main', main => {
         const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
+
+        Object.keys(updatedNetwork).forEach(k => {
+          if (typeof updatedNetwork[k] === 'string') {
+            updatedNetwork[k] = updatedNetwork[k].trim()
+          }
+        })
         
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork

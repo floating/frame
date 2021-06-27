@@ -14,13 +14,22 @@ const getCurrentChainGas = () => {
   const network = store('main.currentNetwork')
   chains.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, response => {
     if (response.result) {
-      const price = parseInt(response.result, 16) / 1000000000
+      // TODO: currently the minimum gasPrice supported is 1 gwei
+      const price = Math.round(parseInt(response.result, 16) / 1000000000) || 1
       setGasPrices(network.type, network.id, {
         slow: price,
         standard: price,
         fast: price,
         asap: Math.round((price + 1) * 1.2),
         custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || response.result,
+      })
+    } else {
+      setGasPrices(network.type, network.id, {
+        slow: 0,
+        standard: 0,
+        fast: 0,
+        asap: Math.round((price + 1) * 1.2),
+        custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || 0,
       })
     }
   })

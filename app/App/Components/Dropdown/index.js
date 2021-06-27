@@ -64,8 +64,10 @@ const Dropdown = ({ options, syncValue, initialValue, style, className, onChange
       >
         <div className={`dropdownItems ${id}`} style={expanded ? {} : { marginTop }}>
           {options.map((option, index) => {
+            const words = option.text.split(' ').slice(0, 3)
+            const text = words.map(w => w.substr(0, Math.round(10 / words.length) - (words.length - 1))).join('-')
             return <div key={option.text + index} className={`dropdownItem ${id}`} onMouseDown={() => handleSelect(index)}>
-              {option.text}
+              {text}
               {indicator(option)}
             </div>
           })}

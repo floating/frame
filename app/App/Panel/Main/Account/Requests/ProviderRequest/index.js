@@ -28,7 +28,7 @@ class ProviderRequest extends React.Component {
     const height = mode === 'monitor' ? '80px' : '340px'
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
-        <div className='approveTransaction'>
+        <div className='approveRequest'>
           {notice ? (
             <div className='requestNotice'>
               {(_ => {

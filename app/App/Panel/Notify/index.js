@@ -10,8 +10,8 @@ import AddChain from './AddChain'
 class Notify extends React.Component {
   mainnet () {
     return (
-      <div className='notifyBoxWrap'>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
           <div className='notifyFrameIcon'>
             <img src={frameIcon} />
           </div>
@@ -43,35 +43,42 @@ class Notify extends React.Component {
 
   betaDisclosure () {
     return (
-      <div className='notifyBoxWrap'>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
-          {/* <div className='notifyFrameIcon'>
-            <img src={frameIcon} />
-          </div> */}
-          <div className='notifyTitle'>
-            Welcome to the Frame!
-          </div>
-          <div className='÷'>
-            <div className='notifyBodyLine'>
-              We are excited to welcome you to the next iteration of Frame. 
-              Please be advised, being on the beta track is likely to be more unstable.
-              Use hardware singers rather than hot signers for high value accounts.
-              Verify transactions and account details on you signing device whenever possible.
-              Please read 
-              <span onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/master/LICENSE') }}>
-                our license
-              </span>
-              , use Frame at your own risk and be sure to send us any feedback you have!
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBoxSlide'>
+          <div className='notifyBox'>
+            <div className='notifyFrameIcon'>
+              <img src={frameIcon} />
             </div>
-          </div>
-          <div className='notifyInput'>
-            <div
-              className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
-                // link.send('tray:action', 'muteBetaDisclosure')
-                this.store.notify()
-              }}
-            >
-              <div className='notifyInputOptionText'>Let's go!</div>
+            <div className='notifyTitle'>
+              Frame v0.5-beta
+            </div>
+            <div className='notifyBody'>
+              <div className='notifyBodyBlock notifyBodyBlockBig'>
+                We are excited to welcome you to the next iteration of Frame!
+              </div>
+              <div className='notifyBodyBlock'>
+                Be advised, this version of Frame is currently in "beta" and will update on a beta track
+              </div>
+              <div className='notifyBodyBlock'>
+                We recommend using hardware singers for high value accounts and verifying all transaction and account details on you signing device
+              </div>
+              <div className='notifyBodyBlock' onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/0.5/LICENSE') }}>
+                Read our license and use Frame at your own risk
+              </div>
+              <div className='notifyBodyBlock notifyBodyBlockBig'>
+                Please give us feedback on the beta and will be sure to address it
+                <div className='notifyBodyLink'>frame.canny.io</div>
+              </div>
+            </div>
+            <div className='notifyInput'>
+              <div
+                className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
+                  link.send('tray:action', 'muteBetaDisclosure')
+                  this.store.notify()
+                }}
+              >
+                <div className='notifyInputOptionText'>Let's go!</div>
+              </div>
             </div>
           </div>
         </div>
@@ -139,8 +146,8 @@ class Notify extends React.Component {
 
   nonceWarning () {
     return (
-      <div className='notifyBoxWrap'>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
           <div className='notifyTitle'>
             Adjustable Nonce
           </div>
@@ -159,8 +166,8 @@ class Notify extends React.Component {
 
   gasFeeWarning ({ req = {}, feeUSD = 0 }) {
     return (
-      <div className='notifyBoxWrap'>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
           <div className='notifyTitle'>
             Gas Fee Warning
           </div>
@@ -208,8 +215,8 @@ class Notify extends React.Component {
 
   contractData () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'contractData' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()} style={this.store('view.notify') === 'contractData' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+        <div className='notifyBox' >
           <div className='notifyTitle'>
             <div>Contract Data</div>
             <div>Not Allowed</div>
@@ -238,8 +245,8 @@ class Notify extends React.Component {
 
   hotAccountWarning () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotAccountWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()} style={this.store('view.notify') === 'hotAccountWarning' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+        <div className='notifyBox'>
           <div className='notifyTitle'>
             <div>Hot Signer Alpha</div>
           </div>
@@ -258,8 +265,8 @@ class Notify extends React.Component {
 
   hotSignerMismatch () {
     return (
-      <div className='notifyBoxWrap' style={this.store('view.notify') === 'hotSignerMismatch' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()} style={this.store('view.notify') === 'hotSignerMismatch' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
+        <div className='notifyBox'>
           <div className='notifyTitle'>
             <div>Hot Signer Address Mismatch</div>
           </div>
@@ -278,8 +285,8 @@ class Notify extends React.Component {
 
   openExternal ({ url }) {
     return (
-      <div className='notifyBoxWrap'>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
           <div className='notifyTitle'>
             Open External Link
           </div>
@@ -310,8 +317,8 @@ class Notify extends React.Component {
 
   openExplorer ({ hash }) {
     return (
-      <div className='notifyBoxWrap'>
-        <div className='notifyBox' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
           <div className='notifyTitle'>
             Open Block Explorer
           </div>
@@ -365,7 +372,7 @@ class Notify extends React.Component {
       )
     } else if (notify === 'betaDisclosure') {
       return (
-        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+        <div className='notify cardShow'>
           {this.betaDisclosure()}
         </div>
       )

@@ -54,7 +54,7 @@ class TransactionRequest extends React.Component {
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         {type === 'sign' ? (
-          <div className='approveTransaction'>
+          <div className='approveRequest'>
             <div className='approveTransactionPayload'>
               {notice ? (
                 <div className='requestNotice'>

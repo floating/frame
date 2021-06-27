@@ -25,7 +25,7 @@ class ChainRequest extends React.Component {
     const chain = this.props.req.chain
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
-        <div className='approveTransaction'>
+        <div className='approveRequest'>
           {notice ? (
             <div className='requestNotice'>
               {(_ => {

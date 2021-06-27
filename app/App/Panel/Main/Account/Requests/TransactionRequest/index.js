@@ -384,7 +384,7 @@ class TransactionRequest extends React.Component {
                     <div className='transactionSubtitle'>Value</div>
                   </div>
                   <TxFee {...this.props} />
-                  <TxModule top={160} req={req} />
+                  <TxModule top={165} req={req} />
                   {req.data.to ? (
                     <div className='transactionTo'>
                       <div className='transactionToAddress'>

@@ -225,6 +225,9 @@ class Provider extends EventEmitter {
                 res(response)
                 cb(null, response.result)
               }
+            }, {
+              type: 'ethereum',
+              id: req.data ? parseInt(req.data.chainId, 'hex') : undefined
             })
           }
           const broadcastTimer = setInterval(() => cast(), 1000)
@@ -272,6 +275,9 @@ class Provider extends EventEmitter {
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
       if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
       res(response)
+    }, {
+      type: 'ethereum',
+      id: rawTx.chainId ? parseInt(rawTx.chainId, 'hex') : undefined
     })
   }
 
