@@ -155,7 +155,7 @@
 
     .transactionToAddressLargeWrap
       position absolute
-      top 12px
+      top 14px
       left 61px
       height 40px
       width 140px
@@ -169,18 +169,14 @@
       right 0px
       bottom 0px
       display flex
-      justify-content flex-start
-      align-items flex-start
-      font-size 18px
-      letter-spacing -1px
+      font-size 17px
       opacity 1
-      font-weight 200
       pointer-events none
 
       svg
         color var(--outerspace08)
         padding-top 3px
-        padding-left 6px
+        padding-left 4px
         padding-right 4px
 
     .transactionToAddressCopy
@@ -1676,7 +1672,9 @@
   
   svg
     position relative
-    left -4px
+
+  span
+    padding-left 4px
 
   *
     pointer-events none
@@ -1690,6 +1688,13 @@
 
 .moduleButtonGood
   color var(--good)
+
+.moduleButtonLocked
+  color var(--ghostG)
+
+.moduleButtonLocked:hover
+  background var(--ghostB)
+  box-shadow 0px 2px 2px var(--ghostA)
 
 
 @import '../Balances/style'

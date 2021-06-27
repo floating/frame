@@ -38,14 +38,17 @@
     right 5px
     transition var(--standard)
     background var(--ghostA)
-    overflow-y scroll
-    overflow-x hidden
-    text-align center
-    opacity 1
     display flex
     justtify-content center
     align-items center
+    text-align center
+    opacity 1
+    overflow-x hidden
 
+    .notifyBoxSlide
+      overflow-y scroll
+      overflow-x hidden
+      max-height 100%
 
     .notifyClose
       position absolute
@@ -64,9 +67,10 @@
       border-bottom 1px solid var(--ghostA)
       min-width calc(100% - 16px)
       overflow hidden
+      padding 64px 0px
       
       .notifyTitle
-        font-size 24px
+        font-size 19px
         position relative
         z-index 3
         margin-bottom 40px
@@ -78,15 +82,13 @@
         margin-bottom 24px
 
       .notifyFrameIcon
-        height 96px 
+        height 106px 
         width 100%
         position relative
         z-index 4
         display flex
         justify-content center
         align-items center
-        margin-top -40px
-        margin-bottom 40px
 
         img
           width 96px
@@ -95,17 +97,29 @@
           // box-shadow 0px 30px 24px -10px var(--doubleThick)
 
       .notifyBody
-        font-size 16px
+        font-size 14px
         position relative
         z-index 3
-        padding 10px
+        padding 4px
         word-break break-word
         width 100%
         box-sizing border-box
 
-        span 
+        .notifyBodyBlock
+          padding 8px
+          margin-bottom 4px
+          background var(--ghostB)
+          border-radius 8px
+
+        .notifyBodyBlockBig
+          padding 16px
+          font-size 18px
+          background var(--ghostC)
+
+        .notifyBodyLink
           text-decoration underline
-          margin-right -3px
+          cursor pointer
+          margin 20px 0px 10px 0px
 
         .notifyBodyHash
           font-size 14px

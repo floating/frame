@@ -202,7 +202,7 @@ class Accounts extends EventEmitter {
         }]
       }
 
-      proxyProvider.emit('send', tx, res => {
+      proxyProvider.emit('send', tx, (res = {}) => {
         if (res.error) return reject(new Error(res.error))
         resolve()
       })
@@ -288,6 +288,7 @@ class Accounts extends EventEmitter {
             this.current().requests[id].status = 'confirmed'
             this.current().requests[id].notice = 'Confirmed'
             this.current().update()
+            setTimeout(() => this.removeRequest(id), 8000)
             clearTimeout(monitorTimer)
           }
         }
@@ -312,6 +313,7 @@ class Accounts extends EventEmitter {
               this.current().requests[id].status = 'confirmed'
               this.current().requests[id].notice = 'Confirmed'
               this.current().update()
+              setTimeout(() => this.removeRequest(id), 8000)
               proxyProvider.removeListener('data', handler)
               proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] })
             }

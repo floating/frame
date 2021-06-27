@@ -258,7 +258,6 @@ class ChainConnection extends EventEmitter {
   }
 
   send (payload, res) {
-    // Verify the payload chainId matches
     if (this.primary.provider && this.primary.connected) { // && this.primary.network === store('main.currentNetwork.id')) {
       this.primary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
@@ -326,12 +325,21 @@ class Chains extends EventEmitter {
     })
   }
 
-  send (payload, res) {
-    const { type, id } = store('main.currentNetwork')
-    if (this.connections[type] && this.connections[type][id]) {
-      this.connections[type][id].send(payload, res)
+  send (payload, res, targetChain) {
+    let chainType, chainId
+    if (targetChain) {
+      const { type, id } = targetChain
+      chainType = type
+      chainId = id
+    } else { // Use currently selected network
+      const { type, id } = store('main.currentNetwork')
+      chainType = type
+      chainId = id
+    }
+    if (this.connections[chainType] && this.connections[chainType][chainId]) {
+      this.connections[chainType][chainId].send(payload, res)
     } else {
-      log.error(`Connection for chain ${payload.chainId} did not exist for send`)
+      log.error(`Connection for ${chainType} chain with chainId ${chainId} did not exist for send`)
     }
     // this.connect(store('main.networks', type, id, 'connection'))
     // store('main.networks', type, chainId, 'connection')

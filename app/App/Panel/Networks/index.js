@@ -19,22 +19,11 @@ class _Network extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
-    this.network = context.store('main.currentNetwork.id')
-    this.networkType = context.store('main.currentNetwork.type')
+    const { id, name, type, explorer, symbol, layer } = this.props
+    this.network = id
+    this.networkType = type
     const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    context.store.observer(() => {
-      const { type, id } = context.store('main.currentNetwork')
-      if (this.network !== id || this.networkType !== type) {
-        this.networkType = type
-        this.network = id
-        const primaryCustom = context.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
-        const secondaryCustom = context.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
-        this.setState({ primaryCustom, secondaryCustom })
-      }
-    })
-    const { id, name, type, explorer, symbol, layer } = this.props
-    // this.state = { }
     this.newNetworkIdDefault = 'ID'
     this.newNetworkNameDefault = 'New Network'
     this.newNetworkExplorerDefault = 'Block Explorer'
@@ -144,14 +133,31 @@ class _Network extends React.Component {
     if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
   }
 
+  componentDidMount () {
+    const { id, type } = this.props
+    this.store.observer(() => {
+      const primaryCustom = this.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
+      const secondaryCustom = this.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
+      this.setState({ primaryCustom, secondaryCustom })
+    })
+  }
+
   render () {
     const changed = (
-      this.props.id !== this.state.id ||
-      this.props.name !== this.state.name ||
-      this.props.symbol !== this.state.symbol ||
-      this.props.explorer !== this.state.explorer ||
-      this.props.type !== this.state.type || 
-      this.props.layer !== this.state.layer
+      this.state.id && 
+      this.state.name && 
+      this.state.symbol && 
+      this.state.symbol && 
+      this.state.explorer && 
+      this.state.type &&
+      this.state.layer && (
+        this.props.id !== this.state.id ||
+        this.props.name !== this.state.name ||
+        this.props.symbol !== this.state.symbol ||
+        this.props.explorer !== this.state.explorer ||
+        this.props.type !== this.state.type || 
+        this.props.layer !== this.state.layer
+      )
     )
     const { id, type, connection } = this.props
 
@@ -277,7 +283,7 @@ class _Network extends React.Component {
 
         <div className='signerDrawer'>
           <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-            {this.state.showControls ? 'hide' : 'more'}
+            {this.state.showControls ? 'less' : 'more'}
           </div>
           <div className='showControlsLine' />
         </div>
@@ -289,6 +295,7 @@ class _Network extends React.Component {
                 className='chainIdInput'
                 value={this.state.id} spellCheck='false'
                 onChange={(e) => {
+                  if (type === 'ethereum' && id === '1') return
                   this.setState({ id: e.target.value })
                 }}
                 onBlur={(e) => {
@@ -299,6 +306,7 @@ class _Network extends React.Component {
                 className='chainSymbolInput'
                 value={this.state.symbol} spellCheck='false'
                 onChange={(e) => {
+                  if (type === 'ethereum' && id === '1') return
                   if (e.target.value.length > 8) return e.preventDefault()
                   this.setState({ symbol: e.target.value })
                 }}
@@ -309,7 +317,7 @@ class _Network extends React.Component {
               <Dropdown
                 syncValue={this.state.layer}
                 onChange={layer => this.setState({ layer })}
-                options={this.props.layer === 'mainnet' ? [
+                options={type === 'ethereum' && id === '1' ? [
                   { text: 'mainnet', value: 'mainnet'}
                 ] : [
                   { text: 'rollup', value: 'rollup'}, 
@@ -335,17 +343,25 @@ class _Network extends React.Component {
         ) : null}
 
         {this.state.showControls ? (
-          <div className='chainMore cardShow'>
-            <div
-              className='moduleButton moduleButtonBad' onMouseDown={() => {
-                const { id, name, type, explorer } = this.props
-                link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
-              }}
-            >
-              {svg.trash(13)} 
-              <span>remove chain</span>
+          type === 'ethereum' && id === '1' ? (
+            <div className='chainMore cardShow'>
+              <div className='moduleButton moduleButtonLocked'>
+                {svg.lock(11)}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className='chainMore cardShow'>
+              <div
+                className='moduleButton moduleButtonBad' onMouseDown={() => {
+                  const { id, name, type, explorer } = this.props
+                  link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+                }}
+              >
+                {svg.trash(13)} 
+                <span>remove chain</span>
+              </div>
+            </div>
+          )
         ) : null}
 
         {changed ? (
@@ -354,6 +370,15 @@ class _Network extends React.Component {
               className='moduleButton moduleButtonGood' onMouseDown={() => {
                 const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer, layer: this.props.layer }
                 const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer, layer: this.state.layer }
+                let empty = false
+                Object.keys(newNet).forEach(k => {
+                  if (typeof newNet[k] === 'string') {
+                    newNet[k] = newNet[k].trim()
+                  }
+                  if (newNet[k] === '') empty = true
+                })
+                if (empty) return
+                this.setState(newNet)
                 this.setState({ submitted: true })
                 link.send('tray:action', 'updateNetwork', net, newNet)
                 setTimeout(() => this.setState({ submitted: false }), 1600)

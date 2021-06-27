@@ -1,33 +1,24 @@
-.badge:before
-  content ''
-  position absolute
-  right 0px
-  top 0px
-  left 0px
-  bottom 3px
-  background var(--pending)
-  border-radius 12px
-  z-index 9
-
 .badge
   position absolute
-  right 10px
-  bottom 13px
-  left 10px
+  right 5px
+  bottom 25px
+  left 5px
   transform translateY(300px)
-  background var(--pendingShader)
-  border-radius 12px
+  border-radius 16px
+  background var(--ghostC)
   z-index 999999999999
   transition var(--standard)
+  font-size 18px
   font-weight 300
-  padding-bottom 15px
-  box-shadow 0px 18px 20px -10px  var(--shader)
+  padding-bottom 60px
+  padding-top 30px
+  box-shadow 0px 0px 100px var(--ghostX), 0px 0px 200px var(--ghostX)
   height 196px
 
   .badgeMessage, .badgeInput
     position relative
     z-index 10
-    color var(--spacewhite)
+    color var(--outerspace)
 
   .badgeMessage
     height 120px
@@ -36,7 +27,6 @@
     align-items center
     text-align center
     padding 0px 40px 0px 40px
-    font-weight 400
 
   .badgeInput
     width 100%
@@ -49,9 +39,10 @@
       display flex
       justify-content center
       align-items center
+      cursor pointer
 
       .badgeInputInner
-        background var(--pendingShade)
+        background var(--ghostD)
         height 33px
         width calc(80% - 2px)
         display flex
@@ -66,7 +57,7 @@
         cursor pointer
 
       .badgeInputInner:hover
-        background var(--pendingShader)
+        background var(--ghostE)
 
       .badgeInputSmall
         font-size 11px

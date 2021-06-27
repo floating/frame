@@ -132,7 +132,7 @@ class Requests extends React.Component {
         </div> */}
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
-            <div key='noReq' style={normal.length !== 0 ? { opacity: 0 } : { transitionDelay: '0.32s' }} className='noRequests'>No Pending Requests</div>
+            <div key='noReq' style={normal.length !== 0 ? { opacity: 0, transform: `translateY(50px)`, transition: 'none' } : { transitionDelay: '0.32s', transform: `translateY(${monitor.length === 0 ? 10 : 0}px)` }} className='noRequests'>No Pending Requests</div>
             <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal +  40}px)` }}>
               <span>Recent Transactions</span>
               <span>{monitor.length}</span>

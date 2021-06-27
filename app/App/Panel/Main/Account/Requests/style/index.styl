@@ -409,61 +409,53 @@
 
     .requestMeta
       position absolute
-      height 40px
+      height 29px
       left 0
       right 0
       top 0
-      font-size 10px
+      font-size 11px
       font-weight 600
+      display flex
+      font-weight 600
+      align-items center
 
       .requestMetaChain
         position absolute
-        top 5px
-        left 5px
-        bottom 17px
-        background var(--ghostE)
+        top 0px
+        left 9px
+        bottom 0px
         color var(--outerspace)
         display flex
         align-items center
-        padding 0px 15px 0px 15px
-        padding-bottom 1px
-        border-radius 4px
         letter-spacing 1.5px
         z-index 3
 
       .requestMetaChainMainnet
-        background var(--good) // var(--ghostF)
-        color var(--goodOver)
+        color var(--good) // var(--ghostF)
+        // color var(--goodOver)
 
       .requestMetaChainSidechain
-        background var(--pending) // var(--ghostF)
-        color var(--pendingOver)
+        color var(--pending) // var(--ghostF)
+        // color var(--pendingOver)
 
       .requestMetaChainRollup
-        background var(--moon) // var(--ghostF)
-        color var(--moonOver)
+        color var(--moon) // var(--ghostF)
+        // color var(--moonOver)
 
       .requestMetaChainTestnet
-        background var(--bad) // var(--ghostF)
-        color var(--badOver)
+        color var(--bad) // var(--ghostF)
+        // color var(--badOver)
 
       .requestMetaOrigin
         position absolute
         top 0px
-        right 0px
-        bottom 12px
-        left 0
+        right 9px
+        bottom 0px
+        // left 0
         display flex
         // font-size 10px
         font-weight 400
         align-items center
-        background var(--ghostA)
-        display flex
-        align-items center
-        justify-content flex-end
-        padding 0px 15px 0px 15px
-        padding-bottom 2px
-        border-radius 8px
         z-index 2
 
   .requestOverlay
@@ -525,17 +517,18 @@
       pointer-events none
 
   .requestNotice
-    height 100%
+    height calc(100% - 20px)
     width 100%
     transform translateZ(0px)
     border-radius 8px
     overflow hidden
+    background var(--ghostC)
 
     .requestNoticeInner
       position absolute
       top 0px
       right 0
-      bottom 0px
+      bottom 00px
       left 0
       display flex
       justify-content center
@@ -612,9 +605,9 @@
       transform translateZ(0px)
       letter-spacing 1px
 
-  .approveTransaction
+  .approveTransaction, .approveRequest
     position relative
-    top 40px
+    top 29px
     width 100%
     height 100%
 
@@ -717,6 +710,9 @@
       right 0
       bottom 0
 
+  .approveRequest
+    top 0px
+
   .signValue
     position absolute
     top 57px
@@ -771,7 +767,7 @@
 
   .transactionValue
     position absolute
-    top 40px
+    top 50px
     left 0
     right 0
     height 55px
@@ -1022,7 +1018,7 @@
     align-items center
     flex-direction column
     position absolute
-    bottom 90px
+    bottom 85px
     right 0
     left 0
 
@@ -1231,7 +1227,7 @@
 
   .txProgressConfirmsItemGood
     svg
-      color var(--outerspace08)
+      color var(--good)
 
 .monitorIcon
   position absolute
@@ -1372,7 +1368,7 @@ span
     opacity 0
 
 .txNonceSet
-  transform translate(1px, -9px)
+  transform translate(1px, -5px)
 
 .monitorTop
   position absolute
@@ -1435,8 +1431,7 @@ span
   letter-spacing 0.2px
   font-weight 500
   border-radius 16px
-  background var(--ghostC)
-  box-shadow 0px 2px 2px var(--ghostZ)
+  background var(--ghostD)
   z-index 20000000009999
   
   .txAugmentCancel
@@ -1496,9 +1491,9 @@ span
     opacity 0
 
   .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
-    background var(--ghostD)
+    background var(--ghostE)
     transform scale(1.05)
-    box-shadow 0px 4px 5px -2px var(--ghostY)
+    box-shadow 0px 14px 6px -3px var(--ghostB)
   
 .txAugmentHidden
   .txAugmentCancel
@@ -1507,12 +1502,14 @@ span
     background var(--ghostD)
     transform translateY(-25px) scale(1.05)
     box-shadow 0px 4px 5px -3px var(--thick), 0px 35px 20px -5px var(--thick)
+    pointer-events none
   .txAugmentSpeedUp
     opacity 0
     background var(--ghostD)
     transform translateY(-25px) scale(1.05)
     transform translateY(-25px)   
     transition var(--standard)
+    pointer-events none
   .txDetails
     background none
 
@@ -1716,7 +1713,7 @@ span
         right 0
         height 2px
         margin-top -1px
-        background var(--ghostB)
+        background var(--ghostA)
         z-index 982
 
       .txProgressSteps
@@ -1757,11 +1754,10 @@ span
             top 40px
             height 12px
             width 12px
-            background red
             margin-top -6px
             margin-left -6px
             border-radius 12px
-            background var(--ghostD)
+            background var(--ghostA)
 
           .txProgressStepCenter
             position absolute
@@ -1773,7 +1769,7 @@ span
             margin-top -3px
             margin-left -3px
             border-radius 3px
-            background var(--thick)
+            background var(--ghostZ)
 
           .txProgressStepCenterOn
             background var(--outerspace)
