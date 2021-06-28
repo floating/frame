@@ -209,8 +209,10 @@ class Accounts extends EventEmitter {
     })
   }
 
-  async confirmations (id, hash) {
+  async confirmations (id, hash, targetChain) {
     return new Promise((resolve, reject) => {
+      // TODO: Route to account even if it's not current
+      if (!targetChain || !targetChain.type || !targetChain.id || !this.current()) return reject(new Error('Unable to determine target chain or account'))
       proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', params: [] }, (res) => {
         if (res.error) return reject(new Error(res.error))
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
@@ -219,7 +221,7 @@ class Accounts extends EventEmitter {
             this.current().requests[id].tx.receipt = receiptRes.result
             this.current().update()
             if (!this.current().requests[id].feeAtTime) {
-              const network = store('main.currentNetwork')
+              const network = targetChain
               if (network.type === 'ethereum' && network.id === '1') {
                 fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
                   if (res && res.message === 'OK' && res.result && res.result.ethusd) {
@@ -253,7 +255,7 @@ class Accounts extends EventEmitter {
 
               // If Frame is hidden, trigger native notification
               notify('Transaction Successful', body, () => {
-                const { type, id } = store('main.currentNetwork')
+                const { type, id } = targetChain
                 const explorer = store('main.networks', type, id, 'explorer')
                 shell.openExternal(explorer + '/tx/' + hash)
               })
@@ -262,49 +264,37 @@ class Accounts extends EventEmitter {
             const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
             resolve(blockHeight - receiptBlock)
           }
-        })
-      })
+        }, targetChain)
+      }, targetChain)
     })
   }
 
   async txMonitor (id, hash) {
     this.current().requests[id].tx = { hash, confirmations: 0 }
     this.current().update()
-    proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
-      if (newHeadRes.error) {
-        log.warn(newHeadRes.error)
-        const monitor = async () => {
-          let confirmations
-          try {
-            confirmations = await this.confirmations(id, hash)
-          } catch (e) {
-            log.error(e)
-            clearTimeout(monitorTimer)
-            return
-          }
-          this.current().requests[id].tx.confirmations = confirmations
-          this.current().update()
-          if (confirmations > 12) {
-            this.current().requests[id].status = 'confirmed'
-            this.current().requests[id].notice = 'Confirmed'
-            this.current().update()
-            setTimeout(() => this.removeRequest(id), 8000)
-            clearTimeout(monitorTimer)
-          }
-        }
-        setTimeout(() => monitor(), 3000)
-        const monitorTimer = setInterval(monitor, 15000)
-      } else if (newHeadRes.result) {
-        const headSub = newHeadRes.result
-        const handler = async payload => {
-          if (payload.method === 'eth_subscription' && payload.params.subscription === headSub) {
-            // const newHead = payload.params.result
+
+    const rawTx = this.current().requests[id].data
+
+    const targetChain = {
+      type: 'ethereum',
+      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
+    }
+
+    if (!targetChain || !targetChain.type || !targetChain.id) {
+      log.error('txMonitor had no targetChain',)
+      setTimeout(() => this.removeRequest(id), 8 * 1000)
+    } else {
+      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
+        if (newHeadRes.error) {
+          log.warn(newHeadRes.error)
+          const monitor = async () => {
             let confirmations
             try {
-              confirmations = await this.confirmations(id, hash)
+              confirmations = await this.confirmations(id, hash, targetChain)
             } catch (e) {
               log.error(e)
-              proxyProvider.removeListener('data', handler)
+              clearTimeout(monitorTimer)
+              setTimeout(() => this.removeRequest(id), 60 * 1000)
               return
             }
             this.current().requests[id].tx.confirmations = confirmations
@@ -314,14 +304,44 @@ class Accounts extends EventEmitter {
               this.current().requests[id].notice = 'Confirmed'
               this.current().update()
               setTimeout(() => this.removeRequest(id), 8000)
-              proxyProvider.removeListener('data', handler)
-              proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] })
+              clearTimeout(monitorTimer)
             }
           }
+          setTimeout(() => monitor(), 3000)
+          const monitorTimer = setInterval(monitor, 15000)
+        } else if (newHeadRes.result) {
+          const headSub = newHeadRes.result
+          const handler = async payload => {
+            if (payload.method === 'eth_subscription' && payload.params.subscription === headSub) {
+              // const newHead = payload.params.result
+              let confirmations
+              try {
+                confirmations = await this.confirmations(id, hash, targetChain)
+              } catch (e) {
+                log.error(e)
+                // proxyProvider.removeListener('data', handler)
+                proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+                setTimeout(() => this.removeRequest(id), 60 * 1000)
+                return
+              }
+              this.current().requests[id].tx.confirmations = confirmations
+              this.current().update()
+              if (confirmations > 12) {
+                this.current().requests[id].status = 'confirmed'
+                this.current().requests[id].notice = 'Confirmed'
+                this.current().update()
+                setTimeout(() => this.removeRequest(id), 8000)
+                // proxyProvider.removeListener('data', handler)
+                
+                proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, targetChain)
+              }
+            }
+          }
+          proxyProvider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
         }
-        proxyProvider.on('data', handler)
-      }
-    })
+      }, targetChain)
+    }
   }
 
   getSigners (cb) {

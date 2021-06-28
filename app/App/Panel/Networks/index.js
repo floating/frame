@@ -283,7 +283,7 @@ class _Network extends React.Component {
 
         <div className='signerDrawer'>
           <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-            {this.state.showControls ? 'less' : 'more'}
+            <span>{this.state.showControls ? 'less' : 'more'}</span>
           </div>
           <div className='showControlsLine' />
         </div>

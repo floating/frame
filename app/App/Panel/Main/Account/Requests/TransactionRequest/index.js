@@ -59,6 +59,10 @@ class Time extends React.Component {
 class TransactionRequest extends React.Component {
   constructor (props, context) {
     super(props, context)
+    this.chain = { 
+      type: 'ethereum', 
+      id: parseInt(props.req.data.chainId, 'hex')
+    }
     this.state = { allowInput: false, dataView: false }
     setTimeout(() => {
       this.setState({ allowInput: true })
@@ -132,8 +136,8 @@ class TransactionRequest extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-    const layer = this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'layer')
-    const nativeCurrency = this.store('main.networksMeta.ethereum', parseInt(req.data.chainId, 'hex'), 'nativeCurrency')
+    const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
+    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
     const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
@@ -144,8 +148,7 @@ class TransactionRequest extends React.Component {
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
-    const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
     const txMeta = { replacement: false, possible: true, notice: '' }
     // TODO
     // if (signer locked) {
@@ -184,7 +187,7 @@ class TransactionRequest extends React.Component {
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <div className='requestMeta'>
-          <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'name')}</div>
+          <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks', this.chain.type, this.chain.id, 'name')}</div>
           <div className='requestMetaOrigin'>{req.origin}</div>
         </div>
         {req.type === 'transaction' ? (
@@ -258,9 +261,9 @@ class TransactionRequest extends React.Component {
                           onMouseDown={() => {
                             if (req && req.tx && req.tx.hash) {
                               if (this.store('main.mute.explorerWarning')) {
-                                link.send('tray:openExplorer', req.tx.hash)
+                                link.send('tray:openExplorer', req.tx.hash, this.chain)
                               } else {
-                                this.store.notify('openExplorer', { hash: req.tx.hash })
+                                this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
                               }
                             }
                           }}
