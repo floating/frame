@@ -83,7 +83,7 @@ const onData = data => {
 
       setGasPrices('ethereum', '1', gas)
 
-      accounts.checkBetterGasPrice()
+      accounts.checkBetterGasPrice({type: 'ethereum', id: '1'})
     }
   } catch (e) {
     log.error('Frame Socket Data Error: ', e)

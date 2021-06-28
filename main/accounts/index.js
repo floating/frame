@@ -103,8 +103,6 @@ class Accounts extends EventEmitter {
   async add (address = '', options = {}, cb = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
-    // const network = store('main.currentNetwork.id')
-    // const id = this.fingerprint(network, addresses)
     const account = store('main.accounts', address)
     if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
@@ -154,8 +152,8 @@ class Accounts extends EventEmitter {
     }
   }
 
-  checkBetterGasPrice () {
-    const { id, type } = store('main.currentNetwork')
+  checkBetterGasPrice(targetChain) {
+    const { id, type } = targetChain
     const gas = store('main.networksMeta', type, id, 'gas.price')
     if (gas && this.current() && this.current().network === id && gas.selected !== 'custom') {
       Object.keys(this.current().requests).forEach(id => {
@@ -178,7 +176,7 @@ class Accounts extends EventEmitter {
       if (!this.current().requests[id]) return reject(new Error('Could not find request'))
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
-      const network = store('main.currentNetwork')
+      const network = { type: 'ethereum', id: parseInt(data.chainId, 'hex')}
       const { levels } = store('main.networksMeta', network.type, network.id, 'gas.price')
 
       // Set the gas default to asap
