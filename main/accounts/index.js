@@ -279,7 +279,7 @@ class Accounts extends EventEmitter {
     }
 
     if (!targetChain || !targetChain.type || !targetChain.id) {
-      log.error('txMonitor had no targetChain',)
+      log.error('txMonitor had no targetChain')
       setTimeout(() => this.removeRequest(id), 8 * 1000)
     } else {
       proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
