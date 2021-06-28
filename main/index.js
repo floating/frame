@@ -115,9 +115,8 @@ ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })
 
-ipcMain.on('tray:openExplorer', (e, hash) => {
-  const { type, id } = store('main.currentNetwork')
-  const explorer = store('main.networks', type, id, 'explorer')
+ipcMain.on('tray:openExplorer', (e, hash, chain) => {
+  const explorer = store('main.networks', chain.type, chain.id, 'explorer')
   shell.openExternal(explorer + '/tx/' + hash)
 })
 

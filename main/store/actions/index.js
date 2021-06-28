@@ -439,6 +439,10 @@ module.exports = {
   toggleDash: (u, force) => {
     u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
   },
+  muteBetaDisclosure: (u) => {
+    u('main.mute.betaDisclosure', () => true)
+    u('dash.showing', () => true)
+  }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
   // }

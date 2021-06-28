@@ -31,9 +31,14 @@ class TransactionFee extends React.Component {
     this.inital = true
     this.state = { hoverGwei: 0 }
     this.gasCache = {}
+
+    this.chain = { 
+      type: 'ethereum', 
+      id: parseInt(this.props.req.data.chainId, 'hex').toString()
+    }
+
     context.store.observer(() => {
-      const network = context.store('main.currentNetwork')
-      const { slow, standard, fast, asap } = context.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
+      const { slow, standard, fast, asap } = context.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels')
       let changed = false
 
       if (this.gasCache.slow !== slow && this.state.selectedIndex === 0) {
@@ -76,10 +81,10 @@ class TransactionFee extends React.Component {
       ) {
         this.gasCache = { slow, standard, fast, asap }
         this.feeUpdateRealtimeRef.current.animate([
-          { opacity: '0.3', backgroundPosition: '0px 0px', offset: 0 },
-          { opacity: '1', offset: 0.1 },
-          { opacity: '1', offset: 0.9 },
-          { opacity: '0.3', backgroundPosition: '0px 60px', offset: 1 }
+          { opacity: '0.1', backgroundPosition: '0px 0px', offset: 0 },
+          { opacity: '0.4', offset: 0.1 },
+          { opacity: '0.4', offset: 0.9 },
+          { opacity: '0.1', backgroundPosition: '0px 60px', offset: 1 }
         ], {
           duration: 2400,
           iterations: 1,
@@ -151,9 +156,8 @@ class TransactionFee extends React.Component {
     if (!hoverGasPercent) hoverGasPercent = this.gasPriceToPercent(this.props.req.data.gas)
     hoverGasPercent = hoverGasPercent > 1 ? 1 : (hoverGasPercent < 0 ? 0 : hoverGasPercent)
     const hoverGasPercentOrigin = hoverGasPercent
-    const network = this.store('main.currentNetwork')
-    const asap = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels.asap')
-    // const slow = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels.slow')
+    const asap = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels.asap')
+    // const slow = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels.slow')
     const top = parseInt(asap, 16) * 1.5
     const bottom = gweiToWei(1)
     let gwei = Math.round(weiToGwei(top * hoverGasPercent))
@@ -197,14 +201,12 @@ class TransactionFee extends React.Component {
   }
 
   gasPriceToPercent (price) {
-    const network = this.store('main.currentNetwork')
-    const asap = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels.asap')
+    const asap = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels.asap')
     return parseInt(price) / (parseInt(asap, 16) * 1.5)
   }
 
   renderFeeLabel (current, expanded, currentGas) {
-    const network = this.store('main.currentNetwork')
-    const levels = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
+    const levels = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels')
     const price = levels[current]
     return (
       <div className='txSectionLabelLeft'>
@@ -271,8 +273,7 @@ class TransactionFee extends React.Component {
     if (isNaN(gasPrice)) return this.setState({ inputGwei: 0 })
     const { price } = this.checkGasMax(gasPrice, hexToInt(this.props.req.data.gas))
     this.setState({ inputGwei: price })
-    const network = this.store('main.currentNetwork')
-    const feeLevel = this.store('main.networksMeta', network.type, network.id, 'gas.price.selected')
+    const feeLevel = this.store('main.networksMeta', netType, netId, 'gas.price.selected')
     if (gweiToWeiHex(price) && (gweiToWeiHex(price) !== this.props.req.data.gasPrice || level !== feeLevel)) {
       link.rpc('setGasPrice', netType, netId, gweiToWeiHex(price), level, this.props.req.handlerId, e => {
         if (e) {
@@ -298,8 +299,7 @@ class TransactionFee extends React.Component {
   }
 
   gasData (levels, gasLimit, etherUSD) {
-    const network = this.store('main.currentNetwork')
-    const gasLevels = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
+    const gasLevels = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels')
     const feeData = {}
     levels.forEach(level => {
       feeData[level] = {}
@@ -314,14 +314,14 @@ class TransactionFee extends React.Component {
     const expanded = this.state.selectedIndex === 0
     const expandActive = this.state.expandActive
     const { data } = this.props.req
-    const network = this.store('main.currentNetwork')
-    let feeLevel = this.store('main.networksMeta', network.type, network.id, 'gas.price.selected')
-    const gasLevels = this.store('main.networksMeta', network.type, network.id, 'gas.price.levels')
+
+    let feeLevel = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.selected')
+    const gasLevels = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels')
     const { slowTime, standardTime, fastTime, asapTime, customTime } = gasLevels
     if (gasLevels[feeLevel] !== data.gasPrice) feeLevel = 'custom'
-    const req = this.props.req
-    const layer = this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'layer')
-    const nativeCurrency = this.store('main.networksMeta.ethereum', parseInt(req.data.chainId, 'hex'), 'nativeCurrency')
+    // const req = this.props.req
+    const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
+    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
     const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const gasLimit = this.state.inputLimit || (this.state.gasLimitInputFocus ? 0 : parseInt(data.gas, 'hex'))
 
@@ -330,7 +330,7 @@ class TransactionFee extends React.Component {
     gasData.custom.feeUSD = (gasData.custom.fee * etherUSD).toFixed(2)
     gasData.custom.feeTime = this.timeDisplay(customTime, 'custom')
 
-    const currentSymbol = this.store('main.networks', network.type, network.id, 'symbol') || 'Ξ'
+    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id,'symbol') || '?'
     let slideLevel, feeTotal, feeTotalUSD, feeTime
     const devHaloAdjust = -68
     const haloLevels = {
@@ -440,7 +440,7 @@ class TransactionFee extends React.Component {
                   const inputGwei = parseInt(e.target.value) || 0
                   const price = inputGwei < 0 ? 0 : inputGwei > 9999 ? 9999 : inputGwei
                   this.setState({ inputGwei: price })
-                  this.setGasPrice(network.type, network.id, gweiToWeiHex(price), 'custom')
+                   this.setGasPrice(this.chain.type, this.chain.id, gweiToWeiHex(price), 'custom')
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -451,13 +451,13 @@ class TransactionFee extends React.Component {
                     const { inputGwei } = this.state
                     const price = inputGwei + 1 > 9999 ? 9999 : inputGwei + 1
                     this.setState({ inputGwei: price })
-                    this.setGasPrice(network.type, network.id, gweiToWeiHex(price), 'custom')
+                     this.setGasPrice(this.chain.type, this.chain.id, gweiToWeiHex(price), 'custom')
                   } else if (e.key === 'ArrowDown') {
                     e.preventDefault()
                     const { inputGwei } = this.state
                     const price = inputGwei - 1 < 0 ? 0 : inputGwei - 1
                     this.setState({ inputGwei: price })
-                    this.setGasPrice(network.type, network.id, gweiToWeiHex(price), 'custom')
+                     this.setGasPrice(this.chain.type, this.chain.id, gweiToWeiHex(price), 'custom')
                   }
                 }}
                 onFocus={() => {
@@ -564,7 +564,7 @@ class TransactionFee extends React.Component {
             ref={this.realtimeValues.slow}
             className={this.state.hoverLevel === 'slow' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
             style={{ opacity: !expanded && feeLevel !== 'slow' ? 0 : 1 }}
-            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.slow, 'slow') : null}
+            onMouseDown={expanded ? () =>  this.setGasPrice(this.chain.type, this.chain.id, gasLevels.slow, 'slow') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'slow', hoverGwei: parseInt(gasLevels.slow, 'hex') / 1000000000 })
               this.hoverBar(this.gasPriceToPercent(gasLevels.slow))
@@ -599,7 +599,7 @@ class TransactionFee extends React.Component {
             ref={this.realtimeValues.standard}
             className={this.state.hoverLevel === 'standard' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
             style={{ opacity: !expanded && feeLevel !== 'standard' ? 0 : 1 }}
-            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.standard, 'standard') : null}
+            onMouseDown={expanded ? () =>  this.setGasPrice(this.chain.type, this.chain.id, gasLevels.standard, 'standard') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'standard', hoverGwei: parseInt(gasLevels.standard, 'hex') / 1000000000 })
               this.hoverBar(this.gasPriceToPercent(gasLevels.standard))
@@ -634,7 +634,7 @@ class TransactionFee extends React.Component {
             ref={this.realtimeValues.fast}
             className={this.state.hoverLevel === 'fast' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
             style={{ opacity: !expanded && feeLevel !== 'fast' ? 0 : 1 }}
-            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.fast, 'fast') : null}
+            onMouseDown={expanded ? () =>  this.setGasPrice(this.chain.type, this.chain.id, gasLevels.fast, 'fast') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'fast', hoverGwei: parseInt(gasLevels.fast, 'hex') / 1000000000 })
               this.hoverBar(this.gasPriceToPercent(gasLevels.fast))
@@ -669,7 +669,7 @@ class TransactionFee extends React.Component {
             ref={this.realtimeValues.asap}
             className={this.state.hoverLevel === 'asap' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
             style={{ opacity: !expanded && feeLevel !== 'asap' ? 0 : 1 }}
-            onMouseDown={expanded ? () => this.setGasPrice(network.type, network.id, gasLevels.asap, 'asap') : null}
+            onMouseDown={expanded ? () =>  this.setGasPrice(this.chain.type, this.chain.id, gasLevels.asap, 'asap') : null}
             onMouseEnter={expandActive ? () => {
               this.setState({ hoverLevel: 'asap', hoverGwei: parseInt(gasLevels.asap, 'hex') / 1000000000 })
               this.hoverBar(this.gasPriceToPercent(gasLevels.asap))
@@ -704,7 +704,7 @@ class TransactionFee extends React.Component {
             ref={this.realtimeValues.custom}
             className={this.state.hoverLevel === 'custom' ? 'networkFeeOption networkFeeOptionHover' : 'networkFeeOption'}
             onMouseDown={expanded ? () => {
-              this.setGasPrice(network.type, network.id, this.state.hoverGasPrice, 'custom')
+               this.setGasPrice(this.chain.type, this.chain.id, this.state.hoverGasPrice, 'custom')
             } : null}
             onMouseEnter={expandActive ? e => {
               this.setState({ hoverLevel: 'custom' })

@@ -66,7 +66,7 @@ class Notify extends React.Component {
                 Read our license and use Frame at your own risk
               </div>
               <div className='notifyBodyBlock notifyBodyBlockBig'>
-                Please give us feedback on the beta and will be sure to address it
+                <div>Please give us your feedback!</div>
                 <div className='notifyBodyLink'>frame.canny.io</div>
               </div>
             </div>
@@ -315,7 +315,7 @@ class Notify extends React.Component {
     )
   }
 
-  openExplorer ({ hash }) {
+  openExplorer ({ hash, chain }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -336,7 +336,7 @@ class Notify extends React.Component {
             </div>
             <div
               className='notifyInputOption notifyInputProceed' onMouseDown={() => {
-                link.send('tray:openExplorer', hash)
+                link.send('tray:openExplorer', hash, chain)
                 this.store.notify()
               }}
             >

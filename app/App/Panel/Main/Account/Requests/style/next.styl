@@ -147,8 +147,8 @@
     border-radius 19px
     position absolute 
     top -2px
-    left 1px
-    right 1px
+    left 0px
+    right 0px
     box-sizing border-box
     pointer-events none
     z-index 5000000
@@ -465,27 +465,27 @@
   background var(--ghostD)
   box-shadow cardDrop // , 0px 2px 2px var(--thin)
   transform translateY(-180px)
-  zIndex 1
+  zIndex 3
   height 31px
-  left 3px
-  right 3px
+  left 0px
+  right 0px
   padding 0px 0px
   // transition var(--standardVibe)
 
   .txFeeUpdateRealtime
     position absolute
-    top 60px
+    top 0px
     left 0px
     right 0px
-    // bottom 65px
-    min-height 202px
+    bottom 0px
+    // min-height 202px
     z-index 1000000
     pointer-events none
-    z-index 20
+    z-index 2
     color var(--good)
     overflow hidden
     transition var(--standardVibe)
-    background var(--ghostD)
+    // background var(--ghostD)
     transform translateY(-100px)
     border-radius 6px
 
@@ -496,9 +496,11 @@
       right -200px
       left -200px
       color var(--good)
-      opacity 0.3
-      background-image url('./App/Panel/Main/Account/Requests/style/wave.svg')
+      opacity 0.1
+      // TODO: This only works for dark colorway currently
+      // background-image url('./App/Panel/Main/Account/Requests/style/wave.svg')
       background-position 0px 0px
+      // background blue
 
       .txFeeUpdateRealtimeTitle
         position absolute
@@ -595,6 +597,7 @@
     display flex
     justify-content space-between
     align-items center
+    z-index 20
     // transform translateY(-200px)
     // transition-delay 0s
 
@@ -630,9 +633,11 @@
     bottom 6px
     height 48px
     // transform translateY(1000px)
-    opacity 1
+    opacity 0
     border-radius 6px
     border 1px solid var(--ghostB)
+    background var(--ghostD)
+    z-index 2
 
     .txFeeSummaryValue
       font-size 20px
@@ -785,8 +790,8 @@
     text-transform uppercase
 
 .txFeeExpanded
-  transform translateY(-32px)
-  height 349px
+  transform translateY(-20px)
+  height 350px
   z-index 20000
   border-radius 8px
 
@@ -796,6 +801,10 @@
 
   .txFeeUpdateRealtime
     transform translateY(0px)
+
+  .txFeeSummary
+    transition var(--standard)
+    opacity 1
   
   .txFeeSummaryHover     
     // background var(--outerspace)
