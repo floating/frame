@@ -8,9 +8,9 @@ const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 // Base Paths
-const BASE_PATH_STANDARD = 'm/44\'/60\'/0\'/0'
-const BASE_PATH_LEGACY = 'm/44\'/60\'/0'
-const BASE_PATH_TESTNET = 'm/44\'/1\'/0\'/0'
+const BASE_PATH_STANDARD = "m/44'/60'/0'/0"
+const BASE_PATH_LEGACY = "m/44'/60'/0'"
+const BASE_PATH_TESTNET = "m/44'/1'/0'/0"
 
 class Trezor extends Signer {
   constructor (device, signers) {
@@ -26,7 +26,7 @@ class Trezor extends Signer {
     this.basePath = () => {
       if (this.derivationPath === 'testnet') {
         return BASE_PATH_TESTNET
-      } else if (this.derivationPath === 'legacy')  {
+      } else if (this.derivationPath === 'legacy') {
         return BASE_PATH_LEGACY
       } else {
         return BASE_PATH_STANDARD
