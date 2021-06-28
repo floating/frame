@@ -61,7 +61,7 @@ class TransactionRequest extends React.Component {
     super(props, context)
     this.chain = { 
       type: 'ethereum', 
-      id: parseInt(props.req.data.chainId, 'hex')
+      id: parseInt(props.req.data.chainId, 'hex').toString()
     }
     this.state = { allowInput: false, dataView: false }
     setTimeout(() => {
