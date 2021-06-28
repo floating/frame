@@ -85,7 +85,7 @@ const initial = {
   },
   dash: {
     type: 'signers',
-    showing: true
+    showing: false
   },
   flow: {},
   dapps: {},
