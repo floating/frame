@@ -223,6 +223,14 @@ const migrations = {
       on: false
     }
     return initial
+  },
+  11: initial => { // Convert all Ξ symbols to ETH
+    Object.keys(initial.main.networks.ethereum).forEach(chain => {
+      if (initial.main.networks.ethereum[chain].symbol === 'Ξ') {
+        initial.main.networks.ethereum[chain].symbol = 'ETH'
+      }
+    })
+    return initial
   }
 }
 
