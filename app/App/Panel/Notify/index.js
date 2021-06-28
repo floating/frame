@@ -60,14 +60,27 @@ class Notify extends React.Component {
                 Be advised, this version of Frame is currently in "beta" and will update on a beta track
               </div>
               <div className='notifyBodyBlock'>
-                We recommend using hardware singers for high value accounts and verifying all transaction and account details on you signing device
+                Use hardware singers for high value accounts and verify all transaction and account details on your signing device
               </div>
-              <div className='notifyBodyBlock' onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/0.5/LICENSE') }}>
-                Read our license and use Frame at your own risk
+              <div className='notifyBodyBlock'>
+                <span>Read</span>
+                <span 
+                  className='notifyBodyLink'
+                  onMouseDown={() => { link.send('tray:openExternal', 'https://github.com/floating/frame/blob/0.5/LICENSE') }}
+                >
+                  our license
+                </span>
+                <span>and use Frame at your own risk</span>
               </div>
               <div className='notifyBodyBlock notifyBodyBlockBig'>
                 <div>Please give us your feedback!</div>
-                <div className='notifyBodyLink'>frame.canny.io</div>
+                <div 
+                  className='notifyBodyLink' 
+                  style={{marginTop: '20px'}}
+                  onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
+                >
+                  frame.canny.io
+                </div>
               </div>
             </div>
             <div className='notifyInput'>
@@ -77,7 +90,7 @@ class Notify extends React.Component {
                   this.store.notify()
                 }}
               >
-                <div className='notifyInputOptionText'>Let's go!</div>
+                <div className='notifyInputOptionText notifyBetaGo'>Let's go!</div>
               </div>
             </div>
           </div>
