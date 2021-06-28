@@ -227,7 +227,7 @@ class Provider extends EventEmitter {
               }
             }, {
               type: 'ethereum',
-              id: req.data ? parseInt(req.data.chainId, 'hex') : undefined
+              id: parseInt(req.data.chainId, 'hex').toString()
             })
           }
           const broadcastTimer = setInterval(() => cast(), 1000)

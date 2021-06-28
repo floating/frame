@@ -176,7 +176,7 @@ class Accounts extends EventEmitter {
       if (!this.current().requests[id]) return reject(new Error('Could not find request'))
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
-      const network = { type: 'ethereum', id: parseInt(data.chainId, 'hex')}
+      const network = { type: 'ethereum', id: parseInt(data.chainId, 'hex').toString()}
       const { levels } = store('main.networksMeta', network.type, network.id, 'gas.price')
 
       // Set the gas default to asap

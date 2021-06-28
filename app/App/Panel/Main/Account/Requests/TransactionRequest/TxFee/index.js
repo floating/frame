@@ -34,7 +34,7 @@ class TransactionFee extends React.Component {
 
     this.chain = { 
       type: 'ethereum', 
-      id: parseInt(this.props.req.data.chainId, 'hex')
+      id: parseInt(this.props.req.data.chainId, 'hex').toString()
     }
 
     context.store.observer(() => {
