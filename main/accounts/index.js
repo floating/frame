@@ -155,7 +155,7 @@ class Accounts extends EventEmitter {
   checkBetterGasPrice(targetChain) {
     const { id, type } = targetChain
     const gas = store('main.networksMeta', type, id, 'gas.price')
-    if (gas && this.current() && this.current().network === id && gas.selected !== 'custom') {
+    if (gas && this.current() && gas.selected !== 'custom') {
       Object.keys(this.current().requests).forEach(id => {
         const req = this.current().requests[id]
         if (req.type === 'transaction' && req.data.gasPrice) {
