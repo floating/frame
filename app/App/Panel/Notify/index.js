@@ -79,7 +79,7 @@ class Notify extends React.Component {
                   style={{marginTop: '20px'}}
                   onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
                 >
-                  frame.canny.io
+                  feedback.frame.sh
                 </div>
               </div>
             </div>

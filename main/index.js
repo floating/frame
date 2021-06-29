@@ -68,7 +68,8 @@ const externalWhitelist = [
   'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
   'https://shop.trezor.io/?offer_id=10&aff_id=3270',
   'https://discord.gg/UH7NGqY',
-  'https://frame.canny.io'
+  'https://frame.canny.io',
+  'https://feedback.frame.sh'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
