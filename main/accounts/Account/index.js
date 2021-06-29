@@ -50,9 +50,11 @@ class Account {
           this.signer = updatedSigner.id
           this.lastSignerType = updatedSigner.type || this.lastSignerType
           this.signerStatus = updatedSigner.status
-          if (updatedSigner.status === 'ok') this.verifyAddress(false, (err, verified) => {
-            if (!err && !verified) this.signer = ''
-          })
+          if (updatedSigner.status === 'ok' && this.id === this.accounts._current) {
+              this.verifyAddress(false, (err, verified) => {
+              if (!err && !verified) this.signer = ''
+            })
+          }
         }
       } else {
         this.signer = ''

@@ -418,7 +418,7 @@ class TransactionRequest extends React.Component {
                 if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
               }}
             >
-              <div className='requestDeclineButton'>Decline</div>
+              <div className='requestDeclineButton requestScaleButtonDecline'>Decline</div>
             </div>
             <div
               className='requestSign' onMouseDown={() => {
@@ -431,7 +431,7 @@ class TransactionRequest extends React.Component {
                 }
               }}
             >
-              <div className='requestSignButton'> Sign </div>
+              <div className='requestSignButton requestScaleButtonSign'> Sign </div>
             </div>
           </div>
         ) : null}

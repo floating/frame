@@ -125,7 +125,7 @@ class Trezor extends Signer {
       if (timeout) return
       if (err) {
         if (err === 'Device call in progress' && attempt < 5) {
-          setTimeout(() => this.verifyAddress(index, current, display, cb, ++attempt), 500)
+          setTimeout(() => this.verifyAddress(index, current, display, cb, ++attempt), 1000 * (attempt + 1))
         } else {
           log.info('Verify Address Error: ')
           // TODO: Error Notification
