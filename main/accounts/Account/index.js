@@ -63,15 +63,17 @@ class Account {
       this.update()
     })
 
-    this.accounts.getMainnetBlockHeight((err, height) => {
-      if (err) return log.error('getBlockHeight Error', err)
-      if (this.created === -1 || !this.created || this.created > height) {
-        log.info('Account has no or invalid creation height, fetching')
-        log.info('Account creation being set to current height: ', height)
-        this.created = height
-        this.update()
-      }
-    })
+    if (this.created.split(':')[0] === 'new') {
+      proxyProvider.on('connect', () => {
+        proxyProvider.emit('send', { jsonrpc: '2.0', id: '1', method: 'eth_blockNumber' }, (response) => {
+          if (response.result) this.created = parseInt(response.result, 'hex') + ':' + this.created.split(':')[1]
+          this.update()
+        }, {
+          type: 'ethereum', 
+          id: '1'
+        })
+      })
+    }
 
     this.lookupAddress() // We need to recheck this on every network change...
     this.update()

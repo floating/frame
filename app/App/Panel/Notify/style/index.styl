@@ -33,7 +33,7 @@
     box-sizing border-box
     position absolute
     top 64px
-    bottom 64px
+    bottom 5px
     left 5px
     right 5px
     transition var(--standard)
@@ -107,19 +107,18 @@
 
         .notifyBodyBlock
           padding 8px
-          margin-bottom 4px
+          margin-bottom 8px
           background var(--ghostB)
           border-radius 8px
 
         .notifyBodyBlockBig
           padding 16px
-          font-size 18px
+          font-size 17px
           background var(--ghostC)
 
         .notifyBodyLink
           text-decoration underline
           cursor pointer
-          margin 20px 0px 10px 0px
 
         .notifyBodyHash
           font-size 14px
@@ -218,8 +217,11 @@
             z-index 200
             padding-bottom 2px
 
+        .notifyBetaGo
+          color var(--good)
+
         .notifyInputOption:hover:before
-          background var(--ghostC)
+          background var(--ghostD)
 
         .notifyInputDeny:before
           content ''

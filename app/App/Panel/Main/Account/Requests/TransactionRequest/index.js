@@ -334,13 +334,13 @@ class TransactionRequest extends React.Component {
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
                     <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
-                      <div className='monitorValue'><span>Ξ</span>{value}</div>
+                      <div className='monitorValue'><span>{currentSymbol}</span>{value}</div>
                       <div className='monitorArrow'>{svg.longArrow(13)}</div>
                       {toAddress ? (
                         <div className='monitorTo'>
-                          {toAddress.substring(0, 6)}
+                          {toAddress.substring(0, 5)}
                           {svg.octicon('kebab-horizontal', { height: 14 })}
-                          {toAddress.substr(toAddress.length - 4)}
+                          {toAddress.substr(toAddress.length - 3)}
                         </div>
                       ) : (
                         <div className='monitorDeploy'>deploy</div>

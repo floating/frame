@@ -372,8 +372,7 @@ const api = {
   dash: () => {
     windows.dash = new BrowserWindow({
       id: 'dash',
-      width: 720,
-      height: 530,
+      width: 360,
       frame: false,
       // transparent: true,
       // hasShadow: false,

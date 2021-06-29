@@ -61,12 +61,14 @@ const externalWhitelist = [
   'https://addons.mozilla.org/en-US/firefox/addon/frame-extension',
   'https://github.com/floating/frame/issues/new',
   'https://github.com/floating/frame/blob/master/LICENSE',
+  'https://github.com/floating/frame/blob/0.5/LICENSE',
   'https://aragon.org',
   'https://mainnet.aragon.org',
   'https://rinkeby.aragon.org',
   'https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f',
   'https://shop.trezor.io/?offer_id=10&aff_id=3270',
-  'https://discord.gg/UH7NGqY'
+  'https://discord.gg/UH7NGqY',
+  'https://frame.canny.io'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line

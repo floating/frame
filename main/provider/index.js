@@ -22,7 +22,10 @@ class Provider extends EventEmitter {
     this.connected = false
     this.connection = chains
     this.connection.syncDataEmit(this)
-    this.connection.on('connect', () => { this.connected = true })
+    this.connection.on('connect', () => { 
+      this.connected = true
+      this.emit('connect')
+    })
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
     this.connection.on('error', err => log.error(err))
