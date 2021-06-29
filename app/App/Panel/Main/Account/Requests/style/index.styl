@@ -1,3 +1,11 @@
+@keyframes scalein
+  0%
+    transform scale(0.5) translateY(0px)
+    opacity 0
+  100%
+    transform scale(1) translateY(0px)
+    opacity 1
+
 @keyframes bounceIn {
   from,
   20%,
@@ -41,7 +49,7 @@
 }
 
 .scaleIn
-  animation scalein 600ms cubic !important
+  animation scalein 600ms var(--cubic) !important
 
 .loader,
 .loader:after {
@@ -84,14 +92,6 @@
   100%
     transform scale(1.0)
     opacity 0
-
-@keyframes scalein
-  0%
-    transform scale(0.8)
-    opacity 0.2
-  100%
-    transform scale(1)
-    opacity 1
 
 @keyframes spin
   0%
@@ -154,7 +154,7 @@
   margin 100px auto
   background-color var(--outerspace08)
   border-radius 100%
-  animation sk-scaleout 600ms infinite cubic
+  animation sk-scaleout 600ms infinite var(--cubic)
 
 .signSuccess
   width 100px
@@ -162,7 +162,7 @@
   margin 100px auto
   background-color var(--outerspace08)
   border-radius 100%
-  animation sk-scaleout 600ms infinite cubic
+  animation sk-scaleout 600ms infinite var(--cubic)
 
 .slideUp-enter
   opacity 0
@@ -1117,7 +1117,7 @@
       right 0
       bottom 0
       left 0
-      animation scalein 3000ms cubic
+      // animation scalein 3000ms var(--cubic)
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1155,7 +1155,6 @@
       right 0
       bottom 0
       left 0
-      animation scalein 3000ms cubic
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1185,8 +1184,15 @@
     .requestSignButton:hover:before
       background var(--good)
 
+
+  .requestScaleButtonSign
+    animation scalein 3000ms var(--cubic) !important
+
+  .requestScaleButtonDecline
+    animation scalein 1500ms var(--cubic) !important
+
   .requestQuickButton
-    animation scalein 800ms cubic !important
+    animation scalein 800ms var(--cubic) !important
 
   .requestApproveDisabled
     pointer-events none

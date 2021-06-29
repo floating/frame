@@ -352,6 +352,12 @@ class Accounts extends EventEmitter {
     const summary = this.current().summary()
     cb(null, summary)
     windows.broadcast('main:action', 'setSigner', summary)
+    if (this.current().status === 'ok') this.verifyAddress(false, (err, verified) => {
+      if (!err && !verified) {
+        this.current().signer = ''
+        this.current().update()
+      }
+    })
   }
 
   unsetSigner (cb) {
