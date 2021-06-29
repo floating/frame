@@ -106,25 +106,19 @@ class Accounts extends EventEmitter {
     const account = store('main.accounts', address)
     if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
-    let blockNumber = -1
-    try {
-      blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
-    } catch (e) {
-      log.err(e)
-    }
-    log.info('Account creation blockNumber', blockNumber)
-    this.accounts[address] = new Account({ address, created: blockNumber, options }, this)
+    const created = 'new:' + Date.now()
+    this.accounts[address] = new Account({ address, created, options }, this)
   }
 
-  async getMainnetBlockHeight (cb) {
-    let blockNumber = -1
-    try {
-      blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
-    } catch (e) {
-      log.err(e)
-    }
-    return blockNumber
-  }
+  // async getMainnetBlockHeight (cb) {
+  //   let blockNumber = -1
+  //   try {
+  //     blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
+  //   } catch (e) {
+  //     log.err(e)
+  //   }
+  //   return blockNumber
+  // }
 
   rename (id, name) { this.accounts[id].rename(name) }
 
@@ -176,11 +170,11 @@ class Accounts extends EventEmitter {
       if (!this.current().requests[id]) return reject(new Error('Could not find request'))
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
-      const network = { type: 'ethereum', id: parseInt(data.chainId, 'hex').toString()}
+      const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 'hex').toString()}
       const { levels } = store('main.networksMeta', network.type, network.id, 'gas.price')
 
       // Set the gas default to asap
-      store.setGasDefault(network.type, network.id, 'asap', levels.asap)
+      store.setGasDefault(targetChain.type, targetChain.id, 'asap', levels.asap)
 
       const tx = {
         id: 1,
@@ -203,7 +197,7 @@ class Accounts extends EventEmitter {
       proxyProvider.emit('send', tx, (res = {}) => {
         if (res.error) return reject(new Error(res.error))
         resolve()
-      })
+      }, targetChain)
     })
   }
 
@@ -590,7 +584,10 @@ class Accounts extends EventEmitter {
         this.current().requests[handlerId].data.nonce = adjustedNonce
         this.current().update()
       } else {
-        const { from } = this.current().requests[handlerId].data
+        const { from, chainId } = this.current().requests[handlerId].data
+
+        const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex').toString() }
+
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
@@ -598,7 +595,7 @@ class Accounts extends EventEmitter {
             this.current().requests[handlerId].data.nonce = adjustedNonce
             this.current().update()
           }
-        })
+        }, targetChain)
       }
     }
   }

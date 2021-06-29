@@ -224,12 +224,38 @@ const migrations = {
     }
     return initial
   },
-  11: initial => { // Convert all Ξ symbols to ETH
+  11: initial => { 
+    // Convert all Ξ symbols to ETH
     Object.keys(initial.main.networks.ethereum).forEach(chain => {
       if (initial.main.networks.ethereum[chain].symbol === 'Ξ') {
         initial.main.networks.ethereum[chain].symbol = 'ETH'
       }
     })
+    // Convert all accounts to new creation type system
+    Object.keys(initial.main.accounts).forEach(account => {
+      try {
+        if (!initial.main.accounts[account].created || initial.main.accounts[account].created === -1) {
+          initial.main.accounts[account].created = 'new:' + Date.now()
+        } else {
+          initial.main.accounts[account].created = initial.main.accounts[account].created + ''
+          const [block, localTime] = initial.main.accounts[account].created.split(':')
+          if (!block) {
+            initial.main.accounts[account].created = 'new:' + Date.now()
+          } else if (!localTime) {
+            initial.main.accounts[account].created = block + ':' + Date.now()
+          }
+        }
+  
+        let [block, localTime] = initial.main.accounts[account].created.split(':')
+        if (block.startsWith('0x')) block = parseInt(block, 'hex')
+        if (block > 12726312) block = 12726312
+        initial.main.accounts[account].created = block + ':' + localTime 
+      } catch (e) {
+        log.error('Migration error', e)
+        delete initial.main.accounts[account]
+      }
+    })
+
     return initial
   }
 }

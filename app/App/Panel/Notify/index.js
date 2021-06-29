@@ -160,16 +160,22 @@ class Notify extends React.Component {
   nonceWarning () {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-        <div className='notifyBox'>
-          <div className='notifyTitle'>
-            Adjustable Nonce
-          </div>
-          <div className='notifyBody' style={{ padding: '20px 0px' }}>
-            Adjusting the nonce of a replacement transaction will convert it to a new transaction, use with caution
-          </div>
-          <div className='notifyInput'>
-            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
-              <div className='notifyInputOptionText'>Got it!</div>
+        <div className='notifyBoxSlide'>
+          <div className='notifyBox'>
+            <div className='notifyTitle'>
+              Adjustable Nonce
+            </div>
+            <div className='notifyBody'>
+              <div className='notifyBodyBlock notifyBodyBlockBig'>
+                <div>
+                  Adjusting the nonce of a replacement transaction will cause it to become a new transaction rather than a replacement, use with caution
+                </div>
+              </div>
+            </div>
+            <div className='notifyInput'>
+              <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => this.store.notify()}>
+                <div className='notifyInputOptionText'>Got it!</div>
+              </div>
             </div>
           </div>
         </div>
