@@ -49,10 +49,6 @@ class Accounts extends EventEmitter {
     })
 
     dataScanner.start(Object.keys(this.accounts))
-
-    windows.events.on('tray:hide', () => {
-      dataScanner.setActiveAddress(undefined)
-    })
   }
 
   list () {
