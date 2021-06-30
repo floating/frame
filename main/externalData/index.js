@@ -162,6 +162,8 @@ function addAddresses (addresses) {
 }
 
 function setActiveAddress (address) {
+  log.debug(`setActiveAddress(${address})`)
+
   addAddresses([address])
   activeAddress = address
 
