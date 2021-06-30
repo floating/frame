@@ -305,27 +305,28 @@ class Ledger extends Signer {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
-      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-      rawTx.gasLimit = rawTx.gas // gas must be gasLimit in new ethereum tx
-      const tx = Transaction.fromTxData(rawTx, { common })
-      tx.raw[6] = Buffer.from([rawTx.chainId]) // v
-      tx.raw[7] = Buffer.from([]) // r
-      tx.raw[8] = Buffer.from([]) // s
+
+      const txData = {
+        ...rawTx,
+        gasLimit: rawTx.gas, // gas must be gasLimit in new ethereum tx
+        v: rawTx.chainId,
+        r: '0x00',
+        s: '0x00'
+      }
+
+      const tx = Transaction.fromTxData(txData)
       const rawTxHex = tx.serialize().toString('hex')
-      const result = await eth.signTransaction(this.getPath(index), rawTxHex)
-      this.busyCount = 0
-      const _tx = Transaction.fromTxData({
-        nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
-        gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
-        gasLimit: Buffer.from(this.normalize(rawTx.gas), 'hex'),
-        to: Buffer.from(this.normalize(rawTx.to), 'hex'),
-        value: Buffer.from(this.normalize(rawTx.value), 'hex'),
-        data: Buffer.from(this.normalize(rawTx.data), 'hex'),
-        v: Buffer.from(this.normalize(result.v), 'hex'),
-        r: Buffer.from(this.normalize(result.r), 'hex'),
-        s: Buffer.from(this.normalize(result.s), 'hex')
-      }, { common })
-      cb(null, '0x' + _tx.serialize().toString('hex'))
+      const signature = await eth.signTransaction(this.getPath(index), rawTxHex)
+
+      txData.v = '0x' + signature.v
+      txData.r = '0x' + signature.r
+      txData.s = '0x' + signature.s
+
+      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
+      const signedTx = Transaction.fromTxData(txData, { common })
+      const signedTxSerialized = signedTx.serialize().toString('hex')
+
+      cb(null, '0x' + signedTxSerialized)
       this.releaseDevice()
     } catch (err) {
       log.error(err)
