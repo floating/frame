@@ -305,11 +305,10 @@ class Ledger extends Signer {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
-      // const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-      rawTx.gasLimit = rawTx.gas // gas must be gasLimit in new ethereum tx
 
       const txData = {
         ...rawTx,
+        gasLimit: rawTx.gas, // gas must be gasLimit in new ethereum tx
         v: rawTx.chainId,
         r: '0x00',
         s: '0x00'
@@ -323,7 +322,8 @@ class Ledger extends Signer {
       txData.r = '0x' + signature.r
       txData.s = '0x' + signature.s
 
-      const signedTx = Transaction.fromTxData(txData)
+      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
+      const signedTx = Transaction.fromTxData(txData, { common })
       const signedTxSerialized = signedTx.serialize().toString('hex')
 
       cb(null, '0x' + signedTxSerialized)
