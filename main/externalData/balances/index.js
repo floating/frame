@@ -1,7 +1,7 @@
 const provider = require('eth-provider')()
 const BigNumber = require('bignumber.js')
 
-const getTokenList = require('../inventory/tokens')
+const tokenLoader = require('../inventory/tokens')
 const multicall = require('../../multicall')
 
 async function chainId () {
@@ -43,7 +43,7 @@ async function getTokenBalances (address, omit = [], knownTokens) {
   const symbolsToOmit = omit.map(a => a.toLowerCase())
 
   const chain = await chainId()
-  const tokenList = await getTokenList(chain)
+  const tokenList = await tokenLoader.getTokens(chain)
   const tokens = tokenList.filter(t => !symbolsToOmit.includes(t.symbol.toLowerCase()))
 
   const foundTokens = await loadTokenBalances(chain, address, tokens)
@@ -66,6 +66,8 @@ async function getTokenBalances (address, omit = [], knownTokens) {
 
   return { networkId: chain, balances: tokenBalances }
 }
+
+tokenLoader.start()
 
 module.exports = {
   getNativeCurrencyBalance,

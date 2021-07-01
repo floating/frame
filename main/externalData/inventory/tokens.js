@@ -49,7 +49,20 @@ async function loadTokenList () {
   log.info(`updated token list to contain ${tokenList.length} tokens`)
 }
 
-loadTokenList()
-setInterval(loadTokenList, 1000 * 60 * 10)
 
-module.exports = chainId => tokenList.filter(token => token.chainId === chainId)
+
+let loader
+
+module.exports = {
+  start: () => {
+    loadTokenList()
+    loader = setInterval(loadTokenList, 1000 * 60 * 10)
+  },
+  stop: () => {
+    if (loader) {
+      clearInterval(loader)
+      loader = null
+    }
+  },
+  getTokens: chainId => tokenList.filter(token => token.chainId === chainId)
+}
