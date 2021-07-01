@@ -28,9 +28,10 @@ function mergeTokens (...tokenLists) {
   const mergedList = tokenLists.reduce((tokens, list) => {
     list.forEach(token => {
       const address = token.address.toLowerCase()
+      const key = `${token.chainId}:${address}`
 
-      if (!(address in tokens)) {
-        tokens[address] = { ...token, address }
+      if (!(key in tokens)) {
+        tokens[key] = { ...token, address }
       }
     })
 
