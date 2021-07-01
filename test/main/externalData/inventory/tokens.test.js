@@ -1,4 +1,4 @@
-/* globals jest it */
+/* globals jest beforeAll afterAll it */
 
 const mockNebula = {
   resolve: jest.fn().mockResolvedValue({ record: {} }),
