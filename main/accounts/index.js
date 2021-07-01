@@ -323,7 +323,11 @@ class Accounts extends EventEmitter {
                 // proxyProvider.removeListener('data', handler)
                 
                 proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
-                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, targetChain)
+                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, res => {
+                  if (res.error) {
+                    log.error('error sending message eth_unsubscribe', res)
+                  }
+                }, targetChain)
               }
             }
           }
