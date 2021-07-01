@@ -78,7 +78,7 @@ class Provider extends EventEmitter {
   getNetVersion (payload, res, targetChain) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
+      // if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     }, targetChain)
   }
@@ -86,7 +86,7 @@ class Provider extends EventEmitter {
   getChainId (payload, res, targetChain) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
+      // if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     }, targetChain)
   }
@@ -258,13 +258,12 @@ class Provider extends EventEmitter {
   }
 
   getGasPrice (rawTx, res) {
-    const chain = parseInt(rawTx.chainId, 'hex').toString()
-    const network = store('main.currentNetwork')
+    const chain = {
+      type: 'ethereum',
+      id: parseInt(rawTx.chainId, 'hex').toString()
+    }
 
-    if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
-
-    const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
-
+    const { levels, selected } = store('main.networksMeta', chain.type, chain.id, 'gas.price')
     if (!levels[selected]) throw new Error('Unable to determine gas')
 
     return levels[selected]

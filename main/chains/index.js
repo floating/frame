@@ -254,7 +254,7 @@ class ChainConnection extends EventEmitter {
 
   resError (error, payload, res) {
     if (typeof error === 'string') error = { message: error, code: -1 }
-    if (res) res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
   send (payload, res) {

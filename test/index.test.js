@@ -67,7 +67,7 @@ test('eth_sign and ecRecover', done => {
   })
 }, 30 * 1000)
 
-test('eth_sign bad message', async (done) => {
+test('eth_sign bad message', async () => {
   const provider = require('eth-provider')()
   let error = ''
   try {
@@ -77,5 +77,5 @@ test('eth_sign bad message', async (done) => {
   } catch (e) { error = e }
   expect(error).toBe('ethSign Error: Invalid hex values')
   provider.close()
-  done()
+  web3.currentProvider.disconnect()
 }, 30 * 1000)

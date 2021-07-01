@@ -3,7 +3,7 @@
 const provider = require('eth-provider')
 const frame = provider('frame')
 
-test('Failing Transaction (Mainnet)', async done => {
+test('Failing Transaction (Mainnet)', async () => {
   try {
     await frame.request({
       method: 'eth_sendTransaction',
@@ -16,10 +16,12 @@ test('Failing Transaction (Mainnet)', async done => {
         gasPrice: '0x2a9ba66600'
       }]
     })
+    frame.close()
+    return false
   } catch (e) {
-    done()
+    frame.close()
+    return Boolean(e)
   }
-  frame.close()
 }, 30 * 1000)
 
 // test('Failing Transaction (Goerli)', async done => {

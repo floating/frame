@@ -304,7 +304,7 @@ class Ledger extends Signer {
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
-      if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
+      // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
 
       const txData = {
         ...rawTx,
