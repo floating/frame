@@ -84,16 +84,16 @@ class Accounts extends EventEmitter {
 
   // Public
   addAragon (account, cb = () => {}) {
-    if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
-    account.network = account.network || store('main.currentNetwork.id')
-    account.id = this.fingerprint(account.network, account.addresses)
+    // if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
+    // account.network = account.network || store('main.currentNetwork.id')
+    // account.id = this.fingerprint(account.network, account.addresses)
     account.options = account.options || {}
-    const existing = store('main.accounts', account.id)
-    if (existing && existing.network === account.network) return cb(null, existing) // Account already exists...
+    const existing = store('main.accounts', account.address)
+    if (existing) return cb(null, existing) // Account already exists...
     log.info('Aragon account not found, creating account')
     account.options.type = 'aragon'
-    this.accounts[account.id] = new Account(account, this)
-    cb(null, this.accounts[account.id].summary())
+    this.accounts[account.address] = new Account(account, this)
+    cb(null, this.accounts[account.address].summary())
   }
 
   async add (address = '', options = {}, cb = () => {}) {
@@ -167,7 +167,7 @@ class Accounts extends EventEmitter {
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
       const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 'hex').toString()}
-      const { levels } = store('main.networksMeta', network.type, network.id, 'gas.price')
+      const { levels } = store('main.networksMeta', targetChain.type, targetChain.id, 'gas.price')
 
       // Set the gas default to asap
       store.setGasDefault(targetChain.type, targetChain.id, 'asap', levels.asap)
@@ -238,6 +238,7 @@ class Accounts extends EventEmitter {
                 if (reqs[k].status === 'verifying' && reqs[k].data.nonce === reqs[id].data.nonce) {
                   this.current().requests[k].status = 'error'
                   this.current().requests[k].notice = 'Dropped'
+                  setTimeout(() => this.removeRequest(k), 8000)
                 }
               })
 
@@ -410,7 +411,7 @@ class Accounts extends EventEmitter {
   signTransaction (rawTx, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     const matchSelected = rawTx.from.toLowerCase() === this.getSelectedAddress().toLowerCase()
-    const matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.address.toLowerCase() : false)
+    const matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.toLowerCase() : false)
     if (matchSelected || matchActor) {
       this.current().signTransaction(rawTx, cb)
     } else {

@@ -178,6 +178,8 @@ class TransactionRequest extends React.Component {
     let nonce = parseInt(req.data.nonce, 'hex')
     if (isNaN(nonce)) nonce = 'TBD'
 
+    const otherChain = (this.chain.id !== this.store('main.currentNetwork.id')) && !this.state.allowOtherChain
+
     let metaChainClass = 'requestMetaChain'
     if (this.chain.id !== this.store('main.currentNetwork.id')) metaChainClass += ' requestMetaChainTestnet'
     // if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
@@ -192,7 +194,7 @@ class TransactionRequest extends React.Component {
         </div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-            {req.warning && status !== 'error' ? (
+            {(req.warning || otherChain) && status !== 'error' ? (
               <div className='approveTransactionWarning'>
                 <div className='approveTransactionWarningOptions'>
                   <div
@@ -216,7 +218,13 @@ class TransactionRequest extends React.Component {
                   </div>
                   <div
                     className='approveTransactionWarningProceed'
-                    onMouseDown={() => this.removeWarning(this.props.req.handlerId)}
+                    onMouseDown={() => {
+                      if (otherChain) {
+                        this.setState({ allowOtherChain: true})
+                      } else {
+                        this.removeWarning(this.props.req.handlerId)
+                      }
+                    }}
                   >Proceed
                   </div>
                 </div>
@@ -228,7 +236,7 @@ class TransactionRequest extends React.Component {
                     {svg.alert(32)}
                   </div>
                   <div className='approveTransactionWarningTitle'>estimated to fail</div>
-                  <div className='approveTransactionWarningMessage'>{req.warning}</div>
+                  <div className='approveTransactionWarningMessage'>{otherChain ? 'transaction is not for currently selected chain' : req.warning}</div>
                 </div>
               </div>
             ) : null}

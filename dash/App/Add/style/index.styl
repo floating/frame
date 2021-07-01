@@ -414,7 +414,7 @@
 
   .addAccountItemOption
     position absolute 
-    top 120px
+    top 150px
     left 0
     right 0
     bottom 60px
@@ -485,6 +485,7 @@
           font-weight 500
           //letter-spacing 1px
           box-sizing border-box
+          // padding 0px 50px
 
   .addAccountItemOptionSubmit
     background var(--ghostB)
@@ -500,11 +501,12 @@
     background var(--ghostC)
 
   .addAccountItemOptionList
-    width calc(100% - 20px)
+    width calc(100% - 0px)
     border-radius 4px
-    padding 10px 0px
-    height 160px
-    margin 0px 0px 10px 0px
+    padding 50px 0px
+    height calc(100% - 60px)
+    top 20px
+    // margin 0px 0px 10px 0px
     position relative
     overflow hidden
     background var(--ghostA)
@@ -518,18 +520,39 @@
     text-transform none
 
   .addAccountItemOptionListItem
-    width 100%
+    // width 100%
     text-align center
-    padding 4px 7px 4px 5px
+    padding 16px 8px 16px 8px
     margin-left -3px
+    margin 10px
     font-weight 600
+    cursor pointer
+    border-radius 8px
+    background var(--ghostB)
+    *
+      cursor pointer
 
-    svg
-      padding 0px 9px 0px 6px
-      margin-bottom -2
+    .actingAccountAddress
+      font-family Fira Code, monospace
+      font-weight 400
+      font-size 20px
+      display flex
+      justify-content center
+      align-items center
+      text-transform none
+
+      svg
+        padding 2px 3px 0px 3px
+
+    .actingAccountTag
+      font-weight 400
+      font-size 12px
+      // letter-spacing 1px
+      text-transform none
+      color var(--outerspace08)
 
   .addAccountItemOptionListItem:hover
-    background var(--ghostA)
+    background var(--ghostC)
 
   .addAccountItemOptionInput
     width calc(100% - 40px)

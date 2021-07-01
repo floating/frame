@@ -123,7 +123,7 @@ const rpc = {
     cb()
   },
   removeAccount (address, options, cb) {
-    if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
+    // if (!utils.isAddress(address)) return cb(new Error('Invalid Address'))
     accounts.remove(address)
     cb()
   },
