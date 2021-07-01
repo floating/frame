@@ -1,56 +1,48 @@
-/* globals jest beforeAll it */
+/* globals jest beforeAll afterAll it */
 
 const mockNebula = {
-  resolve: jest.fn(),
+  resolve: jest.fn().mockResolvedValue({ record: {} }),
   ipfs: {
-    getJson: jest.fn()
+    getJson: jest.fn().mockResolvedValue({
+      tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }]
+    })
   }
 }
 
 const tokenList = require('../../../../main/externalData/inventory/tokens')
-const nebula = require('../../../../main/nebula')
-const fetch = require('node-fetch')
 
-jest.mock('node-fetch')
 jest.mock('../../../../main/nebula', () => jest.fn(() => mockNebula))
 
 beforeAll(() => {
-  fetch.mockImplementation(url => {
-    if (url.endsWith('matic.json')) {
-      return Promise.resolve({
-        json: () => { return Promise.resolve([{ name: 'atoken', chainId: 137, address: '0x9999' }]) }
-      })
-    }
-
-    return Promise.reject('unknown token list!')
-  })
+  tokenList.start()
 })
 
-it('loads a token list from sushiswap', async () => {
-  const tokens = await tokenList(137)
+afterAll(() => {
+  tokenList.stop()
+})
 
-  expect(tokens.length).toBe(1)
-  expect(tokens[0].name).toBe('atoken')
+it('loads the included sushiswap token list', async () => {
+  const tokens = await tokenList.getTokens(137)
+
+  expect(tokens.length).toBe(52)
+  expect(tokens[0].name).toBe('Aave')
 })
 
 it('loads a token list from nebula', async () => {
-  mockNebula.resolve.mockResolvedValue({ record: {} })
-  mockNebula.ipfs.getJson.mockResolvedValue([{ name: 'another-token', chainId: 100, address: '0x9999' }])
-
-  const tokens = await tokenList(100)
+  const tokens = await tokenList.getTokens(299)
 
   expect(tokens.length).toBe(1)
   expect(tokens[0].name).toBe('another-token')
 })
 
 it('loads the default token list for mainnet', async () => {
-  const tokens = await tokenList(1)
+  const tokens = await tokenList.getTokens(1)
 
   expect(tokens.length).toBeGreaterThan(0)
 })
 
 it('fails to load tokens for an unknown chain', async () => {
-  const tokens = await tokenList(-1)
+  const tokens = await tokenList.getTokens(-1)
 
   expect(tokens.length).toBe(0)
 })
