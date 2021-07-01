@@ -257,10 +257,20 @@ const migrations = {
     })
 
     return initial
+  },
+  12: (initial) => {
+    // Update old smart accounts
+    Object.keys(initial.main.accounts).forEach(id => {
+      if (initial.main.accounts[id].smart) {
+        initial.main.accounts[id].smart.actor = initial.main.accounts[id].smart.actor.address
+      }
+    })
+
+    return initial
   }
 }
 
-module.exports = {
+// module.exports = {
   // Apply migrations to current state
   apply: state => {
     state.main._version = state.main._version || 0
