@@ -119,6 +119,7 @@ class Aragon {
     tx.data = tx.data || '0x'
     this.wrap.calculateTransactionPath(this.actor, this.agent, 'execute', [tx.to, tx.value, tx.data]).then(result => {
       const newTx = result[0]
+      if (!newTx) return cb(new Error('Could not calculate a transaction path for Aragon smart account, make sure your acting account has the necessary permissions'))
       delete newTx.nonce
       newTx.chainId = tx.chainId
       this.provider.getNonce(newTx, res => {

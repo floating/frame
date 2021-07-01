@@ -257,6 +257,16 @@ const migrations = {
     })
 
     return initial
+  },
+  12: (initial) => {
+    // Update old smart accounts
+    Object.keys(initial.main.accounts).forEach(id => {
+      if (initial.main.accounts[id].smart) {
+        initial.main.accounts[id].smart.actor = initial.main.accounts[id].smart.actor.address
+      }
+    })
+
+    return initial
   }
 }
 
