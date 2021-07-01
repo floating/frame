@@ -57,7 +57,7 @@ class SignerStatus extends React.Component {
   }
 
   unlockSubmit (e) {
-    link.rpc('unlockSigner', this.props.signer, this.state.unlockInput, (err) => {
+    link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err) => {
       if (err) this.shake()
     })
   }
@@ -67,7 +67,7 @@ class SignerStatus extends React.Component {
   }
 
   submitPin () {
-    link.rpc('trezorPin', this.props.signer, this.state.tPin, () => {})
+    link.rpc('trezorPin', this.props.signer.id, this.state.tPin, () => {})
     this.setState({ tPin: '' })
   }
 
@@ -102,10 +102,9 @@ class SignerStatus extends React.Component {
   }
 
   render () {
-    const signer = this.props.signer ? this.store('main.signers', this.props.signer) : null
     const { shake } = this.state
 
-    return signer && signer && signer.status === 'locked' ? (
+    return this.props.signer && this.props.signer.id && this.props.signer.status === 'locked' ? (
       <div className={shake ? 'signerStatus headShake' : 'signerStatus'} ref={this.statusRef}>
         <div className='signerStatusWrap'>
           <div className='signerStatusTop'>

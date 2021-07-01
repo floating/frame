@@ -961,7 +961,15 @@ class Account extends React.Component {
       }
     }
 
-    const signer = this.store('main.signers', this.props.signer)
+    const account = this.store('main.accounts', this.props.id)
+    let signer
+
+    if (account.signer) {
+      signer = this.store('main.signers', account.signer)
+    } else if (account.smart)  {
+      const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
+      if (actingSigner) signer = this.store('main.signers', actingSigner)
+    }
 
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
@@ -969,7 +977,7 @@ class Account extends React.Component {
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             {!this.state.hideSignerStatus && open ? (
-              <SignerStatus open={open} signer={this.props.signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
+              <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
             ) : null}
             <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {!this.state.addressHover ? this.renderType() : null} 
