@@ -210,7 +210,7 @@ class Trezor extends Signer {
   }
 
   signTransaction (index, rawTx, cb) {
-    if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
+    // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
     const trezorTx = {
       nonce: this.normalize(rawTx.nonce),
       gasPrice: this.normalize(rawTx.gasPrice),

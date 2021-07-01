@@ -292,7 +292,7 @@ class Lattice extends Signer {
 
   async signTransaction (index, rawTx, cb) {
     try {
-      if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
+      // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
       const unsignedTxn = {
         nonce: utils.hexToNumber(rawTx.nonce),
         gasPrice: utils.hexToNumber(rawTx.gasPrice),

@@ -179,10 +179,10 @@ class TransactionRequest extends React.Component {
     if (isNaN(nonce)) nonce = 'TBD'
 
     let metaChainClass = 'requestMetaChain'
-    if (layer === 'testnet') metaChainClass += ' requestMetaChainTestnet'
-    if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
-    if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
-    if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
+    if (this.chain.id !== this.store('main.currentNetwork.id')) metaChainClass += ' requestMetaChainTestnet'
+    // if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
+    // if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
+    // if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
