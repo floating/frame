@@ -27,13 +27,13 @@ class Account {
     this.status = 'ok' // Current Status
     this.name = name || capitalize(options.type) + ' Account'
     this.lastSignerType = lastSignerType || options.type
-    this.created = created
+    this.created = created || `new:${Date.now()}`
     this.address = address
     this.smart = smart
     this.ensName = ensName
     // Update actor to just store actor's address
-    if (this.smart && this.smart.actor && this.smart.actor.address) {
-      this.smart.actor = this.smart.actor.address.toLowerCase()
+    if (this.smart && this.smart.actor) {
+      this.smart.actor = this.smart.actor.toLowerCase()
     }
     this.tokens = tokens || {}
     this.requests = {}
@@ -355,7 +355,7 @@ class Account {
         if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
         const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
         if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find acting address in signer`, actingAccount.address))
-        actingSigner.signTypedData(index, rawTx, cb)
+        actingSigner.signTransaction(index, rawTx, cb)
       } else {
         cb(new Error('No signer found for this account'))
       }
