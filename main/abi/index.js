@@ -3,11 +3,11 @@ const { id } = require('@ethersproject/hash')
 const { defaultAbiCoder } = require('@ethersproject/abi')
 const log = require('electron-log')
 
-function parseAbi (data) {
+function parseAbi (abiData) {
   try {
     return JSON.parse(abiData)
   } catch (e) {
-    log.warn(`could not parse ABI data: "${data}"`)
+    log.warn(`could not parse ABI data: "${abiData}"`)
   }
 }
 
