@@ -1,4 +1,4 @@
-/* globals jest beforeAll it */
+/* globals jest it */
 
 const mockNebula = {
   resolve: jest.fn().mockResolvedValue({ record: {} }),
@@ -10,7 +10,6 @@ const mockNebula = {
 }
 
 const tokenList = require('../../../../main/externalData/inventory/tokens')
-const nebula = require('../../../../main/nebula')
 
 jest.mock('../../../../main/nebula', () => jest.fn(() => mockNebula))
 
