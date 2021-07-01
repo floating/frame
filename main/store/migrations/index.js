@@ -270,7 +270,7 @@ const migrations = {
   }
 }
 
-// module.exports = {
+module.exports = {
   // Apply migrations to current state
   apply: state => {
     state.main._version = state.main._version || 0
