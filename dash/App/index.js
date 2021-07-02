@@ -88,7 +88,7 @@ class AddAccounts extends React.Component {
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
         {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore.json</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>A Non-signing Account</div>
       </div>
     )

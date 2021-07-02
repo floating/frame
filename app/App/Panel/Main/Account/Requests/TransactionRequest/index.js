@@ -194,7 +194,12 @@ class TransactionRequest extends React.Component {
         </div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-            {(req.warning || otherChain) && status !== 'error' ? (
+            {(req.warning || otherChain) && !status &&
+            status !== 'error' && 
+            status !== 'pending' && 
+            status !== 'verifying' && 
+            !status &&
+            mode !== 'monitor' ? (
               <div className='approveTransactionWarning'>
                 <div className='approveTransactionWarningOptions'>
                   <div
@@ -235,8 +240,8 @@ class TransactionRequest extends React.Component {
                   <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
                     {svg.alert(32)}
                   </div>
-                  <div className='approveTransactionWarningTitle'>estimated to fail</div>
-                  <div className='approveTransactionWarningMessage'>{otherChain ? 'transaction is not for currently selected chain' : req.warning}</div>
+                  <div className='approveTransactionWarningTitle'>{otherChain ? 'chain warning' : 'estimated to fail'} </div>
+                  <div className='approveTransactionWarningMessage'>{otherChain ? 'transaction is not on currently selected chain' : req.warning}</div>
                 </div>
               </div>
             ) : null}
