@@ -25,21 +25,6 @@ class Balances extends React.Component {
         <div className='moduleHeader'>{'Settings'}</div>  
         <div className='moduleMain moduleMainSettings'> 
           <div>{account.name}</div> 
-          {account.smart ? (
-            <>
-              <div>SMART ACCOUNT INFO</div>
-              <div>Smart account type: {account.smart.type}</div>
-              <div>DAO Exists on this chain: ?</div>
-              <div>Status: {account.status}</div>
-              <div>Acting Account: {account.smart.actor}</div>
-              <div>DAO Address: {account.smart.dao}</div>
-              <div>IPFS Gateway: {'https://ipfs.aragon.org'}</div>
-              <div>Last Signer: {account.lastSignerType}</div>
-              <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>
-              <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
-              <div>Signer Connected: {account.signer ? 'yes' : 'no'}</div>
-            </>
-          ) : null}
           <div>Status: {account.status}</div>
           <div>Last Signer: {account.lastSignerType}</div>
           <div>ENS Name: {account.ensName  ? account.ensName : 'none'}</div>

@@ -280,7 +280,7 @@ class Lattice extends Signer {
       const clientSign = promisify(this.client.sign).bind(this.client)
 
       const result = await clientSign(signOpts)
-      let v = result.sig.v.toString(16)
+      let v = result.sig.v.toString('hex')
       if (v.length < 2) v = '0' + v
       const signature = '0x' + result.sig.r + result.sig.s + v
 
@@ -323,7 +323,8 @@ class Lattice extends Signer {
       }, { common })
       return cb(null, '0x' + tx.serialize().toString('hex'))
     } catch (err) {
-      return cb(new Error(err))
+      log.error(err)
+      return cb(new Error('Error signing transaction'))
     }
   }
 }
