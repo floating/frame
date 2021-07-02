@@ -28,7 +28,7 @@ const getCurrentChainGas = () => {
         slow: 0,
         standard: 0,
         fast: 0,
-        asap: Math.round((price + 1) * 1.2),
+        asap: 1,
         custom: store('main.networksMeta', network.type, network.id, 'gas.price.levels.custom') || 0,
       })
     }
