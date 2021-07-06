@@ -21,6 +21,15 @@ async function call (path, params = {}) {
   return fetch(url).then(handleJsonResponse)
 }
 
+async function assetPlatforms (chainIds = []) {
+  const chainIdFilter = chainIds.map(id => id.toString())
+  const allPlatforms = await call(`${baseUrl}/asset_platforms`)
+
+  return chainIds.length > 0
+    ? allPlatforms.filter(p => chainIdFilter.includes(p.chain_identifier || "").toString())
+    : allPlatforms
+}
+
 async function coinPrices (ids, currencies = ['usd']) {
   const queryParams = {
     ids: ids.join(','),
@@ -33,7 +42,7 @@ async function coinPrices (ids, currencies = ['usd']) {
   return call(`${baseUrl}/simple/price`, queryParams)
 }
 
-async function tokenPrices (addresses, currencies = ['usd']) {
+async function tokenPrices (addresses, asset_platform, currencies = ['usd']) {
   const queryParams = {
     contract_addresses: addresses.join(','),
     vs_currencies: currencies.join(','),
@@ -42,15 +51,15 @@ async function tokenPrices (addresses, currencies = ['usd']) {
     include_24hr_change: 'true'
   }
 
-  return call(`${baseUrl}/simple/token_price/ethereum`, queryParams)
+  return call(`${baseUrl}/simple/token_price/${asset_platform}`, queryParams)
 }
 
 async function getCoin (id) {
   return call(`${baseUrl}/coins/${id}`)
 }
 
-async function listCoins () {
-  return call(`${baseUrl}/coins/list`)
+async function listCoins (include_platform = true) {
+  return call(`${baseUrl}/coins/list?include_platform=${include_platform}`)
 }
 
 async function listMarkets (ids, vsCurrency = 'usd') {
@@ -63,6 +72,7 @@ async function listMarkets (ids, vsCurrency = 'usd') {
 }
 
 module.exports = {
+  assetPlatforms,
   coinPrices,
   tokenPrices,
   getCoin,
