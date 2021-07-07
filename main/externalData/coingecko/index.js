@@ -26,7 +26,7 @@ async function assetPlatforms (chainIds = []) {
   const allPlatforms = await call(`${baseUrl}/asset_platforms`)
 
   return chainIds.length > 0
-    ? allPlatforms.filter(p => chainIdFilter.includes(p.chain_identifier || "").toString())
+    ? allPlatforms.filter(p => chainIdFilter.includes((p.chain_identifier || "").toString()))
     : allPlatforms
 }
 
