@@ -47,7 +47,7 @@ function createWorker () {
       const tokenSymbols = Object.keys(message.balances).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
 
       if (tokenSymbols.length > 0) {
-        updateRates(tokenSymbols)
+        updateRates(tokenSymbols, message.netId)
       }
     }
 
@@ -136,7 +136,7 @@ function scanActiveData () {
 }
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
-const updateRates = symbols => sendCommandToWorker('updateRates', [symbols])
+const updateRates = (symbols, chainId) => sendCommandToWorker('updateRates', [symbols, chainId])
 const updateNativeCurrencyData = symbols => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateAllTokens = () => sendCommandToWorker('updateTokenBalances', [trackedAddresses])
 const updateActiveBalances = () => {

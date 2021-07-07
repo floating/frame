@@ -6,10 +6,10 @@ const coingecko = require('../coingecko')
 const FETCH_BATCH_SIZE = 200
 
 // { symbol: coinId }
-let allCoins = {}
+let allCoins
 
-// { contractAddress: platformId }
-let tokenPlatforms = {}
+// { chainId: platformId }
+let allPlatforms
 
 function createRate (quote) {
   return {
@@ -21,30 +21,48 @@ function createRate (quote) {
 }
 
 async function coins () {
-  return Object.keys(allCoins).length > 0 ? allCoins : loadCoins()
+  return allCoins || loadCoins()
+}
+
+async function assetPlatforms () {
+  return allPlatforms || loadPlatforms()
 }
 
 async function loadCoins () {
   try {
     const coins = await coingecko.listCoins()
 
-    for (const coin of coins) {
-      allCoins[coin.symbol.toLowerCase()] = coin.id
-
-      for (const platform in (coin.platforms || {})) {
-        const contractAddress = coin.platforms[platform]
-
-        if (contractAddress) {
-          tokenPlatforms[contractAddress.toLowerCase()] = platform
-        }
-      }
-    }
+    allCoins = coins.reduce((coinMapping, coin) => {
+      coinMapping[coin.symbol.toLowerCase()] = coin.id
+      return coinMapping
+    }, {})
 
     return allCoins
   } catch (e) {
     log.error('unable to load coin data', e)
   } finally {
     setTimeout(loadCoins, 60 * 1000)
+  }
+}
+
+async function loadPlatforms () {
+  try {
+    const platforms = await coingecko.assetPlatforms()
+
+    allPlatforms = platforms.reduce((platformMapping, platform) => {
+      if (platform.chain_identifier) {
+        const chainId = platform.chain_identifier.toString()
+        return { ...platformMapping, [chainId]: platform.id }
+      }
+
+      return platformMapping
+    }, {})
+
+    return allPlatforms
+  } catch (e) {
+    log.error('unable to load asset platform data', e)
+  } finally {
+    setTimeout(loadPlatforms, 60 * 1000)
   }
 }
 
@@ -61,10 +79,11 @@ async function fetchRates (fetch, ids, params = []) {
 const fetchPrices = async ids => fetchRates(coingecko.coinPrices, ids)
 const fetchTokenPrices = async (addresses, platform) => fetchRates(coingecko.tokenPrices, addresses, [platform])
 
-async function loadRates (ids) {
+async function loadRates (ids, chainId) {
+  const platforms = await assetPlatforms() 
   const coinMapping = await coins()
 
-  // lookupIds: { symbols: { [id]: symbol }, contracts: { [platform]: [address, ...] } }
+  // lookupIds: { symbols: { [id]: symbol }, contracts: [address, ...] }
   const lookupIds = ids.reduce((lookups, rawId) => {
     // if id is a known symbol, use the CoinGecko id, otherwise it's
     // a contract address and can be looked up directly
@@ -74,13 +93,7 @@ async function loadRates (ids) {
     if (symbolId) {
       lookups.symbols = { ...lookups.symbols, [symbolId]: id }
     } else {
-      const platform = tokenPlatforms[id]
-
-      if (!platform) {
-        log.warn(`could not determine platform for token with address ${id}`)
-      } else {
-        lookups.contracts[platform] = [...(lookups.contracts[platform] || []), id]
-      }
+      lookups.contracts = [...lookups.contracts, id]
     }
 
     return lookups
@@ -88,13 +101,7 @@ async function loadRates (ids) {
 
   try {
     const symbolQuotes = await fetchPrices(Object.keys(lookupIds.symbols))
-
-    const tokenQuotes = await Object.entries(lookupIds.contracts).reduce(async (q, [platform, contracts]) => {
-      const quotes = await q
-      const prices = await fetchTokenPrices(contracts, platform)
-
-      return { ...quotes, ...prices }
-    }, {})
+    const tokenQuotes = await fetchTokenPrices(lookupIds.contracts, platforms[chainId.toString()])
 
     return Object.entries({ ...symbolQuotes, ...tokenQuotes }).reduce((rates, [lookupId, quote]) => {
       const originalId = lookupIds.symbols[lookupId] || lookupId // could be symbol or contract address
