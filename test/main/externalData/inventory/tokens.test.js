@@ -1,4 +1,4 @@
-/* globals jest beforeAll afterAll it */
+/* globals jest beforeEach afterEach it */
 
 const mockNebula = {
   resolve: jest.fn().mockResolvedValue({ record: {} }),
@@ -13,11 +13,11 @@ const tokenList = require('../../../../main/externalData/inventory/tokens')
 
 jest.mock('../../../../main/nebula', () => jest.fn(() => mockNebula))
 
-beforeAll(() => {
+beforeEach(() => {
   tokenList.start()
 })
 
-afterAll(() => {
+afterEach(() => {
   tokenList.stop()
 })
 
