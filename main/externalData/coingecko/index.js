@@ -42,7 +42,7 @@ async function coinPrices (ids, currencies = ['usd']) {
   return call(`${baseUrl}/simple/price`, queryParams)
 }
 
-async function tokenPrices (addresses, asset_platform, currencies = ['usd']) {
+async function tokenPrices (addresses, asset_platform = 'ethereum', currencies = ['usd']) {
   const queryParams = {
     contract_addresses: addresses.join(','),
     vs_currencies: currencies.join(','),
