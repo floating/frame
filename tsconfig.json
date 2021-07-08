@@ -1,8 +1,18 @@
 {
   "compilerOptions": {
-    "types": ["reflect-metadata", "jest"],
+    "target": "es5",                          
+    "module": "commonjs",                    
+    "lib": ["es6"],                     
+    "allowJs": true,
+    "outDir": "build",                          
+    "rootDir": "main",
+    "strict": true,         
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "types": ["jest"],
     "typeRoots": ["./types", "./node_modules/@types"]
   },
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["./src/**/*.tsx", "./src/**/*.ts"]
+  "include": ["./main/**/*.tsx", "./main/**/*.ts"]
 }

@@ -18,7 +18,7 @@ let allCoins: { [key: string]: string }
 // { chainId: platformId }
 let allPlatforms: { [key: string]: string }
 
-function createRate (quote): Rate {
+function createRate (quote: any): Rate {
   return {
     usd: {
       price: new BigNumber(quote.usd || 0),
@@ -42,7 +42,7 @@ async function loadCoins () {
     allCoins = coins.reduce((coinMapping, coin) => {
       coinMapping[coin.symbol.toLowerCase()] = coin.id
       return coinMapping
-    }, {})
+    }, {} as Record<string, string>)
 
     return allCoins
   } catch (e) {
@@ -63,7 +63,7 @@ async function loadPlatforms () {
       }
 
       return platformMapping
-    }, {})
+    }, {} as Record<string, string>)
 
     return allPlatforms
   } catch (e) {
@@ -107,7 +107,7 @@ async function loadRates (ids: string[], chainId: number) {
     }
 
     return lookups
-  }, { contracts: [], symbols: {} })
+  }, { contracts: [], symbols: {} } as any)
 
   try {
     const symbolQuotes = await fetchPrices(Object.keys(lookupIds.symbols))

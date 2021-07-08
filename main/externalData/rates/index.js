@@ -51,9 +51,12 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
         to[j] = from[i];
     return to;
 };
-exports.__esModule = true;
-var bignumber_js_1 = require("bignumber.js");
-var electron_log_1 = require("electron-log");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var bignumber_js_1 = __importDefault(require("bignumber.js"));
+var electron_log_1 = __importDefault(require("electron-log"));
 var coingecko_1 = require("../coingecko");
 var FETCH_BATCH_SIZE = 200;
 // { symbol: coinId }
@@ -63,8 +66,8 @@ var allPlatforms;
 function createRate(quote) {
     return {
         usd: {
-            price: new bignumber_js_1["default"](quote.usd || 0),
-            change24hr: new bignumber_js_1["default"](quote.usd_24h_change || 0)
+            price: new bignumber_js_1.default(quote.usd || 0),
+            change24hr: new bignumber_js_1.default(quote.usd_24h_change || 0)
         }
     };
 }
@@ -99,7 +102,7 @@ function loadCoins() {
                     return [2 /*return*/, allCoins];
                 case 2:
                     e_1 = _a.sent();
-                    electron_log_1["default"].error('unable to load coin data', e_1);
+                    electron_log_1.default.error('unable to load coin data', e_1);
                     return [3 /*break*/, 4];
                 case 3:
                     setTimeout(loadCoins, 60 * 1000);
@@ -130,7 +133,7 @@ function loadPlatforms() {
                     return [2 /*return*/, allPlatforms];
                 case 2:
                     e_2 = _a.sent();
-                    electron_log_1["default"].error('unable to load asset platform data', e_2);
+                    electron_log_1.default.error('unable to load asset platform data', e_2);
                     return [3 /*break*/, 4];
                 case 3:
                     setTimeout(loadPlatforms, 60 * 1000);
@@ -216,4 +219,4 @@ function loadRates(ids, chainId) {
         });
     });
 }
-exports["default"] = loadRates;
+exports.default = loadRates;

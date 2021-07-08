@@ -1,7 +1,7 @@
 const log = require('electron-log')
 
 const balances = require('./balances')
-const rates = require('./rates')
+const rates = require('./rates').default
 const inventory = require('./inventory')
 const loadStaticData = require('./staticData')
 

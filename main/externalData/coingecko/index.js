@@ -35,10 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.listMarkets = exports.listCoins = exports.getCoin = exports.tokenPrices = exports.coinPrices = exports.listAssetPlatforms = void 0;
-var node_fetch_1 = require("node-fetch");
-var electron_log_1 = require("electron-log");
+var node_fetch_1 = __importDefault(require("node-fetch"));
+var electron_log_1 = __importDefault(require("electron-log"));
 var apiVersion = process.env.COIN_GECKO_API_VERSION || 'v3';
 var baseUrl = "https://api.coingecko.com/api/" + apiVersion;
 function handleJsonResponse(response) {
@@ -63,8 +66,8 @@ function call(path, params) {
         return __generator(this, function (_a) {
             queryStr = Object.entries(params).map(function (param) { return param.join('='); }).join('&');
             url = "" + path + (queryStr ? '?' + queryStr : '');
-            electron_log_1["default"].debug("loading coingecko data from " + url);
-            return [2 /*return*/, node_fetch_1["default"](url, {}).then(handleJsonResponse)];
+            electron_log_1.default.debug("loading coingecko data from " + url);
+            return [2 /*return*/, node_fetch_1.default(url, {}).then(handleJsonResponse)];
         });
     });
 }
