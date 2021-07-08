@@ -1,6 +1,11 @@
 import fetch from 'node-fetch'
 import log from 'electron-log'
 
+interface JsonResponse {
+  status: number,
+  json: () => Promise<any>
+}
+
 interface Rates {
   [key: string]: Quote // id => quote
 }
@@ -37,7 +42,7 @@ interface Market {
 const apiVersion = process.env.COIN_GECKO_API_VERSION || 'v3'
 const baseUrl = `https://api.coingecko.com/api/${apiVersion}`
 
-async function handleJsonResponse (response) {
+async function handleJsonResponse (response: JsonResponse) {
   const body = await response.json()
 
   if (response.status !== 200) throw new Error(JSON.stringify(body))
