@@ -15,7 +15,7 @@ interface Quote {
   usd_24h_change: number
 }
 
-interface Coin {
+export interface Coin {
   id: string,
   symbol: string,
   name: string,
@@ -30,13 +30,14 @@ interface Platform {
   short_name: string
 }
 
-interface Market {
+export interface Market {
   id: string,
   symbol: string,
   name: string,
   image: string,
-  current_price: number,
-  market_cap: number
+  current_price?: number,
+  market_cap?: number,
+  price_change_percentage_24h?: number
 }
 
 const apiVersion = process.env.COIN_GECKO_API_VERSION || 'v3'
