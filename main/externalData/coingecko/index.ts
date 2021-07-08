@@ -110,7 +110,7 @@ async function listMarkets (ids: string[], vsCurrency = 'usd'): Promise<Array<Ma
   return call(`${baseUrl}/coins/markets`, queryParams)
 }
 
-export {
+export default {
   listAssetPlatforms,
   coinPrices,
   tokenPrices,
