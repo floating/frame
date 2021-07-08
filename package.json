@@ -144,6 +144,8 @@
     "@babel/plugin-syntax-import-meta": "7.10.4",
     "@babel/preset-env": "7.14.7",
     "@babel/preset-react": "7.14.5",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/jest": "^26.0.24",
     "babel-eslint": "10.1.0",
     "cli-sleep": "1.0.1",
     "electron": "13.1.5",
@@ -154,7 +156,8 @@
     "node-watch": "0.7.1",
     "parcel-bundler": "1.12.3",
     "standardx": "7.0.0",
-    "stylus": "0.54.8"
+    "stylus": "0.54.8",
+    "ts-jest": "^27.0.3"
   },
   "standard": {
     "parser": "babel-eslint",

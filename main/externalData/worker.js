@@ -26,8 +26,8 @@ function chainBalanceScan (address) {
     .catch(err => log.error('chain balance scan error', err))
 }
 
-function ratesScan (symbols) {
-  rates(symbols)
+function ratesScan (symbols, chainId) {
+  rates(symbols, chainId)
     .then(loadedRates => process.send({ type: 'rates', rates: loadedRates }))
     .catch(err => log.error('rates scan error', err))
 }
