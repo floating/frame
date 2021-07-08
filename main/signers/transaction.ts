@@ -21,7 +21,7 @@ function getChainConfig(chainId: number, hardfork = 'london') {
     if (Common.isSupportedChainId(new BN(chainId))) {
       chainConfig = new Common({ chain: chainId, hardfork })
     } else {
-      chainConfig = Common.forCustomChain('mainnet', { chainId })
+      chainConfig = Common.forCustomChain('mainnet', { chainId }, hardfork)
     }
   }
 
