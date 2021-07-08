@@ -10,7 +10,8 @@ export interface TransactionData {
 const chains = <{ [key: string]: Common }>{
   1: new Common({ chain: 'mainnet', hardfork: 'berlin' }),
   3: new Common({ chain: 'ropsten', hardfork: 'london', eips: [1559] }),
-  4: new Common({ chain: 'ropsten', hardfork: 'london', eips: [1559] })
+  4: new Common({ chain: 'rinkeby', hardfork: 'london', eips: [1559] }),
+  5: new Common({ chain: 'goerli', hardfork: 'london', eips: [1559] })
 }
 
 function getChainConfig(chainId: number, hardfork = 'london') {
