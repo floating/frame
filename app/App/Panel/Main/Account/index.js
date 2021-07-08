@@ -305,7 +305,6 @@ class _AccountMain extends React.Component {
             onMouseDown={() => this.setState({ expandedModule: false })}
           >
             <div className='moduleExpanded' onMouseDown={(e) => {
-              e.preventDefault()
               e.stopPropagation()
             }}>
               {this.renderModule(this.state.expandedModule, { height: '100%' }, 0, 0, id => {
@@ -850,9 +849,8 @@ class Account extends React.Component {
       <>
         {!this.state.addressHover ? (
           <div className='signerName'>
-            <div className={!showENS ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
+            <div className={(!showENS || !this.props.name) ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
               {this.props.name}
-              <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
             </div>
           </div>
         ) : null}
@@ -872,7 +870,7 @@ class Account extends React.Component {
               ) : showENS ? (
                 <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
               ) : (
-                <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
+                <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
               )
               }
             </div>

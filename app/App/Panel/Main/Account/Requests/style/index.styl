@@ -1061,10 +1061,18 @@
         display flex
         justify-content center
         align-items center
-        font-size 12px
+        font-size 13px
         opacity 0
         transition var(--standard)
         font-weight bold
+        cursor pointer
+        *
+          pointer-events none
+
+        svg
+          position relative
+          top -3px
+          margin-left 10px
 
     .transactionToAddress:hover
         .transactionToAddressLarge

@@ -69,10 +69,8 @@ class TransactionRequest extends React.Component {
     }, 1700)
   }
 
-  copyAddress (e) {
-    e.preventDefault()
-    e.target.select()
-    document.execCommand('Copy')
+  copyAddress (data) {
+    link.send('tray:clipboardData', data)
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
@@ -406,8 +404,8 @@ class TransactionRequest extends React.Component {
                       <div className='transactionToAddress'>
                         <div className='transactionToAddressLarge'>
                           {req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {req.data.to.substr(req.data.to.length - 11)}</div>
-                        <div className='transactionToAddressFull'>
-                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : req.data.to}
+                        <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
+                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
                         </div>
                       </div>
                       <div className='transactionToSub'>Send To</div>

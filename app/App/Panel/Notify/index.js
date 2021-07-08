@@ -60,7 +60,7 @@ class Notify extends React.Component {
                 Be advised, this version of Frame is currently in "beta" and will update on a beta track
               </div>
               <div className='notifyBodyBlock'>
-                Use hardware singers for high value accounts and verify all transaction and account details on your signing device
+                Use hardware signers for high value accounts and verify all transaction and account details on your signing device
               </div>
               <div className='notifyBodyBlock'>
                 <span>Read</span>
