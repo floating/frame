@@ -1,8 +1,7 @@
 const crypto = require('crypto')
 
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
-const { Transaction } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
+const { sign } = require('../../transaction.js')
 
 const { signTypedData } = require('../../../crypt/typedDataUtils')
 
@@ -50,15 +49,19 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
-    // Create tranasction
-    const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-    rawTx.gasLimit = rawTx.gas // gas must be gasLimit in new ethereum tx
-    let tx = Transaction.fromTxData(rawTx, { common })
+    console.log({ rawTx, key })
     // Sign transaction
-    tx = tx.sign(key)
-    // Return serialized transaction
-    const serialized = tx.serialize().toString('hex')
-    pseudoCallback(null, addHexPrefix(serialized))
+    sign(rawTx, tx => {
+      console.log({ tx })
+      const signedTx = tx.sign(key)
+
+      console.log({ signedTx })
+
+      const serialized = signedTx.serialize().toString('hex')
+
+      console.log({ serialized })
+      pseudoCallback(null, addHexPrefix(serialized))
+    }).catch(pseudoCallback)
   }
 
   verifyAddress ({ index, address }, pseudoCallback) {
