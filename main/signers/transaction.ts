@@ -32,13 +32,40 @@ function createTransaction (rawTx: any) {
   const chainId = parseInt(rawTx.chainId)
   const chainConfig = getChainConfig(chainId)
 
-  const tx = TransactionFactory.fromTxData(rawTx, { common: chainConfig })
-
-  if (tx.supports(Capability.EIP1559FeeMarket)) {
-    // TODO: do we need to do anything here?
-  }
-
-  return tx
+  // TODO: maybe pass in block number and use 
+  //    chainConfig.hardforkIsActiveOnBlock('london', blockNum)
+  return TransactionFactory.fromTxData({
+    ...rawTx,
+    type: chainConfig.isActivatedEIP(1559) ? '0x2' : '0x0'
+  }, { common: chainConfig })
 }
 
-export default createTransaction
+const hexPrefix = (s: string) => s.startsWith('0x') ? s : `0x${s}`
+
+function hexifySignature ({ v, r, s }) {
+  console.log({ v, hex: v.toString('hex') })
+  return {
+    v: hexPrefix(v),
+    r: hexPrefix(r),
+    s: hexPrefix(s)
+  }
+}
+
+async function sign(rawTx, signingFn) {
+  const tx = TransactionFactory.fromTxData(rawTx)
+
+  return signingFn(tx).then(sig => {
+    console.log({ sig })
+    const signature = hexifySignature(sig)
+    
+    return Transaction.fromTxData({
+      ...rawTx,
+      ...signature
+    })
+  })
+}
+
+export {
+  createTransaction,
+  sign
+}

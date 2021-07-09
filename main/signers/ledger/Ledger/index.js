@@ -1,7 +1,4 @@
-const utils = require('web3-utils')
 const { rlp } = require('ethereumjs-util')
-const { Transaction } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
 const log = require('electron-log')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
@@ -301,35 +298,17 @@ class Ledger extends Signer {
     }
   }
 
-  _signedTransaction (txData, signature) {
-    return {
-      ...txData,
-      v: `0x${signature.v}`,
-      r: `0x${signature.r}`,
-      s: `0x${signature.s}`
-    }
-  }
-
   async signTransaction (index, rawTx, cb) {
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
-      // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
-
-      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-
-      const txData = {
-        ...rawTx,
-        gasLimit: rawTx.gas, // gas must be gasLimit in new ethereum tx
-      }
-
-      const tx = Transaction.fromTxData(txData, { common })
+      const signerPath = this.getPath(index)
+      
       const message = tx.getMessageToSign(false)
       const rawTxHex = rlp.encode(message).toString('hex')
 
-      const signature = await eth.signTransaction(this.getPath(index), rawTxHex)
+      const signedTx = sign(rawTx, () => eth.signTransaction(signerPath, rawTxHex))
 
-      const signedTx = Transaction.fromTxData(this._signedTransaction(txData, signature), { common })
       const signedTxSerialized = signedTx.serialize().toString('hex')
 
       cb(null, '0x' + signedTxSerialized)

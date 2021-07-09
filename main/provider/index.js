@@ -11,6 +11,10 @@ const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
+const Common = require('@ethereumjs/common').default
+const { Capability } = require('@ethereumjs/tx')
+const { createTransaction } = require('../signers/transaction')
+
 const version = require('../../package.json').version
 
 class Provider extends EventEmitter {
@@ -276,13 +280,32 @@ class Provider extends EventEmitter {
 
     return levels[selected]
   }
+
+  _getMaxPriorityFeePerGas (rawTx) {
+    // return rawTx.maxPriorityFeePerGas
+    return '0x3b9aca00' // 1 gwei
+  }
+
+  _getMaxFeePerGas (rawTx) {
+    // return rawTx.maxFeePerGas
+    return '0x06fc23ac00' // 30 gwei
+  }
   
-  getGasEstimate (rawTx, res) {
+  async getGasEstimate (rawTx) {
     const targetChain = {
       type: 'ethereum',
       id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
     }
-    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, res, targetChain)
+
+    return new Promise((resolve, reject) => {
+      this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, response => {
+        if (response.error) {
+          reject(response.error)
+        } else {
+          resolve(response.result)
+        }
+      }, targetChain)
+    })
   }
 
   getNonce (rawTx, res) {
@@ -297,45 +320,52 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  fillDone (fullTx, res) {
-    try {
-      fullTx.gasPrice = this.getGasPrice(fullTx)
-      res(null, fullTx)
-    } catch (e) {
-      return res({ need: 'gasPrice', message: e })
-    }
-  }
+  async fillTx (rawTx) {
+    const txData =  { ...rawTx }
 
-  fillTx (rawTx, cb) {
-    if (!rawTx.gas) {
-      this.getGasEstimate(rawTx, response => {
-        if (response.error) {
-          rawTx.gas = '0x0'
-          rawTx.warning = response.error.message
-        } else {
-          rawTx.gas = response.result
-        }
-        this.fillDone(rawTx, cb)
-      })
+    // TODO where do we get chain config from?
+    const chainConfig = new Common({ chain: 'ropsten', hardfork: 'london', eips: [1559] })
+
+    if (chainConfig.hardforkIsActiveOnBlock('london', '0xa1d009')) {
+      console.log('london hardfork active!')
+      txData.maxPriorityFeePerGas = this._getMaxPriorityFeePerGas(txData)
+      txData.maxFeePerGas = this._getMaxFeePerGas(txData)
+      txData.maxFee = parseInt(txData.maxPriorityFeePerGas, 16) + parseInt(txData.maxFeePerGas, 16)
+      txData.gasLimit = `0x61a8`
+      txData.type = '0x2'
     } else {
-      this.fillDone(rawTx, cb)
+      console.log('london hardfork NOT active!')
+      try {
+        txData.gasLimit = rawTx.gas || txData.gasLimit || (await this._getGasEstimate(rawTx))
+      } catch (e) {
+        txData.gasLimit = '0x0'
+        txData.warning = e.message
+      }
+
+      txData.gasPrice = this.getGasPrice(txData)
+      txData.maxFee = parseInt(txData.gasLimit, 16) * parseInt(txData.gasPrice, 16)
     }
+
+    return txData
   }
 
   sendTransaction (payload, res) {
     const rawTx = this.getRawTx(payload)
     if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.currentNetwork.id'))
-    this.fillTx(rawTx, (err, rawTx) => {
-      if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-      const from = rawTx.from
-      const current = accounts.getAccounts()[0]
-      if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
-      const handlerId = uuid()
-      this.handlers[handlerId] = res
-      const { warning } = rawTx
-      delete rawTx.warning
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin, warning }, res)
-    })
+    this.fillTx(rawTx)
+      .then(rawTx => {
+        const from = rawTx.from
+        const current = accounts.getAccounts()[0]
+        if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
+        const handlerId = uuid()
+        this.handlers[handlerId] = res
+        const { warning } = rawTx
+        delete rawTx.warning
+        accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin, warning }, res)
+      })
+      .catch(err => {
+        this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
+      })
   }
 
   ethSign (payload, res) {
