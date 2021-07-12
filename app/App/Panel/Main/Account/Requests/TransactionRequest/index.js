@@ -139,7 +139,7 @@ class TransactionRequest extends React.Component {
     const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
 
-    const fee = this.hexToDisplayValue(utils.numberToHex(req.data.maxFee || 0))
+    const fee = this.hexToDisplayValue(req.data.maxFee || '0x')
     const feeUSD = fee * etherUSD
     const height = req.status === 'error' ? '205px' : mode === 'monitor' ? '205px' : '340px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z

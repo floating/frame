@@ -1,6 +1,10 @@
-import { BN } from 'ethereumjs-util'
+import { BN, stripHexPrefix } from 'ethereumjs-util'
 import { Capability, Transaction, TransactionFactory } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
+
+export interface RawTransaction { 
+  chainId: string | number
+}
 
 export interface TransactionData {
   chainId: string,
@@ -28,16 +32,50 @@ function getChainConfig(chainId: number, hardfork = 'london') {
   return chainConfig
 }
 
-function createTransaction (rawTx: any) {
-  const chainId = parseInt(rawTx.chainId)
-  const chainConfig = getChainConfig(chainId)
+function toHex(bn: BN) {
+  return `0x${bn.toString('hex')}`
+}
 
-  // TODO: maybe pass in block number and use 
-  //    chainConfig.hardforkIsActiveOnBlock('london', blockNum)
-  return TransactionFactory.fromTxData({
-    ...rawTx,
-    type: chainConfig.isActivatedEIP(1559) ? '0x2' : '0x0'
-  }, { common: chainConfig })
+function toBN(hexStr: string) {
+  return new BN(stripHexPrefix(hexStr), 'hex')
+}
+
+async function populate (rawTx: any, chainConfig: Common, gasCalculator) {
+  const chainId = parseInt(rawTx.chainId)
+  const txData =  { ...rawTx }
+
+  // calculate needed gas if not already provided
+  try {
+    txData.gasLimit = txData.gasLimit || (await gasCalculator.getGasEstimate(rawTx))
+  } catch (e) {
+    txData.gasLimit = '0x0'
+    txData.warning = e.message
+  }
+
+  if (chainConfig.hardforkIsActiveOnBlock('london', '0xa1d009')) {
+    console.log('london hardfork active!')
+    txData.type = '0x2'
+
+    const maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(txData))
+    const maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(txData))
+    const maxFee = maxPriorityFee.add(maxBaseFee)
+
+    txData.maxPriorityFeePerGas = toHex(maxPriorityFee)
+    txData.maxFeePerGas = toHex(maxFee)
+    txData.maxFee = txData.maxFeePerGas
+  } else {
+    console.log('london hardfork NOT active!')
+    txData.type = '0x0'
+
+    const gasPrice = toBN(gasCalculator.getGasPrice(txData))
+
+    txData.gasPrice = toHex(gasPrice)
+    txData.maxFee = toHex(toBN(txData.gasLimit).mul(gasPrice))
+  }
+
+  console.log({ txData })
+
+  return txData
 }
 
 const hexPrefix = (s: string) => s.startsWith('0x') ? s : `0x${s}`
@@ -66,6 +104,8 @@ async function sign(rawTx, signingFn) {
 }
 
 export {
-  createTransaction,
+  populate,
   sign
 }
+
+
