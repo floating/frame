@@ -1,12 +1,11 @@
 import { RawTransaction } from './index'
 
-const calculator = function (connection, defaultGasLevel) {
+const calculator = function (connection: any /* Chains */, defaultGasLevel: string) {
   function getGasPrice () {
     return defaultGasLevel
   }
   
   async function getGasEstimate (rawTx: RawTransaction) {
-
     const targetChain = {
       type: 'ethereum',
       id: rawTx.chainId

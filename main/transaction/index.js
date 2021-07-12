@@ -75,7 +75,7 @@ function getChainConfig(chainId, hardfork) {
     return chainConfig;
 }
 function toHex(bn) {
-    return "0x" + bn.toString('hex');
+    return ethereumjs_util_1.addHexPrefix(bn.toString('hex'));
 }
 function toBN(hexStr) {
     return new ethereumjs_util_1.BN(ethereumjs_util_1.stripHexPrefix(hexStr), 'hex');
@@ -124,21 +124,18 @@ function populate(rawTx, chainConfig, gasCalculator) {
                         txData.gasPrice = toHex(gasPrice);
                         txData.maxFee = toHex(toBN(txData.gasLimit).mul(gasPrice));
                     }
-                    console.log({ txData: txData });
                     return [2 /*return*/, txData];
             }
         });
     });
 }
 exports.populate = populate;
-var hexPrefix = function (s) { return s.startsWith('0x') ? s : "0x" + s; };
 function hexifySignature(_a) {
     var v = _a.v, r = _a.r, s = _a.s;
-    console.log({ v: v, hex: v.toString('hex') });
     return {
-        v: hexPrefix(v),
-        r: hexPrefix(r),
-        s: hexPrefix(s)
+        v: ethereumjs_util_1.addHexPrefix(v),
+        r: ethereumjs_util_1.addHexPrefix(r),
+        s: ethereumjs_util_1.addHexPrefix(s)
     };
 }
 function sign(rawTx, signingFn) {
@@ -147,7 +144,6 @@ function sign(rawTx, signingFn) {
         return __generator(this, function (_a) {
             tx = tx_1.TransactionFactory.fromTxData(rawTx);
             return [2 /*return*/, signingFn(tx).then(function (sig) {
-                    console.log({ sig: sig });
                     var signature = hexifySignature(sig);
                     return tx_1.Transaction.fromTxData(__assign(__assign({}, rawTx), signature));
                 })];

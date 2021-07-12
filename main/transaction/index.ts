@@ -1,6 +1,12 @@
-import { BN, stripHexPrefix } from 'ethereumjs-util'
-import { Capability, Transaction, TransactionFactory } from '@ethereumjs/tx'
+import { BN, addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
+import { Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
+
+interface Signature {
+  v: string,
+  r: string,
+  s: string
+}
 
 export interface RawTransaction { 
   chainId: string | number
@@ -33,7 +39,7 @@ function getChainConfig(chainId: number, hardfork = 'london') {
 }
 
 function toHex(bn: BN) {
-  return `0x${bn.toString('hex')}`
+  return addHexPrefix(bn.toString('hex'))
 }
 
 function toBN(hexStr: string) {
@@ -73,27 +79,21 @@ async function populate (rawTx: any, chainConfig: Common, gasCalculator) {
     txData.maxFee = toHex(toBN(txData.gasLimit).mul(gasPrice))
   }
 
-  console.log({ txData })
-
   return txData
 }
 
-const hexPrefix = (s: string) => s.startsWith('0x') ? s : `0x${s}`
-
-function hexifySignature ({ v, r, s }) {
-  console.log({ v, hex: v.toString('hex') })
+function hexifySignature ({ v, r, s }: Signature) {
   return {
-    v: hexPrefix(v),
-    r: hexPrefix(r),
-    s: hexPrefix(s)
+    v: addHexPrefix(v),
+    r: addHexPrefix(r),
+    s: addHexPrefix(s)
   }
 }
 
-async function sign(rawTx, signingFn) {
+async function sign(rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<Signature>) {
   const tx = TransactionFactory.fromTxData(rawTx)
 
   return signingFn(tx).then(sig => {
-    console.log({ sig })
     const signature = hexifySignature(sig)
     
     return Transaction.fromTxData({
@@ -107,5 +107,3 @@ export {
   populate,
   sign
 }
-
-

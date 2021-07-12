@@ -11,7 +11,6 @@ const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
-const { BN } = require('ethereumjs-util')
 const Common = require('@ethereumjs/common').default
 const { populate: populateTransaction } = require('../transaction')
 const gasCalculator = require('../transaction/gasCalculator').default
@@ -280,11 +279,7 @@ class Provider extends EventEmitter {
     const { levels, selected } = store('main.networksMeta', chain.type, chain.id, 'gas.price')
     if (!levels[selected]) throw new Error('Unable to determine gas')
 
-    const calc = gasCalculator(this.connection, levels[selected])
- 
-    console.log({ calc })
-
-    return calc
+    return gasCalculator(this.connection, levels[selected])
   }
 
   getNonce (rawTx, res) {
@@ -304,8 +299,6 @@ class Provider extends EventEmitter {
 
     // TODO where do we get chain config from?
     const chainConfig = new Common({ chain: 'ropsten', hardfork: 'london', eips: [1559] })
-
-    console.log({ rawTx })
 
     populateTransaction(rawTx, chainConfig, this._gasCalculator(rawTx)).then(tx => {
       const from = tx.from

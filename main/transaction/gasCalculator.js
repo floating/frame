@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var calculator = function (connection, defaultGasLevel) {
+var calculator = function (connection /* Chains */, defaultGasLevel) {
     function getGasPrice() {
         return defaultGasLevel;
     }
