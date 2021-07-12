@@ -50,7 +50,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.sign = exports.createTransaction = void 0;
+exports.sign = exports.populate = void 0;
 var ethereumjs_util_1 = require("ethereumjs-util");
 var tx_1 = require("@ethereumjs/tx");
 var common_1 = __importDefault(require("@ethereumjs/common"));
@@ -74,14 +74,63 @@ function getChainConfig(chainId, hardfork) {
     }
     return chainConfig;
 }
-function createTransaction(rawTx) {
-    var chainId = parseInt(rawTx.chainId);
-    var chainConfig = getChainConfig(chainId);
-    // TODO: maybe pass in block number and use 
-    //    chainConfig.hardforkIsActiveOnBlock('london', blockNum)
-    return tx_1.TransactionFactory.fromTxData(__assign(__assign({}, rawTx), { type: chainConfig.isActivatedEIP(1559) ? '0x2' : '0x0' }), { common: chainConfig });
+function toHex(bn) {
+    return "0x" + bn.toString('hex');
 }
-exports.createTransaction = createTransaction;
+function toBN(hexStr) {
+    return new ethereumjs_util_1.BN(ethereumjs_util_1.stripHexPrefix(hexStr), 'hex');
+}
+function populate(rawTx, chainConfig, gasCalculator) {
+    return __awaiter(this, void 0, void 0, function () {
+        var chainId, txData, _a, _b, e_1, maxPriorityFee, maxBaseFee, maxFee, gasPrice;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    chainId = parseInt(rawTx.chainId);
+                    txData = __assign({}, rawTx);
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 4, , 5]);
+                    _a = txData;
+                    _b = txData.gasLimit;
+                    if (_b) return [3 /*break*/, 3];
+                    return [4 /*yield*/, gasCalculator.getGasEstimate(rawTx)];
+                case 2:
+                    _b = (_c.sent());
+                    _c.label = 3;
+                case 3:
+                    _a.gasLimit = _b;
+                    return [3 /*break*/, 5];
+                case 4:
+                    e_1 = _c.sent();
+                    txData.gasLimit = '0x0';
+                    txData.warning = e_1.message;
+                    return [3 /*break*/, 5];
+                case 5:
+                    if (chainConfig.hardforkIsActiveOnBlock('london', '0xa1d009')) {
+                        console.log('london hardfork active!');
+                        txData.type = '0x2';
+                        maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(txData));
+                        maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(txData));
+                        maxFee = maxPriorityFee.add(maxBaseFee);
+                        txData.maxPriorityFeePerGas = toHex(maxPriorityFee);
+                        txData.maxFeePerGas = toHex(maxFee);
+                        txData.maxFee = txData.maxFeePerGas;
+                    }
+                    else {
+                        console.log('london hardfork NOT active!');
+                        txData.type = '0x0';
+                        gasPrice = toBN(gasCalculator.getGasPrice(txData));
+                        txData.gasPrice = toHex(gasPrice);
+                        txData.maxFee = toHex(toBN(txData.gasLimit).mul(gasPrice));
+                    }
+                    console.log({ txData: txData });
+                    return [2 /*return*/, txData];
+            }
+        });
+    });
+}
+exports.populate = populate;
 var hexPrefix = function (s) { return s.startsWith('0x') ? s : "0x" + s; };
 function hexifySignature(_a) {
     var v = _a.v, r = _a.r, s = _a.s;
