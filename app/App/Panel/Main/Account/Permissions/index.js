@@ -38,7 +38,15 @@ class Balances extends React.Component {
     
     return (
       <div ref={this.moduleRef}>
-        <div className='moduleHeader'>{'Permissions'}</div>  
+        <div className='moduleHeader'>
+          {'Permissions'}
+          {this.props.expanded ? (
+            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
+              {svg.close(22)}
+            </div>
+          ) : null}
+        </div>  
+
         <div className='moduleMain moduleMainPermissions'>
           {permissionList.length === 0 ? (
             <div className='signerPermission'>
