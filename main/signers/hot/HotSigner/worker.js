@@ -1,8 +1,7 @@
 const crypto = require('crypto')
-
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
-const { sign } = require('../../../transaction')
 
+const { sign } = require('../../../transaction')
 const { signTypedData } = require('../../../crypt/typedDataUtils')
 
 class HotSignerWorker {
@@ -49,17 +48,10 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
-    console.log({ rawTx, key })
-    // Sign transaction
     sign(rawTx, tx => {
-      console.log({ tx })
       const signedTx = tx.sign(key)
-
-      console.log({ signedTx })
-
       const serialized = signedTx.serialize().toString('hex')
 
-      console.log({ serialized })
       pseudoCallback(null, addHexPrefix(serialized))
     }).catch(pseudoCallback)
   }

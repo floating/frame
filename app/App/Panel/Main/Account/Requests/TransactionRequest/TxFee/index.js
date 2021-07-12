@@ -313,7 +313,6 @@ class TransactionFee extends React.Component {
     const feeData = {}
     levels.forEach(level => {
       feeData[level] = {}
-      console.log({ gasLimit })
       feeData[level].fee = this.hexToDisplayValue(utils.numberToHex(gasLimit * parseInt(gasLevels[level], 16)))
       feeData[level].feeUSD = (feeData[level].fee * etherUSD).toFixed(2)
       feeData[level].feeTime = this.timeDisplay(gasLevels[level + 'Time'], 'gasData ' + level)
