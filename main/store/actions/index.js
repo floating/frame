@@ -1,5 +1,25 @@
 const panelActions = require('./panel')
 
+function validateNetworkSettings (network) {
+  const networkId = parseInt(network.id)
+
+  console.log({ networkId, netId: network.id})
+
+  if (
+    typeof (parseInt(networkId)) !== 'number' ||
+    typeof (network.type) !== 'string' ||
+    typeof (network.name) !== 'string' ||
+    typeof (network.explorer) !== 'string' ||
+    typeof (network.symbol) !== 'string' ||
+    ['ethereum'].indexOf(network.type) === -1
+  ) {
+    throw new Error('Invalid network settings')
+  }
+
+  return networkId
+}
+
+
 module.exports = {
   ...panelActions,
   // setSync: (u, key, payload) => u(key, () => payload),
@@ -203,47 +223,56 @@ module.exports = {
     u('main.networksMeta', netType, netId, 'nativeCurrency', () => meta)
   },
   addNetwork: (u, net) => {
-    const defaultNetwork = {
-      id: 0,
-      type: '',
-      name: '',
-      explorer: '',
-      gas: {
-        price: {
-          selected: 'standard',
-          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-        }
-      },
-      connection: {
-        presets: { local: 'direct' },
-        primary: { on: true, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
-        secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-      },
-      on: true
-    }
-    u('main.networks', networks => {
-      try {
-        net.id = parseInt(net.id)
-        if (
-          typeof (parseInt(net.id)) !== 'number' ||
-          typeof (net.type) !== 'string' ||
-          typeof (net.name) !== 'string' ||
-          typeof (net.explorer) !== 'string' ||
-          typeof (net.symbol) !== 'string' ||
-          ['ethereum'].indexOf(net.type) === -1
-        ) {
-          throw new Error('Invalid network settings')
-        }
-      } catch (e) {
-        console.error(e)
-        return networks
+    console.dir(net)
+    try {
+      net.id = validateNetworkSettings(net)
+
+      const defaultNetwork = {
+        id: 0,
+        type: '',
+        name: '',
+        explorer: '',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          presets: { local: 'direct' },
+          primary: { on: true, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        },
+        on: true
       }
-      if (!networks[net.type]) networks[net.type] = {}
-      if (networks[net.type][net.id]) return networks // Network already exists, don't overwrite, notify user
-      const newNetwork = Object.assign({}, defaultNetwork, net)
-      networks[net.type][net.id] = newNetwork
-      return networks
-    })
+
+      const defaultMeta = {
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
+      }
+
+      u('main.networks', networks => {
+        if (!networks[net.type]) networks[net.type] = {}
+        if (networks[net.type][net.id]) return networks // Network already exists, don't overwrite, notify user
+        const newNetwork = Object.assign({}, defaultNetwork, net)
+        networks[net.type][net.id] = newNetwork
+        return networks
+      })
+
+      u('main.networksMeta', networks => {
+        if (!networks[net.type]) networks[net.type] = {}
+        if (networks[net.type][net.id]) return networks // Network already exists, don't overwrite, notify user
+        const newNetwork = Object.assign({}, defaultMeta)
+        networks[net.type][net.id] = newNetwork
+        return networks
+      })
+    } catch (e) {
+      console.error(e)
+    }
   },
   updateNetwork: (u, net, newNet) => {
     try {
@@ -307,7 +336,12 @@ module.exports = {
         netCount++
       })
       if (netCount <= 1) return main // Cannot delete last network without adding a new network of this type first
-      if (main.networks[net.type]) delete main.networks[net.type][net.id]
+
+      if (main.networks[net.type]) {
+        delete main.networks[net.type][net.id]
+        delete main.networksMeta[net.type][net.id]
+      }
+
       if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's deleted while selected
         const id = Object.keys(main.networks[net.type]).map(i => parseInt(i)).sort((a, b) => a - b)[0].toString()
         const reset = { status: 'loading', connected: false, type: '', network: '' }

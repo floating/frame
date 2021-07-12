@@ -436,7 +436,7 @@ const initial = {
         }
       }
     }),
-    networksMeta: {
+    networksMeta: main('networksMeta', {
       ethereum: {
         1: {
           gas: {
@@ -503,7 +503,7 @@ const initial = {
           }
         }
       }
-    },
+    }),
     ipfs: {},
     openDapps: [],
     dapp: {

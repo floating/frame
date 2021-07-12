@@ -43,11 +43,17 @@ const handler = (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
   if (req.method === 'OPTIONS') {
     res.writeHead(200)
+    console.log('writing options')
     res.end()
   } else if (req.method === 'POST') {
     const body = []
     req.on('data', chunk => body.push(chunk)).on('end', async () => {
-      res.on('error', err => console.error('res err', err))
+      res.on('error', err => {
+
+        console.log(' ====> ERROR')
+        console.error('res err', err)
+      })
+
       const origin = req.headers.origin || 'Unknown'
       const input = Buffer.concat(body).toString()
       const payload = validPayload(input)
@@ -58,6 +64,8 @@ const handler = (req, res) => {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
         // Review
         if (!accounts.getSelectedAddresses()[0]) error = { message: 'No Frame account selected', code: 4001 }
+
+        console.log('writing no account selected')
         res.writeHead(401, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ id: payload.id, jsonrpc: payload.jsonrpc, error }))
       } else {
@@ -69,6 +77,8 @@ const handler = (req, res) => {
               res.writeHead(200, { 'Content-Type': 'application/json' })
               const response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
               if (logTraffic) log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
+
+              console.log('writing response')
               res.end(JSON.stringify(response))
               delete polls[id]
               clearTimeout(cleanupTimers[id])
@@ -84,6 +94,7 @@ const handler = (req, res) => {
             }
           }
           if (typeof id === 'string') return send()
+          console.log('writing invalid client id')
           res.writeHead(401, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ error: 'Invalid Client ID' }))
         }
@@ -102,6 +113,7 @@ const handler = (req, res) => {
       }
     }).on('error', err => console.error('req err', err))
   } else {
+    console.log('writing pernission denied')
     res.writeHead(401, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify({ error: 'Permission Denied' }))
   }
