@@ -264,8 +264,6 @@ class Provider extends EventEmitter {
     }
 
     const { levels, selected } = store('main.networksMeta', chain.type, chain.id, 'gas.price')
-
-    console.log({ chain, levels, selected })
     if (!levels[selected]) throw new Error('Unable to determine gas')
 
     return levels[selected]
@@ -317,8 +315,7 @@ class Provider extends EventEmitter {
 
   sendTransaction (payload, res) {
     const rawTx = this.getRawTx(payload)
-
-    console.log({ rawTx })
+    
     if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.currentNetwork.id'))
     this.fillTx(rawTx, (err, rawTx) => {
       if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)

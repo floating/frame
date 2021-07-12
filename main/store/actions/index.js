@@ -3,8 +3,6 @@ const panelActions = require('./panel')
 function validateNetworkSettings (network) {
   const networkId = parseInt(network.id)
 
-  console.log({ networkId, netId: network.id})
-
   if (
     typeof (parseInt(networkId)) !== 'number' ||
     typeof (network.type) !== 'string' ||
@@ -223,7 +221,6 @@ module.exports = {
     u('main.networksMeta', netType, netId, 'nativeCurrency', () => meta)
   },
   addNetwork: (u, net) => {
-    console.dir(net)
     try {
       net.id = validateNetworkSettings(net)
 
