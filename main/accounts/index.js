@@ -200,7 +200,7 @@ class Accounts extends EventEmitter {
       if (!account)  return reject(new Error('Unable to determine target account'))
       if (!targetChain || !targetChain.type || !targetChain.id) return reject(new Error('Unable to determine target chain'))
       proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', params: [] }, (res) => {
-        if (res.error) return reject(new Error(res.error))
+        if (res.error) return reject(new Error(JSON.stringify(res.error)))
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && account.requests[id]) {
@@ -285,7 +285,7 @@ class Accounts extends EventEmitter {
             try {
               confirmations = await this.confirmations(account, id, hash, targetChain)
             } catch (e) {
-              log.error(e)
+              log.error('error awaiting confirmations', e)
               clearTimeout(monitorTimer)
               setTimeout(() => this.removeRequest(account, id), 60 * 1000)
               return
@@ -456,11 +456,10 @@ class Accounts extends EventEmitter {
   }
 
   removeRequest (account, handlerId) {
-    if (account && account.requests[handlerId]) {
-      if (account.requests[handlerId].res) account.requests[handlerId].res()
-      delete account.requests[handlerId]
-      account.update()
-    }
+    log.debug(`removeRequest(${account.id}, ${handlerId})`)
+
+    delete account.requests[handlerId]
+    account.update()
   }
 
   declineRequest (handlerId) {
@@ -488,17 +487,20 @@ class Accounts extends EventEmitter {
   setRequestError (handlerId, err) {
     log.info('setRequestError', handlerId)
     if (!this.current()) return // cb(new Error('No Account Selected'))
-    if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'error'
+    const req = this.current().requests[handlerId]
+
+    if (req) {
+      req.status = 'error'
       if (err.message === 'Ledger device: Invalid data received (0x6a80)') {
-        this.current().requests[handlerId].notice = 'Ledger Contract Data = No'
+        req.notice = 'Ledger Contract Data = No'
       } else if (err.message === 'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)') {
-        this.current().requests[handlerId].notice = 'Ledger Signature Declined'
+        req.notice = 'Ledger Signature Declined'
       } else {
         const notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
-        this.current().requests[handlerId].notice = notice
+        req.notice = notice
       }
-      if (this.current().requests[handlerId].type === 'transaction') {
+
+      if (req.type === 'transaction') {
         setTimeout(() => {
           if (this.current() && this.current().requests[handlerId]) {
             this.current().requests[handlerId].mode = 'monitor'
@@ -509,6 +511,7 @@ class Accounts extends EventEmitter {
       } else {
         setTimeout(() => this.removeRequest(this.current(), handlerId), 3300)
       }
+
       this.current().update()
     }
   }
