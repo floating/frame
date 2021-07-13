@@ -114,6 +114,10 @@ ipcMain.on('dash:removeSigner', (e, id) => {
   signers.remove(id)
 })
 
+ipcMain.on('dash:reloadSigner', (e, id) => {
+  signers.reload(id)
+})
+
 ipcMain.on('tray:openExternal', (e, url) => {
   if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
 })

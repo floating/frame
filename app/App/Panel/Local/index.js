@@ -147,8 +147,8 @@ class Settings extends React.Component {
 
   discord () {
     return (
-      <div className='discordInvite' onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
-        <div>Need help or have a request?</div>
+      <div className='discordInvite' onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY') }>
+        <div>Need help?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
     )
@@ -204,6 +204,24 @@ class Settings extends React.Component {
           <div className='panelHeaderTitle'>Settings</div>
         </div>
         <div className='localSettingsWrap'>
+          <div className='requestFeature'>
+            <div className='requestFeatureButton' onMouseDown={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+              Feature Requests
+            </div>
+          </div>
+          <div className='snipIt'>
+            <div>Using a dapp that doesn't support Frame natively?</div>
+            <div className='snipItBrowserExtensionIcons'>
+              <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
+                {svg.chrome(30)}
+              </div>
+              <div className='snipItBrowserExtensionIcon snipItSpinRight' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
+                {svg.firefox(30)}
+              </div>
+            </div>
+            <div>Inject a connection with our browser extension!</div>
+          </div>
+          {this.discord()}
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Summon Shortcut</div>
@@ -407,19 +425,6 @@ class Settings extends React.Component {
               When should Frame relock your hot signers?
             </div>
           </div>
-          <div className='snipIt'>
-            <div>Dapp doesn't support Frame natively?</div>
-            <div className='snipItBrowserExtensionIcons'>
-              <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
-                {svg.chrome(30)}
-              </div>
-              <div className='snipItBrowserExtensionIcon snipItSpinRight' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
-                {svg.firefox(30)}
-              </div>
-            </div>
-            <div>Inject a connection with our browser extension!</div>
-          </div>
-          {this.discord()}
           {this.quit()}
           <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
           {this.appInfo()}

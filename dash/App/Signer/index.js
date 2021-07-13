@@ -323,7 +323,7 @@ class Signer extends React.Component {
         )}
         <div className='signerDrawer'>
           <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-            {this.state.showControls ? 'hide' : 'settings'}
+            {this.state.showControls ? 'hide' : 'more'}
           </div>
           <div className='showControlsLine' />
         </div>
@@ -334,6 +334,9 @@ class Signer extends React.Component {
             <div className='signerControlOption'>Deactivte all Accounts</div>
             <div className='signerControlOption'>Reload Signer</div>
             <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div> */}
+            <div className='signerControlOption' onMouseDown={() => {
+              link.send('dash:reloadSigner', this.props.id)
+            }}>Reload Signer</div>
             <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
               link.send('dash:removeSigner', this.props.id)
             }}>Remove Signer</div>

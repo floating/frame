@@ -39,5 +39,6 @@ module.exports = {
     usb.on('attach', () => scan(true))
     usb.on('detach', () => scan(true))
     scan(true)
+    return () => scan(true)
   }
 }
