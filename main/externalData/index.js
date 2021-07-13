@@ -216,8 +216,9 @@ function stop () {
   currentNetworkObserver.remove()
   allNetworksObserver.remove()
 
-  ;[heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
-    .forEach(scanner => { if (scanner) clearInterval(scanner) })
+  const scanners = [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
+
+  scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
 
   heartbeat = null
   allAddressScan = null
