@@ -200,7 +200,7 @@ class Accounts extends EventEmitter {
       if (!account)  return reject(new Error('Unable to determine target account'))
       if (!targetChain || !targetChain.type || !targetChain.id) return reject(new Error('Unable to determine target chain'))
       proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', params: [] }, (res) => {
-        if (res.error) return reject(new Error(res.error))
+        if (res.error) return reject(new Error(JSON.stringify(res.error)))
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && account.requests[id]) {
@@ -285,7 +285,7 @@ class Accounts extends EventEmitter {
             try {
               confirmations = await this.confirmations(account, id, hash, targetChain)
             } catch (e) {
-              log.error(e)
+              log.error('error awaiting confirmations', e)
               clearTimeout(monitorTimer)
               setTimeout(() => this.removeRequest(account, id), 60 * 1000)
               return
@@ -456,11 +456,10 @@ class Accounts extends EventEmitter {
   }
 
   removeRequest (account, handlerId) {
-    if (account && account.requests[handlerId]) {
-      if (account.requests[handlerId].res) account.requests[handlerId].res()
-      delete account.requests[handlerId]
-      account.update()
-    }
+    log.debug(`removeRequest(${account.id}, ${handlerId})`)
+
+    delete account.requests[handlerId]
+    account.update()
   }
 
   declineRequest (handlerId) {
@@ -509,6 +508,7 @@ class Accounts extends EventEmitter {
       } else {
         setTimeout(() => this.removeRequest(this.current(), handlerId), 3300)
       }
+
       this.current().update()
     }
   }

@@ -244,7 +244,15 @@ class Provider extends EventEmitter {
     log.info('approveRequest', req)
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
-      if (response.error) return cb(response.error)
+      if (response.error) {
+        if (this.handlers[req.handlerId]) {
+          this.handlers[req.handlerId](response)
+          delete this.handlers[req.handlerId]
+        }
+
+        return cb(response.error)
+      }
+
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
       this.signAndSend(updatedReq, cb)
     })
@@ -282,6 +290,7 @@ class Provider extends EventEmitter {
       type: 'ethereum',
       id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
     }
+
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
       if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
       res(response)
