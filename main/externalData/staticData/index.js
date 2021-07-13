@@ -35,11 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
-var coingecko_1 = require("../coingecko");
-var electron_log_1 = require("electron-log");
+var coingecko_1 = __importDefault(require("../coingecko"));
+var electron_log_1 = __importDefault(require("electron-log"));
 function byMarketCap(coin1, coin2) {
-    return coin1.market_cap - coin2.market_cap;
+    return coin2.market_cap - coin1.market_cap;
 }
 function loadCoinData(allCoins, symbol) {
     return __awaiter(this, void 0, void 0, function () {
@@ -62,7 +65,7 @@ function loadCoinData(allCoins, symbol) {
                         .filter(function (coin) { return coin.symbol.toLowerCase() === symbol.toLowerCase(); })
                         .map(function (coin) { return coin.id; });
                     if (!(ids.length > 0)) return [3 /*break*/, 3];
-                    return [4 /*yield*/, coingecko_1.listMarkets(ids)];
+                    return [4 /*yield*/, coingecko_1["default"].listMarkets(ids)];
                 case 2:
                     referenceData = _a.sent();
                     sorted = referenceData.sort(byMarketCap);
@@ -87,7 +90,7 @@ function load(symbols) {
             switch (_a.label) {
                 case 0:
                     data = {};
-                    return [4 /*yield*/, coingecko_1.listCoins()];
+                    return [4 /*yield*/, coingecko_1["default"].listCoins()];
                 case 1:
                     allCoins = _a.sent();
                     _i = 0, symbols_1 = symbols;
@@ -115,4 +118,4 @@ function load(symbols) {
         });
     });
 }
-module.exports = load;
+exports["default"] = load;

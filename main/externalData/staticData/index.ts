@@ -1,8 +1,8 @@
-import { listMarkets, listCoins, Market, Coin } from '../coingecko'
+import coingecko, { Market, Coin } from '../coingecko'
 import log from 'electron-log'
 
 function byMarketCap (coin1: Market, coin2: Market) {
-  return coin1.market_cap - coin2.market_cap
+  return coin2.market_cap - coin1.market_cap
 }
 
 async function loadCoinData (allCoins: Coin[], symbol: string): Promise<Market> {
@@ -21,7 +21,7 @@ async function loadCoinData (allCoins: Coin[], symbol: string): Promise<Market> 
       .map(coin => coin.id)
 
     if (ids.length > 0) {
-      const referenceData = await listMarkets(ids)
+      const referenceData = await coingecko.listMarkets(ids)
 
       const sorted = referenceData.sort(byMarketCap)
       const coin = sorted.length > 0 ? sorted[0] : defaultMarket
@@ -37,10 +37,10 @@ async function loadCoinData (allCoins: Coin[], symbol: string): Promise<Market> 
   return defaultMarket
 }
 
-async function load (symbols: string[]) {
+async function load (symbols: string[]): Promise<{ [key: string]: any }> {
   const data = {}
 
-  const allCoins = await listCoins()
+  const allCoins = await coingecko.listCoins()
 
   for (const symbol of symbols) {
     const coinData = await loadCoinData(allCoins, symbol)
@@ -58,4 +58,4 @@ async function load (symbols: string[]) {
   return data
 }
 
-module.exports = load
+export default load

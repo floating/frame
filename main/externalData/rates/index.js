@@ -54,10 +54,10 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var bignumber_js_1 = __importDefault(require("bignumber.js"));
 var electron_log_1 = __importDefault(require("electron-log"));
-var coingecko_1 = require("../coingecko");
+var coingecko_1 = __importDefault(require("../coingecko"));
 var FETCH_BATCH_SIZE = 200;
 // { symbol: coinId }
 var allCoins;
@@ -66,8 +66,8 @@ var allPlatforms;
 function createRate(quote) {
     return {
         usd: {
-            price: new bignumber_js_1.default(quote.usd || 0),
-            change24hr: new bignumber_js_1.default(quote.usd_24h_change || 0)
+            price: new bignumber_js_1["default"](quote.usd || 0),
+            change24hr: new bignumber_js_1["default"](quote.usd_24h_change || 0)
         }
     };
 }
@@ -92,7 +92,7 @@ function loadCoins() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, 3, 4]);
-                    return [4 /*yield*/, coingecko_1.listCoins()];
+                    return [4 /*yield*/, coingecko_1["default"].listCoins()];
                 case 1:
                     coins_1 = _a.sent();
                     allCoins = coins_1.reduce(function (coinMapping, coin) {
@@ -102,7 +102,7 @@ function loadCoins() {
                     return [2 /*return*/, allCoins];
                 case 2:
                     e_1 = _a.sent();
-                    electron_log_1.default.error('unable to load coin data', e_1);
+                    electron_log_1["default"].error('unable to load coin data', e_1);
                     return [3 /*break*/, 4];
                 case 3:
                     setTimeout(loadCoins, 60 * 1000);
@@ -119,7 +119,7 @@ function loadPlatforms() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, 3, 4]);
-                    return [4 /*yield*/, coingecko_1.listAssetPlatforms()];
+                    return [4 /*yield*/, coingecko_1["default"].listAssetPlatforms()];
                 case 1:
                     platforms = _a.sent();
                     allPlatforms = platforms.reduce(function (platformMapping, platform) {
@@ -133,7 +133,7 @@ function loadPlatforms() {
                     return [2 /*return*/, allPlatforms];
                 case 2:
                     e_2 = _a.sent();
-                    electron_log_1.default.error('unable to load asset platform data', e_2);
+                    electron_log_1["default"].error('unable to load asset platform data', e_2);
                     return [3 /*break*/, 4];
                 case 3:
                     setTimeout(loadPlatforms, 60 * 1000);
@@ -164,10 +164,10 @@ function fetchRates(fetch, ids, params) {
     });
 }
 var fetchPrices = function (ids) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-    return [2 /*return*/, fetchRates(coingecko_1.coinPrices, ids)];
+    return [2 /*return*/, fetchRates(coingecko_1["default"].coinPrices, ids)];
 }); }); };
 var fetchTokenPrices = function (addresses, platform) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-    return [2 /*return*/, fetchRates(coingecko_1.tokenPrices, addresses, [platform])];
+    return [2 /*return*/, fetchRates(coingecko_1["default"].tokenPrices, addresses, [platform])];
 }); }); };
 function loadRates(ids, chainId) {
     return __awaiter(this, void 0, void 0, function () {
@@ -219,4 +219,4 @@ function loadRates(ids, chainId) {
         });
     });
 }
-exports.default = loadRates;
+exports["default"] = loadRates;

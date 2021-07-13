@@ -38,8 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.listMarkets = exports.listCoins = exports.getCoin = exports.tokenPrices = exports.coinPrices = exports.listAssetPlatforms = void 0;
+exports.__esModule = true;
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var electron_log_1 = __importDefault(require("electron-log"));
 var apiVersion = process.env.COIN_GECKO_API_VERSION || 'v3';
@@ -66,8 +65,8 @@ function call(path, params) {
         return __generator(this, function (_a) {
             queryStr = Object.entries(params).map(function (param) { return param.join('='); }).join('&');
             url = "" + path + (queryStr ? '?' + queryStr : '');
-            electron_log_1.default.debug("loading coingecko data from " + url);
-            return [2 /*return*/, node_fetch_1.default(url, {}).then(handleJsonResponse)];
+            electron_log_1["default"].debug("loading coingecko data from " + url);
+            return [2 /*return*/, node_fetch_1["default"](url, {}).then(handleJsonResponse)];
         });
     });
 }
@@ -89,7 +88,6 @@ function listAssetPlatforms(chainIds) {
         });
     });
 }
-exports.listAssetPlatforms = listAssetPlatforms;
 function coinPrices(ids, currencies) {
     if (currencies === void 0) { currencies = ['usd']; }
     return __awaiter(this, void 0, void 0, function () {
@@ -106,7 +104,6 @@ function coinPrices(ids, currencies) {
         });
     });
 }
-exports.coinPrices = coinPrices;
 function tokenPrices(addresses, asset_platform, currencies) {
     if (currencies === void 0) { currencies = ['usd']; }
     return __awaiter(this, void 0, void 0, function () {
@@ -123,7 +120,6 @@ function tokenPrices(addresses, asset_platform, currencies) {
         });
     });
 }
-exports.tokenPrices = tokenPrices;
 function getCoin(id) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -131,7 +127,6 @@ function getCoin(id) {
         });
     });
 }
-exports.getCoin = getCoin;
 function listCoins(include_platform) {
     if (include_platform === void 0) { include_platform = true; }
     return __awaiter(this, void 0, void 0, function () {
@@ -140,7 +135,6 @@ function listCoins(include_platform) {
         });
     });
 }
-exports.listCoins = listCoins;
 function listMarkets(ids, vsCurrency) {
     if (vsCurrency === void 0) { vsCurrency = 'usd'; }
     return __awaiter(this, void 0, void 0, function () {
@@ -154,4 +148,11 @@ function listMarkets(ids, vsCurrency) {
         });
     });
 }
-exports.listMarkets = listMarkets;
+exports["default"] = {
+    listAssetPlatforms: listAssetPlatforms,
+    coinPrices: coinPrices,
+    tokenPrices: tokenPrices,
+    getCoin: getCoin,
+    listCoins: listCoins,
+    listMarkets: listMarkets
+};

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import log from 'electron-log'
 
-import { listCoins, listAssetPlatforms, coinPrices, tokenPrices } from '../coingecko'
+import coingecko from '../coingecko'
 
 const FETCH_BATCH_SIZE = 200
 
@@ -37,7 +37,7 @@ async function assetPlatforms () {
 
 async function loadCoins () {
   try {
-    const coins = await listCoins()
+    const coins = await coingecko.listCoins()
 
     allCoins = coins.reduce((coinMapping, coin) => {
       coinMapping[coin.symbol.toLowerCase()] = coin.id
@@ -54,7 +54,7 @@ async function loadCoins () {
 
 async function loadPlatforms () {
   try {
-    const platforms = await listAssetPlatforms()
+    const platforms = await coingecko.listAssetPlatforms()
 
     allPlatforms = platforms.reduce((platformMapping, platform) => {
       if (platform.chain_identifier) {
@@ -86,8 +86,8 @@ async function fetchRates<T> (fetch: (ids: string[], ...params: any) => Promise<
   return Object.assign({}, ...responses)
 }
 
-const fetchPrices = async (ids: string[]) => fetchRates(coinPrices, ids)
-const fetchTokenPrices = async (addresses: string[], platform: string) => fetchRates(tokenPrices, addresses, [platform])
+const fetchPrices = async (ids: string[]) => fetchRates(coingecko.coinPrices, ids)
+const fetchTokenPrices = async (addresses: string[], platform: string) => fetchRates(coingecko.tokenPrices, addresses, [platform])
 
 async function loadRates (ids: string[], chainId: number) {
   const platforms = await assetPlatforms()
