@@ -20,7 +20,7 @@ function createWorker () {
 
   scanWorker.on('message', message => {
     if (process.env.LOG_WORKER) {
-      log.debug('received message from scan worker: ', message)
+      log.debug('received message from scan worker: ', JSON.stringify(message, undefined, 2))
     }
 
     if (message.type === 'chainBalance') {
@@ -192,15 +192,13 @@ function start (addresses = [], omitList = [], knownList) {
     const networks = store('main.networks.ethereum')
 
     const symbols = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
+    const newSymbolAdded = symbols.some(sym => !networkCurrencies.includes(sym))
 
-    if (symbols.some(sym => !networkCurrencies.includes(sym))) {
+    if (!nativeCurrencyScan || newSymbolAdded) {
       networkCurrencies = [...symbols]
       scanNetworkCurrencyRates()
     }
-
   })
-
-  // addAddresses(addresses) // Scan becomes too heavy with many accounts added
 
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
@@ -216,10 +214,11 @@ function stop () {
   log.info('stopping external data worker')
 
   currentNetworkObserver.remove()
-  allNetworksObserver.remove();
+  allNetworksObserver.remove()
 
-  [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
-    .forEach(scanner => { if (scanner) clearInterval(scanner) })
+  const scanners = [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
+
+  scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
 
   heartbeat = null
   allAddressScan = null
