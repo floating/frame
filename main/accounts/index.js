@@ -487,20 +487,17 @@ class Accounts extends EventEmitter {
   setRequestError (handlerId, err) {
     log.info('setRequestError', handlerId)
     if (!this.current()) return // cb(new Error('No Account Selected'))
-    const req = this.current().requests[handlerId]
-
-    if (req) {
-      req.status = 'error'
+    if (this.current().requests[handlerId]) {
+      this.current().requests[handlerId].status = 'error'
       if (err.message === 'Ledger device: Invalid data received (0x6a80)') {
-        req.notice = 'Ledger Contract Data = No'
+        this.current().requests[handlerId].notice = 'Ledger Contract Data = No'
       } else if (err.message === 'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)') {
-        req.notice = 'Ledger Signature Declined'
+        this.current().requests[handlerId].notice = 'Ledger Signature Declined'
       } else {
         const notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
-        req.notice = notice
+        this.current().requests[handlerId].notice = notice
       }
-
-      if (req.type === 'transaction') {
+      if (this.current().requests[handlerId].type === 'transaction') {
         setTimeout(() => {
           if (this.current() && this.current().requests[handlerId]) {
             this.current().requests[handlerId].mode = 'monitor'
