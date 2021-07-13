@@ -70,5 +70,3 @@ process.on('message', message => {
   const args = message.args || []
   messageHandler[message.command](...args)
 })
-
-process.send({ type: 'ready' })
