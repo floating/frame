@@ -201,7 +201,7 @@ const migrations = {
 
     return initial
   },
-  10: initial => {  // Add Optimisim to persisted networks
+  10: initial => {  // Add Optimism to persisted networks
     // if (!initial.main.networks.ethereum[10]) {
     initial.main.networks.ethereum[10] = {
       id: 10,
@@ -263,6 +263,34 @@ const migrations = {
     Object.keys(initial.main.accounts).forEach(id => {
       if (initial.main.accounts[id].smart) {
         initial.main.accounts[id].smart.actor = initial.main.accounts[id].smart.actor.address
+      }
+    })
+
+    return initial
+  },
+  13: initial => {
+    const defaultMeta = {
+      gas: {
+        price: {
+          selected: 'standard',
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
+      }
+    }
+
+    // ensure all network configurations have corresponding network meta
+    Object.keys(initial.main.networks.ethereum).forEach(networkId => {
+      if (initial.main.networksMeta.ethereum[networkId]) {
+        const gasSettings = initial.main.networksMeta.ethereum[networkId].gas || { price: {} }
+
+        initial.main.networksMeta.ethereum[networkId].gas = {
+          price: {
+            selected: gasSettings.price.selected || defaultMeta.gas.price.selected,
+            levels: gasSettings.price.levels || defaultMeta.gas.price.levels,
+          }
+        }
+      } else {
+        initial.main.networksMeta.ethereum[networkId] = { ...defaultMeta }
       }
     })
 
