@@ -254,7 +254,7 @@ module.exports = {
 
       u('main', main => {
         if (!main.networks[net.type]) main.networks[net.type] = {}
-        if (main.networks[net.type][net.id]) return main.networks // Network already exists, don't overwrite, notify user
+        if (main.networks[net.type][net.id]) return main // Network already exists, don't overwrite, notify user
 
         main.networks[net.type][net.id] = { ...defaultNetwork, ...net }
         main.networksMeta[net.type][net.id] = { ...defaultMeta }
