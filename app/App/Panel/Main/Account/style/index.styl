@@ -1525,9 +1525,21 @@
     text-align center
     box-sizing border-box
 
+    .moduleHeaderClose
+      position absolute
+      right 3px
+      top 1px
+      bottom 0
+      display flex
+      justify-content center
+      align-items center
+      cursor pointer
+      *
+        pointer-events none
+
     .moduleHeaderLoading
       position absolute
-      right 6px
+      left 6px
       top 1px
       bottom 0
       // padding 0px 10px
@@ -1657,7 +1669,6 @@
 
 .moduleRow
   height 30px
-  // background blue
   margin-bottom 4px
   display flex
   align-items center
