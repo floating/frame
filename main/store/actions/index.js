@@ -252,20 +252,14 @@ module.exports = {
         }
       }
 
-      u('main.networks', networks => {
-        if (!networks[net.type]) networks[net.type] = {}
-        if (networks[net.type][net.id]) return networks // Network already exists, don't overwrite, notify user
-        const newNetwork = Object.assign({}, defaultNetwork, net)
-        networks[net.type][net.id] = newNetwork
-        return networks
-      })
+      u('main', main => {
+        if (!main.networks[net.type]) main.networks[net.type] = {}
+        if (main.networks[net.type][net.id]) return main.networks // Network already exists, don't overwrite, notify user
 
-      u('main.networksMeta', networks => {
-        if (!networks[net.type]) networks[net.type] = {}
-        if (networks[net.type][net.id]) return networks // Network already exists, don't overwrite, notify user
-        const newNetwork = Object.assign({}, defaultMeta)
-        networks[net.type][net.id] = newNetwork
-        return networks
+        main.networks[net.type][net.id] = { ...defaultNetwork, ...net }
+        main.networksMeta[net.type][net.id] = { ...defaultMeta }
+
+        return main
       })
     } catch (e) {
       console.error(e)
