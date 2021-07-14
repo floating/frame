@@ -133,8 +133,11 @@ class Lattice extends Signer {
     this.latticeObs.remove()
     this.closed = true
     store.removeSigner(this.id)
-    store.removeLattice(this.deviceId)
     super.close()
+  }
+
+  delete () {
+    store.removeLattice(this.deviceId)
   }
 
   async wait (time) {

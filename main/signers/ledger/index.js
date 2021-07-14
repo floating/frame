@@ -4,7 +4,7 @@ const usb = require('usb')
 const log = require('electron-log')
 const Ledger = require('./Ledger')
 // const isLedger = d => (['win32', 'darwin'].includes(process.platform) ? d.usagePage === 0xffa0 : d.interface === 0) && ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
-const isLedger = d => ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97)
+const isLedger = d => ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.vendorId === 0x2c97) && d.interface === 0
 
 let scanTimer = null
 
@@ -39,6 +39,6 @@ module.exports = {
     usb.on('attach', () => scan(true))
     usb.on('detach', () => scan(true))
     scan(true)
-    return () => scan(true)
+    return () => setTimeout(() => scan(true), 500)
   }
 }
