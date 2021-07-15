@@ -80,25 +80,31 @@ module.exports = {
   scan: (signers) => {
     const storedSigners = {}
 
-    // Ensure signer directory exists
-    ensureDirSync(SIGNERS_PATH)
+    const scan = () => {
+      // Ensure signer directory exists
+      ensureDirSync(SIGNERS_PATH)
 
-    // Find stored signers, read them from disk and add them to storedSigners
-    fs.readdirSync(SIGNERS_PATH).forEach((file) => {
-      try {
-        const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
-        storedSigners[signer.id] = signer
-      } catch (e) { log.error(`Corrupt signer file: ${file}`) }
-    })
+      // Find stored signers, read them from disk and add them to storedSigners
+      fs.readdirSync(SIGNERS_PATH).forEach((file) => {
+        try {
+          const signer = JSON.parse(fs.readFileSync(path.resolve(SIGNERS_PATH, file), 'utf8'))
+          storedSigners[signer.id] = signer
+        } catch (e) { log.error(`Corrupt signer file: ${file}`) }
+      })
 
-    // Add stored signers to store
-    Object.keys(storedSigners).forEach(id => {
-      const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
-      if (type === 'seed') {
-        signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
-      } else if (type === 'ring') {
-        signers.add(new RingSigner({ network, addresses, encryptedKeys }))
-      }
-    })
+      // Add stored signers to store
+      Object.keys(storedSigners).forEach(id => {
+        const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
+        if (type === 'seed') {
+          signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
+        } else if (type === 'ring') {
+          signers.add(new RingSigner({ network, addresses, encryptedKeys }))
+        }
+      })
+    }
+
+    scan()
+
+    return scan
   }
 }

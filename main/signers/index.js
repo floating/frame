@@ -14,10 +14,12 @@ class Signers extends EventEmitter {
     super()
     this.signers = []
     // this.lattice = lattice(this)
-    lattice.scan(this)
-    hot.scan(this)
-    ledger.scan(this)
-    trezorConnect.scan(this)
+    this.scans = {
+      lattice: lattice.scan(this),
+      hot: hot.scan(this),
+      ledger: ledger.scan(this),
+      trezor: trezorConnect.scan(this)
+    }
   }
 
   trezorPin (id, pin, cb) {
@@ -102,6 +104,18 @@ class Signers extends EventEmitter {
       // If hot signer -> erase from disk
       if (signer.delete) signer.delete()
       this.signers.splice(index, 1)
+    }
+  }
+
+  reload (id) {
+    const index = this.signers.map(s => s.id).indexOf(id)
+    if (index > -1) {
+      const signer = this.signers[index]
+      let { type } = signer
+      signer.close()
+      this.signers.splice(index, 1)
+      if (type === 'ring' || type === 'seed') type = 'hot'
+      if (this.scans[type] && typeof this.scans[type] === 'function') this.scans[type]()
     }
   }
 

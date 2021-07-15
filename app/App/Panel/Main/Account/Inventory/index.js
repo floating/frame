@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
+import svg from '../../../../../../resources/svg'
 
 class Balances extends React.Component {
   constructor (...args) {

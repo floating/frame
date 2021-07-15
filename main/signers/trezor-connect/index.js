@@ -33,5 +33,6 @@ module.exports = {
       })
       flex.rpc('trezor.scan', err => { if (err) return log.error(err) })
     })
+    return () => flex.rpc('trezor.scan', err => { if (err) return log.error(err) })
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
+import svg from '../../../../../../resources/svg'
 
 class Settings extends React.Component {
   constructor (...args) {
@@ -36,7 +37,12 @@ class Settings extends React.Component {
     return (
       <div ref={this.moduleRef}>
         {this.props.expanded ? (
-          <div className='moduleHeader'>{'Settings'}</div>  
+          <div className='moduleHeader'>
+            {'Settings'}
+            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
+              {svg.close(22)}
+            </div>
+          </div>  
         ) : null}
         <div className='moduleMain moduleMainSettings'>
           {!this.props.expanded ? (
