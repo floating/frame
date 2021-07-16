@@ -22,27 +22,27 @@ afterEach(() => {
 })
 
 it('loads the included sushiswap token list', async () => {
-  const tokens = await tokenList.getTokens(137)
+  const tokens = tokenList.getTokens(137)
 
-  expect(tokens.length).toBe(52)
+  expect(tokens.length).toBeGreaterThan(50)
   expect(tokens[0].name).toBe('Aave')
 })
 
 it('loads a token list from nebula', async () => {
-  const tokens = await tokenList.getTokens(299)
+  const tokens = tokenList.getTokens(299)
 
   expect(tokens.length).toBe(1)
   expect(tokens[0].name).toBe('another-token')
 })
 
 it('loads the default token list for mainnet', async () => {
-  const tokens = await tokenList.getTokens(1)
+  const tokens = tokenList.getTokens(1)
 
   expect(tokens.length).toBeGreaterThan(0)
 })
 
 it('fails to load tokens for an unknown chain', async () => {
-  const tokens = await tokenList.getTokens(-1)
+  const tokens = tokenList.getTokens(-1)
 
   expect(tokens.length).toBe(0)
 })
