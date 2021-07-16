@@ -3,14 +3,7 @@ import Restore from 'react-restore'
 import utils, { toHex } from 'web3-utils'
 import svg from '../../../../../../../../resources/svg'
 import link from '../../../../../../../../resources/link'
-
-// const weiToETH = v => Math.ceil(v / 1e18)
-const weiToGwei = v => Math.ceil(v / 1e9)
-const gweiToWei = v => Math.ceil(v * 1e9)
-const intToHex = v => '0x' + v.toString(16)
-const hexToInt = v => parseInt(v, 'hex')
-const weiHexToGweiInt = v => hexToInt(v) / 1e9
-const gweiToWeiHex = v => intToHex(gweiToWei(v))
+import { weiToGwei, gweiToWei, hexToInt, weiHexToGweiInt, gweiToWeiHex } from '../../../../../../../../resources/utils'
 
 const FEE_WARNING_THRESHOLD_USD = 20
 const FEE_MAX_TOTAL_ETH_WEI = 2 * 1e18
@@ -152,17 +145,31 @@ class TransactionFee extends React.Component {
   //   return `rgba(${Math.round(high[0] * w1 + low[0] * w2)}, ${Math.round(high[1] * w1 + low[1] * w2)}, ${Math.round(high[2] * w1 + low[2] * w2)}, ${percent < 0.5 ? 0.5 : percent})`
   // }
 
+  trimWeiToGwei (level) {
+    let gwei = parseFloat(weiToGwei(level).toFixed(3)) || 0
+    let len = gwei.toString().length
+    len = len > 5 ? 0 : len - 2
+    len = len < 0 ? 0 : len
+    let result = parseFloat(gwei.toFixed(len)) || 0
+    if (result >= 10) {
+      result = Math.ceil(result)
+    } else if (result > 1) {
+      result = Math.ceil(result * 10) / 10
+    }
+    return result
+  }
+
   hoverBar (hoverGasPercent, isCustom) {
     if (!hoverGasPercent) hoverGasPercent = this.gasPriceToPercent(this.props.req.data.gas)
     hoverGasPercent = hoverGasPercent > 1 ? 1 : (hoverGasPercent < 0 ? 0 : hoverGasPercent)
     const hoverGasPercentOrigin = hoverGasPercent
     const asap = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels.asap')
     // const slow = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels.slow')
-    const top = parseInt(asap, 16) * 1.5
-    const bottom = gweiToWei(1)
-    let gwei = Math.round(weiToGwei(top * hoverGasPercent))
+    const top = parseInt(asap, 'hex') * 2
+    const bottom = 0
+    let gwei = this.trimWeiToGwei(top * hoverGasPercent)
     gwei = gwei < weiToGwei(bottom) ? weiToGwei(bottom) : gwei
-    const hoverGasPrice = utils.numberToHex(gwei * 1000000000)
+    const hoverGasPrice = utils.numberToHex(gwei * 1e9)
     hoverGasPercent = (hoverGasPrice / top) // + percentBuffer
     hoverGasPercent = (hoverGasPercent * 2) > 1 ? 1 : hoverGasPercent * 2
     // const diff = asap - slow
@@ -208,14 +215,17 @@ class TransactionFee extends React.Component {
   renderFeeLabel (current, expanded, currentGas) {
     const levels = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels')
     const price = levels[current]
+    let val
+    if (current === 'custom') {
+      val = this.trimWeiToGwei(parseInt(this.state.hoverGasPriceCustom || currentGas, 'hex'))
+    } else {
+      val = this.trimWeiToGwei(parseInt(price, 'hex'))
+    }
+    val = val < 1 ? '<1' : val
     return (
       <div className='txSectionLabelLeft'>
         <div className='txSectionLabelLeftInner' style={{ transform: 'translateX(0px)', opacity: 1 }}>
-          {current === 'custom' ? (
-            weiToGwei(parseInt(this.state.hoverGasPriceCustom || currentGas, 'hex'))
-          ) : (
-            weiToGwei(parseInt(price, 'hex'))
-          )}
+          {val}
           <span className='gwei'>GWEI</span>
         </div>
       </div>
@@ -272,7 +282,7 @@ class TransactionFee extends React.Component {
     gasPrice = weiHexToGweiInt(gasPrice)
     if (isNaN(gasPrice)) return this.setState({ inputGwei: 0 })
     const { price } = this.checkGasMax(gasPrice, hexToInt(this.props.req.data.gas))
-    this.setState({ inputGwei: price })
+    this.setState({ inputGwei: parseFloat(price.toFixed(3)) })
     const feeLevel = this.store('main.networksMeta', netType, netId, 'gas.price.selected')
     if (gweiToWeiHex(price) && (gweiToWeiHex(price) !== this.props.req.data.gasPrice || level !== feeLevel)) {
       link.rpc('setGasPrice', netType, netId, gweiToWeiHex(price), level, this.props.req.handlerId, e => {
@@ -391,7 +401,7 @@ class TransactionFee extends React.Component {
       transform: 'translateY(0px)'
     }
     const marker = (this.state.hoverGasPercentOrigin * 210) + 5
-    const gasPrice = weiToGwei(parseInt(data.gasPrice, 'hex'))
+    const gasPrice = this.trimWeiToGwei(parseInt(data.gasPrice, 'hex'))
     const gasLimitDisplay = this.state.pendingLimit || (this.state.gasLimitInputFocus ? (this.state.inputLimit || '') : parseInt(data.gas, 'hex'))
 
     // Adjust for any hover state
@@ -440,7 +450,7 @@ class TransactionFee extends React.Component {
                   const inputGwei = parseInt(e.target.value) || 0
                   const price = inputGwei < 0 ? 0 : inputGwei > 9999 ? 9999 : inputGwei
                   this.setState({ inputGwei: price })
-                   this.setGasPrice(this.chain.type, this.chain.id, gweiToWeiHex(price), 'custom')
+                  this.setGasPrice(this.chain.type, this.chain.id, gweiToWeiHex(price), 'custom')
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

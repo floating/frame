@@ -265,7 +265,7 @@ class Provider extends EventEmitter {
     return rawTx
   }
 
-  getGasPrice (rawTx, res) {
+  getGasPrice (rawTx) {
     const chain = {
       type: 'ethereum',
       id: parseInt(rawTx.chainId, 'hex').toString()
