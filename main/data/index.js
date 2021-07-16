@@ -29,8 +29,8 @@ const getCurrentChainGas = () => {
       slow: basePrice,
       standard: basePrice,
       fast: basePrice,
-      asap: '0x' + (hexToBn(basePrice).add(ONE_GWEI).mul(new BN(1.2))).toString('hex'),
-      custom: customGasLevel(network.id, network.type) || gas.standard,
+      asap: basePrice,
+      custom: customGasLevel(network.id, network.type) || basePrice
     })
   })
 }
@@ -61,11 +61,11 @@ const onData = data => {
 
       const gas = {
         ...gasTimes,
-        slow: gweiToWei(slow),
-        standard: gweiToWei(standard),
-        fast: gweiToWei(fast),
-        asap: gweiToWei(asap),
-        custom: customGasLevel(1) || gas.standard,
+        slow: '0x' + gweiToWei(slow),
+        standard: '0x' + gweiToWei(standard),
+        fast: '0x' + gweiToWei(fast),
+        asap: '0x' + gweiToWei(asap),
+        custom: customGasLevel(1) || '0x' + gweiToWei(standard),
       }
 
       clearTimeout(staleTimer)

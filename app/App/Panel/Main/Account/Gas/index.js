@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
-import utils from '../../../../../../resources/utils'
+import { weiToGwei, hexToInt } from '../../../../../../resources/utils'
 
 class Gas extends React.Component {
   constructor (...args) {
@@ -25,6 +25,13 @@ class Gas extends React.Component {
     if (time < 3600) return <><span className='timeUnit'>~</span>{Math.round(time / 60)}<span className='timeUnit'>m</span></>
     return <><span className='timeUnit'>~</span>{Math.round(time / 3600)}<span className='timeUnit'>h</span></>
   }
+  levelDisplay (level) {
+    let gwei = parseFloat(weiToGwei(hexToInt(level)).toFixed(3))  
+    let len = gwei.toString().length
+    len = len > 5 ? 0 : len - 2
+    len = len < 0 ? 0 : len
+    return parseFloat(gwei.toFixed(len)) || '?'
+  }
   render () {
     const { type, id } = this.store('main.currentNetwork')
     const levels = this.store('main.networksMeta', type, id, 'gas.price.levels') || {}
@@ -34,7 +41,7 @@ class Gas extends React.Component {
         <div className='gasBlock'>
           <div className='gasItem'>
             <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.slow, 16)) || '?'}</span>
+              <span className='gasGweiNum'>{this.levelDisplay(levels.slow)}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
@@ -44,7 +51,7 @@ class Gas extends React.Component {
           </div>
           <div className='gasItem'>
             <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.standard, 16)) || '?'}</span>
+              <span className='gasGweiNum'>{this.levelDisplay(levels.standard)}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
@@ -54,7 +61,7 @@ class Gas extends React.Component {
           </div>
           <div className='gasItem'>
             <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.fast, 16)) || '?'}</span>
+              <span className='gasGweiNum'>{this.levelDisplay(levels.fast)}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>
@@ -64,7 +71,7 @@ class Gas extends React.Component {
           </div>
           <div className='gasItem'>
           <div className='gasGwei'>
-              <span className='gasGweiNum'>{utils.weiToGwei(parseInt(levels.asap, 16)) || '?'}</span>
+              <span className='gasGweiNum'>{this.levelDisplay(levels.asap)}</span>
               <span className='gasGweiLabel'>{'GWEI'}</span>
             </div>
             <div className='gasLevel'>

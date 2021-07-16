@@ -3,14 +3,7 @@ import Restore from 'react-restore'
 import utils, { toHex } from 'web3-utils'
 import svg from '../../../../../../../../resources/svg'
 import link from '../../../../../../../../resources/link'
-
-// const weiToETH = v => Math.ceil(v / 1e18)
-const weiToGwei = v => Math.ceil(v / 1e9)
-const gweiToWei = v => Math.ceil(v * 1e9)
-const intToHex = v => '0x' + v.toString(16)
-const hexToInt = v => parseInt(v, 'hex')
-const weiHexToGweiInt = v => hexToInt(v) / 1e9
-const gweiToWeiHex = v => intToHex(gweiToWei(v))
+import { weiToGwei, gweiToWei, hexToInt, weiHexToGweiInt, gweiToWeiHex } from '../../../../../../../../resources/utils'
 
 const FEE_WARNING_THRESHOLD_USD = 20
 const FEE_MAX_TOTAL_ETH_WEI = 2 * 1e18
@@ -152,17 +145,27 @@ class TransactionFee extends React.Component {
   //   return `rgba(${Math.round(high[0] * w1 + low[0] * w2)}, ${Math.round(high[1] * w1 + low[1] * w2)}, ${Math.round(high[2] * w1 + low[2] * w2)}, ${percent < 0.5 ? 0.5 : percent})`
   // }
 
+  trimWeiToGwei (level) {
+    let gwei = parseFloat(weiToGwei(level).toFixed(3)) || 0
+    let len = gwei.toString().length
+    len = len > 5 ? 0 : len - 2
+    len = len < 0 ? 0 : len
+    let result = parseFloat(gwei.toFixed(len)) || 0
+    if (result > 1) result = Math.ceil(result)
+    return result
+  }
+
   hoverBar (hoverGasPercent, isCustom) {
     if (!hoverGasPercent) hoverGasPercent = this.gasPriceToPercent(this.props.req.data.gas)
     hoverGasPercent = hoverGasPercent > 1 ? 1 : (hoverGasPercent < 0 ? 0 : hoverGasPercent)
     const hoverGasPercentOrigin = hoverGasPercent
     const asap = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels.asap')
     // const slow = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels.slow')
-    const top = parseInt(asap, 16) * 1.5
-    const bottom = gweiToWei(1)
-    let gwei = Math.round(weiToGwei(top * hoverGasPercent))
+    const top = parseInt(asap, 'hex') * 1.5 
+    const bottom = 0
+    let gwei = this.trimWeiToGwei(top * hoverGasPercent)
     gwei = gwei < weiToGwei(bottom) ? weiToGwei(bottom) : gwei
-    const hoverGasPrice = utils.numberToHex(gwei * 1000000000)
+    const hoverGasPrice = utils.numberToHex(gwei * 1e9)
     hoverGasPercent = (hoverGasPrice / top) // + percentBuffer
     hoverGasPercent = (hoverGasPercent * 2) > 1 ? 1 : hoverGasPercent * 2
     // const diff = asap - slow
@@ -208,14 +211,17 @@ class TransactionFee extends React.Component {
   renderFeeLabel (current, expanded, currentGas) {
     const levels = this.store('main.networksMeta', this.chain.type, this.chain.id, 'gas.price.levels')
     const price = levels[current]
+    let val
+    if (current === 'custom') {
+      val = weiToGwei(parseInt(this.state.hoverGasPriceCustom || currentGas, 'hex'))
+    } else {
+      val = weiToGwei(parseInt(price, 'hex'))
+    }
+    val = val < 1 ? '<1' : val
     return (
       <div className='txSectionLabelLeft'>
         <div className='txSectionLabelLeftInner' style={{ transform: 'translateX(0px)', opacity: 1 }}>
-          {current === 'custom' ? (
-            weiToGwei(parseInt(this.state.hoverGasPriceCustom || currentGas, 'hex'))
-          ) : (
-            weiToGwei(parseInt(price, 'hex'))
-          )}
+          {val}
           <span className='gwei'>GWEI</span>
         </div>
       </div>
