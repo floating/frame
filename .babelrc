@@ -1,7 +1,8 @@
 {
   "presets": [
     ["@babel/preset-env", { "targets": { "node": "12" }}],
-    "@babel/preset-react"
+    "@babel/preset-react",
+    "@babel/preset-typescript"
   ],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "legacy": true }],

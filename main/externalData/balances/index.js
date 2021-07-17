@@ -1,7 +1,8 @@
 const provider = require('eth-provider')()
 const BigNumber = require('bignumber.js')
+const log = require('electron-log')
 
-const getTokenList = require('../inventory/tokens')
+const tokenLoader = require('../inventory/tokens')
 const multicall = require('../../multicall')
 
 async function chainId () {
@@ -26,24 +27,31 @@ function balanceCalls (owner, tokens) {
 
 async function loadTokenBalances (chainId, address, tokens) {
   const calls = balanceCalls(address, tokens)
-  const results = await multicall(chainId).call(calls)
 
-  const balances = Object.entries(results.transformed)
-    .reduce((balances, [key, balance]) => {
-      const address = key.split('_')[0].toLowerCase()
-      balances[address] = balance
+  try {
+    const results = await multicall(chainId).call(calls)
 
-      return balances
-    }, {})
+    const balances = Object.entries(results.transformed)
+      .reduce((balances, [key, balance]) => {
+        const address = key.split('_')[0].toLowerCase()
+        balances[address] = balance
 
-  return balances
+        return balances
+      }, {})
+
+    return balances
+  } catch (e) {
+    log.error('unable to load token balances', e)
+  }
+
+  return {}
 }
 
 async function getTokenBalances (address, omit = [], knownTokens) {
   const symbolsToOmit = omit.map(a => a.toLowerCase())
 
   const chain = await chainId()
-  const tokenList = await getTokenList(chain)
+  const tokenList = tokenLoader.getTokens(chain)
   const tokens = tokenList.filter(t => !symbolsToOmit.includes(t.symbol.toLowerCase()))
 
   const foundTokens = await loadTokenBalances(chain, address, tokens)
@@ -66,6 +74,8 @@ async function getTokenBalances (address, omit = [], knownTokens) {
 
   return { networkId: chain, balances: tokenBalances }
 }
+
+tokenLoader.start()
 
 module.exports = {
   getNativeCurrencyBalance,

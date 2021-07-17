@@ -4,7 +4,7 @@ const LatticeDevice = require('./Lattice')
 
 module.exports = {
   scan: (signers) => {
-    store.observer(() => {
+    const scan = () => {
       const lattice = store('main.lattice') || {}
       Object.keys(lattice).forEach(async deviceId => {
         if (!deviceId || store('main.signers', 'lattice-' + deviceId)) return
@@ -12,6 +12,8 @@ module.exports = {
         const signer = new LatticeDevice(deviceId, signers)
         signers.add(signer)
       })
-    })
+    }
+    store.observer(scan)
+    return scan
   }
 }

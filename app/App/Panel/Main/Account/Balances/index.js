@@ -119,14 +119,20 @@ class Balances extends React.Component {
         priceChangeClass += ' signerBalanceCurrentPriceChangeDown'
       }
     }
+    let name = balanceInfo.name
+    if (name.length > 20) name = name.substr(0, 20) + '...'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner'>
           <div className='signerBalanceLogo'>
-            <img src={balanceInfo.logoURI} />
+            <img 
+              src={balanceInfo.logoURI}
+              value={symbol.toUpperCase()}
+              alt={symbol.toUpperCase()}
+            />
           </div>
           <div className='signerBalanceCurrency'>
-            {balanceInfo.name}
+            {name}
           </div>
           <div className='signerBalancePrice'>
             <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balanceInfo.price}</span>
@@ -134,7 +140,7 @@ class Balances extends React.Component {
               <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange}%</span>
             </span>
           </div>
-          <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
+          <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
             <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
             {balanceInfo.displayBalance}
           </div>
@@ -175,6 +181,11 @@ class Balances extends React.Component {
       <div ref={this.moduleRef} className='balancesBlock'>
         <div className='moduleHeader moduleHeaderBorderless'>
           <span>balances</span>
+          {this.props.expanded ? (
+            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
+              {svg.close(22)}
+            </div>
+          ) : null}
           {balancesLength === 0 || !fullScan ? (
             <div className='moduleHeaderLoading'>
               <div className='moduleHeaderLoadingLoader' />

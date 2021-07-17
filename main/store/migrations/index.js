@@ -201,7 +201,7 @@ const migrations = {
 
     return initial
   },
-  10: initial => {  // Add Optimisim to persisted networks
+  10: initial => {  // Add Optimism to persisted networks
     // if (!initial.main.networks.ethereum[10]) {
     initial.main.networks.ethereum[10] = {
       id: 10,
@@ -222,6 +222,78 @@ const migrations = {
       },
       on: false
     }
+    return initial
+  },
+  11: initial => { 
+    // Convert all Ξ symbols to ETH
+    Object.keys(initial.main.networks.ethereum).forEach(chain => {
+      if (initial.main.networks.ethereum[chain].symbol === 'Ξ') {
+        initial.main.networks.ethereum[chain].symbol = 'ETH'
+      }
+    })
+    // Convert all accounts to new creation type system
+    Object.keys(initial.main.accounts).forEach(account => {
+      try {
+        if (!initial.main.accounts[account].created || initial.main.accounts[account].created === -1) {
+          initial.main.accounts[account].created = 'new:' + Date.now()
+        } else {
+          initial.main.accounts[account].created = initial.main.accounts[account].created + ''
+          const [block, localTime] = initial.main.accounts[account].created.split(':')
+          if (!block) {
+            initial.main.accounts[account].created = 'new:' + Date.now()
+          } else if (!localTime) {
+            initial.main.accounts[account].created = block + ':' + Date.now()
+          }
+        }
+  
+        let [block, localTime] = initial.main.accounts[account].created.split(':')
+        if (block.startsWith('0x')) block = parseInt(block, 'hex')
+        if (block > 12726312) block = 12726312
+        initial.main.accounts[account].created = block + ':' + localTime 
+      } catch (e) {
+        log.error('Migration error', e)
+        delete initial.main.accounts[account]
+      }
+    })
+
+    return initial
+  },
+  12: (initial) => {
+    // Update old smart accounts
+    Object.keys(initial.main.accounts).forEach(id => {
+      if (initial.main.accounts[id].smart) {
+        initial.main.accounts[id].smart.actor = initial.main.accounts[id].smart.actor.address
+      }
+    })
+
+    return initial
+  },
+  13: initial => {
+    const defaultMeta = {
+      gas: {
+        price: {
+          selected: 'standard',
+          levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+        }
+      }
+    }
+
+    // ensure all network configurations have corresponding network meta
+    Object.keys(initial.main.networks.ethereum).forEach(networkId => {
+      if (initial.main.networksMeta.ethereum[networkId]) {
+        const gasSettings = initial.main.networksMeta.ethereum[networkId].gas || { price: {} }
+
+        initial.main.networksMeta.ethereum[networkId].gas = {
+          price: {
+            selected: gasSettings.price.selected || defaultMeta.gas.price.selected,
+            levels: gasSettings.price.levels || defaultMeta.gas.price.levels,
+          }
+        }
+      } else {
+        initial.main.networksMeta.ethereum[networkId] = { ...defaultMeta }
+      }
+    })
+
     return initial
   }
 }

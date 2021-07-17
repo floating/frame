@@ -14,7 +14,8 @@ class SignerStatus extends React.Component {
     //   }
     // })
     this.state = {
-      expand: false
+      expand: false,
+      shake: false
     }
     this.statusRef = React.createRef()
     this.inputRef = React.createRef()
@@ -44,12 +45,21 @@ class SignerStatus extends React.Component {
   //   document.removeEventListener('mousedown', this.clickListener.bind(this))
   // }
 
+  shake () {
+    this.setState({ shake: true })
+    setTimeout(() => {
+      this.setState({ shake: false })
+    }, 1200)
+  }
+
   unlockChange (e) {
     this.setState({ unlockInput: e.target.value })
   }
 
   unlockSubmit (e) {
-    link.rpc('unlockSigner', this.props.signer, this.state.unlockInput, () => {})
+    link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err) => {
+      if (err) this.shake()
+    })
   }
 
   trezorPin (num) {
@@ -57,7 +67,7 @@ class SignerStatus extends React.Component {
   }
 
   submitPin () {
-    link.rpc('trezorPin', this.props.signer, this.state.tPin, () => {})
+    link.rpc('trezorPin', this.props.signer.id, this.state.tPin, () => {})
     this.setState({ tPin: '' })
   }
 
@@ -92,23 +102,25 @@ class SignerStatus extends React.Component {
   }
 
   render () {
-    const signer = this.props.signer ? this.store('main.signers', this.props.signer) : null
+    const { shake } = this.state
 
-    return signer && signer && signer.status === 'locked' ? (
-      <div className='signerStatus' ref={this.statusRef}>
-        <div className='signerStatusTop'>
-          <div className='signerStatusTopArrow' />
-        </div>
-        <div className='signerStatusMain'>
-          <div className='signerUnlockWrap'>
-            <div className='signerUnlockHeader'>The signer for this account is locked</div>
-            <input ref={this.inputRef} className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                this.unlockSubmit()
-              }
-            }} />
-            <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
+    return this.props.signer && this.props.signer.id && this.props.signer.status === 'locked' ? (
+      <div className={shake ? 'signerStatus headShake' : 'signerStatus'} ref={this.statusRef}>
+        <div className='signerStatusWrap'>
+          <div className='signerStatusTop'>
+            <div className='signerStatusTopArrow' />
+          </div>
+          <div className='signerStatusMain'>
+            <div className='signerUnlockWrap'>
+              <div className='signerUnlockHeader'>The signer for this account is locked</div>
+              <input ref={this.inputRef} className='signerUnlockInput' type='password' value={this.state.unlockInput} onChange={this.unlockChange.bind(this)} onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  this.unlockSubmit()
+                }
+              }} />
+              <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
+            </div>
           </div>
         </div>
       </div>

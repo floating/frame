@@ -63,35 +63,27 @@ class AddAragon extends React.Component {
     this.focusActive()
   }
 
-  actorAccount (actorId) {
-    this.setState({ actorId })
-    this.next()
-  }
+  // actorAccount (actorId) {
+  //   this.setState({ actorId })
+  //   this.next()
+  // }
 
   capitalize (s) {
     if (typeof s !== 'string') return ''
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
 
-  actorAddress (actorAddress, actorIndex) {
+  actorAccount  (actorAddress) {
     link.rpc('resolveAragonName', this.state.name, (err, dao) => {
       this.next()
       if (err) return this.setState({ status: err, error: true })
       const aragonAccount = {
-        id: dao.apps.kernel.proxyAddress,
-        index: 0,
-        addresses: [dao.apps.agent.proxyAddress], // Agent Address
+        address: dao.apps.agent.proxyAddress, // Agent Address
         type: 'aragon',
-        name: this.capitalize(dao.name) + ' DAO',
-        ens: dao.ens,
-        network: dao.network,
+        name: dao.name + ' DAO',
         smart: {
           type: 'aragon',
-          actor: { // Reference to Frame account that will act on behalf of the agent
-            id: this.state.actorId,
-            index: actorIndex,
-            address: actorAddress // External Signer
-          },
+          actor: actorAddress, // Reference to Frame account that will act on behalf of the agent
           dao: dao.apps.kernel.proxyAddress, // DAO Address
           agent: dao.apps.agent.proxyAddress // Agent Address
         }
@@ -111,21 +103,37 @@ class AddAragon extends React.Component {
 
   accountSort (a, b) {
     const accounts = this.store('main.accounts')
-    a = accounts[a].created
-    b = accounts[b].created
-    if (a === -1 && b !== -1) return -1
-    if (a !== -1 && b === -1) return 1
-    if (a > b) return -1
-    if (a < b) return 1
-    return 0
+    try {
+      let [aBlock, aLocal] = accounts[a].created.split(':')
+      let [bBlock, bLocal] = accounts[b].created.split(':')
+  
+      aLocal = parseInt(aLocal)
+      bLocal = parseInt(bLocal)
+  
+      if (aBlock === 'new' && bBlock !== 'new') return -1
+      if (bBlock !== 'new' && aBlock === 'new') return 1
+      if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
+  
+      aBlock = parseInt(aBlock)
+      bBlock = parseInt(bBlock)
+  
+      if (aBlock > bBlock) return -1
+      if (aBlock < bBlock) return -1
+      if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
+
+      return 0
+    } catch (e) {
+      log.error(e)
+      return 0
+    }
   }
 
   accountFilter (id) {
     // Need to migrate accounts to use network type
-    const network = this.store('main.currentNetwork.id')
+    // const network = this.store('main.currentNetwork.id')
     const account = this.store('main.accounts', id)
     if (account.type === 'aragon') return false
-    return account.network === network
+    return true 
   }
 
   restart () {
@@ -178,11 +186,14 @@ class AddAragon extends React.Component {
                       .sort((a, b) => this.accountSort(a, b))
                       .map(id => {
                         const account = this.store('main.accounts', id)
-                        return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>{account.name}</div>
+                        return <div key={id} className='addAccountItemOptionListItem' onMouseDown={e => this.actorAccount(id)}>
+                          <div className='actingAccountAddress'>{id ? id.substring(0, 8) : ''}{svg.octicon('kebab-horizontal', { height: 16 })}{id ? id.substr(id.length - 6) : ''}</div>
+                          <div className='actingAccountTag'>{account.name}</div>
+                        </div>
                       })}
                   </div>
                 </div>
-                <div className='addAccountItemOptionSetupFrame'>
+                {/* <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Choose acting address</div>
                   <div className='addAccountItemOptionList'>
                     {(this.store('main.accounts', this.state.actorId, 'addresses') || []).map((a, i) => {
@@ -193,7 +204,7 @@ class AddAragon extends React.Component {
                       )
                     })}
                   </div>
-                </div>
+                </div> */}
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                   {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}

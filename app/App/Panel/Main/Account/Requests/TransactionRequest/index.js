@@ -59,16 +59,18 @@ class Time extends React.Component {
 class TransactionRequest extends React.Component {
   constructor (props, context) {
     super(props, context)
+    this.chain = { 
+      type: 'ethereum', 
+      id: parseInt(props.req.data.chainId, 'hex').toString()
+    }
     this.state = { allowInput: false, dataView: false }
     setTimeout(() => {
       this.setState({ allowInput: true })
     }, 1700)
   }
 
-  copyAddress (e) {
-    e.preventDefault()
-    e.target.select()
-    document.execCommand('Copy')
+  copyAddress (data) {
+    link.send('tray:clipboardData', data)
     this.setState({ copied: true })
     setTimeout(_ => this.setState({ copied: false }), 1000)
   }
@@ -132,8 +134,8 @@ class TransactionRequest extends React.Component {
     if (success) requestClass += ' signerRequestSuccess'
     if (req.status === 'confirmed') requestClass += ' signerRequestConfirmed'
     else if (error) requestClass += ' signerRequestError'
-    const layer = this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'layer')
-    const nativeCurrency = this.store('main.networksMeta.ethereum', parseInt(req.data.chainId, 'hex'), 'nativeCurrency')
+    const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
+    const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
     const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
@@ -144,8 +146,7 @@ class TransactionRequest extends React.Component {
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
-    const { type, id } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
+    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
     const txMeta = { replacement: false, possible: true, notice: '' }
     // TODO
     // if (signer locked) {
@@ -175,21 +176,28 @@ class TransactionRequest extends React.Component {
     let nonce = parseInt(req.data.nonce, 'hex')
     if (isNaN(nonce)) nonce = 'TBD'
 
+    const otherChain = (this.chain.id !== this.store('main.currentNetwork.id')) && !this.state.allowOtherChain
+
     let metaChainClass = 'requestMetaChain'
-    if (layer === 'testnet') metaChainClass += ' requestMetaChainTestnet'
-    if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
-    if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
-    if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
+    if (this.chain.id !== this.store('main.currentNetwork.id')) metaChainClass += ' requestMetaChainTestnet'
+    // if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
+    // if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
+    // if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <div className='requestMeta'>
-          <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks.ethereum', parseInt(req.data.chainId, 'hex'), 'name')}</div>
+          <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks', this.chain.type, this.chain.id, 'name')}</div>
           <div className='requestMetaOrigin'>{req.origin}</div>
         </div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-            {req.warning && status !== 'error' ? (
+            {(req.warning || otherChain) && !status &&
+            status !== 'error' && 
+            status !== 'pending' && 
+            status !== 'verifying' && 
+            !status &&
+            mode !== 'monitor' ? (
               <div className='approveTransactionWarning'>
                 <div className='approveTransactionWarningOptions'>
                   <div
@@ -213,7 +221,13 @@ class TransactionRequest extends React.Component {
                   </div>
                   <div
                     className='approveTransactionWarningProceed'
-                    onMouseDown={() => this.removeWarning(this.props.req.handlerId)}
+                    onMouseDown={() => {
+                      if (otherChain) {
+                        this.setState({ allowOtherChain: true})
+                      } else {
+                        this.removeWarning(this.props.req.handlerId)
+                      }
+                    }}
                   >Proceed
                   </div>
                 </div>
@@ -224,8 +238,8 @@ class TransactionRequest extends React.Component {
                   <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
                     {svg.alert(32)}
                   </div>
-                  <div className='approveTransactionWarningTitle'>estimated to fail</div>
-                  <div className='approveTransactionWarningMessage'>{req.warning}</div>
+                  <div className='approveTransactionWarningTitle'>{otherChain ? 'chain warning' : 'estimated to fail'} </div>
+                  <div className='approveTransactionWarningMessage'>{otherChain ? 'transaction is not on currently selected chain' : req.warning}</div>
                 </div>
               </div>
             ) : null}
@@ -258,9 +272,9 @@ class TransactionRequest extends React.Component {
                           onMouseDown={() => {
                             if (req && req.tx && req.tx.hash) {
                               if (this.store('main.mute.explorerWarning')) {
-                                link.send('tray:openExplorer', req.tx.hash)
+                                link.send('tray:openExplorer', req.tx.hash, this.chain)
                               } else {
-                                this.store.notify('openExplorer', { hash: req.tx.hash })
+                                this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
                               }
                             }
                           }}
@@ -331,13 +345,13 @@ class TransactionRequest extends React.Component {
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
                     <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
-                      <div className='monitorValue'><span>Ξ</span>{value}</div>
+                      <div className='monitorValue'><span>{currentSymbol}</span>{value}</div>
                       <div className='monitorArrow'>{svg.longArrow(13)}</div>
                       {toAddress ? (
                         <div className='monitorTo'>
-                          {toAddress.substring(0, 6)}
+                          {toAddress.substring(0, 5)}
                           {svg.octicon('kebab-horizontal', { height: 14 })}
-                          {toAddress.substr(toAddress.length - 4)}
+                          {toAddress.substr(toAddress.length - 3)}
                         </div>
                       ) : (
                         <div className='monitorDeploy'>deploy</div>
@@ -390,8 +404,8 @@ class TransactionRequest extends React.Component {
                       <div className='transactionToAddress'>
                         <div className='transactionToAddressLarge'>
                           {req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {req.data.to.substr(req.data.to.length - 11)}</div>
-                        <div className='transactionToAddressFull'>
-                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 10 })}</span> : req.data.to}
+                        <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
+                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
                         </div>
                       </div>
                       <div className='transactionToSub'>Send To</div>
@@ -415,7 +429,7 @@ class TransactionRequest extends React.Component {
                 if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
               }}
             >
-              <div className='requestDeclineButton'>Decline</div>
+              <div className='requestDeclineButton requestScaleButtonDecline'>Decline</div>
             </div>
             <div
               className='requestSign' onMouseDown={() => {
@@ -428,7 +442,7 @@ class TransactionRequest extends React.Component {
                 }
               }}
             >
-              <div className='requestSignButton'> Sign </div>
+              <div className='requestSignButton requestScaleButtonSign'> Sign </div>
             </div>
           </div>
         ) : null}

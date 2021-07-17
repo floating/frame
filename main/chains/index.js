@@ -288,31 +288,27 @@ class Chains extends EventEmitter {
             this.connections[type][chainId] = new ChainConnection(type, chainId)
 
             this.connections[type][chainId].on('connect', (...args) => {
+              this.emit(`connect:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === chainId) {
-                this.emit('connect', ...args)
-              }
+              if (current.type === type && current.id === chainId) this.emit('connect', ...args)
             })
 
             this.connections[type][chainId].on('close', (...args) => {
+              this.emit(`close:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === chainId) {
-                this.emit('close', ...args)
-              }
+              if (current.type === type && current.id === chainId) this.emit('close', ...args)
             })
 
             this.connections[type][chainId].on('data', (...args) => {
+              this.emit(`data:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === chainId) {
-                this.emit('data', ...args)
-              }
+              if (current.type === type && current.id === chainId) this.emit('data', ...args)
             })
 
             this.connections[type][chainId].on('error', (...args) => {
+              this.emit(`error:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === chainId) {
-                this.emit('error', ...args)
-              }
+              if (current.type === type && current.id === chainId) this.emit('error', ...args)
             })
 
           } else if (!chainConfig.on && this.connections[type][chainId]) {
@@ -343,6 +339,15 @@ class Chains extends EventEmitter {
     }
     // this.connect(store('main.networks', type, id, 'connection'))
     // store('main.networks', type, chainId, 'connection')
+  }
+
+  syncDataEmit (emitter) {
+    this.syncDataEmitter = emitter
+  }
+
+  emit(type, ...args) {
+    if (this.syncDataEmitter && type.startsWith('data:')) this.syncDataEmitter.emit(type, ...args)
+    super.emit(type, ...args)
   }
 }
 

@@ -21,7 +21,11 @@ class Provider extends EventEmitter {
     this.nonce = {}
     this.connected = false
     this.connection = chains
-    this.connection.on('connect', () => { this.connected = true })
+    this.connection.syncDataEmit(this)
+    this.connection.on('connect', () => { 
+      this.connected = true
+      this.emit('connect')
+    })
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
     this.connection.on('error', err => log.error(err))
@@ -71,21 +75,20 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
   }
 
-  getNetVersion (payload, res) {
+  getNetVersion (payload, res, targetChain) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
+      // if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
-    })
+    }, targetChain)
   }
 
-  getChainId (payload, res) {
+  getChainId (payload, res, targetChain) {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      // const id = parseInt(response.result, 'hex').toString()
-      if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
+      // if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
-    })
+    }, targetChain)
   }
 
   declineRequest (req) {
@@ -227,7 +230,7 @@ class Provider extends EventEmitter {
               }
             }, {
               type: 'ethereum',
-              id: req.data ? parseInt(req.data.chainId, 'hex') : undefined
+              id: parseInt(req.data.chainId, 'hex').toString()
             })
           }
           const broadcastTimer = setInterval(() => cast(), 1000)
@@ -241,7 +244,15 @@ class Provider extends EventEmitter {
     log.info('approveRequest', req)
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
-      if (response.error) return cb(response.error)
+      if (response.error) {
+        if (this.handlers[req.handlerId]) {
+          this.handlers[req.handlerId](response)
+          delete this.handlers[req.handlerId]
+        }
+
+        return cb(response.error)
+      }
+
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
       this.signAndSend(updatedReq, cb)
     })
@@ -254,31 +265,36 @@ class Provider extends EventEmitter {
     return rawTx
   }
 
-  getGasPrice (rawTx, res) {
-    const chain = parseInt(rawTx.chainId, 'hex').toString()
-    const network = store('main.currentNetwork')
+  getGasPrice (rawTx) {
+    const chain = {
+      type: 'ethereum',
+      id: parseInt(rawTx.chainId, 'hex').toString()
+    }
 
-    if (chain !== network.id) throw new Error('Transaction Error: Network Mismatch')
-
-    const { levels, selected } = store('main.networksMeta', network.type, network.id, 'gas.price')
-
+    const { levels, selected } = store('main.networksMeta', chain.type, chain.id, 'gas.price')
     if (!levels[selected]) throw new Error('Unable to determine gas')
 
     return levels[selected]
   }
-
+  
   getGasEstimate (rawTx, res) {
-    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, res)
+    const targetChain = {
+      type: 'ethereum',
+      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
+    }
+    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, res, targetChain)
   }
 
   getNonce (rawTx, res) {
+    const targetChain = {
+      type: 'ethereum',
+      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
+    }
+
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
       if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
       res(response)
-    }, {
-      type: 'ethereum',
-      id: rawTx.chainId ? parseInt(rawTx.chainId, 'hex') : undefined
-    })
+    }, targetChain)
   }
 
   fillDone (fullTx, res) {
@@ -411,13 +427,11 @@ class Provider extends EventEmitter {
     })
   }
 
-  send (payload, res = () => {}) {
+  send (payload, res = () => {}, targetChain) {
     if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_requestAccounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
-    if (payload.method === 'net_version') return this.getNetVersion(payload, res)
-    if (payload.method === 'eth_chainId') return this.getChainId(payload, res)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
     if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
@@ -425,10 +439,22 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3' || payload.method === 'eth_signTypedData_v4') return this.signTypedData(payload, res)
     if (payload.method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
+
+    // Connection dependant methods need to pass targetChain
+    if (payload.method === 'net_version') return this.getNetVersion(payload, res, targetChain)
+    if (payload.method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
+
     // Delete custom data
     delete payload._origin
-    this.connection.send(payload, res)
+
+    // Pass everything else to our connection
+    this.connection.send(payload, res, targetChain)
   }
+
+  emit(type, ...args) {
+    proxy.emit(type, ...args)
+    super.emit(type, ...args)
+  } 
 }
 
 const provider = new Provider()
@@ -442,9 +468,9 @@ store.observer(() => {
   }
 })
 
-proxy.on('send', (payload, cd) => provider.send(payload, cd))
+proxy.on('send', (payload, cd, targetChain) => provider.send(payload, cd, targetChain))
 proxy.ready = true
-provider.on('data', data => proxy.emit('data', data))
+// provider.on('data', data => proxy.emit('data', data))
 
 module.exports = provider
 

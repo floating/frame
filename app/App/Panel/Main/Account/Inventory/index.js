@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
+import svg from '../../../../../../resources/svg'
 
 class Balances extends React.Component {
   constructor (...args) {
@@ -30,7 +31,14 @@ class Balances extends React.Component {
     const collections = Object.keys(inventory || {})
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader'>{'Inventory'}</div>  
+        <div className='moduleHeader'>
+          {'Inventory'}
+          {this.props.expanded ? (
+            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
+              {svg.close(22)}
+            </div>
+          ) : null}
+        </div>  
         <div>
           {collections.length ? collections.map(k => {
             return (

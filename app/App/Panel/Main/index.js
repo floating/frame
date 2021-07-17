@@ -25,30 +25,33 @@ class Main extends React.Component {
   }
 
   accountSort (accounts, a, b) {
-    a = accounts[a].created
-    b = accounts[b].created
-    if (a === -1 && b !== -1) return -1
-    if (a !== -1 && b === -1) return 1
-    if (a > b) return -1
-    if (a < b) return 1
-    return 0
+    try {
+      let [aBlock, aLocal] = accounts[a].created.split(':')
+      let [bBlock, bLocal] = accounts[b].created.split(':')
+  
+      aLocal = parseInt(aLocal)
+      bLocal = parseInt(bLocal)
+  
+      if (aBlock === 'new' && bBlock !== 'new') return -1
+      if (bBlock !== 'new' && aBlock === 'new') return 1
+      if (aBlock === 'new' && bBlock === 'new') return aLocal >= bLocal ? 1 : 0
+  
+      aBlock = parseInt(aBlock)
+      bBlock = parseInt(bBlock)
+  
+      if (aBlock > bBlock) return -1
+      if (aBlock < bBlock) return -1
+      if (aBlock === bBlock) return aLocal >= bLocal ? 1 : 0
+
+      return 0
+    } catch (e) {
+      log.error(e)
+      return 0
+    }
   }
 
   render () {
     const accounts = this.store('main.accounts')
-    const network = this.store('main.currentNetwork.id')
-    const type = this.store('main.currentNetwork.type')
-    // Object.keys(this.store('main.accounts')).forEach(id => {
-    //   const account = this.store('main.accounts', id)
-    //   if (account.network === network) accounts[id] = account
-    // })
-    // const signers = {}
-    // Object.keys(this.store('main.signers')).forEach(id => {
-    //   const signer = this.store('main.signers', id)
-    //   if (signer.network === network) signers[id] = signer
-    // })
-
-    const untethered = [] // Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     const current = this.store('selected.current')
     const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')

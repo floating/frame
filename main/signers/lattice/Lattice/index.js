@@ -133,8 +133,11 @@ class Lattice extends Signer {
     this.latticeObs.remove()
     this.closed = true
     store.removeSigner(this.id)
-    store.removeLattice(this.deviceId)
     super.close()
+  }
+
+  delete () {
+    store.removeLattice(this.deviceId)
   }
 
   async wait (time) {
@@ -309,7 +312,7 @@ class Lattice extends Signer {
 
   async signTransaction (index, rawTx, cb) {
     try {
-      if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
+      // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
       const unsignedTxn = {
         nonce: utils.hexToNumber(rawTx.nonce),
         gasPrice: utils.hexToNumber(rawTx.gasPrice),
@@ -340,7 +343,8 @@ class Lattice extends Signer {
       }, { common })
       return cb(null, '0x' + tx.serialize().toString('hex'))
     } catch (err) {
-      return cb(new Error(err))
+      log.error(err)
+      return cb(new Error('Error signing transaction'))
     }
   }
 }

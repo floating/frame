@@ -1,9 +1,9 @@
 const log = require('electron-log')
 
 const balances = require('./balances')
-const rates = require('./rates')
+const rates = require('./rates').default
 const inventory = require('./inventory')
-const loadStaticData = require('./staticData')
+const loadStaticData = require('./staticData').default
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
 log.transports.console.level = process.env.LOG_WORKER ? 'debug' : false
@@ -26,8 +26,8 @@ function chainBalanceScan (address) {
     .catch(err => log.error('chain balance scan error', err))
 }
 
-function ratesScan (symbols) {
-  rates(symbols)
+function ratesScan (symbols, chainId) {
+  rates(symbols, chainId)
     .then(loadedRates => process.send({ type: 'rates', rates: loadedRates }))
     .catch(err => log.error('rates scan error', err))
 }
@@ -70,5 +70,3 @@ process.on('message', message => {
   const args = message.args || []
   messageHandler[message.command](...args)
 })
-
-process.send({ type: 'ready' })

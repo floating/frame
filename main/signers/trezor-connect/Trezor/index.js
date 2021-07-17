@@ -9,9 +9,9 @@ const { v5: uuid } = require('uuid')
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 // Base Paths
-const BASE_PATH_STANDARD = 'm/44\'/60\'/0\'/0'
-const BASE_PATH_LEGACY = 'm/44\'/60\'/0'
-const BASE_PATH_TESTNET = 'm/44\'/1\'/0\'/0'
+const BASE_PATH_STANDARD = "m/44'/60'/0'/0"
+const BASE_PATH_LEGACY = "m/44'/60'/0'"
+const BASE_PATH_TESTNET = "m/44'/1'/0'/0"
 
 class Trezor extends Signer {
   constructor (device, signers) {
@@ -26,7 +26,7 @@ class Trezor extends Signer {
     this.basePath = () => {
       if (this.derivationPath === 'testnet') {
         return BASE_PATH_TESTNET
-      } else if (this.derivationPath === 'legacy')  {
+      } else if (this.derivationPath === 'legacy') {
         return BASE_PATH_LEGACY
       } else {
         return BASE_PATH_STANDARD
@@ -125,7 +125,7 @@ class Trezor extends Signer {
       if (timeout) return
       if (err) {
         if (err === 'Device call in progress' && attempt < 5) {
-          setTimeout(() => this.verifyAddress(index, current, display, cb, ++attempt), 500)
+          setTimeout(() => this.verifyAddress(index, current, display, cb, ++attempt), 1000 * (attempt + 1))
         } else {
           log.info('Verify Address Error: ')
           // TODO: Error Notification
@@ -210,7 +210,7 @@ class Trezor extends Signer {
   }
 
   signTransaction (index, rawTx, cb) {
-    if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
+    // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
     const trezorTx = {
       nonce: this.normalize(rawTx.nonce),
       gasPrice: this.normalize(rawTx.gasPrice),

@@ -147,8 +147,8 @@
     border-radius 19px
     position absolute 
     top -2px
-    left 1px
-    right 1px
+    left 0px
+    right 0px
     box-sizing border-box
     pointer-events none
     z-index 5000000
@@ -465,27 +465,27 @@
   background var(--ghostD)
   box-shadow cardDrop // , 0px 2px 2px var(--thin)
   transform translateY(-180px)
-  zIndex 1
+  zIndex 3
   height 31px
-  left 3px
-  right 3px
+  left 0px
+  right 0px
   padding 0px 0px
   // transition var(--standardVibe)
 
   .txFeeUpdateRealtime
     position absolute
-    top 60px
+    top 0px
     left 0px
     right 0px
-    // bottom 65px
-    min-height 202px
+    bottom 0px
+    // min-height 202px
     z-index 1000000
     pointer-events none
-    z-index 20
+    z-index 2
     color var(--good)
     overflow hidden
     transition var(--standardVibe)
-    background var(--ghostD)
+    // background var(--ghostD)
     transform translateY(-100px)
     border-radius 6px
 
@@ -496,9 +496,11 @@
       right -200px
       left -200px
       color var(--good)
-      opacity 0.3
-      background-image url('./App/Panel/Main/Account/Requests/style/wave.svg')
+      opacity 0.1
+      // TODO: This only works for dark colorway currently
+      // background-image url('./App/Panel/Main/Account/Requests/style/wave.svg')
       background-position 0px 0px
+      // background blue
 
       .txFeeUpdateRealtimeTitle
         position absolute
@@ -595,6 +597,7 @@
     display flex
     justify-content space-between
     align-items center
+    z-index 20
     // transform translateY(-200px)
     // transition-delay 0s
 
@@ -630,9 +633,11 @@
     bottom 6px
     height 48px
     // transform translateY(1000px)
-    opacity 1
+    opacity 0
     border-radius 6px
     border 1px solid var(--ghostB)
+    background var(--ghostD)
+    z-index 2
 
     .txFeeSummaryValue
       font-size 20px
@@ -785,8 +790,8 @@
     text-transform uppercase
 
 .txFeeExpanded
-  transform translateY(-32px)
-  height 349px
+  transform translateY(-20px)
+  height 350px
   z-index 20000
   border-radius 8px
 
@@ -796,6 +801,10 @@
 
   .txFeeUpdateRealtime
     transform translateY(0px)
+
+  .txFeeSummary
+    transition var(--standard)
+    opacity 1
   
   .txFeeSummaryHover     
     // background var(--outerspace)
@@ -843,23 +852,46 @@
     svg
       transform rotate(-45deg)
 
+.light
+  .approveTransactionWarning:before
+    content ''
+    position absolute 
+    top 0
+    left 0
+    right 0
+    bottom 0
+    background-image url('./App/Panel/Main/Account/Requests/style/wave.svg')
+    opacity 0.2
+    border-radius 8px
+
+.dark
+  .approveTransactionWarning:before
+    content ''
+    position absolute 
+    top 0
+    left 0
+    right 0
+    bottom 0
+    background-image url('./App/Panel/Main/Account/Requests/style/waveDark.svg')
+    opacity 0.2
+    border-radius 8px
+
 .approveTransactionWarning
   position absolute 
-  top 61px
+  top 53px
   right 0
-  bottom 0
+  bottom 19px
   left 0
   z-index 200000
-  border-bottom-left-radius 16px
-  border-bottom-right-radius 16px
-  background-image url('./App/Panel/Main/Account/Requests/style/wave.svg')
+  border-radius 8px
+  background var(--ghostX02)
   background-position 0px 0px
 
   .approveTransactionWarningOptions
     position absolute 
-    bottom 162px
-    right 3px
-    left 3px
+    bottom 160px
+    right 1px
+    left 1px
     height 32px
     border-radius 16px
     z-index 20000
@@ -867,7 +899,6 @@
     text-transform uppercase
     font-weight 400
     background var(--ghostD)
-    box-shadow cardDrop, 0px 4px 6px var(--thin), 0px -2px 6px var(--thin)
 
     .approveTransactionWarningReject
       position absolute 
@@ -879,6 +910,9 @@
       text-align center
       box-sizing border-box
       color var(--bad)
+      cursor pointer
+      *
+        pointer-events none
 
     .approveTransactionWarningPreview
       position absolute 
@@ -910,6 +944,9 @@
       text-align center
       box-sizing border-box
       color var(--good)
+      cursor pointer
+      *
+        pointer-events none
 
   .approveTransactionWarningFill
     position absolute 
@@ -919,8 +956,7 @@
     bottom 0px
     background var(--ghostC)
     transition var(--standard)
-    border-bottom-left-radius 16px
-    border-bottom-right-radius 16px
+    border-radius 8px
 
     .approveTransactionWarningIcon
       position absolute 
@@ -930,7 +966,7 @@
       display flex
       justify-content center
       align-items center
-      color var(--doubleThick)
+      color var(--moon)
 
     .approveTransactionWarningIconLeft
       left 0
@@ -960,16 +996,16 @@
       text-align center
       font-size 18px
       position absolute
-      bottom 10px
-      left 9px
-      right 9px
-      height 142px
+      bottom 4px
+      left 4px
+      right 4px
+      height 146px
       display flex
+      padding 0px 20px
       flex-direction column
       justify-content center
       font-family FiraCode, mono-spaced
       transition var(--standard)
       background var(--ghostD)
-      box-shadow 0px 3px 6px var(--thick)
       border-radius 8px
       overflow hidden

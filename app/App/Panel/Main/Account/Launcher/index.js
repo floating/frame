@@ -2,6 +2,9 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
+import sushi from './logo.png'
+import oneInch from './1inch.png'
+import uniswap from './uniswap.png'
 
 class Launcher extends React.Component {
   constructor (...args) {
@@ -46,17 +49,14 @@ class Launcher extends React.Component {
       <div ref={this.moduleRef} className='launcher'>
         {this.state.l ? (
           <div className='launcherTiles'>
-            <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'wealdtech.eth') }>
-              {svg.wallet(15)}
-            </div>
-            <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'almonit.eth') }>
-              {svg.wallet(15)}
+            <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'uniswap.eth') }>
+              <img src={uniswap} />
             </div>
             <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', '1inch.eth') }>
-              {svg.wallet(15)}
+              <img src={oneInch} />
             </div>
             <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'sushi.frame.eth')}>
-              {svg.wallet(15)}
+              <img src={sushi} />
             </div>
           </div>
         ) : null}

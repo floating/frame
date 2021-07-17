@@ -85,7 +85,7 @@ const initial = {
   },
   dash: {
     type: 'signers',
-    showing: true
+    showing: false
   },
   flow: {},
   dapps: {},
@@ -169,7 +169,7 @@ const initial = {
     menubarGasPrice: main('menubarGasPrice', false),
     lattice: main('lattice', {}),
     latticeSettings: {
-      accountLimit: main('latticeSettings.accountLimit', 4),
+      accountLimit: main('latticeSettings.accountLimit', 5),
       endpointMode: main('latticeSettings.endpointMode', 'default'),
       endpointCustom: main('latticeSettings.endpointCustom', ''),
       suffix: main('latticeSettings.suffix', '')
@@ -436,7 +436,7 @@ const initial = {
         }
       }
     }),
-    networksMeta: {
+    networksMeta: main('networksMeta', {
       ethereum: {
         1: {
           gas: {
@@ -503,7 +503,7 @@ const initial = {
           }
         }
       }
-    },
+    }),
     ipfs: {},
     openDapps: [],
     dapp: {

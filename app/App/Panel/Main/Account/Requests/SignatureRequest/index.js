@@ -57,7 +57,7 @@ class TransactionRequest extends React.Component {
           <div className='approveRequest'>
             <div className='approveTransactionPayload'>
               {notice ? (
-                <div className='requestNotice'>
+                <div className='requestCover'>
                   {(_ => {
                     if (status === 'pending') {
                       return (

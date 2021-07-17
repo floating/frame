@@ -33,9 +33,6 @@ const notify = (title, body, action) => {
   setTimeout(() => note.show(), 1000)
 }
 
-// Until omniconnect, mainnet connection
-const mainnetProvider = provider('wss://mainnet.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b')
-
 const FEE_MAX = 2 * 1e18
 
 class Accounts extends EventEmitter {
@@ -49,10 +46,6 @@ class Accounts extends EventEmitter {
     })
 
     dataScanner.start(Object.keys(this.accounts))
-
-    windows.events.on('tray:hide', () => {
-      dataScanner.setActiveAddress(undefined)
-    })
   }
 
   list () {
@@ -88,45 +81,37 @@ class Accounts extends EventEmitter {
 
   // Public
   addAragon (account, cb = () => {}) {
-    if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
-    account.network = account.network || store('main.currentNetwork.id')
-    account.id = this.fingerprint(account.network, account.addresses)
+    // if (account.addresses.length === 0) return cb(new Error('No addresses, will not add account'))
+    // account.network = account.network || store('main.currentNetwork.id')
+    // account.id = this.fingerprint(account.network, account.addresses)
     account.options = account.options || {}
-    const existing = store('main.accounts', account.id)
-    if (existing && existing.network === account.network) return cb(null, existing) // Account already exists...
+    const existing = store('main.accounts', account.address)
+    if (existing) return cb(null, existing) // Account already exists...
     log.info('Aragon account not found, creating account')
     account.options.type = 'aragon'
-    this.accounts[account.id] = new Account(account, this)
-    cb(null, this.accounts[account.id].summary())
+    this.accounts[account.address] = new Account(account, this)
+    cb(null, this.accounts[account.address].summary())
   }
 
   async add (address = '', options = {}, cb = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
-    // const network = store('main.currentNetwork.id')
-    // const id = this.fingerprint(network, addresses)
     const account = store('main.accounts', address)
     if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
-    let blockNumber = -1
-    try {
-      blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
-    } catch (e) {
-      log.err(e)
-    }
-    log.info('Account creation blockNumber', blockNumber)
-    this.accounts[address] = new Account({ address, created: blockNumber, options }, this)
+    const created = 'new:' + Date.now()
+    this.accounts[address] = new Account({ address, created, options }, this)
   }
 
-  async getMainnetBlockHeight (cb) {
-    let blockNumber = -1
-    try {
-      blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
-    } catch (e) {
-      log.err(e)
-    }
-    return blockNumber
-  }
+  // async getMainnetBlockHeight (cb) {
+  //   let blockNumber = -1
+  //   try {
+  //     blockNumber = await mainnetProvider.request({ method: 'eth_blockNumber' })
+  //   } catch (e) {
+  //     log.err(e)
+  //   }
+  //   return blockNumber
+  // }
 
   rename (id, name) { this.accounts[id].rename(name) }
 
@@ -154,10 +139,10 @@ class Accounts extends EventEmitter {
     }
   }
 
-  checkBetterGasPrice () {
-    const { id, type } = store('main.currentNetwork')
+  checkBetterGasPrice(targetChain) {
+    const { id, type } = targetChain
     const gas = store('main.networksMeta', type, id, 'gas.price')
-    if (gas && this.current() && this.current().network === id && gas.selected !== 'custom') {
+    if (gas && this.current() && gas.selected !== 'custom') {
       Object.keys(this.current().requests).forEach(id => {
         const req = this.current().requests[id]
         if (req.type === 'transaction' && req.data.gasPrice) {
@@ -178,11 +163,11 @@ class Accounts extends EventEmitter {
       if (!this.current().requests[id]) return reject(new Error('Could not find request'))
       if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
       const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
-      const network = store('main.currentNetwork')
-      const { levels } = store('main.networksMeta', network.type, network.id, 'gas.price')
+      const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 'hex').toString()}
+      const { levels } = store('main.networksMeta', targetChain.type, targetChain.id, 'gas.price')
 
       // Set the gas default to asap
-      store.setGasDefault(network.type, network.id, 'asap', levels.asap)
+      store.setGasDefault(targetChain.type, targetChain.id, 'asap', levels.asap)
 
       const tx = {
         id: 1,
@@ -205,123 +190,155 @@ class Accounts extends EventEmitter {
       proxyProvider.emit('send', tx, (res = {}) => {
         if (res.error) return reject(new Error(res.error))
         resolve()
-      })
+      }, targetChain)
     })
   }
 
-  async confirmations (id, hash) {
+  async confirmations (account, id, hash, targetChain) {
     return new Promise((resolve, reject) => {
+      // TODO: Route to account even if it's not current
+      if (!account)  return reject(new Error('Unable to determine target account'))
+      if (!targetChain || !targetChain.type || !targetChain.id) return reject(new Error('Unable to determine target chain'))
       proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', params: [] }, (res) => {
-        if (res.error) return reject(new Error(res.error))
+        if (res.error) return reject(new Error(JSON.stringify(res.error)))
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
-          if (receiptRes.result && this.current().requests[id]) {
-            this.current().requests[id].tx.receipt = receiptRes.result
-            this.current().update()
-            if (!this.current().requests[id].feeAtTime) {
-              const network = store('main.currentNetwork')
+          if (receiptRes.result && account.requests[id]) {
+            account.requests[id].tx.receipt = receiptRes.result
+            account.update()
+            if (!account.requests[id].feeAtTime) {
+              const network = targetChain
               if (network.type === 'ethereum' && network.id === '1') {
                 fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
                   if (res && res.message === 'OK' && res.result && res.result.ethusd) {
-                    const { gasUsed } = this.current().requests[id].tx.receipt
-                    const { gasPrice } = this.current().requests[id].data
-                    this.current().requests[id].feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(gasPrice)) * res.result.ethusd) * 100) / 100).toFixed(2)
-                    this.current().update()
+                    const { gasUsed } = account.requests[id].tx.receipt
+                    const { gasPrice } = account.requests[id].data
+                    account.requests[id].feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(gasPrice)) * res.result.ethusd) * 100) / 100).toFixed(2)
+                    account.update()
                   }
                 }).catch(e => console.log('Unable to fetch exchange rate', e))
               } else {
-                this.current().requests[id].feeAtTime = '?.??'
-                this.current().update()
+                account.requests[id].feeAtTime = '?.??'
+                account.update()
               }
             }
-            if (receiptRes.result.status === '0x1' && this.current().requests[id].status === 'verifying') {
-              this.current().requests[id].status = 'confirming'
-              this.current().requests[id].notice = 'Confirming'
-              this.current().requests[id].completed = Date.now()
-              const { hash } = this.current().requests[id].tx
+            if (receiptRes.result.status === '0x1' && account.requests[id].status === 'verifying') {
+              account.requests[id].status = 'confirming'
+              account.requests[id].notice = 'Confirming'
+              account.requests[id].completed = Date.now()
+              const { hash } = account.requests[id].tx
               const h = hash.substr(0, 6) + '...' + hash.substr(hash.length - 4)
               const body = `Transaction ${h} sucessful! \n Click for details`
 
               // Drop any other pending txs with same nonce
-              Object.keys(this.current().requests).forEach(k => {
-                const reqs = this.current().requests
+              Object.keys(account.requests).forEach(k => {
+                const reqs = account.requests
                 if (reqs[k].status === 'verifying' && reqs[k].data.nonce === reqs[id].data.nonce) {
-                  this.current().requests[k].status = 'error'
-                  this.current().requests[k].notice = 'Dropped'
+                  account.requests[k].status = 'error'
+                  account.requests[k].notice = 'Dropped'
+                  setTimeout(() => this.removeRequest(account, k), 8000)
                 }
               })
 
               // If Frame is hidden, trigger native notification
               notify('Transaction Successful', body, () => {
-                const { type, id } = store('main.currentNetwork')
+                const { type, id } = targetChain
                 const explorer = store('main.networks', type, id, 'explorer')
                 shell.openExternal(explorer + '/tx/' + hash)
               })
             }
             const blockHeight = parseInt(res.result, 16)
-            const receiptBlock = parseInt(this.current().requests[id].tx.receipt.blockNumber, 16)
+            const receiptBlock = parseInt(account.requests[id].tx.receipt.blockNumber, 16)
             resolve(blockHeight - receiptBlock)
           }
-        })
-      })
+        }, targetChain)
+      }, targetChain)
     })
   }
 
-  async txMonitor (id, hash) {
-    this.current().requests[id].tx = { hash, confirmations: 0 }
-    this.current().update()
-    proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
-      if (newHeadRes.error) {
-        log.warn(newHeadRes.error)
-        const monitor = async () => {
-          let confirmations
-          try {
-            confirmations = await this.confirmations(id, hash)
-          } catch (e) {
-            log.error(e)
-            clearTimeout(monitorTimer)
-            return
-          }
-          this.current().requests[id].tx.confirmations = confirmations
-          this.current().update()
-          if (confirmations > 12) {
-            this.current().requests[id].status = 'confirmed'
-            this.current().requests[id].notice = 'Confirmed'
-            this.current().update()
-            setTimeout(() => this.removeRequest(id), 8000)
-            clearTimeout(monitorTimer)
-          }
-        }
-        setTimeout(() => monitor(), 3000)
-        const monitorTimer = setInterval(monitor, 15000)
-      } else if (newHeadRes.result) {
-        const headSub = newHeadRes.result
-        const handler = async payload => {
-          if (payload.method === 'eth_subscription' && payload.params.subscription === headSub) {
-            // const newHead = payload.params.result
+  async txMonitor (account, id, hash) {
+
+    if (!account) return log.error('txMonitor had no target account')
+
+    account.requests[id].tx = { hash, confirmations: 0 }
+    account.update()
+
+    const rawTx = account.requests[id].data
+
+    const targetChain = {
+      type: 'ethereum',
+      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
+    }
+
+    if (!targetChain || !targetChain.type || !targetChain.id ) {
+      log.error('txMonitor had no target chain')
+      setTimeout(() => this.removeRequest(account, id), 8 * 1000)
+    } else {
+      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
+        if (newHeadRes.error) {
+          log.warn(newHeadRes.error)
+          const monitor = async () => {
+
+            if (!account) return log.error('txMonitor internal monitor had no target account')
+
             let confirmations
             try {
-              confirmations = await this.confirmations(id, hash)
+              confirmations = await this.confirmations(account, id, hash, targetChain)
             } catch (e) {
-              log.error(e)
-              proxyProvider.removeListener('data', handler)
+              log.error('error awaiting confirmations', e)
+              clearTimeout(monitorTimer)
+              setTimeout(() => this.removeRequest(account, id), 60 * 1000)
               return
             }
-            this.current().requests[id].tx.confirmations = confirmations
-            this.current().update()
+            account.requests[id].tx.confirmations = confirmations
+            account.update()
             if (confirmations > 12) {
-              this.current().requests[id].status = 'confirmed'
-              this.current().requests[id].notice = 'Confirmed'
-              this.current().update()
-              setTimeout(() => this.removeRequest(id), 8000)
-              proxyProvider.removeListener('data', handler)
-              proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] })
+              account.requests[id].status = 'confirmed'
+              account.requests[id].notice = 'Confirmed'
+              account.update()
+              setTimeout(() => this.removeRequest(account, id), 8000)
+              clearTimeout(monitorTimer)
             }
           }
+          setTimeout(() => monitor(), 3000)
+          const monitorTimer = setInterval(monitor, 15000)
+        } else if (newHeadRes.result) {
+          const headSub = newHeadRes.result
+          const handler = async payload => {
+            if (payload.method === 'eth_subscription' && payload.params.subscription === headSub) {
+              // const newHead = payload.params.result
+              let confirmations
+              try {
+                confirmations = await this.confirmations(account, id, hash, targetChain)
+              } catch (e) {
+                log.error(e)
+                // proxyProvider.removeListener('data', handler)
+                proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+                setTimeout(() => this.removeRequest(account, id), 60 * 1000)
+                return
+              }
+              account.requests[id].tx.confirmations = confirmations
+              account.update()
+              if (confirmations > 12) {
+                account.requests[id].status = 'confirmed'
+                account.requests[id].notice = 'Confirmed'
+                account.update()
+                setTimeout(() => this.removeRequest(account, id), 8000)
+                // proxyProvider.removeListener('data', handler)
+                
+                proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, res => {
+                  if (res.error) {
+                    log.error('error sending message eth_unsubscribe', res)
+                  }
+                }, targetChain)
+              }
+            }
+          }
+          proxyProvider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
         }
-        proxyProvider.on('data', handler)
-      }
-    })
+      }, targetChain)
+    }
   }
 
   getSigners (cb) {
@@ -340,6 +357,12 @@ class Accounts extends EventEmitter {
     const summary = this.current().summary()
     cb(null, summary)
     windows.broadcast('main:action', 'setSigner', summary)
+    if (this.current().status === 'ok') this.verifyAddress(false, (err, verified) => {
+      if (!err && !verified) {
+        this.current().signer = ''
+        this.current().update()
+      }
+    })
   }
 
   unsetSigner (cb) {
@@ -348,12 +371,12 @@ class Accounts extends EventEmitter {
     const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
     windows.broadcast('main:action', 'unsetSigner', summary)
-    setTimeout(() => { // Clear signer requests when unset
-      if (s) {
-        s.requests = {}
-        s.update()
-      }
-    })
+    // setTimeout(() => { // Clear signer requests when unset
+    //   if (s) {
+    //     s.requests = {}
+    //     s.update()
+    //   }
+    // })
   }
 
   verifyAddress (display, cb) {
@@ -396,7 +419,7 @@ class Accounts extends EventEmitter {
   signTransaction (rawTx, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     const matchSelected = rawTx.from.toLowerCase() === this.getSelectedAddress().toLowerCase()
-    const matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.address.toLowerCase() : false)
+    const matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.toLowerCase() : false)
     if (matchSelected || matchActor) {
       this.current().signTransaction(rawTx, cb)
     } else {
@@ -432,12 +455,11 @@ class Accounts extends EventEmitter {
     this.current().addRequest(req, res)
   }
 
-  removeRequest (handlerId) {
-    if (this.current() && this.current().requests[handlerId]) {
-      if (this.current().requests[handlerId].res) this.current().requests[handlerId].res()
-      delete this.current().requests[handlerId]
-      this.current().update()
-    }
+  removeRequest (account, handlerId) {
+    log.debug(`removeRequest(${account.id}, ${handlerId})`)
+
+    delete account.requests[handlerId]
+    account.update()
   }
 
   declineRequest (handlerId) {
@@ -446,11 +468,7 @@ class Accounts extends EventEmitter {
       this.current().requests[handlerId].status = 'error'
       this.current().requests[handlerId].notice = 'Signature Declined'
       this.current().requests[handlerId].mode = 'monitor'
-      setTimeout(() => this.removeRequest(handlerId), 8000)
-      // if (this.current().requests[handlerId].type === 'transaction') {
-      // } else {
-      //   setTimeout(() => this.removeRequest(handlerId), 3300)
-      // }
+      setTimeout(() => this.removeRequest(this.current(), handlerId), 8000)
       this.current().update()
     }
   }
@@ -484,12 +502,13 @@ class Accounts extends EventEmitter {
           if (this.current() && this.current().requests[handlerId]) {
             this.current().requests[handlerId].mode = 'monitor'
             this.current().update()
-            setTimeout(() => this.removeRequest(handlerId), 8000)
+            setTimeout(() => this.removeRequest(this.current(), handlerId), 8000)
           }
         }, 1500)
       } else {
-        setTimeout(() => this.removeRequest(handlerId), 3300)
+        setTimeout(() => this.removeRequest(this.current(), handlerId), 3300)
       }
+
       this.current().update()
     }
   }
@@ -519,7 +538,7 @@ class Accounts extends EventEmitter {
       this.current().requests[handlerId].notice = 'Verifying'
       this.current().requests[handlerId].mode = 'monitor'
       this.current().update()
-      this.txMonitor(handlerId, hash)
+      this.txMonitor(this.accounts[this._current], handlerId, hash)
     }
   }
 
@@ -532,7 +551,7 @@ class Accounts extends EventEmitter {
       if (this.current().requests[handlerId].type === 'transaction') {
         this.current().requests[handlerId].mode = 'monitor'
       } else {
-        setTimeout(() => this.removeRequest(handlerId), 3300)
+        setTimeout(() => this.removeRequest(this.current(), handlerId), 3300)
       }
       this.current().update()
     }
@@ -572,7 +591,10 @@ class Accounts extends EventEmitter {
         this.current().requests[handlerId].data.nonce = adjustedNonce
         this.current().update()
       } else {
-        const { from } = this.current().requests[handlerId].data
+        const { from, chainId } = this.current().requests[handlerId].data
+
+        const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex').toString() }
+
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
@@ -580,7 +602,7 @@ class Accounts extends EventEmitter {
             this.current().requests[handlerId].data.nonce = adjustedNonce
             this.current().update()
           }
-        })
+        }, targetChain)
       }
     }
   }

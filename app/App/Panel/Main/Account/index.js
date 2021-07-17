@@ -305,7 +305,6 @@ class _AccountMain extends React.Component {
             onMouseDown={() => this.setState({ expandedModule: false })}
           >
             <div className='moduleExpanded' onMouseDown={(e) => {
-              e.preventDefault()
               e.stopPropagation()
             }}>
               {this.renderModule(this.state.expandedModule, { height: '100%' }, 0, 0, id => {
@@ -315,7 +314,7 @@ class _AccountMain extends React.Component {
           </div>
         ) : null}
         <div className='accountMainScroll' style={{ pointerEvents: this.state.expandedModule ? 'none' : 'auto' }}>
-          <div className='accountMainSlide' style={{ height: slideHeight + 41 + 'px' }}>
+          <div className='accountMainSlide' style={{ height: slideHeight + 21 + 'px' }}>
             {modules}
           </div>
         </div>
@@ -850,9 +849,8 @@ class Account extends React.Component {
       <>
         {!this.state.addressHover ? (
           <div className='signerName'>
-            <div className={!showENS ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
+            <div className={(!showENS || !this.props.name) ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
               {this.props.name}
-              <div className='signerNameEdit'>{svg.octicon('pencil', { height: 18 })}</div>
             </div>
           </div>
         ) : null}
@@ -872,7 +870,7 @@ class Account extends React.Component {
               ) : showENS ? (
                 <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
               ) : (
-                <div className='transactionToAddressLarge'>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
+                <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
               )
               }
             </div>
@@ -961,7 +959,15 @@ class Account extends React.Component {
       }
     }
 
-    const signer = this.store('main.signers', this.props.signer)
+    const account = this.store('main.accounts', this.props.id)
+    let signer
+
+    if (account.signer) {
+      signer = this.store('main.signers', account.signer)
+    } else if (account.smart)  {
+      const actingSigner = this.store('main.accounts', account.smart.actor, 'signer')
+      if (actingSigner) signer = this.store('main.signers', actingSigner)
+    }
 
     return (
       <div className='signerWrap' style={current ? { height: initial.height + 'px' } : {}} onMouseDown={() => this.closeAccounts()}>
@@ -969,7 +975,7 @@ class Account extends React.Component {
           <div className='signerContainer' style={current ? { height: '100%' } : {}}>
             {this.store('view.clickGuard') ? <div className='clickGuard' /> : null}
             {!this.state.hideSignerStatus && open ? (
-              <SignerStatus open={open} signer={this.props.signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
+              <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
             ) : null}
             <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {!this.state.addressHover ? this.renderType() : null} 

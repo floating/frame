@@ -1,4 +1,5 @@
 const utils = require('web3-utils')
+const { rlp } = require('ethereumjs-util')
 const { Transaction } = require('@ethereumjs/tx')
 const Common = require('@ethereumjs/common').default
 const log = require('electron-log')
@@ -300,32 +301,38 @@ class Ledger extends Signer {
     }
   }
 
+  _signedTransaction (txData, signature) {
+    return {
+      ...txData,
+      v: `0x${signature.v}`,
+      r: `0x${signature.r}`,
+      s: `0x${signature.s}`
+    }
+  }
+
   async signTransaction (index, rawTx, cb) {
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
-      if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
+      // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
+
       const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-      rawTx.gasLimit = rawTx.gas // gas must be gasLimit in new ethereum tx
-      const tx = Transaction.fromTxData(rawTx, { common })
-      tx.raw[6] = Buffer.from([rawTx.chainId]) // v
-      tx.raw[7] = Buffer.from([]) // r
-      tx.raw[8] = Buffer.from([]) // s
-      const rawTxHex = tx.serialize().toString('hex')
-      const result = await eth.signTransaction(this.getPath(index), rawTxHex)
-      this.busyCount = 0
-      const _tx = Transaction.fromTxData({
-        nonce: Buffer.from(this.normalize(rawTx.nonce), 'hex'),
-        gasPrice: Buffer.from(this.normalize(rawTx.gasPrice), 'hex'),
-        gasLimit: Buffer.from(this.normalize(rawTx.gas), 'hex'),
-        to: Buffer.from(this.normalize(rawTx.to), 'hex'),
-        value: Buffer.from(this.normalize(rawTx.value), 'hex'),
-        data: Buffer.from(this.normalize(rawTx.data), 'hex'),
-        v: Buffer.from(this.normalize(result.v), 'hex'),
-        r: Buffer.from(this.normalize(result.r), 'hex'),
-        s: Buffer.from(this.normalize(result.s), 'hex')
-      }, { common })
-      cb(null, '0x' + _tx.serialize().toString('hex'))
+
+      const txData = {
+        ...rawTx,
+        gasLimit: rawTx.gas, // gas must be gasLimit in new ethereum tx
+      }
+
+      const tx = Transaction.fromTxData(txData, { common })
+      const message = tx.getMessageToSign(false)
+      const rawTxHex = rlp.encode(message).toString('hex')
+
+      const signature = await eth.signTransaction(this.getPath(index), rawTxHex)
+
+      const signedTx = Transaction.fromTxData(this._signedTransaction(txData, signature), { common })
+      const signedTxSerialized = signedTx.serialize().toString('hex')
+
+      cb(null, '0x' + signedTxSerialized)
       this.releaseDevice()
     } catch (err) {
       log.error(err)

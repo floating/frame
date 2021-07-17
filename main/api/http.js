@@ -54,7 +54,7 @@ const handler = (req, res) => {
       const payload = validPayload(input)
       if (!payload) return console.warn('Invalid Payload', input)
       payload._origin = origin
-      if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + payload.params)
+      if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + JSON.stringify(payload.params))
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }
         // Review
@@ -69,7 +69,7 @@ const handler = (req, res) => {
             if (result.length || payload.params[1] === 'immediate' || force) {
               res.writeHead(200, { 'Content-Type': 'application/json' })
               const response = { id: payload.id, jsonrpc: payload.jsonrpc, result }
-              if (logTraffic) log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
+              if (logTraffic) log.info('<- res | http | ' + origin + ' | ' + payload.method + ' | <- | ' + JSON.stringify(response))
               res.end(JSON.stringify(response))
               delete polls[id]
               clearTimeout(cleanupTimers[id])
@@ -96,8 +96,9 @@ const handler = (req, res) => {
               payload.params.forEach(sub => { if (pollSubs[sub]) delete pollSubs[sub] })
             }
           }
+
+          if (logTraffic) log.info('<- res | http | ' + req.headers.origin + ' | ' + payload.method + ' | <- | ' + JSON.stringify(response))
           res.writeHead(200, { 'Content-Type': 'application/json' })
-          if (logTraffic) log.info('<- res | http | ' + req.headers.origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
           res.end(JSON.stringify(response))
         })
       }

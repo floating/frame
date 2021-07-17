@@ -20,7 +20,7 @@ function createWorker () {
 
   scanWorker.on('message', message => {
     if (process.env.LOG_WORKER) {
-      log.debug('received message from scan worker: ', message)
+      log.debug('received message from scan worker: ', JSON.stringify(message, undefined, 2))
     }
 
     if (message.type === 'chainBalance') {
@@ -47,7 +47,7 @@ function createWorker () {
       const tokenSymbols = Object.keys(message.balances).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
 
       if (tokenSymbols.length > 0) {
-        updateRates(tokenSymbols)
+        updateRates(tokenSymbols, message.netId)
       }
     }
 
@@ -136,7 +136,7 @@ function scanActiveData () {
 }
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
-const updateRates = symbols => sendCommandToWorker('updateRates', [symbols])
+const updateRates = (symbols, chainId) => sendCommandToWorker('updateRates', [symbols, chainId])
 const updateNativeCurrencyData = symbols => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateAllTokens = () => sendCommandToWorker('updateTokenBalances', [trackedAddresses])
 const updateActiveBalances = () => {
@@ -162,6 +162,8 @@ function addAddresses (addresses) {
 }
 
 function setActiveAddress (address) {
+  log.debug(`setActiveAddress(${address})`)
+
   addAddresses([address])
   activeAddress = address
 
@@ -190,15 +192,13 @@ function start (addresses = [], omitList = [], knownList) {
     const networks = store('main.networks.ethereum')
 
     const symbols = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
+    const newSymbolAdded = symbols.some(sym => !networkCurrencies.includes(sym))
 
-    if (symbols.some(sym => !networkCurrencies.includes(sym))) {
+    if (!nativeCurrencyScan || newSymbolAdded) {
       networkCurrencies = [...symbols]
       scanNetworkCurrencyRates()
     }
-
   })
-
-  // addAddresses(addresses) // Scan becomes too heavy with many accounts added
 
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
@@ -214,10 +214,11 @@ function stop () {
   log.info('stopping external data worker')
 
   currentNetworkObserver.remove()
-  allNetworksObserver.remove();
+  allNetworksObserver.remove()
 
-  [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
-    .forEach(scanner => { if (scanner) clearInterval(scanner) })
+  const scanners = [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
+
+  scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
 
   heartbeat = null
   allAddressScan = null

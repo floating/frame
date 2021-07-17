@@ -1,3 +1,11 @@
+@keyframes scalein
+  0%
+    transform scale(0.5) translateY(0px)
+    opacity 0
+  100%
+    transform scale(1) translateY(0px)
+    opacity 1
+
 @keyframes bounceIn {
   from,
   20%,
@@ -41,7 +49,7 @@
 }
 
 .scaleIn
-  animation scalein 600ms cubic !important
+  animation scalein 600ms var(--cubic) !important
 
 .loader,
 .loader:after {
@@ -84,14 +92,6 @@
   100%
     transform scale(1.0)
     opacity 0
-
-@keyframes scalein
-  0%
-    transform scale(0.8)
-    opacity 0.2
-  100%
-    transform scale(1)
-    opacity 1
 
 @keyframes spin
   0%
@@ -154,7 +154,7 @@
   margin 100px auto
   background-color var(--outerspace08)
   border-radius 100%
-  animation sk-scaleout 600ms infinite cubic
+  animation sk-scaleout 600ms infinite var(--cubic)
 
 .signSuccess
   width 100px
@@ -162,7 +162,7 @@
   margin 100px auto
   background-color var(--outerspace08)
   border-radius 100%
-  animation sk-scaleout 600ms infinite cubic
+  animation sk-scaleout 600ms infinite var(--cubic)
 
 .slideUp-enter
   opacity 0
@@ -399,7 +399,7 @@
     height 40px
     display flex
     justify-content center
-    transition var(--standard)
+    transition var(--standardFast)
     z-index 2000
     color var(--outerspace)
     tranform translateZ(0)
@@ -516,7 +516,7 @@
       opacity 0
       pointer-events none
 
-  .requestNotice
+  .requestNotice, .requestCover
     height calc(100% - 20px)
     width 100%
     transform translateZ(0px)
@@ -528,7 +528,7 @@
       position absolute
       top 0px
       right 0
-      bottom 00px
+      bottom 0px
       left 0
       display flex
       justify-content center
@@ -561,6 +561,9 @@
 
       .cancelRequest:hover
         background var(--thick)
+
+  .requestCover
+    height 100%
 
   .requestProvider
     position absolute
@@ -1058,10 +1061,18 @@
         display flex
         justify-content center
         align-items center
-        font-size 12px
+        font-size 13px
         opacity 0
         transition var(--standard)
         font-weight bold
+        cursor pointer
+        *
+          pointer-events none
+
+        svg
+          position relative
+          top -3px
+          margin-left 10px
 
     .transactionToAddress:hover
         .transactionToAddressLarge
@@ -1117,7 +1128,7 @@
       right 0
       bottom 0
       left 0
-      animation scalein 3000ms cubic
+      // animation scalein 3000ms var(--cubic)
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1155,7 +1166,6 @@
       right 0
       bottom 0
       left 0
-      animation scalein 3000ms cubic
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1185,8 +1195,15 @@
     .requestSignButton:hover:before
       background var(--good)
 
+
+  .requestScaleButtonSign
+    animation scalein 3000ms var(--cubic) !important
+
+  .requestScaleButtonDecline
+    animation scalein 1500ms var(--cubic) !important
+
   .requestQuickButton
-    animation scalein 800ms cubic !important
+    animation scalein 800ms var(--cubic) !important
 
   .requestApproveDisabled
     pointer-events none
@@ -1313,7 +1330,7 @@ span
     align-items center
 
   .txNonceHidden
-    color var(--ghostX)
+    color var(--outerspace06)
     opacity 0
 
   .txNonceControl
@@ -1368,7 +1385,7 @@ span
     opacity 0
 
 .txNonceSet
-  transform translate(1px, -5px)
+  transform translate(1px, -3px)
 
 .monitorTop
   position absolute

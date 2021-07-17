@@ -27,13 +27,13 @@ class Account {
     this.status = 'ok' // Current Status
     this.name = name || capitalize(options.type) + ' Account'
     this.lastSignerType = lastSignerType || options.type
-    this.created = created
+    this.created = created || `new:${Date.now()}`
     this.address = address
     this.smart = smart
     this.ensName = ensName
     // Update actor to just store actor's address
-    if (this.smart && this.smart.actor && this.smart.actor.address) {
-      this.smart.actor = this.smart.actor.address.toLowerCase()
+    if (this.smart && this.smart.actor) {
+      this.smart.actor = this.smart.actor.toLowerCase()
     }
     this.tokens = tokens || {}
     this.requests = {}
@@ -50,9 +50,11 @@ class Account {
           this.signer = updatedSigner.id
           this.lastSignerType = updatedSigner.type || this.lastSignerType
           this.signerStatus = updatedSigner.status
-          if (updatedSigner.status === 'ok') this.verifyAddress(false, (err, verified) => {
-            if (!err && !verified) this.signer = ''
-          })
+          if (updatedSigner.status === 'ok' && this.id === this.accounts._current) {
+              this.verifyAddress(false, (err, verified) => {
+              if (!err && !verified) this.signer = ''
+            })
+          }
         }
       } else {
         this.signer = ''
@@ -63,15 +65,17 @@ class Account {
       this.update()
     })
 
-    this.accounts.getMainnetBlockHeight((err, height) => {
-      if (err) return log.error('getBlockHeight Error', err)
-      if (this.created === -1 || !this.created || this.created > height) {
-        log.info('Account has no or invalid creation height, fetching')
-        log.info('Account creation being set to current height: ', height)
-        this.created = height
-        this.update()
-      }
-    })
+    if (this.created.split(':')[0] === 'new') {
+      proxyProvider.on('connect', () => {
+        proxyProvider.emit('send', { jsonrpc: '2.0', id: '1', method: 'eth_blockNumber' }, (response) => {
+          if (response.result) this.created = parseInt(response.result, 'hex') + ':' + this.created.split(':')[1]
+          this.update()
+        }, {
+          type: 'ethereum', 
+          id: '1'
+        })
+      })
+    }
 
     this.lookupAddress() // We need to recheck this on every network change...
     this.update()
@@ -166,7 +170,7 @@ class Account {
         const { to, data } = req.data
         try {
           const decodedData = await abi.decodeCalldata(to, data)
-          if (this.requests[r.handlerId]) {
+          if (decodedData && this.requests[r.handlerId]) {
             this.requests[r.handlerId].decodedData = decodedData
             this.update()
           }
@@ -351,7 +355,7 @@ class Account {
         if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
         const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
         if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find acting address in signer`, actingAccount.address))
-        actingSigner.signTypedData(index, rawTx, cb)
+        actingSigner.signTransaction(index, rawTx, cb)
       } else {
         cb(new Error('No signer found for this account'))
       }
