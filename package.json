@@ -111,7 +111,7 @@
     "extract-zip": "2.0.1",
     "fs-extra": "10.0.0",
     "get-pixels": "3.3.2",
-    "gridplus-sdk": "0.7.24",
+    "gridplus-sdk": "0.7.26",
     "hdkey": "2.0.1",
     "ipfs-core": "0.8.0",
     "ipfs-http-client": "50.1.2",
