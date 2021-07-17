@@ -423,7 +423,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
-    if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3') return this.signTypedData(payload, res)
+    if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3' || payload.method === 'eth_signTypedData_v4') return this.signTypedData(payload, res)
     if (payload.method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
     // Delete custom data
     delete payload._origin

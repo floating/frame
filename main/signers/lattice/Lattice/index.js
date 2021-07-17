@@ -19,7 +19,7 @@ function humanReadable (str) {
 }
 
 class Lattice extends Signer {
-  constructor (deviceId, signers) { 
+  constructor (deviceId, signers) {
     super()
     this.signers = signers
 
@@ -37,7 +37,7 @@ class Lattice extends Signer {
       }
 
     })
-  
+
     this.update()
   }
 
@@ -98,7 +98,7 @@ class Lattice extends Signer {
         }
         const clientConnect = promisify(this.client.connect).bind(this.client)
         this.paired = await clientConnect(this.deviceId)
-        
+
         if (this.paired) {
           if (this.addresses.length === 0) {
             this.status = 'addresses'
@@ -261,33 +261,50 @@ class Lattice extends Signer {
   }
 
   // Standard Methods
-  async signMessage (index, message, cb) {
-    const asciiMessage = utils.hexToAscii(message)
-    if (humanReadable(asciiMessage)) {
-      message = asciiMessage
-    }
+  async _signMessage (index, protocol, payload) {
+    try{
+      const clientSign = promisify(this.client.sign).bind(this.client)
 
-    try {
       const data = {
-        protocol: 'signPersonal',
-        payload: message,
+        protocol: protocol,
+        payload: payload,
         signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other deviations
       }
       const signOpts = {
         currency: 'ETH_MSG',
         data: data
       }
-      const clientSign = promisify(this.client.sign).bind(this.client)
 
       const result = await clientSign(signOpts)
-      let v = result.sig.v.toString(16)
-      if (v.length < 2) v = '0' + v
-      const signature = '0x' + result.sig.r + result.sig.s + v
+      let v = result.sig.v.toString("hex");
+      if (v.length < 2)
+        v = `0${v}`;
+      return `0x${result.sig.r}${result.sig.s}${v}`;
 
+    } catch (err) {
+      return new Error(err)
+    }
+  }
+
+  async signMessage(index, message, cb){
+    try {
+      const asciiMessage = utils.hexToAscii(message)
+      if (humanReadable(asciiMessage)) {
+        message = asciiMessage
+      }
+      const signature = await this._signMessage(index, 'signPersonal', message)
       return cb(null, signature)
     } catch (err) {
       return cb(new Error(err))
     }
+  }
+  async signTypedData(index, typedData, cb){
+      try {
+          const signature = await this._signMessage(index, 'eip712', typedData)
+          return cb(null, signature)
+      } catch (err) {
+          return cb(new Error(err))
+      }
   }
 
   async signTransaction (index, rawTx, cb) {
