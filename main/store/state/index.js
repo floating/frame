@@ -259,7 +259,7 @@ const initial = {
           poa: 'https://dai.poa.network'
         },
         137: {
-          matic: ['https://rpc-mainnet.maticvigil.com/v1/852d3148d4d2880682d0c12ba514e7106406316d']
+          matic: ['https://polygon-mainnet.infura.io/v3/4de05cd0b6cf4b6288b47be6d9939019']
         }
       }
     },
