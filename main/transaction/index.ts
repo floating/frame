@@ -58,7 +58,7 @@ async function populate (rawTx: any, chainConfig: Common, gasCalculator) {
     txData.warning = e.message
   }
 
-  if (chainConfig.hardforkIsActiveOnBlock('london', '0xa1d009')) {
+  if (chainConfig.isActivatedEIP(1559)) {
     console.log('london hardfork active!')
     txData.type = '0x2'
 
