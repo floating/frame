@@ -143,8 +143,10 @@ function sign(rawTx, signingFn) {
         var tx;
         return __generator(this, function (_a) {
             tx = tx_1.TransactionFactory.fromTxData(rawTx);
+            console.log({ tx: tx });
             return [2 /*return*/, signingFn(tx).then(function (sig) {
                     var signature = hexifySignature(sig);
+                    console.log({ signature: signature });
                     return tx_1.Transaction.fromTxData(__assign(__assign({}, rawTx), signature));
                 })];
         });

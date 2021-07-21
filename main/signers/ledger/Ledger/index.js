@@ -1,11 +1,14 @@
 const { rlp } = require('ethereumjs-util')
 const log = require('electron-log')
+const { v5: uuid } = require('uuid')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
+
+const { sign } = require('../../../transaction')
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const { v5: uuid } = require('uuid')
+
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 // Base Paths
@@ -299,15 +302,28 @@ class Ledger extends Signer {
   }
 
   async signTransaction (index, rawTx, cb) {
+    console.log({ rawTx })
+
+    //rawTx.gas = '0x5208'
+    //rawTx.type = '0x0'
+    //rawTx.gasPrice = '0x405f7e00'
+
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       const signerPath = this.getPath(index)
-      
-      const message = tx.getMessageToSign(false)
-      const rawTxHex = rlp.encode(message).toString('hex')
 
-      const signedTx = sign(rawTx, () => eth.signTransaction(signerPath, rawTxHex))
+      const signedTx = await sign(rawTx, tx => {
+        const rawTxHex = tx.getMessageToSign(false).toString('hex').substring(2)
+        // const rawTxHex = rlp.encode(message).toString('hex')
+
+        // console.log({ raw: tx.raw() })
+        console.log({ rawTxHex })
+
+        return eth.signTransaction(signerPath, rawTxHex)
+      })
+
+      console.log({ signedTx })
 
       const signedTxSerialized = signedTx.serialize().toString('hex')
 
