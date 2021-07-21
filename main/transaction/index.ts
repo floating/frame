@@ -93,8 +93,12 @@ function hexifySignature ({ v, r, s }: Signature) {
 async function sign(rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<Signature>) {
   const tx = TransactionFactory.fromTxData(rawTx)
 
+  console.log({ tx })
+
   return signingFn(tx).then(sig => {
     const signature = hexifySignature(sig)
+
+    console.log({ signature })
     
     return Transaction.fromTxData({
       ...rawTx,
