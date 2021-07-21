@@ -17,6 +17,8 @@ const gasCalculator = require('../transaction/gasCalculator').default
 
 const version = require('../../package.json').version
 
+const londonHardforkSigners = ['seed', 'ring']
+
 class Provider extends EventEmitter {
   constructor () {
     super()
@@ -88,6 +90,15 @@ class Provider extends EventEmitter {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
       // if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
+    }, targetChain)
+  }
+
+  getBlockNumber (res, targetChain) {
+    const payload = { jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }
+    this.connection.send(payload, response => {
+      if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
+      
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     }, targetChain)
   }
@@ -296,24 +307,42 @@ class Provider extends EventEmitter {
 
   sendTransaction (payload, res) {
     const rawTx = this.getRawTx(payload)
+    const activeAccount = accounts.current()
+    const gasCalculator = this._gasCalculator(rawTx)
+
+    const buildTransaction = (chainConfig) => {
+      populateTransaction(rawTx, chainConfig, gasCalculator).then(tx => {
+        const from = tx.from
+        if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)
+        const handlerId = uuid()
+        this.handlers[handlerId] = res
+
+        const { warning, ...data } = tx
+        
+        accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: activeAccount.id, origin: payload._origin, warning }, res)
+      })
+      .catch(err => {
+        this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
+      })
+    }
 
     // TODO where do we get chain config from?
-    const chainConfig = new Common({ chain: 'ropsten', hardfork: 'london', eips: [1559] })
+    const chainConfig = new Common({ chain: 'rinkeby', hardfork: 'berlin' })
 
-    populateTransaction(rawTx, chainConfig, this._gasCalculator(rawTx)).then(tx => {
-      const from = tx.from
-      const current = accounts.getAccounts()[0]
-      if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
-      const handlerId = uuid()
-      this.handlers[handlerId] = res
+    if (londonHardforkSigners.includes(activeAccount.lastSignerType)) {
+      return this.getBlockNumber(response => {
+        if (!response.error) {
+          const blockNumber = response.result
+          chainConfig.setHardforkByBlockNumber(blockNumber)
+        } else {
+          console.warning('could not determine current block number, defaulting to berlin hard fork')
+        }
 
-      const { warning, ...data } = tx
-      
-      accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: accounts.getAccounts()[0], origin: payload._origin, warning }, res)
-    })
-    .catch(err => {
-      this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-    })
+        buildTransaction(chainConfig)
+      })
+    }
+
+    buildTransaction(chainConfig)
   }
 
   ethSign (payload, res) {

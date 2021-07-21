@@ -107,7 +107,7 @@ function populate(rawTx, chainConfig, gasCalculator) {
                     txData.warning = e_1.message;
                     return [3 /*break*/, 5];
                 case 5:
-                    if (chainConfig.hardforkIsActiveOnBlock('london', '0xa1d009')) {
+                    if (chainConfig.isActivatedEIP(1559)) {
                         console.log('london hardfork active!');
                         txData.type = '0x2';
                         maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(txData));
