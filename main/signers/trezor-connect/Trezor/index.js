@@ -223,13 +223,12 @@ class Trezor extends Signer {
   signTransaction (index, rawTx, cb) {
     const trezorTx = this._normalizeTransaction(rawTx)
 
-    sign(rawTx, tx => {
+    sign(rawTx, () => {
       return new Promise((resolve, reject) => {
         flex.rpc('trezor.ethereumSignTransaction', this.device.path, this.getPath(index), trezorTx, (err, result) => {
-          if (err) reject(err)
+          if (err) return reject(err)
 
-          const { v, r, s } = result
-          resolve({ v, r, s })
+          resolve({ v: result.v, r: result.r, s: result.s })
         })
       })
     })
