@@ -50,25 +50,22 @@ function chainConfig(chain, hardfork) {
         : common_1["default"].forCustomChain('mainnet', { chainId: chainId.toNumber() }, hardfork);
 }
 exports.chainConfig = chainConfig;
-function resolveChainConfig(provider, chain, signerType, blockNumber, hardfork) {
+function resolveChainConfig(provider, chain, signerType, hardfork) {
     if (hardfork === void 0) { hardfork = 'berlin'; }
     return __awaiter(this, void 0, void 0, function () {
         var common;
         return __generator(this, function (_a) {
             common = chainConfig(chain, hardfork);
+            if (!londonHardforkSigners.includes(signerType))
+                return [2 /*return*/, common];
             return [2 /*return*/, new Promise(function (resolve) {
-                    if (blockNumber && londonHardforkSigners.includes(signerType)) {
-                        provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, function (response) {
-                            if (!response.error) {
-                                var blockNumber_1 = response.result;
-                                common.setHardforkByBlockNumber(blockNumber_1);
-                            }
-                            resolve(common);
-                        });
-                    }
-                    else {
+                    provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, function (response) {
+                        if (!response.error) {
+                            var blockNumber = response.result;
+                            common.setHardforkByBlockNumber(blockNumber);
+                        }
                         resolve(common);
-                    }
+                    });
                 })];
         });
     });
