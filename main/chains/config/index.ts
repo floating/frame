@@ -11,21 +11,20 @@ function chainConfig (chain: string, hardfork: string) {
     : Common.forCustomChain('mainnet', { chainId: chainId.toNumber() }, hardfork)
 }
 
-async function resolveChainConfig (provider: any, chain: string, signerType: string, blockNumber: number, hardfork = 'berlin') {
+async function resolveChainConfig (provider: any, chain: string, signerType: string, hardfork = 'berlin') {
   const common = chainConfig(chain, hardfork)
 
+  if (!londonHardforkSigners.includes(signerType)) return common
+
   return new Promise(resolve => {
-    if (blockNumber && londonHardforkSigners.includes(signerType)) {
-      provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, (response: any) => {
-        if (!response.error) {
-          const blockNumber = response.result
-          common.setHardforkByBlockNumber(blockNumber)
-        }
-        resolve(common)
-      })
-    } else {
+    provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, (response: any) => {
+      if (!response.error) {
+        const blockNumber = response.result
+        common.setHardforkByBlockNumber(blockNumber)
+      }
+
       resolve(common)
-    }
+    })
   })
 }
 
