@@ -212,7 +212,7 @@ class Trezor extends Signer {
     return {
       nonce: this.normalize(rawTx.nonce),
       gasPrice: this.normalize(rawTx.gasPrice),
-      gasLimit: this.normalize(rawTx.gas),
+      gasLimit: this.normalize(rawTx.gasLimit),
       to: this.normalize(rawTx.to),
       value: this.normalize(rawTx.value),
       data: this.normalize(rawTx.data),
@@ -222,8 +222,6 @@ class Trezor extends Signer {
 
   signTransaction (index, rawTx, cb) {
     const trezorTx = this._normalizeTransaction(rawTx)
-
-    console.log({ trezorTx })
 
     sign(rawTx, tx => {
       return new Promise((resolve, reject) => {
