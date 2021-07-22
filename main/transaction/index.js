@@ -46,47 +46,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 exports.__esModule = true;
 exports.sign = exports.populate = void 0;
 var ethereumjs_util_1 = require("ethereumjs-util");
 var tx_1 = require("@ethereumjs/tx");
-var common_1 = __importDefault(require("@ethereumjs/common"));
-// TODO: how do we determine these chain configs in real time?
-var chains = {
-    1: new common_1["default"]({ chain: 'mainnet', hardfork: 'berlin' }),
-    3: new common_1["default"]({ chain: 'ropsten', hardfork: 'london', eips: [1559] }),
-    4: new common_1["default"]({ chain: 'rinkeby', hardfork: 'london', eips: [1559] }),
-    5: new common_1["default"]({ chain: 'goerli', hardfork: 'london', eips: [1559] })
-};
-function getChainConfig(chainId, hardfork) {
-    if (hardfork === void 0) { hardfork = 'london'; }
-    var chainConfig = chains[chainId];
-    if (!chainConfig) {
-        if (common_1["default"].isSupportedChainId(new ethereumjs_util_1.BN(chainId))) {
-            chainConfig = new common_1["default"]({ chain: chainId, hardfork: hardfork });
-        }
-        else {
-            chainConfig = common_1["default"].forCustomChain('mainnet', { chainId: chainId }, hardfork);
-        }
-    }
-    return chainConfig;
-}
-function toHex(bn) {
-    return ethereumjs_util_1.addHexPrefix(bn.toString('hex'));
-}
+var config_1 = require("../../main/chains/config");
 function toBN(hexStr) {
     return new ethereumjs_util_1.BN(ethereumjs_util_1.stripHexPrefix(hexStr), 'hex');
 }
 function populate(rawTx, chainConfig, gasCalculator) {
     return __awaiter(this, void 0, void 0, function () {
-        var chainId, txData, _a, _b, e_1, maxPriorityFee, maxBaseFee, maxFee, gasPrice;
+        var txData, _a, _b, e_1, maxPriorityFee, maxBaseFee, maxFee, gasPrice;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    chainId = parseInt(rawTx.chainId);
                     txData = __assign({}, rawTx);
                     _c.label = 1;
                 case 1:
@@ -113,16 +86,16 @@ function populate(rawTx, chainConfig, gasCalculator) {
                         maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(txData));
                         maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(txData));
                         maxFee = maxPriorityFee.add(maxBaseFee);
-                        txData.maxPriorityFeePerGas = toHex(maxPriorityFee);
-                        txData.maxFeePerGas = toHex(maxFee);
+                        txData.maxPriorityFeePerGas = ethereumjs_util_1.bnToHex(maxPriorityFee);
+                        txData.maxFeePerGas = ethereumjs_util_1.bnToHex(maxFee);
                         txData.maxFee = txData.maxFeePerGas;
                     }
                     else {
                         console.log('london hardfork NOT active!');
                         txData.type = '0x0';
                         gasPrice = toBN(gasCalculator.getGasPrice(txData));
-                        txData.gasPrice = toHex(gasPrice);
-                        txData.maxFee = toHex(toBN(txData.gasLimit).mul(gasPrice));
+                        txData.gasPrice = ethereumjs_util_1.bnToHex(gasPrice);
+                        txData.maxFee = ethereumjs_util_1.bnToHex(toBN(txData.gasLimit).mul(gasPrice));
                     }
                     return [2 /*return*/, txData];
             }
@@ -140,14 +113,13 @@ function hexifySignature(_a) {
 }
 function sign(rawTx, signingFn) {
     return __awaiter(this, void 0, void 0, function () {
-        var tx;
+        var common, tx;
         return __generator(this, function (_a) {
-            tx = tx_1.TransactionFactory.fromTxData(rawTx);
-            console.log({ tx: tx });
+            common = config_1.chainConfig(rawTx.chainId, parseInt(rawTx.type) === 2 ? 'london' : 'berlin');
+            tx = tx_1.TransactionFactory.fromTxData(rawTx, { common: common });
             return [2 /*return*/, signingFn(tx).then(function (sig) {
                     var signature = hexifySignature(sig);
-                    console.log({ signature: signature });
-                    return tx_1.Transaction.fromTxData(__assign(__assign({}, rawTx), signature));
+                    return tx_1.Transaction.fromTxData(__assign(__assign({}, rawTx), signature), { common: common });
                 })];
         });
     });

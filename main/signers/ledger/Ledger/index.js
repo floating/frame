@@ -302,28 +302,17 @@ class Ledger extends Signer {
   }
 
   async signTransaction (index, rawTx, cb) {
-    console.log({ rawTx })
-
-    //rawTx.gas = '0x5208'
-    //rawTx.type = '0x0'
-    //rawTx.gasPrice = '0x405f7e00'
-
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       const signerPath = this.getPath(index)
 
       const signedTx = await sign(rawTx, tx => {
-        const rawTxHex = tx.getMessageToSign(false).toString('hex').substring(2)
-        // const rawTxHex = rlp.encode(message).toString('hex')
-
-        // console.log({ raw: tx.raw() })
-        console.log({ rawTxHex })
+        const message = tx.getMessageToSign(false)
+        const rawTxHex = rlp.encode(message).toString('hex')
 
         return eth.signTransaction(signerPath, rawTxHex)
       })
-
-      console.log({ signedTx })
 
       const signedTxSerialized = signedTx.serialize().toString('hex')
 
