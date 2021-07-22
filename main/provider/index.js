@@ -11,13 +11,11 @@ const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
-const Common = require('@ethereumjs/common').default
+const { resolveChainConfig } = require('../chains/config')
 const { populate: populateTransaction } = require('../transaction')
 const gasCalculator = require('../transaction/gasCalculator').default
 
 const version = require('../../package.json').version
-
-const londonHardforkSigners = ['seed', 'ring']
 
 class Provider extends EventEmitter {
   constructor () {
@@ -90,15 +88,6 @@ class Provider extends EventEmitter {
     this.connection.send(payload, (response) => {
       if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
       // if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
-    }, targetChain)
-  }
-
-  getBlockNumber (res, targetChain) {
-    const payload = { jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }
-    this.connection.send(payload, response => {
-      if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
     }, targetChain)
   }
@@ -310,8 +299,9 @@ class Provider extends EventEmitter {
     const activeAccount = accounts.current()
     const gasCalculator = this._gasCalculator(rawTx)
 
-    const buildTransaction = (chainConfig) => {
-      populateTransaction(rawTx, chainConfig, gasCalculator).then(tx => {
+    resolveChainConfig(this, rawTx.chainId, activeAccount.lastSignerType)
+      .then(chain => populateTransaction(rawTx, chain, gasCalculator))
+      .then(tx => {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)
         const handlerId = uuid()
@@ -322,27 +312,8 @@ class Provider extends EventEmitter {
         accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: activeAccount.id, origin: payload._origin, warning }, res)
       })
       .catch(err => {
-        this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
+        this.resError(`Frame provider error while sending transaction ${err.need}: ${err.message}`, payload, res)
       })
-    }
-
-    // TODO where do we get chain config from?
-    const chainConfig = new Common({ chain: 'rinkeby', hardfork: 'berlin' })
-
-    if (londonHardforkSigners.includes(activeAccount.lastSignerType)) {
-      return this.getBlockNumber(response => {
-        if (!response.error) {
-          const blockNumber = response.result
-          chainConfig.setHardforkByBlockNumber(blockNumber)
-        } else {
-          console.warning('could not determine current block number, defaulting to berlin hard fork')
-        }
-
-        buildTransaction(chainConfig)
-      })
-    }
-
-    buildTransaction(chainConfig)
   }
 
   ethSign (payload, res) {
