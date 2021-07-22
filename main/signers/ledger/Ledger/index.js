@@ -1,4 +1,4 @@
-const { rlp } = require('ethereumjs-util')
+const { rlp, addHexPrefix } = require('ethereumjs-util')
 const log = require('electron-log')
 const { v5: uuid } = require('uuid')
 const Eth = require('@ledgerhq/hw-app-eth').default
@@ -315,8 +315,8 @@ class Ledger extends Signer {
       })
 
       const signedTxSerialized = signedTx.serialize().toString('hex')
+      cb(null, addHexPrefix(signedTxSerialized))
 
-      cb(null, '0x' + signedTxSerialized)
       this.releaseDevice()
     } catch (err) {
       log.error(err)
