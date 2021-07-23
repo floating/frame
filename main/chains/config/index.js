@@ -65,7 +65,8 @@ function resolveChainConfig(provider, chain, signerType, hardfork) {
                     provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, function (response) {
                         if (!response.error) {
                             var currentBlock = response.result;
-                            var targetBlock = (parseInt(currentBlock, 16) - londonHardforkAdoptionBufferBlocks).toString(16);
+                            var targetBlock = ethereumjs_util_1.addHexPrefix((parseInt(currentBlock, 16) - londonHardforkAdoptionBufferBlocks).toString(16));
+                            console.log({ targetBlock: targetBlock });
                             common.setHardforkByBlockNumber(targetBlock);
                         }
                         resolve(common);
