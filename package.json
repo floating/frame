@@ -153,6 +153,7 @@
     "electron-builder": "22.11.7",
     "electron-notarize": "1.0.0",
     "ganache-cli": "6.12.2",
+    "hardhat": "^2.5.0",
     "jest": "27.0.6",
     "node-watch": "0.7.1",
     "parcel-bundler": "1.12.3",
