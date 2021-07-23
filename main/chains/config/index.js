@@ -43,6 +43,9 @@ exports.resolveChainConfig = exports.chainConfig = void 0;
 var ethereumjs_util_1 = require("ethereumjs-util");
 var common_1 = __importDefault(require("@ethereumjs/common"));
 var londonHardforkSigners = ['seed', 'ring'];
+// because the gas market for EIP-1559 will take a few blocks to
+// stabilize, don't support these transactions until after the buffer period
+var londonHardforkAdoptionBufferBlocks = 120;
 function chainConfig(chain, hardfork) {
     var chainId = new ethereumjs_util_1.BN(ethereumjs_util_1.stripHexPrefix(chain), 'hex');
     return common_1.default.isSupportedChainId(chainId)
@@ -61,8 +64,9 @@ function resolveChainConfig(provider, chain, signerType, hardfork) {
             return [2 /*return*/, new Promise(function (resolve) {
                     provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, function (response) {
                         if (!response.error) {
-                            var blockNumber = response.result;
-                            common.setHardforkByBlockNumber(blockNumber);
+                            var currentBlock = response.result;
+                            var targetBlock = (parseInt(currentBlock, 16) - londonHardforkAdoptionBufferBlocks).toString(16);
+                            common.setHardforkByBlockNumber(targetBlock);
                         }
                         resolve(common);
                     });

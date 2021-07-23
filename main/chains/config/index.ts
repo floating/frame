@@ -3,6 +3,10 @@ import Common from '@ethereumjs/common'
 
 const londonHardforkSigners = ['seed', 'ring']
 
+// because the gas market for EIP-1559 will take a few blocks to
+// stabilize, don't support these transactions until after the buffer period
+const londonHardforkAdoptionBufferBlocks = 120
+
 function chainConfig (chain: string, hardfork: string) {
   const chainId = new BN(stripHexPrefix(chain), 'hex')
 
@@ -19,8 +23,10 @@ async function resolveChainConfig (provider: any, chain: string, signerType: str
   return new Promise(resolve => {
     provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, (response: any) => {
       if (!response.error) {
-        const blockNumber = response.result
-        common.setHardforkByBlockNumber(blockNumber)
+        const currentBlock = response.result
+        const targetBlock = (parseInt(currentBlock, 16) - londonHardforkAdoptionBufferBlocks).toString(16)
+
+        common.setHardforkByBlockNumber(targetBlock)
       }
 
       resolve(common)
