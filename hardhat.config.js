@@ -1,18 +1,18 @@
 require("@nomiclabs/hardhat-waffle");
 
 const { utils } = require('ethers')
-const ethProvider = require('eth-provider')
-
+const ethProvider = require('eth-provider');
 
 task('send-tx', 'send a test transaction')
-  .addParam('amount', 'amount to send, in eth')
-  .setAction(async ({ amount }) => {
+  .addOptionalParam('provider', 'eth provider to use for connection')
+  .addOptionalParam('amount', 'amount to send, in eth')
+  .setAction(async ({ amount, provider = 'frame' }, hre) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
 
-    const eth = ethProvider()
+    const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider)
 
-    eth.request({ method: 'eth_accounts' })
+    eth.request({ method: 'eth_accounts', params: [], id: 2, jsonrpc: '2.0' })
       .then(accounts => ({
         value: utils.parseEther(amount || '.0002').toHexString(),
         from: accounts[0],
