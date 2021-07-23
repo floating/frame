@@ -4,50 +4,46 @@ const { utils } = require('ethers')
 const ethProvider = require('eth-provider')
 
 
-task("send-eip1559-tx", "send a test EIP-1559 transaction", async (taskArgs, hre) => {
+task('send-tx', 'send a test transaction')
+  .addParam('amount', 'amount to send, in eth')
+  .setAction(async ({ amount }) => {
   return new Promise((resolve, reject) => {
-    setTimeout(() => reject(new Error('request timed out!')), 10 * 1000)
+    setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
 
     const eth = ethProvider()
-  
-    const tx = {
-      value: utils.parseEther('.0002').toHexString(),
-      from: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
-      to: '0x5837ec9a54f71B6be9a304115CcDE7a07b666438',
-      data: '0x',
-      gasLimit: '0x5208',
-      chainId: '0x4',
-      type: '0x2',
-    }
-    
-    resolve(eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2 })).then(txHash => {
-      console.log(`success! tx hash: ${txHash}`)
-      return txHash
+
+    eth.request({ method: 'eth_accounts' })
+      .then(accounts => ({
+        value: utils.parseEther(amount || '.0002').toHexString(),
+        from: accounts[0],
+        to: '0x5837ec9a54f71B6be9a304115CcDE7a07b666438',
+        data: '0x',
+        gasLimit: '0x5208',
+      }))
+      .then(tx => eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2 }))
+      .then(txHash => {
+        console.log(`success! tx hash: ${txHash}`)
+        return txHash
+      })
+      .then(resolve)
+      .catch(reject)
     })
-  })
-});
+})
 
 module.exports = {
   defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
-
+      hardfork: 'london',
+      initialBaseFeePerGas: 1_000_000_000,
+      forking: {
+        url: 'https://eth-rinkeby.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'
+      }
     },
     arbitrum: {
       url: 'http://localhost:1248',
       gasPrice: 0,
     },
   },
-  // networks: {
-  //   hardhat: {
-  //   },
-  //   rinkeby: {
-  //     httpHeaders: {origin: 'hardhat'},
-  //     //url: "https://rinkeby.infura.io/v3/3bdcf18b1c0d4aa19b258a6f2b975a75",
-  //     url: 'http://localhost:1248',
-  //     accounts: ['b438238ec6636570363031396d6f6f8cdb21581ba6c3c68bfc7525b527c0bc73'],
-  //     gasPrice: 0
-  //   }
-  // },
-  solidity: "0.8.4",
+  solidity: '0.8.4',
 }
