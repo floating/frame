@@ -38,16 +38,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolveChainConfig = exports.chainConfig = void 0;
 var ethereumjs_util_1 = require("ethereumjs-util");
 var common_1 = __importDefault(require("@ethereumjs/common"));
 var londonHardforkSigners = ['seed', 'ring'];
 function chainConfig(chain, hardfork) {
     var chainId = new ethereumjs_util_1.BN(ethereumjs_util_1.stripHexPrefix(chain), 'hex');
-    return common_1["default"].isSupportedChainId(chainId)
-        ? new common_1["default"]({ chain: chainId.toNumber(), hardfork: hardfork })
-        : common_1["default"].forCustomChain('mainnet', { chainId: chainId.toNumber() }, hardfork);
+    return common_1.default.isSupportedChainId(chainId)
+        ? new common_1.default({ chain: chainId.toNumber(), hardfork: hardfork })
+        : common_1.default.forCustomChain('mainnet', { chainId: chainId.toNumber() }, hardfork);
 }
 exports.chainConfig = chainConfig;
 function resolveChainConfig(provider, chain, signerType, hardfork) {

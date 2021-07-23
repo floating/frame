@@ -38,11 +38,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
-var coingecko_1 = __importDefault(require("../coingecko"));
+Object.defineProperty(exports, "__esModule", { value: true });
+var coingecko_1 = require("../coingecko");
 var electron_log_1 = __importDefault(require("electron-log"));
 function byMarketCap(coin1, coin2) {
-    return coin2.market_cap - coin1.market_cap;
+    return (coin1.market_cap || 1) - (coin2.market_cap || 1);
 }
 function loadCoinData(allCoins, symbol) {
     return __awaiter(this, void 0, void 0, function () {
@@ -54,7 +54,7 @@ function loadCoinData(allCoins, symbol) {
                         symbol: symbol,
                         id: symbol.toLowerCase(),
                         name: symbol.toUpperCase(),
-                        image: undefined,
+                        image: '',
                         current_price: 0,
                         price_change_percentage_24h: 0
                     };
@@ -76,7 +76,7 @@ function loadCoinData(allCoins, symbol) {
                 case 3: return [3 /*break*/, 5];
                 case 4:
                     e_1 = _a.sent();
-                    electron_log_1["default"].error("could not load coin data for " + symbol, e_1);
+                    electron_log_1.default.error("could not load coin data for " + symbol, e_1);
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/, defaultMarket];
             }
