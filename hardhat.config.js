@@ -1,38 +1,41 @@
 require("@nomiclabs/hardhat-waffle");
 
 const { utils } = require('ethers')
+const ethProvider = require('eth-provider')
 
 
- task("send-test-tx", "send a test transaction", async (taskArgs, hre) => {
-  // const tx = {
-  //   nonce: utils.parseUnits('276', 'wei').toHexString(),
-  //   value: utils.parseEther('.0002').toHexString(),
-  //   from: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
-  //   to: '0xc2b7414087311645b586517a4860c404a7104301',
-  //   data: '0x',
-  //   gasLimit: '0x5208',
-  //   chainId: '0x4',
-  //   type: '0x2',
-  // }
+task("send-eip1559-tx", "send a test EIP-1559 transaction", async (taskArgs, hre) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => reject(new Error('request timed out!')), 10 * 1000)
+
+    const eth = ethProvider()
   
-  // const signer = await hre.ethers.getSigner('0x22dd63c3619818fdbc262c78baee43cb61e9cccf');
-
-  // console.log(signer)
-
-  // const result = await signer.sendTransaction(tx)
-
-  // console.log(({ result }))
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, world!");
-  await greeter.deployed();
+    const tx = {
+      value: utils.parseEther('.0002').toHexString(),
+      from: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+      to: '0x5837ec9a54f71B6be9a304115CcDE7a07b666438',
+      data: '0x',
+      gasLimit: '0x5208',
+      chainId: '0x4',
+      type: '0x2',
+    }
+    
+    resolve(eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2 })).then(txHash => {
+      console.log(`success! tx hash: ${txHash}`)
+      return txHash
+    })
+  })
 });
 
 module.exports = {
-  defaultNetwork: "arbitrum",
+  defaultNetwork: 'hardhat',
   networks: {
+    hardhat: {
+
+    },
     arbitrum: {
       url: 'http://localhost:1248',
-  gasPrice: 0,
+      gasPrice: 0,
     },
   },
   // networks: {
