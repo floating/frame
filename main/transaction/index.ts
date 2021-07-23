@@ -1,8 +1,9 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex } from 'ethereumjs-util'
-import { Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
+import { JsonTx, Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
 import { chainConfig } from '../../main/chains/config'
+import GasCalculator from './gasCalculator'
 
 interface Signature {
   v: string,
@@ -15,16 +16,17 @@ export interface RawTransaction {
   type: string
 }
 
-export interface TransactionData {
-  chainId: string,
+export interface TransactionData extends JsonTx {
+  warning?: string,
+  maxFee: string
 }
 
 function toBN(hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
-async function populate (rawTx: any, chainConfig: Common, gasCalculator) {
-  const txData =  { ...rawTx }
+async function populate (rawTx: RawTransaction, chainConfig: Common, gasCalculator: GasCalculator): Promise<TransactionData> {
+  const txData: TransactionData = { ...rawTx, maxFee: '' }
 
   // calculate needed gas if not already provided
   try {
@@ -38,8 +40,8 @@ async function populate (rawTx: any, chainConfig: Common, gasCalculator) {
     console.log('london hardfork active!')
     txData.type = '0x2'
 
-    const maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(txData))
-    const maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(txData))
+    const maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(rawTx))
+    const maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(rawTx))
     const maxFee = maxPriorityFee.add(maxBaseFee)
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
@@ -49,7 +51,7 @@ async function populate (rawTx: any, chainConfig: Common, gasCalculator) {
     console.log('london hardfork NOT active!')
     txData.type = '0x0'
 
-    const gasPrice = toBN(gasCalculator.getGasPrice(txData))
+    const gasPrice = toBN(gasCalculator.getGasPrice(rawTx))
 
     txData.gasPrice = bnToHex(gasPrice)
     txData.maxFee = bnToHex(toBN(txData.gasLimit).mul(gasPrice))
@@ -68,15 +70,21 @@ function hexifySignature ({ v, r, s }: Signature) {
 
 async function sign(rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<Signature>) {
   const common = chainConfig(rawTx.chainId, parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
+
+  // @ts-ignore
   const tx = TransactionFactory.fromTxData(rawTx, { common })
 
   return signingFn(tx).then(sig => {
     const signature = hexifySignature(sig)
-    
-    return Transaction.fromTxData({
+
+    return Transaction.fromTxData(
+      {
       ...rawTx,
       ...signature
-    }, { common })
+      },
+      // @ts-ignore
+      { common }
+    )
   })
 }
 

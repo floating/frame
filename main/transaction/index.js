@@ -46,7 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.sign = exports.populate = void 0;
 var ethereumjs_util_1 = require("ethereumjs-util");
 var tx_1 = require("@ethereumjs/tx");
@@ -60,7 +60,7 @@ function populate(rawTx, chainConfig, gasCalculator) {
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    txData = __assign({}, rawTx);
+                    txData = __assign(__assign({}, rawTx), { maxFee: '' });
                     _c.label = 1;
                 case 1:
                     _c.trys.push([1, 4, , 5]);
@@ -83,8 +83,8 @@ function populate(rawTx, chainConfig, gasCalculator) {
                     if (chainConfig.isActivatedEIP(1559)) {
                         console.log('london hardfork active!');
                         txData.type = '0x2';
-                        maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(txData));
-                        maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(txData));
+                        maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(rawTx));
+                        maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(rawTx));
                         maxFee = maxPriorityFee.add(maxBaseFee);
                         txData.maxPriorityFeePerGas = ethereumjs_util_1.bnToHex(maxPriorityFee);
                         txData.maxFeePerGas = ethereumjs_util_1.bnToHex(maxFee);
@@ -93,7 +93,7 @@ function populate(rawTx, chainConfig, gasCalculator) {
                     else {
                         console.log('london hardfork NOT active!');
                         txData.type = '0x0';
-                        gasPrice = toBN(gasCalculator.getGasPrice(txData));
+                        gasPrice = toBN(gasCalculator.getGasPrice(rawTx));
                         txData.gasPrice = ethereumjs_util_1.bnToHex(gasPrice);
                         txData.maxFee = ethereumjs_util_1.bnToHex(toBN(txData.gasLimit).mul(gasPrice));
                     }
@@ -119,7 +119,9 @@ function sign(rawTx, signingFn) {
             tx = tx_1.TransactionFactory.fromTxData(rawTx, { common: common });
             return [2 /*return*/, signingFn(tx).then(function (sig) {
                     var signature = hexifySignature(sig);
-                    return tx_1.Transaction.fromTxData(__assign(__assign({}, rawTx), signature), { common: common });
+                    return tx_1.Transaction.fromTxData(__assign(__assign({}, rawTx), signature), 
+                    // @ts-ignore
+                    { common: common });
                 })];
         });
     });

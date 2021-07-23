@@ -54,7 +54,7 @@ function loadCoinData(allCoins, symbol) {
                         symbol: symbol,
                         id: symbol.toLowerCase(),
                         name: symbol.toUpperCase(),
-                        image: undefined,
+                        image: '',
                         current_price: 0,
                         price_change_percentage_24h: 0
                     };
@@ -76,7 +76,7 @@ function loadCoinData(allCoins, symbol) {
                 case 3: return [3 /*break*/, 5];
                 case 4:
                     e_1 = _a.sent();
-                    electron_log_1["default"].error("could not load coin data for " + symbol, e_1);
+                    electron_log_1.default.error("could not load coin data for " + symbol, e_1);
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/, defaultMarket];
             }
