@@ -36,6 +36,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var ethereumjs_util_1 = require("ethereumjs-util");
+function rpcPayload(method, params, id) {
+    if (id === void 0) { id = 1; }
+    return {
+        method: method,
+        params: params,
+        id: id,
+        jsonrpc: '2.0'
+    };
+}
 var GasCalculator = /** @class */ (function () {
     function GasCalculator(connection /* Chains */, defaultGasLevel) {
         this.connection = connection;
@@ -54,7 +64,8 @@ var GasCalculator = /** @class */ (function () {
                     id: rawTx.chainId
                 };
                 return [2 /*return*/, new Promise(function (resolve, reject) {
-                        _this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, function (response) {
+                        var payload = rpcPayload('eth_estimateGas', [rawTx]);
+                        _this.connection.send(payload, function (response) {
                             if (response.error) {
                                 reject(response.error);
                             }
@@ -70,7 +81,28 @@ var GasCalculator = /** @class */ (function () {
         return '0x3b9aca00'; // 1 gwei
     };
     GasCalculator.prototype.getMaxBaseFeePerGas = function (rawTx) {
-        return '0x32'; // 50 wei
+        return __awaiter(this, void 0, void 0, function () {
+            var payload;
+            var _this = this;
+            return __generator(this, function (_a) {
+                payload = rpcPayload('eth_feeHistory', [1, 'latest', []]);
+                return [2 /*return*/, new Promise(function (resolve, reject) {
+                        _this.connection.send(payload, function (response) {
+                            console.log({ response: response });
+                            if (response.error) {
+                                console.error("could not load fee history, using default maxBaseFeePerGas=" + _this.defaultGasLevel);
+                                return resolve(_this.defaultGasLevel);
+                            }
+                            // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
+                            var nextBlockFee = response.result.baseFeePerGas[1]; // base fee for next block
+                            var calculatedFee = Math.ceil(parseInt(nextBlockFee, 16) * 1.125 * 1.125);
+                            var maxFee = ethereumjs_util_1.addHexPrefix(calculatedFee.toString(16));
+                            console.log({ nextBlockFee: nextBlockFee, calculatedFee: calculatedFee, maxFee: maxFee });
+                            resolve(maxFee);
+                        });
+                    })];
+            });
+        });
     };
     return GasCalculator;
 }());

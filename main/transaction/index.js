@@ -56,48 +56,51 @@ function toBN(hexStr) {
 }
 function populate(rawTx, chainConfig, gasCalculator) {
     return __awaiter(this, void 0, void 0, function () {
-        var txData, _a, _b, e_1, maxPriorityFee, maxBaseFee, maxFee, gasPrice;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var txData, _a, _b, e_1, maxPriorityFee, maxBaseFee, _c, maxFee, gasPrice;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
                     txData = __assign(__assign({}, rawTx), { maxFee: '' });
-                    _c.label = 1;
+                    _d.label = 1;
                 case 1:
-                    _c.trys.push([1, 4, , 5]);
+                    _d.trys.push([1, 4, , 5]);
                     _a = txData;
                     _b = txData.gasLimit;
                     if (_b) return [3 /*break*/, 3];
                     return [4 /*yield*/, gasCalculator.getGasEstimate(rawTx)];
                 case 2:
-                    _b = (_c.sent());
-                    _c.label = 3;
+                    _b = (_d.sent());
+                    _d.label = 3;
                 case 3:
                     _a.gasLimit = _b;
                     return [3 /*break*/, 5];
                 case 4:
-                    e_1 = _c.sent();
+                    e_1 = _d.sent();
                     txData.gasLimit = '0x0';
                     txData.warning = e_1.message;
                     return [3 /*break*/, 5];
                 case 5:
-                    if (chainConfig.isActivatedEIP(1559)) {
-                        console.log('london hardfork active!');
-                        txData.type = '0x2';
-                        maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(rawTx));
-                        maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(rawTx));
-                        maxFee = maxPriorityFee.add(maxBaseFee);
-                        txData.maxPriorityFeePerGas = ethereumjs_util_1.bnToHex(maxPriorityFee);
-                        txData.maxFeePerGas = ethereumjs_util_1.bnToHex(maxFee);
-                        txData.maxFee = txData.maxFeePerGas;
-                    }
-                    else {
-                        console.log('london hardfork NOT active!');
-                        txData.type = '0x0';
-                        gasPrice = toBN(gasCalculator.getGasPrice(rawTx));
-                        txData.gasPrice = ethereumjs_util_1.bnToHex(gasPrice);
-                        txData.maxFee = ethereumjs_util_1.bnToHex(toBN(txData.gasLimit).mul(gasPrice));
-                    }
-                    return [2 /*return*/, txData];
+                    if (!chainConfig.isActivatedEIP(1559)) return [3 /*break*/, 7];
+                    console.log('london hardfork active!');
+                    txData.type = '0x2';
+                    maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(rawTx));
+                    _c = toBN;
+                    return [4 /*yield*/, gasCalculator.getMaxBaseFeePerGas(rawTx)];
+                case 6:
+                    maxBaseFee = _c.apply(void 0, [_d.sent()]);
+                    maxFee = maxPriorityFee.add(maxBaseFee);
+                    txData.maxPriorityFeePerGas = ethereumjs_util_1.bnToHex(maxPriorityFee);
+                    txData.maxFeePerGas = ethereumjs_util_1.bnToHex(maxFee);
+                    txData.maxFee = txData.maxFeePerGas;
+                    return [3 /*break*/, 8];
+                case 7:
+                    console.log('london hardfork NOT active!');
+                    txData.type = '0x0';
+                    gasPrice = toBN(gasCalculator.getGasPrice(rawTx));
+                    txData.gasPrice = ethereumjs_util_1.bnToHex(gasPrice);
+                    txData.maxFee = ethereumjs_util_1.bnToHex(toBN(txData.gasLimit).mul(gasPrice));
+                    _d.label = 8;
+                case 8: return [2 /*return*/, txData];
             }
         });
     });

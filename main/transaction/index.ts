@@ -41,7 +41,7 @@ async function populate (rawTx: RawTransaction, chainConfig: Common, gasCalculat
     txData.type = '0x2'
 
     const maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(rawTx))
-    const maxBaseFee = toBN(gasCalculator.getMaxBaseFeePerGas(rawTx))
+    const maxBaseFee = toBN(await gasCalculator.getMaxBaseFeePerGas(rawTx))
     const maxFee = maxPriorityFee.add(maxBaseFee)
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)

@@ -1,4 +1,4 @@
-import { BN, stripHexPrefix } from 'ethereumjs-util'
+import { BN, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
 const londonHardforkSigners = ['seed', 'ring']
@@ -24,8 +24,9 @@ async function resolveChainConfig (provider: any, chain: string, signerType: str
     provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, (response: any) => {
       if (!response.error) {
         const currentBlock = response.result
-        const targetBlock = (parseInt(currentBlock, 16) - londonHardforkAdoptionBufferBlocks).toString(16)
+        const targetBlock = addHexPrefix((parseInt(currentBlock, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
 
+        console.log({ targetBlock })
         common.setHardforkByBlockNumber(targetBlock)
       }
 
