@@ -35,21 +35,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var calculator = function (connection /* Chains */, defaultGasLevel) {
-    function getGasPrice() {
-        return defaultGasLevel;
+Object.defineProperty(exports, "__esModule", { value: true });
+var GasCalculator = /** @class */ (function () {
+    function GasCalculator(connection /* Chains */, defaultGasLevel) {
+        this.connection = connection;
+        this.defaultGasLevel = defaultGasLevel;
     }
-    function getGasEstimate(rawTx) {
+    GasCalculator.prototype.getGasPrice = function (rawTx) {
+        return this.defaultGasLevel;
+    };
+    GasCalculator.prototype.getGasEstimate = function (rawTx) {
         return __awaiter(this, void 0, void 0, function () {
             var targetChain;
+            var _this = this;
             return __generator(this, function (_a) {
                 targetChain = {
                     type: 'ethereum',
                     id: rawTx.chainId
                 };
                 return [2 /*return*/, new Promise(function (resolve, reject) {
-                        connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, function (response) {
+                        _this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, function (response) {
                             if (response.error) {
                                 reject(response.error);
                             }
@@ -60,18 +65,13 @@ var calculator = function (connection /* Chains */, defaultGasLevel) {
                     })];
             });
         });
-    }
-    function getMaxPriorityFeePerGas(rawTx) {
-        return '0x3b9aca00'; // 1 gwei
-    }
-    function getMaxBaseFeePerGas(rawTx) {
-        return '0x32'; // 50 wei
-    }
-    return {
-        getGasPrice: getGasPrice,
-        getGasEstimate: getGasEstimate,
-        getMaxPriorityFeePerGas: getMaxPriorityFeePerGas,
-        getMaxBaseFeePerGas: getMaxBaseFeePerGas
     };
-};
-exports["default"] = calculator;
+    GasCalculator.prototype.getMaxPriorityFeePerGas = function (rawTx) {
+        return '0x3b9aca00'; // 1 gwei
+    };
+    GasCalculator.prototype.getMaxBaseFeePerGas = function (rawTx) {
+        return '0x32'; // 50 wei
+    };
+    return GasCalculator;
+}());
+exports.default = GasCalculator;
