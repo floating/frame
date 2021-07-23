@@ -13,7 +13,7 @@ const { recoverTypedData } = require('../crypt/typedDataUtils')
 
 const { resolveChainConfig } = require('../chains/config')
 const { populate: populateTransaction } = require('../transaction')
-const gasCalculator = require('../transaction/gasCalculator').default
+const GasCalculator = require('../transaction/gasCalculator').default
 
 const version = require('../../package.json').version
 
@@ -279,7 +279,7 @@ class Provider extends EventEmitter {
     const { levels, selected } = store('main.networksMeta', chain.type, chain.id, 'gas.price')
     if (!levels[selected]) throw new Error('Unable to determine gas')
 
-    return gasCalculator(this.connection, levels[selected])
+    return new GasCalculator(this.connection, levels[selected])
   }
 
   getNonce (rawTx, res) {
