@@ -6,11 +6,15 @@ const log = require('electron-log')
 const bip39 = require('bip39')
 const zxcvbn = require('zxcvbn')
 
+const crypt = require('../../crypt')
+
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
 
 const USER_DATA = app ? app.getPath('userData') : './test/.userData'
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
+
+const wait = async ms => new Promise(resolve => setTimeout(resolve, ms))
 
 module.exports = {
   newPhrase: (cb) => {
@@ -80,7 +84,7 @@ module.exports = {
   scan: (signers) => {
     const storedSigners = {}
 
-    const scan = () => {
+    const scan = async () => {
       // Ensure signer directory exists
       ensureDirSync(SIGNERS_PATH)
 
@@ -92,18 +96,36 @@ module.exports = {
         } catch (e) { log.error(`Corrupt signer file: ${file}`) }
       })
 
-      // Add stored signers to store
-      Object.keys(storedSigners).forEach(id => {
+
+      for (const id of Object.keys(storedSigners)) {
+        await wait(100)
         const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
-        if (type === 'seed') {
-          signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
-        } else if (type === 'ring') {
-          signers.add(new RingSigner({ network, addresses, encryptedKeys }))
+        if (addresses && addresses.length) {
+          const id = crypt.stringToKey(addresses.join()).toString('hex')
+          if (!signers.exists(id)) {
+            if (type === 'seed') {
+              signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
+            } else if (type === 'ring') {
+              signers.add(new RingSigner({ network, addresses, encryptedKeys }))
+            }
+          }
         }
-      })
+      }
+
+      // Add stored signers to store
+      // Object.keys(storedSigners).forEach(id => {
+      //   const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
+      //   if (type === 'seed') {
+      //     signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
+      //   } else if (type === 'ring') {
+      //     signers.add(new RingSigner({ network, addresses, encryptedKeys }))
+      //   }
+      // })
     }
 
-    scan()
+
+    // Delay creating child process until after initial load
+    setTimeout(scan, 5000)
 
     return scan
   }
