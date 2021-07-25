@@ -1,11 +1,23 @@
-import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
+import { intToHex } from 'ethereumjs-util'
+import log from 'electron-log'
 
 import { RawTransaction } from './index'
 
-// TODO: move this to a declaration file?
-interface ProviderResponse {
-  error: string,
-  result: any
+const oneGwei = '0x3b9aca00'
+
+// TODO: move these to a declaration file?
+interface GasEstimateResponse {
+  error?: string,
+  result: string
+}
+
+interface FeeHistoryResponse {
+  error?: string,
+  result: {
+    baseFeePerGas: string[],
+    gasUsedRatio: number[],
+    reward: Array<string[]>
+  }
 }
 
 interface ProviderRequest {
@@ -13,6 +25,17 @@ interface ProviderRequest {
   params: any[],
   id: number,
   jsonrpc: '2.0'
+}
+
+interface Block {
+  baseFee: number,
+  rewards: number[],
+  gasUsedRatio: number
+}
+
+interface Eip1559GasFees {
+  maxBaseFeePerGas: string,
+  maxPriorityFeePerGas: string
 }
 
 function rpcPayload (method: string, params: any[], id = 1): ProviderRequest {
@@ -46,7 +69,7 @@ export default class GasCalculator {
     return new Promise<string>((resolve, reject) => {
       const payload = rpcPayload('eth_estimateGas', [rawTx])
 
-      this.connection.send(payload, (response: ProviderResponse) => {
+      this.connection.send(payload, (response: GasEstimateResponse) => {
         if (response.error) {
           reject(response.error)
         } else {
@@ -56,27 +79,47 @@ export default class GasCalculator {
     })
   }
 
-  getMaxPriorityFeePerGas (rawTx: RawTransaction) {
-    return '0x3b9aca00' // 1 gwei
-  }
-  
-  async getMaxBaseFeePerGas (rawTx: RawTransaction) {
-    const payload = rpcPayload('eth_feeHistory', [1, 'latest', []])
+  async _getFeeHistory(numBlocks: number, rewardPercentiles: number[], newestBlock = 'latest'): Promise<Block[]> {
+    const payload = rpcPayload('eth_feeHistory', [numBlocks, newestBlock, rewardPercentiles])
 
-    return new Promise<string>((resolve, reject) => {
-      this.connection.send(payload, (response: ProviderResponse) => {
-        if (response.error) {
-          console.error(`could not load fee history, using default maxBaseFeePerGas=${this.defaultGasLevel}`)
-          return resolve(this.defaultGasLevel)
-        }
+    return new Promise((resolve, reject) => {
+      this.connection.send(payload, (response: FeeHistoryResponse) => {
+        if (response.error) return reject()
 
-        // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
-        const nextBlockFee = response.result.baseFeePerGas[1] // base fee for next block
-        const calculatedFee = Math.ceil(parseInt(nextBlockFee, 16) * 1.125 * 1.125)
-        const maxFee = addHexPrefix(calculatedFee.toString(16))
+        const feeHistoryBlocks = response.result.baseFeePerGas.map((baseFee, i) => {
+          return {
+            baseFee: parseInt(baseFee, 16),
+            gasUsedRatio: response.result.gasUsedRatio[i],
+            rewards: (response.result.reward[i] || []).map(reward => parseInt(reward, 16))
+          }
+        })
 
-        resolve(maxFee)
+        resolve(feeHistoryBlocks)
       })
     })
+  }
+  
+  async getFeePerGas (): Promise<Eip1559GasFees> {
+    // fetch the last 10 blocks and the bottom 10% of priority fees paid for each block
+    try {
+      const blocks = await this._getFeeHistory(10, [10])
+      
+      // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
+      const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
+      const calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125)
+
+      // only consider priority fees from blocks that aren't almost empty or almost full
+      const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
+      const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)]
+
+      return {
+        maxBaseFeePerGas: intToHex(calculatedFee),
+        maxPriorityFeePerGas: intToHex(medianReward)
+      }
+    } catch (e) {
+      const defaultGas = { maxBaseFeePerGas: this.defaultGasLevel, maxPriorityFeePerGas: oneGwei }
+      log.warn('could not load fee history, using default', defaultGas)
+      return defaultGas
+    }
   }
 }
