@@ -3,7 +3,7 @@ import log from 'electron-log'
 
 import { RawTransaction } from './index'
 
-const oneGwei = '0x3b9aca00'
+const oneGwei = 1e9
 
 // TODO: move these to a declaration file?
 interface GasEstimateResponse {
@@ -110,14 +110,14 @@ export default class GasCalculator {
 
       // only consider priority fees from blocks that aren't almost empty or almost full
       const eligibleRewardsBlocks = blocks.filter(block => block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9).map(block => block.rewards[0])
-      const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)]
+      const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || oneGwei
 
       return {
         maxBaseFeePerGas: intToHex(calculatedFee),
         maxPriorityFeePerGas: intToHex(medianReward)
       }
     } catch (e) {
-      const defaultGas = { maxBaseFeePerGas: this.defaultGasLevel, maxPriorityFeePerGas: oneGwei }
+      const defaultGas = { maxBaseFeePerGas: this.defaultGasLevel, maxPriorityFeePerGas: intToHex(oneGwei) }
       log.warn('could not load fee history, using default', defaultGas)
       return defaultGas
     }
