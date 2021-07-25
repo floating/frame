@@ -96,7 +96,7 @@ module.exports = {
         } catch (e) { log.error(`Corrupt signer file: ${file}`) }
       })
 
-
+      // Add stored signers
       for (const id of Object.keys(storedSigners)) {
         await wait(100)
         const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
@@ -111,21 +111,10 @@ module.exports = {
           }
         }
       }
-
-      // Add stored signers to store
-      // Object.keys(storedSigners).forEach(id => {
-      //   const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
-      //   if (type === 'seed') {
-      //     signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
-      //   } else if (type === 'ring') {
-      //     signers.add(new RingSigner({ network, addresses, encryptedKeys }))
-      //   }
-      // })
     }
 
-
     // Delay creating child process until after initial load
-    setTimeout(scan, 5000)
+    setTimeout(scan, 4000)
 
     return scan
   }
