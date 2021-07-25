@@ -1,0 +1,183 @@
+._txButton
+  background var(--ghostD)
+  border-radius 8px
+  transition var(--standardFaster)
+  box-shadow 0px 0px 0px 0px var(--ghostA)
+  transform translateY(0px)
+  cursor pointer
+  box-shadow 0px 5px 8px 0px var(--ghostA)
+
+  *
+    pointer-events none
+
+
+._txButton:hover
+  // flex 1
+  // padding 0px 10px
+  background var(--good)
+  color var(--goodOver)
+  box-shadow 0px 20px 30px -5px var(--ghostX)
+  animation 5s shake ease-in-out infinite alternate
+
+._txButtonBad:hover
+  background var(--bad)
+  color var(--badOver)
+
+._txButton:active
+  transform translateY(0px)
+  animation-name shake-little
+  animation-duration 2s
+  animation-timing-function: ease-in-out
+  animation-iteration-count: infinite
+  box-shadow 0px 5px 8px 0px var(--ghostX)
+
+@keyframes shake 
+  0% 
+    transform translate3d(0px, 0px, 0) rotate(-0.4deg) scale(1)
+  25% 
+    transform translate3d(-0.7px, -1px, 0) rotate(0.4deg) scale(1.01)
+  50% 
+    transform translate3d(0.7px, 1px, 0) rotate(-0.4deg) scale(1.02)
+  75% 
+    transform translate3d(-0.7px, 0.3px, 0) rotate(0.2deg) scale(1.01)
+  100% 
+    transform translate3d(0.7px, 0.7px, 0) rotate(-0.4deg) scale(1)
+
+
+@keyframes shake-little 
+  2% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  4% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  6% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  8% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  10% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  12% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  14% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  16% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  18% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  20% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  22% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  24% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  26% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  28% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  30% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  32% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  34% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  36% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  38% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  40% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  42% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  44% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  46% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  48% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  50% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  52% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  54% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  56% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  58% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  60% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  62% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  64% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  66% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  68% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  70% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  72% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  74% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  76% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  78% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  80% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  82% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  84% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  86% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  88% 
+    transform: translate(0px, 0px) rotate(0.5deg) 
+  90% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  92% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  94% 
+    transform: translate(1px, 1px) rotate(0.5deg) 
+  96% 
+    transform: translate(0px, 1px) rotate(0.5deg) 
+  98% 
+    transform: translate(1px, 0px) rotate(0.5deg) 
+  0%, 100% 
+    transform: translate(0, 0) rotate(0)  
+
+
+
+
+._txModule
+  position absolute
+  top 130px
+  left 10px
+  right 10px
+  height 30px
+  z-index 100000
+  box-shadow 0px 0px 0px var(--ghostZ)
+  
+  ._txModuleInner
+    position absolute 
+    top 0
+    right 0
+    bottom 0
+    left 0
+    background var(--ghostC)
+    border-radius 8px
+    display flex
+    flex-direction row
+    align-items stretch
+    font-weight 500
+    // overflow hidden
+
+    ._txModuleSlice
+      display flex
+      justify-content center
+      align-items center
+      text-transform uppercase
+      font-size 12px
+      // border-right 1px solid var(--ghostA)
+      padding 0px 6px
+      font-family FiraCode

@@ -6,7 +6,17 @@ import link from '../../../../../../../resources/link'
 
 import TxBar from './TxBar'
 
-import TxFee from './TxFee'
+// import TxFee from './TxFee'
+
+
+// New Tx
+import TxMain from './TxMain'
+import TxFeeNew from './TxFeeNew'
+import TxData from './TxData'
+import TxRecipient from './TxRecipient'
+import TxOverlay from './TxOverlay'
+
+
 
 import TxModule from './TxModule'
 
@@ -121,6 +131,10 @@ class TransactionRequest extends React.Component {
     setTimeout(_ => this.setState({ copiedData: false }), 1000)
   }
 
+  overlayMode (mode) {
+    this.setState({ overlayMode: mode })
+  }
+
   render () {
     const req = this.props.req
     let notice = req.notice
@@ -137,7 +151,7 @@ class TransactionRequest extends React.Component {
     const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
     const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
     const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-    const value = this.hexToDisplayValue(req.data.value || '0x')
+    // const value = this.hexToDisplayValue(req.data.value || '0x')
     const fee = this.hexToDisplayValue(utils.numberToHex(parseInt(req.data.gas, 16) * parseInt(req.data.gasPrice, 16)))
     const feeUSD = fee * etherUSD
     const height = req.status === 'error' ? '205px' : mode === 'monitor' ? '205px' : '340px'
@@ -146,7 +160,7 @@ class TransactionRequest extends React.Component {
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
     if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
-    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
+    // const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
     const txMeta = { replacement: false, possible: true, notice: '' }
     // TODO
     // if (signer locked) {
@@ -186,6 +200,7 @@ class TransactionRequest extends React.Component {
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
+        <TxOverlay {...this.props} overlayMode={this.state.overlayMode}/>
         <div className='requestMeta'>
           <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks', this.chain.type, this.chain.id, 'name')}</div>
           <div className='requestMetaOrigin'>{req.origin}</div>
@@ -387,34 +402,12 @@ class TransactionRequest extends React.Component {
                     )
                       : null}
                   </div>
-                  <div className='transactionValue'>
-                    <div className='transactionTotals'>
-                      <div className='transactionTotalETH'>
-                        <span className='transactionSymbol'>{currentSymbol}</span>
-                        <span>{value}</span>
-                      </div>
-                      <div className='transactionTotalUSD'>{'$' + (value * etherUSD).toFixed(2)}</div>
-                    </div>
-                    <div className='transactionSubtitle'>Value</div>
-                  </div>
-                  <TxFee {...this.props} />
-                  <TxModule top={165} req={req} />
-                  {req.data.to ? (
-                    <div className='transactionTo'>
-                      <div className='transactionToAddress'>
-                        <div className='transactionToAddressLarge'>
-                          {req.data.to.substring(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })} {req.data.to.substr(req.data.to.length - 11)}</div>
-                        <div className='transactionToAddressFull' onMouseDown={this.copyAddress.bind(this, req.data.to)}>
-                          {this.state.copied ? <span>{'Copied'}{svg.octicon('clippy', { height: 14 })}</span> : req.data.to}
-                        </div>
-                      </div>
-                      <div className='transactionToSub'>Send To</div>
-                    </div>
-                  ) : (
-                    <div className='transactionTo'>
-                      <div className='transactionToSub'>Deploying Contract</div>
-                    </div>
-                  )}
+                  {/* <TxFee {...this.props} /> */}
+                  <TxMain {...this.props} chain={this.chain}/>
+                  <TxRecipient {...this.props} />
+                  <TxData {...this.props} />
+                  <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)}/>
+                  {/* <TxModule top={165} req={req} /> */}
                 </>
               )}
             </div>
@@ -425,14 +418,14 @@ class TransactionRequest extends React.Component {
         {!notice ? (
           <div className='requestApprove'>
             <div
-              className='requestDecline' onMouseDown={() => {
+              className='requestDecline' onClick={() => {
                 if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
               }}
             >
-              <div className='requestDeclineButton requestScaleButtonDecline'>Decline</div>
+              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
             </div>
             <div
-              className='requestSign' onMouseDown={() => {
+              className='requestSign' onClick={() => {
                 if (this.state.allowInput && this.props.onTop) {
                   if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
                     this.store.notify('gasFeeWarning', { req, feeUSD })
@@ -442,7 +435,7 @@ class TransactionRequest extends React.Component {
                 }
               }}
             >
-              <div className='requestSignButton requestScaleButtonSign'> Sign </div>
+              <div className='requestSignButton _txButton'> Sign </div>
             </div>
           </div>
         ) : null}

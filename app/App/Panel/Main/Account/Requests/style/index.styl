@@ -283,7 +283,7 @@
   z-index 200
   transition var(--standardSlow)
   transform translateZ(0)
-  overflow hidden
+  // overflow hidden
 
   // padding 20px 0px 20px 0p
 
@@ -395,7 +395,7 @@
     padding-bottom 10px
     justify-content space-between
     // box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
-    border-radius 8px
+    border-radius 10px
     height 40px
     display flex
     justify-content center
@@ -403,7 +403,7 @@
     z-index 2000
     color var(--outerspace)
     tranform translateZ(0)
-    overflow hidden
+    // overflow hidden
     background var(--ghostB)
     box-shadow 0px 2px 10px var(--ghostZ)
 
@@ -628,8 +628,8 @@
     .approveRequestHeader
       position absolute
       top 0
-      left 0
-      right 0
+      left 5px
+      right 5px
       height 50px
       display flex
       justify-content center
@@ -1100,7 +1100,7 @@
     right 0
     bottom 0
     height 60px
-    border-radius 8px
+    // border-radius 8px
     font-size 14px
     text-transform uppercase
     -webkit-app-region no-drag
@@ -1111,24 +1111,23 @@
     justify-content space-around
     align-items center
     font-weight 400
-    background var(--ghostC)
+    // background var(--ghostC)
 
     .requestDecline
       position relative
       width 50%
       height 100%
-      border-right 1px solid var(--ghostB)
-      overflow hidden
       position relative
       // background blue
 
     .requestDeclineButton
       position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
+      top 5px
+      right 2.5px
+      bottom 5px
+      left 5px
       // animation scalein 3000ms var(--cubic)
+      transition var(--standardFaster)
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1148,24 +1147,24 @@
       height 4px
       border-radius 2px
       width 30px
-      background var(--bad06)
-      bottom 14px
+      background var(--bad)
+      bottom 11px
 
     .requestDeclineButton:hover:before
-      background var(--bad)
+      background var(--badOver)
 
     .requestSign
       position relative
       width 50%
       height 100%
-      overflow hidden
+      // overflow hidden
 
     .requestSignButton
       position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
+      top 5px
+      right 5px
+      bottom 5px
+      left 2.5px
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1174,13 +1173,9 @@
       letter-spacing 2px
       padding-left 2px
       padding-bottom 10px
-      cursor pointer
-      *
-        pointer-events none
 
     // .requestSignButton:hover
     //   background var(--ghostD)
-
 
     .requestSignButton:before
       content ''
@@ -1189,12 +1184,12 @@
       height 4px
       border-radius 2px
       width 30px
-      background var(--good06)
-      bottom 14px
+      background var(--good)
+      bottom 11px
+      transition var(--standardFaster)
 
     .requestSignButton:hover:before
-      background var(--good)
-
+      background var(--goodOver)
 
   .requestScaleButtonSign
     animation scalein 3000ms var(--cubic) !important
@@ -2044,4 +2039,4 @@ span
 
 
 @import './next'
-@import '../TransactionRequest/TxModule/style'
+@import '../TransactionRequest/style'
