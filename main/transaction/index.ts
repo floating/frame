@@ -40,8 +40,10 @@ async function populate (rawTx: RawTransaction, chainConfig: Common, gasCalculat
     console.log('london hardfork active!')
     txData.type = '0x2'
 
-    const maxPriorityFee = toBN(gasCalculator.getMaxPriorityFeePerGas(rawTx))
-    const maxBaseFee = toBN(await gasCalculator.getMaxBaseFeePerGas(rawTx))
+    const fees = await gasCalculator.getFeePerGas()
+
+    const maxPriorityFee = toBN(fees.maxPriorityFeePerGas)
+    const maxBaseFee = toBN(fees.maxBaseFeePerGas)
     const maxFee = maxPriorityFee.add(maxBaseFee)
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)

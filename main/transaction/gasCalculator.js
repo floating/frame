@@ -35,8 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var ethereumjs_util_1 = require("ethereumjs-util");
+var electron_log_1 = __importDefault(require("electron-log"));
+var oneGwei = '0x3b9aca00';
 function rpcPayload(method, params, id) {
     if (id === void 0) { id = 1; }
     return {
@@ -77,30 +82,58 @@ var GasCalculator = /** @class */ (function () {
             });
         });
     };
-    GasCalculator.prototype.getMaxPriorityFeePerGas = function (rawTx) {
-        return '0x3b9aca00'; // 1 gwei
-    };
-    GasCalculator.prototype.getMaxBaseFeePerGas = function (rawTx) {
+    GasCalculator.prototype._getFeeHistory = function (numBlocks, rewardPercentiles, newestBlock) {
+        if (newestBlock === void 0) { newestBlock = 'latest'; }
         return __awaiter(this, void 0, void 0, function () {
             var payload;
             var _this = this;
             return __generator(this, function (_a) {
-                payload = rpcPayload('eth_feeHistory', [1, 'latest', []]);
+                payload = rpcPayload('eth_feeHistory', [numBlocks, newestBlock, rewardPercentiles]);
                 return [2 /*return*/, new Promise(function (resolve, reject) {
                         _this.connection.send(payload, function (response) {
-                            console.log({ response: response });
-                            if (response.error) {
-                                console.error("could not load fee history, using default maxBaseFeePerGas=" + _this.defaultGasLevel);
-                                return resolve(_this.defaultGasLevel);
-                            }
-                            // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
-                            var nextBlockFee = response.result.baseFeePerGas[1]; // base fee for next block
-                            var calculatedFee = Math.ceil(parseInt(nextBlockFee, 16) * 1.125 * 1.125);
-                            var maxFee = ethereumjs_util_1.addHexPrefix(calculatedFee.toString(16));
-                            console.log({ nextBlockFee: nextBlockFee, calculatedFee: calculatedFee, maxFee: maxFee });
-                            resolve(maxFee);
+                            if (response.error)
+                                return reject();
+                            var feeHistoryBlocks = response.result.baseFeePerGas.map(function (baseFee, i) {
+                                return {
+                                    baseFee: parseInt(baseFee, 16),
+                                    gasUsedRatio: response.result.gasUsedRatio[i],
+                                    rewards: (response.result.reward[i] || []).map(function (reward) { return parseInt(reward, 16); })
+                                };
+                            });
+                            resolve(feeHistoryBlocks);
                         });
                     })];
+            });
+        });
+    };
+    GasCalculator.prototype.getFeePerGas = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var blocks, nextBlockFee, calculatedFee, eligibleRewardsBlocks, medianReward, e_1, defaultGas;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this._getFeeHistory(10, [10])
+                            // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
+                        ];
+                    case 1:
+                        blocks = _a.sent();
+                        nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
+                        ;
+                        calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125);
+                        eligibleRewardsBlocks = blocks.filter(function (block) { return block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9; }).map(function (block) { return block.rewards[0]; });
+                        medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)];
+                        return [2 /*return*/, {
+                                maxBaseFeePerGas: ethereumjs_util_1.intToHex(calculatedFee),
+                                maxPriorityFeePerGas: ethereumjs_util_1.intToHex(medianReward)
+                            }];
+                    case 2:
+                        e_1 = _a.sent();
+                        defaultGas = { maxBaseFeePerGas: this.defaultGasLevel, maxPriorityFeePerGas: oneGwei };
+                        electron_log_1.default.warn('could not load fee history, using default', defaultGas);
+                        return [2 /*return*/, defaultGas];
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };
