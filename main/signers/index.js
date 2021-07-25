@@ -92,6 +92,10 @@ class Signers extends EventEmitter {
     }
   }
 
+  exists (id) {
+    return this.signers.find(s => s.id === id)
+  }
+
   add (signer) {
     if (!this.signers.find(s => s.id === signer.id)) this.signers.push(signer)
   }
