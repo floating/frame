@@ -332,8 +332,6 @@ class Chains extends EventEmitter {
       chainType = type
       chainId = id
     }
-    // console.log('payload', payload)
-    // console.log('targetChain', targetChain)
     if (this.connections[chainType] && this.connections[chainType][chainId]) {
       this.connections[chainType][chainId].send(payload, res)
     } else {
