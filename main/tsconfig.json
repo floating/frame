@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es6", "dom"],
+    "types": ["node"],
+    "typeRoots": ["../node_modules/@types"],
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "rootDir": ".",
+    "outDir": "../dist"
+  },
+  "include": ["./**/*.ts", "./**/*.js"],
+  "references": [
+    { "path": ".." }
+  ]
+}

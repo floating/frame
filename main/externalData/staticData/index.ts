@@ -13,7 +13,7 @@ interface CoinData {
 }
 
 function byMarketCap (coin1: Market, coin2: Market) {
-  return coin2.market_cap - coin1.market_cap
+  return (coin1.market_cap || 1) - (coin2.market_cap || 1)
 }
 
 async function loadCoinData (allCoins: Coin[], symbol: string): Promise<Market> {
@@ -48,8 +48,8 @@ async function loadCoinData (allCoins: Coin[], symbol: string): Promise<Market> 
   return defaultMarket
 }
 
-async function load (symbols: string[]): Promise<{ [key: string]: any }> {
-  const data = {}
+async function load (symbols: string[]) {
+  const data: CoinData = {}
 
   const allCoins = await coingecko.listCoins()
 

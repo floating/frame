@@ -2,7 +2,7 @@ import { BN, addHexPrefix, stripHexPrefix, bnToHex } from 'ethereumjs-util'
 import { JsonTx, Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
-import { chainConfig } from '../../main/chains/config'
+import { chainConfig } from '../chains/config'
 import GasCalculator from './gasCalculator'
 
 interface Signature {
@@ -21,7 +21,7 @@ export interface TransactionData extends JsonTx {
   maxFee: string
 }
 
-function toBN(hexStr: string) {
+function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
@@ -70,7 +70,7 @@ function hexifySignature ({ v, r, s }: Signature) {
   }
 }
 
-async function sign(rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<Signature>) {
+async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<Signature>) {
   const common = chainConfig(rawTx.chainId, parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
 
   // @ts-ignore
