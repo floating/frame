@@ -28,7 +28,7 @@
   },
   "scripts": {
     "start": "npm run launch",
-    "bundle": "tsc && npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash  && npm run bundle:dapp && npm run bundle:dapp:inject",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash  && npm run bundle:dapp && npm run bundle:dapp:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
     "bundle:tray": "parcel build app/tray.html --public-url . -d bundle --target browser",
     "bundle:flow": "parcel build flow/flow.html --public-url . -d bundle --target browser",
