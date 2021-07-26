@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es5",                     
-    "module": "commonjs",
-    "lib": ["es6"],
-    "allowJs": true,
-    "rootDir": "main",
-    "strict": true,
-    "noImplicitAny": true,
-    "esModuleInterop": true,
+    "rootDir": ".",
+    "outDir": ".",
     "resolveJsonModule": true,
-    "types": ["jest"],
-    "typeRoots": ["./types", "./node_modules/@types"]
+    "composite": true,
+    "types": ["node", "Long"],
+    "typeRoots": ["./node_modules/@types"]
   },
-  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["./main/**/*.tsx", "./main/**/*.ts"]
+  "files": [
+    "package.json"
+  ]
 }
