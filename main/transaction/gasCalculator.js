@@ -41,7 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ethereumjs_util_1 = require("ethereumjs-util");
 var electron_log_1 = __importDefault(require("electron-log"));
-var oneGwei = '0x3b9aca00';
+var oneGwei = 1e9;
 function rpcPayload(method, params, id) {
     if (id === void 0) { id = 1; }
     return {
@@ -66,7 +66,7 @@ var GasCalculator = /** @class */ (function () {
             return __generator(this, function (_a) {
                 targetChain = {
                     type: 'ethereum',
-                    id: rawTx.chainId
+                    id: parseInt(rawTx.chainId, 16)
                 };
                 return [2 /*return*/, new Promise(function (resolve, reject) {
                         var payload = rpcPayload('eth_estimateGas', [rawTx]);
@@ -122,14 +122,14 @@ var GasCalculator = /** @class */ (function () {
                         ;
                         calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125);
                         eligibleRewardsBlocks = blocks.filter(function (block) { return block.gasUsedRatio >= 0.1 && block.gasUsedRatio <= 0.9; }).map(function (block) { return block.rewards[0]; });
-                        medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)];
+                        medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || oneGwei;
                         return [2 /*return*/, {
                                 maxBaseFeePerGas: ethereumjs_util_1.intToHex(calculatedFee),
                                 maxPriorityFeePerGas: ethereumjs_util_1.intToHex(medianReward)
                             }];
                     case 2:
                         e_1 = _a.sent();
-                        defaultGas = { maxBaseFeePerGas: this.defaultGasLevel, maxPriorityFeePerGas: oneGwei };
+                        defaultGas = { maxBaseFeePerGas: this.defaultGasLevel, maxPriorityFeePerGas: ethereumjs_util_1.intToHex(oneGwei) };
                         electron_log_1.default.warn('could not load fee history, using default', defaultGas);
                         return [2 /*return*/, defaultGas];
                     case 3: return [2 /*return*/];
