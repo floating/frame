@@ -137,6 +137,7 @@ class TransactionRequest extends React.Component {
 
   render () {
     const req = this.props.req
+    console.log(req)
     let notice = req.notice
     const status = req.status
     const mode = req.mode
@@ -152,6 +153,7 @@ class TransactionRequest extends React.Component {
     const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
     const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
+    const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
 
     const fee = this.hexToDisplayValue(req.data.maxFee || '0x')
     const feeUSD = fee * etherUSD
