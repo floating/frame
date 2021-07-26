@@ -61,9 +61,10 @@ export default class GasCalculator {
   }
   
   async getGasEstimate (rawTx: RawTransaction) {
+
     const targetChain = {
       type: 'ethereum',
-      id: rawTx.chainId
+      id: parseInt(rawTx.chainId, 16)
     }
 
     return new Promise<string>((resolve, reject) => {
