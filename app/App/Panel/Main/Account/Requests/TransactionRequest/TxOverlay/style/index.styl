@@ -11,13 +11,32 @@
 
   .txOverlayTitle
     position absolute 
-    top 8px
+    top 0px
     left 12px
-    right 12px
-    // font-family ChangaOne
-    font-size 20px
+    right 40px
+    font-size 18px
+    height 40px
+    display flex
+    align-items center
     // background blue
-    height 30px
+
+  .txOverlayClose
+    position absolute 
+    z-index 10000000000
+    top 8px
+    right 8px
+    cursor pointer
+    width 24px
+    height 24px
+    border-radius 15px
+    display flex
+    justify-content center
+    align-items center
+    background var(--moon)
+    color var(--moonOver)
+    cursor pointer
+    *
+      pointer-event none
 
   .txOverlayBody
     position absolute 

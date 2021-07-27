@@ -45,11 +45,12 @@
       background var(--ghostD)
       border-radius 8px
       flex 1
-      transition var(--standardFaster)
       cursor pointer
       border-bottom 1px solid var(--ghostC)
       transform translateY(0px)
       padding-top 1px
+      font-size 13px
+      font-weight 600
 
       span
         word-spacing 0px
@@ -62,6 +63,11 @@
     ._txDataValue:hover
       background var(--moon)
       color var(--moonOver)
+      ._txDataValueMethod
+        color var(--moonOver)
+
+    ._txDataValueMethod
+      color var(--moon)
 
 ._txData:hover
   z-index 1000001

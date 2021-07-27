@@ -54,9 +54,6 @@ class TxFee extends React.Component {
           <div className='_txFeeSlice _txFeeLabel'>fee</div>
           <div className='_txFeeSlice _txFeeGwei' onClick={() => {
             this.props.overlayMode('fee')
-            setTimeout(() => {
-              this.props.overlayMode()
-            }, 2000)
           }}>
             <span className='_txFeeGweiValue'>{this.toDisplayGwei(maxFeePerGas)}</span>
             <span className='_txFeeGweiLabel'>Gwei</span>
