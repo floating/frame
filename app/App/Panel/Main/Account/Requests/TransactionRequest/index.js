@@ -408,8 +408,8 @@ class TransactionRequest extends React.Component {
                   {/* <TxFee {...this.props} /> */}
                   <TxMain {...this.props} chain={this.chain}/>
                   <TxRecipient {...this.props} />
-                  <TxData {...this.props} />
-                  <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)}/>
+                  <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
+                  <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)}/ >
                   {/* <TxModule top={165} req={req} /> */}
                 </>
               )}

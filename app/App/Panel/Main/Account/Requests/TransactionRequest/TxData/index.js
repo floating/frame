@@ -23,8 +23,13 @@ class txData extends React.Component {
           <div className='_txDataSlice _txDataLabel'>
             Data
           </div>
-          <div className='_txDataSlice _txDataValue _txButton'>
-            <span>No Data</span>
+          <div className='_txDataSlice _txDataValue _txButton' onClick={() => {
+            this.props.overlayMode('data')
+            setTimeout(() => {
+              this.props.overlayMode()
+            }, 2000 * 4)
+          }}>
+            <span>{req.data.data ? 'Sending Data!' : 'No Data'}</span>
           </div>
         </div>
       </div>
