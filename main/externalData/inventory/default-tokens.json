@@ -7584,14 +7584,6 @@
     },
     {
       "chainId": 1,
-      "address": "0x089a502032166e07ae83eb434c16790ca2fa4661",
-      "name": "CURE farm",
-      "symbol": "CURE",
-      "decimals": 18,
-      "logoURI": "https://assets.coingecko.com/coins/images/15381/thumb/cure.PNG?1620697586"
-    },
-    {
-      "chainId": 1,
       "address": "0xc2d3ae29c8309c14994d02ecd228cf86f3efde77",
       "name": "CurrySwap",
       "symbol": "CURRY",
