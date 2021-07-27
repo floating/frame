@@ -5,6 +5,7 @@ const provider = require('eth-provider')
 const log = require('electron-log')
 
 const store = require('../store')
+const { default: BlockMonitor } = require('./blocks')
 
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
@@ -28,6 +29,30 @@ class ChainConnection extends EventEmitter {
       const chain = store('main.networks', type, chainId)
       if (chain) this.connect(chain)
     })
+  }
+
+  _handleConnection (priority) {
+    this._startBlockMonitor(this[priority].provider)
+
+    this.update(priority)
+    this.emit('connect')
+  }
+
+  _startBlockMonitor (provider) {
+    if (this.blockMonitor) {
+      this.blockMonitor.stop()
+    }
+
+    this.blockMonitor = new BlockMonitor(provider)
+
+    this.blockMonitor.on('data', block => {
+      // const { baseFeePerGas: baseFee, gasPrice}
+      // store.setGasPrices(this.type, this.chainId, {
+
+      // }
+    })
+
+    this.blockMonitor.start()
   }
 
   update (priority) {
@@ -121,8 +146,8 @@ class ChainConnection extends EventEmitter {
                   this.secondary.status = 'connected'
                   this.secondary.connected = true
                   this.secondary.type = ''
-                  this.update('secondary')
-                  this.emit('connect')
+
+                  this._handleConnection('secondary')
                 }
               }
             })
@@ -200,8 +225,8 @@ class ChainConnection extends EventEmitter {
                 this.primary.status = 'connected'
                 this.primary.connected = true
                 this.primary.type = ''
-                this.update('primary')
-                this.emit('connect')
+
+                this._handleConnection('primary')
               }
             }
           })
@@ -211,6 +236,7 @@ class ChainConnection extends EventEmitter {
           this.primary.connected = false
           this.primary.type = ''
           this.primary.network = ''
+
           this.update('primary')
           this.emit('close')
         })
@@ -246,6 +272,7 @@ class ChainConnection extends EventEmitter {
     if (this.observer) this.observer.remove()
     if (this.primary.provider) this.primary.provider.close()
     if (this.secondary.provider) this.secondary.provider.close()
+    if (this.blockMonitor) this.blockMonitor.stop()
     this.primary = { status: 'loading', network: '', type: '', connected: false }
     this.secondary = { status: 'loading', network: '', type: '', connected: false }
     this.update('primary')
@@ -278,6 +305,8 @@ class Chains extends EventEmitter {
   constructor () {
     super()
     this.connections = {}
+    this.blockMonitor = new BlockMonitor()
+
     store.observer(() => {
       const networks = store('main.networks')
       Object.keys(networks).forEach(type => {
