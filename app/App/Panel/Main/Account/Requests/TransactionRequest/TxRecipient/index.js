@@ -23,9 +23,18 @@ class TxRecipient extends React.Component {
           <div className='_txRecipientSlice _txRecipientLabel'>
             Recipient
           </div>
+          <div className='_txRecipientFull' onClick={() => {
+            this.copyAddress(req.data.to)
+          }}>
+            {this.state.copied ? 'Address Copied' : req.data.to}
+          </div>
           <div className='_txRecipientSlice _txRecipientValue'>
             {req.data.to ? (
-              <span>{req.data.to.substring(0, 8)} {svg.octicon('kebab-horizontal', { height: 15 })} {req.data.to.substr(req.data.to.length - 6)}</span>
+              req.decodedData && req.decodedData.contractName ? (
+                <span className={'_txRecipientValueSmall'}><span className={'_txRecipientValueMoon'}>{req.decodedData.contractName}</span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 4)}</span>
+               ) : (
+                <span>{req.data.to.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 6)}</span>
+              )
             ) : (
               <span>Deploying Contract</span>
             )}

@@ -1,11 +1,10 @@
 ._txFee
   position absolute
-  top 220px
+  top 215px
   left 5px
   right 5px
   height 30px
   z-index 100000
-  box-shadow 0px 0px 0px var(--ghostZ)
   
   ._txFeeInner
     position absolute 
@@ -26,17 +25,16 @@
       justify-content center
       align-items center
       text-transform uppercase
-      font-size 12px
       // border-right 1px solid var(--ghostA)
       padding 0px 6px
       font-family FiraCode
           
     ._txFeeLabel
       font-weight 600
-      padding 0px 12px 1px 14px
       font-size 11px
       text-transform uppercase
       font-family OpenSans
+      padding 0px 15px 0px 15px
       // background var(--ghostD)
 
     ._txFeeGwei
@@ -44,13 +42,14 @@
       background var(--ghostE)
       border-radius 8px
       // background blue
-      width 80px
       flex 1
+      min-width 100px
+      max-width 150px
+      
       transition var(--standardFaster)
       cursor pointer
       // border-bottom 1px solid var(--ghostD)
       // stransform translateY(-3px)
-      box-shadow 0px 0px 0px 0px var(--ghostA)
       // border-bottom 1px solid var(--ghostD)
       transform translateY(0px)
       padding-top 1px
@@ -94,10 +93,28 @@
       box-shadow 0px 5px 8px 0px var(--ghostZ)
 
     ._txFeeValue
-      padding 2px 7px 0px 12px
+      position relative
       justify-content flex-end
       font-weight 600
       font-size 13px
+      flex 1
+
+      ._txFeeValueDefault
+        position absolute
+        padding 1px 15px 0px 15px
+        opacity 1
+        top 0
+        left 0
+        bottom 0
+        right 0
+        display flex
+        align-items center
+        justify-content center
+
+      ._txFeeValueHover
+        display flex
+        padding 2px 15px 0px 15px
+        opacity 0
 
       ._txFeeETH
         // background yellow
@@ -112,25 +129,31 @@
       ._txFeeUSD
         font-weight 500
         position relative
-        // background blue
-        // padding 0px 10px 0px 13px
+        font-size 14px
+
+      ._txFeeUSDSymbol
+        font-size 11px
+
+      ._txFeeUSDDescription
+        font-size 9px
+        font-family Open Sans
+        padding-left 3px
+        // color var(--moon)
+
       ._txFeeEq
-        // background green
-        padding 0px 6px
-        // font-weight 200
-        // width 13px
-        // height 13px
-        // position absolute
-        // top 50%
-        // margin-top -5px
-        // left -6px
-        // display flex
-        // justify-content center
-        // align-items center
-        // font-size 18px
+        font-size 15px
+        padding 0px 6px 0px 0px
 
 
+    ._txFeeValue:hover
+      ._txFeeValueDefault
+        opacity 0
 
+      ._txFeeValueHover
+        opacity 1
+
+._txFee:hover
+  z-index 1000001
 
       
       

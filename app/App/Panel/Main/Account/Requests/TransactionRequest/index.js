@@ -203,7 +203,7 @@ class TransactionRequest extends React.Component {
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
-        <TxOverlay {...this.props} overlayMode={this.state.overlayMode}/>
+        <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
         <div className='requestMeta'>
           <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks', this.chain.type, this.chain.id, 'name')}</div>
           <div className='requestMetaOrigin'>{req.origin}</div>
@@ -408,8 +408,8 @@ class TransactionRequest extends React.Component {
                   {/* <TxFee {...this.props} /> */}
                   <TxMain {...this.props} chain={this.chain}/>
                   <TxRecipient {...this.props} />
-                  <TxData {...this.props} />
-                  <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)}/>
+                  <TxData {...this.props} overlayMode={this.overlayMode.bind(this)} />
+                  <TxFeeNew {...this.props} chain={this.chain} overlayMode={this.overlayMode.bind(this)}/ >
                   {/* <TxModule top={165} req={req} /> */}
                 </>
               )}

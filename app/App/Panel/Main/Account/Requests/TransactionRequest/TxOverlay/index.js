@@ -4,6 +4,8 @@ import BigNumber from 'bignumber.js'
 import svg from '../../../../../../../../resources/svg'
 import link from '../../../../../../../../resources/link'
 
+import TxDataOverlay from './TxDataOverlay'
+
 
 class TxModule extends React.Component {
   constructor (props, context) {
@@ -43,9 +45,9 @@ class TxModule extends React.Component {
   }
 
   render () {
-    const req = this.props.req
+    const { req, overlayMode } = this.props
     console.log('req', req) 
-    if (this.props.overlayMode === 'fee') {
+    if (this.props.overlay === 'fee') {
       if (req.data.type === '0x2') {
         const baseFee = BigNumber(req.data.maxFeePerGas, 16)
         const priorityFee = BigNumber(req.data.maxPriorityFeePerGas, 16)
@@ -53,6 +55,7 @@ class TxModule extends React.Component {
         return (
           <div className='txOverlay cardShow'>
             <div className='txOverlayTitle'>Adjust Fee</div>
+            <div className='txOverlayClose' onMouseDown={() => overlayMode()}>{svg.octicon('x', { height: 16 })}</div>
             <div className='txOverlayBody'>
               {'EIP-1559 Tx Details'}
               <div className='txOverlayBaseFee'>
@@ -76,6 +79,7 @@ class TxModule extends React.Component {
         return (
           <div className='txOverlay cardShow'>
             <div className='txOverlayTitle'>Adjust Fee</div>
+            <div className='txOverlayClose' onMouseDown={() => overlayMode()}>{svg.octicon('x', { height: 16 })}</div>
             <div className='txOverlayBody'>
               {'Legacy Tx Details'}
               <div className='txOverlayGasFee'>GasFee Fee: {this.toDisplayGwei(gasPrice)}</div>
@@ -84,6 +88,8 @@ class TxModule extends React.Component {
           </div>
         )
       }
+    } else if (this.props.overlay === 'data') {
+      return <TxDataOverlay {...this.props} />
     } else {
       return null
     }
