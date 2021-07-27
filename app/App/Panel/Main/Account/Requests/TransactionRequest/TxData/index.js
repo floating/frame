@@ -23,7 +23,7 @@ class txData extends React.Component {
           <div className='_txDataSlice _txDataLabel'>
             Data
           </div>
-          <div className='_txDataSlice _txDataValue'>
+          <div className='_txDataSlice _txDataValue _txButton'>
             <span>No Data</span>
           </div>
         </div>

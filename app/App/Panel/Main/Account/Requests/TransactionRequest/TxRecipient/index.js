@@ -23,7 +23,7 @@ class TxRecipient extends React.Component {
           <div className='_txRecipientSlice _txRecipientLabel'>
             Recipient
           </div>
-          <div className='_txRecipientSlice _txRecipientValue'>
+          <div className='_txRecipientSlice _txRecipientValue _txButton'>
             {req.data.to ? (
               <span>{req.data.to.substring(0, 8)} {svg.octicon('kebab-horizontal', { height: 15 })} {req.data.to.substr(req.data.to.length - 6)}</span>
             ) : (

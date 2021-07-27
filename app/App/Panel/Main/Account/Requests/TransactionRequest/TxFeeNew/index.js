@@ -62,18 +62,29 @@ class TxFee extends React.Component {
             <span className='_txFeeGweiLabel'>Gwei</span>
           </div>
           <div className='_txFeeSlice _txFeeValue'>
-            <span className='_txFeeETH'>
-              ETH
-            </span>
-            <span className='_txFeeETHValue'>
-              {this.toDisplayEther(maxFee)}
-            </span>
-            <span className='_txFeeEq'>
-              ≈
-            </span>
-            <span className='_txFeeUSD'>
-              ${this.toDisplayUSD(maxFeeUSD)}
-            </span>
+            <div className='_txFeeValueDefault'>
+              <span className='_txFeeEq'>
+                ≈
+              </span>
+              <span className='_txFeeUSDSymbol'>
+                $
+              </span>
+              <span className='_txFeeUSD'>
+                {this.toDisplayUSD(maxFeeUSD)}
+              </span>
+              <span className='_txFeeUSDDescription'>
+                in ETH
+              </span>
+            </div>
+
+            <div className='_txFeeValueHover'>
+              <span className='_txFeeETH'>
+                ETH
+              </span>
+              <span className='_txFeeETHValue'>
+                {this.toDisplayEther(maxFee)}
+              </span>
+            </div> 
           </div>
         </div>
       </div>
