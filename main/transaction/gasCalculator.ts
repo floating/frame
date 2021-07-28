@@ -12,12 +12,9 @@ interface GasEstimateResponse {
 }
 
 interface FeeHistoryResponse {
-  error?: string,
-  result: {
-    baseFeePerGas: string[],
-    gasUsedRatio: number[],
-    reward: Array<string[]>
-  }
+  baseFeePerGas: string[],
+  gasUsedRatio: number[],
+  reward: Array<string[]>
 }
 
 interface ProviderRequest {
@@ -35,7 +32,8 @@ interface Block {
 
 interface Eip1559GasFees {
   maxBaseFeePerGas: string,
-  maxPriorityFeePerGas: string
+  maxPriorityFeePerGas: string,
+  maxFeePerGas: string
 }
 
 function rpcPayload (method: string, params: any[], id = 1): ProviderRequest {
@@ -83,21 +81,17 @@ export default class GasCalculator {
   async _getFeeHistory(numBlocks: number, rewardPercentiles: number[], newestBlock = 'latest'): Promise<Block[]> {
     const payload = rpcPayload('eth_feeHistory', [numBlocks, newestBlock, rewardPercentiles])
 
-    return new Promise((resolve, reject) => {
-      this.connection.send(payload, (response: FeeHistoryResponse) => {
-        if (response.error) return reject()
+    const feeHistory: FeeHistoryResponse = await this.connection.send(payload)
 
-        const feeHistoryBlocks = response.result.baseFeePerGas.map((baseFee, i) => {
-          return {
-            baseFee: parseInt(baseFee, 16),
-            gasUsedRatio: response.result.gasUsedRatio[i],
-            rewards: (response.result.reward[i] || []).map(reward => parseInt(reward, 16))
-          }
-        })
-
-        resolve(feeHistoryBlocks)
-      })
+    const feeHistoryBlocks = feeHistory.baseFeePerGas.map((baseFee, i) => {
+      return {
+        baseFee: parseInt(baseFee, 16),
+        gasUsedRatio: feeHistory.gasUsedRatio[i],
+        rewards: (feeHistory.reward[i] || []).map(reward => parseInt(reward, 16))
+      }
     })
+
+    return feeHistoryBlocks
   }
   
   async getFeePerGas (): Promise<Eip1559GasFees> {
@@ -115,10 +109,16 @@ export default class GasCalculator {
 
       return {
         maxBaseFeePerGas: intToHex(calculatedFee),
-        maxPriorityFeePerGas: intToHex(medianReward)
+        maxPriorityFeePerGas: intToHex(medianReward),
+        maxFeePerGas: intToHex(calculatedFee + medianReward)
       }
     } catch (e) {
-      const defaultGas = { maxBaseFeePerGas: this.defaultGasLevel, maxPriorityFeePerGas: intToHex(oneGwei) }
+      const defaultGas = {
+        maxBaseFeePerGas: this.defaultGasLevel,
+        maxPriorityFeePerGas: intToHex(oneGwei),
+        maxFeePerGas: intToHex(parseInt(this.defaultGasLevel) + oneGwei)
+      }
+
       log.warn('could not load fee history, using default', defaultGas)
       return defaultGas
     }

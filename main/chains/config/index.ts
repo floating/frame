@@ -15,18 +15,17 @@ function chainConfig (chain: string, hardfork: string) {
     : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
 }
 
-async function resolveChainConfig (provider: any, chain: string, signerType: string, hardfork = 'berlin') {
-  const common = chainConfig(chain, hardfork)
+async function resolveChainConfig (chains: any /* Chains */, signerType: string, chainId: string, networkType = 'ethereum') {
+  const common = chains.connections[networkType][parseInt(chainId)].chainConfig
 
   if (!londonHardforkSigners.includes(signerType)) return common
 
   return new Promise(resolve => {
-    provider.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, (response: any) => {
+    chains.send({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }, (response: any) => {
       if (!response.error) {
         const currentBlock = response.result
         const targetBlock = addHexPrefix((parseInt(currentBlock, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
 
-        console.log({ targetBlock })
         common.setHardforkByBlockNumber(targetBlock)
       }
 

@@ -25,12 +25,12 @@ function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
-async function populate (rawTx: RawTransaction, chainConfig: Common, gasCalculator: GasCalculator): Promise<TransactionData> {
+async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Promise<TransactionData> {
   const txData: TransactionData = { ...rawTx, maxFee: '' }
 
   // calculate needed gas if not already provided
   try {
-    txData.gasLimit = txData.gasLimit || (await gasCalculator.getGasEstimate(rawTx))
+    txData.gasLimit = txData.gasLimit || (await gas.getGasEstimate(rawTx))
   } catch (e) {
     txData.gasLimit = '0x0'
     txData.warning = e.message
@@ -40,10 +40,8 @@ async function populate (rawTx: RawTransaction, chainConfig: Common, gasCalculat
     console.log('london hardfork active!')
     txData.type = '0x2'
 
-    const fees = await gasCalculator.getFeePerGas()
-
-    const maxPriorityFee = toBN(fees.maxPriorityFeePerGas)
-    const maxBaseFee = toBN(fees.maxBaseFeePerGas)
+    const maxPriorityFee = toBN(gas.fees.maxPriorityFeePerGas)
+    const maxBaseFee = toBN(gas.fees.maxBaseFeePerGas)
     const maxFee = maxPriorityFee.add(maxBaseFee)
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
@@ -53,10 +51,10 @@ async function populate (rawTx: RawTransaction, chainConfig: Common, gasCalculat
     console.log('london hardfork NOT active!')
     txData.type = '0x0'
 
-    const gasPrice = toBN(gasCalculator.getGasPrice(rawTx))
+    const gasPrice = toBN(gas.price)
 
     txData.gasPrice = bnToHex(gasPrice)
-    txData.maxFee = bnToHex(toBN(txData.gasLimit).mul(gasPrice))
+    txData.maxFee = bnToHex(toBN(<string>txData.gasLimit).mul(gasPrice))
   }
 
   return txData

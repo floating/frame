@@ -440,6 +440,7 @@ const initial = {
       ethereum: {
         1: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -448,6 +449,7 @@ const initial = {
         },
         3: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -456,6 +458,7 @@ const initial = {
         },
         4: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }

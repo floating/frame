@@ -13,7 +13,6 @@ const { recoverTypedData } = require('../crypt/typedDataUtils')
 
 const { resolveChainConfig } = require('../chains/config')
 const { populate: populateTransaction } = require('../transaction')
-const GasCalculator = require('../transaction/gasCalculator').default
 
 const version = require('../../package.json').version
 
@@ -270,16 +269,13 @@ class Provider extends EventEmitter {
     }
   }
 
-  _gasCalculator (rawTx) {
+  _gasFees (rawTx) {
     const chain = {
       type: 'ethereum',
       id: parseInt(rawTx.chainId, 'hex')
     }
 
-    const { levels, selected } = store('main.networksMeta', chain.type, chain.id, 'gas.price')
-    if (!levels[selected]) throw new Error('Unable to determine gas')
-
-    return new GasCalculator(this.connection, levels[selected])
+    return store('main.networksMeta', chain.type, chain.id, 'gas')
   }
 
   getNonce (rawTx, res) {
@@ -297,10 +293,10 @@ class Provider extends EventEmitter {
   sendTransaction (payload, res) {
     const rawTx = this.getRawTx(payload)
     const activeAccount = accounts.current()
-    const gasCalculator = this._gasCalculator(rawTx)
+    const gas = this._gasFees(rawTx)
 
-    resolveChainConfig(this, rawTx.chainId, activeAccount.lastSignerType)
-      .then(chain => populateTransaction(rawTx, chain, gasCalculator))
+    resolveChainConfig(this.connection, activeAccount.lastSignerType, rawTx.chainId)
+      .then(chain => populateTransaction(rawTx, chain, gas))
       .then(tx => {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)

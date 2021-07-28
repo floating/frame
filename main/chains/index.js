@@ -7,13 +7,16 @@ const log = require('electron-log')
 const store = require('../store')
 const { default: BlockMonitor } = require('./blocks')
 const { chainConfig } = require('./config')
+const { default: GasCalculator } = require('../transaction/gasCalculator')
+
+const oneGwei = '0x3b9aca00'
 
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
     this.type = type
     this.chainId = chainId
-    this.chainConfig = chainConfig(this.chainId)
+    this.chainConfig = chainConfig(this.chainId.toString(16))
 
     this.primary = {
       status: 'off',
@@ -39,7 +42,10 @@ class ChainConnection extends EventEmitter {
     this.update(priority)
 
     this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b' })
-    this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
+
+    if (this.chainId == 4) { // FIXME: temporary to prevent spam while testing
+      this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
+    }
   }
 
   _handleConnection (priority) {
@@ -51,7 +57,21 @@ class ChainConnection extends EventEmitter {
     const monitor = new BlockMonitor(provider)
 
     monitor.on('data', block => {
-      if (this.chainConfig.isHardforkBlock(block.number, 'london')) {
+      if (this.chainConfig.hardforkIsActiveOnBlock('london', block.number)) {
+        const { levels, selected } = store('main.networksMeta', this.type, this.chainId, 'gas.price')
+        // console.log({ levels, selected})
+        const defaultGas = levels.standard || oneGwei
+        // console.log({ defaultGas})
+        const gasCalculator = new GasCalculator(provider, defaultGas)
+
+        gasCalculator.getFeePerGas().then(fees => {
+          store.setGasFees(this.type, this.chainId, fees)
+          store.setGasPrices(this.type, this.chainId, { standard: fees.maxFeePerGas })
+          store.setGasDefault(this.type, this.chainId, 'standard')
+          console.log(JSON.stringify(store('main.networksMeta', this.type, this.chainId), undefined, 2))
+        }).catch(err => {
+          log.error(`could not update gas fees for chain ${this.chainId}`, err)
+        })
         // update gas using eth_feeHistory
       } else {
         // update gas using gas service / eth_gasPrice
