@@ -1,4 +1,4 @@
-import { BN, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
+import { BN, addHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
 const londonHardforkSigners = ['seed', 'ring']
@@ -7,16 +7,16 @@ const londonHardforkSigners = ['seed', 'ring']
 // stabilize, don't support these transactions until after the buffer period
 const londonHardforkAdoptionBufferBlocks = 120
 
-function chainConfig (chain: string, hardfork: string) {
-  const chainId = new BN(stripHexPrefix(chain), 'hex')
+function chainConfig (chain: number, hardfork: string) {
+  const chainId = new BN(chain)
 
   return Common.isSupportedChainId(chainId)
     ? new Common({ chain: chainId.toNumber(), hardfork })
     : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
 }
 
-async function resolveChainConfig (chains: any /* Chains */, signerType: string, chainId: string, networkType = 'ethereum') {
-  const common = chains.connections[networkType][parseInt(chainId)].chainConfig
+async function resolveChainConfig (chains: any /* Chains */, signerType: string, chainId: number, networkType = 'ethereum') {
+  const common = chains.connections[networkType][chainId].chainConfig
 
   if (!londonHardforkSigners.includes(signerType)) return common
 

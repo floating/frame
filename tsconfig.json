@@ -4,7 +4,7 @@
     "outDir": ".",
     "resolveJsonModule": true,
     "composite": true,
-    "types": ["node", "Long"]
+    "types": ["node"]
   },
   "files": [
     "package.json"

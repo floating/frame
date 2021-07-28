@@ -9,14 +9,13 @@ const { default: BlockMonitor } = require('./blocks')
 const { chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
 
-const oneGwei = '0x3b9aca00'
-
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
     this.type = type
     this.chainId = chainId
-    this.chainConfig = chainConfig(this.chainId.toString(16))
+
+    this.chainConfig = chainConfig(parseInt(this.chainId))
 
     this.primary = {
       status: 'off',
@@ -43,7 +42,7 @@ class ChainConnection extends EventEmitter {
 
     this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b' })
 
-    if (this.chainId == 4) { // FIXME: temporary to prevent spam while testing
+    if (this.chainId == 4 || this.chainId == 3 || this.chainId == 42) { // FIXME: temporary to prevent spam while testing
       this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
     }
   }
@@ -53,28 +52,40 @@ class ChainConnection extends EventEmitter {
     this.emit('connect')
   }
 
-  _createBlockMonitor (provider, priority) {
+  _createBlockMonitor (provider) {
     const monitor = new BlockMonitor(provider)
 
     monitor.on('data', block => {
-      if (this.chainConfig.hardforkIsActiveOnBlock('london', block.number)) {
-        const { levels, selected } = store('main.networksMeta', this.type, this.chainId, 'gas.price')
-        // console.log({ levels, selected})
-        const defaultGas = levels.standard || oneGwei
-        // console.log({ defaultGas})
-        const gasCalculator = new GasCalculator(provider, defaultGas)
+      const gasCalculator = new GasCalculator(provider)
 
+      // seems like there is a bug in hardforkIsActiveOnBlock(), it always returns true
+      // if the hardfork block isn't defined for the chain
+      const londonHardforkActive = 
+        this.chainConfig.hardforkIsActiveOnChain('london') &&
+        this.chainConfig.hardforkIsActiveOnBlock('london', block.number)
+
+      if (londonHardforkActive) {
         gasCalculator.getFeePerGas().then(fees => {
           store.setGasFees(this.type, this.chainId, fees)
           store.setGasPrices(this.type, this.chainId, { standard: fees.maxFeePerGas })
           store.setGasDefault(this.type, this.chainId, 'standard')
-          console.log(JSON.stringify(store('main.networksMeta', this.type, this.chainId), undefined, 2))
         }).catch(err => {
           log.error(`could not update gas fees for chain ${this.chainId}`, err)
         })
-        // update gas using eth_feeHistory
       } else {
-        // update gas using gas service / eth_gasPrice
+        if (this.chainId != 1) {
+          // prior to the london hardfork, mainnet uses its own gas service
+          gasCalculator.getGasPrices().then(gas => {
+            const customLevel = store('main.networksMeta', this.network, this.chainId, 'gas.price.levels.custom')
+
+            store.setGasPrices({
+              ...gas,
+              custom: customLevel || gas.standard
+            })
+          }).catch(err => {
+            log.error(`could not update gas prices for chain ${this.chainId}`, err)
+          })
+        }
       }
     })
   }

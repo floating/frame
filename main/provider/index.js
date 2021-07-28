@@ -268,6 +268,22 @@ class Provider extends EventEmitter {
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
   }
+  
+  async _getGasEstimate (rawTx) {
+    const payload = { method: 'eth_estimateGas', params: [rawTx], jsonrpc: '2.0', id: 1 }
+    const targetChain = {
+      type: 'ethereum',
+      id: parseInt(rawTx.chainId, 16)
+    }
+
+    return new Promise((resolve, reject) => {
+      this.connection.send(payload, response => {
+        return response.error
+          ? reject(response.error)
+          : resolve(response.result)
+      }, targetChain)
+    })
+  }
 
   _gasFees (rawTx) {
     const chain = {
@@ -295,8 +311,23 @@ class Provider extends EventEmitter {
     const activeAccount = accounts.current()
     const gas = this._gasFees(rawTx)
 
-    resolveChainConfig(this.connection, activeAccount.lastSignerType, rawTx.chainId)
-      .then(chain => populateTransaction(rawTx, chain, gas))
+    resolveChainConfig(this.connection, activeAccount.lastSignerType, parseInt(rawTx.chainId))
+      .then(async chain => {
+        let tx = { ...rawTx }
+        
+        // calculate needed gas if not already provided
+        if (!tx.gasLimit) {
+          try {
+            const gasLimit = await this._getGasEstimate(rawTx)
+            tx.gasLimit = gasLimit
+          } catch (e) {
+            tx.gasLimit = '0x00'
+            tx.warning = e.message
+          }
+        }
+          
+        return populateTransaction(tx, chain, gas)
+      })
       .then(tx => {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)

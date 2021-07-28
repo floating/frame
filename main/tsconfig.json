@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "allowJs": true,
     "rootDir": ".",
-    "outDir": "../dist"
+    "outDir": "../compiled"
   },
   "include": ["./**/*.ts", "./**/*.js"],
   "references": [
