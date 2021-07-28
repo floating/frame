@@ -12,7 +12,7 @@ function chainConfig (chain: string, hardfork: string) {
 
   return Common.isSupportedChainId(chainId)
     ? new Common({ chain: chainId.toNumber(), hardfork })
-    : Common.forCustomChain('mainnet', { chainId: chainId.toNumber() }, hardfork)
+    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
 }
 
 async function resolveChainConfig (provider: any, chain: string, signerType: string, hardfork = 'berlin') {

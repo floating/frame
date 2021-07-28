@@ -29,6 +29,8 @@ class BlockMonitor extends EventEmitter {
   constructor (connection: Connection) {
     super()
 
+    this.start = this.start.bind(this)
+    this.stop = this.stop.bind(this)
     this.handleMessage = this.handleMessage.bind(this)
     this.handleBlock = this.handleBlock.bind(this)
     this.getLatestBlock = this.getLatestBlock.bind(this)
@@ -37,6 +39,12 @@ class BlockMonitor extends EventEmitter {
     this.subscriptionId = ''
 
     this.latestBlock = '0x0'
+
+    this.connection.on('connect', () => {
+      console.log('connected!')
+      this.start()
+    })
+    this.connection.on('close', this.stop)
   }
 
   start () {

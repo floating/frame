@@ -6,18 +6,22 @@ const log = require('electron-log')
 
 const store = require('../store')
 const { default: BlockMonitor } = require('./blocks')
+const { chainConfig } = require('./config')
 
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
     this.type = type
     this.chainId = chainId
+    this.chainConfig = chainConfig(this.chainId)
+
     this.primary = {
       status: 'off',
       network: '',
       type: '',
       connected: false
     }
+
     this.secondary = {
       status: 'off',
       network: '',
@@ -31,28 +35,28 @@ class ChainConnection extends EventEmitter {
     })
   }
 
-  _handleConnection (priority) {
-    this._startBlockMonitor(this[priority].provider)
+  _createProvider (target, priority) {
+    this.update(priority)
 
+    this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b' })
+    this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
+  }
+
+  _handleConnection (priority) {
     this.update(priority)
     this.emit('connect')
   }
 
-  _startBlockMonitor (provider) {
-    if (this.blockMonitor) {
-      this.blockMonitor.stop()
-    }
+  _createBlockMonitor (provider, priority) {
+    const monitor = new BlockMonitor(provider)
 
-    this.blockMonitor = new BlockMonitor(provider)
-
-    this.blockMonitor.on('data', block => {
-      // const { baseFeePerGas: baseFee, gasPrice}
-      // store.setGasPrices(this.type, this.chainId, {
-
-      // }
+    monitor.on('data', block => {
+      if (this.chainConfig.isHardforkBlock(block.number, 'london')) {
+        // update gas using eth_feeHistory
+      } else {
+        // update gas using gas service / eth_gasPrice
+      }
     })
-
-    this.blockMonitor.start()
   }
 
   update (priority) {
@@ -125,8 +129,9 @@ class ChainConnection extends EventEmitter {
           this.secondary.status = 'loading'
           this.secondary.connected = false
           this.secondary.type = ''
-          this.update('secondary')
-          this.secondary.provider = provider(target, { name: 'secondary', infuraId: '786ade30f36244469480aa5c2bf0743b' })
+
+          this._createProvider(target, 'secondary')
+
           this.secondary.provider.on('connect', () => {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
@@ -204,8 +209,9 @@ class ChainConnection extends EventEmitter {
         this.primary.status = 'loading'
         this.primary.connected = false
         this.primary.type = ''
-        this.update('primary')
-        this.primary.provider = provider(target, { name: 'primary', infuraId: '786ade30f36244469480aa5c2bf0743b' })
+
+        this._createProvider(target, 'primary')
+
         this.primary.provider.on('connect', () => {
           log.info('    Primary connection connected')
           this.getNetwork(this.primary.provider, (err, response) => {
@@ -272,7 +278,6 @@ class ChainConnection extends EventEmitter {
     if (this.observer) this.observer.remove()
     if (this.primary.provider) this.primary.provider.close()
     if (this.secondary.provider) this.secondary.provider.close()
-    if (this.blockMonitor) this.blockMonitor.stop()
     this.primary = { status: 'loading', network: '', type: '', connected: false }
     this.secondary = { status: 'loading', network: '', type: '', connected: false }
     this.update('primary')
@@ -305,7 +310,6 @@ class Chains extends EventEmitter {
   constructor () {
     super()
     this.connections = {}
-    this.blockMonitor = new BlockMonitor()
 
     store.observer(() => {
       const networks = store('main.networks')
