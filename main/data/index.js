@@ -48,7 +48,8 @@ const onData = data => {
 
       store.setGasPrices('ethereum', '1', gas)
 
-      accounts.checkBetterGasPrice({type: 'ethereum', id: '1'})
+      // Disable automatically updating the gas price from this source
+      // accounts.checkBetterGasPrice({type: 'ethereum', id: '1'})
     }
   } catch (e) {
     log.error('Frame Socket Data Error: ', e)

@@ -137,7 +137,6 @@ class TransactionRequest extends React.Component {
 
   render () {
     const req = this.props.req
-    console.log(req)
     let notice = req.notice
     const status = req.status
     const mode = req.mode
