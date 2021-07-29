@@ -1,13 +1,18 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
 
 const EventEmitter = require('events')
+const { addHexPrefix } = require('ethereumjs-util')
 const provider = require('eth-provider')
 const log = require('electron-log')
 
 const store = require('../store')
 const { default: BlockMonitor } = require('./blocks')
-const { chainConfig } = require('./config')
+const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
+
+// because the gas market for EIP-1559 will take a few blocks to
+// stabilize, don't support these transactions until after the buffer period
+const londonHardforkAdoptionBufferBlocks = 120
 
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
@@ -41,10 +46,7 @@ class ChainConnection extends EventEmitter {
     this.update(priority)
 
     this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b' })
-
-    if (this.chainId == 4 || this.chainId == 3 || this.chainId == 42) { // FIXME: temporary to prevent spam while testing
-      this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
-    }
+    this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
   }
 
   _handleConnection (priority) {
@@ -56,13 +58,12 @@ class ChainConnection extends EventEmitter {
     const monitor = new BlockMonitor(provider)
 
     monitor.on('data', block => {
-      const gasCalculator = new GasCalculator(provider)
+      const targetBlock = addHexPrefix((parseInt(block.number, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
 
-      // seems like there is a bug in hardforkIsActiveOnBlock(), it always returns true
-      // if the hardfork block isn't defined for the chain
-      const londonHardforkActive = 
-        this.chainConfig.hardforkIsActiveOnChain('london') &&
-        this.chainConfig.hardforkIsActiveOnBlock('london', block.number)
+      this.chainConfig.setHardforkByBlockNumber(targetBlock)
+
+      const gasCalculator = new GasCalculator(provider)
+      const londonHardforkActive = this.chainConfig.gteHardfork('london')
 
       if (londonHardforkActive) {
         gasCalculator.getFeePerGas().then(fees => {

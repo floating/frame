@@ -11,7 +11,6 @@ const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
-const { resolveChainConfig } = require('../chains/config')
 const { populate: populateTransaction } = require('../transaction')
 
 const version = require('../../package.json').version
@@ -310,24 +309,16 @@ class Provider extends EventEmitter {
     const rawTx = this.getRawTx(payload)
     const activeAccount = accounts.current()
     const gas = this._gasFees(rawTx)
+    const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
-    resolveChainConfig(this.connection, activeAccount.lastSignerType, parseInt(rawTx.chainId))
-      .then(async chain => {
-        let tx = { ...rawTx }
-        
-        // calculate needed gas if not already provided
-        if (!tx.gasLimit) {
-          try {
-            const gasLimit = await this._getGasEstimate(rawTx)
-            tx.gasLimit = gasLimit
-          } catch (e) {
-            tx.gasLimit = '0x00'
-            tx.warning = e.message
-          }
-        }
-          
-        return populateTransaction(tx, chain, gas)
-      })
+    const estimateGas = rawTx.gasLimit
+      ? Promise.resolve(rawTx)
+      : this._getGasEstimate(rawTx)
+        .then(gasLimit => ({ ...rawTx, gasLimit }))
+        .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
+
+    estimateGas
+      .then(tx => populateTransaction(tx, activeAccount.lastSignerType, chainConfig, gas))
       .then(tx => {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)

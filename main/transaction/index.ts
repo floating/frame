@@ -2,7 +2,9 @@ import { BN, addHexPrefix, stripHexPrefix, bnToHex } from 'ethereumjs-util'
 import { JsonTx, Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
-import { chainConfig } from '../chains/config'
+import chainConfig from '../chains/config'
+
+const londonHardforkSigners = ['seed', 'ring']
 
 interface Signature {
   v: string,
@@ -24,10 +26,10 @@ function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
-async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Promise<TransactionData> {
+async function populate (rawTx: RawTransaction, signerType: string, chainConfig: Common, gas: any): Promise<TransactionData> {
   const txData: TransactionData = { ...rawTx, maxFee: '' }
   
-  if (chainConfig.isActivatedEIP(1559)) {
+  if (londonHardforkSigners.includes(signerType) && chainConfig.isActivatedEIP(1559)) {
     txData.type = '0x2'
 
     const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
