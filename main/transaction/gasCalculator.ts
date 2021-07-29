@@ -1,7 +1,4 @@
 import { intToHex } from 'ethereumjs-util'
-import log from 'electron-log'
-
-import { RawTransaction } from './index'
 
 const oneGwei = 1e9
 

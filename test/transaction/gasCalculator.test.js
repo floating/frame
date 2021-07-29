@@ -55,13 +55,14 @@ describe('#getGasPrices', () => {
 })
 
 describe('#getFeePerGas', () => {
+  let baseFeeHistory = [ '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0xb6' ]
   let gasUsedRatios = [ 0.12024061496050893 ]
   let blockRewards = [ [ '0x3b9aca00' ] ]
 
   beforeEach(() => {
     requestHandlers = {
       eth_feeHistory: () => ({
-        baseFeePerGas: [ '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0x8', '0xb6' ],
+        baseFeePerGas: baseFeeHistory,
         gasUsedRatio: gasUsedRatios,
         oldestBlock: 8998959,
         reward: blockRewards
