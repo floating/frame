@@ -361,7 +361,7 @@ class Accounts extends EventEmitter {
 
   // Set Current Account
   setSigner (id, cb) {
-    const currentAccounts = this.current()
+    const currentAccount = this.current()
     this._current = id
     const summary = currentAccount.summary()
     cb(null, summary)
