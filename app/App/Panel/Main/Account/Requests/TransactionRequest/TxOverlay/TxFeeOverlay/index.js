@@ -24,20 +24,26 @@ const FEE_MAX_TOTAL_ETH_WEI = 2 * 1e18
 class TxFeeOverlay extends React.Component {
   constructor (props, context) {
     super(props, context)
-    
+
     this.moduleRef = React.createRef()
 
     this.state = {
       copiedData: false
     }
+
     if (props.req.data.type === '0x2') {
-      this.state.baseFee = this.toDisplayGwei(BigNumber(props.req.data.maxFeePerGas, 16))
-      this.state.priorityFee = this.toDisplayGwei(BigNumber(props.req.data.maxPriorityFeePerGas, 16))
+      const prioFee = BigNumber(props.req.data.maxPriorityFeePerGas, 16)
+      const maxFee = BigNumber(props.req.data.maxFeePerGas, 16)
+      const baseFee = maxFee.minus(prioFee)
+
+      this.state.priorityFee = this.toDisplayFullGwei(prioFee)
+      this.state.maxFee = this.toDisplayFullGwei(maxFee)
+      this.state.baseFee = this.toDisplayFullGwei(baseFee)
     } else {
-      this.state.gasPrice = this.toDisplayGwei(BigNumber(props.req.data.gasPrice, 16))
+      this.state.gasPrice = BigNumber(props.req.data.gasPrice, 16).toString()
     }
 
-    this.state.gasLimit = parseInt(props.req.data.gasLimit, 16)
+    this.state.gasLimit = BigNumber(props.req.data.gasLimit, 16).toString()
   }
 
   mouseDetect (e) {
@@ -66,29 +72,31 @@ class TxFeeOverlay extends React.Component {
     return parseFloat(bn.shiftedBy(-18).toFixed(6).toString())
   }
 
-  toDisplayGwei (bn) {
-    return parseFloat(bn.shiftedBy(-9).toFixed(4).toString())
+  toDisplayFullGwei (bn) {
+    return bn.shiftedBy(-9).toFixed(9).toString().replace(/\.0+$/,'')
   }
 
   trimGwei (gwei) {
-    return parseFloat(parseFloat(gwei).toFixed(5))
+    return parseFloat(parseFloat(gwei).toFixed(6))
   }
 
   setBaseFee (baseFee) {
     this.setState({ baseFee })
     clearTimeout(this.baseFeeSubmitTimeout)
     this.baseFeeSubmitTimeout = setTimeout(() => {
-      baseFee = this.trimGwei(this.limitRange(baseFee, 0, 9999))
+      baseFee = parseFloat(baseFee)
       if (isNaN(baseFee)) return
-      const priorityFee = this.toDisplayGwei(BigNumber(this.props.req.data.maxPriorityFeePerGas, 16))
-      const gasLimit = parseInt(this.props.req.data.gasLimit, 'hex')
+      baseFee = this.limitRange(baseFee, 0, 9999)
+      const priorityFee = parseFloat(this.state.priorityFee)
+      const gasLimit = parseInt(this.state.gasLimit)
       if (gweiToWei(baseFee + priorityFee) * gasLimit > FEE_MAX_TOTAL_ETH_WEI) {
         baseFee = Math.floor(FEE_MAX_TOTAL_ETH_WEI / gasLimit / 1e9) - priorityFee
       }
-      this.setState({ baseFee })
       link.rpc('setBaseFee', gweiToWeiHex(baseFee), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
+      baseFee = baseFee.toString()
+      this.setState({ baseFee })
     }, 500)
   }
 
@@ -96,17 +104,19 @@ class TxFeeOverlay extends React.Component {
     this.setState({ priorityFee })
     clearTimeout(this.priorityFeeSubmitTimeout)
     this.priorityFeeSubmitTimeout = setTimeout(() => {
-      priorityFee = this.trimGwei(this.limitRange(priorityFee, 0, 9999))
+      priorityFee = parseFloat(priorityFee)
       if (isNaN(priorityFee)) return
-      const baseFee = this.toDisplayGwei(BigNumber(this.props.req.data.maxFeePerGas, 16))
-      const gasLimit = BigNumber(this.props.req.data.gasLimit, 16)
+      priorityFee = this.limitRange(priorityFee, 0, 9999)
+      const baseFee = parseFloat(this.state.baseFee)
+      const gasLimit = parseInt(this.state.gasLimit)
       if (gweiToWei(baseFee + priorityFee) * gasLimit > FEE_MAX_TOTAL_ETH_WEI) {
         priorityFee = Math.floor(FEE_MAX_TOTAL_ETH_WEI / gasLimit / 1e9) - baseFee
       }
-      this.setState({ priorityFee })
       link.rpc('setPriorityFee', gweiToWeiHex(priorityFee), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
+      priorityFee = priorityFee.toString()
+      this.setState({ priorityFee })
     }, 500)
   }
 
@@ -114,16 +124,18 @@ class TxFeeOverlay extends React.Component {
     this.setState({ gasPrice })
     clearTimeout(this.gasPriceSubmitTimeout)
     this.gasPriceSubmitTimeout = setTimeout(() => {
-      gasPrice = this.trimGwei(this.limitRange(gasPrice, 0, 9999))
+      gasPrice = parseFloat(gasPrice)
       if (isNaN(gasPrice)) return
-      const gasLimit = parseInt(this.props.req.data.gasLimit, 'hex')
+      gasPrice = this.limitRange(gasPrice, 0, 9999)
+      const gasLimit = parseInt(this.state.gasLimit)
       if (gweiToWei(gasPrice) * gasLimit > FEE_MAX_TOTAL_ETH_WEI) {
         gasPrice = Math.floor(FEE_MAX_TOTAL_ETH_WEI / gasLimit / 1e9)
       }
-      this.setState({ gasPrice })
       link.rpc('setGasPrice', gweiToWeiHex(gasPrice), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
+      gasPrice = gasPrice.toString()
+      this.setState({ gasPrice })
     }, 500)
   }
 
@@ -133,30 +145,172 @@ class TxFeeOverlay extends React.Component {
     this.gasLimitSubmitTimeout = setTimeout(() => {
       gasLimit = parseInt(gasLimit)
       if (isNaN(gasLimit)) return
+      if (gasLimit  > 12.5e6) gasLimit = 12.5e6
       if (this.props.req.data.type === '0x2') {
-        const baseFee = this.toDisplayGwei(BigNumber(this.props.req.data.maxFeePerGas, 16))
-        const priorityFee = this.toDisplayGwei(BigNumber(this.props.req.data.maxPriorityFeePerGas, 16))
+        const baseFee = parseFloat(this.state.baseFee)
+        const priorityFee = parseFloat(this.state.priorityFee)
         if (gweiToWei(baseFee + priorityFee) * gasLimit > FEE_MAX_TOTAL_ETH_WEI) {
           gasLimit = Math.floor(FEE_MAX_TOTAL_ETH_WEI / gweiToWei(baseFee + priorityFee))
         }
       } else {
-        const gasPrice = this.toDisplayGwei(BigNumber(this.props.req.data.gasPrice, 16))
+        const gasPrice = parseFloat(this.state.gasPrice)
         if (gweiToWei(gasPrice) * gasLimit > FEE_MAX_TOTAL_ETH_WEI) {
           gasLimit = Math.floor(FEE_MAX_TOTAL_ETH_WEI / gweiToWei(gasPrice))
         }
       }
-      this.setState({ gasLimit })
       link.rpc('setGasLimit', '0x' + gasLimit.toString(16), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
+      gasLimit.toString()
+      this.setState({ gasLimit })
     }, 500)
-
   }
 
   limitRange (num, min, max) {
     if (num > max) return max
     if (num < min) return min
     return num
+  }
+
+  renderBaseFeeInput () {
+    return (
+      <div className='txFeeOverlayBaseFee'>
+        <div className='txFeeOverlayInput'>
+          <input
+            tabIndex={0}
+            value={this.state.baseFee}
+            onChange={(e) => {
+              this.setBaseFee(e.target.value.match('[0-9\.\-]*').toString())
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                e.target.blur()
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                let baseFee = parseFloat(this.state.baseFee)
+                if (isNaN(baseFee)) return
+                baseFee = this.limitRange(baseFee + 1, 0, 9999)
+                baseFee = this.trimGwei(baseFee).toString()
+                this.setBaseFee(baseFee)
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                let baseFee = parseFloat(this.state.baseFee)
+                if (isNaN(baseFee)) return
+                baseFee = this.limitRange(baseFee - 1, 0, 9999)
+                baseFee = this.trimGwei(baseFee).toString()
+                this.setBaseFee(baseFee)
+              }
+            }}
+          />
+        </div>
+        <div className='txFeeOverlayLabel'>Base Fee (GWEI)</div>
+      </div>
+    )
+  }
+
+  renderPriorityFeeInput () {
+    return (
+      <div className='txFeeOverlayPriorityFee'>
+        <div className='txFeeOverlayInput'>
+        <input
+            tabIndex={1}
+            value={this.state.priorityFee}
+            onChange={(e) => {
+              this.setPriorityFee(e.target.value.match('[0-9\.\-]*'))
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                e.target.blur()
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                let priorityFee = parseFloat(this.state.priorityFee)
+                if (isNaN(priorityFee)) return
+                priorityFee = this.limitRange(priorityFee + 1, 0, 9999)
+                priorityFee = this.trimGwei(priorityFee).toString()
+                this.setPriorityFee(priorityFee)
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                let priorityFee = parseFloat(this.state.priorityFee)
+                if (isNaN(priorityFee)) return
+                priorityFee = this.limitRange(priorityFee - 1, 0, 9999)
+                priorityFee = this.trimGwei(priorityFee).toString()
+                this.setPriorityFee(priorityFee)
+              }
+            }}
+          />
+        </div>
+        <div className='txFeeOverlayLabel'>Priority Fee (GWEI) </div>
+      </div>
+    )
+  }
+
+  renderGasPriceInput () {
+    return (
+      <div className='txFeeOverlayBaseFee'>
+        <div className='txFeeOverlayInput'>
+          <input
+            tabIndex={0}
+            value={this.state.gasPrice}
+            onChange={(e) => {
+              this.setGasPrice(e.target.value.match('[0-9\.\-]*').toString())
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                e.target.blur()
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                const gasPrice = this.trimGwei(this.limitRange(parseFloat(this.state.gasPrice) + 1, 0, 9999))
+                if (isNaN(gasPrice)) return
+                this.setGasPrice(gasPrice)
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                const gasPrice = this.trimGwei(this.limitRange(parseFloat(this.state.gasPrice) - 1, 0, 9999))
+                if (isNaN(gasPrice)) return
+                this.setGasPrice(gasPrice)
+              }
+            }}
+          />
+        </div>
+        <div className='txFeeOverlayLabel'>Gas Price (GWEI)</div>
+      </div>
+    )
+  }
+
+  renderGasLimitInput () {
+    return (
+      <div className='txFeeOverlayLimit'>
+        <div className='txFeeOverlayInput'>
+          <input 
+            tabIndex={3} 
+            value={this.state.gasLimit}
+            className='txFeeOverlayInput' 
+            onChange={(e) => {
+              this.setGasLimit(e.target.value.match('[0-9]*'))
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                e.target.blur()
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                const gasLimit = parseInt(this.state.gasLimit) + 1000
+                if (isNaN(gasLimit)) return
+                this.setGasLimit(gasLimit.toString())
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                const gasLimit = parseInt(this.state.gasLimit) - 1000
+                if (isNaN(gasLimit)) return
+                this.setGasLimit(gasLimit.toString())
+              }
+            }}
+          />
+        </div>
+        <div className='txFeeOverlayLabel'>Gas Limit (UNITS)</div>
+      </div>
+    )
   }
 
   render () {
@@ -175,93 +329,9 @@ class TxFeeOverlay extends React.Component {
           <div className='txFeeOverlay'>
             <div className='txFeeOverlayInset'>
               <div className='txFeeOverlayEstimate'></div>
-              <div className='txFeeOverlayBaseFee'>
-                <div className='txFeeOverlayInput'>
-                  <input
-                    tabIndex={0}
-                    value={this.state.baseFee}
-                    onChange={(e) => {
-                      this.setBaseFee(e.target.value.match('[0-9\.\-]*').toString())
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        e.target.blur()
-                      } else if (e.key === 'ArrowUp') {
-                        e.preventDefault()
-                        const baseFee = this.limitRange(this.trimGwei(this.state.baseFee) + 1, 0, 9999)
-                        if (isNaN(baseFee)) return
-                        this.setBaseFee(baseFee)
-                      } else if (e.key === 'ArrowDown') {
-                        e.preventDefault()
-                        const baseFee = this.limitRange(this.trimGwei(this.state.baseFee) - 1, 0, 9999)
-                        if (isNaN(baseFee)) return
-                        this.setBaseFee(baseFee)
-                      }
-                    }}
-                  />
-                </div>
-                <div className='txFeeOverlayLabel'>Base Fee (GWEI)</div>
-              </div>
-              <div className='txFeeOverlayPriorityFee'>
-                <div className='txFeeOverlayInput'>
-                <input
-                    tabIndex={1}
-                    value={this.state.priorityFee}
-                    onChange={(e) => {
-                      const priorityFee = e.target.value.match('[0-9\.\-]*')
-                      this.setPriorityFee(priorityFee)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        e.target.blur()
-                      } else if (e.key === 'ArrowUp') {
-                        e.preventDefault()
-                        const priorityFee = this.limitRange(this.trimGwei(this.state.priorityFee + 1), 0, 9999)
-                        if (isNaN(priorityFee)) return
-                        this.setPriorityFee(priorityFee)
-                      } else if (e.key === 'ArrowDown') {
-                        e.preventDefault()
-                        const priorityFee = this.limitRange(this.trimGwei(this.state.priorityFee - 1), 0, 9999)
-                        if (isNaN(priorityFee)) return
-                        this.setPriorityFee(priorityFee)
-                      }
-                    }}
-                  />
-                </div>
-                <div className='txFeeOverlayLabel'>Priority Fee (GWEI) </div>
-              </div>
-              <div className='txFeeOverlayLimit'>
-                <div className='txFeeOverlayInput'>
-                  <input 
-                    tabIndex={3} 
-                    value={this.state.gasLimit}
-                    className='txFeeOverlayInput' 
-                    onChange={(e) => {
-                      const gasLimit = e.target.value.match('[0-9]*')
-                      this.setGasLimit(gasLimit)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        e.target.blur()
-                      } else if (e.key === 'ArrowUp') {
-                        e.preventDefault()
-                        const gasLimit = parseInt(this.state.gasLimit) + 1000
-                        if (isNaN(gasLimit)) return
-                        this.setGasLimit(gasLimit)
-                      } else if (e.key === 'ArrowDown') {
-                        e.preventDefault()
-                        const gasLimit = parseInt(this.state.gasLimit) - 1000
-                        if (isNaN(gasLimit)) return
-                        this.setGasLimit(gasLimit)
-                      }
-                    }}
-                  />
-                </div>
-                <div className='txFeeOverlayLabel'>Gas Limit (UNITS)</div>
-              </div>
+              {this.renderBaseFeeInput()}
+              {this.renderPriorityFeeInput()}
+              {this.renderGasLimitInput()}
             </div>
           </div>
         </div>
@@ -278,65 +348,8 @@ class TxFeeOverlay extends React.Component {
           <div className='txFeeOverlay'>
             <div className='txFeeOverlayInset'>
               <div className='txFeeOverlayEstimate'></div>
-              <div className='txFeeOverlayBaseFee'>
-                <div className='txFeeOverlayInput'>
-                  <input
-                    tabIndex={0}
-                    value={this.state.gasPrice}
-                    onChange={(e) => {
-                      this.setGasPrice(e.target.value.match('[0-9\.\-]*').toString())
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        e.target.blur()
-                      } else if (e.key === 'ArrowUp') {
-                        e.preventDefault()
-                        const gasPrice = this.limitRange(this.trimGwei(this.state.gasPrice) + 1, 0, 9999)
-                        if (isNaN(gasPrice)) return
-                        this.setGasPrice(gasPrice)
-                      } else if (e.key === 'ArrowDown') {
-                        e.preventDefault()
-                        const gasPrice = this.limitRange(this.trimGwei(this.state.gasPrice) - 1, 0, 9999)
-                        if (isNaN(gasPrice)) return
-                        this.setGasPrice(gasPrice)
-                      }
-                    }}
-                  />
-                </div>
-                <div className='txFeeOverlayLabel'>Gas Price (GWEI)</div>
-              </div>
-              <div className='txFeeOverlayLimit'>
-                <div className='txFeeOverlayInput'>
-                  <input 
-                    tabIndex={1} 
-                    value={this.state.gasLimit}
-                    className='txFeeOverlayInput' 
-                    onChange={(e) => {
-                      const gasLimit = e.target.value.match('[0-9]*')
-                      this.setState({ gasLimit })
-                      this.setGasLimit(gasLimit)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        e.target.blur()
-                      } else if (e.key === 'ArrowUp') {
-                        e.preventDefault()
-                        const gasLimit = parseInt(this.state.gasLimit) + 1000
-                        if (isNaN(gasLimit)) return
-                        this.setGasLimit(gasLimit)
-                      } else if (e.key === 'ArrowDown') {
-                        e.preventDefault()
-                        const gasLimit = parseInt(this.state.gasLimit) - 1000
-                        if (isNaN(gasLimit)) return
-                        this.setGasLimit(gasLimit)
-                      }
-                    }}
-                  />
-                </div>
-                <div className='txFeeOverlayLabel'>Gas Limit (UNITS)</div>
-              </div>
+              {this.renderGasPriceInput()}
+              {this.renderGasLimitInput()}
             </div>
           </div>
         </div>

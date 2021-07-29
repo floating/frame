@@ -34,12 +34,9 @@ class TxFee extends React.Component {
     let maxFeePerGas, maxFee, maxFeeUSD
 
     if (req.data.type === '0x2') {  
-      const baseFee = BigNumber(req.data.maxFeePerGas, 16)
-      const priorityFee = BigNumber(req.data.maxPriorityFeePerGas, 16)
       const gasLimit = BigNumber(req.data.gasLimit, 16)
-  
-      maxFeePerGas = baseFee.plus(priorityFee)
 
+      maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
       maxFee = maxFeePerGas.multipliedBy(gasLimit)
       maxFeeUSD = maxFee.multipliedBy(nativeUSD)
     } else {
