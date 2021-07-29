@@ -361,8 +361,8 @@ class Accounts extends EventEmitter {
 
   // Set Current Account
   setSigner (id, cb) {
-    const currentAccount = this.current()
     this._current = id
+    const currentAccount = this.current()
     const summary = currentAccount.summary()
     cb(null, summary)
     windows.broadcast('main:action', 'setSigner', summary)
@@ -389,7 +389,7 @@ class Accounts extends EventEmitter {
   }
 
   verifyAddress (display, cb) {
-    const currentAddress = this.current()
+    const currentAccount = this.current()
     if (currentAccount && currentAccount.verifyAddress) currentAccount.verifyAddress(display, cb)
   }
 
