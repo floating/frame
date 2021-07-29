@@ -534,7 +534,9 @@ class Accounts extends EventEmitter {
     log.info('setTxSigned', handlerId)
 
     const currentAccount = this.current()
-    if (currentAccount && currentAccount.requests[handlerId]) {
+    if (!currentAccount) return cb(new Error('No account selected'))
+
+    if (currentAccount.requests[handlerId]) {
       if (currentAccount.requests[handlerId].status === 'declined' || currentAccount.requests[handlerId].status === 'error') {
         cb(new Error('Request already declined'))
       } else {
@@ -595,7 +597,8 @@ class Accounts extends EventEmitter {
     if (this.invalidValue(baseFee)) return cb(new Error('Invalid base fee'))
 
     const currentAccount = this.current()
-    if (currentAccount && currentAccount.requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+    if (!currentAccount) return cb(new Error('No account selected while setting gas price'))
+  if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
       if (parseInt(baseFee, 'hex') > 9999 * 1e9) baseFee = '0x' + (9999 * 1e9).toString(16)
 
       const priorityFee = this.current().requests[handlerId].data.maxPriorityFeePerGas
