@@ -40,7 +40,8 @@ class TxFeeOverlay extends React.Component {
       this.state.maxFee = this.toDisplayFullGwei(maxFee)
       this.state.baseFee = this.toDisplayFullGwei(baseFee)
     } else {
-      this.state.gasPrice = BigNumber(props.req.data.gasPrice, 16).toString()
+      const gasPrice = BigNumber(props.req.data.gasPrice, 16)
+      this.state.gasPrice = this.toDisplayFullGwei(gasPrice)
     }
 
     this.state.gasLimit = BigNumber(props.req.data.gasLimit, 16).toString()
@@ -73,7 +74,7 @@ class TxFeeOverlay extends React.Component {
   }
 
   toDisplayFullGwei (bn) {
-    return bn.shiftedBy(-9).toFixed(9).toString().replace(/\.0+$/,'')
+    return bn.shiftedBy(-9).toFixed(9).toString().replace(/0+$/,'').replace(/\.+$/,'')
   }
 
   trimGwei (gwei) {
