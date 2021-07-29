@@ -125,33 +125,39 @@ class Accounts extends EventEmitter {
 
   updateNonce (reqId, nonce) {
     log.info('Update Nonce: ', reqId, nonce)
-    const req = this.current().requests[reqId]
+
+    const currentAccount = this.current()
+    const req = currentAccount.requests[reqId]
     if (req.type === 'transaction') req.data.nonce = nonce
-    this.current().update()
+    currentAccount.update()
     return req
   }
 
   removeRequestWarning (reqId) {
     log.info('removeRequestWarning: ', reqId)
-    if (this.current() && this.current().requests[reqId]) {
-      delete this.current().requests[reqId].warning
-      this.current().update()
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[reqId]) {
+      delete currentAccount.requests[reqId].warning
+      currentAccount.update()
     }
   }
 
   checkBetterGasPrice(targetChain) {
     const { id, type } = targetChain
     const gas = store('main.networksMeta', type, id, 'gas.price')
-    if (gas && this.current() && gas.selected !== 'custom') {
-      Object.keys(this.current().requests).forEach(id => {
-        const req = this.current().requests[id]
+    const currentAccount = this.current()
+
+    if (gas && currentAccount && gas.selected !== 'custom') {
+      Object.keys(currentAccount.requests).forEach(id => {
+        const req = currentAccount.requests[id]
         if (req.type === 'transaction' && req.data.gasPrice) {
           const setPrice = weiHexToGweiInt(req.data.gasPrice)
           const currentPrice = weiHexToGweiInt(gas.levels[gas.selected])
           if (isNaN(setPrice) || isNaN(currentPrice)) return
           if (currentPrice < setPrice) {
             req.data.gasPrice = gweiToWeiHex(currentPrice)
-            this.current().update()
+            currentAccount.update()
           }
         }
       })
@@ -159,10 +165,12 @@ class Accounts extends EventEmitter {
   }
 
   async replaceTx (id, type) {
+    const currentAccount = this.current()
     return new Promise((resolve, reject) => {
-      if (!this.current().requests[id]) return reject(new Error('Could not find request'))
-      if (this.current().requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
-      const data = JSON.parse(JSON.stringify(this.current().requests[id].data))
+      if (!currentAccount || !currentAccount.requests[id]) return reject(new Error('Could not find request'))
+      if (currentAccount.requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
+
+      const data = JSON.parse(JSON.stringify(currentAccount.requests[id].data))
       const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 'hex').toString()}
       const { levels } = store('main.networksMeta', targetChain.type, targetChain.id, 'gas.price')
 
@@ -179,11 +187,11 @@ class Accounts extends EventEmitter {
         tx.params = [data]
       } else {
         tx.params = [{
-          from: this.current().getSelectedAddress(),
-          to: this.current().getSelectedAddress(),
+          from: currentAccount.getSelectedAddress(),
+          to: currentAccount.getSelectedAddress(),
           value: '0x0',
           nonce: data.nonce,
-          _origin: this.current().requests[id].origin
+          _origin: currentAccount.requests[id].origin
         }]
       }
 
@@ -236,7 +244,7 @@ class Accounts extends EventEmitter {
                 if (reqs[k].status === 'verifying' && reqs[k].data.nonce === reqs[id].data.nonce) {
                   account.requests[k].status = 'error'
                   account.requests[k].notice = 'Dropped'
-                  setTimeout(() => this.removeRequest(account, k), 8000)
+                  setTimeout(() => this.accounts[account.address] && this.removeRequest(account, k), 8000)
                 }
               })
 
@@ -272,7 +280,7 @@ class Accounts extends EventEmitter {
 
     if (!targetChain || !targetChain.type || !targetChain.id ) {
       log.error('txMonitor had no target chain')
-      setTimeout(() => this.removeRequest(account, id), 8 * 1000)
+      setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8 * 1000)
     } else {
       proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
         if (newHeadRes.error) {
@@ -287,7 +295,7 @@ class Accounts extends EventEmitter {
             } catch (e) {
               log.error('error awaiting confirmations', e)
               clearTimeout(monitorTimer)
-              setTimeout(() => this.removeRequest(account, id), 60 * 1000)
+              setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 60 * 1000)
               return
             }
             account.requests[id].tx.confirmations = confirmations
@@ -296,7 +304,7 @@ class Accounts extends EventEmitter {
               account.requests[id].status = 'confirmed'
               account.requests[id].notice = 'Confirmed'
               account.update()
-              setTimeout(() => this.removeRequest(account, id), 8000)
+              setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8000)
               clearTimeout(monitorTimer)
             }
           }
@@ -314,7 +322,7 @@ class Accounts extends EventEmitter {
                 log.error(e)
                 // proxyProvider.removeListener('data', handler)
                 proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
-                setTimeout(() => this.removeRequest(account, id), 60 * 1000)
+                setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 60 * 1000)
                 return
               }
               account.requests[id].tx.confirmations = confirmations
@@ -323,7 +331,7 @@ class Accounts extends EventEmitter {
                 account.requests[id].status = 'confirmed'
                 account.requests[id].notice = 'Confirmed'
                 account.update()
-                setTimeout(() => this.removeRequest(account, id), 8000)
+                setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8000)
                 // proxyProvider.removeListener('data', handler)
                 
                 proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
@@ -354,13 +362,14 @@ class Accounts extends EventEmitter {
   // Set Current Account
   setSigner (id, cb) {
     this._current = id
-    const summary = this.current().summary()
+    const currentAccount = this.current()
+    const summary = currentAccount.summary()
     cb(null, summary)
     windows.broadcast('main:action', 'setSigner', summary)
-    if (this.current().status === 'ok') this.verifyAddress(false, (err, verified) => {
+    if (currentAccount.status === 'ok') this.verifyAddress(false, (err, verified) => {
       if (!err && !verified) {
-        this.current().signer = ''
-        this.current().update()
+        currentAccount.signer = ''
+        currentAccount.update()
       }
     })
   }
@@ -380,7 +389,8 @@ class Accounts extends EventEmitter {
   }
 
   verifyAddress (display, cb) {
-    if (this.current() && this.current().verifyAddress) this.current().verifyAddress(display, cb)
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.verifyAddress) currentAccount.verifyAddress(display, cb)
   }
 
   getSelectedAddresses () {
@@ -417,11 +427,15 @@ class Accounts extends EventEmitter {
   }
 
   signTransaction (rawTx, cb) {
-    if (!this.current()) return cb(new Error('No Account Selected'))
+    const currentAccount = this.current()
+
+    if (!currentAccount) return cb(new Error('No Account Selected'))
+
     const matchSelected = rawTx.from.toLowerCase() === this.getSelectedAddress().toLowerCase()
-    const matchActor = rawTx.from.toLowerCase() === (this.current().smart ? this.current().smart.actor.toLowerCase() : false)
+    const matchActor = rawTx.from.toLowerCase() === (currentAccount.smart ? currentAccount.smart.actor.toLowerCase() : false)
+    
     if (matchSelected || matchActor) {
-      this.current().signTransaction(rawTx, cb)
+      currentAccount.signTransaction(rawTx, cb)
     } else {
       cb(new Error('signMessage: Account does not match currently selected'))
     }
@@ -463,66 +477,76 @@ class Accounts extends EventEmitter {
   }
 
   declineRequest (handlerId) {
-    if (!this.current()) return // cb(new Error('No Account Selected'))
-    if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'error'
-      this.current().requests[handlerId].notice = 'Signature Declined'
-      this.current().requests[handlerId].mode = 'monitor'
-      setTimeout(() => this.removeRequest(this.current(), handlerId), 8000)
-      this.current().update()
+    const currentAccount = this.current()
+
+    if (currentAccount && currentAccount.requests[handlerId]) {
+      currentAccount.requests[handlerId].status = 'error'
+      currentAccount.requests[handlerId].notice = 'Signature Declined'
+      currentAccount.requests[handlerId].mode = 'monitor'
+      setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 8000)
+      currentAccount.update()
     }
   }
 
   setRequestPending (req) {
     const handlerId = req.handlerId
+    const currentAccount = this.current()
+    
     log.info('setRequestPending', handlerId)
-    if (!this.current()) return // cb(new Error('No Account Selected'))
-    if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'pending'
-      this.current().requests[handlerId].notice = 'See Signer'
-      this.current().update()
+
+    if (currentAccount && currentAccount.requests[handlerId]) {
+      currentAccount.requests[handlerId].status = 'pending'
+      currentAccount.requests[handlerId].notice = 'See Signer'
+      currentAccount.update()
     }
   }
 
   setRequestError (handlerId, err) {
     log.info('setRequestError', handlerId)
-    if (!this.current()) return // cb(new Error('No Account Selected'))
-    if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'error'
+
+    const currentAccount = this.current()
+
+    if (currentAccount && currentAccount.requests[handlerId]) {
+      currentAccount.requests[handlerId].status = 'error'
       if (err.message === 'Ledger device: Invalid data received (0x6a80)') {
-        this.current().requests[handlerId].notice = 'Ledger Contract Data = No'
+        currentAccount.requests[handlerId].notice = 'Ledger Contract Data = No'
       } else if (err.message === 'Ledger device: Condition of use not satisfied (denied by the user?) (0x6985)') {
-        this.current().requests[handlerId].notice = 'Ledger Signature Declined'
+        currentAccount.requests[handlerId].notice = 'Ledger Signature Declined'
       } else {
         const notice = err && typeof err === 'string' ? err : err && typeof err === 'object' && err.message && typeof err.message === 'string' ? err.message : 'Unknown Error' // TODO: Update to normalize input type
-        this.current().requests[handlerId].notice = notice
+        currentAccount.requests[handlerId].notice = notice
       }
-      if (this.current().requests[handlerId].type === 'transaction') {
+      if (currentAccount.requests[handlerId].type === 'transaction') {
         setTimeout(() => {
-          if (this.current() && this.current().requests[handlerId]) {
-            this.current().requests[handlerId].mode = 'monitor'
-            this.current().update()
-            setTimeout(() => this.removeRequest(this.current(), handlerId), 8000)
+          const activeAccount = this.current()
+          if (activeAccount && activeAccount.requests[handlerId]) {
+            activeAccount.requests[handlerId].mode = 'monitor'
+            activeAccount.update()
+            
+            setTimeout(() => this.accounts[activeAccount.address] && this.removeRequest(activeAccount, handlerId), 8000)
           }
         }, 1500)
       } else {
-        setTimeout(() => this.removeRequest(this.current(), handlerId), 3300)
+        setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 3300)
       }
 
-      this.current().update()
+      currentAccount.update()
     }
   }
 
   setTxSigned (handlerId, cb) {
     log.info('setTxSigned', handlerId)
-    if (!this.current()) return cb(new Error('No account selected'))
-    if (this.current().requests[handlerId]) {
-      if (this.current().requests[handlerId].status === 'declined' || this.current().requests[handlerId].status === 'error') {
+
+    const currentAccount = this.current()
+    if (!currentAccount) return cb(new Error('No account selected'))
+
+    if (currentAccount.requests[handlerId]) {
+      if (currentAccount.requests[handlerId].status === 'declined' || currentAccount.requests[handlerId].status === 'error') {
         cb(new Error('Request already declined'))
       } else {
-        this.current().requests[handlerId].status = 'sending'
-        this.current().requests[handlerId].notice = 'Sending'
-        this.current().update()
+        currentAccount.requests[handlerId].status = 'sending'
+        currentAccount.requests[handlerId].notice = 'Sending'
+        currentAccount.update()
         cb()
       }
     } else {
@@ -532,28 +556,32 @@ class Accounts extends EventEmitter {
 
   setTxSent (handlerId, hash) {
     log.info('setTxSent', handlerId, 'Hash', hash)
-    if (!this.current()) return // cb(new Error('No Account Selected'))
-    if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'verifying'
-      this.current().requests[handlerId].notice = 'Verifying'
-      this.current().requests[handlerId].mode = 'monitor'
-      this.current().update()
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[handlerId]) {
+      currentAccount.requests[handlerId].status = 'verifying'
+      currentAccount.requests[handlerId].notice = 'Verifying'
+      currentAccount.requests[handlerId].mode = 'monitor'
+      currentAccount.update()
+
       this.txMonitor(this.accounts[this._current], handlerId, hash)
     }
   }
 
   setRequestSuccess (handlerId) {
     log.info('setRequestSuccess', handlerId)
-    if (!this.current()) return // cb(new Error('No Account Selected'))
-    if (this.current().requests[handlerId]) {
-      this.current().requests[handlerId].status = 'success'
-      this.current().requests[handlerId].notice = 'Successful'
-      if (this.current().requests[handlerId].type === 'transaction') {
-        this.current().requests[handlerId].mode = 'monitor'
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[handlerId]) {
+      currentAccount.requests[handlerId].status = 'success'
+      currentAccount.requests[handlerId].notice = 'Successful'
+      if (currentAccount.requests[handlerId].type === 'transaction') {
+        tcurrentAccount.requests[handlerId].mode = 'monitor'
       } else {
-        setTimeout(() => this.removeRequest(this.current(), handlerId), 3300)
+        setTimeout(() => this.accounts[currentAccount.address] && this.removeRequest(currentAccount, handlerId), 3300)
       }
-      this.current().update()
+
+      currentAccount.update()
     }
   }
 
@@ -570,13 +598,16 @@ class Accounts extends EventEmitter {
   }
 
   setBaseFee (baseFee, handlerId, cb) {
+    const currentAccount = this.current()
+    
     if (this.invalidValue(baseFee)) return cb(new Error('Invalid base fee'))
-    if (!this.current()) return
-    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+    if (!currentAccount) return cb(new Error('No account selected while setting base fee'))
+
+    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
       if (parseInt(baseFee, 'hex') > 9999 * 1e9) baseFee = '0x' + (9999 * 1e9).toString(16)
 
-      const priorityFee = this.current().requests[handlerId].data.maxPriorityFeePerGas
-      const gasLimit = this.current().requests[handlerId].data.gasLimit
+      const priorityFee = currentAccount.requests[handlerId].data.maxPriorityFeePerGas
+      const gasLimit = currentAccount.requests[handlerId].data.gasLimit
 
       const limit = parseInt(gasLimit, 'hex')
 
@@ -588,21 +619,25 @@ class Accounts extends EventEmitter {
         fee = '0x' + fee.toString(16)
       }
       
-      this.current().requests[handlerId].data.maxFeePerGas = fee
-      this.current().update()
+      currentAccount.requests[handlerId].data.maxFeePerGas = fee
+      currentAccount.update()
+
       cb()
     }
   }
 
   setPriorityFee (priorityFee, handlerId, cb) {
+    const currentAccount = this.current()
+    
     if (this.invalidValue(priorityFee)) return cb(new Error('Invalid priority fee'))
-    if (!this.current()) return
-    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+    if (!currentAccount) return cb(new Error('No account selected while setting priority fee'))
+
+    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
       if (parseInt(priorityFee, 'hex') > 9999 * 1e9) priorityFee = '0x' + (9999 * 1e9).toString(16)
       
-      const maxFeePerGas = parseInt(this.current().requests[handlerId].data.maxFeePerGas, 'hex')
-      const gasLimit = parseInt(this.current().requests[handlerId].data.gasLimit, 'hex')
-      const maxPriorityFeePerGas = parseInt(this.current().requests[handlerId].data.maxPriorityFeePerGas, 'hex')
+      const maxFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxFeePerGas, 'hex')
+      const gasLimit = parseInt(currentAccount.requests[handlerId].data.gasLimit, 'hex')
+      const maxPriorityFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxPriorityFeePerGas, 'hex')
       const baseFee = maxFeePerGas - maxPriorityFeePerGas
 
       const newMaxPriorityFeePerGas = parseInt(priorityFee, 'hex')
@@ -612,43 +647,53 @@ class Accounts extends EventEmitter {
         log.warn('Operation would set fee over hard limit')
         const limitedMaxPriorityFeePerGas = Math.floor(FEE_MAX / gasLimit) - baseFee
         const limitedMaxFeePerGas = baseFee + limitedMaxPriorityFeePerGas
-        this.current().requests[handlerId].data.maxPriorityFeePerGas = '0x' + limitedMaxPriorityFeePerGas.toString(16)
-        this.current().requests[handlerId].data.maxFeePerGas = '0x' + limitedMaxFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + limitedMaxPriorityFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + limitedMaxFeePerGas.toString(16)
       } else {
-        this.current().requests[handlerId].data.maxFeePerGas = '0x' + newMaxFeePerGas.toString(16)
-        this.current().requests[handlerId].data.maxPriorityFeePerGas = '0x' + newMaxPriorityFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + newMaxFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + newMaxPriorityFeePerGas.toString(16)
       }
 
-      this.current().update()
+      currentAccount.update()
+
       cb()
     }
   }
 
   setGasPrice (gasPrice, handlerId, cb) {
+    const currentAccount = this.current()
+
     if (this.invalidValue(gasPrice)) return cb(new Error('Invalid gas price'))
-    if (!this.current()) return
-    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+    if (!currentAccount) return cb(new Error('No account selected while setting gas price'))
+
+    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
       if (parseInt(gasPrice, 'hex') > 9999 * 1e9) gasPrice = '0x' + (9999 * 1e9).toString(16)
-      const gasLimit = this.current().requests[handlerId].data.gasLimit
+
+      const gasLimit = currentAccount.requests[handlerId].data.gasLimit
       const fee = parseInt(gasPrice, 'hex')
       const limit = parseInt(gasLimit, 'hex')
       if (fee * limit > FEE_MAX) {
         log.warn('Operation would set fee over hard limit')
         gasPrice = '0x' + Math.floor(FEE_MAX / limit)
       }
-      this.current().requests[handlerId].data.gasPrice = gasPrice
-      this.current().update()
+
+      currentAccount.requests[handlerId].data.gasPrice = gasPrice
+      currentAccount.update()
+
       cb()
     }
   }
 
   setGasLimit (limit, handlerId, cb) {
+    const currentAccount = this.current()
+
     if (this.invalidValue(limit)) return cb(new Error('Invalid gas limit'))
-    if (!this.current()) return // cb(new Error('No Account Selected'))
-    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+    if (!currentAccount) return cb(new Error('No account selected while setting gas limit'))
+    
+    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
       limit = parseInt(limit, 'hex') 
       if (limit > 12.5e6) limit = 12.5e6
-      const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = this.current().requests[handlerId].data
+      const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = currentAccount.requests[handlerId].data
       const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
       if (limit * fee > FEE_MAX) {
         log.warn('setGasLimit operation would set fee over hard limit')
@@ -656,23 +701,28 @@ class Accounts extends EventEmitter {
       } else {
         limit = '0x' + limit.toString(16)
       }
-      this.current().requests[handlerId].data.gasLimit = limit
-      this.current().update()
+
+      currentAccount.requests[handlerId].data.gasLimit = limit
+      currentAccount.update()
+
       cb()
     }
   }
 
   adjustNonce (handlerId, nonceAdjust) {
+    const currentAccount = this.current()
+
     if (nonceAdjust !== 1 && nonceAdjust !== -1) return log.error('Invalid nonce adjustment', nonceAdjust)
-    if (!this.current()) return log.error('No account selected during nonce adjustement', nonceAdjust)
-    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
-      const nonce = this.current().requests[handlerId].data && this.current().requests[handlerId].data.nonce
+    if (!currentAccount) return log.error('No account selected during nonce adjustement', nonceAdjust)
+
+    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
+      const nonce = currentAccount.requests[handlerId].data && currentAccount.requests[handlerId].data.nonce
       if (nonce) {
         const adjustedNonce = '0x' + (parseInt(nonce, 'hex') + nonceAdjust).toString(16)
-        this.current().requests[handlerId].data.nonce = adjustedNonce
-        this.current().update()
+        currentAccount.requests[handlerId].data.nonce = adjustedNonce
+        currentAccount.update()
       } else {
-        const { from, chainId } = this.current().requests[handlerId].data
+        const { from, chainId } = currentAccount.requests[handlerId].data
 
         const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex').toString() }
 
@@ -680,8 +730,8 @@ class Accounts extends EventEmitter {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
             const adjustedNonce = '0x' + (nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16)
-            this.current().requests[handlerId].data.nonce = adjustedNonce
-            this.current().update()
+            currentAccount.requests[handlerId].data.nonce = adjustedNonce
+            currentAccount.update()
           }
         }, targetChain)
       }
