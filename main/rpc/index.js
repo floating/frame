@@ -176,9 +176,17 @@ const rpc = {
   verifyAddress (cb) {
     accounts.verifyAddress(true, cb)
   },
-  setGasPrice (netType, netId, price, level, handlerId, cb) {
+  setBaseFee (fee, handlerId, cb) {
+    accounts.setBaseFee(fee, handlerId, cb)
+    // store.setGasDefault(netType, netId, level, price)
+  },
+  setPriorityFee (fee, handlerId, cb) {
+    accounts.setPriorityFee(fee, handlerId, cb)
+    // store.setGasDefault(netType, netId, level, price)
+  },
+  setGasPrice (price,handlerId, cb) {
     accounts.setGasPrice(price, handlerId, cb)
-    store.setGasDefault(netType, netId, level, price)
+    // store.setGasDefault(netType, netId, level, price)
   },
   setGasLimit (limit, handlerId, cb) {
     accounts.setGasLimit(limit, handlerId, cb)
