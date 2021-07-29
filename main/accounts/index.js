@@ -575,7 +575,7 @@ class Accounts extends EventEmitter {
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
       if (parseInt(baseFee, 'hex') > 9999 * 1e9) baseFee = '0x' + (9999 * 1e9).toString(16)
 
-      const priorityFee  = this.current().requests[handlerId].data.maxPriorityFeePerGas
+      const priorityFee = this.current().requests[handlerId].data.maxPriorityFeePerGas
       const gasLimit = this.current().requests[handlerId].data.gasLimit
 
       const limit = parseInt(gasLimit, 'hex')
