@@ -565,12 +565,62 @@ class Accounts extends EventEmitter {
     delete this.accounts[address]
   }
 
+  invalidFee (fee) {
+    return (!fee || isNaN(parseInt(fee, 'hex')) || parseInt(fee, 'hex') < 0)
+  }
+
+  limitBaseFee (baseFee, priorityFee, gasLimit) {
+    if (parseInt(baseFee, 'hex') > 9999 * 1e9) baseFee = '0x' + (9999 * 1e9).toString(16)
+    const fee = parseInt(baseFee, 'hex') + parseInt(priorityFee, 'hex')
+    const limit = parseInt(gasLimit, 'hex')
+    if (fee * limit > FEE_MAX) {
+      log.warn('Operation would set fee over hard limit')
+      baseFee = '0x' + (Math.floor(FEE_MAX / limit) - parseInt(priorityFee, 'hex')).toString(16)
+    }
+    return baseFee
+  }
+
+  limitPriorityFee (priorityFee, baseFee, gasLimit) {
+    if (parseInt(priorityFee, 'hex') > 9999 * 1e9) priorityFee = '0x' + (9999 * 1e9).toString(16)
+    const fee = parseInt(baseFee, 'hex') + parseInt(priorityFee, 'hex')
+    const limit = parseInt(gasLimit, 'hex')
+    if (fee * limit > FEE_MAX) {
+      log.warn('Operation would set fee over hard limit')
+      priorityFee = '0x' + (Math.floor(FEE_MAX / limit) - parseInt(baseFee, 'hex')).toString(16)
+    }
+    return priorityFee
+  }
+
+  setBaseFee (fee, handlerId, cb) {
+    if (this.invalidFee(fee)) return cb(new Error('Invalid price'))
+    if (!this.current()) return
+    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      const priorityFee  = this.current().requests[handlerId].data.maxPriorityFeePerGas
+      const gasLimit = this.current().requests[handlerId].data.gasLimit
+      this.current().requests[handlerId].data.maxFeePerGas = this.limitBaseFee(fee, priorityFee, gasLimit)
+      this.current().update()
+      cb()
+    }
+  }
+
+  setPriorityFee (fee, handlerId, cb) {
+    if (this.invalidFee(fee)) return cb(new Error('Invalid price'))
+    if (!this.current()) return
+    if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
+      const baseFee  = this.current().requests[handlerId].data.maxFeePerGas
+      const gasLimit = this.current().requests[handlerId].data.gasLimit
+      this.current().requests[handlerId].data.maxPriorityFeePerGas = this.limitPriorityFee(fee, baseFee, gasLimit)
+      this.current().update()
+      cb()
+    }
+  }
+
   setGasPrice (price, handlerId, cb) {
-    if (!price || isNaN(parseInt(price, 'hex')) || parseInt(price, 'hex') < 0) return cb(new Error('Invalid price'))
-    if (!this.current()) return // cb(new Error('No Account Selected'))
+    if (this.invalidFee(price)) return cb(new Error('Invalid price'))
+    if (!this.current()) return
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
       if (parseInt(price, 'hex') > 9999 * 1e9) price = '0x' + (9999 * 1e9).toString(16)
-      const gasLimit = this.current().requests[handlerId].data.gas
+      const gasLimit = this.current().requests[handlerId].data.gasLimit
       if (parseInt(price, 'hex') * parseInt(gasLimit, 'hex') > FEE_MAX) {
         log.warn('setGasPrice operation would set fee over hard limit')
         price = '0x' + Math.floor(FEE_MAX / parseInt(gasLimit, 'hex')).toString(16)
@@ -619,13 +669,17 @@ class Accounts extends EventEmitter {
     if (!limit || isNaN(parseInt(limit, 'hex')) || parseInt(limit, 'hex') < 0) return cb(new Error('Invalid limit'))
     if (!this.current()) return // cb(new Error('No Account Selected'))
     if (this.current().requests[handlerId] && this.current().requests[handlerId].type === 'transaction') {
-      if (parseInt(limit, 'hex') > 12.5e6) limit = '0x' + (12.5e6).toString(16)
-      const gasPrice = this.current().requests[handlerId].data.gasPrice
-      if (parseInt(limit, 'hex') * parseInt(gasPrice, 'hex') > FEE_MAX) {
+      limit = parseInt(limit, 'hex') 
+      if (limit > 12.5e6) limit = 12.5e6
+      const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = this.current().requests[handlerId].data
+      const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+      if (limit * fee > FEE_MAX) {
         log.warn('setGasLimit operation would set fee over hard limit')
-        limit = '0x' + Math.floor(FEE_MAX / parseInt(gasPrice, 'hex')).toString(16)
+        limit = '0x' + Math.floor(FEE_MAX / fee).toString(16)
+      } else {
+        limit = '0x' + limit.toString(16)
       }
-      this.current().requests[handlerId].data.gas = limit
+      this.current().requests[handlerId].data.gasLimit = limit
       this.current().update()
       cb()
     }

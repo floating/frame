@@ -26,12 +26,12 @@ function toBN (hexStr: string) {
 
 async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Promise<TransactionData> {
   const txData: TransactionData = { ...rawTx, maxFee: '' }
-
+  
   if (chainConfig.isActivatedEIP(1559)) {
     txData.type = '0x2'
 
-    const maxPriorityFee = toBN(gas.fees.maxPriorityFeePerGas)
-    const maxBaseFee = toBN(gas.fees.maxBaseFeePerGas)
+    const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
+    const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
     const maxFee = maxPriorityFee.add(maxBaseFee)
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)

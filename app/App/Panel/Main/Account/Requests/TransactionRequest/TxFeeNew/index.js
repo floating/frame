@@ -5,6 +5,8 @@ import BigNumber from 'bignumber.js'
 
 BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN })
 
+const FEE_WARNING_THRESHOLD_USD = 20
+
 class TxFee extends React.Component {
   constructor (props, context) {
     super(props, context)
@@ -59,7 +61,7 @@ class TxFee extends React.Component {
             <span className='_txFeeGweiLabel'>Gwei</span>
           </div>
           <div className='_txFeeSlice _txFeeValue'>
-            <div className='_txFeeValueDefault'>
+            <div className={maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00' ? '_txFeeValueDefault _txFeeValueDefaultWarn' : '_txFeeValueDefault'}>
               <span className='_txFeeEq'>
                 ≈
               </span>
