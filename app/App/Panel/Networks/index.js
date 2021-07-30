@@ -167,7 +167,7 @@ class _Network extends React.Component {
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
-    const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.standard'), 'hex') / 1e9) || '---'
+    const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9) || '---'
     const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '---'
     const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '---'
     const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '---'

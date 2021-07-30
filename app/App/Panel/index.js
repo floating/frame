@@ -67,7 +67,7 @@ class Panel extends React.Component {
           Math.floor(nativeCurrency.usd.price).toLocaleString()
     ) : '---'
 
-    let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.standard')
+    let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.fast')
     if (gasPrice) gasPrice = Math.round(parseInt(gasPrice, 'hex') / 1e9)
     const networks = this.store('main.networks')
     const networkOptions = []
