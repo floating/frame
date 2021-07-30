@@ -295,6 +295,16 @@ const migrations = {
     })
 
     return initial
+  },
+  14: initial => {
+    // update provider endpoints for polygon and optimism
+    const polygon = initial.main.networks.ethereum[137]
+
+    if (polygon && polygon.connection.primary.current === 'matic') {
+      polygon.connection.primary.current = 'infura'
+    }
+
+    // const optimism = 
   }
 }
 

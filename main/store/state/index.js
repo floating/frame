@@ -259,7 +259,7 @@ const initial = {
           poa: 'https://dai.poa.network'
         },
         137: {
-          matic: ['https://polygon-mainnet.infura.io/v3/4de05cd0b6cf4b6288b47be6d9939019']
+          infura: 'infuraPolygon'
         }
       }
     },
@@ -429,7 +429,7 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: false
