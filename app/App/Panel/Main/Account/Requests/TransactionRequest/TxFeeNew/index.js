@@ -1,9 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
-// import svg from '../../../../../../../../resources/svg'
-
-BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN })
 
 const FEE_WARNING_THRESHOLD_USD = 20
 
