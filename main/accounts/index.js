@@ -385,53 +385,59 @@ class Accounts extends EventEmitter {
     // Unset that flag after 3000ms
     clearTimeout(this.timers[currentAccount.id + ':' + id])
     this.timers[currentAccount.id + ':' + id] = setTimeout(() => {
-      currentAccount.requests[id].recentFeeUpdate = false
-      currentAccount.update()
+      if (this.accounts[currentAccount.address]) {
+        currentAccount.requests[id].recentFeeUpdate = false
+        currentAccount.update()
+      }
     }, 5000)
+  }
+
+  // returns true if fees were updated
+  _updatePendingTransactionGasFees (id, tx, gas) {
+    if (tx.type === '0x2') { // :) Get new EIP-1559 values
+      const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
+
+      // Check if current gas values are different than the ones set on tx
+      if (tx.maxFeePerGas !== maxBaseFeePerGas || tx.maxPriorityFeePerGas !== maxPriorityFeePerGas) {
+        setTimeout(() => {
+          this.setPriorityFee(gas.price.fees.maxPriorityFeePerGas, id, e => { if (e) log.error(e) })
+          this.setBaseFee(gas.price.fees.maxBaseFeePerGas, id, e => { if (e) log.error(e) })
+        }, 500)
+
+        return true
+      }
+    } else { // Update legacy gas values
+      const gasPrice = gas.price.levels.standard // TODO: Use fast level instead of standard for mainnet
+
+      // Check if current gas values are different than the ones set on tx
+      if (tx.gasPrice !== gasPrice) {
+        setTimeout(() => {
+          this.setGasPrice(gas.price.levels.standard, id, e => { if (e) log.error(e) })
+        }, 500)
+
+        return true
+      }
+    }
+
+    return false
   }
 
   updatePendingFees (chainId) {
     const currentAccount = this.current()
+
     if (currentAccount) {
-      Object.keys(currentAccount.requests).forEach(id => {
-        if ( // If chainId, update pending tx requests from that chain, otherwise update all pending tx requests  
-          currentAccount.requests[id].type === 'transaction' &&
-          (!chainId || parseInt(currentAccount.requests[id].data.chainId, 'hex').toString() === chainId)
-        ) {
-          const tx = currentAccount.requests[id].data
-          const chain = { type: 'ethereum', id: parseInt(tx.chainId, 'hex') }
-          const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
-          
-          if (tx.type === '0x2') { // :) Get new EIP-1559 values
+      // If chainId, update pending tx requests from that chain, otherwise update all pending tx requests
+      const transactions = Object.entries(currentAccount.requests)
+        .filter(([_, req]) => req.type === 'transaction')
+        .filter(([_, req]) => !chainId || parseInt(req.data.chainId, 'hex').toString() === chainId)
 
-            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
+      transactions.forEach(([id, req]) => {
+        const tx = req.data
+        const chain = { type: 'ethereum', id: parseInt(tx.chainId, 'hex') }
+        const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
 
-            // Check if current gas values are different than the ones set on tx
-            if (tx.maxFeePerGas !== maxBaseFeePerGas || tx.maxPriorityFeePerGas !== maxPriorityFeePerGas) {
-
-              // TODO: Check if current tx is blocked by manual gas settings
-
-              this.setRecentFeeUpdate(currentAccount, id) 
-              setTimeout(() => {
-                this.setPriorityFee(gas.price.fees.maxPriorityFeePerGas, id, e => { if (e) log.error(e) })
-                this.setBaseFee(gas.price.fees.maxBaseFeePerGas, id, e => { if (e) log.error(e) })
-              }, 500)  
-            }
-
-          } else { // Update legacy gas values 
-
-            const gasPrice = gas.price.levels.standard // TODO: Use fast level instead of standard for mainnet
-
-            // Check if current gas values are different than the ones set on tx
-            if (tx.gasPrice !== gasPrice) {
-
-              // TODO: Check if current tx is blocked by manual gas settings
-              this.setRecentFeeUpdate(currentAccount, id) 
-              setTimeout(() => {
-                this.setGasPrice(gas.price.levels.standard, id, e => { if (e) log.error(e) })
-              }, 500)
-            }
-          }
+        if (this._updatePendingTransactionGasFees(id, tx, gas)) {
+          this.setRecentFeeUpdate(currentAccount, id)
         }
       })
     }
