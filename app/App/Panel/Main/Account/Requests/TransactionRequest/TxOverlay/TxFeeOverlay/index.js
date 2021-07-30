@@ -205,7 +205,7 @@ class TxFeeOverlay extends React.Component {
             }}
           />
         </div>
-        <div className='txFeeOverlayLabel'>Base Fee (GWEI)</div>
+        <div className='txFeeOverlayLabel'>Max Base Fee (GWEI)</div>
       </div>
     )
   }
