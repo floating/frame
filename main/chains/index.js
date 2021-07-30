@@ -85,7 +85,7 @@ class ChainConnection extends EventEmitter {
 
             store.setGasPrices({
               ...gas,
-              custom: customLevel || gas.standard
+              custom: customLevel || gas.fast
             })
           }).catch(err => {
             log.error(`could not update gas prices for chain ${this.chainId}`, err)
