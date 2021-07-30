@@ -407,12 +407,12 @@ class Accounts extends EventEmitter {
         return true
       }
     } else { // Update legacy gas values
-      const gasPrice = gas.price.levels.standard // TODO: Use fast level instead of standard for mainnet
+      const gasPrice = gas.price.levels.fast
 
       // Check if current gas values are different than the ones set on tx
       if (tx.gasPrice !== gasPrice) {
         setTimeout(() => {
-          this.setGasPrice(gas.price.levels.standard, id, e => { if (e) log.error(e) })
+          this.setGasPrice(gasPrice, id, e => { if (e) log.error(e) })
         }, 500)
 
         return true
