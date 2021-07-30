@@ -247,7 +247,7 @@ const initial = {
           prylabs: 'https://goerli.prylabs.net'
         },
         10: {
-          optimism: ['https://mainnet.optimism.io']
+          infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
         },
         42: {
           infura: 'infuraKovan'
@@ -259,7 +259,10 @@ const initial = {
           poa: 'https://dai.poa.network'
         },
         137: {
-          infura: 'infuraPolygon'
+          infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+        },
+        42161: {
+          infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
         }
       }
     },
@@ -433,6 +436,25 @@ const initial = {
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: false
+        },
+        42161: {
+          id: 42161,
+          type: 'ethereum',
+          layer: 'rollup',
+          symbol: 'ETH',
+          name: 'Arbitrum',
+          explorer: 'https://explorer.arbitrum.io',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          },
+          on: false
         }
       }
     }),
@@ -498,6 +520,14 @@ const initial = {
           }
         },
         137: {
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          }
+        },
+        42161: {
           gas: {
             price: {
               selected: 'standard',
