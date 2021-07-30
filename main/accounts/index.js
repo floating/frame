@@ -382,27 +382,27 @@ class Accounts extends EventEmitter {
     currentAccount.requests[id].recentFeeUpdate = true
     currentAccount.update()
     
-    // Unset that flag after 3000ms
+    // Unset that flag after 4000ms
     clearTimeout(this.timers[currentAccount.id + ':' + id])
     this.timers[currentAccount.id + ':' + id] = setTimeout(() => {
-      if (this.accounts[currentAccount.address]) {
+      if (this.accounts[currentAccount.address] && currentAccount.requests[id]) {
         currentAccount.requests[id].recentFeeUpdate = false
         currentAccount.update()
       }
-    }, 5000)
+    }, 4000)
   }
 
   // returns true if fees were updated
   _updatePendingTransactionGasFees (id, tx, gas) {
     if (tx.type === '0x2') { // :) Get new EIP-1559 values
-      const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
+     const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
 
       // Check if current gas values are different than the ones set on tx
       if (tx.maxFeePerGas !== maxBaseFeePerGas || tx.maxPriorityFeePerGas !== maxPriorityFeePerGas) {
         setTimeout(() => {
-          this.setPriorityFee(gas.price.fees.maxPriorityFeePerGas, id, e => { if (e) log.error(e) })
-          this.setBaseFee(gas.price.fees.maxBaseFeePerGas, id, e => { if (e) log.error(e) })
-        }, 500)
+          this.setPriorityFee(maxPriorityFeePerGas, id, false, e => { if (e) log.error(e) })
+          this.setBaseFee(maxBaseFeePerGas, id, false, e => { if (e) log.error(e) })
+        }, 640)
 
         return true
       }
@@ -412,8 +412,8 @@ class Accounts extends EventEmitter {
       // Check if current gas values are different than the ones set on tx
       if (tx.gasPrice !== gasPrice) {
         setTimeout(() => {
-          this.setGasPrice(gasPrice, id, e => { if (e) log.error(e) })
-        }, 500)
+          this.setGasPrice(gasPrice, id, false, e => { if (e) log.error(e) })
+        }, 640)
 
         return true
       }
@@ -428,7 +428,7 @@ class Accounts extends EventEmitter {
     if (currentAccount) {
       // If chainId, update pending tx requests from that chain, otherwise update all pending tx requests
       const transactions = Object.entries(currentAccount.requests)
-        .filter(([_, req]) => req.type === 'transaction')
+        .filter(([_, req]) => req.type === 'transaction' && !req.locked && !req.feesUpdatedByUser)
         .filter(([_, req]) => !chainId || parseInt(req.data.chainId, 'hex').toString() === chainId)
 
       transactions.forEach(([id, req]) => {
@@ -666,13 +666,16 @@ class Accounts extends EventEmitter {
     return (!fee || isNaN(parseInt(fee, 'hex')) || parseInt(fee, 'hex') < 0)
   }
 
-  setBaseFee (baseFee, handlerId, cb) {
+  setBaseFee (baseFee, handlerId, userUpdate, cb) {
     const currentAccount = this.current()
     
     if (this.invalidValue(baseFee)) return cb(new Error('Invalid base fee'))
     if (!currentAccount) return cb(new Error('No account selected while setting base fee'))
 
     if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
+      if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
+      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
+
       if (parseInt(baseFee, 'hex') > 9999 * 1e9) baseFee = '0x' + (9999 * 1e9).toString(16)
 
       const priorityFee = currentAccount.requests[handlerId].data.maxPriorityFeePerGas
@@ -689,19 +692,25 @@ class Accounts extends EventEmitter {
       }
       
       currentAccount.requests[handlerId].data.maxFeePerGas = fee
+
+      if (userUpdate) currentAccount.requests[handlerId].feesUpdatedByUser = true
+
       currentAccount.update()
 
       cb()
     }
   }
 
-  setPriorityFee (priorityFee, handlerId, cb) {
+  setPriorityFee (priorityFee, handlerId, userUpdate, cb) {
     const currentAccount = this.current()
     
     if (this.invalidValue(priorityFee)) return cb(new Error('Invalid priority fee'))
     if (!currentAccount) return cb(new Error('No account selected while setting priority fee'))
 
     if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
+      if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
+      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
+
       if (parseInt(priorityFee, 'hex') > 9999 * 1e9) priorityFee = '0x' + (9999 * 1e9).toString(16)
       
       const maxFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxFeePerGas, 'hex')
@@ -723,19 +732,24 @@ class Accounts extends EventEmitter {
         currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + newMaxPriorityFeePerGas.toString(16)
       }
 
+      if (userUpdate) currentAccount.requests[handlerId].feesUpdatedByUser = true
+
       currentAccount.update()
 
       cb()
     }
   }
 
-  setGasPrice (gasPrice, handlerId, cb) {
+  setGasPrice (gasPrice, handlerId, userUpdate, cb) {
     const currentAccount = this.current()
 
     if (this.invalidValue(gasPrice)) return cb(new Error('Invalid gas price: ' + gasPrice))
     if (!currentAccount) return cb(new Error('No account selected while setting gas price'))
 
     if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
+      if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
+      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
+
       if (parseInt(gasPrice, 'hex') > 9999 * 1e9) gasPrice = '0x' + (9999 * 1e9).toString(16)
 
       const gasLimit = currentAccount.requests[handlerId].data.gasLimit
@@ -747,19 +761,25 @@ class Accounts extends EventEmitter {
       }
 
       currentAccount.requests[handlerId].data.gasPrice = gasPrice
+
+      if (userUpdate) currentAccount.requests[handlerId].feesUpdatedByUser = true
+
       currentAccount.update()
 
       cb()
     }
   }
 
-  setGasLimit (limit, handlerId, cb) {
+  setGasLimit (limit, handlerId, userUpdate, cb) {
     const currentAccount = this.current()
 
     if (this.invalidValue(limit)) return cb(new Error('Invalid gas limit'))
     if (!currentAccount) return cb(new Error('No account selected while setting gas limit'))
     
     if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
+      if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
+      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
+
       limit = parseInt(limit, 'hex') 
       if (limit > 12.5e6) limit = 12.5e6
       const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = currentAccount.requests[handlerId].data
@@ -772,6 +792,9 @@ class Accounts extends EventEmitter {
       }
 
       currentAccount.requests[handlerId].data.gasLimit = limit
+
+      if (userUpdate) currentAccount.requests[handlerId].feesUpdatedByUser = true
+
       currentAccount.update()
 
       cb()
@@ -804,6 +827,16 @@ class Accounts extends EventEmitter {
           }
         }, targetChain)
       }
+    }
+  }
+
+  lockRequest (handlerId) {
+    // When a request is approved, lock it so that no automatic updates such as fee changes can happen
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[handlerId]) {
+      currentAccount.requests[handlerId].locked = true
+    } else {
+      log.error('Trying to lock request ' + handlerId + ' but there is no current account')
     }
   }
 
