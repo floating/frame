@@ -26,6 +26,10 @@ function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
+function usesBaseFee (rawTx: RawTransaction) {
+  return parseInt(rawTx.type) === 2
+}
+
 async function populate (rawTx: RawTransaction, signerType: string, chainConfig: Common, gas: any): Promise<TransactionData> {
   const txData: TransactionData = { ...rawTx, maxFee: '' }
   
@@ -80,6 +84,7 @@ async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<S
 }
 
 export {
+  usesBaseFee,
   populate,
   sign
 }
