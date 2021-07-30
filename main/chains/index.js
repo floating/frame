@@ -67,9 +67,9 @@ class ChainConnection extends EventEmitter {
       }
 
       const gasCalculator = new GasCalculator(provider)
-      const londonHardforkActive = this.chainConfig.gteHardfork('london')
+      const useFeeMarket = this.chainConfig.isActivatedEIP(1559)
 
-      if (londonHardforkActive) {
+      if (useFeeMarket) {
         gasCalculator.getFeePerGas().then(fees => {
           store.setGasFees(this.type, this.chainId, fees)
           store.setGasPrices(this.type, this.chainId, { standard: fees.maxFeePerGas })
