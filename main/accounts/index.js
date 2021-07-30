@@ -372,6 +372,45 @@ class Accounts extends EventEmitter {
         currentAccount.update()
       }
     })
+    // If the account has any current requests, make sure fees are current
+    this.updatePendingFees()
+  }
+
+  updatePendingFees (chainId) {
+    const currentAccount = this.current()
+    if (currentAccount) {
+      Object.keys(currentAccount.requests).forEach(id => {
+        if ( // If chainId, update pending tx requests from that chain, otherwise update all pending tx requests  
+          currentAccount.requests[id].type === 'transaction' &&
+          (!chainId || parseInt(currentAccount.requests[id].data.chainId, 'hex').toString() === chainId)
+        ) {
+          const tx = currentAccount.requests[id].data
+          const chain = { type: 'ethereum', id: parseInt(tx.chainId, 'hex') }
+          const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
+          if (tx.type === '0x2') { // :) Get new EIP-1559 values
+            // TODO: Check if current gas values are different than the ones set on tx
+            // TODO: Check if current tx is blocked by manual gas settings
+
+            // If an update is needed
+            this.setPriorityFee(gas.price.fees.maxPriorityFeePerGas, id, console.log)
+            this.setBaseFee(gas.price.fees.maxBaseFeePerGas, id, console.log)
+
+            // TODO: Set recently updated fee flag on tx and push update
+            // TODO: Unset that flag after 3000ms
+
+          } else { // Update legacy gas values 
+            // TODO: Check if current gas values are different than the ones set on tx
+            // TODO: Check if current tx is blocked by manual gas settings
+
+            // If an update is needed
+            this.setGasPrice(gas.price.levels.standard, id, console.log)
+
+            // TODO: Set recently updated fee flag on tx and push update
+            // TODO: Unset that flag after 3000ms
+          }
+        }
+      })
+    }
   }
 
   unsetSigner (cb) {
@@ -663,7 +702,7 @@ class Accounts extends EventEmitter {
   setGasPrice (gasPrice, handlerId, cb) {
     const currentAccount = this.current()
 
-    if (this.invalidValue(gasPrice)) return cb(new Error('Invalid gas price'))
+    if (this.invalidValue(gasPrice)) return cb(new Error('Invalid gas price: ' + gasPrice))
     if (!currentAccount) return cb(new Error('No account selected while setting gas price'))
 
     if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {

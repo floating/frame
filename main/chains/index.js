@@ -9,6 +9,7 @@ const store = require('../store')
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
+const accounts = require('../accounts')
 
 // because the gas market for EIP-1559 will take a few blocks to
 // stabilize, don't support these transactions until after the buffer period
@@ -91,6 +92,7 @@ class ChainConnection extends EventEmitter {
           })
         }
       }
+      accounts.updatePendingFees(this.chainId)
     })
   }
 
