@@ -72,7 +72,7 @@ class ChainConnection extends EventEmitter {
       if (useFeeMarket) {
         gasCalculator.getFeePerGas().then(fees => {
           store.setGasFees(this.type, this.chainId, fees)
-          store.setGasPrices(this.type, this.chainId, { standard: fees.maxFeePerGas })
+          store.setGasPrices(this.type, this.chainId, { fast: fees.maxFeePerGas })
           store.setGasDefault(this.type, this.chainId, 'fast')
         }).catch(err => {
           log.error(`could not update gas fees for chain ${this.chainId}`, err)
