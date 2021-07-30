@@ -419,6 +419,7 @@ class TransactionRequest extends React.Component {
         )}
         {!notice ? (
           <div className='requestApprove'>
+            {req.recentFeeUpdate ? <div className='requestApproveBlock cardShow'>{'transaction fee updated'}</div> : null}
             <div
               className='requestDecline' onClick={() => {
                 if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)

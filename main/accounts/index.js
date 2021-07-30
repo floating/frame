@@ -40,6 +40,7 @@ class Accounts extends EventEmitter {
     super()
     this._current = ''
     this.accounts = {}
+    this.timers = {}
     const stored = store('main.accounts')
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
@@ -376,6 +377,19 @@ class Accounts extends EventEmitter {
     this.updatePendingFees()
   }
 
+  setRecentFeeUpdate (currentAccount, id) {
+    // Set recently updated fee flag on tx and push update
+    currentAccount.requests[id].recentFeeUpdate = true
+    currentAccount.update()
+    
+    // Unset that flag after 3000ms
+    clearTimeout(this.timers[currentAccount.id + ':' + id])
+    this.timers[currentAccount.id + ':' + id] = setTimeout(() => {
+      currentAccount.requests[id].recentFeeUpdate = false
+      currentAccount.update()
+    }, 5000)
+  }
+
   updatePendingFees (chainId) {
     const currentAccount = this.current()
     if (currentAccount) {
@@ -387,26 +401,36 @@ class Accounts extends EventEmitter {
           const tx = currentAccount.requests[id].data
           const chain = { type: 'ethereum', id: parseInt(tx.chainId, 'hex') }
           const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
+          
           if (tx.type === '0x2') { // :) Get new EIP-1559 values
-            // TODO: Check if current gas values are different than the ones set on tx
-            // TODO: Check if current tx is blocked by manual gas settings
 
-            // If an update is needed
-            this.setPriorityFee(gas.price.fees.maxPriorityFeePerGas, id, console.log)
-            this.setBaseFee(gas.price.fees.maxBaseFeePerGas, id, console.log)
+            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
 
-            // TODO: Set recently updated fee flag on tx and push update
-            // TODO: Unset that flag after 3000ms
+            // Check if current gas values are different than the ones set on tx
+            if (tx.maxFeePerGas !== maxBaseFeePerGas || tx.maxPriorityFeePerGas !== maxPriorityFeePerGas) {
+
+              // TODO: Check if current tx is blocked by manual gas settings
+
+              this.setRecentFeeUpdate(currentAccount, id) 
+              setTimeout(() => {
+                this.setPriorityFee(gas.price.fees.maxPriorityFeePerGas, id, e => { if (e) log.error(e) })
+                this.setBaseFee(gas.price.fees.maxBaseFeePerGas, id, e => { if (e) log.error(e) })
+              }, 500)  
+            }
 
           } else { // Update legacy gas values 
-            // TODO: Check if current gas values are different than the ones set on tx
-            // TODO: Check if current tx is blocked by manual gas settings
 
-            // If an update is needed
-            this.setGasPrice(gas.price.levels.standard, id, console.log)
+            const gasPrice = gas.price.levels.standard // TODO: Use fast level instead of standard for mainnet
 
-            // TODO: Set recently updated fee flag on tx and push update
-            // TODO: Unset that flag after 3000ms
+            // Check if current gas values are different than the ones set on tx
+            if (tx.gasPrice !== gasPrice) {
+
+              // TODO: Check if current tx is blocked by manual gas settings
+              this.setRecentFeeUpdate(currentAccount, id) 
+              setTimeout(() => {
+                this.setGasPrice(gas.price.levels.standard, id, e => { if (e) log.error(e) })
+              }, 500)
+            }
           }
         }
       })
