@@ -2,6 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
+import { usesBaseFee } from '../../../../../../../../main/transaction'
+
 const FEE_WARNING_THRESHOLD_USD = 20
 
 class TxFee extends React.Component {
@@ -30,7 +32,7 @@ class TxFee extends React.Component {
 
     let maxFeePerGas, maxFee, maxFeeUSD
 
-    if (req.data.type === '0x2') {  
+    if (usesBaseFee(req.data)) {
       const gasLimit = BigNumber(req.data.gasLimit, 16)
 
       maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)

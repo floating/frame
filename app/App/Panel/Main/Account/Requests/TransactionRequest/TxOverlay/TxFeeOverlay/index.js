@@ -5,6 +5,7 @@ import Restore from 'react-restore'
 import svg from '../../../../../../../../../resources/svg'
 import link from '../../../../../../../../../resources/link'
 import { gweiToWei, gweiToWeiHex } from '../../../../../../../../../resources/utils'
+import { usesBaseFee } from '../../../../../../../../../main/transaction'
 
 import BigNumber from 'bignumber.js'
 
@@ -31,7 +32,7 @@ class TxFeeOverlay extends React.Component {
       copiedData: false
     }
 
-    if (props.req.data.type === '0x2') {
+    if (usesBaseFee(props.req.data)) {
       const prioFee = BigNumber(props.req.data.maxPriorityFeePerGas, 16)
       const maxFee = BigNumber(props.req.data.maxFeePerGas, 16)
       const baseFee = maxFee.minus(prioFee)
@@ -147,7 +148,7 @@ class TxFeeOverlay extends React.Component {
       gasLimit = parseInt(gasLimit)
       if (isNaN(gasLimit)) return
       if (gasLimit  > 12.5e6) gasLimit = 12.5e6
-      if (this.props.req.data.type === '0x2') {
+      if (usesBaseFee(this.props.req.data)) {
         const baseFee = parseFloat(this.state.baseFee)
         const priorityFee = parseFloat(this.state.priorityFee)
         if (gweiToWei(baseFee + priorityFee) * gasLimit > FEE_MAX_TOTAL_ETH_WEI) {
@@ -316,7 +317,7 @@ class TxFeeOverlay extends React.Component {
 
   render () {
     const { req, overlayMode } = this.props
-    if (req.data.type === '0x2') {  
+    if (usesBaseFee(req.data)) {
       // const baseFee = BigNumber(this.state.maxFeePerGas, 16)
       // const priorityFee = BigNumber(req.data.maxPriorityFeePerGas, 16)
       // const gasLimit = BigNumber(req.data.gasLimit, 16)

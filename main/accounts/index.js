@@ -4,13 +4,13 @@ const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
 const fetch = require('node-fetch')
-const provider = require('eth-provider')
 
 // const bip39 = require('bip39')
 
 const crypt = require('../crypt')
 const store = require('../store')
 const dataScanner = require('../externalData')
+const { usesBaseFee } = require('../transaction')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')
@@ -691,10 +691,14 @@ class Accounts extends EventEmitter {
     if (!currentAccount) return cb(new Error('No account selected while setting gas limit'))
     
     if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
+      const rawTx = currentAccount.requests[handlerId].data
+
       limit = parseInt(limit, 'hex') 
       if (limit > 12.5e6) limit = 12.5e6
-      const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = currentAccount.requests[handlerId].data
-      const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+
+      const fee = usesBaseFee(rawTx) ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+      const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } = rawTx
+
       if (limit * fee > FEE_MAX) {
         log.warn('setGasLimit operation would set fee over hard limit')
         limit = '0x' + Math.floor(FEE_MAX / fee).toString(16)
