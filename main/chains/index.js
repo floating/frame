@@ -20,7 +20,9 @@ class ChainConnection extends EventEmitter {
     this.type = type
     this.chainId = chainId
 
-    this.chainConfig = chainConfig(parseInt(this.chainId))
+    // default chain config to istanbul hardfork until a block is received
+    // to update it to london
+    this.chainConfig = chainConfig(parseInt(this.chainId, 'istanbul'))
 
     this.primary = {
       status: 'off',
@@ -58,9 +60,10 @@ class ChainConnection extends EventEmitter {
     const monitor = new BlockMonitor(provider)
 
     monitor.on('data', block => {
-      const targetBlock = addHexPrefix((parseInt(block.number, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
-
-      this.chainConfig.setHardforkByBlockNumber(targetBlock)
+      if ('baseFeePerGas' in block) {
+        const targetBlock = addHexPrefix((parseInt(block.number, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
+        this.chainConfig.setHardforkByBlockNumber(targetBlock)
+      }
 
       const gasCalculator = new GasCalculator(provider)
       const londonHardforkActive = this.chainConfig.gteHardfork('london')
