@@ -713,36 +713,30 @@ class Accounts extends EventEmitter {
 
   setPriorityFee (priorityFee, handlerId, userUpdate, cb) {
     const currentAccount = this.current()
-    
-    if (this.invalidValue(priorityFee)) return cb(new Error('Invalid priority fee'))
-    if (!currentAccount) return cb(new Error('No account selected while setting priority fee'))
+    const txRequest = this._validateTransactionUpdate(currentAccount, priorityFee, 'priority fee', handlerId, userUpdate, cb)
 
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
-      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
-
-      if (parseInt(priorityFee, 'hex') > 9999 * 1e9) priorityFee = '0x' + (9999 * 1e9).toString(16)
+    if (txRequest) {
+      const gasLimit = parseInt(txRequest.data.gasLimit, 'hex')
+      const maxPriorityFeePerGas = parseInt(txRequest.data.maxPriorityFeePerGas, 'hex')
+      const maxFeePerGas = parseInt(txRequest.data.maxFeePerGas, 'hex')
       
-      const maxFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxFeePerGas, 'hex')
-      const gasLimit = parseInt(currentAccount.requests[handlerId].data.gasLimit, 'hex')
-      const maxPriorityFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxPriorityFeePerGas, 'hex')
-      const baseFee = maxFeePerGas - maxPriorityFeePerGas
-
-      const newMaxPriorityFeePerGas = parseInt(priorityFee, 'hex')
-      const newMaxFeePerGas = baseFee + newMaxPriorityFeePerGas
+      const updatedPriorityFee = Math.min(9999 * 1e9, parseInt(priorityFee, 'hex'))
+      const updatedMaxFee = maxFeePerGas + (updatedPriorityFee - maxPriorityFeePerGas)
   
-      if (newMaxFeePerGas * gasLimit > FEE_MAX) {
+      const maxAllowedFee = Math.floor(FEE_MAX / gasLimit)
+      const amountOverLimit = updatedMaxFee - maxAllowedFee
+
+      if (amountOverLimit > 0) {
         log.warn('Operation would set fee over hard limit')
-        const limitedMaxPriorityFeePerGas = Math.floor(FEE_MAX / gasLimit) - baseFee
-        const limitedMaxFeePerGas = baseFee + limitedMaxPriorityFeePerGas
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + limitedMaxPriorityFeePerGas.toString(16)
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + limitedMaxFeePerGas.toString(16)
+
+        txRequest.data.maxPriorityFeePerGas = addHexPrefix((updatedPriorityFee - amountOverLimit).toString(16))
+        txRequest.data.maxFeePerGas = addHexPrefix((updatedMaxFee - amountOverLimit).toString(16))
       } else {
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + newMaxFeePerGas.toString(16)
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + newMaxPriorityFeePerGas.toString(16)
+        txRequest.data.maxPriorityFeePerGas = addHexPrefix(updatedPriorityFee.toString(16))
+        txRequest.data.maxFeePerGas = addHexPrefix(updatedMaxFee.toString(16))
       }
 
-      if (userUpdate) currentAccount.requests[handlerId].feesUpdatedByUser = true
+      if (userUpdate) txRequest.feesUpdatedByUser = true
 
       currentAccount.update()
 

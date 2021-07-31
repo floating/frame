@@ -102,7 +102,7 @@ describe('#setBaseFee', () => {
   })
 
   it('does not set a negative base fee', done => {
-    setBaseFee(undefined, err => {
+    setBaseFee('-0x12a05f200', err => {
       expect(err.message).toBe('Invalid base fee')
       done()
     })
@@ -165,7 +165,7 @@ describe('#setBaseFee', () => {
     })
   })
 
-  it('caps the base fee at 9999e9', done => {
+  it('caps the base fee at 9999 gwei', done => {
     const highBaseFee = gweiToHex(10200)
     const maxBaseFee = 9999e9
     const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
@@ -194,6 +194,136 @@ describe('#setBaseFee', () => {
 
   it('updates the feesUpdatedByUser flag', done => {
     setBaseFee('0x1dcd65000', err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
+      done()
+    }, 1, true)
+  })
+})
+
+describe('#setPriorityFee', () => {
+  beforeEach(() => {
+    Accounts.addRequest(request, jest.fn())
+  })
+
+  const setPriorityFee = (fee, cb, requestId = 1, userUpdate = false) => Accounts.setPriorityFee(fee, requestId, userUpdate, cb)
+
+  it('does not set an undefined priority fee', done => {
+    setPriorityFee(undefined, err => {
+      expect(err.message).toBe('Invalid priority fee')
+      done()
+    })
+  })
+
+  it('does not set an invalid priority fee', done => {
+    setPriorityFee('incorrect', err => {
+      expect(err.message).toBe('Invalid priority fee')
+      done()
+    })
+  })
+
+  it('does not set a negative priority fee', done => {
+    setPriorityFee('-0x12a05f200', err => {
+      expect(err.message).toBe('Invalid priority fee')
+      done()
+    })
+  })
+
+  it('does not set a priority fee if no account is active', done => {
+    Accounts.unsetSigner(jest.fn())
+
+    setPriorityFee('0x12a05f200', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    })
+  })
+
+  it('fails to find the request', done => {
+    setPriorityFee('0x12a05f200', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    }, 2)
+  })
+
+  it('does not set a priority fee on a non-transaction request', done => {
+    request.type = 'message'
+
+    setPriorityFee('0x12a05f200', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    })
+  })
+
+  it('does not set a priority fee on a locked request', done => {
+    request.locked = true
+
+    setPriorityFee('0x12a05f200', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
+      done()
+    })
+  })
+
+  it('does not set a priority fee on an automatic update if fees were manually set by the user', done => {
+    request.feesUpdatedByUser = true
+
+    setPriorityFee('0x12a05f200', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
+      done()
+    }, 1, false)
+  })
+
+
+  it('sets a valid priority fee', done => {
+    const priorityFee = 2e9 // 2 gwei
+    const priorityFeeChange = priorityFee - parseInt(request.data.maxPriorityFeePerGas)
+    const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
+
+    setPriorityFee(weiToHex(priorityFee), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(priorityFee))
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+      done()
+    })
+  })
+
+  it('caps the priority fee at 9999 gwei', done => {
+    const highPriorityFee = gweiToHex(10200)
+    const maxPriorityFee = 9999e9
+    const priorityFeeChange = maxPriorityFee - parseInt(request.data.maxPriorityFeePerGas)
+    const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
+
+    setPriorityFee(highPriorityFee, err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+      done()
+    })
+  })
+
+  it('does not exceed the max allowable fee', done => {
+    const maxTotal = 2e18 // 2 ETH
+    const gasLimit = 1e7
+    const maxFee = maxTotal / gasLimit
+
+    request.data.gasLimit = weiToHex(gasLimit)
+    request.data.maxFeePerGas = gweiToHex(190)
+    request.data.maxPriorityFeePerGas = gweiToHex(40)
+
+    const highPriorityFee = 60e9 // add 20 gwei to the above to exceed the maximum limit
+    const expectedPriorityFee = maxFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
+
+    setPriorityFee(highPriorityFee, err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+      done()
+    })
+  })
+
+  it('updates the feesUpdatedByUser flag', done => {
+    setPriorityFee('0x12a05f200', err => {
       expect(err).toBe(undefined)
       expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
       done()
