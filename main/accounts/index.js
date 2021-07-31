@@ -746,27 +746,23 @@ class Accounts extends EventEmitter {
 
   setGasPrice (gasPrice, handlerId, userUpdate, cb) {
     const currentAccount = this.current()
+    const txRequest = this._validateTransactionUpdate(currentAccount, gasPrice, 'gas price', handlerId, userUpdate, cb)
 
-    if (this.invalidValue(gasPrice)) return cb(new Error('Invalid gas price: ' + gasPrice))
-    if (!currentAccount) return cb(new Error('No account selected while setting gas price'))
+    if (txRequest) {
+      const price = Math.min(9999 * 1e9, parseInt(gasPrice, 'hex'))
+      const gasLimit = parseInt(txRequest.data.gasLimit)
+      const maxPrice = Math.floor(FEE_MAX / gasLimit)
 
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
-      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
+      console.log({ price, gasLimit, maxPrice })
 
-      if (parseInt(gasPrice, 'hex') > 9999 * 1e9) gasPrice = '0x' + (9999 * 1e9).toString(16)
-
-      const gasLimit = currentAccount.requests[handlerId].data.gasLimit
-      const fee = parseInt(gasPrice, 'hex')
-      const limit = parseInt(gasLimit, 'hex')
-      if (fee * limit > FEE_MAX) {
+      if (price > maxPrice) {
         log.warn('Operation would set fee over hard limit')
-        gasPrice = '0x' + Math.floor(FEE_MAX / limit)
+        txRequest.data.gasPrice = addHexPrefix(maxPrice.toString(16))
+      } else {
+        txRequest.data.gasPrice = addHexPrefix(price.toString(16))
       }
 
-      currentAccount.requests[handlerId].data.gasPrice = gasPrice
-
-      if (userUpdate) currentAccount.requests[handlerId].feesUpdatedByUser = true
+      if (userUpdate) txRequest.feesUpdatedByUser = true
 
       currentAccount.update()
 

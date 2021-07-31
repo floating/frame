@@ -51,7 +51,8 @@ beforeEach(() => {
     handlerId: 1,
     type: 'transaction',
     data: {
-      gasLimit: '0x5208',
+      gasLimit: weiToHex(21000),
+      gasPrice: gweiToHex(30),
       type: '0x2',
       maxPriorityFeePerGas: gweiToHex(1),
       maxFeePerGas: gweiToHex(9)
@@ -331,6 +332,122 @@ describe('#setPriorityFee', () => {
   })
 })
 
+describe('#setGasPrice', () => {
+  beforeEach(() => {
+    Accounts.addRequest(request, jest.fn())
+  })
+
+  const setGasPrice = (price, cb, requestId = 1, userUpdate = false) => Accounts.setGasPrice(price, requestId, userUpdate, cb)
+
+  it('does not set an undefined gas price', done => {
+    setGasPrice(undefined, err => {
+      expect(err.message).toBe('Invalid gas price')
+      done()
+    })
+  })
+
+  it('does not set an invalid gas price', done => {
+    setGasPrice(Number.NaN, err => {
+      expect(err.message).toBe('Invalid gas price')
+      done()
+    })
+  })
+
+  it('does not set a negative gas price', done => {
+    setGasPrice('-0x23', err => {
+      expect(err.message).toBe('Invalid gas price')
+      done()
+    })
+  })
+
+  it('does not set a gas price if no account is active', done => {
+    Accounts.unsetSigner(jest.fn())
+
+    setGasPrice('0x23', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    })
+  })
+
+  it('fails to find the request', done => {
+    setGasPrice('0x23', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    }, 2)
+  })
+
+  it('does not set a gas price on a non-transaction request', done => {
+    request.type = 'message'
+
+    setGasPrice('0x23', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    })
+  })
+
+  it('does not set a gas price on a locked request', done => {
+    request.locked = true
+
+    setGasPrice('0x23', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.gasPrice).toBe(request.data.gasPrice)
+      done()
+    })
+  })
+
+  it('does not set a gas price on an automatic update if fees were manually set by the user', done => {
+    request.feesUpdatedByUser = true
+
+    setGasPrice('0x23', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.gasPrice).toBe(request.data.gasPrice)
+      done()
+    }, 1, false)
+  })
+
+  it('sets a valid gas price', done => {
+    setGasPrice('0x23', err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.gasPrice).toBe('0x23')
+      done()
+    })
+  })
+
+  it('does not exceed the max gas price', done => {
+    const maxTotal = 2e18 // 2 ETH
+    const gasLimit = 1e7
+    const maxFee = maxTotal / gasLimit
+    const highPrice = weiToHex(maxFee + 10e9) // 250 gwei
+
+    request.data.gasLimit = weiToHex(gasLimit)
+
+    setGasPrice(highPrice, err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxFee))
+      done()
+    })
+  })
+
+  it('caps the gas price at 9999 gwei', done => {
+    const maxPrice = gweiToHex(9999)
+    const highPrice = gweiToHex(10200)
+
+    setGasPrice(highPrice, err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.gasPrice).toBe(maxPrice)
+      done()
+    })
+  })
+
+  it('updates the feesUpdatedByUser flag', done => {
+    setGasPrice('0x23', err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
+      done()
+    }, 1, true)
+  })
+})
+
 describe('#setGasLimit', () => {
   beforeEach(() => {
     Accounts.addRequest(request, jest.fn())
@@ -394,14 +511,6 @@ describe('#setGasLimit', () => {
     })
   })
 
-  it('sets a valid gas limit', done => {
-    setGasLimit('0x61a8', err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasLimit).toBe('0x61a8')
-      done()
-    })
-  })
-
   it('does not set a gas limit on an automatic update if fees were manually set by the user', done => {
     request.feesUpdatedByUser = true
 
@@ -410,6 +519,14 @@ describe('#setGasLimit', () => {
       expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
       done()
     }, 1, false)
+  })
+
+  it('sets a valid gas limit', done => {
+    setGasLimit('0x61a8', err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.gasLimit).toBe('0x61a8')
+      done()
+    })
   })
 
   it('does not exceed the max fee for pre-EIP-1559 transactions', done => {
