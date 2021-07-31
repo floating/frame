@@ -4,7 +4,6 @@ const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
 const fetch = require('node-fetch')
-const provider = require('eth-provider')
 
 // const bip39 = require('bip39')
 
@@ -38,6 +37,7 @@ const FEE_MAX = 2 * 1e18
 class Accounts extends EventEmitter {
   constructor () {
     super()
+
     this._current = ''
     this.accounts = {}
     this.timers = {}
@@ -776,29 +776,33 @@ class Accounts extends EventEmitter {
     if (this.invalidValue(limit)) return cb(new Error('Invalid gas limit'))
     if (!currentAccount) return cb(new Error('No account selected while setting gas limit'))
     
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
-      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
+    const accountRequest = currentAccount.requests[handlerId]
 
-      limit = parseInt(limit, 'hex') 
-      if (limit > 12.5e6) limit = 12.5e6
-      const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = currentAccount.requests[handlerId].data
-      const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
-      if (limit * fee > FEE_MAX) {
-        log.warn('setGasLimit operation would set fee over hard limit')
-        limit = '0x' + Math.floor(FEE_MAX / fee).toString(16)
-      } else {
-        limit = '0x' + limit.toString(16)
-      }
-
-      currentAccount.requests[handlerId].data.gasLimit = limit
-
-      if (userUpdate) currentAccount.requests[handlerId].feesUpdatedByUser = true
-
-      currentAccount.update()
-
-      cb()
+    if (!accountRequest || accountRequest.type !== 'transaction') {
+      return cb(new Error(`Could not find transaction request with handlerId ${handlerId}`))
     }
+
+    if (accountRequest.locked) return cb(new Error('Request has already been approved by the user'))
+    if (accountRequest.feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
+
+    limit = parseInt(limit, 'hex')
+    if (limit > 12.5e6) limit = 12.5e6
+    const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = accountRequest.data
+    const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+    if (limit * fee > FEE_MAX) {
+      log.warn('setGasLimit operation would set fee over hard limit')
+      limit = '0x' + Math.floor(FEE_MAX / fee).toString(16)
+    } else {
+      limit = '0x' + limit.toString(16)
+    }
+
+    accountRequest.data.gasLimit = limit
+
+    if (userUpdate) accountRequest.feesUpdatedByUser = true
+
+    currentAccount.update()
+
+    cb()
   }
 
   adjustNonce (handlerId, nonceAdjust) {
