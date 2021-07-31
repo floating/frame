@@ -9,6 +9,9 @@ jest.mock('../../../main/nebula', () => jest.fn(() => ({
   }
 })))
 
+const weiToHex = wei => addHexPrefix(wei.toString(16))
+const gweiToHex = gwei => weiToHex(gwei * 1e9)
+
 const account = {
   "id": "0x22dd63c3619818fdbc262c78baee43cb61e9cccf",
   "name": "Seed Account",
@@ -50,7 +53,8 @@ beforeEach(() => {
     data: {
       gasLimit: '0x5208',
       type: '0x2',
-      maxFeePerGas: addHexPrefix((10e9).toString(16))
+      maxPriorityFeePerGas: gweiToHex(1),
+      maxFeePerGas: gweiToHex(9)
     }
   }
 
@@ -74,6 +78,127 @@ it('loads the list of accounts', () => {
 
 it('sets the account signer', () => {
   expect(Accounts.current().address).toBe('0x22dd63c3619818fdbc262c78baee43cb61e9cccf')
+})
+
+describe('#setBaseFee', () => {
+  beforeEach(() => {
+    Accounts.addRequest(request, jest.fn())
+  })
+
+  const setBaseFee = (baseFee, cb, requestId = 1, userUpdate = false) => Accounts.setBaseFee(baseFee, requestId, userUpdate, cb)
+
+  it('does not set an undefined base fee', done => {
+    setBaseFee(undefined, err => {
+      expect(err.message).toBe('Invalid base fee')
+      done()
+    })
+  })
+
+  it('does not set an invalid base fee', done => {
+    setBaseFee('wrong', err => {
+      expect(err.message).toBe('Invalid base fee')
+      done()
+    })
+  })
+
+  it('does not set a negative base fee', done => {
+    setBaseFee(undefined, err => {
+      expect(err.message).toBe('Invalid base fee')
+      done()
+    })
+  })
+
+  it('does not set a base fee if no account is active', done => {
+    Accounts.unsetSigner(jest.fn())
+
+    setBaseFee('0x1dcd65000', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    })
+  })
+
+  it('fails to find the request', done => {
+    setBaseFee('0x1dcd65000', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    }, 2)
+  })
+
+  it('does not set a base fee on a non-transaction request', done => {
+    request.type = 'message'
+
+    setBaseFee('0x1dcd65000', err => {
+      expect(err.message).toBeTruthy()
+      done()
+    })
+  })
+
+  it('does not set a base fee on a locked request', done => {
+    request.locked = true
+
+    setBaseFee('0x1dcd65000', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
+      done()
+    })
+  })
+
+  it('does not set a base fee on an automatic update if fees were manually set by the user', done => {
+    request.feesUpdatedByUser = true
+
+    setBaseFee('0x1dcd65000', err => {
+      expect(err.message).toBeTruthy()
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(request.data.maxFeePerGas)
+      done()
+    }, 1, false)
+  })
+
+
+  it('sets a valid base fee', done => {
+    const baseFee = 6e9 // 6 gwei
+    const expectedMaxFee = weiToHex(baseFee + parseInt(request.data.maxPriorityFeePerGas))
+
+    setBaseFee(weiToHex(baseFee), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+      done()
+    })
+  })
+
+  it('caps the base fee at 9999e9', done => {
+    const highBaseFee = gweiToHex(10200)
+    const maxBaseFee = 9999e9
+    const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
+
+    setBaseFee(highBaseFee, err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+      done()
+    })
+  })
+
+  it('does not exceed the max allowable fee', done => {
+    const maxTotal = 2e18 // 2 ETH
+    const gasLimit = 1e7
+    const maxFee = maxTotal / gasLimit
+    const highBaseFee = weiToHex(maxFee + 10e9) // add 10 gwei to exceed the maximum limit
+
+    request.data.gasLimit = weiToHex(gasLimit)
+
+    setBaseFee(highBaseFee, err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+      done()
+    })
+  })
+
+  it('updates the feesUpdatedByUser flag', done => {
+    setBaseFee('0x1dcd65000', err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
+      done()
+    }, 1, true)
+  })
 })
 
 describe('#setGasLimit', () => {
@@ -134,7 +259,7 @@ describe('#setGasLimit', () => {
 
     setGasLimit('0x61a8', err => {
       expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.gasLimit).toBe('0x5208')
+      expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
       done()
     })
   })
@@ -152,7 +277,7 @@ describe('#setGasLimit', () => {
 
     setGasLimit('0x61a8', err => {
       expect(err.message).toBeTruthy()
-      expect(Accounts.current().requests[1].data.gasLimit).toBe('0x5208')
+      expect(Accounts.current().requests[1].data.gasLimit).toBe(request.data.gasLimit)
       done()
     }, 1, false)
   })
@@ -161,14 +286,14 @@ describe('#setGasLimit', () => {
     const maxFee = 2e18 // 2 ETH
     const gasPrice = 400e9 // 400 gwei
     const maxLimit = maxFee / gasPrice
-    const gasLimit = addHexPrefix((maxLimit + 1e5).toString(16)) // add 10000 to exceed the maximum limit
+    const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x0'
-    request.data.gasPrice = addHexPrefix(gasPrice.toString(16))
+    request.data.gasPrice = weiToHex(gasPrice)
 
     setGasLimit(gasLimit, err => {
       expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasLimit).toBe(addHexPrefix(maxLimit.toString(16)))
+      expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
       done()
     })
   })
@@ -177,21 +302,21 @@ describe('#setGasLimit', () => {
     const maxFee = 2e18 // 2 ETH
     const maxFeePerGas = 400e9 // 400 gwei
     const maxLimit = maxFee / maxFeePerGas
-    const gasLimit = addHexPrefix((maxLimit + 1e5).toString(16)) // add 10000 to exceed the maximum limit
+    const gasLimit = weiToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x2'
-    request.data.maxFeePerGas = addHexPrefix(maxFeePerGas.toString(16))
+    request.data.maxFeePerGas = weiToHex(maxFeePerGas)
 
     setGasLimit(gasLimit, err => {
       expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasLimit).toBe(addHexPrefix(maxLimit.toString(16)))
+      expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
       done()
     })
   })
 
   it('caps the gas limit at 12.5e6', done => {
-    const maxLimit = addHexPrefix((12.5e6).toString(16))
-    const highLimit = addHexPrefix((13e6).toString(16))
+    const maxLimit = weiToHex(12.5e6)
+    const highLimit = weiToHex(13e6)
 
     setGasLimit(highLimit, err => {
       expect(err).toBe(undefined)
