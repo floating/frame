@@ -173,7 +173,7 @@ describe('#setGasLimit', () => {
     })
   })
 
-  it('sets the gas for limit for post-EIP-1559 transactions', done => {
+  it('does not exceed the max fee for post-EIP-1559 transactions', done => {
     const maxFee = 2e18 // 2 ETH
     const maxFeePerGas = 400e9 // 400 gwei
     const maxLimit = maxFee / maxFeePerGas
