@@ -785,18 +785,16 @@ class Accounts extends EventEmitter {
     if (accountRequest.locked) return cb(new Error('Request has already been approved by the user'))
     if (accountRequest.feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
 
-    limit = parseInt(limit, 'hex')
-    if (limit > 12.5e6) limit = 12.5e6
-    const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = accountRequest.data
-    const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
-    if (limit * fee > FEE_MAX) {
-      log.warn('setGasLimit operation would set fee over hard limit')
-      limit = '0x' + Math.floor(FEE_MAX / fee).toString(16)
-    } else {
-      limit = '0x' + limit.toString(16)
-    }
+    const gasLimit = Math.min(parseInt(limit, 'hex'), 12.5e6)
+    const { type, maxFeePerGas, gasPrice } = accountRequest.data
+    const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
 
-    accountRequest.data.gasLimit = limit
+    if (gasLimit * fee > FEE_MAX) {
+      log.warn('setGasLimit operation would set fee over hard limit')
+      accountRequest.data.gasLimit = '0x' + Math.floor(FEE_MAX / fee).toString(16)
+    } else {
+      accountRequest.data.gasLimit = '0x' + gasLimit.toString(16)
+    }
 
     if (userUpdate) accountRequest.feesUpdatedByUser = true
 
