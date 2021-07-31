@@ -55,7 +55,8 @@ beforeEach(() => {
       gasPrice: gweiToHex(30),
       type: '0x2',
       maxPriorityFeePerGas: gweiToHex(1),
-      maxFeePerGas: gweiToHex(9)
+      maxFeePerGas: gweiToHex(9),
+      nonce: '0xa'
     }
   }
 
@@ -578,5 +579,77 @@ describe('#setGasLimit', () => {
       expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
       done()
     }, 1, true)
+  })
+})
+
+describe('#adjustNonce', () => {
+  let onChainNonce
+
+  const mockProxyProvider = {
+    emit: (event, payload, cb) => {
+      if (event === 'send' && payload.method === 'eth_getTransactionCount') {
+        return cb({ result: onChainNonce })
+      }
+
+      cb({ error: 'wrong call!' })
+    }
+  }
+
+  jest.mock('../../../main/provider/proxy', () => mockProxyProvider)
+
+  beforeEach(() => {
+    onChainNonce = '0x0'
+    Accounts.addRequest(request, jest.fn())
+  })
+
+  const adjustNonce = (nonceAdjust, requestId = 1) => Accounts.adjustNonce(requestId, nonceAdjust)
+
+  it('does not allow an invalid adjustment', () => {
+    adjustNonce(2)
+
+    expect(Accounts.current().requests[1].data.nonce).toBe(request.data.nonce)
+  })
+
+  it('does not adjust a request if no account is active', () => {
+    adjustNonce(1)
+
+    expect(Accounts.current().requests[1].data.nonce).toBe(request.data.nonce)
+  })
+
+  it('adjusts the provided nonce up one increment', () => {
+    const expectedNonce = addHexPrefix((parseInt(request.data.nonce) + 1).toString(16))
+
+    adjustNonce(1)
+
+    expect(Accounts.current().requests[1].data.nonce).toBe(expectedNonce)
+  })
+
+  it('adjusts the provided nonce down one increment', () => {
+    const expectedNonce = addHexPrefix((parseInt(request.data.nonce) - 1).toString(16))
+
+    adjustNonce(-1)
+
+    expect(Accounts.current().requests[1].data.nonce).toBe(expectedNonce)
+  })
+
+  it('gets the latest nonce from the chain', () => {
+    onChainNonce = '0x5'
+
+    delete request.data.nonce
+
+    adjustNonce(1)
+
+    expect(Accounts.current().requests[1].data.nonce).toBe(onChainNonce)
+  })
+
+  it('gets the latest nonce from the chain and adjusts it down one increment', () => {
+    onChainNonce = '0x5'
+    const expectedNonce = addHexPrefix((parseInt(onChainNonce) - 1).toString(16))
+
+    delete request.data.nonce
+
+    adjustNonce(-1)
+
+    expect(Accounts.current().requests[1].data.nonce).toBe(expectedNonce)
   })
 })
