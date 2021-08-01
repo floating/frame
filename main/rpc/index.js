@@ -191,6 +191,9 @@ const rpc = {
   setGasLimit (limit, handlerId, cb) {
     accounts.setGasLimit(limit, handlerId, true, cb)
   },
+  removeFeeUpdateNotice (handlerId, cb) {
+    accounts.removeFeeUpdateNotice(handlerId, cb)
+  },
   // flow
   async flowCommand (command, cb) {
     // console.log('flowCommand', command, cb)

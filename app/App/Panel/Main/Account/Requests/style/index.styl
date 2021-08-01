@@ -1113,19 +1113,39 @@
     font-weight 400
     // background var(--ghostC)
 
-    .requestApproveBlock
+    .requestApproveFeeBlock
       position absolute
       top 5px
       right 4px
       bottom 4px
       left 4px
-      background var(--moon)
-      color var(--moonOver)
+      background var(--ghostD)
       z-index 100000
       display flex
-      justify-content center
+      justify-content space-between
       align-items center
       border-radius 8px
+
+      .requestApproveFeeButton 
+        height 42px
+        margin 0px 5px
+        padding 0px 20px
+        border-radius 5px
+        box-sizing border-box
+        background var(--ghostE)
+        color var(--moon)
+        box-shadow 0px 2px 10px var(--ghostC)
+        font-size 12px
+        display flex
+        justify-content center
+        align-items center
+        cursor pointer
+        *
+          pointer-events none
+
+      .requestApproveFeeButton:hover
+        background var(--ghostF)
+
 
     .requestDecline
       position relative
