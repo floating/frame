@@ -753,8 +753,6 @@ class Accounts extends EventEmitter {
       const gasLimit = parseInt(txRequest.data.gasLimit)
       const maxPrice = Math.floor(FEE_MAX / gasLimit)
 
-      console.log({ price, gasLimit, maxPrice })
-
       if (price > maxPrice) {
         log.warn('Operation would set fee over hard limit')
         txRequest.data.gasPrice = addHexPrefix(maxPrice.toString(16))
