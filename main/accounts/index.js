@@ -378,22 +378,6 @@ class Accounts extends EventEmitter {
     this.updatePendingFees()
   }
 
-  // setRecentFeeUpdate (currentAccount, id, previousFee) {
-  //   console.log('hello setRecentFeeUpdate')
-  //   // Set recently updated fee flag on tx and push update
-  //   currentAccount.requests[id].recentFeeUpdate = { previousFee }
-  //   currentAccount.update()
-    
-  //   // Unset that flag after 4000ms
-  //   // clearTimeout(this.timers[currentAccount.id + ':' + id])
-  //   // this.timers[currentAccount.id + ':' + id] = setTimeout(() => {
-  //   //   if (this.accounts[currentAccount.address] && currentAccount.requests[id]) {
-  //   //     currentAccount.requests[id].recentFeeUpdate = false
-  //   //     currentAccount.update()
-  //   //   }
-  //   // }, 4000)
-  // }
-
   updatePendingFees (chainId) {
     const currentAccount = this.current()
 
