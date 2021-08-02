@@ -42,20 +42,11 @@ function signerCompatibility (txData: TransactionData, signer: string): SignerCo
 
 function londonToLegacy (txData: TransactionData): TransactionData {
   if (txData.type === '0x2') {
-     const { type, maxFeePerGas, maxPriorityFeePerGas, ...tx } = txData
-     return {
-        ...tx,
-        type: '0x0',
-        gasPrice: maxFeePerGas
-      }
- }
- 
- return txData
-    txData.type = '0x0'
-    txData.gasPrice = txData.maxFeePerGas
-    delete txData.maxPriorityFeePerGas
-    delete txData.maxFeePerGas
+    const { type, maxFeePerGas, maxPriorityFeePerGas, ...tx } = txData
+
+    return { ...tx, type: '0x0', gasPrice: maxFeePerGas }
   }
+
   return txData
 }
 
