@@ -25,12 +25,18 @@ async function frameTokenList () {
 }
 
 function mergeTokens (...tokenLists) {
+  const omitList = []
+
   const mergedList = tokenLists.reduce((tokens, list) => {
     list.forEach(token => {
       const address = token.address.toLowerCase()
       const key = `${token.chainId}:${address}`
+      const omitToken = (token.extensions || {}).omit
 
-      if (!(key in tokens)) {
+      if (omitToken) {
+        omitList.push(key)
+        delete tokens[key]
+      } else if (!omitList.includes(key) && !(key in tokens)) {
         tokens[key] = { ...token, address }
       }
     })
@@ -48,8 +54,6 @@ async function loadTokenList () {
 
   log.info(`updated token list to contain ${tokenList.length} tokens`)
 }
-
-
 
 let loader
 
