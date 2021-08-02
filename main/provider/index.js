@@ -256,6 +256,7 @@ class Provider extends EventEmitter {
 
   approveRequest (req, cb) {
     log.info('approveRequest', req)
+    accounts.lockRequest(req.handlerId)
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
       if (response.error) {
@@ -333,7 +334,7 @@ class Provider extends EventEmitter {
         .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
 
     estimateGas
-      .then(tx => populateTransaction(tx, activeAccount.lastSignerType, chainConfig, gas))
+      .then(tx => populateTransaction(tx, chainConfig, gas))
       .then(tx => {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)

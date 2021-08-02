@@ -184,7 +184,7 @@ const api = {
     this.gasObserver = store.observer(() => {
       let title = ''
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
-        const gasPrice = store('main.networksMeta.ethereum.1.gas.price.levels.standard')
+        const gasPrice = store('main.networksMeta.ethereum.1.gas.price.levels.fast')
         if (!gasPrice) return
         const gasDisplay = Math.round(parseInt(gasPrice, 'hex') / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ

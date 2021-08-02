@@ -1,7 +1,5 @@
 const { v5: uuidv5 } = require('uuid')
 
-const log = require('electron-log')
-
 const persist = require('../persist')
 const migrations = require('../migrations')
 

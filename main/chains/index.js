@@ -9,6 +9,7 @@ const store = require('../store')
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
+const accounts = require('../accounts')
 
 // because the gas market for EIP-1559 will take a few blocks to
 // stabilize, don't support these transactions until after the buffer period
@@ -66,13 +67,13 @@ class ChainConnection extends EventEmitter {
       }
 
       const gasCalculator = new GasCalculator(provider)
-      const londonHardforkActive = this.chainConfig.gteHardfork('london')
+      const useFeeMarket = this.chainConfig.isActivatedEIP(1559)
 
-      if (londonHardforkActive) {
+      if (useFeeMarket) {
         gasCalculator.getFeePerGas().then(fees => {
           store.setGasFees(this.type, this.chainId, fees)
-          store.setGasPrices(this.type, this.chainId, { standard: fees.maxFeePerGas })
-          store.setGasDefault(this.type, this.chainId, 'standard')
+          store.setGasPrices(this.type, this.chainId, { fast: fees.maxFeePerGas })
+          store.setGasDefault(this.type, this.chainId, 'fast')
         }).catch(err => {
           log.error(`could not update gas fees for chain ${this.chainId}`, err)
         })
@@ -84,13 +85,14 @@ class ChainConnection extends EventEmitter {
 
             store.setGasPrices({
               ...gas,
-              custom: customLevel || gas.standard
+              custom: customLevel || gas.fast
             })
           }).catch(err => {
             log.error(`could not update gas prices for chain ${this.chainId}`, err)
           })
         }
       }
+      accounts.updatePendingFees(this.chainId)
     })
   }
 

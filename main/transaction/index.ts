@@ -22,23 +22,48 @@ export interface TransactionData extends JsonTx {
   maxFee: string
 }
 
+export interface SignerCompatibility  {
+  signer: string,
+  tx: string,
+  compatible: boolean
+}
+
 function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
+}
+
+function signerCompatibility (txData: TransactionData, signer: string): SignerCompatibility {
+  return txData.type === '0x2' ? ({
+    signer, tx: 'london', compatible: londonHardforkSigners.includes(signer)
+  }) : ({ 
+    signer, tx: 'legacy', compatible: true 
+  })
+}
+
+function londonToLegacy (txData: TransactionData): TransactionData {
+  if (txData.type === '0x2') {
+    const { type, maxFeePerGas, maxPriorityFeePerGas, ...tx } = txData
+
+    return { ...tx, type: '0x0', gasPrice: maxFeePerGas }
+  }
+
+  return txData
 }
 
 function usesBaseFee (rawTx: RawTransaction) {
   return parseInt(rawTx.type) === 2
 }
 
-async function populate (rawTx: RawTransaction, signerType: string, chainConfig: Common, gas: any): Promise<TransactionData> {
+async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Promise<TransactionData> {
   const txData: TransactionData = { ...rawTx, maxFee: '' }
   
-  if (londonHardforkSigners.includes(signerType) && chainConfig.isActivatedEIP(1559)) {
+  if (chainConfig.isActivatedEIP(1559)) {
     txData.type = '0x2'
 
     const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
     const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
-    const maxFee = maxPriorityFee.add(maxBaseFee)
+    const bufferForUX = maxBaseFee.divRound(new BN(20)) // Buffer for fee updater UX
+    const maxFee = maxPriorityFee.add(maxBaseFee).add(bufferForUX)
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
     txData.maxFeePerGas = bnToHex(maxFee)
@@ -86,5 +111,7 @@ async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<S
 export {
   usesBaseFee,
   populate,
-  sign
+  sign,
+  signerCompatibility,
+  londonToLegacy
 }

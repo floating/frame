@@ -4,13 +4,14 @@ const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
 const fetch = require('node-fetch')
+const { addHexPrefix } = require('ethereumjs-util')
 
 // const bip39 = require('bip39')
+const { usesBaseFee, signerCompatibility } = require('../transaction')
 
 const crypt = require('../crypt')
 const store = require('../store')
 const dataScanner = require('../externalData')
-const { usesBaseFee } = require('../transaction')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')
@@ -20,7 +21,7 @@ const windows = require('../windows')
 
 // const weiToGwei = v => Math.ceil(v / 1e9)
 const gweiToWei = v => Math.ceil(v * 1e9)
-const intToHex = v => '0x' + v.toString(16)
+const intToHex = v => addHexPrefix(v.toString(16))
 const hexToInt = v => parseInt(v, 'hex')
 const weiHexToGweiInt = v => hexToInt(v) / 1e9
 const weiIntToEthInt = v => v / 1e18
@@ -38,8 +39,10 @@ const FEE_MAX = 2 * 1e18
 class Accounts extends EventEmitter {
   constructor () {
     super()
+
     this._current = ''
     this.accounts = {}
+    this.timers = {}
     const stored = store('main.accounts')
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
@@ -372,6 +375,34 @@ class Accounts extends EventEmitter {
         currentAccount.update()
       }
     })
+    // If the account has any current requests, make sure fees are current
+    this.updatePendingFees()
+  }
+
+  updatePendingFees (chainId) {
+    const currentAccount = this.current()
+
+    if (currentAccount) {
+      // If chainId, update pending tx requests from that chain, otherwise update all pending tx requests
+      const transactions = Object.entries(currentAccount.requests)
+        .filter(([_, req]) => req.type === 'transaction' && !req.locked && !req.feesUpdatedByUser)
+        .filter(([_, req]) => !chainId || parseInt(req.data.chainId, 'hex').toString() === chainId)
+
+      transactions.forEach(([id, req]) => {
+        const tx = req.data
+        const chain = { type: 'ethereum', id: parseInt(tx.chainId, 'hex') }
+        const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
+
+        if (usesBaseFee(tx)) {
+          const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
+          this.setPriorityFee(maxPriorityFeePerGas, id, false, e => { if (e) log.error(e) })
+          this.setBaseFee(maxBaseFeePerGas, id, false, e => { if (e) log.error(e) })
+        } else {
+          const gasPrice = gas.price.levels.fast
+          this.setGasPrice(gasPrice, id, false, e => { if (e) log.error(e) })
+        }
+      })
+    }
   }
 
   unsetSigner (cb) {
@@ -439,6 +470,20 @@ class Accounts extends EventEmitter {
     } else {
       cb(new Error('signMessage: Account does not match currently selected'))
     }
+  }
+
+  signerCompatibility (handlerId, cb) {
+    const currentAccount = this.current()
+    if (!currentAccount) return cb(new Error('Could not locate account'))
+
+    const request = currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction'
+    if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
+
+    const signer = currentAccount.getSigner()
+    if (!signer) return cb(new Error('No signer'))
+
+    const data = currentAccount.requests[handlerId].data
+    cb(null, signerCompatibility(data, signer.type))
   }
 
   close () {
@@ -597,120 +642,188 @@ class Accounts extends EventEmitter {
     return (!fee || isNaN(parseInt(fee, 'hex')) || parseInt(fee, 'hex') < 0)
   }
 
-  setBaseFee (baseFee, handlerId, cb) {
+  limitedHexValue (hexValue, min, max) {
+    const value = parseInt(hexValue, 'hex')
+    if (value < min) return intToHex(min)
+    if (value > max) return intToHex(max)
+    return hexValue
+  }
+
+  txFeeUpdate (inputValue, handlerId, userUpdate) {
+    // Check value
+    if (this.invalidValue(inputValue)) throw new Error('txFeeUpdate, invalid input value')
+
+    // Get current account
     const currentAccount = this.current()
-    
-    if (this.invalidValue(baseFee)) return cb(new Error('Invalid base fee'))
-    if (!currentAccount) return cb(new Error('No account selected while setting base fee'))
+    if (!currentAccount) throw new Error('No account selected while setting base fee')
 
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      if (parseInt(baseFee, 'hex') > 9999 * 1e9) baseFee = '0x' + (9999 * 1e9).toString(16)
+    const request = currentAccount.requests[handlerId]
+    if (!request || request.type !== 'transaction') throw new Error(`Could not find transaction request with handlerId ${handlerId}`)
+    if (request.locked) throw new Error('Request has already been approved by the user')
+    if (request.feesUpdatedByUser && !userUpdate) throw new Error('Fee has been updated by user')
 
-      const priorityFee = currentAccount.requests[handlerId].data.maxPriorityFeePerGas
-      const gasLimit = currentAccount.requests[handlerId].data.gasLimit
+    const tx = request.data
+    const gasLimit = parseInt(tx.gasLimit, 'hex')
+    const txType = tx.type
 
-      const limit = parseInt(gasLimit, 'hex')
-
-      let fee = parseInt(baseFee, 'hex') + parseInt(priorityFee, 'hex')
-      if (fee * limit > FEE_MAX) {
-        log.warn('Operation would set fee over hard limit')
-        fee = '0x' + (Math.floor(FEE_MAX / limit)).toString(16)
-      } else {
-        fee = '0x' + fee.toString(16)
-      }
-      
-      currentAccount.requests[handlerId].data.maxFeePerGas = fee
-      currentAccount.update()
-
-      cb()
+    if (usesBaseFee(tx)) {
+      const maxFeePerGas = parseInt(tx.maxFeePerGas, 'hex')
+      const maxPriorityFeePerGas = parseInt(tx.maxPriorityFeePerGas, 'hex')
+      const currentBaseFee = maxFeePerGas - maxPriorityFeePerGas
+      return { currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType }
+    } else {
+      const gasPrice = parseInt(tx.gasPrice, 'hex')
+      return { currentAccount, inputValue, gasPrice, gasLimit, txType }
     }
   }
 
-  setPriorityFee (priorityFee, handlerId, cb) {
-    const currentAccount = this.current()
-    
-    if (this.invalidValue(priorityFee)) return cb(new Error('Invalid priority fee'))
-    if (!currentAccount) return cb(new Error('No account selected while setting priority fee'))
+  completeTxFeeUpdate (currentAccount, handlerId, userUpdate, previousFee, cb) {
+    if (userUpdate) {
+      currentAccount.requests[handlerId].feesUpdatedByUser = true
+      delete currentAccount.requests[handlerId].automaticFeeUpdateNotice
+    } else {
+      if (!currentAccount.requests[handlerId].automaticFeeUpdateNotice && previousFee) {
+        currentAccount.requests[handlerId].automaticFeeUpdateNotice = { previousFee }
+      }
+    }
+    currentAccount.update()
+    cb()
+  }
 
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      if (parseInt(priorityFee, 'hex') > 9999 * 1e9) priorityFee = '0x' + (9999 * 1e9).toString(16)
+  setBaseFee (baseFee, handlerId, userUpdate, cb) {
+    try {
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
       
-      const maxFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxFeePerGas, 'hex')
-      const gasLimit = parseInt(currentAccount.requests[handlerId].data.gasLimit, 'hex')
-      const maxPriorityFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxPriorityFeePerGas, 'hex')
-      const baseFee = maxFeePerGas - maxPriorityFeePerGas
+      // New value
+      const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 'hex')
+      const delta = Math.abs((newBaseFee - currentBaseFee) / currentBaseFee)
 
-      const newMaxPriorityFeePerGas = parseInt(priorityFee, 'hex')
-      const newMaxFeePerGas = baseFee + newMaxPriorityFeePerGas
-  
+      // No change
+      if (delta === 0) return cb()
+
+      // Automatic base fee update is insignificant
+      if (!userUpdate && newBaseFee < currentBaseFee && delta < 0.1) return cb()
+
+      // Add buffer to new base fee if automatic update
+      const newMaxFeePerGas = (userUpdate ? newBaseFee : Math.round(newBaseFee * 1.05)) + maxPriorityFeePerGas
+      
+      // Limit max fee
       if (newMaxFeePerGas * gasLimit > FEE_MAX) {
-        log.warn('Operation would set fee over hard limit')
-        const limitedMaxPriorityFeePerGas = Math.floor(FEE_MAX / gasLimit) - baseFee
-        const limitedMaxFeePerGas = baseFee + limitedMaxPriorityFeePerGas
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + limitedMaxPriorityFeePerGas.toString(16)
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + limitedMaxFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(Math.floor(FEE_MAX / gasLimit))
       } else {
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + newMaxFeePerGas.toString(16)
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + newMaxPriorityFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(newMaxFeePerGas)
       }
 
-      currentAccount.update()
-
-      cb()
+      // Complete update
+      const previousFee = { type: txType, baseFee: intToHex(currentBaseFee), priorityFee: intToHex(maxPriorityFeePerGas) }
+      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
+    } catch (e) {
+      cb(e)
     }
   }
 
-  setGasPrice (gasPrice, handlerId, cb) {
-    const currentAccount = this.current()
-
-    if (this.invalidValue(gasPrice)) return cb(new Error('Invalid gas price'))
-    if (!currentAccount) return cb(new Error('No account selected while setting gas price'))
-
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      if (parseInt(gasPrice, 'hex') > 9999 * 1e9) gasPrice = '0x' + (9999 * 1e9).toString(16)
-
-      const gasLimit = currentAccount.requests[handlerId].data.gasLimit
-      const fee = parseInt(gasPrice, 'hex')
-      const limit = parseInt(gasLimit, 'hex')
-      if (fee * limit > FEE_MAX) {
-        log.warn('Operation would set fee over hard limit')
-        gasPrice = '0x' + Math.floor(FEE_MAX / limit)
+  setPriorityFee (priorityFee, handlerId, userUpdate, cb) {
+    try {
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
+      
+      // New values
+      const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 'hex')
+      const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
+      
+      const delta = Math.abs((newMaxPriorityFeePerGas - maxPriorityFeePerGas) / maxPriorityFeePerGas)
+      
+      // No change
+      if (delta === 0) return cb()
+      
+      // Automatic base fee update is insignificant
+      if (!userUpdate && delta < 0.05) return cb()
+  
+      // Limit max fee
+      if (newMaxFeePerGas * gasLimit > FEE_MAX) {
+        const limitedMaxFeePerGas = Math.floor(FEE_MAX / gasLimit)
+        const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
+        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
+        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(limitedMaxFeePerGas)
+      } else {
+        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(newMaxFeePerGas)
+        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = intToHex(newMaxPriorityFeePerGas)
       }
-
-      currentAccount.requests[handlerId].data.gasPrice = gasPrice
-      currentAccount.update()
-
-      cb()
-    }
-  }
-
-  setGasLimit (limit, handlerId, cb) {
-    const currentAccount = this.current()
-
-    if (this.invalidValue(limit)) return cb(new Error('Invalid gas limit'))
-    if (!currentAccount) return cb(new Error('No account selected while setting gas limit'))
     
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      const rawTx = currentAccount.requests[handlerId].data
-
-      limit = parseInt(limit, 'hex') 
-      if (limit > 12.5e6) limit = 12.5e6
-
-      const fee = usesBaseFee(rawTx) ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
-      const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } = rawTx
-
-      if (limit * fee > FEE_MAX) {
-        log.warn('setGasLimit operation would set fee over hard limit')
-        limit = '0x' + Math.floor(FEE_MAX / fee).toString(16)
-      } else {
-        limit = '0x' + limit.toString(16)
+      const previousFee = { 
+        type: txType, 
+        baseFee: intToHex(currentBaseFee),
+        priorityFee: intToHex(maxPriorityFeePerGas)
       }
 
-      currentAccount.requests[handlerId].data.gasLimit = limit
-      currentAccount.update()
-
-      cb()
+      // Complete update
+      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
+    } catch (e) {
+      cb(e)
     }
+  }
+
+  setGasPrice (price, handlerId, userUpdate, cb) {
+    try {
+      const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
+
+      // New values
+      const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 'hex')
+
+      const delta = Math.abs((newGasPrice - gasPrice) / gasPrice)
+      
+      // No change
+      if (delta === 0) return cb() 
+
+      // Automatic base fee update is insignificant
+      if (!userUpdate && delta < 0.05) return cb() 
+
+      // Limit max fee
+      if (newGasPrice * gasLimit > FEE_MAX) {
+        currentAccount.requests[handlerId].data.gasPrice = intToHex(Math.floor(FEE_MAX / gasLimit))
+      } else {
+        currentAccount.requests[handlerId].data.gasPrice = intToHex(newGasPrice)
+      }
+
+      const previousFee = {
+        type: txType, 
+        gasPrice: intToHex(gasPrice)
+      }
+
+      // Complete update
+      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
+    } catch (e) {
+      cb(e)
+    }
+  }
+
+  setGasLimit (limit, handlerId, userUpdate, cb) {
+    try {
+      const { currentAccount, maxFeePerGas, maxPriorityFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
+      
+      // New values
+      const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 'hex')
+
+      const fee = txType === '0x2' ? parseInt(maxFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+      if (newGasLimit * fee > FEE_MAX) {
+        currentAccount.requests[handlerId].data.gasLimit = intToHex(Math.floor(FEE_MAX / fee))
+      } else {
+        currentAccount.requests[handlerId].data.gasLimit = intToHex(newGasLimit)
+      }
+
+      // Complete update
+      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false, cb)
+    } catch (e) {
+      cb(e)
+    }
+  }
+
+  removeFeeUpdateNotice (handlerId, cb) {
+    const currentAccount = this.current()
+    if (!currentAccount) return cb(new Error('No account selected while removing fee notice'))
+    if (!currentAccount.requests[handlerId]) return cb(new Error(`Could not find request ${handlerId}`))
+    delete currentAccount.requests[handlerId].automaticFeeUpdateNotice
+    currentAccount.update()
+    cb()
   }
 
   adjustNonce (handlerId, nonceAdjust) {
@@ -719,26 +832,39 @@ class Accounts extends EventEmitter {
     if (nonceAdjust !== 1 && nonceAdjust !== -1) return log.error('Invalid nonce adjustment', nonceAdjust)
     if (!currentAccount) return log.error('No account selected during nonce adjustement', nonceAdjust)
 
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      const nonce = currentAccount.requests[handlerId].data && currentAccount.requests[handlerId].data.nonce
+    const txRequest = currentAccount.requests[handlerId]
+    if (txRequest && txRequest.type === 'transaction') {
+      const nonce = txRequest.data && txRequest.data.nonce
       if (nonce) {
-        const adjustedNonce = '0x' + (parseInt(nonce, 'hex') + nonceAdjust).toString(16)
+        const adjustedNonce = intToHex(parseInt(nonce, 'hex') + nonceAdjust)
+
         currentAccount.requests[handlerId].data.nonce = adjustedNonce
         currentAccount.update()
       } else {
-        const { from, chainId } = currentAccount.requests[handlerId].data
+        const { from, chainId } = txRequest.data
 
         const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex').toString() }
 
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
-            const adjustedNonce = '0x' + (nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16)
-            currentAccount.requests[handlerId].data.nonce = adjustedNonce
+            const adjustedNonce = intToHex(nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust)
+
+            txRequest.data.nonce = adjustedNonce
             currentAccount.update()
           }
         }, targetChain)
       }
+    }
+  }
+
+  lockRequest (handlerId) {
+    // When a request is approved, lock it so that no automatic updates such as fee changes can happen
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.requests[handlerId]) {
+      currentAccount.requests[handlerId].locked = true
+    } else {
+      log.error('Trying to lock request ' + handlerId + ' but there is no current account')
     }
   }
 
