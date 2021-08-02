@@ -763,50 +763,58 @@ class Accounts extends EventEmitter {
   }
 
   async setGasPrice (price, handlerId, userUpdate, cb) {
-    const { currentAccount, gasLimit, gasPrice, txType } = await this.txFeeUpdate(price, handlerId, userUpdate)
+    try {
+      const { currentAccount, gasLimit, gasPrice, txType } = await this.txFeeUpdate(price, handlerId, userUpdate)
 
-    // New values
-    const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 'hex')
+      // New values
+      const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 'hex')
 
-    const delta = Math.abs((newGasPrice - gasPrice) / gasPrice)
-    
-    // No change
-    if (delta === 0) return cb() 
+      const delta = Math.abs((newGasPrice - gasPrice) / gasPrice)
+      
+      // No change
+      if (delta === 0) return cb() 
 
-    // Automatic base fee update is insignificant
-    if (!userUpdate && delta < 0.05) return cb() 
+      // Automatic base fee update is insignificant
+      if (!userUpdate && delta < 0.05) return cb() 
 
-    // Limit max fee
-    if (newGasPrice * gasLimit > FEE_MAX) {
-      currentAccount.requests[handlerId].data.gasPrice = addHexPrefix(Math.floor(FEE_MAX / gasLimit).toString(16))
-    } else {
-      currentAccount.requests[handlerId].data.gasPrice = addHexPrefix(newGasPrice.toString(16))
+      // Limit max fee
+      if (newGasPrice * gasLimit > FEE_MAX) {
+        currentAccount.requests[handlerId].data.gasPrice = addHexPrefix(Math.floor(FEE_MAX / gasLimit).toString(16))
+      } else {
+        currentAccount.requests[handlerId].data.gasPrice = addHexPrefix(newGasPrice.toString(16))
+      }
+
+      const previousFee = { 
+        type: txType, 
+        gasPrice: addHexPrefix(gasPrice.toString(16)) 
+      }
+
+      // Complete update
+      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
+    } catch (e) {
+      cb(e)
     }
-
-    const previousFee = { 
-      type: txType, 
-      gasPrice: addHexPrefix(gasPrice.toString(16)) 
-    }
-
-    // Complete update
-    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
   }
 
   async setGasLimit (limit, handlerId, userUpdate, cb) {
-    const { currentAccount, maxFeePerGas, maxPriorityFeePerGas, gasPrice, txType } = await this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
-    
-    // New values
-    const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 'hex')
+    try {
+      const { currentAccount, maxFeePerGas, maxPriorityFeePerGas, gasPrice, txType } = await this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
+      
+      // New values
+      const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 'hex')
 
-    const fee = txType === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
-    if (newGasLimit  * fee > FEE_MAX) {
-      currentAccount.requests[handlerId].data.gasLimit  = addHexPrefix(Math.floor(FEE_MAX / fee).toString(16))
-    } else {
-      currentAccount.requests[handlerId].data.gasLimit  = addHexPrefix(newGasLimit.toString(16))
+      const fee = txType === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+      if (newGasLimit  * fee > FEE_MAX) {
+        currentAccount.requests[handlerId].data.gasLimit  = addHexPrefix(Math.floor(FEE_MAX / fee).toString(16))
+      } else {
+        currentAccount.requests[handlerId].data.gasLimit  = addHexPrefix(newGasLimit.toString(16))
+      }
+
+      // Complete update
+      this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false, cb)
+    } catch (e) {
+      cb(e)
     }
-
-    // Complete update
-    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false, cb)
   }
 
   removeFeeUpdateNotice (handlerId, cb) {
