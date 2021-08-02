@@ -56,7 +56,8 @@ const handler = (socket, req) => {
             payload.params.forEach(sub => { if (subs[sub]) delete subs[sub] })
           }
         }
-        if (logTraffic) log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + response.result || response.error)
+        if (logTraffic) log.info('<- res | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | <- | ' + (JSON.stringify(response.result || response.error)))
+
         res(response)
       })
     }

@@ -12,6 +12,7 @@ const { usesBaseFee, signerCompatibility } = require('../transaction')
 const crypt = require('../crypt')
 const store = require('../store')
 const dataScanner = require('../externalData')
+const { usesBaseFee } = require('../transaction')
 
 // Provider Proxy
 const proxyProvider = require('../provider/proxy')

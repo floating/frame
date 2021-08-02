@@ -350,6 +350,18 @@ class Provider extends EventEmitter {
       })
   }
 
+  getTransactionByHash (payload, cb) {
+    const res = response => {
+      if (response.result && !response.result.gasPrice && response.result.maxFeePerGas) {
+        return cb({ ...response, result: { ...response.result, gasPrice: response.result.maxFeePerGas } })
+      }
+
+      cb(response)
+    }
+
+    this.connection.send(payload, res, targetChain)
+  }
+
   ethSign (payload, res) {
     payload.params = [payload.params[0], payload.params[1]]
     if (!payload.params.every(utils.isHexStrict)) return this.resError('ethSign Error: Invalid hex values', payload, res)
@@ -444,6 +456,7 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_requestAccounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
+    if (payload.method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
     if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
