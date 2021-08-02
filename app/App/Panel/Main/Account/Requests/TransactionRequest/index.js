@@ -16,10 +16,6 @@ import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import TxOverlay from './TxOverlay'
 
-
-
-import TxModule from './TxModule'
-
 const FEE_WARNING_THRESHOLD_USD = 20
 
 class Time extends React.Component {
@@ -446,13 +442,19 @@ class TransactionRequest extends React.Component {
             <div
               className='requestSign' onClick={() => {
                 if (this.state.allowInput && this.props.onTop) {
-                  if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
-                    this.store.notify('gasFeeWarning', { req, feeUSD })
-                  } else {
-                    this.approve(req.handlerId, req)
-                  }
-                }
-              }}
+                  link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
+                    if (e === 'No signer')  {
+                      this.store.notify('noSignerWarning', { req })
+                    } else if (!compatibility.compatible) {
+                      this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
+                    } else if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
+                      this.store.notify('gasFeeWarning', { req, feeUSD })
+                    } else {
+                      this.approve(req.handlerId, req)
+                    }
+                  })
+                }}
+              }
             >
               <div className='requestSignButton _txButton'> Sign </div>
             </div>

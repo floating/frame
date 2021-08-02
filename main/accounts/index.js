@@ -7,6 +7,7 @@ const fetch = require('node-fetch')
 const { addHexPrefix } = require('ethereumjs-util')
 
 // const bip39 = require('bip39')
+const { signerCompatibility } = require('../transaction')
 
 const crypt = require('../crypt')
 const store = require('../store')
@@ -469,6 +470,20 @@ class Accounts extends EventEmitter {
     } else {
       cb(new Error('signMessage: Account does not match currently selected'))
     }
+  }
+
+  signerCompatibility (handlerId, cb) {
+    const currentAccount = this.current()
+    if (!currentAccount) return cb(new Error('Could not locate account'))
+
+    const request = currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction'
+    if (!request) return cb(new Error(`Could not locate request ${handlerId}`))
+
+    const signer = currentAccount.getSigner()
+    if (!signer) return cb(new Error('No signer'))
+
+    const data = currentAccount.requests[handlerId].data
+    cb(null, signerCompatibility(data, signer.type))
   }
 
   close () {

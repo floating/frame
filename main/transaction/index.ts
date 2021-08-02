@@ -22,14 +22,38 @@ export interface TransactionData extends JsonTx {
   maxFee: string
 }
 
+export interface SignerCompatibility  {
+  signer: string,
+  tx: string,
+  compatible: boolean
+}
+
 function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
-async function populate (rawTx: RawTransaction, signerType: string, chainConfig: Common, gas: any): Promise<TransactionData> {
+function signerCompatibility (txData: TransactionData, signer: string): SignerCompatibility {
+  return txData.type === '0x2' ? ({
+    signer, tx: 'london', compatible: londonHardforkSigners.includes(signer)
+  }) : ({ 
+    signer, tx: 'legacy', compatible: true 
+  })
+}
+
+function londonToLegacy (txData: TransactionData): TransactionData {
+  if (txData.type === '0x2') {
+    txData.type = '0x0'
+    txData.gasPrice = txData.maxFeePerGas
+    delete txData.maxPriorityFeePerGas
+    delete txData.maxFeePerGas
+  }
+  return txData
+}
+
+async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Promise<TransactionData> {
   const txData: TransactionData = { ...rawTx, maxFee: '' }
   
-  if (londonHardforkSigners.includes(signerType) && chainConfig.isActivatedEIP(1559)) {
+  if (chainConfig.isActivatedEIP(1559)) {
     txData.type = '0x2'
 
     const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
@@ -82,5 +106,7 @@ async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<S
 
 export {
   populate,
-  sign
+  sign,
+  signerCompatibility,
+  londonToLegacy
 }

@@ -1,6 +1,6 @@
 ._txFee
   position absolute
-  top 215px
+  top 213px
   left 5px
   right 5px
   height 30px
@@ -107,19 +107,23 @@
         color var(--bad)
 
       ._txFeeValueHover
-        display flex
-        padding 2px 15px 0px 15px
+        position absolute
         opacity 0
+        top 0
+        left 0
+        bottom 0
+        right 0
+        display flex
+        align-items center
+        justify-content center
+        padding 2px 15px 0px 15px
 
       ._txFeeETH
-        // background yellow
         padding-right 6px
         opacity 0.8
 
       ._txFeeETHValue
-        // background pink
-        // padding-right 4px
-        padding 0
+        padding-right 0px
 
       ._txFeeUSD
         font-weight 500

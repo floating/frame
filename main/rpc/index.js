@@ -194,6 +194,9 @@ const rpc = {
   removeFeeUpdateNotice (handlerId, cb) {
     accounts.removeFeeUpdateNotice(handlerId, cb)
   },
+  signerCompatibility (handlerId, cb) {
+    accounts.signerCompatibility(handlerId, cb)
+  },
   // flow
   async flowCommand (command, cb) {
     // console.log('flowCommand', command, cb)

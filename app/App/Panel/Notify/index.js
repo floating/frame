@@ -7,6 +7,10 @@ import frameIcon from './FrameIcon.png'
 
 import AddChain from './AddChain'
 
+const FEE_WARNING_THRESHOLD_USD = 20
+
+const capitalize = s => s[0].toUpperCase() + s.slice(1)
+
 class Notify extends React.Component {
   mainnet () {
     return (
@@ -232,6 +236,79 @@ class Notify extends React.Component {
     )
   }
 
+  noSignerWarning ({ req = {} }) {
+    return (
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
+          <div className='notifyTitle'>
+            No Signer Attached!
+          </div>
+          <div className='notifyBody'>
+              <div className='notifyBodyLine'>
+                No signer attached for this account
+              </div>
+            <div className='notifyBodyQuestion'>
+              Please attach a signer that can sign for this account
+            </div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
+              <div className='notifyInputOptionText'>OK</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  signerCompatibilityWarning ({ req = {}, compatibility = {}, chain = {} }) {
+    const { signer, tx, compatible } = compatibility
+    return (
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
+          <div className='notifyTitle'>
+            Signer Compatibility
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyLine'>
+              {`Your ${capitalize(signer)} is not compatible with ${capitalize(tx)} ${tx === 'london' ? '(EIP-1559) ' : ''}transactions. Your transaction will be converted to a legacy transaction before signing.`}
+            </div>
+            <div className='notifyBodyQuestion'>
+              Do you want to proceed?
+            </div>
+          </div>
+          <div className='notifyInput'>
+            <div
+              className='notifyInputOption notifyInputDeny' onMouseDown={() => {
+                this.store.notify()
+              }}
+            >
+              <div className='notifyInputOptionText'>Cancel</div>
+            </div>
+            <div
+              className='notifyInputOption notifyInputProceed' onMouseDown={() => {
+                // TODO: Transacionns need a better flow to respond to mutiple notifications after hitting sign
+                const layer = this.store('main.networks', chain.type, chain.id, 'layer')
+                const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
+                const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
+                const fee = parseInt(req.data.maxFee || '0x', 'hex') / 1e18
+                const feeUSD = fee * etherUSD
+                if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
+                  this.store.notify('gasFeeWarning', { req, feeUSD })
+                } else {
+                  link.rpc('approveRequest', req, () => {})
+                  this.store.notify()
+                }
+              }}
+            >
+              <div className='notifyInputOptionText'>Proceed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   contractData () {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()} style={this.store('view.notify') === 'contractData' ? { transform: 'translateX(calc(-100% - 100px))' } : {}}>
@@ -405,6 +482,18 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           {this.gasFeeWarning(this.store('view.notifyData'))}
+        </div>
+      )
+    } else if (notify === 'noSignerWarning') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.noSignerWarning(this.store('view.notifyData'))}
+        </div>
+      )
+    }else if (notify === 'signerCompatibilityWarning') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          {this.signerCompatibilityWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'contractData') {
