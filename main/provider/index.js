@@ -11,7 +11,7 @@ const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
-const { populate: populateTransaction } = require('../transaction')
+const { populate: populateTransaction, usesBaseFee } = require('../transaction')
 
 const version = require('../../package.json').version
 
@@ -195,6 +195,14 @@ class Provider extends EventEmitter {
     })
   }
 
+  feeTotalOverMax (rawTx) {
+    const FEE_MAX = 2 * 1e18 // 2 Ether
+    const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas, 'hex') : parseInt(rawTx.gasPrice, 'hex')
+    const gasLimit = parseInt(rawTx.gasLimit, 'hex')
+    const totalFee = maxFeePerGas * gasLimit
+    return totalFee > FEE_MAX
+  }
+
   signAndSend (req, cb) {
     const rawTx = req.data
     const res = data => {
@@ -202,41 +210,48 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
-    accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
-      if (err) {
-        this.resError(err, payload, res)
-        cb(new Error(err))
-      } else {
-        accounts.setTxSigned(req.handlerId, err => {
-          if (err) return cb(err)
-          let done = false
-          const cast = () => {
-            this.connection.send({
-              id: req.payload.id,
-              jsonrpc: req.payload.jsonrpc,
-              method: 'eth_sendRawTransaction',
-              params: [signedTx]
-            }, response => {
-              clearInterval(broadcastTimer)
-              if (done) return
-              done = true
-              if (response.error) {
-                this.resError(response.error, payload, res)
-                cb(response.error.message)
-              } else {
-                res(response)
-                cb(null, response.result)
-              }
-            }, {
-              type: 'ethereum',
-              id: parseInt(req.data.chainId, 'hex').toString()
-            })
-          }
-          const broadcastTimer = setInterval(() => cast(), 1000)
-          cast()
-        })
-      }
-    })
+
+    if (this.feeTotalOverMax(rawTx)) {
+      const err = 'Max fee is over hard limit (2 ETH)'
+      this.resError(err, payload, res)
+      cb(new Error(err))
+    } else {
+      accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
+        if (err) {
+          this.resError(err, payload, res)
+          cb(new Error(err))
+        } else {
+          accounts.setTxSigned(req.handlerId, err => {
+            if (err) return cb(err)
+            let done = false
+            const cast = () => {
+              this.connection.send({
+                id: req.payload.id,
+                jsonrpc: req.payload.jsonrpc,
+                method: 'eth_sendRawTransaction',
+                params: [signedTx]
+              }, response => {
+                clearInterval(broadcastTimer)
+                if (done) return
+                done = true
+                if (response.error) {
+                  this.resError(response.error, payload, res)
+                  cb(response.error.message)
+                } else {
+                  res(response)
+                  cb(null, response.result)
+                }
+              }, {
+                type: 'ethereum',
+                id: parseInt(req.data.chainId, 'hex').toString()
+              })
+            }
+            const broadcastTimer = setInterval(() => cast(), 1000)
+            cast()
+          })
+        }
+      })
+    }
   }
 
   approveRequest (req, cb) {

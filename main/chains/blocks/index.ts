@@ -40,15 +40,15 @@ class BlockMonitor extends EventEmitter {
 
     this.latestBlock = '0x0'
 
-    this.connection.on('connect', () => {
-      console.log('connected!')
-      this.start()
-    })
+    this.connection.on('connect', this.start)
     this.connection.on('close', this.stop)
   }
 
   start () {
     this.connection.on('message', this.handleMessage)
+
+    // load the latest block first on connect, then start checking for new blocks
+    this.getLatestBlock()
 
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] })
       .then(subId => this.subscriptionId = subId)
