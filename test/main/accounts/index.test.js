@@ -9,6 +9,10 @@ jest.mock('../../../main/nebula', () => jest.fn(() => ({
   }
 })))
 
+
+const log = require('electron-log')
+log.transports.console.level = false
+
 const weiToHex = wei => addHexPrefix(wei.toString(16))
 const gweiToHex = gwei => weiToHex(gwei * 1e9)
 
@@ -91,21 +95,21 @@ describe('#setBaseFee', () => {
 
   it('does not set an undefined base fee', done => {
     setBaseFee(undefined, err => {
-      expect(err.message).toBe('Invalid base fee')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set an invalid base fee', done => {
     setBaseFee('wrong', err => {
-      expect(err.message).toBe('Invalid base fee')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set a negative base fee', done => {
     setBaseFee('-0x12a05f200', err => {
-      expect(err.message).toBe('Invalid base fee')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
@@ -155,14 +159,62 @@ describe('#setBaseFee', () => {
     }, 1, false)
   })
 
+  it('adds a 5% buffer to an automatic base fee update', done => {
+    request.data.maxFeePerGas = gweiToHex(10)
+    request.data.maxPriorityFeePerGas = gweiToHex(2)
 
-  it('sets a valid base fee', done => {
-    const baseFee = 6e9 // 6 gwei
-    const expectedMaxFee = weiToHex(baseFee + parseInt(request.data.maxPriorityFeePerGas))
+    const updatedBaseFee = 6 // gwei
 
-    setBaseFee(weiToHex(baseFee), err => {
+    setBaseFee(gweiToHex(updatedBaseFee), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9 * 1.05)))
+      done()
+    })
+  })
+
+  it('adds no buffer to a user-initiated base fee update', done => {
+    request.data.maxFeePerGas = gweiToHex(10)
+    request.data.maxPriorityFeePerGas = gweiToHex(2)
+
+    setBaseFee(gweiToHex(6), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(8))
+      done()
+    }, 1, true)
+  })
+
+  it('does not update if the base fee has not changed', done => {
+    request.data.maxFeePerGas = gweiToHex(10)
+    request.data.maxPriorityFeePerGas = gweiToHex(2)
+
+    setBaseFee(gweiToHex(8), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
+      done()
+    })
+  })
+
+  it('updates if the base fee has lowered by more than 10%', done => {
+    request.data.maxFeePerGas = gweiToHex(20)
+    request.data.maxPriorityFeePerGas = gweiToHex(2)
+
+    const updatedBaseFee = 14 // gwei
+    const expectedMaxFee = weiToHex(2e9 + (updatedBaseFee * 1e9 * 1.05))
+
+    setBaseFee(gweiToHex(updatedBaseFee), err => {
       expect(err).toBe(undefined)
       expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+      done()
+    })
+  })
+
+  it('does not make an automatic update if the base fee has lowered by less than 10%', done => {
+    request.data.maxFeePerGas = gweiToHex(20)
+    request.data.maxPriorityFeePerGas = gweiToHex(2)
+
+    setBaseFee(gweiToHex(17), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(20))
       done()
     })
   })
@@ -170,7 +222,7 @@ describe('#setBaseFee', () => {
   it('caps the base fee at 9999 gwei', done => {
     const highBaseFee = gweiToHex(10200)
     const maxBaseFee = 9999e9
-    const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
+    const expectedMaxFee = weiToHex((maxBaseFee * 1.05) + parseInt(request.data.maxPriorityFeePerGas))
 
     setBaseFee(highBaseFee, err => {
       expect(err).toBe(undefined)
@@ -195,7 +247,10 @@ describe('#setBaseFee', () => {
   })
 
   it('updates the feesUpdatedByUser flag', done => {
-    setBaseFee('0x1dcd65000', err => {
+    request.data.maxFeePerGas = gweiToHex(10)
+    request.data.maxPriorityFeePerGas = gweiToHex(2)
+
+    setBaseFee(gweiToHex(10), err => {
       expect(err).toBe(undefined)
       expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
       done()
@@ -212,21 +267,21 @@ describe('#setPriorityFee', () => {
 
   it('does not set an undefined priority fee', done => {
     setPriorityFee(undefined, err => {
-      expect(err.message).toBe('Invalid priority fee')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set an invalid priority fee', done => {
     setPriorityFee('incorrect', err => {
-      expect(err.message).toBe('Invalid priority fee')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set a negative priority fee', done => {
     setPriorityFee('-0x12a05f200', err => {
-      expect(err.message).toBe('Invalid priority fee')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
@@ -290,6 +345,30 @@ describe('#setPriorityFee', () => {
     })
   })
 
+  it('does not update if the priority fee has not changed', done => {
+    request.data.maxFeePerGas = gweiToHex(10)
+    request.data.maxPriorityFeePerGas = gweiToHex(2)
+
+    setPriorityFee(gweiToHex(2), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
+      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(2))
+      done()
+    })
+  })
+
+  it('does not make an automatic update if the priority fee has changed by less than 5%', done => {
+    request.data.maxFeePerGas = gweiToHex(160)
+    request.data.maxPriorityFeePerGas = gweiToHex(40)
+
+    setPriorityFee(gweiToHex(41), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(160))
+      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(40))
+      done()
+    })
+  })
+
   it('caps the priority fee at 9999 gwei', done => {
     const highPriorityFee = gweiToHex(10200)
     const maxPriorityFee = 9999e9
@@ -336,27 +415,28 @@ describe('#setPriorityFee', () => {
 describe('#setGasPrice', () => {
   beforeEach(() => {
     Accounts.addRequest(request, jest.fn())
+    request.data.type = '0x0'
   })
 
   const setGasPrice = (price, cb, requestId = 1, userUpdate = false) => Accounts.setGasPrice(price, requestId, userUpdate, cb)
 
   it('does not set an undefined gas price', done => {
     setGasPrice(undefined, err => {
-      expect(err.message).toBe('Invalid gas price')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set an invalid gas price', done => {
     setGasPrice(Number.NaN, err => {
-      expect(err.message).toBe('Invalid gas price')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set a negative gas price', done => {
     setGasPrice('-0x23', err => {
-      expect(err.message).toBe('Invalid gas price')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
@@ -414,6 +494,26 @@ describe('#setGasPrice', () => {
     })
   })
 
+  it('does not update if the gas price has not changed', done => {
+    request.data.gasPrice = gweiToHex(10)
+
+    setGasPrice(gweiToHex(10), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(10))
+      done()
+    })
+  })
+
+  it('does not make an automatic update if the gas price has changed by less than 5%', done => {
+    request.data.gasPrice = gweiToHex(40)
+
+    setGasPrice(gweiToHex(39), err => {
+      expect(err).toBe(undefined)
+      expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(40))
+      done()
+    })
+  })
+
   it('does not exceed the max gas price', done => {
     const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
@@ -441,7 +541,9 @@ describe('#setGasPrice', () => {
   })
 
   it('updates the feesUpdatedByUser flag', done => {
-    setGasPrice('0x23', err => {
+    request.data.gasPrice = gweiToHex(30)
+    
+    setGasPrice(gweiToHex(45), err => {
       expect(err).toBe(undefined)
       expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
       done()
@@ -458,21 +560,21 @@ describe('#setGasLimit', () => {
 
   it('does not set an undefined gas limit', done => {
     setGasLimit(undefined, err => {
-      expect(err.message).toBe('Invalid gas limit')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set an invalid gas limit', done => {
     setGasLimit(Number.NaN, err => {
-      expect(err.message).toBe('Invalid gas limit')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
 
   it('does not set a negative gas limit', done => {
     setGasLimit('-0x61a8', err => {
-      expect(err.message).toBe('Invalid gas limit')
+      expect(err.message).toBeTruthy()
       done()
     })
   })
