@@ -804,7 +804,7 @@ class Accounts extends EventEmitter {
       // New values
       const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 'hex')
 
-      const fee = usesBaseFee(rawTx) ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+      const fee = txType === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
       if (newGasLimit  * fee > FEE_MAX) {
         currentAccount.requests[handlerId].data.gasLimit  = addHexPrefix(Math.floor(FEE_MAX / fee).toString(16))
       } else {
