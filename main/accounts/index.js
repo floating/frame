@@ -814,6 +814,7 @@ class Accounts extends EventEmitter {
       const nonce = txRequest.data && txRequest.data.nonce
       if (nonce) {
         const adjustedNonce = addHexPrefix((parseInt(nonce, 'hex') + nonceAdjust).toString(16))
+        
         currentAccount.requests[handlerId].data.nonce = adjustedNonce
         currentAccount.update()
       } else {
@@ -825,7 +826,8 @@ class Accounts extends EventEmitter {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
             const adjustedNonce = addHexPrefix((nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16))
-            currentAccount.requests[handlerId].data.nonce = adjustedNonce
+            
+            txRequest.data.nonce = adjustedNonce
             currentAccount.update()
           }
         }, targetChain)
