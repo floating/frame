@@ -1,0 +1,207 @@
+.txFeeOverlay
+  box-sizing border-box
+  position absolute
+  top 40px
+  left 0
+  right 0
+  bottom 0
+  font-size 16px
+  display flex
+  justify-content center
+  align-items center
+
+  input
+    outline 0
+    border 0
+    background var(--ghostC)
+    color var(--outerspace)
+    text-align center
+    width 200px
+    font-size 21px
+    margin 5px 25px
+    height 30px
+    border-radius 12px
+    font-family FiraCode
+    transition var(--standardFast)
+    box-shadow 0px 0px 0px var(--ghostA)
+
+  input:focus
+    transform scale(1.2) translateY(-2px)
+    box-shadow 0px 10px 20px var(--ghostA)
+
+  // input:focus::selection
+  //   background var(--moonHighlight)
+
+  .txFeeOverlayInset
+    max-height 100%
+    width 100%
+    overflow-x hidden
+    overflow-y scroll
+
+  .txFeeOverlayType
+    width 100%
+    display none
+
+  .txFeeOverlayEstimate
+    width 100%
+    disaply none
+
+  .txFeeOverlayBaseFee
+    width 100%
+
+  .txFeeOverlayPriorityFee
+    width 100%
+
+  .txFeeOverlayLimit
+    width 100%
+
+  .txFeeOverlayInput
+    display flex
+    justify-content center
+
+  .txFeeOverlayLabel
+    font-size 12px
+    padding 0px 5px 25px 5px 
+    display flex
+    justify-content center
+    text-transform uppercase
+    font-weight 600
+
+// .txModuleDataBodyCopied
+//   position absolute
+//   top 0
+//   left 0
+//   right 0
+//   bottom 0
+//   display flex
+//   justify-content center
+//   align-items center
+//   font-size 16px
+//   letter-spacing 0px
+
+//   svg
+//     margin -3px 0px 0px 10px
+
+.decodedDataContract
+  padding 32px 11px 11px 11px
+  position relative
+  border-radius 8px
+  background var(--ghostC)
+
+.dataUnverified
+  position absolute
+  color var(--bad)
+  top 9px
+  right 15px
+  font-size 11px
+  font-weight 400
+  font-family OpenSans, sans-serif
+  text-transform uppercase
+
+.dataSource
+  position absolute
+  top 9px
+  left 15px
+  font-size 11px
+  font-weight 400
+  font-family OpenSans, sans-serif
+  text-transform uppercase
+
+.decodedDataContractTarget
+  position relative
+  height 70px
+  padding 0px
+  box-sizing border-box
+  display flex
+  flex-direction column
+  align-items center
+  justify-content center
+
+  .decodedDataSync
+    position absolute
+    svg 
+      transform rotate(90deg)
+
+  .decodedDataSyncLeft
+    left 14px
+    top 28px
+    width 8px
+    overflow hidden
+    transform rotate(-10deg)
+    svg 
+      transform rotate(90deg) scaleX(-1)
+
+  .decodedDataSyncRight
+    right 14px
+    top 28px
+    width 8px
+    overflow hidden
+    transform rotate(190deg)
+    svg 
+      transform rotate(90deg)
+
+  .decodedDataContractName
+    text-align center
+    font-size 17px
+    font-family OpenSans, sans-serif
+    font-weight 300
+
+  .decodedDataContractMethod
+    text-align center
+    font-family OpenSans, sans-serif
+    font-weight 500
+    font-size 16px
+    color var(--moon)
+
+.decodedDataContractArgHeader
+  font-size 12px
+  font-family Open Sans, sans-serif
+  text-transform uppercase
+  letter-spacing 2px
+  font-weight 400
+  text-align center
+  height 30px
+  display flex
+  align-items center
+  justify-content center
+  color var(--outerspace)
+  background var(--ghostD)
+  border-radius 8px
+
+.decodedDataContractArg
+  position relative
+  text-align center
+  padding 10px 10px 25px 10px
+  font-size 17px
+
+.decodedDataSubtitle
+  position absolute
+  left 0
+  bottom 0
+  right 0
+  height 30px
+  font-size 12px
+  font-weight 400
+  font-family OpenSans, sans-serif
+  display flex
+  align-items center
+  justify-content center
+
+.overflowBox
+  width 100%
+  height auto
+  overflow-x scroll
+  overflow-y hidden
+  word-wrap normal
+  margin-bottom -15px
+
+.rawDataHeader
+  font-family OpenSans, sans-serif
+  text-align center
+  font-size 16px
+  margin-top 20px
+  margin-bottom 5px
+
+.txDataOverlayRaw
+  margin-top 30px
+  

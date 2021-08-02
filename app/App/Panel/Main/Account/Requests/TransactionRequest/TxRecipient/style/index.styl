@@ -1,0 +1,106 @@
+._txRecipient
+  position absolute
+  top 178px
+  left 5px
+  right 5px
+  height 30px
+  z-index 100001
+  
+  ._txRecipientInner
+    position absolute 
+    top 0
+    right 0
+    bottom 0
+    left 0
+    background var(--ghostC)
+    border-radius 8px
+    display flex
+    flex-direction row
+    align-items stretch
+    font-weight 500
+    // overflow hidden
+
+    ._txRecipientSlice
+      display flex
+      justify-content center
+      align-items center
+      font-size 15px
+      padding 0px 6px
+      font-family FiraCode
+
+    ._txRecipientLabel
+      font-weight 600
+      padding 0px 12px 1px 14px
+      font-size 11px
+      text-transform uppercase
+      font-family OpenSans
+
+    ._txRecipientValue
+      padding 0px 10px
+      background var(--ghostE)
+      border-radius 8px
+      flex 1
+      transition var(--standardFaster)
+      cursor pointer
+      transform translateY(0px)
+      padding-top 1px
+
+      svg
+        position relative
+        top -2px
+        padding 0px 5px
+
+    ._txRecipientValueSmall
+      font-size 13px
+      position relative
+      top 0px
+      font-weight 600
+
+      svg
+        position relative
+        top 0px
+        padding 0px 3px
+
+    ._txRecipientValueMoon
+      margin-right 5px
+      color var(--moon)
+
+    ._txRecipientFull
+      position absolute 
+      top 0
+      left 0
+      bottom 0
+      right 0
+      min-width 100%
+      // padding 0px 15px
+      display flex
+      justify-content center
+      align-items center
+      font-size 12px 
+      z-index 40000
+      background var(--ghostD)
+      border-radius 8px
+      padding-bottom 0px
+      font-family FiraCode
+      background var(--moon)
+      color var(--moonOver)
+      opacity 0
+      font-weight 600
+
+    ._txRecipientFull:hover
+      opacity 1
+      transform translateX(0px) scale(1)
+      background var(--moon)
+      color var(--moonOver)
+      animation 5s shake ease-in-out infinite alternate
+      cursor pointer
+
+    ._txRecipientFull:active
+      animation-name shake-little
+      animation-duration 2s
+      animation-timing-function: ease-in-out
+      animation-iteration-count: infinite
+
+
+._txRecipient:hover
+  z-index 1000001

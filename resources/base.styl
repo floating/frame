@@ -40,6 +40,7 @@ body
   --cardDrop 0px 1px 1px rgba(0, 34, 32, 0.1)
 
   // Transistions
+  --standardFaster .08s cubic-bezier(.82,0,.12,1) all
   --standardFast .16s cubic-bezier(.82,0,.12,1) all
   --standard .32s cubic-bezier(.82,0,.12,1) all
   --standardVibe .48s cubic-bezier(.82,0,.12,1) all
@@ -58,11 +59,11 @@ body
   right 0
   bottom 0 
   left 0
-  background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 70%)
+  background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
   z-index 9999999999999999
   // background-blend-mode screen
   pointer-events none
-  opacity 0
+  // opacity 0.01
   // pointer-events none
 
 .clip
@@ -85,8 +86,9 @@ body
   // --phaseLighter rgba(38, 70, 86, 1)
   --phaseShade rgba(8 , 20, 26, 1)
 
+  --goodHighlight rgb(120, 255, 235)
   --goodLight rgb(0, 220, 200)
-  --goodOver rgba(0, 50, 40, 1)
+  --goodOver rgba(0, 90, 100, 1)
   --good rgb(0, 210, 190)
   --goodUp rgb(120, 230, 200)
 
@@ -100,16 +102,14 @@ body
 
   --goodDark rgba(0, 70, 50, 1)
 
+  --badOver rgb(140, 00, 50)
+  --bad rgb(255, 110, 155)
+  --bad01 rgba(255, 110, 155, 0.1)
+  --bad04 rgba(255, 110, 155, 0.4)
+  --bad06 rgba(255, 110, 155, 0.6)
 
-  --badOver rgb(80, 0, 0)
-  --bad rgb(255, 100, 155)
-  --bad01 rgba(255, 100, 155, 0.1)
-  --bad04 rgba(255, 100, 155, 0.4)
-  --bad06 rgba(255, 100, 155, 0.6)
 
 
-  --overlayA rgba(230, 180, 180, 1) 
-  --overlayB rgba(230, 140, 180, 1)
 
   // --badLight rgb(255, 104, 159)
   // --badLighter rgb(255, 107, 163)
@@ -129,10 +129,11 @@ body
   --foreverwhite rgba(242, 242, 255, 1)
 
   // --moon rgba(242, 168, 59, 1)
-  --moonOver rgba(85, 5, 5, 1)
+  --moonHighlight rgba(255, 215, 215, 1)
+  --moonOver rgba(155, 25, 25, 1)
   --moon rgba(255, 185, 185, 1)
   --moon06 rgba(255, 145, 105, 0.6)
-  --moonUp rgba(255, 135, 155, 1)
+  --moonLight rgba(255, 190, 190, 1)
 
   // // Shadows
   // --cardDrop 0px 1px 1px rgba(0, 34, 32, 0.1)
@@ -193,16 +194,23 @@ body
   --ghostF rgba(246, 246, 255, 1)
   --ghostG rgba(252, 252, 255, 1)
 
-  --moon rgba(235, 125, 110, 1)
+  --moon rgba(255, 120, 130, 1)
+  --moonLight rgba(255, 135, 135, 1)
+  --moonOver rgba(255, 225, 240, 1)
 
-  --good rgb(40, 160, 170)
+  --good rgb(0, 190, 180)
+  --goodOver rgba(230, 255, 255, 1)
   --goodUp rgb(0, 200, 200)
   --goodDark rgb(0, 90, 90)
   // --bad rgba(215, 100, 135, 1)
-  --bad rgba(220, 80, 130, 1) // rgba(235, 90, 140, 1)
+  --badOver rgba(255, 235, 240, 1)
+  --bad rgba(245, 100, 150, 1) // rgba(235, 90, 140, 1)
   
   ::selection 
     background-color var(--outerspace02)
+
+  --overlayA rgba(255, 100, 255, 0.025) 
+  --overlayB rgba(30, 150, 200, 0.075)
 
   // --moon06 rgba(255, 150, 100, 0.6)
   // --moon rgba(5, 120, 100, 1)
@@ -314,6 +322,9 @@ body
 
   ::selection 
     background-color var(--outerspace02)
+
+  --overlayA rgba(230, 0, 180, 0.02) 
+  --overlayB rgba(30, 140, 180, 0.02)
 
   //--warm rgba(245, 230, 230, 1)
 

@@ -176,12 +176,26 @@ const rpc = {
   verifyAddress (cb) {
     accounts.verifyAddress(true, cb)
   },
-  setGasPrice (netType, netId, price, level, handlerId, cb) {
-    accounts.setGasPrice(price, handlerId, cb)
-    store.setGasDefault(netType, netId, level, price)
+  setBaseFee (fee, handlerId, cb) {
+    accounts.setBaseFee(fee, handlerId, true, cb)
+    // store.setGasDefault(netType, netId, level, price)
+  },
+  setPriorityFee (fee, handlerId, cb) {
+    accounts.setPriorityFee(fee, handlerId, true, cb)
+    // store.setGasDefault(netType, netId, level, price)
+  },
+  setGasPrice (price,handlerId, cb) {
+    accounts.setGasPrice(price, handlerId, true, cb)
+    // store.setGasDefault(netType, netId, level, price)
   },
   setGasLimit (limit, handlerId, cb) {
-    accounts.setGasLimit(limit, handlerId, cb)
+    accounts.setGasLimit(limit, handlerId, true, cb)
+  },
+  removeFeeUpdateNotice (handlerId, cb) {
+    accounts.removeFeeUpdateNotice(handlerId, cb)
+  },
+  signerCompatibility (handlerId, cb) {
+    accounts.signerCompatibility(handlerId, cb)
   },
   // flow
   async flowCommand (command, cb) {

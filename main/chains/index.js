@@ -1,22 +1,37 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
 
 const EventEmitter = require('events')
+const { addHexPrefix } = require('ethereumjs-util')
 const provider = require('eth-provider')
 const log = require('electron-log')
 
 const store = require('../store')
+const { default: BlockMonitor } = require('./blocks')
+const { default: chainConfig } = require('./config')
+const { default: GasCalculator } = require('../transaction/gasCalculator')
+const accounts = require('../accounts')
+
+// because the gas market for EIP-1559 will take a few blocks to
+// stabilize, don't support these transactions until after the buffer period
+const londonHardforkAdoptionBufferBlocks = 120
 
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
     this.type = type
     this.chainId = chainId
+
+    // default chain config to istanbul hardfork until a block is received
+    // to update it to london
+    this.chainConfig = chainConfig(parseInt(this.chainId, 'istanbul'))
+
     this.primary = {
       status: 'off',
       network: '',
       type: '',
       connected: false
     }
+
     this.secondary = {
       status: 'off',
       network: '',
@@ -27,6 +42,57 @@ class ChainConnection extends EventEmitter {
     this.observer = store.observer(() => {
       const chain = store('main.networks', type, chainId)
       if (chain) this.connect(chain)
+    })
+  }
+
+  _createProvider (target, priority) {
+    this.update(priority)
+
+    this[priority].provider = provider(target, { name: priority, infuraId: '786ade30f36244469480aa5c2bf0743b' })
+    this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
+  }
+
+  _handleConnection (priority) {
+    this.update(priority)
+    this.emit('connect')
+  }
+
+  _createBlockMonitor (provider) {
+    const monitor = new BlockMonitor(provider)
+
+    monitor.on('data', block => {
+      if ('baseFeePerGas' in block) {
+        const targetBlock = addHexPrefix((parseInt(block.number, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
+        this.chainConfig.setHardforkByBlockNumber(targetBlock)
+      }
+
+      const gasCalculator = new GasCalculator(provider)
+      const useFeeMarket = this.chainConfig.isActivatedEIP(1559)
+
+      if (useFeeMarket) {
+        gasCalculator.getFeePerGas().then(fees => {
+          store.setGasFees(this.type, this.chainId, fees)
+          store.setGasPrices(this.type, this.chainId, { fast: fees.maxFeePerGas })
+          store.setGasDefault(this.type, this.chainId, 'fast')
+        }).catch(err => {
+          log.error(`could not update gas fees for chain ${this.chainId}`, err)
+        })
+      } else {
+        if (this.chainId != 1) {
+          // prior to the london hardfork, mainnet uses its own gas service
+          gasCalculator.getGasPrices().then(gas => {
+            const customLevel = store('main.networksMeta', this.network, this.chainId, 'gas.price.levels.custom')
+
+            store.setGasPrices({
+              ...gas,
+              custom: customLevel || gas.fast
+            })
+          }).catch(err => {
+            log.error(`could not update gas prices for chain ${this.chainId}`, err)
+          })
+        }
+      }
+      accounts.updatePendingFees(this.chainId)
     })
   }
 
@@ -100,8 +166,9 @@ class ChainConnection extends EventEmitter {
           this.secondary.status = 'loading'
           this.secondary.connected = false
           this.secondary.type = ''
-          this.update('secondary')
-          this.secondary.provider = provider(target, { name: 'secondary', infuraId: '786ade30f36244469480aa5c2bf0743b' })
+
+          this._createProvider(target, 'secondary')
+
           this.secondary.provider.on('connect', () => {
             log.info('    Secondary connection connected')
             this.getNetwork(this.secondary.provider, (err, response) => {
@@ -121,8 +188,8 @@ class ChainConnection extends EventEmitter {
                   this.secondary.status = 'connected'
                   this.secondary.connected = true
                   this.secondary.type = ''
-                  this.update('secondary')
-                  this.emit('connect')
+
+                  this._handleConnection('secondary')
                 }
               }
             })
@@ -179,8 +246,9 @@ class ChainConnection extends EventEmitter {
         this.primary.status = 'loading'
         this.primary.connected = false
         this.primary.type = ''
-        this.update('primary')
-        this.primary.provider = provider(target, { name: 'primary', infuraId: '786ade30f36244469480aa5c2bf0743b' })
+
+        this._createProvider(target, 'primary')
+
         this.primary.provider.on('connect', () => {
           log.info('    Primary connection connected')
           this.getNetwork(this.primary.provider, (err, response) => {
@@ -200,8 +268,8 @@ class ChainConnection extends EventEmitter {
                 this.primary.status = 'connected'
                 this.primary.connected = true
                 this.primary.type = ''
-                this.update('primary')
-                this.emit('connect')
+
+                this._handleConnection('primary')
               }
             }
           })
@@ -211,6 +279,7 @@ class ChainConnection extends EventEmitter {
           this.primary.connected = false
           this.primary.type = ''
           this.primary.network = ''
+
           this.update('primary')
           this.emit('close')
         })
@@ -278,6 +347,7 @@ class Chains extends EventEmitter {
   constructor () {
     super()
     this.connections = {}
+
     store.observer(() => {
       const networks = store('main.networks')
       Object.keys(networks).forEach(type => {

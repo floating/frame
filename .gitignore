@@ -6,8 +6,10 @@ hot.json
 nohot.json
 config.json
 dist
+compiled
 release
 test/.userData
 .vscode
 .parcel-cache
+*.tsbuildinfo
 scripts

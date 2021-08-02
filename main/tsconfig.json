@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es6", "dom"],
+    "types": ["node"],
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "rootDir": ".",
+    "outDir": "../compiled"
+  },
+  "include": ["./**/*.ts", "./**/*.js"],
+  "exclude": ["**/__mocks__/*"],
+  "references": [
+    { "path": ".." }
+  ]
+}
