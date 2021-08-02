@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
 const { addHexPrefix } = require('ethereumjs-util')
 
 // const bip39 = require('bip39')
-const { signerCompatibility } = require('../transaction')
+const { usesBaseFee, signerCompatibility } = require('../transaction')
 
 const crypt = require('../crypt')
 const store = require('../store')
@@ -394,7 +394,7 @@ class Accounts extends EventEmitter {
         const chain = { type: 'ethereum', id: parseInt(tx.chainId, 'hex') }
         const gas = store('main.networksMeta', chain.type, chain.id, 'gas')
 
-        if (tx.type === '0x2') {
+        if (usesBaseFee(tx)) {
           const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees
           this.setPriorityFee(maxPriorityFeePerGas, id, false, e => { if (e) log.error(e) })
           this.setBaseFee(maxBaseFeePerGas, id, false, e => { if (e) log.error(e) })
@@ -657,21 +657,23 @@ class Accounts extends EventEmitter {
       // Get current account
       const currentAccount = this.current()
       if (!currentAccount) return reject(new Error('No account selected while setting base fee'))
-      if (!currentAccount.requests[handlerId] || currentAccount.requests[handlerId].type !== 'transaction') return cb(new Error(`Could not find transaction request with handlerId ${handlerId}`))
-      if (currentAccount.requests[handlerId].locked) return reject(new Error('Request has already been approved by the user'))
-      if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return reject(new Error('Fee has been updated by user'))
 
-      const gasLimit = parseInt(currentAccount.requests[handlerId].data.gasLimit, 'hex')
+      const request = currentAccount.requests[handlerId]
+      if (!request || request.type !== 'transaction') return cb(new Error(`Could not find transaction request with handlerId ${handlerId}`))
+      if (request.locked) return reject(new Error('Request has already been approved by the user'))
+      if (request.feesUpdatedByUser && !userUpdate) return reject(new Error('Fee has been updated by user'))
 
-      const txType = currentAccount.requests[handlerId].data.type
+      const tx = request.data
+      const gasLimit = parseInt(tx.gasLimit, 'hex')
+      const txType = tx.type
 
-      if (txType === '0x2') {
-        const maxFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxFeePerGas, 'hex')
-        const maxPriorityFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxPriorityFeePerGas, 'hex')
+      if (usesBaseFee(tx)) {
+        const maxFeePerGas = parseInt(tx.maxFeePerGas, 'hex')
+        const maxPriorityFeePerGas = parseInt(tx.maxPriorityFeePerGas, 'hex')
         const currentBaseFee = maxFeePerGas - maxPriorityFeePerGas
         resolve({ currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType })
       } else {
-        const gasPrice = parseInt(currentAccount.requests[handlerId].data.gasPrice, 'hex')
+        const gasPrice = parseInt(tx.gasPrice, 'hex')
         resolve({ currentAccount, inputValue, gasPrice, gasLimit, txType })
       }
     })
