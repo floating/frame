@@ -825,14 +825,15 @@ class Accounts extends EventEmitter {
     if (nonceAdjust !== 1 && nonceAdjust !== -1) return log.error('Invalid nonce adjustment', nonceAdjust)
     if (!currentAccount) return log.error('No account selected during nonce adjustement', nonceAdjust)
 
-    if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
-      const nonce = currentAccount.requests[handlerId].data && currentAccount.requests[handlerId].data.nonce
+    const txRequest = currentAccount.requests[handlerId]
+    if (txRequest && txRequest.type === 'transaction') {
+      const nonce = txRequest.data && txRequest.data.nonce
       if (nonce) {
         const adjustedNonce = addHexPrefix((parseInt(nonce, 'hex') + nonceAdjust).toString(16))
         currentAccount.requests[handlerId].data.nonce = adjustedNonce
         currentAccount.update()
       } else {
-        const { from, chainId } = currentAccount.requests[handlerId].data
+        const { from, chainId } = txRequest.data
 
         const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex').toString() }
 
