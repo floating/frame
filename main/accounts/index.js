@@ -4,6 +4,7 @@ const log = require('electron-log')
 const publicKeyToAddress = require('ethereum-public-key-to-address')
 const { shell, Notification } = require('electron')
 const fetch = require('node-fetch')
+const { addHexPrefix } = require('ethereumjs-util')
 
 // const bip39 = require('bip39')
 
@@ -19,7 +20,7 @@ const windows = require('../windows')
 
 // const weiToGwei = v => Math.ceil(v / 1e9)
 const gweiToWei = v => Math.ceil(v * 1e9)
-const intToHex = v => '0x' + v.toString(16)
+const intToHex = v => addHexPrefix(v.toString(16))
 const hexToInt = v => parseInt(v, 'hex')
 const weiHexToGweiInt = v => hexToInt(v) / 1e9
 const weiIntToEthInt = v => v / 1e18
@@ -644,17 +645,15 @@ class Accounts extends EventEmitter {
 
   limitedHexValue (hexValue, min, max) {
     const value = parseInt(hexValue, 'hex')
-    if (value < min) return '0x' + min.toString(16)
-    if (value > max) return '0x' + max.toString(16)
+    if (value < min) return addHexPrefix(min.toString(16))
+    if (value > max) return addHexPrefix(max.toString(16))
     return hexValue
   }
 
-  txFeeUpdate (inputValue, handlerId, userUpdate, txType) {
+  txFeeUpdate (inputValue, handlerId, userUpdate) {
     return new Promise((resolve, reject) => {
-      // Check fee
+      // Check value
       if (this.invalidValue(inputValue)) return reject(new Error('txFeeUpdate, invalid input value'))
-      // Limit range of base fee
-      inputValue = this.limitedHexValue(inputValue, 0, 9999 * 1e9)
       // Get current account
       const currentAccount = this.current()
       if (!currentAccount) return reject(new Error('No account selected while setting base fee'))
@@ -664,14 +663,16 @@ class Accounts extends EventEmitter {
 
       const gasLimit = parseInt(currentAccount.requests[handlerId].data.gasLimit, 'hex')
 
+      const txType = currentAccount.requests[handlerId].data.type
+
       if (txType === '0x2') {
         const maxFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxFeePerGas, 'hex')
         const maxPriorityFeePerGas = parseInt(currentAccount.requests[handlerId].data.maxPriorityFeePerGas, 'hex')
         const currentBaseFee = maxFeePerGas - maxPriorityFeePerGas
-        resolve({ currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee })
+        resolve({ currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType })
       } else {
         const gasPrice = parseInt(currentAccount.requests[handlerId].data.gasPrice, 'hex')
-        resolve({ currentAccount, inputValue, gasPrice, gasLimit })
+        resolve({ currentAccount, inputValue, gasPrice, gasLimit, txType })
       }
     })
   }
@@ -681,7 +682,7 @@ class Accounts extends EventEmitter {
       currentAccount.requests[handlerId].feesUpdatedByUser = true
       delete currentAccount.requests[handlerId].automaticFeeUpdateNotice
     } else {
-      if (!currentAccount.requests[handlerId].automaticFeeUpdateNotice) {
+      if (!currentAccount.requests[handlerId].automaticFeeUpdateNotice && previousFee) {
         currentAccount.requests[handlerId].automaticFeeUpdateNotice = { previousFee }
       }
     }
@@ -691,12 +692,11 @@ class Accounts extends EventEmitter {
 
   async setBaseFee (baseFee, handlerId, userUpdate, cb) {
     try {
-      const { inputValue, currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee } = await this.txFeeUpdate(baseFee, handlerId, userUpdate, '0x2')
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = await this.txFeeUpdate(baseFee, handlerId, userUpdate)
       
       // New value
-      const newBaseFee = parseInt(inputValue, 'hex')
+      const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 'hex')
 
-      // Change
       const delta = Math.abs((newBaseFee - currentBaseFee) / currentBaseFee)
 
       // No change
@@ -710,13 +710,13 @@ class Accounts extends EventEmitter {
       
       // Limit max fee
       if (newMaxFeePerGas * gasLimit > FEE_MAX) {
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + (Math.floor(FEE_MAX / gasLimit)).toString(16)
+        currentAccount.requests[handlerId].data.maxFeePerGas = addHexPrefix((Math.floor(FEE_MAX / gasLimit)).toString(16))
       } else {
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + newMaxFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxFeePerGas = addHexPrefix(newMaxFeePerGas.toString(16))
       }
 
       // Complete update
-      const previousFee = { type: '0x2', baseFee: '0x' + currentBaseFee.toString(16), priorityFee: '0x' + maxPriorityFeePerGas.toString(16) }
+      const previousFee = { type: txType, baseFee: addHexPrefix(currentBaseFee.toString(16)), priorityFee: addHexPrefix(maxPriorityFeePerGas.toString(16)) }
       this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
     } catch (e) {
       cb(e)
@@ -725,13 +725,12 @@ class Accounts extends EventEmitter {
 
   async setPriorityFee (priorityFee, handlerId, userUpdate, cb) {
     try {
-      const { inputValue, currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee } = await this.txFeeUpdate(priorityFee, handlerId, userUpdate, '0x2')
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = await this.txFeeUpdate(priorityFee, handlerId, userUpdate)
       
       // New values
-      const newMaxPriorityFeePerGas = parseInt(inputValue, 'hex')
+      const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 'hex')
       const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
       
-      // Change
       const delta = Math.abs((newMaxPriorityFeePerGas - maxPriorityFeePerGas) / maxPriorityFeePerGas)
       
       // No change
@@ -744,15 +743,20 @@ class Accounts extends EventEmitter {
       if (newMaxFeePerGas * gasLimit > FEE_MAX) {
         const limitedMaxFeePerGas = Math.floor(FEE_MAX / gasLimit)
         const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + limitedMaxPriorityFeePerGas.toString(16)
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + limitedMaxFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = addHexPrefix(limitedMaxPriorityFeePerGas.toString(16))
+        currentAccount.requests[handlerId].data.maxFeePerGas = addHexPrefix(limitedMaxFeePerGas.toString(16))
       } else {
-        currentAccount.requests[handlerId].data.maxFeePerGas = '0x' + newMaxFeePerGas.toString(16)
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = '0x' + newMaxPriorityFeePerGas.toString(16)
+        currentAccount.requests[handlerId].data.maxFeePerGas = addHexPrefix(newMaxFeePerGas.toString(16))
+        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = addHexPrefix(newMaxPriorityFeePerGas.toString(16))
       }
-      
+    
+      const previousFee = { 
+        type: txType, 
+        baseFee: addHexPrefix(currentBaseFee.toString(16)), 
+        priorityFee: addHexPrefix(maxPriorityFeePerGas.toString(16))
+      }
+
       // Complete update
-      const previousFee = { type: '0x2', baseFee: '0x' + currentBaseFee.toString(16), priorityFee: '0x' + maxPriorityFeePerGas.toString(16) }
       this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
     } catch (e) {
       cb(e)
@@ -760,12 +764,11 @@ class Accounts extends EventEmitter {
   }
 
   async setGasPrice (price, handlerId, userUpdate, cb) {
-    const { inputValue, currentAccount, gasLimit, gasPrice } = await this.txFeeUpdate(price, handlerId, userUpdate, '0x0')
+    const { currentAccount, gasLimit, gasPrice, txType } = await this.txFeeUpdate(price, handlerId, userUpdate)
 
     // New values
-    const newGasPrice = parseInt(inputValue, 'hex')
+    const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 'hex')
 
-    // Change
     const delta = Math.abs((newGasPrice - gasPrice) / gasPrice)
     
     // No change
@@ -776,44 +779,35 @@ class Accounts extends EventEmitter {
 
     // Limit max fee
     if (newGasPrice * gasLimit > FEE_MAX) {
-      currentAccount.requests[handlerId].data.gasPrice = '0x' + Math.floor(FEE_MAX / gasLimit).toString(16)
+      currentAccount.requests[handlerId].data.gasPrice = addHexPrefix(Math.floor(FEE_MAX / gasLimit).toString(16))
     } else {
-      currentAccount.requests[handlerId].data.gasPrice = '0x' + newGasPrice.toString(16)
+      currentAccount.requests[handlerId].data.gasPrice = addHexPrefix(newGasPrice.toString(16))
+    }
+
+    const previousFee = { 
+      type: txType, 
+      gasPrice: addHexPrefix(gasPrice.toString(16)) 
     }
 
     // Complete update
-    const previousFee = { type: '0x0', gasPrice: '0x' + gasPrice.toString(16) }
     this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
   }
 
-  setGasLimit (limit, handlerId, userUpdate, cb) {
-    const currentAccount = this.current()
+  async setGasLimit (limit, handlerId, userUpdate, cb) {
+    const { currentAccount, maxFeePerGas, maxPriorityFeePerGas, gasPrice, txType } = await this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
+    
+    // New values
+    const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 'hex')
 
-    if (this.invalidValue(limit)) return cb(new Error('Invalid gas limit'))
-    if (!currentAccount) return cb(new Error('No account selected while setting gas limit'))
-    if (!currentAccount.requests[handlerId] || currentAccount.requests[handlerId].type !== 'transaction') return cb(new Error(`Could not find transaction request with handlerId ${handlerId}`))
-    if (currentAccount.requests[handlerId].locked) return cb(new Error('Request has already been approved by the user'))
-    if (currentAccount.requests[handlerId].feesUpdatedByUser && !userUpdate) return cb(new Error('Fee has been updated by user'))
-
-    const { type, maxFeePerGas, maxPriorityFeePerGas, gasPrice } = currentAccount.requests[handlerId].data
-
-    limit = this.limitedHexValue(limit, 0, 12.5e6)
-    const newGasLimit = parseInt(limit, 'hex')
-
-    const fee = type === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
+    const fee = txType === '0x2' ? parseInt(maxFeePerGas, 'hex') + parseInt(maxPriorityFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
     if (newGasLimit  * fee > FEE_MAX) {
-      currentAccount.requests[handlerId].data.gasLimit  = '0x' + Math.floor(FEE_MAX / fee).toString(16)
+      currentAccount.requests[handlerId].data.gasLimit  = addHexPrefix(Math.floor(FEE_MAX / fee).toString(16))
     } else {
-      currentAccount.requests[handlerId].data.gasLimit  = '0x' + newGasLimit.toString(16)
+      currentAccount.requests[handlerId].data.gasLimit  = addHexPrefix(newGasLimit.toString(16))
     }
 
-    if (userUpdate) {
-      currentAccount.requests[handlerId].feesUpdatedByUser = true
-      delete currentAccount.requests[handlerId].automaticFeeUpdateNotice
-    }
-
-    currentAccount.update()
-    cb()
+    // Complete update
+    this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, false, cb)
   }
 
   removeFeeUpdateNotice (handlerId, cb) {
@@ -834,7 +828,7 @@ class Accounts extends EventEmitter {
     if (currentAccount.requests[handlerId] && currentAccount.requests[handlerId].type === 'transaction') {
       const nonce = currentAccount.requests[handlerId].data && currentAccount.requests[handlerId].data.nonce
       if (nonce) {
-        const adjustedNonce = '0x' + (parseInt(nonce, 'hex') + nonceAdjust).toString(16)
+        const adjustedNonce = addHexPrefix((parseInt(nonce, 'hex') + nonceAdjust).toString(16))
         currentAccount.requests[handlerId].data.nonce = adjustedNonce
         currentAccount.update()
       } else {
@@ -845,7 +839,7 @@ class Accounts extends EventEmitter {
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
-            const adjustedNonce = '0x' + (nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16)
+            const adjustedNonce = addHexPrefix((nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust).toString(16))
             currentAccount.requests[handlerId].data.nonce = adjustedNonce
             currentAccount.update()
           }
