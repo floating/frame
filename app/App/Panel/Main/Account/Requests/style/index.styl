@@ -285,8 +285,6 @@
   transform translateZ(0)
   overflow hidden
 
-  // padding 20px 0px 20px 0p
-
   .requestTitle:before
     content ''
     position absolute
@@ -395,7 +393,7 @@
     padding-bottom 10px
     justify-content space-between
     // box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
-    border-radius 8px
+    border-radius 10px
     height 40px
     display flex
     justify-content center
@@ -403,13 +401,13 @@
     z-index 2000
     color var(--outerspace)
     tranform translateZ(0)
-    overflow hidden
+    // overflow hidden
     background var(--ghostB)
     box-shadow 0px 2px 10px var(--ghostZ)
 
     .requestMeta
       position absolute
-      height 29px
+      height 34px
       left 0
       right 0
       top 0
@@ -428,7 +426,9 @@
         display flex
         align-items center
         letter-spacing 1.5px
-        z-index 3
+        background var(--ghostB)
+        z-index 0
+        padding 0px 12px 0px 0px
 
       .requestMetaChainMainnet
         color var(--good) // var(--ghostF)
@@ -627,17 +627,17 @@
 
     .approveRequestHeader
       position absolute
-      top 0
-      left 0
-      right 0
+      top 5px
+      left 5px
+      right 5px
       height 50px
       display flex
       justify-content center
       align-items center
       font-weight 400
       font-size 14px
-      background var(--ghostC)
-      color var(--outerspace08)
+      background var(--ghostD)
+      color var(--outerspace)
       border-radius 8px
       text-transform uppercase
 
@@ -1100,35 +1100,66 @@
     right 0
     bottom 0
     height 60px
-    border-radius 8px
+    // border-radius 8px
     font-size 14px
     text-transform uppercase
     -webkit-app-region no-drag
     pointer-events auto
     opacity 1
-    transition var(--standardFast)
+    /// transition var(--standardFast)
     display flex
     justify-content space-around
     align-items center
     font-weight 400
-    background var(--ghostC)
+    // background var(--ghostC)
+
+    .requestApproveFeeBlock
+      position absolute
+      top 5px
+      right 4px
+      bottom 4px
+      left 4px
+      background var(--ghostD)
+      z-index 100000
+      display flex
+      justify-content space-between
+      align-items center
+      border-radius 8px
+      font-size 13px
+
+      .requestApproveFeeButton 
+        height 100%
+        padding 0px 24px
+        border-radius 8px
+        box-sizing border-box
+        background var(--ghostE)
+        color var(--moon)
+        box-shadow 0px 0px 6px var(--ghostC)
+        display flex
+        justify-content center
+        align-items center
+        cursor pointer
+        *
+          pointer-events none
+
+      .requestApproveFeeButton:hover
+        background var(--ghostF)
 
     .requestDecline
       position relative
       width 50%
       height 100%
-      border-right 1px solid var(--ghostB)
-      overflow hidden
       position relative
       // background blue
 
     .requestDeclineButton
       position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
+      top 5px
+      right 2.5px
+      bottom 5px
+      left 5px
       // animation scalein 3000ms var(--cubic)
+      // transition var(--standardFaster)
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1148,24 +1179,24 @@
       height 4px
       border-radius 2px
       width 30px
-      background var(--bad06)
-      bottom 14px
+      background var(--bad)
+      bottom 11px
 
     .requestDeclineButton:hover:before
-      background var(--bad)
+      background var(--badOver)
 
     .requestSign
       position relative
       width 50%
       height 100%
-      overflow hidden
+      // overflow hidden
 
     .requestSignButton
       position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
+      top 5px
+      right 5px
+      bottom 5px
+      left 2.5px
       transform translateZ(0px)
       display flex
       justify-content center
@@ -1174,13 +1205,9 @@
       letter-spacing 2px
       padding-left 2px
       padding-bottom 10px
-      cursor pointer
-      *
-        pointer-events none
 
     // .requestSignButton:hover
     //   background var(--ghostD)
-
 
     .requestSignButton:before
       content ''
@@ -1189,12 +1216,12 @@
       height 4px
       border-radius 2px
       width 30px
-      background var(--good06)
-      bottom 14px
+      background var(--good)
+      bottom 11px
+      // transition var(--standardFaster)
 
     .requestSignButton:hover:before
-      background var(--good)
-
+      background var(--goodOver)
 
   .requestScaleButtonSign
     animation scalein 3000ms var(--cubic) !important
@@ -1289,13 +1316,13 @@ span
 
 .txNonce
   position absolute
-  top 15px
-  right 12px
+  top 23px
+  right 16px
   background var(--ghostE)
-  height 20px
+  height 25px
   width 48px
-  border-radius 12px
-  box-shadow 0px 2px 1px var(--ghostC)
+  border-radius 8px
+  // box-shadow 0px 2px 1px var(--ghostC)
   display flex
   justify-content center
   align-items center
@@ -1309,10 +1336,10 @@ span
   .txNonceMarker
     position absolute
     background var(--ghostD)
-    top 7px
-    right 7px
-    bottom 7px
-    width 34px
+    top 10px
+    right 9px
+    bottom 9px
+    width 29px
     border-radius 6px
 
   .txNonceNumber
@@ -1338,19 +1365,23 @@ span
     top 0px
     right 48px
     bottom 0px
-    width 98px
+    width 130px
     display flex
     justify-conent space-between
 
   .txNonceButton
-    height 20px
-    width 22px
+    height 24px
+    width 25px
     display flex
     justify-content center 
     align-items center
     font-size 10px
     text-transform uppercase
     border-right 1px solid var(--ghostC)
+    cursor pointer
+
+    *
+      pointer-events none
 
   .txNonceButton:hover
     background var(--ghostF)
@@ -1363,18 +1394,18 @@ span
 
   .txNonceLabel
     height 100%
-    width 60px
+    width 70px
     text-align center
     font-size 10px
     text-transform uppercase
-    border-right 1px solid var(--thick)
+    border-right 1px solid var(--ghostC)
     display flex
     justify-content center 
     align-items center
 
 .txNonce:hover
   color var(--outerspace08)
-  width 145px
+  width 175px
   background var(--ghostF)
   box-shadow 0px 2px 8px var(--ghostC), -16px 0px 16px var(--ghostE)
 
@@ -1385,7 +1416,8 @@ span
     opacity 0
 
 .txNonceSet
-  transform translate(1px, -3px)
+  transform translate(5px, -12px)
+  height 20px
 
 .monitorTop
   position absolute
@@ -2044,4 +2076,4 @@ span
 
 
 @import './next'
-@import '../TransactionRequest/TxModule/style'
+@import '../TransactionRequest/style'

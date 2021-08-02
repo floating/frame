@@ -1,14 +1,14 @@
-const utils = require('web3-utils')
-const { rlp } = require('ethereumjs-util')
-const { Transaction } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
+const { rlp, addHexPrefix } = require('ethereumjs-util')
 const log = require('electron-log')
+const { v5: uuid } = require('uuid')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
+
+const { sign } = require('../../../transaction')
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const { v5: uuid } = require('uuid')
+
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 // Base Paths
@@ -301,38 +301,22 @@ class Ledger extends Signer {
     }
   }
 
-  _signedTransaction (txData, signature) {
-    return {
-      ...txData,
-      v: `0x${signature.v}`,
-      r: `0x${signature.r}`,
-      s: `0x${signature.s}`
-    }
-  }
-
   async signTransaction (index, rawTx, cb) {
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
-      // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) throw new Error('Signer signTx network mismatch')
+      const signerPath = this.getPath(index)
 
-      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
+      const signedTx = await sign(rawTx, tx => {
+        const message = tx.getMessageToSign(false)
+        const rawTxHex = rlp.encode(message).toString('hex')
 
-      const txData = {
-        ...rawTx,
-        gasLimit: rawTx.gas, // gas must be gasLimit in new ethereum tx
-      }
+        return eth.signTransaction(signerPath, rawTxHex)
+      })
 
-      const tx = Transaction.fromTxData(txData, { common })
-      const message = tx.getMessageToSign(false)
-      const rawTxHex = rlp.encode(message).toString('hex')
-
-      const signature = await eth.signTransaction(this.getPath(index), rawTxHex)
-
-      const signedTx = Transaction.fromTxData(this._signedTransaction(txData, signature), { common })
       const signedTxSerialized = signedTx.serialize().toString('hex')
+      cb(null, addHexPrefix(signedTxSerialized))
 
-      cb(null, '0x' + signedTxSerialized)
       this.releaseDevice()
     } catch (err) {
       log.error(err)

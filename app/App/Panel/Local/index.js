@@ -204,11 +204,6 @@ class Settings extends React.Component {
           <div className='panelHeaderTitle'>Settings</div>
         </div>
         <div className='localSettingsWrap'>
-          <div className='requestFeature'>
-            <div className='requestFeatureButton' onMouseDown={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
-              Feature Requests
-            </div>
-          </div>
           <div className='snipIt'>
             <div>Using a dapp that doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
@@ -220,6 +215,11 @@ class Settings extends React.Component {
               </div>
             </div>
             <div>Inject a connection with our browser extension!</div>
+          </div>
+          <div className='requestFeature'>
+            <div className='requestFeatureButton' onMouseDown={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+              Feature Requests
+            </div>
           </div>
           {this.discord()}
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>

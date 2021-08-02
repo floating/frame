@@ -206,6 +206,9 @@ module.exports = {
   setAutohide: (u, v) => {
     u('main.autohide', () => v)
   },
+  setGasFees: (u, netType, netId, fees) => {
+    u('main.networksMeta', netType, netId, 'gas.price.fees', () => fees)
+  },
   setGasPrices: (u, netType, netId, prices) => {
     u('main.networksMeta', netType, netId, 'gas.price.levels', () => prices)
   },

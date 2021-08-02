@@ -1,7 +1,5 @@
 const { v5: uuidv5 } = require('uuid')
 
-const log = require('electron-log')
-
 const persist = require('../persist')
 const migrations = require('../migrations')
 
@@ -440,6 +438,7 @@ const initial = {
       ethereum: {
         1: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -448,6 +447,7 @@ const initial = {
         },
         3: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -456,6 +456,7 @@ const initial = {
         },
         4: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }

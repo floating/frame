@@ -7,9 +7,8 @@ const { BN, stripHexPrefix } = require('ethereumjs-util')
 
 const store = require('../store')
 const accounts = require('../accounts')
-const chains = require('../chains')
 
-let socket, reconnectTimer, gasTimer
+let socket, reconnectTimer
 
 const hexToBn = hex => new BN(stripHexPrefix(hex), 'hex')
 const gweiToWei = num => new BN(num).mul(ONE_GWEI).toString('hex')
@@ -19,31 +18,6 @@ const ONE_GWEI = hexToBn('0x3b9aca00')
 function customGasLevel (chainId, network = 'ethereum') {
   return store('main.networksMeta', network, chainId, 'gas.price.levels.custom')
 }
-
-const getCurrentChainGas = () => {
-  const network = store('main.currentNetwork')
-  chains.send({ id: 1, jsonrpc: '2.0', method: 'eth_gasPrice' }, response => {
-    const basePrice = response.result || '0x00'
-
-    store.setGasPrices(network.type, network.id, {
-      slow: basePrice,
-      standard: basePrice,
-      fast: basePrice,
-      asap: basePrice,
-      custom: customGasLevel(network.id, network.type) || basePrice
-    })
-  })
-}
-
-chains.on('connect', () => {
-  store.observer(() => {
-    clearTimeout(gasTimer)
-    const network = store('main.currentNetwork')
-    if (network.id === '1') return // mainnet gas prices use a websocket callback (see onData() below)
-    getCurrentChainGas()
-    gasTimer = setInterval(getCurrentChainGas, 10 * 1000)
-  })
-})
 
 const reconnect = now => {
   log.info('Trying to reconnect to realtime')
@@ -73,8 +47,7 @@ const onData = data => {
       staleTimer = setTimeout(() => setUpSocket('staleTimer'), 90 * 1000)
 
       store.setGasPrices('ethereum', '1', gas)
-
-      accounts.checkBetterGasPrice({type: 'ethereum', id: '1'})
+      accounts.updatePendingFees('1')
     }
   } catch (e) {
     log.error('Frame Socket Data Error: ', e)
