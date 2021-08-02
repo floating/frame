@@ -297,17 +297,10 @@ const migrations = {
     return initial
   },
   14: initial => {
-    // update provider endpoints for polygon and optimism
-    const chainIds = [
-      10, // optimism
-      137 // polygon
-    ]
-
-    chainIds.forEach(chainId => {
-      const chain = initial.main.networks.ethereum[chainId]
-      if (chain) chain.connection.primary.current = 'infura'
-    })
-
+    const { primary, secondary } = initial.main.networks.ethereum[137].connection
+    if (primary.current === 'matic') primary.current = 'infura'
+    if (secondary.current === 'matic') secondary.current = 'infura'
+  
     // add arbitrum network information
     if (!initial.main.networks.ethereum[42161]) {
       initial.main.networks.ethereum[42161] = {
@@ -333,23 +326,12 @@ const migrations = {
 
     if (!initial.main.networksMeta.ethereum[42161]) {
       initial.main.networksMeta.ethereum[42161] = {
-        id: 42161,
-        type: 'ethereum',
-        layer: 'rollup',
-        symbol: 'ETH',
-        name: 'Arbitrum',
-        explorer: 'https://explorer.arbitrum.io',
         gas: {
           price: {
             selected: 'standard',
             levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
           }
-        },
-        connection: {
-          primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
-          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
-        },
-        on: false
+        }
       }
     }
 

@@ -245,6 +245,7 @@ const initial = {
           prylabs: 'https://goerli.prylabs.net'
         },
         10: {
+          optimism: 'https://mainnet.optimism.io',
           infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
         },
         42: {
