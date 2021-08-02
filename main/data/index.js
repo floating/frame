@@ -47,9 +47,7 @@ const onData = data => {
       staleTimer = setTimeout(() => setUpSocket('staleTimer'), 90 * 1000)
 
       store.setGasPrices('ethereum', '1', gas)
-
-      // Disable automatically updating the gas price from this source
-      // accounts.checkBetterGasPrice({type: 'ethereum', id: '1'})
+      accounts.updatePendingFees('1')
     }
   } catch (e) {
     log.error('Frame Socket Data Error: ', e)

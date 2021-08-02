@@ -16,10 +16,6 @@ import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import TxOverlay from './TxOverlay'
 
-
-
-import TxModule from './TxModule'
-
 const FEE_WARNING_THRESHOLD_USD = 20
 
 class Time extends React.Component {
@@ -419,7 +415,23 @@ class TransactionRequest extends React.Component {
         )}
         {!notice ? (
           <div className='requestApprove'>
-            {req.recentFeeUpdate ? <div className='requestApproveBlock cardShow'>{'transaction fee updated'}</div> : null}
+            {req.automaticFeeUpdateNotice ? (
+              <div className='requestApproveFeeBlock cardShow'>
+                <div className='requestApproveFeeButton requestApproveFeeReject' onClick={() => {
+                  const { previousFee } = req.automaticFeeUpdateNotice
+                  if (previousFee.type === '0x2') {
+                    link.rpc('setBaseFee', previousFee.baseFee, req.handlerId, e => { if (e) console.error(e) })
+                    link.rpc('setPriorityFee', previousFee.priorityFee, req.handlerId, e => { if (e) console.error(e) })
+                  } else if (previousFee.type === '0x0')  {
+                    link.rpc('setGasPrice', previousFee.gasPrice, req.handlerId, e => { if (e) console.error(e) })
+                  }
+                }}>{'reject'}</div>
+                <div>{'fee updated'}</div>
+                <div className='requestApproveFeeButton requestApproveFeeAccept' onClick={() => {
+                  link.rpc('removeFeeUpdateNotice', req.handlerId, e => { if (e) console.error(e) })
+                }}>{'accept'}</div>
+              </div>
+            ) : null}
             <div
               className='requestDecline' onClick={() => {
                 if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
@@ -430,13 +442,19 @@ class TransactionRequest extends React.Component {
             <div
               className='requestSign' onClick={() => {
                 if (this.state.allowInput && this.props.onTop) {
-                  if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
-                    this.store.notify('gasFeeWarning', { req, feeUSD })
-                  } else {
-                    this.approve(req.handlerId, req)
-                  }
-                }
-              }}
+                  link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
+                    if (e === 'No signer')  {
+                      this.store.notify('noSignerWarning', { req })
+                    } else if (!compatibility.compatible) {
+                      this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
+                    } else if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
+                      this.store.notify('gasFeeWarning', { req, feeUSD })
+                    } else {
+                      this.approve(req.handlerId, req)
+                    }
+                  })
+                }}
+              }
             >
               <div className='requestSignButton _txButton'> Sign </div>
             </div>
