@@ -56,7 +56,6 @@ class BlockMonitor extends EventEmitter {
         // subscriptions are not supported, poll for block changes instead
         this._clearSubscription()
         
-        this.getLatestBlock()
         this.poller = setInterval(this.getLatestBlock, 15 * 1000)
       })
   }

@@ -295,6 +295,47 @@ const migrations = {
     })
 
     return initial
+  },
+  14: initial => {
+    const { primary, secondary } = initial.main.networks.ethereum[137].connection
+    if (primary.current === 'matic') primary.current = 'infura'
+    if (secondary.current === 'matic') secondary.current = 'infura'
+  
+    // add arbitrum network information
+    if (!initial.main.networks.ethereum[42161]) {
+      initial.main.networks.ethereum[42161] = {
+        id: 42161,
+        type: 'ethereum',
+        layer: 'rollup',
+        symbol: 'ETH',
+        name: 'Arbitrum',
+        explorer: 'https://explorer.arbitrum.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+        },
+        on: false
+      }
+    }
+
+    if (!initial.main.networksMeta.ethereum[42161]) {
+      initial.main.networksMeta.ethereum[42161] = {
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        }
+      }
+    }
+
+    return initial
   }
 }
 
@@ -309,6 +350,7 @@ module.exports = {
         state.main._version = version
       }
     })
+
     return state
   },
   // Version number of latest known migration
