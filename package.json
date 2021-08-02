@@ -2,7 +2,7 @@
   "name": "frame",
   "version": "0.5.0-beta.3",
   "description": "System-wide web3",
-  "main": "main",
+  "main": "compiled",
   "build": {
     "appId": "sh.frame.app",
     "afterSign": "./build/notarize.js",
@@ -22,7 +22,7 @@
     },
     "win": {},
     "files": [
-      "main",
+      "compiled",
       "bundle"
     ]
   },
@@ -51,15 +51,15 @@
     "launch:dev:worker": "cross-env NODE_ENV=development LOG_WORKER=true electron ./compiled",
     "launch:dev:rinkeby": "cross-env NODE_ENV=development RINKEBY=true electron ./compiled",
     "launch:inspect": "cross-env NODE_ENV=production electron --inspect ./compiled",
-    "prod": "npm run bundle && npm run launch",
-    "hot": "npm run bundle && npm run launch:hot",
+    "prod": "npm run compile && npm run bundle && npm run launch",
+    "hot": "npm run compile && npm run bundle && npm run launch:hot",
     "clean": "rimraf dist bundle compiled .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm cache clean --force && npm install && npm audit fix && npm run bundle",
     "scrub": "rimraf dist bundle compiled .cache \"node_modules/!(rimraf|.bin)\" && npm install",
     "watch:compile": "mkdir -p ./compiled/windows && npm run copy-assets && tsc --build main -w",
     "compile": "tsc --build main && npm run copy-assets",
-    "build": "npm run bundle && sleep 4 && electron-builder",
+    "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
     "copy-assets": "cp ./main/windows/*.png ./compiled/windows",
-    "release": "npm run bundle && sleep 4 && electron-builder -c.snap.publish=github",
+    "release": "npm run compile && sleep 4 npm run bundle && sleep 4 && electron-builder -c.snap.publish=github",
     "postinstall": "electron-builder install-app-deps",
     "test": "jest --env=node --detectOpenHandles --runInBand",
     "standard": "standardx --fix --verbose",
