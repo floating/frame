@@ -651,32 +651,30 @@ class Accounts extends EventEmitter {
   }
 
   txFeeUpdate (inputValue, handlerId, userUpdate) {
-    return new Promise((resolve, reject) => {
-      // Check value
-      if (this.invalidValue(inputValue)) return reject(new Error('txFeeUpdate, invalid input value'))
-      // Get current account
-      const currentAccount = this.current()
-      if (!currentAccount) return reject(new Error('No account selected while setting base fee'))
+    // Check value
+    if (this.invalidValue(inputValue)) throw new Error('txFeeUpdate, invalid input value')
+    // Get current account
+    const currentAccount = this.current()
+    if (!currentAccount) throw new Error('No account selected while setting base fee')
 
-      const request = currentAccount.requests[handlerId]
-      if (!request || request.type !== 'transaction') return cb(new Error(`Could not find transaction request with handlerId ${handlerId}`))
-      if (request.locked) return reject(new Error('Request has already been approved by the user'))
-      if (request.feesUpdatedByUser && !userUpdate) return reject(new Error('Fee has been updated by user'))
+    const request = currentAccount.requests[handlerId]
+    if (!request || request.type !== 'transaction') throw new Error(`Could not find transaction request with handlerId ${handlerId}`)
+    if (request.locked) throw new Error('Request has already been approved by the user')
+    if (request.feesUpdatedByUser && !userUpdate) throw new Error('Fee has been updated by user')
 
-      const tx = request.data
-      const gasLimit = parseInt(tx.gasLimit, 'hex')
-      const txType = tx.type
+    const tx = request.data
+    const gasLimit = parseInt(tx.gasLimit, 'hex')
+    const txType = tx.type
 
-      if (usesBaseFee(tx)) {
-        const maxFeePerGas = parseInt(tx.maxFeePerGas, 'hex')
-        const maxPriorityFeePerGas = parseInt(tx.maxPriorityFeePerGas, 'hex')
-        const currentBaseFee = maxFeePerGas - maxPriorityFeePerGas
-        resolve({ currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType })
-      } else {
-        const gasPrice = parseInt(tx.gasPrice, 'hex')
-        resolve({ currentAccount, inputValue, gasPrice, gasLimit, txType })
-      }
-    })
+    if (usesBaseFee(tx)) {
+      const maxFeePerGas = parseInt(tx.maxFeePerGas, 'hex')
+      const maxPriorityFeePerGas = parseInt(tx.maxPriorityFeePerGas, 'hex')
+      const currentBaseFee = maxFeePerGas - maxPriorityFeePerGas
+      return { currentAccount, inputValue, maxFeePerGas, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType }
+    } else {
+      const gasPrice = parseInt(tx.gasPrice, 'hex')
+      return { currentAccount, inputValue, gasPrice, gasLimit, txType }
+    }
   }
 
   completeTxFeeUpdate (currentAccount, handlerId, userUpdate, previousFee, cb) {
@@ -692,9 +690,9 @@ class Accounts extends EventEmitter {
     cb()
   }
 
-  async setBaseFee (baseFee, handlerId, userUpdate, cb) {
+  setBaseFee (baseFee, handlerId, userUpdate, cb) {
     try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = await this.txFeeUpdate(baseFee, handlerId, userUpdate)
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(baseFee, handlerId, userUpdate)
       
       // New value
       const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 'hex')
@@ -725,9 +723,9 @@ class Accounts extends EventEmitter {
     }
   }
 
-  async setPriorityFee (priorityFee, handlerId, userUpdate, cb) {
+  setPriorityFee (priorityFee, handlerId, userUpdate, cb) {
     try {
-      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = await this.txFeeUpdate(priorityFee, handlerId, userUpdate)
+      const { currentAccount, maxPriorityFeePerGas, gasLimit, currentBaseFee, txType } = this.txFeeUpdate(priorityFee, handlerId, userUpdate)
       
       // New values
       const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 'hex')
@@ -765,9 +763,9 @@ class Accounts extends EventEmitter {
     }
   }
 
-  async setGasPrice (price, handlerId, userUpdate, cb) {
+  setGasPrice (price, handlerId, userUpdate, cb) {
     try {
-      const { currentAccount, gasLimit, gasPrice, txType } = await this.txFeeUpdate(price, handlerId, userUpdate)
+      const { currentAccount, gasLimit, gasPrice, txType } = this.txFeeUpdate(price, handlerId, userUpdate)
 
       // New values
       const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 'hex')
@@ -799,9 +797,9 @@ class Accounts extends EventEmitter {
     }
   }
 
-  async setGasLimit (limit, handlerId, userUpdate, cb) {
+  setGasLimit (limit, handlerId, userUpdate, cb) {
     try {
-      const { currentAccount, maxFeePerGas, maxPriorityFeePerGas, gasPrice, txType } = await this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
+      const { currentAccount, maxFeePerGas, maxPriorityFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
       
       // New values
       const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 'hex')
