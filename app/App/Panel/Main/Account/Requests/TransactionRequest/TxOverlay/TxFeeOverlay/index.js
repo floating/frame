@@ -37,12 +37,12 @@ class TxFeeOverlay extends React.Component {
       const maxFee = BigNumber(props.req.data.maxFeePerGas, 16)
       const baseFee = maxFee.minus(prioFee)
 
-      this.state.priorityFee = this.toDisplayFullGwei(prioFee)
-      this.state.maxFee = this.toDisplayFullGwei(maxFee)
-      this.state.baseFee = this.toDisplayFullGwei(baseFee)
+      this.state.priorityFee = this.toDisplayFromWei(prioFee)
+      this.state.maxFee = this.toDisplayFromWei(maxFee)
+      this.state.baseFee = this.toDisplayFromWei(baseFee)
     } else {
       const gasPrice = BigNumber(props.req.data.gasPrice, 16)
-      this.state.gasPrice = this.toDisplayFullGwei(gasPrice)
+      this.state.gasPrice = this.toDisplayFromWei(gasPrice)
     }
 
     this.state.gasLimit = BigNumber(props.req.data.gasLimit, 16).toString()
@@ -74,12 +74,16 @@ class TxFeeOverlay extends React.Component {
     return parseFloat(bn.shiftedBy(-18).toFixed(6).toString())
   }
 
-  toDisplayFullGwei (bn) {
+  toDisplayFromWei (bn) {
     return bn.shiftedBy(-9).toFixed(9).toString().replace(/0+$/,'').replace(/\.+$/,'')
   }
 
+  toDisplayFromGwei (bn) {
+    return bn.toFixed(9).toString().replace(/0+$/,'').replace(/\.+$/,'')
+  }
+
   trimGwei (gwei) {
-    return parseFloat(parseFloat(gwei).toFixed(6))
+    return parseFloat(parseFloat(gwei).toFixed(3)).toString()
   }
 
   setBaseFee (baseFee) {
@@ -97,8 +101,7 @@ class TxFeeOverlay extends React.Component {
       link.rpc('setBaseFee', gweiToWeiHex(baseFee), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
-      baseFee = baseFee.toString()
-      this.setState({ baseFee })
+      this.setState({ baseFee: this.toDisplayFromGwei(BigNumber(baseFee)) })
     }, 500)
   }
 
@@ -117,8 +120,7 @@ class TxFeeOverlay extends React.Component {
       link.rpc('setPriorityFee', gweiToWeiHex(priorityFee), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
-      priorityFee = priorityFee.toString()
-      this.setState({ priorityFee })
+      this.setState({ priorityFee: this.toDisplayFromGwei(BigNumber(priorityFee)) })
     }, 500)
   }
 
@@ -136,8 +138,7 @@ class TxFeeOverlay extends React.Component {
       link.rpc('setGasPrice', gweiToWeiHex(gasPrice), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
-      gasPrice = gasPrice.toString()
-      this.setState({ gasPrice })
+      this.setState({ gasPrice: this.toDisplayFromGwei(BigNumber(gasPrice)) })
     }, 500)
   }
 
@@ -163,8 +164,7 @@ class TxFeeOverlay extends React.Component {
       link.rpc('setGasLimit', '0x' + gasLimit.toString(16), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
-      gasLimit.toString()
-      this.setState({ gasLimit })
+      this.setState({ gasLimit: gasLimit.toString() })
     }, 500)
   }
 
@@ -192,15 +192,15 @@ class TxFeeOverlay extends React.Component {
                 e.preventDefault()
                 let baseFee = parseFloat(this.state.baseFee)
                 if (isNaN(baseFee)) return
-                baseFee = this.limitRange(baseFee + 1, 0, 9999)
-                baseFee = this.trimGwei(baseFee).toString()
+                baseFee = this.trimGwei(this.limitRange(baseFee + 1, 0, 9999))
+                baseFee = this.toDisplayFromGwei(BigNumber(baseFee))
                 this.setBaseFee(baseFee)
               } else if (e.key === 'ArrowDown') {
                 e.preventDefault()
                 let baseFee = parseFloat(this.state.baseFee)
                 if (isNaN(baseFee)) return
-                baseFee = this.limitRange(baseFee - 1, 0, 9999)
-                baseFee = this.trimGwei(baseFee).toString()
+                baseFee = this.trimGwei(this.limitRange(baseFee - 1, 0, 9999))
+                baseFee = this.toDisplayFromGwei(BigNumber(baseFee))
                 this.setBaseFee(baseFee)
               }
             }}
@@ -229,15 +229,15 @@ class TxFeeOverlay extends React.Component {
                 e.preventDefault()
                 let priorityFee = parseFloat(this.state.priorityFee)
                 if (isNaN(priorityFee)) return
-                priorityFee = this.limitRange(priorityFee + 1, 0, 9999)
-                priorityFee = this.trimGwei(priorityFee).toString()
+                priorityFee = this.trimGwei(this.limitRange(priorityFee + 1, 0, 9999))
+                priorityFee = this.toDisplayFromGwei(BigNumber(priorityFee))
                 this.setPriorityFee(priorityFee)
               } else if (e.key === 'ArrowDown') {
                 e.preventDefault()
                 let priorityFee = parseFloat(this.state.priorityFee)
                 if (isNaN(priorityFee)) return
-                priorityFee = this.limitRange(priorityFee - 1, 0, 9999)
-                priorityFee = this.trimGwei(priorityFee).toString()
+                priorityFee = this.trimGwei(this.limitRange(priorityFee - 1, 0, 9999))
+                priorityFee = this.toDisplayFromGwei(BigNumber(priorityFee))
                 this.setPriorityFee(priorityFee)
               }
             }}
@@ -264,13 +264,17 @@ class TxFeeOverlay extends React.Component {
                 e.target.blur()
               } else if (e.key === 'ArrowUp') {
                 e.preventDefault()
-                const gasPrice = this.trimGwei(this.limitRange(parseFloat(this.state.gasPrice) + 1, 0, 9999))
+                let gasPrice = parseFloat(this.state.gasPrice)
                 if (isNaN(gasPrice)) return
+                gasPrice = this.trimGwei(this.limitRange(gasPrice + 1, 0, 9999))
+                gasPrice = this.toDisplayFromGwei(BigNumber(gasPrice))
                 this.setGasPrice(gasPrice)
               } else if (e.key === 'ArrowDown') {
                 e.preventDefault()
-                const gasPrice = this.trimGwei(this.limitRange(parseFloat(this.state.gasPrice) - 1, 0, 9999))
+                let gasPrice = parseFloat(this.state.gasPrice)
                 if (isNaN(gasPrice)) return
+                gasPrice = this.trimGwei(this.limitRange(gasPrice - 1, 0, 9999))
+                gasPrice = this.toDisplayFromGwei(BigNumber(gasPrice))
                 this.setGasPrice(gasPrice)
               }
             }}

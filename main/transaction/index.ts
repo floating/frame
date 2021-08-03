@@ -1,6 +1,7 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex } from 'ethereumjs-util'
 import { JsonTx, Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
+import log from 'electron-log'
 
 import chainConfig from '../chains/config'
 
@@ -71,7 +72,7 @@ async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): 
   } else {
     txData.type = '0x0'
 
-    const gasPrice = toBN(gas.price.levels[gas.price.selected])
+    const gasPrice = toBN(gas.price.levels.fast)
 
     txData.gasPrice = bnToHex(gasPrice)
     txData.maxFee = bnToHex(toBN(<string>txData.gasLimit).mul(gasPrice))

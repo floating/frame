@@ -274,8 +274,11 @@ const api = {
     return windows.tray
   },
   send: (id, channel, ...args) => {
-    if (!windows[id]) return log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
-    windows[id].send(channel, ...args)
+    if (windows[id] && windows[id].send) {
+      windows[id].send(channel, ...args)
+    } else {
+      log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
+    }
   },
   broadcast: (channel, ...args) => {
     Object.keys(windows).forEach(id => windows[id].send(channel, ...args))

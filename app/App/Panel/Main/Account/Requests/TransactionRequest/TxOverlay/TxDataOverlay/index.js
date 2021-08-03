@@ -87,7 +87,7 @@ class TxDataOverlay extends React.Component {
             </div>
           ) : (
             <div className='txModuleTop'>
-              <div className='txModuleTopData' style={{ justifyContent: 'center' }}>
+              <div className='txModuleTopData' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 No Data
               </div>
             </div>
