@@ -151,7 +151,7 @@
     "babel-eslint": "10.1.0",
     "cli-sleep": "1.0.1",
     "electron": "13.1.7",
-    "electron-builder": "22.11.7",
+    "electron-builder": "22.11.9",
     "electron-notarize": "1.0.1",
     "ganache-cli": "6.12.2",
     "hardhat": "2.5.0",
