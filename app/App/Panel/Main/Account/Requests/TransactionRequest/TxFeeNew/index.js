@@ -45,6 +45,8 @@ class TxFee extends React.Component {
       maxFee = maxFeePerGas.multipliedBy(gasLimit)
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     }
+
+    const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
     
     return (
       <div className='_txFee'>
@@ -68,13 +70,13 @@ class TxFee extends React.Component {
                 {this.toDisplayUSD(maxFeeUSD)}
               </span>
               <span className='_txFeeUSDDescription'>
-                in ETH
+                {`in ${currentSymbol || '?'}`}
               </span>
             </div>
 
             <div className='_txFeeValueHover'>
               <span className='_txFeeETH'>
-                ETH
+                {currentSymbol || '?'}
               </span>
               <span className='_txFeeETHValue'>
                 {this.toDisplayEther(maxFee)}

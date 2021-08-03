@@ -97,7 +97,8 @@
 
   .signerUnlockSubmit
     height 30px
-    background var(--moon)
+    background var(--ghostF)
+    color var(--outerspace)
     font-size 12px
     margin 12px 0px 0px 0px
     width 140px
@@ -105,9 +106,7 @@
     display flex
     justify-content center
     align-items center
-    color var(--moonOver)
     font-weight 600
-    box-shadow 0px 1px 1px var(--ghostA)
     cursor pointer
     text-transform uppercase
 
@@ -115,7 +114,15 @@
       pointer-events none
 
   .signerUnlockSubmit:hover
-    background var(--moonLight)
+    background var(--moon)
+    color var(--moonOver)
+    animation 5s shake ease-in-out infinite alternate
+    box-shadow 0px 5px 15px 0px var(--ghostB)
+
+  .signerUnlockSubmit:active
+    transform translateY(0px)
+    animation shake-little 2s ease-in-out infinite
+    box-shadow 0px 4px 6px 0px var(--ghostB)
 
 .headShake
   animation-duration 1s

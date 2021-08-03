@@ -119,7 +119,7 @@ class SignerStatus extends React.Component {
                   this.unlockSubmit()
                 }
               }} />
-              <div className='signerUnlockSubmit' onMouseDown={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
+              <div className='signerUnlockSubmit' onClick={this.unlockSubmit.bind(this)} >{'Unlock'}</div>
             </div>
           </div>
         </div>

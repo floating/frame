@@ -130,11 +130,19 @@ class TransactionRequest extends React.Component {
           <div className='unknownType'>{'Unknown: ' + this.props.req.type}</div>
         )}
         <div className='requestApprove'>
-          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) this.decline(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestDeclineButton'>Decline</div>
+          <div 
+            className='requestDecline' 
+            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}} 
+            onClick={() => { if (this.state.allowInput && this.props.onTop) this.decline(this.props.req.handlerId, this.props.req) 
+          }}>
+            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
           </div>
-          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) this.approve(this.props.req.handlerId, this.props.req) }}>
-            <div className='requestSignButton'>Sign</div>
+          <div 
+            className='requestSign' 
+            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+            onClick={() => { if (this.state.allowInput && this.props.onTop) this.approve(this.props.req.handlerId, this.props.req) 
+          }}>
+            <div className='requestSignButton _txButton'>Sign</div>
           </div>
         </div>
       </div>

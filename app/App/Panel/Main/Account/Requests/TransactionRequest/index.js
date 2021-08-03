@@ -146,12 +146,12 @@ class TransactionRequest extends React.Component {
     else if (error) requestClass += ' signerRequestError'
     const layer = this.store('main.networks', this.chain.type, this.chain.id, 'layer')
     const nativeCurrency = this.store('main.networksMeta', this.chain.type, this.chain.id, 'nativeCurrency')
-    const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
+    const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
 
     const fee = this.hexToDisplayValue(req.data.maxFee || '0x')
-    const feeUSD = fee * etherUSD
+    const feeUSD = fee * nativeUSD
     const height = req.status === 'error' ? '205px' : mode === 'monitor' ? '205px' : '340px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
@@ -195,6 +195,19 @@ class TransactionRequest extends React.Component {
     // if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
     // if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
     // if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
+
+    let feeAtTime
+    if (req && req.tx && req.tx.receipt && nativeUSD) {
+      const { gasUsed } = req.tx.receipt
+      const { type, maxFeePerGas, gasPrice } = req.data
+      const feePerGas = type === '0x2' ? maxFeePerGas : gasPrice
+      const feeInWei = parseInt(gasUsed, 'hex') * parseInt(feePerGas, 'hex')
+      const feeInEth = feeInWei / 1e18
+      const feeInUsd = feeInEth * nativeUSD
+      feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
+    } else {
+      feeAtTime = '?.??'
+    }
 
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
@@ -322,7 +335,7 @@ class TransactionRequest extends React.Component {
                             </div>
                             <div className='txProgressSuccessItemValue'>
                               <div style={{ margin: '0px 1px 0px 0px', fontSize: '10px' }}>$</div>
-                              {req.feeAtTime || '?.??'}
+                              {feeAtTime || '?.??'}
                             </div>
                           </div>
                         </>
@@ -433,14 +446,18 @@ class TransactionRequest extends React.Component {
               </div>
             ) : null}
             <div
-              className='requestDecline' onClick={() => {
+              className='requestDecline' 
+              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+              onClick={() => {
                 if (this.state.allowInput && this.props.onTop) this.decline(req.handlerId, req)
               }}
             >
               <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
             </div>
             <div
-              className='requestSign' onClick={() => {
+              className='requestSign' 
+              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+              onClick={() => {
                 if (this.state.allowInput && this.props.onTop) {
                   link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
                     if (e === 'No signer')  {

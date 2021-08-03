@@ -76,11 +76,19 @@ class ChainRequest extends React.Component {
           )}
         </div>
         <div className='requestApprove'>
-          <div className='requestDecline' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', this.props.req, false) }}>
-            <div className='requestDeclineButton requestQuickButton'>Decline</div>
+          <div 
+            className='requestDecline' 
+            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+            onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', this.props.req, false) 
+          }}>
+            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
           </div>
-          <div className='requestSign' onMouseDown={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', this.props.req, true) }}>
-            <div className='requestSignButton requestQuickButton'>Approve</div>
+          <div 
+            className='requestSign' 
+            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+            onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', this.props.req, true) 
+          }}>
+            <div className='requestSignButton _txButton'>Approve</div>
           </div>
         </div>
       </div>
