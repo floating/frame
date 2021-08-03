@@ -1,7 +1,6 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex } from 'ethereumjs-util'
 import { JsonTx, Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
-import log from 'electron-log'
 
 import chainConfig from '../chains/config'
 
