@@ -488,6 +488,7 @@ const initial = {
         },
         5: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -496,6 +497,7 @@ const initial = {
         },
         10: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -504,6 +506,7 @@ const initial = {
         },
         42: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -512,6 +515,7 @@ const initial = {
         },
         100: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -520,6 +524,7 @@ const initial = {
         },
         137: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -528,6 +533,7 @@ const initial = {
         },
         42161: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }

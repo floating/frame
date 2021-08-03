@@ -327,6 +327,7 @@ const migrations = {
     if (!initial.main.networksMeta.ethereum[42161]) {
       initial.main.networksMeta.ethereum[42161] = {
         gas: {
+          fees: {},
           price: {
             selected: 'standard',
             levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
