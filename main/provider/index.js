@@ -11,6 +11,8 @@ const chains = require('../chains')
 const accounts = require('../accounts')
 const { recoverTypedData } = require('../crypt/typedDataUtils')
 
+const { populate: populateTransaction, usesBaseFee } = require('../transaction')
+
 const version = require('../../package.json').version
 
 class Provider extends EventEmitter {
@@ -29,10 +31,7 @@ class Provider extends EventEmitter {
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
     this.connection.on('error', err => log.error(err))
-    this.getGasPrice = this.getGasPrice.bind(this)
-    this.getGasEstimate = this.getGasEstimate.bind(this)
     this.getNonce = this.getNonce.bind(this)
-    this.fillTx = this.fillTx.bind(this)
     this.subs = { accountsChanged: [], chainChanged: [], networkChanged: [] }
   }
 
@@ -196,6 +195,14 @@ class Provider extends EventEmitter {
     })
   }
 
+  feeTotalOverMax (rawTx) {
+    const FEE_MAX = 2 * 1e18 // 2 Ether
+    const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas, 'hex') : parseInt(rawTx.gasPrice, 'hex')
+    const gasLimit = parseInt(rawTx.gasLimit, 'hex')
+    const totalFee = maxFeePerGas * gasLimit
+    return totalFee > FEE_MAX
+  }
+
   signAndSend (req, cb) {
     const rawTx = req.data
     const res = data => {
@@ -203,45 +210,53 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
-    accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
-      if (err) {
-        this.resError(err, payload, res)
-        cb(new Error(err))
-      } else {
-        accounts.setTxSigned(req.handlerId, err => {
-          if (err) return cb(err)
-          let done = false
-          const cast = () => {
-            this.connection.send({
-              id: req.payload.id,
-              jsonrpc: req.payload.jsonrpc,
-              method: 'eth_sendRawTransaction',
-              params: [signedTx]
-            }, response => {
-              clearInterval(broadcastTimer)
-              if (done) return
-              done = true
-              if (response.error) {
-                this.resError(response.error, payload, res)
-                cb(response.error.message)
-              } else {
-                res(response)
-                cb(null, response.result)
-              }
-            }, {
-              type: 'ethereum',
-              id: parseInt(req.data.chainId, 'hex').toString()
-            })
-          }
-          const broadcastTimer = setInterval(() => cast(), 1000)
-          cast()
-        })
-      }
-    })
+
+    if (this.feeTotalOverMax(rawTx)) {
+      const err = 'Max fee is over hard limit (2 ETH)'
+      this.resError(err, payload, res)
+      cb(new Error(err))
+    } else {
+      accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
+        if (err) {
+          this.resError(err, payload, res)
+          cb(new Error(err))
+        } else {
+          accounts.setTxSigned(req.handlerId, err => {
+            if (err) return cb(err)
+            let done = false
+            const cast = () => {
+              this.connection.send({
+                id: req.payload.id,
+                jsonrpc: req.payload.jsonrpc,
+                method: 'eth_sendRawTransaction',
+                params: [signedTx]
+              }, response => {
+                clearInterval(broadcastTimer)
+                if (done) return
+                done = true
+                if (response.error) {
+                  this.resError(response.error, payload, res)
+                  cb(response.error.message)
+                } else {
+                  res(response)
+                  cb(null, response.result)
+                }
+              }, {
+                type: 'ethereum',
+                id: parseInt(req.data.chainId, 'hex').toString()
+              })
+            }
+            const broadcastTimer = setInterval(() => cast(), 1000)
+            cast()
+          })
+        }
+      })
+    }
   }
 
   approveRequest (req, cb) {
     log.info('approveRequest', req)
+    accounts.lockRequest(req.handlerId)
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {
       if (response.error) {
@@ -259,30 +274,39 @@ class Provider extends EventEmitter {
   }
 
   getRawTx (payload) {
-    const rawTx = payload.params[0]
-    rawTx.gas = rawTx.gas || rawTx.gasLimit
-    delete rawTx.gasLimit
-    return rawTx
-  }
+    const raw = payload.params[0]
+    const { gas, gasLimit, gasPrice, ...rawTx } = raw
 
-  getGasPrice (rawTx) {
-    const chain = {
-      type: 'ethereum',
-      id: parseInt(rawTx.chainId, 'hex').toString()
+    return {
+      ...rawTx,
+      gasLimit: gasLimit || gas,
+      chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
-
-    const { levels, selected } = store('main.networksMeta', chain.type, chain.id, 'gas.price')
-    if (!levels[selected]) throw new Error('Unable to determine gas')
-
-    return levels[selected]
   }
   
-  getGasEstimate (rawTx, res) {
+  async _getGasEstimate (rawTx) {
+    const payload = { method: 'eth_estimateGas', params: [rawTx], jsonrpc: '2.0', id: 1 }
     const targetChain = {
       type: 'ethereum',
-      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
+      id: parseInt(rawTx.chainId, 16)
     }
-    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_estimateGas', params: [rawTx] }, res, targetChain)
+
+    return new Promise((resolve, reject) => {
+      this.connection.send(payload, response => {
+        return response.error
+          ? reject(response.error)
+          : resolve(response.result)
+      }, targetChain)
+    })
+  }
+
+  _gasFees (rawTx) {
+    const chain = {
+      type: 'ethereum',
+      id: parseInt(rawTx.chainId, 'hex')
+    }
+
+    return store('main.networksMeta', chain.type, chain.id, 'gas')
   }
 
   getNonce (rawTx, res) {
@@ -297,45 +321,45 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  fillDone (fullTx, res) {
-    try {
-      fullTx.gasPrice = this.getGasPrice(fullTx)
-      res(null, fullTx)
-    } catch (e) {
-      return res({ need: 'gasPrice', message: e })
-    }
-  }
-
-  fillTx (rawTx, cb) {
-    if (!rawTx.gas) {
-      this.getGasEstimate(rawTx, response => {
-        if (response.error) {
-          rawTx.gas = '0x0'
-          rawTx.warning = response.error.message
-        } else {
-          rawTx.gas = response.result
-        }
-        this.fillDone(rawTx, cb)
-      })
-    } else {
-      this.fillDone(rawTx, cb)
-    }
-  }
-
   sendTransaction (payload, res) {
     const rawTx = this.getRawTx(payload)
-    if (!rawTx.chainId) rawTx.chainId = utils.toHex(store('main.currentNetwork.id'))
-    this.fillTx(rawTx, (err, rawTx) => {
-      if (err) return this.resError(`Frame provider error while getting ${err.need}: ${err.message}`, payload, res)
-      const from = rawTx.from
-      const current = accounts.getAccounts()[0]
-      if (from && current && from.toLowerCase() !== current.toLowerCase()) return this.resError('Transaction is not from currently selected account', payload, res)
-      const handlerId = uuid()
-      this.handlers[handlerId] = res
-      const { warning } = rawTx
-      delete rawTx.warning
-      accounts.addRequest({ handlerId, type: 'transaction', data: rawTx, payload, account: accounts.getAccounts()[0], origin: payload._origin, warning }, res)
-    })
+    const activeAccount = accounts.current()
+    const gas = this._gasFees(rawTx)
+    const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
+
+    const estimateGas = rawTx.gasLimit
+      ? Promise.resolve(rawTx)
+      : this._getGasEstimate(rawTx)
+        .then(gasLimit => ({ ...rawTx, gasLimit }))
+        .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
+
+    estimateGas
+      .then(tx => populateTransaction(tx, chainConfig, gas))
+      .then(tx => {
+        const from = tx.from
+        if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)
+        const handlerId = uuid()
+        this.handlers[handlerId] = res
+
+        const { warning, ...data } = tx
+        
+        accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: activeAccount.id, origin: payload._origin, warning }, res)
+      })
+      .catch(err => {
+        this.resError(`Frame provider error while sending transaction ${err.need}: ${err.message}`, payload, res)
+      })
+  }
+
+  getTransactionByHash (payload, cb) {
+    const res = response => {
+      if (response.result && !response.result.gasPrice && response.result.maxFeePerGas) {
+        return cb({ ...response, result: { ...response.result, gasPrice: response.result.maxFeePerGas } })
+      }
+
+      cb(response)
+    }
+
+    this.connection.send(payload, res, targetChain)
   }
 
   ethSign (payload, res) {
@@ -432,12 +456,13 @@ class Provider extends EventEmitter {
     if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_requestAccounts') return this.getAccounts(payload, res)
     if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
+    if (payload.method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
     if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
     if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
-    if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3') return this.signTypedData(payload, res)
+    if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3' || payload.method === 'eth_signTypedData_v4') return this.signTypedData(payload, res)
     if (payload.method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
 
     // Connection dependant methods need to pass targetChain

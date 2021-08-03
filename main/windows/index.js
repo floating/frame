@@ -184,7 +184,7 @@ const api = {
     this.gasObserver = store.observer(() => {
       let title = ''
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
-        const gasPrice = store('main.networksMeta.ethereum.1.gas.price.levels.standard')
+        const gasPrice = store('main.networksMeta.ethereum.1.gas.price.levels.fast')
         if (!gasPrice) return
         const gasDisplay = Math.round(parseInt(gasPrice, 'hex') / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
@@ -274,8 +274,11 @@ const api = {
     return windows.tray
   },
   send: (id, channel, ...args) => {
-    if (!windows[id]) return log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
-    windows[id].send(channel, ...args)
+    if (windows[id] && windows[id].send) {
+      windows[id].send(channel, ...args)
+    } else {
+      log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
+    }
   },
   broadcast: (channel, ...args) => {
     Object.keys(windows).forEach(id => windows[id].send(channel, ...args))

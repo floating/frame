@@ -1,7 +1,5 @@
 const { v5: uuidv5 } = require('uuid')
 
-const log = require('electron-log')
-
 const persist = require('../persist')
 const migrations = require('../migrations')
 
@@ -145,7 +143,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 0),
+    _version: main('_version', 14),
     colorway: main('colorway', 'dark'),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
@@ -247,7 +245,8 @@ const initial = {
           prylabs: 'https://goerli.prylabs.net'
         },
         10: {
-          optimism: ['https://mainnet.optimism.io']
+          optimism: 'https://mainnet.optimism.io',
+          infura: 'https://optimism-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
         },
         42: {
           infura: 'infuraKovan'
@@ -259,7 +258,10 @@ const initial = {
           poa: 'https://dai.poa.network'
         },
         137: {
-          matic: ['https://rpc-mainnet.maticvigil.com/v1/852d3148d4d2880682d0c12ba514e7106406316d']
+          infura: 'https://polygon-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
+        },
+        42161: {
+          infura: 'https://arbitrum-mainnet.infura.io/v3/786ade30f36244469480aa5c2bf0743b'
         }
       }
     },
@@ -429,7 +431,26 @@ const initial = {
             }
           },
           connection: {
-            primary: { on: true, current: 'matic', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          },
+          on: false
+        },
+        42161: {
+          id: 42161,
+          type: 'ethereum',
+          layer: 'rollup',
+          symbol: 'ETH',
+          name: 'Arbitrum',
+          explorer: 'https://explorer.arbitrum.io',
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          },
+          connection: {
+            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: false
@@ -440,6 +461,7 @@ const initial = {
       ethereum: {
         1: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -448,6 +470,7 @@ const initial = {
         },
         3: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -456,6 +479,7 @@ const initial = {
         },
         4: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -495,6 +519,14 @@ const initial = {
           }
         },
         137: {
+          gas: {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          }
+        },
+        42161: {
           gas: {
             price: {
               selected: 'standard',

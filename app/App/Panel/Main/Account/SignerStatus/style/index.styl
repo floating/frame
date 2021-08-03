@@ -81,8 +81,8 @@
     padding-bottom 0px
     border 0
     outline 0
-    background var(--ghostF)
-    font-size 20px
+    background var(--ghostD)
+    font-size 24px
     letter-spacing 6px
     display flex
     justify-content center
@@ -90,26 +90,32 @@
     text-align center
     border-radius 22px
     color var(--outerspace08)
-    box-shadow cardDrop, 0px 2px 0px var(--thin), 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
+    box-shadow 0px 1px 1px var(--ghostA), inset 0px 1px 1px var(--ghostA)
+    text-shadow 0px 2px 2px var(--ghostA)
     border 2px solid var(--moon)
+    color var(--moon)
 
   .signerUnlockSubmit
     height 30px
-    background var(--ghostF)
+    background var(--moon)
     font-size 12px
-    margin 10px 0px 0px 0px
+    margin 12px 0px 0px 0px
     width 140px
-    border-radius 17px
+    border-radius 15px
     display flex
     justify-content center
     align-items center
-    color var(--outerspace08)
+    color var(--moonOver)
     font-weight 600
-    box-shadow 0px 2px 4px var(--ghostB)
+    box-shadow 0px 1px 1px var(--ghostA)
     cursor pointer
+    text-transform uppercase
 
     *
       pointer-events none
+
+  .signerUnlockSubmit:hover
+    background var(--moonLight)
 
 .headShake
   animation-duration 1s

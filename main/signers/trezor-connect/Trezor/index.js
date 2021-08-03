@@ -1,11 +1,13 @@
 const log = require('electron-log')
 const utils = require('web3-utils')
-const { Transaction } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
+const { padToEven, stripHexPrefix, addHexPrefix } = require('ethereumjs-util')
+
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const flex = require('../../../flex')
+const { sign } = require('../../../transaction')
 const { v5: uuid } = require('uuid')
+
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 // Base Paths
@@ -185,10 +187,7 @@ class Trezor extends Signer {
   }
 
   normalize (hex) {
-    if (hex == null) return ''
-    if (hex.startsWith('0x')) hex = hex.substring(2)
-    if (hex.length % 2 !== 0) hex = '0' + hex
-    return hex
+    return (hex && padToEven(stripHexPrefix(hex))) || ''
   }
 
   hexToBuffer (hex) {
@@ -209,33 +208,33 @@ class Trezor extends Signer {
     })
   }
 
-  signTransaction (index, rawTx, cb) {
-    // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
-    const trezorTx = {
+  _normalizeTransaction (rawTx) {
+    return {
       nonce: this.normalize(rawTx.nonce),
       gasPrice: this.normalize(rawTx.gasPrice),
-      gasLimit: this.normalize(rawTx.gas),
+      gasLimit: this.normalize(rawTx.gasLimit),
       to: this.normalize(rawTx.to),
       value: this.normalize(rawTx.value),
       data: this.normalize(rawTx.data),
       chainId: utils.hexToNumber(rawTx.chainId)
     }
-    flex.rpc('trezor.ethereumSignTransaction', this.device.path, this.getPath(index), trezorTx, (err, result) => {
-      if (err) return cb(err.message)
-      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-      const tx = Transaction.fromTxData({
-        nonce: this.hexToBuffer(rawTx.nonce),
-        gasPrice: this.hexToBuffer(rawTx.gasPrice),
-        gasLimit: this.hexToBuffer(rawTx.gas),
-        to: this.hexToBuffer(rawTx.to),
-        value: this.hexToBuffer(rawTx.value),
-        data: this.hexToBuffer(rawTx.data),
-        v: this.hexToBuffer(result.v),
-        r: this.hexToBuffer(result.r),
-        s: this.hexToBuffer(result.s)
-      }, { common })
-      cb(null, '0x' + tx.serialize().toString('hex'))
+  }
+
+  signTransaction (index, rawTx, cb) {
+    const trezorTx = this._normalizeTransaction(rawTx)
+    const path = this.getPath(index)
+
+    sign(rawTx, () => {
+      return new Promise((resolve, reject) => {
+        flex.rpc('trezor.ethereumSignTransaction', this.device.path, path, trezorTx, (err, result) => {
+          return err
+            ? reject(err)
+            : resolve({ v: result.v, r: result.r, s: result.s })
+        })
+      })
     })
+    .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
+    .catch(err => cb(err.message))
   }
 }
 

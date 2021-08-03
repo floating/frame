@@ -14,9 +14,6 @@ class Balances extends React.Component {
         }
       })
     }
-    this.state = {
-      expand: false
-    }
   }
 
   componentDidMount () {
@@ -34,7 +31,7 @@ class Balances extends React.Component {
     // const address = this.store('main.accounts', this.props.id, 'address')
     const permissions = this.store('main.permissions', this.props.id) || {}
     let permissionList = Object.keys(permissions).sort((a, b) => a.origin < b.origin ? -1 : 1)
-    if (!this.state.expand) permissionList = permissionList.slice(0, 3)
+    if (!this.props.expanded) permissionList = permissionList.slice(0, 3)
     
     return (
       <div ref={this.moduleRef}>
