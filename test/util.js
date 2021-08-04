@@ -2,6 +2,10 @@
 
 const EventEmitter = require('events')
 const store = require('../main/store')
+const { addHexPrefix } = require('ethereumjs-util')
+
+const weiToHex = wei => addHexPrefix(wei.toString(16))
+const gweiToHex = gwei => weiToHex(gwei * 1e9)
 
 class Observer extends EventEmitter {
   constructor (root, keys) {
@@ -39,4 +43,4 @@ class Counter {
   }
 }
 
-module.exports = { Counter, Observer }
+module.exports = { Counter, Observer, weiToHex, gweiToHex }

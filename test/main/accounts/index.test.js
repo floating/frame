@@ -1,5 +1,7 @@
-const { addHexPrefix } = require('ethereumjs-util')
+import { addHexPrefix } from 'ethereumjs-util'
+import store from '../../../main/store'
 
+jest.mock('../../../main/store', () => require('../../../main/store/__mocks__/store.js'))
 jest.mock('../../../main/signers', () => jest.fn())
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/externalData')
@@ -17,35 +19,23 @@ const weiToHex = wei => addHexPrefix(wei.toString(16))
 const gweiToHex = gwei => weiToHex(gwei * 1e9)
 
 const account = {
-  "id": "0x22dd63c3619818fdbc262c78baee43cb61e9cccf",
-  "name": "Seed Account",
-  "lastSignerType": "seed",
-  "address": "0x22dd63c3619818fdbc262c78baee43cb61e9cccf",
-  "status": "ok",
-  "signer": "3935336131653838663031303266613139373335616337626261373962343231",
-  "requests": {},
-  "ensName": null,
-  "tokens": {},
-  "created": "12819530:1626189153547"
+  id: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+  name: 'Seed Account',
+  lastSignerType: 'seed',
+  address: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+  status: 'ok',
+  signer: '3935336131653838663031303266613139373335616337626261373962343231',
+  requests: {},
+  ensName: null,
+  tokens: {},
+  created: '12819530:1626189153547'
 }
-
-const mockStore = {
-  'main.accounts': {
-    "0x22dd63c3619818fdbc262c78baee43cb61e9cccf": account
-  }
-}
-
-jest.mock('../../../main/store', () => {
-  const store = k => mockStore[k]
-
-  store.updateAccount = () => {}
-  store.observer = () => {}
-  return store
-})
 
 let Accounts, request
 
 beforeAll(async () => {
+  store.addAccount(account.id, account)
+
   // need to import this after mocks are set up
   Accounts = (await import('../../../main/accounts')).default
 })
@@ -64,7 +54,7 @@ beforeEach(() => {
     }
   }
 
-  Accounts.setSigner('0x22dd63c3619818fdbc262c78baee43cb61e9cccf', jest.fn())
+  Accounts.setSigner(account.address, jest.fn())
 })
 
 afterEach(() => {
