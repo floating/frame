@@ -1,24 +1,25 @@
 .badge
   position absolute
   right 5px
-  bottom 25px
+  bottom 55px
   left 5px
   transform translateY(700px)
   border-radius 16px
-  background var(--ghostC)
+  background var(--ghostD)
   z-index 999999999999
   transition var(--standard)
   font-size 18px
   font-weight 300
   padding-bottom 60px
   padding-top 30px
-  box-shadow 0px 0px 100px var(--ghostX)
+  box-shadow 0px 20px 40px var(--ghostX)
   height 196px
+  color var(--outerspace)
+  border 2px solid var(--moon)
 
   .badgeMessage, .badgeInput
     position relative
     z-index 10
-    color var(--goodOver)
 
   .badgeMessage
     height 120px
@@ -42,22 +43,23 @@
       cursor pointer
 
       .badgeInputInner
-        background var(--ghostD)
+        background var(--moon)
         height 33px
         width calc(80% - 2px)
         display flex
         justify-content center
         align-items center
-        border-radius 15px
+        border-radius 12px
         text-transform uppercase
         font-size 14px
         font-weight 400
         letter-spacing 1px
         margin-left 1px
         cursor pointer
+        color var(--moonOver)
 
       .badgeInputInner:hover
-        background var(--ghostE)
+        background var(--moonLight)
 
       .badgeInputSmall
         font-size 11px
