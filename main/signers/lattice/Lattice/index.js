@@ -267,7 +267,7 @@ class Lattice extends Signer {
     const data = {
       protocol: protocol,
       payload: payload,
-      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other deviations
+      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other derivations
     }
     const signOpts = {
       currency: 'ETH_MSG',
@@ -282,25 +282,29 @@ class Lattice extends Signer {
     return `0x${result.sig.r}${result.sig.s}${v}`;
   }
 
-  async signMessage(index, message, cb){
+  async signMessage (index, message, cb) {
     try {
       const asciiMessage = utils.hexToAscii(message)
       if (humanReadable(asciiMessage)) {
         message = asciiMessage
       }
+
       const signature = await this._signMessage(index, 'signPersonal', message)
+
       return cb(null, signature)
     } catch (err) {
       return cb(new Error(err))
     }
   }
-  async signTypedData(index, typedData, cb){
-      try {
-          const signature = await this._signMessage(index, 'eip712', typedData)
-          return cb(null, signature)
-      } catch (err) {
-          return cb(new Error(err))
-      }
+
+  async signTypedData (index, typedData, cb) {
+    try {
+      const signature = await this._signMessage(index, 'eip712', typedData)
+
+      return cb(null, signature)
+    } catch (err) {
+      return cb(new Error(err))
+    }
   }
 
   async signTransaction (index, rawTx, cb) {
