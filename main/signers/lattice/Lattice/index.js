@@ -262,28 +262,24 @@ class Lattice extends Signer {
 
   // Standard Methods
   async _signMessage (index, protocol, payload) {
-    try{
-      const clientSign = promisify(this.client.sign).bind(this.client)
+    const clientSign = promisify(this.client.sign).bind(this.client)
 
-      const data = {
-        protocol: protocol,
-        payload: payload,
-        signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other deviations
-      }
-      const signOpts = {
-        currency: 'ETH_MSG',
-        data: data
-      }
-
-      const result = await clientSign(signOpts)
-      let v = result.sig.v.toString("hex");
-      if (v.length < 2)
-        v = `0${v}`;
-      return `0x${result.sig.r}${result.sig.s}${v}`;
-
-    } catch (err) {
-      return new Error(err)
+    const data = {
+      protocol: protocol,
+      payload: payload,
+      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other deviations
     }
+    const signOpts = {
+      currency: 'ETH_MSG',
+      data: data
+    }
+
+    const result = await clientSign(signOpts)
+    let v = result.sig.v.toString("hex");
+    if (v.length < 2)
+      v = `0${v}`;
+
+    return `0x${result.sig.r}${result.sig.s}${v}`;
   }
 
   async signMessage(index, message, cb){
@@ -334,7 +330,7 @@ class Lattice extends Signer {
     })
     .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
     .catch(err => {
-      log.error(err)
+      log.error('error signing transaction with Lattice', err)
       cb(new Error('Error signing transaction: ', err.message))
     })
   }
