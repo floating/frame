@@ -160,6 +160,7 @@
     "jest": "27.0.6",
     "node-watch": "0.7.1",
     "parcel-bundler": "1.12.3",
+    "spectron": "^15.0.0",
     "standardx": "7.0.0",
     "stylus": "0.54.8",
     "ts-jest": "27.0.4"

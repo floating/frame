@@ -11,6 +11,7 @@ const store = require('../store')
 const dapp = require('./dapp')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
 
+const test = process.env.NODE_ENV === 'test'
 const dev = process.env.NODE_ENV === 'development'
 const fullheight = !!process.env.FULL_HEIGHT
 
@@ -98,11 +99,11 @@ const api = {
       icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
       webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        sandbox: true,
+        nodeIntegration: test,
+        contextIsolation: !test,
+        sandbox: !test,
         disableBlinkFeatures: 'Auxclick',
-        enableRemoteModule: false,
+        enableRemoteModule: test,
         preload: path.resolve(__dirname, '../../bundle/bridge.js'),
         worldSafeExecuteJavaScript: true,
         backgroundThrottling: false // Allows repaint when window is hidden
@@ -386,11 +387,11 @@ const api = {
       // icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
       webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        sandbox: true,
+        nodeIntegration: test,
+        contextIsolation: !test,
+        sandbox: !test,
         disableBlinkFeatures: 'Auxclick',
-        enableRemoteModule: false,
+        enableRemoteModule: test,
         preload: path.resolve(__dirname, '../../bundle/bridge.js'),
         worldSafeExecuteJavaScript: true,
         backgroundThrottling: false // Allows repaint when window is hidden
