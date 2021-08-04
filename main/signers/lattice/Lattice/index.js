@@ -269,17 +269,21 @@ class Lattice extends Signer {
       payload: payload,
       signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other derivations
     }
+
     const signOpts = {
       currency: 'ETH_MSG',
       data: data
     }
 
     const result = await clientSign(signOpts)
-    let v = result.sig.v.toString("hex");
-    if (v.length < 2)
-      v = `0${v}`;
 
-    return `0x${result.sig.r}${result.sig.s}${v}`;
+    const signature = [
+      result.sig.r,
+      result.sig.s,
+      padToEven(result.sig.v.toString('hex'))
+    ].join('')
+
+    return addHexPrefix(signature)
   }
 
   async signMessage (index, message, cb) {
