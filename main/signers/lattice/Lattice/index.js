@@ -1,8 +1,7 @@
 const crypto = require('crypto')
 const log = require('electron-log')
 const utils = require('web3-utils')
-const { Transaction } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
+const { padToEven, stripHexPrefix, addHexPrefix } = require('ethereumjs-util')
 const { Client } = require('gridplus-sdk')
 const { promisify } = require('util')
 const { sign } = require('../../../transaction')
