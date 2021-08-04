@@ -1,10 +1,15 @@
 import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
 
-jest.mock('../../../main/store', () => require('../../../main/store/__mocks__/store.js'))
 jest.mock('../../../main/signers', () => jest.fn())
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/externalData')
+
+jest.mock('../../../main/store/persist', () => ({
+  get: jest.fn(),
+  set: jest.fn()
+}))
+
 jest.mock('../../../main/nebula', () => jest.fn(() => ({
   ens: {
     lookupAddress: jest.fn()
@@ -34,7 +39,7 @@ const account = {
 let Accounts, request
 
 beforeAll(async () => {
-  store.addAccount(account.id, account)
+  store.updateAccount(account)
 
   // need to import this after mocks are set up
   Accounts = (await import('../../../main/accounts')).default
