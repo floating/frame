@@ -321,6 +321,7 @@ class Provider extends EventEmitter {
   }
 
   fillTransaction (newTx, cb) {
+    if (!newTx) return cb('No transaction data')
     const rawTx = this.getRawTx(newTx)
     const gas = this._gasFees(rawTx)
     const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
@@ -343,7 +344,7 @@ class Provider extends EventEmitter {
 
     this.fillTransaction(newTx, (err, tx) => {
       if (err) {
-        this.resError(err.message, payload, res)
+        this.resError(err, payload, res)
       } else {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)
