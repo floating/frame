@@ -273,9 +273,8 @@ class Provider extends EventEmitter {
     })
   }
 
-  getRawTx (payload) {
-    const raw = payload.params[0]
-    const { gas, gasLimit, gasPrice, ...rawTx } = raw
+  getRawTx (newTx) {
+    const { gas, gasLimit, gasPrice, ...rawTx } = newTx
 
     return {
       ...rawTx,
@@ -321,27 +320,30 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  fillTransaction (rawTx, cb) {
-    delete rawTx.gas
-    delete rawTx.gasLimit
-    
+  fillTransaction (newTx, cb) {
+    const rawTx = this.getRawTx(newTx)
     const gas = this._gasFees(rawTx)
     const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
-    this._getGasEstimate(rawTx)
-      .then(gasLimit => ({ ...rawTx, gasLimit }))
+    const estimateGas = rawTx.gasLimit
+      ? Promise.resolve(rawTx)
+      : this._getGasEstimate(rawTx)
+        .then(gasLimit => ({ ...rawTx, gasLimit }))
+        .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
+
+    estimateGas
       .then(tx => populateTransaction(tx, chainConfig, gas))
       .then(tx => cb(null, tx))
-      .catch(err => cb(null, ({ ...rawTx, gasLimit: '0x00', warning: err.message })))
+      .catch(cb)
   }
 
   sendTransaction (payload, res) {
-    const rawTx = this.getRawTx(payload)
+    const newTx = payload.params[0]
     const activeAccount = accounts.current()
 
-    this.fillTransaction(rawTx, (err, tx) => {
+    this.fillTransaction(newTx, (err, tx) => {
       if (err) {
-        this.resError(`Frame provider error while sending transaction ${err.need}: ${err.message}`, payload, res)
+        this.resError(err.message, payload, res)
       } else {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)

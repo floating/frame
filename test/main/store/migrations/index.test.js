@@ -1,3 +1,6 @@
+const log = require('electron-log')
+log.transports.console.level = false
+
 import migrations from '../../../../main/store/migrations'
 
 let state

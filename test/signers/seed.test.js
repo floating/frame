@@ -6,6 +6,9 @@ const { remove } = require('fs-extra')
 const path = require('path')
 const store = require('../../compiled/store')
 
+const log = require('electron-log')
+log.transports.console.level = false
+
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 

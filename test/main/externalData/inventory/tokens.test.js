@@ -1,5 +1,8 @@
 /* globals jest beforeEach afterEach it */
 
+const log = require('electron-log')
+log.transports.console.level = false
+
 const mockNebula = {
   resolve: jest.fn().mockResolvedValue({ record: {} }),
   ipfs: {
