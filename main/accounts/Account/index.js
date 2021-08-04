@@ -208,7 +208,13 @@ class Account {
   }
 
   getSigner () {
-    return this.signer && signers.get(this.signer)
+    if (this.smart) {
+      const actingAccount = this.smart.actor && this.accounts.get(this.smart.actor)
+      const actingSigner = actingAccount && signers.get(actingAccount.signer)
+      return actingSigner 
+    } else {
+      return this.signer && signers.get(this.signer)
+    }
   }
 
   verifyAddress (display, cb = () => {}) {

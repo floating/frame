@@ -5,6 +5,9 @@ const fs = require('fs')
 const { remove } = require('fs-extra')
 const path = require('path')
 
+const log = require('electron-log')
+log.transports.console.level = false
+
 const hot = require('../../compiled/signers/hot')
 const store = require('../../compiled/store')
 

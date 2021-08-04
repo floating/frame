@@ -558,10 +558,8 @@ const initial = {
 
 // Remove permissions granted to unknown origins
 Object.keys(initial.main.accounts).forEach(id => {
-  const account = initial.main.accounts[id]
-  if (account && account.permissions) {
-    delete account.permissions[uuidv5('Unknown', uuidv5.DNS)]
-  }
+  const permissions = initial.main.permissions[id]
+  if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
 })
 
 module.exports = () => migrations.apply(initial)

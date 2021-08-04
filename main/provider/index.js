@@ -273,9 +273,8 @@ class Provider extends EventEmitter {
     })
   }
 
-  getRawTx (payload) {
-    const raw = payload.params[0]
-    const { gas, gasLimit, gasPrice, ...rawTx } = raw
+  getRawTx (newTx) {
+    const { gas, gasLimit, gasPrice, ...rawTx } = newTx
 
     return {
       ...rawTx,
@@ -321,9 +320,9 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  sendTransaction (payload, res) {
-    const rawTx = this.getRawTx(payload)
-    const activeAccount = accounts.current()
+  fillTransaction (newTx, cb) {
+    if (!newTx) return cb('No transaction data')
+    const rawTx = this.getRawTx(newTx)
     const gas = this._gasFees(rawTx)
     const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
@@ -335,7 +334,18 @@ class Provider extends EventEmitter {
 
     estimateGas
       .then(tx => populateTransaction(tx, chainConfig, gas))
-      .then(tx => {
+      .then(tx => cb(null, tx))
+      .catch(cb)
+  }
+
+  sendTransaction (payload, res) {
+    const newTx = payload.params[0]
+    const activeAccount = accounts.current()
+
+    this.fillTransaction(newTx, (err, tx) => {
+      if (err) {
+        this.resError(err, payload, res)
+      } else {
         const from = tx.from
         if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)
         const handlerId = uuid()
@@ -344,10 +354,8 @@ class Provider extends EventEmitter {
         const { warning, ...data } = tx
         
         accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: activeAccount.id, origin: payload._origin, warning }, res)
-      })
-      .catch(err => {
-        this.resError(`Frame provider error while sending transaction ${err.need}: ${err.message}`, payload, res)
-      })
+      }
+    })
   }
 
   getTransactionByHash (payload, cb) {
