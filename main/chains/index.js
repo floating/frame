@@ -81,9 +81,9 @@ class ChainConnection extends EventEmitter {
         if (this.chainId != 1) {
           // prior to the london hardfork, mainnet uses its own gas service
           gasCalculator.getGasPrices().then(gas => {
-            const customLevel = store('main.networksMeta', this.network, this.chainId, 'gas.price.levels.custom')
+            const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
-            store.setGasPrices({
+            store.setGasPrices(this.type, this.chainId, {
               ...gas,
               custom: customLevel || gas.fast
             })
@@ -92,6 +92,7 @@ class ChainConnection extends EventEmitter {
           })
         }
       }
+
       accounts.updatePendingFees(this.chainId)
     })
   }
