@@ -265,7 +265,10 @@ class TransactionRequest extends React.Component {
                     {svg.alert(32)}
                   </div>
                   <div className='approveTransactionWarningTitle'>{otherChain ? 'chain warning' : 'estimated to fail'} </div>
-                  <div className='approveTransactionWarningMessage'>{otherChain ? 'transaction is not on currently selected chain' : req.warning}</div>
+                  <div className='approveTransactionWarningMessage'>
+                    <div className='approveTransactionWarningMessageInner'>
+                      {otherChain ? 'transaction is not on currently selected chain' : req.warning}</div>
+                    </div>
                 </div>
               </div>
             ) : null}

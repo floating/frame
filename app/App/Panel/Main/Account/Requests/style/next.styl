@@ -879,9 +879,9 @@
 .approveTransactionWarning
   position absolute 
   top 63px
-  right 5px
-  bottom 24px
-  left 5px
+  right 0px
+  bottom 20px
+  left 0px
   z-index 200000
   border-radius 8px
   background var(--ghostX02)
@@ -889,7 +889,7 @@
 
   .approveTransactionWarningOptions
     position absolute 
-    bottom 71px
+    bottom 78px
     right 0px
     left 0px
     height 30px
@@ -961,7 +961,7 @@
     .approveTransactionWarningIcon
       position absolute 
       bottom 0px
-      height 70px
+      height 80px
       width 75px
       display flex
       justify-content center
@@ -985,7 +985,7 @@
       bottom 21px
       left 9px
       right 9px
-      height 31px
+      height 36px
       display flex
       flex-direction column
       justify-content center
@@ -994,7 +994,7 @@
 
     .approveTransactionWarningMessage
       text-align center
-      font-size 18px
+      font-size 16px
       position absolute
       top 0px
       left 0px
@@ -1009,3 +1009,9 @@
       background var(--ghostD)
       border-radius 8px
       overflow hidden
+
+      .approveTransactionWarningMessageInner
+        max-height 100%
+        overflow-y scroll
+        padding 10px 0px
+        word-wrap break-word
