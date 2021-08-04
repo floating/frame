@@ -125,7 +125,7 @@ class Aragon {
       this.provider.getNonce(newTx, res => {
         if (res.error) return cb(res.error)
         newTx.nonce = res.result
-        this.provider.fillTx(newTx, (err, fullTx) => {
+        this.provider.fillTransaction(newTx, (err, fullTx) => {
           if (err) return cb(err)
           if (typeof fullTx.value === 'undefined') fullTx.value = '0x'
           cb(null, fullTx)
