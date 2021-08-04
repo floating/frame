@@ -14,21 +14,6 @@
   overflow-x hidden
   overflow-y scroll
 
-// .txModuleDataBodyCopied
-//   position absolute
-//   top 0
-//   left 0
-//   right 0
-//   bottom 0
-//   display flex
-//   justify-content center
-//   align-items center
-//   font-size 16px
-//   letter-spacing 0px
-
-//   svg
-//     margin -3px 0px 0px 10px
-
 .decodedDataContract
   padding 32px 11px 11px 11px
   position relative
@@ -103,17 +88,15 @@
 
 .decodedDataContractArgHeader
   font-size 12px
-  font-family Open Sans, sans-serif
   text-transform uppercase
   letter-spacing 2px
-  font-weight 400
+  font-weight bold
+  color var(--moon)
   text-align center
   height 30px
   display flex
   align-items center
   justify-content center
-  
-  color var(--outerspace)
   // border-top 1px solid var(--thick)
   background var(--ghostD)
   border-radius 8px
@@ -154,5 +137,33 @@
   margin-bottom 5px
 
 .txDataOverlayRaw
-  margin-top 30px
+  padding 0px 13px 40px 20px
+
+.txDataOverlayRawTitle
+  padding-bottom 20px
+  text-align center
+
+.txDataOverlayRawData
+  font-size 14px
+  position relative
+  cursor pointer
+  *
+    pointer-events none
+
+  .txModuleDataBodyCopied
+    position absolute
+    top -5px
+    left -5px
+    right -5px
+    bottom -5px
+    display flex
+    justify-content center
+    align-items center
+    font-size 16px
+    letter-spacing 0px
+    border-radius 12px
+    background var(--ghostD)
+
+    svg
+      margin -3px 0px 0px 10px
   

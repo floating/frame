@@ -1,10 +1,10 @@
 const crypto = require('crypto')
 const log = require('electron-log')
 const utils = require('web3-utils')
-const { Transaction } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
+const { padToEven, stripHexPrefix, addHexPrefix } = require('ethereumjs-util')
 const { Client } = require('gridplus-sdk')
 const { promisify } = require('util')
+const { sign } = require('../../../transaction')
 
 const store = require('../../../store')
 const Signer = require('../../Signer')
@@ -253,10 +253,7 @@ class Lattice extends Signer {
   }
 
   normalize (hex) {
-    if (hex == null) return ''
-    if (hex.startsWith('0x')) hex = hex.substring(2)
-    if (hex.length % 2 !== 0) hex = '0' + hex
-    return hex
+    return (hex && padToEven(stripHexPrefix(hex))) || ''
   }
 
   hexToBuffer (hex) {
@@ -265,87 +262,85 @@ class Lattice extends Signer {
 
   // Standard Methods
   async _signMessage (index, protocol, payload) {
-    try{
-      const clientSign = promisify(this.client.sign).bind(this.client)
+    const clientSign = promisify(this.client.sign).bind(this.client)
 
-      const data = {
-        protocol: protocol,
-        payload: payload,
-        signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other deviations
-      }
-      const signOpts = {
-        currency: 'ETH_MSG',
-        data: data
-      }
-
-      const result = await clientSign(signOpts)
-      let v = result.sig.v.toString("hex");
-      if (v.length < 2)
-        v = `0${v}`;
-      return `0x${result.sig.r}${result.sig.s}${v}`;
-
-    } catch (err) {
-      return new Error(err)
+    const data = {
+      protocol: protocol,
+      payload: payload,
+      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other derivations
     }
+
+    const signOpts = {
+      currency: 'ETH_MSG',
+      data: data
+    }
+
+    const result = await clientSign(signOpts)
+
+    const signature = [
+      result.sig.r,
+      result.sig.s,
+      padToEven(result.sig.v.toString('hex'))
+    ].join('')
+
+    return addHexPrefix(signature)
   }
 
-  async signMessage(index, message, cb){
+  async signMessage (index, message, cb) {
     try {
       const asciiMessage = utils.hexToAscii(message)
       if (humanReadable(asciiMessage)) {
         message = asciiMessage
       }
+
       const signature = await this._signMessage(index, 'signPersonal', message)
+
       return cb(null, signature)
     } catch (err) {
       return cb(new Error(err))
     }
   }
-  async signTypedData(index, typedData, cb){
-      try {
-          const signature = await this._signMessage(index, 'eip712', typedData)
-          return cb(null, signature)
-      } catch (err) {
-          return cb(new Error(err))
-      }
+
+  async signTypedData (index, typedData, cb) {
+    try {
+      const signature = await this._signMessage(index, 'eip712', typedData)
+
+      return cb(null, signature)
+    } catch (err) {
+      return cb(new Error(err))
+    }
   }
 
   async signTransaction (index, rawTx, cb) {
-    try {
-      // if (parseInt(store('main.currentNetwork.id')) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
-      const unsignedTxn = {
-        nonce: utils.hexToNumber(rawTx.nonce),
-        gasPrice: utils.hexToNumber(rawTx.gasPrice),
-        gasLimit: utils.hexToNumber(rawTx.gas),
-        to: rawTx.to,
-        value: rawTx.value,
-        data: rawTx.data || '0x',
+    sign(rawTx, tx => {
+      const { value, to, data, ...txJson } = tx.toJSON()
+
+      const unsignedTx = {
+        to,
+        value,
+        data,
         chainId: rawTx.chainId,
+        nonce: utils.hexToNumber(txJson.nonce),
+        gasPrice: utils.hexToNumber(txJson.gasPrice),
+        gasLimit: utils.hexToNumber(txJson.gasLimit),
         useEIP155: true,
         signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
       }
-
-      const signOpts = { currency: 'ETH', data: unsignedTxn }
+        
+      const signOpts = { currency: 'ETH', data: unsignedTx }
       const clientSign = promisify(this.client.sign).bind(this.client)
-      const result = await clientSign(signOpts)
 
-      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-      const tx = Transaction.fromTxData({
-        nonce: this.hexToBuffer(rawTx.nonce),
-        gasPrice: this.hexToBuffer(rawTx.gasPrice),
-        gasLimit: this.hexToBuffer(rawTx.gas),
-        to: this.hexToBuffer(rawTx.to),
-        value: this.hexToBuffer(rawTx.value),
-        data: this.hexToBuffer(rawTx.data),
+      return clientSign(signOpts).then(result => ({
         v: result.sig.v[0],
-        r: this.hexToBuffer(result.sig.r),
-        s: this.hexToBuffer(result.sig.s)
-      }, { common })
-      return cb(null, '0x' + tx.serialize().toString('hex'))
-    } catch (err) {
-      log.error(err)
-      return cb(new Error('Error signing transaction'))
-    }
+        r: result.sig.r,
+        s: result.sig.s
+      }))
+    })
+    .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
+    .catch(err => {
+      log.error('error signing transaction with Lattice', err)
+      cb(new Error('Error signing transaction: ', err.message))
+    })
   }
 }
 

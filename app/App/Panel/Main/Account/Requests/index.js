@@ -111,7 +111,7 @@ class Requests extends React.Component {
       return 0
     })
     const monitorHeight = 220
-    let containNormal = normal.length ? (360 + (normal.length * 10)) : 26
+    let containNormal = normal.length ? (360 + (normal.length * 6)) : 26
     // if (normal.length && monitor.length > 0) {
     //   containNormal += 50
     // } else if (monitor.length > 0) {
@@ -132,7 +132,7 @@ class Requests extends React.Component {
         </div> */}
         <div className='requestContainerWrap'>
           <div className='requestContainer' style={{ height: containHeight + 'px' }}>
-            <div key='noReq' style={normal.length !== 0 ? { opacity: 0, transform: `translateY(50px)`, transition: 'none' } : { transitionDelay: '0.32s', transform: `translateY(${monitor.length === 0 ? 10 : 0}px)` }} className='noRequests'>No Pending Requests</div>
+            <div key='noReq' style={normal.length !== 0 ? { opacity: 0, transform: `translateY(50px)`, transition: 'none' } : { transform: `translateY(${monitor.length === 0 ? 10 : 0}px)` }} className='noRequests'>No Pending Requests</div>
             <div className='recentRequests' style={{ opacity: monitor.length > 0 ? 1 : 0, transform: `translateY(${containNormal +  40}px)` }}>
               <span>Recent Transactions</span>
               <span>{monitor.length}</span>
@@ -140,7 +140,7 @@ class Requests extends React.Component {
             {normal.concat(monitor).map((req, i) => {
               let pos = 0
               const z = 2000 + i
-              if (req.mode === 'normal') pos = (((normal.length - 1) - i) * 10) + 34
+              if (req.mode === 'normal') pos = (((normal.length - 1) - i) * 6) + 36
               if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight) + 55
               if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} onTop={i === normal.length - 1} accountId={this.props.id} />
               if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />

@@ -26,13 +26,19 @@ class txData extends React.Component {
           <div className='_txDataSlice _txDataValue _txButton' onClick={() => {
             this.props.overlayMode('data')
           }}>
-            <span>{req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
+           {req.data.data && req.data.data !== '0x' && req.data.data !== '0x0' ? (
               req.decodedData && req.decodedData.method ? (
-                <span>{'Sending data to:'} <span className={'_txDataValueMethod'}>{req.decodedData.method}</span></span>
+                <>
+                  <span>{'Sending Data: '}</span>
+                  <span className={'_txDataValueMethod'}>{(() => {
+                    if (req.decodedData.method.length > 17) return `${req.decodedData.method.substr(0, 15)}..`
+                    return req.decodedData.method
+                  })()}</span>
+                </>
                ) : (
-                <span>{'Sending data!'}</span>
+                <span>{'Sending Data!'}</span>
               )
-            ) : 'No Data'}</span>
+            ) : 'No Data'}
           </div>
         </div>
       </div>

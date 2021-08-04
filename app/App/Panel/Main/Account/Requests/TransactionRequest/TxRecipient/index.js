@@ -28,17 +28,21 @@ class TxRecipient extends React.Component {
           }}>
             {this.state.copied ? 'Address Copied' : req.data.to}
           </div>
-          <div className='_txRecipientSlice _txRecipientValue'>
-            {req.data.to ? (
-              req.decodedData && req.decodedData.contractName ? (
-                <span className={'_txRecipientValueSmall'}><span className={'_txRecipientValueMoon'}>{req.decodedData.contractName}</span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 4)}</span>
-               ) : (
-                <span>{req.data.to.substring(0, 8)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 6)}</span>
-              )
-            ) : (
-              <span>Deploying Contract</span>
-            )}
-          </div>
+          {req.data.to ? (
+            <div className='_txRecipientSlice _txRecipientValue'>
+              <span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 4)}</span>
+              {req.decodedData && req.decodedData.contractName ? ( 
+                <span className={'_txRecipientContract'}>{(() => {
+                  if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
+                  return req.decodedData.contractName
+                })()}</span>
+              ) : null}
+            </div>
+          ) : (
+            <div className='_txRecipientSlice _txRecipientValue'>
+              Deploying Contract
+            </div>
+          )}
         </div>
       </div>
     )
