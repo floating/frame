@@ -1,7 +1,14 @@
 import loadRates from '../../../../main/externalData/rates'
 
 jest.mock('../../../../main/externalData/coingecko')
-jest.useFakeTimers()
+
+beforeEach(() => {
+  jest.useFakeTimers()
+})
+
+afterEach(() => {
+  jest.useRealTimers()
+})
 
 it('loads ethereum token rates for an unknown platform', async () => {
   const rates = await loadRates([
