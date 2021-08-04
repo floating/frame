@@ -5,8 +5,8 @@ const fs = require('fs')
 const { remove } = require('fs-extra')
 const path = require('path')
 
-const hot = require('../../main/signers/hot')
-const store = require('../../main/store')
+const hot = require('../../compiled/signers/hot')
+const store = require('../../compiled/store')
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
@@ -59,12 +59,13 @@ describe('Ring signer', () => {
       add: (signer) => {
         signer.close(() => {})
         if (signer.type === 'ring') count++
-      }
+        expect(count).toBe(1)
+        done()
+      },
+      exists: () => false
     }
     hot.scan(signers)
-    expect(count).toBe(1)
-    done()
-  })
+  }, 15 * 1000)
 
   test('Close signer', (done) => {
     signer.close()

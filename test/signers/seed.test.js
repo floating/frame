@@ -1,10 +1,10 @@
 /* globals test, expect, beforeAll, afterAll, describe */
 
 const bip39 = require('bip39')
-const hot = require('../../main/signers/hot')
+const hot = require('../../compiled/signers/hot')
 const { remove } = require('fs-extra')
 const path = require('path')
-const store = require('../../main/store')
+const store = require('../../compiled/store')
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
@@ -47,12 +47,13 @@ describe('Seed signer', () => {
       add: (signer) => {
         signer.close(() => {})
         if (signer.type === 'seed') count++
-      }
+        expect(count).toBe(1)
+        done()
+      },
+      exists: () => false
     }
     hot.scan(signers)
-    expect(count).toBe(1)
-    done()
-  })
+  }, 15 * 1000)
 
   test('Unlock with wrong password', (done) => {
     signer.unlock('Wrong password', (err, result) => {
