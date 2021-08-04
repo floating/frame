@@ -58,6 +58,8 @@ const tokenPriceData = {
 
 const customCoins = []
 
+const __clearCustomCoins = () => customCoins.splice(0, customCoins.length)
+
 const __addCoin = coin => {
   customCoins.push(coin)
 }
@@ -94,5 +96,6 @@ export default {
   listMarkets,
   coinPrices,
   tokenPrices,
+  __clearCustomCoins,
   __addCoin
 }

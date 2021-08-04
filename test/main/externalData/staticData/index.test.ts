@@ -1,7 +1,11 @@
 import loadStaticData from '../../../../main/externalData/staticData'
-import coingecko from '../../../../main/externalData/coingecko/index'
+import coingecko from '../../../../main/externalData/coingecko'
 
 jest.mock('../../../../main/externalData/coingecko')
+
+beforeEach(() => {
+  coingecko.__clearCustomCoins()
+})
 
 it('loads symbol data for known coins', async () => {
   const data = await loadStaticData(['xdai', 'matic'])
@@ -43,7 +47,6 @@ it('loads the coin with the highest market cap', async () => {
     image: 'http://image.com',
     market_cap: 2300
   })
-  
 
   const data = await loadStaticData(['matic'])
 

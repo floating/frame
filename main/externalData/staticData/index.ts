@@ -13,7 +13,7 @@ interface CoinData {
 }
 
 function byMarketCap (coin1: Market, coin2: Market) {
-  return (coin1.market_cap || 1) - (coin2.market_cap || 1)
+  return (coin2.market_cap || 1) - (coin1.market_cap || 1)
 }
 
 async function loadCoinData (allCoins: Coin[], symbol: string): Promise<Market> {
