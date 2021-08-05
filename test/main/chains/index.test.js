@@ -142,25 +142,6 @@ it('sets legacy gas prices on a new non-London block', done => {
   mockConnection.emit('connect')
 })
 
-it('sets legacy gas prices on one of the first 120 blocks after the London hardfork', done => {
-  gasPrice = gweiToHex(7)
-  block = {
-    number: addHexPrefix((8897988 + 20).toString(16)), // london block: 8897988
-    baseFeePerGas: gweiToHex(16)
-  }
-
-  observer = store.observer(() => {
-    const gas = store('main.networksMeta.ethereum.4.gas.price.levels')
-    if (gas.fast) {
-      expect(gas.fast).toBe(gweiToHex(7))
-
-      done()
-    }
-  })
-
-  mockConnection.emit('connect')
-})
-
 it('sets fee market prices on a new London block', done => {
   block = {
     number: addHexPrefix((8897988 + 200).toString(16)), // london block: 8897988
@@ -178,7 +159,7 @@ it('sets fee market prices on a new London block', done => {
       expect(gas.fees.maxFeePerGas).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
 
       expect(gas.selected).toBe('fast')
-      expect(gas.levels.fast).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
+      expect(gas.levels.fast).toBe(weiToHex((expectedBaseFee * 1.05) + expectedPriorityFee))
 
       done()
     }
