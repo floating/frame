@@ -5,7 +5,7 @@ const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 
-const { sign } = require('../../../transaction')
+const { sign, londonToLegacy } = require('../../../transaction')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 
@@ -307,7 +307,10 @@ class Ledger extends Signer {
       const eth = await this.getDevice()
       const signerPath = this.getPath(index)
 
-      const signedTx = await sign(rawTx, tx => {
+      // as of 08-05-2021 Ledger doesn't support EIP-1559 transactions
+      const ledgerTx = londonToLegacy(rawTx)
+
+      const signedTx = await sign(ledgerTx, tx => {
         const message = tx.getMessageToSign(false)
         const rawTxHex = rlp.encode(message).toString('hex')
 

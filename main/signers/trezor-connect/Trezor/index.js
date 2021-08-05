@@ -5,7 +5,7 @@ const { padToEven, stripHexPrefix, addHexPrefix } = require('ethereumjs-util')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 const flex = require('../../../flex')
-const { sign } = require('../../../transaction')
+const { sign, londonToLegacy } = require('../../../transaction')
 const { v5: uuid } = require('uuid')
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
@@ -221,10 +221,13 @@ class Trezor extends Signer {
   }
 
   signTransaction (index, rawTx, cb) {
-    const trezorTx = this._normalizeTransaction(rawTx)
+    // as of 08-05-2021 Trezor doesn't support EIP-1559 transactions
+    const legacyTx = londonToLegacy(rawTx)
+
+    const trezorTx = this._normalizeTransaction(legacyTx)
     const path = this.getPath(index)
 
-    sign(rawTx, () => {
+    sign(legacyTx, () => {
       return new Promise((resolve, reject) => {
         flex.rpc('trezor.ethereumSignTransaction', this.device.path, path, trezorTx, (err, result) => {
           return err

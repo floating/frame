@@ -4,7 +4,7 @@ const utils = require('web3-utils')
 const { padToEven, stripHexPrefix, addHexPrefix } = require('ethereumjs-util')
 const { Client } = require('gridplus-sdk')
 const { promisify } = require('util')
-const { sign } = require('../../../transaction')
+const { sign, londonToLegacy } = require('../../../transaction')
 
 const store = require('../../../store')
 const Signer = require('../../Signer')
@@ -312,14 +312,17 @@ class Lattice extends Signer {
   }
 
   async signTransaction (index, rawTx, cb) {
-    sign(rawTx, tx => {
+    // as of 08-05-2021 Lattice doesn't support EIP-1559 transactions
+    const latticeTx = londonToLegacy(rawTx)
+
+    sign(latticeTx, tx => {
       const { value, to, data, ...txJson } = tx.toJSON()
 
       const unsignedTx = {
         to,
         value,
         data,
-        chainId: rawTx.chainId,
+        chainId: latticeTx.chainId,
         nonce: utils.hexToNumber(txJson.nonce),
         gasPrice: utils.hexToNumber(txJson.gasPrice),
         gasLimit: utils.hexToNumber(txJson.gasLimit),

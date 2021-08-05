@@ -1,11 +1,9 @@
 const log = require('electron-log')
 const utils = require('web3-utils')
-const { Transaction } = require('@ethereumjs/tx')
-const Common = require('@ethereumjs/common').default
 const store = require('../../../store')
 const Signer = require('../../Signer')
-const windows = require('../../../windows')
 const flex = require('../../../flex')
+const { sign, londonToLegacy } = require('../../../transaction')
 
 class LedgerBLE extends Signer {
   constructor (device, api) {
@@ -214,32 +212,30 @@ class LedgerBLE extends Signer {
   }
 
   signTransaction (rawTx, cb) {
-    // if (parseInt(this.network) !== utils.hexToNumber(rawTx.chainId)) return cb(new Error('Signer signTx network mismatch'))
-    const trezorTx = {
-      nonce: this.normalize(rawTx.nonce),
-      gasPrice: this.normalize(rawTx.gasPrice),
-      gasLimit: this.normalize(rawTx.gas),
-      to: this.normalize(rawTx.to),
-      value: this.normalize(rawTx.value),
-      data: this.normalize(rawTx.data),
-      chainId: utils.hexToNumber(rawTx.chainId)
+    // as of 08-05-2021 Ledger doesn't support EIP-1559 transactions
+    const legacyTx = londonToLegacy(rawTx)
+
+    const ledgerTx = {
+      nonce: this.normalize(legacyTx.nonce),
+      gasPrice: this.normalize(legacyTx.gasPrice),
+      gasLimit: this.normalize(legacyTx.gas),
+      to: this.normalize(legacyTx.to),
+      value: this.normalize(legacyTx.value),
+      data: this.normalize(legacyTx.data),
+      chainId: utils.hexToNumber(legacyTx.chainId)
     }
-    flex.rpc('ledger.ethereumSignTransaction', this.id, this.getPath(), trezorTx, (err, result) => {
-      if (err) return cb(err.message)
-      const common = Common.forCustomChain('mainnet', { chainId: parseInt(rawTx.chainId) })
-      const tx = Transaction.fromTxData({
-        nonce: this.hexToBuffer(rawTx.nonce),
-        gasPrice: this.hexToBuffer(rawTx.gasPrice),
-        gasLimit: this.hexToBuffer(rawTx.gas),
-        to: this.hexToBuffer(rawTx.to),
-        value: this.hexToBuffer(rawTx.value),
-        data: this.hexToBuffer(rawTx.data),
-        v: this.hexToBuffer(result.v),
-        r: this.hexToBuffer(result.r),
-        s: this.hexToBuffer(result.s)
-      }, { common })
-      cb(null, '0x' + tx.serialize().toString('hex'))
+
+    sign(legacyTx, () => {
+      return new Promise((resolve, reject) => {
+        flex.rpc('ledger.ethereumSignTransaction', this.id, this.getPath(), ledgerTx, (err, result) => {
+          return err
+            ? reject(err)
+            : resolve({ v: result.v, r: result.r, s: result.s })
+        })
+      })
     })
+    .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
+    .catch(err => cb(err.message))
   }
 }
 
