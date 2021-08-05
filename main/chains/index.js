@@ -11,10 +11,6 @@ const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
 const accounts = require('../accounts')
 
-// because the gas market for EIP-1559 will take a few blocks to
-// stabilize, don't support these transactions until after the buffer period
-const londonHardforkAdoptionBufferBlocks = 120
-
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
@@ -62,8 +58,7 @@ class ChainConnection extends EventEmitter {
 
     monitor.on('data', block => {
       if ('baseFeePerGas' in block) {
-        const targetBlock = addHexPrefix((parseInt(block.number, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
-        this.chainConfig.setHardforkByBlockNumber(targetBlock)
+        this.chainConfig.setHardforkByBlockNumber(block.number)
       }
 
       const gasCalculator = new GasCalculator(provider)
