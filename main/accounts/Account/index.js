@@ -367,6 +367,8 @@ class Account {
         if (!actingAccount) return cb(new Error('Could not find acting account', this.smart.actor))
         const actingSigner = signers.get(actingAccount.signer)
         if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
+        const { tx, compatible } = signerCompatibility(rawTx, actingSigner.type)
+        if (tx === 'london' && !compatible) rawTx = londonToLegacy(rawTx)
         const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
         if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find acting address in signer`, actingAccount.address))
         actingSigner.signTransaction(index, rawTx, cb)
