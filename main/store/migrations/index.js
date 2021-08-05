@@ -297,9 +297,11 @@ const migrations = {
     return initial
   },
   14: initial => {
-    const { primary, secondary } = initial.main.networks.ethereum[137].connection
-    if (primary.current === 'matic') primary.current = 'infura'
-    if (secondary.current === 'matic') secondary.current = 'infura'
+    if (initial.main.networks.ethereum[137] && initial.main.networks.ethereum[137].connection) {
+      const { primary, secondary } = initial.main.networks.ethereum[137].connection || {}
+      if (primary.current === 'matic') primary.current = 'infura'
+      if (secondary.current === 'matic') secondary.current = 'infura'
+    }
   
     // add arbitrum network information
     if (!initial.main.networks.ethereum[42161]) {
