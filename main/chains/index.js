@@ -66,26 +66,25 @@ class ChainConnection extends EventEmitter {
 
       if (useFeeMarket) {
         gasCalculator.getFeePerGas().then(fees => {
+          const gasPrice = (parseInt(fees.maxBaseFeePerGas) * 1.05) + parseInt(fees.maxPriorityFeePerGas)
+
           store.setGasFees(this.type, this.chainId, fees)
-          store.setGasPrices(this.type, this.chainId, { fast: fees.maxFeePerGas })
+          store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
         }).catch(err => {
           log.error(`could not update gas fees for chain ${this.chainId}`, err)
         })
       } else {
-        if (this.chainId != 1) {
-          // prior to the london hardfork, mainnet uses its own gas service
-          gasCalculator.getGasPrices().then(gas => {
-            const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
+        gasCalculator.getGasPrices().then(gas => {
+          const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
-            store.setGasPrices(this.type, this.chainId, {
-              ...gas,
-              custom: customLevel || gas.fast
-            })
-          }).catch(err => {
-            log.error(`could not update gas prices for chain ${this.chainId}`, err)
+          store.setGasPrices(this.type, this.chainId, {
+            ...gas,
+            custom: customLevel || gas.fast
           })
-        }
+        }).catch(err => {
+          log.error(`could not update gas prices for chain ${this.chainId}`, err)
+        })
       }
 
       accounts.updatePendingFees(this.chainId)
