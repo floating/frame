@@ -21,7 +21,7 @@ class TxFee extends React.Component {
     return parseFloat(bn.shiftedBy(-18).toFixed(6).toString())
   }
   toDisplayGwei (bn) {
-    return parseFloat(bn.shiftedBy(-9).toFixed(4).toString())
+    return parseFloat(bn.shiftedBy(-9).toFixed(3).toString())
   }
   render () {
     const req = this.props.req
@@ -51,7 +51,7 @@ class TxFee extends React.Component {
     return (
       <div className='_txFee'>
         <div className='_txFeeInner'>
-          <div className='_txFeeSlice _txFeeLabel'>fee</div>
+          <div className='_txFeeSlice _txFeeLabel'>max fee</div>
           <div className='_txFeeSlice _txFeeGwei' onClick={() => {
             this.props.overlayMode('fee')
           }}>
