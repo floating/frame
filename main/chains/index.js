@@ -120,7 +120,6 @@ class ChainConnection extends EventEmitter {
 
   connect (chain) {
     const connection = chain.connection
-    log.info(' ')
     log.info(this.type + ':' + this.chainId + '\'s connection has been updated')
     if (this.network !== connection.network) {
       if (this.primary.provider) this.primary.provider.close()
@@ -154,7 +153,7 @@ class ChainConnection extends EventEmitter {
         const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
         const target = secondary.current === 'custom' ? secondary.custom : currentPresets[secondary.current]
         if (!this.secondary.provider || this.secondary.currentSecondaryTarget !== target) {
-          log.info('    Creating secondary connection becasue it didn\'t exist or the target changed')
+          log.info('    Creating secondary connection because it didn\'t exist or the target changed')
           if (this.secondary.provider) this.secondary.provider.close()
           this.secondary.provider = null
           this.secondary.currentSecondaryTarget = target
@@ -225,7 +224,7 @@ class ChainConnection extends EventEmitter {
         this.update('secondary')
       }
     }
-
+    
     if (chain.on && connection.primary.on) {
       log.info('    Primary connection: ON')
       const connection = store('main.networks', this.type, this.chainId, 'connection')
@@ -233,8 +232,9 @@ class ChainConnection extends EventEmitter {
       const presets = store('main.networkPresets', this.type)
       const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
       const target = primary.current === 'custom' ? primary.custom : currentPresets[primary.current]
+
       if (!this.primary.provider || this.primary.currentPrimaryTarget !== target) {
-        log.info('    Creating primary connection becasue it didn\'t exist or the target changed')
+        log.info('    Creating primary connection because it didn\'t exist or the target changed')
         if (this.primary.provider) this.primary.provider.close()
         this.primary.provider = null
         this.primary.currentPrimaryTarget = target
@@ -245,7 +245,7 @@ class ChainConnection extends EventEmitter {
         this._createProvider(target, 'primary')
 
         this.primary.provider.on('connect', () => {
-          log.info('    Primary connection connected')
+          log.info(`    Primary connection for network ${this.chainId} connected`)
           this.getNetwork(this.primary.provider, (err, response) => {
             if (err) {
               this.primary.connected = false
