@@ -28,7 +28,7 @@ const dapps = require('./dapps')
 //   })
 // })
 
-const data = require('./data')
+
 const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
@@ -160,7 +160,6 @@ ipcMain.on('tray:launchDapp', async (e, domain) => {
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
-  data()
   menu()
   windows.tray()
   // if (process.platform === 'darwin' || process.platform === 'win32') {
