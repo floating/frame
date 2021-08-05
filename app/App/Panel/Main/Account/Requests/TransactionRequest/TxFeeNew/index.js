@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 
 import { usesBaseFee } from '../../../../../../../../main/transaction'
 
-const FEE_WARNING_THRESHOLD_USD = 20
+const FEE_WARNING_THRESHOLD_USD = 40
 
 class TxFee extends React.Component {
   constructor (props, context) {
@@ -37,7 +37,7 @@ class TxFee extends React.Component {
 
       maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
       maxFee = maxFeePerGas.multipliedBy(gasLimit)
-      maxFeeUSD = maxFee.multipliedBy(nativeUSD)
+      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     } else {
       const gasLimit = BigNumber(req.data.gasLimit, 16)
   
