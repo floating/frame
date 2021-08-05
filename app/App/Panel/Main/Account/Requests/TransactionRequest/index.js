@@ -1,6 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
 import utils from 'web3-utils'
+import BigNumber from 'bignumber.js'
+
+import { usesBaseFee } from '../../../../../../../main/transaction'
+
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
@@ -16,7 +20,7 @@ import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import TxOverlay from './TxOverlay'
 
-const FEE_WARNING_THRESHOLD_USD = 20
+const FEE_WARNING_THRESHOLD_USD = 50
 
 class Time extends React.Component {
   constructor (...args) {
@@ -131,6 +135,10 @@ class TransactionRequest extends React.Component {
     this.setState({ overlayMode: mode })
   }
 
+  toDisplayUSD (bn) {
+    return bn.toFixed(2, BigNumber.ROUND_UP).toString()
+  }
+
   render () {
     const req = this.props.req
     let notice = req.notice
@@ -150,8 +158,20 @@ class TransactionRequest extends React.Component {
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
 
-    const fee = this.hexToDisplayValue(req.data.maxFee || '0x')
-    const feeUSD = fee * nativeUSD
+    let maxFeePerGas, maxFee, maxFeeUSD
+
+    if (usesBaseFee(req.data)) {
+      const gasLimit = BigNumber(req.data.gasLimit, 16)
+      maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
+      maxFee = maxFeePerGas.multipliedBy(gasLimit)
+      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
+    } else {
+      const gasLimit = BigNumber(req.data.gasLimit, 16)
+      maxFeePerGas = BigNumber(req.data.gasPrice, 16)
+      maxFee = maxFeePerGas.multipliedBy(gasLimit)
+      maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
+    }
+
     const height = req.status === 'error' ? '205px' : mode === 'monitor' ? '205px' : '340px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
@@ -465,10 +485,10 @@ class TransactionRequest extends React.Component {
                   link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
                     if (e === 'No signer')  {
                       this.store.notify('noSignerWarning', { req })
-                    } else if (!compatibility.compatible) {
+                    } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
                       this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
-                    } else if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
-                      this.store.notify('gasFeeWarning', { req, feeUSD })
+                    } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
+                      this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
                     } else {
                       this.approve(req.handlerId, req)
                     }

@@ -11,6 +11,7 @@ app.commandLine.appendSwitch('force-color-profile', 'srgb')
 const log = require('electron-log')
 const path = require('path')
 
+const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store')
@@ -28,7 +29,7 @@ const dapps = require('./dapps')
 //   })
 // })
 
-const data = require('./data')
+
 const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')

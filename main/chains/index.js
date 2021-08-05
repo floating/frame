@@ -11,10 +11,6 @@ const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
 const accounts = require('../accounts')
 
-// because the gas market for EIP-1559 will take a few blocks to
-// stabilize, don't support these transactions until after the buffer period
-const londonHardforkAdoptionBufferBlocks = 120
-
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
     super()
@@ -62,8 +58,7 @@ class ChainConnection extends EventEmitter {
 
     monitor.on('data', block => {
       if ('baseFeePerGas' in block) {
-        const targetBlock = addHexPrefix((parseInt(block.number, 16) - londonHardforkAdoptionBufferBlocks).toString(16))
-        this.chainConfig.setHardforkByBlockNumber(targetBlock)
+        this.chainConfig.setHardforkByBlockNumber(block.number)
       }
 
       const gasCalculator = new GasCalculator(provider)
@@ -71,26 +66,25 @@ class ChainConnection extends EventEmitter {
 
       if (useFeeMarket) {
         gasCalculator.getFeePerGas().then(fees => {
+          const gasPrice = (parseInt(fees.maxBaseFeePerGas) * 1.05) + parseInt(fees.maxPriorityFeePerGas)
+
           store.setGasFees(this.type, this.chainId, fees)
-          store.setGasPrices(this.type, this.chainId, { fast: fees.maxFeePerGas })
+          store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
         }).catch(err => {
           log.error(`could not update gas fees for chain ${this.chainId}`, err)
         })
       } else {
-        if (this.chainId != 1) {
-          // prior to the london hardfork, mainnet uses its own gas service
-          gasCalculator.getGasPrices().then(gas => {
-            const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
+        gasCalculator.getGasPrices().then(gas => {
+          const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
-            store.setGasPrices(this.type, this.chainId, {
-              ...gas,
-              custom: customLevel || gas.fast
-            })
-          }).catch(err => {
-            log.error(`could not update gas prices for chain ${this.chainId}`, err)
+          store.setGasPrices(this.type, this.chainId, {
+            ...gas,
+            custom: customLevel || gas.fast
           })
-        }
+        }).catch(err => {
+          log.error(`could not update gas prices for chain ${this.chainId}`, err)
+        })
       }
 
       accounts.updatePendingFees(this.chainId)

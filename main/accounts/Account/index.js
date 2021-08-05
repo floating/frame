@@ -357,8 +357,7 @@ class Account {
       if (this.signer) {
         const s = signers.get(this.signer)
         if (!s) return cb(new Error(`Cannot find signer for this account`))
-        const { tx, compatible } = signerCompatibility(rawTx, s.type)
-        if (tx === 'london' && !compatible) rawTx = londonToLegacy(rawTx)
+
         const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         if (index === -1) cb(new Error(`Signer cannot sign for this address`))
         s.signTransaction(index, rawTx, cb)
