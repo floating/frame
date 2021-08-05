@@ -3,11 +3,14 @@ import Restore from 'react-restore'
 import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
+import BigNumber from 'bignumber.js'
+import { usesBaseFee } from '../../../../main/transaction'
+
 import frameIcon from './FrameIcon.png'
 
 import AddChain from './AddChain'
 
-const FEE_WARNING_THRESHOLD_USD = 20
+const FEE_WARNING_THRESHOLD_USD = 50
 
 const capitalize = s => s[0].toUpperCase() + s.slice(1)
 
@@ -187,7 +190,7 @@ class Notify extends React.Component {
     )
   }
 
-  gasFeeWarning ({ req = {}, feeUSD = 0 }) {
+  gasFeeWarning ({ req = {}, feeUSD = '0.00', currentSymbol = 'ETH' }) {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBox'>
@@ -195,10 +198,10 @@ class Notify extends React.Component {
             Gas Fee Warning
           </div>
           <div className='notifyBody'>
-            {feeUSD ? (
+            {feeUSD !== '0.00' ? (
               <>
-                <div className='notifyBodyLine'>The fee for this transaction is:</div>
-                <div className='notifyBodyLine notifyBodyPrice'>{`${parseFloat(feeUSD).toFixed(2)} USD`}</div>
+                <div className='notifyBodyLine'>The max fee for this transaction is:</div>
+                <div className='notifyBodyLine notifyBodyPrice'>{`≈ $${feeUSD} in ${currentSymbol}`}</div>
               </>
             ) : (
               <div className='notifyBodyLine'>We were unable to determine this transaction's fee in USD.</div>
@@ -208,7 +211,6 @@ class Notify extends React.Component {
           <div className='notifyInput'>
             <div
               className='notifyInputOption notifyInputDeny' onMouseDown={() => {
-                link.rpc('declineRequest', req, () => {})
                 this.store.notify()
               }}
             >
@@ -261,6 +263,10 @@ class Notify extends React.Component {
     )
   }
 
+  toDisplayUSD (bn) {
+    return bn.toFixed(2, BigNumber.ROUND_UP).toString()
+  }
+
   signerCompatibilityWarning ({ req = {}, compatibility = {}, chain = {} }) {
     const { signer, tx, compatible } = compatibility
     return (
@@ -290,11 +296,25 @@ class Notify extends React.Component {
                 // TODO: Transacionns need a better flow to respond to mutiple notifications after hitting sign
                 const layer = this.store('main.networks', chain.type, chain.id, 'layer')
                 const nativeCurrency = this.store('main.networksMeta', chain.type, chain.id, 'nativeCurrency')
-                const etherUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
-                const fee = parseInt(req.data.maxFee || '0x', 'hex') / 1e18
-                const feeUSD = fee * etherUSD
-                if ((feeUSD > FEE_WARNING_THRESHOLD_USD || !feeUSD) && !this.store('main.mute.gasFeeWarning')) {
-                  this.store.notify('gasFeeWarning', { req, feeUSD })
+                const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
+                const currentSymbol = this.store('main.networks', chain.type, chain.id, 'symbol') || '?'
+
+                let maxFeePerGas, maxFee, maxFeeUSD
+
+                if (usesBaseFee(req.data)) {
+                  const gasLimit = BigNumber(req.data.gasLimit, 16)
+                  maxFeePerGas = BigNumber(req.data.maxFeePerGas, 16)
+                  maxFee = maxFeePerGas.multipliedBy(gasLimit)
+                  maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
+                } else {
+                  const gasLimit = BigNumber(req.data.gasLimit, 16)
+                  maxFeePerGas = BigNumber(req.data.gasPrice, 16)
+                  maxFee = maxFeePerGas.multipliedBy(gasLimit)
+                  maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
+                }
+                
+                if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {
+                  this.store.notify('gasFeeWarning', { req, feeUSD: this.toDisplayUSD(maxFeeUSD), currentSymbol })
                 } else {
                   link.rpc('approveRequest', req, () => {})
                   this.store.notify()
@@ -302,6 +322,14 @@ class Notify extends React.Component {
               }}
             >
               <div className='notifyInputOptionText'>Proceed</div>
+            </div>
+          </div>
+          <div className='notifyCheck' onMouseDown={() => link.send('tray:action', 'toggleSignerCompatibilityWarning')}>
+            <div className='notifyCheckBox'>
+              {this.store('main.mute.signerCompatibilityWarning') ? svg.octicon('check', { height: 26 }) : null}
+            </div>
+            <div className='notifyCheckText'>
+              {'Don\'t show this warning again'}
             </div>
           </div>
         </div>

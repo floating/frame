@@ -200,6 +200,9 @@ module.exports = {
   toggleGasFeeWarning: (u) => {
     u('main.mute.gasFeeWarning', v => !v)
   },
+  toggleSignerCompatibilityWarning: (u) => {
+    u('main.mute.signerCompatibilityWarning', v => !v)
+  },
   setAltSpace: (u, v) => {
     u('main.shortcuts.altSlash', () => v)
   },

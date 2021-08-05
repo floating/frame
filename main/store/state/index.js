@@ -152,7 +152,8 @@ const initial = {
       explorerWarning: main('mute.explorerWarning', false),
       signerRelockChange: main('mute.signerRelockChange', false),
       gasFeeWarning: main('mute.gasFeeWarning', false),
-      betaDisclosure: main('mute.betaDisclosure', false)
+      betaDisclosure: main('mute.betaDisclosure', false),
+      signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
     },
     shortcuts: {
       altSlash: main('shortcuts.altSlash', true)
