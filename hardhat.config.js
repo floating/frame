@@ -6,7 +6,7 @@ const ethProvider = require('eth-provider');
 task('send-tx', 'send a test transaction')
   .addOptionalParam('provider', 'eth provider to use for connection')
   .addOptionalParam('amount', 'amount to send, in eth')
-  .setAction(async ({ amount, provider = 'frame' }, hre) => {
+  .setAction(async ({ amount, provider = 'frame' }) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
 
@@ -40,6 +40,9 @@ module.exports = {
         url: 'https://eth-rinkeby.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0',
         blockNumber: 9064009
       }
+    },
+    localTest: {
+      url: 'http://127.0.0.1:8545'
     },
     arbitrum: {
       url: 'http://localhost:1248',

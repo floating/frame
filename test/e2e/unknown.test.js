@@ -1,10 +1,11 @@
 const spectron = require('spectron')
 const electronPath = require('electron')
-// import { MouseEvent } from 'globalthis/implementation'
 
-require("@nomiclabs/hardhat-waffle")
+const { expect } = require('chai')
+
 
 const frame = new spectron.Application({
+  // built version: path: '/Applications/Frame.app/Contents/MacOS/Frame'
   path: electronPath,
   args: ['./compiled'],
   // TODO: point this to the container's config directory so beta warning window isn't displayed
@@ -35,59 +36,54 @@ it('shows some windows', async () => {
   expect(windowCount).toBe(2)
 })
 
-it.only('sends a transaction', async () => {
-  const selectNetworkDropdown = await frame.client.$('.panelMenuItemNetwork .dropdown')
-  await selectNetworkDropdown.click({ button: 0 })
+it.only('sends a transaction', async function () {
+  this.timeout(30 * 1000)
+  // const selectNetworkDropdown = await frame.client.$('.panelMenuItemNetwork .dropdown')
+  // await selectNetworkDropdown.click({ button: 0 })
 
-  const rinkeby = (await selectNetworkDropdown.$$('.dropdownItem'))[2]
-  await rinkeby.waitForClickable()
-  await rinkeby.click({ button: 0 })
+  // const rinkeby = (await selectNetworkDropdown.$$('.dropdownItem'))[2]
+  // await rinkeby.waitForClickable()
+  // await rinkeby.click({ button: 0 })
 
-  const openAccountButton = (await frame.client.$$('.signerSelect .signerSelectIconWrap'))[6]
+  const openAccountButton = (await frame.client.$$('.signerSelect .signerSelectIconWrap'))[0]
+  await openAccountButton.waitForClickable()
   await openAccountButton.click({ button: 0 })
 
   const password = (await frame.client.$('input.signerUnlockInput'))
   await password.waitForDisplayed()
-  await password.setValue('xN3!Yay*$093sUqw')
+  await password.setValue('letstesthardhat')
 
   const unlock = (await frame.client.$('.signerUnlockWrap .signerUnlockSubmit'))
   await unlock.waitForClickable()
   await unlock.click({ button: 0 })
 
-  const approve = await frame.client.$('.requestApprove .requestSignButton')
-  approve.waitForClickable({ timeout: 10000 }).then(() => {
-    console.log('there\'s the button!')
-    return approve.click({ button: 0 })
-  })
+  const txAmount = '.0006'
 
-  return new Promise(resolve => {
-    setTimeout(() => {
-      hre.run('send-tx')
-        .then(async () => {
+  return new Promise((resolve, reject) => {
+    const submitTx = new Promise(submitted => {
+      setTimeout(() => {
+        hre.run('send-tx', { amount: txAmount }).then(async txHash => {
+          const tx = await hre.ethers.provider.waitForTransaction(txHash, 1)
+          const minedTx = await hre.ethers.provider.getTransaction(tx.transactionHash)
 
-          let success, done = false
-          
-          while (!done) {
-            success = (await frame.client.$('.txStatus > div'))
-            await success.waitForDisplayed()
- 
-            const text = (await success.getText()) || ''
+          console.log(`transaction ${txHash} was included in block ${tx.blockNumber}`)
 
-            console.log({ text })
-            done = text.toLowerCase() === 'successful'
-          }
+          expect(tx.blockNumber).to.be.ok
+          expect(minedTx.value.eq(hre.ethers.utils.parseEther(txAmount))).to.be.true
 
-
-          const txDetails = await frame.client.$('.txDetails.txDetailsShow')
-          await txDetails.waitForClickable()
-          await txDetails.click({ button: 0 })
           resolve()
           
-        })
-      }, 2000)
+        }).catch(reject)
+
+        submitted()
+      }, 500)
+    })
+
+    submitTx.then(async () => {
+      const approve = await frame.client.$('.requestApprove .requestSignButton')
+      await approve.waitUntil(() => new Promise(r => setTimeout(() => r(true), 2000)))
+      await approve.waitForClickable()
+      await approve.click({ button: 0 })
+    })
   })
-
-  //const copiedAddress = await frame.electron.clipboard.readText()
-
-  //expect(copiedAddress).toBe('0xe853c56864a2ebe4576a807d26fdc4a0ada51919')
-}, 60 * 1000)
+})
