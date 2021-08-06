@@ -64,6 +64,7 @@
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "npm run compile && jest --env=node --detectOpenHandles --runInBand --testPathIgnorePatterns=e2e",
     "test:e2e": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e",
+    "test:spectron": "npx hardhat --network localTest test ./test/e2e/unknown.test.js",
     "test:e2e:nodeploy": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e --testPathIgnorePatterns=deploy",
     "standard": "standardx --fix --verbose",
     "test:clients": "mocha test/clients/*.test.js",
