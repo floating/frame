@@ -1,8 +1,7 @@
-const spectron = require('spectron')
-const electronPath = require('electron')
+import spectron from 'spectron'
+import electronPath from 'electron'
 
-const { expect } = require('chai')
-
+import { expect } from 'chai'
 
 const frame = new spectron.Application({
   // built version: path: '/Applications/Frame.app/Contents/MacOS/Frame'
@@ -17,6 +16,11 @@ const frame = new spectron.Application({
 
 async function printLogs () {
   return frame.client.getMainProcessLogs().then(logs => logs.forEach(console.log))
+}
+
+async function click(element) {
+  await element.waitForClickable()
+  return element.click({ button: 0 })
 }
 
 before(async () => {
@@ -46,16 +50,14 @@ it.only('sends a transaction', async function () {
   // await rinkeby.click({ button: 0 })
 
   const openAccountButton = (await frame.client.$$('.signerSelect .signerSelectIconWrap'))[0]
-  await openAccountButton.waitForClickable()
-  await openAccountButton.click({ button: 0 })
+  await click(openAccountButton)
 
   const password = (await frame.client.$('input.signerUnlockInput'))
   await password.waitForDisplayed()
   await password.setValue('letstesthardhat')
 
   const unlock = (await frame.client.$('.signerUnlockWrap .signerUnlockSubmit'))
-  await unlock.waitForClickable()
-  await unlock.click({ button: 0 })
+  await click(unlock)
 
   const txAmount = '.0006'
 
@@ -81,9 +83,10 @@ it.only('sends a transaction', async function () {
 
     submitTx.then(async () => {
       const approve = await frame.client.$('.requestApprove .requestSignButton')
-      await approve.waitUntil(() => new Promise(r => setTimeout(() => r(true), 2000)))
-      await approve.waitForClickable()
-      await approve.click({ button: 0 })
+
+      // TODO: why does the display shift if we don't wait for 2000ms before calling waitForClickable()
+      //await approve.waitUntil(() => new Promise(r => setTimeout(() => r(true), 2000)))
+      await click(approve)
     })
   })
 })

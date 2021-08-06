@@ -145,6 +145,7 @@
     "@babel/preset-env": "7.14.9",
     "@babel/preset-react": "7.14.5",
     "@babel/preset-typescript": "7.14.5",
+    "@babel/register": "^7.14.5",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@types/ethereum-protocol": "1.0.2",

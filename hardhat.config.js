@@ -1,4 +1,5 @@
-require("@nomiclabs/hardhat-waffle");
+require('@nomiclabs/hardhat-waffle')
+require('@babel/register')
 
 const { utils } = require('ethers')
 const ethProvider = require('eth-provider');
@@ -49,5 +50,5 @@ module.exports = {
       gasPrice: 0,
     },
   },
-  solidity: '0.8.4',
+  solidity: '0.8.4'
 }
