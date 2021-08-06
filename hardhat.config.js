@@ -37,7 +37,8 @@ module.exports = {
       hardfork: 'london',
       initialBaseFeePerGas: 1_000_000_000,
       forking: {
-        url: 'https://eth-rinkeby.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'
+        url: 'https://eth-rinkeby.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0',
+        blockNumber: 9064009
       }
     },
     arbitrum: {

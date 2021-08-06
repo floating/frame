@@ -42,6 +42,7 @@ log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
 process.on('uncaughtException', (e) => {
+  console.trace(e)
   if (e.code === 'EADDRINUSE') {
     dialog.showErrorBox('Frame is already running', 'Frame is already running or another application is using port 1248.')
   } else {

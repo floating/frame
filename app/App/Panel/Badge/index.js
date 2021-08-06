@@ -24,7 +24,7 @@ class Bridge extends React.Component {
           </div>
         </div>
       )
-    } else if (this.store('view.badge') === 'updateAvailable') {
+    } else if (false && this.store('view.badge') === 'updateAvailable') {
       return (
         <div className='badge' style={{ transform: 'translateY(0px)', height: '224px' }}>
           <div className='badgeInner'>
