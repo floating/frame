@@ -336,7 +336,7 @@ class Ledger extends Signer {
           cb(err)
           return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
-          this._signTransaction = setTimeout(() => this.signTransaction(index, rawTx, cb), 700)
+          this._signTransaction = setTimeout(() => this.signTransaction(index, ledgerTx, cb), 700)
           return log.info('>>>>>>> Busy: cannot open device with path, will try again (signTransaction)')
         }
       } else {
