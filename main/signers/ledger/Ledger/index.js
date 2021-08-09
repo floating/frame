@@ -301,18 +301,17 @@ class Ledger extends Signer {
     }
   }
 
-  async signTransaction (index, rawTx, cb) {
+  async signTransaction (index, ledgerTx, cb) {
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       const signerPath = this.getPath(index)
 
-      // as of 08-05-2021 Ledger doesn't support EIP-1559 transactions
-      const ledgerTx = londonToLegacy(rawTx)
-
       const signedTx = await sign(ledgerTx, tx => {
+        // legacy transactions aren't RLP encoded before they're returned
         const message = tx.getMessageToSign(false)
-        const rawTxHex = rlp.encode(message).toString('hex')
+        const legacyMessage = message[0] !== parseInt(tx.type)
+        const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message.toString('hex')
 
         return eth.signTransaction(signerPath, rawTxHex)
       })

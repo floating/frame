@@ -1,10 +1,10 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex } from 'ethereumjs-util'
-import { JsonTx, Transaction, TransactionFactory, TxData } from '@ethereumjs/tx'
+import { JsonTx, TransactionFactory, TxData } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
 
-const londonHardforkSigners = ['seed', 'ring']
+const londonHardforkSigners = ['seed', 'ring', 'ledger']
 
 interface Signature {
   v: string,
@@ -97,7 +97,7 @@ async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<S
   return signingFn(tx).then(sig => {
     const signature = hexifySignature(sig)
 
-    return Transaction.fromTxData(
+    return TransactionFactory.fromTxData(
       {
       ...rawTx,
       ...signature
