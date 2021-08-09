@@ -483,7 +483,7 @@ class Accounts extends EventEmitter {
     if (!signer) return cb(new Error('No signer'))
 
     const data = currentAccount.requests[handlerId].data
-    cb(null, signerCompatibility(data, signer.type))
+    cb(null, signerCompatibility(data, signer.summary()))
   }
 
   close () {

@@ -4,12 +4,28 @@ import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
 
-const londonHardforkSigners = ['seed', 'ring', 'ledger']
+const londonHardforkSigners: SignerCompatibilityByVersion = {
+  seed: () => true,
+  ring: () => true,
+  ledger: (version: AppVersion): boolean => {
+    return version.major >= 2 || (version.major >= 1 && version.minor >= 9 && version.patch >= 2)
+  }
+}
+
+interface SignerCompatibilityByVersion {
+  [key: string]: (version: AppVersion) => boolean
+}
 
 interface Signature {
   v: string,
   r: string,
   s: string
+}
+
+interface AppVersion {
+  major: number,
+  minor: number,
+  patch: number
 }
 
 export interface RawTransaction { 
@@ -28,16 +44,29 @@ export interface SignerCompatibility  {
   compatible: boolean
 }
 
+export interface SignerSummary {
+  id: string,
+  name: string,
+  type: string,
+  addresses: string[],
+  status: string,
+  liveAddressesFound: number,
+  appVersion: AppVersion
+}
+
 function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
-function signerCompatibility (txData: TransactionData, signer: string): SignerCompatibility {
-  return txData.type === '0x2' ? ({
-    signer, tx: 'london', compatible: londonHardforkSigners.includes(signer)
-  }) : ({ 
-    signer, tx: 'legacy', compatible: true 
-  })
+function signerCompatibility (txData: TransactionData, signer: SignerSummary): SignerCompatibility {
+  if (typeSupportsBaseFee(txData.type)) {
+    const compatible = (signer.type in londonHardforkSigners) && londonHardforkSigners[signer.type](signer.appVersion)
+    return { signer: signer.type, tx: 'london', compatible }
+  }
+
+  return {
+    signer: signer.type, tx: 'legacy', compatible: true
+  }
 }
 
 function londonToLegacy (txData: TransactionData): TransactionData {
@@ -50,8 +79,12 @@ function londonToLegacy (txData: TransactionData): TransactionData {
   return txData
 }
 
+function typeSupportsBaseFee (type: string | undefined) {
+  return parseInt(type || '0') === 2
+}
+
 function usesBaseFee (rawTx: RawTransaction) {
-  return parseInt(rawTx.type) === 2
+  return typeSupportsBaseFee(rawTx.type)
 }
 
 async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Promise<TransactionData> {
