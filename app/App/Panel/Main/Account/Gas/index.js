@@ -93,7 +93,7 @@ class Gas extends React.Component {
         <div className='moduleHeader'>{'Fee Monitor'}</div>  
         <div className='gasBlock'>
           {this.state.baseHover ? <div className='feeToolTip feeToolTipBase cardShow'>The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded</div> : null}
-          {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators incentivises quick inclusion of your transaction into a block</div> : null }
+          {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block</div> : null }
           <div className='gasItem gasItemSmall'>
             <span className='gasGweiNum'>{actualBaseFee}</span>
             <span className='gasGweiLabel'>{'GWEI'}</span>
@@ -102,8 +102,8 @@ class Gas extends React.Component {
           <div className='gasItem gasItemLarge'>
             <div 
               className='gasArrow' 
-              onMouseEnter={() => this.setState({ baseHover: true })}
-              onMouseMove={() => this.setState({ baseHover: true })}
+              onClick={() => this.setState({ baseHover: true })}
+              // onMouseMove={() => this.setState({ baseHover: true })}
               onMouseLeave={() => this.setState({ baseHover: false })}
             >
               <div className='gasArrowNotify'>+</div>
@@ -114,8 +114,8 @@ class Gas extends React.Component {
             <span className='gasLevelLabel'>{'Recommended'}</span>
             <div 
               className='gasArrow gasArrowRight'
-              onMouseEnter={() => this.setState({ prioHover: true })}
-              onMouseMove={() => this.setState({ prioHover: true })}
+              onClick={() => this.setState({ prioHover: true })}
+              // onMouseMove={() => this.setState({ prioHover: true })}
               onMouseLeave={() => this.setState({ prioHover: false })}
             >
               <div className='gasArrowInner'>{svg.chevron(27)}</div>
@@ -132,7 +132,7 @@ class Gas extends React.Component {
             return (
               <div className='gasEstimate'>
                 <div className='gasEstimateRange'>
-                  <span style={{ fontSize: '11px', marginRight: '-2px' }}>{`$`}</span>
+                  <span style={{ fontSize: '10px', marginRight: '-2px', marginTop: '-1px' }}>{`$`}</span>
                   <span className='gasEstimateRangeLow'>{`${esimate.low}`}</span>
                 </div>
                 <div className='gasEstimateLabel'>{esimate.label}</div>
