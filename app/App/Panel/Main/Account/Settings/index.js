@@ -40,7 +40,7 @@ class Settings extends React.Component {
           <div className='moduleHeader'>
             {'Settings'}
             <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
-              {svg.close(22)}
+              {svg.close(12)}
             </div>
           </div>  
         ) : null}

@@ -15,13 +15,22 @@ class PersistStore extends Conf {
     } else {
       options.cwd = defaultCwd
     }
+    electron.app.on('quit', () => this.writeUpdates())
     super(options)
   }
 
+  writeUpdates () {
+    const updates = { ...this.updates }
+    this.updates = null
+    if (Object.keys(updates || {}).length > 0) super.set(updates)
+  }
+
   set (path, value) {
-    // log.info('Setting state version', migrations.latest)
     path = `main.__.${migrations.latest}.${path}`
-    super.set(path, value)
+    this.updates = this.updates || {}
+    this.updates[path] = JSON.parse(JSON.stringify(value))
+    if (Object.keys(this.updates).length < 75) clearTimeout(this.updateTimer)
+    this.updateTimer = setTimeout(() => this.writeUpdates(), 4000)
   }
 }
 

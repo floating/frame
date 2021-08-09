@@ -179,11 +179,11 @@ class Balances extends React.Component {
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
-        <div className='moduleHeader moduleHeaderBorderless'>
+        <div className={'moduleHeader moduleHeaderBorderless'}>
           <span>balances</span>
           {this.props.expanded ? (
             <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
-              {svg.close(22)}
+              {svg.close(12)}
             </div>
           ) : null}
           {balancesLength === 0 || !fullScan ? (

@@ -35,7 +35,7 @@ class Balances extends React.Component {
           {'Inventory'}
           {this.props.expanded ? (
             <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
-              {svg.close(22)}
+              {svg.close(12)}
             </div>
           ) : null}
         </div>  

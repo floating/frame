@@ -22,5 +22,14 @@ const persist = require('./persist')
 
 const store = Restore.create(state(), actions)
 
-store.observer(() => persist.set('main', store('main')))
+// store.observer(() => persist.set('main', store('main')))
+
+store.api.feed((state, actions) => {
+  actions.forEach(action => {
+    action.updates.forEach(update => {
+      persist.set(update.path, update.value)
+    })
+  })
+})
+
 module.exports = store
