@@ -301,11 +301,23 @@ class Ledger extends Signer {
     }
   }
 
-  async signTransaction (index, ledgerTx, cb) {
+  async _supportsEip1559 (eth) {
+    const version = (await eth.getAppConfiguration()).version
+    const [major, minor, patch] = (version || '1.6.1').split('.')
+
+    console.log({ major, minor, patch })
+
+    return major >= 2 || (major >= 1 && minor >= 9 && patch >= 2)
+  }
+
+  async signTransaction (index, rawTx, cb) {
     try {
       if (this.pause) throw new Error('Device access is paused')
       const eth = await this.getDevice()
       const signerPath = this.getPath(index)
+      const supportsEip1559 = await this._supportsEip1559(eth)
+
+      const ledgerTx = supportsEip1559 ? { ...rawTx } : londonToLegacy(rawTx)
 
       const signedTx = await sign(ledgerTx, tx => {
         // legacy transactions aren't RLP encoded before they're returned
@@ -336,7 +348,7 @@ class Ledger extends Signer {
           cb(err)
           return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
         } else {
-          this._signTransaction = setTimeout(() => this.signTransaction(index, ledgerTx, cb), 700)
+          this._signTransaction = setTimeout(() => this.signTransaction(index, rawTx, cb), 700)
           return log.info('>>>>>>> Busy: cannot open device with path, will try again (signTransaction)')
         }
       } else {
