@@ -7,8 +7,11 @@ import chainConfig from '../chains/config'
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
-  ledger: (version: AppVersion): boolean => {
+  ledger: (version) => {
     return version.major >= 2 || (version.major >= 1 && version.minor >= 9)
+  },
+  lattice: (version) => {
+    return version.major >= 1 || version.minor >= 11
   }
 }
 
