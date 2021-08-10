@@ -70,13 +70,6 @@ class Lattice extends Signer {
         privKey
       })
 
-      // TODO: is this right? test on lattice
-      this.appVersion = {
-        major: this.client.fwVersion[0],
-        minor: this.client.fwVersion[1],
-        patch: this.client.fwVersion[2],
-      }
-
       this.status = 'disconnected'
       this.update()
     }
@@ -108,6 +101,12 @@ class Lattice extends Signer {
         this.paired = await clientConnect(this.deviceId)
 
         if (this.paired) {
+          this.appVersion = {
+            major: this.client.fwVersion[2],
+            minor: this.client.fwVersion[1],
+            patch: this.client.fwVersion[0],
+          }
+
           if (this.addresses.length === 0) {
             this.status = 'addresses'
             this.update()
