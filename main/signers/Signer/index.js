@@ -54,7 +54,7 @@ class Signer extends EventEmitter {
       addresses: this.addresses,
       status: this.status,
       liveAddressesFound: this.liveAddressesFound || 0,
-      appVersion: this.appVersion || '0.0.0'
+      appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }
     }
   }
 
