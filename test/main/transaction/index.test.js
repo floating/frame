@@ -1,4 +1,6 @@
-import { signerCompatibility } from '../../../main/transaction'
+import { addHexPrefix } from 'ethereumjs-util'
+
+import { londonToLegacy, signerCompatibility } from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -126,5 +128,52 @@ describe('#signerCompatibility', () => {
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')
     expect(compatibility.compatible).toBe(false)
+  })
+})
+
+describe('#londonToLegacy', () => {
+  it('leaves a legacy transaction untouched', () => {
+    const rawTx = {
+      type: '0x0',
+      gasPrice: '0x165a0bc00',
+      gasLimit: '0x61a8',
+      value: '0x6f05b59d3b20000',
+      to: '0x6635f83421bf059cd8111f180f0727128685bae4',
+      data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072'
+    }
+
+    const tx = londonToLegacy(rawTx)
+
+    expect(parseInt(tx.type)).toBe(0)
+    expect(tx.gasPrice).toBe(rawTx.gasPrice)
+    expect(tx.gasLimit).toBe(rawTx.gasLimit)
+    expect(tx.maxFeePerGas).toBe(undefined)
+    expect(tx.maxPriorityFeePerGas).toBe(undefined)
+    expect(tx.value).toBe(rawTx.value)
+    expect(tx.to).toBe(rawTx.to)
+    expect(tx.data).toBe(rawTx.data)
+  })
+
+  it('converts a London transaction to a legacy transaction', () => {
+    const rawTx = {
+      type: '0x2',
+      maxFeePerGas: addHexPrefix(7e9.toString(16)),
+      maxPriorityFeePerGas: addHexPrefix(2e9.toString(16)),
+      gasLimit: '0x61a8',
+      value: '0x6f05b59d3b20000',
+      to: '0x6635f83421bf059cd8111f180f0727128685bae4',
+      data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072'
+    }
+
+    const tx = londonToLegacy(rawTx)
+
+    expect(parseInt(tx.type)).toBe(0)
+    expect(tx.gasPrice).toBe(addHexPrefix(7e9.toString(16)))
+    expect(tx.gasLimit).toBe(rawTx.gasLimit)
+    expect(tx.maxFeePerGas).toBe(undefined)
+    expect(tx.maxPriorityFeePerGas).toBe(undefined)
+    expect(tx.value).toBe(rawTx.value)
+    expect(tx.to).toBe(rawTx.to)
+    expect(tx.data).toBe(rawTx.data)
   })
 })
