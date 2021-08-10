@@ -1,7 +1,8 @@
 import { addHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
-import { usesBaseFee, londonToLegacy, signerCompatibility, populate } from '../../../main/transaction'
+import { usesBaseFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import { stripHexPrefix } from 'web3-utils'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -271,6 +272,70 @@ describe('#populate', () => {
       const expectedMaxFee = addHexPrefix((totalFees + 4e8).toString(16))
 
       expect(tx.maxFeePerGas).toBe(expectedMaxFee)
+    })
+  })
+})
+
+describe('#sign', () => {
+  const baseTx = {
+    nonce: '0x33',
+    gasLimit: '0x61a8',
+    value: '0x6f05b59d3b20000',
+    to: '0x6635f83421bf059cd8111f180f0727128685bae4',
+    data: '0x00000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072'
+  }
+
+  const signature = {
+    v: '0x00',
+    r: '0xd693b532a80fed6392b428604171fb32fdbf953728a3a7ecc7d4062b1652c042',
+    s: '0x24e9c602ac800b983b035700a14b23f78a253ab762deab5dc27e3555a750b354'
+  }
+
+  it('generates a signed legacy transaction', async () => {
+    const rawTx = { 
+      ...baseTx,
+      type: '0x0',
+      gasPrice: '0x737be7600'
+    }
+
+    const { type, ...expectedFields } = rawTx
+    const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(signature))
+
+    expect(signedTx.toJSON()).toMatchObject({
+      ...expectedFields,
+      ...signature,
+      v: '0x0' // additional zeroes are stripped
+    })
+  })
+
+  it('generates a signed eip-1559 transaction', async () => {
+    const rawTx = { 
+      ...baseTx,
+      type: '0x2',
+      maxFeePerGas: '0x737be7600',
+      maxPriorityFeePerGas: '0x3'
+    }
+
+    const { type, ...expectedFields } = rawTx
+    const signedTx = await sign(rawTx, jest.fn().mockResolvedValueOnce(signature))
+
+    expect(signedTx.toJSON()).toMatchObject({
+      ...expectedFields,
+      ...signature,
+      v: '0x0' // additional zeroes are stripped
+    })
+  })
+
+  it('adds hex prefixes to the signature', async () => {
+    const signedTx = await sign(baseTx, jest.fn().mockResolvedValueOnce({
+      v: stripHexPrefix(signature.v),
+      r: stripHexPrefix(signature.r),
+      s: stripHexPrefix(signature.s)
+    }))
+    
+    expect(signedTx.toJSON()).toMatchObject({
+      ...signature,
+      v: '0x0' // additional zeroes are stripped
     })
   })
 })
