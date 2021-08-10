@@ -1,6 +1,7 @@
 import { addHexPrefix } from 'ethereumjs-util'
+import Common from '@ethereumjs/common'
 
-import { londonToLegacy, signerCompatibility } from '../../../main/transaction'
+import { usesBaseFee, londonToLegacy, signerCompatibility, populate } from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -175,5 +176,101 @@ describe('#londonToLegacy', () => {
     expect(tx.value).toBe(rawTx.value)
     expect(tx.to).toBe(rawTx.to)
     expect(tx.data).toBe(rawTx.data)
+  })
+})
+
+describe('#usesBaseFee', () => {
+  it('identifies a legacy transaction that uses gas price', () => {
+    const tx = {
+      type: '0x0'
+    }
+
+    expect(usesBaseFee(tx)).toBe(false)
+  })
+
+  it('identifies a transaction that uses EIP-1559 base fees', () => {
+    const tx = {
+      type: '0x2'
+    }
+
+    expect(usesBaseFee(tx)).toBe(true)
+  })
+})
+
+describe('#populate', () => {
+  let gas
+  const rawTx = {
+    gasLimit: '0x61a8',
+    value: '0x6f05b59d3b20000',
+    to: '0x6635f83421bf059cd8111f180f0727128685bae4',
+    data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072'
+  }
+
+  describe('legacy transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
+
+    beforeEach(() => {
+      gas = {
+        price: {
+          levels: {
+            fast: ''
+          }
+        }
+      }
+    })
+
+    it('sets the transaction type', () => {
+      const tx = populate(rawTx, chainConfig, gas)
+
+      expect(tx.type).toBe('0x0')
+    })
+
+    it('sets gas price', () => {
+      gas.price.levels.fast = addHexPrefix(7e9.toString(16))
+      const tx = populate(rawTx, chainConfig, gas)
+
+      expect(tx.gasPrice).toBe(gas.price.levels.fast)
+    })
+  })
+
+  describe('eip-1559 transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'london' })
+
+    beforeEach(() => {
+      gas = {
+        price: {
+          fees: {
+            maxPriorityFeePerGas: '',
+            maxBaseFeePerGas: ''
+          }
+        }
+      }
+    })
+
+    it('sets the transaction type', () => {
+      const tx = populate(rawTx, chainConfig, gas)
+
+      expect(tx.type).toBe('0x2')
+    })
+
+    it('sets the max priority fee', () => {
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(2e9.toString(16))
+      const tx = populate(rawTx, chainConfig, gas)
+
+      expect(tx.maxPriorityFeePerGas).toBe(gas.price.fees.maxPriorityFeePerGas)
+    })
+
+    it('sets the max total fee', () => {
+      gas.price.fees.maxPriorityFeePerGas = addHexPrefix(2e9.toString(16))
+      gas.price.fees.maxBaseFeePerGas = addHexPrefix(8e9.toString(16))
+
+      const tx = populate(rawTx, chainConfig, gas)
+      const totalFees = 2e9 + 8e9
+
+      // add a rounded 5% buffer
+      const expectedMaxFee = addHexPrefix((totalFees + 4e8).toString(16))
+
+      expect(tx.maxFeePerGas).toBe(expectedMaxFee)
+    })
   })
 })

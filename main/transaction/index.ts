@@ -33,8 +33,7 @@ export interface RawTransaction {
 }
 
 export interface TransactionData extends JsonTx {
-  warning?: string,
-  maxFee: string
+  warning?: string
 }
 
 export interface SignerCompatibility  {
@@ -86,8 +85,8 @@ function usesBaseFee (rawTx: RawTransaction) {
   return typeSupportsBaseFee(rawTx.type)
 }
 
-async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Promise<TransactionData> {
-  const txData: TransactionData = { ...rawTx, maxFee: '' }
+function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): TransactionData {
+  const txData: TransactionData = { ...rawTx }
   
   if (chainConfig.isActivatedEIP(1559)) {
     txData.type = '0x2'
@@ -99,14 +98,12 @@ async function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): 
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
     txData.maxFeePerGas = bnToHex(maxFee)
-    txData.maxFee = txData.maxFeePerGas
   } else {
     txData.type = '0x0'
 
     const gasPrice = toBN(gas.price.levels.fast)
 
     txData.gasPrice = bnToHex(gasPrice)
-    txData.maxFee = bnToHex(toBN(<string>txData.gasLimit).mul(gasPrice))
   }
 
   return txData
