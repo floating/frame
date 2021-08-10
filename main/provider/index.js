@@ -2,7 +2,7 @@ const { v4: uuid } = require('uuid')
 const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
-const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer } = require('ethereumjs-util')
+const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer, intToHex } = require('ethereumjs-util')
 
 const proxy = require('./proxy')
 
@@ -75,19 +75,15 @@ class Provider extends EventEmitter {
   }
 
   getNetVersion (payload, res, targetChain) {
-    this.connection.send(payload, (response) => {
-      if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      // if (response.result !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
-    }, targetChain)
+    const { type, id } = (targetChain || store('main.currentNetwork'))
+    const chain = store('main.networks', type, id)
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: `${chain.id}` })
   }
 
   getChainId (payload, res, targetChain) {
-    this.connection.send(payload, (response) => {
-      if (response.error) return res({ id: payload.id, jsonrpc: payload.jsonrpc, error: response.error })
-      // if (parseInt(response.result, 'hex').toString() !== store('main.currentNetwork.id')) this.resError('Network mismatch', payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: response.result })
-    }, targetChain)
+    const { type, id } = (targetChain || store('main.currentNetwork'))
+    const chain = store('main.networks', type, id)
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: intToHex(chain.id) })
   }
 
   declineRequest (req) {
