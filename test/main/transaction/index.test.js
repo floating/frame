@@ -114,4 +114,17 @@ describe('#signerCompatibility', () => {
     expect(compatibility.tx).toBe('london')
     expect(compatibility.compatible).toBe(true)
   })
+
+  it('is not compatible for eip-1559 transactions on Trezor signers', () => {
+    const appVersion = { major: 1, minor: 1, patch: 1 }
+    const tx = {
+      type: '0x2'
+    }
+
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
+
+    expect(compatibility.signer).toBe('trezor')
+    expect(compatibility.tx).toBe('london')
+    expect(compatibility.compatible).toBe(false)
+  })
 })
