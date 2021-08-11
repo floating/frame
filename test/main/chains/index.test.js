@@ -11,6 +11,22 @@ class MockConnection extends EventEmitter {
   constructor (chainId) {
     super()
 
+    this.connected = false
+
+    this.connect = () => {
+      if (!this.connected) {
+        this.connected = true
+        process.nextTick(() => this.emit('connect'))
+      }
+    }
+
+    this.close = () => {
+      if (this.connected) {
+        this.connected = false
+        process.nextTick(() => this.emit('close'))
+      }
+    }
+
     this.send = payload => {
       return new Promise((resolve, reject) => {
         if (payload.method === 'eth_getBlockByNumber') {
@@ -38,8 +54,8 @@ class MockConnection extends EventEmitter {
   }
 }
 
-let block, gasPrice, observer
-const mockConnection = new MockConnection(4)
+let block, gasPrice, observer, connectionObserver
+
 const state = {
   main: {
     currentNetwork: {
@@ -53,6 +69,9 @@ const state = {
         },
         4: {
           infura: 'infuraRinkeby'
+        },
+        137: {
+          infura: 'infuraPolygon'
         }
       }
     },
@@ -61,18 +80,19 @@ const state = {
         4: {
           id: 4,
           type: 'ethereum',
-          layer: 'testnet',
-          symbol: 'ETH',
           name: 'Rinkeby',
-          explorer: 'https://rinkeby.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-            }
-          },
           connection: {
-            primary: { on: true, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            primary: { on: false, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
+            secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          },
+          on: true
+        },
+        137: {
+          id: 137,
+          type: 'ethereum',
+          name: 'Polygon',
+          connection: {
+            primary: { on: false, current: 'infura', status: 'loading', connected: false, type: '', network: '', custom: '' },
             secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
           },
           on: true
@@ -83,7 +103,14 @@ const state = {
       ethereum: {
         4: {
           gas: {
-            fees: {},
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+            }
+          }
+        },
+        137: {
+          gas: {
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -95,7 +122,7 @@ const state = {
   }
 }
 
-jest.mock('eth-provider', () => () => mockConnection)
+jest.mock('eth-provider', () => target => mockConnections[target].connection)
 jest.mock('../../../main/store/state', () => () => state)
 jest.mock('../../../main/accounts', () => ({ updatePendingFees: jest.fn() }))
 jest.mock('../../../main/store/persist', () => ({
@@ -103,8 +130,20 @@ jest.mock('../../../main/store/persist', () => ({
   set: jest.fn()
 }))
 
+const mockConnections = {
+  'infuraRinkeby': {
+    id: '4',
+    name: 'rinkeby',
+    connection: new MockConnection(4)
+  },
+  'infuraPolygon': {
+    id: '137',
+    name: 'polygon',
+    connection: new MockConnection(137)
+  }
+}
 
-let Chains 
+let Chains
 beforeAll(async () => {
   // need to import this after mocks are set up
   Chains = (await import('../../../main/chains')).default
@@ -112,58 +151,82 @@ beforeAll(async () => {
 
 beforeEach(() => {
   block = {}
-  store.setGasPrices('ethereum', '4', {})
-  store.setGasFees('ethereum', '4', {})
+
+  connectionObserver = store.observer(() => {
+    Object.values(mockConnections).forEach(chain => {
+      const primary = store(`main.networks.ethereum.${chain.id}.connection.primary`)
+
+      if (primary.on) {
+        chain.connection.connect()
+      }
+    })
+  })
+
+  Object.values(mockConnections).forEach(chain => {
+    store.setGasPrices('ethereum', chain.id, {})
+    store.setGasFees('ethereum', chain.id, {})
+  })
 })
 
-afterEach(() => {
+afterEach(done => {
   if (observer) {
     observer.remove()
   }
+
+  if (connectionObserver) {
+    connectionObserver.remove()
+  }
+
+  const activeConnection = Object.values(mockConnections).find(conn => conn.connection.connected)
+
+  Chains.once(`close:ethereum:${activeConnection.id}`, done)
+  store.toggleConnection('ethereum', activeConnection.id, 'primary', false)
+})
   
-  mockConnection.emit('close')
-})
-
-it('sets legacy gas prices on a new non-London block', done => {
-  gasPrice = gweiToHex(6)
-  block = {
-    number: addHexPrefix((8897988 - 20).toString(16)) // london block: 8897988
-  }
-
-  observer = store.observer(() => {
-    const gas = store('main.networksMeta.ethereum.4.gas.price.levels')
-    if (gas.fast) {
-      expect(gas.fast).toBe(gweiToHex(6))
-
-      done()
+Object.values(mockConnections).forEach(chain => {
+  it(`sets legacy gas prices on a new non-London block on ${chain.name}`, done => {
+    gasPrice = gweiToHex(6)
+    block = {
+      number: addHexPrefix((8897988 - 20).toString(16))
     }
+  
+    observer = store.observer(() => {
+      const gas = store(`main.networksMeta.ethereum.${chain.id}.gas.price.levels`)
+  
+      if (gas.fast) {
+        expect(gas.fast).toBe(gweiToHex(6))
+  
+        done()
+      }
+    })
+    
+    store.toggleConnection('ethereum', chain.id, 'primary', true)
   })
 
-  mockConnection.emit('connect')
-})
-
-it('sets fee market prices on a new London block', done => {
-  block = {
-    number: addHexPrefix((8897988 + 200).toString(16)), // london block: 8897988
-    baseFeePerGas: gweiToHex(9)
-  }
-
-  const expectedBaseFee = 7e9 * 1.125 * 1.125
-  const expectedPriorityFee = 1e9
-
-  observer = store.observer(() => {
-    const gas = store('main.networksMeta.ethereum.4.gas.price')
-    if (gas.fees.maxBaseFeePerGas) {
-      expect(gas.fees.maxBaseFeePerGas).toBe(weiToHex(expectedBaseFee))
-      expect(gas.fees.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
-      expect(gas.fees.maxFeePerGas).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
-
-      expect(gas.selected).toBe('fast')
-      expect(gas.levels.fast).toBe(weiToHex((expectedBaseFee * 1.05) + expectedPriorityFee))
-
-      done()
+  it(`sets fee market prices on a new London block on ${chain.name}`, done => {
+    block = {
+      number: addHexPrefix((12965200).toString(16)),
+      baseFeePerGas: gweiToHex(9)
     }
-  })
 
-  mockConnection.emit('connect')
+    const expectedBaseFee = 7e9 * 1.125 * 1.125
+    const expectedPriorityFee = 1e9
+
+    observer = store.observer(() => {
+      const gas = store(`main.networksMeta.ethereum.${chain.id}.gas.price`)
+
+      if (gas.fees.maxBaseFeePerGas) {
+        expect(gas.fees.maxBaseFeePerGas).toBe(weiToHex(expectedBaseFee))
+        expect(gas.fees.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
+        expect(gas.fees.maxFeePerGas).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
+
+        expect(gas.selected).toBe('fast')
+        expect(gas.levels.fast).toBe(weiToHex((expectedBaseFee * 1.05) + expectedPriorityFee))
+
+        done()
+      }
+    })
+    
+    store.toggleConnection('ethereum', chain.id, 'primary', true)
+  })
 })
