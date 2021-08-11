@@ -557,7 +557,7 @@ class Notify extends React.Component {
     } else if (notify === 'addChain') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
-          <AddChain />
+          <AddChain req={this.store('view.notifyData')} />
         </div>
       )
     } else {
