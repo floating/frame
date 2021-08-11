@@ -16,7 +16,7 @@ task('send-tx', 'send a test transaction')
       .then(accounts => ({
         value: utils.parseEther(amount || '.0002').toHexString(),
         from: accounts[0],
-        to: '0x5837ec9a54f71B6be9a304115CcDE7a07b666438',
+        to: '0xf2C1E45B6611bC4378c3502789957A57e0390B79',
         data: '0x',
         gasLimit: '0x5208',
       }))

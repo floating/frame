@@ -5,7 +5,7 @@ const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 
-const { sign, londonToLegacy } = require('../../../transaction')
+const { sign, signerCompatibility, londonToLegacy } = require('../../../transaction')
 const store = require('../../../store')
 const Signer = require('../../Signer')
 
@@ -213,6 +213,11 @@ class Ledger extends Signer {
         this.deviceStatus()
       }
       this.status = 'ok'
+
+      const version = (await this._getAppConfiguration()).version
+      const [major, minor, patch] = (version || '1.6.1').split('.')
+      this.appVersion = { major, minor, patch }
+
       if (!this.addresses.length) {
         this.status = 'loading'
         this.deriveAddresses()
@@ -307,12 +312,14 @@ class Ledger extends Signer {
       const eth = await this.getDevice()
       const signerPath = this.getPath(index)
 
-      // as of 08-05-2021 Ledger doesn't support EIP-1559 transactions
-      const ledgerTx = londonToLegacy(rawTx)
+      const compatibility = signerCompatibility(rawTx, this.summary())
+      const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
       const signedTx = await sign(ledgerTx, tx => {
+        // legacy transactions aren't RLP encoded before they're returned
         const message = tx.getMessageToSign(false)
-        const rawTxHex = rlp.encode(message).toString('hex')
+        const legacyMessage = message[0] !== parseInt(tx.type)
+        const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message.toString('hex')
 
         return eth.signTransaction(signerPath, rawTxHex)
       })
@@ -352,6 +359,18 @@ class Ledger extends Signer {
     try {
       const eth = await this.getDevice()
       const result = await eth.getAddress(...args)
+      await this.releaseDevice()
+      return result
+    } catch (err) {
+      await this.releaseDevice()
+      throw err
+    }
+  }
+
+  async _getAppConfiguration () {
+    try {
+      const eth = await this.getDevice()
+      const result = await eth.getAppConfiguration()
       await this.releaseDevice()
       return result
     } catch (err) {

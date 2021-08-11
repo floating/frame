@@ -4,7 +4,7 @@ const utils = require('web3-utils')
 const { padToEven, stripHexPrefix, addHexPrefix } = require('ethereumjs-util')
 const { Client } = require('gridplus-sdk')
 const { promisify } = require('util')
-const { sign, londonToLegacy } = require('../../../transaction')
+const { sign, signerCompatibility, londonToLegacy } = require('../../../transaction')
 
 const store = require('../../../store')
 const Signer = require('../../Signer')
@@ -69,6 +69,7 @@ class Lattice extends Signer {
         baseUrl,
         privKey
       })
+
       this.status = 'disconnected'
       this.update()
     }
@@ -100,6 +101,12 @@ class Lattice extends Signer {
         this.paired = await clientConnect(this.deviceId)
 
         if (this.paired) {
+          this.appVersion = {
+            major: this.client.fwVersion[2],
+            minor: this.client.fwVersion[1],
+            patch: this.client.fwVersion[0],
+          }
+
           if (this.addresses.length === 0) {
             this.status = 'addresses'
             this.update()
@@ -311,25 +318,37 @@ class Lattice extends Signer {
     }
   }
 
+  _createTransaction (index, chainId, tx) {
+    const { value, to, data, ...txJson } = tx.toJSON()
+
+    const unsignedTx = {
+      to,
+      value,
+      data,
+      chainId,
+      nonce: utils.hexToNumber(txJson.nonce),
+      gasLimit: utils.hexToNumber(txJson.gasLimit),
+      useEIP155: true,
+      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+    }
+
+    const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']
+
+    optionalFields.forEach(field => {
+      if (txJson[field]) {
+        unsignedTx[field] = utils.hexToNumber(txJson[field])
+      }
+    })
+
+    return unsignedTx
+  }
+
   async signTransaction (index, rawTx, cb) {
-    // as of 08-05-2021 Lattice doesn't support EIP-1559 transactions
-    const latticeTx = londonToLegacy(rawTx)
+    const compatibility = signerCompatibility(rawTx, this.summary())
+    const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
     sign(latticeTx, tx => {
-      const { value, to, data, ...txJson } = tx.toJSON()
-
-      const unsignedTx = {
-        to,
-        value,
-        data,
-        chainId: latticeTx.chainId,
-        nonce: utils.hexToNumber(txJson.nonce),
-        gasPrice: utils.hexToNumber(txJson.gasPrice),
-        gasLimit: utils.hexToNumber(txJson.gasLimit),
-        useEIP155: true,
-        signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
-      }
-        
+      const unsignedTx = this._createTransaction(index, latticeTx.chainId, tx)
       const signOpts = { currency: 'ETH', data: unsignedTx }
       const clientSign = promisify(this.client.sign).bind(this.client)
 
