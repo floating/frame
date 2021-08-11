@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import { JSONRPCRequestPayload, AbstractBlock } from 'ethereum-protocol'
+import log from 'electron-log'
 
 interface Connection {
   send (payload: JSONRPCRequestPayload): Promise<any>,
@@ -85,7 +86,7 @@ class BlockMonitor extends EventEmitter {
       .send({ id: 1, jsonrpc: '2.0', method: 'eth_getBlockByNumber', params: ['latest', false] })
       .then(this.handleBlock)
       .catch(err => {
-        console.error(`could not load latest block`, err)
+        log.error(`Could not load block`, err)
       })
   }
 
@@ -96,7 +97,7 @@ class BlockMonitor extends EventEmitter {
   }
 
   handleBlock (block: Block) {
-    if (block.number !== this.latestBlock) {
+    if (block && block.number !== this.latestBlock) {
       this.latestBlock = block.number
       this.emit('data', block)
     }

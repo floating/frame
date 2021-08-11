@@ -1,4 +1,4 @@
-const provider = require('eth-provider')()
+const provider = require('eth-provider')('frame', { name: 'scanWorker' })
 const BigNumber = require('bignumber.js')
 const log = require('electron-log')
 

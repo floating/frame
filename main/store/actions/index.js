@@ -438,6 +438,7 @@ module.exports = {
     u('main.ipfs', () => ipfs)
   },
   setRates: (u, rates) => {
+    u('main.initialRateScan', () => true)
     u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
   // Inventory
