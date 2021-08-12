@@ -64,7 +64,7 @@ class Gas extends React.Component {
     const priorityFee = this.levelDisplay(maxPriorityFeePerGas)
     const maxFee = this.levelDisplay(gasPrice)
 
-    const actualBaseFee = this.roundGwei(((weiToGwei(hexToInt(maxBaseFeePerGas)) / 21 * 20) / 9) * 8 / 9 * 8)
+    const actualBaseFee = this.roundGwei((weiToGwei(hexToInt(maxBaseFeePerGas)) / 9) * 8 / 9 * 8)
 
     const lowFee = this.roundGwei(actualBaseFee + priorityFee)
     const layer = this.store('main.networks', type, id, 'layer')
