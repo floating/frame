@@ -71,6 +71,8 @@ class ChainConnection extends EventEmitter {
           store.setGasFees(this.type, this.chainId, fees)
           store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
+          
+          accounts.updatePendingFees(this.chainId)
         }).catch(err => {
           log.error(`could not update gas fees for chain ${this.chainId}`, err)
         })
@@ -82,12 +84,12 @@ class ChainConnection extends EventEmitter {
             ...gas,
             custom: customLevel || gas.fast
           })
+
+          accounts.updatePendingFees(this.chainId)
         }).catch(err => {
           log.error(`could not update gas prices for chain ${this.chainId}`, err)
         })
       }
-
-      accounts.updatePendingFees(this.chainId)
     })
   }
 

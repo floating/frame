@@ -35,6 +35,7 @@ interface GasPrices {
 }
 
 interface Eip1559GasFees {
+  nextBaseFee: string,
   maxBaseFeePerGas: string,
   maxPriorityFeePerGas: string,
   maxFeePerGas: string
@@ -98,6 +99,7 @@ export default class GasCalculator {
     const medianReward = eligibleRewardsBlocks.sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || oneGwei
 
     return {
+      nextBaseFee: intToHex(nextBlockFee),
       maxBaseFeePerGas: intToHex(calculatedFee),
       maxPriorityFeePerGas: intToHex(medianReward),
       maxFeePerGas: intToHex(calculatedFee + medianReward)

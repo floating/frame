@@ -47,9 +47,6 @@ class Gas extends React.Component {
     const gwei = weiToGwei(hexToInt(level)) 
     return this.roundGwei(gwei) || 0
   }
-  addBufferBaseFee (base) {
-    return '0x' + Math.round(hexToInt(base) * 1.05).toString(16)
-  }
   txEstimate (value, gasLimit, nativeUSD) {
     return this.toDisplayUSD(BigNumber(value * gasLimit).shiftedBy(-9).multipliedBy(nativeUSD))
   }
@@ -59,12 +56,12 @@ class Gas extends React.Component {
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
     const gasPrice = this.levelDisplay(levels.fast)
 
-    const { maxBaseFeePerGas, maxPriorityFeePerGas } = (fees || {})
+    const { nextBaseFee, maxPriorityFeePerGas } = (fees || {})
 
     const priorityFee = this.levelDisplay(maxPriorityFeePerGas)
     const maxFee = this.levelDisplay(gasPrice)
 
-    const actualBaseFee = this.roundGwei((weiToGwei(hexToInt(maxBaseFeePerGas)) / 9) * 8 / 9 * 8)
+    const actualBaseFee = this.roundGwei((weiToGwei(hexToInt(nextBaseFee))))
 
     const lowFee = this.roundGwei(actualBaseFee + priorityFee)
     const layer = this.store('main.networks', type, id, 'layer')
