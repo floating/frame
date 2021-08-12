@@ -1,19 +1,28 @@
 /* globals test, expect, beforeAll, afterAll, describe */
 
-const crypto = require('crypto')
-const fs = require('fs')
-const { remove } = require('fs-extra')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
+import crypto from 'crypto'
+import { remove } from 'fs-extra'
 
-const log = require('electron-log')
+import hot  from '../../compiled/signers/hot'
+import store from '../../compiled/store'
+
+import log from 'electron-log'
 log.transports.console.level = false
-
-const hot = require('../../compiled/signers/hot')
-const store = require('../../compiled/store')
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
+
+jest.mock('../../compiled/store/persist', () => ({
+  get: jest.fn(),
+  set: jest.fn()
+}))
+jest.mock('../../main/store/persist', () => ({
+  get: jest.fn(),
+  set: jest.fn()
+}))
 
 // Stubs
 const signers = { add: () => {} }

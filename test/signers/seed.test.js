@@ -1,16 +1,25 @@
 /* globals test, expect, beforeAll, afterAll, describe */
+import path from 'path'
+import { remove } from 'fs-extra'
+import { generateMnemonic } from 'bip39'
 
-const bip39 = require('bip39')
-const hot = require('../../compiled/signers/hot')
-const { remove } = require('fs-extra')
-const path = require('path')
-const store = require('../../compiled/store')
+import hot  from '../../compiled/signers/hot'
+import store from '../../compiled/store'
 
-const log = require('electron-log')
+import log from 'electron-log'
 log.transports.console.level = false
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
+
+jest.mock('../../compiled/store/persist', () => ({
+  get: jest.fn(),
+  set: jest.fn()
+}))
+jest.mock('../../main/store/persist', () => ({
+  get: jest.fn(),
+  set: jest.fn()
+}))
 
 // Stubs
 const signers = { add: () => {} }
@@ -33,7 +42,7 @@ describe('Seed signer', () => {
   })
 
   test('Create from phrase', (done) => {
-    const mnemonic = bip39.generateMnemonic()
+    const mnemonic = generateMnemonic()
     hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
       signer = result
       expect(err).toBe(null)
