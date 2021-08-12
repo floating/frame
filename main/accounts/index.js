@@ -696,17 +696,13 @@ class Accounts extends EventEmitter {
       
       // New value
       const newBaseFee = parseInt(this.limitedHexValue(baseFee, 0, 9999 * 1e9), 'hex')
-      const delta = Math.abs((newBaseFee - currentBaseFee) / currentBaseFee)
 
       // No change
-      if (delta === 0) return cb()
+      if (newBaseFee === currentBaseFee) return cb()
 
-      // Automatic base fee update is insignificant
-      if (!userUpdate && newBaseFee < currentBaseFee && delta < 0.1) return cb()
+      // New max fee per gas
+      const newMaxFeePerGas = newBaseFee + maxPriorityFeePerGas
 
-      // Add buffer to new base fee if automatic update
-      const newMaxFeePerGas = (userUpdate ? newBaseFee : Math.round(newBaseFee * 1.05)) + maxPriorityFeePerGas
-      
       // Limit max fee
       if (newMaxFeePerGas * gasLimit > FEE_MAX) {
         currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(Math.floor(FEE_MAX / gasLimit))
@@ -728,16 +724,13 @@ class Accounts extends EventEmitter {
       
       // New values
       const newMaxPriorityFeePerGas = parseInt(this.limitedHexValue(priorityFee, 0, 9999 * 1e9), 'hex')
-      const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
-      
-      const delta = Math.abs((newMaxPriorityFeePerGas - maxPriorityFeePerGas) / maxPriorityFeePerGas)
-      
+
       // No change
-      if (delta === 0) return cb()
-      
-      // Automatic base fee update is insignificant
-      if (!userUpdate && delta < 0.05) return cb()
-  
+      if (newMaxPriorityFeePerGas === maxPriorityFeePerGas) return cb()
+
+      // New max fee per gas
+      const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
+    
       // Limit max fee
       if (newMaxFeePerGas * gasLimit > FEE_MAX) {
         const limitedMaxFeePerGas = Math.floor(FEE_MAX / gasLimit)
@@ -769,13 +762,8 @@ class Accounts extends EventEmitter {
       // New values
       const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 'hex')
 
-      const delta = Math.abs((newGasPrice - gasPrice) / gasPrice)
-      
       // No change
-      if (delta === 0) return cb() 
-
-      // Automatic base fee update is insignificant
-      if (!userUpdate && delta < 0.05) return cb() 
+      if (newGasPrice === gasPrice) return cb() 
 
       // Limit max fee
       if (newGasPrice * gasLimit > FEE_MAX) {

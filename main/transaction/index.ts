@@ -93,8 +93,7 @@ function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): Transa
 
     const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
     const maxBaseFee = toBN(gas.price.fees.maxBaseFeePerGas)
-    const bufferForUX = maxBaseFee.divRound(new BN(20)) // Buffer for fee updater UX
-    const maxFee = maxPriorityFee.add(maxBaseFee).add(bufferForUX)
+    const maxFee = maxPriorityFee.add(maxBaseFee)
 
     txData.maxPriorityFeePerGas = bnToHex(maxPriorityFee)
     txData.maxFeePerGas = bnToHex(maxFee)

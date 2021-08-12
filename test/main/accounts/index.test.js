@@ -154,7 +154,7 @@ describe('#setBaseFee', () => {
     }, 1, false)
   })
 
-  it('adds a 5% buffer to an automatic base fee update', done => {
+  it('applies automatic base fee update', done => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
@@ -162,12 +162,12 @@ describe('#setBaseFee', () => {
 
     setBaseFee(gweiToHex(updatedBaseFee), err => {
       expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9 * 1.05)))
+      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9)))
       done()
     })
   })
 
-  it('adds no buffer to a user-initiated base fee update', done => {
+  it('applies user-initiated base fee update', done => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
@@ -189,35 +189,10 @@ describe('#setBaseFee', () => {
     })
   })
 
-  it('updates if the base fee has lowered by more than 10%', done => {
-    request.data.maxFeePerGas = gweiToHex(20)
-    request.data.maxPriorityFeePerGas = gweiToHex(2)
-
-    const updatedBaseFee = 14 // gwei
-    const expectedMaxFee = weiToHex(2e9 + (updatedBaseFee * 1e9 * 1.05))
-
-    setBaseFee(gweiToHex(updatedBaseFee), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
-      done()
-    })
-  })
-
-  it('does not make an automatic update if the base fee has lowered by less than 10%', done => {
-    request.data.maxFeePerGas = gweiToHex(20)
-    request.data.maxPriorityFeePerGas = gweiToHex(2)
-
-    setBaseFee(gweiToHex(17), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(20))
-      done()
-    })
-  })
-
   it('caps the base fee at 9999 gwei', done => {
     const highBaseFee = gweiToHex(10200)
     const maxBaseFee = 9999e9
-    const expectedMaxFee = weiToHex((maxBaseFee * 1.05) + parseInt(request.data.maxPriorityFeePerGas))
+    const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
 
     setBaseFee(highBaseFee, err => {
       expect(err).toBe(undefined)
@@ -348,18 +323,6 @@ describe('#setPriorityFee', () => {
       expect(err).toBe(undefined)
       expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
       expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(2))
-      done()
-    })
-  })
-
-  it('does not make an automatic update if the priority fee has changed by less than 5%', done => {
-    request.data.maxFeePerGas = gweiToHex(160)
-    request.data.maxPriorityFeePerGas = gweiToHex(40)
-
-    setPriorityFee(gweiToHex(41), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(160))
-      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(40))
       done()
     })
   })
@@ -495,16 +458,6 @@ describe('#setGasPrice', () => {
     setGasPrice(gweiToHex(10), err => {
       expect(err).toBe(undefined)
       expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(10))
-      done()
-    })
-  })
-
-  it('does not make an automatic update if the gas price has changed by less than 5%', done => {
-    request.data.gasPrice = gweiToHex(40)
-
-    setGasPrice(gweiToHex(39), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(40))
       done()
     })
   })
