@@ -15,7 +15,7 @@ class AddChain extends React.Component {
     this.newNetworkType = 'ethereum'
     this.newNetworkLayer = ''
     this.req = props.req
-    this.chain = this.req ? this.req.chain : {}
+    this.chain = (this.req && this.req.chain) || {}
     this.state = {
       newNetworkId: parseInt(this.chain.id, 'hex') || this.newNetworkIdDefault,
       newNetworkName: this.chain.name || this.newNetworkNameDefault,
