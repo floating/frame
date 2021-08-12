@@ -20,6 +20,12 @@ class ChainRequest extends React.Component {
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
+
+    const origin = this.props.req.origin
+    let originClass = 'requestChainOrigin'
+    if (origin.length > 28) originClass = 'requestChainOrigin requestChainOrigin18'
+    if (origin.length > 36) originClass = 'requestChainOrigin requestChainOrigin12'
+
     const mode = this.props.req.mode
     const height = mode === 'monitor' ? '80px' : '340px'
     const chain = this.props.req.chain
@@ -48,29 +54,12 @@ class ChainRequest extends React.Component {
                 <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
                 <div className='approveRequestHeaderLabel'> Add Chain</div>
               </div>
-              <div className='requestProvider scaleIn'>
-                <div>{this.props.req.origin}</div>
-
-                <div>
-                  <div>{chain.id + ' ' + chain.name}</div>
-                  <div>{'id and name'}</div>
+              <div className='requestChain scaleIn'>
+                <div className='requestChainInner'>
+                  <div className={originClass}>{this.props.req.origin}</div>
+                  <div className={'requestChainOriginSub'}>{'wants to add chain'}</div>
+                  <div className='requestChainName'>{chain.name}</div>
                 </div>
-                <div>
-                  <div>{chain.explorer}</div>
-                  <div>{'explorer'}</div>
-                </div>
-                <div>
-                  <div>{chain.symbol}</div>
-                  <div>{'symbol'}</div>
-                </div>
-                <div>
-                  <div>{chain.rpcUrl}</div>
-                  <div>{'rpcUrl'}</div>
-                </div>
-                {/* <pre>{JSON.stringify(Object.keys(this.props.req.payload.params[0]), null, 2)}</pre> */}
-                {/* <pre>
-                  {JSON.stringify(this.props.req, null, 1)}
-                </pre> */}
               </div>
             </div>
           )}
@@ -79,16 +68,16 @@ class ChainRequest extends React.Component {
           <div 
             className='requestDecline' 
             style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', this.props.req, false) 
+            onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', false, this.props.req) 
           }}>
             <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
           </div>
           <div 
             className='requestSign' 
             style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', this.props.req, true) 
+            onClick={() => { if (this.state.allowInput && this.props.onTop) this.store.notify('addChain', this.props.req) 
           }}>
-            <div className='requestSignButton _txButton'>Approve</div>
+            <div className='requestSignButton _txButton'>Review</div>
           </div>
         </div>
       </div>

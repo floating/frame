@@ -4,24 +4,27 @@ import svg from '../../../../../resources/svg'
 import link from '../../../../../resources/link'
 
 class AddChain extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.newNetworkIdDefault = 'ID'
+  constructor (props, context) {
+    super(props, context)
+    this.newNetworkIdDefault = 'Chain ID'
     this.newNetworkNameDefault = 'Chain Name'
     this.newNetworkExplorerDefault = 'Block Explorer'
-    this.newNetworkRPCDefault = 'RPC Endpoint'
-    this.newNetworkSymbolDefault = 'ETH'
+    this.newNetworkRPCPrimary = 'Primary Endpoint'
+    this.newNetworkRPCSecondary = 'Secondary Endpoint'
+    this.newNetworkSymbolDefault = 'Native Symbol'
     this.newNetworkType = 'ethereum'
     this.newNetworkLayer = ''
+    this.req = props.req
+    this.chain = this.req ? this.req.chain : {}
     this.state = {
-      newNetworkId: this.newNetworkIdDefault,
-      newNetworkName: this.newNetworkNameDefault,
-      newNetworkExplorer: this.newNetworkExplorerDefault,
-      newNetworkRPCPrimary: this.newNetworkRPCDefault,
-      newNetworkRPCSecondary: this.newNetworkRPCDefault,
-      newNetworkSymbol: this.newNetworkSymbolDefault,
-      newNetworkType: this.newNetworkType,
-      newNetworkLayer: 'other',
+      newNetworkId: parseInt(this.chain.id, 'hex') || this.newNetworkIdDefault,
+      newNetworkName: this.chain.name || this.newNetworkNameDefault,
+      newNetworkExplorer: this.chain.explorer || this.newNetworkExplorerDefault,
+      newNetworkRPCPrimary: this.chain.rpcUrl || this.newNetworkRPCPrimary,
+      newNetworkRPCSecondary: this.newNetworkRPCSecondary,
+      newNetworkSymbol: this.chain.symbol || this.newNetworkSymbolDefault,
+      newNetworkType: this.chain.type || this.newNetworkType,
+      newNetworkLayer: this.chain.layer || 'other',
       localShake: {}, 
       resetConfirm: false, 
       expandNetwork: false 
@@ -34,8 +37,8 @@ class AddChain extends React.Component {
       this.state.newNetworkName !== this.newNetworkNameDefault ||
       this.state.newNetworkExplorer !== this.newNetworkExplorerDefault ||
       this.state.newNetworkSymbol !== this.newNetworkSymbolDefault ||
-      this.state.newNetworkRPCPrimary !== this.newNetworkRPCDefault ||
-      this.state.newNetworkRPCSecondary !== this.newNetworkRPCDefault
+      this.state.newNetworkRPCPrimary !== this.newNetworkRPCPrimary ||
+      this.state.newNetworkRPCSecondary !== this.newNetworkRPCSecondary
     )
 
     const newNetworkReady = (
@@ -46,7 +49,7 @@ class AddChain extends React.Component {
 
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-        <div className='notifyBox'>
+        <div className='notifyBoxSlide'>
           <div className='addChainTitle'>
             Add New Chain
           </div>
@@ -55,7 +58,7 @@ class AddChain extends React.Component {
               <div className='chainName'>
                 <div className='chainInputLabel'>Chain Name</div>
                 <input
-                  className='chainInput'
+                  className='chainInput chainInputLarge'
                   value={this.state.newNetworkName} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkName: e.target.value })
@@ -123,6 +126,44 @@ class AddChain extends React.Component {
                   }}
                   onBlur={(e) => {
                     if (e.target.value === '') this.setState({ newNetworkExplorer: this.newNetworkExplorerDefault })
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className='chainRow'>
+              <div className='chainExplorer'>
+                <div className='chainInputLabel'>Primary RPC</div>
+                <input
+                  className='chainInput'
+                  value={this.state.newNetworkRPCPrimary} spellCheck='false'
+                  onChange={(e) => {
+                    this.setState({ newNetworkRPCPrimary: e.target.value })
+                  }}
+                  onFocus={(e) => {
+                    if (e.target.value === this.newNetworkRPCPrimary) this.setState({ newNetworkRPCPrimary: '' })
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '') this.setState({ newNetworkRPCPrimary: this.newNetworkRPCPrimary })
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className='chainRow'>
+              <div className='chainExplorer'>
+                <div className='chainInputLabel'>Secondary RPC</div>
+                <input
+                  className='chainInput'
+                  value={this.state.newNetworkRPCSecondary} spellCheck='false'
+                  onChange={(e) => {
+                    this.setState({ newNetworkRPCSecondary: e.target.value })
+                  }}
+                  onFocus={(e) => {
+                    if (e.target.value === this.newNetworkRPCSecondary) this.setState({ newNetworkRPCSecondary: '' })
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '') this.setState({ newNetworkRPCSecondary: this.newNetworkRPCSecondary})
                   }}
                 />
               </div>
@@ -203,16 +244,14 @@ class AddChain extends React.Component {
                       type: this.state.newNetworkType,
                       explorer: this.state.newNetworkExplorer,
                       symbol: this.state.newNetworkSymbol,
-                      layer: this.state.newNetworkLayer
+                      layer: this.state.newNetworkLayer,
+                      primaryRpc: this.state.newNetworkRPCPrimary,
+                      secondaryRpc: this.state.newNetworkRPCSecondary,
                     }
-                    link.send('tray:action', 'addNetwork', net)
-                    this.setState({
-                      newNetworkId: this.newNetworkIdDefault,
-                      newNetworkName: this.newNetworkNameDefault,
-                      newNetworkExplorer: this.newNetworkExplorerDefault,
-                      newNetworkSymbol: this.newNetworkSymbolDefault,
-                      newNetworkLayer: 'other'
-                    })
+                    link.send('tray:addChain', net, this.props.req)
+                    setTimeout(() => {
+                      this.store.notify()
+                    }, 400)
                   }}
                 >
                   {svg.octicon('plus', { height: 17 })} Add Chain

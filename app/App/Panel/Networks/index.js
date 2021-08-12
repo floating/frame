@@ -630,7 +630,7 @@ class Settings extends React.Component {
           </div>
           {this.renderConnections('mainnet')}
           <div className='networkBreak'>
-            <div className='networkBreakLayer'>L2 / Rollups</div>
+            <div className='networkBreakLayer'>Rollups</div>
           </div>
           {this.renderConnections('rollup')}
           <div className='networkBreak'>

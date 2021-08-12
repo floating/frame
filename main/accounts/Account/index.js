@@ -121,17 +121,8 @@ class Account {
     }
   }
 
-  addChain (req, added) {
-    const { chain } = req
-    if (added) {
-      store.addNetwork({
-        id: chain.id,
-        type: chain.type,
-        name: chain.name,
-        explorer: chain.explorer,
-        symbol: chain.symbol
-      })
-    }
+  addChain (chain, req = {}) {
+    if (chain) store.addNetwork(chain)
     if (this.requests[req.handlerId]) {
       if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()
       delete this.requests[req.handlerId]

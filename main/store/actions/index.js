@@ -230,6 +230,11 @@ module.exports = {
     try {
       net.id = validateNetworkSettings(net)
 
+      const primaryRpc = net.primaryRpc || ''
+      const secondaryRpc = net.secondaryRpc || ''
+      delete net.primaryRpc
+      delete net.secondaryRpc
+
       const defaultNetwork = {
         id: 0,
         type: '',
@@ -243,8 +248,24 @@ module.exports = {
         },
         connection: {
           presets: { local: 'direct' },
-          primary: { on: true, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' },
-          secondary: { on: false, current: 'custom', status: 'loading', connected: false, type: '', network: '', custom: '' }
+          primary: { 
+            on: true, 
+            current: 'custom', 
+            status: 'loading', 
+            connected: false, 
+            type: '', 
+            network: '', 
+            custom: primaryRpc
+          },
+          secondary: { 
+            on: false, 
+            current: 'custom', 
+            status: 'loading', 
+            connected: false, 
+            type: '', 
+            network: '', 
+            custom: secondaryRpc
+          }
         },
         on: true
       }
@@ -417,6 +438,7 @@ module.exports = {
     u('main.ipfs', () => ipfs)
   },
   setRates: (u, rates) => {
+    u('main.initialRateScan', () => true)
     u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
   // Inventory

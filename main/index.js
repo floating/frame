@@ -132,8 +132,8 @@ ipcMain.on('tray:giveAccess', (e, req, access) => {
   accounts.setAccess(req, access)
 })
 
-ipcMain.on('tray:addChain', (e, req, added) => {
-  accounts.addChain(req, added)
+ipcMain.on('tray:addChain', (e, chain, req) => {
+  accounts.addChain(chain, req)
 })
 
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
