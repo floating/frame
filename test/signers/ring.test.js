@@ -1,12 +1,8 @@
 /* globals test, expect, beforeAll, afterAll, describe */
-
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
 import { remove } from 'fs-extra'
-
-import hot  from '../../compiled/signers/hot'
-import store from '../../compiled/store'
 
 import log from 'electron-log'
 log.transports.console.level = false
@@ -15,30 +11,37 @@ const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
 
-jest.mock('../../compiled/store/persist', () => ({
+const mockPersist = {
   get: jest.fn(),
   set: jest.fn()
-}))
-jest.mock('../../main/store/persist', () => ({
-  get: jest.fn(),
-  set: jest.fn()
-}))
+}
+
+jest.mock('../../compiled/store/persist', () => mockPersist)
+jest.mock('../../main/store/persist', () => mockPersist)
 
 // Stubs
 const signers = { add: () => {} }
 // Util
 const clean = () => remove(SIGNER_PATH)
 
+let hot, store
+
 describe('Ring signer', () => {
   let signer
 
-  beforeAll(clean)
+  beforeAll(async () => {
+    clean()
+
+    hot = await import('../../compiled/signers/hot')
+    store = require('../../compiled/store')
+  })
+
   afterAll(clean)
 
   test('Create from invalid private key', (done) => {
     const privateKey = 'invalid key'
-    hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
-      expect(err).not.toBe(null)
+    hot.createFromPrivateKey(signers, privateKey, PASSWORD, err => {
+      expect(err).toBeTruthy()
       expect(store('main.signers')).toEqual({})
       done()
     })
@@ -46,8 +49,8 @@ describe('Ring signer', () => {
 
   test('Create from invalid keystore key', (done) => {
     const keystore = { invalid: 'keystore' }
-    hot.createFromKeystore(signers, keystore, 'test', PASSWORD, (err, result) => {
-      expect(err).not.toBe(null)
+    hot.createFromKeystore(signers, keystore, 'test', PASSWORD, err => {
+      expect(err).toBeTruthy()
       expect(store('main.signers')).toEqual({})
       done()
     })
@@ -108,7 +111,7 @@ describe('Ring signer', () => {
 
   test('Remove private key', (done) => {
     const secondAddress = signer.addresses[1]
-    signer.removePrivateKey(0, PASSWORD, (err, result) => {
+    signer.removePrivateKey(0, PASSWORD, err => {
       expect(err).toBe(null)
       expect(signer.addresses.length).toBe(1)
       expect(signer.addresses[0]).toEqual(secondAddress)
@@ -117,7 +120,7 @@ describe('Ring signer', () => {
   })
 
   test('Remove last private key', (done) => {
-    signer.removePrivateKey(0, PASSWORD, (err, result) => {
+    signer.removePrivateKey(0, PASSWORD, err => {
       expect(err).toBe(null)
       done()
     })
@@ -127,7 +130,7 @@ describe('Ring signer', () => {
     const file = fs.readFileSync(FILE_PATH, 'utf8')
     const keystore = JSON.parse(file)
     const previousLength = signer.addresses.length
-    signer.addKeystore(keystore, 'test', PASSWORD, (err, result) => {
+    signer.addKeystore(keystore, 'test', PASSWORD, err => {
       expect(err).toBe(null)
       expect(signer.addresses.length).toBe(previousLength + 1)
       done()
@@ -135,14 +138,14 @@ describe('Ring signer', () => {
   })
 
   test('Unlock with wrong password', (done) => {
-    signer.unlock('Wrong password', (err, result) => {
-      expect(err).not.toBe(null)
+    signer.unlock('Wrong password', err => {
+      expect(err).toBeTruthy()
       done()
     })
   })
 
   test('Unlock', (done) => {
-    signer.unlock(PASSWORD, (err, result) => {
+    signer.unlock(PASSWORD, err => {
       expect(err).toBe(null)
       done()
     })
@@ -190,7 +193,7 @@ describe('Ring signer', () => {
   })
 
   test('Lock', (done) => {
-    signer.lock((err, result) => {
+    signer.lock(err => {
       expect(err).toBe(null)
       expect(signer.status).toBe('locked')
       done()
@@ -198,7 +201,7 @@ describe('Ring signer', () => {
   })
 
   test('Sign message when locked', (done) => {
-    signer.signMessage(0, 'test', (err, result) => {
+    signer.signMessage(0, 'test', err => {
       expect(err.message).toBe('Signer locked')
       done()
     })
