@@ -154,7 +154,7 @@ describe('#setBaseFee', () => {
     }, 1, false)
   })
 
-  it('Doesn\'t add a 5% buffer to an automatic base fee update', done => {
+  it('applies automatic base fee update', done => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
@@ -167,7 +167,7 @@ describe('#setBaseFee', () => {
     })
   })
 
-  it('adds no buffer to a user-initiated base fee update', done => {
+  it('applies user-initiated base fee update', done => {
     request.data.maxFeePerGas = gweiToHex(10)
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
