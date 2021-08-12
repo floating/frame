@@ -352,18 +352,6 @@ describe('#setPriorityFee', () => {
     })
   })
 
-  it('make an automatic update even if the priority fee has changed by less than 5%', done => {
-    request.data.maxFeePerGas = gweiToHex(160)
-    request.data.maxPriorityFeePerGas = gweiToHex(40)
-
-    setPriorityFee(gweiToHex(41), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(161))
-      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(41))
-      done()
-    })
-  })
-
   it('caps the priority fee at 9999 gwei', done => {
     const highPriorityFee = gweiToHex(10200)
     const maxPriorityFee = 9999e9
@@ -495,16 +483,6 @@ describe('#setGasPrice', () => {
     setGasPrice(gweiToHex(10), err => {
       expect(err).toBe(undefined)
       expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(10))
-      done()
-    })
-  })
-
-  it('make an automatic update even if the gas price has changed by less than 5%', done => {
-    request.data.gasPrice = gweiToHex(40)
-
-    setGasPrice(gweiToHex(39), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(39))
       done()
     })
   })
