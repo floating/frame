@@ -221,7 +221,7 @@ Object.values(mockConnections).forEach(chain => {
         expect(gas.fees.maxFeePerGas).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
 
         expect(gas.selected).toBe('fast')
-        expect(gas.levels.fast).toBe(weiToHex((expectedBaseFee * 1.05) + expectedPriorityFee))
+        expect(gas.levels.fast).toBe(weiToHex(expectedBaseFee + expectedPriorityFee))
 
         done()
       }

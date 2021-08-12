@@ -66,7 +66,7 @@ class ChainConnection extends EventEmitter {
 
       if (useFeeMarket) {
         gasCalculator.getFeePerGas().then(fees => {
-          const gasPrice = Math.round(parseInt(fees.maxBaseFeePerGas) * 1.05) + parseInt(fees.maxPriorityFeePerGas)
+          const gasPrice = parseInt(fees.maxBaseFeePerGas) + parseInt(fees.maxPriorityFeePerGas)
 
           store.setGasFees(this.type, this.chainId, fees)
           store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
