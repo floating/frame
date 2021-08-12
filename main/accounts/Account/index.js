@@ -121,7 +121,7 @@ class Account {
     }
   }
 
-  addChain (chain, req) {
+  addChain (chain, req = {}) {
     if (chain) store.addNetwork(chain)
     if (this.requests[req.handlerId]) {
       if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()

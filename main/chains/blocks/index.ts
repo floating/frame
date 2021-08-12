@@ -97,7 +97,8 @@ class BlockMonitor extends EventEmitter {
   }
 
   handleBlock (block: Block) {
-    if (block && block.number !== this.latestBlock) {
+    if (!block) return log.error('handleBlock received undefined block')
+    if (block.number !== this.latestBlock) {
       this.latestBlock = block.number
       this.emit('data', block)
     }

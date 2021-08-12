@@ -49,7 +49,7 @@ class AddChain extends React.Component {
 
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
-        <div className='notifyBox'>
+        <div className='notifyBoxSlide'>
           <div className='addChainTitle'>
             Add New Chain
           </div>

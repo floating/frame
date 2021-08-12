@@ -51,7 +51,11 @@ class Panel extends React.Component {
     const [type, id] = network.split(':')
     if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
   }
-
+  
+  hexToDisplayGwei (weiHex) {
+    return parseInt(weiHex, 'hex') / 1e9 < 1 ? '‹1' : Math.round(parseInt(weiHex, 'hex') / 1e9)
+  }
+  
   render () {
     const opacity = this.store('tray.initial') ? 0 : 1 // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
     const { type, id } = this.store('main.currentNetwork')
@@ -69,7 +73,7 @@ class Panel extends React.Component {
 
     let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.fast')
     if (!gasPrice) gasPrice = this.store('main.networksMeta', type, id, 'gas.price.fees.maxFeePerGas')
-    if (gasPrice) gasPrice = parseInt(gasPrice, 'hex') / 1e9 < 1 ? '‹1' : Math.round(parseInt(gasPrice, 'hex') / 1e9)
+    if (gasPrice) gasPrice = this.hexToDisplayGwei(gasPrice)
     const networks = this.store('main.networks')
     const networkOptions = []
     Object.keys(networks).forEach(type => {
