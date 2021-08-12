@@ -216,7 +216,7 @@ class AddChain extends React.Component {
                   <div 
                     className={this.state.newNetworkLayer === 'rollup' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
                     onMouseDown={() => this.setState({ newNetworkLayer: 'rollup' })}
-                  >L2 / Rollup</div>
+                  >Rollup</div>
                   <div 
                     className={this.state.newNetworkLayer === 'sidechain' ?  'chainLayerOption chainLayerOptionOn' : 'chainLayerOption'}
                     onMouseDown={() => this.setState({ newNetworkLayer: 'sidechain' })}
