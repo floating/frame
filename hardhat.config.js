@@ -5,8 +5,9 @@ const ethProvider = require('eth-provider');
 
 task('send-tx', 'send a test transaction')
   .addOptionalParam('provider', 'eth provider to use for connection')
+  .addOptionalParam('to', 'account to send to')
   .addOptionalParam('amount', 'amount to send, in eth')
-  .setAction(async ({ amount, provider = 'frame' }, hre) => {
+  .setAction(async ({ amount, to = '0xf2C1E45B6611bC4378c3502789957A57e0390B79', provider = 'frame' }) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
 
@@ -16,9 +17,8 @@ task('send-tx', 'send a test transaction')
       .then(accounts => ({
         value: utils.parseEther(amount || '.0002').toHexString(),
         from: accounts[0],
-        to: '0xf2C1E45B6611bC4378c3502789957A57e0390B79',
-        data: '0x',
-        gasLimit: '0x5208',
+        to,
+        data: '0x'
       }))
       .then(tx => eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2 }))
       .then(txHash => {
