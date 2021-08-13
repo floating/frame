@@ -318,19 +318,23 @@ class Lattice extends Signer {
     }
   }
 
-  _createTransaction (index, type, chainId, tx) {
+  _createTransaction (index, txType, chainId, tx) {
     const { value, to, data, ...txJson } = tx.toJSON()
+    const type = utils.hexToNumber(txType)
 
     const unsignedTx = {
       to,
       value,
       data,
       chainId,
-      type: utils.hexToNumber(type),
       nonce: utils.hexToNumber(txJson.nonce),
       gasLimit: utils.hexToNumber(txJson.gasLimit),
       useEIP155: true,
       signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+    }
+
+    if (type) {
+      unsignedTx.type = type
     }
 
     const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']
@@ -362,7 +366,7 @@ class Lattice extends Signer {
     .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
     .catch(err => {
       log.error('error signing transaction with Lattice', err)
-      cb(new Error(`Failed to sign transaction: ${err.message}`))
+      cb(new Error(`Failed to sign transaction: ${err}`))
     })
   }
 }
