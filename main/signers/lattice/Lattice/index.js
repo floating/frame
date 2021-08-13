@@ -318,7 +318,7 @@ class Lattice extends Signer {
     }
   }
 
-  _createTransaction (index, chainId, tx) {
+  _createTransaction (index, type, chainId, tx) {
     const { value, to, data, ...txJson } = tx.toJSON()
 
     const unsignedTx = {
@@ -326,6 +326,7 @@ class Lattice extends Signer {
       value,
       data,
       chainId,
+      type: utils.hexToNumber(type),
       nonce: utils.hexToNumber(txJson.nonce),
       gasLimit: utils.hexToNumber(txJson.gasLimit),
       useEIP155: true,
@@ -348,7 +349,7 @@ class Lattice extends Signer {
     const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
     sign(latticeTx, tx => {
-      const unsignedTx = this._createTransaction(index, latticeTx.chainId, tx)
+      const unsignedTx = this._createTransaction(index, rawTx.type, latticeTx.chainId, tx)
       const signOpts = { currency: 'ETH', data: unsignedTx }
       const clientSign = promisify(this.client.sign).bind(this.client)
 
