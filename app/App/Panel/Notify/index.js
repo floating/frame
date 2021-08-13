@@ -279,6 +279,11 @@ class Notify extends React.Component {
             <div className='notifyBodyLine'>
               {`Your ${capitalize(signer)} is not compatible with ${capitalize(tx)} ${tx === 'london' ? '(EIP-1559) ' : ''}transactions. Your transaction will be converted to a legacy transaction before signing.`}
             </div>
+            {['lattice', 'ledger'].includes(signer) ? (
+              <div className='notifyBodyUpdate'>
+                {`Update your ${capitalize(signer)} to enable compatibility`}
+              </div>
+            ) : null}
             <div className='notifyBodyQuestion'>
               Do you want to proceed?
             </div>
