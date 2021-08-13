@@ -270,21 +270,15 @@ class Provider extends EventEmitter {
   }
 
   getRawTx (newTx) {
-    const { gas, gasLimit, gasPrice, data, value: rawValue, ...rawTx } = newTx
+    const { gas, gasLimit, gasPrice, data, value, ...rawTx } = newTx
 
-    const tx = {
+    return {
       ...rawTx,
+      value: addHexPrefix(unpadHexString(value || '0x')),
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
-
-    if (rawValue) {
-      const value = addHexPrefix(unpadHexString(rawValue))
-      tx.value = value === '0x' ? '0x0' : value
-    }
-
-    return tx
   }
   
   async _getGasEstimate (rawTx, chainConfig) {
