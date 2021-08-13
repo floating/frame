@@ -46,9 +46,7 @@ function createWorker () {
 
       const tokenSymbols = Object.keys(message.balances).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
 
-      if (tokenSymbols.length > 0) {
-        updateRates(tokenSymbols, message.netId)
-      }
+      updateRates(tokenSymbols, message.netId)
     }
 
     if (message.type === 'rates') {
