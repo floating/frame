@@ -362,7 +362,7 @@ class Lattice extends Signer {
     .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
     .catch(err => {
       log.error('error signing transaction with Lattice', err)
-      cb(new Error('Error signing transaction: ', err.message))
+      cb(new Error(`Failed to sign transaction: ${err.message}`))
     })
   }
 }
