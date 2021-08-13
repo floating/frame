@@ -279,8 +279,11 @@ class Provider extends EventEmitter {
     }
   }
   
-  async _getGasEstimate (rawTx) {
-    const payload = { method: 'eth_estimateGas', params: [rawTx], jsonrpc: '2.0', id: 1 }
+  async _getGasEstimate (rawTx, chainConfig) {
+    const { chainId, ...rest } = rawTx
+    const txParams = chainConfig.isActivatedEIP(2930) ? rawTx : rest
+
+    const payload = { method: 'eth_estimateGas', params: [txParams], jsonrpc: '2.0', id: 1 }
     const targetChain = {
       type: 'ethereum',
       id: parseInt(rawTx.chainId, 16)
@@ -324,7 +327,7 @@ class Provider extends EventEmitter {
 
     const estimateGas = rawTx.gasLimit
       ? Promise.resolve(rawTx)
-      : this._getGasEstimate(rawTx)
+      : this._getGasEstimate(rawTx, chainConfig)
         .then(gasLimit => ({ ...rawTx, gasLimit }))
         .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
 
