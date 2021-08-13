@@ -2,7 +2,7 @@ const { v4: uuid } = require('uuid')
 const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
-const { pubToAddress, ecrecover, hashPersonalMessage, toBuffer, intToHex } = require('ethereumjs-util')
+const { padToEven, unpadHexString, addHexPrefix, stripHexPrefix, pubToAddress, ecrecover, hashPersonalMessage, toBuffer, intToHex } = require('ethereumjs-util')
 
 const proxy = require('./proxy')
 
@@ -270,10 +270,12 @@ class Provider extends EventEmitter {
   }
 
   getRawTx (newTx) {
-    const { gas, gasLimit, gasPrice, ...rawTx } = newTx
+    const { gas, gasLimit, gasPrice, data, value, ...rawTx } = newTx
 
     return {
       ...rawTx,
+      value: addHexPrefix(unpadHexString(value || '0x')),
+      data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
