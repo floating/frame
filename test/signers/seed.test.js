@@ -1,39 +1,52 @@
 /* globals test, expect, beforeAll, afterAll, describe */
+import path from 'path'
+import { remove } from 'fs-extra'
+import { generateMnemonic } from 'bip39'
 
-const bip39 = require('bip39')
-const hot = require('../../compiled/signers/hot')
-const { remove } = require('fs-extra')
-const path = require('path')
-const store = require('../../compiled/store')
-
-const log = require('electron-log')
+import log from 'electron-log'
 log.transports.console.level = false
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
+
+const mockPersist = {
+  get: jest.fn(),
+  set: jest.fn()
+}
+
+jest.mock('../../compiled/store/persist', () => mockPersist)
+jest.mock('../../main/store/persist', () => mockPersist)
 
 // Stubs
 const signers = { add: () => {} }
 // Util
 const clean = () => remove(SIGNER_PATH)
 
+let hot, store
+
 describe('Seed signer', () => {
   let signer
 
-  beforeAll(clean)
+  beforeAll(async () => {
+    clean()
+
+    hot = await import('../../compiled/signers/hot')
+    store = require('../../compiled/store')
+  })
+
   afterAll(clean)
 
   test('Create from invalid phrase', (done) => {
     const mnemonic = 'invalid mnemonic'
-    hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
-      expect(err).not.toBe(null)
+    hot.createFromPhrase(signers, mnemonic, PASSWORD, err => {
+      expect(err).toBeTruthy()
       expect(store('main.signers')).toEqual({})
       done()
     })
   })
 
   test('Create from phrase', (done) => {
-    const mnemonic = bip39.generateMnemonic()
+    const mnemonic = generateMnemonic()
     hot.createFromPhrase(signers, mnemonic, PASSWORD, (err, result) => {
       signer = result
       expect(err).toBe(null)
@@ -59,15 +72,15 @@ describe('Seed signer', () => {
   }, 15 * 1000)
 
   test('Unlock with wrong password', (done) => {
-    signer.unlock('Wrong password', (err, result) => {
-      expect(err).not.toBe(null)
+    signer.unlock('Wrong password', err => {
+      expect(err).toBeTruthy()
       expect(signer.status).toBe('locked')
       done()
     })
   })
 
   test('Unlock', (done) => {
-    signer.unlock(PASSWORD, (err, result) => {
+    signer.unlock(PASSWORD, err => {
       expect(err).toBe(null)
       done()
     })
@@ -115,7 +128,7 @@ describe('Seed signer', () => {
   })
 
   test('Lock', (done) => {
-    signer.lock((err, result) => {
+    signer.lock(err => {
       expect(err).toBe(null)
       expect(signer.status).toBe('locked')
       done()
@@ -123,7 +136,7 @@ describe('Seed signer', () => {
   })
 
   test('Sign message when locked', (done) => {
-    signer.signMessage(0, 'test', (err, result) => {
+    signer.signMessage(0, 'test', err => {
       expect(err.message).toBe('Signer locked')
       done()
     })

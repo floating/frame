@@ -265,12 +265,8 @@ describe('#populate', () => {
       gas.price.fees.maxBaseFeePerGas = addHexPrefix(8e9.toString(16))
 
       const tx = populate(rawTx, chainConfig, gas)
-      const totalFees = 2e9 + 8e9
 
-      // add a rounded 5% buffer
-      const expectedMaxFee = addHexPrefix((totalFees + 4e8).toString(16))
-
-      expect(tx.maxFeePerGas).toBe(expectedMaxFee)
+      expect(tx.maxFeePerGas).toBe(addHexPrefix((2e9 + 8e9).toString(16)))
     })
   })
 })
