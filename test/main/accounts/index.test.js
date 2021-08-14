@@ -7,7 +7,8 @@ jest.mock('../../../main/externalData')
 
 jest.mock('../../../main/store/persist', () => ({
   get: jest.fn(),
-  set: jest.fn()
+  set: jest.fn(),
+  queue: jest.fn()
 }))
 
 jest.mock('../../../main/nebula', () => jest.fn(() => ({

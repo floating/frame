@@ -25,12 +25,17 @@ class PersistStore extends Conf {
     if (Object.keys(updates || {}).length > 0) super.set(updates)
   }
 
-  set (path, value) {
+  queue (path, value) {
     path = `main.__.${migrations.latest}.${path}`
     this.updates = this.updates || {}
     this.updates[path] = JSON.parse(JSON.stringify(value))
     if (Object.keys(this.updates).length < 75) clearTimeout(this.updateTimer)
     this.updateTimer = setTimeout(() => this.writeUpdates(), 4000)
+  }
+
+  set (path, value) {
+    path = `main.__.${migrations.latest}.${path}`
+    super.set(path, value)
   }
 }
 
