@@ -22,10 +22,14 @@ const persist = require('./persist')
 
 const store = Restore.create(state(), actions)
 
-store.api.feed((state, actions) => {
-  actions.forEach(action => {
+// Persist initial full state
+persist.set('main', store('main'))
+
+// Apply updates to persisted state
+store.api.feed((state, actionBatch) => {
+  actionBatch.forEach(action => {
     action.updates.forEach(update => {
-      persist.set(update.path, update.value)
+      persist.queue(update.path, update.value)
     })
   })
 })

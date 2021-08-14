@@ -11,7 +11,8 @@ const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 
 const mockPersist = {
   get: jest.fn(),
-  set: jest.fn()
+  set: jest.fn(),
+  queue: jest.fn()
 }
 
 jest.mock('../../compiled/store/persist', () => mockPersist)

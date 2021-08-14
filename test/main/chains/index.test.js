@@ -127,7 +127,8 @@ jest.mock('../../../main/store/state', () => () => state)
 jest.mock('../../../main/accounts', () => ({ updatePendingFees: jest.fn() }))
 jest.mock('../../../main/store/persist', () => ({
   get: jest.fn(),
-  set: jest.fn()
+  set: jest.fn(),
+  queue: jest.fn()
 }))
 
 const mockConnections = {
