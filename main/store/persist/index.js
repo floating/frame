@@ -1,7 +1,6 @@
 const path = require('path')
 const electron = require('electron')
 const Conf = require('conf')
-const log = require('electron-log')
 
 const migrations = require('../migrations')
 
@@ -17,6 +16,7 @@ class PersistStore extends Conf {
     }
     electron.app.on('quit', () => this.writeUpdates())
     super(options)
+    setInterval(() => this.writeUpdates(), 30 * 1000)
   }
 
   writeUpdates () {
@@ -28,9 +28,8 @@ class PersistStore extends Conf {
   queue (path, value) {
     path = `main.__.${migrations.latest}.${path}`
     this.updates = this.updates || {}
+    delete this.updates[path] // maintain entry order
     this.updates[path] = JSON.parse(JSON.stringify(value))
-    if (Object.keys(this.updates).length < 75) clearTimeout(this.updateTimer)
-    this.updateTimer = setTimeout(() => this.writeUpdates(), 4000)
   }
 
   set (path, value) {
