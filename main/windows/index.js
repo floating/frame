@@ -99,9 +99,9 @@ const api = {
       icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
       webPreferences: {
-        nodeIntegration: test,
+        nodeIntegration: false,
         contextIsolation: !test,
-        sandbox: !test,
+        sandbox: false,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: test,
         preload: path.resolve(__dirname, '../../bundle/bridge.js'),
@@ -387,9 +387,9 @@ const api = {
       // icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
       webPreferences: {
-        nodeIntegration: test,
+        nodeIntegration: false,
         contextIsolation: !test,
-        sandbox: !test,
+        sandbox: false,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: test,
         preload: path.resolve(__dirname, '../../bundle/bridge.js'),

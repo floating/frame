@@ -2,10 +2,18 @@ import { ipcRenderer } from 'electron'
 // import state from '../../state'
 import rpc from './rpc'
 
+const testMode = process.env.NODE_ENV === 'test'
 // const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
 // process.once('loaded', () => { global.setImmediate = _setImmediate })
 // webFrame.executeJavaScript(`window.__initialState = ${JSON.stringify(state())}`)
+
+if (testMode) {
+  window.electronRequire = require
+} else {
+  // in non-test environment (with context isolation enabled) you need to
+  // use the contextBridge here instead of modifying the window object directly
+}
 
 const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
 const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v

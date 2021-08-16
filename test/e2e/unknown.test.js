@@ -7,6 +7,7 @@ const frame = new spectron.Application({
   // built version: path: '/Applications/Frame.app/Contents/MacOS/Frame'
   path: electronPath,
   args: ['./compiled'],
+  requireName: 'electronRequire',
   // TODO: point this to the container's config directory so beta warning window isn't displayed
   chromeDriverArgs: ['user-data-dir=/Users/matthewholtzman/Library/Application Support/Electron'],
   env: {
