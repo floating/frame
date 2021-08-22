@@ -10,8 +10,8 @@ const crypt = require('../../crypt')
 class Signer extends EventEmitter {
   constructor () {
     super()
+
     this.addresses = []
-    this.requests = {}
   }
 
   deriveHDAccounts (publicKey, chainCode, cb) {
