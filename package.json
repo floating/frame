@@ -134,6 +134,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.15.0",
+    "@babel/node": "^7.14.9",
     "@babel/plugin-proposal-decorators": "7.14.5",
     "@babel/plugin-proposal-do-expressions": "7.14.5",
     "@babel/plugin-proposal-export-default-from": "7.14.5",
