@@ -5,7 +5,7 @@ let requestHandlers
 let testConnection = {
   send: jest.fn(payload => {
     if (payload.method in requestHandlers) {
-      return Promise.resolve(requestHandlers[payload.method]())
+      return Promise.resolve(requestHandlers[payload.method](payload.params))
     }
 
     return Promise.reject('unsupported method: ' + payload.method)
@@ -61,12 +61,16 @@ describe('#getFeePerGas', () => {
 
   beforeEach(() => {
     requestHandlers = {
-      eth_feeHistory: () => ({
-        baseFeePerGas: baseFeeHistory,
-        gasUsedRatio: gasUsedRatios,
-        oldestBlock: 8998959,
-        reward: blockRewards
-      })
+      eth_feeHistory: (params) => {
+        const numBlocks = parseInt(params[0] || '0x', 16)
+
+        return {
+          baseFeePerGas: baseFeeHistory.slice(-numBlocks),
+          gasUsedRatio: gasUsedRatios,
+          oldestBlock: '0x89502f',
+          reward: blockRewards
+        }
+      }
     }
   })
 

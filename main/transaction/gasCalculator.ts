@@ -3,15 +3,11 @@ import { intToHex } from 'ethereumjs-util'
 const oneGwei = 1e9
 
 // TODO: move these to a declaration file?
-interface GasEstimateResponse {
-  error?: string,
-  result: string
-}
-
 interface FeeHistoryResponse {
   baseFeePerGas: string[],
   gasUsedRatio: number[],
-  reward: Array<string[]>
+  reward: Array<string[]>,
+  oldestBlock: string
 }
 
 interface ProviderRequest {
@@ -58,7 +54,8 @@ export default class GasCalculator {
   }
 
   async _getFeeHistory(numBlocks: number, rewardPercentiles: number[], newestBlock = 'latest'): Promise<Block[]> {
-    const payload = rpcPayload('eth_feeHistory', [numBlocks, newestBlock, rewardPercentiles])
+    const blockCount = intToHex(numBlocks)
+    const payload = rpcPayload('eth_feeHistory', [blockCount, newestBlock, rewardPercentiles])
 
     const feeHistory: FeeHistoryResponse = await this.connection.send(payload)
 
