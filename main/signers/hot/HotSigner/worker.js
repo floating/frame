@@ -50,6 +50,7 @@ class HotSignerWorker {
   signTransaction (key, rawTx, pseudoCallback) {
     sign(rawTx, tx => {
       const signedTx = tx.sign(key)
+
       const serialized = signedTx.serialize().toString('hex')
 
       pseudoCallback(null, addHexPrefix(serialized))
