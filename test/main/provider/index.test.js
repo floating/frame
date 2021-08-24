@@ -42,6 +42,38 @@ beforeAll(async () => {
   provider.handlers = {}
 })
 
+describe('#getRawTx', () => {
+  it('leaves a valid value unchanged', () => {
+    const tx = provider.getRawTx({ value: '0x2540be400' })
+
+    expect(tx.value).toBe('0x2540be400')
+  })
+
+  it('removes a leading zero from a valid value', () => {
+    const tx = provider.getRawTx({ value: '0x0a45c6' })
+
+    expect(tx.value).toBe('0xa45c6')
+  })
+
+  it('leaves a valid zero value unchanged', () => {
+    const tx = provider.getRawTx({ value: '0x0' })
+
+    expect(tx.value).toBe('0x0')
+  })
+
+  it('turns a zero value into the correct hex value for zero', () => {
+    const tx = provider.getRawTx({ value: '0x' })
+
+    expect(tx.value).toBe('0x0')
+  })
+
+  it('turns an undefined value into the correct hex value for zero', () => {
+    const tx = provider.getRawTx({ value: undefined })
+
+    expect(tx.value).toBe('0x0')
+  })
+})
+
 describe('#signAndSend', () => {
   let tx = {}, request = {}
 
