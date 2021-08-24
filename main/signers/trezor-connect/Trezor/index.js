@@ -208,27 +208,39 @@ class Trezor extends Signer {
     })
   }
 
-  _normalizeTransaction (rawTx) {
-    return {
-      nonce: this.normalize(rawTx.nonce),
-      gasPrice: this.normalize(rawTx.gasPrice),
-      gasLimit: this.normalize(rawTx.gasLimit),
-      to: this.normalize(rawTx.to),
-      value: this.normalize(rawTx.value),
-      data: this.normalize(rawTx.data),
-      chainId: utils.hexToNumber(rawTx.chainId)
+  _normalizeTransaction (chainId, tx) {
+    const txJson = tx.toJSON()
+
+    const unsignedTx = {
+      nonce: this.normalize(txJson.nonce),
+      gasLimit: this.normalize(txJson.gasLimit),
+      to: this.normalize(txJson.to),
+      value: this.normalize(txJson.value),
+      data: this.normalize(txJson.data),
+      chainId: utils.hexToNumber(chainId)
     }
+
+    const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']
+
+    optionalFields.forEach(field => {
+      if (txJson[field]) {
+        unsignedTx[field] = this.normalize(txJson[field])
+      }
+    })
+
+    return unsignedTx
   }
 
   signTransaction (index, rawTx, cb) {
-    // as of 08-05-2021 Trezor doesn't support EIP-1559 transactions
-    const legacyTx = londonToLegacy(rawTx)
+    const compatibility = signerCompatibility(rawTx, this.summary())
+    const compatibleTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
-    const trezorTx = this._normalizeTransaction(legacyTx)
-    const path = this.getPath(index)
 
-    sign(legacyTx, () => {
+    sign(compatibleTx, () => {
       return new Promise((resolve, reject) => {
+        const trezorTx = this._normalizeTransaction(tx)
+        const path = this.getPath(index)
+
         flex.rpc('trezor.ethereumSignTransaction', this.device.path, path, trezorTx, (err, result) => {
           return err
             ? reject(err)
