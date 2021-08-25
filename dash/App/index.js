@@ -82,7 +82,7 @@ class AddAccounts extends React.Component {
           <div className='addAccountsHeaderTitle'>What type of account would you like to add?</div>
           <div className='addAccountsHeaderClose' onMouseDown={() => this.props.close()}>{svg.close(20)}</div>
         </div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>Grid+ Lattice1</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Wallet</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'trezor' })}>Trezor Wallet</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
