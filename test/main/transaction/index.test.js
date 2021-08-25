@@ -206,18 +206,18 @@ describe('#populate', () => {
     data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072'
   }
 
-  describe('legacy transactions', () => {
-    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'istanbul' })
-
-    beforeEach(() => {
-      gas = {
-        price: {
-          levels: {
-            fast: ''
-          }
+  beforeEach(() => {
+    gas = {
+      price: {
+        levels: {
+          fast: ''
         }
       }
-    })
+    }
+  })
+
+  describe('legacy transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'istanbul' })
 
     it('sets the transaction type', () => {
       const tx = populate(rawTx, chainConfig, gas)
