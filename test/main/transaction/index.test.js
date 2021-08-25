@@ -118,8 +118,8 @@ describe('#signerCompatibility', () => {
     expect(compatibility.compatible).toBe(true)
   })
 
-  it('is not compatible for eip-1559 transactions on Trezor signers using firmware prior to 2.4.2', () => {
-    const appVersion = { major: 2, minor: 3, patch: 1 }
+  it('is not compatible for eip-1559 transactions on Trezor signers', () => {
+    const appVersion = { major: 1, minor: 1, patch: 1 }
     const tx = {
       type: '0x2'
     }
@@ -129,32 +129,6 @@ describe('#signerCompatibility', () => {
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')
     expect(compatibility.compatible).toBe(false)
-  })
-
-  it('is compatible for eip-1559 transactions on Trezor signers using firmware 2.4.2+', () => {
-    const appVersion = { major: 2, minor: 4, patch: 3 }
-    const tx = {
-      type: '0x2'
-    }
-
-    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
-
-    expect(compatibility.signer).toBe('trezor')
-    expect(compatibility.tx).toBe('london')
-    expect(compatibility.compatible).toBe(true)
-  })
-
-  it('is compatible for eip-1559 transactions on Trezor signers using firmware 3.x', () => {
-    const appVersion = { major: 3, minor: 2, patch: 4 }
-    const tx = {
-      type: '0x2'
-    }
-
-    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
-
-    expect(compatibility.signer).toBe('trezor')
-    expect(compatibility.tx).toBe('london')
-    expect(compatibility.compatible).toBe(true)
   })
 })
 
@@ -259,16 +233,6 @@ describe('#populate', () => {
     })
   })
 
-  describe('eip-2930 transactions', () => {
-    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
-
-    it('sets the transaction type', () => {
-      const tx = populate(rawTx, chainConfig, gas)
-
-      expect(tx.type).toBe('0x1')
-    })
-  })
-
   describe('eip-1559 transactions', () => {
     const chainConfig = new Common({ chain: 'mainnet', hardfork: 'london' })
 
@@ -303,6 +267,16 @@ describe('#populate', () => {
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((2e9 + 8e9).toString(16)))
+    })
+  })
+
+  describe('eip-2930 transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
+
+    it('sets the transaction type', () => {
+      const tx = populate(rawTx, chainConfig, gas)
+
+      expect(tx.type).toBe('0x1')
     })
   })
 })

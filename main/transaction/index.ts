@@ -8,7 +8,6 @@ const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
   ledger: version => version.major >= 2 || (version.major >= 1 && version.minor >= 9),
-  trezor: version => version.major >= 3 || (version.major >= 2 && version.minor >= 4 && version.patch >= 2),
   lattice: version =>  version.major >= 1 || version.minor >= 11
 }
 
