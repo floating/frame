@@ -107,7 +107,7 @@ class AddHardwareLattice extends React.Component {
               <div className='addAccountItemTopTitle'>Lattice</div>
             </div>
             <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
-            <div className='addAccountItemSummary'>Grid+ Lattice1</div>
+            <div className='addAccountItemSummary'>GridPlus Lattice1</div>
           </div>
           <div className='addAccountItemOption'>
             <div
@@ -122,8 +122,12 @@ class AddHardwareLattice extends React.Component {
                       tabIndex='-1' ref={this.forms[0]} value={this.state.deviceId}
                       onChange={e => this.onChange('deviceId', e)}
                       onFocus={e => this.onFocus('deviceId', e)}
-                      onBlur={e => this.onBlur('deviceId', e)} onKeyPress={e => {
-                        if (e.key === 'Enter') this.createLattice()
+                      onBlur={e => this.onBlur('deviceId', e)} 
+                      onKeyPress={e => { 
+                        if (e.key === 'Enter') {
+                          this.createLattice()
+                          this.next()
+                        }
                       }}
                     />
                   </div>
