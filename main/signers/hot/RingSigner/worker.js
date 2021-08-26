@@ -52,11 +52,11 @@ class RingSignerWorker extends HotSignerWorker {
     super.signMessage(this.keys[index], message, pseudoCallback)
   }
 
-  signTypedData ({ index, typedData }, pseudoCallback) {
+  signTypedData (params, pseudoCallback) {
     // Make sure signer is unlocked
     if (!this.keys) return pseudoCallback('Signer locked')
     // Sign Typed Data
-    super.signTypedData(this.keys[index], typedData, pseudoCallback)
+    super.signTypedData(this.keys[params.index], params, pseudoCallback)
   }
 
   signTransaction ({ index, rawTx }, pseudoCallback) {

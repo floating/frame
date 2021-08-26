@@ -1,5 +1,4 @@
 // Translated to JavaScript from https://github.com/dicether/eip712/blob/master/src/eip712.ts
-const ethSigUtil = require('eth-sig-util')
 const abi = require('ethereumjs-abi')
 const ethUtil = require('ethereumjs-util')
 
@@ -110,10 +109,4 @@ function hashTypedData (typedData) {
   )
 }
 
-function signTypedData (version, typedData, privateKey) {
-  // const hash = hashTypedData(typedData)
-  // const sig = ethUtil.ecsign(hash, privateKey)
-  return ethSigUtil.signTypedMessage(privateKey, { data: typedData }, version)
-}
-
-module.exports = { signTypedData, hashTypedData }
+module.exports = { hashTypedData }

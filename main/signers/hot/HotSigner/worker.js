@@ -1,8 +1,8 @@
 const crypto = require('crypto')
+const ethSigUtil = require('eth-sig-util')
 const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
 
 const { sign } = require('../../../transaction')
-const { signTypedData } = require('../../../crypt/typedDataUtils')
 
 class HotSignerWorker {
   constructor () {
@@ -43,7 +43,7 @@ class HotSignerWorker {
   }
 
   signTypedData (key, params, pseudoCallback) {
-    const signature = signTypedData(params.version, params.typedData, key)
+    const signature = ethSigUtil.signTypedMessage(key, { data: params.typedData }, params.version)
     pseudoCallback(null, signature)
   }
 

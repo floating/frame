@@ -413,7 +413,7 @@ class Provider extends EventEmitter {
     const handlerId = uuid()
     this.handlers[handlerId] = res
 
-    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: currentAccount, version, origin: payload._origin })
+    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount, origin: payload._origin })
   }
 
   subscribe (payload, res) {
