@@ -63,7 +63,7 @@ class Lattice extends Signer {
       this.client = new Client({
         name: suffix ? `Frame-${suffix}` : 'Frame',
         crypto: crypto,
-        timeout: 30000,
+        timeout: 120000,
         baseUrl,
         privKey
       })
