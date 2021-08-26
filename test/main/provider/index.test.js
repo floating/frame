@@ -74,6 +74,83 @@ describe('#getRawTx', () => {
   })
 })
 
+describe('#send', () => {
+  let accountRequests = []
+  const send = (request, cb = jest.fn()) => provider.send(request, cb)
+
+  const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
+
+  beforeEach(() => {
+    accountRequests = []
+
+    mockAccounts.getAccounts = jest.fn(() => [address])
+    mockAccounts.addRequest = req => accountRequests.push(req)
+  })
+
+  describe('#eth_signTypedData', () => {
+    const typedData = {
+      types: {
+          EIP712Domain: 'domain',
+          Bid: 'bid',
+          Identity: 'identity',
+      },
+      domain: 'domainData',
+      primaryType: 'Bid',
+      message: 'message'
+    }
+
+    const validRequests = [
+      // the first 2 parameters are reversed for V1
+      { method: 'eth_signTypedData', params: [typedData, address], version: 'V1' },
+      { method: 'eth_signTypedData_v1', params: [typedData, address], version: 'V1' },
+      { method: 'eth_signTypedData_v3', params: [address, typedData], version: 'V3' },
+      { method: 'eth_signTypedData_v4', params: [address, typedData], version: 'V4' }
+    ]
+
+    function verifyRequest (version) {
+      expect(accountRequests).toHaveLength(1)
+      expect(accountRequests[0].handlerId).toBeTruthy()
+      expect(accountRequests[0].payload.params[0]).toBe(address)
+      expect(accountRequests[0].payload.params[1]).toEqual(typedData)
+      expect(accountRequests[0].version).toBe(version)
+    }
+    
+    validRequests.forEach(({ method, params, version }) => {
+      it(`submits a ${method} request to sign typed data`, () => {
+        send({ method, params })
+  
+        verifyRequest(version)
+      })
+    })
+
+    it('handles typed data as a stringified json param', () => {
+      const params = [JSON.stringify(typedData), address]
+
+      send({ method: 'eth_signTypedData', params })
+
+      verifyRequest('V1')
+    })
+
+    it('does not submit a request from an account other than the current one', done => {
+      const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', typedData]
+
+      send({ method: 'eth_signTypedData_v3', params }, err => {
+        expect(err.error).toBeTruthy()
+        done()
+      })
+    }, 100)
+
+    it('does not submit a request with malformed type data', done => {
+      const params = [address, 'test']
+
+      send({ method: 'eth_signTypedData_v3', params }, err => {
+        expect(err.error).toBeTruthy()
+        done()
+      })
+    }, 100)
+  })
+})
+
 describe('#signAndSend', () => {
   let tx = {}, request = {}
 

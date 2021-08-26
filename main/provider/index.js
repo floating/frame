@@ -384,23 +384,36 @@ class Provider extends EventEmitter {
     accounts.addRequest(req, _res)
   }
 
-  signTypedData (payload, res) {
-    let [from = '', typedData = {}, ...rest] = payload.params
-    const current = accounts.getAccounts()[0]
-    if (from.toLowerCase() !== current.toLowerCase()) return this.resError('signTypedData request is not from currently selected account.', payload, res)
+  signTypedData (rawPayload, version, res) {
+    // v1 has the param order as: [data, address, ...], all other versions have [address, data, ...]
+    const orderedParams = version === 'V1'
+      ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
+      : [...rawPayload.params]
+
+    const payload = {
+      ...rawPayload,
+      params: orderedParams
+    }
+
+    let [from = '', typedData = {}, ...additionalParams] = payload.params
+    const currentAccount = accounts.getAccounts()[0]
+
+    if (from.toLowerCase() !== currentAccount.toLowerCase()) return this.resError('signTypedData request is not from currently selected account.', payload, res)
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof (typedData) === 'string') {
       try {
         typedData = JSON.parse(typedData)
-        payload.params = [from, typedData, ...rest]
+        payload.params = [from, typedData, ...additionalParams]
       } catch (e) {
         return this.resError('Malformed typedData.', payload, res)
       }
     }
+
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: accounts.getAccounts()[0], origin: payload._origin })
+
+    accounts.addRequest({ handlerId, type: 'signTypedData', payload, account: currentAccount, version, origin: payload._origin })
   }
 
   subscribe (payload, res) {
@@ -461,22 +474,29 @@ class Provider extends EventEmitter {
   }
 
   send (payload, res = () => {}, targetChain) {
-    if (payload.method === 'eth_coinbase') return this.getCoinbase(payload, res)
-    if (payload.method === 'eth_accounts') return this.getAccounts(payload, res)
-    if (payload.method === 'eth_requestAccounts') return this.getAccounts(payload, res)
-    if (payload.method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
-    if (payload.method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
-    if (payload.method === 'personal_ecRecover') return this.ecRecover(payload, res)
-    if (payload.method === 'web3_clientVersion') return this.clientVersion(payload, res)
-    if (payload.method === 'eth_sign' || payload.method === 'personal_sign') return this.ethSign(payload, res)
-    if (payload.method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
-    if (payload.method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
-    if (payload.method === 'eth_signTypedData' || payload.method === 'eth_signTypedData_v3' || payload.method === 'eth_signTypedData_v4') return this.signTypedData(payload, res)
-    if (payload.method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
+    const method = payload.method || ''
+
+    if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
+    if (method === 'eth_accounts') return this.getAccounts(payload, res)
+    if (method === 'eth_requestAccounts') return this.getAccounts(payload, res)
+    if (method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
+    if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
+    if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
+    if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
+    if (method === 'eth_sign' || method === 'personal_sign') return this.ethSign(payload, res)
+    if (method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
+    if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
+
+    if (method.startsWith('eth_signTypedData')) {
+      const version = (method.substring(18) || 'v1').toUpperCase()
+      return this.signTypedData(payload, version, res)
+    }
+    
+    if (method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
 
     // Connection dependant methods need to pass targetChain
-    if (payload.method === 'net_version') return this.getNetVersion(payload, res, targetChain)
-    if (payload.method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
+    if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
+    if (method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
 
     // Delete custom data
     delete payload._origin
