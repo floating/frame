@@ -206,18 +206,18 @@ describe('#populate', () => {
     data: '0x0000000000000000000006635f83421bf059cd8111f180f0726635f83421bf059cd8111f180f072'
   }
 
-  describe('legacy transactions', () => {
-    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
-
-    beforeEach(() => {
-      gas = {
-        price: {
-          levels: {
-            fast: ''
-          }
+  beforeEach(() => {
+    gas = {
+      price: {
+        levels: {
+          fast: ''
         }
       }
-    })
+    }
+  })
+
+  describe('legacy transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'istanbul' })
 
     it('sets the transaction type', () => {
       const tx = populate(rawTx, chainConfig, gas)
@@ -267,6 +267,16 @@ describe('#populate', () => {
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((2e9 + 8e9).toString(16)))
+    })
+  })
+
+  describe('eip-2930 transactions', () => {
+    const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
+
+    it('sets the transaction type', () => {
+      const tx = populate(rawTx, chainConfig, gas)
+
+      expect(tx.type).toBe('0x1')
     })
   })
 })
