@@ -14,8 +14,6 @@ const store = require('../../store')
 
 const { Aragon } = require('../aragon')
 
-const { signerCompatibility, londonToLegacy } = require('../../transaction')
-
 const capitalize = (s) => {
   if (typeof s !== 'string') return ''
   return s.charAt(0).toUpperCase() + s.slice(1)
@@ -319,7 +317,7 @@ class Account {
     }
   }
 
-  signTypedData (typedData, cb) {
+  signTypedData (version, typedData, cb) {
     if (!typedData) return cb(new Error('No data to sign'))
     if (typeof (typedData) !== 'object') return cb(new Error('Data to sign has the wrong format'))
     if (this.signer) {
@@ -327,7 +325,7 @@ class Account {
       if (!s) return cb(new Error(`Cannot find signer for this account`))
       const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
       if (index === -1) cb(new Error(`Signer cannot sign for this address`))
-      s.signTypedData(index, typedData, cb)
+      s.signTypedData(index, version, typedData, cb)
     } else if (this.smart && this.smart.actor) {
       const actingAccount = this.accounts.get(this.smart.actor)
       if (!actingAccount) return cb(new Error('Could not find acting account', this.smart.actor))
@@ -335,7 +333,7 @@ class Account {
       if (!actingSigner || !actingSigner.verifyAddress) return cb(new Error('Could not find acting account signer', actingAccount.signer))
       const index = actingSigner.addresses.map(a => a.toLowerCase()).indexOf(actingAccount.address)
       if (index === -1) cb(new Error(`Acting signer cannot sign for this address, could not find acting address in signer`, actingAccount.address))
-      actingSigner.signTypedData(index, typedData, cb)
+      actingSigner.signTypedData(index, version, typedData, cb)
     } else {
       cb(new Error('No signer found for this account'))
     }

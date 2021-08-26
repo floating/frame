@@ -2,6 +2,7 @@ const { v4: uuid } = require('uuid')
 const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
+const ethSignature = require('eth-sig-util')
 const { padToEven, unpadHexString, addHexPrefix, stripHexPrefix, pubToAddress, ecrecover, hashPersonalMessage, toBuffer, intToHex } = require('ethereumjs-util')
 
 const proxy = require('./proxy')
@@ -9,7 +10,6 @@ const proxy = require('./proxy')
 const store = require('../store')
 const chains = require('../chains')
 const accounts = require('../accounts')
-const { recoverTypedData } = require('../crypt/typedDataUtils')
 
 const { populate: populateTransaction, usesBaseFee } = require('../transaction')
 
@@ -171,21 +171,21 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
-    const [address, typedData] = payload.params
+    const [address, data] = payload.params
 
-    accounts.signTypedData(address, typedData, (err, signed) => {
+    accounts.signTypedData(req.version, address, data, (err, sig) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
       } else {
-        const recoveredAddress = recoverTypedData(typedData, signed)
+        const recoveredAddress = ethSignature.recoverTypedMessage({ data, sig }, req.version)
         if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
           const err = new Error('TypedData signature verification failed')
           this.resError(err.message, { ...payload, recoveredAddress }, res)
           cb(err.message)
         } else {
-          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
-          cb(null, signed)
+          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
+          cb(null, sig)
         }
       }
     })

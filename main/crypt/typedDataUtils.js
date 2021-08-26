@@ -110,18 +110,10 @@ function hashTypedData (typedData) {
   )
 }
 
-function signTypedData (typedData, privateKey) {
-  const hash = hashTypedData(typedData)
-  const sig = ethUtil.ecsign(hash, privateKey)
-  return ethSigUtil.concatSig(sig.v, sig.r, sig.s)
+function signTypedData (version, typedData, privateKey) {
+  // const hash = hashTypedData(typedData)
+  // const sig = ethUtil.ecsign(hash, privateKey)
+  return ethSigUtil.signTypedMessage(privateKey, { data: typedData }, version)
 }
 
-function recoverTypedData (typedData, signature) {
-  const hash = hashTypedData(typedData)
-  const sigParams = ethUtil.fromRpcSig(signature)
-  const pubKey = ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
-  const address = ethUtil.pubToAddress(pubKey)
-  return ethUtil.toChecksumAddress(ethUtil.bufferToHex(address))
-}
-
-module.exports = { recoverTypedData, signTypedData, hashTypedData }
+module.exports = { signTypedData, hashTypedData }

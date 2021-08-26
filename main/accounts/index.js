@@ -451,10 +451,10 @@ class Accounts extends EventEmitter {
     this.current().signMessage(message, cb)
   }
 
-  signTypedData (address, typedData, cb) {
+  signTypedData (version, address, typedData, cb) {
     if (!this.current()) return cb(new Error('No Account Selected'))
     if (address.toLowerCase() !== this.getSelectedAddress().toLowerCase()) return cb(new Error('signMessage: Wrong Account Selected'))
-    this.current().signTypedData(typedData, cb)
+    this.current().signTypedData(version, typedData, cb)
   }
 
   signTransaction (rawTx, cb) {
