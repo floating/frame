@@ -37,8 +37,6 @@ class Lattice extends Signer {
       }
 
     })
-
-    this.update()
   }
 
   createClient () {
@@ -65,13 +63,13 @@ class Lattice extends Signer {
       this.client = new Client({
         name: suffix ? `Frame-${suffix}` : 'Frame',
         crypto: crypto,
-        timeout: 30000,
+        timeout: 120000,
         baseUrl,
         privKey
       })
 
       this.status = 'disconnected'
-      this.update()
+      this.create()
     }
   }
 
@@ -128,6 +126,7 @@ class Lattice extends Signer {
       } catch (e) {
         log.error(e)
       }
+      // Update this signer only if it was previously created
       this.status = err
       this.update()
       log.error('Lattice Open Error', err)
@@ -249,8 +248,20 @@ class Lattice extends Signer {
     }
   }
 
+  signerExists() {
+    return (store('main.signers')[`lattice-${this.deviceId}`]) !== undefined
+  }
+
   update () {
-    store.updateSigner(this.summary())
+    // If this signer exists, update with current params
+    if (this.signerExists())
+      store.updateSigner(this.summary())
+  }
+
+  create () {
+    // If this signer does NOT exist, create it
+    if (!this.signerExists())
+      store.updateSigner(this.summary())
   }
 
   async reset () {
