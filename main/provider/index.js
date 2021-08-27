@@ -359,7 +359,7 @@ class Provider extends EventEmitter {
     })
   }
 
-  getTransactionByHash (payload, cb) {
+  getTransactionByHash (payload, cb, targetChain) {
     const res = response => {
       if (response.result && !response.result.gasPrice && response.result.maxFeePerGas) {
         return cb({ ...response, result: { ...response.result, gasPrice: response.result.maxFeePerGas } })
