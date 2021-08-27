@@ -357,7 +357,7 @@ class Ledger extends Signer {
   }
 
   async signTypedData (index, version, typedData, cb) {
-    const versionNum = version.match(/[Vv](\d+)/)[1]
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
       return cb(new Error(`Invalid version (${version}), Ledger only supports eth_signTypedData version 4+`))
