@@ -3,7 +3,22 @@ const EventEmitter = require('events')
 const log = require('electron-log')
 const utils = require('web3-utils')
 const ethSignature = require('eth-sig-util')
-const { padToEven, unpadHexString, addHexPrefix, stripHexPrefix, pubToAddress, ecrecover, hashPersonalMessage, toBuffer, intToHex } = require('ethereumjs-util')
+
+const {
+  padToEven,
+  unpadHexString,
+  addHexPrefix,
+  stripHexPrefix,
+  intToHex,
+  isHexString,
+  isHexPrefixed,
+  fromUtf8,
+  toBuffer,
+  pubToAddress,
+  ecrecover,
+  hashPersonalMessage
+} = require('ethereumjs-util')
+
 
 const proxy = require('./proxy')
 
@@ -144,15 +159,26 @@ class Provider extends EventEmitter {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
+
     const payload = req.payload
-    const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
-    const message = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
+    let [address, rawMessage] = payload.params
+
+    let message = rawMessage
+
+    if (isHexString(rawMessage)) {
+      if (!isHexPrefixed(rawMessage)) {
+        message = addHexPrefix(rawMessage)
+      }
+    } else {
+      message = fromUtf8(rawMessage)
+    }
+
     accounts.signMessage(address, message, (err, signed) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
       } else {
-        this.verifySignature(signed, message, address, (err, success) => {
+        this.verifySignature(signed, message, address, err => {
           if (err) {
             this.resError(err.message, payload, res)
             cb(err.message)
@@ -300,6 +326,10 @@ class Provider extends EventEmitter {
     })
   }
 
+  _isCurrentAccount (address, account = accounts.current()) {
+    return address && (account.id.toLowerCase() === address.toLowerCase())
+  }
+
   _gasFees (rawTx) {
     const chain = {
       type: 'ethereum',
@@ -341,20 +371,21 @@ class Provider extends EventEmitter {
 
   sendTransaction (payload, res) {
     const newTx = payload.params[0]
-    const activeAccount = accounts.current()
+    const currentAccount = accounts.current()
 
     this.fillTransaction(newTx, (err, tx) => {
       if (err) {
         this.resError(err, payload, res)
       } else {
         const from = tx.from
-        if (from && from.toLowerCase() !== activeAccount.id) return this.resError('Transaction is not from currently selected account', payload, res)
+
+        if (from && !this._isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
         const handlerId = uuid()
         this.handlers[handlerId] = res
 
         const { warning, ...data } = tx
         
-        accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: activeAccount.id, origin: payload._origin, warning }, res)
+        accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: currentAccount.id, origin: payload._origin, warning }, res)
       }
     })
   }
@@ -371,16 +402,32 @@ class Provider extends EventEmitter {
     this.connection.send(payload, res, targetChain)
   }
 
-  ethSign (payload, res) {
-    payload.params = [payload.params[0], payload.params[1]]
-    if (!payload.params.every(utils.isHexStrict)) return this.resError('ethSign Error: Invalid hex values', payload, res)
+  sign (payload, res) {
+    // normalize the payload for downstream rendering
+    const orderedParams = payload.method === 'eth_sign'
+      ? [...payload.params]
+      : [payload.params[1], payload.params[0], ...payload.params.slice(2)]
+
+    const normalizedPayload = {
+      ...payload,
+      params: orderedParams
+    }
+
+    const from = orderedParams[0]
+    const currentAccount = accounts.current()
+
+    if (!this._isCurrentAccount(from, currentAccount)) return this.resError('sign request is not from currently selected account.', payload, res)
+
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    const req = { handlerId, type: 'sign', payload, account: accounts.getAccounts()[0], origin: payload._origin }
+
+    const req = { handlerId, type: 'sign', payload: normalizedPayload, account: currentAccount.getAccounts[0], origin: payload._origin }
+
     const _res = data => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
+
     accounts.addRequest(req, _res)
   }
 
@@ -396,9 +443,9 @@ class Provider extends EventEmitter {
     }
 
     let [from = '', typedData = {}, ...additionalParams] = payload.params
-    const currentAccount = accounts.getAccounts()[0]
+    const currentAccount = accounts.current()
 
-    if (from.toLowerCase() !== currentAccount.toLowerCase()) return this.resError('signTypedData request is not from currently selected account.', payload, res)
+    if (!this._isCurrentAccount(from, currentAccount)) return this.resError('signTypedData request is not from currently selected account.', payload, res)
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof (typedData) === 'string') {
@@ -413,7 +460,7 @@ class Provider extends EventEmitter {
     const handlerId = uuid()
     this.handlers[handlerId] = res
 
-    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount, origin: payload._origin })
+    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
   }
 
   subscribe (payload, res) {
@@ -483,9 +530,9 @@ class Provider extends EventEmitter {
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
-    if (method === 'eth_sign' || method === 'personal_sign') return this.ethSign(payload, res)
     if (method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
+    if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
     if (method.startsWith('eth_signTypedData')) {
       const version = (method.substring(18) || 'v1').toUpperCase()

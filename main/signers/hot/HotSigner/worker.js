@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 const ethSigUtil = require('eth-sig-util')
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
+const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
 
 const { sign } = require('../../../transaction')
 
@@ -27,18 +27,15 @@ class HotSignerWorker {
   }
 
   signMessage (key, message, pseudoCallback) {
-    // Check if message is hex
-    if (isHexString(message)) {
-      if (!isHexPrefixed(message)) message = '0x' + message
-    } else {
-      message = fromUtf8(message)
-    }
     // Hash message
     const hash = hashPersonalMessage(toBuffer(message))
+
     // Sign message
     const signed = ecsign(hash, key)
+
     // Return serialized signed message
     const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
+
     pseudoCallback(null, addHexPrefix(hex))
   }
 

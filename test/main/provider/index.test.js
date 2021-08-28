@@ -83,8 +83,52 @@ describe('#send', () => {
   beforeEach(() => {
     accountRequests = []
 
-    mockAccounts.getAccounts = jest.fn(() => [address])
+    mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
     mockAccounts.addRequest = req => accountRequests.push(req)
+  })
+
+  describe('#eth_sign', () => {
+    const message = 'hello, Ethereum!'
+
+    it('submits a request to sign a message', () => {
+      send({ method: 'eth_sign', params: [address, message] })
+
+      expect(accountRequests).toHaveLength(1)
+      expect(accountRequests[0].handlerId).toBeTruthy()
+      expect(accountRequests[0].payload.params[0]).toBe(address)
+      expect(accountRequests[0].payload.params[1]).toEqual(message)
+    })
+
+    it('does not submit a request from an account other than the current one', done => {
+      const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', message]
+
+      send({ method: 'eth_sign', params }, err => {
+        expect(err.error).toBeTruthy()
+        done()
+      })
+    }, 100)
+  })
+
+  describe('#personal_sign', () => {
+    const message = 'hello, Ethereum!'
+
+    it('submits a request to sign a personal message', () => {
+      send({ method: 'personal_sign', params: [message, address] })
+
+      expect(accountRequests).toHaveLength(1)
+      expect(accountRequests[0].handlerId).toBeTruthy()
+      expect(accountRequests[0].payload.params[0]).toBe(address)
+      expect(accountRequests[0].payload.params[1]).toEqual(message)
+    })
+
+    it('does not submit a request from an account other than the current one', done => {
+      const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', message]
+
+      send({ method: 'personal_sign', params }, err => {
+        expect(err.error).toBeTruthy()
+        done()
+      })
+    }, 100)
   })
 
   describe('#eth_signTypedData', () => {
