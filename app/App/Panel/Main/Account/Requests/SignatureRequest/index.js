@@ -42,7 +42,8 @@ class TransactionRequest extends React.Component {
     const status = this.props.req.status
     const notice = this.props.req.notice
     const payload = this.props.req.payload
-    const message = utils.toAscii(payload.method === 'eth_sign' ? payload.params[1] : payload.params[0] || '0x')
+    const message = payload.params[1]
+
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'

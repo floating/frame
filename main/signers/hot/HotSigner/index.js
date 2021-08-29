@@ -109,8 +109,8 @@ class HotSigner extends Signer {
     this._callWorker(payload, cb)
   }
 
-  signTypedData (index, typedData, cb) {
-    const payload = { method: 'signTypedData', params: { index, typedData } }
+  signTypedData (index, version, typedData, cb) {
+    const payload = { method: 'signTypedData', params: { index, typedData, version } }
     this._callWorker(payload, cb)
   }
 

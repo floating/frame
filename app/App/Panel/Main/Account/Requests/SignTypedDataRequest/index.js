@@ -4,7 +4,7 @@ import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
-const SimpleJSON = ({ json, key = '_base' }) => {
+const SimpleJSON = ({ json }) => {
   return (
     <div className='simpleJson'>
       {Object.keys(json).map((key, o) => (
@@ -70,6 +70,36 @@ class TransactionRequest extends React.Component {
     if (status === 'error') requestClass += ' signerRequestError'
     const mode = this.props.req.mode
     const height = mode === 'monitor' ? '80px' : '340px'
+
+    const messageToSign = typedData.domain
+     ? (
+        <div className='signTypedData'>
+          <div className='signTypedDataInner'>
+            <div className='signTypedDataSection'>
+              <div className='signTypedDataTitle'>Domain</div>
+              <SimpleJSON json={typedData.domain} />
+            </div>
+            <div className='signTypedDataSection'>
+              <div className='signTypedDataTitle'>Message</div>
+              <SimpleJSON json={typedData.message} />
+            </div>
+          </div>
+        </div>
+        )
+      : (
+        <div className='signTypedData'>
+          <div className='signTypedDataInner'>
+            <div className='signTypedDataSection'>
+            <SimpleJSON json={
+              typedData.reduce((data, elem) => {
+                data[elem.name] = elem.value
+                return data
+              }, {})
+            } />
+          </div>
+        </div>
+      </div>
+      )
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height }}>
         {type === 'signTypedData' ? (
@@ -110,18 +140,7 @@ class TransactionRequest extends React.Component {
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
                     <div className='approveRequestHeaderLabel'> Sign Message</div>
                   </div>
-                  <div className='signTypedData'>
-                    <div className='signTypedDataInner'>
-                      <div className='signTypedDataSection'>
-                        <div className='signTypedDataTitle'>Domain</div>
-                        <SimpleJSON json={typedData.domain} />
-                      </div>
-                      <div className='signTypedDataSection'>
-                        <div className='signTypedDataTitle'>Message</div>
-                        <SimpleJSON json={typedData.message} />
-                      </div>
-                    </div>
-                  </div>
+                  {messageToSign}
                 </>
               )}
             </div>

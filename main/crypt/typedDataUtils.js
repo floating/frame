@@ -1,5 +1,4 @@
 // Translated to JavaScript from https://github.com/dicether/eip712/blob/master/src/eip712.ts
-const ethSigUtil = require('eth-sig-util')
 const abi = require('ethereumjs-abi')
 const ethUtil = require('ethereumjs-util')
 
@@ -110,18 +109,4 @@ function hashTypedData (typedData) {
   )
 }
 
-function signTypedData (typedData, privateKey) {
-  const hash = hashTypedData(typedData)
-  const sig = ethUtil.ecsign(hash, privateKey)
-  return ethSigUtil.concatSig(sig.v, sig.r, sig.s)
-}
-
-function recoverTypedData (typedData, signature) {
-  const hash = hashTypedData(typedData)
-  const sigParams = ethUtil.fromRpcSig(signature)
-  const pubKey = ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
-  const address = ethUtil.pubToAddress(pubKey)
-  return ethUtil.toChecksumAddress(ethUtil.bufferToHex(address))
-}
-
-module.exports = { recoverTypedData, signTypedData, hashTypedData }
+module.exports = { hashTypedData }

@@ -1,6 +1,7 @@
-const { rlp, addHexPrefix } = require('ethereumjs-util')
+const { rlp, addHexPrefix, padToEven } = require('ethereumjs-util')
 const log = require('electron-log')
 const { v5: uuid } = require('uuid')
+const ethSigUtil = require('eth-sig-util')
 const Eth = require('@ledgerhq/hw-app-eth').default
 const HID = require('node-hid')
 const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
@@ -352,6 +353,31 @@ class Ledger extends Signer {
       }
       this.releaseDevice()
       log.error(err)
+    }
+  }
+
+  async signTypedData (index, version, typedData, cb) {
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
+
+    if ((parseInt(versionNum) || 0) < 4) {
+      return cb(new Error(`Invalid version (${version}), Ledger only supports eth_signTypedData version 4+`))
+    }
+
+    try {
+      if (this.pause) throw new Error('Device access is paused')
+      const eth = await this.getDevice()
+      const signerPath = this.getPath(index)
+
+      const { domain, types, primaryType, message } = ethSigUtil.TypedDataUtils.sanitizeData(typedData)
+      const domainSeparatorHex = ethSigUtil.TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
+      const hashStructMessageHex = ethSigUtil.TypedDataUtils.hashStruct(primaryType, message, types).toString('hex')
+
+      const signature = await eth.signEIP712HashedMessage(signerPath, domainSeparatorHex, hashStructMessageHex)
+      const hashedSignature = signature.r + signature.s + padToEven((signature.v - 27).toString(16))
+
+      cb(null, addHexPrefix(hashedSignature))
+    } catch (e) {
+      cb(e)
     }
   }
 

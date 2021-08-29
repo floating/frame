@@ -10,12 +10,12 @@ const windows = require('../windows')
 const trusted = require('./trusted')
 const validPayload = require('./validPayload')
 const isFrameExtension = require('./isFrameExtension')
+const protectedMethods = require('./protectedMethods')
 
 const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
-const protectedMethods = ['eth_coinbase', 'eth_accounts', 'eth_requestAccounts', 'eth_sendTransaction', 'personal_sign', 'personal_ecRecover', 'eth_sign']
 
 const handler = (socket, req) => {
   socket.id = uuid()
