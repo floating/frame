@@ -18,19 +18,17 @@
 
 <img src="/asset/png/FrameExample0-3-4.png?raw=true" />
 
-Frame is a web3 interface that lets you sign data, manage accounts, run your own connections to Ethereum/IPFS and securely and transparently interact with dapps and web3 protocols.
+Frame is a native web3 interface that lets you sign data, securely manage accounts and transparently interact with dapps via web3 protocols like Ethereum and IPFS!
 
 ### Features
 - **First-class Hardware Signer Support**
-  - Use your Ledger and Trezor accounts with any dapp!
+  - Use your GridPlus, Ledger and Trezor accounts with any dapp!
 - **Extensive Software Signer Support**
   - Use a mnemonic phrase, keystore.json or standalone private keys to create and backup accounts!
 - **Permissions**
   - You'll always have full control of which dapps have permission to access Frame and can monitor with full transparency what requests are being made to the network.
-- **Create your own connections to Ethereum/IPFS**
-  - Run your own Ethereum light client or IPFS gateway without the command line!
-  - Seamlessly swap from local to remote nodes on the fly
-  - Never be locked into using a centralized gateway again!
+- **Set your own connections to Ethereum and IPFS**
+  - Never be locked into using a centralized gateway
 - **Menu Bar Support**
   - Frame stays out of the way and sits quietly in your menu bar until it's needed
 - **Cross Platform**

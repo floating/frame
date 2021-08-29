@@ -841,7 +841,6 @@ class Account extends React.Component {
     requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
 
     const { id } = this.store('main.currentNetwork')
-    const showENS = ensName && id === '1'
 
     return this.props.status !== 'ok' ? (
       <div className='signerStatusNotOk'>{status}</div>
@@ -849,7 +848,7 @@ class Account extends React.Component {
       <>
         {!this.state.addressHover ? (
           <div className='signerName'>
-            <div className={(!showENS || !this.props.name) ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
+            <div className={(!ensName || !this.props.name) ? 'signerNameText' : 'signerNameText signerNameTextENS'}>
               {this.props.name}
             </div>
           </div>
@@ -867,7 +866,7 @@ class Account extends React.Component {
             <div className='transactionToAddressLargeWrap'>
               {this.state.addressHover ? (
                 <div className='transactionToAddressLarge transactionToAddressCopy'>copy address</div>
-              ) : showENS ? (
+              ) : ensName ? (
                 <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
               ) : (
                 <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>

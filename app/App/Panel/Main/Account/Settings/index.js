@@ -23,7 +23,8 @@ class Settings extends React.Component {
   componentDidMount () {
     if (this.resizeObserver) this.resizeObserver.observe(this.moduleRef.current)
     this.nameObs = this.store.observer(() => {
-      this.setState({ name: this.store('main.accounts', this.props.id, 'name') })
+      const name = this.store('main.accounts', this.props.id, 'name')
+      if (name !== this.state.name) this.setState({ name })
     })
   }
 
@@ -53,11 +54,14 @@ class Settings extends React.Component {
             <>
               <div className='moduleRow'>
                 Account Tag: 
-                <input 
+                <input
                   type='text'
                   tabIndex='-1'
                   value={this.state.name} 
-                  onChange={(e) => link.send('tray:renameAccount', this.props.id, e.target.value)} 
+                  onChange={(e) => {
+                    this.setState({ name: e.target.value })
+                    link.send('tray:renameAccount', this.props.id, e.target.value)
+                  }}
                 />
               </div> 
               <div className='moduleRow'>Status: {account.status}</div>
