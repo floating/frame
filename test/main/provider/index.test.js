@@ -17,7 +17,9 @@ class MockConnection extends EventEmitter {
     super()
     
     this.syncDataEmit = jest.fn()
-    this.send = jest.fn()
+    this.send = jest.fn((payload, cb, targetChain) => {
+      cb({ error: 'received unhandled request' })
+    })
   }
 }
 
@@ -192,6 +194,15 @@ describe('#send', () => {
         done()
       })
     }, 100)
+
+    it('passes a request with an unknown version through to the connection', done => {
+      const params = [address, 'test']
+
+      send({ method: 'eth_signTypedData_v5', params }, err => {
+        expect(err.error).toBe('received unhandled request')
+        done()
+      })
+    })
   })
 })
 
