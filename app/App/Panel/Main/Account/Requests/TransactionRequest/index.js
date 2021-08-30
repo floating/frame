@@ -172,7 +172,7 @@ class TransactionRequest extends React.Component {
       maxFeeUSD = maxFee.shiftedBy(-18).multipliedBy(nativeUSD)
     }
 
-    const height = req.status === 'error' ? '205px' : mode === 'monitor' ? '205px' : '340px'
+    const height = req.status === 'error' ? '215px' : mode === 'monitor' ? '215px' : '340px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
@@ -211,7 +211,7 @@ class TransactionRequest extends React.Component {
     const otherChain = (this.chain.id !== this.store('main.currentNetwork.id')) && !this.state.allowOtherChain
 
     let metaChainClass = 'requestMetaChain'
-    if (this.chain.id !== this.store('main.currentNetwork.id')) metaChainClass += ' requestMetaChainTestnet'
+    if (this.chain.id !== this.store('main.currentNetwork.id')) metaChainClass += ' requestMetaChainWarn'
     // if (layer === 'sidechain') metaChainClass += ' requestMetaChainSidechain'
     // if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
     // if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
@@ -232,10 +232,6 @@ class TransactionRequest extends React.Component {
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
-        <div className='requestMeta'>
-          <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks', this.chain.type, this.chain.id, 'name')}</div>
-          <div className='requestMetaOrigin'>{req.origin}</div>
-        </div>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
             {(req.warning || otherChain) && !status &&
@@ -416,6 +412,10 @@ class TransactionRequest extends React.Component {
                 </div>
               ) : (
                 <>
+                  <div className='requestMeta'>
+                    <div className={metaChainClass} style={{ textTransform: 'uppercase' }}>{this.store('main.networks', this.chain.type, this.chain.id, 'name')}</div>
+                    <div className='requestMetaOrigin'>{req.origin}</div>
+                  </div>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'>
                       {svg.octicon('radio-tower', { height: 22 })}
