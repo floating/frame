@@ -1,16 +1,8 @@
-let chains, provider
 import log from 'electron-log'
+import { utils } from 'ethers'
 import { EventEmitter } from 'events'
 
-
 log.transports.console.level = false
-
-// mock disk access modules
-// jest.mock('../../main/store/persist', () => ({
-//   get: jest.fn(),
-//   set: jest.fn(),
-//   queue: jest.fn()
-// }))
 
 // mock electron rendering modules
 class MockElectronApp extends EventEmitter {
@@ -51,10 +43,13 @@ jest.mock('electron', () => {
 jest.mock('../../main/externalData')
 jest.mock('../../main/nebula')
 
+let chains, accounts, provider
+
 beforeAll(async () => {
   mockElectronApp = new MockElectronApp()
 
   chains = (await import('../../main/chains')).default
+  accounts = (await import('../../main/accounts')).default
   provider = (await import('../../main/provider')).default
 
   return new Promise(resolve => {
@@ -63,6 +58,8 @@ beforeAll(async () => {
 })
 
 afterAll(() => {
+  jest.useRealTimers()
+
   mockElectronApp.emit('quit')
 })
 
@@ -79,29 +76,50 @@ it('gets the chain id', function (done) {
   })
 })
 
-it('gets a transaction by hash', function (done) {
-  const request = {
-    jsonrpc: '2.0',
-    id: 1,
-    method: 'eth_getTransactionByHash',
-    params: ['0x9b6887e5b533838640232e5645804e17c5f99604d3ab6a3cac2927d391670c3f']
-  }
-  
-  provider.send(request, response => {
-    const tx = response.result
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    expect(tx).toEqual(
-      expect.objectContaining({
-        blockHash:'0x742e8218fd9f846d90a940bc1634aa9fb560ec34cfde3d43c6a4b26bc19a8a83',
-        from: '0x4722aa9673167306cbb57ff579e26c664f27455b',
-        to: '0x1a96673fd6ebeed815d07c7aba998f75fdd432b6',
-        value: '0x0',
-        v: '0x1',
-        r: '0xd32785caadf19082180d98e1734b23a7280acb9a5f6393aaa626fe251c53b3b3',
-        s: '0x6a2b900711f83ee555cfa91375efedd6b5e2fec26ef589ec39d1c40a2c761b52'
-      })
-    )
-    
-    done()
+
+it('submits a transaction', function (done) {
+  // jest.useFakeTimers()
+  accounts.setSigner('0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266', async (err, summary) => {
+    await sleep(2000)
+    const tx = {
+      value: utils.parseEther('.0002').toHexString(),
+      from: summary.address,
+      to: '0x22c22ebefc6a55b013e0edafbb0a8e5021190def',
+      data: '0x'
+    }
+  
+    const request = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'eth_sendTransaction',
+      params: [tx]
+    }
+
+    provider.send(request, response => {
+      //console.log(accounts.current().requests)
+      //provider.approveRequest(accounts.current().requests[0], jest.fn())
+      const hash = response
+  
+      console.log({ hash })
+      
+      done()
+    })
+
+    let tries = 10
+
+    while (tries > 0 && Object.keys(accounts.current().requests).length <= 0) {
+      await sleep(1000)
+      tries -= 1
+    }
+
+    provider.approveRequest(Object.values(accounts.current().requests)[0], (err, result) => {
+      console.log({ err, result })
+    })
   })
-})
+
+  
+}, 10000)
