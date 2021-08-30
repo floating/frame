@@ -27,9 +27,7 @@ class MockConnection extends EventEmitter {
     super()
     
     this.syncDataEmit = jest.fn()
-    this.send = jest.fn((payload, cb, targetChain) => {
-      cb({ error: 'received unhandled request' })
-    })
+    this.send = jest.fn()
   }
 }
 
@@ -95,6 +93,10 @@ describe('#send', () => {
   beforeEach(() => {
     accountRequests = []
 
+    mockConnection.send.mockImplementation((payload, cb, targetChain) => {
+      cb({ error: 'received unhandled request' })
+    })
+
     mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
     mockAccounts.addRequest = req => accountRequests.push(req)
   })
@@ -112,6 +114,74 @@ describe('#send', () => {
         expect(response.result).toBe('0x4')
         done()
       }, { type: 'ethereum', id: 4 })
+    })
+  })
+
+  describe('#eth_getTransactionByHash', () => {
+    const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
+    const request = { method: 'eth_getTransactionByHash', params: [txHash] }
+    const chain = '4'
+
+    let blockResult
+
+    beforeEach(() => {
+      mockConnection.send.mockImplementation((payload, res, targetChain) => {
+        if (targetChain.id === chain && payload.params[0] === txHash) {
+          return res({ result: blockResult })
+        }
+
+        res({ error: 'invalid request' })
+      })
+    })
+
+    it('returns the response from the connection', done => {
+      blockResult = {
+        blockHash: '0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123',
+        blockNumber: '0xc80d08'
+      }
+
+      send(request, response => {
+        expect(response.result.blockHash).toBe('0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123')
+        expect(response.result.blockNumber).toBe('0xc80d08')
+        done()
+      }, { type: 'ethereum', id: chain })
+    })
+
+    it('uses maxFeePerGas as the gasPrice if one is not defined', done => {
+      const fee = `0x${(10e9).toString(16)}`
+
+      blockResult = {
+        maxFeePerGas: fee
+      }
+
+      send(request, response => {
+        expect(response.result.gasPrice).toBe(fee)
+        expect(response.result.maxFeePerGas).toBe(fee)
+        done()
+      }, { type: 'ethereum', id: chain })
+    })
+
+    it('maintains the gasPrice if maxFeePerGas exists', done => {
+      const gasPrice = `0x${(8e9).toString(16)}`
+      const maxFeePerGas = `0x${(10e9).toString(16)}`
+
+      blockResult = {
+        gasPrice,
+        maxFeePerGas
+      }
+
+      send(request, response => {
+        expect(response.result.gasPrice).toBe(gasPrice)
+        expect(response.result.maxFeePerGas).toBe(maxFeePerGas)
+        done()
+      }, { type: 'ethereum', id: chain })
+    })
+
+    it('returns a response with no result attribute', done => {
+      send(request, response => {
+        expect(response.error).toBe('invalid request')
+        done()
+      }, '1')
     })
   })
 

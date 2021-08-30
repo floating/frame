@@ -153,14 +153,16 @@ describe('Ring signer', () => {
   })
 
   test('Sign message', (done) => {
-    signer.signMessage(0, 'test', (err, result) => {
+    const message = '0x' + Buffer.from('test').toString('hex')
+
+    signer.signMessage(0, message, (err, result) => {
       expect(err).toBe(null)
       expect(result.length).toBe(132)
       done()
     })
   })
 
-  test('Sign tranasction', (done) => {
+  test('Sign transaction', (done) => {
     const rawTx = {
       nonce: '0x6',
       gasPrice: '0x09184e72a000',
