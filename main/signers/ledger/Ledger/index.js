@@ -376,6 +376,8 @@ class Ledger extends Signer {
       const hashedSignature = signature.r + signature.s + padToEven((signature.v - 27).toString(16))
 
       cb(null, addHexPrefix(hashedSignature))
+
+      await this.releaseDevice()
     } catch (e) {
       cb(e)
     }
