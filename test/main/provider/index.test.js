@@ -9,6 +9,16 @@ const mockAccounts = {}
 const mockStore = {
   'main.accounts': {
     "0x22dd63c3619818fdbc262c78baee43cb61e9cccf": {}
+  },
+  'main.currentNetwork': {
+    type: 'ethereum',
+    id: 1
+  },
+  'main.networks.ethereum.1': {
+    id: 1
+  },
+  'main.networks.ethereum.4': {
+    id: 4
   }
 }
 
@@ -29,7 +39,7 @@ jest.mock('../../../main/chains', () => mockConnection)
 jest.mock('../../../main/accounts', () => mockAccounts)
 
 jest.mock('../../../main/store', () => {
-  const store = k => mockStore[k]
+  const store = (...args) => mockStore[args.join('.')]
 
   store.updateAccount = () => {}
   store.observer = () => {}
@@ -78,7 +88,7 @@ describe('#getRawTx', () => {
 
 describe('#send', () => {
   let accountRequests = []
-  const send = (request, cb = jest.fn()) => provider.send(request, cb)
+  const send = (request, cb = jest.fn(), targetChain) => provider.send(request, cb, targetChain)
 
   const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
@@ -87,6 +97,22 @@ describe('#send', () => {
 
     mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
     mockAccounts.addRequest = req => accountRequests.push(req)
+  })
+
+  describe('#eth_chainId', () => {
+    it('returns the current chain id from the store', done => {
+      send({ method: 'eth_chainId' }, response => {
+        expect(response.result).toBe('0x1')
+        done()
+      })
+    })
+
+    it('returns a chain id from the target chain', done => {
+      send({ method: 'eth_chainId' }, response => {
+        expect(response.result).toBe('0x4')
+        done()
+      }, { type: 'ethereum', id: 4 })
+    })
   })
 
   describe('#eth_sign', () => {
