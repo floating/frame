@@ -50,7 +50,7 @@ class TransactionRequest extends React.Component {
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
     const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '205px' : '340px'
+    const height = mode === 'monitor' ? '215px' : '340px'
     const z = mode === 'monitor' ? this.props.z + 2000 - (this.props.i * 2) : this.props.z
     return (
       <div key={this.props.req.id || this.props.req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
@@ -62,7 +62,7 @@ class TransactionRequest extends React.Component {
                   {(_ => {
                     if (status === 'pending') {
                       return (
-                        <div key={status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner cardShow'>
                           <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
                           <div className='requestNoticeInnerText'>See Signer</div>
                           <div className='cancelRequest' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>Cancel</div>
@@ -70,20 +70,20 @@ class TransactionRequest extends React.Component {
                       )
                     } else if (status === 'success') {
                       return (
-                        <div key={status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
                           <div>{svg.octicon('check', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else if (status === 'error' || status === 'declined') {
                       return (
-                        <div key={status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
                           <div>{svg.octicon('circle-slash', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else {
-                      return <div key={notice} className='requestNoticeInner bounceIn'>{notice}</div>
+                      return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
                     }
                   })()}
                 </div>

@@ -57,10 +57,11 @@ class TransactionRequest extends React.Component {
   }
 
   render () {
-    const type = this.props.req.type
-    const status = this.props.req.status
-    const notice = this.props.req.notice
-    const payload = this.props.req.payload
+    const { req } = this.props
+    const type = req.type
+    const status = req.status
+    const notice = req.notice
+    const payload = req.payload
     const typedData = payload.params[1] || {}
 
     let requestClass = 'signerRequest'
@@ -68,8 +69,8 @@ class TransactionRequest extends React.Component {
     if (status === 'declined') requestClass += ' signerRequestDeclined'
     if (status === 'pending') requestClass += ' signerRequestPending'
     if (status === 'error') requestClass += ' signerRequestError'
-    const mode = this.props.req.mode
-    const height = mode === 'monitor' ? '80px' : '340px'
+    const mode = req.mode
+    const height = mode === 'monitor' ? '215px' : '340px'
 
     const messageToSign = typedData.domain
      ? (
@@ -110,7 +111,7 @@ class TransactionRequest extends React.Component {
                   {(_ => {
                     if (status === 'pending') {
                       return (
-                        <div key={status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner cardShow'>
                           <div style={{ paddingBottom: 20 }}><div className='loader' /></div>
                           <div className='requestNoticeInnerText'>See Signer</div>
                           <div className='cancelRequest' onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}>Cancel</div>
@@ -118,24 +119,28 @@ class TransactionRequest extends React.Component {
                       )
                     } else if (status === 'success') {
                       return (
-                        <div key={status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeSuccess'>
                           <div>{svg.octicon('check', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else if (status === 'error' || status === 'declined') {
                       return (
-                        <div key={status} className='requestNoticeInner bounceIn'>
+                        <div key={status} className='requestNoticeInner cardShow requestNoticeError'>
+                          <div>{svg.octicon('circle-slash', { height: 80 })}</div>
                           <div className='requestNoticeInnerText'>{notice}</div>
                         </div>
                       )
                     } else {
-                      return <div key={notice} className='requestNoticeInner bounceIn'>{notice}</div>
+                      return <div key={notice} className='requestNoticeInner cardShow'>{notice}</div>
                     }
                   })()}
                 </div>
               ) : (
                 <>
+                  <div className='requestMeta'>
+                    <div className='requestMetaOrigin'>{req.origin}</div>
+                  </div>
                   <div className='approveRequestHeader approveTransactionHeader'>
                     <div className='approveRequestHeaderIcon'> {svg.octicon('pencil', { height: 20 })}</div>
                     <div className='approveRequestHeaderLabel'> Sign Message</div>

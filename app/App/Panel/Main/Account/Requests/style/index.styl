@@ -388,7 +388,6 @@
     top 0px
     left 0px
     right 0px
-    padding-bottom 10px
     justify-content space-between
     // box-shadow 0px 2px 0px var(--thick), 0px 8px 8px -2px var(--thick), 0px 0px 10px -2px var(--thick)
     border-radius 10px
@@ -405,28 +404,33 @@
 
     .requestMeta
       position absolute
-      height 34px
-      left 0
-      right 0
-      top 0
-      font-size 11px
-      font-weight 600
+      height 18px
+      left 5px
+      right 5px
+      top 60px
+      background var(--ghostC)
+      font-size 10px
+      font-weight 300
       display flex
-      font-weight 600
-      align-items center
-
+      border-radius 9px
+      overflow hidden
+      
       .requestMetaChain
         position absolute
         top 0px
-        left 9px
+        left 0px
         bottom 0px
         color var(--outerspace)
         display flex
         align-items center
         letter-spacing 1.5px
-        background var(--ghostB)
-        z-index 0
-        padding 0px 12px 0px 0px
+        background var(--ghostC)
+        z-index 3
+        padding 0px 10px 0px 12px
+        background var(--good)
+        color var(--goodOver)
+        font-weight 600
+        border-radius 3px
 
       .requestMetaChainMainnet
         color var(--good) // var(--ghostF)
@@ -440,14 +444,14 @@
         color var(--moon) // var(--ghostF)
         // color var(--moonOver)
 
-      .requestMetaChainTestnet
-        color var(--bad) // var(--ghostF)
-        // color var(--badOver)
+      .requestMetaChainWarn
+        background var(--bad) // var(--ghostF)
+        color var(--badOver)
 
       .requestMetaOrigin
         position absolute
         top 0px
-        right 9px
+        right 0px
         bottom 0px
         // left 0
         display flex
@@ -455,6 +459,10 @@
         font-weight 400
         align-items center
         z-index 2
+        background var(--ghostD)
+        font-weight 400
+        border-radius 3px
+        padding 0px 6px 0px 12px
 
   .requestOverlay
     display none
@@ -514,9 +522,20 @@
       opacity 0
       pointer-events none
 
+  .requestNoticeError
+    color var(--bad)
+    fill car(--bad)
+
+  .requestNoticeSuccess
+    color var(--good)
+    fill car(--good)
+
   .requestNotice, .requestCover
-    height calc(100% - 20px)
-    width 100%
+    position absolute
+    top 5px
+    right 5px
+    bottom 5px
+    left 5px
     transform translateZ(0px)
     border-radius 8px
     overflow hidden
@@ -559,9 +578,6 @@
 
       .cancelRequest:hover
         background var(--thick)
-
-  .requestCover
-    height 100%
 
   .requestProvider
     position absolute
@@ -608,7 +624,7 @@
 
   .approveTransaction, .approveRequest
     position relative
-    top 29px
+    top 0px
     width 100%
     height 100%
 
@@ -711,9 +727,6 @@
       right 0
       bottom 0
 
-  .approveRequest
-    top 0px
-
   .signValue
     position absolute
     top 57px
@@ -741,10 +754,10 @@
 
   .signTypedData
     position absolute
-    top 57px
+    top 85px
     left 0
     right 0
-    bottom 60px
+    bottom 46px
     margin 0
     font-size 20px
     font-weight 300
@@ -1415,7 +1428,7 @@ span
     opacity 0
 
 .txNonceSet
-  transform translate(8px, -8px)
+  transform translate(3px, -3px)
   height 20px
 
 .monitorTop
