@@ -9,6 +9,16 @@ const mockAccounts = {}
 const mockStore = {
   'main.accounts': {
     "0x22dd63c3619818fdbc262c78baee43cb61e9cccf": {}
+  },
+  'main.currentNetwork': {
+    type: 'ethereum',
+    id: 1
+  },
+  'main.networks.ethereum.1': {
+    id: 1
+  },
+  'main.networks.ethereum.4': {
+    id: 4
   }
 }
 
@@ -27,7 +37,7 @@ jest.mock('../../../main/chains', () => mockConnection)
 jest.mock('../../../main/accounts', () => mockAccounts)
 
 jest.mock('../../../main/store', () => {
-  const store = k => mockStore[k]
+  const store = (...args) => mockStore[args.join('.')]
 
   store.updateAccount = () => {}
   store.observer = () => {}
@@ -76,15 +86,103 @@ describe('#getRawTx', () => {
 
 describe('#send', () => {
   let accountRequests = []
-  const send = (request, cb = jest.fn()) => provider.send(request, cb)
+  const send = (request, cb = jest.fn(), targetChain) => provider.send(request, cb, targetChain)
 
   const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
   beforeEach(() => {
     accountRequests = []
 
+    mockConnection.send.mockImplementation((payload, cb, targetChain) => {
+      cb({ error: 'received unhandled request' })
+    })
+
     mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
     mockAccounts.addRequest = req => accountRequests.push(req)
+  })
+
+  describe('#eth_chainId', () => {
+    it('returns the current chain id from the store', done => {
+      send({ method: 'eth_chainId' }, response => {
+        expect(response.result).toBe('0x1')
+        done()
+      })
+    })
+
+    it('returns a chain id from the target chain', done => {
+      send({ method: 'eth_chainId' }, response => {
+        expect(response.result).toBe('0x4')
+        done()
+      }, { type: 'ethereum', id: 4 })
+    })
+  })
+
+  describe('#eth_getTransactionByHash', () => {
+    const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
+    const request = { method: 'eth_getTransactionByHash', params: [txHash] }
+    const chain = '4'
+
+    let blockResult
+
+    beforeEach(() => {
+      mockConnection.send.mockImplementation((payload, res, targetChain) => {
+        if (targetChain.id === chain && payload.params[0] === txHash) {
+          return res({ result: blockResult })
+        }
+
+        res({ error: 'invalid request' })
+      })
+    })
+
+    it('returns the response from the connection', done => {
+      blockResult = {
+        blockHash: '0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123',
+        blockNumber: '0xc80d08'
+      }
+
+      send(request, response => {
+        expect(response.result.blockHash).toBe('0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123')
+        expect(response.result.blockNumber).toBe('0xc80d08')
+        done()
+      }, { type: 'ethereum', id: chain })
+    })
+
+    it('uses maxFeePerGas as the gasPrice if one is not defined', done => {
+      const fee = `0x${(10e9).toString(16)}`
+
+      blockResult = {
+        maxFeePerGas: fee
+      }
+
+      send(request, response => {
+        expect(response.result.gasPrice).toBe(fee)
+        expect(response.result.maxFeePerGas).toBe(fee)
+        done()
+      }, { type: 'ethereum', id: chain })
+    })
+
+    it('maintains the gasPrice if maxFeePerGas exists', done => {
+      const gasPrice = `0x${(8e9).toString(16)}`
+      const maxFeePerGas = `0x${(10e9).toString(16)}`
+
+      blockResult = {
+        gasPrice,
+        maxFeePerGas
+      }
+
+      send(request, response => {
+        expect(response.result.gasPrice).toBe(gasPrice)
+        expect(response.result.maxFeePerGas).toBe(maxFeePerGas)
+        done()
+      }, { type: 'ethereum', id: chain })
+    })
+
+    it('returns a response with no result attribute', done => {
+      send(request, response => {
+        expect(response.error).toBe('invalid request')
+        done()
+      }, '1')
+    })
   })
 
   describe('#eth_sign', () => {
@@ -192,6 +290,15 @@ describe('#send', () => {
         done()
       })
     }, 100)
+
+    it('passes a request with an unknown version through to the connection', done => {
+      const params = [address, 'test']
+
+      send({ method: 'eth_signTypedData_v5', params }, err => {
+        expect(err.error).toBe('received unhandled request')
+        done()
+      })
+    })
   })
 })
 
