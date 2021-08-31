@@ -28,6 +28,8 @@ class Lattice extends Signer {
     this.type = 'lattice'
     this.status = 'loading'
 
+    this.create()
+
     this.latticeObs = store.observer(() => {
       this.createClient()
 
@@ -68,7 +70,7 @@ class Lattice extends Signer {
       })
 
       this.status = 'disconnected'
-      this.create()
+      this.update()
     }
   }
 
