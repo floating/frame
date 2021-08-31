@@ -35,7 +35,6 @@ class Lattice extends Signer {
         this.accountLimit = store('main.latticeSettings.accountLimit')
         this.open()
       }
-
     })
   }
 
@@ -98,13 +97,13 @@ class Lattice extends Signer {
         const clientConnect = promisify(this.client.connect).bind(this.client)
         this.paired = await clientConnect(this.deviceId)
 
-        if (this.paired) {
-          this.appVersion = {
-            major: this.client.fwVersion[2],
-            minor: this.client.fwVersion[1],
-            patch: this.client.fwVersion[0],
-          }
+        const [patch, minor, major] = this.client.fwVersion || [0, 0, 0]
 
+        log.debug(`Connected to Lattice with deviceId=${this.deviceId}, firmware v${major}.${minor}.${patch}`)
+
+        this.appVersion = { major, minor, patch }
+
+        if (this.paired) {
           if (this.addresses.length === 0) {
             this.status = 'addresses'
             this.update()
