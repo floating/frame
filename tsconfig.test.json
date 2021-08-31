@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "types": ["jest", "reflect-metadata", "node"]
+  }
+}

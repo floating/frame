@@ -1,6 +1,28 @@
 import log from 'electron-log'
+import { mocked } from 'ts-jest/utils'
 import { utils } from 'ethers'
 import { EventEmitter } from 'events'
+
+import SeedSignerWorker from '../../main/signers/hot/SeedSigner/worker'
+
+import { fork } from 'child_process'
+jest.mock('child_process')
+
+const mockFork = mocked(fork)
+
+class FakeChildProcess {
+  constructor () {
+  }
+
+  addListener () { }
+  removeListener () { }
+
+  send (message) {
+    console.log(`worker receiveed:`, { message })
+    SeedSignerWorker.handleMessage(message)
+  }
+
+}
 
 log.transports.console.level = false
 
@@ -81,8 +103,8 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
 it('submits a transaction', function (done) {
+  mockFork.mockImplementation(() => new FakeChildProcess())
   signers.createFromPhrase('test test test test test test test test test test test junk', 'letstesthardhat', (err, signer) => {
     signer.unlock('letstesthardhat', () => {
 
@@ -135,7 +157,4 @@ it('submits a transaction', function (done) {
       })
     })
   })
-  
-
-  
 }, 10000)
