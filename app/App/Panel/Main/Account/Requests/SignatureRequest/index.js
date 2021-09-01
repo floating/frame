@@ -1,8 +1,21 @@
 import React from 'react'
 import Restore from 'react-restore'
-import utils from 'web3-utils'
+import { fromWei, toAscii, isHex } from 'web3-utils'
+import { addHexPrefix } from 'ethereumjs-util'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
+
+const DISPLAYABLE = /^[\x20-\x7E]*$/
+
+function decodeMessage (rawMessage) {
+  if (isHex(rawMessage)) {
+    // attempt to decode plaintext (unhashed) hex messages to ASCII for display
+    const ascii = toAscii(addHexPrefix(rawMessage))
+    return ascii.match(DISPLAYABLE) ? ascii : rawMessage
+  }
+
+  return rawMessage
+}
 
 class TransactionRequest extends React.Component {
   constructor (...args) {
@@ -34,7 +47,7 @@ class TransactionRequest extends React.Component {
   }
 
   hexToDisplayValue (hex) {
-    return (Math.round(parseFloat(utils.fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
+    return (Math.round(parseFloat(fromWei(hex, 'ether')) * 1000000) / 1000000).toFixed(6)
   }
 
   render () {
@@ -42,7 +55,8 @@ class TransactionRequest extends React.Component {
     const status = this.props.req.status
     const notice = this.props.req.notice
     const payload = this.props.req.payload
-    const message = payload.params[1]
+
+    const message = decodeMessage(payload.params[1])
 
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
