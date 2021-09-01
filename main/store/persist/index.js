@@ -20,6 +20,7 @@ class PersistStore extends Conf {
   }
 
   writeUpdates () {
+    if (this.blockUpdates) return
     const updates = { ...this.updates }
     this.updates = null
     if (Object.keys(updates || {}).length > 0) super.set(updates)
@@ -33,8 +34,14 @@ class PersistStore extends Conf {
   }
 
   set (path, value) {
+    if (this.blockUpdates) return
     path = `main.__.${migrations.latest}.${path}`
     super.set(path, value)
+  }
+
+  clear () {
+    this.blockUpdates = true
+    super.clear()
   }
 }
 
