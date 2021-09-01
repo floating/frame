@@ -1,5 +1,6 @@
 const electron = require('electron')
 const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
+const url = require('url')
 const path = require('path')
 const log = require('electron-log')
 
@@ -108,7 +109,15 @@ const api = {
         backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
-    windows.tray.loadURL(path.join('file://', __dirname, '/../../bundle/tray.html'))
+
+    const trayUrl = url.format({
+      pathname: path.join(__dirname, '/../../bundle/tray.html'),
+      protocol: 'file',
+      slashes: true
+    })
+
+    windows.tray.loadURL(trayUrl)
+
     windows.tray.on('closed', () => delete windows.tray)
     windows.tray.webContents.on('will-navigate', e => e.preventDefault()) // Prevent navigation
     windows.tray.webContents.on('will-attach-webview', e => e.preventDefault()) // Prevent attaching <webview>
@@ -396,7 +405,14 @@ const api = {
         backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
-    windows.dash.loadURL(`file://${__dirname}/../../bundle/dash.html`)
+
+    const dashUrl = url.format({
+      pathname: path.join(__dirname, '/../../bundle/dash.html'),
+      protocol: 'file',
+      slashes: true
+    })
+
+    windows.dash.loadURL(dashUrl)
     // windows.flow.setAlwaysOnTop(true)
     // windows.dash.on('blur', () => api.hideDash())
   },
