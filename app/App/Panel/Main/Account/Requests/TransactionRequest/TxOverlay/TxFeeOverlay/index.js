@@ -120,7 +120,9 @@ class TxFeeOverlay extends React.Component {
       link.rpc('setPriorityFee', gweiToWeiHex(priorityFee), this.props.req.handlerId, e => {
         if (e) console.error(e)
       })
-      this.setState({ priorityFee: this.toDisplayFromGwei(BigNumber(priorityFee)) })
+      if (this.toDisplayFromGwei(BigNumber(priorityFee)) !== this.toDisplayFromGwei(BigNumber(this.state.priorityFee))) {
+        this.setState({ priorityFee: this.toDisplayFromGwei(BigNumber(priorityFee)) })
+      }
     }, 500)
   }
 
