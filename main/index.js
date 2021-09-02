@@ -10,6 +10,7 @@ app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
 const log = require('electron-log')
 const path = require('path')
+const url = require('url')
 
 const data = require('./data')
 const windows = require('./windows')
@@ -170,11 +171,14 @@ app.on('ready', () => {
   //   setTimeout(windows.tray, 800)
   // }
   if (app.dock) app.dock.hide()
+
   protocol.interceptFileProtocol('file', (req, cb) => {
     const appOrigin = path.resolve(__dirname, '../')
-    const filePath = path.resolve(__dirname, req.url.replace(process.platform === 'win32' ? 'file:///' : 'file://', ''))
-    if (filePath.startsWith(appOrigin)) cb({path: filePath}) // eslint-disable-line
+    const filePath = url.fileURLToPath(req.url)
+
+    if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line
   })
+
   store.observer(_ => {
     if (store('dash.showing')) {
       windows.showDash()
