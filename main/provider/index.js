@@ -98,7 +98,7 @@ class Provider extends EventEmitter {
   getChainId (payload, res, targetChain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
     const chain = store('main.networks', type, id)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: intToHex(chain.id) })
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: intToHex(Number.parseInt(chain.id)) })
   }
 
   declineRequest (req) {
