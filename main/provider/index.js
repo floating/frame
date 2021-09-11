@@ -403,10 +403,17 @@ class Provider extends EventEmitter {
   }
 
   sign (payload, res) {
-    // normalize the payload for downstream rendering
-    const orderedParams = payload.method === 'eth_sign'
-      ? [...payload.params]
-      : [payload.params[1], payload.params[0], ...payload.params.slice(2)]
+    // normalize the payload for downstream rendering, taking the first address and
+    // making it the first parameter, which is the account that needs to sign
+    const addressIndex = payload.params.findIndex(utils.isAddress)
+
+    const orderedParams = addressIndex > 0
+      ? [
+          payload.params[addressIndex],
+          ...payload.params.slice(0, addressIndex),
+          ...payload.params.slice(addressIndex + 1)
+        ]
+      : payload.params
 
     const normalizedPayload = {
       ...payload,
