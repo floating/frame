@@ -83,7 +83,7 @@ const migrations = {
       type: 'ethereum',
       symbol: 'MATIC',
       name: 'Polygon',
-      explorer: 'https://explorer.matic.network',
+      explorer: 'https://polygonscan.com',
       gas: {
         price: {
           selected: 'standard',
