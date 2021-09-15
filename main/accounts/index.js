@@ -502,9 +502,9 @@ class Accounts extends EventEmitter {
     }
   }
 
-  addChain (chain, req) {
+  resolveRequest (req) {
     if (this.current() && this.current().addChain) {
-      this.current().addChain(chain, req)
+      this.current().resolveRequest(req)
     }
   }
 

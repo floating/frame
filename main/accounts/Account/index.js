@@ -119,8 +119,7 @@ class Account {
     }
   }
 
-  addChain (chain, req = {}) {
-    if (chain) store.addNetwork(chain)
+  resolveRequest (req = {}) {
     if (this.requests[req.handlerId]) {
       if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()
       delete this.requests[req.handlerId]
