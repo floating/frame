@@ -704,3 +704,31 @@ describe('#adjustNonce', () => {
     expect(Accounts.current().requests[1].data.nonce).toBe(expectedNonce)
   })
 })
+
+describe('#resolveRequest', () => {
+  it ('does nothing with an unknown request', () => {
+    Accounts.addRequest(request, () => {
+      throw new Error('unexpected callback!')
+    })
+
+    Accounts.resolveRequest({ handlerId: '-1' })
+
+    expect(Object.keys(Accounts.current().requests)).toHaveLength(1)
+  })
+
+  it ('resolves a request with a callback', done => {
+    Accounts.addRequest(request, done)
+
+    Accounts.resolveRequest(request)
+
+    expect(Object.keys(Accounts.current().requests)).toHaveLength(0)
+  })
+
+  it ('resolves a request with no callback', () => {
+    Accounts.addRequest(request)
+
+    Accounts.resolveRequest(request)
+
+    expect(Object.keys(Accounts.current().requests)).toHaveLength(0)
+  })
+})

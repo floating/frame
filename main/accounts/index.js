@@ -503,8 +503,9 @@ class Accounts extends EventEmitter {
   }
 
   resolveRequest (req) {
-    if (this.current() && this.current().addChain) {
-      this.current().resolveRequest(req)
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.resolveRequest) {
+      currentAccount.resolveRequest(req)
     }
   }
 
