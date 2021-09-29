@@ -1,25 +1,90 @@
+// @ts-nocheck
+
 const EventEmitter = require('events')
 const log = require('electron-log')
 const crypto = require('crypto')
 
+import Signer from './signer'
+import { SignerAdapter } from './adapter'
+
 const hot = require('./hot')
-const ledger = require('./ledger')
+import LedgerAdapter from './ledger/adapter'
 const trezorConnect = require('./trezor-connect')
 const lattice = require('./lattice')
 
 const store = require('../store')
 
+const adapters = [
+  new LedgerAdapter()
+]
+
+interface AdapterSpec {
+  [key: string]: {
+    adapter: SignerAdapter,
+    listeners: {
+      event: string,
+      handler: (p: any) => void
+    }[]
+  }
+}
+
 class Signers extends EventEmitter {
+  private adapters: AdapterSpec;
+  private signers: { [key: string]: Signer };
+
   constructor () {
     super()
-    this.signers = []
-    // this.lattice = lattice(this)
-    this.scans = {
-      lattice: lattice.scan(this),
-      hot: hot.scan(this),
-      ledger: ledger.scan(this),
-      trezor: trezorConnect.scan(this)
+
+    this.signers = {}
+    this.adapters = {}
+
+    adapters.forEach(this.addAdapter.bind(this))
+  }
+
+  addAdapter (adapter: SignerAdapter) {
+    const addFn = (signer: Signer) => {
+      this.add(signer.id, signer)
     }
+
+    const removeFn = (signerId: string) => {
+      this.remove(signerId)
+    }
+
+    const updateFn = (signer: Signer) => {
+      store.updateSigner(signer.summary())
+    }
+
+    adapter.on('add', addFn)
+    adapter.on('remove', removeFn)
+    adapter.on('update', updateFn)
+
+    this.adapters[adapter.name] = {
+      adapter,
+      listeners: [
+        {
+          event: 'add',
+          handler: addFn
+        },
+        {
+          event: 'remove',
+          handler: removeFn
+        },
+        {
+          event: 'update',
+          handler: updateFn
+        }
+      ]
+    }
+  }
+
+  removeAdapter (adapter: SignerAdapter) {
+    const adapterSpec = this.adapters[adapter.name]
+
+    adapterSpec.listeners.forEach(listener => {
+      adapter.removeListener(listener.event, listener.handler)
+    })
+
+    delete this.adapter[adapter.name]
   }
 
   trezorPin (id, pin, cb) {
@@ -96,18 +161,22 @@ class Signers extends EventEmitter {
     return this.signers.find(s => s.id === id)
   }
 
-  add (signer) {
-    if (!this.signers.find(s => s.id === signer.id)) this.signers.push(signer)
+  add (id: string, signer: Signer) {
+    if (!(id in this.signers)) {
+      this.signers[id] = signer
+    }
   }
 
-  remove (id) {
-    const index = this.signers.map(s => s.id).indexOf(id)
-    if (index > -1) {
-      const signer = this.signers[index]
+  remove (id: string) {
+    if (id in this.signers) {
+      store.removeSigner(id)
+
+      const signer = this.signers[id]
+
       signer.close()
-      // If hot signer -> erase from disk
-      if (signer.delete) signer.delete()
-      this.signers.splice(index, 1)
+      signer.delete()
+
+      delete this.signers[id]
     }
   }
 

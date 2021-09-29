@@ -1,5 +1,15 @@
 const crypto = require('crypto')
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover, isHexString, isHexPrefixed, fromUtf8 } = require('ethereumjs-util')
+const {
+  hashPersonalMessage,
+  toBuffer,
+  ecsign,
+  addHexPrefix,
+  pubToAddress,
+  ecrecover,
+  isHexString,
+  isHexPrefixed,
+  fromUtf8
+} = require('ethereumjs-util')
 
 const { sign } = require('../../../transaction')
 const { signTypedData } = require('../../../crypt/typedDataUtils')

@@ -66,6 +66,10 @@ class Signer extends EventEmitter {
     // windows.broadcast('main:action', 'removeSigner', this.summary())
   }
 
+  delete () {
+    
+  }
+
   update (options = {}) {
     // if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     // windows.broadcast('main:action', 'updateSigner', this.summary())

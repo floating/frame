@@ -1,12 +1,18 @@
+// @ts-nocheck
+
 const { rlp, addHexPrefix } = require('ethereumjs-util')
 const log = require('electron-log')
 const { v5: uuid } = require('uuid')
-const Eth = require('@ledgerhq/hw-app-eth').default
-const HID = require('node-hid')
-const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
 
-const { sign, signerCompatibility, londonToLegacy } = require('../../../transaction')
-// const store = require('../../../store')
+import HID from 'node-hid'
+import Transport from '@ledgerhq/hw-transport'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import Eth from '@ledgerhq/hw-app-eth'
+
+import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
+
+
+const store = require('../../../store')
 const Signer = require('../../Signer')
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
@@ -20,183 +26,68 @@ const BASE_PATH_TESTNET = '44\'/1\'/0\'/0/'
 const BASE_PATH_LIVE = '44\'/60\'/'
 
 
-class Ledger extends Signer {
-  type;
+class LedgerEthereumApp {
+  private transport: Transport;
+  private devicePath: string;
+  private eth: Eth;
 
-  constructor (devicePath) {
-    super()
+  constructor (devicePath: string) {
+    this.transport = new TransportNodeHid(new HID.HID(devicePath))
 
     this.devicePath = devicePath
-
-    this.addresses = []
-    this.id = uuid('Ledger' + this.devicePath, ns)
-
-    this.type = 'ledger'
-    this.status = 'initial'
-    this.coinbase = '0x'
-    
-    // this.lastUse = Date.now()
-    // this.busyCount = 0
-    // this.pause = false
-    
-    // this.derivation = store('main.ledger.derivation')
-    // this.liveAccountLimit = store('main.ledger.liveAccountLimit')
-    // this.varObserver = store.observer(() => {
-    //   if (
-    //     this.derivation !== store('main.ledger.derivation') ||
-    //     this.liveAccountLimit !== store('main.ledger.liveAccountLimit')
-    //   ) {
-    //     this.reset()
-    //   }
-    // })
-    // this.deviceStatus()
+    this.eth = new Eth(this.transport)
   }
 
-  async connect () {
-    return TransportNodeHid.open(this.devicePath).then(transport => {
-      return this.eth = new Eth(transport)
-    })
-  }
-
-  getPath (i = 0) {
-    if (this.derivation === 'legacy') {
-      return (BASE_PATH_LEGACY + i)
-    } else if (this.derivation === 'standard') {
-      return (BASE_PATH_STANDARD + i)
-    } else if (this.derivation === 'testnet') {
-      return (BASE_PATH_TESTNET + i)
-    } else {
-      return (BASE_PATH_LIVE + i + '\'/0/0')
-    }
-  }
-
-  update () {
-    if (this.invalid || this.status === 'Invalid sequence' || this.status === 'initial') return
-    store.updateSigner(this.summary())
-  }
-
-  updateStatus (status) {
-    this.status = status
-
-    this.emit('status', status)
-  }
-
-  async wait (time) {
-    return new Promise(resolve => setTimeout(resolve, time))
-  }
-
-  async getDevice () {
-    if (this.pause) throw new Error('Device access is paused')
-    if (Date.now() - this.lastUse < 300) await this.wait(300)
-    await this.releaseDevice()
-    this.pause = true
-    this.currentDevice = new HID.HID(this.devicePath)
-    this.currentTransport = new TransportNodeHid(this.currentDevice)
-    return new Eth(this.currentTransport)
-  }
-
-  async releaseDevice () {
-    if (this.currentTransport) this.currentTransport.close()
-    if (this.currentDevice) this.currentDevice.close()
-    delete this.currentTransport
-    delete this.currentDevice
-    this.lastUse = Date.now()
-    await this.wait(300)
-    this.pause = false
-  }
-
-  reset () {
-    this.pauseLive = true
-    this.derivation = store('main.ledger.derivation')
-    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
-    this.status = 'loading'
-    this.addresses = []
-    this.update()
-    this.deriveAddresses()
-  }
-
-  async getDeviceAddress (i, cb = () => {}) {
-    if (this.pause) return cb(new Error('Device access is paused'))
+  async verifyAddress (path: string, currentAddress: string, display: boolean, cb = (err: Error | null, result: boolean | undefined) => {}) {
     try {
-      const { address } = await this.getAddress(this.getPath(i), false, true)
-      cb(null, address)
-    } catch (err) {
-      cb(err)
-    }
-  }
-
-  async verifyAddress (index, current, display, cb = () => {}) {
-    if (this.verifyActive) {
-      log.info('verifyAddress Called but it\'s already active')
-      return cb(new Error('verifyAddress Called but it\'s already active'))
-    }
-    if (this.pause) {
-      log.info('Device access is paused')
-      return cb(new Error('Device access is paused'))
-    }
-    this.verifyActive = true
-    try {
-      const result = await this.getAddress(this.getPath(index), display, true)
-      const address = result.address.toLowerCase()
-      current = current.toLowerCase()
-      if (address !== current) {
-        log.error(new Error('Address does not match device'))
-        this.signers.remove(this.id)
-        cb(new Error('Address does not match device'))
-      } else {
-        log.info('Address matches device')
-        cb(null, true)
+      const result = await this.getAddress(path, display, true)
+      
+      if (result.address.toLowerCase() !== currentAddress.toLowerCase()) {
+        log.error(new Error(`Ledger address ${currentAddress} does not match device`))
+        return cb(new Error('Address does not match device'), false)
       }
-      this.verifyActive = false
-    } catch (err) {
-      log.error('Verify Address Error')
-      log.error(err)
-      this.signers.remove(this.id)
-      cb(new Error('Verify Address Error'))
-      this.verifyActive = false
+      
+      cb(null, true)
+    } catch (err: any) {
+      log.error(new Error(`could not verify Ledger address: ${err.message}`))
+      cb(new Error('Verify Address Error'), false)
     }
   }
 
-  async deriveAddresses (accountLimit) {
-    // live addresses are derived one by one so it will emit its own events
-    if (this.derivation === 'live') {
-      this.updateStatus('Deriving Live Addresses')
-      return this._deriveLiveAddresses(accountLimit)
+  async deriveAddresses () {
+    let addresses
+    if (this.pause) throw new Error('Device access is paused')
+    if (this.derivingAddresses) {
+      await this.wait(1000)
+      return await this.deriveAddresses()
     }
-
-    this.updateStatus('loading')
-
-    if (this.derivation === 'legacy') {
-      this.addresses = await this._deriveLegacyAddresses()
-    } else if (this.derivation === 'standard') {
-      this.addresses = await this._deriveStandardAddresses()
-    } else if (this.derivation === 'testnet') {
-      this.addresses = await this._deriveTestnetAddresses()
+    clearTimeout(this.derivingAddressesErrorTimeout)
+    this.derivingAddresses = true
+    try {
+      // Derive addresses
+      if (this.derivation === 'legacy') {
+        addresses = await this._deriveLegacyAddresses()
+      } else if (this.derivation === 'standard') {
+        addresses = await this._deriveStandardAddresses()
+      } else if (this.derivation === 'testnet') {
+        addresses = await this._deriveTestnetAddresses()
+      } else {
+        addresses = await this._deriveLiveAddresses()
+      }
+      // Update signer
+      this.addresses = addresses
+      this.update()
+      this.derivingAddresses = false
+    } catch (e) {
+      log.error(e)
+      this.derivingAddressesErrorTimeout = setTimeout(() => {
+        this.derivingAddresses = false
+      }, 4000)
     }
-
-    return this.addresses
   }
 
   close () {
-    if (this.eth) {
-      this.eth.transport.close()
-      this.eth = null
-    }
-
-    this.removeAllListeners()
-
-    if (this._pollStatus) clearTimeout(this._pollStatus)
-    if (this._deviceStatus) clearTimeout(this._deviceStatus)
-    if (this._signMessage) clearTimeout(this._signMessage)
-    if (this._signTransaction) clearTimeout(this._signTransaction)
-    if (this._scanTimer) clearTimeout(this._scanTimer)
-    
-    super.close()
-  }
-
-  pollStatus (interval = 21 * 1000) { // Detect sleep/wake
-    clearTimeout(this._pollStatus)
-    this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
+    this.transport.close()
   }
 
   async deviceStatus () {
@@ -306,62 +197,29 @@ class Ledger extends Signer {
     }
   }
 
-  async signTransaction (index, rawTx, cb) {
+  async signTransaction (path: string, rawTx: any, cb: (err: any, ...signature: string[]) => void) {
+    const compatibility = signerCompatibility(rawTx, this.summary())
+    const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
+
     try {
-      if (this.pause) throw new Error('Device access is paused')
-      const eth = await this.getDevice()
-      const signerPath = this.getPath(index)
-
-      const compatibility = signerCompatibility(rawTx, this.summary())
-      const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
-
       const signedTx = await sign(ledgerTx, tx => {
         // legacy transactions aren't RLP encoded before they're returned
         const message = tx.getMessageToSign(false)
-        const legacyMessage = message[0] !== parseInt(tx.type)
+        const legacyMessage = message[0] !== tx.type
         const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message.toString('hex')
 
-        return eth.signTransaction(signerPath, rawTxHex)
+        return this.eth.signTransaction(path, rawTxHex)
       })
 
       const signedTxSerialized = signedTx.serialize().toString('hex')
       cb(null, addHexPrefix(signedTxSerialized))
-
-      this.releaseDevice()
-    } catch (err) {
-      log.error(err)
-      log.error(err.message)
-      const deviceBusy = (
-        err.message.startsWith('cannot open device with path') ||
-        err.message === 'Device access is paused' ||
-        err.message === 'Invalid channel' ||
-        err.message === 'DisconnectedDevice'
-      )
-      if (deviceBusy) {
-        clearTimeout(this._signTransaction)
-        if (++this.busyCount > 20) {
-          this.busyCount = 0
-          cb(err)
-          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-        } else {
-          this._signTransaction = setTimeout(() => this.signTransaction(index, rawTx, cb), 700)
-          return log.info('>>>>>>> Busy: cannot open device with path, will try again (signTransaction)')
-        }
-      } else {
-        cb(err)
-      }
-      this.releaseDevice()
-      log.error(err)
+    } catch (e) {
+      cb(e)
     }
   }
 
-  async getAddress (...args) {
-    try {
-      const result = await this.eth.getAddress(...args)
-      return result
-    } catch (err) {
-      throw err
-    }
+  async getAddress (path: string, display = false, chainCode = false) {
+    return this.eth.getAddress(path, display, chainCode)
   }
 
   async _getAppConfiguration () {
@@ -376,20 +234,26 @@ class Ledger extends Signer {
     }
   }
 
-  async _deriveLiveAddresses (accountLimit) {
+  async _deriveLiveAddresses () {
+    let addresses = []
+    this.status = 'Deriving Live Addresses'
     this.liveAddressesFound = 0
-
-    for (let i = 0; i < accountLimit; i++) {
+    for (let i = 0; i < this.liveAccountLimit; i++) {
+      if (this.pauseLive) {
+        this.status = 'loading'
+        addresses = []
+        this.liveAddressesFound = 0
+        this.update()
+        this.pauseLive = false
+        this._scanTimer = setTimeout(() => this.scan(), 300)
+        break
+      }
       const { address } = await this.getAddress(this.getPath(i), false, false)
-
       log.info(`Found Ledger Live address #${i}: ${address}`)
-
-      this.addresses = [...this.addresses, address]
-      this.liveAddressesFound = this.addresses.length
-
-      this.updateStatus('ok')
-      this.emit('addresses', this.addresses)
+      addresses.push(address)
+      this.liveAddressesFound = addresses.length
     }
+    return addresses
   }
 
   _deriveLegacyAddresses () {

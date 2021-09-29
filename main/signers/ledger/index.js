@@ -9,6 +9,9 @@ const isLedger = d => ((d.vendorId === 0x2581 && d.productId === 0x3b7c) || d.ve
 let scanTimer = null
 
 module.exports = {
+  getSignerId: function (usbDevice) {
+
+  },
   scan: (signers) => {
     log.info('Ledger Scanner Started...')
     const scan = (followup = false) => {
