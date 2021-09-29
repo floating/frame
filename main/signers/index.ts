@@ -51,7 +51,7 @@ class Signers extends EventEmitter {
     }
 
     const updateFn = (signer: Signer) => {
-      store.updateSigner(signer.summary())
+      this.update(signer.id, signer)
     }
 
     adapter.on('add', addFn)
@@ -165,9 +165,9 @@ class Signers extends EventEmitter {
 
   add (id: string, signer: Signer) {
     if (!(id in this.signers)) {
-      store.newSigner(signer.summary())
-
       this.signers[id] = signer
+
+      store.newSigner(signer.summary())
     }
   }
 
@@ -181,6 +181,16 @@ class Signers extends EventEmitter {
       signer.delete()
 
       delete this.signers[id]
+    }
+  }
+
+  update (id: string, signer: Signer) {
+    if (id in this.signers) {
+      this.signers[id] = signer
+
+      store.updateSigner(signer.summary())
+    } else {
+      this.add(id, signer)
     }
   }
 

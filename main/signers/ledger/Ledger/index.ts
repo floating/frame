@@ -16,7 +16,7 @@ const { sign, signerCompatibility, londonToLegacy } = require('../../../transact
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 // Base Paths
-const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
+const BASE_PATH_LEGACY = "44'/60'/0'/"
 const BASE_PATH_STANDARD = `44\'/60\'/0\'/0/`
 const BASE_PATH_TESTNET = '44\'/1\'/0\'/0/'
 
@@ -30,7 +30,7 @@ export default class Ledger extends Signer {
 
   private coinbase = '0x'
 
-  constructor (devicePath: string) {
+  constructor (devicePath: string, version: AppVersion) {
     super()
 
     this.devicePath = devicePath
@@ -58,10 +58,18 @@ export default class Ledger extends Signer {
     // this.deviceStatus()
   }
 
-  async connect () {
-    return TransportNodeHid.open(this.devicePath).then(transport => {
-      return this.eth = new Eth(transport)
-    })
+  async connect (version: AppVersion) {
+    const transport = await TransportNodeHid.open(this.devicePath)
+
+    this.eth = new Eth(transport)
+
+    const config = await this.eth.getAppConfiguration()
+
+    const [major, minor, patch] = (config.version || '1.6.1').split('.')
+    const version = { major, minor, patch }
+    this.appVersion = version
+
+    return this.eth
   }
 
   close () {
@@ -69,6 +77,8 @@ export default class Ledger extends Signer {
       this.eth.transport.close()
       this.eth = null
     }
+
+    this.emit('close')
 
     this.removeAllListeners()
 
@@ -170,12 +180,12 @@ export default class Ledger extends Signer {
         log.info('Address matches device')
         cb(null, true)
       }
-      this.verifyActive = false
     } catch (err) {
       log.error('Verify Address Error')
       log.error(err)
       this.signers.remove(this.id)
       cb(new Error('Verify Address Error'))
+    } finally {
       this.verifyActive = false
     }
   }
@@ -219,10 +229,6 @@ export default class Ledger extends Signer {
         this.deviceStatus()
       }
       this.status = 'ok'
-
-      const version = (await this._getAppConfiguration()).version
-      const [major, minor, patch] = (version || '1.6.1').split('.')
-      this.appVersion = { major, minor, patch }
 
       if (!this.addresses.length) {
         this.status = 'loading'

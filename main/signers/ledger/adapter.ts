@@ -11,6 +11,37 @@ import store from '../../store'
 
 const supportedPlatforms = ['win32', 'darwin']
 
+const STATUS = {
+  OK: 'ok',
+  LOCKED: 'Please unlock your ledger',
+  WRONG_APP: 'Open your Ledger and select the Ethereum application',
+  DISCONNECTED: 'Please reconnect this Ledger device'
+}
+
+async function checkEthAppIsOpen (ledger) {
+  return ledger.getAddress("44'/60'/0'/0", false, false)
+}
+
+function isDeviceAsleep (err: { statusCode: number }) {
+  return [27404].includes(err.statusCode)
+}
+
+function needToOpenEthApp (err: { statusCode: number }) {
+  return [27904, 27906, 25873].includes(err.statusCode)
+}
+
+function getStatusForError (err: { statusCode: number }) {
+  if (needToOpenEthApp(err)) {
+    return STATUS.WRONG_APP
+  }
+  
+  if (isDeviceAsleep(err)) {
+    return STATUS.LOCKED
+  }
+
+  return STATUS.DISCONNECTED
+}
+
 const supportedModels = [
   function isNanoX (device: usb.Device) {
     return (
@@ -27,14 +58,16 @@ const supportedModels = [
 
 export default class LedgerSignerAdapter extends UsbSignerAdapter {
   private knownSigners: { [key: string]: Ledger };
+  private removals: { [key: string]: NodeJS.Timeout }
 
   constructor () {
     super('Ledger')
 
     this.knownSigners = {}
+    this.removals = {}
   }
 
-  handleAttachedDevice (usbDevice: usb.Device) {
+  async handleAttachedDevice (usbDevice: usb.Device) {
     log.debug(`detected Ledger device attached`)
 
     const deviceId = this.deviceId(usbDevice)
@@ -45,44 +78,56 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       return
     }
 
+    const pendingRemoval = this.removals[devicePath]
+
+    if (pendingRemoval) {
+      clearTimeout(pendingRemoval)
+      delete this.removals[devicePath]
+    }
+
     if (!(deviceId in this.knownSigners)) {
       this.knownSigners[deviceId] = new Ledger(devicePath)
       this.emit('add', this.knownSigners[deviceId])
     }
 
     const ledger = this.knownSigners[deviceId]
+    const emitUpdate = () => this.emit('update', ledger)
 
-    // check if eth app is open
-    TransportNodeHid.open(devicePath).then(transport => {
-      const eth = new Eth(transport)
-      eth.getAppConfiguration().then(config => {
-        transport.close()
+    try {
+      await ledger.connect()
+      await checkEthAppIsOpen(ledger)
 
-        ledger.connect().then(() => {
-          const derivation = store('main.ledger.derivation')
-          const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
+      let statusCheck = this.startStatusCheck(ledger, 10000)
 
-          ledger.derivation = derivation
+      ledger.on('addresses', emitUpdate)
+      ledger.on('status', emitUpdate)
 
-          const emitter = () => this.emit('update', ledger)
-
-          ledger.on('addresses', emitter)
-          ledger.on('status', emitter)
-
-          ledger.deriveAddresses(accountLimit)
-            .then(() => {
-              ledger.status = 'ok'
-              this.emit('update', ledger)
-            })
-        })
-      }).catch(err => {
-        transport.close()
-
-        console.log('eth app not open!', err)
-        ledger.status = 'Select the Ethereum application on your Ledger'
-        this.emit('update', ledger)
+      ledger.on('unlock', () => {
+        clearInterval(statusCheck)
+        statusCheck = this.startStatusCheck(ledger, 10000)
       })
-    })
+
+      ledger.on('lock', () => {
+        clearInterval(statusCheck)
+        statusCheck = this.startStatusCheck(ledger, 500)
+      })
+
+      ledger.on('close', () => {
+        clearInterval(statusCheck)
+      })
+
+      const derivation = store('main.ledger.derivation')
+      ledger.derivation = derivation
+
+      const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
+      await ledger.deriveAddresses(accountLimit)
+
+      ledger.status = STATUS.OK
+    } catch (err) {
+      ledger.status = getStatusForError(err)
+    } finally {
+      emitUpdate()
+    }
   }
 
   handleDetachedDevice (usbDevice: usb.Device) {
@@ -93,8 +138,15 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     if (deviceId in this.knownSigners) {
       const ledger = this.knownSigners[deviceId]
 
-      this.emit('remove', ledger.id)
-      delete this.knownSigners[deviceId]
+      ledger.close()
+
+      // when a user exits the eth app, it takes a few seconds for the
+      // main ledger to reconnect via USB, so wait for this instead of
+      // immediately removing the signer
+      this.removals[ledger.devicePath] = setTimeout(() => {
+        this.emit('remove', ledger.id)
+        delete this.knownSigners[deviceId]
+      }, 5000)
     }
   }
 
@@ -107,5 +159,27 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
   supportsDevice (usbDevice: usb.Device) {
     return supportedModels.some(checkSupport => checkSupport(usbDevice))
+  }
+
+  startStatusCheck (ledger, interval) {
+    return setInterval(() => {
+      checkEthAppIsOpen(ledger)
+      .then(() => {
+        if (ledger.status === STATUS.LOCKED) {
+          ledger.status = STATUS.OK
+          ledger.emit('unlock')
+
+          this.emit('update', ledger)
+        }
+      })
+      .catch(err => {
+        if (isDeviceAsleep(err) && ledger.status !== STATUS.LOCKED) {
+          ledger.status = STATUS.LOCKED
+          ledger.emit('lock')
+
+          this.emit('update', ledger)
+        }
+      })
+    }, interval)
   }
 }
