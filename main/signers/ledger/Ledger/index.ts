@@ -150,13 +150,13 @@ export default class Ledger extends Signer {
 
   async verifyAddress (index, current, display, cb = () => {}) {
     if (this.verifyActive) {
-      log.info('verifyAddress Called but it\'s already active')
-      return cb(new Error('verifyAddress Called but it\'s already active'))
+      const message = "verifyAddress called but it's already active"
+
+      log.info(message)
+      return cb(new Error(message))
     }
     
     this.verifyActive = true
-
-    console.log('VERIFYING!')
 
     try {
       const result = await this.getAddress(this.getPath(index), display, true)

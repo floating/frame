@@ -2,6 +2,8 @@
 
 import usb from 'usb'
 import log from 'electron-log'
+import Eth from '@ledgerhq/hw-app-eth'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 
 import { UsbSignerAdapter } from '../adapters'
 import Ledger from './Ledger'
@@ -18,8 +20,7 @@ const supportedModels = [
   },
   function isNanoS (device: usb.Device) {
     return (
-      device.deviceDescriptor.idVendor === 0x2c97 &&
-      device.deviceDescriptor.idProduct === 0x1015
+      device.deviceDescriptor.idVendor === 0x2c97
     )
   }
 ]
@@ -51,22 +52,36 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
     const ledger = this.knownSigners[deviceId]
 
-    ledger.connect().then(() => {
-      const derivation = store('main.ledger.derivation')
-      const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
+    // check if eth app is open
+    TransportNodeHid.open(devicePath).then(transport => {
+      const eth = new Eth(transport)
+      eth.getAppConfiguration().then(config => {
+        transport.close()
 
-      ledger.derivation = derivation
+        ledger.connect().then(() => {
+          const derivation = store('main.ledger.derivation')
+          const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
 
-      const emitter = () => this.emit('update', ledger)
+          ledger.derivation = derivation
 
-      ledger.on('addresses', emitter)
-      ledger.on('status', emitter)
+          const emitter = () => this.emit('update', ledger)
 
-      ledger.deriveAddresses(accountLimit)
-        .then(() => {
-          ledger.status = 'ok'
-          this.emit('update', ledger)
+          ledger.on('addresses', emitter)
+          ledger.on('status', emitter)
+
+          ledger.deriveAddresses(accountLimit)
+            .then(() => {
+              ledger.status = 'ok'
+              this.emit('update', ledger)
+            })
         })
+      }).catch(err => {
+        transport.close()
+
+        console.log('eth app not open!', err)
+        ledger.status = 'Select the Ethereum application on your Ledger'
+        this.emit('update', ledger)
+      })
     })
   }
 
