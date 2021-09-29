@@ -46,11 +46,9 @@ export default class Ledger extends Signer {
     // this.pause = false
     
     // this.derivation = store('main.ledger.derivation')
-    // this.liveAccountLimit = store('main.ledger.liveAccountLimit')
     // this.varObserver = store.observer(() => {
     //   if (
     //     this.derivation !== store('main.ledger.derivation') ||
-    //     this.liveAccountLimit !== store('main.ledger.liveAccountLimit')
     //   ) {
     //     this.reset()
     //   }
@@ -191,10 +189,13 @@ export default class Ledger extends Signer {
   }
 
   async deriveAddresses (accountLimit) {
+    this.addresses = []
+
     // live addresses are derived one by one so it will emit its own events
     if (this.derivation === 'live') {
       this.updateStatus('Deriving Live Addresses')
-      return this._deriveLiveAddresses(accountLimit)
+      await this._deriveLiveAddresses(accountLimit)
+      return this.emit('ready')
     }
 
     this.updateStatus('loading')
@@ -206,6 +207,9 @@ export default class Ledger extends Signer {
     } else if (this.derivation === 'testnet') {
       this.addresses = await this._deriveTestnetAddresses()
     }
+
+    this.emit('addresses', this.addresses)
+    this.emit('ready')
 
     return this.addresses
   }
@@ -394,7 +398,6 @@ export default class Ledger extends Signer {
       this.addresses = [...this.addresses, address]
       this.liveAddressesFound = this.addresses.length
 
-      this.updateStatus('ok')
       this.emit('addresses', this.addresses)
     }
   }
@@ -433,27 +436,6 @@ export default class Ledger extends Signer {
     const executor = async (resolve, reject) => {
       try {
         const result = await this.getAddress(BASE_PATH_TESTNET, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
-  }
-
-  _deriveStandardAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        let path
-        if (store('main.hardwareDerivation') === 'mainnet') {
-          path = BASE_PATH_STANDARD
-        } else {
-          path = BASE_PATH_STANDARD_TEST
-        }
-        const result = await this.getAddress(path, false, true)
         this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
           if (err) reject(err)
           else resolve(addresses)

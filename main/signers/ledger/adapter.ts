@@ -58,13 +58,43 @@ const supportedModels = [
 
 export default class LedgerSignerAdapter extends UsbSignerAdapter {
   private knownSigners: { [key: string]: Ledger };
-  private removals: { [key: string]: NodeJS.Timeout }
+  private disconnections: { [key: string]: NodeJS.Timeout }
+  private observer: any;
 
   constructor () {
     super('Ledger')
 
     this.knownSigners = {}
-    this.removals = {}
+    this.disconnections = {}
+  }
+
+  open () {
+    super.open()
+
+    this.observer = store.observer(() => {
+      const ledgerDerivation = store('main.ledger.derivation')
+      const liveAccountLimit = store('main.ledger.liveAccountLimit')
+
+      Object.values(this.knownSigners).forEach(ledger => {
+        if (
+          ledger.derivation !== ledgerDerivation || 
+          (ledger.derivation === 'live' && ledger.liveAccountLimit !== liveAccountLimit)
+        ) {
+          ledger.derivation = ledgerDerivation
+          ledger.liveAccountLimit = liveAccountLimit
+
+          checkEthAppIsOpen(ledger)
+            .then(() => ledger.deriveAddresses(liveAccountLimit))
+            .catch(() => {})
+        }
+      })
+    })
+  }
+
+  close () {
+    this.observer.remove()
+
+    super.close()
   }
 
   async handleAttachedDevice (usbDevice: usb.Device) {
@@ -78,11 +108,11 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       return
     }
 
-    const pendingRemoval = this.removals[devicePath]
+    const pendingDisconnection = this.disconnections[devicePath]
 
-    if (pendingRemoval) {
-      clearTimeout(pendingRemoval)
-      delete this.removals[devicePath]
+    if (pendingDisconnection) {
+      clearTimeout(pendingDisconnection)
+      delete this.disconnections[devicePath]
     }
 
     if (!(deviceId in this.knownSigners)) {
@@ -97,10 +127,20 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       await ledger.connect()
       await checkEthAppIsOpen(ledger)
 
-      let statusCheck = this.startStatusCheck(ledger, 10000)
+      ledger.on('addresses', () => {
+        ledger.status = STATUS.OK
+        emitUpdate()
+      })
 
-      ledger.on('addresses', emitUpdate)
       ledger.on('status', emitUpdate)
+
+      const derivation = store('main.ledger.derivation')
+      ledger.derivation = derivation
+
+      const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
+      await ledger.deriveAddresses(accountLimit)
+
+      let statusCheck = this.startStatusCheck(ledger, 10000)
 
       ledger.on('unlock', () => {
         clearInterval(statusCheck)
@@ -115,17 +155,8 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       ledger.on('close', () => {
         clearInterval(statusCheck)
       })
-
-      const derivation = store('main.ledger.derivation')
-      ledger.derivation = derivation
-
-      const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
-      await ledger.deriveAddresses(accountLimit)
-
-      ledger.status = STATUS.OK
     } catch (err) {
       ledger.status = getStatusForError(err)
-    } finally {
       emitUpdate()
     }
   }
@@ -143,7 +174,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       // when a user exits the eth app, it takes a few seconds for the
       // main ledger to reconnect via USB, so wait for this instead of
       // immediately removing the signer
-      this.removals[ledger.devicePath] = setTimeout(() => {
+      this.disconnections[ledger.devicePath] = setTimeout(() => {
         this.emit('remove', ledger.id)
         delete this.knownSigners[deviceId]
       }, 5000)
