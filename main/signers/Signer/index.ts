@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
 
-import deriveHDAccounts = require('./derive')
+import deriveHDAccounts from './derive'
 import crypt from '../../crypt'
 
 interface AppVersion {

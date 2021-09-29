@@ -51,7 +51,6 @@ class Signers extends EventEmitter {
     }
 
     const updateFn = (signer: Signer) => {
-      console.log('UPDATING', signer.summary())
       store.updateSigner(signer.summary())
     }
 
@@ -61,7 +60,7 @@ class Signers extends EventEmitter {
 
     adapter.open()
 
-    this.adapters[adapter.name] = {
+    this.adapters[adapter.adapterType] = {
       adapter,
       listeners: [
         {
@@ -81,13 +80,13 @@ class Signers extends EventEmitter {
   }
 
   removeAdapter (adapter: SignerAdapter) {
-    const adapterSpec = this.adapters[adapter.name]
+    const adapterSpec = this.adapters[adapter.adapterType]
 
     adapterSpec.listeners.forEach(listener => {
       adapter.removeListener(listener.event, listener.handler)
     })
 
-    delete this.adapter[adapter.name]
+    delete this.adapter[adapter.adapterType]
   }
 
   trezorPin (id, pin, cb) {
@@ -166,9 +165,7 @@ class Signers extends EventEmitter {
 
   add (id: string, signer: Signer) {
     if (!(id in this.signers)) {
-
-      console.log('ADDING', signer.summary())
-      store.newSigner(signer)
+      store.newSigner(signer.summary())
 
       this.signers[id] = signer
     }

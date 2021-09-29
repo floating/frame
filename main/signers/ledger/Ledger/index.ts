@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import log from 'electron-log'
 import { rlp, addHexPrefix } from 'ethereumjs-util'
 import { v5 as uuid } from 'uuid'

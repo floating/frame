@@ -4,12 +4,12 @@ import usb from 'usb'
 import HID from 'node-hid'
 
 export class SignerAdapter extends EventEmitter {
-  name: string;
+  adapterType: string;
 
-  constructor (name: string) {
+  constructor (type: string) {
     super() 
 
-    this.name = name
+    this.adapterType = type
   }
 
   open () {}
