@@ -119,7 +119,7 @@ async function loadRates (ids: string[], chainId: number) {
 
       return rates
     }, {} as Record<string, Rate>)
-  } catch (e) {
+  } catch (e: any) {
     throw new Error(`unable to load latest rates: ${e.message}`)
   }
 }

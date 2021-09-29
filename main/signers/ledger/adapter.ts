@@ -15,7 +15,8 @@ const STATUS = {
   OK: 'ok',
   LOCKED: 'Please unlock your ledger',
   WRONG_APP: 'Open your Ledger and select the Ethereum application',
-  DISCONNECTED: 'Please reconnect this Ledger device'
+  DISCONNECTED: 'Disconnected',
+  NEEDS_RECONNECTION: 'Please reconnect this Ledger device'
 }
 
 async function checkEthAppIsOpen (ledger) {
@@ -39,7 +40,7 @@ function getStatusForError (err: { statusCode: number }) {
     return STATUS.LOCKED
   }
 
-  return STATUS.DISCONNECTED
+  return STATUS.NEEDS_RECONNECTION
 }
 
 const supportedModels = [
@@ -154,6 +155,9 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
       ledger.on('close', () => {
         clearInterval(statusCheck)
+
+        ledger.status = STATUS.DISCONNECTED
+        emitUpdate()
       })
     } catch (err) {
       ledger.status = getStatusForError(err)
