@@ -6,7 +6,7 @@ const { app } = require('electron')
 const log = require('electron-log')
 const { v4: uuid } = require('uuid')
 
-const Signer = require('../../Signer')
+const Signer = require('../../Signer').default
 const store = require('../../../store')
 // Mock windows module during tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }

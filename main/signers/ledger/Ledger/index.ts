@@ -1,13 +1,18 @@
-const { rlp, addHexPrefix } = require('ethereumjs-util')
-const log = require('electron-log')
-const { v5: uuid } = require('uuid')
-const Eth = require('@ledgerhq/hw-app-eth').default
-const HID = require('node-hid')
-const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
+// @ts-nocheck
+
+import log from 'electron-log'
+import { rlp, addHexPrefix } from 'ethereumjs-util'
+import { v5 as uuid } from 'uuid'
+
+import HID from 'node-hid'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import Eth from '@ledgerhq/hw-app-eth'
+
+import Signer from '../../Signer'
+
 
 const { sign, signerCompatibility, londonToLegacy } = require('../../../transaction')
 // const store = require('../../../store')
-const Signer = require('../../Signer')
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -20,10 +25,13 @@ const BASE_PATH_TESTNET = '44\'/1\'/0\'/0/'
 const BASE_PATH_LIVE = '44\'/60\'/'
 
 
-class Ledger extends Signer {
-  type;
+export default class Ledger extends Signer {
+  private eth: Eth | undefined;
+  private devicePath: string;
 
-  constructor (devicePath) {
+  private coinbase = '0x'
+
+  constructor (devicePath: string) {
     super()
 
     this.devicePath = devicePath
@@ -33,7 +41,6 @@ class Ledger extends Signer {
 
     this.type = 'ledger'
     this.status = 'initial'
-    this.coinbase = '0x'
     
     // this.lastUse = Date.now()
     // this.busyCount = 0
@@ -56,6 +63,23 @@ class Ledger extends Signer {
     return TransportNodeHid.open(this.devicePath).then(transport => {
       return this.eth = new Eth(transport)
     })
+  }
+
+  close () {
+    if (this.eth) {
+      this.eth.transport.close()
+      this.eth = null
+    }
+
+    this.removeAllListeners()
+
+    if (this._pollStatus) clearTimeout(this._pollStatus)
+    if (this._deviceStatus) clearTimeout(this._deviceStatus)
+    if (this._signMessage) clearTimeout(this._signMessage)
+    if (this._signTransaction) clearTimeout(this._signTransaction)
+    if (this._scanTimer) clearTimeout(this._scanTimer)
+    
+    super.close()
   }
 
   getPath (i = 0) {
@@ -130,11 +154,11 @@ class Ledger extends Signer {
       log.info('verifyAddress Called but it\'s already active')
       return cb(new Error('verifyAddress Called but it\'s already active'))
     }
-    if (this.pause) {
-      log.info('Device access is paused')
-      return cb(new Error('Device access is paused'))
-    }
+    
     this.verifyActive = true
+
+    console.log('VERIFYING!')
+
     try {
       const result = await this.getAddress(this.getPath(index), display, true)
       const address = result.address.toLowerCase()
@@ -175,23 +199,6 @@ class Ledger extends Signer {
     }
 
     return this.addresses
-  }
-
-  close () {
-    if (this.eth) {
-      this.eth.transport.close()
-      this.eth = null
-    }
-
-    this.removeAllListeners()
-
-    if (this._pollStatus) clearTimeout(this._pollStatus)
-    if (this._deviceStatus) clearTimeout(this._deviceStatus)
-    if (this._signMessage) clearTimeout(this._signMessage)
-    if (this._signTransaction) clearTimeout(this._signTransaction)
-    if (this._scanTimer) clearTimeout(this._scanTimer)
-    
-    super.close()
   }
 
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake
@@ -356,12 +363,7 @@ class Ledger extends Signer {
   }
 
   async getAddress (...args) {
-    try {
-      const result = await this.eth.getAddress(...args)
-      return result
-    } catch (err) {
-      throw err
-    }
+    return this.eth.getAddress(...args)
   }
 
   async _getAppConfiguration () {
@@ -458,47 +460,3 @@ class Ledger extends Signer {
     return new Promise(executor)
   }
 }
-
-module.exports = Ledger
-
-// const { hashTypedData } = require('../../../crypt/typedDataUtils')
-
-/// / NOTE: Commented out because Ledger does not support signTypedData at the moment
-/// / see: https://github.com/floating/frame/issues/136
-/// /
-// async signTypedData (index, typedData, cb) {
-//   if (this.pause) return cb(new Error('Device access is paused'))
-//   try {
-//     this.currentDevice = new HID.HID(this.devicePath)
-//     this.currentTransport = new TransportNodeHid(this.currentDevice)
-//     // let transport = await TransportNodeHid.open(this.devicePath)
-//     const eth = new Eth(this.currentTransport)
-//     const message = hashTypedData(typedData).toString('hex')
-
-//     eth.signPersonalMessage(this.getPath(index), message.replace('0x', '')).then(result => {
-//       let v = (result['v'] - 27).toString(16)
-//       if (v.length < 2) v = '0' + v
-//       cb(null, '0x' + result['r'] + result['s'] + v)
-//       this.currentTransport.close()
-//       this.currentDevice.close()
-//       this.busyCount = 0
-//     }).catch(err => {
-//       cb(err)
-//       this.currentTransport.close()
-//       this.currentDevice.close()
-//     })
-//   } catch (err) {
-//     if (err.message.startsWith('cannot open device with path')) {
-//       clearTimeout(this._signMessage)
-//       if (++this.busyCount > 10) {
-//         this.busyCount = 0
-//         return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-//       } else {
-//         this._signMessage = setTimeout(() => this.signMessage(message, cb), 700)
-//         return log.info('>>>>>>> Busy: cannot open device with path, will try again (signMessage)')
-//       }
-//     }
-//     cb(err)
-//     log.error(err)
-//   }
-// }

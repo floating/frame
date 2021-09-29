@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["es6", "dom"],
     "types": ["node"],
-    "strict": true,
+    "strict": false,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
