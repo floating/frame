@@ -8,10 +8,7 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import Eth from '@ledgerhq/hw-app-eth'
 
 import Signer from '../../Signer'
-
-
-const { sign, signerCompatibility, londonToLegacy } = require('../../../transaction')
-// const store = require('../../../store')
+import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -22,7 +19,6 @@ const BASE_PATH_TESTNET = '44\'/1\'/0\'/0/'
 
 // Live Path
 const BASE_PATH_LIVE = '44\'/60\'/'
-
 
 export default class Ledger extends Signer {
   private eth: Eth | undefined;
@@ -40,20 +36,6 @@ export default class Ledger extends Signer {
 
     this.type = 'ledger'
     this.status = 'initial'
-    
-    // this.lastUse = Date.now()
-    // this.busyCount = 0
-    // this.pause = false
-    
-    // this.derivation = store('main.ledger.derivation')
-    // this.varObserver = store.observer(() => {
-    //   if (
-    //     this.derivation !== store('main.ledger.derivation') ||
-    //   ) {
-    //     this.reset()
-    //   }
-    // })
-    // this.deviceStatus()
   }
 
   async connect (version: AppVersion) {
