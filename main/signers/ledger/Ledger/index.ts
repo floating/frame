@@ -7,80 +7,162 @@ import HID from 'node-hid'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import Eth from '@ledgerhq/hw-app-eth'
 
+import { Request, RequestQueue } from './requestQueue'
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
+import { request } from 'http'
+import LedgerEthereumApp from './eth'
+import { threadId } from 'worker_threads'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-// Base Paths
-const BASE_PATH_LEGACY = "44'/60'/0'/"
-const BASE_PATH_STANDARD = `44\'/60\'/0\'/0/`
-const BASE_PATH_TESTNET = '44\'/1\'/0\'/0/'
+const STATUS = {
+  OK: 'ok',
+  DERIVING: 'Deriving addresses',
+  LOCKED: 'Please unlock your ledger',
+  WRONG_APP: 'Open your Ledger and select the Ethereum application',
+  DISCONNECTED: 'Disconnected',
+  NEEDS_RECONNECTION: 'Please reconnect this Ledger device'
+}
 
-// Live Path
-const BASE_PATH_LIVE = '44\'/60\'/'
+function isDeviceAsleep (err: { statusCode: number }) {
+  return [27404].includes(err.statusCode)
+}
+
+function needToOpenEthApp (err: { statusCode: number }) {
+  return [27904, 27906, 25873, 25871].includes(err.statusCode)
+}
+
+function getStatusForError (err: { statusCode: number }) {
+  if (needToOpenEthApp(err)) {
+    return STATUS.WRONG_APP
+  }
+  
+  if (isDeviceAsleep(err)) {
+    return STATUS.LOCKED
+  }
+
+  return STATUS.NEEDS_RECONNECTION
+}
+
 
 export default class Ledger extends Signer {
-  private eth: Eth | undefined;
+  private eth: LedgerEthereumApp | undefined;
   private devicePath: string;
+
+  // the Ledger device can only handle one request at a time; the transport will reject
+  // all incoming requests while its busy, so we need to make sure requests are only executed
+  // when the device is ready
+  private requestQueue = new RequestQueue()
+  private ethAppPoller: NodeJS.Timeout
 
   private coinbase = '0x'
 
-  constructor (devicePath: string, version: AppVersion) {
+  constructor (devicePath: string) {
     super()
 
     this.devicePath = devicePath
 
     this.addresses = []
-    this.id = uuid('Ledger' + this.devicePath, ns)
 
+    this.id = uuid('Ledger' + this.devicePath, ns)
     this.type = 'ledger'
     this.status = 'initial'
   }
 
-  async connect (version: AppVersion) {
+  async connect () {
     const transport = await TransportNodeHid.open(this.devicePath)
 
-    this.eth = new Eth(transport)
+    this.eth = new LedgerEthereumApp(transport)
 
-    const config = await this.eth.getAppConfiguration()
+    console.log('WE HAVE AN APP')
 
-    const [major, minor, patch] = (config.version || '1.6.1').split('.')
-    const version = { major, minor, patch }
-    this.appVersion = version
+    try {
+      const config = await this.eth.getAppConfiguration()
+      
+      const [major, minor, patch] = (config.version || '1.6.1').split('.')
+      const version = { major, minor, patch }
+      this.appVersion = version
+    } catch (err) {
+      this.eth = undefined
+      this.handleError(err)
+    }
+
+    return this.eth
+  }
+
+  async open () {
+    console.log('OPENING')
+    this.requestQueue.start()
+console.log('CONNECTING')
+
+    await this.connect()
+
+    console.log('CHECKING')
+
+    this.checkEthAppIsOpen()
 
     return this.eth
   }
 
   close () {
+    this.requestQueue.close()
+
+    clearTimeout(this.ethAppPoller)
+
     if (this.eth) {
-      this.eth.transport.close()
+      this.status = STATUS.DISCONNECTED
+      this.eth.close()
       this.eth = null
     }
 
     this.emit('close')
-
     this.removeAllListeners()
-
-    if (this._pollStatus) clearTimeout(this._pollStatus)
-    if (this._deviceStatus) clearTimeout(this._deviceStatus)
-    if (this._signMessage) clearTimeout(this._signMessage)
-    if (this._signTransaction) clearTimeout(this._signTransaction)
-    if (this._scanTimer) clearTimeout(this._scanTimer)
     
     super.close()
   }
 
-  getPath (i = 0) {
-    if (this.derivation === 'legacy') {
-      return (BASE_PATH_LEGACY + i)
-    } else if (this.derivation === 'standard') {
-      return (BASE_PATH_STANDARD + i)
-    } else if (this.derivation === 'testnet') {
-      return (BASE_PATH_TESTNET + i)
-    } else {
-      return (BASE_PATH_LIVE + i + '\'/0/0')
-    }
+  enqueueRequest (request: Request) {
+    this.requestQueue.add(request)
+  }
+
+  async checkEthAppIsOpen () {
+    const timeout = this.status === STATUS.LOCKED ? 500 : 4000
+
+    this.ethAppPoller = setTimeout(() => {
+      const lastRequest = this.requestQueue.peekBack()
+
+      // prevent spamming eth app checks
+      if (!lastRequest || lastRequest.type !== 'checkEthApp') {
+        this.enqueueRequest({
+          type: 'checkEthApp',
+          execute: async () => {
+            console.log(' -----> CHECKING ETH APP ', { status: this.status })
+            try {
+              await this.eth.getAddress("44'/60'/0'/0", false, false)
+
+              if (this.status === STATUS.LOCKED) {
+                this.status = STATUS.OK
+      
+                this.emit('unlock')
+              }
+            } catch (err) {
+              console.log('NO ETH APP')
+              if (isDeviceAsleep(err) && this.status !== STATUS.LOCKED) {
+                console.log('ASLEEP')
+                this.status = STATUS.LOCKED
+      
+                this.emit('lock')
+              } else {
+                this.handleError(err)
+              }
+            }
+          }
+        })
+      }
+
+      this.checkEthAppIsOpen()
+    }, timeout)
   }
 
   update () {
@@ -88,44 +170,17 @@ export default class Ledger extends Signer {
     store.updateSigner(this.summary())
   }
 
+  handleError (err) {
+    this.status = getStatusForError(err)
+
+    console.log('UPDATED ERROR STATUS TO: ', this.status, err)
+    this.emit('update')
+  }
+
   updateStatus (status) {
     this.status = status
 
     this.emit('status', status)
-  }
-
-  async wait (time) {
-    return new Promise(resolve => setTimeout(resolve, time))
-  }
-
-  async getDevice () {
-    if (this.pause) throw new Error('Device access is paused')
-    if (Date.now() - this.lastUse < 300) await this.wait(300)
-    await this.releaseDevice()
-    this.pause = true
-    this.currentDevice = new HID.HID(this.devicePath)
-    this.currentTransport = new TransportNodeHid(this.currentDevice)
-    return new Eth(this.currentTransport)
-  }
-
-  async releaseDevice () {
-    if (this.currentTransport) this.currentTransport.close()
-    if (this.currentDevice) this.currentDevice.close()
-    delete this.currentTransport
-    delete this.currentDevice
-    this.lastUse = Date.now()
-    await this.wait(300)
-    this.pause = false
-  }
-
-  reset () {
-    this.pauseLive = true
-    this.derivation = store('main.ledger.derivation')
-    this.liveAccountLimit = store('main.ledger.liveAccountLimit')
-    this.status = 'loading'
-    this.addresses = []
-    this.update()
-    this.deriveAddresses()
   }
 
   async getDeviceAddress (i, cb = () => {}) {
@@ -170,30 +225,33 @@ export default class Ledger extends Signer {
     }
   }
 
-  async deriveAddresses (accountLimit) {
-    this.addresses = []
+  deriveAddresses (accountLimit) {
+    this.enqueueRequest({
+      type: 'deriveAddresses',
+      execute: async () => {
+        console.log('DERIVING ADDRESSES')
+        if (this.eth) {
+          this.status = STATUS.DERIVING
+          this.emit('update')
 
-    // live addresses are derived one by one so it will emit its own events
-    if (this.derivation === 'live') {
-      this.updateStatus('Deriving Live Addresses')
-      await this._deriveLiveAddresses(accountLimit)
-      return this.emit('ready')
-    }
+          return new Promise(resolve => {
+            console.log({ eth: this.eth })
+            const stream = this.eth.deriveAddresses(this.derivation, accountLimit)
 
-    this.updateStatus('loading')
+            stream.on('addresses', derivedAddresses => {
+              console.log('GOT SOME ADDRESSES')
+              this.status = STATUS.OK
+              this.addresses = [...this.addresses, ...derivedAddresses]
+              this.emit('update')
+            })
 
-    if (this.derivation === 'legacy') {
-      this.addresses = await this._deriveLegacyAddresses()
-    } else if (this.derivation === 'standard') {
-      this.addresses = await this._deriveStandardAddresses()
-    } else if (this.derivation === 'testnet') {
-      this.addresses = await this._deriveTestnetAddresses()
-    }
+            stream.on('error', err => this.handleError(err))
 
-    this.emit('addresses', this.addresses)
-    this.emit('ready')
-
-    return this.addresses
+            stream.on('close', resolve)
+          })
+        }
+      }
+    })
   }
 
   pollStatus (interval = 21 * 1000) { // Detect sleep/wake

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Stream, Writable as WritableStream } from 'stream'
 
-const { rlp, addHexPrefix } = require('ethereumjs-util')
+const { rlp, addHexPrefix, padToEven } = require('ethereumjs-util')
 const log = require('electron-log')
 
 import Transport from '@ledgerhq/hw-transport'
@@ -9,6 +9,8 @@ import Eth from '@ledgerhq/hw-app-eth'
 
 import deriveHDAccounts from '../../Signer/derive'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
+import { stripHexPrefix } from 'web3-utils'
+import { stream } from '../../../dapps/server/asset'
 
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
@@ -46,17 +48,20 @@ export default class LedgerEthereumApp {
     let performDerivation
     const addressStream = new WritableStream()
 
-    // live addresses are derived one by one so it will emit its own events
     if (derivation === Derivation.live) {
       log.debug(`deriving ${derivation} Ledger addresses (live limit: ${limit})`)
 
+      // live addresses are derived one by one so this function
+      // will emit its own events
       performDerivation = this._deriveLiveAddresses(addressStream, limit)
     } else {
       performDerivation = this._deriveAddresses(derivation)
         .then(addresses => addressStream.emit('addresses', addresses))
     }
 
-    performDerivation.finally(() => addressStream.destroy())
+    performDerivation
+      .catch(err => addressStream.emit('error', err))
+      .finally(() => addressStream.destroy())
 
     return addressStream
   }
@@ -168,37 +173,15 @@ export default class LedgerEthereumApp {
   }
 
   // Standard Methods
-  async signMessage (index, message, cb) {
-    try {
-      if (this.pause) throw new Error('Device access is paused')
-      const eth = await this.getDevice()
-      const result = await eth.signPersonalMessage(this.getPath(index), message.replace('0x', ''))
-      let v = (result.v - 27).toString(16)
-      if (v.length < 2) v = '0' + v
-      cb(null, '0x' + result.r + result.s + v)
-      await this.releaseDevice()
-      this.busyCount = 0
-    } catch (err) {
-      const deviceBusy = (
-        err.message.startsWith('cannot open device with path') ||
-        err.message === 'Device access is paused' ||
-        err.message === 'Invalid channel' ||
-        err.message === 'DisconnectedDevice'
-      )
-      if (deviceBusy) {
-        clearTimeout(this._signMessage)
-        if (++this.busyCount > 20) {
-          this.busyCount = 0
-          return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-        } else {
-          this._signMessage = setTimeout(() => this.signMessage(index, message, cb), 700)
-          return log.info('>>>>>>> Busy: cannot open device with path, will try again (signMessage)')
-        }
-      }
-      cb(err)
-      await this.releaseDevice()
-      log.error(err)
-    }
+  async signMessage (derivation: Derivation, index: number, message: string) {
+    const path = this.getPath(derivation, index)
+    const rawMessage = stripHexPrefix(message)
+    
+    const result = await this.eth.signPersonalMessage(path, rawMessage)
+
+    let v = (result.v - 27).toString(16)
+
+    return addHexPrefix(result.r + result.s + padToEven(v))
   }
 
   async signTransaction (path: string, rawTx: any, cb: (err: any, ...signature: string[]) => void) {

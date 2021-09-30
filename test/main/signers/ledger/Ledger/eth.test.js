@@ -25,28 +25,42 @@ async function createEthApp (replayCodes = '') {
   return new LedgerEthereumApp(transport)
 }
 
-describe('#getPath', () => {
-  it('constructs a path using legacy derivation', async () => {
-    const ethApp = await createEthApp()
+it.skip('test conflict', async () => {
+  const ethApp = await createEthApp()
 
+  setTimeout(() => {
+    ethApp.signMessage(Derivation.legacy, 1, 'test', (err, res) => {
+      console.log({ err, res })
+    })
+  }, 1500)
+
+  return new Promise(resolve => {
+    setInterval(() => {
+      ethApp.getAddress("44'/60'/0'/0").then(console.log)
+    }, 1000)
+  })
+}, 20000)
+
+describe('#getPath', () => {
+  let ethApp
+
+  beforeEach(async () => {
+    ethApp = await createEthApp()
+  })
+
+  it('constructs a path using legacy derivation', async () => {
     expect(ethApp.getPath(Derivation.legacy, 2)).toBe("44'/60'/0'/2")
   })
 
   it('constructs a path using standard derivation', async () => {
-    const ethApp = await createEthApp()
-
     expect(ethApp.getPath(Derivation.standard, 8)).toBe("44'/60'/0'/0/8")
   })
 
   it('constructs a path using testnet derivation', async () => {
-    const ethApp = await createEthApp()
-
     expect(ethApp.getPath(Derivation.testnet, 0)).toBe("44'/1'/0'/0/0")
   })
 
   it('constructs a path using live derivation', async () => {
-    const ethApp = await createEthApp()
-
     expect(ethApp.getPath(Derivation.live, 9)).toBe("44'/60'/9'/0/0")
   })
 })
