@@ -2,12 +2,11 @@
 
 import usb from 'usb'
 import log from 'electron-log'
-import Eth from '@ledgerhq/hw-app-eth'
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 
 import { UsbSignerAdapter } from '../adapters'
 import Ledger from './Ledger'
 import store from '../../store'
+import { Derivation } from './Ledger/eth'
 
 const supportedPlatforms = ['win32', 'darwin']
 
@@ -25,13 +24,11 @@ const supportedModels = [
   }
 ]
 
-function deriveAddresses (ledger: Ledger) {
-  const derivation = store('main.ledger.derivation')
+function updateDerivation (ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit) {
+  const liveAccountLimit = accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
+
   ledger.derivation = derivation
-
-  const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
-
-  ledger.deriveAddresses(accountLimit)
+  ledger.accountLimit = liveAccountLimit
 }
 
 export default class LedgerSignerAdapter extends UsbSignerAdapter {
@@ -47,8 +44,6 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   }
 
   open () {
-    super.open()
-
     this.observer = store.observer(() => {
       const ledgerDerivation = store('main.ledger.derivation')
       const liveAccountLimit = store('main.ledger.liveAccountLimit')
@@ -56,14 +51,15 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       Object.values(this.knownSigners).forEach(ledger => {
         if (
           ledger.derivation !== ledgerDerivation || 
-          (ledger.derivation === 'live' && ledger.liveAccountLimit !== liveAccountLimit)
+          (ledger.derivation === 'live' && ledger.accountLimit !== liveAccountLimit)
         ) {
-          ledger.derivation = ledgerDerivation
-          ledger.liveAccountLimit = liveAccountLimit
-          ledger.deriveAddresses(liveAccountLimit)
+          updateDerivation(ledger, ledgerDerivation, liveAccountLimit)
+          ledger.deriveAddresses()
         }
       })
     })
+
+    super.open()
   }
 
   close () {
@@ -90,7 +86,6 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       delete this.disconnections[devicePath]
     }
 
-
     let [existingDeviceId, ledger] = Object.entries(this.knownSigners)
       .find(([deviceId, ledger]) => ledger.devicePath === devicePath) || []
 
@@ -104,69 +99,19 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     this.knownSigners[deviceId] = ledger
     const emitUpdate = () => this.emit('update', ledger)
 
-    ledger.on('update', l => {
-      console.log('UPDATE', ledger.status)
-      emitUpdate()
-    })
-
+    ledger.on('update', emitUpdate)
     ledger.on('close', emitUpdate)
     ledger.on('error', emitUpdate)
     ledger.on('lock', emitUpdate)
 
     ledger.on('unlock', () => {
-      if (ledger.addresses.length === 0) {
-        deriveAddresses(ledger)
-      }
+      ledger.connect()
     })
 
+    updateDerivation(ledger)
+
     await ledger.open()
-
-    if (ledger.eth) {
-      deriveAddresses(ledger)
-    }
-
-    // try {
-      
-
-    //   await ledger.connect()
-    //   await checkEthAppIsOpen(ledger)
-
-    //   ledger.on('addresses', () => {
-    //     ledger.status = STATUS.OK
-    //     emitUpdate()
-    //   })
-
-    //   ledger.on('status', emitUpdate)
-
-    //   const derivation = store('main.ledger.derivation')
-    //   ledger.derivation = derivation
-
-    //   const accountLimit = derivation === 'live' ? store('main.ledger.liveAccountLimit') : 0
-    //   await ledger.deriveAddresses(accountLimit)
-
-    //   let statusCheck = this.startStatusCheck(ledger, 10000)
-
-    //   ledger.on('unlock', () => {
-    //     clearInterval(statusCheck)
-    //     statusCheck = this.startStatusCheck(ledger, 10000)
-    //   })
-
-    //   ledger.on('lock', () => {
-    //     clearInterval(statusCheck)
-    //     statusCheck = this.startStatusCheck(ledger, 500)
-    //   })
-
-    //   ledger.on('close', () => {
-    //     clearInterval(statusCheck)
-
-    //     ledger.status = STATUS.DISCONNECTED
-    //     emitUpdate()
-    //   })
-    // } catch (err) {
-    //   ledger.status = getStatusForError(err)
-    //   emitUpdate()
-    // }
-  
+    await ledger.connect()
   }
 
   handleDetachedDevice (usbDevice: usb.Device) {
@@ -175,7 +120,6 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     const deviceId = this.deviceId(usbDevice)
 
     if (deviceId in this.knownSigners) {
-      console.log('CLOSING')
       const ledger = this.knownSigners[deviceId]
 
       ledger.close()
@@ -199,27 +143,5 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
   supportsDevice (usbDevice: usb.Device) {
     return supportedModels.some(checkSupport => checkSupport(usbDevice))
-  }
-
-  startStatusCheck (ledger, interval) {
-    return setInterval(() => {
-      checkEthAppIsOpen(ledger)
-      .then(() => {
-        if (ledger.status === STATUS.LOCKED) {
-          ledger.status = STATUS.OK
-          ledger.emit('unlock')
-
-          this.emit('update', ledger)
-        }
-      })
-      .catch(err => {
-        if (isDeviceAsleep(err) && ledger.status !== STATUS.LOCKED) {
-          ledger.status = STATUS.LOCKED
-          ledger.emit('lock')
-
-          this.emit('update', ledger)
-        }
-      })
-    }, interval)
   }
 }

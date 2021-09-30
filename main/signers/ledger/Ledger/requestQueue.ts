@@ -19,6 +19,7 @@ export class RequestQueue {
   }
 
   pollRequest () {
+    console.log('QUEUE DEPTH', this.requestQueue.length)
     // each request must return a resolved promise
     const request = (this.requestQueue.length === 0) 
       ? noRequest

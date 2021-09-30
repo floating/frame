@@ -11,13 +11,14 @@ import { Request, RequestQueue } from './requestQueue'
 import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import { request } from 'http'
-import LedgerEthereumApp from './eth'
+import LedgerEthereumApp, { Derivation } from './eth'
 import { threadId } from 'worker_threads'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 const STATUS = {
   OK: 'ok',
+  LOADING: 'loading',
   DERIVING: 'Deriving addresses',
   LOCKED: 'Please unlock your ledger',
   WRONG_APP: 'Open your Ledger and select the Ethereum application',
@@ -50,6 +51,9 @@ export default class Ledger extends Signer {
   private eth: LedgerEthereumApp | undefined;
   private devicePath: string;
 
+  private derivation: Derivation;
+  private accountLimit = 5;
+
   // the Ledger device can only handle one request at a time; the transport will reject
   // all incoming requests while its busy, so we need to make sure requests are only executed
   // when the device is ready
@@ -70,37 +74,35 @@ export default class Ledger extends Signer {
     this.status = 'initial'
   }
 
-  async connect () {
+  async open () {
     const transport = await TransportNodeHid.open(this.devicePath)
 
     this.eth = new LedgerEthereumApp(transport)
-
-    console.log('WE HAVE AN APP')
-
-    try {
-      const config = await this.eth.getAppConfiguration()
-      
-      const [major, minor, patch] = (config.version || '1.6.1').split('.')
-      const version = { major, minor, patch }
-      this.appVersion = version
-    } catch (err) {
-      this.eth = undefined
-      this.handleError(err)
-    }
-
-    return this.eth
+    this.requestQueue.start()
   }
 
-  async open () {
-    console.log('OPENING')
-    this.requestQueue.start()
-console.log('CONNECTING')
+  async connect () {
 
-    await this.connect()
+    try {
+      // this check needs to start before we try to connect so that it can
+      // keep checking if the device is already locked
+      clearInterval(this.ethAppPoller)
+      this.checkEthAppIsOpen(4000)
 
-    console.log('CHECKING')
+      const config = await this.eth.getAppConfiguration()
+      const [major, minor, patch] = (config.version || '1.6.1').split('.')
+      const version = { major, minor, patch }
+      
+      this.appVersion = version
 
-    this.checkEthAppIsOpen()
+      this.deriveAddresses()
+    } catch (err) {
+      this.handleError(err)
+
+      if (this.status !== STATUS.LOCKED) {
+        this.close()
+      }
+    }
 
     return this.eth
   }
@@ -110,8 +112,8 @@ console.log('CONNECTING')
 
     clearTimeout(this.ethAppPoller)
 
-    if (this.eth) {
-      this.status = STATUS.DISCONNECTED
+    if (this.eth && this.status === STATUS.OK) {
+      this.updateStatus(STATUS.DISCONNECTED)
       this.eth.close()
       this.eth = null
     }
@@ -126,61 +128,34 @@ console.log('CONNECTING')
     this.requestQueue.add(request)
   }
 
-  async checkEthAppIsOpen () {
-    const timeout = this.status === STATUS.LOCKED ? 500 : 4000
+  updateStatus (status: string) {
+    this.status = status
 
-    this.ethAppPoller = setTimeout(() => {
-      const lastRequest = this.requestQueue.peekBack()
+    if (this.status === STATUS.OK) {
+      clearInterval(this.ethAppPoller)
+      this.checkEthAppIsOpen(4000)
+    }
 
-      // prevent spamming eth app checks
-      if (!lastRequest || lastRequest.type !== 'checkEthApp') {
-        this.enqueueRequest({
-          type: 'checkEthApp',
-          execute: async () => {
-            console.log(' -----> CHECKING ETH APP ', { status: this.status })
-            try {
-              await this.eth.getAddress("44'/60'/0'/0", false, false)
-
-              if (this.status === STATUS.LOCKED) {
-                this.status = STATUS.OK
-      
-                this.emit('unlock')
-              }
-            } catch (err) {
-              console.log('NO ETH APP')
-              if (isDeviceAsleep(err) && this.status !== STATUS.LOCKED) {
-                console.log('ASLEEP')
-                this.status = STATUS.LOCKED
-      
-                this.emit('lock')
-              } else {
-                this.handleError(err)
-              }
-            }
-          }
-        })
-      }
-
-      this.checkEthAppIsOpen()
-    }, timeout)
-  }
-
-  update () {
-    if (this.invalid || this.status === 'Invalid sequence' || this.status === 'initial') return
-    store.updateSigner(this.summary())
+    if (this.status === STATUS.LOCKED) {
+      clearInterval(this.ethAppPoller)
+      this.checkEthAppIsOpen(1500)
+    }
   }
 
   handleError (err) {
-    this.status = getStatusForError(err)
+    if (isDeviceAsleep(err) && this.status !== STATUS.LOCKED) {
+      this.updateStatus(STATUS.LOCKED)
 
-    console.log('UPDATED ERROR STATUS TO: ', this.status, err)
-    this.emit('update')
-  }
+      this.emit('lock')
+    } else {
+      this.updateStatus(getStatusForError(err))
 
-  updateStatus (status) {
-    this.status = status
+      this.emit('update')
 
-    this.emit('status', status)
+      if (this.status === STATUS.NEEDS_RECONNECTION) {
+        this.close()
+      }
+    }
   }
 
   async getDeviceAddress (i, cb = () => {}) {
@@ -225,22 +200,56 @@ console.log('CONNECTING')
     }
   }
 
-  deriveAddresses (accountLimit) {
+  async checkEthAppIsOpen (frequency: number) {
+
+    const lastStatus = this.status
+
+    this.ethAppPoller = setTimeout(() => {
+      const lastRequest = this.requestQueue.peekBack()
+
+      // prevent spamming eth app checks
+      if (!lastRequest || lastRequest.type !== 'checkEthApp') {
+        this.enqueueRequest({
+          type: 'checkEthApp',
+          execute: () => {
+            if (lastStatus !== this.status) {
+              // check if the status changed since this event was enqueued, this
+              // will prevent unintended status transitions
+              return Promise.resolve()
+            }
+
+            return this.eth.getAddress("44'/60'/0'/0", false, false)
+              .then(() => {
+                if (this.status === STATUS.LOCKED) {
+                  this.updateStatus(STATUS.OK)
+        
+                  this.emit('unlock')
+                }
+              })
+              .catch(err => {
+                this.handleError(err)
+              })
+          }
+        })
+      }
+
+      this.checkEthAppIsOpen(frequency)
+    }, frequency)
+  }
+
+  deriveAddresses () {
     this.enqueueRequest({
       type: 'deriveAddresses',
       execute: async () => {
-        console.log('DERIVING ADDRESSES')
         if (this.eth) {
-          this.status = STATUS.DERIVING
+          this.updateStatus(STATUS.DERIVING)
           this.emit('update')
 
           return new Promise(resolve => {
-            console.log({ eth: this.eth })
-            const stream = this.eth.deriveAddresses(this.derivation, accountLimit)
+            const stream = this.eth.deriveAddresses(this.derivation, this.accountLimit)
 
             stream.on('addresses', derivedAddresses => {
-              console.log('GOT SOME ADDRESSES')
-              this.status = STATUS.OK
+              this.updateStatus(STATUS.OK)
               this.addresses = [...this.addresses, ...derivedAddresses]
               this.emit('update')
             })
@@ -252,73 +261,6 @@ console.log('CONNECTING')
         }
       }
     })
-  }
-
-  pollStatus (interval = 21 * 1000) { // Detect sleep/wake
-    clearTimeout(this._pollStatus)
-    this._pollStatus = setTimeout(() => this.deviceStatus(), interval)
-  }
-
-  async deviceStatus () {
-    if (this.status === 'Invalid sequence') return log.warn('INVALID SEQUENCE')
-    this.pollStatus()
-    if (this.pause || this.deviceStatusActive || this.verifyActive) return
-    this.deviceStatusActive = true
-    try {
-      // If signer has no addresses, try deriving them
-      if (!this.addresses.length) await this.deriveAddresses()
-      const { address } = await this.getAddress(this.getPath(0), false, true)
-      if (address !== this.coinbase || this.status !== 'ok') {
-        this.coinbase = address
-        this.deviceStatus()
-      }
-      this.status = 'ok'
-
-      if (!this.addresses.length) {
-        this.status = 'loading'
-        this.deriveAddresses()
-      } else {
-        this.busyCount = 0
-      }
-      this.update()
-      this.deviceStatusActive = false
-    } catch (err) {
-      log.error(err)
-      log.error(err.message)
-      const deviceBusy = (
-        err.message.startsWith('cannot open device with path') ||
-        err.message === 'Device access is paused' ||
-        err.message === 'Invalid channel' ||
-        err.message === 'DisconnectedDevice'
-      )
-      if (deviceBusy) { // Device is busy, try again
-        clearTimeout(this._deviceStatus)
-        if (++this.busyCount > 10) {
-          this.busyCount = 0
-          log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-        } else {
-          this._deviceStatus = setTimeout(() => this.deviceStatus(), 700)
-          log.info('>>>>>>> Busy: cannot open device with path, will try again (deviceStatus)')
-        }
-      } else {
-        this.status = err.message
-        if (err.statusCode === 27904) this.status = 'Wrong application, select the Ethereum application on your Ledger'
-        if (err.statusCode === 26368) this.status = 'Select the Ethereum application on your Ledger'
-        if (err.statusCode === 26625 || err.statusCode === 26628) {
-          this.pollStatus(3000)
-          this.status = 'Confirm your Ledger is not asleep'
-        }
-        if (err.message === 'Cannot write to HID device') {
-          this.status = 'loading'
-          log.error('Device Status: Cannot write to HID device')
-        }
-        if (err.message === 'Invalid sequence') this.invalid = true
-        if (err.message.indexOf('UNKNOWN_ERROR') > -1) this.status = 'Please reconnect this Ledger device'
-        this.addresses = []
-        this.update()
-      }
-      this.deviceStatusActive = false
-    }
   }
 
   normalize (hex) {
