@@ -1,93 +1,97 @@
 // @ts-nocheck
+import { Stream, Writable as WritableStream } from 'stream'
 
 const { rlp, addHexPrefix } = require('ethereumjs-util')
 const log = require('electron-log')
-const { v5: uuid } = require('uuid')
 
-import HID from 'node-hid'
 import Transport from '@ledgerhq/hw-transport'
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import Eth from '@ledgerhq/hw-app-eth'
 
+import deriveHDAccounts from '../../Signer/derive'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 
 
-const store = require('../../../store')
-const Signer = require('../../Signer')
-
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-// Base Paths
-const BASE_PATH_LEGACY = '44\'/60\'/0\'/'
-const BASE_PATH_STANDARD = `44\'/60\'/0\'/0/`
-const BASE_PATH_TESTNET = '44\'/1\'/0\'/0/'
+export enum Derivation {
+  live = 'live', legacy = 'legacy', standard = 'standard', testnet = 'testnet'
+}
 
-// Live Path
-const BASE_PATH_LIVE = '44\'/60\'/'
+const derivationPaths: { [key: Derivation]: string } = {
+  [Derivation.legacy.valueOf()]: "44'/60'/0'/",
+  [Derivation.standard.valueOf()]: "44'/60'/0'/0/",
+  [Derivation.testnet.valueOf()]: "44'/1'/0'/0/"
+}
 
-
-class LedgerEthereumApp {
-  private transport: Transport;
-  private devicePath: string;
+export default class LedgerEthereumApp {
   private eth: Eth;
 
-  constructor (devicePath: string) {
-    this.transport = new TransportNodeHid(new HID.HID(devicePath))
-
-    this.devicePath = devicePath
-    this.eth = new Eth(this.transport)
-  }
-
-  async verifyAddress (path: string, currentAddress: string, display: boolean, cb = (err: Error | null, result: boolean | undefined) => {}) {
-    try {
-      const result = await this.getAddress(path, display, true)
-      
-      if (result.address.toLowerCase() !== currentAddress.toLowerCase()) {
-        log.error(new Error(`Ledger address ${currentAddress} does not match device`))
-        return cb(new Error('Address does not match device'), false)
-      }
-      
-      cb(null, true)
-    } catch (err: any) {
-      log.error(new Error(`could not verify Ledger address: ${err.message}`))
-      cb(new Error('Verify Address Error'), false)
-    }
-  }
-
-  async deriveAddresses () {
-    let addresses
-    if (this.pause) throw new Error('Device access is paused')
-    if (this.derivingAddresses) {
-      await this.wait(1000)
-      return await this.deriveAddresses()
-    }
-    clearTimeout(this.derivingAddressesErrorTimeout)
-    this.derivingAddresses = true
-    try {
-      // Derive addresses
-      if (this.derivation === 'legacy') {
-        addresses = await this._deriveLegacyAddresses()
-      } else if (this.derivation === 'standard') {
-        addresses = await this._deriveStandardAddresses()
-      } else if (this.derivation === 'testnet') {
-        addresses = await this._deriveTestnetAddresses()
-      } else {
-        addresses = await this._deriveLiveAddresses()
-      }
-      // Update signer
-      this.addresses = addresses
-      this.update()
-      this.derivingAddresses = false
-    } catch (e) {
-      log.error(e)
-      this.derivingAddressesErrorTimeout = setTimeout(() => {
-        this.derivingAddresses = false
-      }, 4000)
-    }
+  constructor (transport: Transport) {
+    this.eth = new Eth(transport)
   }
 
   close () {
-    this.transport.close()
+    this.eth.transport.close()
+  }
+
+  getPath (derivation: Derivation, index: number) {
+    if (derivation === Derivation.live) {
+      return `44'/60'/${index}'/0/0`
+    }
+
+    return derivationPaths[derivation] + index
+  }
+
+  deriveAddresses (derivation: Derivation, limit = 5) {
+    let performDerivation
+    const addressStream = new WritableStream()
+
+    // live addresses are derived one by one so it will emit its own events
+    if (derivation === Derivation.live) {
+      log.debug(`deriving ${derivation} Ledger addresses (live limit: ${limit})`)
+
+      performDerivation = this._deriveLiveAddresses(addressStream, limit)
+    } else {
+      performDerivation = this._deriveAddresses(derivation)
+        .then(addresses => addressStream.emit('addresses', addresses))
+    }
+
+    performDerivation.finally(() => addressStream.destroy())
+
+    return addressStream
+  }
+
+  async _deriveLiveAddresses (stream: Stream, accountLimit: number) {
+    log.debug(`deriving ${accountLimit} Ledger live addresses`)
+
+    for (let i = 0; i < accountLimit; i++) {
+      const path = this.getPath(Derivation.live, i)
+      const { address } = await this.getAddress(path, false, false)
+
+      log.debug(`Found Ledger Live address #${i}: ${address}`)
+
+      stream.emit('addresses', [address])
+    }
+  }
+
+  async _deriveAddresses (derivation: Derivation) {
+    log.debug(`deriving ${derivation} Ledger addresses`)
+
+    const path = derivationPaths[derivation]
+
+    const executor = async (resolve, reject) => {
+      try {
+        const result = await this.getAddress(path, false, true)
+        deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
+          if (err) reject(err)
+          else resolve(addresses)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    }
+
+    return new Promise(executor)
   }
 
   async deviceStatus () {
@@ -222,147 +226,7 @@ class LedgerEthereumApp {
     return this.eth.getAddress(path, display, chainCode)
   }
 
-  async _getAppConfiguration () {
-    try {
-      const eth = await this.getDevice()
-      const result = await eth.getAppConfiguration()
-      await this.releaseDevice()
-      return result
-    } catch (err) {
-      await this.releaseDevice()
-      throw err
-    }
-  }
-
-  async _deriveLiveAddresses () {
-    let addresses = []
-    this.status = 'Deriving Live Addresses'
-    this.liveAddressesFound = 0
-    for (let i = 0; i < this.liveAccountLimit; i++) {
-      if (this.pauseLive) {
-        this.status = 'loading'
-        addresses = []
-        this.liveAddressesFound = 0
-        this.update()
-        this.pauseLive = false
-        this._scanTimer = setTimeout(() => this.scan(), 300)
-        break
-      }
-      const { address } = await this.getAddress(this.getPath(i), false, false)
-      log.info(`Found Ledger Live address #${i}: ${address}`)
-      addresses.push(address)
-      this.liveAddressesFound = addresses.length
-    }
-    return addresses
-  }
-
-  _deriveLegacyAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        const result = await this.getAddress(BASE_PATH_LEGACY, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
-  }
-
-  _deriveStandardAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        const result = await this.getAddress(BASE_PATH_STANDARD, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
-  }
-
-  _deriveTestnetAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        const result = await this.getAddress(BASE_PATH_TESTNET, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
-  }
-
-  _deriveStandardAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        let path
-        if (store('main.hardwareDerivation') === 'mainnet') {
-          path = BASE_PATH_STANDARD
-        } else {
-          path = BASE_PATH_STANDARD_TEST
-        }
-        const result = await this.getAddress(path, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
+  async getAppConfiguration () {
+    return this.eth.getAppConfiguration()
   }
 }
-
-module.exports = Ledger
-
-// const { hashTypedData } = require('../../../crypt/typedDataUtils')
-
-/// / NOTE: Commented out because Ledger does not support signTypedData at the moment
-/// / see: https://github.com/floating/frame/issues/136
-/// /
-// async signTypedData (index, typedData, cb) {
-//   if (this.pause) return cb(new Error('Device access is paused'))
-//   try {
-//     this.currentDevice = new HID.HID(this.devicePath)
-//     this.currentTransport = new TransportNodeHid(this.currentDevice)
-//     // let transport = await TransportNodeHid.open(this.devicePath)
-//     const eth = new Eth(this.currentTransport)
-//     const message = hashTypedData(typedData).toString('hex')
-
-//     eth.signPersonalMessage(this.getPath(index), message.replace('0x', '')).then(result => {
-//       let v = (result['v'] - 27).toString(16)
-//       if (v.length < 2) v = '0' + v
-//       cb(null, '0x' + result['r'] + result['s'] + v)
-//       this.currentTransport.close()
-//       this.currentDevice.close()
-//       this.busyCount = 0
-//     }).catch(err => {
-//       cb(err)
-//       this.currentTransport.close()
-//       this.currentDevice.close()
-//     })
-//   } catch (err) {
-//     if (err.message.startsWith('cannot open device with path')) {
-//       clearTimeout(this._signMessage)
-//       if (++this.busyCount > 10) {
-//         this.busyCount = 0
-//         return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-//       } else {
-//         this._signMessage = setTimeout(() => this.signMessage(message, cb), 700)
-//         return log.info('>>>>>>> Busy: cannot open device with path, will try again (signMessage)')
-//       }
-//     }
-//     cb(err)
-//     log.error(err)
-//   }
-// }
