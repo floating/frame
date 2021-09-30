@@ -122,6 +122,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     if (deviceId in this.knownSigners) {
       const ledger = this.knownSigners[deviceId]
 
+      ledger.status = 'Disconnected'
       ledger.close()
 
       // when a user exits the eth app, it takes a few seconds for the

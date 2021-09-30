@@ -113,7 +113,6 @@ export default class Ledger extends Signer {
     clearTimeout(this.ethAppPoller)
 
     if (this.eth && this.status === STATUS.OK) {
-      this.updateStatus(STATUS.DISCONNECTED)
       this.eth.close()
       this.eth = null
     }
@@ -244,6 +243,8 @@ export default class Ledger extends Signer {
         if (this.eth) {
           this.updateStatus(STATUS.DERIVING)
           this.emit('update')
+
+          this.addresses = []
 
           return new Promise(resolve => {
             const stream = this.eth.deriveAddresses(this.derivation, this.accountLimit)

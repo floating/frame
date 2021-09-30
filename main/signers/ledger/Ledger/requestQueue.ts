@@ -14,12 +14,10 @@ export class RequestQueue {
   private requestPoller = setTimeout(() => {})
 
   add (request: Request) {
-    console.log('ADDING REQUEST', request.type)
     this.requestQueue.push(request)
   }
 
   pollRequest () {
-    console.log('QUEUE DEPTH', this.requestQueue.length)
     // each request must return a resolved promise
     const request = (this.requestQueue.length === 0) 
       ? noRequest
