@@ -286,7 +286,8 @@ describe('#send', () => {
       const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', typedData]
 
       send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error).toBeTruthy()
+        expect(err.error.message).toBeTruthy()
+        expect(err.error.code).toBe(-1)
         done()
       })
     }, 100)
@@ -295,7 +296,21 @@ describe('#send', () => {
       const params = [address, 'test']
 
       send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error).toBeTruthy()
+        expect(err.error.message).toBeTruthy()
+        expect(err.error.code).toBe(-1)
+        done()
+      })
+    }, 100)
+
+    it('does not submit a V3 request to a Ledger', done => {
+      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'ledger' })
+
+      // Ledger only supports V4+
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v3', params }, err => {
+        expect(err.error.message).toBeTruthy()
+        expect(err.error.code).toBe(-1)
         done()
       })
     }, 100)
@@ -423,7 +438,7 @@ describe('#signAndSend', () => {
         provider.handlers[request.handlerId] = err => {
           expect(err.id).toBe(request.payload.id)
           expect(err.jsonrpc).toBe(request.payload.jsonrpc)
-          expect(err.error).toBe(errorMessage)
+          expect(err.error.message).toBe(errorMessage)
           done()
         }
 

@@ -30,6 +30,10 @@ const { populate: populateTransaction, usesBaseFee } = require('../transaction')
 
 const version = require('../../package.json').version
 
+function equalCaseInsensitive(s1, s2) {
+  return s1.toLowerCase() === s2.toLowerCase()
+}
+
 class Provider extends EventEmitter {
   constructor () {
     super()
@@ -107,13 +111,16 @@ class Provider extends EventEmitter {
       delete this.handlers[req.handlerId]
     }
     const payload = req.payload
-    this.resError('User declined transaction', payload, res)
+    this.resError({ message: 'User declined transaction', code: 4001 }, payload, res)
   }
 
-  resError (error, payload, res) {
-    if (typeof error === 'string') error = { message: error, code: -1 }
+  resError (errorData, payload, res) {
+    const error = (typeof errorData === 'string')
+      ? { message: errorData, code: -1 }
+      : { message: errorData.message, code: errorData.code || -1 }
+
     log.warn(error)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, error: error.message })
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
   getSignedAddress (signed, message, cb) {
@@ -462,6 +469,13 @@ class Provider extends EventEmitter {
       } catch (e) {
         return this.resError('Malformed typedData.', payload, res)
       }
+    }
+
+    if (
+        version !== 'V4' &&
+        equalCaseInsensitive((currentAccount.lastSignerType || ''), 'ledger')
+      ) {
+      return this.resError('Ledger only supports eth_signTypedData_v4+', payload, res)
     }
 
     const handlerId = uuid()
