@@ -1,6 +1,7 @@
 // @ts-nocheck
 
-import { rlp, addHexPrefix, padToEven } from 'ethereumjs-util'
+import { rlp, addHexPrefix, stripHexPrefix, padToEven } from 'ethereumjs-util'
+import ethSigUtil from 'eth-sig-util'
 import log from 'electron-log'
 
 import Transport from '@ledgerhq/hw-transport'
@@ -8,7 +9,6 @@ import Eth from '@ledgerhq/hw-app-eth'
 
 import deriveHDAccounts from '../../Signer/derive'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
-import { stripHexPrefix } from 'web3-utils'
 
 export enum Derivation {
   live = 'live', legacy = 'legacy', standard = 'standard', testnet = 'testnet'
@@ -132,16 +132,24 @@ export default class LedgerEthereumApp {
     return hex
   }
 
-  // Standard Methods
-  async signMessage (derivation: Derivation, index: number, message: string) {
-    const path = this.getPath(derivation, index)
+  async signMessage (path: string, message: string) {
     const rawMessage = stripHexPrefix(message)
     
-    const result = await this.eth.signPersonalMessage(path, rawMessage)
+    const signature = await this.eth.signPersonalMessage(path, rawMessage)
+    const hashedSignature = signature.r + signature.s + padToEven((signature.v - 27).toString(16))
 
-    let v = (result.v - 27).toString(16)
+    return addHexPrefix(hashedSignature)
+  }
 
-    return addHexPrefix(result.r + result.s + padToEven(v))
+  async signTypedData (path: string, typedData: string) {
+    const { domain, types, primaryType, message } = ethSigUtil.TypedDataUtils.sanitizeData(typedData)
+    const domainSeparatorHex = ethSigUtil.TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
+    const hashStructMessageHex = ethSigUtil.TypedDataUtils.hashStruct(primaryType, message, types).toString('hex')
+
+    const signature = await this.eth.signEIP712HashedMessage(path, domainSeparatorHex, hashStructMessageHex)
+    const hashedSignature = signature.r + signature.s + padToEven((signature.v - 27).toString(16))
+
+    return addHexPrefix(hashedSignature)
   }
 
   async signTransaction (path: string, rawTx: any, cb: (err: any, ...signature: string[]) => void) {

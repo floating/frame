@@ -335,7 +335,7 @@ export default class Ledger extends Signer {
       type: 'verifyAddress',
       execute: async () => {
         if (!this.eth)  throw new Error('attempted to verify address but Eth app is not connected!')
-        if (!this.derivation) throw new Error('attempted to verify address for unknown derivation!')
+        if (!this.derivation) throw new Error('attempted to verify address with unknown derivation!')
 
         try {
           const path = this.eth.getPath(this.derivation, index)
@@ -356,6 +356,58 @@ export default class Ledger extends Signer {
         } catch (e) {
           const err = e as DeviceError
           const message = wasRequestRejected(err) ? 'Verify request rejected by user' : 'Verify address error'
+
+          this.handleError(err)
+
+          cb(new Error(message), undefined)
+        }
+      }
+    })
+  }
+
+  async signMessage (index: number, message: string, cb: Callback) {
+    this.enqueueRequests({
+      type: 'signMessage',
+      execute: async () => {
+        if (!this.eth)  throw new Error('attempted to sign message but Eth app is not connected!')
+        if (!this.derivation) throw new Error('attempted to sign message with unknown derivation!')
+
+        try {
+          const path = this.eth.getPath(this.derivation, index)
+          const signedMessage = await this.eth.signMessage(path, message)
+
+          log.debug('successfully signed message on Ledger: ', message)
+
+          cb(null, signedMessage)
+        } catch (e) {
+          const err = e as DeviceError
+          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
+
+          this.handleError(err)
+
+          cb(new Error(message), undefined)
+        }
+      }
+    })
+  }
+
+  async signTypedData (index: number, version: string, typedData: string, cb: Callback) {
+    this.enqueueRequests({
+      type: 'signMessage',
+      execute: async () => {
+        if (!this.eth)  throw new Error('attempted to sign typed data but Eth app is not connected!')
+        if (!this.derivation) throw new Error('attempted to sign typed data with unknown derivation!')
+
+        try {
+          const path = this.eth.getPath(this.derivation, index)
+          const signedData = await this.eth.signTypedData(path, typedData)
+
+          log.debug('successfully signed typed data on Ledger: ', typedData)
+
+          cb(null, signedData)
+        } catch (e) {
+          const err = e as DeviceError
+          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
 
           this.handleError(err)
 
@@ -402,38 +454,7 @@ export default class Ledger extends Signer {
 
   // Standard Methods
   // TODO
-  // async signMessage (index, message, cb) {
-  //   try {
-  //     if (this.pause) throw new Error('Device access is paused')
-  //     const eth = await this.getDevice()
-  //     const result = await eth.signPersonalMessage(this.getPath(index), message.replace('0x', ''))
-  //     let v = (result.v - 27).toString(16)
-  //     if (v.length < 2) v = '0' + v
-  //     cb(null, '0x' + result.r + result.s + v)
-  //     await this.releaseDevice()
-  //     this.busyCount = 0
-  //   } catch (err) {
-  //     const deviceBusy = (
-  //       err.message.startsWith('cannot open device with path') ||
-  //       err.message === 'Device access is paused' ||
-  //       err.message === 'Invalid channel' ||
-  //       err.message === 'DisconnectedDevice'
-  //     )
-  //     if (deviceBusy) {
-  //       clearTimeout(this._signMessage)
-  //       if (++this.busyCount > 20) {
-  //         this.busyCount = 0
-  //         return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-  //       } else {
-  //         this._signMessage = setTimeout(() => this.signMessage(index, message, cb), 700)
-  //         return log.info('>>>>>>> Busy: cannot open device with path, will try again (signMessage)')
-  //       }
-  //     }
-  //     cb(err)
-  //     await this.releaseDevice()
-  //     log.error(err)
-  //   }
-  // }
+  
 
   // TODO
   // async signTransaction (index, rawTx, cb) {

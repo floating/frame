@@ -78,7 +78,7 @@ export default class Signer extends EventEmitter {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
 
-  signTypedData (index: number, typedData: string, cb: Callback) {
+  signTypedData (index: number, version: string, typedData: string, cb: Callback) {
     return cb(new Error(`Signer: ${this.type} does not support eth_signTypedData`), undefined)
   }
 }
