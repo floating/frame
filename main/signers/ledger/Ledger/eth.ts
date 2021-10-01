@@ -1,8 +1,7 @@
 // @ts-nocheck
-import { Stream, Writable as WritableStream } from 'stream'
 
-const { rlp, addHexPrefix, padToEven } = require('ethereumjs-util')
-const log = require('electron-log')
+import { rlp, addHexPrefix, padToEven } from 'ethereumjs-util'
+import log from 'electron-log'
 
 import Transport from '@ledgerhq/hw-transport'
 import Eth from '@ledgerhq/hw-app-eth'
@@ -10,10 +9,6 @@ import Eth from '@ledgerhq/hw-app-eth'
 import deriveHDAccounts from '../../Signer/derive'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import { stripHexPrefix } from 'web3-utils'
-import { stream } from '../../../dapps/server/asset'
-
-
-const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 export enum Derivation {
   live = 'live', legacy = 'legacy', standard = 'standard', testnet = 'testnet'
@@ -44,42 +39,7 @@ export default class LedgerEthereumApp {
     return derivationPaths[derivation] + index
   }
 
-  deriveAddresses (derivation: Derivation, limit = 5) {
-    let performDerivation
-    const addressStream = new WritableStream()
-
-    if (derivation === Derivation.live) {
-      log.debug(`deriving ${derivation} Ledger addresses (live limit: ${limit})`)
-
-      // live addresses are derived one by one so this function
-      // will emit its own events
-      performDerivation = this._deriveLiveAddresses(addressStream, limit)
-    } else {
-      performDerivation = this._deriveAddresses(derivation)
-        .then(addresses => addressStream.emit('addresses', addresses))
-    }
-
-    performDerivation
-      .catch(err => addressStream.emit('error', err))
-      .finally(() => addressStream.destroy())
-
-    return addressStream
-  }
-
-  async _deriveLiveAddresses (stream: Stream, accountLimit: number) {
-    log.debug(`deriving ${accountLimit} Ledger live addresses`)
-
-    for (let i = 0; i < accountLimit; i++) {
-      const path = this.getPath(Derivation.live, i)
-      const { address } = await this.getAddress(path, false, false)
-
-      log.debug(`Found Ledger Live address #${i}: ${address}`)
-
-      stream.emit('addresses', [address])
-    }
-  }
-
-  async _deriveAddresses (derivation: Derivation) {
+  async deriveAddresses (derivation: Derivation) {
     log.debug(`deriving ${derivation} Ledger addresses`)
 
     const path = derivationPaths[derivation]

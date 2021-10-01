@@ -123,8 +123,8 @@ export default class Ledger extends Signer {
     super.close()
   }
 
-  enqueueRequest (request: Request) {
-    this.requestQueue.add(request)
+  enqueueRequests (...requests: Request[]) {
+    requests.forEach(req => this.requestQueue.add(req))
   }
 
   updateStatus (status: string) {
@@ -208,7 +208,7 @@ export default class Ledger extends Signer {
 
       // prevent spamming eth app checks
       if (!lastRequest || lastRequest.type !== 'checkEthApp') {
-        this.enqueueRequest({
+        this.enqueueRequests({
           type: 'checkEthApp',
           execute: () => {
             if (lastStatus !== this.status) {
@@ -237,28 +237,70 @@ export default class Ledger extends Signer {
   }
 
   deriveAddresses () {
-    this.enqueueRequest({
+    this.requestQueue.clear()
+
+    if (this.derivation === Derivation.live) {
+      this._deriveLiveAddresses()
+    } else {
+      this._deriveHardwareAddresses()
+    }
+  }
+
+  _deriveLiveAddresses () {
+    const requests = [{
+      type: 'updateStatus',
+      execute: async () => {
+        this.addresses = []
+
+        this.updateStatus(STATUS.DERIVING)
+        this.emit('update')
+      }
+    }]
+
+    for (let i = 0; i < this.accountLimit; i++) {
+      requests.push({
+        type: 'deriveAddresses',
+        execute: async () => {
+          try {
+            if (this.derivation === Derivation.live) {
+              const path = this.eth.getPath(this.derivation, i)
+              const { address } = await this.eth.getAddress(path, false, false)
+
+              log.info(`Found Ledger Live address #${i}: ${address}`)
+
+              this.addresses = [...this.addresses, address]
+              
+              this.updateStatus(STATUS.OK)
+              this.emit('update')
+            }
+          } catch (e) {
+            this.handleError(e)
+          }
+        }
+      })
+    }
+
+    this.enqueueRequests(...requests)
+  }
+
+  _deriveHardwareAddresses () {
+    this.enqueueRequests({
       type: 'deriveAddresses',
       execute: async () => {
-        if (this.eth) {
+        try {
+          this.addresses = []
+
           this.updateStatus(STATUS.DERIVING)
           this.emit('update')
 
-          this.addresses = []
+          const addresses = await this.eth.deriveAddresses(this.derivation)
 
-          return new Promise(resolve => {
-            const stream = this.eth.deriveAddresses(this.derivation, this.accountLimit)
+          this.addresses = [...addresses]
 
-            stream.on('addresses', derivedAddresses => {
-              this.updateStatus(STATUS.OK)
-              this.addresses = [...this.addresses, ...derivedAddresses]
-              this.emit('update')
-            })
-
-            stream.on('error', err => this.handleError(err))
-
-            stream.on('close', resolve)
-          })
+          this.updateStatus(STATUS.OK)
+          this.emit('update')
+        } catch (e) {
+          this.handleError(e)
         }
       }
     })
@@ -368,65 +410,5 @@ export default class Ledger extends Signer {
       await this.releaseDevice()
       throw err
     }
-  }
-
-  async _deriveLiveAddresses (accountLimit) {
-    this.liveAddressesFound = 0
-
-    for (let i = 0; i < accountLimit; i++) {
-      const { address } = await this.getAddress(this.getPath(i), false, false)
-
-      log.info(`Found Ledger Live address #${i}: ${address}`)
-
-      this.addresses = [...this.addresses, address]
-      this.liveAddressesFound = this.addresses.length
-
-      this.emit('addresses', this.addresses)
-    }
-  }
-
-  _deriveLegacyAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        const result = await this.getAddress(BASE_PATH_LEGACY, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
-  }
-
-  _deriveStandardAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        const result = await this.getAddress(BASE_PATH_STANDARD, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
-  }
-
-  _deriveTestnetAddresses () {
-    const executor = async (resolve, reject) => {
-      try {
-        const result = await this.getAddress(BASE_PATH_TESTNET, false, true)
-        this.deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
-        })
-      } catch (err) {
-        reject(err)
-      }
-    }
-    return new Promise(executor)
   }
 }

@@ -42,6 +42,10 @@ export class RequestQueue {
 
   close () {
     this.stop()
+    this.clear()
+  }
+
+  clear () {
     this.requestQueue = []
   }
 
