@@ -238,6 +238,10 @@ export default class Ledger extends Signer {
 
   deriveAddresses () {
     this.requestQueue.clear()
+    this.addresses = []
+
+    this.updateStatus(STATUS.DERIVING)
+    this.emit('update')
 
     if (this.derivation === Derivation.live) {
       this._deriveLiveAddresses()
@@ -247,30 +251,26 @@ export default class Ledger extends Signer {
   }
 
   _deriveLiveAddresses () {
-    const requests = [{
-      type: 'updateStatus',
-      execute: async () => {
-        this.addresses = []
-
-        this.updateStatus(STATUS.DERIVING)
-        this.emit('update')
-      }
-    }]
+    const requests = []
 
     for (let i = 0; i < this.accountLimit; i++) {
       requests.push({
         type: 'deriveAddresses',
         execute: async () => {
           try {
-            if (this.derivation === Derivation.live) {
-              const path = this.eth.getPath(this.derivation, i)
-              const { address } = await this.eth.getAddress(path, false, false)
+            const path = this.eth.getPath(this.derivation, i)
+            const { address } = await this.eth.getAddress(path, false, false)
 
-              log.info(`Found Ledger Live address #${i}: ${address}`)
+            log.debug(`Found Ledger Live address #${i}: ${address}`)
+
+            if (this.derivation === Derivation.live) {
+              // don't update if the derivation was changed while this request was running
+              if (this.status === STATUS.DERIVING) {
+                this.updateStatus(STATUS.OK)
+              }
 
               this.addresses = [...this.addresses, address]
-              
-              this.updateStatus(STATUS.OK)
+
               this.emit('update')
             }
           } catch (e) {
@@ -284,21 +284,24 @@ export default class Ledger extends Signer {
   }
 
   _deriveHardwareAddresses () {
+    const targetDerivation = this.derivation
+
     this.enqueueRequests({
       type: 'deriveAddresses',
       execute: async () => {
         try {
-          this.addresses = []
-
-          this.updateStatus(STATUS.DERIVING)
-          this.emit('update')
-
           const addresses = await this.eth.deriveAddresses(this.derivation)
 
-          this.addresses = [...addresses]
+          if (this.derivation === targetDerivation) {
+            // don't update if the derivation was changed while this request was running
+            if (this.status === STATUS.DERIVING) {
+              this.updateStatus(STATUS.OK)
+            }
 
-          this.updateStatus(STATUS.OK)
-          this.emit('update')
+            this.addresses = [...addresses]
+
+            this.emit('update')
+          }
         } catch (e) {
           this.handleError(e)
         }
