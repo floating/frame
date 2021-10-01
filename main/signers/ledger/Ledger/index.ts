@@ -39,6 +39,9 @@ function normalizeHex (hex: string) {
   return padToEven(stripHexPrefix(hex || ''))
 }
 
+function wasRequestRejected(err: DeviceError) {
+  return [27013].includes(err.statusCode)
+}
 function isDeviceAsleep (err: DeviceError) {
   return [27404].includes(err.statusCode)
 }
@@ -352,10 +355,11 @@ export default class Ledger extends Signer {
           cb(null, true)
         } catch (e) {
           const err = e as DeviceError
+          const message = wasRequestRejected(err) ? 'Verify request rejected by user' : 'Verify address error'
 
           this.handleError(err)
 
-          cb(new Error(`verify address error: ${err.message}`), undefined)
+          cb(new Error(message), undefined)
         }
       }
     })

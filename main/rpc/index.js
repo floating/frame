@@ -174,7 +174,8 @@ const rpc = {
     resolveName(name).then(result => cb(null, result)).catch(cb)
   },
   verifyAddress (cb) {
-    accounts.verifyAddress(true, cb)
+    const res = (err, data) => cb(err, data || false)
+    accounts.verifyAddress(true, res)
   },
   setBaseFee (fee, handlerId, cb) {
     accounts.setBaseFee(fee, handlerId, true, cb)
