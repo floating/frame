@@ -39,15 +39,15 @@ function normalizeHex (hex: string) {
   return padToEven(stripHexPrefix(hex || ''))
 }
 
-function isDeviceAsleep (err: { statusCode: number }) {
+function isDeviceAsleep (err: DeviceError) {
   return [27404].includes(err.statusCode)
 }
 
-function needToOpenEthApp (err: { statusCode: number }) {
+function needToOpenEthApp (err: DeviceError) {
   return [27904, 27906, 25873, 25871].includes(err.statusCode)
 }
 
-function getStatusForError (err: { statusCode: number }) {
+function getStatusForError (err: DeviceError) {
   if (needToOpenEthApp(err)) {
     return STATUS.WRONG_APP
   }
@@ -186,34 +186,34 @@ export default class Ledger extends Signer {
   }
 
   private async checkDeviceStatus () {
-    const check = new Promise(async (resolve: (code: number) => void) => {
-      setTimeout(() => resolve(-1), 3000)
+    const check = new Promise(async (resolve: (err: DeviceError | undefined) => void) => {
+      setTimeout(() => resolve({ statusCode: -1, message: 'status check timed out' }), 3000)
 
       try {
         await this.eth?.getAddress("44'/60'/0'/0", false, false)
-        resolve(0)
+        resolve(undefined)
       } catch (e: any) {
-        resolve(e.statusCode || -1)
+        const err = e as DeviceError
+        resolve({ message: err.message, statusCode: err.statusCode || -1 })
       }
     })
 
-    return check.then(statusCode => {
-      if (!statusCode) {
+    return check.then(err => {
+      if (!err) {
         // success, handle different status state transitions
 
         if (this.status === STATUS.LOCKED) {
           // when the app is unlocked, stop checking status since we will respond
-          // to this event and start checking for status when that's complete
+          // to the unlock event and start checking for status when that's complete
           clearTimeout(this.statusPoller)
 
-          this.updateStatus(STATUS.OK)
           this.emit('unlock')
         }
       } else {
-        this.handleError({ statusCode, message: '' })
+        this.handleError(err)
       }
 
-      return statusCode
+      return err?.statusCode || 0
     })
   }
 
@@ -271,10 +271,9 @@ export default class Ledger extends Signer {
         type: 'deriveAddresses',
         execute: async () => {
           try {
-            if (!this.eth)  throw new Error('attempted to derive addresses but Eth app is not connected!')
-            if (!this.derivation) throw new Error('attempted to derive addresses for unknown derivation!')
+            if (!this.eth)  throw new Error('attempted to derive Live addresses but Eth app is not connected!')
 
-            const path = this.eth.getPath(this.derivation, i)
+            const path = this.eth.getPath(Derivation.live, i)
             const { address } = await this.eth.getAddress(path, false, false)
 
             log.debug(`Found Ledger Live address #${i}: ${address}`)
@@ -306,8 +305,8 @@ export default class Ledger extends Signer {
       type: 'deriveAddresses',
       execute: async () => {
         try {
-          if (!this.eth)  throw new Error('attempted to derive addresses but Eth app is not connected!')
-          if (!this.derivation) throw new Error('attempted to derive addresses for unknown derivation!')
+          if (!this.eth)  throw new Error('attempted to derive hardware addresses but Eth app is not connected!')
+          if (!this.derivation) throw new Error('attempted to derive hardware addresses for unknown derivation!')
 
           const addresses = await this.eth.deriveAddresses(this.derivation)
 
@@ -343,7 +342,7 @@ export default class Ledger extends Signer {
             const err = new Error('Address does not match device')
             log.error(err)
 
-            this.handleError({ statusCode: -1, message: '' })
+            this.handleError({ statusCode: -1, message: 'failed to verify device address' })
 
             return cb(err, undefined)
           }
