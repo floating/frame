@@ -1,16 +1,11 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
 
+import { AppVersion } from '../../transaction'
 import deriveHDAccounts from './derive'
 import crypt from '../../crypt'
 
-interface AppVersion {
-  major: number,
-  minor: number,
-  patch: number
-}
-
-type Callback = (err: any, result: any) => void
+export type Callback = (err: Error | null, result: any | undefined) => void
 
 export default class Signer extends EventEmitter {
   id = '';
@@ -40,7 +35,7 @@ export default class Signer extends EventEmitter {
     cb(null, this.addresses[0])
   }
 
-  verifyAddress (cb: Callback) {
+  verifyAddress (index: number, current: string, display: boolean, cb: Callback) {
     const err = new Error('Signer:' + this.type + ' did not implement verifyAddress method')
     log.error(err)
     cb(err, undefined)

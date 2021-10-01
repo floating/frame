@@ -27,8 +27,8 @@ export default class LedgerEthereumApp {
     this.eth = new Eth(transport)
   }
 
-  close () {
-    this.eth.transport.close()
+  async close () {
+    return this.eth.transport.close()
   }
 
   getPath (derivation: Derivation, index: number) {
@@ -44,7 +44,7 @@ export default class LedgerEthereumApp {
 
     const path = derivationPaths[derivation]
 
-    const executor = async (resolve, reject) => {
+    const executor = async (resolve: (addresses: string[]) => void, reject) => {
       try {
         const result = await this.getAddress(path, false, true)
         deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
@@ -165,7 +165,7 @@ export default class LedgerEthereumApp {
     }
   }
 
-  async getAddress (path: string, display = false, chainCode = false) {
+  async getAddress (path: string, display, chainCode ) {
     return this.eth.getAddress(path, display, chainCode)
   }
 

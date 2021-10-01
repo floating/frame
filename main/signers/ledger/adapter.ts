@@ -4,7 +4,7 @@ import usb from 'usb'
 import log from 'electron-log'
 
 import { UsbSignerAdapter } from '../adapters'
-import Ledger from './Ledger'
+import Ledger, { STATUS, Status } from './Ledger'
 import store from '../../store'
 import { Derivation } from './Ledger/eth'
 
@@ -122,12 +122,12 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     if (deviceId in this.knownSigners) {
       const ledger = this.knownSigners[deviceId]
 
-      ledger.status = 'Disconnected'
+      ledger.status = STATUS.DISCONNECTED
       ledger.close()
 
       // when a user exits the eth app, it takes a few seconds for the
-      // main ledger to reconnect via USB, so wait for this instead of
-      // immediately removing the signer
+      // main ledger to reconnect via USB, so attempt to wait for this event
+      // instead of immediately removing the signer
       this.disconnections[ledger.devicePath] = setTimeout(() => {
         this.emit('remove', ledger.id)
         delete this.knownSigners[deviceId]

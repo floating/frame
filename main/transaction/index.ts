@@ -21,7 +21,7 @@ interface Signature {
   s: string
 }
 
-interface AppVersion {
+export interface AppVersion {
   major: number,
   minor: number,
   patch: number
