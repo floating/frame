@@ -1,5 +1,4 @@
 import log from 'electron-log'
-import { rlp, addHexPrefix, stripHexPrefix, padToEven } from 'ethereumjs-util'
 
 // @ts-ignore
 import { v5 as uuid } from 'uuid'
@@ -8,12 +7,13 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 
 import { Request, RequestQueue } from './requestQueue'
 import Signer, { Callback } from '../../Signer'
-import LedgerEthereumApp, { Derivation } from './eth'
-import { sign, signerCompatibility, londonToLegacy, AppVersion } from '../../../transaction'
+import LedgerEthereumApp from './eth'
+import { Derivation, getDerivationPath } from '../../Signer/derive'
+import { signerCompatibility, londonToLegacy, TransactionData } from '../../../transaction'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-export const STATUS = {
+export const Status = {
   INITIAL: 'Connecting',
   OK: 'ok',
   LOADING: 'loading',
@@ -35,10 +35,6 @@ interface Address {
   chainCode?: string | undefined
 }
 
-function normalizeHex (hex: string) {
-  return padToEven(stripHexPrefix(hex || ''))
-}
-
 function wasRequestRejected(err: DeviceError) {
   return [27013].includes(err.statusCode)
 }
@@ -52,16 +48,15 @@ function needToOpenEthApp (err: DeviceError) {
 
 function getStatusForError (err: DeviceError) {
   if (needToOpenEthApp(err)) {
-    return STATUS.WRONG_APP
+    return Status.WRONG_APP
   }
   
   if (isDeviceAsleep(err)) {
-    return STATUS.LOCKED
+    return Status.LOCKED
   }
 
-  return STATUS.NEEDS_RECONNECTION
+  return Status.NEEDS_RECONNECTION
 }
-
 
 export default class Ledger extends Signer {
   private eth: LedgerEthereumApp | undefined;
@@ -87,7 +82,7 @@ export default class Ledger extends Signer {
 
     this.id = uuid('Ledger' + this.devicePath, ns)
     this.type = 'ledger'
-    this.status = STATUS.INITIAL
+    this.status = Status.INITIAL
   }
 
   async open () {
@@ -114,7 +109,7 @@ export default class Ledger extends Signer {
   }
 
   async connect () {
-    this.updateStatus(STATUS.INITIAL)
+    this.updateStatus(Status.INITIAL)
     this.emit('update')
 
     try {
@@ -133,7 +128,7 @@ export default class Ledger extends Signer {
       await this.checkDeviceStatus()
 
       if (this.isReady()) {
-        const [major, minor, patch] = (config.version || '1.6.1').split('.').map(parseInt)
+        const [major, minor, patch] = (config.version || '1.6.1').split('.').map(n => parseInt(n))
         const version = { major, minor, patch }
         
         this.appVersion = version
@@ -143,21 +138,21 @@ export default class Ledger extends Signer {
     } catch (err) {
       this.handleError(err as DeviceError)
 
-      if (this.status !== STATUS.LOCKED) {
+      if (this.status !== Status.LOCKED) {
         this.close()
       }
     }
   }
 
   private isReady () {
-    const readyStatuses = [STATUS.INITIAL, STATUS.OK]
+    const readyStatuses = [Status.INITIAL, Status.OK]
 
     return readyStatuses.includes(this.status)
   }
 
   private handleError (err: DeviceError) {
-    if (isDeviceAsleep(err) && this.status !== STATUS.LOCKED) {
-      this.updateStatus(STATUS.LOCKED)
+    if (isDeviceAsleep(err) && this.status !== Status.LOCKED) {
+      this.updateStatus(Status.LOCKED)
 
       this.emit('lock')
     } else {
@@ -167,7 +162,7 @@ export default class Ledger extends Signer {
         this.updateStatus(errorStatus)
         this.emit('update')
 
-        if (this.status === STATUS.NEEDS_RECONNECTION) {
+        if (this.status === Status.NEEDS_RECONNECTION) {
           this.close()
         }
       }
@@ -177,12 +172,12 @@ export default class Ledger extends Signer {
   updateStatus (status: string) {
     this.status = status
 
-    if (this.status === STATUS.OK) {
+    if (this.status === Status.OK) {
       clearInterval(this.statusPoller)
       this.pollDeviceStatus(5000)
     }
 
-    if (this.status === STATUS.LOCKED) {
+    if (this.status === Status.LOCKED) {
       clearInterval(this.statusPoller)
       this.pollDeviceStatus(500)
     }
@@ -205,7 +200,7 @@ export default class Ledger extends Signer {
       if (!err) {
         // success, handle different status state transitions
 
-        if (this.status === STATUS.LOCKED) {
+        if (this.status === Status.LOCKED) {
           // when the app is unlocked, stop checking status since we will respond
           // to the unlock event and start checking for status when that's complete
           clearTimeout(this.statusPoller)
@@ -250,13 +245,25 @@ export default class Ledger extends Signer {
     requests.forEach(req => this.requestQueue.add(req))
   }
 
+  private getPath (index: number) {
+    if (this.derivation === Derivation.live) {
+      return `44'/60'/${index}'/0/0`
+    }
+
+    if (!this.derivation) {
+      throw new Error('attempted to get path with unknown derivation!')
+    }
+  
+    return getDerivationPath(this.derivation) + index
+  }
+
   // *** request enqueuing methods *** //
 
   deriveAddresses () {
     this.requestQueue.clear()
     this.addresses = []
 
-    this.updateStatus(STATUS.DERIVING)
+    this.updateStatus(Status.DERIVING)
     this.emit('update')
 
     if (this.derivation === Derivation.live) {
@@ -276,15 +283,15 @@ export default class Ledger extends Signer {
           try {
             if (!this.eth)  throw new Error('attempted to derive Live addresses but Eth app is not connected!')
 
-            const path = this.eth.getPath(Derivation.live, i)
+            const path = this.getPath(i)
             const { address } = await this.eth.getAddress(path, false, false)
 
             log.debug(`Found Ledger Live address #${i}: ${address}`)
 
             if (this.derivation === Derivation.live) {
               // don't update if the derivation was changed while this request was running
-              if (this.status === STATUS.DERIVING) {
-                this.updateStatus(STATUS.OK)
+              if (this.status === Status.DERIVING) {
+                this.updateStatus(Status.OK)
               }
 
               this.addresses = [...this.addresses, address]
@@ -315,8 +322,8 @@ export default class Ledger extends Signer {
 
           if (this.derivation === targetDerivation) {
             // don't update if the derivation was changed while this request was running
-            if (this.status === STATUS.DERIVING) {
-              this.updateStatus(STATUS.OK)
+            if (this.status === Status.DERIVING) {
+              this.updateStatus(Status.OK)
             }
 
             this.addresses = [...addresses]
@@ -338,7 +345,7 @@ export default class Ledger extends Signer {
         if (!this.derivation) throw new Error('attempted to verify address with unknown derivation!')
 
         try {
-          const path = this.eth.getPath(this.derivation, index)
+          const path = this.getPath(index)
           const result = await this.getAddress(path, display, true)
 
           if (result.address.toLowerCase() !== currentAddress.toLowerCase()) {
@@ -373,7 +380,7 @@ export default class Ledger extends Signer {
         if (!this.derivation) throw new Error('attempted to sign message with unknown derivation!')
 
         try {
-          const path = this.eth.getPath(this.derivation, index)
+          const path = this.getPath(index)
           const signedMessage = await this.eth.signMessage(path, message)
 
           log.debug('successfully signed message on Ledger: ', message)
@@ -384,6 +391,7 @@ export default class Ledger extends Signer {
           const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
 
           this.handleError(err)
+          log.error('error signing message on Ledger', err)
 
           cb(new Error(message), undefined)
         }
@@ -391,15 +399,21 @@ export default class Ledger extends Signer {
     })
   }
 
-  async signTypedData (index: number, version: string, typedData: string, cb: Callback) {
+  async signTypedData (index: number, version: string, typedData: any, cb: Callback) {
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
+
+    if ((parseInt(versionNum) || 0) < 4) {
+      return cb(new Error(`Invalid version (${version}), Ledger only supports eth_signTypedData version 4+`), undefined)
+    }
+
     this.enqueueRequests({
-      type: 'signMessage',
+      type: 'signTypedData',
       execute: async () => {
         if (!this.eth)  throw new Error('attempted to sign typed data but Eth app is not connected!')
         if (!this.derivation) throw new Error('attempted to sign typed data with unknown derivation!')
 
         try {
-          const path = this.eth.getPath(this.derivation, index)
+          const path = this.getPath(index)
           const signedData = await this.eth.signTypedData(path, typedData)
 
           log.debug('successfully signed typed data on Ledger: ', typedData)
@@ -410,6 +424,37 @@ export default class Ledger extends Signer {
           const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
 
           this.handleError(err)
+          log.error('error signing typed data on Ledger', err)
+
+          cb(new Error(message), undefined)
+        }
+      }
+    })
+  }
+
+  async signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
+    const compatibility = signerCompatibility(rawTx, this.summary())
+    const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
+
+    this.enqueueRequests({
+      type: 'signTransaction',
+      execute: async () => {
+        if (!this.eth)  throw new Error('attempted to sign transaction but Eth app is not connected!')
+        if (!this.derivation) throw new Error('attempted to sign transaction with unknown derivation!')
+
+        try {
+          const path = this.getPath(index)
+          const signedTx = await this.eth.signTransaction(path, ledgerTx)
+
+          log.debug('successfully signed transaction on Ledger: ', ledgerTx)
+
+          cb(null, signedTx)
+        } catch (e) {
+          const err = e as DeviceError
+          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign transaction error'
+
+          this.handleError(err)
+          log.error('error signing transaction on Ledger', err)
 
           cb(new Error(message), undefined)
         }
@@ -444,65 +489,11 @@ export default class Ledger extends Signer {
       }
 
       setTimeout(() => {
-        const statusCode = (this.status === STATUS.INITIAL) ? 27904 : -1
+        const statusCode = (this.status === Status.INITIAL) ? 27904 : -1
         reject({ message: 'getAppConfiguration timed out', statusCode })
       }, 1000)
 
       this.eth.getAppConfiguration().then(resolve).catch(reject)
     })
   }
-
-  // Standard Methods
-  // TODO
-  
-
-  // TODO
-  // async signTransaction (index, rawTx, cb) {
-  //   try {
-  //     if (this.pause) throw new Error('Device access is paused')
-  //     const eth = await this.getDevice()
-  //     const signerPath = this.getPath(index)
-
-  //     const compatibility = signerCompatibility(rawTx, this.summary())
-  //     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
-
-  //     const signedTx = await sign(ledgerTx, tx => {
-  //       // legacy transactions aren't RLP encoded before they're returned
-  //       const message = tx.getMessageToSign(false)
-  //       const legacyMessage = message[0] !== parseInt(tx.type)
-  //       const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message.toString('hex')
-
-  //       return eth.signTransaction(signerPath, rawTxHex)
-  //     })
-
-  //     const signedTxSerialized = signedTx.serialize().toString('hex')
-  //     cb(null, addHexPrefix(signedTxSerialized))
-
-  //     this.releaseDevice()
-  //   } catch (err) {
-  //     log.error(err)
-  //     log.error(err.message)
-  //     const deviceBusy = (
-  //       err.message.startsWith('cannot open device with path') ||
-  //       err.message === 'Device access is paused' ||
-  //       err.message === 'Invalid channel' ||
-  //       err.message === 'DisconnectedDevice'
-  //     )
-  //     if (deviceBusy) {
-  //       clearTimeout(this._signTransaction)
-  //       if (++this.busyCount > 20) {
-  //         this.busyCount = 0
-  //         cb(err)
-  //         return log.info('>>>>>>> Busy: Limit (10) hit, cannot open device with path, will not try again')
-  //       } else {
-  //         this._signTransaction = setTimeout(() => this.signTransaction(index, rawTx, cb), 700)
-  //         return log.info('>>>>>>> Busy: cannot open device with path, will try again (signTransaction)')
-  //       }
-  //     } else {
-  //       cb(err)
-  //     }
-  //     this.releaseDevice()
-  //     log.error(err)
-  //   }
-  // }
 }

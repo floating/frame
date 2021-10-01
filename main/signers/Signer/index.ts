@@ -1,8 +1,8 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
 
-import { AppVersion } from '../../transaction'
-import deriveHDAccounts from './derive'
+import { AppVersion, TransactionData } from '../../transaction'
+import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
 
 export type Callback = (err: Error | null, result: any | undefined) => void
@@ -23,7 +23,7 @@ export default class Signer extends EventEmitter {
     this.addresses = []
   }
 
-  deriveHDAccounts (publicKey: string, chainCode: string, cb: () => void) {
+  deriveHDAccounts (publicKey: string, chainCode: string, cb: (err: any, accounts: string[] | undefined) => void) {
     deriveHDAccounts(publicKey, chainCode, cb)
   }
 
@@ -74,7 +74,7 @@ export default class Signer extends EventEmitter {
     console.warn('Signer:' + this.type + ' did not implement a signMessage method')
   }
 
-  signTransaction (index: number, rawTx: string, cb: Callback) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
 

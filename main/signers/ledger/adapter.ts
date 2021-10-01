@@ -4,9 +4,9 @@ import usb from 'usb'
 import log from 'electron-log'
 
 import { UsbSignerAdapter } from '../adapters'
-import Ledger, { STATUS, Status } from './Ledger'
+import Ledger, { Status } from './Ledger'
 import store from '../../store'
-import { Derivation } from './Ledger/eth'
+import { Derivation } from '../Signer/derive'
 
 const supportedPlatforms = ['win32', 'darwin']
 
@@ -122,7 +122,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     if (deviceId in this.knownSigners) {
       const ledger = this.knownSigners[deviceId]
 
-      ledger.status = STATUS.DISCONNECTED
+      ledger.status = Status.DISCONNECTED
       ledger.close()
 
       // when a user exits the eth app, it takes a few seconds for the
