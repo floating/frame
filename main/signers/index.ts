@@ -1,25 +1,92 @@
+// @ts-nocheck
+
 const EventEmitter = require('events')
 const log = require('electron-log')
 const crypto = require('crypto')
 
+import Signer from './signer'
+import { SignerAdapter } from './adapters'
+
 const hot = require('./hot')
-const ledger = require('./ledger')
+import LedgerAdapter from './ledger/adapter'
 const trezorConnect = require('./trezor-connect')
 const lattice = require('./lattice')
 
-const store = require('../store')
+import store from '../store'
+
+const registeredAdapters = [
+  new LedgerAdapter()
+]
+
+interface AdapterSpec {
+  [key: string]: {
+    adapter: SignerAdapter,
+    listeners: {
+      event: string,
+      handler: (p: any) => void
+    }[]
+  }
+}
 
 class Signers extends EventEmitter {
+  private adapters: AdapterSpec;
+  private signers: { [key: string]: Signer };
+
   constructor () {
     super()
-    this.signers = []
-    // this.lattice = lattice(this)
-    this.scans = {
-      lattice: lattice.scan(this),
-      hot: hot.scan(this),
-      ledger: ledger.scan(this),
-      trezor: trezorConnect.scan(this)
+
+    this.signers = {}
+    this.adapters = {}
+
+    registeredAdapters.forEach(this.addAdapter.bind(this))
+  }
+
+  addAdapter (adapter: SignerAdapter) {
+    const addFn = (signer: Signer) => {
+      this.add(signer.id, signer)
     }
+
+    const removeFn = (signerId: string) => {
+      this.remove(signerId)
+    }
+
+    const updateFn = (signer: Signer) => {
+      this.update(signer.id, signer)
+    }
+
+    adapter.on('add', addFn)
+    adapter.on('remove', removeFn)
+    adapter.on('update', updateFn)
+
+    adapter.open()
+
+    this.adapters[adapter.adapterType] = {
+      adapter,
+      listeners: [
+        {
+          event: 'add',
+          handler: addFn
+        },
+        {
+          event: 'remove',
+          handler: removeFn
+        },
+        {
+          event: 'update',
+          handler: updateFn
+        }
+      ]
+    }
+  }
+
+  removeAdapter (adapter: SignerAdapter) {
+    const adapterSpec = this.adapters[adapter.adapterType]
+
+    adapterSpec.listeners.forEach(listener => {
+      adapter.removeListener(listener.event, listener.handler)
+    })
+
+    delete this.adapter[adapter.adapterType]
   }
 
   trezorPin (id, pin, cb) {
@@ -93,72 +160,68 @@ class Signers extends EventEmitter {
   }
 
   exists (id) {
-    return this.signers.find(s => s.id === id)
+    return id in this.signers
   }
 
-  add (signer) {
-    if (!this.signers.find(s => s.id === signer.id)) this.signers.push(signer)
+  add (id: string, signer: Signer) {
+    if (!(id in this.signers)) {
+      this.signers[id] = signer
+
+      store.newSigner(signer.summary())
+    }
   }
 
-  remove (id) {
-    const index = this.signers.map(s => s.id).indexOf(id)
-    if (index > -1) {
-      const signer = this.signers[index]
+  remove (id: string) {
+    if (id in this.signers) {
+      store.removeSigner(id)
+
+      const signer = this.signers[id]
+
       signer.close()
-      // If hot signer -> erase from disk
-      if (signer.delete) signer.delete()
-      this.signers.splice(index, 1)
+      signer.delete()
+
+      delete this.signers[id]
+    }
+  }
+
+  update (id: string, signer: Signer) {
+    if (id in this.signers) {
+      this.signers[id] = signer
+
+      store.updateSigner(signer.summary())
+    } else {
+      this.add(id, signer)
     }
   }
 
   reload (id) {
-    const index = this.signers.map(s => s.id).indexOf(id)
-    if (index > -1) {
-      const signer = this.signers[index]
+    const signer = this.signers[id]
+    
+    if (signer) {
       let { type } = signer
+
       signer.close()
-      this.signers.splice(index, 1)
+      delete this.signers[id]
+
       if (type === 'ring' || type === 'seed') type = 'hot'
       if (this.scans[type] && typeof this.scans[type] === 'function') this.scans[type]()
     }
   }
 
-  // removeAllSigners () {
-  //   this.signers.forEach(signer => {
-  //     signer.close()
-  //     if (signer.delete) signer.delete()
-  //   })
-  //   this.signers = []
-  //   const { app } = require('electron')
-  //   const fs = require('fs')
-  //   const path = require('path')
-  //   const USER_DATA = app ? app.getPath('userData') : './test/.userData'
-  //   const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
-  //   const directory = SIGNERS_PATH
-  //   fs.readdir(directory, (err, files) => {
-  //     if (err) throw err
-  //     for (const file of files) {
-  //       fs.unlink(path.join(directory, file), err => {
-  //         if (err) throw err
-  //       })
-  //     }
-  //   })
-  // }
-
   find (f) {
-    return this.signers.find(f)
+    return Object.values(this.signers).find(f)
   }
 
   filter (f) {
-    return this.signers.filter(f)
+    return Object.values(this.signers).filter(f)
   }
 
   list () {
-    return this.signers
+    return Object.values(this.signers)
   }
 
   get (id) {
-    return this.signers.find(signer => signer.id === id)
+    return this.signers[id]
   }
 
   createFromPhrase (mnemonic, password, cb) {
@@ -206,7 +269,7 @@ class Signers extends EventEmitter {
   }
 
   unlock (id, password, cb) {
-    const signer = this.signers.find(s => s.id === id)
+    const signer = this.signers[id]
     if (signer && signer.unlock) {
       signer.unlock(password, cb)
     } else {

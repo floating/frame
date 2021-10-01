@@ -1,285 +1,110 @@
-// @ts-nocheck
-
-const EventEmitter = require('events')
-const log = require('electron-log')
 const crypto = require('crypto')
+const ethSigUtil = require('eth-sig-util')
+const { hashPersonalMessage,
+  toBuffer,
+  ecsign,
+  addHexPrefix,
+  pubToAddress,
+  ecrecover
+} = require('ethereumjs-util')
 
-import Signer from './signer'
-import { SignerAdapter } from './adapters'
+const { sign } = require('../../../transaction')
 
-const hot = require('./hot')
-import LedgerAdapter from './ledger/adapter'
-const trezorConnect = require('./trezor-connect')
-const lattice = require('./lattice')
-
-import store from '../store'
-
-const registeredAdapters = [
-  new LedgerAdapter()
-]
-
-interface AdapterSpec {
-  [key: string]: {
-    adapter: SignerAdapter,
-    listeners: {
-      event: string,
-      handler: (p: any) => void
-    }[]
-  }
-}
-
-class Signers extends EventEmitter {
-  private adapters: AdapterSpec;
-  private signers: { [key: string]: Signer };
-
+class HotSignerWorker {
   constructor () {
-    super()
-
-    this.signers = {}
-    this.adapters = {}
-
-    registeredAdapters.forEach(this.addAdapter.bind(this))
+    this.token = crypto.randomBytes(32).toString('hex')
+    process.send({ type: 'token', token: this.token })
   }
 
-  addAdapter (adapter: SignerAdapter) {
-    const addFn = (signer: Signer) => {
-      this.add(signer.id, signer)
+  handleMessage ({ id, method, params, token }) {
+    // Define (pseudo) callback
+    const pseudoCallback = (error, result) => {
+      // Add correlation id to response
+      const response = { id, error, result, type: 'rpc' }
+      // Send response to parent process
+      process.send(response)
     }
-
-    const removeFn = (signerId: string) => {
-      this.remove(signerId)
-    }
-
-    const updateFn = (signer: Signer) => {
-      this.update(signer.id, signer)
-    }
-
-    adapter.on('add', addFn)
-    adapter.on('remove', removeFn)
-    adapter.on('update', updateFn)
-
-    adapter.open()
-
-    this.adapters[adapter.adapterType] = {
-      adapter,
-      listeners: [
-        {
-          event: 'add',
-          handler: addFn
-        },
-        {
-          event: 'remove',
-          handler: removeFn
-        },
-        {
-          event: 'update',
-          handler: updateFn
-        }
-      ]
-    }
+    // Verify token
+    if (!crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.token))) return pseudoCallback('Invalid token')
+    // If method exists -> execute
+    if (this[method]) return this[method](params, pseudoCallback)
+    // Else return error
+    pseudoCallback(`Invalid method: '${method}'`)
   }
 
-  removeAdapter (adapter: SignerAdapter) {
-    const adapterSpec = this.adapters[adapter.adapterType]
+  signMessage (key, message, pseudoCallback) {
+    // Hash message
+    const hash = hashPersonalMessage(toBuffer(message))
 
-    adapterSpec.listeners.forEach(listener => {
-      adapter.removeListener(listener.event, listener.handler)
+    // Sign message
+    const signed = ecsign(hash, key)
+
+    // Return serialized signed message
+    const hex = Buffer.concat([Buffer.from(signed.r), Buffer.from(signed.s), Buffer.from([signed.v])]).toString('hex')
+
+    pseudoCallback(null, addHexPrefix(hex))
+  }
+
+  signTypedData (key, params, pseudoCallback) {
+    const signature = ethSigUtil.signTypedMessage(key, { data: params.typedData }, params.version)
+    pseudoCallback(null, signature)
+  }
+
+  signTransaction (key, rawTx, pseudoCallback) {
+    sign(rawTx, tx => {
+      const signedTx = tx.sign(key)
+      const serialized = signedTx.serialize().toString('hex')
+
+      pseudoCallback(null, addHexPrefix(serialized))
+    }).catch(pseudoCallback)
+  }
+
+  verifyAddress ({ index, address }, pseudoCallback) {
+    const message = '0x' + crypto.randomBytes(32).toString('hex')
+    this.signMessage({ index, message }, (err, signedMessage) => {
+      // Handle signing errors
+      if (err) return pseudoCallback(err)
+      // Signature -> buffer
+      const signature = Buffer.from(signedMessage.replace('0x', ''), 'hex')
+      // Ensure correct length
+      if (signature.length !== 65) return pseudoCallback(new Error('Frame verifyAddress signature has incorrect length'))
+      // Verify address
+      let v = signature[64]
+      v = v === 0 || v === 1 ? v + 27 : v
+      const r = toBuffer(signature.slice(0, 32))
+      const s = toBuffer(signature.slice(32, 64))
+      const hash = hashPersonalMessage(toBuffer(message))
+      const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, v, r, s)).toString('hex')
+      // Return result
+      pseudoCallback(null, verifiedAddress.toLowerCase() === address.toLowerCase())
     })
-
-    delete this.adapter[adapter.adapterType]
   }
 
-  trezorPin (id, pin, cb) {
-    const signer = this.get(id)
-    if (signer && signer.setPin) {
-      signer.setPin(pin)
-      cb(null, { status: 'ok' })
-    } else {
-      cb(new Error('Set pin not avaliable...'))
-    }
+  _encrypt (string, password) {
+    const salt = crypto.randomBytes(16)
+    const iv = crypto.randomBytes(16)
+    const cipher = crypto.createCipheriv('aes-256-cbc', this._hashPassword(password, salt), iv)
+    const encrypted = Buffer.concat([cipher.update(string), cipher.final()])
+    return salt.toString('hex') + ':' + iv.toString('hex') + ':' + encrypted.toString('hex')
   }
 
-  trezorPhrase (id, phrase, cb) {
-    const signer = this.get(id)
-    if (signer && signer.trezorPhrase) {
-      signer.trezorPhrase(phrase || '')
-      cb(null, { status: 'ok' })
-    } else {
-      cb(new Error('Set phrase not avaliable...'))
-    }
+  _decrypt (string, password) {
+    const parts = string.split(':')
+    const salt = Buffer.from(parts.shift(), 'hex')
+    const iv = Buffer.from(parts.shift(), 'hex')
+    const decipher = crypto.createDecipheriv('aes-256-cbc', this._hashPassword(password, salt), iv)
+    const encryptedString = Buffer.from(parts.join(':'), 'hex')
+    const decrypted = Buffer.concat([decipher.update(encryptedString), decipher.final()])
+    return decrypted.toString()
   }
 
-  async latticePair (id, pin) {
+  _hashPassword (password, salt) {
     try {
-      const signer = this.get(id)
-      if (signer && signer.setPair) {
-        try {
-          const result = await signer.setPair(pin)
-          return result
-        } catch (err) {
-          log.error('latticePair Error', err)
-          return new Error(err)
-        }
-      } else {
-        return new Error('Could not pair')
-      }
-    } catch (err) {
-      return new Error(err)
+      return crypto.scryptSync(password, salt, 32, { N: 32768, r: 8, p: 1, maxmem: 36000000 })
+    } catch (e) {
+      console.error('Error during hashPassword', e) // TODO: Handle Error
     }
-  }
-
-  async createLattice (deviceId) {
-    if (deviceId) {
-      store.updateLattice(deviceId, { 
-        deviceId, 
-        baseUrl: 'https://signing.gridpl.us',
-        endpointMode: 'default',
-        suffix: '',
-        privKey: crypto.randomBytes(32).toString('hex')  
-      })    
-      return { id: 'lattice-' + deviceId}
-    } else {
-      throw new Error('No Device ID')
-    }
-  }
-
-
-  async latticeConnect (connectOpts) {
-    const signer = lattice(this)
-    if (signer && signer.open) {
-      try {
-        const response = await signer.open(connectOpts)
-
-        return response
-      } catch (err) {
-        throw new Error('Could not connect to lattice', err)
-      }
-    } else {
-      return new Error('Lattice, no signer or signer not open')
-    }
-  }
-
-  exists (id) {
-    return id in this.signers
-  }
-
-  add (id: string, signer: Signer) {
-    if (!(id in this.signers)) {
-      this.signers[id] = signer
-
-      store.newSigner(signer.summary())
-    }
-  }
-
-  remove (id: string) {
-    if (id in this.signers) {
-      store.removeSigner(id)
-
-      const signer = this.signers[id]
-
-      signer.close()
-      signer.delete()
-
-      delete this.signers[id]
-    }
-  }
-
-  update (id: string, signer: Signer) {
-    if (id in this.signers) {
-      this.signers[id] = signer
-
-      store.updateSigner(signer.summary())
-    } else {
-      this.add(id, signer)
-    }
-  }
-
-  reload (id) {
-    const signer = this.signers[id]
-    
-    if (signer) {
-      let { type } = signer
-
-      signer.close()
-      delete this.signers[id]
-
-      if (type === 'ring' || type === 'seed') type = 'hot'
-      if (this.scans[type] && typeof this.scans[type] === 'function') this.scans[type]()
-    }
-  }
-
-  find (f) {
-    return Object.values(this.signers).find(f)
-  }
-
-  filter (f) {
-    return Object.values(this.signers).filter(f)
-  }
-
-  list () {
-    return Object.values(this.signers)
-  }
-
-  get (id) {
-    return this.signers[id]
-  }
-
-  createFromPhrase (mnemonic, password, cb) {
-    hot.createFromPhrase(this, mnemonic, password, cb)
-  }
-
-  createFromPrivateKey (privateKey, password, cb) {
-    hot.createFromPrivateKey(this, privateKey, password, cb)
-  }
-
-  createFromKeystore (keystore, keystorePassword, password, cb) {
-    hot.createFromKeystore(this, keystore, keystorePassword, password, cb)
-  }
-
-  addPrivateKey (id, privateKey, password, cb) {
-    // Get signer
-    const signer = this.get(id)
-    // Make sure signer is of type 'ring'
-    if (!signer.type === 'ring') return cb(new Error('Private keys can only be added to ring signers'))
-    // Add private key
-    signer.addPrivateKey(privateKey, password, cb)
-  }
-
-  removePrivateKey (id, index, password, cb) {
-    // Get signer
-    const signer = this.get(id)
-    // Make sure signer is of type 'ring'
-    if (!signer.type === 'ring') return cb(new Error('Private keys can only be removed from ring signers'))
-    // Add keystore
-    signer.removePrivateKey(index, password, cb)
-  }
-
-  addKeystore (id, keystore, keystorePassword, password, cb) {
-    // Get signer
-    const signer = this.get(id)
-    // Make sure signer is of type 'ring'
-    if (!signer.type === 'ring') return cb(new Error('Keystores can only be used with ring signers'))
-    // Add keystore
-    signer.addKeystore(keystore, keystorePassword, password, cb)
-  }
-
-  lock (id, cb) {
-    const signer = this.get(id)
-    if (signer && signer.lock) signer.lock(cb)
-  }
-
-  unlock (id, password, cb) {
-    const signer = this.signers[id]
-    if (signer && signer.unlock) {
-      signer.unlock(password, cb)
-    } else {
-      log.error('Signer not unlockable via password, no unlock method')
-    }
-  }
-
-  unsetSigner () {
-    log.info('unsetSigner')
   }
 }
 
-module.exports = new Signers()
+module.exports = HotSignerWorker
