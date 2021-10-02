@@ -46,6 +46,9 @@ function needToOpenEthApp (err: DeviceError) {
   return [27904, 27906, 25873, 25871].includes(err.statusCode)
 }
 
+// additional status codes
+//   27264: 'INCORRECT_DATA'
+
 function getStatusForError (err: DeviceError) {
   if (needToOpenEthApp(err)) {
     return Status.WRONG_APP
@@ -53,6 +56,10 @@ function getStatusForError (err: DeviceError) {
   
   if (isDeviceAsleep(err)) {
     return Status.LOCKED
+  }
+
+  if (wasRequestRejected(err)) {
+    return Status.OK
   }
 
   return Status.NEEDS_RECONNECTION
@@ -151,20 +158,20 @@ export default class Ledger extends Signer {
   }
 
   private handleError (err: DeviceError) {
-    if (isDeviceAsleep(err) && this.status !== Status.LOCKED) {
+    const errorStatus = getStatusForError(err)
+
+    if (errorStatus === Status.LOCKED && this.status !== Status.LOCKED) {
       this.updateStatus(Status.LOCKED)
 
-      this.emit('lock')
-    } else {
-      const errorStatus = getStatusForError(err)
+      return this.emit('lock')
+    }
 
-      if (errorStatus !== this.status) {
-        this.updateStatus(errorStatus)
-        this.emit('update')
+    if (errorStatus !== this.status) {
+      this.updateStatus(errorStatus)
+      this.emit('update')
 
-        if (this.status === Status.NEEDS_RECONNECTION) {
-          this.close()
-        }
+      if (this.status === Status.NEEDS_RECONNECTION) {
+        this.close()
       }
     }
   }
@@ -364,7 +371,10 @@ export default class Ledger extends Signer {
           const err = e as DeviceError
           const message = wasRequestRejected(err) ? 'Verify request rejected by user' : 'Verify address error'
 
-          this.handleError(err)
+          // if the address couldn't be verified for any reason the signer can no longer
+          // be used, so force it to be closed by setting the status code to unhandled error
+          this.handleError({ message, statusCode: -1 })
+          log.error('error verifying message on Ledger', err.toString())
 
           cb(new Error(message), undefined)
         }
@@ -391,7 +401,7 @@ export default class Ledger extends Signer {
           const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
 
           this.handleError(err)
-          log.error('error signing message on Ledger', err)
+          log.error('error signing message on Ledger', err.toString())
 
           cb(new Error(message), undefined)
         }
@@ -424,7 +434,7 @@ export default class Ledger extends Signer {
           const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
 
           this.handleError(err)
-          log.error('error signing typed data on Ledger', err)
+          log.error('error signing typed data on Ledger', err.toString())
 
           cb(new Error(message), undefined)
         }
@@ -454,7 +464,7 @@ export default class Ledger extends Signer {
           const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign transaction error'
 
           this.handleError(err)
-          log.error('error signing transaction on Ledger', err)
+          log.error('error signing transaction on Ledger', err.toString())
 
           cb(new Error(message), undefined)
         }
