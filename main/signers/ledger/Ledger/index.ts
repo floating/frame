@@ -96,6 +96,7 @@ export default class Ledger extends Signer {
     const transport = await TransportNodeHid.open(this.devicePath)
 
     this.eth = new LedgerEthereumApp(transport)
+
     this.requestQueue.start()
   }
 
@@ -480,12 +481,14 @@ export default class Ledger extends Signer {
         return reject(new Error('tried to get address but Eth app is not connected!'))
       }
 
+      let fallback = setTimeout(() => {})
+
       if (!display) {
         // if display is true, the Ledger waits for user input so never time out
-        setTimeout(() => reject({ message: 'getAddress timed out', statusCode: -1 }), 3000)
+        fallback = setTimeout(() => reject({ message: 'getAddress timed out', statusCode: -1 }), 3000)
       }
 
-      this.eth.getAddress(path, display, chainCode).then(resolve).catch(reject)
+      this.eth.getAddress(path, display, chainCode).then(resolve).catch(reject).finally(() => clearTimeout(fallback))
     })
   }
 
@@ -498,12 +501,12 @@ export default class Ledger extends Signer {
         return reject(new Error('tried to get app configuration but Eth app is not connected!'))
       }
 
-      setTimeout(() => {
+      const fallback = setTimeout(() => {
         const statusCode = (this.status === Status.INITIAL) ? 27904 : -1
         reject({ message: 'getAppConfiguration timed out', statusCode })
       }, 1000)
 
-      this.eth.getAppConfiguration().then(resolve).catch(reject)
+      this.eth.getAppConfiguration().then(resolve).catch(reject).finally(() => clearTimeout(fallback))
     })
   }
 }
