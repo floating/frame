@@ -1,21 +1,26 @@
 import LedgerEthereumApp from '../../../../../main/signers/ledger/Ledger/eth'
-
 import { Derivation } from '../../../../../main/signers/Signer/derive'
 
 import {
-  createTransportRecorder,
   openTransportReplayer,
   RecordStore,
 } from '@ledgerhq/hw-transport-mocker'
-import TransportNodeHid, { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 
-let recordStore = RecordStore.fromString('')
+// -------------------
+// uncomment this version of eth app creation to record interactions with the Ledger so they can be replayed.
+// when test is done, call `recordStore.toString()` to print ADPU exchange codes.
+// it also seems there is a bug in the `createTransportRecorder()` code, to fix it, change the line
+// (_a = DecoratedTransport.constructor).open.apply(...) in the `open`
+// method definition to (_a = DecoratedTransport).open.apply(...)
+// -------------------
+
+// let recordStore = RecordStore.fromString('')
 
 // async function createEthApp () {
+
 //   const Recorder = createTransportRecorder(TransportNodeHid, recordStore)
 
 //   return Recorder.open(getDevices()[0].path).then(t => {
-//     console.log('OPENING')
 //     return new LedgerEthereumApp(t)
 //   })
 // }
@@ -120,7 +125,7 @@ describe('#signMessage', () => {
     }
   }, 100)
 
-  it('fails a sign a message when rejected by the user', async () => {
+  it('fails to sign a message when rejected by the user', async () => {
     const replayData = `
       => e008000022048000002c8000003c80000001000000040000000d68656c6c6f2c204672616d6521
       <= 6985
@@ -131,6 +136,185 @@ describe('#signMessage', () => {
     try {
       await ethApp.signMessage("44'/60'/1'/4", '0x68656c6c6f2c204672616d6521')
       throw new Error('signed rejected message!')
+    } catch (e) {
+      expect(e.statusCode).toBe(27013)
+    }
+  }, 100)
+})
+
+describe('#signTypedData', () => {
+  const typedData = {
+    domain: {
+      chainId: '4',
+      name: 'Ether Mail',
+      verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+      version: '1'
+    },
+    message: {
+      contents: 'Hello, Bob!',
+      from: {
+        name: 'Cow',
+        wallets: [
+          '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF'
+        ]
+      },
+      to: [
+        {
+          name: 'Bob',
+          wallets: [
+            '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+            '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+            '0xB0B0b0b0b0b0B000000000000000000000000000'
+          ]
+        }
+       ]
+    },
+    primaryType: 'Mail',
+    types: {
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' }
+      ],
+      Group: [
+        { name: 'name', type: 'string' },
+        { name: 'members', type: 'Person[]' }
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person[]' },
+        { name: 'contents', type: 'string' }
+      ],
+      Person: [
+        { name: 'name', type: 'string' },
+        { name: 'wallets', type: 'address[]' }
+      ]
+    }
+  }
+
+  it('signs valid v4 typed data', async () => {
+    const replayData = `
+      => e00c000051048000002c8000003c80000000000000003173a9c41e96ee138ed70f662fc9412ce2542bd7135229c5ca739a62faff853beb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8
+      <= 1bee800a5a7e4e1668a8ebab2a5bce4c96424e0f80b7ba08fc48e063393196e0851c0f9dab8909655368974e8aec6dba5c15772d575189e31b894fb7f8286c63b99000
+    `
+
+    const ethApp = await createEthApp(replayData)
+    const signature = await ethApp.signTypedData("44'/60'/0'/0", typedData)
+
+    expect(signature).toBe('0xee800a5a7e4e1668a8ebab2a5bce4c96424e0f80b7ba08fc48e063393196e0851c0f9dab8909655368974e8aec6dba5c15772d575189e31b894fb7f8286c63b900')
+  }, 100)
+
+  it('fails to sign typed data with an invalid BIP 32 path', async () => {
+    const replayData = `
+      => e00c000041003173a9c41e96ee138ed70f662fc9412ce2542bd7135229c5ca739a62faff853beb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8
+      <= 6a80
+    `
+
+    const ethApp = await createEthApp(replayData)
+
+    try {
+      await ethApp.signTypedData('badpath', typedData)
+      throw new Error('signed typed data with invalid path!')
+    } catch (e) {
+      expect(e.statusCode).toBe(27264)
+    }
+  }, 100)
+
+  it('fails to sign typed data when rejected by the user', async () => {
+    const replayData = `
+      => e00c000051048000002c8000003c80000000000000003173a9c41e96ee138ed70f662fc9412ce2542bd7135229c5ca739a62faff853beb4221181ff3f1a83ea7313993ca9218496e424604ba9492bb4052c03d5c3df8
+      <= 6985
+    `
+
+    const ethApp = await createEthApp(replayData)
+
+    try {
+      await ethApp.signTypedData("44'/60'/0'/0", typedData)
+      throw new Error('signed rejected typed data!')
+    } catch (e) {
+      expect(e.statusCode).toBe(27013)
+    }
+  }, 100)
+})
+
+describe('#signTransaction', () => {
+  const legacyTx = {
+    from: '0x46bdba9c90ea453426d0b8d4a7a8a99b8a9dade5',
+    to: '0x2f318c334780961fb129d2a6c30d0763d9a5c970',
+    value: '0x5af3107a4000',
+    data: '0x',
+    gasLimit: '0x5208',
+    gasPrice: '0x1dcd65000',
+    chainId: '0x4',
+    type: '0x0',
+    nonce: '0x5'
+  }
+
+  const eip1559Tx = {
+    from: '0x46bdba9c90ea453426d0b8d4a7a8a99b8a9dade5',
+    to: '0x2f318c334780961fb129d2a6c30d0763d9a5c970',
+    value: '0x5af3107a4000',
+    data: '0x',
+    gasLimit: '0x5208',
+    chainId: '0x4',
+    type: '0x2',
+    maxPriorityFeePerGas: '0x3b9aca00',
+    maxFeePerGas: '0x3b9aca0b',
+    nonce: '0x6'
+  }
+
+  it('signs a pre-EIP-1193 transaction', async () => {
+    const replayData = `
+      => e00400003c048000002c8000003c8000000000000000ea058501dcd65000825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080048080
+      <= 2b87cdd3a45082a1d86c4dab5a1944360a69543dba2acacea01f19133a7ddef11578365690e4bdcf1bb58242bb673d53f94d525bee4217b0f191048eaca8cade739000
+    `
+    const ethApp = await createEthApp(replayData)
+    const signature = await ethApp.signTransaction("44'/60'/0'/0", legacyTx)
+
+    expect(signature).toBe('0xf86a058501dcd65000825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a4000802ba087cdd3a45082a1d86c4dab5a1944360a69543dba2acacea01f19133a7ddef115a078365690e4bdcf1bb58242bb673d53f94d525bee4217b0f191048eaca8cade73')
+  }, 100)
+
+  it('signs an EIP-1193 transaction', async () => {
+    const replayData = `
+      => e004000040048000002c8000003c800000000000000002ed0406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c0
+      <= 01ebefc9f798b04e3952310d6b82c48fda245df9edef77507d06025cdc5af4efa1570784cbcf84a0f03cac7771fbfeee4f4759034baf42ca735065554afa600ee39000
+    `
+
+    const ethApp = await createEthApp(replayData)
+    const signature = await ethApp.signTransaction("44'/60'/0'/0", eip1559Tx)
+
+    expect(signature).toBe('0x02f8700406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c001a0ebefc9f798b04e3952310d6b82c48fda245df9edef77507d06025cdc5af4efa1a0570784cbcf84a0f03cac7771fbfeee4f4759034baf42ca735065554afa600ee3')
+  }, 100)
+
+  it('fails to sign a transaction with an invalid BIP 32 path', async () => {
+    const replayData = `
+      => e004000040048000002c8000003c800000000000000002ed0406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c0
+      <= 6a80
+    `
+
+    const ethApp = await createEthApp(replayData)
+
+    try {
+      await ethApp.signTransaction('badpath', eip1559Tx)
+      throw new Error('signed transaction with invalid path!')
+    } catch (e) {
+      expect(e).toBeTruthy()
+    }
+  }, 100)
+
+  it('fails to sign a transaction when rejected by the user', async () => {
+    const replayData = `
+      => e004000040048000002c8000003c800000000000000002ed0406843b9aca00843b9aca0b825208942f318c334780961fb129d2a6c30d0763d9a5c970865af3107a400080c0
+      <= 6985
+    `
+
+    const ethApp = await createEthApp(replayData)
+
+    try {
+      await ethApp.signTransaction("44'/60'/0'/0", eip1559Tx)
+      throw new Error('signed rejected transaction!')
     } catch (e) {
       expect(e.statusCode).toBe(27013)
     }

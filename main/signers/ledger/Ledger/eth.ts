@@ -1,14 +1,12 @@
-// @ts-nocheck
-
 import { rlp, addHexPrefix, stripHexPrefix, padToEven } from 'ethereumjs-util'
-import { TypedDataUtils } from 'eth-sig-util'
+import { TypedDataUtils, TypedMessage } from 'eth-sig-util'
 import log from 'electron-log'
 
 import Transport from '@ledgerhq/hw-transport'
 import Eth from '@ledgerhq/hw-app-eth'
 
 import { Derivation, getDerivationPath, deriveHDAccounts } from '../../Signer/derive'
-import { sign } from '../../../transaction'
+import { sign, TransactionData } from '../../../transaction'
 
 export default class LedgerEthereumApp {
   private eth: Eth;
@@ -26,12 +24,12 @@ export default class LedgerEthereumApp {
 
     const path = getDerivationPath(derivation)
 
-    const executor = async (resolve: (addresses: string[]) => void, reject) => {
+    const executor = async (resolve: (addresses: string[]) => void, reject: (err: any) => void) => {
       try {
         const result = await this.getAddress(path, false, true)
-        deriveHDAccounts(result.publicKey, result.chainCode, (err, addresses) => {
-          if (err) reject(err)
-          else resolve(addresses)
+        deriveHDAccounts(result.publicKey, result.chainCode || '', (err, addresses) => {
+          if (err) return reject(err)
+          resolve(addresses as string[])
         })
       } catch (err) {
         reject(err)
@@ -50,10 +48,10 @@ export default class LedgerEthereumApp {
     return addHexPrefix(hashedSignature)
   }
 
-  async signTypedData (path: string, typedData: any) {
+  async signTypedData (path: string, typedData: TypedMessage<any>) {
     const { domain, types, primaryType, message } = TypedDataUtils.sanitizeData(typedData)
     const domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
-    const hashStructMessageHex = TypedDataUtils.hashStruct(primaryType, message, types).toString('hex')
+    const hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types).toString('hex')
 
     const signature = await this.eth.signEIP712HashedMessage(path, domainSeparatorHex, hashStructMessageHex)
     const hashedSignature = signature.r + signature.s + padToEven((signature.v - 27).toString(16))
@@ -74,7 +72,7 @@ export default class LedgerEthereumApp {
     return addHexPrefix(signedTx.serialize().toString('hex'))
   }
 
-  async getAddress (path: string, display, chainCode ) {
+  async getAddress (path: string, display: boolean, chainCode: boolean) {
     return this.eth.getAddress(path, display, chainCode)
   }
 
