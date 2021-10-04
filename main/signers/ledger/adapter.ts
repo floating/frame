@@ -2,7 +2,7 @@
 
 import usb from 'usb'
 import log from 'electron-log'
-import { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
+import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { UsbSignerAdapter } from '../adapters'
 import Ledger, { Status } from './Ledger'
@@ -32,14 +32,14 @@ function updateDerivation (ledger: Ledger, derivation = store('main.ledger.deriv
 
 export default class LedgerSignerAdapter extends UsbSignerAdapter {
   private knownSigners: { [key: string]: Ledger };
-  private disconnections: { [key: string]: NodeJS.Timeout }
+  private disconnections: { devicePath: string, timeout: NodeJS.Timeout }[]
   private observer: any;
 
   constructor () {
     super('Ledger')
 
     this.knownSigners = {}
-    this.disconnections = {}
+    this.disconnections = []
   }
 
   open () {
@@ -70,19 +70,21 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   async handleAttachedDevice (usbDevice: usb.Device) {
     log.debug(`detected Ledger device attached`)
 
+    const knownPaths = Object.values(this.knownSigners).map(d => d.devicePath)
     const deviceId = this.deviceId(usbDevice)
-    const devicePath = this.getDevicePath(usbDevice)
+    let devicePath = this.getAttachedDevicePath(knownPaths)
 
     if (!devicePath) {
-      log.error(`could not determine path for attached Ledger device`, usbDevice)
-      return
-    }
+      // if this isn't a new device, assume this is the first pending disconnection
+      const pendingDisconnection = this.disconnections.pop()
 
-    const pendingDisconnection = this.disconnections[devicePath]
+      if (!pendingDisconnection) {
+        log.error(`could not determine path for attached Ledger device`, usbDevice)
+        return
+      }
 
-    if (pendingDisconnection) {
-      clearTimeout(pendingDisconnection)
-      delete this.disconnections[devicePath]
+      clearTimeout(pendingDisconnection.timeout)
+      devicePath = pendingDisconnection.devicePath
     }
 
     let [existingDeviceId, ledger] = Object.entries(this.knownSigners)
@@ -92,20 +94,22 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       delete this.knownSigners[existingDeviceId]
     } else {
       ledger = new Ledger(devicePath)
+
+      const emitUpdate = () => this.emit('update', ledger)
+
+      ledger.on('update', emitUpdate)
+      ledger.on('close', emitUpdate)
+      ledger.on('error', emitUpdate)
+      ledger.on('lock', emitUpdate)
+
+      ledger.on('unlock', () => {
+        ledger.connect()
+      })
+
       this.emit('add', ledger)
     }
 
     this.knownSigners[deviceId] = ledger
-    const emitUpdate = () => this.emit('update', ledger)
-
-    ledger.on('update', emitUpdate)
-    ledger.on('close', emitUpdate)
-    ledger.on('error', emitUpdate)
-    ledger.on('lock', emitUpdate)
-
-    ledger.on('unlock', () => {
-      ledger.connect()
-    })
 
     updateDerivation(ledger)
 
@@ -127,18 +131,25 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       // when a user exits the eth app, it takes a few seconds for the
       // main ledger to reconnect via USB, so attempt to wait for this event
       // instead of immediately removing the signer
-      this.disconnections[ledger.devicePath] = setTimeout(() => {
-        this.emit('remove', ledger.id)
-        delete this.knownSigners[deviceId]
-      }, 5000)
+      this.disconnections.push({
+        devicePath: ledger.devicePath,
+        timeout: setTimeout(() => {
+          const index = this.disconnections.findIndex(d => d.devicePath === ledger.devicePath)
+          this.disconnections.splice(index, 1)
+
+          delete this.knownSigners[deviceId]
+
+          this.emit('remove', ledger.id)
+        }, 5000)
+      })
     }
   }
 
-  getDevicePath (usbDevice: usb.Device) {
-    const devices = getDevices()
-    const hid = (devices.length === 1) ? devices[0] : devices.find(d => d.productId === usbDevice.deviceDescriptor.idProduct)
+  private getAttachedDevicePath (knownDevicePaths: string[]) {
+    // check all Ledger devices and return the device that isn't yet known
+    const hid = getLedgerDevices().find(d => !knownDevicePaths.includes(d.path))
 
-    return hid.path || ''
+    return hid?.path || ''
   }
 
   supportsDevice (usbDevice: usb.Device) {
