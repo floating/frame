@@ -72,10 +72,11 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
     const knownPaths = Object.values(this.knownSigners).map(d => d.devicePath)
     const deviceId = this.deviceId(usbDevice)
+
     let devicePath = this.getAttachedDevicePath(knownPaths)
 
     if (!devicePath) {
-      // if this isn't a new device, assume this is the first pending disconnection
+      // if this isn't a new device, check if there is a pending disconnection
       const pendingDisconnection = this.disconnections.pop()
 
       if (!pendingDisconnection) {

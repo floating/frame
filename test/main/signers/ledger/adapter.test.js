@@ -34,13 +34,30 @@ jest.mock('../../../../main/signers/ledger/Ledger', () => {
   return { __esModule: true, default: constructor, Status: L.Status }
 })
 
+const ledgerUsbDevice = {
+  deviceDescriptor: {
+    idVendor: 11415,
+    idProduct: 4117
+  }
+}
+
+async function simulateLedgerConnection (path, deviceAddress = 1) {
+  connectedHids.push({ interface: 0, usagePage: 0xffa0, path })
+  return adapter.handleAttachedDevice({ ...ledgerUsbDevice, deviceAddress })
+}
+
+async function simulateLedgerDisconnection (path, deviceAddress = 1) {
+  const hidIndex = connectedHids.findIndex(hid => hid.path === path)
+  connectedHids.splice(hidIndex, 1)
+
+  return adapter.handleDetachedDevice({ ...ledgerUsbDevice, deviceAddress })
+}
+
 let adapter, connectedHids
 
 beforeEach(() => {
   jest.useFakeTimers()
-})
 
-beforeEach(() => {
   HID.devices.mockImplementation(() => connectedHids)
   connectedHids = []
 
@@ -57,29 +74,17 @@ afterAll(() => {
 })
 
 it('recognizes a Ledger Nano S', done => {
-  connectedHids.push({ interface: 0, usagePage: 0xffa0, path: 'nano-s-path' })
-
-  adapter.on('add', ledger => {
+  adapter.once('add', ledger => {
     try {
       expect(ledger.devicePath).toBe('nano-s-path')
       done()
     } catch (e) { done(e) }
   })
 
-  adapter.handleAttachedDevice({
-    deviceDescriptor: {
-      idVendor: 11415,
-      idProduct: 4113
-    }
-  })
+  simulateLedgerConnection('nano-s-path')
 })
 
 it('creates a new Ledger when one is already attached', done => {
-  const deviceDescriptor = {
-    idVendor: 11415,
-    idProduct: 4113
-  }
-
   const addedLedgers = []
   
   adapter.on('add', ledger => {
@@ -94,26 +99,12 @@ it('creates a new Ledger when one is already attached', done => {
     }
   })
 
-  connectedHids.push({ interface: 0, usagePage: 0xffa0, path: 'connected-nano-s-path', productId: 4113 })
-  adapter.handleAttachedDevice({ deviceAddress: 1, deviceDescriptor })
-
-  connectedHids.push({ interface: 0, usagePage: 0xffa0, path: 'new-nano-s-path', productId: 4113 })
-  adapter.handleAttachedDevice({ deviceAddress: 2, deviceDescriptor })
+  simulateLedgerConnection('connected-nano-s-path', 1)
+  simulateLedgerConnection('new-nano-s-path', 2)
 })
 
 it('handles a disconnected Ledger', done => {
-  const usbDevice = {
-    deviceAddress: 1,
-    deviceDescriptor: {
-      idVendor: 11415,
-      idProduct: 4117
-    }
-  }
-
-  connectedHids.push({ interface: 0, usagePage: 0xffa0, path: 'nano-x-discon-path' })
-
-  // simulate opening eth app
-  adapter.handleAttachedDevice(usbDevice).then(() => {
+  simulateLedgerConnection('nano-x-discon-path').then(() => {
     // ensure no Ledgers are added
     adapter.once('add', () => done('new Ledger should not be added!'))
 
@@ -132,8 +123,7 @@ it('handles a disconnected Ledger', done => {
       } catch (e) { done(e) }
     })
 
-    connectedHids.pop()
-    adapter.handleDetachedDevice(usbDevice)
+    simulateLedgerDisconnection('nano-x-discon-path')
 
     jest.advanceTimersByTime(5000)
   })
@@ -141,18 +131,8 @@ it('handles a disconnected Ledger', done => {
 
 it('updates an existing Ledger when the eth app is exited', done => {
   let receivedDisconnect = false
-  const usbDevice = {
-    deviceAddress: 1,
-    deviceDescriptor: {
-      idVendor: 11415,
-      idProduct: 4117
-    }
-  }
 
-  connectedHids.push({ interface: 0, usagePage: 0xffa0, path: 'nano-x-eth-path' })
-
-  // simulate opening eth app
-  adapter.handleAttachedDevice(usbDevice).then(() => {
+  simulateLedgerConnection('nano-x-eth-app-path').then(() => {
     // ensure no Ledgers are added or removed
     adapter.once('add', () => done('new Ledger should not be added!'))
     adapter.once('remove', () => done('new Ledger should not be removed!'))
@@ -163,17 +143,14 @@ it('updates an existing Ledger when the eth app is exited', done => {
 
       try {
         expect(receivedDisconnect).toBe(true)
-        expect(ledger.devicePath).toBe('nano-x-eth-path')
+        expect(ledger.devicePath).toBe('nano-x-eth-app-path')
         expect(adapter.disconnections).toHaveLength(0)
         expect(Object.keys(adapter.knownSigners)).toHaveLength(1)
         done()
       } catch (e) { done(e) }
     })
 
-    connectedHids.pop()
-    adapter.handleDetachedDevice(usbDevice)
-
-    connectedHids.push({ interface: 0, usagePage: 0xffa0, path: 'nano-x-eth-path' })
-    adapter.handleAttachedDevice({ deviceAddress: 2, deviceDescriptor: usbDevice.deviceDescriptor })
+    simulateLedgerDisconnection('nano-x-eth-app-path', 1)
+    simulateLedgerConnection('nano-x-eth-app-path', 2)
   })
 }, 200)
