@@ -2,13 +2,12 @@
 
 import usb from 'usb'
 import log from 'electron-log'
+import { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { UsbSignerAdapter } from '../adapters'
 import Ledger, { Status } from './Ledger'
 import store from '../../store'
 import { Derivation } from '../Signer/derive'
-
-const supportedPlatforms = ['win32', 'darwin']
 
 const supportedModels = [
   function isNanoX (device: usb.Device) {
@@ -136,10 +135,10 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   }
 
   getDevicePath (usbDevice: usb.Device) {
-    const devices = this.findHid(usbDevice)
-    const hid = devices.find(device => device.interface === 0)
+    const devices = getDevices()
+    const hid = (devices.length === 1) ? devices[0] : devices.find(d => d.productId === usbDevice.deviceDescriptor.idProduct)
 
-    return hid?.path || ''
+    return hid.path || ''
   }
 
   supportsDevice (usbDevice: usb.Device) {

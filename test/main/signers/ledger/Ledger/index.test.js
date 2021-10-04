@@ -1,4 +1,3 @@
-import { Stats } from 'fs'
 import Ledger, { Status } from '../../../../../main/signers/ledger/Ledger'
 import Eth from '../../../../../main/signers/ledger/Ledger/eth'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
