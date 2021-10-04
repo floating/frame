@@ -50,7 +50,7 @@ class Trezor extends Signer {
   }
 
   getId () {
-    return this.fingerprint() || uuid('Trezor' + this.device.path, ns)
+    return uuid('Trezor' + this.device.path, ns)
   }
 
   update () {

@@ -99,9 +99,12 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       const emitUpdate = () => this.emit('update', ledger)
 
       ledger.on('update', emitUpdate)
-      ledger.on('close', emitUpdate)
       ledger.on('error', emitUpdate)
       ledger.on('lock', emitUpdate)
+
+      ledger.on('close', () => {
+        this.emit('remove', ledger.id)
+      })
 
       ledger.on('unlock', () => {
         ledger.connect()
@@ -126,8 +129,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     if (deviceId in this.knownSigners) {
       const ledger = this.knownSigners[deviceId]
 
-      ledger.status = Status.DISCONNECTED
-      ledger.close()
+      ledger.disconnect()
 
       // when a user exits the eth app, it takes a few seconds for the
       // main ledger to reconnect via USB, so attempt to wait for this event
@@ -140,7 +142,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
           delete this.knownSigners[deviceId]
 
-          this.emit('remove', ledger.id)
+          ledger.close()
         }, 5000)
       })
     }

@@ -25,7 +25,12 @@ jest.mock('../../../../main/signers/ledger/Ledger', () => {
   const constructor = function (devicePath) {
     const ledger = new L.default(devicePath)
     ledger.open = async function () { }
-    ledger.connect = async function () { ledger.emit('update') }
+
+    ledger.connect = async function () {
+      this.status = L.Status.OK
+      ledger.emit('update')
+    }
+
     ledger.close = async function () { ledger.emit('close') }
 
     return ledger
@@ -143,6 +148,7 @@ it('updates an existing Ledger when the eth app is exited', done => {
 
       try {
         expect(receivedDisconnect).toBe(true)
+        expect(ledger.status).toBe(Status.OK)
         expect(ledger.devicePath).toBe('nano-x-eth-app-path')
         expect(adapter.disconnections).toHaveLength(0)
         expect(Object.keys(adapter.knownSigners)).toHaveLength(1)

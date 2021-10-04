@@ -1,16 +1,16 @@
 // @ts-nocheck
 
 const EventEmitter = require('events')
-const log = require('electron-log')
-const crypto = require('crypto')
+import log from 'electron-log'
+import crypto from 'crypto'
 
 import Signer from './signer'
 import { SignerAdapter } from './adapters'
 
-const hot = require('./hot')
+import hot from './hot'
 import LedgerAdapter from './ledger/adapter'
-const trezorConnect = require('./trezor-connect')
-const lattice = require('./lattice')
+import trezorConnect  from './trezor-connect'
+import lattice from './lattice'
 
 import store from '../store'
 
@@ -38,21 +38,20 @@ class Signers extends EventEmitter {
     this.signers = {}
     this.adapters = {}
 
+    // TODO: convert these scans to adapters
+    this.scans = {
+      lattice: lattice.scan(this),
+      hot: hot.scan(this),
+      trezor: trezorConnect.scan(this)
+    }
+
     registeredAdapters.forEach(this.addAdapter.bind(this))
   }
 
   addAdapter (adapter: SignerAdapter) {
-    const addFn = (signer: Signer) => {
-      this.add(signer.id, signer)
-    }
-
-    const removeFn = (signerId: string) => {
-      this.remove(signerId)
-    }
-
-    const updateFn = (signer: Signer) => {
-      this.update(signer.id, signer)
-    }
+    const addFn = this.add.bind(this)
+    const removeFn = this.remove.bind(this)
+    const updateFn = this.update.bind(this)
 
     adapter.on('add', addFn)
     adapter.on('remove', removeFn)
@@ -163,7 +162,9 @@ class Signers extends EventEmitter {
     return id in this.signers
   }
 
-  add (id: string, signer: Signer) {
+  add (signer: Signer) {
+    const id = signer.id
+
     if (!(id in this.signers)) {
       this.signers[id] = signer
 
@@ -184,7 +185,9 @@ class Signers extends EventEmitter {
     }
   }
 
-  update (id: string, signer: Signer) {
+  update (signer: Signer) {
+    const id = signer.id
+
     if (id in this.signers) {
       this.signers[id] = signer
 

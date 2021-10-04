@@ -100,16 +100,7 @@ export default class Ledger extends Signer {
     this.requestQueue.start()
   }
 
-  async close () {
-    this.requestQueue.close()
-
-    clearTimeout(this.statusPoller)
-
-    if (this.eth) {
-      await this.eth.close()
-      this.eth = undefined
-    }
-
+  close () {
     this.emit('close')
     this.removeAllListeners()
     
@@ -117,9 +108,6 @@ export default class Ledger extends Signer {
   }
 
   async connect () {
-    this.updateStatus(Status.INITIAL)
-    this.emit('update')
-
     try {
       // since the Ledger doesn't provide information about whether the eth app is open or if
       // the device is locked, the order of these checks is important in order to correctly determine
@@ -129,6 +117,9 @@ export default class Ledger extends Signer {
       //  3. deriveAddresses
 
       const config = await this.getAppConfiguration()
+
+      this.updateStatus(Status.INITIAL)
+      this.emit('update')
 
       // during connection is the only time we can access the device without
       // enqueuing the request, since no other requests should be active before
@@ -147,8 +138,24 @@ export default class Ledger extends Signer {
       this.handleError(err as DeviceError)
 
       if (this.status !== Status.LOCKED) {
-        this.close()
+        this.disconnect()
       }
+    }
+  }
+
+  async disconnect () {
+    if (this.status === Status.OK) {
+      this.updateStatus(Status.DISCONNECTED)
+      this.emit('update')
+    }
+
+    this.requestQueue.close()
+
+    clearTimeout(this.statusPoller)
+
+    if (this.eth) {
+      await this.eth.close()
+      this.eth = undefined
     }
   }
 

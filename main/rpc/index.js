@@ -167,8 +167,8 @@ const rpc = {
   lockSigner (id, cb) {
     signers.lock(id, cb)
   },
-  remove (id, cb) {
-    signers.remove(id, cb)
+  remove (id) {
+    signers.remove(id)
   },
   resolveAragonName (name, cb) {
     resolveName(name).then(result => cb(null, result)).catch(cb)
