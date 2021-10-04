@@ -28,10 +28,15 @@ jest.mock('../../../../main/signers/ledger/Ledger', () => {
 
     ledger.connect = async function () {
       this.status = L.Status.OK
-      ledger.emit('update')
+      this.emit('update')
     }
 
-    ledger.close = async function () { ledger.emit('close') }
+    ledger.disconnect = async function () {
+      this.status = L.Status.DISCONNECTED
+      this.emit('update')
+    }
+
+    ledger.close = async function () { this.emit('close') }
 
     return ledger
   }
