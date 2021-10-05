@@ -50,7 +50,7 @@ class Signers extends EventEmitter {
 
   addAdapter (adapter: SignerAdapter) {
     const addFn = this.add.bind(this)
-    const removeFn = this.remove.bind(this)
+    const removeFn = id => this.remove(id, false)
     const updateFn = this.update.bind(this)
 
     adapter.on('add', addFn)
@@ -172,13 +172,15 @@ class Signers extends EventEmitter {
     }
   }
 
-  remove (id: string) {
+  remove (id: string, close = true) {
     if (id in this.signers) {
       store.removeSigner(id)
 
       const signer = this.signers[id]
 
-      signer.close()
+      // for backwards compatibility, when all scans are converted to adapters
+      // they should close the signers before emitting the close event
+      if (close) signer.close()
       signer.delete()
 
       delete this.signers[id]

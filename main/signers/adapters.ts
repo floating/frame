@@ -46,12 +46,12 @@ export class UsbSignerAdapter extends SignerAdapter {
         this.handleDetachedDevice(usbDevice)
       }
     }
-
-    usb.on('attach', this.attachListener)
-    usb.on('detach', this.detachListener)
   }
 
   open () {
+    usb.on('attach', this.attachListener)
+    usb.on('detach', this.detachListener)
+
     const attachedDevices = usb.getDeviceList()
 
     attachedDevices.forEach(usbDevice => {

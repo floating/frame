@@ -281,10 +281,6 @@ describe('#verifyAddress', () => {
         })
       })
 
-      const closed = new Promise(resolve => {
-        ledger.on('close', resolve)
-      })
-
       const callback = new Promise((resolve, reject) => {
         setup()
 
@@ -298,7 +294,7 @@ describe('#verifyAddress', () => {
 
       runNextRequest()
 
-      return Promise.all([statusUpdate, closed, callback])
+      return Promise.all([statusUpdate, callback])
     })
   })
 })
@@ -374,8 +370,6 @@ signingMethods.forEach(signingMethod => {
           })
         })
 
-        const closed = new Promise(resolve => ledger.on('close', resolve))
-
         const callback = new Promise((resolve, reject) => {
           setup()
 
@@ -389,7 +383,7 @@ signingMethods.forEach(signingMethod => {
 
         runNextRequest()
 
-        return Promise.all([statusUpdate, closed, callback])
+        return Promise.all([statusUpdate, callback])
       })
     })
   })
@@ -473,8 +467,6 @@ describe('#signTypedData', () => {
         })
       })
 
-      const closed = new Promise(resolve => ledger.on('close', resolve))
-
       const callback = new Promise((resolve, reject) => {
         setup()
 
@@ -488,7 +480,7 @@ describe('#signTypedData', () => {
 
       runNextRequest()
 
-      return Promise.all([statusUpdate, closed, callback])
+      return Promise.all([statusUpdate, callback])
     })
   })
 })

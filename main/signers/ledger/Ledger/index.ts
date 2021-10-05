@@ -179,7 +179,7 @@ export default class Ledger extends Signer {
       this.emit('update')
 
       if (this.status === Status.NEEDS_RECONNECTION) {
-        this.close()
+        this.disconnect()
       }
     }
   }
