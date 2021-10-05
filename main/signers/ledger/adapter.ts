@@ -9,20 +9,6 @@ import Ledger, { Status } from './Ledger'
 import store from '../../store'
 import { Derivation } from '../Signer/derive'
 
-const supportedModels = [
-  function isNanoX (device: usb.Device) {
-    return (
-      device.deviceDescriptor.idVendor === 0x2581 &&
-      device.deviceDescriptor.idProduct === 0x3b7c
-    )
-  },
-  function isNanoS (device: usb.Device) {
-    return (
-      device.deviceDescriptor.idVendor === 0x2c97
-    )
-  }
-]
-
 function updateDerivation (ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit) {
   const liveAccountLimit = accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
 
@@ -68,7 +54,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   }
 
   async handleAttachedDevice (usbDevice: usb.Device) {
-    log.debug(`detected Ledger device attached`)
+    log.debug(`detected Ledger device attached`, usbDevice)
 
     const knownPaths = Object.values(this.knownSigners).map(d => d.devicePath)
     const deviceId = this.deviceId(usbDevice)
@@ -122,7 +108,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   }
 
   handleDetachedDevice (usbDevice: usb.Device) {
-    log.debug(`detected Ledger device detached`)
+    log.debug(`detected Ledger device detached`, usbDevice)
 
     const deviceId = this.deviceId(usbDevice)
 
@@ -156,6 +142,6 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   }
 
   supportsDevice (usbDevice: usb.Device) {
-    return supportedModels.some(checkSupport => checkSupport(usbDevice))
+    return usbDevice.deviceDescriptor.idVendor === 0x2c97
   }
 }

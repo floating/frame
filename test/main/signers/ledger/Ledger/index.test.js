@@ -66,7 +66,8 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-  await ledger.close()
+  ledger.removeAllListeners()
+  await ledger.disconnect()
 })
 
 afterAll(() => {
@@ -283,14 +284,204 @@ describe('#verifyAddress', () => {
       const closed = new Promise(resolve => {
         ledger.on('close', resolve)
       })
-      
+
       const callback = new Promise((resolve, reject) => {
         setup()
-  
+
         ledger.verifyAddress(1, '0xe9d6f5779cf6936de03c0bec631f3bb3e336d98d', false, (err, verified) => {
           verifyPromise(resolve, reject, () => {
             expect(verified).toBeUndefined()
             expect(err.message).toBe(expectedError)
+          })
+        })
+      })
+
+      runNextRequest()
+
+      return Promise.all([statusUpdate, closed, callback])
+    })
+  })
+})
+
+const signingMethods = ['signMessage', 'signTransaction']
+
+signingMethods.forEach(signingMethod => {
+  const signType = signingMethod.substring(4).toLowerCase()
+
+  describe(`#${signingMethod}`, () => {
+    beforeEach(async () => {
+      await connectEthApp()
+    })
+
+    it(`signs a ${signType}`, done => {
+      Eth.mock.instances[0][signingMethod].mockImplementation(path => new Promise(resolve => {
+        resolve((path === "44'/60'/0'/3")
+          ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+          : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
+        )
+      }))
+
+      ledger.once('update', () => done('Ledger unexpectedly updated!'))
+
+      ledger[signingMethod](3, 'hello, Frame!', (err, signature) => {
+        verifyDone(done, () => {
+          expect(ledger.status).toBe(Status.OK)
+          expect(err).toBeFalsy()
+          expect(signature).toBe('0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b')
+        })
+      })
+
+      runNextRequest()
+    })
+
+    it('fails if the signing request is rejected by the user', done => {
+      Eth.mock.instances[0][signingMethod].mockRejectedValue({ statusCode: 27013 })
+
+      ledger.once('update', () => done('Ledger unexpectedly updated!'))
+      ledger.once('close', () => done('Ledger unexpectedly closed!'))
+
+      ledger[signingMethod](3, 'hello, Frame!', (err, signature) => {
+        verifyDone(done, () => {
+          expect(ledger.status).toBe(Status.OK)
+          expect(signature).toBeUndefined()
+          expect(err.message).toBe('Sign request rejected by user')
+        })
+      })
+
+      runNextRequest()
+    })
+
+    const errorCases = [
+      {
+        testCase: 'there is a communication error',
+        setup: () => Eth.mock.instances[0][signingMethod].mockRejectedValue({ statusCode: -1 })
+      },
+      {
+        testCase: 'the eth app is not initialized',
+        setup: () => ledger.eth = undefined
+      },
+      {
+        testCase: 'the derivation type is not initialized',
+        setup: () => ledger.derivation = undefined
+      }
+    ]
+
+    errorCases.forEach(({ testCase, setup = () => {} }) => {
+      it(`fails if ${testCase}`, async () => {
+        const statusUpdate = new Promise((resolve, reject) => {
+          ledger.on('update', () => {
+            verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+          })
+        })
+
+        const closed = new Promise(resolve => ledger.on('close', resolve))
+
+        const callback = new Promise((resolve, reject) => {
+          setup()
+
+          ledger[signingMethod](3, 'hello, Frame!', (err, signature) => {
+            verifyPromise(resolve, reject, () => {
+              expect(signature).toBeUndefined()
+              expect(err.message).toBe(`Sign ${signType} error`)
+            })
+          })
+        })
+
+        runNextRequest()
+
+        return Promise.all([statusUpdate, closed, callback])
+      })
+    })
+  })
+})
+
+describe('#signTypedData', () => {
+  beforeEach(async () => {
+    await connectEthApp()
+  })
+
+  it('signs v4 typed data', done => {
+    Eth.mock.instances[0].signTypedData.mockImplementation(path => new Promise(resolve => {
+      resolve((path === "44'/60'/0'/5")
+        ? '0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b'
+        : '0xf257b7f96ad7cbf11b80c2085dc76d10ede662fb2c77dc7fbd9f574d78d9da6d08cb1a99c7d97ac87b9d7f5a4e3ae052ba3a11888fdfeefe6a169a0547c1b2e01b'
+      )
+    }))
+
+    ledger.once('update', () => done('Ledger unexpectedly updated!'))
+
+    ledger.signTypedData(5, 'V4', 'all sorts of typed data', (err, signature) => {
+      verifyDone(done, () => {
+        expect(ledger.status).toBe(Status.OK)
+        expect(err).toBeFalsy()
+        expect(signature).toBe('0x724e7dfa6ee0fd0dd84c5d8a84eb57be29ff20ed253b3249de2e3d6b119d7b1e6a211ce0c48f93c5e399ac8cd7c6fe56e36fa960b6da92de2c435814928f2f8c1b')
+      })
+    })
+
+    runNextRequest()
+  })
+
+  it('fails to sign pre-v4 typed data', done => {
+    ledger.once('update', () => done('Ledger unexpectedly updated!'))
+
+    ledger.signTypedData(5, 'V3', 'all sorts of typed data', (err, signature) => {
+      verifyDone(done, () => {
+        expect(ledger.status).toBe(Status.OK)
+        expect(signature).toBeUndefined()
+        expect(err.message.toLowerCase().indexOf('invalid version')).toBeGreaterThanOrEqual(0)
+      })
+    })
+  })
+
+  it('fails if the signing request is rejected by the user', done => {
+    Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: 27013 })
+
+    ledger.once('update', () => done('Ledger unexpectedly updated!'))
+    ledger.once('close', () => done('Ledger unexpectedly closed!'))
+
+    ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+      verifyDone(done, () => {
+        expect(ledger.status).toBe(Status.OK)
+        expect(signature).toBeUndefined()
+        expect(err.message).toBe('Sign request rejected by user')
+      })
+    })
+
+    runNextRequest()
+  })
+
+  const errorCases = [
+    {
+      testCase: 'there is a communication error',
+      setup: () => Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: -1 })
+    },
+    {
+      testCase: 'the eth app is not initialized',
+      setup: () => ledger.eth = undefined
+    },
+    {
+      testCase: 'the derivation type is not initialized',
+      setup: () => ledger.derivation = undefined
+    }
+  ]
+
+  errorCases.forEach(({ testCase, setup = () => {} }) => {
+    it(`fails if ${testCase}`, async () => {
+      const statusUpdate = new Promise((resolve, reject) => {
+        ledger.on('update', () => {
+          verifyPromise(resolve, reject, () => expect(ledger.status).toBe(Status.NEEDS_RECONNECTION))
+        })
+      })
+
+      const closed = new Promise(resolve => ledger.on('close', resolve))
+
+      const callback = new Promise((resolve, reject) => {
+        setup()
+
+        ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+          verifyPromise(resolve, reject, () => {
+            expect(signature).toBeUndefined()
+            expect(err.message).toBe('Sign message error')
           })
         })
       })
