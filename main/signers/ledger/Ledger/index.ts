@@ -138,7 +138,7 @@ export default class Ledger extends Signer {
       this.handleError(err as DeviceError)
 
       if (this.status !== Status.LOCKED) {
-        this.disconnect()
+        return this.disconnect()
       }
     }
   }
@@ -352,14 +352,14 @@ export default class Ledger extends Signer {
     })
   }
 
-  async verifyAddress (index: number, currentAddress: string, display = false, cb: Callback = () => {}) {
+  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback = () => {}) {
     this.enqueueRequests({
       type: 'verifyAddress',
       execute: async () => {
-        if (!this.eth)  throw new Error('attempted to verify address but Eth app is not connected!')
-        if (!this.derivation) throw new Error('attempted to verify address with unknown derivation!')
-
         try {
+          if (!this.eth)  throw new Error('attempted to verify address but Eth app is not connected!')
+          if (!this.derivation) throw new Error('attempted to verify address with unknown derivation!')
+
           const path = this.getPath(index)
           const result = await this.getAddress(path, display, true)
 
@@ -390,14 +390,14 @@ export default class Ledger extends Signer {
     })
   }
 
-  async signMessage (index: number, message: string, cb: Callback) {
+  signMessage (index: number, message: string, cb: Callback) {
     this.enqueueRequests({
       type: 'signMessage',
       execute: async () => {
-        if (!this.eth)  throw new Error('attempted to sign message but Eth app is not connected!')
-        if (!this.derivation) throw new Error('attempted to sign message with unknown derivation!')
-
         try {
+          if (!this.eth)  throw new Error('attempted to sign message but Eth app is not connected!')
+          if (!this.derivation) throw new Error('attempted to sign message with unknown derivation!')
+
           const path = this.getPath(index)
           const signedMessage = await this.eth.signMessage(path, message)
 
@@ -417,7 +417,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  async signTypedData (index: number, version: string, typedData: any, cb: Callback) {
+  signTypedData (index: number, version: string, typedData: any, cb: Callback) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
@@ -427,10 +427,10 @@ export default class Ledger extends Signer {
     this.enqueueRequests({
       type: 'signTypedData',
       execute: async () => {
-        if (!this.eth)  throw new Error('attempted to sign typed data but Eth app is not connected!')
-        if (!this.derivation) throw new Error('attempted to sign typed data with unknown derivation!')
-
         try {
+          if (!this.eth)  throw new Error('attempted to sign typed data but Eth app is not connected!')
+          if (!this.derivation) throw new Error('attempted to sign typed data with unknown derivation!')
+
           const path = this.getPath(index)
           const signedData = await this.eth.signTypedData(path, typedData)
 
@@ -450,17 +450,17 @@ export default class Ledger extends Signer {
     })
   }
 
-  async signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
     this.enqueueRequests({
       type: 'signTransaction',
       execute: async () => {
-        if (!this.eth)  throw new Error('attempted to sign transaction but Eth app is not connected!')
-        if (!this.derivation) throw new Error('attempted to sign transaction with unknown derivation!')
-
         try {
+          if (!this.eth)  throw new Error('attempted to sign transaction but Eth app is not connected!')
+          if (!this.derivation) throw new Error('attempted to sign transaction with unknown derivation!')
+
           const path = this.getPath(index)
           const signedTx = await this.eth.signTransaction(path, ledgerTx)
 
