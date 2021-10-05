@@ -1,6 +1,7 @@
 import HID from 'node-hid'
 import LedgerSignerAdapter from '../../../../main/signers/ledger/adapter'
 import { Status } from '../../../../main/signers/ledger/Ledger'
+import log from 'electron-log'
 
 jest.mock('node-hid')
 
@@ -65,9 +66,12 @@ async function simulateLedgerDisconnection (path, deviceAddress = 1) {
 
 let adapter, connectedHids
 
-beforeEach(() => {
+beforeAll(() => {
   jest.useFakeTimers()
+  log.transports.console.level = false
+})
 
+beforeEach(() => {
   HID.devices.mockImplementation(() => connectedHids)
   connectedHids = []
 
@@ -81,6 +85,7 @@ afterEach(() => {
 
 afterAll(() => {
   jest.useRealTimers()
+  log.transports.console.level = 'debug'
 })
 
 it('recognizes a Ledger Nano S', done => {

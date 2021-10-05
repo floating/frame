@@ -1,5 +1,6 @@
 import LedgerEthereumApp from '../../../../../main/signers/ledger/Ledger/eth'
 import { Derivation } from '../../../../../main/signers/Signer/derive'
+import log from 'electron-log'
 
 import {
   openTransportReplayer,
@@ -24,6 +25,14 @@ import {
 //     return new LedgerEthereumApp(t)
 //   })
 // }
+
+beforeAll(() => {
+  log.transports.console.level = false
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
+})
 
 async function createEthApp (replayCodes = '') {
   const record = RecordStore.fromString(replayCodes)
