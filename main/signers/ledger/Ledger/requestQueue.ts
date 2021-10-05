@@ -20,13 +20,13 @@ export class RequestQueue {
   }
 
   pollRequest () {
-    // each request must return a resolved promise
+    // each request must return a promise
     const request = (this.requestQueue.length === 0) 
       ? noRequest
       : this.requestQueue.splice(0, 1)[0]
 
     request.execute()
-      .catch(err => log.warn('request queue caught unexpected error!', err))
+      .catch(err => log.warn('Ledger request queue caught unexpected error', err))
       .finally(() => {
         if (this.running) {
           this.requestPoller = setTimeout(this.pollRequest.bind(this), 200)
