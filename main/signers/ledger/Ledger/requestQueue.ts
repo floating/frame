@@ -1,3 +1,5 @@
+import log from 'electron-log'
+
 export interface Request {
   execute: () => Promise<any>,
   type: string
@@ -23,11 +25,13 @@ export class RequestQueue {
       ? noRequest
       : this.requestQueue.splice(0, 1)[0]
 
-    request.execute().then(() => {
-      if (this.running) {
-        this.requestPoller = setTimeout(this.pollRequest.bind(this), 200)
-      }
-    })
+    request.execute()
+      .catch(err => log.warn('request queue caught unexpected error!', err))
+      .finally(() => {
+        if (this.running) {
+          this.requestPoller = setTimeout(this.pollRequest.bind(this), 200)
+        }
+      })
   }
 
   start () {

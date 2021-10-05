@@ -218,7 +218,7 @@ describe('#deriveAddress', () => {
 
     // all this craziness is necessary to simulate the queue running multiple
     // requests, resolving their promsies, and advancing the timer to run the next request
-    firstUpdateDone.then(() => { }).then(runNextRequest)
+    firstUpdateDone.then(() => { }).then(() => { }).then(runNextRequest)
   })
 })
 
