@@ -1,12 +1,12 @@
 const log = require('electron-log')
 
+log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
+log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
+
 const balances = require('./balances')
 const rates = require('./rates').default
 const inventory = require('./inventory')
 const loadStaticData = require('./staticData').default
-
-log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
-log.transports.console.level = process.env.LOG_WORKER ? 'debug' : false
 
 let heartbeat
 
