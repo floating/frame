@@ -83,7 +83,7 @@ const migrations = {
       type: 'ethereum',
       symbol: 'MATIC',
       name: 'Polygon',
-      explorer: 'https://explorer.matic.network',
+      explorer: 'https://polygonscan.com',
       gas: {
         price: {
           selected: 'standard',
@@ -202,7 +202,6 @@ const migrations = {
     return initial
   },
   10: initial => {  // Add Optimism to persisted networks
-    // if (!initial.main.networks.ethereum[10]) {
     initial.main.networks.ethereum[10] = {
       id: 10,
       type: 'ethereum',
@@ -335,6 +334,19 @@ const migrations = {
             levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
           }
         }
+      }
+    }
+
+    return initial
+  },
+  15: initial => {
+    // Polygon
+    if (initial.main.networks.ethereum['137']) {
+      const oldExplorer = initial.main.networks.ethereum['137'].explorer
+
+      if (!oldExplorer || oldExplorer.endsWith('explorer.matic.network')) {
+        // only replace if it hasn't been changed from the initial setting
+        initial.main.networks.ethereum['137'].explorer = 'https://polygonscan.com'
       }
     }
 

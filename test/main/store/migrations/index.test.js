@@ -249,3 +249,63 @@ describe('migration 14', () => {
     expect(arbitrum.gas.fees.maxFeePerGas).toBe('0xf')
   })
 })
+
+describe('migration 15', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 14,
+        networks: {
+          ethereum: {
+            137: {
+              id: 1,
+              type: 'ethereum',
+              layer: 'sidechain',
+              symbol: 'MATIC',
+              name: 'Polygon',
+              explorer: 'https://explorer.matic.network',
+              connection: {
+                primary: {
+                  on: true,
+                  current: 'matic'
+                },
+                secondary: {
+                  on: false,
+                  current: 'local'
+                }
+              }
+            }
+          }
+        },
+        networksMeta: {
+          ethereum: { }
+        }
+      }
+    }
+  })
+
+  it('updates the initial explorer for Polygon', () => {
+    const updatedState = migrations.apply(state)
+    const polygon = updatedState.main.networks.ethereum['137']
+
+    expect(polygon.explorer).toBe('https://polygonscan.com')
+  })
+
+  it('adds the Polygon explorer if one does not exist', () => {
+    delete state.main.networks.ethereum['137'].explorer
+    
+    const updatedState = migrations.apply(state)
+    const polygon = updatedState.main.networks.ethereum['137']
+
+    expect(polygon.explorer).toBe('https://polygonscan.com')
+  })
+
+  it('does not update the Polygon explorer if it has been manually changed', () => {
+    state.main.networks.ethereum['137'].explorer = 'https://custom-explorer.io'
+
+    const updatedState = migrations.apply(state)
+    const polygon = updatedState.main.networks.ethereum['137']
+
+    expect(polygon.explorer).toBe('https://custom-explorer.io')
+  })
+})
