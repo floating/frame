@@ -3,6 +3,12 @@ import { EventEmitter } from 'stream'
 import usb from 'usb'
 import HID from 'node-hid'
 
+function wait (ms: number) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
+}
+
 export class SignerAdapter extends EventEmitter {
   adapterType: string;
 
@@ -35,7 +41,14 @@ export class UsbSignerAdapter extends SignerAdapter {
   constructor (name: string) {
     super(name)
 
-    this.attachListener = usbDevice => {
+    this.attachListener = async usbDevice => {
+      // it seems like the 'attach' event can be fired just before
+      // the USB device is ready to be read from, 200ms seems to
+      // always be enough time to wait
+      // TODO: is there a low-level programmatic way to try to communicate
+      // with the USB device and wait until its ready?
+      await wait(200)
+
       if (this.supportsDevice(usbDevice)) {
         this.handleAttachedDevice(usbDevice)
       }
