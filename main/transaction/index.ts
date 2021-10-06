@@ -1,5 +1,5 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex, intToHex } from 'ethereumjs-util'
-import { JsonTx, TransactionFactory, TxData } from '@ethereumjs/tx'
+import { JsonTx, TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
@@ -21,7 +21,7 @@ interface Signature {
   s: string
 }
 
-interface AppVersion {
+export interface AppVersion {
   major: number,
   minor: number,
   patch: number
@@ -34,6 +34,8 @@ export interface RawTransaction {
 
 export interface TransactionData extends JsonTx {
   warning?: string
+  chainId: string,
+  type: string
 }
 
 export interface SignerCompatibility  {
@@ -116,7 +118,7 @@ function hexifySignature ({ v, r, s }: Signature) {
   }
 }
 
-async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<Signature>) {
+async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
   const common = chainConfig(parseInt(rawTx.chainId), parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
 
   // @ts-ignore

@@ -1,6 +1,12 @@
 const crypto = require('crypto')
 const ethSigUtil = require('eth-sig-util')
-const { hashPersonalMessage, toBuffer, ecsign, addHexPrefix, pubToAddress, ecrecover } = require('ethereumjs-util')
+const { hashPersonalMessage,
+  toBuffer,
+  ecsign,
+  addHexPrefix,
+  pubToAddress,
+  ecrecover
+} = require('ethereumjs-util')
 
 const { sign } = require('../../../transaction')
 

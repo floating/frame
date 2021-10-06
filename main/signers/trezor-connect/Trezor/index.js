@@ -3,7 +3,7 @@ const utils = require('web3-utils')
 const { padToEven, stripHexPrefix, addHexPrefix } = require('ethereumjs-util')
 
 const store = require('../../../store')
-const Signer = require('../../Signer')
+const Signer = require('../../Signer').default
 const flex = require('../../../flex')
 const { sign, londonToLegacy } = require('../../../transaction')
 const { v5: uuid } = require('uuid')
@@ -50,7 +50,7 @@ class Trezor extends Signer {
   }
 
   getId () {
-    return this.fingerprint() || uuid('Trezor' + this.device.path, ns)
+    return uuid('Trezor' + this.device.path, ns)
   }
 
   update () {

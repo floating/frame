@@ -7,7 +7,7 @@ const { promisify } = require('util')
 const { sign, signerCompatibility, londonToLegacy } = require('../../../transaction')
 
 const store = require('../../../store')
-const Signer = require('../../Signer')
+const Signer = require('../../Signer').default
 
 const HARDENED_OFFSET = 0x80000000
 

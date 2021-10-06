@@ -19,7 +19,7 @@ class Verify extends React.Component {
   }
 
   verifyAddress () {
-    link.rpc('verifyAddress', (err, res) => {
+    link.rpc('verifyAddress', err => {
       if (err) {
         this.setState({ verifyAddressSuccess: false, verifyAddressResponse: err })
       } else {

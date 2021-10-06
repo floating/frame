@@ -1,20 +1,29 @@
-// const HDKey = require('hdkey')
-// const { publicToAddress, toChecksumAddress } = require('ethereumjs-util')
+import log from 'electron-log'
+import EventEmitter from 'stream'
 
-// const deriveHDAccounts = require('worker-farm')(require.resolve('./derive'))
-const log = require('electron-log')
-const deriveHDAccounts = require('./derive')
-const EventEmitter = require('events')
-const crypt = require('../../crypt')
+import { AppVersion, TransactionData } from '../../transaction'
+import { deriveHDAccounts } from './derive'
+import crypt from '../../crypt'
 
-class Signer extends EventEmitter {
+export type Callback = (err: Error | null, result: any | undefined) => void
+
+export default class Signer extends EventEmitter {
+  id = '';
+  type = '';
+  name = '';
+  status = '';
+  appVersion: AppVersion = { major: 0, minor: 0, patch: 0 }
+
+  liveAddressesFound = 0;
+  addresses: string[];
+  
   constructor () {
     super()
+
     this.addresses = []
-    this.requests = {}
   }
 
-  deriveHDAccounts (publicKey, chainCode, cb) {
+  deriveHDAccounts (publicKey: string, chainCode: string, cb: (err: any, accounts: string[] | undefined) => void) {
     deriveHDAccounts(publicKey, chainCode, cb)
   }
 
@@ -22,28 +31,14 @@ class Signer extends EventEmitter {
     if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
   }
 
-  getCoinbase (cb) {
+  getCoinbase (cb: Callback) {
     cb(null, this.addresses[0])
   }
 
-  verifyAddress (cb) {
+  verifyAddress (index: number, current: string, display: boolean, cb: Callback) {
     const err = new Error('Signer:' + this.type + ' did not implement verifyAddress method')
     log.error(err)
-    cb(err)
-  }
-
-  getAccounts (cb) {
-    const account = this.addresses[this.index]
-    if (cb) cb(null, account ? [account] : [])
-    return account ? [account] : []
-  }
-
-  getSelectedAccounts () {
-    return this.addresses[this.index] ? [this.addresses[this.index]] : []
-  }
-
-  getSelectedAccount () {
-    return this.addresses[this.index]
+    cb(err, undefined)
   }
 
   summary () {
@@ -66,22 +61,24 @@ class Signer extends EventEmitter {
     // windows.broadcast('main:action', 'removeSigner', this.summary())
   }
 
+  delete () {
+    
+  }
+
   update (options = {}) {
     // if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     // windows.broadcast('main:action', 'updateSigner', this.summary())
   }
 
-  signMessage (index, message, cb) {
+  signMessage (index: number, message: string, cb: Callback) {
     console.warn('Signer:' + this.type + ' did not implement a signMessage method')
   }
 
-  signTransaction (index, rawTx, cb) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
 
-  signTypedData (index, version, typedData, cb) {
-    return cb(new Error(`Signer: ${this.type} does not support eth_signTypedData`))
+  signTypedData (index: number, version: string, typedData: string, cb: Callback) {
+    return cb(new Error(`Signer: ${this.type} does not support eth_signTypedData`), undefined)
   }
 }
-
-module.exports = Signer

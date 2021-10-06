@@ -167,14 +167,15 @@ const rpc = {
   lockSigner (id, cb) {
     signers.lock(id, cb)
   },
-  remove (id, cb) {
-    signers.remove(id, cb)
+  remove (id) {
+    signers.remove(id)
   },
   resolveAragonName (name, cb) {
     resolveName(name).then(result => cb(null, result)).catch(cb)
   },
   verifyAddress (cb) {
-    accounts.verifyAddress(true, cb)
+    const res = (err, data) => cb(err, data || false)
+    accounts.verifyAddress(true, res)
   },
   setBaseFee (fee, handlerId, cb) {
     accounts.setBaseFee(fee, handlerId, true, cb)
