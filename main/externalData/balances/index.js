@@ -27,24 +27,34 @@ function balanceCalls (owner, tokens) {
 
 async function loadTokenBalances (chainId, address, tokens) {
   const calls = balanceCalls(address, tokens)
+  const BATCH_SIZE = 3000
 
-  try {
-    const results = await multicall(chainId).call(calls)
+  const numBatches = Math.ceil(calls.length / BATCH_SIZE)
 
-    const balances = Object.entries(results.transformed)
-      .reduce((balances, [key, balance]) => {
-        const address = key.split('_')[0].toLowerCase()
-        balances[address] = balance
+  // multicall seems to time out sometimes with very large requests, so batch them
+  const fetches = [...Array(numBatches).keys()].map(async (_, batchIndex) => {
+    const batchStart = batchIndex * BATCH_SIZE
+    const batchEnd = batchStart + BATCH_SIZE
 
-        return balances
-      }, {})
+    try {
+      const results = await multicall(chainId).call(calls.slice(batchStart, batchEnd))
+      return Object.entries(results.transformed)
+    } catch (e) {
+      log.error(`unable to load token balances (batch ${batchIndex}-${batchEnd}`, e)
+      return []
+    }
+  })
 
-    return balances
-  } catch (e) {
-    log.error('unable to load token balances', e)
-  }
+  const fetchResults = await Promise.all(fetches)
+  const balanceResults = [].concat(...fetchResults)
 
-  return {}
+  return balanceResults
+    .reduce((balances, [key, balance]) => {
+      const address = key.split('_')[0].toLowerCase()
+      balances[address] = balance
+
+      return balances
+    }, {})
 }
 
 async function getTokenBalances (address, omit = [], knownTokens) {
