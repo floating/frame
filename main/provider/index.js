@@ -241,7 +241,7 @@ class Provider extends EventEmitter {
     const payload = req.payload
     const maxTotalFee = maxFee(rawTx)
 
-    if (!this.feeTotalOverMax(rawTx, maxTotalFee)) {
+    if (this.feeTotalOverMax(rawTx, maxTotalFee)) {
       const chainId = parseInt(rawTx.chainId).toString()
       const symbol = store(`main.networks.ethereum.${chainId}.symbol`)
       const displayAmount = symbol
