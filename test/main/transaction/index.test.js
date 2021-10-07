@@ -237,7 +237,7 @@ describe('#maxFee', () => {
       chainId: addHexPrefix((250).toString(16))
     }
 
-    expect(maxFee(tx)).toBe(1e21)
+    expect(maxFee(tx)).toBe(250e18)
   })
 
   it('sets the max fee as 10 on other chains', () => {

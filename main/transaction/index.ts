@@ -95,9 +95,9 @@ function maxFee (rawTx: RawTransaction) {
     return 2 * 1e18
   }
 
-  // for Fantom, the max fee should be 1,000 FTM
+  // for Fantom, the max fee should be 250 FTM
   if ([250, 4002].includes(chainId)) {
-    return 1000 * 1e18
+    return 250 * 1e18
   }
 
   // for all other chains, default to 10 of the chain's currency
