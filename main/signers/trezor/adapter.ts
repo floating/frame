@@ -1,4 +1,5 @@
 import log from 'electron-log'
+import { Device as TrezorDevice } from 'trezor-connect'
 
 import flex from '../../flex'
 import { SignerAdapter } from '../adapters'
@@ -6,7 +7,7 @@ import Trezor from './Trezor'
 import store from '../../store'
 
 export default class TrezorSignerAdapter extends SignerAdapter {
-  private flexListeners: { [event: string]: (device: any) => void };
+  private flexListeners: { [event: string]: (device: TrezorDevice) => void };
   private knownSigners: { [id: string]: Trezor };
   private observer: any;
 
@@ -18,7 +19,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   }
 
   open () {
-    const connectListener = (device: any) => {
+    const connectListener = (device: TrezorDevice) => {
       log.info(':: Trezor Scan - Connected Device')
       log.debug({ trezorDevice: device })
 
@@ -42,7 +43,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       trezor.open()
     }
 
-    const disconnectListener = (device: any) => {
+    const disconnectListener = (device: TrezorDevice) => {
       log.info(':: Trezor Scan - Disconnected Device')
 
       this.withSigner(device, signer => {
@@ -54,12 +55,12 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       })
     }
 
-    const updateListener = (device: any) => {
+    const updateListener = (device: TrezorDevice) => {
       log.debug(':: Trezor Scan - Updated Device')
       this.withSigner(device, signer => this.emit('update', signer))
     }
 
-    const needPinListener = (device: any) => {
+    const needPinListener = (device: TrezorDevice) => {
       log.debug(':: Trezor Scan - Device Needs Pin')
 
       this.withSigner(device, signer => {
@@ -68,7 +69,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       })
     }
 
-    const needPhraseListener = (device: any) => {
+    const needPhraseListener = (device: TrezorDevice) => {
       log.debug(':: Trezor Scan - Device Needs Phrase')
 
       this.withSigner(device, signer => {
@@ -121,7 +122,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     super.close()
   }
 
-  private withSigner (device: any, fn: (signer: Trezor) => void) {
+  private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {
     const signer = this.knownSigners[device.path]
 
     if (signer) {

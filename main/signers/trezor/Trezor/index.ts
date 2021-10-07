@@ -1,6 +1,7 @@
 import log from 'electron-log'
 import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
+import { Device as TrezorDevice } from 'trezor-connect'
 
 import Signer, { Callback } from '../../Signer'
 import flex from '../../../flex'
@@ -14,29 +15,6 @@ import { TypedTransaction } from '@ethereumjs/tx'
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 type FlexCallback = (err: string | null, result: any | undefined) => void
-
-interface TrezorFirmwareRelease {
-  release: {
-    version: number[]
-  }
-}
-
-interface TrezorFeatures {
-  model: string
-}
-
-interface TrezorDevice {
-  type: string,
-  id: string,
-  path: string,
-  label: string,
-  state: string,
-  status: string,
-  mode: string,
-  firmware: string,
-  firmwareRelease: TrezorFirmwareRelease
-  features: TrezorFeatures
-}
 
 export default class Trezor extends Signer {
   private closed = false;
@@ -53,7 +31,7 @@ export default class Trezor extends Signer {
 
     const [major, minor, patch] = device.firmwareRelease?.release?.version || '1.8.0'
     this.appVersion = { major, minor, patch }
-    this.model = ['Trezor', device.features.model].join(' ').trim()
+    this.model = ['Trezor', device.features?.model].join(' ').trim()
 
     this.type = 'trezor'
     this.status = 'loading'
