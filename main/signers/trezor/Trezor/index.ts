@@ -44,9 +44,6 @@ export default class Trezor extends Signer {
   device: TrezorDevice;
   derivation: Derivation | undefined;
 
-  setPhrase: ((phrase: string) => void) | undefined;
-  setPin: ((pin: string) => void) | undefined;
-
   constructor (device: TrezorDevice) {
     super()
 
@@ -155,9 +152,7 @@ export default class Trezor extends Signer {
         if (err === 'Device call in progress' && attempt < 5) {
           setTimeout(() => this.verifyAddress(index, currentAddress, display, cb, ++attempt), 1000 * (attempt + 1))
         } else {
-          log.info('Verify Address Error: ')
-          // TODO: Error Notification
-          log.error(err)
+          log.error('Verify address error: ', err)
           
           this.close()
 
@@ -195,36 +190,28 @@ export default class Trezor extends Signer {
     flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), rpcCallback)
   }
 
-  needPhrase () {
-    this.status = 'Enter Passphrase'
-    this.update()
-
+  setPhrase (phrase: string) {
     const rpcCallback: FlexCallback = err => {
       if (err) log.error(err)
       setTimeout(() => this.deviceStatus(), 1000)
     }
 
-    this.setPhrase = (phrase) => {
-      this.status = 'loading'
-      this.update()
-      flex.rpc('trezor.inputPhrase', this.device.path, phrase, rpcCallback)
-    }
-  }
-
-  needPin () {
-    this.status = 'Need Pin'
+    this.status = 'loading'
     this.update()
 
+    flex.rpc('trezor.inputPhrase', this.device.path, phrase, rpcCallback)
+  }
+
+  setPin (pin: string) {
     const rpcCallback: FlexCallback = err => {
       if (err) log.error(err)
       setTimeout(() => this.deviceStatus(), 250)
     }
 
-    this.setPin = (pin) => {
-      this.status = 'loading'
-      this.update()
-      flex.rpc('trezor.inputPin', this.device.path, pin, rpcCallback)
-    }
+    this.status = 'loading'
+    this.update()
+
+    flex.rpc('trezor.inputPin', this.device.path, pin, rpcCallback)
   }
 
   // Standard Methods

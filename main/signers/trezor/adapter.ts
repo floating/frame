@@ -55,18 +55,26 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
 
     const updateListener = (device: any) => {
-      log.info(':: Trezor Scan - Updated Device')
+      log.debug(':: Trezor Scan - Updated Device')
       this.withSigner(device, signer => this.emit('update', signer))
     }
 
     const needPinListener = (device: any) => {
-      log.info(':: Trezor Scan - Device Needs Pin')
-      this.withSigner(device, signer => signer.needPin())
+      log.debug(':: Trezor Scan - Device Needs Pin')
+
+      this.withSigner(device, signer => {
+        signer.status = 'Need Pin',
+        signer.update()
+      })
     }
 
     const needPhraseListener = (device: any) => {
-      log.info(':: Trezor Scan - Device Needs Phrase')
-      this.withSigner(device, signer => signer.needPhrase())
+      log.debug(':: Trezor Scan - Device Needs Phrase')
+
+      this.withSigner(device, signer => {
+        signer.status = 'Enter Passphrase'
+        signer.update()
+      })
     }
 
     const scanListener = (err: any) => {
