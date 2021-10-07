@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
 const { addHexPrefix } = require('ethereumjs-util')
 
 // const bip39 = require('bip39')
-const { usesBaseFee, signerCompatibility } = require('../transaction')
+const { usesBaseFee, signerCompatibility, maxFee } = require('../transaction')
 
 const crypt = require('../crypt')
 const store = require('../store')
@@ -33,8 +33,6 @@ const notify = (title, body, action) => {
   note.on('click', action)
   setTimeout(() => note.show(), 1000)
 }
-
-const FEE_MAX = 2 * 1e18
 
 class Accounts extends EventEmitter {
   constructor () {
@@ -701,14 +699,17 @@ class Accounts extends EventEmitter {
       // No change
       if (newBaseFee === currentBaseFee) return cb()
 
+      const tx = currentAccount.requests[handlerId].data
+
       // New max fee per gas
       const newMaxFeePerGas = newBaseFee + maxPriorityFeePerGas
+      const maxTotalFee = maxFee(tx)
 
       // Limit max fee
-      if (newMaxFeePerGas * gasLimit > FEE_MAX) {
-        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(Math.floor(FEE_MAX / gasLimit))
+      if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+        tx.maxFeePerGas = intToHex(Math.floor(maxTotalFee / gasLimit))
       } else {
-        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(newMaxFeePerGas)
+        tx.maxFeePerGas = intToHex(newMaxFeePerGas)
       }
 
       // Complete update
@@ -729,18 +730,21 @@ class Accounts extends EventEmitter {
       // No change
       if (newMaxPriorityFeePerGas === maxPriorityFeePerGas) return cb()
 
+      const tx = currentAccount.requests[handlerId].data
+
       // New max fee per gas
       const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
+      const maxTotalFee = maxFee(tx)
     
       // Limit max fee
-      if (newMaxFeePerGas * gasLimit > FEE_MAX) {
-        const limitedMaxFeePerGas = Math.floor(FEE_MAX / gasLimit)
+      if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+        const limitedMaxFeePerGas = Math.floor(maxTotalFee / gasLimit)
         const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
-        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(limitedMaxFeePerGas)
+        tx.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
+        tx.maxFeePerGas = intToHex(limitedMaxFeePerGas)
       } else {
-        currentAccount.requests[handlerId].data.maxFeePerGas = intToHex(newMaxFeePerGas)
-        currentAccount.requests[handlerId].data.maxPriorityFeePerGas = intToHex(newMaxPriorityFeePerGas)
+        tx.maxFeePerGas = intToHex(newMaxFeePerGas)
+        tx.maxPriorityFeePerGas = intToHex(newMaxPriorityFeePerGas)
       }
     
       const previousFee = { 
@@ -764,13 +768,16 @@ class Accounts extends EventEmitter {
       const newGasPrice = parseInt(this.limitedHexValue(price, 0, 9999 * 1e9), 'hex')
 
       // No change
-      if (newGasPrice === gasPrice) return cb() 
+      if (newGasPrice === gasPrice) return cb()
+
+      const tx = currentAccount.requests[handlerId].data
+      const maxTotalFee = maxFee(tx)
 
       // Limit max fee
-      if (newGasPrice * gasLimit > FEE_MAX) {
-        currentAccount.requests[handlerId].data.gasPrice = intToHex(Math.floor(FEE_MAX / gasLimit))
+      if (newGasPrice * gasLimit > maxTotalFee) {
+        tx.gasPrice = intToHex(Math.floor(maxTotalFee / gasLimit))
       } else {
-        currentAccount.requests[handlerId].data.gasPrice = intToHex(newGasPrice)
+        tx.gasPrice = intToHex(newGasPrice)
       }
 
       const previousFee = {
@@ -787,16 +794,19 @@ class Accounts extends EventEmitter {
 
   setGasLimit (limit, handlerId, userUpdate, cb) {
     try {
-      const { currentAccount, maxFeePerGas, maxPriorityFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
+      const { currentAccount, maxFeePerGas, gasPrice, txType } = this.txFeeUpdate(limit, handlerId, userUpdate, '0x0')
       
       // New values
       const newGasLimit = parseInt(this.limitedHexValue(limit, 0, 12.5e6), 'hex')
 
+      const tx = currentAccount.requests[handlerId].data
+      const maxTotalFee = maxFee(tx)
+
       const fee = txType === '0x2' ? parseInt(maxFeePerGas, 'hex') : parseInt(gasPrice, 'hex')
-      if (newGasLimit * fee > FEE_MAX) {
-        currentAccount.requests[handlerId].data.gasLimit = intToHex(Math.floor(FEE_MAX / fee))
+      if (newGasLimit * fee > maxTotalFee) {
+        tx.gasLimit = intToHex(Math.floor(maxTotalFee / fee))
       } else {
-        currentAccount.requests[handlerId].data.gasLimit = intToHex(newGasLimit)
+        tx.gasLimit = intToHex(newGasLimit)
       }
 
       // Complete update

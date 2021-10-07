@@ -51,6 +51,7 @@ beforeEach(() => {
     handlerId: 1,
     type: 'transaction',
     data: {
+      chainId: '0x1',
       gasLimit: weiToHex(21000),
       gasPrice: gweiToHex(30),
       type: '0x2',

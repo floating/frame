@@ -340,9 +340,24 @@ describe('#signAndSend', () => {
       data: tx
     }
   })
+
+  it('allows a Fantom transaction with fees over the mainnet hard limit', done => {
+    // 200 gwei * 10M gas = 2 FTM
+    tx.chainId = '0xfa'
+    tx.type = '0x0'
+    tx.gasPrice = utils.parseUnits('210', 'gwei').toHexString()
+    tx.gasLimit = addHexPrefix((1e7).toString(16))
+
+    mockAccounts.signTransaction = () => done()
+
+    signAndSend(err => {
+      done('unexpected error :' + err.message)
+    })
+  })
   
-  it('does not allow a pre-EIP-1559 transaction with fees that exceed the hard limit', done => {
+  it('does not allow a pre-EIP-1559 transaction with fees that exceeds the hard limit', done => {
     // 200 gwei * 10M gas = 2 ETH
+    tx.chainId = '0x1'
     tx.type = '0x0'
     tx.gasPrice = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))
@@ -355,6 +370,7 @@ describe('#signAndSend', () => {
   
   it('does not allow a post-EIP-1559 transaction with fees that exceed the hard limit', done => {
     // 200 gwei * 10M gas = 2 ETH
+    tx.chainId = '0x1'
     tx.type = '0x2'
     tx.maxFeePerGas = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))

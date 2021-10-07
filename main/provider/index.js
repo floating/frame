@@ -26,7 +26,7 @@ const store = require('../store')
 const chains = require('../chains')
 const accounts = require('../accounts')
 
-const { populate: populateTransaction, usesBaseFee } = require('../transaction')
+const { populate: populateTransaction, usesBaseFee, maxFee } = require('../transaction')
 
 const version = require('../../package.json').version
 
@@ -224,12 +224,11 @@ class Provider extends EventEmitter {
     })
   }
 
-  feeTotalOverMax (rawTx) {
-    const FEE_MAX = 2 * 1e18 // 2 Ether
+  feeTotalOverMax (rawTx, maxTotalFee) {
     const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas, 'hex') : parseInt(rawTx.gasPrice, 'hex')
     const gasLimit = parseInt(rawTx.gasLimit, 'hex')
     const totalFee = maxFeePerGas * gasLimit
-    return totalFee > FEE_MAX
+    return totalFee > maxTotalFee
   }
 
   signAndSend (req, cb) {
@@ -238,10 +237,19 @@ class Provider extends EventEmitter {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
-    const payload = req.payload
 
-    if (this.feeTotalOverMax(rawTx)) {
-      const err = 'Max fee is over hard limit (2 ETH)'
+    const payload = req.payload
+    const maxTotalFee = maxFee(rawTx)
+
+    if (!this.feeTotalOverMax(rawTx, maxTotalFee)) {
+      const chainId = parseInt(rawTx.chainId).toString()
+      const symbol = store(`main.networks.ethereum.${chainId}.symbol`)
+      const displayAmount = symbol
+        ? ` (${Math.floor(maxTotalFee / 1e18)} ${symbol})`
+        : ''
+
+      const err = `Max fee is over hard limit${displayAmount}`
+
       this.resError(err, payload, res)
       cb(new Error(err))
     } else {
