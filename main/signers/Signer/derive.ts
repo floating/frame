@@ -26,9 +26,9 @@ export function deriveHDAccounts (publicKey: string, chainCode: string, cb: (err
 }
 
 const derivationPaths: { [key: string]: string } = {
-  [Derivation.legacy.valueOf()]: "44'/60'/0'/",
-  [Derivation.standard.valueOf()]: "44'/60'/0'/0/",
-  [Derivation.testnet.valueOf()]: "44'/1'/0'/0/"
+  [Derivation.legacy.valueOf()]: "44'/60'/0'",
+  [Derivation.standard.valueOf()]: "44'/60'/0'/0",
+  [Derivation.testnet.valueOf()]: "44'/1'/0'/0"
 }
 
 export function getDerivationPath (derivation: Derivation) {

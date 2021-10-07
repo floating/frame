@@ -51,7 +51,6 @@ export interface SignerSummary {
   type: string,
   addresses: string[],
   status: string,
-  liveAddressesFound: number,
   appVersion: AppVersion
 }
 
