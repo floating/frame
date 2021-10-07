@@ -5,7 +5,7 @@ import log from 'electron-log'
 import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { UsbSignerAdapter } from '../adapters'
-import Ledger, { Status } from './Ledger'
+import Ledger from './Ledger'
 import store from '../../store'
 import { Derivation } from '../Signer/derive'
 
@@ -22,7 +22,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   private observer: any;
 
   constructor () {
-    super('Ledger')
+    super('ledger')
 
     this.knownSigners = {}
     this.disconnections = []

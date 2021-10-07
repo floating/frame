@@ -46,8 +46,24 @@ const rpc = {
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
-  trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
-  trezorPhrase: (id, phrase, cb) => signers.trezorPhrase(id, phrase, cb),
+  trezorPin: (id, pin, cb) => {
+    const signer = signers.get(id)
+    if (signer && signer.setPin) {
+      signer.setPin(pin)
+      cb(null, { status: 'ok' })
+    } else {
+      cb(new Error('Set pin not available'))
+    }
+  },
+  trezorPhrase: (id, phrase, cb) => {
+    const signer = signers.get(id)
+    if (signer && signer.setPhrase) {
+      signer.setPhrase(phrase || '')
+      cb(null, { status: 'ok' })
+    } else {
+      cb(new Error('Set phrase not available'))
+    }
+  },
   createLattice: async (id, cb) => {
     try {
       cb(null, await signers.createLattice(id))

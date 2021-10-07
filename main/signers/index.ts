@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-const EventEmitter = require('events')
+import EventEmitter from 'events'
 import log from 'electron-log'
 import crypto from 'crypto'
 
@@ -9,13 +9,15 @@ import { SignerAdapter } from './adapters'
 
 import hot from './hot'
 import LedgerAdapter from './ledger/adapter'
-import trezorConnect  from './trezor-connect'
+import TrezorAdapter  from './trezor/adapter'
+
 import lattice from './lattice'
 
 import store from '../store'
 
 const registeredAdapters = [
-  new LedgerAdapter()
+  new LedgerAdapter(),
+  new TrezorAdapter()
 ]
 
 interface AdapterSpec {
@@ -41,8 +43,7 @@ class Signers extends EventEmitter {
     // TODO: convert these scans to adapters
     this.scans = {
       lattice: lattice.scan(this),
-      hot: hot.scan(this),
-      trezor: trezorConnect.scan(this)
+      hot: hot.scan(this)
     }
 
     registeredAdapters.forEach(this.addAdapter.bind(this))
@@ -86,26 +87,6 @@ class Signers extends EventEmitter {
     })
 
     delete this.adapter[adapter.adapterType]
-  }
-
-  trezorPin (id, pin, cb) {
-    const signer = this.get(id)
-    if (signer && signer.setPin) {
-      signer.setPin(pin)
-      cb(null, { status: 'ok' })
-    } else {
-      cb(new Error('Set pin not avaliable...'))
-    }
-  }
-
-  trezorPhrase (id, phrase, cb) {
-    const signer = this.get(id)
-    if (signer && signer.trezorPhrase) {
-      signer.trezorPhrase(phrase || '')
-      cb(null, { status: 'ok' })
-    } else {
-      cb(new Error('Set phrase not avaliable...'))
-    }
   }
 
   async latticePair (id, pin) {

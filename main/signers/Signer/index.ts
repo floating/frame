@@ -12,9 +12,10 @@ export default class Signer extends EventEmitter {
   type = '';
   name = '';
   status = '';
+  coinbase = '0x';
+  model = '';
   appVersion: AppVersion = { major: 0, minor: 0, patch: 0 }
 
-  liveAddressesFound = 0;
   addresses: string[];
   
   constructor () {
@@ -48,7 +49,6 @@ export default class Signer extends EventEmitter {
       type: this.type,
       addresses: this.addresses,
       status: this.status,
-      liveAddressesFound: this.liveAddressesFound || 0,
       appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }
     }
   }
