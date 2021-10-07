@@ -52,7 +52,7 @@ const rpc = {
       signer.setPin(pin)
       cb(null, { status: 'ok' })
     } else {
-      cb(new Error('Set pin not avaliable...'))
+      cb(new Error('Set pin not available'))
     }
   },
   trezorPhrase: (id, phrase, cb) => {
@@ -61,7 +61,7 @@ const rpc = {
       signer.setPhrase(phrase || '')
       cb(null, { status: 'ok' })
     } else {
-      cb(new Error('Set phrase not avaliable...'))
+      cb(new Error('Set phrase not available'))
     }
   },
   createLattice: async (id, cb) => {
