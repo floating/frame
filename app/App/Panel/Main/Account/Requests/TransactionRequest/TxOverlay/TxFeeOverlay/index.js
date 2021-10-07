@@ -110,7 +110,7 @@ class TxFeeOverlay extends React.Component {
       const priorityFee = parseFloat(this.state.priorityFee)
       const gasLimit = parseInt(this.state.gasLimit)
       const maxTotalFee = maxFee(this.props.req.data)
-
+      
       if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
         baseFee = Math.floor(maxTotalFee / gasLimit / 1e9) - priorityFee
       }
@@ -170,7 +170,7 @@ class TxFeeOverlay extends React.Component {
     this.gasLimitSubmitTimeout = setTimeout(() => {
       gasLimit = parseInt(gasLimit)
       if (isNaN(gasLimit)) return
-      if (gasLimit > 1e8) gasLimit = 1e8
+      if (gasLimit > 12.5e6) gasLimit = 12.5e6
 
       const maxTotalFee = maxFee(this.props.req.data)
 
