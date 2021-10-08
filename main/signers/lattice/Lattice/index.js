@@ -370,7 +370,7 @@ class Lattice extends Signer {
       const clientSign = promisify(this.client.sign).bind(this.client)
 
       return clientSign(signOpts).then(result => ({
-        v: result.sig.v[0],
+        v: result.sig.v.toString('hex'),
         r: result.sig.r,
         s: result.sig.s
       }))
