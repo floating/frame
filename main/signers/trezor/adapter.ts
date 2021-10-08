@@ -21,7 +21,6 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   open () {
     const connectListener = (device: TrezorDevice) => {
       log.info(':: Trezor Scan - Connected Device')
-      log.debug({ trezorDevice: device })
 
       const trezor = new Trezor(device)
       trezor.derivation = store('main.trezor.derivation')
