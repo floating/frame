@@ -48,6 +48,7 @@ class Lattice extends Signer {
     } else {
       baseUrl = 'https://signing.gridpl.us'
     }
+
     suffix = store('main.latticeSettings.suffix')
     privKey = store('main.lattice', this.deviceId, 'privKey')
 
@@ -62,7 +63,8 @@ class Lattice extends Signer {
       this.baseUrl = baseUrl
       this.privKey = privKey
       this.client = new Client({
-        name: suffix ? `Frame-${suffix}` : 'Frame',
+        // Lattice supports a suffix with a max of 24 characters
+        name: suffix ? `Frame-${suffix.substring(0, 18)}` : 'Frame',
         crypto: crypto,
         timeout: 120000,
         baseUrl,
