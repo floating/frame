@@ -1,3 +1,5 @@
+import log from 'electron-log'
+
 const panelActions = require('./panel')
 
 function validateNetworkSettings (network) {
@@ -11,7 +13,7 @@ function validateNetworkSettings (network) {
     typeof (network.symbol) !== 'string' ||
     ['ethereum'].indexOf(network.type) === -1
   ) {
-    throw new Error('Invalid network settings')
+    throw new Error('Invalid network settings ' + JSON.stringify(network))
   }
 
   return networkId
@@ -291,7 +293,7 @@ module.exports = {
         return main
       })
     } catch (e) {
-      console.error(e)
+      log.error(e)
     }
   },
   updateNetwork: (u, net, newNet) => {
@@ -320,7 +322,7 @@ module.exports = {
         return main
       })
     } catch (e) {
-      console.error(e)
+      log.error(e)
     }
   },
   removeNetwork: (u, net) => {
@@ -357,7 +359,7 @@ module.exports = {
         return main
       })
     } catch (e) {
-      console.error(e)
+      log.error(e)
     }
   },
   // Flow

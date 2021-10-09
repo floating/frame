@@ -1,4 +1,4 @@
-const log = require('electron-log')
+import log from 'electron-log'
 log.transports.console.level = false
 
 import migrations from '../../../../main/store/migrations'
@@ -307,5 +307,61 @@ describe('migration 15', () => {
     const polygon = updatedState.main.networks.ethereum['137']
 
     expect(polygon.explorer).toBe('https://custom-explorer.io')
+  })
+})
+
+describe('migration 16', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 14,
+        currentNetwork: {
+          type: 'ethereum', 
+          id: '1'
+        },
+        networks: {
+          ethereum: {
+            137: {
+              id: '137',
+              type: 'ethereum',
+              layer: 'sidechain',
+              symbol: 'MATIC',
+              name: 'Polygon',
+              explorer: 'https://explorer.matic.network',
+              connection: {
+                primary: {
+                  on: true,
+                  current: 'matic'
+                },
+                secondary: {
+                  on: false,
+                  current: 'local'
+                }
+              }
+            }
+          }
+        },
+        networksMeta: {
+          ethereum: {}
+        }
+      }
+    }
+  })
+
+  it('converts string ids to numbers', () => {
+    const updatedState = migrations.apply(state)
+    const polygon = updatedState.main.networks.ethereum[137]
+    expect(polygon.id).toBe(137)
+  })
+
+  it('converts current id to number', () => {
+    const updatedState = migrations.apply(state)
+    const id = updatedState.main.currentNetwork.id
+    expect(id).toBe(1)
+  })
+
+  it('updates state version to 16', () => {
+    const updatedState = migrations.apply(state)
+    expect(updatedState.main._version).toBe('16')
   })
 })

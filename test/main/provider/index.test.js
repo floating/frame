@@ -8,7 +8,7 @@ log.transports.console.level = false
 const mockAccounts = {}
 const mockStore = {
   'main.accounts': {
-    "0x22dd63c3619818fdbc262c78baee43cb61e9cccf": {}
+    '0x22dd63c3619818fdbc262c78baee43cb61e9cccf': {}
   },
   'main.currentNetwork': {
     type: 'ethereum',
@@ -173,19 +173,30 @@ describe('#send', () => {
     })
   })
 
-  describe('#eth_switchEthereumChain', () => {
+  describe('#wallet_switchEthereumChain', () => {
     it('switches to chain if chain exists in store', done => {
-      send({ method: 'eth_switchEthereumChain' }, response => {
-        expect(response.result).toBe('0x1')
+      send({ 
+        method: 'wallet_switchEthereumChain', 
+        params: [{
+          chainId: '0x1'
+        }]
+      }, () => {
+        expect(accountRequests).toHaveLength(1)
+        expect(accountRequests[0].handlerId).toBeTruthy()
+        expect(accountRequests[0].type).toBe('switchChain')
         done()
       })
     })
-
-    it('returns an error if chain does not exist in store', done => {
-      send({ method: 'eth_switchEthereumChain' }, response => {
-        expect(response.result).toBe('0x4')
+    it('rejects switch is chains doen\'t exist in the store', done => {
+      send({
+        method: 'wallet_switchEthereumChain', 
+        params: [{
+          chainId: '0x1234'
+        }]
+      }, () => {
+        expect(accountRequests).toHaveLength(0)
         done()
-      }, { type: 'ethereum', id: 4 })
+      })
     })
   })
 

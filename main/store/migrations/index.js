@@ -353,10 +353,12 @@ const migrations = {
     return initial
   },
   16: initial => {
+    if (initial?.main?.currentNetwork?.id) {
+      initial.main.currentNetwork.id = parseInt(initial.main.currentNetwork.id)
+    }
     Object.keys(initial.main.networks.ethereum).forEach(chain => {
       try {
-        initial.main.currentNetwork.id = parseInt(initial.main.currentNetwork.id)
-        initial.main.networks[chain].id = parseInt(initial.main.networks[chain].id)
+        initial.main.networks.ethereum[chain].id = parseInt(initial.main.networks.ethereum[chain].id)
       } catch (e) {
         log.error(e)
       }
