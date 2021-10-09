@@ -1,14 +1,7 @@
 import { addNetwork as addNetworkAction } from '../../../../main/store/actions'
 
 describe('#addNetwork', () => {
-  const updaterFn = (node, update) => {
-    if (node !== 'main') throw new Error(`attempted to update wrong node: ${node}`)
-    update({ networks, networksMeta })
-  }
-
-  const addNetwork = network => addNetworkAction(updaterFn, network)
-
-  const network = {
+  const polygonNetwork = {
     id: 137,
     name: 'Polygon',
     type: 'ethereum',
@@ -19,73 +12,80 @@ describe('#addNetwork', () => {
 
   let networks, networksMeta
 
+  const updaterFn = (node, update) => {
+    if (node !== 'main') throw new Error(`attempted to update wrong node: ${node}`)
+    update({ networks, networksMeta })
+  }
+
+  const addNetwork = network => addNetworkAction(updaterFn, network)
+
   beforeEach(() => {
     networks = { ethereum: {} }
     networksMeta = { ethereum: {} }
   })
 
   it('adds a network with the correct id', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].id).toBe(137)
   })
 
   it('adds a network with the correct id if the id is a number represented as a string', () => {
-    addNetwork({ ...network, id: '137' })
+    addNetwork({ ...polygonNetwork, id: '137' })
 
     expect(networks.ethereum['137'].id).toBe(137)
   })
 
   it('adds a network with the correct name', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].name).toBe('Polygon')
   })
 
   it('adds a network with the correct symbol', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].symbol).toBe('MATIC')
   })
 
   it('adds a network with the correct explorer', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].explorer).toBe('https://polygonscan.com')
   })
 
   it('adds a network that is on by default', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].on).toBe(true)
   })
 
   it('adds a network with the correct primary RPC', () => {
-    network.primaryRpc = 'https://polygon-rpc.com'
+    polygonNetwork.primaryRpc = 'https://polygon-rpc.com'
 
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].primaryRpc).toBeUndefined()
     expect(networks.ethereum['137'].connection.primary.custom).toBe('https://polygon-rpc.com')
   })
 
   it('adds a network with the correct secondary RPC', () => {
-    network.secondaryRpc = 'https://rpc-mainnet.matic.network'
+    polygonNetwork.secondaryRpc = 'https://rpc-mainnet.matic.network'
 
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].secondaryRpc).toBeUndefined()
     expect(networks.ethereum['137'].connection.secondary.custom).toBe( 'https://rpc-mainnet.matic.network')
   })
 
   it('adds a network with the correct default connection presets', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].connection.presets).toEqual({ local: 'direct' })
   })
 
   it('adds a network with the correct default primary connection settings', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].connection.primary).toEqual({ 
       on: true, 
@@ -99,7 +99,7 @@ describe('#addNetwork', () => {
   })
 
   it('adds a network with the correct default secondary connection settings', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].connection.secondary).toEqual({ 
       on: false, 
@@ -113,7 +113,7 @@ describe('#addNetwork', () => {
   })
 
   it('adds a network with the correct default gas settings', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networks.ethereum['137'].gas).toEqual({
       price: {
@@ -124,7 +124,7 @@ describe('#addNetwork', () => {
   })
 
   it('adds a network with the correct default metadata', () => {
-    addNetwork(network)
+    addNetwork(polygonNetwork)
 
     expect(networksMeta.ethereum['137']).toEqual({
       gas: {
@@ -137,49 +137,49 @@ describe('#addNetwork', () => {
   })
 
   it('does not add the network if id is not a parseable number', () => {
-    addNetwork({ ...network, id: 'test' })
+    addNetwork({ ...polygonNetwork, id: 'test' })
 
     expect(Object.keys(networks.ethereum)).toHaveLength(0)
     expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
   })
 
   it('does not add the network if name is not defined', () => {
-    addNetwork({ ...network, name: undefined })
+    addNetwork({ ...polygonNetwork, name: undefined })
 
     expect(Object.keys(networks.ethereum)).toHaveLength(0)
     expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
   })
 
   it('does not add the network if explorer is not defined', () => {
-    addNetwork({ ...network, explorer: undefined })
+    addNetwork({ ...polygonNetwork, explorer: undefined })
 
     expect(Object.keys(networks.ethereum)).toHaveLength(0)
     expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
   })
 
   it('does not add the network if symbol is not defined', () => {
-    addNetwork({ ...network, symbol: undefined })
+    addNetwork({ ...polygonNetwork, symbol: undefined })
 
     expect(Object.keys(networks.ethereum)).toHaveLength(0)
     expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
   })
 
   it('does not add the network if type is not a string', () => {
-    addNetwork({ ...network, type: 2 })
+    addNetwork({ ...polygonNetwork, type: 2 })
 
     expect(Object.keys(networks.ethereum)).toHaveLength(0)
     expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
   })
 
   it('does not add the network if type is not "ethereum"', () => {
-    addNetwork({ ...network, type: 'solana' })
+    addNetwork({ ...polygonNetwork, type: 'solana' })
 
     expect(Object.keys(networks.ethereum)).toHaveLength(0)
     expect(Object.keys(networksMeta.ethereum)).toHaveLength(0)
   })
 
   it('does not add the network if the networks already exists', () => {
-    networks.ethereum['137'] = { ...network }
+    networks.ethereum['137'] = { ...polygonNetwork }
   
     addNetwork({
       id: 137,
