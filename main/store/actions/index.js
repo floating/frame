@@ -4,7 +4,7 @@ function validateNetworkSettings (network) {
   const networkId = parseInt(network.id)
 
   if (
-    typeof (parseInt(networkId)) !== 'number' ||
+    (!Number.isInteger(networkId)) ||
     typeof (network.type) !== 'string' ||
     typeof (network.name) !== 'string' ||
     typeof (network.explorer) !== 'string' ||
