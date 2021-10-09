@@ -22,6 +22,8 @@ module.exports = {
   ...panelActions,
   // setSync: (u, key, payload) => u(key, () => payload),
   selectNetwork: (u, type, id) => {
+    id = parseInt(id)
+    if (!id || id === NaN) return
     const reset = { status: 'loading', connected: false, type: '', network: '' }
     u('main.currentNetwork', selected => {
       u('main.networks', selected.type, selected.id, connection => {
@@ -36,7 +38,7 @@ module.exports = {
     if (!active) {
       u('main.currentNetwork', (current) => {
         if (current.type === type && current.id === chainId) {
-          return { type: 'ethereum', id: '1' }
+          return { type: 'ethereum', id: 1 }
         } else {
           return current
         }
@@ -294,28 +296,9 @@ module.exports = {
   },
   updateNetwork: (u, net, newNet) => {
     try {
-      if (
-        typeof (parseInt(net.id)) !== 'number' ||
-        typeof (net.type) !== 'string' ||
-        typeof (net.name) !== 'string' ||
-        typeof (net.explorer) !== 'string' ||
-        typeof (net.symbol) !== 'string' ||
-        typeof (net.layer) !== 'string' ||
-        ['ethereum'].indexOf(net.type) === -1
-      ) {
-        throw new Error('Invalid network settings')
-      }
-      if (
-        typeof (parseInt(newNet.id)) !== 'number' ||
-        typeof (newNet.type) !== 'string' ||
-        typeof (newNet.name) !== 'string' ||
-        typeof (newNet.explorer) !== 'string' ||
-        typeof (newNet.symbol) !== 'string' ||
-        typeof (newNet.layer) !== 'string' ||
-        ['ethereum'].indexOf(newNet.type) === -1
-      ) {
-        throw new Error('Invalid new network settings')
-      }
+      net.id = validateNetworkSettings(net)
+      newNet.id = validateNetworkSettings(newNet)
+      
       u('main', main => {
         const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
 
@@ -341,34 +324,41 @@ module.exports = {
     }
   },
   removeNetwork: (u, net) => {
-    // Cannot delete mainnet
-    if (net.type === 'ethereum' && net.id === '1') return
-    u('main', main => {
-      // If deleting a network that the user is currently on, move them to mainnet
-      if (net.type === main.currentNetwork.type && net.id === main.currentNetwork.id) {
-        main.currentNetwork.type = 'ethereum'
-        main.currentNetwork.id = '1'
-      }
-      let netCount = 0
-      Object.keys(main.networks[net.type]).forEach(id => {
-        netCount++
+    try {
+      net.id = parseInt(net.id)
+
+      // Cannot delete mainnet
+      if (net.id === NaN) throw new Error('Invalid chain id')
+      if (net.type === 'ethereum' && net.id === 1) throw new Error('Cannot remove mainnet')
+      u('main', main => {
+        // If deleting a network that the user is currently on, move them to mainnet
+        if (net.type === main.currentNetwork.type && net.id === main.currentNetwork.id) {
+          main.currentNetwork.type = 'ethereum'
+          main.currentNetwork.id = 1
+        }
+        let netCount = 0
+        Object.keys(main.networks[net.type]).forEach(id => {
+          netCount++
+        })
+        if (netCount <= 1) return main // Cannot delete last network without adding a new network of this type first
+
+        if (main.networks[net.type]) {
+          delete main.networks[net.type][net.id]
+          delete main.networksMeta[net.type][net.id]
+        }
+
+        if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's deleted while selected
+          const id = Object.keys(main.networks[net.type]).map(i => parseInt(i)).sort((a, b) => a - b)[0]
+          const reset = { status: 'loading', connected: false, type: '', network: '' }
+          main.currentNetwork = { type: net.type, id }
+          main.networks[net.type][id].primary = Object.assign({}, main.networks[net.type][id].primary, reset)
+          main.networks[net.type][id].secondary = Object.assign({}, main.networks[net.type][id].secondary, reset)
+        }
+        return main
       })
-      if (netCount <= 1) return main // Cannot delete last network without adding a new network of this type first
-
-      if (main.networks[net.type]) {
-        delete main.networks[net.type][net.id]
-        delete main.networksMeta[net.type][net.id]
-      }
-
-      if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's deleted while selected
-        const id = Object.keys(main.networks[net.type]).map(i => parseInt(i)).sort((a, b) => a - b)[0].toString()
-        const reset = { status: 'loading', connected: false, type: '', network: '' }
-        main.currentNetwork = { type: net.type, id }
-        main.networks[net.type][id].primary = Object.assign({}, main.networks[net.type][id].primary, reset)
-        main.networks[net.type][id].secondary = Object.assign({}, main.networks[net.type][id].secondary, reset)
-      }
-      return main
-    })
+    } catch (e) {
+      console.error(e)
+    }
   },
   // Flow
   addDapp: (u, namehash, data, options = { docked: false, added: false }) => {

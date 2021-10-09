@@ -174,7 +174,7 @@ class Accounts extends EventEmitter {
       if (currentAccount.requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
 
       const data = JSON.parse(JSON.stringify(currentAccount.requests[id].data))
-      const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 'hex').toString()}
+      const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 'hex')}
       const { levels } = store('main.networksMeta', targetChain.type, targetChain.id, 'gas.price')
 
       // Set the gas default to asap
@@ -219,7 +219,7 @@ class Accounts extends EventEmitter {
             account.update()
             if (!account.requests[id].feeAtTime) {
               const network = targetChain
-              if (network.type === 'ethereum' && network.id === '1') {
+              if (network.type === 'ethereum' && network.id === 1) {
                 fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then(res => {
                   if (res && res.message === 'OK' && res.result && res.result.ethusd) {
                     const { gasUsed } = account.requests[id].tx.receipt
@@ -386,7 +386,7 @@ class Accounts extends EventEmitter {
       // If chainId, update pending tx requests from that chain, otherwise update all pending tx requests
       const transactions = Object.entries(currentAccount.requests)
         .filter(([_, req]) => req.type === 'transaction' && !req.locked && !req.feesUpdatedByUser)
-        .filter(([_, req]) => !chainId || parseInt(req.data.chainId, 'hex').toString() === chainId)
+        .filter(([_, req]) => !chainId || parseInt(req.data.chainId, 'hex') === chainId)
 
       transactions.forEach(([id, req]) => {
         const tx = req.data
@@ -832,7 +832,7 @@ class Accounts extends EventEmitter {
       } else {
         const { from, chainId } = txRequest.data
 
-        const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex').toString() }
+        const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex') }
 
         proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
           if (res.result) {

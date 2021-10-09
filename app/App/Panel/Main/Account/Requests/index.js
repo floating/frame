@@ -146,7 +146,7 @@ class Requests extends React.Component {
               if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
-              if (req.type === 'addChain') return <ChainRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
+              if (req.type === 'addChain' || req.type === 'switchChain') return <ChainRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               return null
             })}
           </div>

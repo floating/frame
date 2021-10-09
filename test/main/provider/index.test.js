@@ -98,7 +98,11 @@ describe('#send', () => {
     })
 
     mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-    mockAccounts.addRequest = req => accountRequests.push(req)
+    mockAccounts.addRequest = (req, res) => {
+      accountRequests.push(req)
+      if (res) res()
+    }
+    mockAccounts.getAccounts = () => [address]
   })
 
   describe('#eth_chainId', () => {
@@ -111,6 +115,74 @@ describe('#send', () => {
 
     it('returns a chain id from the target chain', done => {
       send({ method: 'eth_chainId' }, response => {
+        expect(response.result).toBe('0x4')
+        done()
+      }, { type: 'ethereum', id: 4 })
+    })
+  })
+
+  describe('#wallet_addEthereumChain', () => {
+    it('adds the current chain to the store', done => {
+      send({ 
+        method: 'wallet_addEthereumChain', 
+        params: [
+          {
+            chainId: '0x1234', // A 0x-prefixed hexadecimal string
+            chainName: 'New Chain',
+            nativeCurrency: {
+              name: 'New',
+              symbol: 'NEW', // 2-6 characters long
+              decimals: 18
+            },
+            rpcUrls: ['https://pylon.link'],
+            blockExplorerUrls: ['https://pylon.link'],
+            iconUrls: [''] // Currently ignored
+          }
+        ] 
+      }, () => {
+        expect(accountRequests).toHaveLength(1)
+        expect(accountRequests[0].handlerId).toBeTruthy()
+        expect(accountRequests[0].type).toBe('addChain')
+        done()
+      })
+    })
+
+    it('adds the current chain to the store', done => {
+      send({ 
+        method: 'wallet_addEthereumChain', 
+        params: [
+          {
+            chainId: '0x1', // A 0x-prefixed hexadecimal string
+            chainName: 'Mainnet',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH', // 2-6 characters long
+              decimals: 18
+            },
+            rpcUrls: ['https://pylon.link'],
+            blockExplorerUrls: ['https://pylon.link'],
+            iconUrls: [''] // Currently ignored
+          }
+        ] 
+      }, () => {
+        expect(accountRequests).toHaveLength(1)
+        expect(accountRequests[0].handlerId).toBeTruthy()
+        expect(accountRequests[0].type).toBe('switchChain')
+        done()
+      })
+    })
+  })
+
+  describe('#eth_switchEthereumChain', () => {
+    it('switches to chain if chain exists in store', done => {
+      send({ method: 'eth_switchEthereumChain' }, response => {
+        expect(response.result).toBe('0x1')
+        done()
+      })
+    })
+
+    it('returns an error if chain does not exist in store', done => {
+      send({ method: 'eth_switchEthereumChain' }, response => {
         expect(response.result).toBe('0x4')
         done()
       }, { type: 'ethereum', id: 4 })
