@@ -48,6 +48,12 @@ describe('#addNetwork', () => {
     expect(networks.ethereum['137'].symbol).toBe('MATIC')
   })
 
+  it('adds a network with the correct layer', () => {
+    addNetwork(polygonNetwork)
+
+    expect(networks.ethereum['137'].layer).toBe('sidechain')
+  })
+
   it('adds a network with the correct explorer', () => {
     addNetwork(polygonNetwork)
 
