@@ -152,15 +152,17 @@ const rpc = {
     signers.createFromPhrase(phrase, password, cb)
   },
   locateKeystore (cb) {
-    const keystore = dialog.showOpenDialog({ properties: ['openFile'] })
-    if (keystore && keystore.length) {
-      fs.readFile(keystore[0], 'utf8', (err, data) => {
-        if (err) return cb(err)
-        try { cb(null, JSON.parse(data)) } catch (err) { cb(err) }
-      })
-    } else {
-      cb(new Error('No Keystore Found'))
-    }
+    dialog.showOpenDialog({ properties: ['openFile'] }).then(file => {
+      const keystore = file || { filePaths: [] }
+      if ((keystore.filePaths || []).length > 0) {
+        fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
+          if (err) return cb(err)
+          try { cb(null, JSON.parse(data)) } catch (err) { cb(err) }
+        })
+      } else {
+        cb(new Error('No Keystore Found'))
+      }
+    }).catch(cb)
   },
   createFromKeystore (keystore, keystorePassword, password, cb) {
     signers.createFromKeystore(keystore, keystorePassword, password, cb)
