@@ -1,5 +1,7 @@
 const crypto = require('crypto')
 const ethSigUtil = require('eth-sig-util')
+const { TransactionFactory } = require('@ethereumjs/tx')
+
 const { hashPersonalMessage,
   toBuffer,
   ecsign,
@@ -7,8 +9,6 @@ const { hashPersonalMessage,
   pubToAddress,
   ecrecover
 } = require('ethereumjs-util')
-
-const { sign } = require('../../../transaction')
 
 class HotSignerWorker {
   constructor () {
@@ -51,13 +51,11 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
-    sign(rawTx, tx => {
-      const signedTx = tx.sign(key)
+    const tx = TransactionFactory.fromTxData(rawTx)
+    const signedTx = tx.sign(key)
+    const serialized = signedTx.serialize().toString('hex')
 
-      const serialized = signedTx.serialize().toString('hex')
-
-      pseudoCallback(null, addHexPrefix(serialized))
-    }).catch(pseudoCallback)
+    pseudoCallback(null, addHexPrefix(serialized))
   }
 
   verifyAddress ({ index, address }, pseudoCallback) {
