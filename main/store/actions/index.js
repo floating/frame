@@ -25,7 +25,7 @@ module.exports = {
   // setSync: (u, key, payload) => u(key, () => payload),
   selectNetwork: (u, type, id) => {
     id = parseInt(id)
-    if (!id || id === NaN) return
+    if (!Number.isInteger(id)) return
     const reset = { status: 'loading', connected: false, type: '', network: '' }
     u('main.currentNetwork', selected => {
       u('main.networks', selected.type, selected.id, connection => {

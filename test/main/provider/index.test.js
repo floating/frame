@@ -140,14 +140,18 @@ describe('#send', () => {
           }
         ] 
       }, () => {
-        expect(accountRequests).toHaveLength(1)
-        expect(accountRequests[0].handlerId).toBeTruthy()
-        expect(accountRequests[0].type).toBe('addChain')
-        done()
+        try {
+          expect(accountRequests).toHaveLength(1)
+          expect(accountRequests[0].handlerId).toBeTruthy()
+          expect(accountRequests[0].type).toBe('addChain')
+          done()
+        } catch (e) { 
+          done(e) 
+        }
       })
     })
 
-    it('adds the current chain to the store', done => {
+    it('adds switch chain request if chain exists', done => {
       send({ 
         method: 'wallet_addEthereumChain', 
         params: [
@@ -165,10 +169,14 @@ describe('#send', () => {
           }
         ] 
       }, () => {
-        expect(accountRequests).toHaveLength(1)
-        expect(accountRequests[0].handlerId).toBeTruthy()
-        expect(accountRequests[0].type).toBe('switchChain')
-        done()
+        try {
+          expect(accountRequests).toHaveLength(1)
+          expect(accountRequests[0].handlerId).toBeTruthy()
+          expect(accountRequests[0].type).toBe('switchChain')
+          done()
+        } catch (e) { 
+          done(e) 
+        }
       })
     })
   })
@@ -181,21 +189,29 @@ describe('#send', () => {
           chainId: '0x1'
         }]
       }, () => {
-        expect(accountRequests).toHaveLength(1)
-        expect(accountRequests[0].handlerId).toBeTruthy()
-        expect(accountRequests[0].type).toBe('switchChain')
-        done()
+        try {
+          expect(accountRequests).toHaveLength(1)
+          expect(accountRequests[0].handlerId).toBeTruthy()
+          expect(accountRequests[0].type).toBe('switchChain')
+          done()
+        } catch (e) { 
+          done(e) 
+        }
       })
     })
-    it('rejects switch is chains doen\'t exist in the store', done => {
+    it('rejects switch if chain doesn\'t exist in the store', done => {
       send({
         method: 'wallet_switchEthereumChain', 
         params: [{
           chainId: '0x1234'
         }]
       }, () => {
-        expect(accountRequests).toHaveLength(0)
-        done()
+        try {
+          expect(accountRequests).toHaveLength(0)
+          done()
+        } catch (e) { 
+          done(e) 
+        }
       })
     })
   })

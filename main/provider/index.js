@@ -511,7 +511,7 @@ class Provider extends EventEmitter {
     const type = 'ethereum'
     try {
       const id = parseInt(chainId)
-      if (!id || id === NaN) throw new Error('Invalid chain id')
+      if (!Number.isInteger(id)) throw new Error('Invalid chain id')
 
       // Check if chain exists 
       const exists = Boolean(store('main.networks', type, parseInt(chainId)))
@@ -561,16 +561,7 @@ class Provider extends EventEmitter {
     const exists = Boolean(store('main.networks', type, parseInt(chainId)))
     if (exists) {
       // Ask user if they want to switch chains
-      accounts.addRequest({
-        handlerId,
-        type: 'switchChain',
-        chain: { 
-          type, 
-          id: chainId 
-        },
-        account: accounts.getAccounts()[0],
-        origin: payload._origin
-      }, res)
+      this.switchEthereumChain(payload, res)
     } else {
       // Ask user if they want to add this chain
       accounts.addRequest({

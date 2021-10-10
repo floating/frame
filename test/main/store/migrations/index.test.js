@@ -314,7 +314,7 @@ describe('migration 16', () => {
   beforeEach(() => {
     state = {
       main: {
-        _version: 14,
+        _version: 15,
         currentNetwork: {
           type: 'ethereum', 
           id: '1'

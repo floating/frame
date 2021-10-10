@@ -353,7 +353,7 @@ const migrations = {
     return initial
   },
   16: initial => {
-    if (initial?.main?.currentNetwork?.id) {
+    if (initial.main.currentNetwork?.id) {
       initial.main.currentNetwork.id = parseInt(initial.main.currentNetwork.id)
     }
     Object.keys(initial.main.networks.ethereum).forEach(chain => {
