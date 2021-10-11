@@ -507,9 +507,13 @@ class Provider extends EventEmitter {
   }
 
   switchEthereumChain (payload, res) {
-    const chainId = payload?.params?.[0]?.chainId
-    const type = 'ethereum'
     try {
+      const params = payload.params
+      if (!params || !params[0]) throw new Error('Params not supplied')
+      
+      const chainId = params[0].chainId
+      const type = 'ethereum'
+
       const id = parseInt(chainId)
       if (!Number.isInteger(id)) throw new Error('Invalid chain id')
 
