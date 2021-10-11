@@ -85,6 +85,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@aragon/wrapper": "5.4.0",
+    "@ethereumjs/common": "2.5.0",
     "@ethereumjs/tx": "3.3.2",
     "@ethersproject/abi": "5.4.1",
     "@ethersproject/hash": "5.4.0",
@@ -168,6 +169,9 @@
     "standardx": "7.0.0",
     "stylus": "0.55.0",
     "ts-jest": "27.0.5"
+  },
+  "resolutions": {
+    "ipfs-utils": "https://github.com/gatsby-tv/js-ipfs-utils#fix/defer-to-native-fetch"
   },
   "standard": {
     "parser": "babel-eslint",
