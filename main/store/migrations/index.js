@@ -51,7 +51,7 @@ const migrations = {
         initial.main.networks.ethereum[id].connection.primary.on = connection.local.on
         initial.main.networks.ethereum[id].connection.secondary.on = connection.secondary.on
       })
-      initial.main.currentNetwork.id = connection.network + '' || initial.main.currentNetwork.id || '1'
+      initial.main.currentNetwork.id = connection.network || initial.main.currentNetwork.id || 1
     }
 
     Object.keys(initial.main.networks.ethereum).forEach(id => {
@@ -350,6 +350,19 @@ const migrations = {
       }
     }
 
+    return initial
+  },
+  16: initial => {
+    if (initial.main.currentNetwork?.id) {
+      initial.main.currentNetwork.id = parseInt(initial.main.currentNetwork.id)
+    }
+    Object.keys(initial.main.networks.ethereum).forEach(chain => {
+      try {
+        initial.main.networks.ethereum[chain].id = parseInt(initial.main.networks.ethereum[chain].id)
+      } catch (e) {
+        log.error(e)
+      }
+    })
     return initial
   }
 }

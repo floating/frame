@@ -16,13 +16,18 @@ class AddChain extends React.Component {
     this.newNetworkLayer = ''
     this.req = props.req
     this.chain = (this.req && this.req.chain) || {}
+
+    const blockExplorerUrls = this.chain.blockExplorerUrls || []
+    const rpcUrls = this.chain.rpcUrls || []
+    const nativeChainCurrency = this.chain.nativeCurrency || {}
+
     this.state = {
       newNetworkId: parseInt(this.chain.id, 'hex') || this.newNetworkIdDefault,
       newNetworkName: this.chain.name || this.newNetworkNameDefault,
-      newNetworkExplorer: this.chain.explorer || this.newNetworkExplorerDefault,
-      newNetworkRPCPrimary: this.chain.rpcUrl || this.newNetworkRPCPrimary,
-      newNetworkRPCSecondary: this.newNetworkRPCSecondary,
-      newNetworkSymbol: this.chain.symbol || this.newNetworkSymbolDefault,
+      newNetworkExplorer: blockExplorerUrls[0] || this.newNetworkExplorerDefault,
+      newNetworkRPCPrimary: rpcUrls[0] || this.newNetworkRPCPrimary,
+      newNetworkRPCSecondary: rpcUrls[1] || this.newNetworkRPCSecondary,
+      newNetworkSymbol: nativeChainCurrency.symbol || this.newNetworkSymbolDefault,
       newNetworkType: this.chain.type || this.newNetworkType,
       newNetworkLayer: this.chain.layer || 'other',
       localShake: {}, 

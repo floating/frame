@@ -116,7 +116,7 @@ class AddPhrase extends React.Component {
             <div
               className='phaseItemOptionIntro' onMouseDown={() => {
                 this.adding()
-                if (this.store('main.currentNetwork.id') === '1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+                if (this.store('main.currentNetwork.id') === 1) setTimeout(() => this.store.notify('hotAccountWarning'), 800)
               }}
             >
               Add Phrase Account
