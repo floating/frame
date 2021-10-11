@@ -10,6 +10,7 @@ const crypt = require('../../crypt')
 
 const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
+const { stripHexPrefix } = require('ethereumjs-util')
 
 const USER_DATA = app ? app.getPath('userData') : './test/.userData'
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
@@ -51,12 +52,15 @@ module.exports = {
     })
   },
   createFromPrivateKey: (signers, privateKey, password, cb) => {
-    if (!privateKey) return cb(new Error('Private key required to create hot signer'))
+    const privateKeyHex = stripHexPrefix(privateKey)
+
+    if (!privateKeyHex) return cb(new Error('Private key required to create hot signer'))
     if (!password) return cb(new Error('Password required to create hot signer'))
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
-    signer.addPrivateKey(privateKey, password, (err, result) => {
+
+    signer.addPrivateKey(privateKeyHex, password, err => {
       if (err) {
         signer.close()
         return cb(err)
