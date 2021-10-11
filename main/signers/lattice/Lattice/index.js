@@ -159,7 +159,7 @@ class Lattice extends Signer {
     try {
       const req = {
         currency: 'ETH',
-        startPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, 0],
+        startPath: this._getPath(0),
         n: accountLimit,
         skipCache: true
       }
@@ -281,14 +281,18 @@ class Lattice extends Signer {
     return Buffer.from(this.normalize(hex), 'hex')
   }
 
+  _getPath (index) {
+    return [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+  }
+
   // Standard Methods
   async _signMessage (index, protocol, payload) {
     const clientSign = promisify(this.client.sign).bind(this.client)
 
     const data = {
-      protocol: protocol,
-      payload: payload,
-      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other derivations
+      protocol,
+      payload,
+      signerPath: this._getPath(index)
     }
 
     const signOpts = {
@@ -322,7 +326,13 @@ class Lattice extends Signer {
     }
   }
 
-  async signTypedData (index, typedData, cb) {
+  async signTypedData (index, version, typedData, cb) {
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
+
+    if ((parseInt(versionNum) || 0) < 4) {
+      return cb(new Error(`Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`), undefined)
+    }
+
     try {
       const signature = await this._signMessage(index, 'eip712', typedData)
 
@@ -344,7 +354,7 @@ class Lattice extends Signer {
       nonce: utils.hexToNumber(txJson.nonce),
       gasLimit: utils.hexToNumber(txJson.gasLimit),
       useEIP155: true,
-      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+      signerPath: this._getPath(index)
     }
 
     if (type) {

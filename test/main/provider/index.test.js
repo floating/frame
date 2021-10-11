@@ -3,8 +3,6 @@ import { utils } from 'ethers'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
-log.transports.console.level = false
-
 const mockAccounts = {}
 const mockStore = {
   'main.accounts': {
@@ -45,11 +43,17 @@ jest.mock('../../../main/store', () => {
 })
 
 beforeAll(async () => {
+  log.transports.console.level = false
+
   mockConnection = new MockConnection()
 
   // need to import this after mocks are set up
   provider = (await import('../../../main/provider')).default
   provider.handlers = {}
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
 })
 
 describe('#getRawTx', () => {
@@ -408,7 +412,20 @@ describe('#send', () => {
       const params = [address, typedData]
 
       send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error.message).toBeTruthy()
+        expect(err.error.message).toMatch(/Ledger/)
+        expect(err.error.code).toBe(-1)
+        done()
+      })
+    }, 100)
+
+    it('does not submit a V3 request to a Lattice', done => {
+      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'lattice' })
+
+      // Lattice only supports V4+
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v3', params }, err => {
+        expect(err.error.message).toMatch(/Lattice/)
         expect(err.error.code).toBe(-1)
         done()
       })

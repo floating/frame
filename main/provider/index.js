@@ -30,10 +30,6 @@ const { populate: populateTransaction, usesBaseFee, maxFee } = require('../trans
 
 const version = require('../../package.json').version
 
-function equalCaseInsensitive(s1, s2) {
-  return s1.toLowerCase() === s2.toLowerCase()
-}
-
 class Provider extends EventEmitter {
   constructor () {
     super()
@@ -206,7 +202,7 @@ class Provider extends EventEmitter {
     const payload = req.payload
     const [address, data] = payload.params
 
-    accounts.signTypedData(req.version, address, data, (err, sig) => {
+    accounts.signTypedData(req.version, address, { ...data }, (err, sig) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
@@ -481,9 +477,10 @@ class Provider extends EventEmitter {
 
     if (
         version !== 'V4' &&
-        equalCaseInsensitive((currentAccount.lastSignerType || ''), 'ledger')
+        ['ledger', 'lattice'].includes((currentAccount.lastSignerType || '').toLowerCase())
       ) {
-      return this.resError('Ledger only supports eth_signTypedData_v4+', payload, res)
+        const signerName = currentAccount.lastSignerType[0].toUpperCase() + currentAccount.lastSignerType.substring(1)
+        return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = uuid()
