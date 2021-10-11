@@ -1,7 +1,7 @@
 import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
-import { usesBaseFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import { usesBaseFee, maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -220,6 +220,32 @@ describe('#usesBaseFee', () => {
     }
 
     expect(usesBaseFee(tx)).toBe(true)
+  })
+})
+
+describe('#maxFee', () => {
+  it('sets the max fee as 2 ETH on mainnet', () => {
+    const tx = {
+      chainId: addHexPrefix((1).toString(16))
+    }
+
+    expect(maxFee(tx)).toBe(2e18)
+  })
+
+  it('sets the max fee as 1000 FTM on Fantom', () => {
+    const tx = {
+      chainId: addHexPrefix((250).toString(16))
+    }
+
+    expect(maxFee(tx)).toBe(250e18)
+  })
+
+  it('sets the max fee as 10 on other chains', () => {
+    const tx = {
+      chainId: addHexPrefix((255).toString(16))
+    }
+
+    expect(maxFee(tx)).toBe(1e19)
   })
 })
 
