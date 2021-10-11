@@ -170,9 +170,6 @@
     "stylus": "0.55.0",
     "ts-jest": "27.0.5"
   },
-  "resolutions": {
-    "ipfs-utils": "https://github.com/gatsby-tv/js-ipfs-utils#fix/defer-to-native-fetch"
-  },
   "standard": {
     "parser": "babel-eslint",
     "env": [
