@@ -205,8 +205,8 @@ class AddAragon extends React.Component {
             className='phaseItemSummary' onMouseDown={() => {
               const net = this.store('main.currentNetwork.id')
               const open = url => this.store.notify('openExternal', { url })
-              if (net === '1') return open('https://mainnet.aragon.org')
-              if (net === '4') return open('https://rinkeby.aragon.org')
+              if (net === 1) return open('https://mainnet.aragon.org')
+              if (net === 4) return open('https://rinkeby.aragon.org')
               return open('https://aragon.org')
             }}
           >{'Don\'t have a dao? Create one'}

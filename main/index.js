@@ -138,6 +138,11 @@ ipcMain.on('tray:addChain', (e, chain, req) => {
   accounts.resolveRequest(req)
 })
 
+ipcMain.on('tray:switchChain', (e, type, id, req) => {
+  if (type && id) store.selectNetwork(type, id)
+  accounts.resolveRequest(req)
+})
+
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
   accounts.adjustNonce(handlerId, nonceAdjust)
 })

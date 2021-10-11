@@ -272,7 +272,7 @@ class Provider extends EventEmitter {
                 }
               }, {
                 type: 'ethereum',
-                id: parseInt(req.data.chainId, 'hex').toString()
+                id: parseInt(req.data.chainId, 'hex')
               })
             }
             const broadcastTimer = setInterval(() => cast(), 1000)
@@ -506,32 +506,84 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${version}` })
   }
 
+  switchEthereumChain (payload, res) {
+    try {
+      const params = payload.params
+      if (!params || !params[0]) throw new Error('Params not supplied')
+      
+      const chainId = params[0].chainId
+      const type = 'ethereum'
+
+      const id = parseInt(chainId)
+      if (!Number.isInteger(id)) throw new Error('Invalid chain id')
+
+      // Check if chain exists 
+      const exists = Boolean(store('main.networks', type, parseInt(chainId)))
+      if (exists === false) throw new Error('Chain does not exist')
+
+      const handlerId = uuid()
+      this.handlers[handlerId] = res
+      
+      // Ask user if they want to switch chains
+      accounts.addRequest({
+        handlerId,
+        type: 'switchChain',
+        chain: { 
+          type, 
+          id: chainId 
+        },
+        account: accounts.getAccounts()[0],
+        origin: payload._origin
+      }, res)
+
+    } catch (e) {
+      return this.resError(e, payload, res)
+    }
+  }
+
   addEthereumChain (payload, res) {
     if (!payload.params[0]) return this.resError('addChain request missing params', payload, res)
 
-    const id = payload.params[0].chainId
     const type = 'ethereum'
-    const name = payload.params[0].chainName
-    const explorer = payload.params[0].blockExplorerUrls ? payload.params[0].blockExplorerUrls[0] : ''
-    const symbol = payload.params[0].nativeCurrency ? payload.params[0].nativeCurrency.symbol : ''
-    const rpcUrl = payload.params[0].rpcUrls ? payload.params[0].rpcUrls[0] : ''
+    const { 
+      chainId, 
+      chainName, 
+      nativeCurrency, 
+      rpcUrls = [], 
+      blockExplorerUrls = [],
+      iconUrls = [] 
+    } = payload.params[0]
+
+    if (!chainId) return this.resError('addChain request missing chainId', payload, res)
+    if (!chainName) return this.resError('addChain request missing chainName', payload, res)
+    if (!nativeCurrency) return this.resError('addChain request missing nativeCurrency', payload, res)
 
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({
-      handlerId,
-      type: 'addChain',
-      chain : {
-        id,
-        type,
-        name,
-        explorer,
-        symbol,
-        rpcUrl
-      },
-      account: accounts.getAccounts()[0],
-      origin: payload._origin
-    }, res)
+
+    // Check if chain exists 
+    const exists = Boolean(store('main.networks', type, parseInt(chainId)))
+    if (exists) {
+      // Ask user if they want to switch chains
+      this.switchEthereumChain(payload, res)
+    } else {
+      // Ask user if they want to add this chain
+      accounts.addRequest({
+        handlerId,
+        type: 'addChain',
+        chain : {
+          type,
+          id: chainId,
+          name: chainName,
+          nativeCurrency,
+          rpcUrls,
+          blockExplorerUrls, 
+          iconUrls
+        },
+        account: accounts.getAccounts()[0],
+        origin: payload._origin
+      }, res)
+    }
   }
 
   sendAsync (payload, cb) {
@@ -564,6 +616,7 @@ class Provider extends EventEmitter {
     }
     
     if (method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
+    if (method === 'wallet_switchEthereumChain') return this.switchEthereumChain(payload, res)
 
     // Connection dependant methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)

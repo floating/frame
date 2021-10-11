@@ -32,7 +32,7 @@ class _Balances extends React.Component {
 
   setActive (active) {
     const { type, id } = this.store('main.currentNetwork')
-    if (type !== 'ethereum' || id !== '1') return
+    if (type !== 'ethereum' || id !== 1) return
     this.setState({ openActive: active })
     this.openTimer = setTimeout(() => this.setState({ open: active }), 480)
     if (active && !this.state.openActive) {

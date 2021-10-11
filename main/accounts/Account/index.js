@@ -72,7 +72,7 @@ class Account {
           this.update()
         }, {
           type: 'ethereum', 
-          id: '1'
+          id: 1
         })
       })
     }

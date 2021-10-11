@@ -15,6 +15,7 @@ class ChainRequest extends React.Component {
   render () {
     const status = this.props.req.status
     const notice = this.props.req.notice
+    const type = this.props.req.type
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
     if (status === 'declined') requestClass += ' signerRequestDeclined'
@@ -50,36 +51,64 @@ class ChainRequest extends React.Component {
             </div>
           ) : (
             <div className='approveTransactionPayload'>
-              <div className='approveRequestHeader approveTransactionHeader'>
-                <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
-                <div className='approveRequestHeaderLabel'> Add Chain</div>
-              </div>
+              {type === 'switchChain' ? ( 
+                <div className='approveRequestHeader approveTransactionHeader'>
+                  <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
+                  <div className='approveRequestHeaderLabel'> Switch Chain</div>
+                </div>
+              ) : (
+                <div className='approveRequestHeader approveTransactionHeader'>
+                  <div className='approveRequestHeaderIcon'> {svg.octicon('shield', { height: 20 })}</div>
+                  <div className='approveRequestHeaderLabel'> Add Chain</div>
+                </div>
+              )}
               <div className='requestChain scaleIn'>
                 <div className='requestChainInner'>
                   <div className={originClass}>{this.props.req.origin}</div>
-                  <div className={'requestChainOriginSub'}>{'wants to add chain'}</div>
-                  <div className='requestChainName'>{chain.name}</div>
+                  <div className={'requestChainOriginSub'}>{type === 'switchChain' ? 'wants to switch to chain' : 'wants to add chain'}</div>
+                  <div className='requestChainName'>{type === 'switchChain' ? (
+                    this.store('main.networks', chain.type, parseInt(chain.id), 'name')
+                  ) : chain.name}</div>
                 </div>
               </div>
             </div>
           )}
         </div>
-        <div className='requestApprove'>
-          <div 
-            className='requestDecline' 
-            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', false, this.props.req) 
-          }}>
-            <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+        {type === 'switchChain' ? (
+          <div className='requestApprove'>
+            <div 
+              className='requestDecline' 
+              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+              onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:switchChain', false, false, this.props.req) 
+            }}>
+              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+            </div>
+            <div 
+              className='requestSign' 
+              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+              onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:switchChain', chain.type, parseInt(chain.id), this.props.req)
+            }}>
+              <div className='requestSignButton _txButton'>Switch</div>
+            </div>
           </div>
-          <div 
-            className='requestSign' 
-            style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-            onClick={() => { if (this.state.allowInput && this.props.onTop) this.store.notify('addChain', this.props.req) 
-          }}>
-            <div className='requestSignButton _txButton'>Review</div>
+        ) : (
+          <div className='requestApprove'>
+            <div 
+              className='requestDecline' 
+              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+              onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addChain', false, this.props.req) 
+            }}>
+              <div className='requestDeclineButton _txButton _txButtonBad'>Decline</div>
+            </div>
+            <div 
+              className='requestSign' 
+              style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
+              onClick={() => { if (this.state.allowInput && this.props.onTop) this.store.notify('addChain', this.props.req) 
+            }}>
+              <div className='requestSignButton _txButton'>Review</div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     )
   }

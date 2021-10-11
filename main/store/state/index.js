@@ -222,7 +222,7 @@ const initial = {
     },
     currentNetwork: main('currentNetwork', {
       type: 'ethereum',
-      id: '1'
+      id: 1
     }),
     networkPresets: {
       ethereum: {

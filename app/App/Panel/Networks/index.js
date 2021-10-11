@@ -186,7 +186,7 @@ class _Network extends React.Component {
               }}
             />
           </div>
-          {this.props.id === '1' ? (
+          {this.props.id === 1 ? (
             <div className='mainnetToggleLock'>{svg.lock(9)}</div>
           ) : (
             <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
@@ -295,7 +295,7 @@ class _Network extends React.Component {
                 className='chainIdInput'
                 value={this.state.id} spellCheck='false'
                 onChange={(e) => {
-                  if (type === 'ethereum' && id === '1') return
+                  if (type === 'ethereum' && id === 1) return
                   this.setState({ id: e.target.value })
                 }}
                 onBlur={(e) => {
@@ -306,7 +306,7 @@ class _Network extends React.Component {
                 className='chainSymbolInput'
                 value={this.state.symbol} spellCheck='false'
                 onChange={(e) => {
-                  if (type === 'ethereum' && id === '1') return
+                  if (type === 'ethereum' && id === 1) return
                   if (e.target.value.length > 8) return e.preventDefault()
                   this.setState({ symbol: e.target.value })
                 }}
@@ -317,7 +317,7 @@ class _Network extends React.Component {
               <Dropdown
                 syncValue={this.state.layer}
                 onChange={layer => this.setState({ layer })}
-                options={type === 'ethereum' && id === '1' ? [
+                options={type === 'ethereum' && id === 1 ? [
                   { text: 'mainnet', value: 'mainnet'}
                 ] : [
                   { text: 'rollup', value: 'rollup'}, 
@@ -343,7 +343,7 @@ class _Network extends React.Component {
         ) : null}
 
         {this.state.showControls ? (
-          type === 'ethereum' && id === '1' ? (
+          type === 'ethereum' && id === 1 ? (
             <div className='chainMore cardShow'>
               <div className='moduleButton moduleButtonLocked'>
                 {svg.lock(11)}
