@@ -1,5 +1,5 @@
-import fetch from 'node-fetch'
 import log from 'electron-log'
+const fetch = require('node-fetch')
 
 interface JsonResponse {
   status: number,

@@ -83,7 +83,7 @@ class Account {
 
   async lookupAddress () {
     try {
-      this.ensName = await nebula.ens.lookupAddress(this.address)
+      this.ensName = (await nebula.ens.reverseLookup(this.address))[0]
       this.update()
     } catch (e) {
       log.error('lookupAddress Error:', e)
