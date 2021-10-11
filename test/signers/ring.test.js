@@ -58,14 +58,17 @@ describe('Ring signer', () => {
   })
 
   test('Create from private key', (done) => {
-    const privateKey = crypto.randomBytes(32).toString('hex')
+    const privateKey = '0x' + crypto.randomBytes(32).toString('hex')
     hot.createFromPrivateKey(signers, privateKey, PASSWORD, (err, result) => {
       signer = result
-      expect(err).toBe(null)
-      expect(signer.status).toBe('locked')
-      expect(signer.id).not.toBe(undefined)
-      expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
-      done()
+
+      try {
+        expect(err).toBe(null)
+        expect(signer.status).toBe('locked')
+        expect(signer.id).not.toBe(undefined)
+        expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
+        done()
+      } catch(e) { done(e) }
     })
   })
 
