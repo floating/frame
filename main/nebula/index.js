@@ -1,5 +1,12 @@
-const ethProvider = require('eth-provider')
+// delete the Electron version while requiring Nebula. this allows ipfs-utils to use
+// node-fetch instead of electron-fetch
+const electron = process.versions.electron
+delete process.versions.electron
+
 const nebula = require('nebula')
+process.versions.electron = electron
+
+const ethProvider = require('eth-provider')
 
 const authToken = process.env.NEBULA_AUTH_TOKEN ? process.env.NEBULA_AUTH_TOKEN + '@' : ''
 const pylonUrl = `https://${authToken}@ipfs.nebula.land`

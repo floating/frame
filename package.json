@@ -85,6 +85,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@aragon/wrapper": "5.4.0",
+    "@ethereumjs/common": "2.5.0",
     "@ethereumjs/tx": "3.3.2",
     "@ethersproject/abi": "5.4.1",
     "@ethersproject/hash": "5.4.0",
