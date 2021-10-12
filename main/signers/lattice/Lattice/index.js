@@ -270,9 +270,11 @@ class Lattice extends Signer {
 
   summary () {
     const summary = super.summary()
-    const addressLimit = store('main.latticeSettings.accountLimit') || 5
 
-    return { ...summary, addresses: this.addresses.slice(0, addressLimit) }
+    return {
+      ...summary,
+      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
+    }
   }
 
   update () {
