@@ -621,8 +621,13 @@ class Settings extends React.Component {
     })
     return (
       <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
-        <div className='panelHeader' style={{ zIndex: 50, pointerEvents: 'none' }}>
+        <div className='panelHeader' style={{ zIndex: 50 }}>
           <div className='panelHeaderTitle'>Chains</div>
+          <div className='panelHeaderAddChain' onMouseDown={() => this.store.notify('addChain')}>
+            <div className='panelHeaderAddChainInner'>
+              {'Add Chain'}
+            </div>
+          </div>
         </div>
         <div className='localSettingsWrap'>
           <div className='networkBreak'>
@@ -645,12 +650,6 @@ class Settings extends React.Component {
             <div className='networkBreakLayer'>Other</div>
           </div>
           {this.renderConnections('other')}
-          <div className='networkAdd'>
-          <div 
-            className='networkAddButton'
-            onMouseDown={() => this.store.notify('addChain')}
-          >Add a new chain</div>
-          </div>
           {this.discord()}
         </div>
       </div>
