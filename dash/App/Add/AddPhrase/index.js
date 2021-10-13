@@ -61,9 +61,9 @@ class AddPhrase extends React.Component {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false, createdSignerId: signer.id })
-        // setTimeout(() => {
-        //   this.store.toggleAddAccount()
-        // }, 2000)
+        setTimeout(() => {
+          this.props.close()
+        }, 2000)
       }
     })
   }

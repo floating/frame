@@ -10,6 +10,7 @@ import AddHardwareLattice from './Add/AddHardwareLattice'
 import AddAragon from './Add/AddAragon'
 import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
+import AddKeystore from './Add/AddKeystore'
 import AddAddress from './Add/AddAddress'
 
 class AddAccounts extends React.Component {
@@ -26,10 +27,17 @@ class AddAccounts extends React.Component {
       </div>
     )
   }
-  renderAddKeystore () {
+  renderAddKeyring () {
     return (
       <div className='addAccounts cardShow'>
         <AddRing close={this.props.close} />
+      </div>
+    )
+  }
+  renderAddKeystore () {
+    return (
+      <div className='addAccounts cardShow'>
+        <AddKeystore close={this.props.close} />
       </div>
     )
   }
@@ -83,13 +91,14 @@ class AddAccounts extends React.Component {
           <div className='addAccountsHeaderClose' onMouseDown={() => this.props.close()}>{svg.close(20)}</div>
         </div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Wallet</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'trezor' })}>Trezor Wallet</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
         {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
         <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>A Non-signing Account</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keyring' })}>Private Key</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore File (json)</div>
+        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>Watch-only Account</div>
       </div>
     )
   }
@@ -109,6 +118,8 @@ class AddAccounts extends React.Component {
       return this.renderAddLattice()
     } else if (view === 'seed')  {
       return this.renderAddSeed()
+    } else if (view === 'keyring')  {
+      return this.renderAddKeyring()
     } else if (view === 'keystore')  {
       return this.renderAddKeystore()
     } else if (view === 'nonsigning')  {

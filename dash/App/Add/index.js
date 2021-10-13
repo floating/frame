@@ -32,7 +32,7 @@ class Add extends React.Component {
   }
 
   toggleAddAccount (state) {
-    if (state === 'entered' || state === 'exited') this.store.toggleAddAccount()
+    if (state === 'entered' || state === 'exited') this.props.close()
   }
 
   exit () {

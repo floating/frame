@@ -51,7 +51,7 @@ class AddHardware extends React.Component {
                 )
               }).concat(tethered.map((signer, i) => {
                 return (
-                  <div className='addAccountItemDevice' key={signer.id} onMouseDown={() => this.store.toggleAddAccount()}>
+                  <div className='addAccountItemDevice' key={signer.id}>
                     <div className='addAccountItemDeviceTitle'>Device Found</div>
                     <div className='addAccountItemDeviceStatus'>Account Created</div>
                   </div>
