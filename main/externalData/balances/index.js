@@ -40,7 +40,7 @@ async function loadTokenBalances (chainId, address, tokens) {
       const results = await multicall(chainId).call(calls.slice(batchStart, batchEnd))
       return Object.entries(results.transformed)
     } catch (e) {
-      log.error(`unable to load token balances (batch ${batchIndex}-${batchEnd}`, e)
+      log.error(`unable to load token balances (batch ${batchStart}-${batchEnd}`, e)
       return []
     }
   })

@@ -485,6 +485,7 @@ class Accounts extends EventEmitter {
   }
 
   close () {
+    dataScanner.stop()
     dataScanner.kill()
     // usbDetect.stopMonitoring()
   }
