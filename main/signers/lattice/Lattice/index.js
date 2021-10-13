@@ -9,6 +9,7 @@ const { sign, signerCompatibility, londonToLegacy } = require('../../../transact
 const store = require('../../../store')
 const Signer = require('../../Signer').default
 
+const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
 
 function humanReadable (str) {
@@ -35,7 +36,12 @@ class Lattice extends Signer {
 
       if (this.accountLimit !== store('main.latticeSettings.accountLimit')) {
         this.accountLimit = store('main.latticeSettings.accountLimit')
-        this.open()
+
+        if (this.addresses.length < this.accountLimit) {
+          this.open()
+        } else {
+          this.update()
+        }
       }
     })
   }
@@ -108,10 +114,9 @@ class Lattice extends Signer {
         this.appVersion = { major, minor, patch }
 
         if (this.paired) {
-          if (this.addresses.length === 0) {
-            this.status = 'addresses'
-            this.update()
-          }
+          this.status = 'addresses'
+          this.update()
+
           await this.deriveAddresses()
         } else {
           this.status = 'pair'
@@ -156,20 +161,28 @@ class Lattice extends Signer {
   async deriveAddresses () {
     // TODO: Move these settings to be device spectifc
     const accountLimit = store('main.latticeSettings.accountLimit')
+
     try {
-      const req = {
-        currency: 'ETH',
-        startPath: this._getPath(0),
-        n: accountLimit,
-        skipCache: true
-      }
-      if (!this.client) throw new Error('Client not ready during deriveAddresse')
+      if (!this.client) throw new Error('Client not ready during deriveAddresses')
+
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
-      const result = await getAddresses(req)
+
+      while (this.addresses.length < accountLimit) {
+        const req = {
+          currency: 'ETH',
+          startPath: this._getPath(this.addresses.length),
+          n: Math.min(ADDRESS_LIMIT, accountLimit - this.addresses.length),
+          skipCache: true
+        }
+
+        const loadedAddresses = await getAddresses(req)
+        this.addresses = [...this.addresses, ...loadedAddresses]
+      }
+
       this.status = 'ok'
-      this.addresses = result
       this.update()
-      return result
+
+      return this.addresses
     } catch (err) {
       if (err === 'Error from device: Invalid Request') return log.warn('Lattice: Invalid Request')
       if (err === 'Error from device: Device Busy') return log.warn('Lattice: Device Busy')
@@ -253,6 +266,15 @@ class Lattice extends Signer {
 
   signerExists() {
     return (store('main.signers')[`lattice-${this.deviceId}`]) !== undefined
+  }
+
+  summary () {
+    const summary = super.summary()
+
+    return {
+      ...summary,
+      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
+    }
   }
 
   update () {
