@@ -13,7 +13,7 @@ class AddRing extends React.Component {
       password: '',
       status: '',
       error: false,
-      mode: 'manual',
+      mode: this.props.mode ? this.props.mode : 'manual',
       privateKey: '',
       keystore: '',
       keystorePassword: ''
@@ -55,9 +55,9 @@ class AddRing extends React.Component {
     this.focusActive()
   }
 
-  createManual () {
+  createKeystore () {
     this.next()
-    link.rpc('createFromPrivateKey', this.state.privateKey, this.state.password, (err, signer) => {
+    link.rpc('createFromKeystore', this.state.keystore, this.state.keystorePassword, this.state.password, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
@@ -69,8 +69,23 @@ class AddRing extends React.Component {
     })
   }
 
+  addKeystore () {
+    this.setState({ mode: 'keystore' })
+    this.next()
+    setTimeout(() => {
+      link.rpc('locateKeystore', (err, keystore) => {
+        if (err) {
+          this.setState({ keystore: '', error: err })
+        } else {
+          this.setState({ keystore })
+          this.next()
+        }
+      })
+    }, 640)
+  }
+
   restart () {
-    this.setState({ index: 0, adding: false, password: '', mode: 'manual', privateKey: '', keystore: '', keystorePassword: '' })
+    this.setState({ index: 1, adding: false, password: '', mode: 'manual', privateKey: '', keystore: '', keystorePassword: '' })
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)
@@ -102,8 +117,8 @@ class AddRing extends React.Component {
 
   currentForm () {
     let current
-    if (this.state.index === 0) current = this.forms.enterPrivateKey
-    if (this.state.index === 1) current = this.forms.manualCreatePassword
+    if (this.state.index === 2) current = this.forms.keystorePassword
+    if (this.state.index === 3) current = this.forms.keystoreCreatePassword
     return current
   }
 
@@ -138,19 +153,26 @@ class AddRing extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>Enter Private Key</div>
+                  <div className='addAccountItemOptionTitle'>Add Keystore File</div>
+                  <div className='addAccountItemOptionSubmit' style={{ marginTop: '10px' }} onMouseDown={() => this.addKeystore()}>Locate Keystore File (json)</div>
+                </div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>Locating Keystore</div>
+                </div>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>Enter Keystore Password</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <input type='password' tabIndex='-1' ref={this.forms.enterPrivateKey} value={this.state.privateKey} onChange={e => this.onChange('privateKey', e)} onFocus={e => this.onFocus('privateKey', e)} onBlur={e => this.onBlur('privateKey', e)} onKeyPress={e => this.keyPress(e, () => this.next())} />
+                    <input type='password' tabIndex='-1' ref={this.forms.keystorePassword} value={this.state.keystorePassword} onChange={e => this.onChange('keystorePassword', e)} onFocus={e => this.onFocus('keystorePassword', e)} onBlur={e => this.onBlur('keystorePassword', e)} onKeyPress={e => this.keyPress(e, () => this.next())} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  <div className='addAccountItemOptionTitle'>Create Password</div>
+                  <div className='addAccountItemOptionTitle'>Create Account Password</div>
                   <div className='addAccountItemOptionInputPhrase addAccountItemOptionInputPassword'>
                     <div className='addAccountItemOptionSubtitle'>password must be 12 characters or longer</div>
-                    <input type='password' tabIndex='-1' ref={this.forms.manualCreatePassword} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e, () => this.createManual())} />
+                    <input type='password' tabIndex='-1' ref={this.forms.keystoreCreatePassword} value={this.state.password} onChange={e => this.onChange('password', e)} onFocus={e => this.onFocus('password', e)} onBlur={e => this.onBlur('password', e)} onKeyPress={e => this.keyPress(e, () => this.createKeystore())} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.createManual()}>Create</div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.createKeystore()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{this.state.status}</div>

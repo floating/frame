@@ -60,7 +60,7 @@ class AddPhrase extends React.Component {
       } else {
         this.setState({ status: 'Successful', error: false })
         setTimeout(() => {
-          this.store.toggleAddAccount()
+          this.props.close()
         }, 2000)
       }
     })
