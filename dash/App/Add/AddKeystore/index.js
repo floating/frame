@@ -14,13 +14,10 @@ class AddRing extends React.Component {
       status: '',
       error: false,
       mode: this.props.mode ? this.props.mode : 'manual',
-      privateKey: '',
       keystore: '',
       keystorePassword: ''
     }
     this.forms = {
-      enterPrivateKey: React.createRef(),
-      manualCreatePassword: React.createRef(),
       keystorePassword: React.createRef(),
       keystoreCreatePassword: React.createRef()
     }

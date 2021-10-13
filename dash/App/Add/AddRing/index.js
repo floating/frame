@@ -14,15 +14,11 @@ class AddRing extends React.Component {
       status: '',
       error: false,
       mode: 'manual',
-      privateKey: '',
-      keystore: '',
-      keystorePassword: ''
+      privateKey: ''
     }
     this.forms = {
       enterPrivateKey: React.createRef(),
-      manualCreatePassword: React.createRef(),
-      keystorePassword: React.createRef(),
-      keystoreCreatePassword: React.createRef()
+      manualCreatePassword: React.createRef()
     }
   }
 
@@ -70,7 +66,7 @@ class AddRing extends React.Component {
   }
 
   restart () {
-    this.setState({ index: 0, adding: false, password: '', mode: 'manual', privateKey: '', keystore: '', keystorePassword: '' })
+    this.setState({ index: 0, adding: false, password: '', mode: 'manual', privateKey: '' })
     setTimeout(() => {
       this.setState({ status: '', error: false })
     }, 500)

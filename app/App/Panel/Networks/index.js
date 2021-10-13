@@ -2,18 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
-// import Client from '../Client'
 
 import Dropdown from '../../Components/Dropdown'
-
-// <Network key={type + id} id={id} name={networks[type][id].name} symbol={networks[type][id].symbol} explorer={networks[type][id].explorer} type={type} />
-
-
-// import React from 'react'
-// import Restore from 'react-restore'
-
-// import svg from '../../../../../resources/svg'
-// import link from '../../../../../resources/link'
 
 class _Network extends React.Component {
   constructor (props, context) {
@@ -132,15 +122,6 @@ class _Network extends React.Component {
   customPrimaryBlur () {
     if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
   }
-
-  // componentDidMount () {
-  //   const { id, type } = this.props
-  //   this.store.observer(() => {
-  //     const primaryCustom = this.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
-  //     const secondaryCustom = this.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
-  //     this.setState({ primaryCustom, secondaryCustom })
-  //   })
-  // }
 
   render () {
     const changed = (
@@ -440,78 +421,6 @@ class Settings extends React.Component {
     }
   }
 
-  // okProtocol (location) {
-  //   if (location === 'injected') return true
-  //   if (location.endsWith('.ipc')) return true
-  //   if (location.startsWith('wss://') || location.startsWith('ws://')) return true
-  //   if (location.startsWith('https://') || location.startsWith('http://')) return true
-  //   return false
-  // }
-
-  // customSecondaryFocus () {
-  //   if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
-  // }
-
-  // customSecondaryBlur () {
-  //   if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  // }
-
-  // customPrimaryFocus () {
-  //   if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
-  // }
-
-  // customPrimaryBlur () {
-  //   if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
-  // }
-
-  // inputPrimaryCustom (e) {
-  //   e.preventDefault()
-  //   clearTimeout(this.customPrimaryInputTimeout)
-  //   const value = e.target.value.replace(/\s+/g, '')
-  //   this.setState({ primaryCustom: value })
-  //   const { type, id } = this.store('main.currentNetwork')
-  //   this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', type, id, this.state.primaryCustom), 1000)
-  // }
-
-  // inputSecondaryCustom (e) {
-  //   e.preventDefault()
-  //   clearTimeout(this.customSecondaryInputTimeout)
-  //   const value = e.target.value.replace(/\s+/g, '')
-  //   this.setState({ secondaryCustom: value })
-  //   const { type, id } = this.store('main.currentNetwork')
-  //   this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', type, id, this.state.secondaryCustom), 1000)
-  // }
-
-  // localShake (key) {
-  //   const localShake = Object.assign({}, this.state.localShake)
-  //   localShake[key] = true
-  //   this.setState({ localShake })
-  //   setTimeout(() => {
-  //     const localShake = Object.assign({}, this.state.localShake)
-  //     localShake[key] = false
-  //     this.setState({ localShake })
-  //   }, 1010)
-  // }
-
-  // status (layer) {
-  //   const { type, id } = this.store('main.currentNetwork')
-  //   const connection = this.store('main.networks', type, id, 'connection', layer)
-  //   let status = connection.status
-  //   const current = connection.current
-
-  //   if (current === 'custom') {
-  //     if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage && !this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
-  //     if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
-  //   }
-  //   if (status === 'connected' && !connection.network) status = 'loading'
-  //   return (
-  //     <div className='connectionOptionStatus'>
-  //       {this.indicator(status)}
-  //       <div className='connectionOptionStatusText'>{status}</div>
-  //     </div>
-  //   )
-  // }
-
   discord () {
     return (
       <div className='discordInvite' onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
@@ -528,16 +437,6 @@ class Settings extends React.Component {
       </div>
     )
   }
-
-  // indicator (status) {
-  //   if (status === 'connected') {
-  //     return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-  //   } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-  //     return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-  //   } else {
-  //     return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
-  //   }
-  // }
 
   selectNetwork (network) {
     const [type, id] = network.split(':')
@@ -567,14 +466,6 @@ class Settings extends React.Component {
   }
 
   renderConnections (layer) {
-    // const { type, id } = this.store('main.currentNetwork')
-    // const networkPresets = this.store('main.networkPresets', type)
-    // let presets = networkPresets[id] || {}
-    // const { type, id } = this.store('main.currentNetwork')
-    // const networks = this.store('main.networks')
-    // const connection = networks[type][id].connection
-    // console.log(presets)
-    // const networks = this.store('main.networks')
     const nets = []
     const networks = this.store('main.networks')
     Object.keys(networks).forEach(type => {
@@ -658,46 +549,3 @@ class Settings extends React.Component {
 }
 
 export default Restore.connect(Settings)
-
-// <div className='signerPermission'>
-//   <div>{provider.url}</div>
-//   <div className={this.store('node.provider') ? 'nodeProviderStatus nodeProviderConnected' : 'nodeProviderStatus'}>
-//     {this.store('node.provider') ? 'connected' : 'disconnected'}
-//   </div>
-// </div>
-
-// <div className='signerPermission' onMouseDown={_ => this.store.runLocalNode()}>
-//   <div className='signerPermissionSetting'>{'Run Local Node'}</div>
-//   <div className={this.store('local.node.run') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
-//     <div className='signerPermissionToggleSwitch' />
-//   </div>
-// </div>
-
-/* <div className='signerPermission'>
-  <div className={this.store('main..connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
-    <div className='connectionOptionToggle'>
-      <div className='signerPermissionSetting'>Local</div>
-      <div className={this.store('main..connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'primary')}>
-        <div className='signerPermissionToggleSwitch' />
-      </div>
-    </div>
-    <div className='connectionOptionDetails'>
-      <div className='connectionOptionDetailsInset'>
-        {this.status(this.store('main..connection.local'))}
-        <div className='signerOptionSetWrap'>
-          <div className={this.state.localShake.custom ? 'signerOptionSet headShake' : 'signerOptionSet'} onMouseDown={() => this.localShake('custom')}>
-            <div className='signerOptionSetButton' />
-            {this.store('main..connection.local.type') ? (
-              <div className='signerOptionSetText'>{this.store('main..connection.local.type')}</div>
-            ) : (_ => {
-              const status = this.store('main..connection.local.status')
-              if (status === 'not found' || status === 'loading' || status === 'disconnected') return <div>scanning...</div>
-              return ''
-            })()}
-            <div className='signerOptionSetButton' />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> */
