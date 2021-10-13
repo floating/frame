@@ -133,14 +133,14 @@ class _Network extends React.Component {
     if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
   }
 
-  componentDidMount () {
-    const { id, type } = this.props
-    this.store.observer(() => {
-      const primaryCustom = this.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
-      const secondaryCustom = this.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
-      this.setState({ primaryCustom, secondaryCustom })
-    })
-  }
+  // componentDidMount () {
+  //   const { id, type } = this.props
+  //   this.store.observer(() => {
+  //     const primaryCustom = this.store('main.networks', type, id, 'connection.primary.custom') || this.customMessage
+  //     const secondaryCustom = this.store('main.networks', type, id, 'connection.secondary.custom') || this.customMessage
+  //     this.setState({ primaryCustom, secondaryCustom })
+  //   })
+  // }
 
   render () {
     const changed = (
