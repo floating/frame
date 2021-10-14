@@ -97,11 +97,11 @@ export class UsbSignerAdapter extends SignerAdapter {
     return false
   }
 
-  handleAttachedDevice (device: any) {
+  handleAttachedDevice (device: usb.Device) {
     throw new Error(`attempted to attach device with no adapter: ${device.toString()}`)
   }
 
-  handleDetachedDevice (device: any) {
+  handleDetachedDevice (device: usb.Device) {
     throw new Error(`attempted to detach device with no adapter: ${device.toString()}`)
   }
 }
