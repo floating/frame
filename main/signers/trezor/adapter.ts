@@ -5,6 +5,7 @@ import flex from '../../flex'
 import { SignerAdapter } from '../adapters'
 import Trezor from './Trezor'
 import store from '../../store'
+import Signer from '../signer'
 
 export default class TrezorSignerAdapter extends SignerAdapter {
   private flexListeners: { [event: string]: (device: TrezorDevice) => void };
@@ -119,6 +120,10 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     Object.entries(this.flexListeners).forEach(([event, listener]) => flex.off(event, listener))
 
     super.close()
+  }
+
+  reload (signer: Signer) {
+    signer.open()
   }
 
   private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {

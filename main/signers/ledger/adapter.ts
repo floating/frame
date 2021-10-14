@@ -53,6 +53,17 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     super.close()
   }
 
+  reload (signer: Signer) {
+    if (signer.type === 'ledger') {
+      const ledger = Object.values(this.knownSigners).find(s => s.devicePath === signer.devicePath)
+
+      ledger.disconnect().then(() => {
+        console.log('DISCONNECTED', ledger.status)
+        return ledger.open().then(() => ledger.connect())
+      })
+    }
+  }
+
   async handleAttachedDevice (usbDevice: usb.Device) {
     log.debug(`detected Ledger device attached`, usbDevice)
 
