@@ -14,3 +14,4 @@ test/.userData
 .parcel-cache
 *.tsbuildinfo
 scripts
+*.code-workspace
