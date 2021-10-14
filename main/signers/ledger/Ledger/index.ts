@@ -39,7 +39,7 @@ function wasRequestRejected(err: DeviceError) {
   return [27013].includes(err.statusCode)
 }
 function isDeviceAsleep (err: DeviceError) {
-  return [27404].includes(err.statusCode)
+  return [27404, 26628].includes(err.statusCode)
 }
 
 function needToOpenEthApp (err: DeviceError) {

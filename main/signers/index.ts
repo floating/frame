@@ -184,13 +184,16 @@ class Signers extends EventEmitter {
     const signer = this.signers[id]
     
     if (signer) {
-      let { type } = signer
+      const type = (signer.type === 'ring' || signer.type === 'seed') ? 'hot' : signer.type
 
-      signer.close()
-      delete this.signers[id]
+      if (this.scans[type] && typeof this.scans[type] === 'function') {
+        signer.close()
+        delete this.signers[id]
 
-      if (type === 'ring' || type === 'seed') type = 'hot'
-      if (this.scans[type] && typeof this.scans[type] === 'function') this.scans[type]()
+        this.scans[type]()
+      } else if (type in this.adapters) {
+        this.adapters[type].adapter.reload(signer)
+      }
     }
   }
 

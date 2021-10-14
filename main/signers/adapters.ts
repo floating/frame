@@ -2,6 +2,7 @@ import { EventEmitter } from 'stream'
 
 import usb from 'usb'
 import HID from 'node-hid'
+import Signer from './signer'
 
 function wait (ms: number) {
   return new Promise(resolve => {
@@ -20,18 +21,7 @@ export class SignerAdapter extends EventEmitter {
 
   open () {}
   close () {}
-
-  supportsDevice (device: any) { 
-    return false
-  }
-
-  handleAttachedDevice (device: any) {
-    throw new Error(`attempted to attach device with no adapter: ${device.toString()}`)
-  }
-
-  handleDetachedDevice (device: any) {
-    throw new Error(`attempted to detach device with no adapter: ${device.toString()}`)
-  }
+  reload (signer: Signer) { }
 }
 
 export class UsbSignerAdapter extends SignerAdapter {
@@ -105,5 +95,13 @@ export class UsbSignerAdapter extends SignerAdapter {
 
   supportsDevice (device: usb.Device) {
     return false
+  }
+
+  handleAttachedDevice (device: usb.Device) {
+    throw new Error(`attempted to attach device with no adapter: ${device.toString()}`)
+  }
+
+  handleDetachedDevice (device: usb.Device) {
+    throw new Error(`attempted to detach device with no adapter: ${device.toString()}`)
   }
 }
