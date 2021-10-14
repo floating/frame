@@ -93,7 +93,7 @@ export class UsbSignerAdapter extends SignerAdapter {
     ].join(':')
   }
 
-  supportsDevice (device: usb.Device) { 
+  supportsDevice (device: usb.Device) {
     return false
   }
 
