@@ -51,7 +51,7 @@ const migrations = {
         initial.main.networks.ethereum[id].connection.primary.on = connection.local.on
         initial.main.networks.ethereum[id].connection.secondary.on = connection.secondary.on
       })
-      initial.main.currentNetwork.id = connection.network + '' || initial.main.currentNetwork.id || '1'
+      initial.main.currentNetwork.id = connection.network || initial.main.currentNetwork.id || 1
     }
 
     Object.keys(initial.main.networks.ethereum).forEach(id => {
@@ -83,7 +83,7 @@ const migrations = {
       type: 'ethereum',
       symbol: 'MATIC',
       name: 'Polygon',
-      explorer: 'https://explorer.matic.network',
+      explorer: 'https://polygonscan.com',
       gas: {
         price: {
           selected: 'standard',
@@ -202,7 +202,6 @@ const migrations = {
     return initial
   },
   10: initial => {  // Add Optimism to persisted networks
-    // if (!initial.main.networks.ethereum[10]) {
     initial.main.networks.ethereum[10] = {
       id: 10,
       type: 'ethereum',
@@ -338,6 +337,32 @@ const migrations = {
       }
     }
 
+    return initial
+  },
+  15: initial => {
+    // Polygon
+    if (initial.main.networks.ethereum['137']) {
+      const oldExplorer = initial.main.networks.ethereum['137'].explorer
+
+      if (!oldExplorer || oldExplorer.endsWith('explorer.matic.network')) {
+        // only replace if it hasn't been changed from the initial setting
+        initial.main.networks.ethereum['137'].explorer = 'https://polygonscan.com'
+      }
+    }
+
+    return initial
+  },
+  16: initial => {
+    if (initial.main.currentNetwork?.id) {
+      initial.main.currentNetwork.id = parseInt(initial.main.currentNetwork.id)
+    }
+    Object.keys(initial.main.networks.ethereum).forEach(chain => {
+      try {
+        initial.main.networks.ethereum[chain].id = parseInt(initial.main.networks.ethereum[chain].id)
+      } catch (e) {
+        log.error(e)
+      }
+    })
     return initial
   }
 }

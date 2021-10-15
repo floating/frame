@@ -11,7 +11,7 @@ class TxFee extends React.Component {
     super(props, context)
     this.chain = { 
       type: 'ethereum', 
-      id: parseInt(props.req.data.chainId, 'hex').toString()
+      id: parseInt(props.req.data.chainId, 'hex')
     }
   }
   toDisplayUSD (bn) {

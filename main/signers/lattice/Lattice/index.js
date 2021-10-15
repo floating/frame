@@ -7,8 +7,9 @@ const { promisify } = require('util')
 const { sign, signerCompatibility, londonToLegacy } = require('../../../transaction')
 
 const store = require('../../../store')
-const Signer = require('../../Signer')
+const Signer = require('../../Signer').default
 
+const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
 
 function humanReadable (str) {
@@ -35,7 +36,12 @@ class Lattice extends Signer {
 
       if (this.accountLimit !== store('main.latticeSettings.accountLimit')) {
         this.accountLimit = store('main.latticeSettings.accountLimit')
-        this.open()
+
+        if (this.addresses.length < this.accountLimit) {
+          this.open()
+        } else {
+          this.update()
+        }
       }
     })
   }
@@ -48,6 +54,7 @@ class Lattice extends Signer {
     } else {
       baseUrl = 'https://signing.gridpl.us'
     }
+
     suffix = store('main.latticeSettings.suffix')
     privKey = store('main.lattice', this.deviceId, 'privKey')
 
@@ -62,7 +69,8 @@ class Lattice extends Signer {
       this.baseUrl = baseUrl
       this.privKey = privKey
       this.client = new Client({
-        name: suffix ? `Frame-${suffix}` : 'Frame',
+        // Lattice supports a suffix with a max of 24 characters
+        name: suffix ? `Frame-${suffix.substring(0, 18)}` : 'Frame',
         crypto: crypto,
         timeout: 120000,
         baseUrl,
@@ -106,10 +114,9 @@ class Lattice extends Signer {
         this.appVersion = { major, minor, patch }
 
         if (this.paired) {
-          if (this.addresses.length === 0) {
-            this.status = 'addresses'
-            this.update()
-          }
+          this.status = 'addresses'
+          this.update()
+
           await this.deriveAddresses()
         } else {
           this.status = 'pair'
@@ -154,20 +161,28 @@ class Lattice extends Signer {
   async deriveAddresses () {
     // TODO: Move these settings to be device spectifc
     const accountLimit = store('main.latticeSettings.accountLimit')
+
     try {
-      const req = {
-        currency: 'ETH',
-        startPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, 0],
-        n: accountLimit,
-        skipCache: true
-      }
-      if (!this.client) throw new Error('Client not ready during deriveAddresse')
+      if (!this.client) throw new Error('Client not ready during deriveAddresses')
+
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
-      const result = await getAddresses(req)
+
+      while (this.addresses.length < accountLimit) {
+        const req = {
+          currency: 'ETH',
+          startPath: this._getPath(this.addresses.length),
+          n: Math.min(ADDRESS_LIMIT, accountLimit - this.addresses.length),
+          skipCache: true
+        }
+
+        const loadedAddresses = await getAddresses(req)
+        this.addresses = [...this.addresses, ...loadedAddresses]
+      }
+
       this.status = 'ok'
-      this.addresses = result
       this.update()
-      return result
+
+      return this.addresses
     } catch (err) {
       if (err === 'Error from device: Invalid Request') return log.warn('Lattice: Invalid Request')
       if (err === 'Error from device: Device Busy') return log.warn('Lattice: Device Busy')
@@ -253,6 +268,15 @@ class Lattice extends Signer {
     return (store('main.signers')[`lattice-${this.deviceId}`]) !== undefined
   }
 
+  summary () {
+    const summary = super.summary()
+
+    return {
+      ...summary,
+      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
+    }
+  }
+
   update () {
     // If this signer exists, update with current params
     if (this.signerExists())
@@ -279,14 +303,18 @@ class Lattice extends Signer {
     return Buffer.from(this.normalize(hex), 'hex')
   }
 
+  _getPath (index) {
+    return [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+  }
+
   // Standard Methods
   async _signMessage (index, protocol, payload) {
     const clientSign = promisify(this.client.sign).bind(this.client)
 
     const data = {
-      protocol: protocol,
-      payload: payload,
-      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index] // setup for other derivations
+      protocol,
+      payload,
+      signerPath: this._getPath(index)
     }
 
     const signOpts = {
@@ -320,7 +348,13 @@ class Lattice extends Signer {
     }
   }
 
-  async signTypedData (index, typedData, cb) {
+  async signTypedData (index, version, typedData, cb) {
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
+
+    if ((parseInt(versionNum) || 0) < 4) {
+      return cb(new Error(`Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`), undefined)
+    }
+
     try {
       const signature = await this._signMessage(index, 'eip712', typedData)
 
@@ -342,7 +376,7 @@ class Lattice extends Signer {
       nonce: utils.hexToNumber(txJson.nonce),
       gasLimit: utils.hexToNumber(txJson.gasLimit),
       useEIP155: true,
-      signerPath: [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+      signerPath: this._getPath(index)
     }
 
     if (type) {
@@ -370,7 +404,7 @@ class Lattice extends Signer {
       const clientSign = promisify(this.client.sign).bind(this.client)
 
       return clientSign(signOpts).then(result => ({
-        v: result.sig.v[0],
+        v: result.sig.v.toString('hex'),
         r: result.sig.r,
         s: result.sig.s
       }))

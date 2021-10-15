@@ -58,7 +58,7 @@ async function loadPlatforms () {
 
     allPlatforms = platforms.reduce((platformMapping, platform) => {
       if (platform.chain_identifier) {
-        const chainId = platform.chain_identifier.toString()
+        const chainId = platform.chain_identifier
         return { ...platformMapping, [chainId]: platform.id }
       }
 
@@ -111,7 +111,7 @@ async function loadRates (ids: string[], chainId: number) {
 
   try {
     const symbolQuotes = await fetchPrices(Object.keys(lookupIds.symbols))
-    const tokenQuotes = await fetchTokenPrices(lookupIds.contracts, platforms[chainId.toString()] || 'ethereum')
+    const tokenQuotes = await fetchTokenPrices(lookupIds.contracts, platforms[chainId] || 'ethereum')
 
     return Object.entries({ ...symbolQuotes, ...tokenQuotes }).reduce((rates, [lookupId, quote]) => {
       const originalId = lookupIds.symbols[lookupId] || lookupId // could be symbol or contract address

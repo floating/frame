@@ -21,30 +21,6 @@ class SignerStatus extends React.Component {
     this.inputRef = React.createRef()
   }
 
-  // clickListener (event) {
-  //   console.log('found a clikc')
-  //   const statusRef = ReactDOM.findDOMNode(this.statusRef.current)
-  //   if (statusRef && statusRef.contains(event.target)) {
-  //     console.log('inside statu ref')
-  //     this.setState({ hideStatus: false })
-  //   } else  {
-  //     console.log('outside statu ref')
-  //     this.setState({ hideStatus: true })
-  //   }
-  //   // if (!element.contains(event.target)) { // or use: event.target.closest(selector) === null
-  //   //   element.style.display = 'none'
-  //   //   removeClickListener()
-  //   // }
-  // }
-
-  // componentDidMount () {
-  //   document.addEventListener('mousedown', this.clickListener.bind(this))
-  // } 
-
-  // componentWillUnmount () {
-  //   document.removeEventListener('mousedown', this.clickListener.bind(this))
-  // }
-
   shake () {
     this.setState({ shake: true })
     setTimeout(() => {

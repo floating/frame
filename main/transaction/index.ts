@@ -1,5 +1,5 @@
 import { BN, addHexPrefix, stripHexPrefix, bnToHex, intToHex } from 'ethereumjs-util'
-import { JsonTx, TransactionFactory, TxData } from '@ethereumjs/tx'
+import { JsonTx, TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
@@ -8,6 +8,7 @@ const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
   ledger: version => version.major >= 2 || (version.major >= 1 && version.minor >= 9),
+  trezor: version => version.major >= 3 || (version.major >= 2 && version.minor >= 4 && version.patch >= 2),
   lattice: version =>  version.major >= 1 || version.minor >= 11
 }
 
@@ -21,7 +22,7 @@ interface Signature {
   s: string
 }
 
-interface AppVersion {
+export interface AppVersion {
   major: number,
   minor: number,
   patch: number
@@ -34,6 +35,8 @@ export interface RawTransaction {
 
 export interface TransactionData extends JsonTx {
   warning?: string
+  chainId: string,
+  type: string
 }
 
 export interface SignerCompatibility  {
@@ -48,7 +51,6 @@ export interface SignerSummary {
   type: string,
   addresses: string[],
   status: string,
-  liveAddressesFound: number,
   appVersion: AppVersion
 }
 
@@ -85,6 +87,23 @@ function usesBaseFee (rawTx: RawTransaction) {
   return typeSupportsBaseFee(rawTx.type)
 }
 
+function maxFee (rawTx: RawTransaction) {
+  const chainId = parseInt(rawTx.chainId)
+
+  // for ETH-based chains, the max fee should be 2 ETH
+  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 42161, 421611].includes(chainId)) {
+    return 2 * 1e18
+  }
+
+  // for Fantom, the max fee should be 250 FTM
+  if ([250, 4002].includes(chainId)) {
+    return 250 * 1e18
+  }
+
+  // for all other chains, default to 10 of the chain's currency
+  return 10 * 1e18
+}
+
 function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): TransactionData {
   const txData: TransactionData = { ...rawTx }
 
@@ -116,10 +135,9 @@ function hexifySignature ({ v, r, s }: Signature) {
   }
 }
 
-async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<Signature>) {
+async function sign (rawTx: TransactionData, signingFn: (tx: TypedTransaction) => Promise<Signature>) {
   const common = chainConfig(parseInt(rawTx.chainId), parseInt(rawTx.type) === 2 ? 'london' : 'berlin')
 
-  // @ts-ignore
   const tx = TransactionFactory.fromTxData(rawTx, { common })
 
   return signingFn(tx).then(sig => {
@@ -138,6 +156,7 @@ async function sign (rawTx: RawTransaction, signingFn: (tx: TxData) => Promise<S
 
 export {
   usesBaseFee,
+  maxFee,
   populate,
   sign,
   signerCompatibility,

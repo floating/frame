@@ -26,13 +26,9 @@ const store = require('../store')
 const chains = require('../chains')
 const accounts = require('../accounts')
 
-const { populate: populateTransaction, usesBaseFee } = require('../transaction')
+const { populate: populateTransaction, usesBaseFee, maxFee } = require('../transaction')
 
 const version = require('../../package.json').version
-
-function equalCaseInsensitive(s1, s2) {
-  return s1.toLowerCase() === s2.toLowerCase()
-}
 
 class Provider extends EventEmitter {
   constructor () {
@@ -206,7 +202,7 @@ class Provider extends EventEmitter {
     const payload = req.payload
     const [address, data] = payload.params
 
-    accounts.signTypedData(req.version, address, data, (err, sig) => {
+    accounts.signTypedData(req.version, address, { ...data }, (err, sig) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
@@ -224,12 +220,11 @@ class Provider extends EventEmitter {
     })
   }
 
-  feeTotalOverMax (rawTx) {
-    const FEE_MAX = 2 * 1e18 // 2 Ether
+  feeTotalOverMax (rawTx, maxTotalFee) {
     const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas, 'hex') : parseInt(rawTx.gasPrice, 'hex')
     const gasLimit = parseInt(rawTx.gasLimit, 'hex')
     const totalFee = maxFeePerGas * gasLimit
-    return totalFee > FEE_MAX
+    return totalFee > maxTotalFee
   }
 
   signAndSend (req, cb) {
@@ -238,10 +233,19 @@ class Provider extends EventEmitter {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
-    const payload = req.payload
 
-    if (this.feeTotalOverMax(rawTx)) {
-      const err = 'Max fee is over hard limit (2 ETH)'
+    const payload = req.payload
+    const maxTotalFee = maxFee(rawTx)
+
+    if (this.feeTotalOverMax(rawTx, maxTotalFee)) {
+      const chainId = parseInt(rawTx.chainId)
+      const symbol = store(`main.networks.ethereum.${chainId}.symbol`)
+      const displayAmount = symbol
+        ? ` (${Math.floor(maxTotalFee / 1e18)} ${symbol})`
+        : ''
+
+      const err = `Max fee is over hard limit${displayAmount}`
+
       this.resError(err, payload, res)
       cb(new Error(err))
     } else {
@@ -272,7 +276,7 @@ class Provider extends EventEmitter {
                 }
               }, {
                 type: 'ethereum',
-                id: parseInt(req.data.chainId, 'hex').toString()
+                id: parseInt(req.data.chainId, 'hex')
               })
             }
             const broadcastTimer = setInterval(() => cast(), 1000)
@@ -473,9 +477,10 @@ class Provider extends EventEmitter {
 
     if (
         version !== 'V4' &&
-        equalCaseInsensitive((currentAccount.lastSignerType || ''), 'ledger')
+        ['ledger', 'lattice'].includes((currentAccount.lastSignerType || '').toLowerCase())
       ) {
-      return this.resError('Ledger only supports eth_signTypedData_v4+', payload, res)
+        const signerName = currentAccount.lastSignerType[0].toUpperCase() + currentAccount.lastSignerType.substring(1)
+        return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = uuid()
@@ -506,32 +511,86 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${version}` })
   }
 
+  switchEthereumChain (payload, res) {
+    try {
+      const params = payload.params
+      if (!params || !params[0]) throw new Error('Params not supplied')
+      
+      const type = 'ethereum'
+
+      const chainId = parseInt(params[0].chainId)
+      if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
+
+      // Check if chain exists 
+      const exists = Boolean(store('main.networks', type, chainId))
+      if (exists === false) throw new Error('Chain does not exist')
+
+      const handlerId = uuid()
+      this.handlers[handlerId] = res
+      
+      // Ask user if they want to switch chains
+      accounts.addRequest({
+        handlerId,
+        type: 'switchChain',
+        chain: { 
+          type, 
+          id: params[0].chainId
+        },
+        account: accounts.getAccounts()[0],
+        origin: payload._origin
+      }, res)
+
+    } catch (e) {
+      return this.resError(e, payload, res)
+    }
+  }
+
   addEthereumChain (payload, res) {
     if (!payload.params[0]) return this.resError('addChain request missing params', payload, res)
 
-    const id = payload.params[0].chainId
     const type = 'ethereum'
-    const name = payload.params[0].chainName
-    const explorer = payload.params[0].blockExplorerUrls ? payload.params[0].blockExplorerUrls[0] : ''
-    const symbol = payload.params[0].nativeCurrency ? payload.params[0].nativeCurrency.symbol : ''
-    const rpcUrl = payload.params[0].rpcUrls ? payload.params[0].rpcUrls[0] : ''
+    const { 
+      chainId, 
+      chainName, 
+      nativeCurrency, 
+      rpcUrls = [], 
+      blockExplorerUrls = [],
+      iconUrls = [] 
+    } = payload.params[0]
+
+    if (!chainId) return this.resError('addChain request missing chainId', payload, res)
+    if (!chainName) return this.resError('addChain request missing chainName', payload, res)
+    if (!nativeCurrency) return this.resError('addChain request missing nativeCurrency', payload, res)
 
     const handlerId = uuid()
     this.handlers[handlerId] = res
-    accounts.addRequest({
-      handlerId,
-      type: 'addChain',
-      chain : {
-        id,
-        type,
-        name,
-        explorer,
-        symbol,
-        rpcUrl
-      },
-      account: accounts.getAccounts()[0],
-      origin: payload._origin
-    }, res)
+
+    // Check if chain exists
+    const id = parseInt(chainId)
+    if (!Number.isInteger(id)) throw new Error('Invalid chain id')
+
+    const exists = Boolean(store('main.networks', type, id))
+    if (exists) {
+      // Ask user if they want to switch chains
+      this.switchEthereumChain(payload, res)
+    } else {
+      // Ask user if they want to add this chain
+      accounts.addRequest({
+        handlerId,
+        type: 'addChain',
+        chain: {
+          type,
+          id: chainId,
+          name: chainName,
+          nativeCurrency,
+          rpcUrls,
+          blockExplorerUrls, 
+          iconUrls
+        },
+        account: accounts.getAccounts()[0],
+        origin: payload._origin
+      }, res)
+    }
   }
 
   sendAsync (payload, cb) {
@@ -564,6 +623,7 @@ class Provider extends EventEmitter {
     }
     
     if (method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
+    if (method === 'wallet_switchEthereumChain') return this.switchEthereumChain(payload, res)
 
     // Connection dependant methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)

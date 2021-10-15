@@ -109,7 +109,11 @@ class Settings extends React.Component {
   inputLatticeSuffix (e) {
     e.preventDefault()
     clearTimeout(this.inputLatticeSuffixTimeout)
-    const value = e.target.value.replace(/\s+/g, '')
+
+    // Lattice only supports a suffix of up to 24 characters, and we append "Frame-"
+    // to the front so limit it to 18 characters
+    const value = e.target.value.replace(/\s+/g, '').substring(0, 18)
+
     this.setState({ latticeSuffix: value })
     // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeSuffixTimeout = setTimeout(() => link.send('tray:action', 'setLatticeSuffix', this.state.latticeSuffix), 1000)
@@ -379,7 +383,9 @@ class Settings extends React.Component {
                 onChange={(value) => link.send('tray:action', 'setLatticeAccountLimit', value)}
                 options={[
                   { text: '5', value: 5 },
-                  { text: '10', value: 10 }
+                  { text: '10', value: 10 },
+                  { text: '20', value: 20 },
+                  { text: '40', value: 40 },
                 ]}
               />
             </div>

@@ -3,12 +3,10 @@ import { utils } from 'ethers'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
-log.transports.console.level = false
-
 const mockAccounts = {}
 const mockStore = {
   'main.accounts': {
-    "0x22dd63c3619818fdbc262c78baee43cb61e9cccf": {}
+    '0x22dd63c3619818fdbc262c78baee43cb61e9cccf': {}
   },
   'main.currentNetwork': {
     type: 'ethereum',
@@ -45,11 +43,17 @@ jest.mock('../../../main/store', () => {
 })
 
 beforeAll(async () => {
+  log.transports.console.level = false
+
   mockConnection = new MockConnection()
 
   // need to import this after mocks are set up
   provider = (await import('../../../main/provider')).default
   provider.handlers = {}
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
 })
 
 describe('#getRawTx', () => {
@@ -98,7 +102,11 @@ describe('#send', () => {
     })
 
     mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-    mockAccounts.addRequest = req => accountRequests.push(req)
+    mockAccounts.addRequest = (req, res) => {
+      accountRequests.push(req)
+      if (res) res()
+    }
+    mockAccounts.getAccounts = () => [address]
   })
 
   describe('#eth_chainId', () => {
@@ -114,6 +122,101 @@ describe('#send', () => {
         expect(response.result).toBe('0x4')
         done()
       }, { type: 'ethereum', id: 4 })
+    })
+  })
+
+  describe('#wallet_addEthereumChain', () => {
+    it('adds the current chain to the store', done => {
+      send({ 
+        method: 'wallet_addEthereumChain', 
+        params: [
+          {
+            chainId: '0x1234', // A 0x-prefixed hexadecimal string
+            chainName: 'New Chain',
+            nativeCurrency: {
+              name: 'New',
+              symbol: 'NEW', // 2-6 characters long
+              decimals: 18
+            },
+            rpcUrls: ['https://pylon.link'],
+            blockExplorerUrls: ['https://pylon.link'],
+            iconUrls: [''] // Currently ignored
+          }
+        ] 
+      }, () => {
+        try {
+          expect(accountRequests).toHaveLength(1)
+          expect(accountRequests[0].handlerId).toBeTruthy()
+          expect(accountRequests[0].type).toBe('addChain')
+          done()
+        } catch (e) { 
+          done(e) 
+        }
+      })
+    })
+
+    it('adds switch chain request if chain exists', done => {
+      send({ 
+        method: 'wallet_addEthereumChain', 
+        params: [
+          {
+            chainId: '0x1', // A 0x-prefixed hexadecimal string
+            chainName: 'Mainnet',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH', // 2-6 characters long
+              decimals: 18
+            },
+            rpcUrls: ['https://pylon.link'],
+            blockExplorerUrls: ['https://pylon.link'],
+            iconUrls: [''] // Currently ignored
+          }
+        ] 
+      }, () => {
+        try {
+          expect(accountRequests).toHaveLength(1)
+          expect(accountRequests[0].handlerId).toBeTruthy()
+          expect(accountRequests[0].type).toBe('switchChain')
+          done()
+        } catch (e) { 
+          done(e) 
+        }
+      })
+    })
+  })
+
+  describe('#wallet_switchEthereumChain', () => {
+    it('switches to chain if chain exists in store', done => {
+      send({ 
+        method: 'wallet_switchEthereumChain', 
+        params: [{
+          chainId: '0x1'
+        }]
+      }, () => {
+        try {
+          expect(accountRequests).toHaveLength(1)
+          expect(accountRequests[0].handlerId).toBeTruthy()
+          expect(accountRequests[0].type).toBe('switchChain')
+          done()
+        } catch (e) { 
+          done(e) 
+        }
+      })
+    })
+    it('rejects switch if chain doesn\'t exist in the store', done => {
+      send({
+        method: 'wallet_switchEthereumChain', 
+        params: [{
+          chainId: '0x1234'
+        }]
+      }, () => {
+        try {
+          expect(accountRequests).toHaveLength(0)
+          done()
+        } catch (e) { 
+          done(e) 
+        }
+      })
     })
   })
 
@@ -309,7 +412,20 @@ describe('#send', () => {
       const params = [address, typedData]
 
       send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error.message).toBeTruthy()
+        expect(err.error.message).toMatch(/Ledger/)
+        expect(err.error.code).toBe(-1)
+        done()
+      })
+    }, 100)
+
+    it('does not submit a V3 request to a Lattice', done => {
+      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'lattice' })
+
+      // Lattice only supports V4+
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v3', params }, err => {
+        expect(err.error.message).toMatch(/Lattice/)
         expect(err.error.code).toBe(-1)
         done()
       })
@@ -340,9 +456,24 @@ describe('#signAndSend', () => {
       data: tx
     }
   })
+
+  it('allows a Fantom transaction with fees over the mainnet hard limit', done => {
+    // 200 gwei * 10M gas = 2 FTM
+    tx.chainId = '0xfa'
+    tx.type = '0x0'
+    tx.gasPrice = utils.parseUnits('210', 'gwei').toHexString()
+    tx.gasLimit = addHexPrefix((1e7).toString(16))
+
+    mockAccounts.signTransaction = () => done()
+
+    signAndSend(err => {
+      done('unexpected error :' + err.message)
+    })
+  })
   
-  it('does not allow a pre-EIP-1559 transaction with fees that exceed the hard limit', done => {
+  it('does not allow a pre-EIP-1559 transaction with fees that exceeds the hard limit', done => {
     // 200 gwei * 10M gas = 2 ETH
+    tx.chainId = '0x1'
     tx.type = '0x0'
     tx.gasPrice = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))
@@ -355,6 +486,7 @@ describe('#signAndSend', () => {
   
   it('does not allow a post-EIP-1559 transaction with fees that exceed the hard limit', done => {
     // 200 gwei * 10M gas = 2 ETH
+    tx.chainId = '0x1'
     tx.type = '0x2'
     tx.maxFeePerGas = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))

@@ -76,20 +76,28 @@ function createWorker () {
 
   scanWorker.on('error', err => {
     if (err.code === 'ERR_IPC_CHANNEL_CLOSED') {
-      console.error('scan worker IPC channel closed! restarting worker')
+      log.error('scan worker IPC channel closed!')
 
       kill()
-      setTimeout(restart, 1000 * 5)
+
+      if (heartbeat) {
+        log.info('restarting scan worker after IPC channel closed')
+        setTimeout(restart, 1000 * 5)
+      }
     }
 
     log.error(new Error(`scan worker error with code: ${err.code}`))
   })
 
   scanWorker.on('exit', code => {
-    log.warn(`scan worker exited with code ${code}, restarting worker`)
+    log.warn(`scan worker exited with code ${code}`)
 
     kill()
-    setTimeout(restart, 1000 * 5)
+
+    if (heartbeat) {
+      log.info(`restarting scan worker after exiting with code ${code}`)
+      setTimeout(restart, 1000 * 5)
+    }
   })
 
   return scanWorker
@@ -232,6 +240,10 @@ function restart () {
 
 function kill () {
   if (scanWorker) {
+    const eventTypes = ['message', 'error', 'exit']
+
+    eventTypes.forEach(evt => scanWorker.removeAllListeners(evt))
+
     scanWorker.kill()
     scanWorker = null
   }

@@ -1,7 +1,7 @@
 import { addHexPrefix, stripHexPrefix } from 'ethereumjs-util'
 import Common from '@ethereumjs/common'
 
-import { usesBaseFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
+import { usesBaseFee, maxFee, londonToLegacy, signerCompatibility, populate, sign } from '../../../main/transaction'
 
 describe('#signerCompatibility', () => {
   it('is always compatible with legacy transactions', () => {
@@ -118,8 +118,8 @@ describe('#signerCompatibility', () => {
     expect(compatibility.compatible).toBe(true)
   })
 
-  it('is not compatible for eip-1559 transactions on Trezor signers', () => {
-    const appVersion = { major: 1, minor: 1, patch: 1 }
+  it('is not compatible for eip-1559 transactions on Trezor signers using firmware prior to 2.4.2', () => {
+    const appVersion = { major: 2, minor: 3, patch: 1 }
     const tx = {
       type: '0x2'
     }
@@ -129,6 +129,32 @@ describe('#signerCompatibility', () => {
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')
     expect(compatibility.compatible).toBe(false)
+  })
+
+  it('is compatible for eip-1559 transactions on Trezor signers using firmware 2.4.2+', () => {
+    const appVersion = { major: 2, minor: 4, patch: 3 }
+    const tx = {
+      type: '0x2'
+    }
+
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
+
+    expect(compatibility.signer).toBe('trezor')
+    expect(compatibility.tx).toBe('london')
+    expect(compatibility.compatible).toBe(true)
+  })
+
+  it('is compatible for eip-1559 transactions on Trezor signers using firmware 3.x', () => {
+    const appVersion = { major: 3, minor: 2, patch: 4 }
+    const tx = {
+      type: '0x2'
+    }
+
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
+
+    expect(compatibility.signer).toBe('trezor')
+    expect(compatibility.tx).toBe('london')
+    expect(compatibility.compatible).toBe(true)
   })
 })
 
@@ -194,6 +220,32 @@ describe('#usesBaseFee', () => {
     }
 
     expect(usesBaseFee(tx)).toBe(true)
+  })
+})
+
+describe('#maxFee', () => {
+  it('sets the max fee as 2 ETH on mainnet', () => {
+    const tx = {
+      chainId: addHexPrefix((1).toString(16))
+    }
+
+    expect(maxFee(tx)).toBe(2e18)
+  })
+
+  it('sets the max fee as 1000 FTM on Fantom', () => {
+    const tx = {
+      chainId: addHexPrefix((250).toString(16))
+    }
+
+    expect(maxFee(tx)).toBe(250e18)
+  })
+
+  it('sets the max fee as 10 on other chains', () => {
+    const tx = {
+      chainId: addHexPrefix((255).toString(16))
+    }
+
+    expect(maxFee(tx)).toBe(1e19)
   })
 })
 

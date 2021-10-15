@@ -222,7 +222,7 @@ const initial = {
     },
     currentNetwork: main('currentNetwork', {
       type: 'ethereum',
-      id: '1'
+      id: 1
     }),
     networkPresets: {
       ethereum: {
@@ -424,7 +424,7 @@ const initial = {
           layer: 'sidechain',
           symbol: 'MATIC',
           name: 'Polygon',
-          explorer: 'https://explorer.matic.network',
+          explorer: 'https://polygonscan.com',
           gas: {
             price: {
               selected: 'standard',

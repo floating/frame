@@ -2,6 +2,7 @@ node_modules
 .DS_Store
 bundle
 .cache
+cache
 hot.json
 nohot.json
 config.json
@@ -13,3 +14,4 @@ test/.userData
 .parcel-cache
 *.tsbuildinfo
 scripts
+*.code-workspace

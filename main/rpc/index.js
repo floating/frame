@@ -46,8 +46,24 @@ const rpc = {
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
-  trezorPin: (id, pin, cb) => signers.trezorPin(id, pin, cb),
-  trezorPhrase: (id, phrase, cb) => signers.trezorPhrase(id, phrase, cb),
+  trezorPin: (id, pin, cb) => {
+    const signer = signers.get(id)
+    if (signer && signer.setPin) {
+      signer.setPin(pin)
+      cb(null, { status: 'ok' })
+    } else {
+      cb(new Error('Set pin not available'))
+    }
+  },
+  trezorPhrase: (id, phrase, cb) => {
+    const signer = signers.get(id)
+    if (signer && signer.setPhrase) {
+      signer.setPhrase(phrase || '')
+      cb(null, { status: 'ok' })
+    } else {
+      cb(new Error('Set phrase not available'))
+    }
+  },
   createLattice: async (id, cb) => {
     try {
       cb(null, await signers.createLattice(id))
@@ -136,15 +152,17 @@ const rpc = {
     signers.createFromPhrase(phrase, password, cb)
   },
   locateKeystore (cb) {
-    const keystore = dialog.showOpenDialog({ properties: ['openFile'] })
-    if (keystore && keystore.length) {
-      fs.readFile(keystore[0], 'utf8', (err, data) => {
-        if (err) return cb(err)
-        try { cb(null, JSON.parse(data)) } catch (err) { cb(err) }
-      })
-    } else {
-      cb(new Error('No Keystore Found'))
-    }
+    dialog.showOpenDialog({ properties: ['openFile'] }).then(file => {
+      const keystore = file || { filePaths: [] }
+      if ((keystore.filePaths || []).length > 0) {
+        fs.readFile(keystore.filePaths[0], 'utf8', (err, data) => {
+          if (err) return cb(err)
+          try { cb(null, JSON.parse(data)) } catch (err) { cb(err) }
+        })
+      } else {
+        cb(new Error('No Keystore Found'))
+      }
+    }).catch(cb)
   },
   createFromKeystore (keystore, keystorePassword, password, cb) {
     signers.createFromKeystore(keystore, keystorePassword, password, cb)
@@ -167,14 +185,15 @@ const rpc = {
   lockSigner (id, cb) {
     signers.lock(id, cb)
   },
-  remove (id, cb) {
-    signers.remove(id, cb)
+  remove (id) {
+    signers.remove(id)
   },
   resolveAragonName (name, cb) {
     resolveName(name).then(result => cb(null, result)).catch(cb)
   },
   verifyAddress (cb) {
-    accounts.verifyAddress(true, cb)
+    const res = (err, data) => cb(err, data || false)
+    accounts.verifyAddress(true, res)
   },
   setBaseFee (fee, handlerId, cb) {
     accounts.setBaseFee(fee, handlerId, true, cb)

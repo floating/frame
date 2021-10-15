@@ -1,5 +1,7 @@
-import fetch from 'node-fetch'
 import log from 'electron-log'
+
+// @ts-ignore (no type file)
+import fetch from 'node-fetch'
 
 interface JsonResponse {
   status: number,
