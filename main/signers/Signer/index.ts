@@ -62,7 +62,7 @@ export default class Signer extends EventEmitter {
   }
 
   delete () {
-    
+    console.warn('Signer:' + this.type + ' did not implement a delete method')
   }
 
   update (options = {}) {

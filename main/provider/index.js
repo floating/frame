@@ -238,7 +238,7 @@ class Provider extends EventEmitter {
     const maxTotalFee = maxFee(rawTx)
 
     if (this.feeTotalOverMax(rawTx, maxTotalFee)) {
-      const chainId = parseInt(rawTx.chainId).toString()
+      const chainId = parseInt(rawTx.chainId)
       const symbol = store(`main.networks.ethereum.${chainId}.symbol`)
       const displayAmount = symbol
         ? ` (${Math.floor(maxTotalFee / 1e18)} ${symbol})`
@@ -516,14 +516,13 @@ class Provider extends EventEmitter {
       const params = payload.params
       if (!params || !params[0]) throw new Error('Params not supplied')
       
-      const chainId = params[0].chainId
       const type = 'ethereum'
 
-      const id = parseInt(chainId)
-      if (!Number.isInteger(id)) throw new Error('Invalid chain id')
+      const chainId = parseInt(params[0].chainId)
+      if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
 
       // Check if chain exists 
-      const exists = Boolean(store('main.networks', type, parseInt(chainId)))
+      const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
       const handlerId = uuid()
@@ -535,7 +534,7 @@ class Provider extends EventEmitter {
         type: 'switchChain',
         chain: { 
           type, 
-          id: chainId 
+          id: params[0].chainId
         },
         account: accounts.getAccounts()[0],
         origin: payload._origin
@@ -566,8 +565,11 @@ class Provider extends EventEmitter {
     const handlerId = uuid()
     this.handlers[handlerId] = res
 
-    // Check if chain exists 
-    const exists = Boolean(store('main.networks', type, parseInt(chainId)))
+    // Check if chain exists
+    const id = parseInt(chainId)
+    if (!Number.isInteger(id)) throw new Error('Invalid chain id')
+
+    const exists = Boolean(store('main.networks', type, id))
     if (exists) {
       // Ask user if they want to switch chains
       this.switchEthereumChain(payload, res)
@@ -576,7 +578,7 @@ class Provider extends EventEmitter {
       accounts.addRequest({
         handlerId,
         type: 'addChain',
-        chain : {
+        chain: {
           type,
           id: chainId,
           name: chainName,

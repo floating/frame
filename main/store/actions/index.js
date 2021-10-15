@@ -330,7 +330,7 @@ module.exports = {
       net.id = parseInt(net.id)
 
       // Cannot delete mainnet
-      if (net.id === NaN) throw new Error('Invalid chain id')
+      if (!Number.isInteger(net.id)) throw new Error('Invalid chain id')
       if (net.type === 'ethereum' && net.id === 1) throw new Error('Cannot remove mainnet')
       u('main', main => {
         // If deleting a network that the user is currently on, move them to mainnet
