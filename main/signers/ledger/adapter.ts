@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import usb from 'usb'
 import log from 'electron-log'
 import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
@@ -9,7 +7,7 @@ import Ledger from './Ledger'
 import store from '../../store'
 import { Derivation } from '../Signer/derive'
 
-function updateDerivation (ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit) {
+function updateDerivation (ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit = 0) {
   const liveAccountLimit = accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
 
   ledger.derivation = derivation
@@ -53,12 +51,14 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     super.close()
   }
 
-  reload (signer: Signer) {
+  reload (signer: Ledger) {
     const ledger = Object.values(this.knownSigners).find(s => s.devicePath === signer.devicePath)
 
-    ledger.disconnect()
-      .then(() => ledger.open())
-      .then(() => ledger.connect())
+    if (ledger) {
+      ledger.disconnect()
+        .then(() => ledger.open())
+        .then(() => ledger.connect())
+    }
   }
 
   async handleAttachedDevice (usbDevice: usb.Device) {
@@ -85,7 +85,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     let [existingDeviceId, ledger] = Object.entries(this.knownSigners)
       .find(([deviceId, ledger]) => ledger.devicePath === devicePath) || []
 
-    if (ledger) {
+    if (ledger && existingDeviceId) {
       delete this.knownSigners[existingDeviceId]
     } else {
       ledger = new Ledger(devicePath)
@@ -97,11 +97,11 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       ledger.on('lock', emitUpdate)
 
       ledger.on('close', () => {
-        this.emit('remove', ledger.id)
+        this.emit('remove', ledger?.id)
       })
 
       ledger.on('unlock', () => {
-        ledger.connect()
+        ledger?.connect()
       })
 
       this.emit('add', ledger)
@@ -144,7 +144,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
   private getAttachedDevicePath (knownDevicePaths: string[]) {
     // check all Ledger devices and return the device that isn't yet known
-    const hid = getLedgerDevices().find(d => !knownDevicePaths.includes(d.path))
+    const hid = getLedgerDevices().find(d => !knownDevicePaths.includes(d.path || ''))
 
     return hid?.path || ''
   }
