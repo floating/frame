@@ -162,7 +162,7 @@ class Signers extends EventEmitter {
       // for backwards compatibility, when all scans are converted to adapters
       // they should close the signers before emitting the close event
       if (close) signer.close()
-      signer.delete()
+      if (signer.delete) signer.delete()
 
       delete this.signers[id]
     }
