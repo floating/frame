@@ -2,7 +2,7 @@ import { EventEmitter } from 'stream'
 
 import usb from 'usb'
 import HID from 'node-hid'
-import Signer from './signer'
+import Signer from './Signer'
 
 function wait (ms: number) {
   return new Promise(resolve => {

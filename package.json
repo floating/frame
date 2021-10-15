@@ -165,6 +165,7 @@
     "jest": "27.2.5",
     "node-watch": "0.7.2",
     "parcel-bundler": "1.12.3",
+    "rimraf": "^3.0.2",
     "shx": "0.3.3",
     "standardx": "7.0.0",
     "stylus": "0.55.0",

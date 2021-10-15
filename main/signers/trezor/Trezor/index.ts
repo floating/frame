@@ -9,7 +9,7 @@ import { sign, londonToLegacy, signerCompatibility, TransactionData } from '../.
 
 // @ts-ignore
 import { v5 as uuid } from 'uuid'
-import { Derivation, getDerivationPath } from '../../signer/derive'
+import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { TypedTransaction } from '@ethereumjs/tx'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
