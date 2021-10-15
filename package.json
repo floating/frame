@@ -171,7 +171,8 @@
     "shx": "0.3.3",
     "standardx": "7.0.0",
     "stylus": "0.55.0",
-    "ts-jest": "27.0.6"
+    "ts-jest": "27.0.5",
+    "typescript": "^4.4.4"
   },
   "standard": {
     "parser": "babel-eslint",
