@@ -349,13 +349,6 @@ module.exports = {
           delete main.networksMeta[net.type][net.id]
         }
 
-        if (main.currentNetwork.type === net.type && main.currentNetwork.id === net.id) { // Change selected network if it's deleted while selected
-          const id = Object.keys(main.networks[net.type]).map(i => parseInt(i)).sort((a, b) => a - b)[0]
-          const reset = { status: 'loading', connected: false, type: '', network: '' }
-          main.currentNetwork = { type: net.type, id }
-          main.networks[net.type][id].primary = Object.assign({}, main.networks[net.type][id].primary, reset)
-          main.networks[net.type][id].secondary = Object.assign({}, main.networks[net.type][id].secondary, reset)
-        }
         return main
       })
     } catch (e) {
