@@ -4,7 +4,7 @@ import EventEmitter from 'events'
 import log from 'electron-log'
 import crypto from 'crypto'
 
-import Signer from './signer'
+import Signer from './Signer'
 import { SignerAdapter } from './adapters'
 
 import hot from './hot'

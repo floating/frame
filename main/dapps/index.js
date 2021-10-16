@@ -1,4 +1,3 @@
-const electron = require('electron')
 const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
 const crypto = require('crypto')
@@ -11,19 +10,6 @@ const ipfs = require('../ipfs')
 const windows = require('../windows')
 
 const server = require('./server')
-
-const mock = {
-  ens: {
-    resolveContent: (domain) => {
-      return { type: 'ipfs', hash: 'QmXSBLw6VMegqkCHSDBPg7xzfLhUyuRBzTb927KVzKC1vq' }
-    }
-  },
-  shell: {
-    openExternal: (url) => {
-      require('child_process').exec(`xdg-open "${url}"`)
-    }
-  }
-}
 
 // const shell = electron.shell ? electron.shell : mock.shell
 

@@ -1,5 +1,4 @@
 const http = require('http')
-const cookie = require('cookie')
 
 const sessions = require('./sessions')
 const asset = require('./asset')
