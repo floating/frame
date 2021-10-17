@@ -199,10 +199,13 @@ class Provider extends EventEmitter {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
+
     const payload = req.payload
     const [address, data] = payload.params
 
-    accounts.signTypedData(req.version, address, { ...data }, (err, sig) => {
+    const dataToSign = (Array.isArray(data)) ? [...data] : { ...data }
+
+    accounts.signTypedData(req.version, address, dataToSign, (err, sig) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
