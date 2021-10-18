@@ -1,10 +1,13 @@
 import os from 'os'
 import usb from 'usb'
 import log from 'electron-log'
+
 import { DeviceModel } from '@ledgerhq/devices'
 import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-singleton'
+import { Subscription } from '@ledgerhq/hw-transport'
 
-import { UsbSignerAdapter } from '../adapters'
+import { SignerAdapter } from '../adapters'
 import Ledger from './Ledger'
 import store from '../../store'
 import { Derivation } from '../Signer/derive'
@@ -18,10 +21,12 @@ function updateDerivation (ledger: Ledger, derivation = store('main.ledger.deriv
   ledger.accountLimit = liveAccountLimit
 }
 
-export default class LedgerSignerAdapter extends UsbSignerAdapter {
+export default class LedgerSignerAdapter extends SignerAdapter {
   private knownSigners: Ledger[];
   private disconnections: { devicePath: string, timeout: NodeJS.Timeout }[]
+
   private observer: any;
+  private usbListener: Subscription | undefined;
 
   constructor () {
     super('ledger')
@@ -46,11 +51,38 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       })
     })
 
+    this.usbListener = TransportNodeHid.listen({
+      next: evt => {
+        if (!evt.deviceModel) {
+          log.warn('received USB event with no Ledger device model', evt)
+          return
+        }
+
+        if (evt.type === 'add') {
+          return this.handleAttachedDevice(evt.deviceModel)
+        }
+
+        if (evt.type === 'remove') {
+          return this.handleDetachedDevice(evt.deviceModel)
+        }
+      },
+      complete: () => {
+        log.debug('received USB complete event')
+      },
+      error: err => {
+        log.error('USB error', err)
+      }
+    })
+
     super.open()
   }
 
   close () {
     this.observer.remove()
+
+    if (this.usbListener) {
+      this.usbListener.unsubscribe()
+    }
 
     super.close()
   }
@@ -176,9 +208,5 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
 
   private getSignersForModel (usbDevice: DeviceModel) {
     return this.knownSigners.filter(signer => signer.model === usbDevice.id)
-  }
-
-  supportsDevice (usbDevice: usb.Device) {
-    return usbDevice.deviceDescriptor.idVendor === 0x2c97
   }
 }
