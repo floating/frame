@@ -92,6 +92,7 @@
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "6.9.0",
     "@ledgerhq/hw-transport-node-hid": "6.7.0",
+    "@ledgerhq/hw-transport-node-hid-singleton": "^6.10.0",
     "@ledgerhq/hw-transport-web-ble": "6.7.0",
     "@makerdao/multicall": "0.12.0",
     "@sushiswap/default-token-list": "17.0.0",

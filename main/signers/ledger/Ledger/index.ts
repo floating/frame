@@ -79,7 +79,7 @@ export default class Ledger extends Signer {
   private requestQueue = new RequestQueue()
   private statusPoller = setTimeout(() => {})
 
-  constructor (devicePath: string) {
+  constructor (devicePath: string, model: string) {
     super()
 
     this.devicePath = devicePath
@@ -88,6 +88,7 @@ export default class Ledger extends Signer {
 
     this.id = uuid('Ledger' + this.devicePath, ns)
     this.type = 'ledger'
+    this.model = model
     this.status = Status.INITIAL
   }
 

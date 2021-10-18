@@ -1,11 +1,16 @@
+import os from 'os'
 import usb from 'usb'
 import log from 'electron-log'
+import { DeviceModel } from '@ledgerhq/devices'
 import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { UsbSignerAdapter } from '../adapters'
 import Ledger from './Ledger'
 import store from '../../store'
 import { Derivation } from '../Signer/derive'
+import { publicEncrypt } from 'crypto'
+
+const IS_WINDOWS = os.type().toLowerCase().includes('windows')
 
 function updateDerivation (ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit = 0) {
   const liveAccountLimit = accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
@@ -15,14 +20,14 @@ function updateDerivation (ledger: Ledger, derivation = store('main.ledger.deriv
 }
 
 export default class LedgerSignerAdapter extends UsbSignerAdapter {
-  private knownSigners: { [key: string]: Ledger };
+  private knownSigners: Ledger[];
   private disconnections: { devicePath: string, timeout: NodeJS.Timeout }[]
   private observer: any;
 
   constructor () {
     super('ledger')
 
-    this.knownSigners = {}
+    this.knownSigners = []
     this.disconnections = []
   }
 
@@ -52,7 +57,7 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   }
 
   reload (signer: Ledger) {
-    const ledger = Object.values(this.knownSigners).find(s => s.devicePath === signer.devicePath)
+    const ledger = this.knownSigners.find(s => s.devicePath === signer.devicePath)
 
     if (ledger) {
       ledger.disconnect()
@@ -61,16 +66,22 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     }
   }
 
-  async handleAttachedDevice (usbDevice: usb.Device) {
+  async handleAttachedDevice (usbDevice: DeviceModel) {
     log.debug(`detected Ledger device attached`, usbDevice)
 
-    const knownPaths = Object.values(this.knownSigners).map(d => d.devicePath)
-    const deviceId = this.deviceId(usbDevice)
+    const knownPaths = this.knownSigners.map(d => d.devicePath)
 
+    let ledger: Ledger
     let devicePath = this.getAttachedDevicePath(knownPaths)
+
+    console.log({ devicePath })
 
     if (!devicePath) {
       // if this isn't a new device, check if there is a pending disconnection
+      
+      // on Windows, the same
+      // device will have a different path for the manager and eth apps, so we need to rely on timing
+      // to determine if this is the re-connection event for a Ledger that was just disconnected
       const pendingDisconnection = this.disconnections.pop()
 
       if (!pendingDisconnection) {
@@ -82,13 +93,14 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       devicePath = pendingDisconnection.devicePath
     }
 
-    let [existingDeviceId, ledger] = Object.entries(this.knownSigners)
-      .find(([deviceId, ledger]) => ledger.devicePath === devicePath) || []
+    let existingDeviceIndex = this.knownSigners.findIndex(ledger => ledger.devicePath === devicePath)
 
-    if (ledger && existingDeviceId) {
-      delete this.knownSigners[existingDeviceId]
+    if (existingDeviceIndex >= 0) {
+      console.log('EXISTING LEDGER')
+      ledger = this.knownSigners[existingDeviceIndex]
     } else {
-      ledger = new Ledger(devicePath)
+      console.log('NEW LEDGER')
+      ledger = new Ledger(devicePath, usbDevice.id)
 
       const emitUpdate = () => this.emit('update', ledger)
 
@@ -105,9 +117,9 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       })
 
       this.emit('add', ledger)
-    }
 
-    this.knownSigners[deviceId] = ledger
+      this.knownSigners.push(ledger)
+    }
 
     updateDerivation(ledger)
 
@@ -115,38 +127,58 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     await ledger.connect()
   }
 
-  handleDetachedDevice (usbDevice: usb.Device) {
+  handleDetachedDevice (usbDevice: DeviceModel) {
     log.debug(`detected Ledger device detached`, usbDevice)
 
-    const deviceId = this.deviceId(usbDevice)
+    const ledger = this.getDetachedSigner(usbDevice)
 
-    if (deviceId in this.knownSigners) {
-      const ledger = this.knownSigners[deviceId]
+    console.log({ ledger })
 
+    if (ledger) {
       ledger.disconnect()
 
       // when a user exits the eth app, it takes a few seconds for the
       // main ledger to reconnect via USB, so attempt to wait for this event
       // instead of immediately removing the signer
-      this.disconnections.push({
-        devicePath: ledger.devicePath,
-        timeout: setTimeout(() => {
-          const index = this.disconnections.findIndex(d => d.devicePath === ledger.devicePath)
-          this.disconnections.splice(index, 1)
 
-          delete this.knownSigners[deviceId]
+      // on Windows, the device reconnects with a completely different mount point
+      // path, so we can't reliably check if the one that reconnects is the one that
+      // was disconnected
+      if (!IS_WINDOWS) {
+        this.disconnections.push({
+          devicePath: ledger.devicePath,
+          timeout: setTimeout(() => {
+            const index = this.disconnections.findIndex(d => d.devicePath === ledger.devicePath)
+            this.disconnections.splice(index, 1)
 
-          ledger.close()
-        }, 5000)
-      })
+            this.knownSigners.splice(this.knownSigners.indexOf(ledger), 1)
+
+            ledger.close()
+          }, 5000)
+        })
+      }
     }
   }
 
   private getAttachedDevicePath (knownDevicePaths: string[]) {
     // check all Ledger devices and return the device that isn't yet known
+    console.log('DEVICES', getLedgerDevices(), { knownDevicePaths })
     const hid = getLedgerDevices().find(d => !knownDevicePaths.includes(d.path || ''))
 
     return hid?.path || ''
+  }
+
+  private getDetachedSigner (usbDevice: DeviceModel) {
+    // check all Ledger devices and return the device that is missing from the known devices
+    const attachedDevices = getLedgerDevices()
+
+    console.log(this.knownSigners)
+    console.log(attachedDevices)
+
+    return this.knownSigners.find(signer => 
+      signer.model === usbDevice.id && 
+      !attachedDevices.some(device => device.path === signer.devicePath
+    ))
   }
 
   supportsDevice (usbDevice: usb.Device) {

@@ -4,6 +4,7 @@ import EventEmitter from 'stream'
 import { AppVersion, TransactionData } from '../../transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
+import { typedSignatureHash } from 'eth-sig-util'
 
 export type Callback = (err: Error | null, result: any | undefined) => void
 
@@ -47,6 +48,7 @@ export default class Signer extends EventEmitter {
       id: this.id,
       name: this.name || this.type + ' signer',
       type: this.type,
+      model: this.model,
       addresses: this.addresses,
       status: this.status,
       appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }

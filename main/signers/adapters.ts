@@ -1,8 +1,11 @@
+// @ts-nocheck
 import { EventEmitter } from 'stream'
 
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-singleton'
 import usb from 'usb'
 import HID from 'node-hid'
 import Signer from './Signer'
+import { runInThisContext } from 'vm'
 
 function wait (ms: number) {
   return new Promise(resolve => {
@@ -39,42 +42,47 @@ export class UsbSignerAdapter extends SignerAdapter {
       // with the USB device and wait until its ready?
       await wait(200)
 
-      if (this.supportsDevice(usbDevice)) {
+     // if (this.supportsDevice(usbDevice)) {
         this.handleAttachedDevice(usbDevice)
-      }
+     // }
     }
 
     this.detachListener = usbDevice => {
-      if (this.supportsDevice(usbDevice)) {
+      //if (this.supportsDevice(usbDevice)) {
         this.handleDetachedDevice(usbDevice)
-      }
+     // }
     }
   }
 
   open () {
-    usb.on('attach', this.attachListener)
-    usb.on('detach', this.detachListener)
+    this.subscription = TransportNodeHid.listen({
+      next: evt => {
+        if (evt.type === 'add') {
+          console.log({ evt })
+          return this.handleAttachedDevice(evt.deviceModel)
+        }
 
-    const attachedDevices = usb.getDeviceList()
-
-    attachedDevices.forEach(usbDevice => {
-      if (this.supportsDevice(usbDevice)) {
-        this.handleAttachedDevice(usbDevice)
+        if (evt.type === 'remove') {
+          return this.handleDetachedDevice(evt.deviceModel)
+        }
       }
     })
+    //usbDetect.on('add:11415', this.attachListener)
+    //usbDetect.on('remove:11415', this.detachListener)
+    //usb.on('attach', this.attachListener)
+    //usb.on('detach', this.detachListener)
+
+    // const attachedDevices = usb.getDeviceList()
+
+    // attachedDevices.forEach(usbDevice => {
+    //   if (this.supportsDevice(usbDevice)) {
+    //     this.handleAttachedDevice(usbDevice)
+    //   }
+    // })
   }
 
   close () {
-    usb.removeListener('attach', this.attachListener)
-    usb.removeListener('detach', this.detachListener)
-
-    const attachedDevices = usb.getDeviceList()
-
-    attachedDevices.forEach(usbDevice => {
-      if (this.supportsDevice(usbDevice)) {
-        this.handleDetachedDevice(usbDevice)
-      }
-    })
+    this.subscription.unsubscribe()
 
     super.close()
   }
@@ -86,10 +94,9 @@ export class UsbSignerAdapter extends SignerAdapter {
 
   deviceId (device: usb.Device) {
     return [
-      device.busNumber,
       device.deviceAddress,
-      device.deviceDescriptor.idProduct,
-      device.deviceDescriptor.idVendor
+      device.productId,
+      device.vendorId
     ].join(':')
   }
 
@@ -97,11 +104,11 @@ export class UsbSignerAdapter extends SignerAdapter {
     return false
   }
 
-  handleAttachedDevice (device: usb.Device) {
+  handleAttachedDevice (device: any) {
     throw new Error(`attempted to attach device with no adapter: ${device.toString()}`)
   }
 
-  handleDetachedDevice (device: usb.Device) {
+  handleDetachedDevice (device: any) {
     throw new Error(`attempted to detach device with no adapter: ${device.toString()}`)
   }
 }
