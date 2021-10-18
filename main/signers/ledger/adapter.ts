@@ -8,7 +8,6 @@ import { UsbSignerAdapter } from '../adapters'
 import Ledger from './Ledger'
 import store from '../../store'
 import { Derivation } from '../Signer/derive'
-import { publicEncrypt } from 'crypto'
 
 const IS_WINDOWS = os.type().toLowerCase().includes('windows')
 
@@ -69,19 +68,13 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
   async handleAttachedDevice (usbDevice: DeviceModel) {
     log.debug(`detected Ledger device attached`, usbDevice)
 
-    const knownPaths = this.knownSigners.map(d => d.devicePath)
-
     let ledger: Ledger
-    let devicePath = this.getAttachedDevicePath(knownPaths)
+    let devicePath = this.getAttachedDevicePath()
 
     console.log({ devicePath })
 
     if (!devicePath) {
       // if this isn't a new device, check if there is a pending disconnection
-      
-      // on Windows, the same
-      // device will have a different path for the manager and eth apps, so we need to rely on timing
-      // to determine if this is the re-connection event for a Ledger that was just disconnected
       const pendingDisconnection = this.disconnections.pop()
 
       if (!pendingDisconnection) {
@@ -93,7 +86,8 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       devicePath = pendingDisconnection.devicePath
     }
 
-    let existingDeviceIndex = this.knownSigners.findIndex(ledger => ledger.devicePath === devicePath)
+    let existingDeviceIndex = this.getSignersForModel(usbDevice)
+      .findIndex(ledger => ledger.devicePath === devicePath)
 
     if (existingDeviceIndex >= 0) {
       console.log('EXISTING LEDGER')
@@ -160,9 +154,9 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     }
   }
 
-  private getAttachedDevicePath (knownDevicePaths: string[]) {
+  private getAttachedDevicePath () {
     // check all Ledger devices and return the device that isn't yet known
-    console.log('DEVICES', getLedgerDevices(), { knownDevicePaths })
+    const knownDevicePaths = this.knownSigners.map(d => d.devicePath)
     const hid = getLedgerDevices().find(d => !knownDevicePaths.includes(d.path || ''))
 
     return hid?.path || ''
@@ -175,10 +169,13 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     console.log(this.knownSigners)
     console.log(attachedDevices)
 
-    return this.knownSigners.find(signer => 
-      signer.model === usbDevice.id && 
-      !attachedDevices.some(device => device.path === signer.devicePath
-    ))
+    return this.getSignersForModel(usbDevice).find(signer =>
+      !attachedDevices.some(device => device.path === signer.devicePath)
+    )
+  }
+
+  private getSignersForModel (usbDevice: DeviceModel) {
+    return this.knownSigners.filter(signer => signer.model === usbDevice.id)
   }
 
   supportsDevice (usbDevice: usb.Device) {
