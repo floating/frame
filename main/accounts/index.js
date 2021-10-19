@@ -54,7 +54,7 @@ class Accounts extends EventEmitter {
   }
 
   get (id) {
-    return this.accounts[id].summary()
+    return this.accounts[id] && this.accounts[id].summary()
   }
 
   select (id) {
