@@ -3,7 +3,7 @@ import log from 'electron-log'
 // @ts-ignore
 import { v5 as uuid } from 'uuid'
 
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { Request, RequestQueue } from './requestQueue'
 import Signer, { Callback } from '../../Signer'

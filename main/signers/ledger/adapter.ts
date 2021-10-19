@@ -29,7 +29,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   private disconnections: Disconnection[]
 
   private observer: any;
-  private usbListener: Subscription | undefined;
+  private usbListener: Subscription | null = null;
 
   constructor () {
     super('ledger')
@@ -79,10 +79,12 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   close () {
     if (this.observer) {
       this.observer.remove()
+      this.observer = null
     }
 
     if (this.usbListener) {
       this.usbListener.unsubscribe()
+      this.usbListener = null
     }
 
     super.close()
@@ -114,7 +116,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   }
 
   private async handleAttachedDevice (device: ConnectedDevice) {
-    log.debug(`Ledger ${device.product} attached`, device.path)
+    log.debug(`Ledger ${device.product} attached at ${device.path}`)
 
     const ledger = new Ledger(device.path, device.product)
 
@@ -132,14 +134,14 @@ export default class LedgerSignerAdapter extends SignerAdapter {
       ledger.connect()
     })
 
+    this.knownSigners[ledger.devicePath] = ledger
+
     this.emit('add', ledger)
     
     await this.handleConnectedDevice(ledger)
   }
 
   private async handleConnectedDevice (ledger: Ledger) {
-    this.knownSigners[ledger.devicePath] = ledger
-
     updateDerivation(ledger)
 
     await ledger.open()
@@ -147,7 +149,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   }
 
   private async handleReconnectedDevice (disconnection: Disconnection) {
-    log.debug(`Ledger ${disconnection.device.model} re-connected`, disconnection.device.devicePath)
+    log.debug(`Ledger ${disconnection.device.model} re-connected at ${disconnection.device.devicePath}`)
 
     clearTimeout(disconnection.timeout)
 
@@ -155,9 +157,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   }
 
   handleDisconnectedDevice (ledger: Ledger) {
-    log.debug(`Ledger ${ledger.model} disconnected`, ledger.devicePath)
-
-    delete this.knownSigners[ledger.devicePath]
+    log.debug(`Ledger ${ledger.model} disconnected from ${ledger.devicePath}`)
 
     ledger.disconnect()
 
@@ -170,7 +170,9 @@ export default class LedgerSignerAdapter extends SignerAdapter {
         const index = this.disconnections.findIndex(d => d.device.devicePath === ledger.devicePath)
         this.disconnections.splice(index, 1)
 
-        log.debug(`Ledger ${ledger.model} detached`, ledger.devicePath)
+        log.debug(`Ledger ${ledger.model} detached from ${ledger.devicePath}`)
+
+        delete this.knownSigners[ledger.devicePath]
 
         ledger.close()
       }, 5000)
