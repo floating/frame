@@ -55,7 +55,7 @@
     "hot": "npm run compile && npm run bundle && npm run launch:hot",
     "clean": "rimraf dist bundle compiled .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm cache clean --force && npm install && npm audit fix && npm run bundle",
     "scrub": "rimraf dist bundle compiled .cache \"node_modules/!(rimraf|.bin)\" && npm install",
-    "watch:compile": "mkdir -p ./compiled/windows && npm run copy-assets && tsc --build main -w",
+    "watch:compile": "shx mkdir -p ./compiled/windows && npm run copy-assets && tsc --build main -w",
     "compile": "tsc --build main && npm run copy-assets",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
     "copy-assets": "shx cp ./main/windows/*.png ./compiled/windows",

@@ -163,23 +163,29 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     if (ledger) {
       ledger.disconnect()
 
-      // when a user exits the eth app, it takes a few seconds for the
-      // main ledger to reconnect via USB, so attempt to wait for this event
-      // instead of immediately removing the signer
+      const close = () => {
+        this.knownSigners.splice(this.knownSigners.indexOf(ledger), 1)
 
-      // on Windows, the device reconnects with a completely different mount point
-      // path, so we can't reliably check if the one that reconnects is the one that
-      // was disconnected
-      if (!IS_WINDOWS) {
+        ledger.close()
+      }
+
+      if (IS_WINDOWS) {
+        // on Windows, the device reconnects with a completely different mount point
+        // path, thus we can't reliably check if the one that reconnects is the one that
+        // was disconnected, so just close immediately
+        close()
+      } else {
+        // on all other platforms when a user exits the eth app, it takes a few seconds for the
+        // main ledger to reconnect via USB and it does so with the same path
+        // as the one that was disconnected, so attempt to wait for this event
+        // instead of immediately removing the signer
         this.disconnections.push({
           devicePath: ledger.devicePath,
           timeout: setTimeout(() => {
             const index = this.disconnections.findIndex(d => d.devicePath === ledger.devicePath)
             this.disconnections.splice(index, 1)
 
-            this.knownSigners.splice(this.knownSigners.indexOf(ledger), 1)
-
-            ledger.close()
+            close()
           }, 5000)
         })
       }
@@ -197,9 +203,6 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   private getDetachedSigner (usbDevice: DeviceModel) {
     // check all Ledger devices and return the device that is missing from the known devices
     const attachedDevices = getLedgerDevices()
-
-    console.log(this.knownSigners)
-    console.log(attachedDevices)
 
     return this.getSignersForModel(usbDevice).find(signer =>
       !attachedDevices.some(device => device.path === signer.devicePath)
