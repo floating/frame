@@ -27,7 +27,7 @@ function balanceCalls (owner, tokens) {
 
 async function loadTokenBalances (chainId, address, tokens) {
   const calls = balanceCalls(address, tokens)
-  const BATCH_SIZE = 3000
+  const BATCH_SIZE = 2000
 
   const numBatches = Math.ceil(calls.length / BATCH_SIZE)
 
