@@ -4,7 +4,7 @@ import { Derivation } from '../../../../../main/signers/Signer/derive'
 import log from 'electron-log'
 
 jest.mock('../../../../../main/signers/ledger/Ledger/eth')
-jest.mock('@ledgerhq/hw-transport-node-hid')
+jest.mock('@ledgerhq/hw-transport-node-hid-noevents')
 
 function runNextRequest () {
   // move forward in time to allow the queue to process one request

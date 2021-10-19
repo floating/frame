@@ -3,7 +3,7 @@ import log from 'electron-log'
 // @ts-ignore
 import { v5 as uuid } from 'uuid'
 
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { Request, RequestQueue } from './requestQueue'
 import Signer, { Callback } from '../../Signer'
@@ -79,7 +79,7 @@ export default class Ledger extends Signer {
   private requestQueue = new RequestQueue()
   private statusPoller = setTimeout(() => {})
 
-  constructor (devicePath: string) {
+  constructor (devicePath: string, model: string) {
     super()
 
     this.devicePath = devicePath
@@ -88,6 +88,7 @@ export default class Ledger extends Signer {
 
     this.id = uuid('Ledger' + this.devicePath, ns)
     this.type = 'ledger'
+    this.model = model
     this.status = Status.INITIAL
   }
 

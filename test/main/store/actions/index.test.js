@@ -1,4 +1,13 @@
+import log from 'electron-log'
 import { addNetwork as addNetworkAction } from '../../../../main/store/actions'
+
+beforeAll(() => {
+  log.transports.console.level = false
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
+})
 
 describe('#addNetwork', () => {
   const polygonNetwork = {

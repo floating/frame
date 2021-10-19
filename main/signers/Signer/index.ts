@@ -47,6 +47,7 @@ export default class Signer extends EventEmitter {
       id: this.id,
       name: this.name || this.type + ' signer',
       type: this.type,
+      model: this.model,
       addresses: this.addresses,
       status: this.status,
       appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }

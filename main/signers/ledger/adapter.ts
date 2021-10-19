@@ -1,11 +1,14 @@
-import usb from 'usb'
 import log from 'electron-log'
-import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 
-import { UsbSignerAdapter } from '../adapters'
+import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-singleton'
+import { Subscription } from '@ledgerhq/hw-transport'
+import { Device } from 'node-hid'
+
+import { Derivation } from '../Signer/derive'
+import { SignerAdapter } from '../adapters'
 import Ledger from './Ledger'
 import store from '../../store'
-import { Derivation } from '../Signer/derive'
 
 function updateDerivation (ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit = 0) {
   const liveAccountLimit = accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
@@ -14,10 +17,19 @@ function updateDerivation (ledger: Ledger, derivation = store('main.ledger.deriv
   ledger.accountLimit = liveAccountLimit
 }
 
-export default class LedgerSignerAdapter extends UsbSignerAdapter {
-  private knownSigners: { [key: string]: Ledger };
-  private disconnections: { devicePath: string, timeout: NodeJS.Timeout }[]
+interface Disconnection {
+  device: Ledger,
+  timeout: NodeJS.Timeout
+}
+
+type ConnectedDevice = Device & { path: string, product: string }
+
+export default class LedgerSignerAdapter extends SignerAdapter {
+  private knownSigners: { [devicePath: string]: Ledger };
+  private disconnections: Disconnection[]
+
   private observer: any;
+  private usbListener: Subscription | null = null;
 
   constructor () {
     super('ledger')
@@ -42,17 +54,44 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
       })
     })
 
+    this.usbListener = TransportNodeHid.listen({
+      next: evt => {
+        log.debug(`received ${evt.type} USB event`)
+
+        if (!evt.deviceModel) {
+          log.warn('received USB event with no Ledger device model', evt)
+          return
+        }
+        
+        this.handleDeviceChanges()
+      },
+      complete: () => {
+        log.debug('received USB complete event')
+      },
+      error: err => {
+        log.error('USB error', err)
+      }
+    })
+
     super.open()
   }
 
   close () {
-    this.observer.remove()
+    if (this.observer) {
+      this.observer.remove()
+      this.observer = null
+    }
+
+    if (this.usbListener) {
+      this.usbListener.unsubscribe()
+      this.usbListener = null
+    }
 
     super.close()
   }
 
   reload (signer: Ledger) {
-    const ledger = Object.values(this.knownSigners).find(s => s.devicePath === signer.devicePath)
+    const ledger = this.knownSigners[signer.devicePath]
 
     if (ledger) {
       ledger.disconnect()
@@ -61,95 +100,154 @@ export default class LedgerSignerAdapter extends UsbSignerAdapter {
     }
   }
 
-  async handleAttachedDevice (usbDevice: usb.Device) {
-    log.debug(`detected Ledger device attached`, usbDevice)
+  private handleDeviceChanges () {
+    const {
+      attachedDevices,
+      detachedLedgers,
+      reconnections,
+      pendingDisconnections
+    } = this.detectDeviceChanges()
 
-    const knownPaths = Object.values(this.knownSigners).map(d => d.devicePath)
-    const deviceId = this.deviceId(usbDevice)
+    this.disconnections = pendingDisconnections
 
-    let devicePath = this.getAttachedDevicePath(knownPaths)
+    detachedLedgers.forEach(ledger => this.handleDisconnectedDevice(ledger))
+    reconnections.forEach(disconnection => this.handleReconnectedDevice(disconnection))
+    attachedDevices.forEach(device => this.handleAttachedDevice(device))
+  }
 
-    if (!devicePath) {
-      // if this isn't a new device, check if there is a pending disconnection
-      const pendingDisconnection = this.disconnections.pop()
+  private async handleAttachedDevice (device: ConnectedDevice) {
+    log.debug(`Ledger ${device.product} attached at ${device.path}`)
 
-      if (!pendingDisconnection) {
-        log.error(`could not determine path for attached Ledger device`, usbDevice)
-        return
-      }
+    const ledger = new Ledger(device.path, device.product)
 
-      clearTimeout(pendingDisconnection.timeout)
-      devicePath = pendingDisconnection.devicePath
-    }
+    const emitUpdate = () => this.emit('update', ledger)
 
-    let [existingDeviceId, ledger] = Object.entries(this.knownSigners)
-      .find(([deviceId, ledger]) => ledger.devicePath === devicePath) || []
+    ledger.on('update', emitUpdate)
+    ledger.on('error', emitUpdate)
+    ledger.on('lock', emitUpdate)
 
-    if (ledger && existingDeviceId) {
-      delete this.knownSigners[existingDeviceId]
-    } else {
-      ledger = new Ledger(devicePath)
+    ledger.on('close', () => {
+      this.emit('remove', ledger.id)
+    })
 
-      const emitUpdate = () => this.emit('update', ledger)
+    ledger.on('unlock', () => {
+      ledger.connect()
+    })
 
-      ledger.on('update', emitUpdate)
-      ledger.on('error', emitUpdate)
-      ledger.on('lock', emitUpdate)
+    this.knownSigners[ledger.devicePath] = ledger
 
-      ledger.on('close', () => {
-        this.emit('remove', ledger?.id)
-      })
+    this.emit('add', ledger)
+    
+    await this.handleConnectedDevice(ledger)
+  }
 
-      ledger.on('unlock', () => {
-        ledger?.connect()
-      })
-
-      this.emit('add', ledger)
-    }
-
-    this.knownSigners[deviceId] = ledger
-
+  private async handleConnectedDevice (ledger: Ledger) {
     updateDerivation(ledger)
 
     await ledger.open()
     await ledger.connect()
   }
 
-  handleDetachedDevice (usbDevice: usb.Device) {
-    log.debug(`detected Ledger device detached`, usbDevice)
+  private async handleReconnectedDevice (disconnection: Disconnection) {
+    log.debug(`Ledger ${disconnection.device.model} re-connected at ${disconnection.device.devicePath}`)
 
-    const deviceId = this.deviceId(usbDevice)
+    clearTimeout(disconnection.timeout)
 
-    if (deviceId in this.knownSigners) {
-      const ledger = this.knownSigners[deviceId]
+    this.handleConnectedDevice(disconnection.device)
+  }
 
-      ledger.disconnect()
+  handleDisconnectedDevice (ledger: Ledger) {
+    log.debug(`Ledger ${ledger.model} disconnected from ${ledger.devicePath}`)
 
-      // when a user exits the eth app, it takes a few seconds for the
-      // main ledger to reconnect via USB, so attempt to wait for this event
-      // instead of immediately removing the signer
-      this.disconnections.push({
-        devicePath: ledger.devicePath,
-        timeout: setTimeout(() => {
-          const index = this.disconnections.findIndex(d => d.devicePath === ledger.devicePath)
-          this.disconnections.splice(index, 1)
+    ledger.disconnect()
 
-          delete this.knownSigners[deviceId]
+    // when a user exits the eth app, it takes a few seconds for the
+    // main ledger to reconnect via USB, so attempt to wait for this event
+    // instead of immediately removing the signer
+    this.disconnections.push({
+      device: ledger,
+      timeout: setTimeout(() => {
+        const index = this.disconnections.findIndex(d => d.device.devicePath === ledger.devicePath)
+        this.disconnections.splice(index, 1)
 
-          ledger.close()
-        }, 5000)
-      })
+        log.debug(`Ledger ${ledger.model} detached from ${ledger.devicePath}`)
+
+        delete this.knownSigners[ledger.devicePath]
+
+        ledger.close()
+      }, 5000)
+    })
+  }
+
+  private detectDeviceChanges () {
+    // all Ledger devices that are currently connected
+    const ledgerDevices = getLedgerDevices()
+      .filter(device => !!device.path)
+      .map(d => ({ ...d, path: d.path as string, product: d.product || '' }))
+
+    const { pendingDisconnections, reconnections } = this.getReconnectedLedgers(ledgerDevices)
+    const detachedLedgers = this.getDetachedLedgers(ledgerDevices)
+    const attachedDevices = this.getAttachedDevices(ledgerDevices).filter(device =>
+      !reconnections.some(r => r.device.devicePath === device.path)
+    )
+
+    return {
+      attachedDevices, detachedLedgers, pendingDisconnections, reconnections
     }
   }
 
-  private getAttachedDevicePath (knownDevicePaths: string[]) {
-    // check all Ledger devices and return the device that isn't yet known
-    const hid = getLedgerDevices().find(d => !knownDevicePaths.includes(d.path || ''))
-
-    return hid?.path || ''
+  private getAttachedDevices (connectedDevices: ConnectedDevice[]) {
+    // attached devices are ones where a connected device
+    // is not yet one of the currently known signers
+    return connectedDevices.filter(device => !(device.path in this.knownSigners))
   }
 
-  supportsDevice (usbDevice: usb.Device) {
-    return usbDevice.deviceDescriptor.idVendor === 0x2c97
+  private getDetachedLedgers (connectedDevices: ConnectedDevice[]) {
+    // detached Ledgers are previously known signers that are
+    // no longer one of the connected Ledger devices
+    return Object.values(this.knownSigners).filter(signer =>
+      !connectedDevices.some(device => device.path === signer.devicePath)
+    )
+  }
+
+  private getReconnectedLedgers (connectedDevices: ConnectedDevice[]) {
+    // group all the disconnections into ones that are either accounted for
+    // by the currently connected devices (reconnections) or ones that are still
+    // pending (pendingDisconnections)
+    const {
+      pendingDisconnections,
+      reconnections
+    } = this.disconnections.reduce((resolved, disconnection) => {
+      if (connectedDevices.some(device => device.path === disconnection.device.devicePath)) {
+        resolved.reconnections.push(disconnection)
+      } else {
+        resolved.pendingDisconnections.push(disconnection)
+      }
+
+      return resolved
+    }, { pendingDisconnections: [] as Array<Disconnection>, reconnections: [] as Array<Disconnection> })
+
+    // if we are still waiting on reconnections, check if any more devices have been added. if so, assume
+    // that these are the reconnection events and allow any newly connected device to take the place
+    // of a disconnected one. this mostly happens on Windows because the devices reconnect at a different
+    // device path from the one from which they were disconnected
+    while (pendingDisconnections.length > 0) {
+      const reconnectedDevice = connectedDevices.find(device => 
+        !reconnections.some(r => r.device.devicePath === device.path) &&
+        !this.knownSigners[device.path]
+      )
+
+      if (reconnectedDevice) {
+        const disconnection = pendingDisconnections.pop() as Disconnection
+        this.knownSigners[reconnectedDevice.path] = disconnection.device
+        delete this.knownSigners[disconnection.device.devicePath]
+
+        disconnection.device.devicePath = reconnectedDevice.path
+
+        reconnections.push(disconnection)
+      } else break;
+    }
+
+    return { pendingDisconnections, reconnections }
   }
 }

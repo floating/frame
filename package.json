@@ -55,7 +55,7 @@
     "hot": "npm run compile && npm run bundle && npm run launch:hot",
     "clean": "rimraf dist bundle compiled .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm cache clean --force && npm install && npm audit fix && npm run bundle",
     "scrub": "rimraf dist bundle compiled .cache \"node_modules/!(rimraf|.bin)\" && npm install",
-    "watch:compile": "mkdir -p ./compiled/windows && npm run copy-assets && tsc --build main -w",
+    "watch:compile": "shx mkdir -p ./compiled/windows && npm run copy-assets && tsc --build main -w",
     "compile": "tsc --build main && npm run copy-assets",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
     "copy-assets": "shx cp ./main/windows/*.png ./compiled/windows",
@@ -91,8 +91,9 @@
     "@ethersproject/hash": "5.4.0",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "6.9.0",
-    "@ledgerhq/hw-transport-node-hid": "6.7.0",
-    "@ledgerhq/hw-transport-web-ble": "6.7.0",
+    "@ledgerhq/hw-transport-node-hid-noevents": "6.10.0",
+    "@ledgerhq/hw-transport-node-hid-singleton": "6.10.0",
+    "@ledgerhq/hw-transport-web-ble": "6.10.0",
     "@makerdao/multicall": "0.12.0",
     "@sushiswap/default-token-list": "17.0.0",
     "abi-codec": "0.0.9",
@@ -127,7 +128,6 @@
     "react-transition-group": "4.4.2",
     "semver": "7.3.5",
     "trezor-connect": "8.2.1",
-    "usb": "1.8.0",
     "uuid": "8.3.2",
     "web3-utils": "1.6.0",
     "ws": "8.2.3",
@@ -154,7 +154,6 @@
     "@types/node": "16.11.0",
     "@types/node-fetch": "3.0.2",
     "@types/node-hid": "1.3.1",
-    "@types/usb": "1.5.3",
     "babel-eslint": "10.1.0",
     "cli-sleep": "1.0.1",
     "electron": "15.2.0",
@@ -185,5 +184,8 @@
       "react/no-find-dom-node": 0
     }
   },
-  "repository": "github:floating/frame"
+  "repository": "github:floating/frame",
+  "resolutions": {
+    "node-abi": "3.2.0"
+  }
 }
