@@ -2,13 +2,13 @@ import log from 'electron-log'
 
 import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-singleton'
+import { Device } from '@ledgerhq/hw-transport-web-ble/lib/types'
 import { Subscription } from '@ledgerhq/hw-transport'
 
+import { Derivation } from '../Signer/derive'
 import { SignerAdapter } from '../adapters'
 import Ledger from './Ledger'
 import store from '../../store'
-import { Derivation } from '../Signer/derive'
-import { Device } from '@ledgerhq/hw-transport-web-ble/lib/types'
 
 function updateDerivation (ledger: Ledger, derivation = store('main.ledger.derivation'), accountLimit = 0) {
   const liveAccountLimit = accountLimit || (derivation === Derivation.live ? store('main.ledger.liveAccountLimit') : 0)
@@ -63,11 +63,9 @@ export default class LedgerSignerAdapter extends SignerAdapter {
         
         const { attachedDevices, reconnectedLedgers, detachedLedgers } = this.detectDeviceChanges()
 
-        console.log({ attachedDevices, reconnectedLedgers, detachedLedgers })
-
         detachedLedgers.forEach(ledger => this.handleDisconnectedDevice(ledger))
         reconnectedLedgers.forEach(ledger => this.handleConnectedDevice(ledger))
-        attachedDevices.forEach(device => this.handleAttachedDevice(device.path as string, device.product || ''))
+        attachedDevices.forEach(device => this.handleAttachedDevice(device.path, device.product || 'Ledger'))
       },
       complete: () => {
         log.debug('received USB complete event')
@@ -114,11 +112,11 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     ledger.on('lock', emitUpdate)
 
     ledger.on('close', () => {
-      this.emit('remove', ledger?.id)
+      this.emit('remove', ledger.id)
     })
 
     ledger.on('unlock', () => {
-      ledger?.connect()
+      ledger.connect()
     })
 
     this.emit('add', ledger)

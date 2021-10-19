@@ -4,7 +4,6 @@ import EventEmitter from 'stream'
 import { AppVersion, TransactionData } from '../../transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
-import { typedSignatureHash } from 'eth-sig-util'
 
 export type Callback = (err: Error | null, result: any | undefined) => void
 
