@@ -184,5 +184,8 @@
       "react/no-find-dom-node": 0
     }
   },
-  "repository": "github:floating/frame"
+  "repository": "github:floating/frame",
+  "resolutions": {
+    "node-abi": "3.2.0"
+  }
 }
