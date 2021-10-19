@@ -2,8 +2,8 @@ import log from 'electron-log'
 
 import { getDevices as getLedgerDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-singleton'
-import { Device } from '@ledgerhq/hw-transport-web-ble/lib/types'
 import { Subscription } from '@ledgerhq/hw-transport'
+import { Device } from 'node-hid'
 
 import { Derivation } from '../Signer/derive'
 import { SignerAdapter } from '../adapters'
@@ -22,7 +22,7 @@ interface Disconnection {
   timeout: NodeJS.Timeout
 }
 
-type ConnectedDevice = Device & { path: string }
+type ConnectedDevice = Device & { path: string, product: string }
 
 export default class LedgerSignerAdapter extends SignerAdapter {
   private knownSigners: { [devicePath: string]: Ledger };
@@ -183,7 +183,7 @@ export default class LedgerSignerAdapter extends SignerAdapter {
     // all Ledger devices that are currently connected
     const ledgerDevices = getLedgerDevices()
       .filter(device => !!device.path)
-      .map(d => ({ ...d, path: d.path as string }))
+      .map(d => ({ ...d, path: d.path as string, product: d.product || '' }))
 
     const { pendingDisconnections, reconnections } = this.getReconnectedLedgers(ledgerDevices)
     const detachedLedgers = this.getDetachedLedgers(ledgerDevices)
