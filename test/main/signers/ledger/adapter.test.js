@@ -193,6 +193,7 @@ platforms.forEach(platform => {
             expect(ledger.devicePath).toBe(expectedReconnectionPath)
             expect(adapter.disconnections).toHaveLength(0)
             expect(Object.keys(adapter.knownSigners)).toHaveLength(1)
+            expect(adapter.knownSigners[expectedReconnectionPath]).toBeDefined()
             done()
           } catch (e) { done(e) }
         })

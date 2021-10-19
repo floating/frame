@@ -239,6 +239,9 @@ export default class LedgerSignerAdapter extends SignerAdapter {
 
       if (reconnectedDevice) {
         const disconnection = pendingDisconnections.pop() as Disconnection
+        this.knownSigners[reconnectedDevice.path] = disconnection.device
+        delete this.knownSigners[disconnection.device.devicePath]
+
         disconnection.device.devicePath = reconnectedDevice.path
 
         reconnections.push(disconnection)
