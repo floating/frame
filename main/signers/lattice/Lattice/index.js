@@ -158,12 +158,13 @@ class Lattice extends Signer {
     return new Promise(resolve => setTimeout(resolve, time))
   }
 
-  async deriveAddresses () {
-    // TODO: Move these settings to be device spectifc
+  async deriveAddresses (retriesRemaining = 2) {
     const accountLimit = store('main.latticeSettings.accountLimit')
 
     try {
       if (!this.client) throw new Error('Client not ready during deriveAddresses')
+
+      log.debug(`deriving addresses for Lattice ${this.client.name}`)
 
       const getAddresses = promisify(this.client.getAddresses).bind(this.client)
 
@@ -184,12 +185,25 @@ class Lattice extends Signer {
 
       return this.addresses
     } catch (err) {
-      if (err === 'Error from device: Invalid Request') return log.warn('Lattice: Invalid Request')
-      if (err === 'Error from device: Device Busy') return log.warn('Lattice: Device Busy')
-      this.status = 'loading'
+      if (err === 'Error from device: Invalid Request') log.warn('Lattice: Invalid Request')
+      if (err === 'Error from device: Device Busy') log.warn('Lattice: Device Busy')
+      else log.error(err)
+
+      if (retriesRemaining > 0) {
+        this.status = 'loading'
+
+        setTimeout(() => {
+          this.status = 'addresses'
+          this.update()
+
+          this.deriveAddresses(retriesRemaining - 1)
+        }, 5000)
+      } else {
+        this.status = 'Error contacting Lattice'
+      }
+
       this.update()
-      log.error(err)
-      setTimeout(() => this.deriveAddresses(), 6000)
+
       return []
     }
   }
