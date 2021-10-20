@@ -93,7 +93,7 @@ class Trezor {
       if (e.type === DEVICE.CONNECT || e.type === DEVICE.CHANGED) {
         // when plugging in the Trezor, the first event can sometimes be "unacquired" which
         // does not have any information about the firmware, so ignore it and wait
-        // for an "acquired event"
+        // for an "acquired" event
         if (e.payload.type === 'acquired') {
           if (!this.devices[e.payload.path]) {
             this.devices[e.payload.path] = new Device(e.payload, this.emit)

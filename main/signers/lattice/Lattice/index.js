@@ -199,7 +199,7 @@ class Lattice extends Signer {
           this.deriveAddresses(retriesRemaining - 1)
         }, 5000)
       } else {
-        this.status = 'Error contacting Lattice'
+        this.status = 'Error connecting'
       }
 
       this.update()
