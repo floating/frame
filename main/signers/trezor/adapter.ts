@@ -27,6 +27,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
       log.info(`:: Trezor Scan - Connected Device: ${trezor.model}, firmware v${version}`)
 
+      console.log({ device })
       trezor.on('close', () => {
         delete this.knownSigners[device.path]
 
@@ -57,6 +58,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
 
     const updateListener = (device: TrezorDevice) => {
+      console.log({ device })
       log.debug(':: Trezor Scan - Updated Device')
       this.withSigner(device, signer => this.emit('update', signer))
     }
