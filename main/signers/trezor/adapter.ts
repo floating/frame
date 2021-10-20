@@ -21,10 +21,11 @@ export default class TrezorSignerAdapter extends SignerAdapter {
 
   open () {
     const connectListener = (device: TrezorDevice) => {
-      log.info(':: Trezor Scan - Connected Device')
-
       const trezor = new Trezor(device)
       trezor.derivation = store('main.trezor.derivation')
+
+      const version = [trezor.appVersion.major, trezor.appVersion.minor, trezor.appVersion.patch].join('.')
+      log.info(`Trezor ${device.id} connected: ${trezor.model}, firmware v${version}`)
 
       trezor.on('close', () => {
         delete this.knownSigners[device.path]
@@ -44,7 +45,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
 
     const disconnectListener = (device: TrezorDevice) => {
-      log.info(':: Trezor Scan - Disconnected Device')
+      log.info(`Trezor ${device.id} disconnected`)
 
       this.withSigner(device, signer => {
         signer.close()
@@ -56,12 +57,13 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
 
     const updateListener = (device: TrezorDevice) => {
-      log.debug(':: Trezor Scan - Updated Device')
+      log.debug(`Trezor ${device.id} updated`)
+
       this.withSigner(device, signer => this.emit('update', signer))
     }
 
     const needPinListener = (device: TrezorDevice) => {
-      log.debug(':: Trezor Scan - Device Needs Pin')
+      log.debug(`Trezor ${device.id} needs pin`)
 
       this.withSigner(device, signer => {
         signer.status = 'Need Pin',
@@ -70,7 +72,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     }
 
     const needPhraseListener = (device: TrezorDevice) => {
-      log.debug(':: Trezor Scan - Device Needs Phrase')
+      log.debug(`Trezor ${device.id} needs passphrase`)
 
       this.withSigner(device, signer => {
         signer.status = 'Enter Passphrase'
@@ -129,10 +131,6 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {
     const signer = this.knownSigners[device.path]
 
-    if (signer) {
-      fn(signer)
-    } else {
-      log.warn('got Trezor Connect event for unknown signer', device)
-    }
+    if (signer) fn(signer)
   }
 }

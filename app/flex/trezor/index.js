@@ -1,4 +1,5 @@
 const TrezorConnect = require('trezor-connect').default
+const { DEVICE_EVENT, DEVICE } = require('trezor-connect')
 const EventEmitter = require('events')
 const events = new EventEmitter()
 events.setMaxListeners(128)
@@ -88,12 +89,17 @@ class Trezor {
   constructor (emit) {
     this.emit = emit
     this.devices = {}
-    TrezorConnect.on('DEVICE_EVENT', e => {
-      if (e.type === 'device-connect' || e.type === 'device-changed') {
-        if (!this.devices[e.payload.path]) {
-          this.devices[e.payload.path] = new Device(e.payload, this.emit)
-        } else {
-          this.devices[e.payload.path].update(e.payload)
+    TrezorConnect.on(DEVICE_EVENT, e => {
+      if (e.type === DEVICE.CONNECT || e.type === DEVICE.CHANGED) {
+        // when plugging in the Trezor, the first event can sometimes be "unacquired" which
+        // does not have any information about the firmware, so ignore it and wait
+        // for an "acquired" event
+        if (e.payload.type === 'acquired') {
+          if (!this.devices[e.payload.path]) {
+            this.devices[e.payload.path] = new Device(e.payload, this.emit)
+          } else {
+            this.devices[e.payload.path].update(e.payload)
+          }
         }
       } else if (e.type === 'device-disconnect') {
         if (this.devices[e.payload.path]) this.devices[e.payload.path].disconnect()
