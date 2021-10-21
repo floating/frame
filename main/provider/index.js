@@ -478,12 +478,18 @@ class Provider extends EventEmitter {
       }
     }
 
-    if (
-        version !== 'V4' &&
-        ['ledger', 'lattice'].includes((currentAccount.lastSignerType || '').toLowerCase())
-      ) {
-        const signerName = currentAccount.lastSignerType[0].toUpperCase() + currentAccount.lastSignerType.substring(1)
-        return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
+    const signerType = (currentAccount.lastSignerType || '').toLowerCase()
+
+    // check for signers that don't support signing typed data at all
+    if (['trezor'].includes(signerType)) {
+      const signerName = signerType[0].toUpperCase() + signerType.substring(1)
+      return this.resError(`${signerName} does not support eth_signTypedData`, payload, res)
+    }
+
+    // check for signers that only support signing a specific version of typed data
+    if (version !== 'V4' && ['ledger', 'lattice'].includes(signerType)) {
+      const signerName = signerType[0].toUpperCase() + signerType.substring(1)
+      return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = uuid()
