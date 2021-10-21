@@ -431,6 +431,19 @@ describe('#send', () => {
       })
     }, 100)
 
+    it('does not submit a request to a Trezor', done => {
+      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'trezor' })
+
+      // Trezor does not support signing typed data
+      const params = [address, typedData]
+
+      send({ method: 'eth_signTypedData_v4', params }, err => {
+        expect(err.error.message).toMatch(/Trezor/)
+        expect(err.error.code).toBe(-1)
+        done()
+      })
+    }, 100)
+
     it('passes a request with an unknown version through to the connection', done => {
       const params = [address, 'test']
 
