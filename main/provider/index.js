@@ -489,7 +489,7 @@ class Provider extends EventEmitter {
     // check for signers that only support signing a specific version of typed data
     if (version !== 'V4' && ['ledger', 'lattice'].includes(signerType)) {
       const signerName = signerType[0].toUpperCase() + signerType.substring(1)
-        return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
+      return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = uuid()
