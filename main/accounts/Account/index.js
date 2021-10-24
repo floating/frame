@@ -121,7 +121,9 @@ class Account {
 
   resolveRequest (req = {}) {
     if (this.requests[req.handlerId]) {
-      if (this.requests[req.handlerId].res) this.requests[req.handlerId].res()
+      if (this.requests[req.handlerId].res && req.payload) {
+        this.requests[req.handlerId].res({ id: req.payload.id, jsonrpc: req.payload.jsonrpc, result: null })
+      }
       delete this.requests[req.handlerId]
       this.update()
     }

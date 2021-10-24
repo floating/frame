@@ -534,6 +534,8 @@ class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
+      if (store('main.currentNetwork.id') === parseInt(chainId)) return res({ id: payload.id, jsonrpc: '2.0', result: null })
+
       const handlerId = uuid()
       this.handlers[handlerId] = res
       
@@ -546,7 +548,8 @@ class Provider extends EventEmitter {
           id: params[0].chainId
         },
         account: accounts.getAccounts()[0],
-        origin: payload._origin
+        origin: payload._origin,
+        payload
       }, res)
 
     } catch (e) {
@@ -597,7 +600,8 @@ class Provider extends EventEmitter {
           iconUrls
         },
         account: accounts.getAccounts()[0],
-        origin: payload._origin
+        origin: payload._origin,
+        payload
       }, res)
     }
   }
