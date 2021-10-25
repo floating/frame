@@ -5,7 +5,8 @@ const contractAddresses = {
   4: '0x42ad527de7d4e9d9d011ac45b31d8551f8fe9821', // rinkeby,
   5: '0x77dca2c955b15e9de4dbbcf1246b4b85b651e50e', // goerli
   42: '0x2cc8688c5f75e365aaeeb4ea8d6a480405a48d2a', // kovan,
-  100: '0xb5b692a88bdfc81ca69dcb1d924f59f0413a602a' // xdai
+  100: '0xb5b692a88bdfc81ca69dcb1d924f59f0413a602a', // xdai,
+  137: '0x11ce4B23bD875D7F5C6a31084f55fDe1e9A87507' // polygon
 }
 
 function chainConfig (chainId) {
