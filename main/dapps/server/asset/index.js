@@ -1,8 +1,9 @@
 const fs = require('fs')
 const path = require('path')
 const cheerio = require('cheerio')
+const nebula = require('nebula')
 
-const ipfs = require('../../../ipfs')
+const ipfs = nebula('https://ipfs.nebula.land').ipfs
 
 const resolve = require('../resolve')
 const storage = require('../storage')
@@ -34,7 +35,7 @@ module.exports = {
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
       res.writeHead(200)
-      res.write(file.content)
+      res.write(file)
       res.end()
     }
 
@@ -59,7 +60,8 @@ module.exports = {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
     res.writeHead(200)
-    const $ = cheerio.load(index.content.toString('utf8'))
+
+    const $ = cheerio.load(index.toString('utf8'))
     $('html').prepend(`
       <script>
         const initial = ${JSON.stringify(storage.get(cid) || {})}

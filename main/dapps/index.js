@@ -2,8 +2,6 @@ const log = require('electron-log')
 const { hash } = require('eth-ens-namehash')
 const crypto = require('crypto')
 
-const cheerio = require('cheerio')
-
 const resolve = require('./server/resolve')
 const store = require('../store')
 const ipfs = require('../ipfs')
