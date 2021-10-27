@@ -16,7 +16,6 @@ describe('#signTransaction', () => {
     value: '0xb5e620f48000',
     data: '0x',
     gasLimit: '0x5208',
-    chainId: '0x13881',
     type: '0x0',
     gasPrice: '0xb2d05e00'
   }
