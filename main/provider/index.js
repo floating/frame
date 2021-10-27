@@ -25,10 +25,13 @@ const proxy = require('./proxy')
 const store = require('../store')
 const chains = require('../chains')
 const accounts = require('../accounts')
+const protectedMethods = require('../api/protectedMethods')
 
 const { populate: populateTransaction, usesBaseFee, maxFee } = require('../transaction')
 
 const version = require('../../package.json').version
+
+const permission = (date, method) => ({ parentCapability: method, date })
 
 class Provider extends EventEmitter {
   constructor () {
@@ -606,6 +609,23 @@ class Provider extends EventEmitter {
     }
   }
 
+  getPermissions (payload, res) {
+    const now = new Date().getTime()
+    const toPermission = permission.bind(null, now)
+    const allowedOperations = protectedMethods.map(toPermission)
+
+    res({ id: payload.id, jsonrpc: '2.0', result: allowedOperations })
+  }
+
+  requestPermissions (payload, res) {
+    // we already require the user to grant permission to call this method so
+    // we just need to return permission objects for the requested operations
+    const now = new Date().getTime()
+    const requestedOperations = (payload.params || []).map(param => permission(now, Object.keys(param)[0]))
+
+    res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
+  }
+
   sendAsync (payload, cb) {
     this.send(payload, res => {
       if (res.error) return cb(new Error(res.error))
@@ -637,8 +657,10 @@ class Provider extends EventEmitter {
     
     if (method === 'wallet_addEthereumChain') return this.addEthereumChain(payload, res)
     if (method === 'wallet_switchEthereumChain') return this.switchEthereumChain(payload, res)
+    if (method === 'wallet_getPermissions') return this.getPermissions(payload, res)
+    if (method === 'wallet_requestPermissions') return this.requestPermissions(payload, res)
 
-    // Connection dependant methods need to pass targetChain
+    // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
     if (method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
 
