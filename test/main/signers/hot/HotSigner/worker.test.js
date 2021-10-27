@@ -45,4 +45,15 @@ describe('#signTransaction', () => {
       })
     }, 200)
   })
+
+  it('rejects a transaction with an unknown chain id', done => {
+    const { chainId, ...tx } = rawTx
+
+    worker.signTransaction(key, tx, err => {
+      try {
+        expect(err).toBe('could not determine chain id for transaction')
+        done()
+      } catch (e) { done(e) }
+    })
+  }, 200)
 })

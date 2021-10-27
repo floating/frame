@@ -62,7 +62,12 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
-    const chainId = rawTx.chainId ? parseInt(rawTx.chainId) : 1
+    if (!rawTx.chainId) {
+      console.error(`invalid chain id ${rawTx.chainId} for transaction`)
+      return pseudoCallback('could not determine chain id for transaction')
+    }
+
+    const chainId = parseInt(rawTx.chainId)
     const hardfork = parseInt(rawTx.type) === 2 ? 'london' : 'berlin'
     const common = chainConfig(chainId, hardfork)
 
