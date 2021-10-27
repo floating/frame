@@ -1,14 +1,25 @@
 const crypto = require('crypto')
 const ethSigUtil = require('eth-sig-util')
 const { TransactionFactory } = require('@ethereumjs/tx')
+const Common = require('@ethereumjs/common').default
 
-const { hashPersonalMessage,
+const {
+  BN,
+  hashPersonalMessage,
   toBuffer,
   ecsign,
   addHexPrefix,
   pubToAddress,
   ecrecover
 } = require('ethereumjs-util')
+
+function chainConfig (chain, hardfork) {
+  const chainId = new BN(chain)
+
+  return Common.isSupportedChainId(chainId)
+    ? new Common({ chain: chainId.toNumber(), hardfork })
+    : Common.custom({ chainId: chainId.toNumber() }, { baseChain: 'mainnet', hardfork })
+}
 
 class HotSignerWorker {
   constructor () {
@@ -51,7 +62,11 @@ class HotSignerWorker {
   }
 
   signTransaction (key, rawTx, pseudoCallback) {
-    const tx = TransactionFactory.fromTxData(rawTx)
+    const chainId = rawTx.chainId ? parseInt(rawTx.chainId) : 1
+    const hardfork = parseInt(rawTx.type) === 2 ? 'london' : 'berlin'
+    const common = chainConfig(chainId, hardfork)
+
+    const tx = TransactionFactory.fromTxData(rawTx, { common })
     const signedTx = tx.sign(key)
     const serialized = signedTx.serialize().toString('hex')
 
