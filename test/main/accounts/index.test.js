@@ -58,6 +58,11 @@ beforeEach(() => {
       maxPriorityFeePerGas: gweiToHex(1),
       maxFeePerGas: gweiToHex(9),
       nonce: '0xa'
+    },
+    payload: {
+      jsonrpc: '2.0',
+      id: 7,
+      method: 'eth_signTransaction'
     }
   }
 
@@ -718,11 +723,13 @@ describe('#resolveRequest', () => {
   })
 
   it ('resolves a request with a callback', done => {
-    Accounts.addRequest(request, done)
+    Accounts.addRequest(request, () => done())
 
     Accounts.resolveRequest(request)
 
-    expect(Object.keys(Accounts.current().requests)).toHaveLength(0)
+    try {
+      expect(Object.keys(Accounts.current().requests)).toHaveLength(0)
+    } catch (e) { done(e) }
   })
 
   it ('resolves a request with no callback', () => {
