@@ -8,6 +8,7 @@ log.transports.console.level = false
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
+console.log({ SIGNER_PATH })
 
 const mockPersist = {
   get: jest.fn(),
@@ -15,8 +16,12 @@ const mockPersist = {
   queue: jest.fn()
 }
 
-jest.mock('../../compiled/store/persist', () => mockPersist)
-jest.mock('../../main/store/persist', () => mockPersist)
+jest.mock('electron', () => ({
+  app: undefined
+}))
+
+jest.mock('../../../../../compiled/store/persist', () => mockPersist)
+jest.mock('../../../../../main/store/persist', () => mockPersist)
 
 // Stubs
 const signers = { add: () => {} }
@@ -31,11 +36,11 @@ describe('Seed signer', () => {
   beforeAll(async () => {
     clean()
 
-    hot = await import('../../compiled/signers/hot')
-    store = require('../../compiled/store')
+    hot = await import('../../../../../compiled/signers/hot')
+    store = require('../../../../../compiled/store')
   })
 
-  afterAll(clean)
+  //afterAll(clean)
 
   test('Create from invalid phrase', (done) => {
     const mnemonic = 'invalid mnemonic'
@@ -70,7 +75,7 @@ describe('Seed signer', () => {
       exists: () => false
     }
     hot.scan(signers)
-  }, 15 * 1000)
+  }, 10 * 1000)
 
   test('Unlock with wrong password', (done) => {
     signer.unlock('Wrong password', err => {
@@ -103,7 +108,8 @@ describe('Seed signer', () => {
       gasPrice: '0x09184e72a000',
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x0'
+      value: '0x0',
+      chainId: '0x1'
     }
 
     signer.signTransaction(0, rawTx, (err, result) => {
