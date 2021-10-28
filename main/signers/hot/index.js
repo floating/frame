@@ -12,10 +12,9 @@ const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
 const { stripHexPrefix } = require('ethereumjs-util')
 
-const USER_DATA = app ? app.getPath('userData') : './test/.userData'
+const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData');
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-console.log({ SIGNERS_PATH })
 const wait = async ms => new Promise(resolve => setTimeout(resolve, ms))
 
 module.exports = {

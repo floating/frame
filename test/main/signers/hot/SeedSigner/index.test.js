@@ -4,11 +4,9 @@ import { remove } from 'fs-extra'
 import { generateMnemonic } from 'bip39'
 
 import log from 'electron-log'
-log.transports.console.level = false
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
-console.log({ SIGNER_PATH })
 
 const mockPersist = {
   get: jest.fn(),
@@ -16,10 +14,7 @@ const mockPersist = {
   queue: jest.fn()
 }
 
-jest.mock('electron', () => ({
-  app: undefined
-}))
-
+jest.mock('electron')
 jest.mock('../../../../../compiled/store/persist', () => mockPersist)
 jest.mock('../../../../../main/store/persist', () => mockPersist)
 
@@ -34,13 +29,23 @@ describe('Seed signer', () => {
   let signer
 
   beforeAll(async () => {
+    log.transports.console.level = false
+
     clean()
 
     hot = await import('../../../../../compiled/signers/hot')
     store = require('../../../../../compiled/store')
   })
 
-  //afterAll(clean)
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  afterAll(() => {
+    clean()
+
+    log.transports.console.level = 'debug'
+  })
 
   test('Create from invalid phrase', (done) => {
     const mnemonic = 'invalid mnemonic'
@@ -61,9 +66,11 @@ describe('Seed signer', () => {
       expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
       done()
     })
-  })
+  }, 1000)
 
   test('Scan for signers', (done) => {
+    jest.useFakeTimers()
+
     let count = 0
     const signers = {
       add: (signer) => {
@@ -74,8 +81,11 @@ describe('Seed signer', () => {
       },
       exists: () => false
     }
+
     hot.scan(signers)
-  }, 10 * 1000)
+
+    jest.runAllTimers()
+  }, 1000)
 
   test('Unlock with wrong password', (done) => {
     signer.unlock('Wrong password', err => {

@@ -14,8 +14,6 @@ const windows = app ? require('../../../windows') : { broadcast: () => {} }
 const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData')
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
-console.log({ SIGNERS_PATH })
-
 class HotSigner extends Signer {
   constructor (signer, workerPath) {
     super()

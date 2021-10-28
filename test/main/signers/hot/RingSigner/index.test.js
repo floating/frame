@@ -5,7 +5,6 @@ import crypto from 'crypto'
 import { remove } from 'fs-extra'
 
 import log from 'electron-log'
-log.transports.console.level = false
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
@@ -17,8 +16,9 @@ const mockPersist = {
   queue: jest.fn()
 }
 
-jest.mock('../../compiled/store/persist', () => mockPersist)
-jest.mock('../../main/store/persist', () => mockPersist)
+jest.mock('electron')
+jest.mock('../../../../../compiled/store/persist', () => mockPersist)
+jest.mock('../../../../../main/store/persist', () => mockPersist)
 
 // Stubs
 const signers = { add: () => {} }
@@ -31,13 +31,23 @@ describe('Ring signer', () => {
   let signer
 
   beforeAll(async () => {
+    log.transports.console.level = false
+
     clean()
 
-    hot = await import('../../compiled/signers/hot')
-    store = require('../../compiled/store')
+    hot = await import('../../../../../compiled/signers/hot')
+    store = require('../../../../../compiled/store')
   })
 
-  afterAll(clean)
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  afterAll(() => {
+    clean()
+
+    log.transports.console.level = 'debug'
+  })
 
   test('Create from invalid private key', done => {
     const privateKey = 'invalid key'
@@ -77,6 +87,8 @@ describe('Ring signer', () => {
   })
 
   test('Scan for signers', done => {
+    jest.useFakeTimers()
+
     let count = 0
     const signers = {
       add: (signer) => {
@@ -91,7 +103,9 @@ describe('Ring signer', () => {
     }
 
     hot.scan(signers)
-  }, 15 * 1000)
+
+    jest.runAllTimers()
+  }, 1000)
 
   test('Close signer', done => {
     try {
@@ -196,7 +210,8 @@ describe('Ring signer', () => {
       gasPrice: '0x09184e72a000',
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x0'
+      value: '0x0',
+      chainId: '0x1'
     }
 
     signer.signTransaction(0, rawTx, (err, result) => {
