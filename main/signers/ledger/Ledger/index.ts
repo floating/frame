@@ -16,7 +16,6 @@ const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 export const Status = {
   INITIAL: 'Connecting',
   OK: 'ok',
-  LOADING: 'loading',
   DERIVING: 'Deriving addresses',
   LOCKED: 'Please unlock your ledger',
   WRONG_APP: 'Open your Ledger and select the Ethereum application',
@@ -184,8 +183,19 @@ export default class Ledger extends Signer {
     }
   }
 
+  private isValidStatusTransition (status: string) {
+    // TODO: outline all valid state transitions
+    if (status === Status.DERIVING) {
+      return [Status.OK, Status.INITIAL].includes(this.status)
+    }
+
+    return true
+  }
+
   updateStatus (status: string) {
-    this.status = status
+    if (this.isValidStatusTransition(status)) {
+      this.status = status
+    }
 
     if (this.status === Status.OK) {
       clearInterval(this.statusPoller)
