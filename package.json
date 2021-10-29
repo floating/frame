@@ -62,9 +62,10 @@
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder -c.snap.publish=github",
     "postinstall": "electron-builder install-app-deps",
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "npm run compile && jest --env=node --testPathIgnorePatterns='/e2e|/main/signers/ledger/adapter' --detectOpenHandles --runInBand",
+    "test:unit": "npm run compile && jest --env=node --testPathIgnorePatterns='/e2e|/main/signers/ledger/adapter' --detectOpenHandles --runInBand && npm run test:usbAdapters",
     "test:e2e": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e",
     "test:e2e:nodeploy": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e --testPathIgnorePatterns=deploy",
+    "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js",
     "standard": "standardx --fix --verbose",
     "test:clients": "mocha test/clients/*.test.js",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
