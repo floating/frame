@@ -117,7 +117,10 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   }
 
   close () {
-    this.observer.remove()
+    if (this.observer) {
+      this.observer.remove()
+      this.observer = null
+    }
 
     Object.entries(this.flexListeners).forEach(([event, listener]) => flex.off(event, listener))
 

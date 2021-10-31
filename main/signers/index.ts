@@ -14,10 +14,12 @@ import TrezorAdapter  from './trezor/adapter'
 import lattice from './lattice'
 
 import store from '../store'
+import LatticeAdapter from './lattice/adapter'
 
 const registeredAdapters = [
   new LedgerAdapter(),
-  new TrezorAdapter()
+  new TrezorAdapter(),
+  new LatticeAdapter
 ]
 
 interface AdapterSpec {
@@ -42,7 +44,6 @@ class Signers extends EventEmitter {
 
     // TODO: convert these scans to adapters
     this.scans = {
-      lattice: lattice.scan(this),
       hot: hot.scan(this)
     }
 
