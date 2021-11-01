@@ -210,7 +210,7 @@ class Signer extends React.Component {
   }
 
   pairToLattice () {
-    link.rpc('latticePair', this.props.id, this.state.latticePairCode, (err, accounts) => {
+    link.rpc('latticePair', this.props.id, this.state.latticePairCode, err => {
       if (err) {
         this.setState({ status: err, error: true })
       } else {

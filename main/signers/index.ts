@@ -2,7 +2,6 @@
 
 import EventEmitter from 'events'
 import log from 'electron-log'
-import crypto from 'crypto'
 
 import Signer from './Signer'
 import { SignerAdapter } from './adapters'
@@ -90,41 +89,6 @@ class Signers extends EventEmitter {
     delete this.adapter[adapter.adapterType]
   }
 
-  async latticePair (id, pin) {
-    try {
-      const signer = this.get(id)
-      if (signer && signer.setPair) {
-        try {
-          const result = await signer.setPair(pin)
-          return result
-        } catch (err) {
-          log.error('latticePair Error', err)
-          return new Error(err)
-        }
-      } else {
-        return new Error('Could not pair')
-      }
-    } catch (err) {
-      return new Error(err)
-    }
-  }
-
-  async createLattice (deviceId) {
-    if (deviceId) {
-      store.updateLattice(deviceId, { 
-        deviceId, 
-        baseUrl: 'https://signing.gridpl.us',
-        endpointMode: 'default',
-        suffix: '',
-        privKey: crypto.randomBytes(32).toString('hex')  
-      })    
-      return { id: 'lattice-' + deviceId}
-    } else {
-      throw new Error('No Device ID')
-    }
-  }
-
-
   async latticeConnect (connectOpts) {
     const signer = lattice(this)
     if (signer && signer.open) {
@@ -145,6 +109,10 @@ class Signers extends EventEmitter {
   }
 
   add (signer: Signer) {
+    if (signer.type === 'lattice') {
+      console.log('---> adding', signer)
+    }
+    
     const id = signer.id
 
     if (!(id in this.signers)) {
@@ -156,6 +124,7 @@ class Signers extends EventEmitter {
 
   remove (id: string, close = true) {
     if (id in this.signers) {
+      console.log('REMOVING', { id })
       store.removeSigner(id)
 
       const signer = this.signers[id]

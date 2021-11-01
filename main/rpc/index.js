@@ -2,6 +2,7 @@ const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
 const log = require('electron-log')
 const utils = require('web3-utils')
+const crypto = require('crypto')
 
 const accounts = require('../accounts')
 const signers = require('../signers')
@@ -64,21 +65,36 @@ const rpc = {
       cb(new Error('Set phrase not available'))
     }
   },
-  createLattice: async (id, cb) => {
-    try {
-      cb(null, await signers.createLattice(id))
-    } catch (e) {
-      log.error('latticeContactError', e)
-      cb(e)
+  createLattice: (deviceId, cb) => {
+    if (deviceId) {
+      store.updateLattice(deviceId, { 
+        deviceId, 
+        baseUrl: 'https://signing.gridpl.us',
+        endpointMode: 'default',
+        suffix: '',
+        privKey: crypto.randomBytes(32).toString('hex')  
+      })
+      
+      cb(null, { id: 'lattice-' + deviceId})
+    } else {
+      cb(new Error('No Device ID'))
     }
   },
   latticePair (id, pin, cb) {
-    signers.latticePair(id, pin).then(result => {
-      cb(null, result)
-    }).catch(err => {
-      log.error('latticePairError', err)
-      cb(err)
-    })
+    console.log('LATTICE PAIR', { id, pin })
+      const signer = signers.get(id)
+
+      console.log({ signer })
+      if (signer && signer.pair) {
+        return signer.pair(pin)
+          .then(res => cb(null, res))
+          .catch(err => {
+            log.error('Lattice pairing error', err)
+            cb(err)
+          })
+        }
+
+      cb('Error pairing')
   },
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),
