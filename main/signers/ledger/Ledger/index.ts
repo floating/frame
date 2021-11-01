@@ -88,8 +88,6 @@ export default class Ledger extends Signer {
 
     this.devicePath = devicePath
 
-    this.addresses = []
-
     this.id = uuid('Ledger' + this.devicePath, ns)
     this.type = 'ledger'
     this.model = model
