@@ -39,7 +39,6 @@ export default class Lattice extends Signer {
     this.status = Status.CONNECTING
     this.emit('update')
 
-    console.log({ Client })
     this.connection = new Client({
       name, baseUrl, privKey: privateKey, crypto
     })
@@ -55,19 +54,9 @@ export default class Lattice extends Signer {
 
       this.appVersion = { major, minor, patch }
 
-      if (paired) {
-        // Lattice recognizes the private key and remembers if this
-        // client is already paired between sessions
-        await this.deriveAddresses()
-      } else {
-        this.status = Status.PAIRING
-        this.emit('update')
-      }
+      this.emit('connect', paired)
     } catch (e) {
-      log.error('could not connect to Lattice', e)
-
-      this.status = Status.DISCONNECTED
-      this.emit('update')
+      this.handleError('could not connect to Lattice', e)
     }
   }
 
@@ -76,6 +65,8 @@ export default class Lattice extends Signer {
   }
 
   close () {
+    this.disconnect()
+    
     this.emit('close')
     this.removeAllListeners()
     
@@ -93,12 +84,9 @@ export default class Lattice extends Signer {
       const clientPair = promisify<string, boolean>(this.connection.pair).bind(this.connection)
       const hasActiveWallet = await clientPair(pairingCode)
 
-      if (hasActiveWallet) {
-        await this.deriveAddresses()
-      }
-    } catch (e) { 
-      this.status = Status.NEEDS_RECONNECTION
-      this.emit('update')
+      this.emit('paired', hasActiveWallet)
+    } catch (e) {
+      this.handleError('could not pair to Lattice', e)
     }
   }
 
@@ -154,5 +142,14 @@ export default class Lattice extends Signer {
 
   private getPath (index: number) {
     return [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+  }
+
+  private handleError (message: string, err: any) {
+    log.error(message, err)
+
+    this.disconnect()
+
+    this.status = Status.NEEDS_RECONNECTION
+    this.emit('update')
   }
 }

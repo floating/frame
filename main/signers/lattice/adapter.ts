@@ -2,7 +2,7 @@ import log from 'electron-log'
 
 import { SignerAdapter } from '../adapters'
 import store from '../../store'
-import Lattice from './Lattice'
+import Lattice, { Status } from './Lattice'
 
 interface LatticeSettings {
   deviceName: string,
@@ -69,8 +69,27 @@ export default class LatticeAdapter extends SignerAdapter {
         log.debug('Connecting to Lattice device', { deviceId })
 
         const lattice = new Lattice(deviceId)
+        const emitUpdate = () => this.emit('update', lattice)
 
-        lattice.on('update', () => this.emit('update', lattice))
+        lattice.on('update', emitUpdate)
+
+        lattice.on('connect', paired => {
+          if (paired) {
+            // Lattice recognizes the private key and remembers if this
+            // client is already paired between sessions
+            lattice.deriveAddresses()
+          } else {
+            lattice.status = Status.PAIRING
+            emitUpdate()
+          }
+        })
+
+        lattice.on('paired', (hasActiveWallet: boolean) => {
+          if (hasActiveWallet) {
+            lattice.deriveAddresses()
+          }
+        })
+
         lattice.on('close', () => {
           delete this.knownSigners[deviceId]
           this.emit('remove', lattice.id)
