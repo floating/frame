@@ -6,6 +6,14 @@ import svg from '../../../../resources/svg' // TODO: get gridplus svg
 
 import Signer from '../../Signer'
 
+function parseDeviceName (name) {
+  if (!name) return 'Frame'
+
+  // Lattice only supports a suffix of up to 24 characters, and we append 
+  // "Frame-<device code>-" (13 characters) to the front so limit it to 11 characters
+  return name.replace(/\s+/g, '').substring(0, 11)
+}
+
 class AddHardwareLattice extends React.Component {
   constructor (...args) {
     super(...args)
@@ -15,16 +23,20 @@ class AddHardwareLattice extends React.Component {
       status: '',
       error: false,
       deviceId: '',
+      deviceName: 'Frame',
       pairCode: ''
     }
-    this.forms = [React.createRef(), React.createRef(), React.createRef()]
+    this.forms = [React.createRef(), React.createRef(), React.createRef(), React.createRef()]
   }
 
   onChange (key, e) {
     e.preventDefault()
-    const update = {}
-    update[key] = (e.target.value || '') // .replace(/\W/g, '')
-    this.setState(update)
+
+    const value = (key === 'deviceName')
+      ? parseDeviceName(e.target.value)
+      : e.target.value
+    
+    this.setState({ [key]: value || '' })
   }
 
   onBlur (key, e) {
@@ -66,7 +78,7 @@ class AddHardwareLattice extends React.Component {
   }
 
   createLattice () {
-    link.rpc('createLattice', this.state.deviceId, (err, signer) => {
+    link.rpc('createLattice', this.state.deviceId, this.state.deviceName, (err, signer) => {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
@@ -108,6 +120,26 @@ class AddHardwareLattice extends React.Component {
             </div>
             <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
             <div className='addAccountItemSummary'>GridPlus Lattice1</div>
+          </div>
+          <div className='addAccountItemOption'>
+          <div
+              className='addAccountItemOptionSetup'
+              style={{ top: '-120px', transform: `translateX(-${100 * this.state.index}%)` }}
+            >
+              <div className='addAccountItemOptionSetupFrames'>
+                <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>Device Name</div>
+                  <div className='addAccountItemOptionInputPhrase'>
+                    <input
+                        tabIndex='-1' ref={this.forms[0]} value={this.state.deviceName}
+                        onChange={e => this.onChange('deviceName', e)}
+                        onFocus={e => this.onFocus('deviceName', e)}
+                        onBlur={e => this.onBlur('deviceName', e)} 
+                      />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div className='addAccountItemOption'>
             <div

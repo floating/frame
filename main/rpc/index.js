@@ -13,6 +13,10 @@ const dapps = require('../dapps')
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
 
+function randomLetters (num) {
+  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
+}
+
 const { resolveName } = require('../accounts/aragon')
 
 const rpc = {
@@ -65,13 +69,14 @@ const rpc = {
       cb(new Error('Set phrase not available'))
     }
   },
-  createLattice: (deviceId, cb) => {
+  createLattice: (deviceId, deviceName, cb) => {
+    console.log('CREATE LATTICE', { deviceId, deviceName, full: deviceName.substring(0, 17) + '-' + randomLetters(6) })
     if (deviceId) {
-      store.updateLattice(deviceId, { 
+      store.updateLattice(deviceId, {
         deviceId, 
         baseUrl: 'https://signing.gridpl.us',
         endpointMode: 'default',
-        suffix: '',
+        deviceName: deviceName.substring(0, 17) + '-' + randomLetters(6),
         privKey: crypto.randomBytes(32).toString('hex')  
       })
       
@@ -86,12 +91,13 @@ const rpc = {
 
       console.log({ signer })
       if (signer && signer.pair) {
-        return signer.pair(pin)
-          .then(res => cb(null, res))
-          .catch(err => {
-            log.error('Lattice pairing error', err)
-            cb(err)
-          })
+        //signer.once('paired')
+        signer.pair(pin)
+          // .then(res => cb(null, res))
+          // .catch(err => {
+          //   log.error('Lattice pairing error', err)
+          //   cb(err)
+          // })
         }
 
       cb('Error pairing')

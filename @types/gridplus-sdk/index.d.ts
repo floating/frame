@@ -7,12 +7,12 @@ declare module 'gridplus-sdk' {
     privKey: string;
     fwVersion: [number, number, number] | undefined;
 
-    connect (deviceId: string | Callback, cb?: Callback);
-    pair (pairingSecret: string, cb: Callback);
+    connect (deviceId: string | Callback<boolean>, cb?: Callback<boolean>);
+    pair (pairingSecret: string, cb: Callback<boolean>);
     getAddresses (opts: DerivationOptions, cb: Callback);
   }
 
-  type Callback = (err: string | null, result: any | undefined) => void
+  type Callback<T> = (err: string | null, result: T | undefined) => void
 
   export interface ClientOptions {
     name?: string,

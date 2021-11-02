@@ -170,8 +170,7 @@ const initial = {
     latticeSettings: {
       accountLimit: main('latticeSettings.accountLimit', 5),
       endpointMode: main('latticeSettings.endpointMode', 'default'),
-      endpointCustom: main('latticeSettings.endpointCustom', ''),
-      suffix: main('latticeSettings.suffix', '')
+      endpointCustom: main('latticeSettings.endpointCustom', '')
     },
     ledger: {
       derivation: main('ledger.derivation', 'live'),

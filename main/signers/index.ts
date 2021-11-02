@@ -122,19 +122,23 @@ class Signers extends EventEmitter {
     }
   }
 
-  remove (id: string, close = true) {
-    if (id in this.signers) {
+  remove (id: string) {
+    const signer = this.signers[id]
+    
+    if (signer) {
       console.log('REMOVING', { id })
+      delete this.signers[id]
       store.removeSigner(id)
 
-      const signer = this.signers[id]
+      const type = (signer.type === 'ring' || signer.type === 'seed') ? 'hot' : signer.type
 
-      // for backwards compatibility, when all scans are converted to adapters
-      // they should close the signers before emitting the close event
-      if (close) signer.close()
-      if (signer.delete) signer.delete()
-
-      delete this.signers[id]
+      if (type in this.adapters) {
+        this.adapters[type].adapter.remove(signer)
+      } else {
+        // backwards compatibility
+        signer.close()
+        signer.delete()
+      }
     }
   }
 

@@ -28,7 +28,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       log.info(`Trezor ${device.id} connected: ${trezor.model}, firmware v${version}`)
 
       trezor.on('close', () => {
-        delete this.knownSigners[device.path]
+        this.remove(trezor)
 
         this.emit('remove', trezor.id)
       })
@@ -48,9 +48,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       log.info(`Trezor ${device.id} disconnected`)
 
       this.withSigner(device, signer => {
-        signer.close()
-
-        delete this.knownSigners[device.path]
+        this.remove(signer)
 
         this.emit('remove', signer.id)
       })
@@ -127,8 +125,14 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     super.close()
   }
 
-  reload (signer: Signer) {
-    signer.open()
+  remove (trezor: Trezor) {
+    delete this.knownSigners[trezor.device.path]
+
+    trezor.close()
+  }
+
+  reload (trezor: Trezor) {
+    trezor.open()
   }
 
   private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {
