@@ -16,8 +16,7 @@ class Settings extends React.Component {
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
-    const latticeSuffix = context.store('main.latticeSettings.suffix')
-    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeSuffix, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
+    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
       if (this.network !== id || this.networkType !== type) {
@@ -117,19 +116,6 @@ class Settings extends React.Component {
     this.setState({ latticeEndpoint: value })
     // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
-  }
-
-  inputLatticeSuffix (e) {
-    e.preventDefault()
-    clearTimeout(this.inputLatticeSuffixTimeout)
-
-    // Lattice only supports a suffix of up to 24 characters, and we append "Frame-"
-    // to the front so limit it to 18 characters
-    const value = e.target.value.replace(/\s+/g, '').substring(0, 18)
-
-    this.setState({ latticeSuffix: value })
-    // TODO: Update to target specific Lattice device rather than global
-    this.inputLatticeSuffixTimeout = setTimeout(() => link.send('tray:action', 'setLatticeSuffix', this.state.latticeSuffix), 1000)
   }
 
   localShake (key) {
@@ -427,14 +413,6 @@ class Settings extends React.Component {
             </div>
             <div className={this.state.latticeEndpointMode === 'custom' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
               <input tabIndex='-1' placeholder={'Custom Relay'} value={this.state.latticeEndpoint} onChange={e => this.inputLatticeEndpoint(e)} />
-            </div>
-          </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 201 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Lattice Frame Suffix</div>
-            </div>
-            <div className='connectionCustomInput connectionCustomInputOn'>
-              <input placeholder={'Lattice Suffix'} tabIndex='-2' value={this.state.latticeSuffix} onChange={e => this.inputLatticeSuffix(e)} />
             </div>
           </div>
 

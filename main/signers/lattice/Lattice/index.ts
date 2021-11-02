@@ -12,8 +12,9 @@ export const Status = {
   INITIAL: 'loading',
   OK: 'ok',
   CONNECTING: 'connecting',
-  DERIVING: 'addresses',
-  PAIRING: 'pair',
+  DERIVING: 'Deriving addresses',
+  READY_FOR_PAIRING: 'pair',
+  PAIRING: 'Pairing',
   WRONG_APP: 'Open your Ledger and select the Ethereum application',
   DISCONNECTED: 'Disconnected',
   NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
@@ -35,7 +36,7 @@ export default class Lattice extends Signer {
     this.model = 'Lattice1'
   }
 
-  async connect (name: string, baseUrl: string, privateKey: string) {
+  connect (name: string, baseUrl: string, privateKey: string) {
     this.status = Status.CONNECTING
     this.emit('update')
 
@@ -43,25 +44,27 @@ export default class Lattice extends Signer {
       name, baseUrl, privKey: privateKey, crypto
     })
 
-    try {
-      const clientConnect = promisify<string, boolean>(this.connection.connect).bind(this.connection)
+    this.connection.connect(this.deviceId, (err, paired) => {
+      if (err) return this.handleError('could not connect to Lattice', err)
 
-      const paired = await clientConnect(this.deviceId)
-
-      const [patch, minor, major] = this.connection.fwVersion || [0, 0, 0]
+      const [patch, minor, major] = this.connection?.fwVersion || [0, 0, 0]
 
       log.debug(`Connected to Lattice with deviceId=${this.deviceId}, firmware v${major}.${minor}.${patch}`)
 
       this.appVersion = { major, minor, patch }
 
+      if (!paired) {
+        this.status = Status.READY_FOR_PAIRING
+        this.emit('update')
+      }
+
       this.emit('connect', paired)
-    } catch (e) {
-      this.handleError('could not connect to Lattice', e)
-    }
+    })
   }
 
   disconnect () {
     this.connection = null
+    this.addresses = []
   }
 
   close () {
@@ -73,21 +76,21 @@ export default class Lattice extends Signer {
     super.close()
   }
 
-  async pair (pairingCode: string) {
+  pair (pairingCode: string) {
     log.debug('pairing to Lattice with code', pairingCode)
 
     if (!this.connection) {
       throw new Error('attempted to pair to disconnected Lattice')
     }
 
-    try {
-      const clientPair = promisify<string, boolean>(this.connection.pair).bind(this.connection)
-      const hasActiveWallet = await clientPair(pairingCode)
+    this.status = Status.PAIRING
+    this.emit('update')
+
+    this.connection.pair(pairingCode, (err, hasActiveWallet) => {
+      if (err) return this.handleError('could not pair to Lattice', err)
 
       this.emit('paired', hasActiveWallet)
-    } catch (e) {
-      this.handleError('could not pair to Lattice', e)
-    }
+    })
   }
 
   async deriveAddresses (retriesRemaining = 2) {

@@ -11,15 +11,12 @@ interface LatticeSettings {
 }
 
 function getLatticeSettings (deviceId: string): LatticeSettings {
-  // Lattice supports a name with a max of 24 characters
-  const suffix = store('main.latticeSettings.suffix')
-  const deviceName = suffix ? `Frame-${suffix.substring(0, 18)}` : 'Frame'
-
   const endpointMode = store('main.latticeSettings.endpointMode')
   const baseUrl = (endpointMode === 'custom')
     ? store('main.latticeSettings.endpointCustom')
     : 'https://signing.gridpl.us'
   
+  const deviceName = store('main.lattice', deviceId, 'deviceName')
   const privateKey = store('main.lattice', deviceId, 'privKey')
 
   return { deviceName, baseUrl, privateKey }
@@ -39,19 +36,15 @@ export default class LatticeAdapter extends SignerAdapter {
 
   open () {
     this.settingsObserver = store.observer(() => {
+      console.log('SETTINGS CHANGED!')
       Object.values(this.knownSigners).forEach(lattice => {
         if (!lattice.connection) return
         
-        const { deviceName, baseUrl, privateKey } = getLatticeSettings(lattice.deviceId)
+        const { baseUrl } = getLatticeSettings(lattice.deviceId)
         
         // if any connection settings have changed, re-connect
-        if (
-          deviceName !== lattice.connection.name ||
-          baseUrl !== lattice.connection.baseUrl ||
-          privateKey !== lattice.connection.privKey
-        ) {
-          lattice.disconnect()
-          lattice.connect(deviceName, baseUrl, privateKey)
+        if (baseUrl !== lattice.connection.baseUrl) {
+          this.reload(lattice)
         }
       })
 
@@ -78,9 +71,6 @@ export default class LatticeAdapter extends SignerAdapter {
             // Lattice recognizes the private key and remembers if this
             // client is already paired between sessions
             lattice.deriveAddresses()
-          } else {
-            lattice.status = Status.PAIRING
-            emitUpdate()
           }
         })
 
@@ -92,12 +82,13 @@ export default class LatticeAdapter extends SignerAdapter {
 
         lattice.on('close', () => {
           delete this.knownSigners[deviceId]
+
           this.emit('remove', lattice.id)
         })
 
         this.knownSigners[deviceId] = lattice
         this.emit('add', lattice)
-
+        
         const { deviceName, baseUrl, privateKey } = getLatticeSettings(lattice.deviceId)
         lattice.connect(deviceName, baseUrl, privateKey)
       })
@@ -114,5 +105,18 @@ export default class LatticeAdapter extends SignerAdapter {
       this.settingsObserver.remove()
       this.settingsObserver = null
     }
+  }
+
+  remove (lattice: Lattice) {
+    store.removeLattice(lattice.deviceId)
+
+    lattice.close()
+  }
+
+  reload (lattice: Lattice) {
+    lattice.disconnect()
+
+    const { deviceName, baseUrl, privateKey } = getLatticeSettings(lattice.deviceId)
+    lattice.connect(deviceName, baseUrl, privateKey)
   }
 }
