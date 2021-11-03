@@ -4,6 +4,10 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
+function isHardwareSigner (type) {
+  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
+}
+
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
@@ -186,12 +190,15 @@ class Signer extends React.Component {
         <div className='signerStatusText signerStatusReady'>{'ready to sign'}</div>
       )
     } else if (this.props.status === 'locked') {
+      const lockText = isHardwareSigner(this.props.type)
+        ? 'Please unlock your ' + this.props.model
+        : 'locked'
       return (
-        <div className='signerStatusText signerStatusIssue'>{'locked'}</div>
+        <div className='signerStatusText signerStatusIssue'>{lockText}</div>
       )
     } else if (this.props.status === 'addresses') {
       return (
-        <div className='signerStatusText'>{'getting addresses'}</div>
+        <div className='signerStatusText'>{'Deriving Addresses'}</div>
       )
     } else {
       return (
@@ -228,6 +235,13 @@ class Signer extends React.Component {
 
     const activeAccounts = signer.addresses.filter(a => this.store('main.accounts', a.toLowerCase()))
 
+    console.log({ props: this.props })
+    const status = (this.props.status || '').toLowerCase()
+
+    const isHwSigner = isHardwareSigner(this.props.type)
+    const isLoading = ['loading', 'connecting', 'addresses', 'pairing'].includes(status)
+    const isDisconnected = isHwSigner && !isLoading && status !== 'ok'
+
     let signerClass = 'signer'
     if (this.props.status === 'ok') signerClass += ' signerOk'
     if (this.props.status === 'locked') signerClass += ' signerLocked'
@@ -246,7 +260,7 @@ class Signer extends React.Component {
             return <div className='signerIconWrap'>{svg.logo(20)}</div>
           })()}
           </div>
-          <div className='signerType'>{this.props.type}</div>
+          <div className='signerType'>{this.props.model}</div>
           <div className='signerName'>
             {this.props.name}
             <div className='signerNameUpdate'>
@@ -279,7 +293,7 @@ class Signer extends React.Component {
               className='signerLatticePairSubmit'
             >Pair</div>
           </div>
-        ) : this.props.status === 'ok' || this.props.status === 'locked' ? (
+        ) : this.props.status === 'ok' || (this.props.status === 'locked' && !isHwSigner) ? (
           <>
             {/* <div className='signerAccountsTitle'>
               <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
@@ -318,18 +332,20 @@ class Signer extends React.Component {
             {this.renderTrezorPin(this.props.type === 'trezor' && this.props.status === 'Need Pin')}
             {this.renderTrezorPhrase(this.props.type === 'trezor' && this.props.status === 'Enter Passphrase')}
           </div> 
-        ) : (
+        ) : isLoading ? (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />
           </div>
-        )}
-        <div className='signerDrawer'>
-          <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-            {this.state.showControls ? 'hide' : 'more'}
+        ): <></>}
+        {isDisconnected ? null : (
+          <div className='signerDrawer'>
+            <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
+              {this.state.showControls ? 'hide' : 'more'}
+            </div>
+            <div className='showControlsLine' />
           </div>
-          <div className='showControlsLine' />
-        </div>
-        {this.state.showControls ? (
+        )}
+        {this.state.showControls || isDisconnected ? (
           <div className='signerControls cardShow'>
             {/* <div className='signerControlOption'>Hide empty accounts</div>
             <div className='signerControlOption'>Deactivte empty Accounts</div>
@@ -338,7 +354,7 @@ class Signer extends React.Component {
             <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div> */}
             <div className='signerControlOption' onMouseDown={() => {
               link.send('dash:reloadSigner', this.props.id)
-            }}>Reload Signer</div>
+            }}>{isHwSigner ? 'Re-connect' : 'Reload Signer'}</div>
             <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
               link.send('dash:removeSigner', this.props.id)
             }}>Remove Signer</div>

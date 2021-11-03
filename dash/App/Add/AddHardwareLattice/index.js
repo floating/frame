@@ -22,7 +22,7 @@ class AddHardwareLattice extends React.Component {
       index: 0,
       status: '',
       error: false,
-      deviceId: '',
+      deviceId: 'NcBASi',
       deviceName: 'Frame',
       pairCode: ''
     }
@@ -82,7 +82,8 @@ class AddHardwareLattice extends React.Component {
       if (err) {
         this.setState({ status: err, error: true })
       } else {
-        this.setState({ status: 'Successful', error: false, createdSignerId: signer.id })
+        this.setState({ status: 'Successful', error: false })
+        this.props.close()
       }
     })
   }
@@ -102,10 +103,8 @@ class AddHardwareLattice extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
-    let signer
-    if (this.state.createdSignerId) {
-      signer = this.store('main.signers', this.state.createdSignerId)
-    }
+
+    let statusMessage = (this.state.error && this.state.status)
 
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
@@ -154,7 +153,7 @@ class AddHardwareLattice extends React.Component {
                   <div className='addAccountItemOptionTitle'>Enter device id</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <input
-                      tabIndex='-1' ref={this.forms[0]} value={this.state.deviceId}
+                      tabIndex='-1' ref={this.forms[1]} value={this.state.deviceId}
                       onChange={e => this.onChange('deviceId', e)}
                       onFocus={e => this.onFocus('deviceId', e)}
                       onBlur={e => this.onBlur('deviceId', e)} 
@@ -176,13 +175,10 @@ class AddHardwareLattice extends React.Component {
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  {signer ? <Signer key={signer.id} {...signer} />
-                  : (
                     <>
-                      <div className='phaseItemOptionTitle'>{this.state.status}</div>
-                      {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                      <div className='phaseItemOptionTitle'>{statusMessage}</div>
+                      {statusMessage ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                     </>
-                  )} 
                 </div>
               </div>
             </div>

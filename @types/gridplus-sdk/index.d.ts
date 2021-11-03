@@ -6,6 +6,7 @@ declare module 'gridplus-sdk' {
     baseUrl: string;
     privKey: string;
     fwVersion: [number, number, number] | undefined;
+    isPaired: boolean;
 
     connect (deviceId: string | Callback<boolean>, cb?: Callback<boolean>);
     pair (pairingSecret: string, cb: Callback<boolean>);
