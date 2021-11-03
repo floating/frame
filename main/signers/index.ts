@@ -109,10 +109,6 @@ class Signers extends EventEmitter {
   }
 
   add (signer: Signer) {
-    if (signer.type === 'lattice') {
-      console.log('---> adding', signer)
-    }
-    
     const id = signer.id
 
     if (!(id in this.signers)) {
@@ -126,7 +122,6 @@ class Signers extends EventEmitter {
     const signer = this.signers[id]
     
     if (signer) {
-      console.log('REMOVING', { id })
       delete this.signers[id]
       store.removeSigner(id)
 
