@@ -122,31 +122,34 @@ class AddHardwareLattice extends React.Component {
             <div className='addAccountItemSummary'>GridPlus Lattice1</div>
           </div>
           <div className='addAccountItemOption'>
-          <div
+            <div
               className='addAccountItemOptionSetup'
-              style={{ top: '-120px', transform: `translateX(-${100 * this.state.index}%)` }}
+              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
             >
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Device Name</div>
                   <div className='addAccountItemOptionInputPhrase'>
                     <input
-                        tabIndex='-1' ref={this.forms[0]} value={this.state.deviceName}
-                        onChange={e => this.onChange('deviceName', e)}
-                        onFocus={e => this.onFocus('deviceName', e)}
-                        onBlur={e => this.onBlur('deviceName', e)} 
-                      />
+                      tabIndex='-1' ref={this.forms[0]} value={this.state.deviceName}
+                      onChange={e => this.onChange('deviceName', e)}
+                      onFocus={e => this.onFocus('deviceName', e)}
+                      onBlur={e => this.onBlur('deviceName', e)} 
+                      onKeyPress={e => { 
+                        if (e.key === 'Enter') {
+                          this.next()
+                        }
+                      }}
+                    />
+                  </div>
+                  <div
+                    className='addAccountItemOptionSubmit'
+                    onMouseDown={() => {
+                      this.next()
+                    }}
+                  >Next
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className='addAccountItemOption'>
-            <div
-              className='addAccountItemOptionSetup'
-              style={{ transform: `translateX(-${100 * this.state.index}%)` }}
-            >
-              <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>Enter device id</div>
                   <div className='addAccountItemOptionInputPhrase'>
