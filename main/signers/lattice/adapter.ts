@@ -36,7 +36,6 @@ export default class LatticeAdapter extends SignerAdapter {
 
   open () {
     this.settingsObserver = store.observer(() => {
-      console.log('SETTINGS CHANGED!')
       Object.values(this.knownSigners).forEach(lattice => {
         if (!lattice.connection) return
         
@@ -54,8 +53,6 @@ export default class LatticeAdapter extends SignerAdapter {
     this.signerObserver = store.observer(() => {
       const lattice = store('main.lattice') || {}
 
-      console.log({ lattice })
-
       Object.keys(lattice).forEach(deviceId => {
         if (!deviceId || (deviceId in this.knownSigners)) return
 
@@ -70,7 +67,9 @@ export default class LatticeAdapter extends SignerAdapter {
           if (paired) {
             // Lattice recognizes the private key and remembers if this
             // client is already paired between sessions
-            lattice.deriveAddresses()
+            setTimeout(() => {
+              lattice.deriveAddresses()
+            }, 5000)
           }
         })
 
