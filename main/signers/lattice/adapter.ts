@@ -122,7 +122,6 @@ export default class LatticeAdapter extends SignerAdapter {
   }
 
   remove (lattice: Lattice) {
-    console.log('REMOVING LATTICE')
     store.removeLattice(lattice.deviceId)
 
     lattice.close()
