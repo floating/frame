@@ -40,6 +40,8 @@ export default class Lattice extends Signer {
     this.status = Status.CONNECTING
     this.emit('update')
 
+    log.debug('connecting to Lattice', { name, baseUrl, privateKey })
+
     this.connection = new Client({
       name, baseUrl, privKey: privateKey, crypto
     })
@@ -77,11 +79,11 @@ export default class Lattice extends Signer {
   }
 
   pair (pairingCode: string) {
-    log.debug('pairing to Lattice with code', pairingCode)
-
     if (!this.connection) {
       throw new Error('attempted to pair to disconnected Lattice')
     }
+
+    log.debug('pairing to Lattice with code', pairingCode)
 
     this.status = Status.PAIRING
     this.emit('update')
