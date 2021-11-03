@@ -70,37 +70,32 @@ const rpc = {
     }
   },
   createLattice: (deviceId, deviceName, cb) => {
-    console.log('CREATE LATTICE', { deviceId, deviceName, full: deviceName.substring(0, 17) + '-' + randomLetters(6) })
     if (deviceId) {
       store.updateLattice(deviceId, {
         deviceId, 
         baseUrl: 'https://signing.gridpl.us',
         endpointMode: 'default',
+        paired: true,
         deviceName: deviceName.substring(0, 17) + '-' + randomLetters(6),
         privKey: crypto.randomBytes(32).toString('hex')  
       })
       
-      cb(null, { id: 'lattice-' + deviceId})
+      cb(null, { id: 'lattice-' + deviceId })
     } else {
       cb(new Error('No Device ID'))
     }
   },
-  latticePair (id, pin, cb) {
-    console.log('LATTICE PAIR', { id, pin })
-      const signer = signers.get(id)
+  async latticePair (id, pin, cb) {
+    const signer = signers.get(id)
 
-      console.log({ signer })
-      if (signer && signer.pair) {
-        //signer.once('paired')
-        signer.pair(pin)
-          // .then(res => cb(null, res))
-          // .catch(err => {
-          //   log.error('Lattice pairing error', err)
-          //   cb(err)
-          // })
-        }
-
-      cb('Error pairing')
+    if (signer && signer.pair) {
+      try {
+        const hasActiveWallet = await signer.pair(pin)
+        cb(null, hasActiveWallet)
+      } catch (e) {
+        cb(e.message)
+      }
+    }
   },
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),

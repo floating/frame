@@ -9,15 +9,34 @@ const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
 
 export const Status = {
-  INITIAL: 'loading',
   OK: 'ok',
   CONNECTING: 'connecting',
-  DERIVING: 'Deriving addresses',
+  DERIVING: 'addresses',
   READY_FOR_PAIRING: 'pair',
+  LOCKED: 'locked',
   PAIRING: 'Pairing',
-  WRONG_APP: 'Open your Ledger and select the Ethereum application',
+  PAIRING_FAILED: 'Pairing Failed',
+  UNKNOWN_ERROR: 'Unknown Error',
   DISCONNECTED: 'Disconnected',
   NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
+}
+
+function parseError (err: string) {
+  return err.replace(/Error from device: /, '')
+}
+
+function getStatusForError (err: string) {
+  const errText = err.toLowerCase()
+
+  if (errText.includes('device locked')) {
+    return Status.LOCKED
+  }
+
+  if (errText.includes('pairing failed')) {
+    return Status.PAIRING_FAILED
+  }
+
+  return Status.UNKNOWN_ERROR
 }
 
 export default class Lattice extends Signer {
@@ -31,23 +50,28 @@ export default class Lattice extends Signer {
 
     this.id = 'lattice-' + deviceId
     this.deviceId = deviceId
-    this.status = Status.INITIAL
+    this.status = Status.DISCONNECTED
     this.type = 'lattice'
     this.model = 'Lattice1'
   }
 
-  connect (name: string, baseUrl: string, privateKey: string) {
+  async connect (name: string, baseUrl: string, privateKey: string) {
     this.status = Status.CONNECTING
     this.emit('update')
 
     log.debug('connecting to Lattice', { name, baseUrl, privateKey })
 
     this.connection = new Client({
-      name, baseUrl, privKey: privateKey, crypto
+      name,
+      baseUrl,
+      privKey: privateKey,
+      crypto,
+      timeout: 30000
     })
 
-    this.connection.connect(this.deviceId, (err, paired) => {
-      if (err) return this.handleError('could not connect to Lattice', err)
+    try {
+      const connect = promisify(this.connection.connect).bind(this.connection, this.deviceId)
+      const paired = !!(await connect())
 
       const [patch, minor, major] = this.connection?.fwVersion || [0, 0, 0]
 
@@ -61,38 +85,61 @@ export default class Lattice extends Signer {
       }
 
       this.emit('connect', paired)
-    })
+
+      return paired
+    } catch (e) {
+      const errorMessage = this.handleError('could not connect to Lattice', e as string)
+      
+      throw new Error(errorMessage)
+    }
   }
 
   disconnect () {
+    if (this.status === Status.OK) {
+      this.status = Status.DISCONNECTED
+      this.emit('update')
+    }
+
     this.connection = null
+    
     this.addresses = []
   }
 
   close () {
-    this.disconnect()
-    
     this.emit('close')
     this.removeAllListeners()
+
+    this.disconnect()
     
     super.close()
   }
 
-  pair (pairingCode: string) {
+  async pair (pairingCode: string) {
     if (!this.connection) {
       throw new Error('attempted to pair to disconnected Lattice')
     }
 
-    log.debug('pairing to Lattice with code', pairingCode)
+    log.debug(`pairing to Lattice ${this.deviceId} with code`, pairingCode)
 
     this.status = Status.PAIRING
     this.emit('update')
 
-    this.connection.pair(pairingCode, (err, hasActiveWallet) => {
-      if (err) return this.handleError('could not pair to Lattice', err)
+    try {
+      const pair = promisify(this.connection.pair).bind(this.connection, pairingCode)
+      console.log('CALLING')
+      const hasActiveWallet = !!(await pair())
+      console.log('DONE')
+
+      log.debug(`successfully paired to Lattice ${this.deviceId}`)
 
       this.emit('paired', hasActiveWallet)
-    })
+
+      return hasActiveWallet
+    } catch (e) {
+      const errorMessage = this.handleError('could not pair to Lattice', e as string)
+      
+      throw new Error(errorMessage)
+    }
   }
 
   async deriveAddresses (retriesRemaining = 2) {
@@ -149,12 +196,16 @@ export default class Lattice extends Signer {
     return [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
   }
 
-  private handleError (message: string, err: any) {
-    log.error(message, err)
+  private handleError (message: string, err: string) {
+    const status = getStatusForError(err)
+    const parsedErrorMessage = parseError(err)
+    const fullMessage = message + ': ' + parsedErrorMessage
 
-    this.disconnect()
+    log.error(fullMessage)
 
-    this.status = Status.NEEDS_RECONNECTION
-    this.emit('update')
+    this.status = status
+    this.emit('error')
+
+    return fullMessage
   }
 }

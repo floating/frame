@@ -186,9 +186,6 @@ app.on('ready', () => {
   })
 
   store.observer(_ => {
-    const dashShowing = store('dash.showing')
-
-    console.log('DASH', { dashShowing})
     if (store('dash.showing')) {
       windows.showDash()
     } else {

@@ -16,8 +16,9 @@ const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 export const Status = {
   INITIAL: 'Connecting',
   OK: 'ok',
-  DERIVING: 'Deriving addresses',
-  LOCKED: 'Please unlock your ledger',
+  LOADING: 'loading',
+  DERIVING: 'addresses',
+  LOCKED: 'locked',
   WRONG_APP: 'Open your Ledger and select the Ethereum application',
   DISCONNECTED: 'Disconnected',
   NEEDS_RECONNECTION: 'Please reconnect this Ledger device'

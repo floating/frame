@@ -7,7 +7,8 @@ import Lattice, { Status } from './Lattice'
 interface LatticeSettings {
   deviceName: string,
   baseUrl: string,
-  privateKey: string
+  privKey: string,
+  paired: boolean
 }
 
 function getLatticeSettings (deviceId: string): LatticeSettings {
@@ -15,11 +16,10 @@ function getLatticeSettings (deviceId: string): LatticeSettings {
   const baseUrl = (endpointMode === 'custom')
     ? store('main.latticeSettings.endpointCustom')
     : 'https://signing.gridpl.us'
-  
-  const deviceName = store('main.lattice', deviceId, 'deviceName')
-  const privateKey = store('main.lattice', deviceId, 'privKey')
 
-  return { deviceName, baseUrl, privateKey }
+  const device = store('main.lattice', deviceId)
+
+  return { ...device, baseUrl }
 }
 
 export default class LatticeAdapter extends SignerAdapter {
@@ -51,32 +51,43 @@ export default class LatticeAdapter extends SignerAdapter {
     })
 
     this.signerObserver = store.observer(() => {
-      const lattice = store('main.lattice') || {}
+      const devices: { [id: string]: LatticeSettings } = store('main.lattice') || {}
 
-      Object.keys(lattice).forEach(deviceId => {
+      Object.entries(devices).forEach(([deviceId, device]) => {
+        console.log({ checking: device })
         if (!deviceId || (deviceId in this.knownSigners)) return
 
-        log.debug('Connecting to Lattice device', { deviceId })
+        log.debug('Initializing Lattice device', { deviceId })
 
         const lattice = new Lattice(deviceId)
         const emitUpdate = () => this.emit('update', lattice)
 
         lattice.on('update', emitUpdate)
 
-        lattice.on('connect', paired => {
+        lattice.on('connect', (paired: boolean) => {
           if (paired) {
             // Lattice recognizes the private key and remembers if this
             // client is already paired between sessions
-            setTimeout(() => {
-              lattice.deriveAddresses()
-            }, 5000)
+            lattice.deriveAddresses()
           }
         })
 
         lattice.on('paired', (hasActiveWallet: boolean) => {
+          store.updateLattice(deviceId, { paired: true })
+
           if (hasActiveWallet) {
             lattice.deriveAddresses()
           }
+        })
+
+        lattice.on('error', () => {
+          if (lattice.connection && !lattice.connection.isPaired) {
+            store.updateLattice(deviceId, { paired: false })
+          }
+
+          lattice.disconnect()
+
+          emitUpdate()
         })
 
         lattice.on('close', () => {
@@ -88,8 +99,12 @@ export default class LatticeAdapter extends SignerAdapter {
         this.knownSigners[deviceId] = lattice
         this.emit('add', lattice)
         
-        const { deviceName, baseUrl, privateKey } = getLatticeSettings(lattice.deviceId)
-        lattice.connect(deviceName, baseUrl, privateKey)
+        if (device.paired) {
+          // don't attempt to automatically connect if the Lattice isn't
+          // paired as this could happen without the user noticing
+          const { deviceName, baseUrl, privKey } = getLatticeSettings(lattice.deviceId)
+          lattice.connect(deviceName, baseUrl, privKey).catch()
+        }
       })
     })
   }
@@ -107,6 +122,7 @@ export default class LatticeAdapter extends SignerAdapter {
   }
 
   remove (lattice: Lattice) {
+    console.log('REMOVING LATTICE')
     store.removeLattice(lattice.deviceId)
 
     lattice.close()
@@ -115,7 +131,7 @@ export default class LatticeAdapter extends SignerAdapter {
   reload (lattice: Lattice) {
     lattice.disconnect()
 
-    const { deviceName, baseUrl, privateKey } = getLatticeSettings(lattice.deviceId)
-    lattice.connect(deviceName, baseUrl, privateKey)
+    const { deviceName, baseUrl, privKey } = getLatticeSettings(lattice.deviceId)
+    lattice.connect(deviceName, baseUrl, privKey)
   }
 }
