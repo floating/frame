@@ -208,5 +208,3 @@ describe('#addNetwork', () => {
     expect(networks.ethereum['137'].explorer).toBe('https://polygonscan.com')
   })
 })
-
-describe()

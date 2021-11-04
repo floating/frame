@@ -24,7 +24,7 @@ class AddHardwareLattice extends React.Component {
       deviceName: 'Frame',
       pairCode: ''
     }
-    this.forms = [React.createRef(), React.createRef(), React.createRef(), React.createRef()]
+    this.forms = [React.createRef(), React.createRef()]
   }
 
   onChange (key, e) {
