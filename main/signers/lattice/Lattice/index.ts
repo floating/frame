@@ -149,7 +149,7 @@ export default class Lattice extends Signer {
 
       log.debug(`deriving addresses for Lattice ${this.connection.name}`)
 
-      const getAddresses = promisify<DerivationOptions, Array<string>>(this.connection.getAddresses).bind(this.connection)
+      const getAddresses = promisify(this.connection.getAddresses).bind(this.connection)
 
       while (this.addresses.length < this.accountLimit) {
         const req = {
@@ -158,7 +158,7 @@ export default class Lattice extends Signer {
           skipCache: true
         }
 
-        const loadedAddresses = await getAddresses(req)
+        const loadedAddresses = (await getAddresses(req)) as string[]
         this.addresses = [...this.addresses, ...loadedAddresses]
       }
 

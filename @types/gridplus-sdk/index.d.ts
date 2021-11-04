@@ -10,12 +10,12 @@ declare module 'gridplus-sdk' {
 
     connect (deviceId: string | Callback<boolean>, cb?: Callback<boolean>);
     pair (pairingSecret: string, cb: Callback<boolean>);
-    getAddresses (opts: DerivationOptions, cb: Callback);
+    getAddresses (opts: DerivationOptions, cb: Callback<Array<string>>);
   }
 
   type Callback<T> = (err: string | null, result: T | undefined) => void
 
-  export interface ClientOptions {
+  interface ClientOptions {
     name?: string,
     baseUrl: string,
     privKey?: string,
@@ -24,7 +24,7 @@ declare module 'gridplus-sdk' {
     retryCount?: number
   }
 
-  export interface DerivationOptions {
+  interface DerivationOptions {
     startPath: number[],
     n: number,
     skipCache?: boolean
