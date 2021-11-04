@@ -126,9 +126,7 @@ export default class Lattice extends Signer {
 
     try {
       const pair = promisify(this.connection.pair).bind(this.connection, pairingCode)
-      console.log('CALLING')
       const hasActiveWallet = !!(await pair())
-      console.log('DONE')
 
       log.debug(`successfully paired to Lattice ${this.deviceId}`)
 

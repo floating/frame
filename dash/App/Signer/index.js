@@ -190,11 +190,16 @@ class Signer extends React.Component {
         <div className='signerStatusText signerStatusReady'>{'ready to sign'}</div>
       )
     } else if (this.props.status === 'locked') {
-      const lockText = isHardwareSigner(this.props.type)
-        ? 'Please unlock your ' + this.props.model
+      const isHwSigner = isHardwareSigner(this.props.type)
+      const lockText = isHwSigner
+        ? 'Please unlock your ' + this.props.type
         : 'locked'
+      
+      const classes = isHwSigner 
+        ? 'signerStatusText'
+        : 'signerStatusText signerStatusIssue'
       return (
-        <div className='signerStatusText signerStatusIssue'>{lockText}</div>
+        <div className={classes}>{lockText}</div>
       )
     } else if (this.props.status === 'addresses') {
       return (
@@ -236,9 +241,12 @@ class Signer extends React.Component {
     const isLoading = ['loading', 'connecting', 'addresses', 'pairing'].includes(status)
     const isDisconnected = isHwSigner && !isLoading && status !== 'ok'
 
+    // UI changes for this status only apply to hot signers
+    const isLocked = !isHwSigner && status === 'locked'
+
     let signerClass = 'signer'
     if (this.props.status === 'ok') signerClass += ' signerOk'
-    if (this.props.status === 'locked') signerClass += ' signerLocked'
+    if (isLocked) signerClass += ' signerLocked'
 
     return (
       <div className={signerClass} style={{ zIndex: 1000 - this.props.index }}>
@@ -287,7 +295,7 @@ class Signer extends React.Component {
               className='signerLatticePairSubmit'
             >Pair</div>
           </div>
-        ) : this.props.status === 'ok' || (this.props.status === 'locked' && !isHwSigner) ? (
+        ) : this.props.status === 'ok' || (isLocked) ? (
           <>
             {/* <div className='signerAccountsTitle'>
               <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
