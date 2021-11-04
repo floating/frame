@@ -4,14 +4,12 @@ import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg' // TODO: get gridplus svg
 
-import Signer from '../../Signer'
-
 function parseDeviceName (name) {
   if (!name) return 'Frame'
 
-  // Lattice only supports a suffix of up to 24 characters, and we append 
-  // "Frame-<device code>-" (13 characters) to the front so limit it to 11 characters
-  return name.replace(/\s+/g, '').substring(0, 11)
+  // Lattice only supports a device name of up to 24 characters and we append 
+  // a dash and a 6 character device code to the end, so limit this to 17 characters
+  return name.replace(/\s+/g, '-').substring(0, 17)
 }
 
 class AddHardwareLattice extends React.Component {
@@ -22,7 +20,7 @@ class AddHardwareLattice extends React.Component {
       index: 0,
       status: '',
       error: false,
-      deviceId: 'NcBASi',
+      deviceId: '',
       deviceName: 'Frame',
       pairCode: ''
     }
