@@ -70,20 +70,20 @@ const rpc = {
     }
   },
   createLattice: (deviceId, deviceName, cb) => {
-    if (deviceId) {
-      store.updateLattice(deviceId, {
-        deviceId, 
-        baseUrl: 'https://signing.gridpl.us',
-        endpointMode: 'default',
-        paired: true,
-        deviceName: deviceName.substring(0, 17) + '-' + randomLetters(6),
-        privKey: crypto.randomBytes(32).toString('hex')  
-      })
-      
-      cb(null, { id: 'lattice-' + deviceId })
-    } else {
-      cb(new Error('No Device ID'))
+    if (!deviceId) {
+      return cb(new Error('No Device ID'))
     }
+
+    store.updateLattice(deviceId, {
+      deviceId, 
+      baseUrl: 'https://signing.gridpl.us',
+      endpointMode: 'default',
+      paired: true,
+      deviceName: (deviceName || 'Frame').substring(0, 17) + '-' + randomLetters(6),
+      privKey: crypto.randomBytes(32).toString('hex')  
+    })
+
+    cb(null, { id: 'lattice-' + deviceId })
   },
   async latticePair (id, pin, cb) {
     const signer = signers.get(id)
