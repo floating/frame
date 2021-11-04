@@ -2,7 +2,7 @@ import log from 'electron-log'
 
 import { SignerAdapter } from '../adapters'
 import store from '../../store'
-import Lattice, { Status } from './Lattice'
+import Lattice from './Lattice'
 
 interface LatticeSettings {
   deviceName: string,
