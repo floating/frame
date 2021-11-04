@@ -7,7 +7,7 @@ import svg from '../../../../resources/svg' // TODO: get gridplus svg
 function parseDeviceName (name) {
   if (!name) return 'Frame'
 
-  // Lattice only supports a device name of up to 24 characters and we append 
+  // Lattice supports a device name of up to 24 characters and we append 
   // a dash and a 6 character device code to the end, so limit this to 17 characters
   return name.replace(/\s+/g, '-').substring(0, 17)
 }
@@ -81,6 +81,8 @@ class AddHardwareLattice extends React.Component {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false })
+
+        // TODO: signal some sort of success and close this more gracefully
         this.props.close()
       }
     })
@@ -101,8 +103,6 @@ class AddHardwareLattice extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
-
-    let statusMessage = (this.state.error && this.state.status)
 
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
@@ -174,8 +174,8 @@ class AddHardwareLattice extends React.Component {
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                     <>
-                      <div className='phaseItemOptionTitle'>{statusMessage}</div>
-                      {statusMessage ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                      <div className='phaseItemOptionTitle'>{this.state.status}</div>
+                      {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                     </>
                 </div>
               </div>
