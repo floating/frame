@@ -4,13 +4,18 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
-function isHardwareSigner (type) {
+function isHardwareSigner (type = '') {
   return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
+}
+
+function isLoading (status = '') {
+  return ['loading', 'connecting', 'addresses', 'pairing'].includes(status.toLowerCase())
 }
 
 class Signer extends React.Component {
   constructor (...args) {
     super(...args)
+
     this.state = {
       page: 0,
       addressLimit: 5,
@@ -39,7 +44,7 @@ class Signer extends React.Component {
   }
 
   renderLoadingLive () {
-    if (this.props.type === 'ledger' && this.props.status.toLowerCase() === 'deriving live addresses') {
+    if (this.props.type === 'ledger' && this.getStatus() === 'deriving live addresses') {
       const liveAccountLimit = this.store('main.ledger.liveAccountLimit')
       const styleWidth = liveAccountLimit === 20 ? 120 : liveAccountLimit === 40 ? 120 : 60
       const marginTop = liveAccountLimit === 40 ? -8 : 0
@@ -162,14 +167,20 @@ class Signer extends React.Component {
   //     </div>
   //   )
 
+  getStatus () {
+    return (this.props.status || '').toLowerCase()
+  }
+
   status () {
-    if (this.props.status === 'ok') {
+    const status = this.getStatus()
+
+    if (status === 'ok') {
       return (
         <div className='signerStatus'>
           <div className='signerStatusIndicator signerStatusIndicatorReady'></div>
         </div>
       )
-    } else if (this.props.status === 'locked') {
+    } else if (status === 'locked') {
       return (
         <div className='signerStatus'>
           <div className='signerStatusIndicator signerStatusIndicatorLocked'></div>
@@ -185,25 +196,27 @@ class Signer extends React.Component {
   }
 
   statusText () {
-    if (this.props.status === 'ok') {
+    const status = this.getStatus()
+
+    if (status === 'ok') {
       return (
         <div className='signerStatusText signerStatusReady'>{'ready to sign'}</div>
       )
-    } else if (this.props.status === 'locked') {
-      const isHwSigner = isHardwareSigner(this.props.type)
-      const lockText = isHwSigner
+    } else if (status === 'locked') {
+      const hwSigner = isHardwareSigner(this.props.type)
+      const lockText = hwSigner
         ? 'Please unlock your ' + this.props.type
         : 'locked'
       
-      const classes = isHwSigner 
+      const classes = hwSigner 
         ? 'signerStatusText'
         : 'signerStatusText signerStatusIssue'
       return (
         <div className={classes}>{lockText}</div>
       )
-    } else if (this.props.status === 'addresses') {
+    } else if (status === 'addresses') {
       return (
-        <div className='signerStatusText'>{'Deriving Addresses'}</div>
+        <div className='signerStatusText'>{'deriving addresses'}</div>
       )
     } else {
       return (
@@ -234,18 +247,17 @@ class Signer extends React.Component {
 
     const activeAccounts = signer.addresses.filter(a => this.store('main.accounts', a.toLowerCase()))
 
-    console.log({ props: this.props })
-    const status = (this.props.status || '').toLowerCase()
+    const status = this.getStatus()
 
-    const isHwSigner = isHardwareSigner(this.props.type)
-    const isLoading = ['loading', 'connecting', 'addresses', 'pairing'].includes(status)
-    const isDisconnected = isHwSigner && !isLoading && status !== 'ok'
+    const hwSigner = isHardwareSigner(this.props.type)
+    const loading = isLoading(status)
+    const disconnected = hwSigner && !loading && status !== 'ok'
 
     // UI changes for this status only apply to hot signers
-    const isLocked = !isHwSigner && status === 'locked'
+    const isLocked = !hwSigner && status === 'locked'
 
     let signerClass = 'signer'
-    if (this.props.status === 'ok') signerClass += ' signerOk'
+    if (status === 'ok') signerClass += ' signerOk'
     if (isLocked) signerClass += ' signerLocked'
 
     return (
@@ -272,7 +284,7 @@ class Signer extends React.Component {
           {this.status()}
         </div>
         {this.statusText()}
-        {this.props.type === 'lattice' && this.props.status === 'pair' ? (
+        {this.props.type === 'lattice' && status === 'pair' ? (
           <div className='signerLatticePair'>
             <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
             <div className='signerLatticePairInput'>
@@ -295,7 +307,7 @@ class Signer extends React.Component {
               className='signerLatticePairSubmit'
             >Pair</div>
           </div>
-        ) : this.props.status === 'ok' || (isLocked) ? (
+        ) : status === 'ok' || (isLocked) ? (
           <>
             {/* <div className='signerAccountsTitle'>
               <span className={activeAccounts.length > 0 ? 'signerAccountsTitleActive signerAccountsTitleActiveOn' : 'signerAccountsTitleActive'}>
@@ -308,9 +320,7 @@ class Signer extends React.Component {
               return (
                 <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onMouseDown={() => {
                   if (this.store('main.accounts', address.toLowerCase())) {
-                    link.rpc('removeAccount', address, {}, () => {
-                      // console.log('Removed account ', address)
-                    })
+                    link.rpc('removeAccount', address, {}, () => { })
                   } else {
                     link.rpc('createAccount', address, { type: signer.type }, (e) => {
                       if (e) console.error(e)
@@ -329,17 +339,17 @@ class Signer extends React.Component {
               <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>{svg.triangleLeft(20)}</div>
             </div>
           </>
-        ) : this.props.type === 'trezor' && (this.props.status === 'Need Pin' || this.props.status === 'Enter Passphrase') ? (
+        ) : this.props.type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
           <div className='signerInterface'>
-            {this.renderTrezorPin(this.props.type === 'trezor' && this.props.status === 'Need Pin')}
-            {this.renderTrezorPhrase(this.props.type === 'trezor' && this.props.status === 'Enter Passphrase')}
+            {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
+            {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
           </div> 
-        ) : isLoading ? (
+        ) : loading ? (
           <div className='signerLoading'>
             <div className='signerLoadingLoader' />
           </div>
         ): <></>}
-        {isDisconnected ? null : (
+        {disconnected ? null : (
           <div className='signerDrawer'>
             <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
               {this.state.showControls ? 'hide' : 'more'}
@@ -347,7 +357,7 @@ class Signer extends React.Component {
             <div className='showControlsLine' />
           </div>
         )}
-        {this.state.showControls || isDisconnected ? (
+        {this.state.showControls || disconnected ? (
           <div className='signerControls cardShow'>
             {/* <div className='signerControlOption'>Hide empty accounts</div>
             <div className='signerControlOption'>Deactivte empty Accounts</div>
@@ -356,7 +366,7 @@ class Signer extends React.Component {
             <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div> */}
             <div className='signerControlOption' onMouseDown={() => {
               link.send('dash:reloadSigner', this.props.id)
-            }}>{isHwSigner ? 'Re-connect' : 'Reload Signer'}</div>
+            }}>{hwSigner ? 'Re-connect' : 'Reload Signer'}</div>
             <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
               link.send('dash:removeSigner', this.props.id)
             }}>Remove Signer</div>
