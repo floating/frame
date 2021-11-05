@@ -58,7 +58,8 @@ export default class LatticeAdapter extends SignerAdapter {
 
         log.debug('Initializing Lattice device', { deviceId })
 
-        const lattice = new Lattice(deviceId)
+        const { deviceName, baseUrl, privKey } = getLatticeSettings(deviceId)
+        const lattice = new Lattice(deviceId, deviceName)
         const emitUpdate = () => this.emit('update', lattice)
 
         lattice.on('update', emitUpdate)
@@ -68,6 +69,8 @@ export default class LatticeAdapter extends SignerAdapter {
             // Lattice recognizes the private key and remembers if this
             // client is already paired between sessions
             lattice.deriveAddresses()
+          } else {
+            store.updateLattice(deviceId, { paired: false })
           }
         })
 
@@ -101,8 +104,9 @@ export default class LatticeAdapter extends SignerAdapter {
         if (device.paired) {
           // don't attempt to automatically connect if the Lattice isn't
           // paired as this could happen without the user noticing
-          const { deviceName, baseUrl, privKey } = getLatticeSettings(lattice.deviceId)
-          lattice.connect(deviceName, baseUrl, privKey).catch()
+          lattice.connect(baseUrl, privKey).catch(() => {
+            store.updateLattice(deviceId, { paired: false })
+          })
         }
       })
     })
@@ -121,15 +125,26 @@ export default class LatticeAdapter extends SignerAdapter {
   }
 
   remove (lattice: Lattice) {
+    log.info(`removing Lattice ${lattice.deviceId}`)
+
     store.removeLattice(lattice.deviceId)
 
-    lattice.close()
+    if (lattice.deviceId in this.knownSigners) {
+      lattice.close()
+    }
   }
 
-  reload (lattice: Lattice) {
+  async reload (lattice: Lattice) {
+    log.info(`reloading Lattice ${lattice.deviceId}`)
+
     lattice.disconnect()
 
-    const { deviceName, baseUrl, privKey } = getLatticeSettings(lattice.deviceId)
-    lattice.connect(deviceName, baseUrl, privKey)
+    const { baseUrl, privKey } = getLatticeSettings(lattice.deviceId)
+
+    try {
+      await lattice.connect(baseUrl, privKey)
+    } catch (e) {
+      log.error('could not reload Lattice', e)
+    }
   }
 }

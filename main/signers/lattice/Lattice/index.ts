@@ -45,24 +45,25 @@ export default class Lattice extends Signer {
 
   accountLimit = 5;
 
-  constructor (deviceId: string) {
+  constructor (deviceId: string, name: string) {
     super()
 
     this.id = 'lattice-' + deviceId
     this.deviceId = deviceId
+    this.name = name
     this.status = Status.DISCONNECTED
     this.type = 'lattice'
     this.model = 'Lattice1'
   }
 
-  async connect (name: string, baseUrl: string, privateKey: string) {
+  async connect (baseUrl: string, privateKey: string) {
     this.status = Status.CONNECTING
     this.emit('update')
 
-    log.debug('connecting to Lattice', { name, baseUrl, privateKey })
+    log.debug('connecting to Lattice', { name: this.name, baseUrl, privateKey })
 
     this.connection = new Client({
-      name,
+      name: this.name,
       baseUrl,
       privKey: privateKey,
       crypto,
@@ -187,6 +188,15 @@ export default class Lattice extends Signer {
       this.update()
 
       return []
+    }
+  }
+
+  summary () {
+    const summary = super.summary()
+
+    return {
+      ...summary,
+      addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
     }
   }
 
