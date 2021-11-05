@@ -54,12 +54,13 @@ export default class LatticeAdapter extends SignerAdapter {
       const devices: { [id: string]: LatticeSettings } = store('main.lattice') || {}
 
       Object.entries(devices).forEach(([deviceId, device]) => {
-        if (!deviceId || (deviceId in this.knownSigners)) return
+        if (deviceId in this.knownSigners) return
 
         log.debug('Initializing Lattice device', { deviceId })
 
         const { deviceName, baseUrl, privKey } = getLatticeSettings(deviceId)
         const lattice = new Lattice(deviceId, deviceName)
+
         const emitUpdate = () => this.emit('update', lattice)
 
         lattice.on('update', emitUpdate)
@@ -122,6 +123,8 @@ export default class LatticeAdapter extends SignerAdapter {
       this.settingsObserver.remove()
       this.settingsObserver = null
     }
+
+    this.knownSigners = {}
   }
 
   remove (lattice: Lattice) {
