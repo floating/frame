@@ -7,37 +7,11 @@ import Lattice from '../../../../main/signers/lattice/Lattice'
 import store from '../../../../main/store'
 
 jest.mock('../../../../main/signers/lattice/Lattice')
-jest.mock('../../../../main/store', () => jest.fn())
 
-let lattices = {}, mockObservers = [], adapter
+let adapter
 
 beforeAll(() => {
   log.transports.console.level = false
-
-  store.mockImplementation((key, val) => {
-    if (key === 'main.lattice') {
-      return val ? lattices[val] : lattices
-    }
-
-    if (key === 'main.latticeSettings.endpointMode') {
-      return 'standard'
-    }
-
-    return ''
-  })
-  
-  store.observer = function (cb) {
-    const observer = {
-      fire: () => {
-          cb()
-      },
-      remove: jest.fn()
-    }
-
-    mockObservers.push(observer)
-
-    return observer
-  }
 })
 
 afterAll(() => {
@@ -45,18 +19,17 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  mockObservers = []
-
-  store.updateLattice = jest.fn()
-  store.removeLattice = jest.fn()
-
-  lattices['NBaJ8e'] = {
+  store.set('main.lattice', 'NBaJ8e', {
     deviceName: 'Frame-testlattice',
     privKey: 'supersecretkey',
     paired: true
-  }
+  })
 
   adapter = new LatticeSignerAdapter()
+})
+
+afterEach(() => {
+  store.clear()
 })
 
 it('has the correct adapter type', () => {
@@ -87,14 +60,14 @@ describe('#close', () => {
     adapter.close()
 
     expect(adapter.settingsObserver).toBe(null)
-    expect(mockObservers[0].remove).toHaveBeenCalled()
+    expect(store.getObserver('latticeSettings')).toBe(undefined)
   })
 
   it('removes the signer observer', () => {
     adapter.close()
 
     expect(adapter.signerObserver).toBe(null)
-    expect(mockObservers[1].remove).toHaveBeenCalled()
+    expect(store.getObserver('latticeSigners')).toBe(undefined)
   })
 })
 
@@ -102,6 +75,7 @@ describe('#remove', () => {
   const latticeSigner = { deviceId: 'M8jl93' }
 
   beforeEach(() => {
+    store.removeLattice = jest.fn()
     latticeSigner.close = jest.fn()
   })
   
@@ -148,10 +122,12 @@ describe('#reload', () => {
   })
 })
 
-describe('creating signers', () => {
-  let latticeSigner, settingsObserver, signerObserver
+describe('signer device changes', () => {
+  let latticeSigner, signerObserver
 
   beforeEach(() => {
+    store.updateLattice = jest.fn()
+
     latticeSigner = new EventEmitter()
     latticeSigner.connect = jest.fn(() => Promise.resolve())
     latticeSigner.disconnect = jest.fn()
@@ -165,7 +141,7 @@ describe('creating signers', () => {
     })
 
     adapter.open()
-    signerObserver = mockObservers[1]
+    signerObserver = store.getObserver('latticeSigners')
   })
 
   describe('detecting a new Lattice', () => {
@@ -193,7 +169,7 @@ describe('creating signers', () => {
     })
 
     it('connects to a paired signer', () => {
-      lattices['NBaJ8e'].paired = true
+      store.set('main.lattice', 'NBaJ8e', 'paired', true)
 
       latticeSigner.connect.mockImplementation((baseUrl, privKey) => {
         expect(baseUrl).toBe('https://signing.gridpl.us')
@@ -207,7 +183,7 @@ describe('creating signers', () => {
     })
 
     it('does not attempt to connect to an unpaired signer', () => {
-      lattices['NBaJ8e'].paired = false
+      store.set('main.lattice', 'NBaJ8e', 'paired', false)
 
       latticeSigner.connect.mockImplementation(() => { throw new Error('should not attempt to connect!') })
 

@@ -48,7 +48,7 @@ export default class LatticeAdapter extends SignerAdapter {
       })
 
       const accountLimit = store('main.latticeSettings.accountLimit')
-    })
+    }, 'latticeSettings')
 
     this.signerObserver = store.observer(() => {
       const devices: { [id: string]: LatticeSettings } = store('main.lattice') || {}
@@ -110,7 +110,7 @@ export default class LatticeAdapter extends SignerAdapter {
           })
         }
       })
-    })
+    }, 'latticeSigners')
   }
 
   close () {
