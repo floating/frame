@@ -7,11 +7,13 @@ import Lattice from './Lattice'
 interface LatticeSettings {
   deviceName: string,
   baseUrl: string,
+  accountLimit: number,
   privKey: string,
   paired: boolean
 }
 
 function getLatticeSettings (deviceId: string): LatticeSettings {
+  const accountLimit = store('main.latticeSettings.accountLimit')
   const endpointMode = store('main.latticeSettings.endpointMode')
   const baseUrl = (endpointMode === 'custom')
     ? store('main.latticeSettings.endpointCustom')
@@ -19,7 +21,7 @@ function getLatticeSettings (deviceId: string): LatticeSettings {
 
   const device = store('main.lattice', deviceId)
 
-  return { ...device, baseUrl }
+  return { ...device, baseUrl, accountLimit }
 }
 
 export default class LatticeAdapter extends SignerAdapter {
@@ -39,15 +41,23 @@ export default class LatticeAdapter extends SignerAdapter {
       Object.values(this.knownSigners).forEach(lattice => {
         if (!lattice.connection) return
         
-        const { baseUrl } = getLatticeSettings(lattice.deviceId)
-        
+        const { baseUrl, accountLimit } = getLatticeSettings(lattice.deviceId)
+        let needsUpdate = false
+
+        if (accountLimit !== lattice.accountLimit) {
+          lattice.accountLimit = accountLimit
+          needsUpdate = true
+        }
+
         // if any connection settings have changed, re-connect
         if (baseUrl !== lattice.connection.baseUrl) {
           this.reload(lattice)
+        } else if (lattice.addresses.length < lattice.accountLimit) {
+          lattice.deriveAddresses()
+        } else if (needsUpdate) {
+          lattice.update()
         }
       })
-
-      const accountLimit = store('main.latticeSettings.accountLimit')
     }, 'latticeSettings')
 
     this.signerObserver = store.observer(() => {

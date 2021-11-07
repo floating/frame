@@ -6,6 +6,7 @@ import Lattice from '../../../../main/signers/lattice/Lattice'
 
 import store from '../../../../main/store'
 
+jest.mock('../../../../main/store')
 jest.mock('../../../../main/signers/lattice/Lattice')
 
 let adapter
@@ -119,6 +120,94 @@ describe('#reload', () => {
     adapter.reload(latticeSigner)
 
     expect(latticeSigner.connect).toHaveBeenCalledWith('https://signing.gridpl.us', 'supersecretkey')
+  })
+})
+
+describe('settings changes', () => {
+  const latticeSigner = {
+    deviceId: 'NBaJ8e'
+  }
+
+  let settingsObserver
+
+  beforeEach(() => {
+    latticeSigner.connect = jest.fn()
+    latticeSigner.disconnect = jest.fn()
+    latticeSigner.deriveAddresses = jest.fn()
+    latticeSigner.update = jest.fn()
+
+    latticeSigner.addresses = Array(5).fill('addr')
+    latticeSigner.connection = {
+      baseUrl: 'https://signing.gridpl.us'
+    }
+
+    adapter.knownSigners['NBaJ8e'] = latticeSigner
+    adapter.open()
+
+    settingsObserver = store.getObserver('latticeSettings')
+  })
+
+  it('does not attempt to reload a Lattice with no connection', () => {
+    delete latticeSigner.connection
+
+    store.set('main.latticeSettings', { endpointMode: 'custom', endpointCustom: 'https://myendpoint.io' })
+
+    settingsObserver.fire()
+
+    expect(latticeSigner.disconnect).not.toHaveBeenCalled()
+    expect(latticeSigner.connect).not.toHaveBeenCalled()
+  })
+
+  it('does not attempt to reload a Lattice if the relay URL has not changed', () => {
+    store.set('main.latticeSettings', { endpointMode: 'custom', endpointCustom: 'https://signing.gridpl.us' })
+
+    settingsObserver.fire()
+
+    expect(latticeSigner.disconnect).not.toHaveBeenCalled()
+    expect(latticeSigner.connect).not.toHaveBeenCalled()
+  })
+
+  it('reloads a connected Lattice if the relay URL is changed to custom', () => {
+    store.set('main.latticeSettings', { endpointMode: 'custom', endpointCustom: 'https://myendpoint.io' })
+
+    settingsObserver.fire()
+
+    expect(latticeSigner.disconnect).toHaveBeenCalled()
+    expect(latticeSigner.connect).toHaveBeenCalledWith('https://myendpoint.io', 'supersecretkey')
+  })
+
+  it('reloads a connected Lattice if the relay URL is changed back to the default', () => {
+    latticeSigner.connection = {
+      baseUrl: 'https://customendpoint.io'
+    }
+
+    store.set('main.latticeSettings', { endpointMode: 'standard', endpointCustom: 'https://customendpoint.io' })
+
+    settingsObserver.fire()
+
+    expect(latticeSigner.disconnect).toHaveBeenCalled()
+    expect(latticeSigner.connect).toHaveBeenCalledWith('https://signing.gridpl.us', 'supersecretkey')
+  })
+
+  it('derives addresses if the account limit has increased above the number of addresses', () => {
+    latticeSigner.accountLimit = 5
+
+    store.set('main.latticeSettings.accountLimit', 10)
+
+    settingsObserver.fire()
+
+    expect(latticeSigner.deriveAddresses).toHaveBeenCalled()
+  })
+
+  it('updates if the number of displayed addresses has changed but none need to be derived', () => {
+    latticeSigner.accountLimit = 10
+
+    store.set('main.latticeSettings.accountLimit', 5)
+
+    settingsObserver.fire()
+
+    expect(latticeSigner.deriveAddresses).not.toHaveBeenCalled()
+    expect(latticeSigner.update).toHaveBeenCalled()
   })
 })
 
