@@ -204,10 +204,13 @@ describe('settings changes', () => {
 
     store.set('main.latticeSettings.accountLimit', 5)
 
+    const updateHandler = jest.fn()
+    adapter.once('update', updateHandler)
+
     settingsObserver.fire()
 
     expect(latticeSigner.deriveAddresses).not.toHaveBeenCalled()
-    expect(latticeSigner.update).toHaveBeenCalled()
+    expect(updateHandler).toHaveBeenCalled()
   })
 })
 
