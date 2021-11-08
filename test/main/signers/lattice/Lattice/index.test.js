@@ -556,26 +556,17 @@ describe('#signTransaction', () => {
     chainId: '0x89'
   }
 
+  const expectedSignature = {
+    sig: {
+      r: '3ea8cd',
+      s: '96f7a0',
+      v: Buffer.from('00', 'hex')
+    }
+  }
+
   beforeEach(() => {
     lattice.appVersion = { major: 1, minor: 1, patch: 0 }
-    lattice.connection = {
-      sign: jest.fn((opts, cb) => {
-        if (
-          opts.currency === 'ETH' &&
-          parseInt(opts.data.chainId) === 137 &&
-          opts.data.signerPath[4] === 4) {
-          return cb(null, {
-            sig: {
-              r: '3ea8cd',
-              s: '96f7a0',
-              v: Buffer.from('00', 'hex')
-            }
-          })
-        }
-
-        cb('invalid message!')
-      })
-    }
+    lattice.connection = { sign: jest.fn() }
   })
 
   it('does not attempt to sign if Lattice is disconnected', done => {
@@ -591,7 +582,20 @@ describe('#signTransaction', () => {
   })
 
   it('signs a legacy transaction', done => {
+    // Lattice expects the type to be undefined for legacy transactions,
+    // sending a type of zero if EIP-1559 is enabled will cause an error
     const txToSign = { ...tx, type: '0x0' }
+
+    lattice.connection.sign.mockImplementation((opts, cb) => {
+      try {
+        expect(opts.currency).toBe('ETH')
+        expect(opts.data.type).toBe(undefined)
+        expect(opts.data.signerPath[4]).toBe(4)
+        expect(parseInt(opts.data.chainId)).toBe(137)
+
+        cb(null, expectedSignature)
+      } catch (e) { done(e) }
+    })
 
     lattice.signTransaction(4, txToSign, (err, res) => {
       try {
@@ -604,6 +608,17 @@ describe('#signTransaction', () => {
 
   it('signs a post eip-1559 transaction', done => {
     const txToSign = { ...tx, type: '0x2' }
+
+    lattice.connection.sign.mockImplementation((opts, cb) => {
+      try {
+        expect(opts.currency).toBe('ETH')
+        expect(opts.data.type).toBe(2)
+        expect(opts.data.signerPath[4]).toBe(4)
+        expect(parseInt(opts.data.chainId)).toBe(137)
+
+        cb(null, expectedSignature)
+      } catch (e) { done(e) }
+    })
 
     lattice.signTransaction(4, txToSign, (err, res) => {
       try {

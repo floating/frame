@@ -125,7 +125,8 @@ ipcMain.on('tray:openExternal', (e, url) => {
 })
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
-  const explorer = store('main.networks', chain.type, chain.id, 'explorer')
+  // remove trailing slashes
+  const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
   shell.openExternal(explorer + '/tx/' + hash)
 })
 

@@ -330,7 +330,7 @@ export default class Lattice extends Signer {
     const { value, to, data, ...txJson } = tx.toJSON()
     const type = hexToNumber(txType)
 
-    const unsignedTx = {
+    const unsignedTx: any = {
       to,
       value,
       data,
@@ -338,8 +338,7 @@ export default class Lattice extends Signer {
       nonce: hexToNumber(txJson.nonce || ''),
       gasLimit: hexToNumber(txJson.gasLimit || ''),
       useEIP155: true,
-      signerPath: this.getPath(index),
-      type: 0
+      signerPath: this.getPath(index)
     }
 
     if (type) {
