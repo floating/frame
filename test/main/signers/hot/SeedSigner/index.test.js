@@ -123,10 +123,12 @@ describe('Seed signer', () => {
     }
 
     signer.signTransaction(0, rawTx, (err, result) => {
-      expect(err).toBe(null)
-      expect(result.length).not.toBe(0)
-      expect(result.slice(0, 2)).toBe('0x')
-      done()
+      try {
+        expect(err).toBe(null)
+        expect(result.length).not.toBe(0)
+        expect(result.slice(0, 2)).toBe('0x')
+        done()
+      } catch (e) { done(e) }
     })
   })
 
