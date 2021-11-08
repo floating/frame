@@ -47,9 +47,12 @@ declare module 'gridplus-sdk' {
 
   interface SigningOptions {
     currency: string,
-    data: {
+    data: ({
       protocol: string,
-      payload: string,
+      payload: string
+    } | {
+      chainId?: string
+    }) & {
       signerPath: number[]
     }
   }

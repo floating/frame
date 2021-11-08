@@ -381,6 +381,18 @@ describe('#verifyAddress', () => {
     lattice.connection = { getAddresses: jest.fn() }
   })
 
+  it('does not attempt to verify if Lattice is disconnected', done => {
+    lattice.connection = null
+
+    lattice.verifyAddress(2, 'addr3', false, (err, result) => {
+      try {
+        expect(err.message).toMatch(/disconnected/)
+        expect(result).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
   it('verifies a matching address', done => {
     lattice.verifyAddress(2, 'addr3', false, (err, result) => {
       try {
@@ -438,6 +450,18 @@ describe('#signMessage', () => {
     }
   })
 
+  it('does not attempt to sign if Lattice is disconnected', done => {
+    lattice.connection = null
+
+    lattice.signMessage(4, 'sign this please', (err, res) => {
+      try {
+        expect(err.message).toMatch(/disconnected/)
+        expect(res).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
   it('signs a valid message', done => {
     lattice.signMessage(4, 'sign this please', (err, res) => {
       try {
@@ -454,6 +478,137 @@ describe('#signMessage', () => {
       try {
         expect(err).toBeTruthy()
         expect(res).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+})
+
+describe('#signTypedData', () => {
+  beforeEach(() => {
+    lattice.connection = {
+      sign: jest.fn((opts, cb) => {
+        if (
+          opts.currency === 'ETH_MSG' &&
+          opts.data.protocol === 'eip712' &&
+          opts.data.payload &&
+          opts.data.signerPath[4] === 2) {
+          return cb(null, {
+            sig: {
+              r: '3ea8cd',
+              s: 'abcd04',
+              v: Buffer.from('01', 'hex')
+            }
+          })
+        }
+
+        cb('invalid message!')
+      })
+    }
+  })
+
+  it('does not attempt to sign if Lattice is disconnected', done => {
+    lattice.connection = null
+
+    lattice.signTypedData(2, 'V4', 'sign this please', (err, res) => {
+      try {
+        expect(err.message).toMatch(/disconnected/)
+        expect(res).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('signs a valid message', done => {
+    lattice.signTypedData(2, 'V4', 'sign this please', (err, res) => {
+      try {
+        expect(err).toBe(null)
+        expect(res).toBe('0x3ea8cdabcd0401')
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('is not able to sign typed data less than V4', done => {
+    lattice.signTypedData(2, 'V3', 'sign this please', (err, res) => {
+      try {
+        expect(err.message.toLowerCase()).toMatch(/invalid version/)
+        expect(res).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('returns an error on failure', done => {
+    // wrong index, mock function expects 2, not 3
+    lattice.signTypedData(3, 'V4', 'sign this please', (err, res) => {
+      try {
+        expect(err).toBeTruthy()
+        expect(res).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+})
+
+describe('#signTransaction', () => {
+  const tx = {
+    chainId: '0x89'
+  }
+
+  beforeEach(() => {
+    lattice.appVersion = { major: 1, minor: 1, patch: 0 }
+    lattice.connection = {
+      sign: jest.fn((opts, cb) => {
+        if (
+          opts.currency === 'ETH' &&
+          parseInt(opts.data.chainId) === 137 &&
+          opts.data.signerPath[4] === 4) {
+          return cb(null, {
+            sig: {
+              r: '3ea8cd',
+              s: '96f7a0',
+              v: Buffer.from('00', 'hex')
+            }
+          })
+        }
+
+        cb('invalid message!')
+      })
+    }
+  })
+
+  it('does not attempt to sign if Lattice is disconnected', done => {
+    lattice.connection = null
+
+    lattice.signTransaction(4, tx, (err, res) => {
+      try {
+        expect(err.message).toMatch(/disconnected/)
+        expect(res).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('signs a legacy transaction', done => {
+    const txToSign = { ...tx, type: '0x0' }
+
+    lattice.signTransaction(4, txToSign, (err, res) => {
+      try {
+        expect(err).toBe(null)
+        expect(res).toBe('0xcf80808080808080833ea8cd8396f7a0')
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('signs a post eip-1559 transaction', done => {
+    const txToSign = { ...tx, type: '0x2' }
+
+    lattice.signTransaction(4, txToSign, (err, res) => {
+      try {
+        expect(err).toBe(null)
+        expect(res).toBe('0x02d3818980808080808080c080833ea8cd8396f7a0')
         done()
       } catch (e) { done(e) }
     })
