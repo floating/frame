@@ -1,4 +1,4 @@
-import { Client, DerivationOptions } from 'gridplus-sdk'
+import { Client } from 'gridplus-sdk'
 import { promisify } from 'util'
 import log from 'electron-log'
 import crypto from 'crypto'
@@ -17,7 +17,7 @@ export const Status = {
   PAIRING: 'Pairing',
   PAIRING_FAILED: 'Pairing Failed',
   UNKNOWN_ERROR: 'Unknown Error',
-  DISCONNECTED: 'Disconnected',
+  DISCONNECTED: 'disconnected',
   NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
 }
 
