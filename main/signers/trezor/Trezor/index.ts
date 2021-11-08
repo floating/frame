@@ -3,7 +3,7 @@ import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import { Device as TrezorDevice } from 'trezor-connect'
 
-import Signer, { Callback } from '../../Signer'
+import Signer from '../../Signer'
 import flex from '../../../flex'
 import { sign, londonToLegacy, signerCompatibility, TransactionData } from '../../../transaction'
 
@@ -112,7 +112,7 @@ export default class Trezor extends Signer {
     })
   }
 
-  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback = () => {}, attempt = 0) {
+  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
     let timeout = false
     const timer = setTimeout(() => {
@@ -194,8 +194,8 @@ export default class Trezor extends Signer {
   }
 
   // Standard Methods
-  signMessage (index: number, message: string, cb: Callback) {
-    const rpcCallback: Callback = (err, result) => {
+  signMessage (index: number, message: string, cb: Callback<string>) {
+    const rpcCallback: Callback<any> = (err, result) => {
       if (err) {
         log.error('signMessage Error')
         log.error(err)
@@ -209,7 +209,7 @@ export default class Trezor extends Signer {
     flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), rpcCallback)
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const compatibleTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
@@ -218,7 +218,7 @@ export default class Trezor extends Signer {
         const trezorTx = this.normalizeTransaction(rawTx.chainId, tx)
         const path = this.getPath(index)
 
-        const rpcCallback: Callback = (err, result) => {
+        const rpcCallback: Callback<any> = (err, result) => {
           return err
             ? reject(err)
             : resolve({ v: result.v, r: result.r, s: result.s })

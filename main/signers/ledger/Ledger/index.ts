@@ -6,7 +6,7 @@ import { v5 as uuid } from 'uuid'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { Request, RequestQueue } from './requestQueue'
-import Signer, { Callback } from '../../Signer'
+import Signer from '../../Signer'
 import LedgerEthereumApp from './eth'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { signerCompatibility, londonToLegacy, TransactionData } from '../../../transaction'
@@ -366,7 +366,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback = () => {}) {
+  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>) {
     this.enqueueRequests({
       type: 'verifyAddress',
       execute: async () => {
@@ -404,7 +404,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signMessage (index: number, message: string, cb: Callback) {
+  signMessage (index: number, message: string, cb: Callback<string>) {
     this.enqueueRequests({
       type: 'signMessage',
       execute: async () => {
@@ -431,7 +431,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTypedData (index: number, version: string, typedData: any, cb: Callback) {
+  signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
@@ -464,7 +464,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 

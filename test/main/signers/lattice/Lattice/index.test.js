@@ -8,15 +8,29 @@ let lattice
 
 beforeAll(() => {
   log.transports.console.level = false
+  jest.useFakeTimers()
 })
 
 afterAll(() => {
   log.transports.console.level = 'debug'
+  jest.useRealTimers()
 })
 
 beforeEach(() => {
   lattice = new Lattice('L8geF2', 'Frame-test-lattice')
+  lattice.on('error', jest.fn())
 })
+
+async function waitForNextPromise (fn, numPromisesInQueue = 1) {
+  while (numPromisesInQueue > 0) {
+    await Promise.resolve()
+    numPromisesInQueue -= 1
+  }
+
+  fn()
+
+  jest.runAllTimers()
+}
 
 describe('#connect', () => {
   const baseUrl = 'https://gridplus.io', privateKey = 'supersecretkey'
@@ -132,7 +146,7 @@ describe('#connect', () => {
 
       lattice.once('error', () => {
         try {
-          expect(lattice.status).toBe('Unknown Error')
+          expect(lattice.status.toLowerCase()).toMatch(/unknown device error/)
           resolve()
         } catch (e) { reject(e) }
       })
@@ -176,7 +190,7 @@ describe('#pair', () => {
 
     try {
       await lattice.pair(pairingCode)
-      throw new Error('should not connect!')
+      throw new Error('should not pair!')
     } catch (e) {
       expect(e.message).toMatch(/disconnected/)
       expect(lattice.status).not.toBe('Pairing')
@@ -233,6 +247,216 @@ describe('#pair', () => {
     }
 
     return handler
+  })
+})
+
+describe('#deriveAddresses', () => {
+  beforeEach(() => {
+    lattice.accountLimit = 5
+
+    lattice.connection = {
+      getAddresses: jest.fn((opts, cb) => {
+        const path = opts.startPath
+
+        // derivation 44'/60'/0'/0/index
+        if (
+          path[0] === (0x80000000 + 44) &&
+          path[1] === (0x80000000 + 60) &&
+          path[2] === 0x80000000 &&
+          path[3] === 0 &&
+          path[4] === lattice.addresses.length
+        ) {
+          return cb(null, Array(opts.n).fill().map((_, i) => `addr${opts.startPath[4] + i}`))
+        }
+
+        cb('Error from device: Getting addresses failed')
+      })
+    }
+  })
+
+  it('does not attempt to derive if Lattice is disconnected', async () => {
+    lattice.connection = null
+
+    try {
+      await lattice.deriveAddresses()
+      throw new Error('should not derive!')
+    } catch (e) {
+      expect(e.message).toMatch(/disconnected/)
+      expect(lattice.status).not.toBe('addresses')
+    }
+  })
+
+  it('emits an update with deriving status', done => {
+    lattice.once('update', () => {
+      try {
+        expect(lattice.status).toBe('addresses')
+        done()
+      } catch (e) { done(e) }
+    })
+
+    lattice.deriveAddresses()
+  })
+
+  it('derives new addresses', async () => {
+    await lattice.deriveAddresses()
+
+    expect(lattice.status).toBe('ok')
+    expect(lattice.addresses).toStrictEqual(
+      ['addr0', 'addr1', 'addr2', 'addr3', 'addr4']
+    )
+  })
+
+  it('derives addresses when the limit has increased', async () => {
+    lattice.addresses = [0, 1, 2, 3, 4].map(l => `addr${l}`)
+    lattice.accountLimit = 10
+
+    await lattice.deriveAddresses()
+
+    expect(lattice.status).toBe('ok')
+    expect(lattice.addresses).toStrictEqual(
+      ['addr0', 'addr1', 'addr2', 'addr3', 'addr4', 'addr5', 'addr6', 'addr7', 'addr8', 'addr9']
+    )
+  })
+
+  it('derives no addresses when enough have already been derived', async () => {
+    lattice.addresses = Array(10).fill().map((_, i) => `addr${i + 10}`)
+    lattice.accountLimit = 5
+
+    await lattice.deriveAddresses()
+
+    expect(lattice.connection.getAddresses).not.toHaveBeenCalled()
+    expect(lattice.addresses.length).toBe(10)
+  })
+  
+  it('retries on failure', done => {
+    let requestNum = 0
+
+    lattice.connection.getAddresses.mockImplementation((opts, cb) => {
+      if ((requestNum += 1) === 1) {
+        return cb('Error from device: Getting addresses failed')
+      }
+      return cb(null, ['addr1', 'addr2', 'addr3', 'addr4', 'addr5'])
+    })
+
+    lattice.once('error', () => done('should not emit an error!'))
+    lattice.on('update', () => {
+      if (lattice.status === 'ok') {
+        try {
+          expect(lattice.addresses).toHaveLength(5)
+          done()
+        } catch (e) { done(e) }
+      }
+    })
+      
+    lattice.deriveAddresses()
+
+    waitForNextPromise(() => jest.advanceTimersByTime(3000), 3)
+  })
+  
+  it('emits an error event on failure', done => {
+    lattice.connection.getAddresses.mockImplementation((opts, cb) => 
+      cb('Error from device: Getting addresses failed')
+    )
+
+    lattice.on('update', () => {
+      if (lattice.status === 'ok') done('should not have derived!')
+    })
+
+    lattice.once('error', () => {
+      try {
+        expect(lattice.addresses).toHaveLength(0)
+        expect(lattice.status.toLowerCase()).toMatch(/error/)
+        done()
+      } catch (e) { done(e) }
+    })
+      
+    lattice.deriveAddresses(0).catch(err => expect(err).toBeTruthy())
+  })
+})
+
+describe('#verifyAddress', () => {
+  beforeEach(() => {
+    lattice.addresses = ['addr1', 'addr2', 'addr3', 'addr4', 'addr5']
+    lattice.accountLimit = 5
+    lattice.connection = { getAddresses: jest.fn() }
+  })
+
+  it('verifies a matching address', done => {
+    lattice.verifyAddress(2, 'addr3', false, (err, result) => {
+      try {
+        expect(err).toBe(null)
+        expect(result).toBe(true)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('identifies a non-matching address', done => {
+    lattice.verifyAddress(2, 'addrX', false, (err, result) => {
+      try {
+        expect(err.message.toLowerCase()).toBe('address does not match device')
+        expect(result).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('fails if deriving addresses fails', done => {
+    lattice.addresses = []
+    lattice.connection.getAddresses = (opts, cb) => cb('error!')
+
+    lattice.verifyAddress(2, 'addr3', false, (err, result) => {
+      try {
+        expect(err.message.toLowerCase()).toBe('verify address error')
+        expect(result).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+})
+
+describe('#signMessage', () => {
+  beforeEach(() => {
+    lattice.connection = {
+      sign: jest.fn((opts, cb) => {
+        if (
+          opts.currency === 'ETH_MSG' &&
+          opts.data.protocol === 'signPersonal' &&
+          opts.data.payload &&
+          opts.data.signerPath[4] === 4) {
+          return cb(null, {
+            sig: {
+              r: '9af6cb',
+              s: 'abcd04',
+              v: Buffer.from('01', 'hex')
+            }
+          })
+        }
+
+        cb('invalid message!')
+      })
+    }
+  })
+
+  it('signs a valid message', done => {
+    lattice.signMessage(4, 'sign this please', (err, res) => {
+      try {
+        expect(err).toBe(null)
+        expect(res).toBe('0x9af6cbabcd0401')
+        done()
+      } catch (e) { done(e) }
+    })
+  })
+
+  it('returns an error on failure', done => {
+    // wrong index, mock function expects 4, not 3
+    lattice.signMessage(3, 'sign this please', (err, res) => {
+      try {
+        expect(err).toBeTruthy()
+        expect(res).toBe(undefined)
+        done()
+      } catch (e) { done(e) }
+    })
   })
 })
 
@@ -302,5 +526,14 @@ describe('#close', () => {
     lattice.close()
     
     expect(lattice.connection).toBeFalsy()
+  })
+})
+
+describe('#summary', () => {
+  it('only returns addresses up to the address limit', () => {
+    lattice.addresses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    lattice.accountLimit = 5
+
+    expect(lattice.summary().addresses).toHaveLength(5)
   })
 })

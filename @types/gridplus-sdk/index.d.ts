@@ -11,9 +11,24 @@ declare module 'gridplus-sdk' {
     connect (deviceId: string | Callback<boolean>, cb?: Callback<boolean>);
     pair (pairingSecret: string, cb: Callback<boolean>);
     getAddresses (opts: DerivationOptions, cb: Callback<Array<string>>);
+    sign (opts: SigningOptions, cb: Callback<SignedData>)
   }
 
   type Callback<T> = (err: string | null, result: T | undefined) => void
+
+  export type Signature = {
+    v: Buffer,
+    r: string,
+    s: string
+  }
+
+  export type SignedData = {
+    tx?: string,
+    txHash?: string,
+    changeRecipient?: string,
+    sigs?: any[],
+    sig?: Signature
+  }
 
   interface ClientOptions {
     name?: string,
@@ -28,5 +43,14 @@ declare module 'gridplus-sdk' {
     startPath: number[],
     n: number,
     skipCache?: boolean
+  }
+
+  interface SigningOptions {
+    currency: string,
+    data: {
+      protocol: string,
+      payload: string,
+      signerPath: number[]
+    }
   }
 }

@@ -55,7 +55,7 @@ export default class LatticeAdapter extends SignerAdapter {
         } else if (lattice.addresses.length < lattice.accountLimit) {
           lattice.deriveAddresses()
         } else if (needsUpdate) {
-          lattice.update()
+          this.emit('update', lattice)
         }
       })
     }, 'latticeSettings')
