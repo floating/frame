@@ -2,12 +2,15 @@ import { Client } from 'gridplus-sdk'
 import type { SignedData, Signature } from 'gridplus-sdk'
 import { promisify } from 'util'
 
-import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
+import { padToEven, addHexPrefix } from 'ethereumjs-util'
+import { hexToNumber } from 'web3-utils'
 import log from 'electron-log'
 import crypto from 'crypto'
 
 import Signer from '../../Signer'
-import { TransactionData } from '../../../transaction'
+import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
+import type { TransactionData } from '../../../transaction'
+import { TypedTransaction } from '@ethereumjs/tx'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
@@ -194,7 +197,11 @@ export default class Lattice extends Signer {
   }
 
   async verifyAddress (index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
-    log.debug(`verifying address ${currentAddress} for Lattice ${this.connection?.name}`)
+    if (!this.connection) {
+      return cb(new Error('attempted to verify address using a disconnected Lattice'), undefined)
+    }
+
+    log.debug(`verifying address ${currentAddress} for Lattice ${this.connection.name}`)
 
     try {
       const addresses = await this.deriveAddresses(0)
@@ -218,20 +225,70 @@ export default class Lattice extends Signer {
   }
 
   async signMessage (index: number, message: string, cb: Callback<string>) {
+    if (!this.connection) {
+      return cb(new Error('attempted to sign message using a disconnected Lattice'), undefined)
+    }
+
     try {
       const signature = await this.sign(index, 'signPersonal', message)
 
       return cb(null, signature)
     } catch (err) {
+      log.error('failed to sign message with Lattice', err)
       return cb(new Error(err as string), undefined)
     }
   }
 
   async signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
-    
+    if (!this.connection) {
+      return cb(new Error('attempted to sign typed data using a disconnected Lattice'), undefined)
+    }
+
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
+
+    if ((parseInt(versionNum) || 0) < 4) {
+      return cb(new Error(`Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`), undefined)
+    }
+
+    try {
+      const signature = await this.sign(index, 'eip712', typedData)
+
+      return cb(null, signature)
+    } catch (err) {
+      log.error('failed to sign typed data with Lattice', err)
+      return cb(new Error(err as string), undefined)
+    }
   }
 
   async signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
+    if (!this.connection) {
+      return cb(new Error('attempted to sign transaction using a disconnected Lattice'), undefined)
+    }
+
+    try {
+      const compatibility = signerCompatibility(rawTx, this.summary())
+      const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
+
+      const signedTx = await sign(latticeTx, async tx => {
+        const unsignedTx = this.createTransaction(index, rawTx.type, latticeTx.chainId, tx)
+        const signOpts = { currency: 'ETH', data: unsignedTx }
+        const clientSign = promisify((this.connection as Client).sign).bind(this.connection)
+
+        const result = (await clientSign(signOpts)) as SignedData
+        const sig = result.sig as Signature
+
+        return {
+          v: sig.v.toString('hex'),
+          r: sig.r,
+          s: sig.s
+        }
+      })
+
+      cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
+    } catch (err) {
+      log.error('error signing transaction with Lattice', err)
+      return cb(new Error(err as string), undefined)
+    }
   }
 
   summary () {
@@ -269,16 +326,40 @@ export default class Lattice extends Signer {
     return addHexPrefix(signature)
   }
 
+  private createTransaction (index: number, txType: string, chainId: string, tx: TypedTransaction) {
+    const { value, to, data, ...txJson } = tx.toJSON()
+    const type = hexToNumber(txType)
+
+    const unsignedTx = {
+      to,
+      value,
+      data,
+      chainId,
+      nonce: hexToNumber(txJson.nonce || ''),
+      gasLimit: hexToNumber(txJson.gasLimit || ''),
+      useEIP155: true,
+      signerPath: this.getPath(index),
+      type: 0
+    }
+
+    if (type) {
+      unsignedTx.type = type
+    }
+
+    const optionalFields = ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']
+
+    optionalFields.forEach(field => {
+      if (field in txJson) {
+        // @ts-ignore
+        unsignedTx[field] = hexToNumber(txJson[field])
+      }
+    })
+
+    return unsignedTx
+  }
+
   private getPath (index: number) {
     return [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
-  }
-
-  private normalize (hex: string ) {
-    return (hex && padToEven(stripHexPrefix(hex))) || ''
-  }
-
-  private hexToBuffer (hex: string) {
-    return Buffer.from(this.normalize(hex), 'hex')
   }
 
   private handleError (message: string, err: string) {
