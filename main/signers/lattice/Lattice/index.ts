@@ -1,9 +1,13 @@
 import { Client } from 'gridplus-sdk'
+import type { SignedData, Signature } from 'gridplus-sdk'
 import { promisify } from 'util'
+
+import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 import crypto from 'crypto'
 
 import Signer from '../../Signer'
+import { TransactionData } from '../../../transaction'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
@@ -16,7 +20,7 @@ export const Status = {
   LOCKED: 'locked',
   PAIRING: 'Pairing',
   PAIRING_FAILED: 'Pairing Failed',
-  UNKNOWN_ERROR: 'Unknown Error',
+  UNKNOWN_ERROR: 'Unknown Device Error',
   DISCONNECTED: 'disconnected',
   NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
 }
@@ -90,6 +94,8 @@ export default class Lattice extends Signer {
       return paired
     } catch (e) {
       const errorMessage = this.handleError('could not connect to Lattice', e as string)
+
+      this.emit('error')
       
       throw new Error(errorMessage)
     }
@@ -136,15 +142,19 @@ export default class Lattice extends Signer {
       return hasActiveWallet
     } catch (e) {
       const errorMessage = this.handleError('could not pair to Lattice', e as string)
+
+      this.emit('error')
       
       throw new Error(errorMessage)
     }
   }
 
   async deriveAddresses (retriesRemaining = 2) {
-    try {
-      if (!this.connection) throw new Error('attempted to derive addresses for disconnected Lattice')
+    if (!this.connection) {
+      throw new Error('attempted to derive addresses for disconnected Lattice')
+    }
 
+    try {
       this.status = Status.DERIVING
       this.emit('update')
 
@@ -167,28 +177,61 @@ export default class Lattice extends Signer {
       this.emit('update')
 
       return this.addresses
-    } catch (err) {
-      if (err === 'Error from device: Invalid Request') log.warn('Lattice: Invalid Request')
-      if (err === 'Error from device: Device Busy') log.warn('Lattice: Device Busy')
-      else log.error(err)
-
+    } catch (e) {
       if (retriesRemaining > 0) {
-        this.status = 'loading'
+        return new Promise<string[]>(resolve => {
+          setTimeout(() => {
+            resolve(this.deriveAddresses(retriesRemaining - 1))
+          }, 3000)
+        })
+      }
+      
+      const errorMessage = this.handleError('could not derive addresses', e as string)
+      this.emit('error')
 
-        setTimeout(() => {
-          this.status = 'addresses'
-          this.update()
+      throw new Error(errorMessage)
+    }
+  }
 
-          this.deriveAddresses(retriesRemaining - 1)
-        }, 5000)
-      } else {
-        this.status = 'Error connecting'
+  async verifyAddress (index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
+    log.debug(`verifying address ${currentAddress} for Lattice ${this.connection?.name}`)
+
+    try {
+      const addresses = await this.deriveAddresses(0)
+      
+      const address = (addresses[index] || '').toLowerCase()
+
+      if (address !== currentAddress) {
+        throw new Error('Address does not match device')
       }
 
-      this.update()
+      log.debug(`address ${currentAddress} matches device`)
+      cb(null, true)
+    } catch (e) {
+      const err = (e as Error).message
 
-      return []
+      this.handleError('could not verify address', err)
+      this.emit('error')
+      
+      cb(new Error(err === 'Address does not match device' ? err : 'Verify Address Error'), undefined)
     }
+  }
+
+  async signMessage (index: number, message: string, cb: Callback<string>) {
+    try {
+      const signature = await this.sign(index, 'signPersonal', message)
+
+      return cb(null, signature)
+    } catch (err) {
+      return cb(new Error(err as string), undefined)
+    }
+  }
+
+  async signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
+    
+  }
+
+  async signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
   }
 
   summary () {
@@ -200,8 +243,42 @@ export default class Lattice extends Signer {
     }
   }
 
+  private async sign (index: number, protocol: string, payload: string) {
+    const clientSign = promisify((this.connection as Client).sign).bind(this.connection)
+
+    const data = {
+      protocol,
+      payload,
+      signerPath: this.getPath(index)
+    }
+
+    const signOpts = {
+      currency: 'ETH_MSG',
+      data: data
+    }
+
+    const result = (await clientSign(signOpts)) as SignedData
+    const sig = result.sig as Signature
+
+    const signature = [
+      sig.r,
+      sig.s,
+      padToEven(sig.v.toString('hex'))
+    ].join('')
+
+    return addHexPrefix(signature)
+  }
+
   private getPath (index: number) {
     return [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+  }
+
+  private normalize (hex: string ) {
+    return (hex && padToEven(stripHexPrefix(hex))) || ''
+  }
+
+  private hexToBuffer (hex: string) {
+    return Buffer.from(this.normalize(hex), 'hex')
   }
 
   private handleError (message: string, err: string) {
@@ -212,7 +289,6 @@ export default class Lattice extends Signer {
     log.error(fullMessage)
 
     this.status = status
-    this.emit('error')
 
     return fullMessage
   }
