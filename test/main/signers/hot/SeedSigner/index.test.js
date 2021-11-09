@@ -54,7 +54,7 @@ describe('Seed signer', () => {
       expect(store('main.signers')).toEqual({})
       done()
     })
-  })
+  }, 200)
 
   test('Create from phrase', (done) => {
     const mnemonic = generateMnemonic()
@@ -85,7 +85,7 @@ describe('Seed signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  }, 1000)
+  })
 
   test('Unlock with wrong password', (done) => {
     signer.unlock('Wrong password', err => {
@@ -93,14 +93,14 @@ describe('Seed signer', () => {
       expect(signer.status).toBe('locked')
       done()
     })
-  })
+  }, 200)
 
   test('Unlock', (done) => {
     signer.unlock(PASSWORD, err => {
       expect(err).toBe(null)
       done()
     })
-  })
+  }, 200)
 
   test('Sign message', (done) => {
     const message = '0x' + Buffer.from('test').toString('hex')

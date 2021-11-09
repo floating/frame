@@ -58,7 +58,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 200)
 
   test('Create from invalid keystore key', done => {
     const keystore = { invalid: 'keystore' }
@@ -69,7 +69,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 200)
 
   test('Create from private key', done => {
     const privateKey = '0x' + crypto.randomBytes(32).toString('hex')
@@ -84,7 +84,7 @@ describe('Ring signer', () => {
         done()
       } catch(e) { done(e) }
     })
-  })
+  }, 1000)
 
   test('Scan for signers', done => {
     jest.useFakeTimers()
@@ -105,7 +105,7 @@ describe('Ring signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  }, 1000)
+  })
 
   test('Close signer', done => {
     try {
@@ -127,7 +127,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 1000)
 
   test('Add private key', done => {
     const privateKey = crypto.randomBytes(32).toString('hex')
@@ -138,7 +138,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Remove private key', done => {
     const secondAddress = signer.addresses[1]
@@ -150,7 +150,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Remove last private key', done => {
     signer.removePrivateKey(0, PASSWORD, err => {
@@ -159,7 +159,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Add private key from keystore', done => {
     const file = fs.readFileSync(FILE_PATH, 'utf8')
@@ -172,7 +172,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Unlock with wrong password', done => {
     signer.unlock('Wrong password', err => {
@@ -181,7 +181,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done (e) }
     })
-  })
+  }, 200)
 
   test('Unlock', done => {
     signer.unlock(PASSWORD, err => {
@@ -190,7 +190,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 200)
 
   test('Sign message', done => {
     const message = '0x' + Buffer.from('test').toString('hex')
