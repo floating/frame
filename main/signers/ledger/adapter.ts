@@ -91,18 +91,22 @@ export default class LedgerSignerAdapter extends SignerAdapter {
   }
 
   remove (ledger: Ledger) {
+    log.info(`removing Ledger ${ledger.model} attached at ${ledger.devicePath}`)
+
     delete this.knownSigners[ledger.devicePath]
 
     ledger.close()
   }
 
-  reload (signer: Ledger) {
-    const ledger = this.knownSigners[signer.devicePath]
+  reload (ledger: Ledger) {
+    log.info(`reloading  Ledger ${ledger.model} attached at ${ledger.devicePath}`)
 
-    if (ledger) {
-      ledger.disconnect()
-        .then(() => ledger.open())
-        .then(() => ledger.connect())
+    const signer = this.knownSigners[ledger.devicePath]
+
+    if (signer) {
+      signer.disconnect()
+        .then(() => signer.open())
+        .then(() => signer.connect())
     }
   }
 

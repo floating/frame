@@ -1,1 +1,1 @@
-type Callback<T> = (err: Error | null, result: T | undefined) => void;
+type Callback<T> = (err: Error | null, result?: T) => void;
