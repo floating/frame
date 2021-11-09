@@ -14,7 +14,7 @@ declare module 'gridplus-sdk' {
     sign (opts: SigningOptions, cb: Callback<SignedData>)
   }
 
-  type Callback<T> = (err: string | null, result: T | undefined) => void
+  type Callback<T> = (err: string | null, result: T) => void
 
   export type Signature = {
     v: Buffer,

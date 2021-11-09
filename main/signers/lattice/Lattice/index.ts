@@ -125,17 +125,13 @@ export default class Lattice extends Signer {
   }
 
   async pair (pairingCode: string) {
-    if (!this.connection) {
-      throw new Error('attempted to pair to disconnected Lattice')
-    }
-
     log.debug(`pairing to Lattice ${this.deviceId} with code`, pairingCode)
 
     this.status = Status.PAIRING
     this.emit('update')
 
     try {
-      const pair = promisify(this.connection.pair).bind(this.connection, pairingCode)
+      const pair = promisify((this.connection as Client).pair).bind(this.connection, pairingCode)
       const hasActiveWallet = !!(await pair())
 
       log.debug(`successfully paired to Lattice ${this.deviceId}`)
@@ -153,17 +149,15 @@ export default class Lattice extends Signer {
   }
 
   async deriveAddresses (retriesRemaining = 2) {
-    if (!this.connection) {
-      throw new Error('attempted to derive addresses for disconnected Lattice')
-    }
-
     try {
       this.status = Status.DERIVING
       this.emit('update')
 
-      log.debug(`deriving addresses for Lattice ${this.connection.name}`)
+      const connection = this.connection as Client
 
-      const getAddresses = promisify(this.connection.getAddresses).bind(this.connection)
+      log.debug(`deriving addresses for Lattice ${connection.name}`)
+
+      const getAddresses = promisify(connection.getAddresses).bind(connection)
 
       while (this.addresses.length < this.accountLimit) {
         const req = {
@@ -172,7 +166,7 @@ export default class Lattice extends Signer {
           skipCache: true
         }
 
-        const loadedAddresses = (await getAddresses(req)) as string[]
+        const loadedAddresses = await getAddresses(req)
         this.addresses = [...this.addresses, ...loadedAddresses]
       }
 
@@ -197,11 +191,9 @@ export default class Lattice extends Signer {
   }
 
   async verifyAddress (index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
-    if (!this.connection) {
-      return cb(new Error('attempted to verify address using a disconnected Lattice'), undefined)
-    }
+    const connection = this.connection as Client
 
-    log.debug(`verifying address ${currentAddress} for Lattice ${this.connection.name}`)
+    log.debug(`verifying address ${currentAddress} for Lattice ${connection.name}`)
 
     try {
       const addresses = await this.deriveAddresses(0)
@@ -213,6 +205,7 @@ export default class Lattice extends Signer {
       }
 
       log.debug(`address ${currentAddress} matches device`)
+
       cb(null, true)
     } catch (e) {
       const err = (e as Error).message
@@ -220,34 +213,26 @@ export default class Lattice extends Signer {
       this.handleError('could not verify address', err)
       this.emit('error')
       
-      cb(new Error(err === 'Address does not match device' ? err : 'Verify Address Error'), undefined)
+      cb(new Error(err === 'Address does not match device' ? err : 'Verify Address Error'))
     }
   }
 
   async signMessage (index: number, message: string, cb: Callback<string>) {
-    if (!this.connection) {
-      return cb(new Error('attempted to sign message using a disconnected Lattice'), undefined)
-    }
-
     try {
       const signature = await this.sign(index, 'signPersonal', message)
 
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign message with Lattice', err)
-      return cb(new Error(err as string), undefined)
+      return cb(new Error(err as string))
     }
   }
 
   async signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
-    if (!this.connection) {
-      return cb(new Error('attempted to sign typed data using a disconnected Lattice'), undefined)
-    }
-
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
-      return cb(new Error(`Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`), undefined)
+      return cb(new Error(`Invalid version (${version}), Lattice only supports eth_signTypedData version 4+`))
     }
 
     try {
@@ -256,15 +241,11 @@ export default class Lattice extends Signer {
       return cb(null, signature)
     } catch (err) {
       log.error('failed to sign typed data with Lattice', err)
-      return cb(new Error(err as string), undefined)
+      return cb(new Error(err as string))
     }
   }
 
   async signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
-    if (!this.connection) {
-      return cb(new Error('attempted to sign transaction using a disconnected Lattice'), undefined)
-    }
-
     try {
       const compatibility = signerCompatibility(rawTx, this.summary())
       const latticeTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
@@ -274,7 +255,7 @@ export default class Lattice extends Signer {
         const signOpts = { currency: 'ETH', data: unsignedTx }
         const clientSign = promisify((this.connection as Client).sign).bind(this.connection)
 
-        const result = (await clientSign(signOpts)) as SignedData
+        const result = await clientSign(signOpts)
         const sig = result.sig as Signature
 
         return {
@@ -287,7 +268,7 @@ export default class Lattice extends Signer {
       cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
     } catch (err) {
       log.error('error signing transaction with Lattice', err)
-      return cb(new Error(err as string), undefined)
+      return cb(new Error(err as string))
     }
   }
 
@@ -314,7 +295,7 @@ export default class Lattice extends Signer {
       data: data
     }
 
-    const result = (await clientSign(signOpts)) as SignedData
+    const result = await clientSign(signOpts)
     const sig = result.sig as Signature
 
     const signature = [

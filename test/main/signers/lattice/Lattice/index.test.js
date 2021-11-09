@@ -185,18 +185,6 @@ describe('#pair', () => {
     }
   })
 
-  it('does not attempt to pair if Lattice is disconnected', async () => {
-    lattice.connection = null
-
-    try {
-      await lattice.pair(pairingCode)
-      throw new Error('should not pair!')
-    } catch (e) {
-      expect(e.message).toMatch(/disconnected/)
-      expect(lattice.status).not.toBe('Pairing')
-    }
-  })
-
   it('emits an update with pairing status', done => {
     lattice.once('update', () => {
       try {
@@ -271,18 +259,6 @@ describe('#deriveAddresses', () => {
 
         cb('Error from device: Getting addresses failed')
       })
-    }
-  })
-
-  it('does not attempt to derive if Lattice is disconnected', async () => {
-    lattice.connection = null
-
-    try {
-      await lattice.deriveAddresses()
-      throw new Error('should not derive!')
-    } catch (e) {
-      expect(e.message).toMatch(/disconnected/)
-      expect(lattice.status).not.toBe('addresses')
     }
   })
 
@@ -381,18 +357,6 @@ describe('#verifyAddress', () => {
     lattice.connection = { getAddresses: jest.fn() }
   })
 
-  it('does not attempt to verify if Lattice is disconnected', done => {
-    lattice.connection = null
-
-    lattice.verifyAddress(2, 'addr3', false, (err, result) => {
-      try {
-        expect(err.message).toMatch(/disconnected/)
-        expect(result).toBe(undefined)
-        done()
-      } catch (e) { done(e) }
-    })
-  })
-
   it('verifies a matching address', done => {
     lattice.verifyAddress(2, 'addr3', false, (err, result) => {
       try {
@@ -450,18 +414,6 @@ describe('#signMessage', () => {
     }
   })
 
-  it('does not attempt to sign if Lattice is disconnected', done => {
-    lattice.connection = null
-
-    lattice.signMessage(4, 'sign this please', (err, res) => {
-      try {
-        expect(err.message).toMatch(/disconnected/)
-        expect(res).toBe(undefined)
-        done()
-      } catch (e) { done(e) }
-    })
-  })
-
   it('signs a valid message', done => {
     lattice.signMessage(4, 'sign this please', (err, res) => {
       try {
@@ -505,18 +457,6 @@ describe('#signTypedData', () => {
         cb('invalid message!')
       })
     }
-  })
-
-  it('does not attempt to sign if Lattice is disconnected', done => {
-    lattice.connection = null
-
-    lattice.signTypedData(2, 'V4', 'sign this please', (err, res) => {
-      try {
-        expect(err.message).toMatch(/disconnected/)
-        expect(res).toBe(undefined)
-        done()
-      } catch (e) { done(e) }
-    })
   })
 
   it('signs a valid message', done => {
@@ -567,18 +507,6 @@ describe('#signTransaction', () => {
   beforeEach(() => {
     lattice.appVersion = { major: 1, minor: 1, patch: 0 }
     lattice.connection = { sign: jest.fn() }
-  })
-
-  it('does not attempt to sign if Lattice is disconnected', done => {
-    lattice.connection = null
-
-    lattice.signTransaction(4, tx, (err, res) => {
-      try {
-        expect(err.message).toMatch(/disconnected/)
-        expect(res).toBe(undefined)
-        done()
-      } catch (e) { done(e) }
-    })
   })
 
   it('signs a legacy transaction', done => {

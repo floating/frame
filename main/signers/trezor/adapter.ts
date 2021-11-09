@@ -126,12 +126,16 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   }
 
   remove (trezor: Trezor) {
+    log.info(`removing Trezor ${trezor.device.id}`)
+
     delete this.knownSigners[trezor.device.path]
 
     trezor.close()
   }
 
   reload (trezor: Trezor) {
+    log.info(`reloading Trezor ${trezor.device.id}`)
+
     trezor.open()
   }
 

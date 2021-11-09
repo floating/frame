@@ -32,7 +32,9 @@ export default class Trezor extends Signer {
     const defaultVersion = device.features?.model === 'T' ? '2.3.0' : '1.8.0'
     const [major, minor, patch] = device.firmwareRelease?.release?.version || defaultVersion.split('.')
     this.appVersion = { major, minor, patch }
-    this.model = ['Trezor', device.features?.model].join(' ').trim()
+
+    const model = (device.features?.model || '').toString() === '1' ? 'One' : device.features?.model
+    this.model = ['Trezor', model].join(' ').trim()
 
     this.type = 'trezor'
     this.status = 'loading'
