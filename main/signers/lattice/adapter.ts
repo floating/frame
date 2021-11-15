@@ -50,7 +50,6 @@ export default class LatticeAdapter extends SignerAdapter {
   open () {
     this.settingsObserver = store.observer(() => {
       const { baseUrl, derivation, accountLimit } = getGlobalLatticeSettings()
-      console.log('LATTICE SETTINGS CHANGED!')
 
       Object.values(this.knownSigners).forEach(lattice => {
         if (!lattice.connection) return
