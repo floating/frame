@@ -381,6 +381,19 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
+          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Lattice Derivation</div>
+              <Dropdown
+                syncValue={this.store('main.latticeSettings.derivation')}
+                onChange={(value) => link.send('tray:action', 'setLatticeDerivation', value)}
+                options={[{ text: 'Standard', value: 'standard' }, { text: 'Legacy', value: 'legacy' }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Derivation path for connected Lattice devices'}
+            </div>
+          </div>
           <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Accounts</div>

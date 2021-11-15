@@ -3,25 +3,36 @@ import log from 'electron-log'
 import { SignerAdapter } from '../adapters'
 import store from '../../store'
 import Lattice from './Lattice'
+import { Derivation } from '../Signer/derive'
 
-interface LatticeSettings {
-  deviceName: string,
+interface GlobalLatticeSettings {
   baseUrl: string,
   accountLimit: number,
+  derivation: Derivation
+}
+
+interface LatticeSettings extends GlobalLatticeSettings {
+  deviceName: string,
   privKey: string,
   paired: boolean
 }
 
 function getLatticeSettings (deviceId: string): LatticeSettings {
+  const { baseUrl, derivation, accountLimit } = getGlobalLatticeSettings()
+  const device = store('main.lattice', deviceId)
+
+  return { ...device, baseUrl, derivation, accountLimit }
+}
+
+function getGlobalLatticeSettings (): GlobalLatticeSettings {
   const accountLimit = store('main.latticeSettings.accountLimit')
+  const derivation = store('main.latticeSettings.derivation')
   const endpointMode = store('main.latticeSettings.endpointMode')
   const baseUrl = (endpointMode === 'custom')
     ? store('main.latticeSettings.endpointCustom')
     : 'https://signing.gridpl.us'
 
-  const device = store('main.lattice', deviceId)
-
-  return { ...device, baseUrl, accountLimit }
+  return { baseUrl, derivation, accountLimit }
 }
 
 export default class LatticeAdapter extends SignerAdapter {
@@ -38,21 +49,32 @@ export default class LatticeAdapter extends SignerAdapter {
 
   open () {
     this.settingsObserver = store.observer(() => {
+      const { baseUrl, derivation, accountLimit } = getGlobalLatticeSettings()
+      console.log('LATTICE SETTINGS CHANGED!')
+
       Object.values(this.knownSigners).forEach(lattice => {
         if (!lattice.connection) return
         
-        const { baseUrl, accountLimit } = getLatticeSettings(lattice.deviceId)
-        let needsUpdate = false
+        let needsUpdate = false, reloadAddresses = false
+
+        if (derivation !== lattice.derivation) {
+          lattice.derivation = derivation
+          lattice.addresses = []
+
+          reloadAddresses = true
+        }
 
         if (accountLimit !== lattice.accountLimit) {
           lattice.accountLimit = accountLimit
+
+          reloadAddresses = reloadAddresses || (lattice.addresses.length < lattice.accountLimit)
           needsUpdate = true
         }
 
-        // if any connection settings have changed, re-connect
         if (baseUrl !== lattice.connection.baseUrl) {
+          // if any connection settings have changed, re-connect
           this.reload(lattice)
-        } else if (lattice.addresses.length < lattice.accountLimit) {
+        } else if (reloadAddresses) {
           lattice.deriveAddresses()
         } else if (needsUpdate) {
           this.emit('update', lattice)
@@ -79,7 +101,9 @@ export default class LatticeAdapter extends SignerAdapter {
           if (paired) {
             // Lattice recognizes the private key and remembers if this
             // client is already paired between sessions
-            lattice.deriveAddresses()
+            const { derivation } = getLatticeSettings(deviceId)
+
+            lattice.deriveAddresses({ derivation })
           } else {
             store.updateLattice(deviceId, { paired: false })
           }
@@ -89,7 +113,8 @@ export default class LatticeAdapter extends SignerAdapter {
           store.updateLattice(deviceId, { paired: true })
 
           if (hasActiveWallet) {
-            lattice.deriveAddresses()
+            const { derivation } = getLatticeSettings(deviceId)
+            lattice.deriveAddresses({ derivation })
           }
         })
 

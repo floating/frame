@@ -1,5 +1,5 @@
 import { Client } from 'gridplus-sdk'
-import type { SignedData, Signature } from 'gridplus-sdk'
+import type { Signature } from 'gridplus-sdk'
 import { promisify } from 'util'
 
 import { padToEven, addHexPrefix } from 'ethereumjs-util'
@@ -11,9 +11,15 @@ import Signer from '../../Signer'
 import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import type { TransactionData } from '../../../transaction'
 import { TypedTransaction } from '@ethereumjs/tx'
+import { Derivation, getDerivationPath } from '../../Signer/derive'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
+
+interface DeriveOptions {
+  retries?: number,
+  derivation?: Derivation
+}
 
 export const Status = {
   OK: 'ok',
@@ -48,6 +54,7 @@ function getStatusForError (err: string) {
 
 export default class Lattice extends Signer {
   deviceId: string;
+  derivation: Derivation | undefined;
   connection: Client | null = null;
 
   accountLimit = 5;
@@ -148,10 +155,17 @@ export default class Lattice extends Signer {
     }
   }
 
-  async deriveAddresses (retriesRemaining = 2) {
+  async deriveAddresses (opts?: DeriveOptions) {
+    const { derivation, retriesRemaining } = {
+      derivation: opts?.derivation || this.derivation,
+      retriesRemaining: ((opts && ('retries' in opts)) ? opts.retries : 2) as number
+    }
+
     try {
       this.status = Status.DERIVING
       this.emit('update')
+
+      this.derivation = derivation
 
       const connection = this.connection as Client
 
@@ -178,7 +192,7 @@ export default class Lattice extends Signer {
       if (retriesRemaining > 0) {
         return new Promise<string[]>(resolve => {
           setTimeout(() => {
-            resolve(this.deriveAddresses(retriesRemaining - 1))
+            resolve(this.deriveAddresses({ retries: retriesRemaining - 1 }))
           }, 3000)
         })
       }
@@ -196,7 +210,7 @@ export default class Lattice extends Signer {
     log.debug(`verifying address ${currentAddress} for Lattice ${connection.name}`)
 
     try {
-      const addresses = await this.deriveAddresses(0)
+      const addresses = await this.deriveAddresses({ retries: 0 })
       
       const address = (addresses[index] || '').toLowerCase()
 
@@ -339,7 +353,19 @@ export default class Lattice extends Signer {
   }
 
   private getPath (index: number) {
-    return [HARDENED_OFFSET + 44, HARDENED_OFFSET + 60, HARDENED_OFFSET, 0, index]
+    if (!this.derivation) {
+      throw new Error('attempted to get base path with unknown derivation!')
+    }
+
+    const path = getDerivationPath(this.derivation) + "/" + index.toString()
+
+    return path.split('/').map(element => {
+      if (element.endsWith("'")) {
+        return parseInt(element.substring(0, element.length - 1)) + HARDENED_OFFSET
+      }
+
+      return parseInt(element)
+    })
   }
 
   private handleError (message: string, err: string) {
