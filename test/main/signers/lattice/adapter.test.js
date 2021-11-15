@@ -26,6 +26,10 @@ beforeEach(() => {
     paired: true
   })
 
+  store.set('main.latticeSettings', {
+    derivation: 'legacy'
+  })
+
   adapter = new LatticeSignerAdapter()
 })
 
@@ -211,6 +215,14 @@ describe('settings changes', () => {
 
     expect(latticeSigner.deriveAddresses).not.toHaveBeenCalled()
     expect(updateHandler).toHaveBeenCalled()
+  })
+
+  it('derives addresses if the derivation changed', () => {
+    store.set('main.latticeSettings.derivation', 'standard')
+
+    settingsObserver.fire()
+
+    expect(latticeSigner.deriveAddresses).toHaveBeenCalled()
   })
 })
 

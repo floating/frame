@@ -1,6 +1,7 @@
 import Lattice from '../../../../../main/signers/lattice/Lattice'
 import { Client } from 'gridplus-sdk'
 import log from 'electron-log'
+import { Derivation } from '../../../../../main/signers/Signer/derive'
 
 jest.mock('gridplus-sdk')
 
@@ -18,6 +19,7 @@ afterAll(() => {
 
 beforeEach(() => {
   lattice = new Lattice('L8geF2', 'Frame-test-lattice')
+  lattice.derivation = Derivation.standard
   lattice.on('error', jest.fn())
 })
 
@@ -241,25 +243,57 @@ describe('#pair', () => {
 describe('#deriveAddresses', () => {
   beforeEach(() => {
     lattice.accountLimit = 5
+    lattice.derivation = Derivation.standard
 
     lattice.connection = {
       getAddresses: jest.fn((opts, cb) => {
-        const path = opts.startPath
-
-        // derivation 44'/60'/0'/0/index
-        if (
-          path[0] === (0x80000000 + 44) &&
-          path[1] === (0x80000000 + 60) &&
-          path[2] === 0x80000000 &&
-          path[3] === 0 &&
-          path[4] === lattice.addresses.length
-        ) {
-          return cb(null, Array(opts.n).fill().map((_, i) => `addr${opts.startPath[4] + i}`))
-        }
-
-        cb('Error from device: Getting addresses failed')
+        return cb(null, Array(opts.n).fill().map((_, i) => `addr${opts.startPath[4] + i}`))
       })
     }
+  })
+
+  it('derives addresses using standard derivation', async () => {
+    // 44'/60'/0'/0/<index>
+    lattice.derivation = Derivation.standard
+
+    await lattice.deriveAddresses()
+
+    expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({
+        startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 0, 0]
+      }),
+      expect.any(Function)
+    )
+  })
+
+  it('derives addresses using legacy derivation', async () => {
+    // 44'/60'/0'/<index>
+    lattice.derivation = Derivation.legacy
+    lattice.accountLimit = 10
+    lattice.addresses = ['addr1', 'addr2', 'addr3', 'addr4', 'addr5']
+
+    await lattice.deriveAddresses()
+
+    expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({
+        startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000, 5]
+      }),
+      expect.any(Function)
+    )
+  })
+
+  it('derives addresses using testnet derivation', async () => {
+    // 44'/1'/0'/0/<index>
+    lattice.derivation = Derivation.testnet
+
+    await lattice.deriveAddresses()
+
+    expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({
+        startPath: [0x80000000 + 44, 0x80000000 + 1, 0x80000000, 0, 0]
+      }),
+      expect.any(Function)
+    )
   })
 
   it('emits an update with deriving status', done => {
@@ -346,7 +380,7 @@ describe('#deriveAddresses', () => {
       } catch (e) { done(e) }
     })
       
-    lattice.deriveAddresses(0).catch(err => expect(err).toBeTruthy())
+    lattice.deriveAddresses({ retries: 0 }).catch(err => expect(err).toBeTruthy())
   })
 })
 

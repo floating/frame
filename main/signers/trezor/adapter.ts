@@ -5,7 +5,6 @@ import flex from '../../flex'
 import { SignerAdapter } from '../adapters'
 import Trezor from './Trezor'
 import store from '../../store'
-import Signer from '../Signer'
 
 export default class TrezorSignerAdapter extends SignerAdapter {
   private flexListeners: { [event: string]: (device: TrezorDevice) => void };

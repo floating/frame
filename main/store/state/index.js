@@ -169,6 +169,7 @@ const initial = {
     lattice: main('lattice', {}),
     latticeSettings: {
       accountLimit: main('latticeSettings.accountLimit', 5),
+      derivation: main('latticeSettings.derivation', 'standard'),
       endpointMode: main('latticeSettings.endpointMode', 'default'),
       endpointCustom: main('latticeSettings.endpointCustom', '')
     },

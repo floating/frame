@@ -174,6 +174,9 @@ module.exports = {
   setLatticeEndpointCustom: (u, url) => {
     u('main.latticeSettings.endpointCustom', () => url)
   },
+  setLatticeDerivation: (u, value) => {
+    u('main.latticeSettings.derivation', () => value)
+  },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
