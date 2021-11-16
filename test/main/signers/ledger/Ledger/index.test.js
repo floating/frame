@@ -444,6 +444,23 @@ describe('#signTypedData', () => {
     runNextRequest()
   })
 
+  it('fails if the signing request is invalid', done => {
+    Eth.mock.instances[0].signTypedData.mockRejectedValue({ statusCode: 99901, message: 'Invalid typed data' })
+
+    ledger.once('update', () => done('Ledger unexpectedly updated!'))
+    ledger.once('close', () => done('Ledger unexpectedly closed!'))
+
+    ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
+      verifyDone(done, () => {
+        expect(ledger.status).toBe(Status.OK)
+        expect(signature).toBeUndefined()
+        expect(err.message).toMatch(/Sign message error/)
+      })
+    })
+
+    runNextRequest()
+  })
+
   const errorCases = [
     {
       testCase: 'there is a communication error',
@@ -473,7 +490,7 @@ describe('#signTypedData', () => {
         ledger.signTypedData(5, 'V4', 'typed data', (err, signature) => {
           verifyPromise(resolve, reject, () => {
             expect(signature).toBeUndefined()
-            expect(err.message).toBe('Sign message error')
+            expect(err.message).toMatch(/Sign message error/)
           })
         })
       })

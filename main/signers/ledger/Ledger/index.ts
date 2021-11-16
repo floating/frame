@@ -37,6 +37,11 @@ interface Address {
 function wasRequestRejected(err: DeviceError) {
   return [27013].includes(err.statusCode)
 }
+
+function isInvalidRequest(err: DeviceError) {
+  return [99901].includes(err.statusCode)
+}
+
 function isDeviceAsleep (err: DeviceError) {
   return [27404, 26628].includes(err.statusCode)
 }
@@ -57,7 +62,7 @@ function getStatusForError (err: DeviceError) {
     return Status.LOCKED
   }
 
-  if (wasRequestRejected(err)) {
+  if (wasRequestRejected(err) || isInvalidRequest(err)) {
     return Status.OK
   }
 
@@ -449,10 +454,10 @@ export default class Ledger extends Signer {
           cb(null, signedData)
         } catch (e) {
           const err = e as DeviceError
-          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : 'Sign message error'
+          const message = wasRequestRejected(err) ? 'Sign request rejected by user' : `Sign message error: ${err.message}`
 
           this.handleError(err)
-          log.error('error signing typed data on Ledger', err.toString())
+          log.error('error signing typed data on Ledger', message)
 
           cb(new Error(message), undefined)
         }

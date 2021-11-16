@@ -57,8 +57,12 @@ class HotSignerWorker {
   }
 
   signTypedData (key, params, pseudoCallback) {
-    const signature = ethSigUtil.signTypedMessage(key, { data: params.typedData }, params.version)
-    pseudoCallback(null, signature)
+    try {
+      const signature = ethSigUtil.signTypedMessage(key, { data: params.typedData }, params.version)
+      pseudoCallback(null, signature)
+    } catch (e) {
+      pseudoCallback(e.message)
+    }
   }
 
   signTransaction (key, rawTx, pseudoCallback) {

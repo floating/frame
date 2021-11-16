@@ -49,9 +49,15 @@ export default class LedgerEthereumApp {
   }
 
   async signTypedData (path: string, typedData: TypedMessage<any>) {
-    const { domain, types, primaryType, message } = TypedDataUtils.sanitizeData(typedData)
-    const domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
-    const hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types).toString('hex')
+    let domainSeparatorHex, hashStructMessageHex
+
+    try {
+      const { domain, types, primaryType, message } = TypedDataUtils.sanitizeData(typedData)
+      domainSeparatorHex = TypedDataUtils.hashStruct('EIP712Domain', domain, types).toString('hex')
+      hashStructMessageHex = TypedDataUtils.hashStruct(primaryType as string, message, types).toString('hex')
+    } catch (e) {
+      throw { statusCode: 99901, message: 'Invalid typed data' }
+    }
 
     const signature = await this.eth.signEIP712HashedMessage(path, domainSeparatorHex, hashStructMessageHex)
     const hashedSignature = signature.r + signature.s + padToEven((signature.v - 27).toString(16))
