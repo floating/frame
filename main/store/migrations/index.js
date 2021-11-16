@@ -364,6 +364,18 @@ const migrations = {
       }
     })
     return initial
+  },
+  17: initial => {
+    // update Lattice settings
+    const lattices = initial.main.lattice || {}
+    const oldSuffix = initial.main.latticeSettings?.suffix || ''
+
+    Object.values(lattices).forEach(lattice => {
+      lattice.paired = true
+      lattice.deviceName = oldSuffix ? `Frame-${oldSuffix}` : 'Frame'
+    })
+
+    return initial
   }
 }
 

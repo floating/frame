@@ -359,9 +359,52 @@ describe('migration 16', () => {
     const id = updatedState.main.currentNetwork.id
     expect(id).toBe(1)
   })
+})
 
-  it('updates state version to 16', () => {
+describe('migration 17', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 16,
+        lattice: {
+          McBbS7: {
+            deviceId: 'McBbS7'
+          }
+        },
+        latticeSettings: {
+          suffix: 'my-laptop'
+        }
+      }
+    }
+  })
+
+  it('handles no Lattices to migrate', () => {
+    delete state.main.lattice
+
     const updatedState = migrations.apply(state)
-    expect(updatedState.main._version).toBe('16')
+    expect(updatedState.main.lattice).toBe(undefined)
+  })
+
+  it('adds paired state to existing Lattices', () => {
+    const updatedState = migrations.apply(state)
+
+    const lattice = updatedState.main.lattice['McBbS7']
+    expect(lattice.paired).toBe(true)
+  })
+
+  it('sets the device name of existing Lattices using the old suffix', () => {
+    const updatedState = migrations.apply(state)
+
+    const lattice = updatedState.main.lattice['McBbS7']
+    expect(lattice.deviceName).toBe('Frame-my-laptop')
+  })
+
+  it('sets the device name of existing Lattices with no suffix', () => {
+    delete state.main.latticeSettings.suffix
+
+    const updatedState = migrations.apply(state)
+
+    const lattice = updatedState.main.lattice['McBbS7']
+    expect(lattice.deviceName).toBe('Frame')
   })
 })
