@@ -282,18 +282,24 @@ describe('#deriveAddresses', () => {
     )
   })
 
-  it('derives addresses using testnet derivation', async () => {
-    // 44'/1'/0'/0/<index>
-    lattice.derivation = Derivation.testnet
+  it('derives addresses using live derivation', async () => {
+    // 44'/60'/<index>'/0/0
+    lattice.derivation = Derivation.live
 
     await lattice.deriveAddresses()
 
-    expect(lattice.connection.getAddresses).toHaveBeenCalledWith(
-      expect.objectContaining({
-        startPath: [0x80000000 + 44, 0x80000000 + 1, 0x80000000, 0, 0]
-      }),
-      expect.any(Function)
-    )
+    const expectedIndexes = [0, 1, 2, 3, 4]
+
+    expect(lattice.connection.getAddresses).toHaveBeenCalledTimes(expectedIndexes.length)
+
+    expectedIndexes.forEach(n => {
+      expect(lattice.connection.getAddresses).toHaveBeenNthCalledWith(n + 1,
+        expect.objectContaining({
+          startPath: [0x80000000 + 44, 0x80000000 + 60, 0x80000000 + n, 0, 0]
+        }),
+        expect.any(Function)
+      )
+    })
   })
 
   it('emits an update with deriving status', done => {

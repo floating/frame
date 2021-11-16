@@ -77,7 +77,7 @@ export default class Trezor extends Signer {
   }
 
   private getPath (index: number) {
-    return `${this.basePath()}/${index}`
+    return this.basePath() + '/' + index.toString()
   }
 
   private basePath () {
@@ -85,7 +85,7 @@ export default class Trezor extends Signer {
       throw new Error('attempted to get base path with unknown derivation!')
     }
 
-    return `m/${getDerivationPath(this.derivation)}`
+    return `m/${getDerivationPath(this.derivation)}`.replace(/\/+$/,'')
   }
 
   deviceStatus () {
