@@ -203,6 +203,7 @@ describe('#send', () => {
         }
       })
     })
+
     it('rejects switch if chain doesn\'t exist in the store', done => {
       send({
         method: 'wallet_switchEthereumChain', 
@@ -216,6 +217,68 @@ describe('#send', () => {
         } catch (e) { 
           done(e) 
         }
+      })
+    })
+  })
+  
+  describe('#wallet_getPermissions', () => {
+    it('returns all allowed permissions', done => {
+      const request = {
+        method: 'wallet_getPermissions'
+      }
+
+      send(request, response => {
+        try {
+          expect(response.error).toBe(undefined)
+
+          const permissions = response.result
+          expect(permissions).toHaveLength(13)
+          expect(permissions.map(p => p.parentCapability)).toEqual(expect.arrayContaining(
+            [
+              'eth_coinbase',
+              'eth_accounts',
+              'eth_requestAccounts',
+              'eth_sendTransaction',
+              'personal_sign',
+              'personal_ecRecover',
+              'eth_sign',
+              'eth_signTypedData',
+              'eth_signTypedData_v1',
+              'eth_signTypedData_v3',
+              'eth_signTypedData_v4',
+              'wallet_switchEthereumChain',
+              'wallet_addEthereumChain'
+            ]
+          ))
+
+          done()
+        } catch (e) { done(e) }
+      })
+    })
+  })
+
+  describe('#wallet_requestPermissions', () => {
+    it('returns the requested permissions', done => {
+      const request = {
+        method: 'wallet_requestPermissions',
+        params: [
+          { eth_accounts: {} },
+          { eth_signTransaction: {} }
+        ]
+      }
+
+      send(request, response => {
+        try {
+          expect(response.error).toBe(undefined)
+
+          const permissions = response.result
+          expect(permissions).toHaveLength(2)
+          expect(permissions[0].parentCapability).toBe('eth_accounts')
+          expect(Number.isInteger(permissions[0].date)).toBe(true)
+          expect(permissions[1].parentCapability).toBe('eth_signTransaction')
+          expect(Number.isInteger(permissions[1].date)).toBe(true)
+          done()
+        } catch (e) { done(e) }
       })
     })
   })
