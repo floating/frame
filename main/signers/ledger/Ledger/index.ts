@@ -275,15 +275,11 @@ export default class Ledger extends Signer {
   }
 
   private getPath (index: number) {
-    if (this.derivation === Derivation.live) {
-      return `44'/60'/${index}'/0/0`
-    }
-
     if (!this.derivation) {
       throw new Error('attempted to get path with unknown derivation!')
     }
   
-    return getDerivationPath(this.derivation) + '/' + index
+    return getDerivationPath(this.derivation, index)
   }
 
   // *** request enqueuing methods *** //

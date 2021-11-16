@@ -172,11 +172,12 @@ export default class Lattice extends Signer {
       log.debug(`deriving addresses for Lattice ${connection.name}`)
 
       const getAddresses = promisify(connection.getAddresses).bind(connection)
+      const addressLimit = derivation === Derivation.live ? 1 : ADDRESS_LIMIT
 
       while (this.addresses.length < this.accountLimit) {
         const req = {
           startPath: this.getPath(this.addresses.length),
-          n: Math.min(ADDRESS_LIMIT, this.accountLimit - this.addresses.length),
+          n: Math.min(addressLimit, this.accountLimit - this.addresses.length),
           skipCache: true
         }
 
@@ -357,7 +358,7 @@ export default class Lattice extends Signer {
       throw new Error('attempted to get base path with unknown derivation!')
     }
 
-    const path = getDerivationPath(this.derivation) + "/" + index.toString()
+    const path = getDerivationPath(this.derivation, index)
 
     return path.split('/').map(element => {
       if (element.endsWith("'")) {

@@ -89,8 +89,10 @@ export default class LatticeAdapter extends SignerAdapter {
 
         log.debug('Initializing Lattice device', { deviceId })
 
-        const { deviceName, baseUrl, privKey } = getLatticeSettings(deviceId)
+        const { deviceName, baseUrl, privKey, accountLimit } = getLatticeSettings(deviceId)
+
         const lattice = new Lattice(deviceId, deviceName)
+        lattice.accountLimit = accountLimit
 
         const emitUpdate = () => this.emit('update', lattice)
 

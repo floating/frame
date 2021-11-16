@@ -367,7 +367,7 @@ class Settings extends React.Component {
               <Dropdown
                 syncValue={this.store('main.latticeSettings.derivation')}
                 onChange={(value) => link.send('tray:action', 'setLatticeDerivation', value)}
-                options={[{ text: 'Standard', value: 'standard' }, { text: 'Legacy', value: 'legacy' }]}
+                options={[{ text: 'Standard', value: 'standard' }, { text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
               />
             </div>
             <div className='signerPermissionDetails'>
