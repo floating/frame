@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events')
 const { addHexPrefix } = require('ethereumjs-util')
+const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')
 
@@ -59,6 +60,12 @@ class ChainConnection extends EventEmitter {
     monitor.on('data', block => {
       if ('baseFeePerGas' in block) {
         this.chainConfig.setHardforkByBlockNumber(block.number)
+
+        if (!this.chainConfig.gteHardfork(Hardfork.London)) {
+          // if baseFeePerGas is present in the block header, the hardfork
+          // must be at least London
+          this.chainConfig.setHardfork(Hardfork.London)
+        }
       }
 
       const gasCalculator = new GasCalculator(provider)
