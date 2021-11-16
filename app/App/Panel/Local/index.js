@@ -54,6 +54,19 @@ class Settings extends React.Component {
     if (location.startsWith('https://') || location.startsWith('http://')) return true
     return false
   }
+
+  okPort (location) {
+    const match = location.match(/^(?:https?|wss?).*:(?<port>\d{4,})/)
+
+    if (match) {
+      const portStr = (match.groups || { port: 0 }).port
+      const port = parseInt(portStr)
+      return port >= 0 && port <= 65535
+    }
+
+    return true
+  }
+
   //
   // latticeFocus () {
   //   if (this.state.latticeEndpoint === this.customMessage) this.setState({ secondaryCustom: '' })
@@ -137,8 +150,15 @@ class Settings extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage && !this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
-      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
+        if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
+        else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
+      }
+
+      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
+        if (!this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+        else if (!this.okPort(this.state.secondaryCustom)) status = 'invalid port'
+      }
     }
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
