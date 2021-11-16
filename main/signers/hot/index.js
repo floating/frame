@@ -12,7 +12,7 @@ const SeedSigner = require('./SeedSigner')
 const RingSigner = require('./RingSigner')
 const { stripHexPrefix } = require('ethereumjs-util')
 
-const USER_DATA = app ? app.getPath('userData') : './test/.userData'
+const USER_DATA = app ? app.getPath('userData') : path.resolve(path.dirname(require.main.filename), '../.userData');
 const SIGNERS_PATH = path.resolve(USER_DATA, 'signers')
 
 const wait = async ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -42,7 +42,7 @@ module.exports = {
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new SeedSigner()
-    signer.addPhrase(phrase, password, (err, result) => {
+    signer.addPhrase(phrase, password, err => {
       if (err) {
         signer.close()
         return cb(err)

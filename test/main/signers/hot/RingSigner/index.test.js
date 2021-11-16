@@ -5,7 +5,6 @@ import crypto from 'crypto'
 import { remove } from 'fs-extra'
 
 import log from 'electron-log'
-log.transports.console.level = false
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
@@ -17,8 +16,9 @@ const mockPersist = {
   queue: jest.fn()
 }
 
-jest.mock('../../compiled/store/persist', () => mockPersist)
-jest.mock('../../main/store/persist', () => mockPersist)
+jest.mock('electron')
+jest.mock('../../../../../compiled/store/persist', () => mockPersist)
+jest.mock('../../../../../main/store/persist', () => mockPersist)
 
 // Stubs
 const signers = { add: () => {} }
@@ -31,13 +31,23 @@ describe('Ring signer', () => {
   let signer
 
   beforeAll(async () => {
+    log.transports.console.level = false
+
     clean()
 
-    hot = await import('../../compiled/signers/hot')
-    store = require('../../compiled/store')
+    hot = await import('../../../../../compiled/signers/hot')
+    store = require('../../../../../compiled/store')
   })
 
-  afterAll(clean)
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  afterAll(() => {
+    clean()
+
+    log.transports.console.level = 'debug'
+  })
 
   test('Create from invalid private key', done => {
     const privateKey = 'invalid key'
@@ -48,7 +58,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 200)
 
   test('Create from invalid keystore key', done => {
     const keystore = { invalid: 'keystore' }
@@ -59,7 +69,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 200)
 
   test('Create from private key', done => {
     const privateKey = '0x' + crypto.randomBytes(32).toString('hex')
@@ -74,9 +84,11 @@ describe('Ring signer', () => {
         done()
       } catch(e) { done(e) }
     })
-  })
+  }, 1000)
 
   test('Scan for signers', done => {
+    jest.useFakeTimers()
+
     let count = 0
     const signers = {
       add: (signer) => {
@@ -91,7 +103,9 @@ describe('Ring signer', () => {
     }
 
     hot.scan(signers)
-  }, 15 * 1000)
+
+    jest.runAllTimers()
+  })
 
   test('Close signer', done => {
     try {
@@ -113,7 +127,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 1000)
 
   test('Add private key', done => {
     const privateKey = crypto.randomBytes(32).toString('hex')
@@ -124,7 +138,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Remove private key', done => {
     const secondAddress = signer.addresses[1]
@@ -136,7 +150,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Remove last private key', done => {
     signer.removePrivateKey(0, PASSWORD, err => {
@@ -145,7 +159,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Add private key from keystore', done => {
     const file = fs.readFileSync(FILE_PATH, 'utf8')
@@ -158,7 +172,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 400)
 
   test('Unlock with wrong password', done => {
     signer.unlock('Wrong password', err => {
@@ -167,7 +181,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done (e) }
     })
-  })
+  }, 200)
 
   test('Unlock', done => {
     signer.unlock(PASSWORD, err => {
@@ -176,7 +190,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  })
+  }, 200)
 
   test('Sign message', done => {
     const message = '0x' + Buffer.from('test').toString('hex')
@@ -196,7 +210,8 @@ describe('Ring signer', () => {
       gasPrice: '0x09184e72a000',
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x0'
+      value: '0x0',
+      chainId: '0x1'
     }
 
     signer.signTransaction(0, rawTx, (err, result) => {

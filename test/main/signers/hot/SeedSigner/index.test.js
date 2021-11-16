@@ -4,7 +4,6 @@ import { remove } from 'fs-extra'
 import { generateMnemonic } from 'bip39'
 
 import log from 'electron-log'
-log.transports.console.level = false
 
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
@@ -15,8 +14,9 @@ const mockPersist = {
   queue: jest.fn()
 }
 
-jest.mock('../../compiled/store/persist', () => mockPersist)
-jest.mock('../../main/store/persist', () => mockPersist)
+jest.mock('electron')
+jest.mock('../../../../../compiled/store/persist', () => mockPersist)
+jest.mock('../../../../../main/store/persist', () => mockPersist)
 
 // Stubs
 const signers = { add: () => {} }
@@ -29,13 +29,23 @@ describe('Seed signer', () => {
   let signer
 
   beforeAll(async () => {
+    log.transports.console.level = false
+
     clean()
 
-    hot = await import('../../compiled/signers/hot')
-    store = require('../../compiled/store')
+    hot = await import('../../../../../compiled/signers/hot')
+    store = require('../../../../../compiled/store')
   })
 
-  afterAll(clean)
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  afterAll(() => {
+    clean()
+
+    log.transports.console.level = 'debug'
+  })
 
   test('Create from invalid phrase', (done) => {
     const mnemonic = 'invalid mnemonic'
@@ -44,7 +54,7 @@ describe('Seed signer', () => {
       expect(store('main.signers')).toEqual({})
       done()
     })
-  })
+  }, 200)
 
   test('Create from phrase', (done) => {
     const mnemonic = generateMnemonic()
@@ -56,9 +66,11 @@ describe('Seed signer', () => {
       expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
       done()
     })
-  })
+  }, 1000)
 
   test('Scan for signers', (done) => {
+    jest.useFakeTimers()
+
     let count = 0
     const signers = {
       add: (signer) => {
@@ -69,8 +81,11 @@ describe('Seed signer', () => {
       },
       exists: () => false
     }
+
     hot.scan(signers)
-  }, 15 * 1000)
+
+    jest.runAllTimers()
+  })
 
   test('Unlock with wrong password', (done) => {
     signer.unlock('Wrong password', err => {
@@ -78,14 +93,14 @@ describe('Seed signer', () => {
       expect(signer.status).toBe('locked')
       done()
     })
-  })
+  }, 200)
 
   test('Unlock', (done) => {
     signer.unlock(PASSWORD, err => {
       expect(err).toBe(null)
       done()
     })
-  })
+  }, 200)
 
   test('Sign message', (done) => {
     const message = '0x' + Buffer.from('test').toString('hex')
@@ -103,7 +118,8 @@ describe('Seed signer', () => {
       gasPrice: '0x09184e72a000',
       gasLimit: '0x30000',
       to: '0xfa3caabc8eefec2b5e2895e5afbf79379e7268a7',
-      value: '0x0'
+      value: '0x0',
+      chainId: '0x1'
     }
 
     signer.signTransaction(0, rawTx, (err, result) => {
