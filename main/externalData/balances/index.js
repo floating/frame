@@ -3,7 +3,8 @@ const BigNumber = require('bignumber.js')
 const log = require('electron-log')
 
 const tokenLoader = require('../inventory/tokens')
-const multicall = require('../../multicall')
+const multicall = require('../../multicall').default
+const { supportsChain: multicallSupportsChain } = require('../../multicall')
 
 async function chainId () {
   return parseInt(await provider.request({ method: 'eth_chainId' }))
@@ -37,7 +38,10 @@ async function loadTokenBalances (chainId, address, tokens) {
     const batchEnd = batchStart + BATCH_SIZE
 
     try {
-      const results = await multicall(chainId).call(calls.slice(batchStart, batchEnd))
+      const results = multicallSupportsChain(chainId)
+        ? await multicall(chainId).call(calls.slice(batchStart, batchEnd))
+        : { transformed: [] }
+
       return Object.entries(results.transformed)
     } catch (e) {
       log.error(`unable to load token balances (batch ${batchStart}-${batchEnd}`, e)

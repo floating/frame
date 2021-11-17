@@ -1,6 +1,7 @@
-const { createWatcher, aggregate } = require('@makerdao/multicall')
+// @ts-ignore
+import { createWatcher, aggregate } from '@makerdao/multicall'
 
-const contractAddresses = {
+const contractAddresses: { [chainId: number]: string } = {
   1: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // mainnet
   3: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // ropsten
   4: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // rinkeby
@@ -15,24 +16,28 @@ const contractAddresses = {
   80001: '0x08411add0b5aa8ee47563b146743c13b3556c9cc' // mumbai
 }
 
-function chainConfig (chainId) {
+export function supportsChain (chainId: number) {
+  return chainId in contractAddresses
+}
+
+function chainConfig (chainId: number) {
   return {
     rpcUrl: 'http://0.0.0.0:1248', // Frame
     multicallAddress: contractAddresses[chainId]
   }
 }
 
-module.exports = function (chainId) {
+export default function (chainId: number) {
   const config = chainConfig(chainId)
 
   return {
-    call: async function (calls) {
+    call: async function (calls: any) {
       return (await aggregate(calls, config)).results
     },
-    subscribe: function (calls, cb) {
+    subscribe: function (calls: any, cb: (err: any, val: any) => void) {
       const watcher = createWatcher(calls, config)
 
-      watcher.subscribe(update => cb(null, update))
+      watcher.subscribe((update: any) => cb(null, update))
       watcher.onError(cb)
 
       watcher.start()
