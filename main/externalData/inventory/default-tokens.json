@@ -1,6 +1,6 @@
 {
   "name":"Frame Token List",
-  "timestamp":"2021-11-17T15:45:25.014Z",
+  "timestamp":"2021-11-17T17:03:06.944Z",
   "version":{
      "major":0,
      "minor":0,
@@ -241,19 +241,19 @@
      },
      {
         "chainId":1,
-        "address":"0x8c6bf16c273636523c29db7db04396143770f6a0",
-        "name":"Moon Rabbit",
-        "symbol":"AAA",
-        "decimals":18,
-        "logoURI":"https://assets.coingecko.com/coins/images/17310/thumb/logo_moon_no_inscriptions-01.png?1627275874"
-     },
-     {
-        "chainId":1,
         "address":"0xd938137e6d96c72e4a6085412ada2dad78ff89c4",
         "name":"Abulaba",
         "symbol":"AAA",
         "decimals":8,
         "logoURI":"https://assets.coingecko.com/coins/images/4016/thumb/abulaba.png?1547039118"
+     },
+     {
+        "chainId":1,
+        "address":"0x8c6bf16c273636523c29db7db04396143770f6a0",
+        "name":"Moon Rabbit",
+        "symbol":"AAA",
+        "decimals":18,
+        "logoURI":"https://assets.coingecko.com/coins/images/17310/thumb/logo_moon_no_inscriptions-01.png?1627275874"
      },
      {
         "chainId":1,
@@ -4533,7 +4533,7 @@
         "name":"Blind Boxes",
         "symbol":"BLES",
         "decimals":18,
-        "logoURI":"https://assets.coingecko.com/coins/images/14537/thumb/BlindBoxes_logo_fuschia.png?1618300494"
+        "logoURI":"https://assets.coingecko.com/coins/images/14537/thumb/BLES-Logo-BW.png?1637158078"
      },
      {
         "chainId":1,
@@ -6385,19 +6385,19 @@
      },
      {
         "chainId":1,
-        "address":"0x2e9c861713a8cbd4aca72a832f347b9520edbb90",
-        "name":"Crypto Application ",
-        "symbol":"CAPP",
-        "decimals":18,
-        "logoURI":"https://assets.coingecko.com/coins/images/11082/thumb/capp.PNG?1588048135"
-     },
-     {
-        "chainId":1,
         "address":"0x11613b1f840bb5a40f8866d857e24da126b79d73",
         "name":"Cappasity",
         "symbol":"CAPP",
         "decimals":2,
         "logoURI":"https://assets.coingecko.com/coins/images/1302/thumb/cappasity.png?1547564648"
+     },
+     {
+        "chainId":1,
+        "address":"0x2e9c861713a8cbd4aca72a832f347b9520edbb90",
+        "name":"Crypto Application ",
+        "symbol":"CAPP",
+        "decimals":18,
+        "logoURI":"https://assets.coingecko.com/coins/images/11082/thumb/capp.PNG?1588048135"
      },
      {
         "chainId":1,
@@ -6541,7 +6541,7 @@
         "name":"CBC network",
         "symbol":"CBC",
         "decimals":8,
-        "logoURI":"https://assets.coingecko.com/coins/images/2477/thumb/CBC.network_logo_200x200.png?1623677507"
+        "logoURI":"https://assets.coingecko.com/coins/images/2477/thumb/Icon_for_White_Bg_75x75.png?1637155730"
      },
      {
         "chainId":1,
@@ -6705,7 +6705,7 @@
      },
      {
         "chainId":1,
-        "address":"0x9e547061a345015869d26c7b6ee4ab5b63424441",
+        "address":"0x612e1726435fe38dd49a0b35b4065b56f49c8f11",
         "name":"Cryptocart",
         "symbol":"CC",
         "decimals":18,
@@ -8737,6 +8737,16 @@
      },
      {
         "chainId":1,
+        "name":"CURE Token",
+        "symbol":"CURE",
+        "address":"0x089a502032166e07ae83eb434c16790ca2fa4661",
+        "decimals":18,
+        "extensions":{
+           "omit":true
+        }
+     },
+     {
+        "chainId":1,
         "address":"0xc2d3ae29c8309c14994d02ecd228cf86f3efde77",
         "name":"CurrySwap",
         "symbol":"CURRY",
@@ -10630,6 +10640,13 @@
         "symbol":"DOGES",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/12763/thumb/20200926-220107.png?1622520018"
+     },
+     {
+        "chainId":1,
+        "address":"0x4d8046b2f7986feb5a4b0781ebf5fa2d7a808617",
+        "name":"Doge Zilla Token",
+        "symbol":"DOGEZ",
+        "decimals":18
      },
      {
         "chainId":1,
@@ -13993,18 +14010,18 @@
      },
      {
         "chainId":1,
+        "address":"0x54735d716995071585a4f6ba341a6ded79756f09",
+        "name":"FLUX Token",
+        "symbol":"FLX",
+        "decimals":18
+     },
+     {
+        "chainId":1,
         "address":"0x6243d8cea23066d098a15582d81a598b4e8391f4",
         "name":"Reflexer Ungovernan",
         "symbol":"FLX",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/14123/thumb/EAfYdwgd_400x400.jpg?1614564508"
-     },
-     {
-        "chainId":1,
-        "address":"0x54735d716995071585a4f6ba341a6ded79756f09",
-        "name":"FLUX Token",
-        "symbol":"FLX",
-        "decimals":18
      },
      {
         "chainId":1,
@@ -16877,6 +16894,16 @@
         "symbol":"HOODIE",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/17842/thumb/cryptopunk-hoodie.png?1629468579"
+     },
+     {
+        "chainId":1,
+        "name":"HOPE Token",
+        "symbol":"HOPE",
+        "address":"0x6f2afbf4f5e5e804c5b954889d7bf3768a3c9a45",
+        "decimals":18,
+        "extensions":{
+           "omit":true
+        }
      },
      {
         "chainId":1,
@@ -20451,19 +20478,19 @@
      },
      {
         "chainId":1,
-        "address":"0xb59490ab09a0f526cc7305822ac65f2ab12f9723",
-        "name":"Litentry",
-        "symbol":"LIT",
-        "decimals":18,
-        "logoURI":"https://assets.coingecko.com/coins/images/13825/thumb/logo_200x200.png?1612153317"
-     },
-     {
-        "chainId":1,
         "address":"0x763fa6806e1acf68130d2d0f0df754c93cc546b2",
         "name":"Lition",
         "symbol":"LIT",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/6580/thumb/Lition_ico.png?1547042787"
+     },
+     {
+        "chainId":1,
+        "address":"0xb59490ab09a0f526cc7305822ac65f2ab12f9723",
+        "name":"Litentry",
+        "symbol":"LIT",
+        "decimals":18,
+        "logoURI":"https://assets.coingecko.com/coins/images/13825/thumb/logo_200x200.png?1612153317"
      },
      {
         "chainId":1,
@@ -20662,19 +20689,19 @@
      },
      {
         "chainId":1,
-        "address":"0xf91ac30e9b517f6d57e99446ee44894e6c22c032",
-        "name":"LOL",
-        "symbol":"LOL",
-        "decimals":9,
-        "logoURI":"https://assets.coingecko.com/coins/images/20354/thumb/lol.png?1636943964"
-     },
-     {
-        "chainId":1,
         "address":"0x5978708d6cce1cc9640eed47422d64c91bbd5171",
         "name":"LOLTOKEN",
         "symbol":"LOL",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/8551/thumb/logo100.png?1596534732"
+     },
+     {
+        "chainId":1,
+        "address":"0xf91ac30e9b517f6d57e99446ee44894e6c22c032",
+        "name":"LOL",
+        "symbol":"LOL",
+        "decimals":9,
+        "logoURI":"https://assets.coingecko.com/coins/images/20354/thumb/lol.png?1636943964"
      },
      {
         "chainId":1,
@@ -21821,7 +21848,7 @@
         "name":"Melalie",
         "symbol":"MEL",
         "decimals":18,
-        "logoURI":"https://assets.coingecko.com/coins/images/15028/thumb/melalie.PNG?1619494266"
+        "logoURI":"https://assets.coingecko.com/coins/images/15028/thumb/melx.jpeg?1637156878"
      },
      {
         "chainId":1,
@@ -21889,19 +21916,19 @@
      },
      {
         "chainId":1,
-        "address":"0xc0bfeba72805f22dc18dde31467c5a55c16ff57b",
-        "name":"The MetaONEz",
-        "symbol":"META",
-        "decimals":18,
-        "logoURI":"https://assets.coingecko.com/coins/images/14367/thumb/metaonez.png?1615730788"
-     },
-     {
-        "chainId":1,
         "address":"0x93ecdfe316de6dc44c2104183b7f6736d83521c2",
         "name":"Meta Inu Token",
         "symbol":"META",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/20466/thumb/META-INU.png?1637064437"
+     },
+     {
+        "chainId":1,
+        "address":"0xc0bfeba72805f22dc18dde31467c5a55c16ff57b",
+        "name":"The MetaONEz",
+        "symbol":"META",
+        "decimals":18,
+        "logoURI":"https://assets.coingecko.com/coins/images/14367/thumb/metaonez.png?1615730788"
      },
      {
         "chainId":1,
@@ -31926,19 +31953,19 @@
      },
      {
         "chainId":1,
-        "address":"0x79c75e2e8720b39e258f41c37cc4f309e0b0ff80",
-        "name":"Phantasma",
-        "symbol":"SOUL",
-        "decimals":8,
-        "logoURI":"https://assets.coingecko.com/coins/images/4130/thumb/phantasma.png?1548331035"
-     },
-     {
-        "chainId":1,
         "address":"0xbb1f24c0c1554b9990222f036b0aad6ee4caec29",
         "name":"CryptoSoul",
         "symbol":"SOUL",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/6723/thumb/cryptosoul.png?1547042952"
+     },
+     {
+        "chainId":1,
+        "address":"0x79c75e2e8720b39e258f41c37cc4f309e0b0ff80",
+        "name":"Phantasma",
+        "symbol":"SOUL",
+        "decimals":8,
+        "logoURI":"https://assets.coingecko.com/coins/images/4130/thumb/phantasma.png?1548331035"
      },
      {
         "chainId":1,
@@ -35824,7 +35851,7 @@
         "chainId":1,
         "address":"0x06b884e60794ce02aafab13791b59a2e6a07442f",
         "name":"Unbanked",
-        "symbol":"UNBK",
+        "symbol":"UNBNK",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/20171/thumb/logo_-_2021-11-11T115427.135.png?1636602880"
      },
@@ -36514,7 +36541,7 @@
         "name":"Uzumaki Inu",
         "symbol":"UZUMAKI",
         "decimals":9,
-        "logoURI":"https://assets.coingecko.com/coins/images/18585/thumb/UzumakiInu.png?1632555636"
+        "logoURI":"https://assets.coingecko.com/coins/images/18585/thumb/XjTLLU9c_400x400.jpg?1637157360"
      },
      {
         "chainId":1,
@@ -38442,6 +38469,16 @@
         "symbol":"XAUTBULL",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/11979/thumb/683JEXMN_400x400__1_.png?1596618665"
+     },
+     {
+        "chainId":1,
+        "name":"XAUt Token",
+        "symbol":"XAUt",
+        "address":"0x4922a015c4407f87432b179bb209e125432e4a2a",
+        "decimals":18,
+        "extensions":{
+           "omit":true
+        }
      },
      {
         "chainId":1,
