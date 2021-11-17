@@ -225,7 +225,7 @@ class Accounts extends EventEmitter {
               this.current().requests[id].completed = Date.now()
               const { hash } = this.current().requests[id].tx
               const h = hash.substr(0, 6) + '...' + hash.substr(hash.length - 4)
-              const body = `Transaction ${h} sucessful! \n Click for details`
+              const body = `Transaction ${h} successful! \n Click for details`
 
               // Drop any other pending txs with same nonce
               Object.keys(this.current().requests).forEach(k => {
