@@ -1,6 +1,7 @@
 const log = require('electron-log')
 
 const nebula = require('../../nebula')('tokenWorker')
+const tokenListPath = '/ipns/k51qzi5uqu5dgj8vqkoy9ctids6zfwn53tazlfgqv44svb0ktdkdw02qopy1y1'
 
 let tokenList = mergeTokens(
   require('@sushiswap/default-token-list').tokens,
@@ -11,8 +12,11 @@ async function frameTokenList () {
   log.debug('loading tokens from tokens.frame.eth')
 
   try {
-    const tokenListRecord = await nebula.resolve('tokens.frame.eth')
-    const tokens = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
+    // FIXME: put this back when ENS record is updated correctly
+    // const tokenListRecord = await nebula.resolve('tokens.frame.eth')
+    // const tokens = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
+
+    const tokens = (await nebula.ipfs.getJson(tokenListPath)).tokens
 
     log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
 
