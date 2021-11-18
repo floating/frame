@@ -9,7 +9,7 @@ let trackedAddresses = []
 let networkCurrencies = []
 
 let currentNetworkObserver, allNetworksObserver
-let scanWorker, heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan
+let scanWorker, heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan
 
 function createWorker () {
   if (scanWorker) {
@@ -209,11 +209,6 @@ function start (addresses = [], omitList = [], knownList) {
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
   }
-
-  if (!allAddressScan) {
-    // update tokens for all accounts (even inactive) every 5 minutes
-    allAddressScan = startScan(updateAllTokens, 1000 * 60 * 5)
-  }
 }
 
 function stop () {
@@ -222,12 +217,11 @@ function stop () {
   currentNetworkObserver.remove()
   allNetworksObserver.remove()
 
-  const scanners = [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
+  const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan]
 
   scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
 
   heartbeat = null
-  allAddressScan = null
   trackedAddressScan = null
   nativeCurrencyScan = null
   inventoryScan = null
