@@ -14,7 +14,7 @@ function tokenBalanceScan (addresses) {
   addresses.forEach(address => {
     balances.getTokenBalances(address)
       .then(foundTokens => {
-        process.send({ type: 'tokenBalances', netId: foundTokens.networkId, address, balances: foundTokens.balances, fullScan: true })
+        process.send({ type: 'tokenBalances', netId: foundTokens.chainId, address, balances: foundTokens.balances, fullScan: true })
       })
       .catch(err => log.error('token scan error', err))
   })
