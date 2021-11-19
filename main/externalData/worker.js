@@ -9,10 +9,10 @@ const inventory = require('./inventory')
 const loadStaticData = require('./staticData').default
 
 let heartbeat
-
+// 0xba418cddd91111f5c1d1ac2777fa8cea28d71843
 function tokenBalanceScan (addresses) {
   addresses.forEach(address => {
-    balances.getTokenBalances(address)
+    balances.getTokenBalances(address, knownTokens)
       .then(foundTokens => {
         process.send({ type: 'tokenBalances', netId: foundTokens.chainId, address, balances: foundTokens.balances, fullScan: true })
       })

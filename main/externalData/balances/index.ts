@@ -9,6 +9,7 @@ import multicall, { Call, supportsChain as multicallSupportsChain } from '../../
 import erc20TokenAbi from './erc-20-abi'
 
 const provider = ethProvider('frame', { name: 'scanWorker' })
+const web3Provider = new ethers.providers.Web3Provider(provider)
 
 interface FoundBalances {
   [address: string]: TokenBalance
@@ -55,10 +56,11 @@ function intoPositiveBalances (positiveBalances: FoundBalances, tokenBalance: To
 }
 
 async function getTokenBalance (token: Token, owner: string) {
-  const contract = new ethers.Contract(token.address, erc20TokenAbi, provider)
+  const contract = new ethers.Contract(token.address, erc20TokenAbi, web3Provider)
 
   try {
-    return new BigNumber(await contract.balanceOf(owner))
+    const balance = await contract.balanceOf(owner)
+    return new BigNumber(balance.toHexString()).shiftedBy(-token.decimals)
   } catch (e) {
     log.warn(`could not load balance for token with address ${token.address}`, e)
     return new BigNumber(0)
@@ -123,7 +125,7 @@ async function getTokenBalances (owner: string, knownTokens: Token[] = [], omit:
   
   const balances = useMulticall
     ? await getTokenBalancesFromMulticall(chainId, tokens, owner)
-    : await getTokenBalancesFromContracts(knownTokens, owner)
+    : await getTokenBalancesFromContracts(tokens, owner)
 
   return { chainId, balances }
 }
