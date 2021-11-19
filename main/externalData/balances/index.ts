@@ -8,8 +8,9 @@ import tokenLoader from '../inventory/tokens'
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
 import erc20TokenAbi from './erc-20-abi'
 
+import { providers } from 'ethers'
+
 const provider = ethProvider('frame', { name: 'scanWorker' })
-const web3Provider = new ethers.providers.Web3Provider(provider)
 
 interface FoundBalances {
   [address: string]: TokenBalance
@@ -55,8 +56,8 @@ function intoPositiveBalances (positiveBalances: FoundBalances, tokenBalance: To
   return positiveBalances
 }
 
-async function getTokenBalance (token: Token, owner: string) {
-  const contract = new ethers.Contract(token.address, erc20TokenAbi, web3Provider)
+async function getTokenBalance (token: Token, owner: string, provider: providers.JsonRpcProvider) {
+  const contract = new ethers.Contract(token.address, erc20TokenAbi, provider)
 
   try {
     const balance = await contract.balanceOf(owner)
@@ -68,8 +69,9 @@ async function getTokenBalance (token: Token, owner: string) {
 }
 
 async function getTokenBalancesFromContracts (tokens: Token[], owner: string) {
+  const web3Provider = new providers.Web3Provider(provider)
   const balances = tokens.map(async token => {
-    const balance = await getTokenBalance(token, owner)
+    const balance = await getTokenBalance(token, owner, web3Provider)
 
     return {
       ...token,
@@ -117,7 +119,7 @@ async function getTokenBalances (owner: string, knownTokens: Token[] = [], omit:
   // to only currently known tokens
   const tokenList = useMulticall
     ? tokenLoader.getTokens(chainId) // TODO: merge with known tokens
-    : knownTokens
+    : knownTokens.filter(token => token.chainId === chainId)
 
   const tokens = tokenList
     .filter(token => !symbolsToOmit.includes(token.symbol.toLowerCase()))
