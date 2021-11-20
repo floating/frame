@@ -124,15 +124,6 @@ describe('#getTokenBalances', () => {
       })
     })
 
-    it('loads only known token balances', async () => {
-      tokenLoader.getTokens.mockReturnValue([olympusDaoToken])
-
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens, onlyKnown: true })
-      
-      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
-      expect(Object.keys(tokenBalances.balances)).not.toContain(olympusDaoToken.address)
-    })
-
     it('allows a known token to take precedence over one from the list', async () => {
       const olderZrxToken = {
         ...zrxToken,
@@ -144,6 +135,25 @@ describe('#getTokenBalances', () => {
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
 
       expect(tokenBalances.balances[zrxToken.address].balance.toString()).toBe('756.5784589845')
+    })
+
+    it('does not return a zero balance from the scan of the entire chain', async () => {
+      onChainBalances[olympusDaoToken.address] = new BigNumber(0)
+      tokenLoader.getTokens.mockReturnValue([olympusDaoToken])
+
+      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
+
+      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
+      expect(Object.keys(tokenBalances.balances)).not.toContain(olympusDaoToken.address)
+    })
+
+    it('loads only known token balances when option is set', async () => {
+      tokenLoader.getTokens.mockReturnValue([olympusDaoToken])
+
+      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens, onlyKnown: true })
+      
+      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
+      expect(Object.keys(tokenBalances.balances)).not.toContain(olympusDaoToken.address)
     })
   })
 

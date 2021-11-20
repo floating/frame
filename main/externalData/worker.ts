@@ -18,7 +18,8 @@ function sendToMainProcess (data: any) {
 
 interface BalanceScanAddresses {
   [address: string]: {
-    knownTokens: Token[]
+    knownTokens: Token[],
+    only: Token[]
   }
 }
 
@@ -31,11 +32,15 @@ let heartbeat: NodeJS.Timeout
 
 function tokenBalanceScan (addresses: BalanceScanAddresses) {
   for (const address in addresses) {
-    const { knownTokens } = addresses[address]
+    const { knownTokens, only } = addresses[address]
 
-    balances.getTokenBalances(address, knownTokens)
+    const opts = only && only.length > 0
+      ? { knownTokens: only, onlyKnown: true }
+      : { knownTokens }
+
+    balances.getTokenBalances(address, opts)
       .then(foundTokens => {
-        sendToMainProcess({ type: 'tokenBalances', netId: foundTokens.chainId, address, balances: foundTokens.balances, fullScan: true })
+        sendToMainProcess({ type: 'tokenBalances', netId: foundTokens.chainId, address, balances: foundTokens.balances })
       })
       .catch(err => log.error('token scan error', err))
   }

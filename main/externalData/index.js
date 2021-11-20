@@ -9,7 +9,7 @@ let activeAddress
 let trackedAddresses = []
 let networkCurrencies = []
 
-let currentNetworkObserver, allNetworksObserver
+let currentNetworkObserver, allNetworksObserver, tokenObserver
 let scanWorker, heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan
 
 function createWorker () {
@@ -43,7 +43,8 @@ function createWorker () {
     }
 
     if (message.type === 'tokenBalances') {
-      store.setBalances(message.netId, message.address, message.balances, message.fullScan)
+      store.setScanning(message.address, false)
+      store.setBalances(message.netId, message.address, message.balances)
 
       const tokenSymbols = Object.keys(message.balances).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
 
@@ -127,6 +128,10 @@ function scanNetworkCurrencyRates () {
 }
 
 function scanActiveData () {
+  if (activeAddress) {
+    store.setScanning(activeAddress, true)
+  }
+
   if (trackedAddressScan) {
     clearInterval(trackedAddressScan)
   }
@@ -223,6 +228,13 @@ function start () {
     }
   })
 
+  tokenObserver = store.observer(() => {
+    const customTokens = store('main.tokens')
+    if (activeAddress && chainId) {
+      sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens: customTokens, only: true } } ])
+    }
+  })
+
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
   }
@@ -233,6 +245,7 @@ function stop () {
 
   currentNetworkObserver.remove()
   allNetworksObserver.remove()
+  tokenObserver.remove()
 
   const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan]
 

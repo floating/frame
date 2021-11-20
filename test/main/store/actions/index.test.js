@@ -1,5 +1,11 @@
+import BigNumber from 'bignumber.js'
 import log from 'electron-log'
-import { addNetwork as addNetworkAction } from '../../../../main/store/actions'
+
+import {
+  addNetwork as addNetworkAction,
+  setBalances as setBalancesAction,
+  setScanning as setScanningAction
+} from '../../../../main/store/actions'
 
 beforeAll(() => {
   log.transports.console.level = false
@@ -8,6 +14,8 @@ beforeAll(() => {
 afterAll(() => {
   log.transports.console.level = 'debug'
 })
+
+const owner = '0xa8be0f701d0f37088600164e71bffc0ad652c251'
 
 describe('#addNetwork', () => {
   const polygonNetwork = {
@@ -206,5 +214,127 @@ describe('#addNetwork', () => {
 
     expect(networks.ethereum['137'].name).toBe('Polygon')
     expect(networks.ethereum['137'].explorer).toBe('https://polygonscan.com')
+  })
+})
+
+describe('#setBalances', () => {
+  const zrxToken = {
+    chainId: 1,
+    address: '0xe41d2489571d322189246dafa5ebde1f4699f498',
+    symbol: 'ZRX',
+    decimals: 18
+  }
+
+  const badgerDaoToken = {
+    chainId: 42161,
+    address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
+    symbol: 'BADGER',
+    decimals: 18
+  }
+
+  const updaterFn = (node, netId, address, update) => {
+    expect(node).toBe('main.balances')
+    expect(netId).toBe(1)
+    expect(address).toBe(owner)
+
+    balances = update(balances)
+  }
+
+  const setBalances = updatedBalances => setBalancesAction(updaterFn, 1, owner, updatedBalances)
+
+  let balances
+
+  beforeEach(() => {
+    balances = {
+      [badgerDaoToken.address]: {
+        ...badgerDaoToken,
+        balance: new BigNumber(30.5)
+      }
+    }
+  })
+
+  it('adds a new balance', () => {
+    setBalances({
+      [zrxToken.address]: {
+        ...zrxToken,
+        balance: new BigNumber(7983.2332)
+      }
+    })
+    
+    expect(balances).toStrictEqual({
+      [zrxToken.address]: {
+        ...zrxToken,
+        balance: new BigNumber(7983.2332)
+      },
+      [badgerDaoToken.address]: {
+        ...badgerDaoToken,
+        balance: new BigNumber(30.5)
+      }
+    })
+  })
+
+  it('updates an existing balance', () => {
+    setBalances({
+      [badgerDaoToken.address]: {
+        ...badgerDaoToken,
+        balance: new BigNumber(41.9)
+      }
+    })
+    
+    expect(balances).toStrictEqual({
+      [badgerDaoToken.address]: {
+        ...badgerDaoToken,
+        balance: new BigNumber(41.9)
+      }
+    })
+  })
+
+  it('removes a zero balance', () => {
+    setBalances({
+      [badgerDaoToken.address]: {
+        ...badgerDaoToken,
+        balance: new BigNumber(0)
+      }
+    })
+
+    expect(Object.keys(balances)).toHaveLength(0)
+  })
+})
+
+describe('#setScanning', () => {
+  let isScanning
+
+  beforeAll(() => {
+    isScanning = false
+    jest.useFakeTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.scanning')
+    expect(address).toBe(owner)
+
+    isScanning = update()
+  }
+
+  const setScanning = scanning => setScanningAction(updaterFn, owner, scanning)
+
+  it('immediately sets the state to scanning', () => {
+    setScanning(true)
+
+    expect(isScanning).toBe(true)
+  })
+
+  it('sets the state back to not scanning after 1 second', () => {
+    setScanning(false)
+
+    expect(isScanning).toBe(true)
+
+    jest.advanceTimersByTime(1000)
+
+    expect(isScanning).toBe(false)
   })
 })

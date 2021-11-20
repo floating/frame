@@ -8,7 +8,7 @@ const store = require('../store')
 const windows = require('../windows')
 
 const trusted = require('./trusted')
-const validPayload = require('./validPayload')
+const validPayload = require('./validPayload').default
 const isFrameExtension = require('./isFrameExtension')
 const protectedMethods = require('./protectedMethods')
 

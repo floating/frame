@@ -16,7 +16,7 @@ const {
   toBuffer,
   pubToAddress,
   ecrecover,
-  hashPersonalMessage
+  hashPersonalMessage,
 } = require('ethereumjs-util')
 
 
@@ -31,6 +31,7 @@ const { populate: populateTransaction, usesBaseFee, maxFee } = require('../trans
 
 const version = require('../../package.json').version
 
+const capitalize = s => s[0].toUpperCase() + s.substring(1).toLowerCase()
 const permission = (date, method) => ({ parentCapability: method, date })
 
 class Provider extends EventEmitter {
@@ -626,6 +627,45 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
   }
 
+  addCustomToken (payload, res, targetChain) {
+    const { type, options: tokenData } = payload.params || {}
+
+    if ((type || '').toLowerCase() !== 'erc20') {
+      return this.resError('only ERC-20 tokens are supported', payload, res)
+    }
+
+    this.getChainId({ id: 1, jsonrpc: '2.0' }, response => {
+      const chainId = 42161 // parseInt(response.result)
+
+      const address = (tokenData.address || '').toLowerCase()
+      const symbol = (tokenData.symbol || '').toUpperCase()
+      const decimals = parseInt(tokenData.decimals || '1')
+
+      if (!address) {
+        return this.resError('tokens must define an address', payload, res)
+      }
+
+      const token = {
+        chainId,
+        name: tokenData.name || capitalize(symbol),
+        address,
+        symbol,
+        decimals,
+        logoURI: tokenData.image || tokenData.logoURI || ''
+      }
+
+      store.addCustomTokens([token])
+
+      // const result = {
+      //   suggestedAssetMeta: {
+      //     asset: { token }
+      //   }
+      // }
+
+      res({ id: payload.id, jsonrpc: '2.0', result: true })
+    }, targetChain)
+  }
+
   sendAsync (payload, cb) {
     this.send(payload, res => {
       if (res.error) return cb(new Error(res.error))
@@ -659,6 +699,7 @@ class Provider extends EventEmitter {
     if (method === 'wallet_switchEthereumChain') return this.switchEthereumChain(payload, res)
     if (method === 'wallet_getPermissions') return this.getPermissions(payload, res)
     if (method === 'wallet_requestPermissions') return this.requestPermissions(payload, res)
+    if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res)
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
