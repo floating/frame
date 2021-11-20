@@ -231,7 +231,7 @@ function start () {
   tokenObserver = store.observer(() => {
     const customTokens = store('main.tokens')
     if (activeAddress && chainId) {
-      sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens: customTokens, only: true } } ])
+      sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens: customTokens, onlyKnown: true } } ])
     }
   })
 
