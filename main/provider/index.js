@@ -324,6 +324,13 @@ class Provider extends EventEmitter {
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
   }
+
+  _addRequestHandler (res) {
+    const handlerId = uuid()
+    this.handlers[handlerId] = res
+
+    return handlerId
+  }
   
   async _getGasEstimate (rawTx, chainConfig) {
     const { chainId, ...rest } = rawTx
@@ -398,9 +405,8 @@ class Provider extends EventEmitter {
         const from = tx.from
 
         if (from && !this._isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
-        const handlerId = uuid()
-        this.handlers[handlerId] = res
 
+        const handlerId = this._addRequestHandler(res)
         const { warning, ...data } = tx
         
         accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: currentAccount.id, origin: payload._origin, warning }, res)
@@ -443,8 +449,7 @@ class Provider extends EventEmitter {
 
     if (!this._isCurrentAccount(from, currentAccount)) return this.resError('sign request is not from currently selected account.', payload, res)
 
-    const handlerId = uuid()
-    this.handlers[handlerId] = res
+    const handlerId = this._addRequestHandler(res)
 
     const req = { handlerId, type: 'sign', payload: normalizedPayload, account: currentAccount.getAccounts[0], origin: payload._origin }
 
@@ -496,8 +501,7 @@ class Provider extends EventEmitter {
       return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
-    const handlerId = uuid()
-    this.handlers[handlerId] = res
+    const handlerId = this._addRequestHandler(res)
 
     accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
   }
@@ -540,8 +544,7 @@ class Provider extends EventEmitter {
 
       if (store('main.currentNetwork.id') === parseInt(chainId)) return res({ id: payload.id, jsonrpc: '2.0', result: null })
 
-      const handlerId = uuid()
-      this.handlers[handlerId] = res
+      const handlerId = this._addRequestHandler(res)
       
       // Ask user if they want to switch chains
       accounts.addRequest({
@@ -578,8 +581,7 @@ class Provider extends EventEmitter {
     if (!chainName) return this.resError('addChain request missing chainName', payload, res)
     if (!nativeCurrency) return this.resError('addChain request missing nativeCurrency', payload, res)
 
-    const handlerId = uuid()
-    this.handlers[handlerId] = res
+    const handlerId = this._addRequestHandler(res)
 
     // Check if chain exists
     const id = parseInt(chainId)
@@ -635,7 +637,7 @@ class Provider extends EventEmitter {
     }
 
     this.getChainId({ id: 1, jsonrpc: '2.0' }, response => {
-      const chainId = 42161 // parseInt(response.result)
+      const chainId = parseInt(response.result)
 
       const address = (tokenData.address || '').toLowerCase()
       const symbol = (tokenData.symbol || '').toUpperCase()
@@ -654,15 +656,22 @@ class Provider extends EventEmitter {
         logoURI: tokenData.image || tokenData.logoURI || ''
       }
 
-      store.addCustomTokens([token])
-
       // const result = {
       //   suggestedAssetMeta: {
       //     asset: { token }
       //   }
       // }
 
-      res({ id: payload.id, jsonrpc: '2.0', result: true })
+      const handlerId = this._addRequestHandler(res)
+
+      accounts.addRequest({
+        handlerId,
+        type: 'addToken',
+        token,
+        account: accounts.current().id,
+        origin: payload._origin,
+        payload
+      }, res)
     }, targetChain)
   }
 
