@@ -6,15 +6,16 @@ import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
 
 export default class Signer extends EventEmitter {
-  id = '';
-  type = '';
-  name = '';
-  status = '';
-  coinbase = '0x';
-  model = '';
+  id = ''
+  type = ''
+  tag = ''
+  name = ''
+  status = ''
+  coinbase = '0x'
+  model = ''
   appVersion: AppVersion = { major: 0, minor: 0, patch: 0 }
 
-  addresses: string[];
+  addresses: string[]
   
   constructor () {
     super()
@@ -45,6 +46,7 @@ export default class Signer extends EventEmitter {
       id: this.id,
       name: this.name || this.type + ' signer',
       type: this.type,
+      tag: this.tag,
       model: this.model,
       addresses: this.addresses,
       status: this.status,

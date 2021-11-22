@@ -79,7 +79,8 @@ const rpc = {
       baseUrl: 'https://signing.gridpl.us',
       endpointMode: 'default',
       paired: true,
-      deviceName: (deviceName || 'Frame').substring(0, 17) + '-' + randomLetters(6),
+      deviceName: (deviceName || 'GridPlus').substring(0, 17),
+      tag: randomLetters(6),
       privKey: crypto.randomBytes(32).toString('hex')  
     })
 
