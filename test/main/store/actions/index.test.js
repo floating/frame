@@ -273,7 +273,7 @@ describe('#setBalances', () => {
     })
   })
 
-  it('updates an existing balance', () => {
+  it('updates an existing balance to a positive amount', () => {
     setBalances({
       [badgerDaoToken.address]: {
         ...badgerDaoToken,
@@ -289,15 +289,20 @@ describe('#setBalances', () => {
     })
   })
 
-  it('removes a zero balance', () => {
+  it('updates an existing balance to zero', () => {
     setBalances({
       [badgerDaoToken.address]: {
         ...badgerDaoToken,
         balance: new BigNumber(0)
       }
     })
-
-    expect(Object.keys(balances)).toHaveLength(0)
+    
+    expect(balances).toStrictEqual({
+      [badgerDaoToken.address]: {
+        ...badgerDaoToken,
+        balance: new BigNumber(0)
+      }
+    })
   })
 })
 

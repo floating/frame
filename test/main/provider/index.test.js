@@ -6,22 +6,6 @@ import { utils } from 'ethers'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
-const mockStore = {
-  'main.accounts': {
-    '0x22dd63c3619818fdbc262c78baee43cb61e9cccf': {}
-  },
-  'main.currentNetwork': {
-    type: 'ethereum',
-    id: 1
-  },
-  'main.networks.ethereum.1': {
-    id: 1
-  },
-  'main.networks.ethereum.4': {
-    id: 4
-  }
-}
-
 class MockConnection extends EventEmitter {
   constructor () {
     super()
@@ -32,7 +16,9 @@ class MockConnection extends EventEmitter {
 }
 
 const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
-let provider, mockConnection, accountRequests
+
+const mockStore = {}
+let provider, mockConnection, accountRequests = []
 
 jest.mock('../../../main/chains', () => mockConnection)
 jest.mock('../../../main/accounts', () => ({}))
@@ -71,6 +57,12 @@ beforeEach(() => {
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
   accounts.signTransaction = jest.fn()
   accounts.setTxSigned = jest.fn()
+
+  mockStore['main.accounts'] = { '0x22dd63c3619818fdbc262c78baee43cb61e9cccf': {} }
+  mockStore['main.currentNetwork'] = { type: 'ethereum', id: 1 }
+  mockStore['main.networks.ethereum.1'] = { id: 1 },
+  mockStore['main.networks.ethereum.4'] = { id: 4 }
+  mockStore['main.tokens'] = []
 })
 
 describe('#getRawTx', () => {
@@ -327,6 +319,17 @@ describe('#send', () => {
             payload: request
           })
         )
+      })
+    })
+
+    it('does not add a request for a token that is already added', () => {
+      mockStore['main.tokens'] = [
+        { address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }
+      ]
+
+      send(request, ({ result }) => {
+        expect(result).toBe(true)
+        expect(accountRequests).toHaveLength(0)
       })
     })
 

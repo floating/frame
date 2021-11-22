@@ -629,11 +629,11 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
   }
 
-  addCustomToken (payload, res, targetChain) {
+  addCustomToken (payload, cb, targetChain) {
     const { type, options: tokenData } = payload.params || {}
 
     if ((type || '').toLowerCase() !== 'erc20') {
-      return this.resError('only ERC-20 tokens are supported', payload, res)
+      return this.resError('only ERC-20 tokens are supported', payload, cb)
     }
 
     this.getChainId({ id: 1, jsonrpc: '2.0' }, response => {
@@ -644,7 +644,17 @@ class Provider extends EventEmitter {
       const decimals = parseInt(tokenData.decimals || '1')
 
       if (!address) {
-        return this.resError('tokens must define an address', payload, res)
+        return this.resError('tokens must define an address', payload, cb)
+      }
+
+      const res = () => {
+        cb({ id: payload.id, jsonrpc: '2.0', result: true })
+      }
+
+      // don't attempt to add the token if it's already been added
+      const tokenExists = store('main.tokens').some(token => token.chainId === chainId && token.address === address)
+      if (tokenExists) {
+        return res()
       }
 
       const token = {

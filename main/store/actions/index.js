@@ -447,10 +447,12 @@ module.exports = {
     u('main.balances', netId, address, (balances = {}) => {
       // remove zero balances
       const updatedBalances = { ...balances, ...newBalances }
-      const withoutZeroBalances = Object.entries(updatedBalances)
-        .filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
 
-      return Object.fromEntries(withoutZeroBalances)
+      // TODO: possibly add an option to filter out zero balances
+      //const withoutZeroBalances = Object.entries(updatedBalances)
+        //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
+
+      return updatedBalances
     })
   },
   setScanning: (u, address, scanning) => {

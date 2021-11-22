@@ -143,6 +143,11 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
   accounts.resolveRequest(req)
 })
 
+ipcMain.on('tray:addToken', (e, token, req) => {
+  if (token) store.addCustomTokens([token])
+  accounts.resolveRequest(req)
+})
+
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
   accounts.adjustNonce(handlerId, nonceAdjust)
 })

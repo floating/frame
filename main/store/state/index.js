@@ -184,7 +184,7 @@ const initial = {
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
     balances: {},
-    tokens: main('tokens', []), // custom token list added by users
+    tokens: [], // main('tokens', []), // custom token list added by users
     rates: {}, // main('rates', {}),
     inventory: {}, // main('rates', {}),
     signers: {},

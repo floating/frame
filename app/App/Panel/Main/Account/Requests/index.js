@@ -6,6 +6,7 @@ import ProviderRequest from './ProviderRequest'
 import TransactionRequest from './TransactionRequest'
 import SignatureRequest from './SignatureRequest'
 import ChainRequest from './ChainRequest'
+import AddTokenRequest from './AddTokenRequest'
 
 import link from '../../../../../../resources/link'
 import SignTypedDataRequest from './SignTypedDataRequest'
@@ -147,6 +148,7 @@ class Requests extends React.Component {
               if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               if (req.type === 'addChain' || req.type === 'switchChain') return <ChainRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
+              if (req.type === 'addToken') return <AddTokenRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               return null
             })}
           </div>
