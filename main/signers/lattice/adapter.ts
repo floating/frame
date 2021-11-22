@@ -13,6 +13,7 @@ interface GlobalLatticeSettings {
 
 interface LatticeSettings extends GlobalLatticeSettings {
   deviceName: string,
+  tag: string,
   privKey: string,
   paired: boolean
 }
@@ -89,9 +90,9 @@ export default class LatticeAdapter extends SignerAdapter {
 
         log.debug('Initializing Lattice device', { deviceId })
 
-        const { deviceName, baseUrl, privKey, accountLimit } = getLatticeSettings(deviceId)
+        const { deviceName, tag, baseUrl, privKey, accountLimit } = getLatticeSettings(deviceId)
 
-        const lattice = new Lattice(deviceId, deviceName)
+        const lattice = new Lattice(deviceId, deviceName, tag)
         lattice.accountLimit = accountLimit
 
         const emitUpdate = () => this.emit('update', lattice)

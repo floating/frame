@@ -5,8 +5,6 @@ import link from '../../../../resources/link'
 import svg from '../../../../resources/svg' // TODO: get gridplus svg
 
 function parseDeviceName (name) {
-  if (!name) return 'Frame'
-
   // Lattice supports a device name of up to 24 characters and we append 
   // a dash and a 6 character device code to the end, so limit this to 17 characters
   return name.replace(/\s+/g, '-').substring(0, 17)
@@ -21,7 +19,7 @@ class AddHardwareLattice extends React.Component {
       status: '',
       error: false,
       deviceId: '',
-      deviceName: 'Frame',
+      deviceName: 'GridPlus',
       pairCode: ''
     }
     this.forms = [React.createRef(), React.createRef()]

@@ -359,6 +359,11 @@ class Signer extends React.Component {
         )}
         {this.state.showControls || disconnected ? (
           <div className='signerControls cardShow'>
+            {this.props.tag ? (
+              <div className='signerControlDetail'>
+                {`Frame-${this.props.tag}`}
+              </div>
+            ) : null}
             {/* <div className='signerControlOption'>Hide empty accounts</div>
             <div className='signerControlOption'>Deactivte empty Accounts</div>
             <div className='signerControlOption'>Deactivte all Accounts</div>
@@ -366,7 +371,7 @@ class Signer extends React.Component {
             <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div> */}
             <div className='signerControlOption' onMouseDown={() => {
               link.send('dash:reloadSigner', this.props.id)
-            }}>{hwSigner ? 'Re-connect' : 'Reload Signer'}</div>
+            }}>{hwSigner ? 'Reconnect' : 'Reload Signer'}</div>
             <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
               link.send('dash:removeSigner', this.props.id)
             }}>Remove Signer</div>
