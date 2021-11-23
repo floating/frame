@@ -58,6 +58,7 @@ export default class Lattice extends Signer {
   connection: Client | null = null
 
   accountLimit = 5
+  tag = ''
 
   constructor (deviceId: string, name: string, tag: string) {
     super()
@@ -293,6 +294,7 @@ export default class Lattice extends Signer {
 
     return {
       ...summary,
+      tag: this.tag,
       addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
     }
   }
