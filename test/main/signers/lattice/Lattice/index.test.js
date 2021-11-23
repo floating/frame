@@ -18,7 +18,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  lattice = new Lattice('L8geF2', 'Frame-test-lattice')
+  lattice = new Lattice('L8geF2', 'Gridplus-test', 'ABCXYZ')
   lattice.derivation = Derivation.standard
   lattice.on('error', jest.fn())
 })
@@ -44,15 +44,13 @@ describe('#connect', () => {
     connectFn = jest.fn()
 
     Client.mockImplementation(opts => {
-      if (
-        opts.name === 'Frame-test-lattice' &&
-        opts.baseUrl === 'https://gridplus.io' &&
-        opts.privKey === 'supersecretkey'
-      ) {
-        return {
-          connect: connectFn,
-          fwVersion: [4, 13, 0]
-        }
+      expect(opts.name).toBe('Frame-ABCXYZ')
+      expect(opts.baseUrl).toBe('https://gridplus.io')
+      expect(opts.privKey).toBe('supersecretkey')
+
+      return {
+        connect: connectFn,
+        fwVersion: [4, 13, 0]
       }
     })
 

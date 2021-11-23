@@ -1,6 +1,5 @@
 const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
-const log = require('electron-log')
 const utils = require('web3-utils')
 const crypto = require('crypto')
 
