@@ -6,6 +6,11 @@ import svg from '../../../../../../resources/svg'
 import link from '../../../../../../resources/link'
 import { weiToGwei, hexToInt } from '../../../../../../resources/utils'
 
+// estimated gas to perform various common tasks
+const gasToSendEth = 21 * 1000
+const gasToSendToken = 65 * 1000
+const gasForDexSwap = 200 * 1000
+
 class Gas extends React.Component {
   constructor (...args) {
     super(...args)
@@ -47,47 +52,81 @@ class Gas extends React.Component {
     const gwei = weiToGwei(hexToInt(level)) 
     return this.roundGwei(gwei) || 0
   }
+
   txEstimate (value, gasLimit, nativeUSD) {
     return this.toDisplayUSD(BigNumber(value * gasLimit).shiftedBy(-9).multipliedBy(nativeUSD))
   }
+
+  txEstimates (type, id, gasPrice, calculatedFees) {
+    const estimates = [
+      {
+        label: 'Send ETH',
+        estimatedGas: gasToSendEth
+      },
+      {
+        label: 'Send Tokens',
+        estimatedGas: gasToSendToken
+      },
+      {
+        label: 'Dex Swap',
+        estimatedGas: gasForDexSwap
+      }
+    ]
+    
+    const layer = this.store('main.networks', type, id, 'layer')
+    const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
+    const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0)
+
+    if (id === 10) {
+      const l1GasEstimates = [4300, 5100, 6900]
+      // Optimism specific calculations
+      // TODO: re-structure the way we store and model gas fees
+      const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
+      const l1Price = this.levelDisplay(ethPriceLevels.fast)
+
+      const optimismEstimate = (l1Limit, l2Limit) => {
+        const l1Estimate = BigNumber(l1Price * l1Limit * 1.5).shiftedBy(-9).multipliedBy(nativeUSD)
+        const l2Estimate = BigNumber(gasPrice * l2Limit).shiftedBy(-9).multipliedBy(nativeUSD)
+
+        return this.toDisplayUSD(l1Estimate.plus(l2Estimate))
+      }
+
+      return estimates.map(({ label, estimatedGas }, i) => (
+        {
+          low: optimismEstimate(l1GasEstimates[i], estimatedGas),
+          high: optimismEstimate(l1GasEstimates[i], estimatedGas),
+          label
+        }
+      ))
+    } else {
+      const low = calculatedFees ? this.roundGwei(calculatedFees.actualBaseFee + calculatedFees.priorityFee) : gasPrice
+
+      return estimates.map(({ label, estimatedGas }) => (
+        {
+          low: this.txEstimate(low, estimatedGas, nativeUSD),
+          high: this.txEstimate(gasPrice, estimatedGas, nativeUSD),
+          label
+        }
+      ))
+    }
+  }
+
   render () {
     const { type, id } = this.store('main.currentNetwork')
     const levels = this.store('main.networksMeta', type, id, 'gas.price.levels')
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
     const gasPrice = this.levelDisplay(levels.fast)
-
+    
     const { nextBaseFee, maxPriorityFeePerGas } = (fees || {})
 
-    const priorityFee = this.levelDisplay(maxPriorityFeePerGas)
-    const maxFee = this.levelDisplay(gasPrice)
+    const calculatedFees = {
+      actualBaseFee: this.roundGwei((weiToGwei(hexToInt(nextBaseFee)))),
+      priorityFee: this.levelDisplay(maxPriorityFeePerGas)
+    }
 
-    const actualBaseFee = this.roundGwei((weiToGwei(hexToInt(nextBaseFee))))
+    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, fees ? calculatedFees : null)
 
-    const lowFee = this.roundGwei(actualBaseFee + priorityFee)
-    const layer = this.store('main.networks', type, id, 'layer')
-    const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
-    const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0)
-
-    const low = fees ? lowFee : gasPrice
-    const high = fees ? maxFee : gasPrice
-    const feeEstimatesUSD = [
-      {
-        low: this.txEstimate(low, 21 * 1000, nativeUSD),
-        high: this.txEstimate(high, 21 * 1000, nativeUSD),
-        label: 'Send ETH'
-      }, 
-      {
-        low: this.txEstimate(low, 65 * 1000, nativeUSD),
-        high: this.txEstimate(high, 65 * 1000, nativeUSD),
-        label: 'Send Tokens'
-      },
-      {
-        low: this.txEstimate(low, 200 * 1000, nativeUSD),
-        high: this.txEstimate(high, 200 * 1000, nativeUSD),
-        label: 'Dex Swap'
-      }
-    ]
-
+    console.log(feeEstimatesUSD)
     // const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
 
     return (
@@ -97,7 +136,7 @@ class Gas extends React.Component {
           {this.state.baseHover ? <div className='feeToolTip feeToolTipBase cardShow'>The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded</div> : null}
           {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block</div> : null }
           <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-            <span className='gasGweiNum'>{actualBaseFee}</span>
+            <span className='gasGweiNum'>{calculatedFees.actualBaseFee}</span>
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Current Base'}</span>
           </div>
@@ -124,20 +163,20 @@ class Gas extends React.Component {
             </div>
           </div>
           <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-            <span className='gasGweiNum'>{priorityFee}</span>
+            <span className='gasGweiNum'>{calculatedFees.priorityFee}</span>
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Priority Tip'}</span>
           </div>
         </div>
         <div className='gasEstimateBlock'>
-          {feeEstimatesUSD.map((esimate) =>{
+          {feeEstimatesUSD.map((estimate) =>{
             return (
               <div className='gasEstimate'>
                 <div className='gasEstimateRange'>
-                  <span style={{ fontSize: '11px', marginRight: '-2px', marginTop: '-1px' }}>{!esimate.low || esimate.low >= 1 ? `$` : '<$'}</span>
-                  <span className='gasEstimateRangeLow'>{`${!esimate.low ? 0 : esimate.low < 1 ? 1 : esimate.low}`}</span>
+                  <span style={{ fontSize: '11px', marginRight: '-2px', marginTop: '-1px' }}>{!estimate.low || estimate.low >= 1 ? `$` : '<$'}</span>
+                  <span className='gasEstimateRangeLow'>{`${!estimate.low ? 0 : estimate.low < 1 ? 1 : estimate.low}`}</span>
                 </div>
-                <div className='gasEstimateLabel'>{esimate.label}</div>
+                <div className='gasEstimateLabel'>{estimate.label}</div>
               </div>
             )
           })}
