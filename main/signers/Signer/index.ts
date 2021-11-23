@@ -8,7 +8,6 @@ import crypt from '../../crypt'
 export default class Signer extends EventEmitter {
   id = ''
   type = ''
-  tag = ''
   name = ''
   status = ''
   coinbase = '0x'
@@ -46,7 +45,6 @@ export default class Signer extends EventEmitter {
       id: this.id,
       name: this.name || this.type + ' signer',
       type: this.type,
-      tag: this.tag,
       model: this.model,
       addresses: this.addresses,
       status: this.status,
