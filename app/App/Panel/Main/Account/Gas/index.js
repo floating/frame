@@ -78,17 +78,18 @@ class Gas extends React.Component {
     const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0)
 
     if (id === 10) {
-      const l1GasEstimates = [4300, 5100, 6900]
       // Optimism specific calculations
       // TODO: re-structure the way we store and model gas fees
+
+      const l1GasEstimates = [4300, 5100, 6900]
       const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
       const l1Price = this.levelDisplay(ethPriceLevels.fast)
 
       const optimismEstimate = (l1Limit, l2Limit) => {
-        const l1Estimate = BigNumber(l1Price * l1Limit * 1.5).shiftedBy(-9).multipliedBy(nativeUSD)
-        const l2Estimate = BigNumber(gasPrice * l2Limit).shiftedBy(-9).multipliedBy(nativeUSD)
+        const l1Estimate = BigNumber(l1Price * l1Limit * 1.5)
+        const l2Estimate = BigNumber(gasPrice * l2Limit)
 
-        return this.toDisplayUSD(l1Estimate.plus(l2Estimate))
+        return this.toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))
       }
 
       return estimates.map(({ label, estimatedGas }, i) => (
@@ -126,7 +127,6 @@ class Gas extends React.Component {
 
     const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, fees ? calculatedFees : null)
 
-    console.log(feeEstimatesUSD)
     // const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
 
     return (
