@@ -117,7 +117,7 @@ class Gas extends React.Component {
     const levels = this.store('main.networksMeta', type, id, 'gas.price.levels')
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
     const gasPrice = this.levelDisplay(levels.fast)
-    
+
     const { nextBaseFee, maxPriorityFeePerGas } = (fees || {})
 
     const calculatedFees = {
