@@ -53,18 +53,20 @@ function getStatusForError (err: string) {
 }
 
 export default class Lattice extends Signer {
-  deviceId: string;
-  derivation: Derivation | undefined;
-  connection: Client | null = null;
+  deviceId: string
+  derivation: Derivation | undefined
+  connection: Client | null = null
 
-  accountLimit = 5;
+  accountLimit = 5
+  tag = ''
 
-  constructor (deviceId: string, name: string) {
+  constructor (deviceId: string, name: string, tag: string) {
     super()
 
     this.id = 'lattice-' + deviceId
     this.deviceId = deviceId
     this.name = name
+    this.tag = tag
     this.status = Status.DISCONNECTED
     this.type = 'lattice'
     this.model = 'Lattice1'
@@ -77,7 +79,7 @@ export default class Lattice extends Signer {
     log.debug('connecting to Lattice', { name: this.name, baseUrl, privateKey })
 
     this.connection = new Client({
-      name: this.name,
+      name: 'Frame-' + this.tag,
       baseUrl,
       privKey: privateKey,
       crypto
@@ -291,6 +293,7 @@ export default class Lattice extends Signer {
 
     return {
       ...summary,
+      tag: this.tag,
       addresses: this.addresses.slice(0, this.accountLimit || this.addresses.length)
     }
   }

@@ -392,19 +392,26 @@ describe('migration 17', () => {
     expect(lattice.paired).toBe(true)
   })
 
-  it('sets the device name of existing Lattices using the old suffix', () => {
+  it('sets the device name of existing Lattices to be "GridPlus"', () => {
     const updatedState = migrations.apply(state)
 
     const lattice = updatedState.main.lattice['McBbS7']
-    expect(lattice.deviceName).toBe('Frame-my-laptop')
+    expect(lattice.deviceName).toBe('GridPlus')
   })
 
-  it('sets the device name of existing Lattices with no suffix', () => {
+  it('sets the tag of an existing Lattice to the old suffix', () => {
+    const updatedState = migrations.apply(state)
+
+    const lattice = updatedState.main.lattice['McBbS7']
+    expect(lattice.tag).toBe('my-laptop')
+  })
+
+  it('updates an existing Lattice with no suffix to have a random new tag', () => {
     delete state.main.latticeSettings.suffix
 
     const updatedState = migrations.apply(state)
 
     const lattice = updatedState.main.lattice['McBbS7']
-    expect(lattice.deviceName).toBe('Frame')
+    expect(lattice.tag).toMatch(/^[A-Z]{6,}$/)
   })
 })

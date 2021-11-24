@@ -1,6 +1,5 @@
 const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
-const log = require('electron-log')
 const utils = require('web3-utils')
 const crypto = require('crypto')
 
@@ -79,7 +78,8 @@ const rpc = {
       baseUrl: 'https://signing.gridpl.us',
       endpointMode: 'default',
       paired: true,
-      deviceName: (deviceName || 'Frame').substring(0, 17) + '-' + randomLetters(6),
+      deviceName: (deviceName || 'GridPlus').substring(0, 17),
+      tag: randomLetters(6),
       privKey: crypto.randomBytes(32).toString('hex')  
     })
 

@@ -269,7 +269,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 211 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -280,7 +280,7 @@ class Settings extends React.Component {
               {'Mouse to display\'s right edge to summon Frame'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Adjustable Nonce</div>
               <div
@@ -308,7 +308,7 @@ class Settings extends React.Component {
             </div>
           </div> */}
           {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Display Gas in Menubar</div>
                 <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
@@ -320,7 +320,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Colorway</div>
               <Dropdown
@@ -335,7 +335,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Trezor Derivation</div>
               <Dropdown
@@ -348,7 +348,7 @@ class Settings extends React.Component {
               {'Derivation path for connected Trezor devices'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Ledger Derivation</div>
               <Dropdown
@@ -362,7 +362,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.store('main.ledger.derivation') === 'live' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Ledger Live Accounts</div>
                 <Dropdown
@@ -381,7 +381,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Derivation</div>
               <Dropdown
