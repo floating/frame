@@ -382,12 +382,13 @@ class Provider extends EventEmitter {
     if (existing.length > 0) {
       if (tx.maxPriorityFeePerGas && tx.maxFeePerGas) {
         const existingFee = Math.max(...existing.map(r => r.data.maxPriorityFeePerGas))
+        const existingMax = Math.max(...existing.map(r => r.data.maxFeePerGas))
         const feeInt = parseInt(tx.maxPriorityFeePerGas)
         const maxInt = parseInt(tx.maxFeePerGas)
-        if (existingFee >= feeInt) {
+        if (existingFee * 1.1 >= feeInt || existingMax * 1.1 >= maxInt) {
           // Bump fees by 10%
-          const bumpedFee = Math.ceil(existingFee * 1.1)
-          const bumpedBase = Math.ceil((maxInt - feeInt) * 1.1)
+          const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
+          const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
           tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
           tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
           tx.feesUpdated = true
