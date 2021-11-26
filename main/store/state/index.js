@@ -143,7 +143,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 16),
+    _version: main('_version', 17),
     colorway: main('colorway', 'dark'),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
