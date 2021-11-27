@@ -17,16 +17,20 @@ interface Quote {
   usd_24h_change: number
 }
 
+export type CoinId = string
+
 export interface Coin {
-  id: string,
+  id: CoinId,
   symbol: string,
   name: string,
   asset_platform_id: string,
   platforms?: {}
 }
 
-interface Platform {
-  id: string,
+export type PlatformId = string
+
+export interface Platform {
+  id: PlatformId,
   chain_identifier: string,
   name: string,
   short_name: string
