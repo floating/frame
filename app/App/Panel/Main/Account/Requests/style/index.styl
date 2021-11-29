@@ -1546,25 +1546,61 @@ span
     right 28%
     left 28%
     border-radius 4px
-    bottom 0px
+    bottom 0
     display flex
     justify-content center
     align-items center
     transform translateY(0px)
     z-index 900000000
-    cursor pointer
     *
       pointer-events none
-  
+
+  .txDetailsOptions
+    position absolute
+    top 0px
+    left 0px
+    right 0px
+    bottom 0
+    font-size 11px
+    display flex
+    justify-content center
+    align-items center
+    z-index 9000000000
+
+    .txDetailsOptionsOpen, .txDetailsOptionsCopy
+      height 30px
+      border-radius 4px
+      display flex
+      justify-content center
+      align-items center
+      padding 0px 14px
+      box-sizing border-box
+      cursor pointer
+      background var(--ghostD)
+
+      *
+        pointer-events none
+
+    .txDetailsOptionsOpen:hover, .txDetailsOptionsCopy:hover
+      background var(--ghostE)
+      transform scale(1.05)
+      box-shadow 0px 14px 6px -3px var(--ghostB)
+
+  .txDetailsOptionsTxHash
+    color var(--good)
+
   .txDetailsHide
     pointer-events none 
     opacity 0
 
-  .txAugmentCancel:hover, .txAugmentSpeedUp:hover, .txDetails:hover
+  .txAugmentCancel:hover, .txAugmentSpeedUp:hover
     background var(--ghostE)
     transform scale(1.05)
     box-shadow 0px 14px 6px -3px var(--ghostB)
-  
+
+  .txDetails:hover
+    background var(--ghostE)
+
 .txAugmentHidden
   .txAugmentCancel
     opacity 0
@@ -1580,8 +1616,6 @@ span
     transform translateY(-25px)   
     transition var(--standard)
     pointer-events none
-  .txDetails
-    background none
 
 .txSuccessHash
   position absolute
