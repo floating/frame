@@ -78,7 +78,9 @@
       "/dist/"
     ],
     "testTimeout": 100,
-    "modulePathIgnorePatterns": ["<rootDir>/.*/__mocks__"]
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.*/__mocks__"
+    ]
   },
   "author": {
     "name": "Jordan Muir",
@@ -111,7 +113,7 @@
     "electron-log": "4.4.1",
     "electron-updater": "4.3.9",
     "eth-ens-namehash": "2.0.8",
-    "eth-provider": "0.9.7",
+    "eth-provider": "0.9.8",
     "eth-sig-util": "3.0.1",
     "ethereum-public-key-to-address": "0.0.5",
     "extract-zip": "2.0.1",
