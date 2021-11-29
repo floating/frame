@@ -125,9 +125,15 @@ ipcMain.on('tray:openExternal', (e, url) => {
 })
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
-  // remove trailing slashes
+  // remove trailing slashes from the base url
   const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
   shell.openExternal(`${explorer}/tx/${hash}`)
+})
+
+ipcMain.on('tray:copyExplorer', (e, hash, chain) => {
+  // remove trailing slashes from the base url
+  const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
+  clipboard.writeText(explorer + '/tx/' + hash)
 })
 
 ipcMain.on('tray:giveAccess', (e, req, access) => {

@@ -337,6 +337,16 @@ class TransactionRequest extends React.Component {
                         >
                           View Details
                         </div>
+                        <div
+                          className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
+                          onMouseDown={() => {
+                            if (req && req.tx && req.tx.hash) {
+                              link.send('tray:copyExplorer', req.tx.hash, this.chain)
+                            }
+                          }}
+                        >
+                          Copy Details
+                        </div>
                         <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
                           Speed Up
                         </div>
