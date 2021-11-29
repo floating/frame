@@ -3,7 +3,7 @@ import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
 import { Device as TrezorDevice } from 'trezor-connect'
 
-import Signer, { Callback } from '../../Signer'
+import Signer from '../../Signer'
 import flex from '../../../flex'
 import { sign, londonToLegacy, signerCompatibility, TransactionData } from '../../../transaction'
 
@@ -32,7 +32,9 @@ export default class Trezor extends Signer {
     const defaultVersion = device.features?.model === 'T' ? '2.3.0' : '1.8.0'
     const [major, minor, patch] = device.firmwareRelease?.release?.version || defaultVersion.split('.')
     this.appVersion = { major, minor, patch }
-    this.model = ['Trezor', device.features?.model].join(' ').trim()
+
+    const model = (device.features?.model || '').toString() === '1' ? 'One' : device.features?.model
+    this.model = ['Trezor', model].join(' ').trim()
 
     this.type = 'trezor'
     this.status = 'loading'
@@ -75,7 +77,7 @@ export default class Trezor extends Signer {
   }
 
   private getPath (index: number) {
-    return `${this.basePath()}/${index}`
+    return this.basePath() + '/' + index.toString()
   }
 
   private basePath () {
@@ -83,7 +85,7 @@ export default class Trezor extends Signer {
       throw new Error('attempted to get base path with unknown derivation!')
     }
 
-    return `m/${getDerivationPath(this.derivation)}`
+    return `m/${getDerivationPath(this.derivation)}`.replace(/\/+$/,'')
   }
 
   deviceStatus () {
@@ -112,7 +114,7 @@ export default class Trezor extends Signer {
     })
   }
 
-  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback = () => {}, attempt = 0) {
+  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>, attempt = 0) {
     log.info('Verify Address, attempt: ' + attempt)
     let timeout = false
     const timer = setTimeout(() => {
@@ -194,8 +196,8 @@ export default class Trezor extends Signer {
   }
 
   // Standard Methods
-  signMessage (index: number, message: string, cb: Callback) {
-    const rpcCallback: Callback = (err, result) => {
+  signMessage (index: number, message: string, cb: Callback<string>) {
+    const rpcCallback: Callback<any> = (err, result) => {
       if (err) {
         log.error('signMessage Error')
         log.error(err)
@@ -209,7 +211,7 @@ export default class Trezor extends Signer {
     flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), rpcCallback)
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const compatibleTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 
@@ -218,7 +220,7 @@ export default class Trezor extends Signer {
         const trezorTx = this.normalizeTransaction(rawTx.chainId, tx)
         const path = this.getPath(index)
 
-        const rpcCallback: Callback = (err, result) => {
+        const rpcCallback: Callback<any> = (err, result) => {
           return err
             ? reject(err)
             : resolve({ v: result.v, r: result.r, s: result.s })

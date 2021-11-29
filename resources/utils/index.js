@@ -5,7 +5,12 @@ const hexToInt = v => parseInt(v, 'hex')
 const weiHexToGweiInt = v => hexToInt(v) / 1e9
 const gweiToWeiHex = v => intToHex(gweiToWei(v))
 
-module.exports = {
+function randomLetters (num) {
+  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
+}
+
+export {
+  randomLetters,
   weiToGwei,
   gweiToWei, 
   intToHex,
