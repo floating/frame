@@ -169,12 +169,12 @@
     "jest": "27.4.0",
     "node-watch": "0.7.2",
     "parcel-bundler": "1.12.3",
-    "rimraf": "^3.0.2",
+    "rimraf": "3.0.2",
     "shx": "0.3.3",
     "standardx": "7.0.0",
     "stylus": "0.55.0",
     "ts-jest": "27.0.7",
-    "typescript": "^4.5.2"
+    "typescript": "4.5.2"
   },
   "standard": {
     "parser": "babel-eslint",
