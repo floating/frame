@@ -16,8 +16,7 @@ class Settings extends React.Component {
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
-    const latticeSuffix = context.store('main.latticeSettings.suffix')
-    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeSuffix, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
+    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
       if (this.network !== id || this.networkType !== type) {
@@ -54,6 +53,19 @@ class Settings extends React.Component {
     if (location.startsWith('https://') || location.startsWith('http://')) return true
     return false
   }
+
+  okPort (location) {
+    const match = location.match(/^(?:https?|wss?).*:(?<port>\d{4,})/)
+
+    if (match) {
+      const portStr = (match.groups || { port: 0 }).port
+      const port = parseInt(portStr)
+      return port >= 0 && port <= 65535
+    }
+
+    return true
+  }
+
   //
   // latticeFocus () {
   //   if (this.state.latticeEndpoint === this.customMessage) this.setState({ secondaryCustom: '' })
@@ -106,19 +118,6 @@ class Settings extends React.Component {
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
   }
 
-  inputLatticeSuffix (e) {
-    e.preventDefault()
-    clearTimeout(this.inputLatticeSuffixTimeout)
-
-    // Lattice only supports a suffix of up to 24 characters, and we append "Frame-"
-    // to the front so limit it to 18 characters
-    const value = e.target.value.replace(/\s+/g, '').substring(0, 18)
-
-    this.setState({ latticeSuffix: value })
-    // TODO: Update to target specific Lattice device rather than global
-    this.inputLatticeSuffixTimeout = setTimeout(() => link.send('tray:action', 'setLatticeSuffix', this.state.latticeSuffix), 1000)
-  }
-
   localShake (key) {
     const localShake = Object.assign({}, this.state.localShake)
     localShake[key] = true
@@ -137,8 +136,15 @@ class Settings extends React.Component {
     const current = connection.current
 
     if (current === 'custom') {
-      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage && !this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
-      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage && !this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+      if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
+        if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
+        else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
+      }
+
+      if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
+        if (!this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+        else if (!this.okPort(this.state.secondaryCustom)) status = 'invalid port'
+      }
     }
     if (status === 'connected' && !connection.network) status = 'loading'
     return (
@@ -263,7 +269,7 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 211 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Glide</div>
               <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
@@ -274,7 +280,7 @@ class Settings extends React.Component {
               {'Mouse to display\'s right edge to summon Frame'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Adjustable Nonce</div>
               <div
@@ -302,7 +308,7 @@ class Settings extends React.Component {
             </div>
           </div> */}
           {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Display Gas in Menubar</div>
                 <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
@@ -314,7 +320,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Colorway</div>
               <Dropdown
@@ -329,7 +335,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Trezor Derivation</div>
               <Dropdown
@@ -342,7 +348,7 @@ class Settings extends React.Component {
               {'Derivation path for connected Trezor devices'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Ledger Derivation</div>
               <Dropdown
@@ -356,7 +362,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.store('main.ledger.derivation') === 'live' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Ledger Live Accounts</div>
                 <Dropdown
@@ -375,6 +381,19 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
+          <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Lattice Derivation</div>
+              <Dropdown
+                syncValue={this.store('main.latticeSettings.derivation')}
+                onChange={(value) => link.send('tray:action', 'setLatticeDerivation', value)}
+                options={[{ text: 'Standard', value: 'standard' }, { text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Derivation path for connected Lattice devices'}
+            </div>
+          </div>
           <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Accounts</div>
@@ -407,14 +426,6 @@ class Settings extends React.Component {
             </div>
             <div className={this.state.latticeEndpointMode === 'custom' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
               <input tabIndex='-1' placeholder={'Custom Relay'} value={this.state.latticeEndpoint} onChange={e => this.inputLatticeEndpoint(e)} />
-            </div>
-          </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 201 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Lattice Frame Suffix</div>
-            </div>
-            <div className='connectionCustomInput connectionCustomInputOn'>
-              <input placeholder={'Lattice Suffix'} tabIndex='-2' value={this.state.latticeSuffix} onChange={e => this.inputLatticeSuffix(e)} />
             </div>
           </div>
 

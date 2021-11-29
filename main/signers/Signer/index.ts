@@ -5,18 +5,16 @@ import { AppVersion, TransactionData } from '../../transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
 
-export type Callback = (err: Error | null, result: any | undefined) => void
-
 export default class Signer extends EventEmitter {
-  id = '';
-  type = '';
-  name = '';
-  status = '';
-  coinbase = '0x';
-  model = '';
+  id = ''
+  type = ''
+  name = ''
+  status = ''
+  coinbase = '0x'
+  model = ''
   appVersion: AppVersion = { major: 0, minor: 0, patch: 0 }
 
-  addresses: string[];
+  addresses: string[]
   
   constructor () {
     super()
@@ -32,11 +30,11 @@ export default class Signer extends EventEmitter {
     if (this.addresses && this.addresses.length) return crypt.stringToKey(this.addresses.join()).toString('hex')
   }
 
-  getCoinbase (cb: Callback) {
+  getCoinbase (cb: Callback<string>) {
     cb(null, this.addresses[0])
   }
 
-  verifyAddress (index: number, current: string, display: boolean, cb: Callback) {
+  verifyAddress (index: number, current: string, display: boolean, cb: Callback<boolean>) {
     const err = new Error('Signer:' + this.type + ' did not implement verifyAddress method')
     log.error(err)
     cb(err, undefined)
@@ -62,20 +60,24 @@ export default class Signer extends EventEmitter {
     // windows.broadcast('main:action', 'removeSigner', this.summary())
   }
 
+  delete () {
+    console.warn('Signer:' + this.type + ' did not implement a delete method')
+  }
+
   update (options = {}) {
     // if (options.setView) windows.broadcast('main:action', 'setView', options.setView)
     // windows.broadcast('main:action', 'updateSigner', this.summary())
   }
 
-  signMessage (index: number, message: string, cb: Callback) {
+  signMessage (index: number, message: string, cb: Callback<string>) {
     console.warn('Signer:' + this.type + ' did not implement a signMessage method')
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
 
-  signTypedData (index: number, version: string, typedData: string, cb: Callback) {
+  signTypedData (index: number, version: string, typedData: string, cb: Callback<string>) {
     return cb(new Error(`Signer: ${this.type} does not support eth_signTypedData`), undefined)
   }
 }

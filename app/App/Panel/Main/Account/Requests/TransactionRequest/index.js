@@ -197,9 +197,20 @@ class TransactionRequest extends React.Component {
           if (monitorFilter[i].status === 'confirming' || monitorFilter[i].status === 'confirmed') {
             txMeta.possible = false
             txMeta.notice = 'nonce used'
-          } else if (parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')) {
+          } else if (
+            req.data.gasPrice &&
+            parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')
+          ) {
             txMeta.possible = false
             txMeta.notice = 'gas price too low'
+          } else if (
+              req.data.maxPriorityFeePerGas &&
+              req.data.maxFeePerGas &&
+              Math.ceil(parseInt(monitorFilter[i].data.maxPriorityFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxPriorityFeePerGas, 'hex') &&
+              Math.ceil(parseInt(monitorFilter[i].data.maxFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxFeePerGas, 'hex')
+            ) {
+            txMeta.possible = false
+            txMeta.notice = 'gas fees too low'
           }
         }
       })
@@ -325,6 +336,16 @@ class TransactionRequest extends React.Component {
                           }}
                         >
                           View Details
+                        </div>
+                        <div
+                          className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
+                          onMouseDown={() => {
+                            if (req && req.tx && req.tx.hash) {
+                              link.send('tray:copyExplorer', req.tx.hash, this.chain)
+                            }
+                          }}
+                        >
+                          Copy Details
                         </div>
                         <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
                           Speed Up

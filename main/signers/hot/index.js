@@ -76,7 +76,7 @@ module.exports = {
     if (password.length < 12) return cb(new Error('Hot account password is too short'))
     if (zxcvbn(password).score < 3) return cb(new Error('Hot account password is too weak'))
     const signer = new RingSigner()
-    signer.addKeystore(keystore, keystorePassword, password, (err, result) => {
+    signer.addKeystore(keystore, keystorePassword, password, err => {
       if (err) {
         signer.close()
         return cb(err)

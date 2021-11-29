@@ -162,12 +162,13 @@ class Dash extends React.Component {
           return false
         }
       }).filter(s => s)
+      
       return (
       <div className='dash'>
         {this.state.showAddAccounts ? <AddAccounts close={() => this.setState({ showAddAccounts: false })} /> : null}
-        <div className='newAccount' onMouseDown={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
+        <div className='newAccount' onClick={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
           <div className='newAccountIcon'>{'+'}</div> 
-          Add New Accounts
+          Add New Account
         </div>
         <div className='signers'>
           <div className='signersMid'>
@@ -176,7 +177,9 @@ class Dash extends React.Component {
             </div>
             <div className='signersList'>
               {hardwareSigners.length ? (
-                hardwareSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
+                hardwareSigners
+                  .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+                  .map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
               ) : (
                 <div className='noSigners'>
                   {'No hardware signers detected'}

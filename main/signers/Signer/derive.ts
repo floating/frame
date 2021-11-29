@@ -26,11 +26,14 @@ export function deriveHDAccounts (publicKey: string, chainCode: string, cb: (err
 }
 
 const derivationPaths: { [key: string]: string } = {
-  [Derivation.legacy.valueOf()]: "44'/60'/0'",
-  [Derivation.standard.valueOf()]: "44'/60'/0'/0",
-  [Derivation.testnet.valueOf()]: "44'/1'/0'/0"
+  [Derivation.legacy.valueOf()]: "44'/60'/0'/<index>",
+  [Derivation.standard.valueOf()]: "44'/60'/0'/0/<index>",
+  [Derivation.testnet.valueOf()]: "44'/1'/0'/0/<index>",
+  [Derivation.live.valueOf()]: "44'/60'/<index>'/0/0"
 }
 
-export function getDerivationPath (derivation: Derivation) {
-  return derivationPaths[derivation.valueOf()]
+export function getDerivationPath (derivation: Derivation, index = -1) {
+  const path = derivationPaths[derivation.valueOf()]
+
+  return path.replace('<index>', (index > -1 ? index : '').toString())
 }

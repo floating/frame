@@ -143,7 +143,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 16),
+    _version: main('_version', 17),
     colorway: main('colorway', 'dark'),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
@@ -169,9 +169,9 @@ const initial = {
     lattice: main('lattice', {}),
     latticeSettings: {
       accountLimit: main('latticeSettings.accountLimit', 5),
+      derivation: main('latticeSettings.derivation', 'standard'),
       endpointMode: main('latticeSettings.endpointMode', 'default'),
-      endpointCustom: main('latticeSettings.endpointCustom', ''),
-      suffix: main('latticeSettings.suffix', '')
+      endpointCustom: main('latticeSettings.endpointCustom', '')
     },
     ledger: {
       derivation: main('ledger.derivation', 'live'),

@@ -136,11 +136,11 @@ module.exports = {
   },
   updateSigner: (u, signer) => {
     if (!signer.id) return
-    u('main.signers', signer.id, () => signer)
+    u('main.signers', signer.id, prev => ({ ...prev, ...signer }))
   },
   newSigner: (u, signer) => {
     u('main.signers', signers => {
-      signers[signer.id] = signer
+      signers[signer.id] = { ...signer, createdAt: new Date().getTime() }
       return signers
     })
   },
@@ -175,8 +175,8 @@ module.exports = {
   setLatticeEndpointCustom: (u, url) => {
     u('main.latticeSettings.endpointCustom', () => url)
   },
-  setLatticeSuffix: (u, suffix) => {
-    u('main.latticeSettings.suffix', () => suffix)
+  setLatticeDerivation: (u, value) => {
+    u('main.latticeSettings.derivation', () => value)
   },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)

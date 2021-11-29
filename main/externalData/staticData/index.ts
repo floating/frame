@@ -54,7 +54,8 @@ async function load (symbols: string[]) {
   const allCoins = await coingecko.listCoins()
 
   for (const symbol of symbols) {
-    const coinData = await loadCoinData(allCoins, symbol)
+    const lookupSymbol = (symbol === 'aeth' || symbol === 'oeth') ? 'eth' : symbol
+    const coinData = await loadCoinData(allCoins, lookupSymbol)
 
       data[symbol] = {
         icon: coinData.image,

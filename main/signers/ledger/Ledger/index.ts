@@ -6,7 +6,7 @@ import { v5 as uuid } from 'uuid'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents'
 
 import { Request, RequestQueue } from './requestQueue'
-import Signer, { Callback } from '../../Signer'
+import Signer from '../../Signer'
 import LedgerEthereumApp from './eth'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { signerCompatibility, londonToLegacy, TransactionData } from '../../../transaction'
@@ -16,8 +16,9 @@ const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 export const Status = {
   INITIAL: 'Connecting',
   OK: 'ok',
-  DERIVING: 'Deriving addresses',
-  LOCKED: 'Please unlock your ledger',
+  LOADING: 'loading',
+  DERIVING: 'addresses',
+  LOCKED: 'locked',
   WRONG_APP: 'Open your Ledger and select the Ethereum application',
   DISCONNECTED: 'Disconnected',
   NEEDS_RECONNECTION: 'Please reconnect this Ledger device'
@@ -87,8 +88,6 @@ export default class Ledger extends Signer {
     super()
 
     this.devicePath = devicePath
-
-    this.addresses = []
 
     this.id = uuid('Ledger' + this.devicePath, ns)
     this.type = 'ledger'
@@ -276,15 +275,11 @@ export default class Ledger extends Signer {
   }
 
   private getPath (index: number) {
-    if (this.derivation === Derivation.live) {
-      return `44'/60'/${index}'/0/0`
-    }
-
     if (!this.derivation) {
       throw new Error('attempted to get path with unknown derivation!')
     }
   
-    return getDerivationPath(this.derivation) + '/' + index
+    return getDerivationPath(this.derivation, index)
   }
 
   // *** request enqueuing methods *** //
@@ -367,7 +362,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback = () => {}) {
+  verifyAddress (index: number, currentAddress: string, display = false, cb: Callback<boolean>) {
     this.enqueueRequests({
       type: 'verifyAddress',
       execute: async () => {
@@ -405,7 +400,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signMessage (index: number, message: string, cb: Callback) {
+  signMessage (index: number, message: string, cb: Callback<string>) {
     this.enqueueRequests({
       type: 'signMessage',
       execute: async () => {
@@ -432,7 +427,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTypedData (index: number, version: string, typedData: any, cb: Callback) {
+  signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
@@ -465,7 +460,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTransaction (index: number, rawTx: TransactionData, cb: Callback) {
+  signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
     const compatibility = signerCompatibility(rawTx, this.summary())
     const ledgerTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 

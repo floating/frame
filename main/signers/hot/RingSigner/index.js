@@ -10,6 +10,7 @@ class RingSigner extends HotSigner {
   constructor (signer) {
     super(signer, WORKER_PATH)
     this.type = 'ring'
+    this.model = 'keyring'
     this.encryptedKeys = (signer && signer.encryptedKeys)
     if (this.encryptedKeys) this.update()
   }
