@@ -320,36 +320,76 @@ class TransactionRequest extends React.Component {
                   <div className='requestNoticeInner'>
                     {!error ? (
                       <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
-                        <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
-                          Cancel
-                        </div>
-                        <div
-                          className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
-                          onMouseDown={() => {
-                            if (req && req.tx && req.tx.hash) {
-                              if (this.store('main.mute.explorerWarning')) {
-                                link.send('tray:openExplorer', req.tx.hash, this.chain)
-                              } else {
-                                this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
-                              }
-                            }
-                          }}
-                        >
-                          View Details
-                        </div>
-                        <div
-                          className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
-                          onMouseDown={() => {
-                            if (req && req.tx && req.tx.hash) {
-                              link.send('tray:copyExplorer', req.tx.hash, this.chain)
-                            }
-                          }}
-                        >
-                          Copy Details
-                        </div>
-                        <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
-                          Speed Up
-                        </div>
+                        {this.state.txHashCopied ? (
+                          <div className={'txDetailsOptions txDetailsOptionsTxHash'}>
+                            Transaction Hash Copied
+                          </div>
+                        ) : this.state.viewDetailsHover ? (
+                          <div 
+                            className={'txDetailsOptions'}
+                            onMouseOver={() => {
+                              clearTimeout(this.viewDetailsHoverTimer)
+                              this.setState({ viewDetailsHover: true })
+                            }}
+                            onMouseLeave={() => {
+                              this.viewDetailsHoverTimer = setTimeout(() => {
+                                this.setState({ viewDetailsHover: false })
+                              }, 0)
+                            }}
+                          >
+                            <div
+                              className={'txDetailsOptionsOpen'}
+                              onMouseDown={() => {
+                                if (req && req.tx && req.tx.hash) {
+                                  if (this.store('main.mute.explorerWarning')) {
+                                    link.send('tray:openExplorer', req.tx.hash, this.chain)
+                                  } else {
+                                    this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
+                                  }
+                                }
+                              }}
+                            >
+                              Open Explorer
+                            </div>
+                            <div
+                              className={'txDetailsOptionsCopy'}
+                              onMouseDown={() => {
+                                if (req && req.tx && req.tx.hash) {
+                                  link.send('tray:copyTxHash', req.tx.hash, this.chain)
+                                  this.setState({ txHashCopied: true, viewDetailsHover: false })
+                                  setTimeout(() => {
+                                    this.setState({ txHashCopied: false })
+                                  }, 3000)
+                                }
+                              }}
+                            >
+                              Copy Hash
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div 
+                              className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
+                              onMouseOver={() => {
+                                clearTimeout(this.viewDetailsHoverTimer)
+                                this.setState({ viewDetailsHover: true })
+                              }}
+                              onMouseLeave={() => {
+                                this.viewDetailsHoverTimer = setTimeout(() => {
+                                  this.setState({ viewDetailsHover: false })
+                                }, 0)
+                              }}
+                            >
+                              View Details
+                            </div>
+                            <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
+                              Cancel
+                            </div>
+                            <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
+                              Speed Up
+                            </div>
+                          </>
+                        )}
                       </div>
                     ) : null}
                     <div className={success ? 'txSuccessHash ' : 'txSuccessHash'}>
