@@ -16,6 +16,22 @@ const contractAddresses: { [chainId: number]: string } = {
   80001: '0x08411add0b5aa8ee47563b146743c13b3556c9cc' // mumbai
 }
 
+export interface Call<R, T> {
+  target: string, // address
+  call: any[],
+  returns: [
+    [
+      string, (val: R) => T
+    ]
+  ]
+}
+
+type CallResults<T> = {
+  transformed: {
+    [returnKey: string]: T
+  }
+}
+
 export function supportsChain (chainId: number) {
   return chainId in contractAddresses
 }
@@ -31,10 +47,10 @@ export default function (chainId: number) {
   const config = chainConfig(chainId)
 
   return {
-    call: async function (calls: any) {
+    call: async function <R, T> (calls: Call<R, T>[]): Promise<CallResults<T>> {
       return (await aggregate(calls, config)).results
     },
-    subscribe: function (calls: any, cb: (err: any, val: any) => void) {
+    subscribe: function <R, T> (calls: Call<R, T>[], cb: (err: any, val: any) => void) {
       const watcher = createWatcher(calls, config)
 
       watcher.subscribe((update: any) => cb(null, update))

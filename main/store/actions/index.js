@@ -1,4 +1,5 @@
 import log from 'electron-log'
+import BigNumber from 'bignumber.js'
 
 const panelActions = require('./panel')
 
@@ -442,18 +443,24 @@ module.exports = {
     })
   },
   // Tokens
-  setBalances: (u, netId, address, newBalances, fullScan) => {
+  setBalances: (u, netId, address, newBalances) => {
     u('main.balances', netId, address, (balances = {}) => {
-      const updatedBalances = Object.entries(newBalances).reduce((acc, [key, token]) => {
-        acc[key] = token
-        return acc
-      }, {})
+      // remove zero balances
+      const updatedBalances = { ...balances, ...newBalances }
 
-      return { ...balances, ...updatedBalances }
+      // TODO: possibly add an option to filter out zero balances
+      //const withoutZeroBalances = Object.entries(updatedBalances)
+        //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
+
+      return updatedBalances
     })
-    if (fullScan) {
+  },
+  setScanning: (u, address, scanning) => {
+    if (scanning) {
+      u('main.scanning', address, () => true)
+    } else {
       setTimeout(() => {
-        u('main.fullScan', address, () => true)
+        u('main.scanning', address, () => false)
       }, 1000)
     }
   },
@@ -462,6 +469,19 @@ module.exports = {
       omit = omit || []
       if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
       return omit
+    })
+  },
+  addCustomTokens: (u, tokens) => {
+    u('main.tokens', existing => {
+      // remove any tokens that have been overwritten by one with
+      // the same address and chain ID
+      const existingTokens = existing.filter(token => {
+        return !tokens.some(t => 
+          t.address === token.address && t.chainId === token.chainId
+        )
+      })
+
+      return [...existingTokens, ...tokens]
     })
   },
   setColorway: (u, colorway) => {

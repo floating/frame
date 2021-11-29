@@ -1,24 +1,10 @@
+import accounts from '../../../main/accounts'
+
 import EventEmitter from 'events'
+import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
-
-const mockAccounts = {}
-const mockStore = {
-  'main.accounts': {
-    '0x22dd63c3619818fdbc262c78baee43cb61e9cccf': {}
-  },
-  'main.currentNetwork': {
-    type: 'ethereum',
-    id: 1
-  },
-  'main.networks.ethereum.1': {
-    id: 1
-  },
-  'main.networks.ethereum.4': {
-    id: 4
-  }
-}
 
 class MockConnection extends EventEmitter {
   constructor () {
@@ -29,10 +15,13 @@ class MockConnection extends EventEmitter {
   }
 }
 
-let provider, mockConnection
+const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
+
+const mockStore = {}
+let provider, mockConnection, accountRequests = []
 
 jest.mock('../../../main/chains', () => mockConnection)
-jest.mock('../../../main/accounts', () => mockAccounts)
+jest.mock('../../../main/accounts', () => ({}))
 
 jest.mock('../../../main/store', () => {
   const store = (...args) => mockStore[args.join('.')]
@@ -49,11 +38,31 @@ beforeAll(async () => {
 
   // need to import this after mocks are set up
   provider = (await import('../../../main/provider')).default
-  provider.handlers = {}
+
+  accounts.getAccounts = () => [address]
+  accounts.addRequest = (req, res) => {
+    accountRequests.push(req)
+    if (res) res()
+  }
 })
 
 afterAll(() => {
   log.transports.console.level = 'debug'
+})
+
+beforeEach(() => {
+  provider.handlers = {}
+  accountRequests = []
+
+  accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
+  accounts.signTransaction = jest.fn()
+  accounts.setTxSigned = jest.fn()
+
+  mockStore['main.accounts'] = { '0x22dd63c3619818fdbc262c78baee43cb61e9cccf': {} }
+  mockStore['main.currentNetwork'] = { type: 'ethereum', id: 1 }
+  mockStore['main.networks.ethereum.1'] = { id: 1 },
+  mockStore['main.networks.ethereum.4'] = { id: 4 }
+  mockStore['main.tokens'] = []
 })
 
 describe('#getRawTx', () => {
@@ -89,24 +98,12 @@ describe('#getRawTx', () => {
 })
 
 describe('#send', () => {
-  let accountRequests = []
   const send = (request, cb = jest.fn(), targetChain) => provider.send(request, cb, targetChain)
 
-  const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
-
   beforeEach(() => {
-    accountRequests = []
-
     mockConnection.send.mockImplementation((payload, cb, targetChain) => {
       cb({ error: 'received unhandled request' })
     })
-
-    mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-    mockAccounts.addRequest = (req, res) => {
-      accountRequests.push(req)
-      if (res) res()
-    }
-    mockAccounts.getAccounts = () => [address]
   })
 
   describe('#eth_chainId', () => {
@@ -279,6 +276,90 @@ describe('#send', () => {
           expect(Number.isInteger(permissions[1].date)).toBe(true)
           done()
         } catch (e) { done(e) }
+      })
+    })
+  })
+
+  describe('#wallet_watchAsset', () => {
+    let request
+    
+    beforeEach(() => {
+      request = {
+        id: 10,
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
+            symbol: 'BADGER',
+            name: 'BadgerDAO Token',
+            decimals: 18,
+            image: 'https://badgerdao.io/icon.jpg'
+          }
+        }
+      }
+    })
+
+    it('adds a request for a custom token', () => {
+      send(request, () => {
+        expect(accountRequests).toHaveLength(1)
+        expect(validateUUID(accountRequests[0].handlerId)).toBe(true)
+        expect(accountRequests[0]).toEqual(
+          expect.objectContaining({
+            type: 'addToken',
+            account: address,
+            token: {
+              chainId: 1,
+              address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
+              symbol: 'BADGER',
+              name: 'BadgerDAO Token',
+              decimals: 18,
+              logoURI: 'https://badgerdao.io/icon.jpg'
+            },
+            payload: request
+          })
+        )
+      })
+    })
+
+    it('does not add a request for a token that is already added', () => {
+      mockStore['main.tokens'] = [
+        { address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }
+      ]
+
+      send(request, ({ result }) => {
+        expect(result).toBe(true)
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request with no type', () => {
+      delete request.params.type
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('only ERC-20 tokens are supported')
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request with for a non-ERC-20 token', () => {
+      request.params.type = 'ERC721'
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('only ERC-20 tokens are supported')
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request with no token address', () => {
+      delete request.params.options.address
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('tokens must define an address')
+        expect(accountRequests).toHaveLength(0)
       })
     })
   })
@@ -469,7 +550,7 @@ describe('#send', () => {
     }, 100)
 
     it('does not submit a V3 request to a Ledger', done => {
-      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'ledger' })
+      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'ledger' })
 
       // Ledger only supports V4+
       const params = [address, typedData]
@@ -482,7 +563,7 @@ describe('#send', () => {
     }, 100)
 
     it('does not submit a V3 request to a Lattice', done => {
-      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'lattice' })
+      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'lattice' })
 
       // Lattice only supports V4+
       const params = [address, typedData]
@@ -495,7 +576,7 @@ describe('#send', () => {
     }, 100)
 
     it('does not submit a request to a Trezor', done => {
-      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'trezor' })
+      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'trezor' })
 
       // Trezor does not support signing typed data
       const params = [address, typedData]
@@ -540,7 +621,7 @@ describe('#signAndSend', () => {
     tx.gasPrice = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))
 
-    mockAccounts.signTransaction = () => done()
+    accounts.signTransaction.mockImplementation(() => done())
 
     signAndSend(err => {
       done('unexpected error :' + err.message)
@@ -578,8 +659,8 @@ describe('#signAndSend', () => {
     const txHash = '0x6e8b1de115105ceab599b4d99604797b961cfd1f46b85e10f23a81974baae3d5'
 
     beforeEach(() => {
-      mockAccounts.signTransaction = jest.fn((_, cb) => cb(null, signedTx))
-      mockAccounts.setTxSigned = jest.fn((reqId, cb) => {
+      accounts.signTransaction.mockImplementation((_, cb) => cb(null, signedTx))
+      accounts.setTxSigned.mockImplementation((reqId, cb) => {
         if (reqId === request.handlerId) return cb()
         cb('unknown request!')
       })

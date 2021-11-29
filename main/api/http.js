@@ -6,7 +6,7 @@ const accounts = require('../accounts')
 const store = require('../store')
 
 const trusted = require('./trusted')
-const validPayload = require('./validPayload')
+const validPayload = require('./validPayload').default
 const protectedMethods = require('./protectedMethods')
 
 const logTraffic = process.env.LOG_TRAFFIC

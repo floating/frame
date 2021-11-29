@@ -108,7 +108,7 @@ class Balances extends React.Component {
   }
 
 
-  renderBalance (symbol, balanceInfo, i, fullScan) {
+  renderBalance (symbol, balanceInfo, i, doneScanning) {
     const change = parseFloat(balanceInfo.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
@@ -123,7 +123,7 @@ class Balances extends React.Component {
     if (name.length > 20) name = name.substr(0, 20) + '...'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: fullScan || i === 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
+        <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
               src={balanceInfo.logoURI}
@@ -142,9 +142,9 @@ class Balances extends React.Component {
           </div>
           <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
             <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
-            {fullScan || balanceInfo.displayBalance !== '0.00' ? balanceInfo.displayBalance : '---.--'}
+            {doneScanning || balanceInfo.displayBalance !== '0.00' ? balanceInfo.displayBalance : '---.--'}
           </div>
-          {fullScan || balanceInfo.displayValue !== '0' ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
+          {doneScanning || balanceInfo.displayValue !== '0' ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
         </div>
       </div>
     )
@@ -173,7 +173,8 @@ class Balances extends React.Component {
       balances = balances.slice(0, 5)
     }
 
-    const fullScan = this.store('main.fullScan', address) && this.store('main.initialRateScan')
+    const scanning = this.store('main.scanning', address)
+    const initialRateScanComplete = this.store('main.initialRateScan')
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
@@ -184,13 +185,13 @@ class Balances extends React.Component {
               {svg.close(12)}
             </div>
           ) : null}
-          {balancesLength === 0 || !fullScan ? (
+          {balancesLength === 0 || scanning ? (
             <div className='moduleHeaderLoading'>
               <div className='moduleHeaderLoadingLoader' />
             </div>
           ) : null}
         </div>
-        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, fullScan))}
+        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, initialRateScanComplete))}
         <div className='signerBalanceTotal'>
           {balancesLength > 5 && !this.props.expanded ? (
             <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
@@ -202,7 +203,7 @@ class Balances extends React.Component {
               {'Total: '}
             </div>
             <div className='signerBalanceTotalValue'>
-              {svg.usd(11)}{balances.length > 0 && fullScan ? totalDisplayValue : '---.--'}
+              {svg.usd(11)}{balances.length > 0 && initialRateScanComplete ? totalDisplayValue : '---.--'}
             </div>
           </div>
         </div>
