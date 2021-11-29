@@ -3,29 +3,38 @@ import { JsonTx, TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import Common from '@ethereumjs/common'
 
 import chainConfig from '../chains/config'
+import { AppVersion, SignerSummary } from '../signers/Signer'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
   ledger: version => version.major >= 2 || (version.major >= 1 && version.minor >= 9),
-  trezor: version => version.major >= 3 || (version.major >= 2 && version.minor >= 4 && version.patch >= 2),
+  trezor: (version, model) => {
+    console.log({ version, model })
+    if ((model || '').toLowerCase() === 'trezor one') {
+      return version.major >= 2 ||
+        (
+          version.major >= 1 &&
+            (
+              version.minor > 10 ||
+              (version.minor === 10 && version.patch >= 4)
+            )
+        )
+    }
+
+    return version.major >= 3 || (version.major >= 2 && version.minor >= 4 && version.patch >= 2)
+  },
   lattice: version =>  version.major >= 1 || version.minor >= 11
 }
 
 type SignerCompatibilityByVersion = {
-  [key: string]: (version: AppVersion) => boolean
+  [key: string]: (version: AppVersion, model?: string) => boolean
 }
 
 interface Signature {
   v: string,
   r: string,
   s: string
-}
-
-export interface AppVersion {
-  major: number,
-  minor: number,
-  patch: number
 }
 
 export interface RawTransaction { 
@@ -45,22 +54,13 @@ export interface SignerCompatibility  {
   compatible: boolean
 }
 
-export interface SignerSummary {
-  id: string,
-  name: string,
-  type: string,
-  addresses: string[],
-  status: string,
-  appVersion: AppVersion
-}
-
 function toBN (hexStr: string) {
   return new BN(stripHexPrefix(hexStr), 'hex')
 }
 
 function signerCompatibility (txData: TransactionData, signer: SignerSummary): SignerCompatibility {
   if (typeSupportsBaseFee(txData.type)) {
-    const compatible = (signer.type in londonHardforkSigners) && londonHardforkSigners[signer.type](signer.appVersion)
+    const compatible = (signer.type in londonHardforkSigners) && londonHardforkSigners[signer.type](signer.appVersion, signer.model)
     return { signer: signer.type, tx: 'london', compatible }
   }
 
