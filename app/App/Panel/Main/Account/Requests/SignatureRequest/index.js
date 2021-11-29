@@ -1,17 +1,14 @@
 import React from 'react'
 import Restore from 'react-restore'
-import { fromWei, toAscii, isHex } from 'web3-utils'
-import { addHexPrefix } from 'ethereumjs-util'
+import { fromWei, isHex } from 'web3-utils'
+import { stripHexPrefix } from 'ethereumjs-util'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
 
-const DISPLAYABLE = /^[\x20-\x7E]*$/
-
 function decodeMessage (rawMessage) {
   if (isHex(rawMessage)) {
-    // attempt to decode plaintext (unhashed) hex messages to ASCII for display
-    const ascii = toAscii(addHexPrefix(rawMessage))
-    return ascii.match(DISPLAYABLE) ? ascii : rawMessage
+    const buff = Buffer.from(stripHexPrefix(rawMessage), 'hex')
+    return buff.length === 32 ? rawMessage : buff.toString('utf8')
   }
 
   return rawMessage

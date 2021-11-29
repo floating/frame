@@ -166,9 +166,9 @@ class Dash extends React.Component {
       return (
       <div className='dash'>
         {this.state.showAddAccounts ? <AddAccounts close={() => this.setState({ showAddAccounts: false })} /> : null}
-        <div className='newAccount' onMouseDown={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
+        <div className='newAccount' onClick={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
           <div className='newAccountIcon'>{'+'}</div> 
-          Add New Accounts
+          Add New Account
         </div>
         <div className='signers'>
           <div className='signersMid'>

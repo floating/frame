@@ -1,4 +1,8 @@
-const log = require('electron-log')
+import log from 'electron-log'
+
+function randomLetters (num) {
+  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
+}
 
 const migrations = {
   4: initial => {
@@ -372,7 +376,8 @@ const migrations = {
 
     Object.values(lattices).forEach(lattice => {
       lattice.paired = true
-      lattice.deviceName = oldSuffix ? `Frame-${oldSuffix}` : 'Frame'
+      lattice.tag = oldSuffix || randomLetters(6)
+      lattice.deviceName = 'GridPlus'
     })
 
     return initial

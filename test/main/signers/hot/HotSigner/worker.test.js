@@ -4,6 +4,16 @@ let worker
 
 // mnemonic: test test test test test test test test test test test junk
 const key = Buffer.from('4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356', 'hex')
+let errorOutput = console.error
+
+beforeAll(() => {
+  errorOutput = console.error
+  console.error = jest.fn()
+})
+
+afterAll(() => {
+  console.error = errorOutput
+})
 
 beforeEach(() => {
   worker = new HotSignerWorker()

@@ -82,8 +82,7 @@ export default class Lattice extends Signer {
       name: 'Frame-' + this.tag,
       baseUrl,
       privKey: privateKey,
-      crypto,
-      timeout: 30000
+      crypto
     })
 
     try {

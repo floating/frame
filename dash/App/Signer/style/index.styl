@@ -3,7 +3,9 @@
   width 100%
   // height 300px
   overflow hidden
-  background var(--ghostB)
+  background var(--ghostA)
+  border-bottom 2px solid var(--ghostZ)
+  box-shadow 0px 6px 8px 0px var(--ghostY)
   box-sizing border-box
   margin 0px 10px 40px 10px
   border-radius 16px
@@ -213,9 +215,17 @@
       box-sizing border-box
       font-size 16px
       font-weight 400
-      font-family 'Fira Code', monospace
       border 2px solid var(--ghostA)
       border-radius 9px
+
+      .signerControlDetailKey
+        font-size 11px
+        margin 4px 4px 6px 4px
+        letter-spacing 1px
+
+      .signerControlDetailValue
+        margin 4px
+        font-family 'Fira Code', monospace
 
     .signerControlOption
       height 40px
@@ -289,8 +299,10 @@
        outline none
        color var(--outerspace)
        text-align center
-       font-size 16px
-       letter-spacing 3px
+       font-size 22px
+       letter-spacing 6px
+       padding-left 6px
+       font-family 'Exo2', OpenSans, sans-serif
 
     .signerLatticePairSubmit
       width 100px

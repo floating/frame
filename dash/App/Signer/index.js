@@ -292,6 +292,7 @@ class Signer extends React.Component {
                 <input
                   tabIndex='1' value={this.state.latticePairCode}
                   onChange={e => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
+                  autoFocus
                   // onFocus={e => this.onFocus('pairCode', e)}
                   // onBlur={e => this.onBlur('pairCode', e)} 
                   onKeyPress={e => {
@@ -361,7 +362,12 @@ class Signer extends React.Component {
           <div className='signerControls cardShow'>
             {this.props.tag ? (
               <div className='signerControlDetail'>
-                {`Frame-${this.props.tag}`}
+                <div className='signerControlDetailKey'>
+                  {'PERMISSION ID:'}
+                </div>
+                <div className='signerControlDetailValue'>
+                  {`Frame-${this.props.tag}`}
+                </div>
               </div>
             ) : null}
             {/* <div className='signerControlOption'>Hide empty accounts</div>
