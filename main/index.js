@@ -92,7 +92,7 @@ ipcMain.on('tray:replaceTx', async (e, id, type) => {
   try {
     await accounts.replaceTx(id, type)
   } catch (e) {
-    console.log('tray:replaceTx Error', e)
+    log.error('tray:replaceTx Error', e)
   }
 })
 

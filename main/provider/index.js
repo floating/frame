@@ -368,6 +368,46 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
+  checkExistingNonceGas (tx) {
+    const { from, nonce } = tx
+
+    const reqs = this.store('main.accounts', from, 'requests')
+    const requests = Object.keys(reqs || {}).map(key => reqs[key])
+    const existing = requests.filter(r => (
+      r.mode === 'monitor' && 
+      r.status !== 'error' && 
+      r.data.nonce === nonce
+    ))
+
+    if (existing.length > 0) {
+      if (tx.maxPriorityFeePerGas && tx.maxFeePerGas) {
+        const existingFee = Math.max(...existing.map(r => r.data.maxPriorityFeePerGas))
+        const existingMax = Math.max(...existing.map(r => r.data.maxFeePerGas))
+        const feeInt = parseInt(tx.maxPriorityFeePerGas)
+        const maxInt = parseInt(tx.maxFeePerGas)
+        if (existingFee * 1.1 >= feeInt || existingMax * 1.1 >= maxInt) {
+          // Bump fees by 10%
+          const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
+          const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
+          tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
+          tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
+          tx.feesUpdated = true
+        }
+      } else if (tx.gasPrice) {
+        const existingPrice = Math.max(...existing.map(r => r.data.gasPrice))
+        const priceInt = parseInt(tx.gasPrice)
+        if (existingPrice >= priceInt) {
+          // Bump price by 10%
+          const bumpedPrice = Math.ceil(existingPrice * 1.1)
+          tx.gasPrice = '0x' + bumpedPrice.toString(16)
+          tx.feesUpdated = true
+        }
+      }
+    }
+
+    return tx
+  }
+
   fillTransaction (newTx, cb) {
     if (!newTx) return cb('No transaction data')
     const rawTx = this.getRawTx(newTx)
@@ -382,6 +422,7 @@ class Provider extends EventEmitter {
 
     estimateGas
       .then(tx => populateTransaction(tx, chainConfig, gas))
+      .then(tx => this.checkExistingNonceGas(tx))
       .then(tx => cb(null, tx))
       .catch(cb)
   }
@@ -400,9 +441,18 @@ class Provider extends EventEmitter {
         const handlerId = uuid()
         this.handlers[handlerId] = res
 
-        const { warning, ...data } = tx
+        const { warning, feesUpdated, ...data } = tx
         
-        accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: currentAccount.id, origin: payload._origin, warning }, res)
+        accounts.addRequest({ 
+          handlerId, 
+          type: 'transaction', 
+          data, 
+          payload, 
+          account: currentAccount.id, 
+          origin: payload._origin, 
+          warning,
+          feesUpdatedByUser: feesUpdated
+        }, res)
       }
     })
   }

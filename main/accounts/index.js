@@ -197,7 +197,7 @@ class Accounts extends EventEmitter {
       }
 
       proxyProvider.emit('send', tx, (res = {}) => {
-        if (res.error) return reject(new Error(res.error))
+        if (res.error) return reject(new Error(res.error.message))
         resolve()
       }, targetChain)
     })
