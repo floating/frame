@@ -467,47 +467,32 @@ class Settings extends React.Component {
     this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
   }
 
-  renderNets () {
-    const networks = this.store('main.networks')
-    const nets = []
-    Object.keys(networks).forEach(type => {
-      nets.push(
-        <div key={type}>
-          {Object.keys(networks[type]).sort((a, b) => {
-            return parseInt(a) - parseInt(b)
-          }).map(id => {
-            return <Network key={type + id} id={id} name={networks[type][id].name} symbol={networks[type][id].symbol} explorer={networks[type][id].explorer} type={type} />
-          })}
-        </div>
-      )
-    })
-    return nets
-  }
-
   renderConnections (layer) {
     const nets = []
     const networks = this.store('main.networks')
     Object.keys(networks).forEach(type => {
       nets.push(
         <div key={type}>
-          {Object.keys(networks[type]).sort((a, b) => {
-            return parseInt(a) - parseInt(b)
-          }).filter(id => {
-            if (!networks[type][id].layer && layer === 'other') return true
-            return networks[type][id].layer === layer
-          }).map(id => {
-            return <Network 
-              key={type + id} 
-              id={id} 
-              name={networks[type][id].name} 
-              symbol={networks[type][id].symbol} 
-              explorer={networks[type][id].explorer} 
-              type={type} 
-              connection={networks[type][id].connection}
-              layer={networks[type][id].layer}
-              on={networks[type][id].on}
-            />
-          })}
+          {Object.keys(networks[type])
+            .map(id => parseInt(id))
+            .sort((a, b) => a - b)
+            .filter(id => {
+              if (!networks[type][id].layer && layer === 'other') return true
+              return networks[type][id].layer === layer
+            }).map(id => {
+              return <Network
+                key={type + id}
+                id={id}
+                name={networks[type][id].name}
+                symbol={networks[type][id].symbol}
+                explorer={networks[type][id].explorer}
+                type={type}
+                connection={networks[type][id].connection}
+                layer={networks[type][id].layer}
+                on={networks[type][id].on}
+              />
+            })
+          }
         </div>
       )
     })
