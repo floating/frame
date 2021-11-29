@@ -1,9 +1,25 @@
 import log from 'electron-log'
 import EventEmitter from 'stream'
 
-import { AppVersion, TransactionData } from '../../transaction'
+import { TransactionData } from '../../transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
+
+export interface SignerSummary {
+  id: string,
+  name: string,
+  model: string,
+  type: string,
+  addresses: string[],
+  status: string,
+  appVersion: AppVersion
+}
+
+export interface AppVersion {
+  major: number,
+  minor: number,
+  patch: number
+}
 
 export default class Signer extends EventEmitter {
   id = ''
@@ -40,7 +56,7 @@ export default class Signer extends EventEmitter {
     cb(err, undefined)
   }
 
-  summary () {
+  summary (): SignerSummary {
     return {
       id: this.id,
       name: this.name || this.type + ' signer',

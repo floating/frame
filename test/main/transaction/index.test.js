@@ -118,26 +118,52 @@ describe('#signerCompatibility', () => {
     expect(compatibility.compatible).toBe(true)
   })
 
-  it('is not compatible for eip-1559 transactions on Trezor signers using firmware prior to 2.4.2', () => {
-    const appVersion = { major: 2, minor: 3, patch: 1 }
+  it('is not compatible for eip-1559 transactions on Trezor One signers using firmware prior to 1.10.4', () => {
+    const appVersion = { major: 1, minor: 10, patch: 0 }
     const tx = {
       type: '0x2'
     }
 
-    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion, model: 'Trezor One' })
 
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')
     expect(compatibility.compatible).toBe(false)
   })
 
-  it('is compatible for eip-1559 transactions on Trezor signers using firmware 2.4.2+', () => {
+  it('is not compatible for eip-1559 transactions on Trezor T signers using firmware prior to 2.4.2', () => {
+    const appVersion = { major: 2, minor: 3, patch: 1 }
+    const tx = {
+      type: '0x2'
+    }
+
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion, model: 'Trezor T' })
+
+    expect(compatibility.signer).toBe('trezor')
+    expect(compatibility.tx).toBe('london')
+    expect(compatibility.compatible).toBe(false)
+  })
+
+  it('is compatible for eip-1559 transactions on Trezor One signers using firmware 1.10.4+', () => {
+    const appVersion = { major: 1, minor: 11, patch: 0 }
+    const tx = {
+      type: '0x2'
+    }
+
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion, model: 'Trezor One' })
+
+    expect(compatibility.signer).toBe('trezor')
+    expect(compatibility.tx).toBe('london')
+    expect(compatibility.compatible).toBe(true)
+  })
+
+  it('is compatible for eip-1559 transactions on Trezor T signers using firmware 2.4.2+', () => {
     const appVersion = { major: 2, minor: 4, patch: 3 }
     const tx = {
       type: '0x2'
     }
 
-    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion, model: 'Trezor T' })
 
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')
@@ -150,7 +176,7 @@ describe('#signerCompatibility', () => {
       type: '0x2'
     }
 
-    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion })
+    const compatibility = signerCompatibility(tx, { type: 'trezor', appVersion, model: 'Trezor T' })
 
     expect(compatibility.signer).toBe('trezor')
     expect(compatibility.tx).toBe('london')
