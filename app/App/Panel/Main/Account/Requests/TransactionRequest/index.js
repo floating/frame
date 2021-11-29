@@ -322,7 +322,7 @@ class TransactionRequest extends React.Component {
                       <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
                         {this.state.txHashCopied ? (
                           <div className={'txDetailsOptions txDetailsOptionsTxHash'}>
-                            Transaciton Hash Copied
+                            Transaction Hash Copied
                           </div>
                         ) : this.state.viewDetailsHover ? (
                           <div 
