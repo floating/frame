@@ -72,7 +72,7 @@ class Gas extends React.Component {
         estimatedGas: gasForDexSwap
       }
     ]
-    
+
     const layer = this.store('main.networks', type, id, 'layer')
     const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
     const nativeUSD = BigNumber(nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0)
