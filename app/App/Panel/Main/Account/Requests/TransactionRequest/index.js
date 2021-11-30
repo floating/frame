@@ -325,7 +325,7 @@ class TransactionRequest extends React.Component {
                             Transaction Hash Copied
                           </div>
                         ) : this.state.viewDetailsHover ? (
-                          <div 
+                          <div
                             className={'txDetailsOptions'}
                             onMouseOver={() => {
                               clearTimeout(this.viewDetailsHoverTimer)
@@ -368,7 +368,7 @@ class TransactionRequest extends React.Component {
                           </div>
                         ) : (
                           <>
-                            <div 
+                            <div
                               className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
                               onMouseOver={() => {
                                 clearTimeout(this.viewDetailsHoverTimer)
