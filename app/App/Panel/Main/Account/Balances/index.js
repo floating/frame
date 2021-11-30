@@ -120,7 +120,7 @@ class Balances extends React.Component {
       }
     }
     let name = balanceInfo.name
-    if (name.length > 20) name = name.substr(0, 20) + '...'
+    if (name.length > 18) name = name.substr(0, 18) + '..'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
@@ -142,7 +142,11 @@ class Balances extends React.Component {
           </div>
           <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
             <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
-            {doneScanning || balanceInfo.displayBalance !== '0.00' ? balanceInfo.displayBalance : '---.--'}
+            <span
+              style={(balanceInfo.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
+            >
+              {doneScanning || balanceInfo.displayBalance !== '0.00' ? balanceInfo.displayBalance : '---.--'}
+            </span>
           </div>
           {doneScanning || balanceInfo.displayValue !== '0' ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
         </div>
@@ -195,16 +199,17 @@ class Balances extends React.Component {
         <div className='signerBalanceTotal'>
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
-              {balancesLength > 5 ? (
-                <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
-                  <span>More</span>
-                </div>
-              ) : null}
+              <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+                More
+              </div>
+            </div>
+          ) : (
+            <div className='signerBalanceButtons'>
               <div className='signerBalanceButton signerBalanceAddToken' onMouseDown={() => this.store.notify('addToken')}>
                 <span>Add Token</span>
               </div>
             </div>
-          ) : null}
+          )}
           <div className='signerBalanceTotalText'>
             <div className='signerBalanceTotalLabel'>
               {'Total: '}

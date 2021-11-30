@@ -11,7 +11,7 @@ class AddToken extends React.Component {
     this.symbolDefault = 'Symbol'
     this.chainDefault = 'Chain ID'
     this.addressDefault = 'Contract Address'
-    this.logoURIDefault = 'Token Logo URI'
+    this.logoURIDefault = 'Logo URI'
     
     this.req = props.req || {}
     this.token = this.req.token || {}
@@ -83,6 +83,26 @@ class AddToken extends React.Component {
                 />
               </div>
 
+              <div className='tokenDecimals'>
+                <div className='tokenInputLabel'>Decimals</div>
+                <input
+                  className='tokenInput'
+                  value={this.state.decimals} spellCheck='false'
+                  onChange={(e) => {
+                    if (!e.target.value) return this.setState({ decimals: '' })
+                    if (e.target.value.length > 2) return e.preventDefault()
+
+                    const decimals = parseInt(e.target.value)
+                    if (!Number.isInteger(decimals)) return e.preventDefault()
+
+                    this.setState({ decimals })
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '') this.setState({ decimals: 18 })
+                  }}
+                />
+              </div>
+
               <div className='tokenChainId'>
                 <div className='tokenInputLabel'>Chain ID</div>
                 <input
@@ -104,33 +124,13 @@ class AddToken extends React.Component {
                   }}
                 />
               </div>
-
-              <div className='tokenDecimals'>
-                <div className='tokenInputLabel'>Decimals</div>
-                <input
-                  className='tokenInput'
-                  value={this.state.decimals} spellCheck='false'
-                  onChange={(e) => {
-                    if (!e.target.value) return this.setState({ decimals: '' })
-                    if (e.target.value.length > 2) return e.preventDefault()
-
-                    const decimals = parseInt(e.target.value)
-                    if (!Number.isInteger(decimals)) return e.preventDefault()
-
-                    this.setState({ decimals })
-                  }}
-                  onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ decimals: 18 })
-                  }}
-                />
-              </div>
             </div>
 
             <div className='tokenRow'>
               <div className='tokenAddress'>
-                <div className='tokenInputLabel'>Address</div>
+                <div className='tokenInputLabel'>Contract Address</div>
                 <input
-                  className='tokenInput'
+                  className='tokenInput tokenInputAddress'
                   value={this.state.address} spellCheck='false'
                   onChange={(e) => {
                     if (e.target.value.length > 42) return e.preventDefault()
