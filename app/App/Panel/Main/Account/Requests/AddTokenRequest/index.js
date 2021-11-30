@@ -83,9 +83,9 @@ class AddTokenRequest extends React.Component {
             <div 
               className='requestSign' 
               style={{ pointerEvents: this.state.allowInput && this.props.onTop ? 'auto' : 'none'}}
-              onClick={() => { if (this.state.allowInput && this.props.onTop) link.send('tray:addToken', token, this.props.req) 
+              onClick={() => { if (this.state.allowInput && this.props.onTop) this.store.notify('addToken', this.props.req)
             }}>
-              <div className='requestSignButton _txButton'>Approve</div>
+              <div className='requestSignButton _txButton'>Review</div>
             </div>
           </div>
         }

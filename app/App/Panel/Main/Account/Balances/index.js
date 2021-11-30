@@ -193,9 +193,16 @@ class Balances extends React.Component {
         </div>
         {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, initialRateScanComplete))}
         <div className='signerBalanceTotal'>
-          {balancesLength > 5 && !this.props.expanded ? (
-            <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
-              <span>More</span>
+          {!this.props.expanded ? (
+            <div className='signerBalanceButtons'>
+              {balancesLength > 5 ? (
+                <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+                  <span>More</span>
+                </div>
+              ) : null}
+              <div className='signerBalanceButton signerBalanceAddToken' onMouseDown={() => this.store.notify('addToken')}>
+                <span>Add Token</span>
+              </div>
             </div>
           ) : null}
           <div className='signerBalanceTotalText'>

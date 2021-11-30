@@ -9,12 +9,16 @@
   z-index 200000
   font-size 14px
 
-  .signerBalanceShowAll
-    position absolute
-    left 10px
-    top 7px
+  .signerBalanceButtons
+    display flex
+    justify-content left
+    align-items center
+    height 100%
+
+  .signerBalanceButton
     height 30px
     width 60px
+    margin-left 10px
     background var(--ghostC)
     border-radius 6px
     cursor pointer
@@ -27,12 +31,16 @@
     letter-spacing 2px
     text-transform uppercase
     color var(--outerspace07)
+    
+  .signerBalanceAddToken
+    width 84px
 
     *
       pointer-events none
       margin-left 2px
 
-  .signerBalanceShowAll:hover
+
+  .signerBalanceButton:hover
     background var(--ghostD)
     color var(--outerspace)
     // color var(--good)
