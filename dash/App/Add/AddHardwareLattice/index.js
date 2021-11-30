@@ -109,9 +109,9 @@ class AddHardwareLattice extends React.Component {
               <div className='addAccountItemIcon'>
                 <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.lattice(24)}</div>
               </div>
-              <div className='addAccountItemTopTitle'>Lattice</div>
+              <div className='addAccountItemTopTitle'>GridPlus</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div>
             <div className='addAccountItemSummary'>GridPlus Lattice1</div>
           </div>
           <div className='addAccountItemOption'>
@@ -170,8 +170,8 @@ class AddHardwareLattice extends React.Component {
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                     <>
-                      <div className='phaseItemOptionTitle'>{this.state.status}</div>
-                      {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                      <div className='addAccountItemOptionTitle'>{this.state.status}</div>
+                      {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                     </>
                 </div>
               </div>
