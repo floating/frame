@@ -59,9 +59,6 @@ class AddPhrase extends React.Component {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false })
-        setTimeout(() => {
-          this.props.close()
-        }, 2000)
       }
     })
   }
@@ -108,14 +105,14 @@ class AddPhrase extends React.Component {
                 <div className='addAccountItemIconType addAccountItemIconMock' style={{ marginTop: '2px' }}>{svg.mask(24)}</div>
                 <div className='addAccountItemIconHex addAccountItemIconHexSmart' />
               </div>
-              <div className='addAccountItemTopTitle'>Address</div>
+              <div className='addAccountItemTopTitle'>Watch Account</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
-            <div className='addAccountItemSummary'>An address account represents an address but cannot sign for it</div>
+            <div className='addAccountItemClose' onClick={() => this.props.close()}>{'Done'}</div>
+            <div className='addAccountItemSummary'>Watch accounts work like normal accounts but cannot sign</div>
           </div>
           <div className='addAccountItemOption'>
             <div
-              className='addAccountItemOptionIntro' onMouseDown={() => {
+              className='addAccountItemOptionIntro' onClick={() => {
                 this.adding()
               }}
             >
@@ -128,11 +125,11 @@ class AddPhrase extends React.Component {
                   <div className='addAccountItemOptionInputPhrase'>
                     <textarea tabIndex='-1' value={this.state.address} ref={this.forms[0]} onChange={e => this.onChange('address', e)} onFocus={e => this.onFocus('address', e)} onBlur={e => this.onBlur('address', e)} onKeyPress={e => this.keyPress(e)} />
                   </div>
-                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
+                  <div className='addAccountItemOptionSubmit' onClick={() => this.create()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>{this.state.status}</div>
-                  {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                  {this.state.error ? <div className='addAccountItemOptionSubmit' onClick={() => this.restart()}>try again</div> : null}
                 </div>
               </div>
             </div>

@@ -29,15 +29,15 @@ class AddHardware extends React.Component {
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
                 {this.props.type === 'ledger' ? (
-                  <div className='addAccountItemIconType addAccountItemIconLedger'>{svg.ledger(22)}</div>
+                  <div className='addAccountItemIconType addAccountItemIconLedger'>{svg.ledger(17)}</div>
                 ) : (
-                  <div className='addAccountItemIconType addAccountItemIconTrezor'>{svg.trezor(22)}</div>
+                  <div className='addAccountItemIconType addAccountItemIconTrezor'>{svg.trezor(17)}</div>
                 )}
                 <div className='addAccountItemIconHex addAccountItemIconHexHardware' />
               </div>
               <div className='addAccountItemTopTitle'>{this.deviceName}</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div>
             <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           </div>
           <div className='addAccountItemDevices'>
@@ -71,7 +71,7 @@ class AddHardware extends React.Component {
               if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
               if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
             }}
-          >{`Need a signer? Get a ${this.deviceName}`}
+          >{``}
           </div>
         </div>
       </div>
