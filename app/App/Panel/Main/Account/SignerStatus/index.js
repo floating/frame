@@ -1,8 +1,11 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
+
+function isHardwareSigner (type = '') {
+  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
+}
 
 class SignerStatus extends React.Component {
   constructor (...args) {
@@ -80,7 +83,10 @@ class SignerStatus extends React.Component {
   render () {
     const { shake } = this.state
 
-    return this.props.signer && this.props.signer.id && this.props.signer.status === 'locked' ? (
+    const signer = this.props.signer || {}
+    const isHardware = isHardwareSigner(signer.type)
+
+    return !isHardware && signer.id && signer.status === 'locked' ? (
       <div className={shake ? 'signerStatus headShake' : 'signerStatus'} ref={this.statusRef}>
         <div className='signerStatusWrap'>
           <div className='signerStatusTop'>
