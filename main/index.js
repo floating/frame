@@ -152,7 +152,6 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
 })
 
 ipcMain.on('tray:addToken', (e, token, req) => {
-  console.log('ADDING TOKEN', {token})
   if (token) store.addCustomTokens([token])
   accounts.resolveRequest(req)
 })
