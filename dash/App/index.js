@@ -88,17 +88,17 @@ class AddAccounts extends React.Component {
       <div className='addAccounts cardShow'>
         <div className='addAccountsHeader'>
           <div className='addAccountsHeaderTitle'>What type of account would you like to add?</div>
-          <div className='addAccountsHeaderClose' onMouseDown={() => this.props.close()}>{svg.close(20)}</div>
+          <div className='addAccountsHeaderClose' onClick={() => this.props.close()}>{'done'}</div>
         </div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
-        {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keyring' })}>Private Key</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore File (json)</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>Watch-only Account</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
+        {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keyring' })}>Private Key</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keystore' })}>Keystore File (json)</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'nonsigning' })}>Watch-only Account</div>
       </div>
     )
   }

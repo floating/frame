@@ -59,9 +59,6 @@ class AddRing extends React.Component {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false })
-        setTimeout(() => {
-          this.props.close()
-        }, 2000)
       }
     })
   }
@@ -133,10 +130,10 @@ class AddRing extends React.Component {
                 <div className='addAccountItemIconType addAccountItemIconHot' style={{ marginTop: '2px' }}>{svg.octicon('key', { height: 23 })}</div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>
-              <div className='addAccountItemTopTitle'>Keyring</div>
+              <div className='addAccountItemTopTitle'>Keystore</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
-            <div className='addAccountItemSummary'>A keyring account lets you add individual private keys to an account</div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div>
+            <div className='addAccountItemSummary'>A keystore account lets you add accounts from your keystore.json file</div>
           </div>
           <div className='addAccountItemOption'>
             <div

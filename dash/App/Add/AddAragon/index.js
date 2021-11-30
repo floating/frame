@@ -160,9 +160,9 @@ class AddAragon extends React.Component {
               <div className='addAccountItemIcon'>
                 <div className='addAccountItemIconType addAccountItemIconSmart' style={{ paddingTop: '6px' }}>{svg.aragon(30)}</div>
               </div>
-              <div className='addAccountItemTopTitle'>Aragon</div>
+              <div className='addAccountItemTopTitle'>Aragon DAO</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div>
             <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
           </div>
           <div className='addAccountItemOption'>
@@ -220,7 +220,7 @@ class AddAragon extends React.Component {
               if (net === '4') return open('https://rinkeby.aragon.org')
               return open('https://aragon.org')
             }}
-          >{'Don\'t have a dao? Create one'}
+          >{''}
           </div>
         </div>
       </div>
