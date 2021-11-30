@@ -1,0 +1,136 @@
+.addTokenTitle
+  padding 42px
+  font-size 24px
+  font-weight 100
+
+.addToken
+  font-size 16px
+  position relative
+  z-index 3
+  word-break break-word
+  width 100%
+  box-sizing border-box
+  padding-bottom 32px
+
+.tokenRow
+  width 100%
+  display flex
+  justify-content space-between
+  padding 0px 5px 20px 5px
+  box-sizing border-box
+
+.tokenRow:last-child
+  padding 0px 5px 0px 5px
+
+.tokenName
+  width 100%
+
+.tokenId
+  width calc(50% - 5px)
+
+.tokenSymbol
+  width calc(50% - 5px)
+
+.tokenExplorer
+  width 100%
+
+.tokenRpc
+  width 100%  
+
+.tokenInput
+  background transparent
+  outline none
+  border none
+  text-align center
+  font-size 16px
+  padding 8px
+  width 100%
+  background var(--ghostZ)
+  border-radius 8px
+  font-family OpenSans, sans-serif
+  padding 10px
+  font-weight 300
+  color var(--outerspace)
+
+.tokenInputLarge
+  font-size 24px
+
+.tokenInputLabel
+  font-size 11px
+  text-transform uppercase
+  font-weight 500
+  padding 0px 0px 5px 10px
+  text-align left
+  width 100%
+  letter-spacing 0.5px
+
+.tokenLayers
+  width 100%
+  // padding 0px 0px
+  margin-top 25px
+
+.tokenLayerOptions
+  display flex
+  flex-wrap wrap
+  justify-content space-between
+
+.tokenLayerOption
+  background var(--ghostC)
+  margin-bottom 5px
+  height 42px
+  border-radius 8px
+  box-sizing border-box
+  padding 8px
+  cursor pointer
+  width calc(50% - 2.5px)
+  box-sizing border-box
+  font-weight 300
+  border 2px solid transparent
+  * 
+    pointer-events none
+
+.tokenLayerOption:hover
+  background var(--ghostD)
+  color var(--good)
+
+.tokenLayerOptionOn
+  color var(--good)
+  border 2px solid var(--good)
+
+.tokenLayerOptionOn:hover
+  background var(--ghostD)
+  color var(--good)
+
+.addTokenSubmit
+  background var(--ghostE)
+  width 100%
+  margin-top 25px
+  margin-bottom 25px
+  height 48px
+  border-radius 8px
+  box-sizing border-box
+  padding 13px
+  text-align center
+  margin-bottom 5px
+  display flex
+  justify-content center
+  align-items center
+  font-size 15px
+  text-transform uppercase
+  opacity 0.5
+
+  svg
+    margin-right 10px
+
+// .addTokenSubmit:hover
+//   background var(--ghostE)
+//   color var(--good)
+
+.addTokenSubmitEnabled
+  background var(--ghostE)
+  color var(--good)
+  opacity 1
+  cursor pointer
+  * 
+    pointer-events none
+    
