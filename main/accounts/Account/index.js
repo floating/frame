@@ -224,7 +224,7 @@ class Account {
       const signer = signers.get(this.signer) || {}
 
       if (signer.verifyAddress && signer.status === 'ok') {
-        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
+        const index = signer.addresses.map(a => a.toLowerCase()).indexOf(this.address)
         if (index > -1) {
           signer.verifyAddress(index, this.address, display, cb)
         } else {
