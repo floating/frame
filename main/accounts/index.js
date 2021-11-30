@@ -480,6 +480,8 @@ class Accounts extends EventEmitter {
     const signer = currentAccount.getSigner()
     if (!signer) return cb(new Error('No signer'))
 
+    if (signer.status === 'locked') return cb(new Error('Signer locked'))
+
     const data = currentAccount.requests[handlerId].data
     cb(null, signerCompatibility(data, signer.summary()))
   }

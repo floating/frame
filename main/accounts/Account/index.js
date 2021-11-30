@@ -220,18 +220,21 @@ class Account {
         log.info('Could not find address in signer')
         cb(new Error('Could not find address in signer'))
       }
-    } else if (this.signer && signers.get(this.signer) && signers.get(this.signer).verifyAddress) {
-      const s = signers.get(this.signer)
-      const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
-      if (index > -1) {
-        s.verifyAddress(index, this.address, display, cb)
-      } else {
-        log.info('Could not find address in signer')
-        cb(new Error('Could not find address in signer'))
-      }
     } else {
-      log.info('No signer active to verify address')
-      cb(new Error('No signer active to verify address'))
+      const signer = signers.get(this.signer) || {}
+
+      if (signer.verifyAddress && signer.status === 'ok') {
+        const index = s.addresses.map(a => a.toLowerCase()).indexOf(this.address)
+        if (index > -1) {
+          signer.verifyAddress(index, this.address, display, cb)
+        } else {
+          log.info('Could not find address in signer')
+          cb(new Error('Could not find address in signer'))
+        }
+      } else {
+        log.info('No signer active to verify address')
+        cb(new Error('No signer active to verify address'))
+      }
     }
   }
 
