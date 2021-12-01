@@ -41,16 +41,6 @@ class Requests extends React.Component {
     this.setState({ minimized: true })
   }
 
-  setSigner () {
-    this.setState({ minimized: false })
-    const current = this.store('selected.current') === this.props.id
-    if (!current) {
-      link.rpc('setSigner', this.props.id, (err, status) => {
-        if (err) throw new Error(err)
-      })
-    }
-  }
-
   // unlockChange (e) {
   //   this.setState({ unlockInput: e.target.value })
   // }
