@@ -344,9 +344,10 @@ class Provider extends EventEmitter {
 
     return new Promise((resolve, reject) => {
       this.connection.send(payload, response => {
-        return response.error
-          ? reject(response.error)
-          : resolve(response.result)
+        if (response.error) return reject(response.error)
+
+        log.debug(`gas estimate for tx to ${txParams.to}: ${response.result}`)
+        return resolve(response.result)
       }, targetChain)
     })
   }
@@ -429,7 +430,13 @@ class Provider extends EventEmitter {
         .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
 
     estimateGas
-      .then(tx => populateTransaction(tx, chainConfig, gas))
+      .then(tx => {
+        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+
+        log.info({ populatedTransaction })
+
+        return populatedTransaction
+      })
       .then(tx => this.checkExistingNonceGas(tx))
       .then(tx => cb(null, tx))
       .catch(cb)
@@ -438,6 +445,8 @@ class Provider extends EventEmitter {
   sendTransaction (payload, res) {
     const newTx = payload.params[0]
     const currentAccount = accounts.current()
+
+    log.debug(`sendTransaction(${JSON.stringify(newTx)}`)
 
     this.fillTransaction(newTx, (err, tx) => {
       if (err) {
