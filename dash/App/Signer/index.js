@@ -245,8 +245,6 @@ class Signer extends React.Component {
     const { page, addressLimit } = this.state
     const startIndex = page * addressLimit
 
-    const activeAccounts = signer.addresses.filter(a => this.store('main.accounts', a.toLowerCase()))
-
     const status = this.getStatus()
 
     const hwSigner = isHardwareSigner(this.props.type)
@@ -255,6 +253,9 @@ class Signer extends React.Component {
 
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'
+    const permissionId = (this.props.tag || this.props.tag === '')
+      ? 'Frame' + (this.props.tag ? `-${this.props.tag}` : '')
+      : undefined
 
     let signerClass = 'signer'
     if (status === 'ok') signerClass += ' signerOk'
@@ -360,13 +361,13 @@ class Signer extends React.Component {
         )}
         {this.state.showControls || disconnected ? (
           <div className='signerControls cardShow'>
-            {this.props.tag ? (
+            {!!permissionId ? (
               <div className='signerControlDetail'>
                 <div className='signerControlDetailKey'>
                   {'PERMISSION ID:'}
                 </div>
                 <div className='signerControlDetailValue'>
-                  {`Frame-${this.props.tag}`}
+                  {permissionId}
                 </div>
               </div>
             ) : null}

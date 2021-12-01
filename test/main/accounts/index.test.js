@@ -1,7 +1,7 @@
 import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
 
-jest.mock('../../../main/signers', () => jest.fn())
+jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/externalData')
 

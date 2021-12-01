@@ -34,6 +34,10 @@ export const Status = {
   NEEDS_RECONNECTION: 'Please reload this Lattice1 device'
 }
 
+function devicePermission (tag: string) {
+  return tag ? `Frame-${tag}` : 'Frame'
+}
+
 function parseError (err: string) {
   return err.replace(/Error from device: /, '')
 }
@@ -79,7 +83,7 @@ export default class Lattice extends Signer {
     log.debug('connecting to Lattice', { name: this.name, baseUrl, privateKey })
 
     this.connection = new Client({
-      name: 'Frame-' + this.tag,
+      name: devicePermission(this.tag),
       baseUrl,
       privKey: privateKey,
       crypto

@@ -376,7 +376,7 @@ const migrations = {
 
     Object.values(lattices).forEach(lattice => {
       lattice.paired = true
-      lattice.tag = oldSuffix || randomLetters(6)
+      lattice.tag = oldSuffix
       lattice.deviceName = 'GridPlus'
     })
 

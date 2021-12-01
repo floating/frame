@@ -1,9 +1,15 @@
 import log from 'electron-log'
-log.transports.console.level = false
-
 import migrations from '../../../../main/store/migrations'
 
 let state
+
+beforeAll(() => {
+  log.transports.console.level = false
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
+})
 
 describe('migration 13', () => {
   beforeEach(() => {
@@ -406,12 +412,12 @@ describe('migration 17', () => {
     expect(lattice.tag).toBe('my-laptop')
   })
 
-  it('updates an existing Lattice with no suffix to have a random new tag', () => {
+  it('sets an empty tag on an existing Lattice with no suffix', () => {
     delete state.main.latticeSettings.suffix
 
     const updatedState = migrations.apply(state)
 
     const lattice = updatedState.main.lattice['McBbS7']
-    expect(lattice.tag).toMatch(/^[A-Z]{6,}$/)
+    expect(lattice.tag).toBe('')
   })
 })
