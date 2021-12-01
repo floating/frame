@@ -1,5 +1,5 @@
 .requestFeature
-  padding 30px 0px 15px 0px
+  padding 30px 0px 0px 0px
   display flex
   justify-content center
   align-items center
@@ -10,13 +10,13 @@
   .requestFeatureButton
     background var(--moon)
     color var(--moonOver)
+    padding 0px 30px
+    border-radius 12px
     height 30px
-    padding 0px 15px
-    border-radius 8px
+    font-size 13px
     display flex
     justify-content center
     align-items center
-    font-size 12px
     text-transform uppercase
     font-weight 400
     cursor pointer
@@ -253,6 +253,28 @@
   border-radius 12px
   margin-bottom 6px
   padding 12px
+
+.addCustonTokenButton
+  padding 0px
+  margin-top 3px
+  width 100%
+  border-radius 12px
+  height 40px
+  font-size 13px
+  text-transform uppercase
+  font-weight 400
+  letter-spacing 1px
+  display flex
+  justify-content center
+  align-items center
+  background var(--ghostA)
+  transition var(--standardFast)
+  cursor pointer
+  * 
+    pointer-events none
+
+.addCustonTokenButton:hover
+  background var(--ghostB)
 
 .signerPermissionToggle
   position relative
