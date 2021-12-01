@@ -38,7 +38,7 @@ class Balances extends React.Component {
         <div className='moduleHeader'>
           {'Permissions'}
           {this.props.expanded ? (
-            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
+            <div className='moduleHeaderClose' onClick={() => this.props.expandModule(false)}>
               {svg.close(12)}
             </div>
           ) : null}
@@ -48,7 +48,7 @@ class Balances extends React.Component {
           {permissionList.length === 0 ? (
             <div className='signerPermission'>
               <div className='signerPermissionControls'>
-                <div className='signerPermissionOrigin'>No Permissions Set</div>
+                <div className='signerPermissionNoPermissions'>No Permissions Set</div>
               </div>
             </div>
           ) : (
@@ -59,7 +59,7 @@ class Balances extends React.Component {
                     <div className='signerPermissionOrigin'>{permissions[o].origin}</div>
                     <div 
                       className={permissions[o].provider ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}
-                      onMouseDown={_ => link.send('tray:action', 'toggleAccess', this.props.id, o)}
+                      onClick={_ => link.send('tray:action', 'toggleAccess', this.props.id, o)}
                     >
                       <div className='signerPermissionToggleSwitch' />
                     </div>
@@ -70,7 +70,7 @@ class Balances extends React.Component {
           )}
           {this.props.expanded ? (
             <div className='quitFrame'>
-              <div onMouseDown={() => {
+              <div onClick={() => {
                 link.send('tray:action', 'clearPermissions', this.props.id)
               }} className='moduleButton'>Clear All Permissions</div>
             </div>
@@ -78,8 +78,10 @@ class Balances extends React.Component {
         </div>
         {!this.props.expanded ? (
           <div className='signerBalanceTotal'>
-            <div className='signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
-              <span>More</span>
+            <div className='signerBalanceButtons'>
+              <div className='signerBalanceButton signerBalanceShowAll' onClick={() => this.props.expandModule(this.props.moduleId)}>
+                More
+              </div>
             </div>
           </div>
         ) : null }
