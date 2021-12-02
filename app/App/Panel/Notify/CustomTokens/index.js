@@ -30,7 +30,7 @@ class CustomTokens extends React.Component {
               </div>
             </div>
             <div className='customTokensList'>
-              {[].concat(tokens).sort((a, b) => {
+              {tokens.length > 0 ? [].concat(tokens).sort((a, b) => {
                 return a.chainId <= b.chainId
               }).map((token, i) => {
                 return (
@@ -58,8 +58,15 @@ class CustomTokens extends React.Component {
                         </div>
                       </div>
                     </div>
-                    <div className='customTokensListItemAddress'>
-                      {token.address}
+                    <div 
+                      className='customTokensListItemAddress'
+                      onClick={() => {
+                        link.send('tray:clipboardData', token.address)
+                        this.setState({ copied: true })
+                        setTimeout(_ => this.setState({ copied: false }), 1000)
+                      }}
+                    >
+                      {this.state.copied ? 'Address Copied' : token.address}
                     </div>
                     <div className='customTokensListItemBottom'>
                       <div className='customTokensListItemChainDecimal'>
@@ -78,7 +85,11 @@ class CustomTokens extends React.Component {
                     </div>
                   </div>
                 )
-              })}
+              }) : (
+                <div className='customTokensListNoTokens'>
+                  {'No Custom Tokens Added'}
+                </div>
+              )}
             </div>
           </div>
         </div>
