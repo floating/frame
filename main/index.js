@@ -156,6 +156,10 @@ ipcMain.on('tray:addToken', (e, token, req) => {
   accounts.resolveRequest(req)
 })
 
+ipcMain.on('tray:removeToken', (e, token) => {
+  if (token) store.removeCustomTokens([token])
+})
+
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
   accounts.adjustNonce(handlerId, nonceAdjust)
 })
