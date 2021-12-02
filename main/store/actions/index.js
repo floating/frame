@@ -476,12 +476,21 @@ module.exports = {
       // remove any tokens that have been overwritten by one with
       // the same address and chain ID
       const existingTokens = existing.filter(token => {
+        const existingAddress = token.address.toLowerCase()
         return !tokens.some(t => 
-          t.address === token.address && t.chainId === token.chainId
+          t.address.toLowerCase() === existingAddress && t.chainId === token.chainId
         )
       })
 
       return [...existingTokens, ...tokens]
+    })
+  },
+  removeCustomTokens: (u, tokens) => {
+    u('main.tokens', existing => {
+      return existing.filter(token => {
+        const existingAddress = token.address.toLowerCase()
+        return !tokens.some(t => t.address.toLowerCase() === existingAddress && t.chainId === token.chainId)
+      })
     })
   },
   setColorway: (u, colorway) => {
