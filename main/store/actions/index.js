@@ -1,5 +1,4 @@
 import log from 'electron-log'
-import BigNumber from 'bignumber.js'
 
 const panelActions = require('./panel')
 
@@ -20,6 +19,12 @@ function validateNetworkSettings (network) {
   return networkId
 }
 
+function includesToken (tokens, token) {
+  const existingAddress = token.address.toLowerCase()
+  return tokens.some(t => 
+    t.address.toLowerCase() === existingAddress && t.chainId === token.chainId
+  )
+}
 
 module.exports = {
   ...panelActions,
@@ -475,13 +480,14 @@ module.exports = {
     u('main.tokens', existing => {
       // remove any tokens that have been overwritten by one with
       // the same address and chain ID
-      const existingTokens = existing.filter(token => {
-        return !tokens.some(t => 
-          t.address === token.address && t.chainId === token.chainId
-        )
-      })
+      const existingTokens = existing.filter(token => !includesToken(tokens, token))
 
       return [...existingTokens, ...tokens]
+    })
+  },
+  removeCustomTokens: (u, tokens) => {
+    u('main.tokens', existing => {
+      return existing.filter(token => !includesToken(tokens, token))
     })
   },
   setColorway: (u, colorway) => {

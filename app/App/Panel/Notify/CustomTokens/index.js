@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 import svg from '../../../../../resources/svg'
+import link from '../../../../../resources/link'
 
 class CustomTokens extends React.Component {
   constructor (props, context) {
@@ -69,7 +70,9 @@ class CustomTokens extends React.Component {
                           {token.decimals}
                         </div>
                       </div>
-                      <div className='customTokensListItemRemoveButton'>
+                      <div className='customTokensListItemRemoveButton'
+                           onClick={() => link.send('tray:removeToken', token)}
+                      >
                         {'Remove Token'}
                       </div>
                     </div>

@@ -4,6 +4,8 @@ import log from 'electron-log'
 import {
   addNetwork as addNetworkAction,
   setBalances as setBalancesAction,
+  addCustomTokens as addTokensAction,
+  removeCustomTokens as removeTokensAction,
   setScanning as setScanningAction
 } from '../../../../main/store/actions'
 
@@ -16,6 +18,21 @@ afterAll(() => {
 })
 
 const owner = '0xa8be0f701d0f37088600164e71bffc0ad652c251'
+
+const testTokens = {
+  zrx: {
+    chainId: 1,
+    address: '0xe41d2489571d322189246dafa5ebde1f4699f498',
+    symbol: 'ZRX',
+    decimals: 18
+  },
+  badger: {
+    chainId: 42161,
+    address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
+    symbol: 'BADGER',
+    decimals: 18
+  }
+}
 
 describe('#addNetwork', () => {
   const polygonNetwork = {
@@ -218,20 +235,6 @@ describe('#addNetwork', () => {
 })
 
 describe('#setBalances', () => {
-  const zrxToken = {
-    chainId: 1,
-    address: '0xe41d2489571d322189246dafa5ebde1f4699f498',
-    symbol: 'ZRX',
-    decimals: 18
-  }
-
-  const badgerDaoToken = {
-    chainId: 42161,
-    address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
-    symbol: 'BADGER',
-    decimals: 18
-  }
-
   const updaterFn = (node, netId, address, update) => {
     expect(node).toBe('main.balances')
     expect(netId).toBe(1)
@@ -246,8 +249,8 @@ describe('#setBalances', () => {
 
   beforeEach(() => {
     balances = {
-      [badgerDaoToken.address]: {
-        ...badgerDaoToken,
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
         balance: new BigNumber(30.5)
       }
     }
@@ -255,19 +258,19 @@ describe('#setBalances', () => {
 
   it('adds a new balance', () => {
     setBalances({
-      [zrxToken.address]: {
-        ...zrxToken,
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
         balance: new BigNumber(7983.2332)
       }
     })
     
     expect(balances).toStrictEqual({
-      [zrxToken.address]: {
-        ...zrxToken,
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
         balance: new BigNumber(7983.2332)
       },
-      [badgerDaoToken.address]: {
-        ...badgerDaoToken,
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
         balance: new BigNumber(30.5)
       }
     })
@@ -275,15 +278,15 @@ describe('#setBalances', () => {
 
   it('updates an existing balance to a positive amount', () => {
     setBalances({
-      [badgerDaoToken.address]: {
-        ...badgerDaoToken,
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
         balance: new BigNumber(41.9)
       }
     })
     
     expect(balances).toStrictEqual({
-      [badgerDaoToken.address]: {
-        ...badgerDaoToken,
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
         balance: new BigNumber(41.9)
       }
     })
@@ -291,18 +294,115 @@ describe('#setBalances', () => {
 
   it('updates an existing balance to zero', () => {
     setBalances({
-      [badgerDaoToken.address]: {
-        ...badgerDaoToken,
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
         balance: new BigNumber(0)
       }
     })
     
     expect(balances).toStrictEqual({
-      [badgerDaoToken.address]: {
-        ...badgerDaoToken,
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
         balance: new BigNumber(0)
       }
     })
+  })
+})
+
+describe('#addCustomTokens', () => {
+  let tokens = []
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.tokens')
+
+    tokens = update(tokens)
+  }
+
+  const addTokens = tokensToAdd => addTokensAction(updaterFn, tokensToAdd)
+
+  it('adds a token', () => {
+    tokens = [testTokens.zrx]
+
+    addTokens([testTokens.badger])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('overwrites a token', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+
+    const updatedBadgerToken = {
+      ...testTokens.badger,
+      symbol: 'BAD'
+    }
+
+    addTokens([updatedBadgerToken])
+
+    expect(tokens).toHaveLength(2)
+    expect(tokens[0]).toEqual(testTokens.zrx)
+    expect(tokens[1].symbol).toBe('BAD')
+  })
+})
+
+describe('#removeCustomTokens', () => {
+  let tokens = []
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.tokens')
+
+    tokens = update(tokens)
+  }
+
+  const removeTokens = tokensToRemove => removeTokensAction(updaterFn, tokensToRemove)
+
+  it('removes a token', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+    
+    const tokenToRemove = { ...testTokens.zrx }
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.badger])
+  })
+
+  it('does not modify tokens if they cannot be found', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+
+    const tokenToRemove = {
+      chainId: 1,
+      address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
+      symbol: 'OHM'
+    }
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('does not remove a token with the same address but different chain id', () => {
+    const tokenToRemove = {
+      ...testTokens.badger,
+      chainId: 1
+    }
+
+    tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('does not remove a token with the same chain id but different address', () => {
+    const tokenToRemove = {
+      ...testTokens.zrx,
+      address: '0xa7a82dd06901f29ab14af63faf3358ad101724a8'
+    }
+
+    tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
   })
 })
 
