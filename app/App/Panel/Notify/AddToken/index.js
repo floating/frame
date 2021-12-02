@@ -178,13 +178,13 @@ class AddToken extends React.Component {
                     }, 400)
                   }}
                 >
-                  {svg.octicon('plus', { height: 17 })} Add Token
+                  Add Token
                 </div>
               ) : (
                 <div 
                   className='addTokenSubmit' 
                 >
-                  {svg.octicon('plus', { height: 17 })} Fill in Token Details
+                  Fill in Token Details
                 </div>
               )}
             </div>

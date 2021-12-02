@@ -226,17 +226,17 @@ class Settings extends React.Component {
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>
-          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => this.store.notify('addToken')}>
-              Add Custom Token
-            </div>
-          </div>
           <div className='requestFeature'>
             <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Feature Requests
             </div>
           </div>
           {this.discord()}
+          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
+              Custom Tokens
+            </div>
+          </div>
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Summon Shortcut</div>
