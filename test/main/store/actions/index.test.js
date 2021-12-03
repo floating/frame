@@ -260,7 +260,7 @@ describe('#removeBalance', () => {
 
   const removeBalance = key => removeBalanceAction(updaterFn, 1, key)
 
-  it('remove a balance from all accounts', () => {
+  it('removes a balance from all accounts', () => {
     removeBalance(testTokens.zrx.address)
 
     expect(balances[owner][testTokens.zrx.address]).toBe(undefined)
