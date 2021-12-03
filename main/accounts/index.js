@@ -364,6 +364,12 @@ class Accounts extends EventEmitter {
   setSigner (id, cb) {
     this._current = id
     const currentAccount = this.current()
+
+    if (!currentAccount) {
+      console.trace(`no current account with id: ${id}`)
+      return cb(new Error('could not set signer'))
+    }
+
     const summary = currentAccount.summary()
     cb(null, summary)
     windows.broadcast('main:action', 'setSigner', summary)
