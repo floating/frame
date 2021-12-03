@@ -598,12 +598,18 @@ class Notify extends React.Component {
     } else if (notify === 'addToken') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           <AddToken req={this.store('view.notifyData')} />
         </div>
       )
     } else if (notify === 'customTokens') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           <CustomTokens req={this.store('view.notifyData')} />
         </div>
       )

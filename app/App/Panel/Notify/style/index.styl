@@ -15,7 +15,28 @@
   background var(--ghostX09)
   
   ::selection
-    background var(--good02) // #ffb7b7
+    background var(--moon) //  #ffb7b7
+
+  .notifyCloseButton
+    position absolute
+    top 23px
+    width 50px
+    margin-left -25px
+    left 50%
+    height 25px
+    border-radius 12px
+    display flex
+    justify-content center
+    align-items center
+    text-transform uppercase
+    font-size 11px
+    font-weight 600
+    cursor pointer
+    background var(--moon)
+    color var(--moonOver)
+
+    *
+      pointer-events none
 
   // .notifyBox:before
   //   content ''
