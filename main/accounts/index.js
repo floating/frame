@@ -366,8 +366,10 @@ class Accounts extends EventEmitter {
     const currentAccount = this.current()
 
     if (!currentAccount) {
-      console.trace(`no current account with id: ${id}`)
-      return cb(new Error('could not set signer'))
+      const err = new Error('could not set signer')
+      log.error(`no current account with id: ${id}`, err.stack)
+
+      return cb(err)
     }
 
     const summary = currentAccount.summary()
