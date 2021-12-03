@@ -447,6 +447,15 @@ module.exports = {
       return updates
     })
   },
+  removeBalance: (u, chainId, key) => {
+    u('main.balances', chainId, (balances = {}) => {
+      for (const accountAddress in balances) {
+        delete balances[accountAddress][key.toLowerCase()]
+      }
+
+      return balances
+    })
+  },
   // Tokens
   setBalances: (u, netId, address, newBalances) => {
     u('main.balances', netId, address, (balances = {}) => {

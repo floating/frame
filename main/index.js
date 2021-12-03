@@ -157,7 +157,10 @@ ipcMain.on('tray:addToken', (e, token, req) => {
 })
 
 ipcMain.on('tray:removeToken', (e, token) => {
-  if (token) store.removeCustomTokens([token])
+  if (token) {
+    store.removeBalance(token.chainId, token.address)
+    store.removeCustomTokens([token])
+  }
 })
 
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {
