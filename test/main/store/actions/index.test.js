@@ -3,6 +3,7 @@ import log from 'electron-log'
 
 import {
   addNetwork as addNetworkAction,
+  removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
   addCustomTokens as addTokensAction,
   removeCustomTokens as removeTokensAction,
@@ -231,6 +232,39 @@ describe('#addNetwork', () => {
 
     expect(networks.ethereum['137'].name).toBe('Polygon')
     expect(networks.ethereum['137'].explorer).toBe('https://polygonscan.com')
+  })
+})
+
+describe('#removeBalance', () => {
+  let balances = {
+    [owner]: {
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: BigNumber('798.564')
+      }
+    },
+    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': {
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: BigNumber('8201.343')
+      }
+    }
+  }
+
+  const updaterFn = (node, chainId, update) => {
+    expect(node).toBe('main.balances')
+    expect(chainId).toBe(1)
+
+    balances = update(balances)
+  }
+
+  const removeBalance = key => removeBalanceAction(updaterFn, 1, key)
+
+  it('removes a balance from all accounts', () => {
+    removeBalance(testTokens.zrx.address)
+
+    expect(balances[owner][testTokens.zrx.address]).toBe(undefined)
+    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e'][testTokens.zrx.address]).toBe(undefined)
   })
 })
 
