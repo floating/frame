@@ -7,8 +7,9 @@ class AddToken extends React.Component {
     super(props, context)
 
     this.nameDefault = 'Token Name'
-    this.symbolDefault = 'Symbol'
-    this.chainDefault = 'Chain ID'
+    this.symbolDefault = 'SYMBOL'
+    this.chainDefault = 'ID'
+    this.decimalsDefault = '?'
     this.addressDefault = 'Contract Address'
     this.logoURIDefault = 'Logo URI'
     
@@ -23,7 +24,7 @@ class AddToken extends React.Component {
       symbol: (this.token.symbol || '').toUpperCase() || this.symbolDefault,
       chainId: (Number.isInteger(chainId) && chainId) || this.chainDefault,
       address: (this.token.address || '').toLowerCase() || this.addressDefault,
-      decimals: (Number.isInteger(decimals) && decimals) || 18,
+      decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
       logoURI: this.token.logoURI || this.logoURIDefault
     }
   }
@@ -48,7 +49,7 @@ class AddToken extends React.Component {
               <div className='tokenName'>
                 <div className='tokenInputLabel'>Token Name</div>
                 <input
-                  className='tokenInput tokenInputLarge'
+                  className={this.state.name === this.nameDefault ? 'tokenInput tokenInputLarge tokenInputDim' : 'tokenInput tokenInputLarge'}
                   value={this.state.name} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ name: e.target.value })
@@ -67,7 +68,7 @@ class AddToken extends React.Component {
               <div className='tokenSymbol'>
                 <div className='tokenInputLabel'>Symbol</div>
                 <input
-                  className='tokenInput'
+                  className={this.state.symbol === this.symbolDefault ? 'tokenInput tokenInputDim' : 'tokenInput'}
                   value={this.state.symbol} spellCheck='false'
                   onChange={(e) => {
                     if (e.target.value.length > 10) return e.preventDefault()
@@ -85,7 +86,7 @@ class AddToken extends React.Component {
               <div className='tokenDecimals'>
                 <div className='tokenInputLabel'>Decimals</div>
                 <input
-                  className='tokenInput'
+                  className={this.state.decimals === this.decimalsDefault ? 'tokenInput tokenInputDim' : 'tokenInput'}
                   value={this.state.decimals} spellCheck='false'
                   onChange={(e) => {
                     if (!e.target.value) return this.setState({ decimals: '' })
@@ -96,8 +97,11 @@ class AddToken extends React.Component {
 
                     this.setState({ decimals })
                   }}
+                  onFocus={(e) => {
+                    if (e.target.value === this.decimalsDefault) this.setState({ decimals: '' })
+                  }}
                   onBlur={(e) => {
-                    if (e.target.value === '') this.setState({ decimals: 18 })
+                    if (e.target.value === '') this.setState({ decimals: this.decimalsDefault })
                   }}
                 />
               </div>
@@ -105,7 +109,7 @@ class AddToken extends React.Component {
               <div className='tokenChainId'>
                 <div className='tokenInputLabel'>Chain ID</div>
                 <input
-                  className='tokenInput'
+                  className={this.state.chainId === this.chainDefault ? 'tokenInput tokenInputDim' : 'tokenInput'}
                   value={this.state.chainId} spellCheck='false'
                   onChange={(e) => {
                     if (!e.target.value) return this.setState({ chainId: '' })
@@ -129,7 +133,7 @@ class AddToken extends React.Component {
               <div className='tokenAddress'>
                 <div className='tokenInputLabel'>Contract Address</div>
                 <input
-                  className='tokenInput tokenInputAddress'
+                  className={this.state.address === this.addressDefault ? 'tokenInput tokenInputAddress tokenInputDim' : 'tokenInput tokenInputAddress'}
                   value={this.state.address} spellCheck='false'
                   onChange={(e) => {
                     if (e.target.value.length > 42) return e.preventDefault()
@@ -149,7 +153,7 @@ class AddToken extends React.Component {
               <div className='tokenLogoUri'>
                 <div className='tokenInputLabel'>Logo URI</div>
                 <input
-                  className='tokenInput'
+                  className={this.state.logoURI === this.logoURIDefault ? 'tokenInput tokenInputDim' : 'tokenInput'}
                   value={this.state.logoURI} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ logoURI: e.target.value })
