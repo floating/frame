@@ -57,45 +57,49 @@ class ChainConnection extends EventEmitter {
   _createBlockMonitor (provider) {
     const monitor = new BlockMonitor(provider)
 
-    monitor.on('data', block => {
-      if ('baseFeePerGas' in block) {
-        this.chainConfig.setHardforkByBlockNumber(block.number)
+    monitor.on('data', async block => {
+      let feeMarket
 
-        if (!this.chainConfig.gteHardfork(Hardfork.London)) {
-          // if baseFeePerGas is present in the block header, the hardfork
-          // must be at least London
-          this.chainConfig.setHardfork(Hardfork.London)
+      const gasCalculator = new GasCalculator(provider)
+
+      if ('baseFeePerGas' in block) {
+        try {
+          // only consider this an EIP-1559 block if fee market can be loaded
+          feeMarket = await gasCalculator.getFeePerGas()
+
+          this.chainConfig.setHardforkByBlockNumber(block.number)
+
+          if (!this.chainConfig.gteHardfork(Hardfork.London)) {
+            // if baseFeePerGas is present in the block header, the hardfork
+            // must be at least London
+            this.chainConfig.setHardfork(Hardfork.London)
+          }
+        } catch (e) {
+          log.error(`could not load EIP-1559 fee market for chain ${this.chainId}`, e)
         }
       }
 
-      const gasCalculator = new GasCalculator(provider)
-      const useFeeMarket = this.chainConfig.isActivatedEIP(1559)
+      try {
+        if (feeMarket) {
+          const gasPrice = parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
 
-      if (useFeeMarket) {
-        gasCalculator.getFeePerGas().then(fees => {
-          const gasPrice = parseInt(fees.maxBaseFeePerGas) + parseInt(fees.maxPriorityFeePerGas)
-
-          store.setGasFees(this.type, this.chainId, fees)
+          store.setGasFees(this.type, this.chainId, feeMarket)
           store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
-          
-          accounts.updatePendingFees(this.chainId)
-        }).catch(err => {
-          log.error(`could not update gas fees for chain ${this.chainId}`, err)
-        })
-      } else {
-        gasCalculator.getGasPrices().then(gas => {
+        } else {
+          const gas = await gasCalculator.getGasPrices()
           const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
+          store.setGasFees(this.type, this.chainId, null)
           store.setGasPrices(this.type, this.chainId, {
             ...gas,
             custom: customLevel || gas.fast
           })
+        }
 
-          accounts.updatePendingFees(this.chainId)
-        }).catch(err => {
-          log.error(`could not update gas prices for chain ${this.chainId}`, err)
-        })
+        accounts.updatePendingFees(this.chainId)
+      } catch (e) {
+        log.error(`could not update gas prices for chain ${this.chainId}`, { feeMarket, chainConfig: this.chainConfig }, e)
       }
     })
   }
