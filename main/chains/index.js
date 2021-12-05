@@ -75,7 +75,8 @@ class ChainConnection extends EventEmitter {
             this.chainConfig.setHardfork(Hardfork.London)
           }
         } catch (e) {
-          log.error(`could not load EIP-1559 fee market for chain ${this.chainId}`, e)
+          feeMarket = null
+          // log.error(`could not load EIP-1559 fee market for chain ${this.chainId}`, e)
         }
       }
 
@@ -83,19 +84,19 @@ class ChainConnection extends EventEmitter {
         if (feeMarket) {
           const gasPrice = parseInt(feeMarket.maxBaseFeePerGas) + parseInt(feeMarket.maxPriorityFeePerGas)
 
-          store.setGasFees(this.type, this.chainId, feeMarket)
           store.setGasPrices(this.type, this.chainId, { fast: addHexPrefix(gasPrice.toString(16)) })
           store.setGasDefault(this.type, this.chainId, 'fast')
         } else {
           const gas = await gasCalculator.getGasPrices()
           const customLevel = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.custom')
 
-          store.setGasFees(this.type, this.chainId, null)
           store.setGasPrices(this.type, this.chainId, {
             ...gas,
             custom: customLevel || gas.fast
           })
         }
+
+        store.setGasFees(this.type, this.chainId, feeMarket)
 
         accounts.updatePendingFees(this.chainId)
       } catch (e) {
