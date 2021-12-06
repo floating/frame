@@ -61,4 +61,5 @@ const create = function () {
   return store
 }
 
+module.exports = create()
 export default create()
