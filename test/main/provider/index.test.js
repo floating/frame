@@ -1,59 +1,53 @@
-import EventEmitter from 'events'
+import provider from '../../../main/provider'
+import accounts from '../../../main/accounts'
+import connection from '../../../main/chains'
+import store from '../../../main/store'
+import chainConfig from '../../../main/chains/config'
+import { weiToHex, gweiToHex } from '../../../resources/utils'
+
+import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
-const mockAccounts = {}
-const mockStore = {
-  'main.accounts': {
-    '0x22dd63c3619818fdbc262c78baee43cb61e9cccf': {}
-  },
-  'main.currentNetwork': {
-    type: 'ethereum',
-    id: 1
-  },
-  'main.networks.ethereum.1': {
-    id: 1
-  },
-  'main.networks.ethereum.4': {
-    id: 4
-  }
-}
+const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
-class MockConnection extends EventEmitter {
-  constructor () {
-    super()
-    
-    this.syncDataEmit = jest.fn()
-    this.send = jest.fn()
-  }
-}
+let accountRequests = []
 
-let provider, mockConnection
-
-jest.mock('../../../main/chains', () => mockConnection)
-jest.mock('../../../main/accounts', () => mockAccounts)
-
-jest.mock('../../../main/store', () => {
-  const store = (...args) => mockStore[args.join('.')]
-
-  store.updateAccount = () => {}
-  store.observer = () => {}
-  return store
-})
+jest.mock('../../../main/store')
+jest.mock('../../../main/chains', () => ({ send: jest.fn(), syncDataEmit: jest.fn(), on: jest.fn() }))
+jest.mock('../../../main/accounts', () => ({}))
 
 beforeAll(async () => {
   log.transports.console.level = false
 
-  mockConnection = new MockConnection()
+  jest.useFakeTimers()
 
-  // need to import this after mocks are set up
-  provider = (await import('../../../main/provider')).default
-  provider.handlers = {}
+  accounts.getAccounts = () => [address]
+  accounts.addRequest = (req, res) => {
+    store.set('main.accounts', req.account, 'requests', { [req.handlerId]: req })
+    accountRequests.push(req)
+    if (res) res()
+  }
 })
 
 afterAll(() => {
   log.transports.console.level = 'debug'
+  jest.useRealTimers()
+})
+
+beforeEach(() => {
+  provider.handlers = {}
+
+  accountRequests = []
+  store.set('main.accounts', {})
+
+  connection.send = jest.fn()
+  connection.connections = { ethereum: {} }
+
+  accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
+  accounts.signTransaction = jest.fn()
+  accounts.setTxSigned = jest.fn()
 })
 
 describe('#getRawTx', () => {
@@ -89,28 +83,13 @@ describe('#getRawTx', () => {
 })
 
 describe('#send', () => {
-  let accountRequests = []
   const send = (request, cb = jest.fn(), targetChain) => provider.send(request, cb, targetChain)
-
-  const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
-
-  beforeEach(() => {
-    accountRequests = []
-
-    mockConnection.send.mockImplementation((payload, cb, targetChain) => {
-      cb({ error: 'received unhandled request' })
-    })
-
-    mockAccounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
-    mockAccounts.addRequest = (req, res) => {
-      accountRequests.push(req)
-      if (res) res()
-    }
-    mockAccounts.getAccounts = () => [address]
-  })
 
   describe('#eth_chainId', () => {
     it('returns the current chain id from the store', done => {
+      store.set('main.networks.ethereum', 1, { id: 1 })
+      store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
+
       send({ method: 'eth_chainId' }, response => {
         expect(response.result).toBe('0x1')
         done()
@@ -118,6 +97,8 @@ describe('#send', () => {
     })
 
     it('returns a chain id from the target chain', done => {
+      store.set('main.networks.ethereum', 4, { id: 4 })
+
       send({ method: 'eth_chainId' }, response => {
         expect(response.result).toBe('0x4')
         done()
@@ -156,6 +137,9 @@ describe('#send', () => {
     })
 
     it('adds switch chain request if chain exists', done => {
+      store.set('main.networks.ethereum', 1, { id: 1 })
+      store.set('main.currentNetwork', { type: 'ethereum', id: 137 })
+
       send({ 
         method: 'wallet_addEthereumChain', 
         params: [
@@ -187,6 +171,8 @@ describe('#send', () => {
 
   describe('#wallet_switchEthereumChain', () => {
     it('switches to chain if chain exists in store', done => {
+      store.set('main.currentNetwork', { type: 'ethereum', id: 42161 })
+
       send({ 
         method: 'wallet_switchEthereumChain', 
         params: [{
@@ -283,6 +269,91 @@ describe('#send', () => {
     })
   })
 
+  describe('#wallet_watchAsset', () => {
+    let request
+    
+    beforeEach(() => {
+      store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
+      store.set('main.tokens', [])
+
+      request = {
+        id: 10,
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
+            symbol: 'BADGER',
+            name: 'BadgerDAO Token',
+            decimals: 18,
+            image: 'https://badgerdao.io/icon.jpg'
+          }
+        }
+      }
+    })
+
+    it('adds a request for a custom token', () => {
+      send(request, () => {
+        expect(accountRequests).toHaveLength(1)
+        expect(validateUUID(accountRequests[0].handlerId)).toBe(true)
+        expect(accountRequests[0]).toEqual(
+          expect.objectContaining({
+            type: 'addToken',
+            account: address,
+            token: {
+              chainId: 1,
+              address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
+              symbol: 'BADGER',
+              name: 'BadgerDAO Token',
+              decimals: 18,
+              logoURI: 'https://badgerdao.io/icon.jpg'
+            },
+            payload: request
+          })
+        )
+      })
+    })
+
+    it('does not add a request for a token that is already added', () => {
+      store.set('main.tokens', [{ address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }])
+
+      send(request, ({ result }) => {
+        expect(result).toBe(true)
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request with no type', () => {
+      delete request.params.type
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('only ERC-20 tokens are supported')
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request with for a non-ERC-20 token', () => {
+      request.params.type = 'ERC721'
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('only ERC-20 tokens are supported')
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+
+    it('rejects a request with no token address', () => {
+      delete request.params.options.address
+
+      send(request, ({ error }) => {
+        expect(error.code).toBe(-1)
+        expect(error.message).toMatch('tokens must define an address')
+        expect(accountRequests).toHaveLength(0)
+      })
+    })
+  })
+
   describe('#eth_getTransactionByHash', () => {
     const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
     const request = { method: 'eth_getTransactionByHash', params: [txHash] }
@@ -291,7 +362,7 @@ describe('#send', () => {
     let blockResult
 
     beforeEach(() => {
-      mockConnection.send.mockImplementation((payload, res, targetChain) => {
+      connection.send.mockImplementation((payload, res, targetChain) => {
         if (targetChain.id === chain && payload.params[0] === txHash) {
           return res({ result: blockResult })
         }
@@ -348,6 +419,227 @@ describe('#send', () => {
         expect(response.error).toBe('invalid request')
         done()
       }, '1')
+    })
+  })
+
+  describe('#eth_sendTransaction', () => {
+    let tx
+
+    const sendTransaction = cb => provider.send({
+      jsonrpc: '2.0',
+      id: 7,
+      method: 'eth_sendTransaction',
+      params: [tx]
+    }, cb)
+
+    describe('replacing gas fees', () => {
+      beforeEach(() => {
+        tx = {
+          from: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+          to: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+          chainId: '0x1',
+          gasLimit: weiToHex(21000),
+          type: '0x1',
+          nonce: '0xa'
+        }
+
+        const chainIds = [1, 137]
+
+        chainIds.forEach(chainId => {
+          store.set('main.networksMeta.ethereum', chainId, 'gas', {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
+              fees: {
+                maxPriorityFeePerGas: gweiToHex(1),
+                maxBaseFeePerGas: gweiToHex(8)
+              }
+            }
+          })
+
+          connection.connections.ethereum[chainId] = {
+            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
+          }
+        })
+      })
+      
+      it('adds a 10% gas buffer when replacing a legacy transaction', done => {
+        tx.type = '0x0'
+        tx.chainId = addHexPrefix((137).toString(16))
+
+        try {
+          sendTransaction(() => {
+            const initialRequest = accountRequests[0]
+            const initialPrice = initialRequest.data.gasPrice
+    
+            expect(initialPrice).toBe(gweiToHex(30))
+            expect(initialRequest.feesUpdatedByUser).toBeFalsy()
+    
+            initialRequest.mode = 'monitor'
+    
+            sendTransaction(() => {
+              const replacementRequest = accountRequests[1]
+              const bumpedPrice = Math.ceil(initialPrice * 1.1)
+              expect(replacementRequest.data.gasPrice).toBe(weiToHex(bumpedPrice))
+              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              done()
+            })
+          })
+        } catch (e) {
+         done(e) 
+        }
+      })
+      
+      it('does not add a buffer to replacement legacy transactions if the current gas price is already higher', done => {
+        tx.type = '0x0'
+        tx.chainId = addHexPrefix((137).toString(16))
+
+        try {
+          sendTransaction(() => {
+            const initialRequest = accountRequests[0]
+            const initialPrice = initialRequest.data.gasPrice
+    
+            expect(initialPrice).toBe(gweiToHex(30))
+            expect(initialRequest.feesUpdatedByUser).toBeFalsy()
+    
+            initialRequest.mode = 'monitor'
+    
+            store.set('main.networksMeta.ethereum', 137, 'gas', {
+              price: {
+                selected: 'standard',
+                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
+                fees: {
+                  maxPriorityFeePerGas: gweiToHex(1),
+                  maxBaseFeePerGas: gweiToHex(8)
+                }
+              }
+            })
+            
+            sendTransaction(() => {
+              const replacementRequest = accountRequests[1]
+              expect(replacementRequest.data.gasPrice).toBe(gweiToHex(40))
+              expect(replacementRequest.feesUpdatedByUser).toBeFalsy()
+              done()
+            })
+          })
+        } catch (e) {
+         done(e)
+        }
+      })
+  
+      it('adds a 10% gas buffer when replacing an EIP-1559 transaction', done => {
+        tx.type = '0x2'
+        tx.chainId = addHexPrefix((1).toString(16))
+
+        try {
+          sendTransaction(() => {
+            const initialRequest = accountRequests[0]
+            const initialTip = initialRequest.data.maxPriorityFeePerGas
+            const initialMax = initialRequest.data.maxFeePerGas
+    
+            expect(initialTip).toBe(gweiToHex(1))
+            expect(initialMax).toBe(gweiToHex(9))
+            expect(initialRequest.feesUpdatedByUser).toBeFalsy()
+
+            initialRequest.mode = 'monitor'
+
+            sendTransaction(() => {
+              const replacementRequest = accountRequests[1]
+              const bumpedFee = Math.ceil(initialTip * 1.1)
+              const bumpedBase = Math.ceil((initialMax - initialTip) * 1.1)
+              const bumpedMax = bumpedFee + bumpedBase
+    
+              expect(replacementRequest.data.maxPriorityFeePerGas).toBe(weiToHex(bumpedFee))
+              expect(replacementRequest.data.maxFeePerGas).toBe(weiToHex(bumpedMax))
+              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              done()
+            })
+          })
+        } catch (e) {
+         done(e) 
+        }
+      })
+      
+      it('buffers only the priority fee for replacement EIP-1559 transactions if the current base price is high enough for replacement', done => {
+        tx.type = '0x2'
+        tx.chainId = addHexPrefix((1).toString(16))
+
+        try {
+          sendTransaction(() => {
+            const initialRequest = accountRequests[0]
+            const initialTip = initialRequest.data.maxPriorityFeePerGas
+            const initialMax = initialRequest.data.maxFeePerGas
+    
+            expect(initialTip).toBe(gweiToHex(1))
+            expect(initialMax).toBe(gweiToHex(9))
+            expect(initialRequest.feesUpdatedByUser).toBeFalsy()
+    
+            initialRequest.mode = 'monitor'
+
+            store.set('main.networksMeta.ethereum', 1, 'gas', {
+              price: {
+                selected: 'standard',
+                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
+                fees: {
+                  maxPriorityFeePerGas: gweiToHex(1),
+                  maxBaseFeePerGas: gweiToHex(20)
+                }
+              }
+            })
+    
+            sendTransaction(() => {
+              const replacementRequest = accountRequests[1]
+              const bumpedFee = Math.ceil(initialTip * 1.1)
+              expect(replacementRequest.data.maxPriorityFeePerGas).toBe(weiToHex(bumpedFee))
+              expect(replacementRequest.data.maxFeePerGas).toBe(weiToHex((20 * 1e9) + bumpedFee))
+              expect(replacementRequest.feesUpdatedByUser).toBe(true)
+              done()
+            })
+          })
+        } catch (e) {
+         done(e)
+        }
+      })
+      
+      it('does not add a buffer to replacement EIP-1559 transactions if the current gas price is already higher', done => {
+        tx.type = '0x2'
+        tx.chainId = addHexPrefix((1).toString(16))
+
+        try {
+          sendTransaction(() => {
+            const initialRequest = accountRequests[0]
+            const initialTip = initialRequest.data.maxPriorityFeePerGas
+            const initialMax = initialRequest.data.maxFeePerGas
+    
+            expect(initialTip).toBe(gweiToHex(1))
+            expect(initialMax).toBe(gweiToHex(9))
+            expect(initialRequest.feesUpdatedByUser).toBeFalsy()
+    
+            initialRequest.mode = 'monitor'
+            store.set('main.networksMeta.ethereum', 1, 'gas', {
+              price: {
+                selected: 'standard',
+                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
+                fees: {
+                  maxPriorityFeePerGas: gweiToHex(2),
+                  maxBaseFeePerGas: gweiToHex(14)
+                }
+              }
+            })
+    
+            sendTransaction(() => {
+              const replacementRequest = accountRequests[1]
+    
+              expect(replacementRequest.data.maxPriorityFeePerGas).toBe(gweiToHex(2))
+              expect(replacementRequest.data.maxFeePerGas).toBe(gweiToHex(16))
+              expect(replacementRequest.feesUpdatedByUser).toBeFalsy()
+              done()
+            })
+          })
+        } catch (e) {
+         done(e)
+        }
+      })
     })
   })
 
@@ -469,7 +761,7 @@ describe('#send', () => {
     }, 100)
 
     it('does not submit a V3 request to a Ledger', done => {
-      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'ledger' })
+      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'ledger' })
 
       // Ledger only supports V4+
       const params = [address, typedData]
@@ -482,7 +774,7 @@ describe('#send', () => {
     }, 100)
 
     it('does not submit a V3 request to a Lattice', done => {
-      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'lattice' })
+      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'lattice' })
 
       // Lattice only supports V4+
       const params = [address, typedData]
@@ -495,7 +787,7 @@ describe('#send', () => {
     }, 100)
 
     it('does not submit a request to a Trezor', done => {
-      mockAccounts.current = () => ({ id: address, getAccounts: () => [address], lastSignerType: 'trezor' })
+      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'trezor' })
 
       // Trezor does not support signing typed data
       const params = [address, typedData]
@@ -509,6 +801,10 @@ describe('#send', () => {
 
     it('passes a request with an unknown version through to the connection', done => {
       const params = [address, 'test']
+
+      connection.send.mockImplementation((payload, cb, targetChain) => {
+        cb({ error: 'received unhandled request' })
+      })
 
       send({ method: 'eth_signTypedData_v5', params }, err => {
         expect(err.error).toBe('received unhandled request')
@@ -540,11 +836,9 @@ describe('#signAndSend', () => {
     tx.gasPrice = utils.parseUnits('210', 'gwei').toHexString()
     tx.gasLimit = addHexPrefix((1e7).toString(16))
 
-    mockAccounts.signTransaction = () => done()
+    accounts.signTransaction.mockImplementation(() => done())
 
-    signAndSend(err => {
-      done('unexpected error :' + err.message)
-    })
+    signAndSend(done)
   })
   
   it('does not allow a pre-EIP-1559 transaction with fees that exceeds the hard limit', done => {
@@ -555,8 +849,10 @@ describe('#signAndSend', () => {
     tx.gasLimit = addHexPrefix((1e7).toString(16))
 
     signAndSend(err => {
-      expect(err.message).toMatch(/over hard limit/)
-      done()
+      try {
+        expect(err.message).toMatch(/over hard limit/)
+        done()
+      } catch (e) { done(e) }
     })
   })
   
@@ -568,8 +864,10 @@ describe('#signAndSend', () => {
     tx.gasLimit = addHexPrefix((1e7).toString(16))
 
     signAndSend(err => {
-      expect(err.message).toMatch(/over hard limit/)
-      done()
+      try {
+        expect(err.message).toMatch(/over hard limit/)
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -578,50 +876,45 @@ describe('#signAndSend', () => {
     const txHash = '0x6e8b1de115105ceab599b4d99604797b961cfd1f46b85e10f23a81974baae3d5'
 
     beforeEach(() => {
-      mockAccounts.signTransaction = jest.fn((_, cb) => cb(null, signedTx))
-      mockAccounts.setTxSigned = jest.fn((reqId, cb) => {
-        if (reqId === request.handlerId) return cb()
-        cb('unknown request!')
+      accounts.signTransaction.mockImplementation((_, cb) => cb(null, signedTx))
+      accounts.setTxSigned.mockImplementation((reqId, cb) => {
+        expect(reqId).toBe(request.handlerId)
+        cb()
       })
-
-      jest.useFakeTimers()
-    })
-  
-    afterEach(() => {
-      jest.useRealTimers()
     })
 
     describe('success', () => {
       beforeEach(() => {
-        mockConnection.send.mockImplementation((payload, cb) => {
-          if (payload.id === request.payload.id && 
-              payload.method === 'eth_sendRawTransaction' &&
-              payload.params[0] === signedTx) {
-                return cb({ result: txHash })
-              }
-          cb('could not send transaction!')
+        connection.send.mockImplementation((payload, cb) => {
+          expect(payload).toEqual(expect.objectContaining({
+            id: request.payload.id,
+            method: 'eth_sendRawTransaction',
+            params: [signedTx]
+          }))
+          
+          cb({ result: txHash })
         })
       })
 
       it('sends a successfully signed transaction', done => {
         signAndSend((err, result) => {
-          expect(err).toBe(null)
-          expect(result).toBe(txHash)
-          done()
+          try {
+            expect(err).toBe(null)
+            expect(result).toBe(txHash)
+            done()
+          } catch (e) { done(e) }
         })
-  
-        jest.runAllTimers()
       })
 
       it('responds to a successful transaction request with the transaction hash result', done => {
         provider.handlers[request.handlerId] = response => {
-          expect(response.result).toBe(txHash)
-          done()
+          try {
+            expect(response.result).toBe(txHash)
+            done()
+          } catch (e) { done(e) }
         }
-        
+
         signAndSend()
-  
-        jest.runAllTimers()
       })
     })
 
@@ -630,7 +923,7 @@ describe('#signAndSend', () => {
 
       beforeEach(() => {
         errorMessage = 'invalid transaction!'
-        mockConnection.send.mockImplementation((_, cb) => cb({ error: { message: errorMessage } }))
+        connection.send.mockImplementation((_, cb) => cb({ error: { message: errorMessage } }))
       })
 
       it('handles a transaction send failure', done => {
@@ -638,8 +931,6 @@ describe('#signAndSend', () => {
           expect(err).toBe(errorMessage)
           done()
         })
-
-        jest.runAllTimers()
       })
 
       it('responds to a failed transaction request with the payload', done => {
@@ -651,8 +942,6 @@ describe('#signAndSend', () => {
         }
 
         signAndSend()
-
-        jest.runAllTimers()
       })
     })
   })

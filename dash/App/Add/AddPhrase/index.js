@@ -61,9 +61,6 @@ class AddPhrase extends React.Component {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false, createdSignerId: signer.id })
-        setTimeout(() => {
-          this.props.close()
-        }, 2000)
       }
     })
   }
@@ -117,9 +114,9 @@ class AddPhrase extends React.Component {
                 <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>
-              <div className='addAccountItemTopTitle'>Phrase</div>
+              <div className='addAccountItemTopTitle'>Seed Phrase</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{svg.close(24)}</div>
+            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div>
             <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
           </div>
           <div className='addAccountItemOption'>
@@ -152,8 +149,8 @@ class AddPhrase extends React.Component {
                   {signer ? <Signer key={signer.id} {...signer} />
                   : (
                     <>
-                      <div className='phaseItemOptionTitle'>{this.state.status}</div>
-                      {this.state.error ? <div className='phaseItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                      <div className='addAccountItemOptionTitle'>{this.state.status}</div>
+                      {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                     </>
                   )} 
                 </div>

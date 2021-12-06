@@ -5,7 +5,6 @@ import flex from '../../flex'
 import { SignerAdapter } from '../adapters'
 import Trezor from './Trezor'
 import store from '../../store'
-import Signer from '../Signer'
 
 export default class TrezorSignerAdapter extends SignerAdapter {
   private flexListeners: { [event: string]: (device: TrezorDevice) => void };
@@ -28,8 +27,6 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       log.info(`Trezor ${device.id} connected: ${trezor.model}, firmware v${version}`)
 
       trezor.on('close', () => {
-        delete this.knownSigners[device.path]
-
         this.emit('remove', trezor.id)
       })
 
@@ -48,11 +45,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       log.info(`Trezor ${device.id} disconnected`)
 
       this.withSigner(device, signer => {
-        signer.close()
-
-        delete this.knownSigners[device.path]
-
-        this.emit('remove', signer.id)
+        this.remove(signer)
       })
     }
 
@@ -117,15 +110,30 @@ export default class TrezorSignerAdapter extends SignerAdapter {
   }
 
   close () {
-    this.observer.remove()
+    if (this.observer) {
+      this.observer.remove()
+      this.observer = null
+    }
 
     Object.entries(this.flexListeners).forEach(([event, listener]) => flex.off(event, listener))
 
     super.close()
   }
 
-  reload (signer: Signer) {
-    signer.open()
+  remove (trezor: Trezor) {
+    if (trezor.device.path in this.knownSigners) {
+      log.info(`removing Trezor ${trezor.device.id}`)
+
+      delete this.knownSigners[trezor.device.path]
+
+      trezor.close()
+    }
+  }
+
+  reload (trezor: Trezor) {
+    log.info(`reloading Trezor ${trezor.device.id}`)
+
+    trezor.open()
   }
 
   private withSigner (device: TrezorDevice, fn: (signer: Trezor) => void) {

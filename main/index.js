@@ -92,7 +92,7 @@ ipcMain.on('tray:replaceTx', async (e, id, type) => {
   try {
     await accounts.replaceTx(id, type)
   } catch (e) {
-    console.log('tray:replaceTx Error', e)
+    log.error('tray:replaceTx Error', e)
   }
 })
 
@@ -125,8 +125,16 @@ ipcMain.on('tray:openExternal', (e, url) => {
 })
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
-  const explorer = store('main.networks', chain.type, chain.id, 'explorer')
-  shell.openExternal(explorer + '/tx/' + hash)
+  // remove trailing slashes from the base url
+  const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
+  shell.openExternal(`${explorer}/tx/${hash}`)
+})
+
+ipcMain.on('tray:copyTxHash', (e, hash, chain) => {
+  // remove trailing slashes from the base url
+  // const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
+  // clipboard.writeText(explorer + '/tx/' + hash)
+  if (hash) clipboard.writeText(hash)
 })
 
 ipcMain.on('tray:giveAccess', (e, req, access) => {
@@ -141,6 +149,18 @@ ipcMain.on('tray:addChain', (e, chain, req) => {
 ipcMain.on('tray:switchChain', (e, type, id, req) => {
   if (type && id) store.selectNetwork(type, id)
   accounts.resolveRequest(req)
+})
+
+ipcMain.on('tray:addToken', (e, token, req) => {
+  if (token) store.addCustomTokens([token])
+  accounts.resolveRequest(req)
+})
+
+ipcMain.on('tray:removeToken', (e, token) => {
+  if (token) {
+    store.removeBalance(token.chainId, token.address)
+    store.removeCustomTokens([token])
+  }
 })
 
 ipcMain.on('tray:adjustNonce', (e, handlerId, nonceAdjust) => {

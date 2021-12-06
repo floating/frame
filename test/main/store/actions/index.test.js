@@ -1,5 +1,14 @@
+import BigNumber from 'bignumber.js'
 import log from 'electron-log'
-import { addNetwork as addNetworkAction } from '../../../../main/store/actions'
+
+import {
+  addNetwork as addNetworkAction,
+  removeBalance as removeBalanceAction,
+  setBalances as setBalancesAction,
+  addCustomTokens as addTokensAction,
+  removeCustomTokens as removeTokensAction,
+  setScanning as setScanningAction
+} from '../../../../main/store/actions'
 
 beforeAll(() => {
   log.transports.console.level = false
@@ -8,6 +17,23 @@ beforeAll(() => {
 afterAll(() => {
   log.transports.console.level = 'debug'
 })
+
+const owner = '0xa8be0f701d0f37088600164e71bffc0ad652c251'
+
+const testTokens = {
+  zrx: {
+    chainId: 1,
+    address: '0xe41d2489571d322189246dafa5ebde1f4699f498',
+    symbol: 'ZRX',
+    decimals: 18
+  },
+  badger: {
+    chainId: 42161,
+    address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e',
+    symbol: 'BADGER',
+    decimals: 18
+  }
+}
 
 describe('#addNetwork', () => {
   const polygonNetwork = {
@@ -206,5 +232,248 @@ describe('#addNetwork', () => {
 
     expect(networks.ethereum['137'].name).toBe('Polygon')
     expect(networks.ethereum['137'].explorer).toBe('https://polygonscan.com')
+  })
+})
+
+describe('#removeBalance', () => {
+  let balances = {
+    [owner]: {
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: BigNumber('798.564')
+      }
+    },
+    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': {
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: BigNumber('8201.343')
+      }
+    }
+  }
+
+  const updaterFn = (node, chainId, update) => {
+    expect(node).toBe('main.balances')
+    expect(chainId).toBe(1)
+
+    balances = update(balances)
+  }
+
+  const removeBalance = key => removeBalanceAction(updaterFn, 1, key)
+
+  it('removes a balance from all accounts', () => {
+    removeBalance(testTokens.zrx.address)
+
+    expect(balances[owner][testTokens.zrx.address]).toBe(undefined)
+    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e'][testTokens.zrx.address]).toBe(undefined)
+  })
+})
+
+describe('#setBalances', () => {
+  const updaterFn = (node, netId, address, update) => {
+    expect(node).toBe('main.balances')
+    expect(netId).toBe(1)
+    expect(address).toBe(owner)
+
+    balances = update(balances)
+  }
+
+  const setBalances = updatedBalances => setBalancesAction(updaterFn, 1, owner, updatedBalances)
+
+  let balances
+
+  beforeEach(() => {
+    balances = {
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
+        balance: new BigNumber(30.5)
+      }
+    }
+  })
+
+  it('adds a new balance', () => {
+    setBalances({
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: new BigNumber(7983.2332)
+      }
+    })
+    
+    expect(balances).toStrictEqual({
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: new BigNumber(7983.2332)
+      },
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
+        balance: new BigNumber(30.5)
+      }
+    })
+  })
+
+  it('updates an existing balance to a positive amount', () => {
+    setBalances({
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
+        balance: new BigNumber(41.9)
+      }
+    })
+    
+    expect(balances).toStrictEqual({
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
+        balance: new BigNumber(41.9)
+      }
+    })
+  })
+
+  it('updates an existing balance to zero', () => {
+    setBalances({
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
+        balance: new BigNumber(0)
+      }
+    })
+    
+    expect(balances).toStrictEqual({
+      [testTokens.badger.address]: {
+        ...testTokens.badger,
+        balance: new BigNumber(0)
+      }
+    })
+  })
+})
+
+describe('#addCustomTokens', () => {
+  let tokens = []
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.tokens')
+
+    tokens = update(tokens)
+  }
+
+  const addTokens = tokensToAdd => addTokensAction(updaterFn, tokensToAdd)
+
+  it('adds a token', () => {
+    tokens = [testTokens.zrx]
+
+    addTokens([testTokens.badger])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('overwrites a token', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+
+    const updatedBadgerToken = {
+      ...testTokens.badger,
+      symbol: 'BAD'
+    }
+
+    addTokens([updatedBadgerToken])
+
+    expect(tokens).toHaveLength(2)
+    expect(tokens[0]).toEqual(testTokens.zrx)
+    expect(tokens[1].symbol).toBe('BAD')
+  })
+})
+
+describe('#removeCustomTokens', () => {
+  let tokens = []
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.tokens')
+
+    tokens = update(tokens)
+  }
+
+  const removeTokens = tokensToRemove => removeTokensAction(updaterFn, tokensToRemove)
+
+  it('removes a token', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+    
+    const tokenToRemove = { ...testTokens.zrx }
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.badger])
+  })
+
+  it('does not modify tokens if they cannot be found', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+
+    const tokenToRemove = {
+      chainId: 1,
+      address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
+      symbol: 'OHM'
+    }
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('does not remove a token with the same address but different chain id', () => {
+    const tokenToRemove = {
+      ...testTokens.badger,
+      chainId: 1
+    }
+
+    tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('does not remove a token with the same chain id but different address', () => {
+    const tokenToRemove = {
+      ...testTokens.zrx,
+      address: '0xa7a82dd06901f29ab14af63faf3358ad101724a8'
+    }
+
+    tokens = [testTokens.zrx, testTokens.badger, tokenToRemove]
+
+    removeTokens([tokenToRemove])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+})
+
+describe('#setScanning', () => {
+  let isScanning
+
+  beforeAll(() => {
+    isScanning = false
+    jest.useFakeTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.scanning')
+    expect(address).toBe(owner)
+
+    isScanning = update()
+  }
+
+  const setScanning = scanning => setScanningAction(updaterFn, owner, scanning)
+
+  it('immediately sets the state to scanning', () => {
+    setScanning(true)
+
+    expect(isScanning).toBe(true)
+  })
+
+  it('sets the state back to not scanning after 1 second', () => {
+    setScanning(false)
+
+    expect(isScanning).toBe(true)
+
+    jest.advanceTimersByTime(1000)
+
+    expect(isScanning).toBe(false)
   })
 })

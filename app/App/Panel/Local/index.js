@@ -16,8 +16,7 @@ class Settings extends React.Component {
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
-    const latticeSuffix = context.store('main.latticeSettings.suffix')
-    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeSuffix, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
+    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
       if (this.network !== id || this.networkType !== type) {
@@ -37,10 +36,10 @@ class Settings extends React.Component {
         <div className='appInfoLine appInfoLineReset'>
           {this.state.resetConfirm ? (
             <span className='appInfoLineResetConfirm'>
-              Are you sure you want to reset everything? <span className='pointer' onMouseDown={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onMouseDown={() => this.setState({ resetConfirm: false })}>No</span>
+              Are you sure you want to reset everything? <span className='pointer' onClick={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onClick={() => this.setState({ resetConfirm: false })}>No</span>
             </span>
           ) : (
-            <span className='pointer' onMouseDown={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
+            <span className='pointer' onClick={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
           )}
         </div>
       </div>
@@ -119,19 +118,6 @@ class Settings extends React.Component {
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
   }
 
-  inputLatticeSuffix (e) {
-    e.preventDefault()
-    clearTimeout(this.inputLatticeSuffixTimeout)
-
-    // Lattice only supports a suffix of up to 24 characters, and we append "Frame-"
-    // to the front so limit it to 18 characters
-    const value = e.target.value.replace(/\s+/g, '').substring(0, 18)
-
-    this.setState({ latticeSuffix: value })
-    // TODO: Update to target specific Lattice device rather than global
-    this.inputLatticeSuffixTimeout = setTimeout(() => link.send('tray:action', 'setLatticeSuffix', this.state.latticeSuffix), 1000)
-  }
-
   localShake (key) {
     const localShake = Object.assign({}, this.state.localShake)
     localShake[key] = true
@@ -171,7 +157,7 @@ class Settings extends React.Component {
 
   discord () {
     return (
-      <div className='discordInvite' onMouseDown={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY') }>
+      <div className='discordInvite' onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY') }>
         <div>Need help?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
@@ -181,7 +167,7 @@ class Settings extends React.Component {
   quit () {
     return (
       <div className='quitFrame'>
-        <div onMouseDown={() => link.send('tray:quit')} className='quitFrameButton'>Quit</div>
+        <div onClick={() => link.send('tray:quit')} className='quitFrameButton'>Quit</div>
       </div>
     )
   }
@@ -223,7 +209,7 @@ class Settings extends React.Component {
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
+      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'} onClick={e => this.expandNetwork(e, false)}>
         <div className='panelHeader' style={{ zIndex: 50, pointerEvents: 'none' }}>
           <div className='panelHeaderTitle'>Settings</div>
         </div>
@@ -231,25 +217,30 @@ class Settings extends React.Component {
           <div className='snipIt'>
             <div>Using a dapp that doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
-              <div className='snipItBrowserExtensionIcon snipItSpinLeft' onMouseDown={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
+              <div className='snipItBrowserExtensionIcon snipItSpinLeft' onClick={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
                 {svg.chrome(30)}
               </div>
-              <div className='snipItBrowserExtensionIcon snipItSpinRight' onMouseDown={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
+              <div className='snipItBrowserExtensionIcon snipItSpinRight' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
                 {svg.firefox(30)}
               </div>
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>
           <div className='requestFeature'>
-            <div className='requestFeatureButton' onMouseDown={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Feature Requests
             </div>
           </div>
           {this.discord()}
+          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
+              Custom Tokens
+            </div>
+          </div>
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Summon Shortcut</div>
-              <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
+              <div className={this.store('main.shortcuts.altSlash') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setAltSpace', !this.store('main.shortcuts.altSlash'))}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
@@ -262,7 +253,7 @@ class Settings extends React.Component {
           <div className='signerPermission localSetting' style={{ zIndex: 213 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Auto-hide</div>
-              <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
+              <div className={this.store('main.autohide') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setAutohide', !this.store('main.autohide'))}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
@@ -275,7 +266,7 @@ class Settings extends React.Component {
           <div className='signerPermission localSetting' style={{ zIndex: 212 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Run on Startup</div>
-              <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleLaunch')}>
+              <div className={this.store('main.launch') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleLaunch')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
@@ -283,10 +274,10 @@ class Settings extends React.Component {
               Run Frame when your computer starts
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 211 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Glide</div>
-              <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleReveal')}>
+              <div className={this.store('main.reveal') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleReveal')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
@@ -294,11 +285,11 @@ class Settings extends React.Component {
               {'Mouse to display\'s right edge to summon Frame'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 210 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Adjustable Nonce</div>
               <div
-                className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => {
+                className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => {
                   link.send('tray:action', 'toggleNonceAdjust')
                   if (!this.store('main.nonceAdjust')) this.store.notify('nonceWarning')
                 }}
@@ -313,7 +304,7 @@ class Settings extends React.Component {
           {/* <div className='signerPermission localSetting' style={{ zIndex: 6 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Show USD Value</div>
-              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleUSDValue')}>
+              <div className={this.store('main.showUSDValue') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleUSDValue')}>
                 <div className='signerPermissionToggleSwitch' />
               </div>
             </div>
@@ -322,10 +313,10 @@ class Settings extends React.Component {
             </div>
           </div> */}
           {this.store('platform') === 'darwin' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 209 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Display Gas in Menubar</div>
-                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
+                <div className={this.store('main.menubarGasPrice') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'setMenubarGasPrice', !this.store('main.menubarGasPrice'))}>
                   <div className='signerPermissionToggleSwitch' />
                 </div>
               </div>
@@ -334,7 +325,7 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
-          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 208 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Colorway</div>
               <Dropdown
@@ -349,7 +340,7 @@ class Settings extends React.Component {
               </span>
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 207 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Trezor Derivation</div>
               <Dropdown
@@ -362,7 +353,7 @@ class Settings extends React.Component {
               {'Derivation path for connected Trezor devices'}
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
+          <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Ledger Derivation</div>
               <Dropdown
@@ -376,7 +367,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.store('main.ledger.derivation') === 'live' ? (
-            <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
+            <div className='signerPermission localSetting' style={{ zIndex: 205 }}>
               <div className='signerPermissionControls'>
                 <div className='signerPermissionSetting'>Ledger Live Accounts</div>
                 <Dropdown
@@ -395,6 +386,19 @@ class Settings extends React.Component {
               </div>
             </div>
           ) : null}
+          <div className='signerPermission localSetting' style={{ zIndex: 204 }}>
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>Lattice Derivation</div>
+              <Dropdown
+                syncValue={this.store('main.latticeSettings.derivation')}
+                onChange={(value) => link.send('tray:action', 'setLatticeDerivation', value)}
+                options={[{ text: 'Standard', value: 'standard' }, { text: 'Legacy', value: 'legacy' }, { text: 'Live', value: 'live' }]}
+              />
+            </div>
+            <div className='signerPermissionDetails'>
+              {'Derivation path for connected Lattice devices'}
+            </div>
+          </div>
           <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Accounts</div>
@@ -429,14 +433,6 @@ class Settings extends React.Component {
               <input tabIndex='-1' placeholder={'Custom Relay'} value={this.state.latticeEndpoint} onChange={e => this.inputLatticeEndpoint(e)} />
             </div>
           </div>
-          <div className='signerPermission localSetting' style={{ zIndex: 201 }}>
-            <div className='signerPermissionControls'>
-              <div className='signerPermissionSetting'>Lattice Frame Suffix</div>
-            </div>
-            <div className='connectionCustomInput connectionCustomInputOn'>
-              <input placeholder={'Lattice Suffix'} tabIndex='-2' value={this.state.latticeSuffix} onChange={e => this.inputLatticeSuffix(e)} />
-            </div>
-          </div>
 
           <div className='signerPermission localSetting' style={{ zIndex: 200 }}>
             <div className='signerPermissionControls'>
@@ -452,7 +448,7 @@ class Settings extends React.Component {
             </div>
           </div>
           {this.quit()}
-          <div className='viewLicense' onMouseDown={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
+          <div className='viewLicense' onClick={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
           {this.appInfo()}
         </div>
       </div>
@@ -469,7 +465,7 @@ export default Restore.connect(Settings)
 //   </div>
 // </div>
 
-// <div className='signerPermission localSetting' onMouseDown={_ => this.store.runLocalNode()}>
+// <div className='signerPermission localSetting' onClick={_ => this.store.runLocalNode()}>
 //   <div className='signerPermissionSetting'>{'Run Local Node'}</div>
 //   <div className={this.store('local.node.run') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'}>
 //     <div className='signerPermissionToggleSwitch' />
@@ -480,7 +476,7 @@ export default Restore.connect(Settings)
   <div className={this.store('main..connection.local.on') ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
     <div className='connectionOptionToggle'>
       <div className='signerPermissionSetting'>Local</div>
-      <div className={this.store('main..connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={_ => link.send('tray:action', 'toggleConnection', 'primary')}>
+      <div className={this.store('main..connection.local.on') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => link.send('tray:action', 'toggleConnection', 'primary')}>
         <div className='signerPermissionToggleSwitch' />
       </div>
     </div>
@@ -488,7 +484,7 @@ export default Restore.connect(Settings)
       <div className='connectionOptionDetailsInset'>
         {this.status(this.store('main..connection.local'))}
         <div className='signerOptionSetWrap'>
-          <div className={this.state.localShake.custom ? 'signerOptionSet headShake' : 'signerOptionSet'} onMouseDown={() => this.localShake('custom')}>
+          <div className={this.state.localShake.custom ? 'signerOptionSet headShake' : 'signerOptionSet'} onClick={() => this.localShake('custom')}>
             <div className='signerOptionSetButton' />
             {this.store('main..connection.local.type') ? (
               <div className='signerOptionSetText'>{this.store('main..connection.local.type')}</div>

@@ -1,23 +1,23 @@
-// @ts-nocheck
-
 import EventEmitter from 'events'
 import log from 'electron-log'
-import crypto from 'crypto'
 
 import Signer from './Signer'
 import { SignerAdapter } from './adapters'
 
-import hot from './hot'
 import LedgerAdapter from './ledger/adapter'
 import TrezorAdapter  from './trezor/adapter'
+import LatticeAdapter from './lattice/adapter'
 
-import lattice from './lattice'
+import hot from './hot'
+import RingSigner from './hot/RingSigner'
+import HotSigner from './hot/HotSigner'
 
 import store from '../store'
 
 const registeredAdapters = [
   new LedgerAdapter(),
-  new TrezorAdapter()
+  new TrezorAdapter(),
+  new LatticeAdapter()
 ]
 
 interface AdapterSpec {
@@ -30,9 +30,13 @@ interface AdapterSpec {
   }
 }
 
+type Keystore = string | { version: number }
+
 class Signers extends EventEmitter {
   private adapters: AdapterSpec;
-  private signers: { [key: string]: Signer };
+  private scans: { [key: string]: any};
+
+  private signers: { [id: string]: Signer };
 
   constructor () {
     super()
@@ -42,7 +46,6 @@ class Signers extends EventEmitter {
 
     // TODO: convert these scans to adapters
     this.scans = {
-      lattice: lattice.scan(this),
       hot: hot.scan(this)
     }
 
@@ -51,7 +54,7 @@ class Signers extends EventEmitter {
 
   addAdapter (adapter: SignerAdapter) {
     const addFn = this.add.bind(this)
-    const removeFn = id => this.remove(id, false)
+    const removeFn = this.remove.bind(this)
     const updateFn = this.update.bind(this)
 
     adapter.on('add', addFn)
@@ -86,60 +89,10 @@ class Signers extends EventEmitter {
       adapter.removeListener(listener.event, listener.handler)
     })
 
-    delete this.adapter[adapter.adapterType]
+    delete this.adapters[adapter.adapterType]
   }
 
-  async latticePair (id, pin) {
-    try {
-      const signer = this.get(id)
-      if (signer && signer.setPair) {
-        try {
-          const result = await signer.setPair(pin)
-          return result
-        } catch (err) {
-          log.error('latticePair Error', err)
-          return new Error(err)
-        }
-      } else {
-        return new Error('Could not pair')
-      }
-    } catch (err) {
-      return new Error(err)
-    }
-  }
-
-  async createLattice (deviceId) {
-    if (deviceId) {
-      store.updateLattice(deviceId, { 
-        deviceId, 
-        baseUrl: 'https://signing.gridpl.us',
-        endpointMode: 'default',
-        suffix: '',
-        privKey: crypto.randomBytes(32).toString('hex')  
-      })    
-      return { id: 'lattice-' + deviceId}
-    } else {
-      throw new Error('No Device ID')
-    }
-  }
-
-
-  async latticeConnect (connectOpts) {
-    const signer = lattice(this)
-    if (signer && signer.open) {
-      try {
-        const response = await signer.open(connectOpts)
-
-        return response
-      } catch (err) {
-        throw new Error('Could not connect to lattice', err)
-      }
-    } else {
-      return new Error('Lattice, no signer or signer not open')
-    }
-  }
-
-  exists (id) {
+  exists (id: string) {
     return id in this.signers
   }
 
@@ -153,18 +106,22 @@ class Signers extends EventEmitter {
     }
   }
 
-  remove (id: string, close = true) {
-    if (id in this.signers) {
+  remove (id: string) {
+    const signer = this.signers[id]
+    
+    if (signer) {
+      delete this.signers[id]
       store.removeSigner(id)
 
-      const signer = this.signers[id]
+      const type = (signer.type === 'ring' || signer.type === 'seed') ? 'hot' : signer.type
 
-      // for backwards compatibility, when all scans are converted to adapters
-      // they should close the signers before emitting the close event
-      if (close) signer.close()
-      if (signer.delete) signer.delete()
-
-      delete this.signers[id]
+      if (type in this.adapters) {
+        this.adapters[type].adapter.remove(signer)
+      } else {
+        // backwards compatibility
+        signer.close()
+        signer.delete()
+      }
     }
   }
 
@@ -176,11 +133,11 @@ class Signers extends EventEmitter {
 
       store.updateSigner(signer.summary())
     } else {
-      this.add(id, signer)
+      this.add(signer)
     }
   }
 
-  reload (id) {
+  reload (id: string) {
     const signer = this.signers[id]
     
     if (signer) {
@@ -197,70 +154,72 @@ class Signers extends EventEmitter {
     }
   }
 
-  find (f) {
-    return Object.values(this.signers).find(f)
-  }
-
-  filter (f) {
-    return Object.values(this.signers).filter(f)
-  }
-
-  list () {
-    return Object.values(this.signers)
-  }
-
-  get (id) {
+  get (id: string) {
     return this.signers[id]
   }
 
-  createFromPhrase (mnemonic, password, cb) {
+  createFromPhrase (mnemonic: string, password: string, cb: Callback<Signer>) {
     hot.createFromPhrase(this, mnemonic, password, cb)
   }
 
-  createFromPrivateKey (privateKey, password, cb) {
+  createFromPrivateKey (privateKey: string, password: string, cb: Callback<Signer>) {
     hot.createFromPrivateKey(this, privateKey, password, cb)
   }
 
-  createFromKeystore (keystore, keystorePassword, password, cb) {
+  createFromKeystore (keystore: Keystore, keystorePassword: string, password: string, cb: Callback<Signer>) {
     hot.createFromKeystore(this, keystore, keystorePassword, password, cb)
   }
 
-  addPrivateKey (id, privateKey, password, cb) {
+  addPrivateKey (id: string, privateKey: string, password: string, cb: Callback<Signer>) {
     // Get signer
     const signer = this.get(id)
     // Make sure signer is of type 'ring'
-    if (!signer.type === 'ring') return cb(new Error('Private keys can only be added to ring signers'))
+    if (signer.type !== 'ring') {
+      return cb(new Error('Private keys can only be added to ring signers'), undefined)
+    }
+
     // Add private key
-    signer.addPrivateKey(privateKey, password, cb)
+    (signer as RingSigner).addPrivateKey(privateKey, password, cb)
   }
 
-  removePrivateKey (id, index, password, cb) {
+  removePrivateKey (id: string, index: number, password: string, cb: Callback<Signer>) {
     // Get signer
     const signer = this.get(id)
-    // Make sure signer is of type 'ring'
-    if (!signer.type === 'ring') return cb(new Error('Private keys can only be removed from ring signers'))
+
+    if (signer.type !== 'ring') {
+      return cb(new Error('Private keys can only be removed from ring signers'), undefined)
+    }
+
     // Add keystore
-    signer.removePrivateKey(index, password, cb)
+    (signer as RingSigner).removePrivateKey(index, password, cb)
   }
 
-  addKeystore (id, keystore, keystorePassword, password, cb) {
+  addKeystore (id: string, keystore: Keystore, keystorePassword: string, password: string, cb: Callback<Signer>) {
     // Get signer
     const signer = this.get(id)
-    // Make sure signer is of type 'ring'
-    if (!signer.type === 'ring') return cb(new Error('Keystores can only be used with ring signers'))
-    // Add keystore
-    signer.addKeystore(keystore, keystorePassword, password, cb)
+
+    if (signer.type !== 'ring') {
+      return cb(new Error('Keystores can only be used with ring signers'), undefined)
+    }
+
+    (signer as RingSigner).addKeystore(keystore, keystorePassword, password, cb)
   }
 
-  lock (id, cb) {
+  lock (id: string, cb: Callback<Signer>) {
     const signer = this.get(id)
-    if (signer && signer.lock) signer.lock(cb)
+
+    // @ts-ignore
+    if (signer && signer.lock) {
+      (signer as HotSigner).lock(cb)
+    }
   }
 
-  unlock (id, password, cb) {
+  unlock (id: string, password: string, cb: Callback<Signer>) {
     const signer = this.signers[id]
+
+    // @ts-ignore
     if (signer && signer.unlock) {
-      signer.unlock(password, cb)
+      (signer as HotSigner).unlock(password, cb)
     } else {
       log.error('Signer not unlockable via password, no unlock method')
     }

@@ -88,17 +88,17 @@ class AddAccounts extends React.Component {
       <div className='addAccounts cardShow'>
         <div className='addAccountsHeader'>
           <div className='addAccountsHeaderTitle'>What type of account would you like to add?</div>
-          <div className='addAccountsHeaderClose' onMouseDown={() => this.props.close()}>{svg.close(20)}</div>
+          <div className='addAccountsHeaderClose' onClick={() => this.props.close()}>{'done'}</div>
         </div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
-        {/* <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keyring' })}>Private Key</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'keystore' })}>Keystore File (json)</div>
-        <div className='accountTypeSelect' onMouseDown={() => this.setState({ view: 'nonsigning' })}>Watch-only Account</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
+        {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keyring' })}>Private Key</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keystore' })}>Keystore File (json)</div>
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'nonsigning' })}>Watch-only Account</div>
       </div>
     )
   }
@@ -162,12 +162,13 @@ class Dash extends React.Component {
           return false
         }
       }).filter(s => s)
+      
       return (
       <div className='dash'>
         {this.state.showAddAccounts ? <AddAccounts close={() => this.setState({ showAddAccounts: false })} /> : null}
-        <div className='newAccount' onMouseDown={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
+        <div className='newAccount' onClick={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
           <div className='newAccountIcon'>{'+'}</div> 
-          Add New Accounts
+          Add New Account
         </div>
         <div className='signers'>
           <div className='signersMid'>
@@ -176,7 +177,9 @@ class Dash extends React.Component {
             </div>
             <div className='signersList'>
               {hardwareSigners.length ? (
-                hardwareSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
+                hardwareSigners
+                  .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+                  .map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
               ) : (
                 <div className='noSigners'>
                   {'No hardware signers detected'}

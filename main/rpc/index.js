@@ -1,7 +1,7 @@
 const { ipcMain, dialog } = require('electron')
 const fs = require('fs')
-const log = require('electron-log')
 const utils = require('web3-utils')
+const crypto = require('crypto')
 
 const accounts = require('../accounts')
 const signers = require('../signers')
@@ -11,6 +11,10 @@ const store = require('../store')
 const dapps = require('../dapps')
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
+
+function randomLetters (num) {
+  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
+}
 
 const { resolveName } = require('../accounts/aragon')
 
@@ -64,21 +68,34 @@ const rpc = {
       cb(new Error('Set phrase not available'))
     }
   },
-  createLattice: async (id, cb) => {
-    try {
-      cb(null, await signers.createLattice(id))
-    } catch (e) {
-      log.error('latticeContactError', e)
-      cb(e)
+  createLattice: (deviceId, deviceName, cb) => {
+    if (!deviceId) {
+      return cb(new Error('No Device ID'))
     }
-  },
-  latticePair (id, pin, cb) {
-    signers.latticePair(id, pin).then(result => {
-      cb(null, result)
-    }).catch(err => {
-      log.error('latticePairError', err)
-      cb(err)
+
+    store.updateLattice(deviceId, {
+      deviceId, 
+      baseUrl: 'https://signing.gridpl.us',
+      endpointMode: 'default',
+      paired: true,
+      deviceName: (deviceName || 'GridPlus').substring(0, 14),
+      tag: randomLetters(6),
+      privKey: crypto.randomBytes(32).toString('hex')  
     })
+
+    cb(null, { id: 'lattice-' + deviceId })
+  },
+  async latticePair (id, pin, cb) {
+    const signer = signers.get(id)
+
+    if (signer && signer.pair) {
+      try {
+        const hasActiveWallet = await signer.pair(pin)
+        cb(null, hasActiveWallet)
+      } catch (e) {
+        cb(e.message)
+      }
+    }
   },
   launchStatus: launch.status,
   providerSend: (payload, cb) => provider.send(payload, cb),

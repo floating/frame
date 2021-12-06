@@ -19,6 +19,12 @@ function validateNetworkSettings (network) {
   return networkId
 }
 
+function includesToken (tokens, token) {
+  const existingAddress = token.address.toLowerCase()
+  return tokens.some(t => 
+    t.address.toLowerCase() === existingAddress && t.chainId === token.chainId
+  )
+}
 
 module.exports = {
   ...panelActions,
@@ -135,11 +141,11 @@ module.exports = {
   },
   updateSigner: (u, signer) => {
     if (!signer.id) return
-    u('main.signers', signer.id, () => signer)
+    u('main.signers', signer.id, prev => ({ ...prev, ...signer }))
   },
   newSigner: (u, signer) => {
     u('main.signers', signers => {
-      signers[signer.id] = signer
+      signers[signer.id] = { ...signer, createdAt: new Date().getTime() }
       return signers
     })
   },
@@ -174,8 +180,8 @@ module.exports = {
   setLatticeEndpointCustom: (u, url) => {
     u('main.latticeSettings.endpointCustom', () => url)
   },
-  setLatticeSuffix: (u, suffix) => {
-    u('main.latticeSettings.suffix', () => suffix)
+  setLatticeDerivation: (u, value) => {
+    u('main.latticeSettings.derivation', () => value)
   },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
@@ -441,19 +447,34 @@ module.exports = {
       return updates
     })
   },
-  // Tokens
-  setBalances: (u, netId, address, newBalances, fullScan) => {
-    u('main.balances', netId, address, (balances = {}) => {
-      const updatedBalances = Object.entries(newBalances).reduce((acc, [key, token]) => {
-        acc[key] = token
-        return acc
-      }, {})
+  removeBalance: (u, chainId, key) => {
+    u('main.balances', chainId, (balances = {}) => {
+      for (const accountAddress in balances) {
+        delete balances[accountAddress][key.toLowerCase()]
+      }
 
-      return { ...balances, ...updatedBalances }
+      return balances
     })
-    if (fullScan) {
+  },
+  // Tokens
+  setBalances: (u, netId, address, newBalances) => {
+    u('main.balances', netId, address, (balances = {}) => {
+      // remove zero balances
+      const updatedBalances = { ...balances, ...newBalances }
+
+      // TODO: possibly add an option to filter out zero balances
+      //const withoutZeroBalances = Object.entries(updatedBalances)
+        //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
+
+      return updatedBalances
+    })
+  },
+  setScanning: (u, address, scanning) => {
+    if (scanning) {
+      u('main.scanning', address, () => true)
+    } else {
       setTimeout(() => {
-        u('main.fullScan', address, () => true)
+        u('main.scanning', address, () => false)
       }, 1000)
     }
   },
@@ -462,6 +483,20 @@ module.exports = {
       omit = omit || []
       if (omit.indexOf(omitToken) === -1) omit.push(omitToken)
       return omit
+    })
+  },
+  addCustomTokens: (u, tokens) => {
+    u('main.tokens', existing => {
+      // remove any tokens that have been overwritten by one with
+      // the same address and chain ID
+      const existingTokens = existing.filter(token => !includesToken(tokens, token))
+
+      return [...existingTokens, ...tokens]
+    })
+  },
+  removeCustomTokens: (u, tokens) => {
+    u('main.tokens', existing => {
+      return existing.filter(token => !includesToken(tokens, token))
     })
   },
   setColorway: (u, colorway) => {

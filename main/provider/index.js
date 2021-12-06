@@ -16,7 +16,7 @@ const {
   toBuffer,
   pubToAddress,
   ecrecover,
-  hashPersonalMessage
+  hashPersonalMessage,
 } = require('ethereumjs-util')
 
 
@@ -31,6 +31,7 @@ const { populate: populateTransaction, usesBaseFee, maxFee } = require('../trans
 
 const version = require('../../package.json').version
 
+const capitalize = s => s[0].toUpperCase() + s.substring(1).toLowerCase()
 const permission = (date, method) => ({ parentCapability: method, date })
 
 class Provider extends EventEmitter {
@@ -323,6 +324,13 @@ class Provider extends EventEmitter {
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
   }
+
+  _addRequestHandler (res) {
+    const handlerId = uuid()
+    this.handlers[handlerId] = res
+
+    return handlerId
+  }
   
   async _getGasEstimate (rawTx, chainConfig) {
     const { chainId, ...rest } = rawTx
@@ -336,9 +344,10 @@ class Provider extends EventEmitter {
 
     return new Promise((resolve, reject) => {
       this.connection.send(payload, response => {
-        return response.error
-          ? reject(response.error)
-          : resolve(response.result)
+        if (response.error) return reject(response.error)
+
+        log.debug(`gas estimate for tx to ${txParams.to}: ${response.result}`)
+        return resolve(response.result)
       }, targetChain)
     })
   }
@@ -368,6 +377,46 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
+  checkExistingNonceGas (tx) {
+    const { from, nonce } = tx
+
+    const reqs = this.store('main.accounts', from, 'requests')
+    const requests = Object.keys(reqs || {}).map(key => reqs[key])
+    const existing = requests.filter(r => (
+      r.mode === 'monitor' && 
+      r.status !== 'error' && 
+      r.data.nonce === nonce
+    ))
+
+    if (existing.length > 0) {
+      if (tx.maxPriorityFeePerGas && tx.maxFeePerGas) {
+        const existingFee = Math.max(...existing.map(r => r.data.maxPriorityFeePerGas))
+        const existingMax = Math.max(...existing.map(r => r.data.maxFeePerGas))
+        const feeInt = parseInt(tx.maxPriorityFeePerGas)
+        const maxInt = parseInt(tx.maxFeePerGas)
+        if (existingFee * 1.1 >= feeInt || existingMax * 1.1 >= maxInt) {
+          // Bump fees by 10%
+          const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
+          const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
+          tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
+          tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
+          tx.feesUpdated = true
+        }
+      } else if (tx.gasPrice) {
+        const existingPrice = Math.max(...existing.map(r => r.data.gasPrice))
+        const priceInt = parseInt(tx.gasPrice)
+        if (existingPrice >= priceInt) {
+          // Bump price by 10%
+          const bumpedPrice = Math.ceil(existingPrice * 1.1)
+          tx.gasPrice = '0x' + bumpedPrice.toString(16)
+          tx.feesUpdated = true
+        }
+      }
+    }
+
+    return tx
+  }
+
   fillTransaction (newTx, cb) {
     if (!newTx) return cb('No transaction data')
     const rawTx = this.getRawTx(newTx)
@@ -381,7 +430,14 @@ class Provider extends EventEmitter {
         .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
 
     estimateGas
-      .then(tx => populateTransaction(tx, chainConfig, gas))
+      .then(tx => {
+        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+
+        log.info({ populatedTransaction })
+
+        return populatedTransaction
+      })
+      .then(tx => this.checkExistingNonceGas(tx))
       .then(tx => cb(null, tx))
       .catch(cb)
   }
@@ -390,6 +446,8 @@ class Provider extends EventEmitter {
     const newTx = payload.params[0]
     const currentAccount = accounts.current()
 
+    log.debug(`sendTransaction(${JSON.stringify(newTx)}`)
+
     this.fillTransaction(newTx, (err, tx) => {
       if (err) {
         this.resError(err, payload, res)
@@ -397,12 +455,20 @@ class Provider extends EventEmitter {
         const from = tx.from
 
         if (from && !this._isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
-        const handlerId = uuid()
-        this.handlers[handlerId] = res
 
-        const { warning, ...data } = tx
+        const handlerId = this._addRequestHandler(res)
+        const { warning, feesUpdated, ...data } = tx
         
-        accounts.addRequest({ handlerId, type: 'transaction', data, payload, account: currentAccount.id, origin: payload._origin, warning }, res)
+        accounts.addRequest({ 
+          handlerId, 
+          type: 'transaction', 
+          data, 
+          payload, 
+          account: currentAccount.id, 
+          origin: payload._origin, 
+          warning,
+          feesUpdatedByUser: feesUpdated
+        }, res)
       }
     })
   }
@@ -442,8 +508,7 @@ class Provider extends EventEmitter {
 
     if (!this._isCurrentAccount(from, currentAccount)) return this.resError('sign request is not from currently selected account.', payload, res)
 
-    const handlerId = uuid()
-    this.handlers[handlerId] = res
+    const handlerId = this._addRequestHandler(res)
 
     const req = { handlerId, type: 'sign', payload: normalizedPayload, account: currentAccount.getAccounts[0], origin: payload._origin }
 
@@ -495,8 +560,7 @@ class Provider extends EventEmitter {
       return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
-    const handlerId = uuid()
-    this.handlers[handlerId] = res
+    const handlerId = this._addRequestHandler(res)
 
     accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
   }
@@ -539,8 +603,7 @@ class Provider extends EventEmitter {
 
       if (store('main.currentNetwork.id') === parseInt(chainId)) return res({ id: payload.id, jsonrpc: '2.0', result: null })
 
-      const handlerId = uuid()
-      this.handlers[handlerId] = res
+      const handlerId = this._addRequestHandler(res)
       
       // Ask user if they want to switch chains
       accounts.addRequest({
@@ -577,8 +640,7 @@ class Provider extends EventEmitter {
     if (!chainName) return this.resError('addChain request missing chainName', payload, res)
     if (!nativeCurrency) return this.resError('addChain request missing nativeCurrency', payload, res)
 
-    const handlerId = uuid()
-    this.handlers[handlerId] = res
+    const handlerId = this._addRequestHandler(res)
 
     // Check if chain exists
     const id = parseInt(chainId)
@@ -626,6 +688,62 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
   }
 
+  addCustomToken (payload, cb, targetChain) {
+    const { type, options: tokenData } = payload.params || {}
+
+    if ((type || '').toLowerCase() !== 'erc20') {
+      return this.resError('only ERC-20 tokens are supported', payload, cb)
+    }
+
+    this.getChainId({ id: 1, jsonrpc: '2.0' }, response => {
+      const chainId = parseInt(response.result)
+
+      const address = (tokenData.address || '').toLowerCase()
+      const symbol = (tokenData.symbol || '').toUpperCase()
+      const decimals = parseInt(tokenData.decimals || '1')
+
+      if (!address) {
+        return this.resError('tokens must define an address', payload, cb)
+      }
+
+      const res = () => {
+        cb({ id: payload.id, jsonrpc: '2.0', result: true })
+      }
+
+      // don't attempt to add the token if it's already been added
+      const tokenExists = store('main.tokens').some(token => token.chainId === chainId && token.address === address)
+      if (tokenExists) {
+        return res()
+      }
+
+      const token = {
+        chainId,
+        name: tokenData.name || capitalize(symbol),
+        address,
+        symbol,
+        decimals,
+        logoURI: tokenData.image || tokenData.logoURI || ''
+      }
+
+      // const result = {
+      //   suggestedAssetMeta: {
+      //     asset: { token }
+      //   }
+      // }
+
+      const handlerId = this._addRequestHandler(res)
+
+      accounts.addRequest({
+        handlerId,
+        type: 'addToken',
+        token,
+        account: accounts.current().id,
+        origin: payload._origin,
+        payload
+      }, res)
+    }, targetChain)
+  }
+
   sendAsync (payload, cb) {
     this.send(payload, res => {
       if (res.error) return cb(new Error(res.error))
@@ -659,6 +777,7 @@ class Provider extends EventEmitter {
     if (method === 'wallet_switchEthereumChain') return this.switchEthereumChain(payload, res)
     if (method === 'wallet_getPermissions') return this.getPermissions(payload, res)
     if (method === 'wallet_requestPermissions') return this.requestPermissions(payload, res)
+    if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res)
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)

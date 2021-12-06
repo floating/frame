@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import log from 'electron-log'
 
-import coingecko from '../coingecko'
+import coingecko, { CoinId, PlatformId } from '../coingecko'
 
 const FETCH_BATCH_SIZE = 200
 
@@ -13,10 +13,10 @@ interface Rate {
 }
 
 // { symbol: coinId }
-let allCoins: { [key: string]: string }
+let allCoins: { [symbol: string]: CoinId }
 
 // { chainId: platformId }
-let allPlatforms: { [key: string]: string }
+let allPlatforms: { [chainId: string]: PlatformId }
 
 function createRate (quote: any): Rate {
   return {

@@ -197,7 +197,7 @@ class Accounts extends EventEmitter {
       }
 
       proxyProvider.emit('send', tx, (res = {}) => {
-        if (res.error) return reject(new Error(res.error))
+        if (res.error) return reject(new Error(res.error.message))
         resolve()
       }, targetChain)
     })
@@ -364,6 +364,14 @@ class Accounts extends EventEmitter {
   setSigner (id, cb) {
     this._current = id
     const currentAccount = this.current()
+
+    if (!currentAccount) {
+      const err = new Error('could not set signer')
+      log.error(`no current account with id: ${id}`, err.stack)
+
+      return cb(err)
+    }
+
     const summary = currentAccount.summary()
     cb(null, summary)
     windows.broadcast('main:action', 'setSigner', summary)
@@ -479,6 +487,8 @@ class Accounts extends EventEmitter {
 
     const signer = currentAccount.getSigner()
     if (!signer) return cb(new Error('No signer'))
+
+    if (signer.status === 'locked') return cb(new Error('Signer locked'))
 
     const data = currentAccount.requests[handlerId].data
     cb(null, signerCompatibility(data, signer.summary()))

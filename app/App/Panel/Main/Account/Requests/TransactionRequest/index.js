@@ -197,9 +197,20 @@ class TransactionRequest extends React.Component {
           if (monitorFilter[i].status === 'confirming' || monitorFilter[i].status === 'confirmed') {
             txMeta.possible = false
             txMeta.notice = 'nonce used'
-          } else if (parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')) {
+          } else if (
+            req.data.gasPrice &&
+            parseInt(monitorFilter[i].data.gasPrice, 'hex') >= parseInt(req.data.gasPrice, 'hex')
+          ) {
             txMeta.possible = false
             txMeta.notice = 'gas price too low'
+          } else if (
+              req.data.maxPriorityFeePerGas &&
+              req.data.maxFeePerGas &&
+              Math.ceil(parseInt(monitorFilter[i].data.maxPriorityFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxPriorityFeePerGas, 'hex') &&
+              Math.ceil(parseInt(monitorFilter[i].data.maxFeePerGas, 'hex') * 1.1) > parseInt(req.data.maxFeePerGas, 'hex')
+            ) {
+            txMeta.possible = false
+            txMeta.notice = 'gas fees too low'
           }
         }
       })
@@ -309,26 +320,76 @@ class TransactionRequest extends React.Component {
                   <div className='requestNoticeInner'>
                     {!error ? (
                       <div className={success || !req.tx ? 'txAugment txAugmentHidden' : 'txAugment'}>
-                        <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
-                          Cancel
-                        </div>
-                        <div
-                          className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
-                          onMouseDown={() => {
-                            if (req && req.tx && req.tx.hash) {
-                              if (this.store('main.mute.explorerWarning')) {
-                                link.send('tray:openExplorer', req.tx.hash, this.chain)
-                              } else {
-                                this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
-                              }
-                            }
-                          }}
-                        >
-                          View Details
-                        </div>
-                        <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
-                          Speed Up
-                        </div>
+                        {this.state.txHashCopied ? (
+                          <div className={'txDetailsOptions txDetailsOptionsTxHash'}>
+                            Transaction Hash Copied
+                          </div>
+                        ) : this.state.viewDetailsHover ? (
+                          <div
+                            className={'txDetailsOptions'}
+                            onMouseOver={() => {
+                              clearTimeout(this.viewDetailsHoverTimer)
+                              this.setState({ viewDetailsHover: true })
+                            }}
+                            onMouseLeave={() => {
+                              this.viewDetailsHoverTimer = setTimeout(() => {
+                                this.setState({ viewDetailsHover: false })
+                              }, 0)
+                            }}
+                          >
+                            <div
+                              className={'txDetailsOptionsOpen'}
+                              onMouseDown={() => {
+                                if (req && req.tx && req.tx.hash) {
+                                  if (this.store('main.mute.explorerWarning')) {
+                                    link.send('tray:openExplorer', req.tx.hash, this.chain)
+                                  } else {
+                                    this.store.notify('openExplorer', { hash: req.tx.hash, chain: this.chain })
+                                  }
+                                }
+                              }}
+                            >
+                              Open Explorer
+                            </div>
+                            <div
+                              className={'txDetailsOptionsCopy'}
+                              onMouseDown={() => {
+                                if (req && req.tx && req.tx.hash) {
+                                  link.send('tray:copyTxHash', req.tx.hash, this.chain)
+                                  this.setState({ txHashCopied: true, viewDetailsHover: false })
+                                  setTimeout(() => {
+                                    this.setState({ txHashCopied: false })
+                                  }, 3000)
+                                }
+                              }}
+                            >
+                              Copy Hash
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div
+                              className={req && req.tx && req.tx.hash ? 'txDetails txDetailsShow' : 'txDetails txDetailsHide'}
+                              onMouseOver={() => {
+                                clearTimeout(this.viewDetailsHoverTimer)
+                                this.setState({ viewDetailsHover: true })
+                              }}
+                              onMouseLeave={() => {
+                                this.viewDetailsHoverTimer = setTimeout(() => {
+                                  this.setState({ viewDetailsHover: false })
+                                }, 0)
+                              }}
+                            >
+                              View Details
+                            </div>
+                            <div className='txAugmentCancel' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'cancel')}>
+                              Cancel
+                            </div>
+                            <div className='txAugmentSpeedUp' onMouseDown={() => link.send('tray:replaceTx', req.handlerId, 'speed')}>
+                              Speed Up
+                            </div>
+                          </>
+                        )}
                       </div>
                     ) : null}
                     <div className={success ? 'txSuccessHash ' : 'txSuccessHash'}>
@@ -485,6 +546,8 @@ class TransactionRequest extends React.Component {
                   link.rpc('signerCompatibility', req.handlerId, (e, compatibility) => {
                     if (e === 'No signer')  {
                       this.store.notify('noSignerWarning', { req })
+                    } else if (e === 'Signer locked') {
+                      this.store.notify('signerLockedWarning', { req })
                     } else if (!compatibility.compatible && !this.store('main.mute.signerCompatibilityWarning')) {
                       this.store.notify('signerCompatibilityWarning', { req, compatibility, chain: this.chain })
                     } else if ((maxFeeUSD.toNumber() > FEE_WARNING_THRESHOLD_USD || this.toDisplayUSD(maxFeeUSD) === '0.00') && !this.store('main.mute.gasFeeWarning')) {

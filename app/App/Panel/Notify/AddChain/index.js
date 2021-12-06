@@ -63,7 +63,7 @@ class AddChain extends React.Component {
               <div className='chainName'>
                 <div className='chainInputLabel'>Chain Name</div>
                 <input
-                  className='chainInput chainInputLarge'
+                  className={this.state.newNetworkName === this.newNetworkNameDefault ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkName} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkName: e.target.value })
@@ -82,7 +82,7 @@ class AddChain extends React.Component {
               <div className='chainId'>
                 <div className='chainInputLabel'>Chain ID</div>
                 <input
-                  className='chainInput'
+                  className={this.state.newNetworkId === this.newNetworkIdDefault ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkId} spellCheck='false'
                   onChange={(e) => {
                     if (Number(parseInt(e.target.value)) || e.target.value === '') {
@@ -101,7 +101,7 @@ class AddChain extends React.Component {
               <div className='chainSymbol'>
                 <div className='chainInputLabel'>Native Symbol</div>
                 <input
-                  className='chainInput'
+                  className={this.state.newNetworkSymbol === this.newNetworkSymbolDefault ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkSymbol} spellCheck='false'
                   onChange={(e) => {
                     if (e.target.value.length > 8) return e.preventDefault()
@@ -121,7 +121,7 @@ class AddChain extends React.Component {
               <div className='chainExplorer'>
                 <div className='chainInputLabel'>Block Explorer</div>
                 <input
-                  className='chainInput'
+                  className={this.state.newNetworkExplorer === this.newNetworkExplorerDefault ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkExplorer} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkExplorer: e.target.value })
@@ -140,7 +140,7 @@ class AddChain extends React.Component {
               <div className='chainExplorer'>
                 <div className='chainInputLabel'>Primary RPC</div>
                 <input
-                  className='chainInput'
+                  className={this.state.newNetworkRPCPrimary === this.newNetworkRPCPrimary ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkRPCPrimary} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkRPCPrimary: e.target.value })
@@ -159,7 +159,7 @@ class AddChain extends React.Component {
               <div className='chainExplorer'>
                 <div className='chainInputLabel'>Secondary RPC</div>
                 <input
-                  className='chainInput'
+                  className={this.state.newNetworkRPCSecondary === this.newNetworkRPCSecondary ? 'chainInput chainInputDim' : 'chainInput'}
                   value={this.state.newNetworkRPCSecondary} spellCheck='false'
                   onChange={(e) => {
                     this.setState({ newNetworkRPCSecondary: e.target.value })
@@ -241,7 +241,7 @@ class AddChain extends React.Component {
             <div className='chainRow'>
               {changedNewNetwork && newNetworkReady ? (
                 <div 
-                  className='addChainSubmit addChainSubmitEnabled' 
+                  className='addTokenSubmit addTokenSubmitEnabled' 
                   onMouseDown={() => {
                     const net = {
                       id: this.state.newNetworkId,
@@ -259,13 +259,13 @@ class AddChain extends React.Component {
                     }, 400)
                   }}
                 >
-                  {svg.octicon('plus', { height: 17 })} Add Chain
+                  Add Chain
                 </div>
               ) : (
                 <div 
-                  className='addChainSubmit' 
+                  className='addTokenSubmit' 
                 >
-                  {svg.octicon('plus', { height: 17 })} Fill in Chain
+                  Fill in Chain
                 </div>
               )}
             </div>

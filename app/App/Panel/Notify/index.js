@@ -9,6 +9,8 @@ import { usesBaseFee } from '../../../../main/transaction'
 import frameIcon from './FrameIcon.png'
 
 import AddChain from './AddChain'
+import AddToken from './AddToken'
+import CustomTokens from './CustomTokens'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -231,6 +233,28 @@ class Notify extends React.Component {
             </div>
             <div className='notifyCheckText'>
               {'Don\'t show this warning again'}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  signerLockedWarning ({ req = {} }) {
+    return (
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBox'>
+          <div className='notifyTitle'>
+            Signer locked!
+          </div>
+          <div className='notifyBody'>
+            <div className='notifyBodyQuestion'>
+              Please unlock this signer and try again
+            </div>
+          </div>
+          <div className='notifyInput'>
+            <div className='notifyInputOption notifyInputSingleButton' onMouseDown={() => { this.store.notify() }}>
+              <div className='notifyInputOptionText'>OK</div>
             </div>
           </div>
         </div>
@@ -496,6 +520,9 @@ class Notify extends React.Component {
     if (notify === 'mainnet') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.mainnet()}
         </div>
       )
@@ -508,61 +535,118 @@ class Notify extends React.Component {
     } else if (notify === 'nonceWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.nonceWarning()}
         </div>
       )
     } else if (notify === 'gasFeeWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.gasFeeWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'noSignerWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.noSignerWarning(this.store('view.notifyData'))}
         </div>
       )
-    }else if (notify === 'signerCompatibilityWarning') {
+    } else if (notify === 'signerLockedWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
+          {this.signerLockedWarning(this.store('view.notifyData'))}
+        </div>
+      )
+    } else if (notify === 'signerCompatibilityWarning') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.signerCompatibilityWarning(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'contractData') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.contractData()}
         </div>
       )
     } else if (notify === 'hotAccountWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.hotAccountWarning()}
         </div>
       )
     } else if (notify === 'hotSignerMismatch') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.hotSignerMismatch()}
         </div>
       )
     } else if (notify === 'openExternal') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.openExternal(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'openExplorer') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           {this.openExplorer(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'addChain') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
           <AddChain req={this.store('view.notifyData')} />
+        </div>
+      )
+    } else if (notify === 'addToken') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
+          <AddToken req={this.store('view.notifyData')} />
+        </div>
+      )
+    } else if (notify === 'customTokens') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
+          <CustomTokens req={this.store('view.notifyData')} />
         </div>
       )
     } else {

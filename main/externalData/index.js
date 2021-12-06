@@ -4,12 +4,13 @@ const { fork } = require('child_process')
 
 const store = require('../store')
 
+let chainId = 0
 let activeAddress
 let trackedAddresses = []
 let networkCurrencies = []
 
-let currentNetworkObserver, allNetworksObserver
-let scanWorker, heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan
+let currentNetworkObserver, allNetworksObserver, tokenObserver
+let scanWorker, heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan
 
 function createWorker () {
   if (scanWorker) {
@@ -42,7 +43,8 @@ function createWorker () {
     }
 
     if (message.type === 'tokenBalances') {
-      store.setBalances(message.netId, message.address, message.balances, message.fullScan)
+      store.setScanning(message.address, false)
+      store.setBalances(message.netId, message.address, message.balances)
 
       const tokenSymbols = Object.keys(message.balances).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
 
@@ -126,6 +128,10 @@ function scanNetworkCurrencyRates () {
 }
 
 function scanActiveData () {
+  if (activeAddress) {
+    store.setScanning(activeAddress, true)
+  }
+
   if (trackedAddressScan) {
     clearInterval(trackedAddressScan)
   }
@@ -144,11 +150,24 @@ function scanActiveData () {
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
 const updateRates = (symbols, chainId) => sendCommandToWorker('updateRates', [symbols, chainId])
 const updateNativeCurrencyData = symbols => sendCommandToWorker('updateNativeCurrencyData', [symbols])
-const updateAllTokens = () => sendCommandToWorker('updateTokenBalances', [trackedAddresses])
 const updateActiveBalances = () => {
-  if (activeAddress) {
+  if (activeAddress && chainId) {
+    const tokensWithBalance = Object
+      .entries(store('main.balances', chainId, activeAddress) || [])
+      .reduce((tokens, [address, tokenBalance]) => {
+        if (address !== 'native') {
+          const { balance, ...token } = tokenBalance
+          return [...tokens, token]
+        }
+
+        return tokens
+      }, [])
+      
+    const customTokens = store('main.tokens')
+    const knownTokens = [...tokensWithBalance, ...customTokens]
+
     sendCommandToWorker('updateChainBalance', [activeAddress])
-    sendCommandToWorker('updateTokenBalances', [[activeAddress]])
+    sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens } } ])
   }
 }
 
@@ -168,7 +187,7 @@ function addAddresses (addresses) {
 }
 
 function setActiveAddress (address) {
-  log.debug(`setActiveAddress(${address})`)
+  log.debug(`externalData setActiveAddress(${address})`)
 
   addAddresses([address])
   activeAddress = address
@@ -176,7 +195,7 @@ function setActiveAddress (address) {
   scanActiveData()
 }
 
-function start (addresses = [], omitList = [], knownList) {
+function start () {
   if (scanWorker) {
     log.warn('external data worker already scanning')
     return
@@ -189,9 +208,12 @@ function start (addresses = [], omitList = [], knownList) {
   currentNetworkObserver = store.observer(() => {
     const { id } = store('main.currentNetwork')
 
-    log.debug(`changed scanning network to chainId: ${id}`)
+    if (id !== chainId) {
+      log.debug(`changed scanning network to chainId: ${id}`)
 
-    scanActiveData()
+      chainId = id
+      scanActiveData()
+    }
   })
 
   allNetworksObserver = store.observer(() => {
@@ -206,13 +228,15 @@ function start (addresses = [], omitList = [], knownList) {
     }
   })
 
+  tokenObserver = store.observer(() => {
+    const customTokens = store('main.tokens')
+    if (activeAddress && chainId) {
+      sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens: customTokens, onlyKnown: true } } ])
+    }
+  })
+
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
-  }
-
-  if (!allAddressScan) {
-    // update tokens for all accounts (even inactive) every 5 minutes
-    allAddressScan = startScan(updateAllTokens, 1000 * 60 * 5)
   }
 }
 
@@ -221,13 +245,13 @@ function stop () {
 
   currentNetworkObserver.remove()
   allNetworksObserver.remove()
+  tokenObserver.remove()
 
-  const scanners = [heartbeat, allAddressScan, trackedAddressScan, nativeCurrencyScan, inventoryScan]
+  const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan]
 
   scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
 
   heartbeat = null
-  allAddressScan = null
   trackedAddressScan = null
   nativeCurrencyScan = null
   inventoryScan = null
