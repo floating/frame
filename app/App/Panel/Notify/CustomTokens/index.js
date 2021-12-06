@@ -87,7 +87,7 @@ class CustomTokens extends React.Component {
                 )
               }) : (
                 <div className='customTokensListNoTokens'>
-                  {'No Custom Tokens Added'}
+                  {'No Custom Tokens'}
                 </div>
               )}
             </div>
