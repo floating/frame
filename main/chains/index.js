@@ -58,7 +58,7 @@ class ChainConnection extends EventEmitter {
     const monitor = new BlockMonitor(provider)
 
     monitor.on('data', async block => {
-      let feeMarket
+      let feeMarket = null
 
       const gasCalculator = new GasCalculator(provider)
 
