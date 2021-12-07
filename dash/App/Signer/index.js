@@ -249,7 +249,7 @@ class Signer extends React.Component {
 
     const hwSigner = isHardwareSigner(this.props.type)
     const loading = isLoading(status)
-    const disconnected = hwSigner && !loading && status !== 'ok'
+    const disconnected = this.props.type === 'lattice' && !loading && status !== 'ok'
 
     // UI changes for this status only apply to hot signers
     const isLocked = !hwSigner && status === 'locked'
@@ -275,7 +275,7 @@ class Signer extends React.Component {
             return <div className='signerIconWrap'>{svg.logo(20)}</div>
           })()}
           </div>
-          <div className='signerType'>{this.props.model}</div>
+          <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div>
           <div className='signerName'>
             {this.props.name}
             <div className='signerNameUpdate'>
@@ -289,20 +289,14 @@ class Signer extends React.Component {
           <div className='signerLatticePair'>
             <div className='signerLatticePairTitle'>Please input your Lattice's pairing code</div>
             <div className='signerLatticePairInput'>
-              <div className=''>
-                <input
-                  tabIndex='1' value={this.state.latticePairCode}
-                  onChange={e => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
-                  autoFocus
-                  // onFocus={e => this.onFocus('pairCode', e)}
-                  // onBlur={e => this.onBlur('pairCode', e)} 
-                  onKeyPress={e => {
-                    if (e.key === 'Enter') this.pairToLattice()
-                  }}
-                />
-              </div>
-              <div>
-              </div>
+              <input
+                autoFocus
+                tabIndex='1' value={this.state.latticePairCode}
+                onChange={e => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
+                onKeyPress={e => {
+                  if (e.key === 'Enter') this.pairToLattice()
+                }}
+              />
             </div>
             <div
               onMouseDown={() => this.pairToLattice()}
@@ -351,7 +345,7 @@ class Signer extends React.Component {
             <div className='signerLoadingLoader' />
           </div>
         ): <></>}
-        {disconnected ? null : (
+        {disconnected || this.props.inSetup ? null : (
           <div className='signerDrawer'>
             <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
               {this.state.showControls ? 'hide' : 'more'}

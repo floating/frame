@@ -146,7 +146,7 @@ class AddPhrase extends React.Component {
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.create()}>Create</div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
-                  {signer ? <Signer key={signer.id} {...signer} />
+                  {signer ? <Signer key={signer.id} {...signer} inSetup={true} />
                   : (
                     <>
                       <div className='addAccountItemOptionTitle'>{this.state.status}</div>

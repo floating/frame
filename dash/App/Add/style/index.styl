@@ -333,18 +333,20 @@
     align-items center
     justify-content center
     z-index 9999999
-    line-height 22px
+    // line-height px
     font-size 13px
     text-transform uppercase
-    letter-spacing 1px
+    letter-spacing 0px
     height 50px
     text-align center
     min-height 22px
     box-sizing border-box
     position absolute
-    top 91px
+    font-weight 500
+    top 67px
     left 20px
     right 20px
+    color var(--good)
 
   .addAccountItemFooter:before
     content ''
@@ -374,21 +376,24 @@
     bottom 8px
     left 8px
     right 8px
+    display none
   
   .addAccountItemDevices
-    width calc(100% - 20px)
+    position absolute
+    top 120px
+    left 0px
+    bottom 0px
+    right 0px
+    padding 10px
     font-size 12px
     text-transform uppercase
     letter-spacing 2px
     margin-top 12px
-    border-radius 4px
     transition var(--standardSlow)
-    position relative
     overflow hidden
     font-weight 400
     flex-direction column
-    background var(--ghostA)
-    padding-bottom 10px
+    overflow-y scroll
 
     .addAccountItemDevice
       margin-top 10px
@@ -469,6 +474,8 @@
         display flex
         justify-content center
         align-items center
+        padding 0px 10px
+        box-sizing border-box
 
         .signerAddressAdded
           color var(--good)
@@ -582,11 +589,11 @@
       background rgba(5, 25, 35, 1)
 
   .addAccountItemOptionInputPhrase
-    width calc(100% - 20px)
+    width 100%
     border-radius 16px
     height 72px
     padding 0px 0px
-    margin 10px 10px 20px 10px
+    margin 10px 0px 20px 0px
     position relative
     overflow hidden
     background var(--ghostA)
