@@ -3,6 +3,8 @@ import Restore from 'react-restore'
 
 import svg from '../../../../resources/svg'
 
+import Signer from '../../Signer'
+
 class AddHardware extends React.Component {
   constructor (...args) {
     super(...args)
@@ -13,14 +15,10 @@ class AddHardware extends React.Component {
   render () {
     const accounts = this.store('main.accounts')
     const signers = this.store('main.signers')
-
-    // this tethered check is out of date
-    let tethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) > -1)
-    let untethered = Object.keys(signers).filter(id => Object.keys(accounts).indexOf(id) < 0)
     const isType = id => this.store('main.signers', id, 'type') === this.props.type
     const toDevice = id => this.store('main.signers', id)
-    tethered = tethered.filter(isType.bind(this)).map(toDevice.bind(this))
-    untethered = untethered.filter(isType.bind(this)).map(toDevice.bind(this))
+
+    const tethered = Object.keys(signers).filter(isType.bind(this)).map(toDevice.bind(this))
     return (
       <div className='addAccountItem addAccountItemAdding'>
         <div className='addAccountItemBar addAccountItemHardware' />
@@ -41,22 +39,20 @@ class AddHardware extends React.Component {
             <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           </div>
           <div className='addAccountItemDevices'>
-            {untethered.length || tethered.length ? (
-              untethered.map((signer, i) => {
+            {tethered.length ? (
+              tethered.map((signer, i) => {
                 return (
-                  <div className='addAccountItemDevice' key={signer.id}>
-                    <div className='addAccountItemDeviceTitle'>Device Found</div>
-                    <div className='addAccountItemDeviceStatus'>{signer.status}</div>
+                  <div className='addAccountItemOptionSetupFrame'>
+                    {signer ? <Signer key={signer.id} {...signer} />
+                    : (
+                      <>
+                        <div className='addAccountItemOptionTitle'>{this.state.status}</div>
+                        {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
+                      </>
+                    )} 
                   </div>
                 )
-              }).concat(tethered.map((signer, i) => {
-                return (
-                  <div className='addAccountItemDevice' key={signer.id}>
-                    <div className='addAccountItemDeviceTitle'>Device Found</div>
-                    <div className='addAccountItemDeviceStatus'>Account Created</div>
-                  </div>
-                )
-              }))
+              })
             ) : (
               <div className='addAccountItemDevice'>
                 <div className='addAccountItemDeviceTitle'>

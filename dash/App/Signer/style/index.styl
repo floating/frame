@@ -5,7 +5,7 @@
   overflow hidden
   background var(--ghostA)
   box-sizing border-box
-  margin 3px 10px 40px 10px
+  margin 3px 0px 40px 0px
   border-radius 16px
 
   .signerTop
@@ -31,6 +31,7 @@
     font-weight 400
     font-family 'Exo2', sans-serif
     text-transform capitalize
+    letter-spacing 0px
 
     .signerNameUpdate
       position absolute
@@ -279,14 +280,15 @@
       display flex
       justify-content center
       align-items center
-      font-size 17px
+      font-size 14px
       font-weight 300
       text-transform none
+      color var(--moon)
 
     .signerLatticePairInput
       background var(--ghostC)
       height 60px
-      border-radius 8px
+      border-radius 12px
       margin 10px 10px 20px 10px
 
       input
@@ -309,11 +311,16 @@
       justify-content center
       align-items center
       background var(--ghostC)
-      border-radius 15px
+      border-radius 12px
       position relative
       left 50%
       margin-left -50px
       cursor pointer
+      letter-spacing 1px
+      font-size 13px
+      text-transform uppercase
+      font-weight 500
+      padding-left 1px
 
       *
         pointer-events none
