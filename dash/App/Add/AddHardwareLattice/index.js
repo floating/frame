@@ -1,6 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import Signer from '../../Signer'
+
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg' // TODO: get gridplus svg
 
@@ -77,9 +79,6 @@ class AddHardwareLattice extends React.Component {
         this.setState({ status: err, error: true })
       } else {
         this.setState({ status: 'Successful', error: false })
-
-        // TODO: signal some sort of success and close this more gracefully
-        this.props.close()
       }
     })
   }
@@ -99,6 +98,12 @@ class AddHardwareLattice extends React.Component {
 
   render () {
     let itemClass = 'addAccountItem addAccountItemSmart addAccountItemAdding'
+
+    let signer
+
+    if (this.state.status === 'Successful') {
+      signer = this.store('main.signers', 'lattice-' + this.state.deviceId)
+    }
 
     return (
       <div className={itemClass} style={{ transitionDelay: (0.64 * this.props.index / 4) + 's' }}>
@@ -169,10 +174,14 @@ class AddHardwareLattice extends React.Component {
                   </div>
                 </div>
                 <div className='addAccountItemOptionSetupFrame'>
+                  {signer && this.state.status === 'Successful' ? (
+                    <Signer key={signer.id} {...signer} inSetup={true} />
+                  ) : (
                     <>
                       <div className='addAccountItemOptionTitle'>{this.state.status}</div>
                       {this.state.error ? <div className='addAccountItemOptionSubmit' onMouseDown={() => this.restart()}>try again</div> : null}
                     </>
+                  )}
                 </div>
               </div>
             </div>

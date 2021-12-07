@@ -43,7 +43,7 @@ class AddHardware extends React.Component {
               tethered.map((signer, i) => {
                 return (
                   <div className='addAccountItemOptionSetupFrame'>
-                    {signer ? <Signer key={signer.id} {...signer} />
+                    {signer ? <Signer key={signer.id} {...signer} inSetup={true} />
                     : (
                       <>
                         <div className='addAccountItemOptionTitle'>{this.state.status}</div>
