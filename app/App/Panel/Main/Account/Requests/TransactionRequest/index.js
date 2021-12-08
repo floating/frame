@@ -227,18 +227,20 @@ class TransactionRequest extends React.Component {
     // if (layer === 'rollup') metaChainClass += ' requestMetaChainRollup'
     // if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
 
-    let feeAtTime
+    let feeAtTime = '?.??'
 
     if (req && req.tx && req.tx.receipt && nativeUSD) {
       const { gasUsed, effectiveGasPrice } = req.tx.receipt
-      const { type, maxFeePerGas, gasPrice } = req.data
-      const feePerGas = effectiveGasPrice || (type === '0x2' ? maxFeePerGas : gasPrice)
-      const feeInWei = parseInt(gasUsed, 'hex') * parseInt(feePerGas, 'hex')
-      const feeInEth = feeInWei / 1e18
-      const feeInUsd = feeInEth * nativeUSD
-      feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
-    } else {
-      feeAtTime = '?.??'
+      const { type, gasPrice } = req.data
+
+      const paidGas = effectiveGasPrice || (parseInt(type) < 2 ? gasPrice : null)
+
+      if (paidGas) {
+        const feeInWei = parseInt(gasUsed, 'hex') * parseInt(paidGas, 'hex')
+        const feeInEth = feeInWei / 1e18
+        const feeInUsd = feeInEth * nativeUSD
+        feeAtTime = (Math.round(feeInUsd * 100) / 100).toFixed(2)
+      }
     }
 
     return (
