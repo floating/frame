@@ -28,7 +28,10 @@
       "entitlements": "build/entitlements.mac.plist",
       "requirements": "build/electron-builder-requirements.txt"
     },
-    "win": {},
+    "win": {
+      "publisherName": "Frame Labs, Inc.",
+      "signAndEditExecutable": true
+    },
     "files": [
       "compiled",
       "bundle"
