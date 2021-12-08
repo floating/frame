@@ -228,10 +228,11 @@ class TransactionRequest extends React.Component {
     // if (layer === 'mainnet') metaChainClass += ' requestMetaChainMainnet'
 
     let feeAtTime
+
     if (req && req.tx && req.tx.receipt && nativeUSD) {
-      const { gasUsed } = req.tx.receipt
+      const { gasUsed, effectiveGasPrice } = req.tx.receipt
       const { type, maxFeePerGas, gasPrice } = req.data
-      const feePerGas = type === '0x2' ? maxFeePerGas : gasPrice
+      const feePerGas = effectiveGasPrice || (type === '0x2' ? maxFeePerGas : gasPrice)
       const feeInWei = parseInt(gasUsed, 'hex') * parseInt(feePerGas, 'hex')
       const feeInEth = feeInWei / 1e18
       const feeInUsd = feeInEth * nativeUSD
