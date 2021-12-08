@@ -101,12 +101,12 @@ if (!dev) {
     setTimeout(() => {
       autoUpdater.checkForUpdates()
       setInterval(() => autoUpdater.checkForUpdates(), 60 * 60 * 1000)
-    }, 2000)
+    }, 10 * 1000)
   } else {
     setTimeout(() => {
       updater.checkManualUpdate()
       setInterval(() => updater.checkManualUpdate(), 60 * 60 * 1000)
-    }, 2000)
+    }, 10 * 1000)
   }
 }
 

@@ -25,7 +25,8 @@
       },
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist"
+      "entitlements": "build/entitlements.mac.plist",
+      "requirements": "build/electron-builder-requirements.txt"
     },
     "win": {},
     "files": [
@@ -90,7 +91,7 @@
     ]
   },
   "author": {
-    "name": "Jordan Muir",
+    "name": "Frame Labs",
     "email": "jordan@frame.sh",
     "url": "https://frame.sh"
   },
