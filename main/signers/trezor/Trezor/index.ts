@@ -145,7 +145,7 @@ export default class Trezor extends Signer {
           log.error('Verify address error:', err)
           
           this.status = (err || '').toLowerCase().match(/forbidden key path/)
-            ? 'derivation path failed strict safety checks'
+            ? 'derivation path failed strict safety checks on trezor device'
             : err
 
           cb(new Error('Verify Address Error'), undefined)
