@@ -246,9 +246,9 @@ export default class Trezor extends Signer {
 
         const rpcCallback: FlexCallback<Signature> = (err, result) => {
           if (err) {
-            if (err.toLowerCase().match(/forbidden key path/)) {
-              return reject(new Error(`Turn off strict Trezor safety checks in order to use the ${this.derivation} derivation path on this chain`))
-            }
+            const errMsg = err.toLowerCase().match(/forbidden key path/)
+              ? `Turn off strict Trezor safety checks in order to use the ${this.derivation} derivation path on this chain`
+              : err
 
             return reject(new Error(err))
           }
