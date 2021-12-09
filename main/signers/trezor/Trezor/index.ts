@@ -250,7 +250,7 @@ export default class Trezor extends Signer {
               ? `Turn off strict Trezor safety checks in order to use the ${this.derivation} derivation path on this chain`
               : err
 
-            return reject(new Error(err))
+            return reject(new Error(errMsg))
           }
 
           const { v, r, s } = result as Signature
