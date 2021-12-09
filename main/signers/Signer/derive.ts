@@ -1,4 +1,4 @@
-//@ts-ignore
+// @ts-ignore
 import HDKey from 'hdkey'
 
 import { publicToAddress, toChecksumAddress } from 'ethereumjs-util'
@@ -19,6 +19,7 @@ export function deriveHDAccounts (publicKey: string, chainCode: string, cb: (err
     }
     const accounts = []
     for (let i = 0; i < 100; i++) { accounts[i] = derive(i) }
+
     cb(null, accounts)
   } catch (e) {
     cb(e, undefined)

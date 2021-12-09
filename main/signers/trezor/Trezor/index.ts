@@ -5,7 +5,7 @@ import { Device as TrezorDevice } from 'trezor-connect'
 
 import Signer from '../../Signer'
 import flex from '../../../flex'
-import { sign, londonToLegacy, signerCompatibility, TransactionData } from '../../../transaction'
+import { sign, londonToLegacy, signerCompatibility, TransactionData, Signature } from '../../../transaction'
 
 // @ts-ignore
 import { v5 as uuid } from 'uuid'
@@ -14,7 +14,15 @@ import { TypedTransaction } from '@ethereumjs/tx'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
-type FlexCallback = (err: string | null, result: any | undefined) => void
+const defaultTrezorTVersion = { major_version: 2, minor_version: 3, patch_version: 0 }
+const defaultTrezorOneVersion = { major_version: 1, minor_version: 9, patch_version: 2 }
+
+type FlexCallback<T> = (err: string | null, result: T | undefined) => void
+
+interface PublicKeyResponse {
+  chainCode: string,
+  publicKey: string,
+}
 
 export default class Trezor extends Signer {
   private closed = false;
@@ -29,8 +37,8 @@ export default class Trezor extends Signer {
     this.device = device
     this.id = this.getId()
 
-    const defaultVersion = device.features?.model === 'T' ? '2.3.0' : '1.8.0'
-    const [major, minor, patch] = device.firmwareRelease?.release?.version || defaultVersion.split('.')
+    const defaultVersion = device.features?.model === 'T' ? defaultTrezorTVersion : defaultTrezorOneVersion
+    const { major_version: major, minor_version: minor, patch_version: patch } = device.features || defaultVersion
     this.appVersion = { major, minor, patch }
 
     const model = (device.features?.model || '').toString() === '1' ? 'One' : device.features?.model
@@ -92,7 +100,8 @@ export default class Trezor extends Signer {
     this.lookupAddresses((err, addresses) => {
       if (err) {
         if (err === 'Device call in progress') return
-        this.status = 'loading'
+
+        if (err.toLowerCase() !== 'verify address error') this.status = 'loading'
         if (err === 'ui-device_firmware_old') this.status = `Update Firmware (v${this.device.firmwareRelease.release.version.join('.')})`
         if (err === 'ui-device_bootloader_mode') this.status = 'Device in Bootloader Mode'
         this.addresses = []
@@ -126,22 +135,27 @@ export default class Trezor extends Signer {
       cb(new Error('Address verification timed out'), undefined)
     }, 60 * 1000)
 
-    const rpcCallback: FlexCallback = (err, result) => {
+    const rpcCallback: FlexCallback<{ address: string }> = (err, result) => {
       clearTimeout(timer)
       if (timeout) return
       if (err) {
         if (err === 'Device call in progress' && attempt < 5) {
           setTimeout(() => this.verifyAddress(index, currentAddress, display, cb, ++attempt), 1000 * (attempt + 1))
         } else {
-          log.error('Verify address error: ', err)
+          log.error('Verify address error:', err)
           
-          this.close()
+          this.status = (err || '').toLowerCase().match(/forbidden key path/)
+            ? 'derivation path failed strict safety checks on trezor device'
+            : err
 
           cb(new Error('Verify Address Error'), undefined)
         }
       } else {
-        const address = result.address ? result.address.toLowerCase() : ''
-        const current = this.addresses[index] ? this.addresses[index].toLowerCase() : ''
+        const verified = result as { address: string }
+
+        const address = verified.address ? verified.address.toLowerCase() : ''
+        const current = (currentAddress || '').toLowerCase()
+
         log.info('Frame has the current address as: ' + current)
         log.info('Trezor is reporting: ' + address)
         if (address !== current) {
@@ -161,18 +175,28 @@ export default class Trezor extends Signer {
     flex.rpc('trezor.ethereumGetAddress', this.device.path, this.getPath(index), display, rpcCallback)
   }
 
-  lookupAddresses (cb: FlexCallback) {
-    const rpcCallback: FlexCallback = (err, result) => {
-      return err
-        ? cb(err, undefined)
-        : this.deriveHDAccounts(result.publicKey, result.chainCode, cb)
+  lookupAddresses (cb: FlexCallback<Array<string>>) {
+    const rpcCallback: FlexCallback<PublicKeyResponse> = (err, result) => {
+      if (err) return cb(err, undefined)
+
+      const key = result as PublicKeyResponse
+      this.deriveHDAccounts(key.publicKey, key.chainCode, (err, accs) => {
+        if (err) return cb(err.message, undefined)
+
+        const accounts = (accs || []) as string[]
+        const firstAccount = accounts[0] || ''
+        this.verifyAddress(0, firstAccount, false, err => {
+          if (err) return cb(err.message, undefined)
+          cb(null, accounts)
+        })
+      })
     }
 
     flex.rpc('trezor.getPublicKey', this.device.path, this.basePath(), rpcCallback)
   }
 
   setPhrase (phrase: string) {
-    const rpcCallback: FlexCallback = err => {
+    const rpcCallback: FlexCallback<void> = err => {
       if (err) log.error(err)
       setTimeout(() => this.deviceStatus(), 1000)
     }
@@ -184,7 +208,7 @@ export default class Trezor extends Signer {
   }
 
   setPin (pin: string) {
-    const rpcCallback: FlexCallback = err => {
+    const rpcCallback: FlexCallback<void> = err => {
       if (err) log.error(err)
       setTimeout(() => this.deviceStatus(), 250)
     }
@@ -220,10 +244,17 @@ export default class Trezor extends Signer {
         const trezorTx = this.normalizeTransaction(rawTx.chainId, tx)
         const path = this.getPath(index)
 
-        const rpcCallback: Callback<any> = (err, result) => {
-          return err
-            ? reject(err)
-            : resolve({ v: result.v, r: result.r, s: result.s })
+        const rpcCallback: FlexCallback<Signature> = (err, result) => {
+          if (err) {
+            const errMsg = err.toLowerCase().match(/forbidden key path/)
+              ? `Turn off strict Trezor safety checks in order to use the ${this.derivation} derivation path on this chain`
+              : err
+
+            return reject(new Error(errMsg))
+          }
+
+          const { v, r, s } = result as Signature
+          resolve({ v, r, s })
         }
 
         flex.rpc('trezor.ethereumSignTransaction', this.device.path, path, trezorTx, rpcCallback)

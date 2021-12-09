@@ -30,7 +30,7 @@ type SignerCompatibilityByVersion = {
   [key: string]: (version: AppVersion, model?: string) => boolean
 }
 
-interface Signature {
+export interface Signature {
   v: string,
   r: string,
   s: string
@@ -42,7 +42,7 @@ export interface RawTransaction {
 }
 
 export interface TransactionData extends JsonTx {
-  warning?: string
+  warning?: string,
   chainId: string,
   type: string
 }
