@@ -30,7 +30,7 @@ type SignerCompatibilityByVersion = {
   [key: string]: (version: AppVersion, model?: string) => boolean
 }
 
-interface Signature {
+export interface Signature {
   v: string,
   r: string,
   s: string
