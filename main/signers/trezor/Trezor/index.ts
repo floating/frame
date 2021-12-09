@@ -14,6 +14,9 @@ import { TypedTransaction } from '@ethereumjs/tx'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
+const defaultTrezorTVersion = { major_version: 2, minor_version: 3, patch_version: 0 }
+const defaultTrezorOneVersion = { major_version: 1, minor_version: 9, patch_version: 2 }
+
 type FlexCallback = (err: string | null, result: any | undefined) => void
 
 export default class Trezor extends Signer {
@@ -29,8 +32,8 @@ export default class Trezor extends Signer {
     this.device = device
     this.id = this.getId()
 
-    const defaultVersion = device.features?.model === 'T' ? '2.3.0' : '1.8.0'
-    const [major, minor, patch] = device.firmwareRelease?.release?.version || defaultVersion.split('.')
+    const defaultVersion = device.features?.model === 'T' ? defaultTrezorTVersion : defaultTrezorOneVersion
+    const { major_version: major, minor_version: minor, patch_version: patch } = device.features || defaultVersion
     this.appVersion = { major, minor, patch }
 
     const model = (device.features?.model || '').toString() === '1' ? 'One' : device.features?.model
@@ -212,6 +215,10 @@ export default class Trezor extends Signer {
   }
 
   signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
+    if (this.appVersion.major >= 2 && this.derivation !== Derivation.testnet && rawTx.chainLayer === 'testnet') {
+      return cb(new Error('Only the Testnet derivation path is supported on testnets'), undefined)
+    }
+
     const compatibility = signerCompatibility(rawTx, this.summary())
     const compatibleTx = compatibility.compatible ? { ...rawTx } : londonToLegacy(rawTx)
 

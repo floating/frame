@@ -93,17 +93,22 @@ class Account {
   }
 
   findSigner (address) {
-    const availiableSigners = []
+    // in order of increasing priority
+    const signerTypes = ['ring', 'seed', 'trezor', 'ledger', 'lattice']
     const signers = store('main.signers')
-    Object.keys(signers).forEach(id => {
-      if (!signers[id] || !id) return
-      if (signers[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
-        availiableSigners.push(signers[id])
-      }
-    })
-    availiableSigners.sort((a, b) => a.status === 'ok' ? -1 : b.status === 'ok' ? -1 : 0)
-    const foundSigner = availiableSigners[0]
-    return foundSigner
+
+    const signerOrdinal = signer => {
+      const isOk = signer.status === 'ok' ? 2 : 1
+      const typeIndex = Math.max(signerTypes.indexOf(signer.type), 0)
+
+      return isOk * typeIndex
+    }
+
+    const availableSigners = Object.values(signers)
+      .filter(signer => signer.addresses.some(addr => addr.toLowerCase() === address))
+      .sort((a, b) => signerOrdinal(b) - signerOrdinal(a))
+
+    return availableSigners[0]
   }
 
   setAccess (req, access) {
