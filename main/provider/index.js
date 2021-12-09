@@ -324,7 +324,7 @@ class Provider extends EventEmitter {
       value: addHexPrefix(unpadHexString(value || '0x') || '0'),
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
-      chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id')),
+      chainId,
       chainLayer: chain.layer
     }
   }
