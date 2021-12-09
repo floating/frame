@@ -180,9 +180,10 @@ export default class Trezor extends Signer {
       if (err) return cb(err, undefined)
 
       const key = result as PublicKeyResponse
-      this.deriveHDAccounts(key.publicKey, key.chainCode, (err, accounts: any) => {
+      this.deriveHDAccounts(key.publicKey, key.chainCode, (err, accs) => {
         if (err) return cb(err.message, undefined)
 
+        const accounts = (accs || []) as string[]
         const firstAccount = accounts[0] || ''
         this.verifyAddress(0, firstAccount, false, err => {
           if (err) return cb(err.message, undefined)
