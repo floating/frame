@@ -316,16 +316,12 @@ class Provider extends EventEmitter {
   getRawTx (newTx) {
     const { gas, gasLimit, gasPrice, data, value, ...rawTx } = newTx
 
-    const chainId = rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
-    const chain = store('main.networks.ethereum', parseInt(chainId))
-
     return {
       ...rawTx,
       value: addHexPrefix(unpadHexString(value || '0x') || '0'),
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
-      chainId,
-      chainLayer: chain.layer
+      chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
     }
   }
 

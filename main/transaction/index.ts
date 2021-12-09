@@ -43,7 +43,6 @@ export interface RawTransaction {
 
 export interface TransactionData extends JsonTx {
   warning?: string,
-  chainLayer?: string,
   chainId: string,
   type: string
 }
