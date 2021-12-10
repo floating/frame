@@ -1,10 +1,14 @@
-const { v4: uuid } = require('uuid')
-const EventEmitter = require('events')
-const log = require('electron-log')
-const utils = require('web3-utils')
-const ethSignature = require('eth-sig-util')
+// @ts-ignore
+import { v4 as uuid } from 'uuid'
+import EventEmitter from 'events'
+import log from 'electron-log'
+import utils from 'web3-utils'
+import ethSignature, { Version } from 'eth-sig-util'
+import crypto from 'crypto'
 
-const {
+import type { JSONRPCRequestPayload, JSONRPCResponsePayload } from 'ethereum-protocol'
+
+import {
   padToEven,
   unpadHexString,
   addHexPrefix,
@@ -17,104 +21,130 @@ const {
   pubToAddress,
   ecrecover,
   hashPersonalMessage,
-} = require('ethereumjs-util')
+} from 'ethereumjs-util'
 
+import proxy from './proxy'
+import store from '../store'
+import accounts, { AccountRequest } from '../accounts'
+import protectedMethods from '../api/protectedMethods'
 
-const proxy = require('./proxy')
+import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
+import { capitalize } from '../../resources/utils'
 
-const store = require('../store')
-const chains = require('../chains')
-const accounts = require('../accounts')
-const protectedMethods = require('../api/protectedMethods')
+import packageFile from '../../package.json'
+import ChainConnection from '../chains'
 
-const { populate: populateTransaction, usesBaseFee, maxFee } = require('../transaction')
-
-const version = require('../../package.json').version
-
-const capitalize = s => s[0].toUpperCase() + s.substring(1).toLowerCase()
 const permission = (date, method) => ({ parentCapability: method, date })
 
+interface SignTypedDataRequest extends AccountRequest {
+  version: Version
+}
+
+interface Chain {
+  id: string,
+  type: 'ethereum'
+}
+
+interface JSONRPCErrorResponse extends Omit<JSONRPCResponsePayload, 'result'> {
+  error: any
+}
+
+type RPCRequestPayload = JSONRPCRequestPayload & { _origin: string }
+type JSONRPCRequestCallback = (res: JSONRPCResponsePayload | JSONRPCErrorResponse) => void
+
+type ErrorMessageCallback<T> = (err: string | null, result?: T) => void
+
+interface EVMError {
+  message: string,
+  code: number
+}
+
+interface Subscriptions {
+  accountsChanged: string[],
+  chainChanged: string[],
+  networkChanged: string[],
+}
+
 class Provider extends EventEmitter {
+  connected = false
+  connection: ChainConnection
+
+  handlers: { [id: string]: any } = {}
+  subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], networkChanged: [] }
+  store: (...args: any) => any
+
   constructor () {
     super()
     this.store = store
-    this.handlers = {}
     this.nonce = {}
-    this.connected = false
-    this.connection = chains
+    
+    this.connection = (chains as unknown as ChainConnection)
     this.connection.syncDataEmit(this)
+
     this.connection.on('connect', () => { 
       this.connected = true
       this.emit('connect')
     })
+
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
     this.connection.on('error', err => log.error(err))
+
     this.getNonce = this.getNonce.bind(this)
-    this.subs = { accountsChanged: [], chainChanged: [], networkChanged: [] }
   }
 
-  accountsChanged (accounts) {
-    this.subs.accountsChanged.forEach(subscription => {
+  accountsChanged (accounts: string[]) {
+    this.subscriptions.accountsChanged.forEach(subscription => {
       this.emit('data:address', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
     })
   }
 
-  chainChanged (netId) {
-    this.subs.chainChanged.forEach(subscription => {
+  chainChanged (chainId: number | string) {
+    this.subscriptions.chainChanged.forEach(subscription => {
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chainId } })
+    })
+  }
+
+  networkChanged (netId: number | string) {
+    this.subscriptions.networkChanged.forEach(subscription => {
       this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
     })
   }
 
-  networkChanged (netId) {
-    this.subs.networkChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: netId } })
-    })
-  }
-
-  randHex (len) {
-    const maxlen = 8
-    const min = Math.pow(16, Math.min(len, maxlen) - 1)
-    const max = Math.pow(16, Math.min(len, maxlen)) - 1
-    const n = Math.floor(Math.random() * (max - min + 1)) + min
-    let r = n.toString(16)
-    while (r.length < len) r = r + this.randHex(len - maxlen)
-    return r
-  }
-
-  getCoinbase (payload, res) {
+  getCoinbase (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
     accounts.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
-      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts[0] })
+      res({ id: payload.id, jsonrpc: payload.jsonrpc, result: (accounts || [])[0] })
     })
   }
 
-  getAccounts (payload, res) {
+  getAccounts (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
   }
 
-  getNetVersion (payload, res, targetChain) {
+  getNetVersion (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
     const chain = store('main.networks', type, id)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: `${chain.id}` })
   }
 
-  getChainId (payload, res, targetChain) {
+  getChainId (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
     const chain = store('main.networks', type, id)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: intToHex(chain.id) })
   }
 
-  declineRequest (req) {
-    const res = data => {
+  declineRequest (req: AccountRequest) {
+    const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
+
     const payload = req.payload
     this.resError({ message: 'User declined transaction', code: 4001 }, payload, res)
   }
 
-  resError (errorData, payload, res) {
+  resError (errorData: string | EVMError, payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
     const error = (typeof errorData === 'string')
       ? { message: errorData, code: -1 }
       : { message: errorData.message, code: errorData.code || -1 }
@@ -123,7 +153,7 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
-  getSignedAddress (signed, message, cb) {
+  getSignedAddress (signed: string, message: string, cb: Callback<String>) {
     const signature = Buffer.from(signed.replace('0x', ''), 'hex')
     if (signature.length !== 65) cb(new Error('Frame verifySignature: Signature has incorrect length'))
     let v = signature[64]
@@ -135,7 +165,7 @@ class Provider extends EventEmitter {
     cb(null, verifiedAddress)
   }
 
-  ecRecover (payload, res) {
+  ecRecover (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
     const message = payload.params[0]
     const signed = payload.params[1]
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
@@ -144,7 +174,7 @@ class Provider extends EventEmitter {
     })
   }
 
-  verifySignature (signed, message, address, cb) {
+  verifySignature (signed: string, message: string, address: string, cb: Callback<boolean>) {
     if (signed.length === 134) { // Aragon smart signed message
       try {
         signed = '0x' + signed.substring(4)
@@ -154,15 +184,16 @@ class Provider extends EventEmitter {
         return cb(new Error('Could not resolve message or actor for smart accoount'))
       }
     }
+
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
       if (err) return cb(err)
-      if (verifiedAddress.toLowerCase() !== address.toLowerCase()) return cb(new Error('Frame verifySignature: Failed ecRecover check'))
+      if ((verifiedAddress || '').toLowerCase() !== address.toLowerCase()) return cb(new Error('Frame verifySignature: Failed ecRecover check'))
       cb(null, true)
     })
   }
 
-  approveSign (req, cb) {
-    const res = data => {
+  approveSign (req: AccountRequest, cb: ErrorMessageCallback<string>) {
+    const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
@@ -183,23 +214,24 @@ class Provider extends EventEmitter {
     accounts.signMessage(address, message, (err, signed) => {
       if (err) {
         this.resError(err.message, payload, res)
-        cb(err.message)
+        cb(err.message, undefined)
       } else {
-        this.verifySignature(signed, message, address, err => {
+        const signature = signed || ''
+        this.verifySignature(signature, message, address, err => {
           if (err) {
             this.resError(err.message, payload, res)
             cb(err.message)
           } else {
-            res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signed })
-            cb(null, signed)
+            res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signature })
+            cb(null, signature)
           }
         })
       }
     })
   }
 
-  approveSignTypedData (req, cb) {
-    const res = data => {
+  approveSignTypedData (req: SignTypedDataRequest, cb: ErrorMessageCallback<string>) {
+    const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
@@ -209,15 +241,19 @@ class Provider extends EventEmitter {
 
     const dataToSign = (Array.isArray(data)) ? [...data] : { ...data }
 
-    accounts.signTypedData(req.version, address, dataToSign, (err, sig) => {
+    accounts.signTypedData(req.version, address, dataToSign, (err, signature) => {
       if (err) {
         this.resError(err.message, payload, res)
         cb(err.message)
       } else {
+        const sig = signature || ''
         const recoveredAddress = ethSignature.recoverTypedMessage({ data, sig }, req.version)
         if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
           const err = new Error('TypedData signature verification failed')
+
+          // @ts-ignore
           this.resError(err.message, { ...payload, recoveredAddress }, res)
+
           cb(err.message)
         } else {
           res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
@@ -227,16 +263,16 @@ class Provider extends EventEmitter {
     })
   }
 
-  feeTotalOverMax (rawTx, maxTotalFee) {
-    const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas, 'hex') : parseInt(rawTx.gasPrice, 'hex')
-    const gasLimit = parseInt(rawTx.gasLimit, 'hex')
+  feeTotalOverMax (rawTx, maxTotalFee: number) {
+    const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas, 16) : parseInt(rawTx.gasPrice, 16)
+    const gasLimit = parseInt(rawTx.gasLimit, 16)
     const totalFee = maxFeePerGas * gasLimit
     return totalFee > maxTotalFee
   }
 
-  signAndSend (req, cb) {
+  signAndSend (req: AccountRequest, cb: Callback<string>) {
     const rawTx = req.data
-    const res = data => {
+    const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
@@ -294,7 +330,7 @@ class Provider extends EventEmitter {
     }
   }
 
-  approveRequest (req, cb) {
+  approveRequest (req: AccountRequest, cb) {
     log.info('approveRequest', req)
     accounts.lockRequest(req.handlerId)
     if (req.data.nonce) return this.signAndSend(req, cb)
@@ -325,8 +361,8 @@ class Provider extends EventEmitter {
     }
   }
 
-  _addRequestHandler (res) {
-    const handlerId = uuid()
+  _addRequestHandler (res: JSONRPCRequestCallback) {
+    const handlerId: string = uuid()
     this.handlers[handlerId] = res
 
     return handlerId
@@ -352,23 +388,23 @@ class Provider extends EventEmitter {
     })
   }
 
-  _isCurrentAccount (address, account = accounts.current()) {
+  _isCurrentAccount (address: string, account = accounts.current()) {
     return address && (account.id.toLowerCase() === address.toLowerCase())
   }
 
   _gasFees (rawTx) {
     const chain = {
       type: 'ethereum',
-      id: parseInt(rawTx.chainId, 'hex')
+      id: parseInt(rawTx.chainId, 16)
     }
 
     return store('main.networksMeta', chain.type, chain.id, 'gas')
   }
 
-  getNonce (rawTx, res) {
+  getNonce (rawTx: TransactionData, res: JSONRPCRequestCallback) {
     const targetChain = {
       type: 'ethereum',
-      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 'hex') : undefined
+      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 16) : undefined
     }
 
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
@@ -417,7 +453,7 @@ class Provider extends EventEmitter {
     return tx
   }
 
-  fillTransaction (newTx, cb) {
+  fillTransaction (newTx, cb: ErrorMessageCallback<TransactionData>) {
     if (!newTx) return cb('No transaction data')
     const rawTx = this.getRawTx(newTx)
     const gas = this._gasFees(rawTx)
@@ -442,7 +478,7 @@ class Provider extends EventEmitter {
       .catch(cb)
   }
 
-  sendTransaction (payload, res) {
+  sendTransaction (payload: RPCRequestPayload, res: JSONRPCRequestCallback) {
     const newTx = payload.params[0]
     const currentAccount = accounts.current()
 
@@ -485,7 +521,7 @@ class Provider extends EventEmitter {
     this.connection.send(payload, res, targetChain)
   }
 
-  sign (payload, res) {
+  sign (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
     // normalize the payload for downstream rendering, taking the first address and
     // making it the first parameter, which is the account that needs to sign
     const addressIndex = payload.params.findIndex(utils.isAddress)
@@ -512,7 +548,7 @@ class Provider extends EventEmitter {
 
     const req = { handlerId, type: 'sign', payload: normalizedPayload, account: currentAccount.getAccounts[0], origin: payload._origin }
 
-    const _res = data => {
+    const _res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
     }
@@ -520,7 +556,7 @@ class Provider extends EventEmitter {
     accounts.addRequest(req, _res)
   }
 
-  signTypedData (rawPayload, version, res) {
+  signTypedData (rawPayload: RPCRequestPayload, version: Version, res: JSONRPCRequestCallback) {
     // v1 has the param order as: [data, address, ...], all other versions have [address, data, ...]
     const orderedParams = version === 'V1'
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
@@ -565,26 +601,29 @@ class Provider extends EventEmitter {
     accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
   }
 
-  subscribe (payload, res) {
-    const subId = '0x' + this.randHex(32)
-    this.subs[payload.params[0]] = this.subs[payload.params[0]] || []
-    this.subs[payload.params[0]].push(subId)
+  subscribe (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+    const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
+    const subscriptionType = payload.params[0] as ('accountsChanged' | 'chainChanged' | 'networkChanged')
+    
+    this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
+    this.subscriptions[subscriptionType].push(subId)
+
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
 
   ifSubRemove (id) {
     let found = false
-    Object.keys(this.subs).some(type => {
-      const index = this.subs[type].indexOf(id)
+    Object.keys(this.subscriptions).some(type => {
+      const index = this.subscriptions[type].indexOf(id)
       found = index > -1
-      if (found) this.subs[type].splice(index, 1)
+      if (found) this.subscriptions[type].splice(index, 1)
       return found
     })
     return found
   }
 
   clientVersion (payload, res) {
-    res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${version}` })
+    res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${packageFile.version}` })
   }
 
   switchEthereumChain (payload, res) {
@@ -623,7 +662,7 @@ class Provider extends EventEmitter {
     }
   }
 
-  addEthereumChain (payload, res) {
+  addEthereumChain (payload: RPCRequestPayload, res: JSONRPCRequestCallback) {
     if (!payload.params[0]) return this.resError('addChain request missing params', payload, res)
 
     const type = 'ethereum'
@@ -671,7 +710,7 @@ class Provider extends EventEmitter {
     }
   }
 
-  getPermissions (payload, res) {
+  getPermissions (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
     const now = new Date().getTime()
     const toPermission = permission.bind(null, now)
     const allowedOperations = protectedMethods.map(toPermission)
@@ -679,7 +718,7 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: allowedOperations })
   }
 
-  requestPermissions (payload, res) {
+  requestPermissions (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
     // we already require the user to grant permission to call this method so
     // we just need to return permission objects for the requested operations
     const now = new Date().getTime()
@@ -688,14 +727,15 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
   }
 
-  addCustomToken (payload, cb, targetChain) {
-    const { type, options: tokenData } = payload.params || {}
+  addCustomToken (payload: RPCRequestPayload, cb: JSONRPCRequestCallback, targetChain: Chain) {
+    const { type, options: tokenData } = (payload.params || {}) as any
 
     if ((type || '').toLowerCase() !== 'erc20') {
       return this.resError('only ERC-20 tokens are supported', payload, cb)
     }
 
-    this.getChainId({ id: 1, jsonrpc: '2.0' }, response => {
+    this.getChainId({ id: 1, jsonrpc: '2.0' } as JSONRPCRequestPayload, resp => {
+      const response = resp as JSONRPCResponsePayload
       const chainId = parseInt(response.result)
 
       const address = (tokenData.address || '').toLowerCase()
@@ -711,7 +751,7 @@ class Provider extends EventEmitter {
       }
 
       // don't attempt to add the token if it's already been added
-      const tokenExists = store('main.tokens').some(token => token.chainId === chainId && token.address === address)
+      const tokenExists = store('main.tokens').some((token: Token) => token.chainId === chainId && token.address === address)
       if (tokenExists) {
         return res()
       }
@@ -744,15 +784,19 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  sendAsync (payload, cb) {
+  sendAsync (payload: RPCRequestPayload, cb: Callback<JSONRPCResponsePayload | JSONRPCErrorResponse>) {
     this.send(payload, res => {
-      if (res.error) return cb(new Error(res.error))
+      
+      if (res.hasOwnProperty('error')) return cb(new Error((res as JSONRPCErrorResponse).error))
       cb(null, res)
     })
   }
 
-  send (payload, res = () => {}, targetChain) {
+  send (payload: RPCRequestPayload, res: JSONRPCRequestCallback = () => {}, chain?: string) {
     const method = payload.method || ''
+    const targetChain: Chain = {
+      type: 'ethereum', id: chain || utils.toHex(store('main.currentNetwork.id'))
+    }
 
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (method === 'eth_accounts') return this.getAccounts(payload, res)
@@ -761,7 +805,7 @@ class Provider extends EventEmitter {
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
-    if (method === 'eth_subscribe' && this.subs[payload.params[0]]) return this.subscribe(payload, res)
+    if (method === 'eth_subscribe' && this.subscriptions[payload.params[0]]) return this.subscribe(payload, res)
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
@@ -809,33 +853,5 @@ store.observer(() => {
 
 proxy.on('send', (payload, cd, targetChain) => provider.send(payload, cd, targetChain))
 proxy.ready = true
-// provider.on('data', data => proxy.emit('data', data))
 
-module.exports = provider
-
-// setTimeout(() => {
-//   provider.send({
-//     id: 1,
-//     jsonrpc: '2.0',
-//     method: 'wallet_addEthereumChain',
-//     _origin: 'Frame',
-//     params: [
-//       {
-//         chainId: '0x64',
-//         chainName: 'xDAI Chain',
-//         rpcUrls: ['https://dai.poa.network'],
-//         iconUrls: [
-//           'https://xdaichain.com/fake/example/url/xdai.svg',
-//           'https://xdaichain.com/fake/example/url/xdai.png'
-//         ],
-//         nativeCurrency: {
-//           name: 'xDAI',
-//           symbol: 'xDAI',
-//           decimals: 18
-//         }
-//       }
-//     ]
-//   }, (err, res) => {
-//     console.log('Callback from provider.send wallet_addEthereumChain', err, res)
-//   })
-// }, 9000)
+export default provider

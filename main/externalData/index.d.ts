@@ -6,3 +6,13 @@ interface Token {
   decimals: number,
   logoUri?: string
 }
+
+interface Chain {
+  type: 'ethereum',
+  id: number,
+  name: string,
+  nativeCurrency: string,
+  rpcUrls: string[],
+  blockExplorerUrls: string[], 
+  iconUrls: string[]
+}
