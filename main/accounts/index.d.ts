@@ -6,26 +6,28 @@ export interface AccountRequest {
   origin: string,
   payload: JSONRPCRequestPayload,
   handlerId: string,
-  account: string,
-  data: any
+  account: string
 }
 
-export interface AddTokenRequest extends Omit<AccountRequest, 'data'> {
+export interface AddTokenRequest extends AccountRequest {
   type: 'addToken',
   token: Token
 }
 
-export interface AddChainRequest extends Omit<AccountRequest, 'data'> {
+export interface AddChainRequest extends AccountRequest {
   type: 'addChain',
   chain: Chain
 }
 
 export interface TransactionRequest extends AccountRequest {
+  type: 'transaction',
+  data: any, // TransactionData
   warning?: string,
   feesUpdatedByUser: boolean
 }
 
-export interface SignTypedDataRequest extends Omit<AccountRequest, 'data'> {
+export interface SignTypedDataRequest extends AccountRequest {
+  type: 'signTypedData',
   version: Version
 }
 
