@@ -52,6 +52,9 @@ const center = (window) => {
   }
 }
 
+const setWindowSize = (window, width, height) => window.setBounds({ ...window.getBounds(), width, height })
+const setWindowPosition = (window, x, y) => window.setBounds({ width: 0, height: 0, x, y })
+
 const timeout = ms => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -251,15 +254,19 @@ const api = {
     //   if (hideShow.running !== 'show') hideShow.next = 'show'
     // } else {
     if (!windows.tray) return api.tray()
-    windows.tray.setPosition(0, 0)
     windows.tray.setAlwaysOnTop(true)
     // hideShow.running = 'show'
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistant
+
+    setWindowPosition(windows.tray, 0, 0) // reset
+
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    windows.tray.setSize(358, dev && !fullheight ? 740 : area.height)
-    const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
-    windows.tray.setPosition(pos.x, pos.y)
+    setWindowSize(windows.tray, 358, dev && !fullheight ? 740 : area.height)
+
+    const {x, y} = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
+    setWindowPosition(windows.tray, x, y)
+
     if (!glide) windows.tray.focus()
     windows.tray.emit('show')
     windows.tray.show()
@@ -433,12 +440,18 @@ const api = {
       // hideShow.running = 'show'
       windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.dash.setResizable(false) // Keeps height consistant
+
+      setWindowPosition(windows.dash, 0, 0) // reset
+
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.dash.setSize(360, dev && !fullheight ? 740 - 120 : area.height - 120)
+      setWindowSize(windows.dash, 360, dev && !fullheight ? 740 - 120 : area.height - 120)
+
       const {x, y} = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
-      windows.dash.setPosition(x - 380, y + 60)
+      setWindowPosition(windows.dash, x - 380, y + 60)
+
       // if (!glide) windows.tray.focus()
       // windows.flow.emit('show')
+
       windows.dash.show()
       windows.dash.focus()
       windows.dash.setVisibleOnAllWorkspaces(false, { visibleOnFullScreen: true })
