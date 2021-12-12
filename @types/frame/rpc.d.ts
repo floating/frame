@@ -2,6 +2,7 @@ type RPCCallback<T> = (res: T) => void;
 type RPCRequestCallback = RPCCallback<JSONRPCResponsePayload>
 
 type Address = string // 20 hex bytes, 0x-prefixed
+enum SubscriptionType { ACCOUNTS = 'accountsChanged', CHAIN = 'chainChanged', NETWORK = 'networkChanged' }
 
 interface RPCId {
   id: number,
@@ -53,6 +54,11 @@ declare namespace RPCRequests {
 
   interface Subscribe extends RPCRequestPayload {
     method: 'eth_subscribe',
+    params: [SubscriptionType]
+  }
+
+  interface Unsubscribe extends RPCRequestPayload {
+    method: 'eth_unsubscribe',
     params: [string]
   }
 }

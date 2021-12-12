@@ -41,6 +41,7 @@ beforeEach(() => {
 
   accountRequests = []
   store.set('main.accounts', {})
+  store.set('main.currentNetwork.id', 1)
 
   connection.send = jest.fn()
   connection.connections = { ethereum: {} }
@@ -88,9 +89,9 @@ describe('#send', () => {
   it('passes the given target chain to the connection', () => {
     store.set('main.networks.ethereum', 10, { id: 10 })
 
-    const request = { method: 'eth_testFrame', chain: '0xa' }
+    const request = { method: 'eth_testFrame' }
 
-    send(request)
+    send({ ...request, chain: '0xa' })
 
     expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 10 })
   })
@@ -452,9 +453,10 @@ describe('#send', () => {
     })
 
     it('returns a response with no result attribute', done => {
-      connection.send.mockImplementation((p, cb) => cb({ error: 'no transaction!' }))
+      mockConnectionError('no transaction!')
+
       send(request, response => {
-        expect(response.error).toBe('no transaction!')
+        expect(response.error.message).toBe('no transaction!')
         done()
       })
     })
@@ -838,58 +840,83 @@ describe('#send', () => {
     }, 100)
 
     it('passes a request with an unknown version through to the connection', done => {
+      mockConnectionError('received unhandled request')
+
       const params = [address, 'test']
 
-      connection.send.mockImplementation((payload, cb, targetChain) => {
-        cb({ error: 'received unhandled request' })
-      })
-
       send({ method: 'eth_signTypedData_v5', params }, err => {
-        expect(err.error).toBe('received unhandled request')
+        expect(err.error.message).toBe('received unhandled request')
         done()
       })
     })
   })
 
-  describe('#eth_unsubscribe', () => {
+  describe('subscriptions', () => {
     const eventTypes = ['accountsChanged', 'chainChanged', 'networkChanged']
 
-    const unsubscribe = (id, cb) => send({ method: 'eth_unsubscribe', params: [id] }, cb)
+    describe('#eth_subscribe', () => {
+      const subscribe = (eventType, cb) => send({ id: 9, jsonrpc: '2.0', method: 'eth_subscribe', params: [eventType] }, cb)
 
-    eventTypes.forEach(eventType => {
-      it(`unsubscribes from ${eventType} events`, done => {
-        const subId = '0x1acc2933618a0ff548f03b1c99420366'
-        provider.subscriptions[eventType] = [subId]
-
-        unsubscribe(subId, response => {
-          try {
+      eventTypes.forEach(eventType => {
+        it(`subscribes to ${eventType} events`, () => {
+          subscribe(eventType, response => {
+            expect(response.id).toBe(9)
+            expect(response.jsonrpc).toBe('2.0')
             expect(response.error).toBe(undefined)
-            expect(response.result).toBe(true)
-            expect(provider.subscriptions[eventType]).toHaveLength(0)
-            done()
-          } catch (e) { done(e) }
+            expect(response.result).toMatch(/0x\w{32}$/)
+
+            expect(provider.subscriptions[eventType]).toHaveLength(1)
+          })
+        })
+      })
+
+      it('returns an error from the node if attempting to unsubscribe to an unknown event', () => {
+        mockConnectionError('unknown event!')
+  
+        subscribe('everythingChanged', response => {
+          expect(response.id).toBe(9)
+          expect(response.jsonrpc).toBe('2.0')
+          expect(response.error.message).toBe('unknown event!')
+          expect(response.result).toBe(undefined)
         })
       })
     })
 
-    it('returns an error from the node if attempting to unsubscribe from an unknown subscription', done => {
-      connection.send.mockImplementation((payload, cb) => cb({ error: 'unknown subscription!' }))
-
-      provider.subscriptions.accountsChanged = ['0xtest1']
-      provider.subscriptions.chainChanged = ['0xtest2']
-      provider.subscriptions.networkChanged = ['0xtest2']
-
-      unsubscribe('0xanothersub', response => {
-        try {
-          expect(response.error).toBe('unknown subscription!')
+    describe('#eth_unsubscribe', () => {
+      const unsubscribe = (id, cb) => send({ id: 8, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [id] }, cb)
+  
+      eventTypes.forEach(eventType => {
+        it(`unsubscribes from ${eventType} events`, () => {
+          const subId = '0x1acc2933618a0ff548f03b1c99420366'
+          provider.subscriptions[eventType] = [subId]
+  
+          unsubscribe(subId, response => {
+            expect(response.id).toBe(8)
+            expect(response.jsonrpc).toBe('2.0')
+            expect(response.error).toBe(undefined)
+            expect(response.result).toBe(true)
+            expect(provider.subscriptions[eventType]).toHaveLength(0)
+          })
+        })
+      })
+  
+      it('returns an error from the node if attempting to unsubscribe from an unknown subscription', () => {
+        mockConnectionError('unknown subscription!')
+  
+        provider.subscriptions.accountsChanged = ['0xtest1']
+        provider.subscriptions.chainChanged = ['0xtest2']
+        provider.subscriptions.networkChanged = ['0xtest2']
+  
+        unsubscribe('0xanothersub', response => {
+          expect(response.id).toBe(8)
+          expect(response.jsonrpc).toBe('2.0')
+          expect(response.error.message).toBe('unknown subscription!')
           expect(response.result).toBe(undefined)
 
           eventTypes.forEach(eventType => {
             expect(provider.subscriptions[eventType]).toHaveLength(1)
           })
-
-          done()
-        } catch (e) { done(e) }
+        })
       })
     })
   })
@@ -1000,11 +1027,10 @@ describe('#signAndSend', () => {
     })
 
     describe('failure', () => {
-      let errorMessage
+      let errorMessage = 'invalid transaction!'
 
       beforeEach(() => {
-        errorMessage = 'invalid transaction!'
-        connection.send.mockImplementation((_, cb) => cb({ error: { message: errorMessage } }))
+        mockConnectionError(errorMessage)
       })
 
       it('handles a transaction send failure', done => {
@@ -1027,3 +1053,9 @@ describe('#signAndSend', () => {
     })
   })
 })
+
+// utility functions //
+
+function mockConnectionError (message) {
+  connection.send.mockImplementation((p, cb) => cb({ id: p.id, jsonrpc: p.jsonrpc, error: { message, code: -1 } }))
+}

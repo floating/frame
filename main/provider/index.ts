@@ -35,18 +35,12 @@ import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData }
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
-enum SubscriptionType { ACCOUNTS = 'accountsChanged', CHAIN = 'chainChanged', NETWORK = 'networkChanged' }
 type Subscriptions = { [key in SubscriptionType]: string[] }
-
-interface RequestHandlers {
-  [requestType: string]: (payload: RPCRequestPayload, cb: RPCRequestCallback) => void
-}
 
 class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
-  requestHandlers: RequestHandlers = {}
   handlers: { [id: string]: any } = {}
   subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], networkChanged: [] }
   store: (...args: any) => any
@@ -421,7 +415,7 @@ class Provider extends EventEmitter {
     return tx
   }
 
-  fillTransaction (newTx: RPCRequests.TxParams, cb: Callback<TransactionData>) {
+  async fillTransaction (newTx: RPCRequests.TxParams, cb: Callback<TransactionData>) {
     if (!newTx) return cb(new Error('No transaction data'))
 
     const rawTx = this.getRawTx(newTx)
@@ -571,9 +565,9 @@ class Provider extends EventEmitter {
     accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
   }
 
-  subscribe (payload: RPCRequestPayload, res: RPCCallback<JSONRPCResponsePayload>) {
+  subscribe (payload: RPCRequests.Subscribe, res: RPCCallback<JSONRPCResponsePayload>) {
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
-    const subscriptionType = payload.params[0] as SubscriptionType
+    const subscriptionType = payload.params[0]
     
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
     this.subscriptions[subscriptionType].push(subId)
@@ -752,27 +746,27 @@ class Provider extends EventEmitter {
   }
 
   private parseTargetChain (payload: RPCRequestPayload) {
+    const target: Chain = { type: 'ethereum', id: 0 }
+
     if (!('chain' in payload)) {
-      return store('main.currentNetwork.id')
+      target.id = store('main.currentNetwork.id')
     }
 
     const chainId = parseInt(payload.chain || '', 16)
-    const isKnown = !!store('main.networks.ethereum', chainId)
+    if (!!store('main.networks.ethereum', chainId)) {
+      target.id = chainId
+    }
 
-    return isKnown && chainId
+    return target
   }
 
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
-    const targetChainId = this.parseTargetChain(payload)
+    const targetChain = this.parseTargetChain(payload)
 
-    if (!targetChainId) {
+    if (!targetChain.id) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
       return this.resError(`unknown chain: ${payload.chain}`, payload, res)
-    }
-
-    const targetChain: Chain = {
-      type: 'ethereum', id: targetChainId
     }
 
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
@@ -782,7 +776,10 @@ class Provider extends EventEmitter {
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
-    if (method === 'eth_subscribe' && this.subscriptions[payload.params[0] as SubscriptionType]) return this.subscribe(payload, res)
+    if (method === 'eth_subscribe' && payload.params[0] in this.subscriptions) {
+      return this.subscribe(payload as RPCRequests.Subscribe, res)
+    }
+
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
@@ -805,7 +802,7 @@ class Provider extends EventEmitter {
     if (method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
 
     // remove custom data
-    const { _origin, ...rpcPayload } = payload
+    const { _origin, chain, ...rpcPayload } = payload
 
     // Pass everything else to our connection
     this.connection.send(rpcPayload, res, targetChain)
