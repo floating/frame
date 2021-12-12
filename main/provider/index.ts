@@ -38,10 +38,15 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 enum SubscriptionType { ACCOUNTS = 'accountsChanged', CHAIN = 'chainChanged', NETWORK = 'networkChanged' }
 type Subscriptions = { [key in SubscriptionType]: string[] }
 
+interface RequestHandlers {
+  [requestType: string]: (payload: RPCRequestPayload, cb: RPCRequestCallback) => void
+}
+
 class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
+  requestHandlers: RequestHandlers = {}
   handlers: { [id: string]: any } = {}
   subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], networkChanged: [] }
   store: (...args: any) => any
@@ -746,9 +751,25 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
+  private parseTargetChain (payload: RPCRequestPayload) {
+    if (!('chain' in payload)) {
+      return store('main.currentNetwork.id')
+    }
+
+    const chainId = parseInt(payload.chain || '', 16)
+    const isKnown = !!store('main.networks.ethereum', chainId)
+
+    return isKnown && chainId
+  }
+
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
-    const targetChainId = (payload.chain && parseInt(payload.chain, 16)) || store('main.currentNetwork.id')
+    const targetChainId = this.parseTargetChain(payload)
+
+    if (!targetChainId) {
+      log.warn('received request with unknown chain', JSON.stringify(payload))
+      return this.resError(`unknown chain: ${payload.chain}`, payload, res)
+    }
 
     const targetChain: Chain = {
       type: 'ethereum', id: targetChainId

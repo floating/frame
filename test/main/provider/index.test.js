@@ -83,26 +83,64 @@ describe('#getRawTx', () => {
 })
 
 describe('#send', () => {
-  const send = (request, cb = jest.fn(), targetChain) => provider.send(request, cb, targetChain)
+  const send = (request, cb = jest.fn()) => provider.send(request, cb)
+
+  it('passes the given target chain to the connection', () => {
+    store.set('main.networks.ethereum', 10, { id: 10 })
+
+    const request = { method: 'eth_testFrame', chain: '0xa' }
+
+    send(request)
+
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 10 })
+  })
+
+  it('passes the default target chain to the connection when none is given', () => {
+    store.set('main.currentNetwork.id', 137)
+
+    const request = { method: 'eth_testFrame' }
+
+    send(request)
+
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 137 })
+  })
+
+  it('returns an error when an unknown chain is given', () => {
+    const request = { method: 'eth_testFrame', chain: '0x63' }
+
+    send(request, response => {
+      expect(connection.send).not.toHaveBeenCalled()
+      expect(response.error.message).toMatch(/unknown chain/)
+      expect(response.result).toBe(undefined)
+    })
+  })
+
+  it('returns an error when an invalid chain is given', () => {
+    const request = { method: 'eth_testFrame', chain: 'test' }
+
+    send(request, response => {
+      expect(connection.send).not.toHaveBeenCalled()
+      expect(response.error.message).toMatch(/unknown chain/)
+      expect(response.result).toBe(undefined)
+    })
+  })
 
   describe('#eth_chainId', () => {
-    it('returns the current chain id from the store', done => {
+    it('returns the current chain id from the store', () => {
       store.set('main.networks.ethereum', 1, { id: 1 })
       store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
 
       send({ method: 'eth_chainId' }, response => {
         expect(response.result).toBe('0x1')
-        done()
       })
     })
 
-    it('returns a chain id from the target chain', done => {
+    it('returns a chain id from the target chain', () => {
       store.set('main.networks.ethereum', 4, { id: 4 })
 
-      send({ method: 'eth_chainId' }, response => {
+      send({ method: 'eth_chainId', chain: '0x4' }, response => {
         expect(response.result).toBe('0x4')
-        done()
-      }, { type: 'ethereum', id: 4 })
+      })
     })
   })
 
@@ -355,19 +393,18 @@ describe('#send', () => {
   })
 
   describe('#eth_getTransactionByHash', () => {
+    const chain = 4
     const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
-    const request = { method: 'eth_getTransactionByHash', params: [txHash] }
-    const chain = '4'
+    const request = { method: 'eth_getTransactionByHash', params: [txHash], chain: '0x' + chain.toString(16) }
 
     let blockResult
 
     beforeEach(() => {
       connection.send.mockImplementation((payload, res, targetChain) => {
-        if (targetChain.id === chain && payload.params[0] === txHash) {
-          return res({ result: blockResult })
-        }
+        expect(targetChain.id).toBe(chain)
+        expect(payload.params[0]).toBe(txHash)
 
-        res({ error: 'invalid request' })
+        return res({ result: blockResult })
       })
     })
 
@@ -381,7 +418,7 @@ describe('#send', () => {
         expect(response.result.blockHash).toBe('0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123')
         expect(response.result.blockNumber).toBe('0xc80d08')
         done()
-      }, { type: 'ethereum', id: chain })
+      })
     })
 
     it('uses maxFeePerGas as the gasPrice if one is not defined', done => {
@@ -395,7 +432,7 @@ describe('#send', () => {
         expect(response.result.gasPrice).toBe(fee)
         expect(response.result.maxFeePerGas).toBe(fee)
         done()
-      }, { type: 'ethereum', id: chain })
+      })
     })
 
     it('maintains the gasPrice if maxFeePerGas exists', done => {
@@ -411,14 +448,15 @@ describe('#send', () => {
         expect(response.result.gasPrice).toBe(gasPrice)
         expect(response.result.maxFeePerGas).toBe(maxFeePerGas)
         done()
-      }, { type: 'ethereum', id: chain })
+      })
     })
 
     it('returns a response with no result attribute', done => {
+      connection.send.mockImplementation((p, cb) => cb({ error: 'no transaction!' }))
       send(request, response => {
-        expect(response.error).toBe('invalid request')
+        expect(response.error).toBe('no transaction!')
         done()
-      }, '1')
+      })
     })
   })
 
@@ -971,7 +1009,7 @@ describe('#signAndSend', () => {
 
       it('handles a transaction send failure', done => {
         signAndSend(err => {
-          expect(err).toBe(errorMessage)
+          expect(err.message).toBe(errorMessage)
           done()
         })
       })

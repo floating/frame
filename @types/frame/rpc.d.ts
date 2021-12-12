@@ -50,4 +50,9 @@ declare namespace RPCRequests {
     method: 'eth_sendTransaction',
     params: TxParams[]
   }
+
+  interface Subscribe extends RPCRequestPayload {
+    method: 'eth_subscribe',
+    params: [string]
+  }
 }
