@@ -4,7 +4,7 @@ const { isValidAddress } = require('ethereumjs-util')
 const abi = require('../../abi')
 
 // Provider Proxy
-const proxyProvider = require('../../provider/proxy')
+const proxyProvider = require('../../provider/proxy').default
 
 const nebula = require('../../nebula')()
 

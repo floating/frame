@@ -6,8 +6,6 @@ import utils from 'web3-utils'
 import ethSignature, { Version } from 'eth-sig-util'
 import crypto from 'crypto'
 
-import type { JSONRPCRequestPayload, JSONRPCResponsePayload } from 'ethereum-protocol'
-
 import {
   padToEven,
   unpadHexString,
@@ -25,60 +23,42 @@ import {
 
 import proxy from './proxy'
 import store from '../store'
-import accounts, { AccountRequest } from '../accounts'
+import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest } from '../accounts'
 import protectedMethods from '../api/protectedMethods'
 
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
-import { capitalize } from '../../resources/utils'
+
+// @ts-ignore
+import { capitalize } from '../../resources/utils' // TODO: include this in TS build
 
 import packageFile from '../../package.json'
-import ChainConnection from '../chains'
+import Common from '@ethereumjs/common'
+import Chains, { Chain } from '../chains'
 
-const permission = (date, method) => ({ parentCapability: method, date })
+const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
-interface SignTypedDataRequest extends AccountRequest {
-  version: Version
-}
+enum SubscriptionType { ACCOUNTS = 'accountsChanged', CHAIN = 'chainChanged', NETWORK = 'networkChanged' }
+type Subscriptions = { [key in SubscriptionType]: string[] }
 
-interface Chain {
-  id: string,
-  type: 'ethereum'
-}
-
-interface JSONRPCErrorResponse extends Omit<JSONRPCResponsePayload, 'result'> {
-  error: any
-}
-
-type RPCRequestPayload = JSONRPCRequestPayload & { _origin: string }
-type JSONRPCRequestCallback = (res: JSONRPCResponsePayload | JSONRPCErrorResponse) => void
-
-type ErrorMessageCallback<T> = (err: string | null, result?: T) => void
-
-interface EVMError {
-  message: string,
-  code: number
-}
-
-interface Subscriptions {
-  accountsChanged: string[],
-  chainChanged: string[],
-  networkChanged: string[],
+interface Nonce {
+  age: number,
+  current: string,
+  account: string
 }
 
 class Provider extends EventEmitter {
   connected = false
-  connection: ChainConnection
+  connection = Chains
 
   handlers: { [id: string]: any } = {}
+  nonce: Nonce | {} = {} // TODO: remove?
   subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], networkChanged: [] }
   store: (...args: any) => any
 
   constructor () {
     super()
     this.store = store
-    this.nonce = {}
     
-    this.connection = (chains as unknown as ChainConnection)
     this.connection.syncDataEmit(this)
 
     this.connection.on('connect', () => { 
@@ -111,24 +91,24 @@ class Provider extends EventEmitter {
     })
   }
 
-  getCoinbase (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  getCoinbase (payload: RPCRequestPayload, res: RPCRequestCallback) {
     accounts.getAccounts((err, accounts) => {
       if (err) return this.resError(`signTransaction Error: ${JSON.stringify(err)}`, payload, res)
       res({ id: payload.id, jsonrpc: payload.jsonrpc, result: (accounts || [])[0] })
     })
   }
 
-  getAccounts (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  getAccounts (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
   }
 
-  getNetVersion (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback, targetChain: Chain) {
+  getNetVersion (payload: JSONRPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
     const chain = store('main.networks', type, id)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: `${chain.id}` })
   }
 
-  getChainId (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback, targetChain: Chain) {
+  getChainId (payload: JSONRPCRequestPayload, res: RPCCallback<JSONRPCResponsePayload>, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
     const chain = store('main.networks', type, id)
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: intToHex(chain.id) })
@@ -144,13 +124,13 @@ class Provider extends EventEmitter {
     this.resError({ message: 'User declined transaction', code: 4001 }, payload, res)
   }
 
-  resError (errorData: string | EVMError, payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  resError (errorData: string | EVMError, request: JSONRPC, res: RPCRequestCallback) {
     const error = (typeof errorData === 'string')
       ? { message: errorData, code: -1 }
       : { message: errorData.message, code: errorData.code || -1 }
 
     log.warn(error)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
+    res({ id: request.id, jsonrpc: request.jsonrpc, error })
   }
 
   getSignedAddress (signed: string, message: string, cb: Callback<String>) {
@@ -165,7 +145,7 @@ class Provider extends EventEmitter {
     cb(null, verifiedAddress)
   }
 
-  ecRecover (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  ecRecover (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
     const message = payload.params[0]
     const signed = payload.params[1]
     this.getSignedAddress(signed, message, (err, verifiedAddress) => {
@@ -192,7 +172,7 @@ class Provider extends EventEmitter {
     })
   }
 
-  approveSign (req: AccountRequest, cb: ErrorMessageCallback<string>) {
+  approveSign (req: AccountRequest, cb: Callback<string>) {
     const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
@@ -214,13 +194,13 @@ class Provider extends EventEmitter {
     accounts.signMessage(address, message, (err, signed) => {
       if (err) {
         this.resError(err.message, payload, res)
-        cb(err.message, undefined)
+        cb(err, undefined)
       } else {
         const signature = signed || ''
         this.verifySignature(signature, message, address, err => {
           if (err) {
             this.resError(err.message, payload, res)
-            cb(err.message)
+            cb(err)
           } else {
             res({ id: payload.id, jsonrpc: payload.jsonrpc, result: signature })
             cb(null, signature)
@@ -230,7 +210,7 @@ class Provider extends EventEmitter {
     })
   }
 
-  approveSignTypedData (req: SignTypedDataRequest, cb: ErrorMessageCallback<string>) {
+  approveSignTypedData (req: SignTypedDataRequest, cb: Callback<string>) {
     const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
       delete this.handlers[req.handlerId]
@@ -244,17 +224,16 @@ class Provider extends EventEmitter {
     accounts.signTypedData(req.version, address, dataToSign, (err, signature) => {
       if (err) {
         this.resError(err.message, payload, res)
-        cb(err.message)
+        cb(err)
       } else {
         const sig = signature || ''
         const recoveredAddress = ethSignature.recoverTypedMessage({ data, sig }, req.version)
         if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
           const err = new Error('TypedData signature verification failed')
 
-          // @ts-ignore
-          this.resError(err.message, { ...payload, recoveredAddress }, res)
+          this.resError(err.message, payload, res)
 
-          cb(err.message)
+          cb(err)
         } else {
           res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
           cb(null, sig)
@@ -263,14 +242,14 @@ class Provider extends EventEmitter {
     })
   }
 
-  feeTotalOverMax (rawTx, maxTotalFee: number) {
-    const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas, 16) : parseInt(rawTx.gasPrice, 16)
-    const gasLimit = parseInt(rawTx.gasLimit, 16)
+  feeTotalOverMax (rawTx: TransactionData, maxTotalFee: number) {
+    const maxFeePerGas = usesBaseFee(rawTx) ? parseInt(rawTx.maxFeePerGas || '', 16) : parseInt(rawTx.gasPrice || '', 16)
+    const gasLimit = parseInt(rawTx.gasLimit || '', 16)
     const totalFee = maxFeePerGas * gasLimit
     return totalFee > maxTotalFee
   }
 
-  signAndSend (req: AccountRequest, cb: Callback<string>) {
+  signAndSend (req: TransactionRequest, cb: Callback<string>) {
     const rawTx = req.data
     const res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
@@ -295,7 +274,7 @@ class Provider extends EventEmitter {
       accounts.signTransaction(rawTx, (err, signedTx) => { // Sign Transaction
         if (err) {
           this.resError(err, payload, res)
-          cb(new Error(err))
+          cb(err)
         } else {
           accounts.setTxSigned(req.handlerId, err => {
             if (err) return cb(err)
@@ -312,14 +291,14 @@ class Provider extends EventEmitter {
                 done = true
                 if (response.error) {
                   this.resError(response.error, payload, res)
-                  cb(response.error.message)
+                  cb(new Error(response.error.message))
                 } else {
                   res(response)
                   cb(null, response.result)
                 }
               }, {
                 type: 'ethereum',
-                id: parseInt(req.data.chainId, 'hex')
+                id: parseInt(req.data.chainId, 16)
               })
             }
             const broadcastTimer = setInterval(() => cast(), 1000)
@@ -330,7 +309,7 @@ class Provider extends EventEmitter {
     }
   }
 
-  approveRequest (req: AccountRequest, cb) {
+  approveTransactionRequest (req: TransactionRequest, cb: Callback<string>) {
     log.info('approveRequest', req)
     accounts.lockRequest(req.handlerId)
     if (req.data.nonce) return this.signAndSend(req, cb)
@@ -341,7 +320,7 @@ class Provider extends EventEmitter {
           delete this.handlers[req.handlerId]
         }
 
-        return cb(response.error)
+        return cb(new Error(response.error.message))
       }
 
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
@@ -349,7 +328,7 @@ class Provider extends EventEmitter {
     })
   }
 
-  getRawTx (newTx) {
+  getRawTx (newTx: TransactionData): TransactionData {
     const { gas, gasLimit, gasPrice, data, value, ...rawTx } = newTx
 
     return {
@@ -361,19 +340,19 @@ class Provider extends EventEmitter {
     }
   }
 
-  _addRequestHandler (res: JSONRPCRequestCallback) {
+  _addRequestHandler (res: RPCRequestCallback) {
     const handlerId: string = uuid()
     this.handlers[handlerId] = res
 
     return handlerId
   }
   
-  async _getGasEstimate (rawTx, chainConfig) {
+  private async getGasEstimate (rawTx: TransactionData, chainConfig: Common) {
     const { chainId, ...rest } = rawTx
     const txParams = chainConfig.isActivatedEIP(2930) ? rawTx : rest
 
-    const payload = { method: 'eth_estimateGas', params: [txParams], jsonrpc: '2.0', id: 1 }
-    const targetChain = {
+    const payload: JSONRPCRequestPayload = { method: 'eth_estimateGas', params: [txParams], jsonrpc: '2.0', id: 1 }
+    const targetChain: Chain = {
       type: 'ethereum',
       id: parseInt(rawTx.chainId, 16)
     }
@@ -392,28 +371,20 @@ class Provider extends EventEmitter {
     return address && (account.id.toLowerCase() === address.toLowerCase())
   }
 
-  _gasFees (rawTx) {
-    const chain = {
-      type: 'ethereum',
-      id: parseInt(rawTx.chainId, 16)
-    }
-
-    return store('main.networksMeta', chain.type, chain.id, 'gas')
+  private gasFees (rawTx: TransactionData) {
+    return store('main.networksMeta', 'ethereum', parseInt(rawTx.chainId, 16), 'gas')
   }
 
-  getNonce (rawTx: TransactionData, res: JSONRPCRequestCallback) {
-    const targetChain = {
+  getNonce (rawTx: TransactionData, res: RPCRequestCallback) {
+    const targetChain: Chain = {
       type: 'ethereum',
-      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 16) : undefined
+      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 16) : store('main.currentNetwork.id')
     }
 
-    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, (response) => {
-      if (response.result) this.nonce = { age: Date.now(), current: response.result, account: rawTx.from }
-      res(response)
-    }, targetChain)
+    this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, res, targetChain)
   }
 
-  checkExistingNonceGas (tx) {
+  checkExistingNonceGas (tx: TransactionData) {
     const { from, nonce } = tx
 
     const reqs = this.store('main.accounts', from, 'requests')
@@ -453,15 +424,16 @@ class Provider extends EventEmitter {
     return tx
   }
 
-  fillTransaction (newTx, cb: ErrorMessageCallback<TransactionData>) {
-    if (!newTx) return cb('No transaction data')
+  fillTransaction (newTx: TransactionData, cb: Callback<TransactionData>) {
+    if (!newTx) return cb(new Error('No transaction data'))
+
     const rawTx = this.getRawTx(newTx)
-    const gas = this._gasFees(rawTx)
+    const gas = this.gasFees(rawTx)
     const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
     const estimateGas = rawTx.gasLimit
       ? Promise.resolve(rawTx)
-      : this._getGasEstimate(rawTx, chainConfig)
+      : this.getGasEstimate(rawTx, chainConfig)
         .then(gasLimit => ({ ...rawTx, gasLimit }))
         .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
 
@@ -478,16 +450,17 @@ class Provider extends EventEmitter {
       .catch(cb)
   }
 
-  sendTransaction (payload: RPCRequestPayload, res: JSONRPCRequestCallback) {
+  sendTransaction (payload: RPCRequestPayload, res: RPCRequestCallback) {
     const newTx = payload.params[0]
     const currentAccount = accounts.current()
 
     log.debug(`sendTransaction(${JSON.stringify(newTx)}`)
 
-    this.fillTransaction(newTx, (err, tx) => {
+    this.fillTransaction(newTx, (err, transaction) => {
       if (err) {
         this.resError(err, payload, res)
       } else {
+        const tx = transaction as TransactionData
         const from = tx.from
 
         if (from && !this._isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
@@ -503,14 +476,14 @@ class Provider extends EventEmitter {
           account: currentAccount.id, 
           origin: payload._origin, 
           warning,
-          feesUpdatedByUser: feesUpdated
+          feesUpdatedByUser: feesUpdated || false
         }, res)
       }
     })
   }
 
-  getTransactionByHash (payload, cb, targetChain) {
-    const res = response => {
+  getTransactionByHash (payload: RPCRequestPayload, cb: RPCRequestCallback, targetChain: Chain) {
+    const res = (response: any) => {
       if (response.result && !response.result.gasPrice && response.result.maxFeePerGas) {
         return cb({ ...response, result: { ...response.result, gasPrice: response.result.maxFeePerGas } })
       }
@@ -521,7 +494,7 @@ class Provider extends EventEmitter {
     this.connection.send(payload, res, targetChain)
   }
 
-  sign (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  sign (payload: RPCRequestPayload, res: RPCRequestCallback) {
     // normalize the payload for downstream rendering, taking the first address and
     // making it the first parameter, which is the account that needs to sign
     const addressIndex = payload.params.findIndex(utils.isAddress)
@@ -556,7 +529,7 @@ class Provider extends EventEmitter {
     accounts.addRequest(req, _res)
   }
 
-  signTypedData (rawPayload: RPCRequestPayload, version: Version, res: JSONRPCRequestCallback) {
+  signTypedData (rawPayload: RPCRequestPayload, version: Version, res: RPCRequestCallback) {
     // v1 has the param order as: [data, address, ...], all other versions have [address, data, ...]
     const orderedParams = version === 'V1'
       ? [rawPayload.params[1], rawPayload.params[0], ...rawPayload.params.slice(2)]
@@ -601,9 +574,9 @@ class Provider extends EventEmitter {
     accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
   }
 
-  subscribe (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  subscribe (payload: RPCRequestPayload, res: RPCCallback<JSONRPCResponsePayload>) {
     const subId = addHexPrefix(crypto.randomBytes(16).toString('hex'))
-    const subscriptionType = payload.params[0] as ('accountsChanged' | 'chainChanged' | 'networkChanged')
+    const subscriptionType = payload.params[0] as SubscriptionType
     
     this.subscriptions[subscriptionType] = this.subscriptions[subscriptionType] || []
     this.subscriptions[subscriptionType].push(subId)
@@ -611,22 +584,21 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: subId })
   }
 
-  ifSubRemove (id) {
-    let found = false
-    Object.keys(this.subscriptions).some(type => {
-      const index = this.subscriptions[type].indexOf(id)
-      found = index > -1
-      if (found) this.subscriptions[type].splice(index, 1)
-      return found
+  // TODO: write a test for this
+  ifSubRemove (id: string) {
+    return Object.keys(this.subscriptions).some(type => {
+      const subscriptionType = type as SubscriptionType
+      const index = this.subscriptions[subscriptionType].indexOf(id)
+
+      return (index > -1) && this.subscriptions[subscriptionType].splice(index, 1)
     })
-    return found
   }
 
-  clientVersion (payload, res) {
+  clientVersion (payload: RPCRequestPayload, res: RPCCallback<JSONRPCResponsePayload>) {
     res({ id: payload.id, jsonrpc: '2.0', result: `Frame/v${packageFile.version}` })
   }
 
-  switchEthereumChain (payload, res) {
+  switchEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
     try {
       const params = payload.params
       if (!params || !params[0]) throw new Error('Params not supplied')
@@ -640,7 +612,7 @@ class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      if (store('main.currentNetwork.id') === parseInt(chainId)) return res({ id: payload.id, jsonrpc: '2.0', result: null })
+      if (store('main.currentNetwork.id') === chainId) return res({ id: payload.id, jsonrpc: '2.0', result: null })
 
       const handlerId = this._addRequestHandler(res)
       
@@ -656,13 +628,12 @@ class Provider extends EventEmitter {
         origin: payload._origin,
         payload
       }, res)
-
     } catch (e) {
-      return this.resError(e, payload, res)
+      return this.resError(e as EVMError, payload, res)
     }
   }
 
-  addEthereumChain (payload: RPCRequestPayload, res: JSONRPCRequestCallback) {
+  addEthereumChain (payload: RPCRequestPayload, res: RPCRequestCallback) {
     if (!payload.params[0]) return this.resError('addChain request missing params', payload, res)
 
     const type = 'ethereum'
@@ -710,7 +681,7 @@ class Provider extends EventEmitter {
     }
   }
 
-  getPermissions (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  getPermissions (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
     const now = new Date().getTime()
     const toPermission = permission.bind(null, now)
     const allowedOperations = protectedMethods.map(toPermission)
@@ -718,7 +689,7 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: allowedOperations })
   }
 
-  requestPermissions (payload: JSONRPCRequestPayload, res: JSONRPCRequestCallback) {
+  requestPermissions (payload: JSONRPCRequestPayload, res: RPCRequestCallback) {
     // we already require the user to grant permission to call this method so
     // we just need to return permission objects for the requested operations
     const now = new Date().getTime()
@@ -727,16 +698,15 @@ class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: '2.0', result: requestedOperations })
   }
 
-  addCustomToken (payload: RPCRequestPayload, cb: JSONRPCRequestCallback, targetChain: Chain) {
+  addCustomToken (payload: RPCRequestPayload, cb: RPCRequestCallback, targetChain: Chain) {
     const { type, options: tokenData } = (payload.params || {}) as any
 
     if ((type || '').toLowerCase() !== 'erc20') {
       return this.resError('only ERC-20 tokens are supported', payload, cb)
     }
 
-    this.getChainId({ id: 1, jsonrpc: '2.0' } as JSONRPCRequestPayload, resp => {
-      const response = resp as JSONRPCResponsePayload
-      const chainId = parseInt(response.result)
+    this.getChainId(payload, resp => {
+      const chainId = parseInt(resp.result)
 
       const address = (tokenData.address || '').toLowerCase()
       const symbol = (tokenData.symbol || '').toUpperCase()
@@ -751,7 +721,7 @@ class Provider extends EventEmitter {
       }
 
       // don't attempt to add the token if it's already been added
-      const tokenExists = store('main.tokens').some((token: Token) => token.chainId === chainId && token.address === address)
+      const tokenExists = store('main.tokens').some((token: TokenDefinition) => token.chainId === chainId && token.address === address)
       if (tokenExists) {
         return res()
       }
@@ -784,18 +754,23 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  sendAsync (payload: RPCRequestPayload, cb: Callback<JSONRPCResponsePayload | JSONRPCErrorResponse>) {
+  sendAsync (payload: RPCRequestPayload, cb: Callback<JSONRPCResponsePayload>) {
     this.send(payload, res => {
-      
-      if (res.hasOwnProperty('error')) return cb(new Error((res as JSONRPCErrorResponse).error))
-      cb(null, res)
+      // TODO: remove this whole method?
+      if (res.error) {
+        return cb(new Error(res.error))
+      }
+
+      cb(null, res as JSONRPCResponsePayload)
     })
   }
 
-  send (payload: RPCRequestPayload, res: JSONRPCRequestCallback = () => {}, chain?: string) {
+  send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
+    const targetChainId = (payload.chain && parseInt(payload.chain, 16)) || store('main.currentNetwork.id')
+
     const targetChain: Chain = {
-      type: 'ethereum', id: chain || utils.toHex(store('main.currentNetwork.id'))
+      type: 'ethereum', id: targetChainId
     }
 
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
@@ -805,7 +780,7 @@ class Provider extends EventEmitter {
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
-    if (method === 'eth_subscribe' && this.subscriptions[payload.params[0]]) return this.subscribe(payload, res)
+    if (method === 'eth_subscribe' && this.subscriptions[payload.params[0] as SubscriptionType]) return this.subscribe(payload, res)
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
@@ -813,7 +788,7 @@ class Provider extends EventEmitter {
     const signTypedDataRequest = method.match(signTypedDataMatcher)
 
     if (signTypedDataRequest) {
-      const version = (signTypedDataRequest[1] || 'v1').toUpperCase()
+      const version = (signTypedDataRequest[1] || 'v1').toUpperCase() as Version
       return this.signTypedData(payload, version, res)
     }
     
@@ -821,23 +796,23 @@ class Provider extends EventEmitter {
     if (method === 'wallet_switchEthereumChain') return this.switchEthereumChain(payload, res)
     if (method === 'wallet_getPermissions') return this.getPermissions(payload, res)
     if (method === 'wallet_requestPermissions') return this.requestPermissions(payload, res)
-    if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res)
+    if (method === 'wallet_watchAsset') return this.addCustomToken(payload, res, targetChain)
 
     // Connection dependent methods need to pass targetChain
     if (method === 'net_version') return this.getNetVersion(payload, res, targetChain)
     if (method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
 
-    // Delete custom data
-    delete payload._origin
+    // remove custom data
+    const { _origin, ...rpcPayload } = payload
 
     // Pass everything else to our connection
-    this.connection.send(payload, res, targetChain)
+    this.connection.send(rpcPayload, res, targetChain)
   }
 
-  emit(type, ...args) {
+  emit (type: string | symbol, ...args: any[]) {
     proxy.emit(type, ...args)
-    super.emit(type, ...args)
-  } 
+    return super.emit(type, ...args)
+  }
 }
 
 const provider = new Provider()
@@ -851,7 +826,7 @@ store.observer(() => {
   }
 })
 
-proxy.on('send', (payload, cd, targetChain) => provider.send(payload, cd, targetChain))
+proxy.on('send', (payload, cd) => provider.send(payload, cd))
 proxy.ready = true
 
 export default provider

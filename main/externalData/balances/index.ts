@@ -16,12 +16,12 @@ export interface FoundBalances {
   [address: string]: TokenBalance
 }
 
-interface TokenBalance extends Token {
+interface TokenBalance extends TokenDefinition {
   balance: BigNumber
 }
 
 export interface BalanceScanOptions {
-  knownTokens?: Token[],
+  knownTokens?: TokenDefinition[],
   omit?: string[],
   onlyKnown?: boolean // if true, only scan for known tokens, not all tokens for a given chain
 }
@@ -38,7 +38,7 @@ async function getNativeCurrencyBalance (address: string) {
   return { address, balance, chainId: await getChainId() }
 }
 
-function balanceCalls (owner: string, tokens: Token[]): Call<BigNumber.Value, TokenBalance>[] {
+function balanceCalls (owner: string, tokens: TokenDefinition[]): Call<BigNumber.Value, TokenBalance>[] {
   return tokens.map(token => ({
     target: token.address,
     call: ['balanceOf(address)(uint256)', owner],
@@ -54,7 +54,7 @@ function balanceCalls (owner: string, tokens: Token[]): Call<BigNumber.Value, To
   }))
 }
 
-function mergeTokenLists (lowerPriority: Token[], higherPriority: Token[]) {
+function mergeTokenLists (lowerPriority: TokenDefinition[], higherPriority: TokenDefinition[]) {
   return [
     ...higherPriority,
     ...(lowerPriority.filter(token => !higherPriority.find(t => t.address === token.address)))
@@ -69,7 +69,7 @@ function relevantBalances (knownAddresses: string[], positiveBalances: FoundBala
   return positiveBalances
 }
 
-async function getTokenBalance (token: Token, owner: string, provider: providers.JsonRpcProvider) {
+async function getTokenBalance (token: TokenDefinition, owner: string, provider: providers.JsonRpcProvider) {
   const contract = new ethers.Contract(token.address, erc20TokenAbi, provider)
 
   try {
@@ -81,7 +81,7 @@ async function getTokenBalance (token: Token, owner: string, provider: providers
   }
 }
 
-async function getTokenBalancesFromContracts (owner: string, tokens: Token[]) {
+async function getTokenBalancesFromContracts (owner: string, tokens: TokenDefinition[]) {
   const web3Provider = new providers.Web3Provider(provider)
   const balances = tokens.map(async token => ({
     ...token,
@@ -91,7 +91,7 @@ async function getTokenBalancesFromContracts (owner: string, tokens: Token[]) {
   return (await Promise.all(balances))
 }
 
-async function getTokenBalancesFromMulticall (owner: string, tokens: Token[], chainId: number) {
+async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
   const calls = balanceCalls(owner, tokens)
   const BATCH_SIZE = 2000
 

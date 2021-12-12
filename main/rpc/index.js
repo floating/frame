@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const accounts = require('../accounts')
 const signers = require('../signers')
 const launch = require('../launch')
-const provider = require('../provider')
+const provider = require('../provider').default
 const store = require('../store')
 const dapps = require('../dapps')
 // const ens = require('../ens')
@@ -118,7 +118,7 @@ const rpc = {
   approveRequest (req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
-      provider.approveRequest(req, (err, res) => {
+      provider.approveTransactionRequest(req, (err, res) => {
         if (err) return accounts.setRequestError(req.handlerId, err)
         setTimeout(() => accounts.setTxSent(req.handlerId, res), 1800)
       })

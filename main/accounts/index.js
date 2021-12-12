@@ -14,7 +14,7 @@ const store = require('../store')
 const dataScanner = require('../externalData')
 
 // Provider Proxy
-const proxyProvider = require('../provider/proxy')
+const proxyProvider = require('../provider/proxy').default
 
 const Account = require('./Account')
 const windows = require('../windows')

@@ -1,13 +1,13 @@
 const http = require('http')
 const log = require('electron-log')
 
-const provider = require('../provider')
+const provider = require('../provider').default
 const accounts = require('../accounts')
 const store = require('../store')
 
 const trusted = require('./trusted')
 const validPayload = require('./validPayload').default
-const protectedMethods = require('./protectedMethods')
+const protectedMethods = require('./protectedMethods').default
 
 const logTraffic = process.env.LOG_TRAFFIC
 

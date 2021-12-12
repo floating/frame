@@ -4,7 +4,7 @@ const namehash = require('eth-ens-namehash')
 const contentHash = require('content-hash')
 
 // Frame modules
-const provider = require('../provider')
+const provider = require('../provider').default
 const store = require('../store')
 
 // Local modules

@@ -1,4 +1,4 @@
-interface Token {
+interface TokenDefinition {
   chainId: number,
   name: string,
   symbol: string,
@@ -7,7 +7,7 @@ interface Token {
   logoUri?: string
 }
 
-interface Chain {
+interface ChainDefinition {
   type: 'ethereum',
   id: number,
   name: string,

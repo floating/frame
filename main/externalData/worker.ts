@@ -18,7 +18,7 @@ function sendToMainProcess (data: any) {
 
 interface BalanceScanAddresses {
   [address: string]: {
-    knownTokens: Token[],
+    knownTokens: TokenDefinition[],
     onlyKnown: boolean
   }
 }

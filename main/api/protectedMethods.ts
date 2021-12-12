@@ -1,4 +1,4 @@
-module.exports = [
+export default [
   'eth_coinbase',
   'eth_accounts',
   'eth_requestAccounts',
