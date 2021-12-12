@@ -27,7 +27,8 @@ export interface SwitchChainRequest extends AccountRequest {
 
 export interface TransactionRequest extends AccountRequest {
   type: 'transaction',
-  data: any, // TransactionData
+  payload: Requests.SendTransaction,
+  data: TransactionData,
   warning?: string,
   feesUpdatedByUser: boolean
 }

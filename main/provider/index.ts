@@ -5,6 +5,7 @@ import log from 'electron-log'
 import utils from 'web3-utils'
 import ethSignature, { Version } from 'eth-sig-util'
 import crypto from 'crypto'
+import Common from '@ethereumjs/common'
 
 import {
   padToEven,
@@ -21,37 +22,27 @@ import {
   hashPersonalMessage,
 } from 'ethereumjs-util'
 
-import proxy from './proxy'
-import store from '../store'
-import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest } from '../accounts'
-import protectedMethods from '../api/protectedMethods'
-
-import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
-
 // @ts-ignore
 import { capitalize } from '../../resources/utils' // TODO: include this in TS build
-
+import proxy from './proxy'
+import store from '../store'
+import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
-import Common from '@ethereumjs/common'
+
+import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
+import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
 enum SubscriptionType { ACCOUNTS = 'accountsChanged', CHAIN = 'chainChanged', NETWORK = 'networkChanged' }
 type Subscriptions = { [key in SubscriptionType]: string[] }
 
-interface Nonce {
-  age: number,
-  current: string,
-  account: string
-}
-
 class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
   handlers: { [id: string]: any } = {}
-  nonce: Nonce | {} = {} // TODO: remove?
   subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], networkChanged: [] }
   store: (...args: any) => any
 
@@ -124,7 +115,7 @@ class Provider extends EventEmitter {
     this.resError({ message: 'User declined transaction', code: 4001 }, payload, res)
   }
 
-  resError (errorData: string | EVMError, request: JSONRPC, res: RPCRequestCallback) {
+  resError (errorData: string | EVMError, request: RPCId, res: RPCRequestCallback) {
     const error = (typeof errorData === 'string')
       ? { message: errorData, code: -1 }
       : { message: errorData.message, code: errorData.code || -1 }
@@ -328,11 +319,12 @@ class Provider extends EventEmitter {
     })
   }
 
-  getRawTx (newTx: TransactionData): TransactionData {
-    const { gas, gasLimit, gasPrice, data, value, ...rawTx } = newTx
+  private getRawTx (newTx: Requests.TxParams): TransactionData {
+    const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
 
     return {
       ...rawTx,
+      type: '0x0',
       value: addHexPrefix(unpadHexString(value || '0x') || '0'),
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
@@ -357,7 +349,7 @@ class Provider extends EventEmitter {
       id: parseInt(rawTx.chainId, 16)
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       this.connection.send(payload, response => {
         if (response.error) return reject(response.error)
 
@@ -424,7 +416,7 @@ class Provider extends EventEmitter {
     return tx
   }
 
-  fillTransaction (newTx: TransactionData, cb: Callback<TransactionData>) {
+  fillTransaction (newTx: Requests.TxParams, cb: Callback<TransactionData>) {
     if (!newTx) return cb(new Error('No transaction data'))
 
     const rawTx = this.getRawTx(newTx)
@@ -450,7 +442,7 @@ class Provider extends EventEmitter {
       .catch(cb)
   }
 
-  sendTransaction (payload: RPCRequestPayload, res: RPCRequestCallback) {
+  sendTransaction (payload: Requests.SendTransaction, res: RPCRequestCallback) {
     const newTx = payload.params[0]
     const currentAccount = accounts.current()
 
@@ -754,17 +746,6 @@ class Provider extends EventEmitter {
     }, targetChain)
   }
 
-  sendAsync (payload: RPCRequestPayload, cb: Callback<JSONRPCResponsePayload>) {
-    this.send(payload, res => {
-      // TODO: remove this whole method?
-      if (res.error) {
-        return cb(new Error(res.error))
-      }
-
-      cb(null, res as JSONRPCResponsePayload)
-    })
-  }
-
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
     const targetChainId = (payload.chain && parseInt(payload.chain, 16)) || store('main.currentNetwork.id')
@@ -776,7 +757,7 @@ class Provider extends EventEmitter {
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (method === 'eth_accounts') return this.getAccounts(payload, res)
     if (method === 'eth_requestAccounts') return this.getAccounts(payload, res)
-    if (method === 'eth_sendTransaction') return this.sendTransaction(payload, res)
+    if (method === 'eth_sendTransaction') return this.sendTransaction(payload as Requests.SendTransaction, res)
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)
