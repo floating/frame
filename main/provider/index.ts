@@ -319,7 +319,7 @@ class Provider extends EventEmitter {
     })
   }
 
-  private getRawTx (newTx: Requests.TxParams): TransactionData {
+  private getRawTx (newTx: RPCRequests.TxParams): TransactionData {
     const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
 
     return {
@@ -416,7 +416,7 @@ class Provider extends EventEmitter {
     return tx
   }
 
-  fillTransaction (newTx: Requests.TxParams, cb: Callback<TransactionData>) {
+  fillTransaction (newTx: RPCRequests.TxParams, cb: Callback<TransactionData>) {
     if (!newTx) return cb(new Error('No transaction data'))
 
     const rawTx = this.getRawTx(newTx)
@@ -442,7 +442,7 @@ class Provider extends EventEmitter {
       .catch(cb)
   }
 
-  sendTransaction (payload: Requests.SendTransaction, res: RPCRequestCallback) {
+  sendTransaction (payload: RPCRequests.SendTransaction, res: RPCRequestCallback) {
     const newTx = payload.params[0]
     const currentAccount = accounts.current()
 
@@ -757,7 +757,7 @@ class Provider extends EventEmitter {
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
     if (method === 'eth_accounts') return this.getAccounts(payload, res)
     if (method === 'eth_requestAccounts') return this.getAccounts(payload, res)
-    if (method === 'eth_sendTransaction') return this.sendTransaction(payload as Requests.SendTransaction, res)
+    if (method === 'eth_sendTransaction') return this.sendTransaction(payload as RPCRequests.SendTransaction, res)
     if (method === 'eth_getTransactionByHash') return this.getTransactionByHash(payload, res, targetChain)
     if (method === 'personal_ecRecover') return this.ecRecover(payload, res)
     if (method === 'web3_clientVersion') return this.clientVersion(payload, res)

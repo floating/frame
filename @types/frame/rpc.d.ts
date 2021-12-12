@@ -30,7 +30,7 @@ interface EVMError {
 
 type RPCRequestPayload = JSONRPCRequestPayload & InternalPayload
 
-declare namespace Requests {
+declare namespace RPCRequests {
   interface TxParams {
     nonce?: string;
     gasPrice?: string,
