@@ -812,6 +812,49 @@ describe('#send', () => {
       })
     })
   })
+
+  describe('#eth_unsubscribe', () => {
+    const eventTypes = ['accountsChanged', 'chainChanged', 'networkChanged']
+
+    const unsubscribe = (id, cb) => send({ method: 'eth_unsubscribe', params: [id] }, cb)
+
+    eventTypes.forEach(eventType => {
+      it(`unsubscribes from ${eventType} events`, done => {
+        const subId = '0x1acc2933618a0ff548f03b1c99420366'
+        provider.subscriptions[eventType] = [subId]
+
+        unsubscribe(subId, response => {
+          try {
+            expect(response.error).toBe(undefined)
+            expect(response.result).toBe(true)
+            expect(provider.subscriptions[eventType]).toHaveLength(0)
+            done()
+          } catch (e) { done(e) }
+        })
+      })
+    })
+
+    it('returns an error from the node if attempting to unsubscribe from an unknown subscription', done => {
+      connection.send.mockImplementation((payload, cb) => cb({ error: 'unknown subscription!' }))
+
+      provider.subscriptions.accountsChanged = ['0xtest1']
+      provider.subscriptions.chainChanged = ['0xtest2']
+      provider.subscriptions.networkChanged = ['0xtest2']
+
+      unsubscribe('0xanothersub', response => {
+        try {
+          expect(response.error).toBe('unknown subscription!')
+          expect(response.result).toBe(undefined)
+
+          eventTypes.forEach(eventType => {
+            expect(provider.subscriptions[eventType]).toHaveLength(1)
+          })
+
+          done()
+        } catch (e) { done(e) }
+      })
+    })
+  })
 })
 
 describe('#signAndSend', () => {
