@@ -1,10 +1,9 @@
-import { addHexPrefix } from 'ethereumjs-util'
+import { addHexPrefix, intToHex } from 'ethereumjs-util'
 
 const weiToGwei = (wei: number) => wei / 1e9
 const weiToHex = (wei: number) => addHexPrefix(wei.toString(16))
 const gweiToWei = (gwei: number) => gwei * 1e9
 const gweiToHex = (gwei: number) => weiToHex(gwei * 1e9)
-const intToHex = (n: number) => addHexPrefix(n.toString(16))
 const hexToInt = (hexStr: string) => parseInt(hexStr, 16)
 const weiHexToGweiInt = (weiHex: string) => hexToInt(weiHex) / 1e9
 const gweiToWeiHex = (gwei: number) => intToHex(gweiToWei(gwei))
@@ -26,6 +25,6 @@ export {
   gweiToHex,
   intToHex,
   hexToInt,
-  weiHexToGweiInt, 
+  weiHexToGweiInt,
   gweiToWeiHex
 }

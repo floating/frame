@@ -42,7 +42,7 @@ class Provider extends EventEmitter {
   connection = Chains
 
   handlers: { [id: string]: any } = {}
-  subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], networkChanged: [] }
+  subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], chainsChanged: [], networkChanged: [] }
   store: (...args: any) => any
 
   constructor () {
@@ -69,9 +69,21 @@ class Provider extends EventEmitter {
     })
   }
 
-  chainChanged (chainId: number | string) {
+  // fires when the current default chain changes
+  chainChanged (chainId: number) {
+    const chain = intToHex(chainId)
+
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chainId } })
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chain } })
+    })
+  }
+
+  // fires when the list of available chains changes
+  chainsChanged (availableChains: number[]) {
+    const chains = availableChains.map(intToHex)
+
+    this.subscriptions.chainsChanged.forEach(subscription => {
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chains } })
     })
   }
 
@@ -331,7 +343,7 @@ class Provider extends EventEmitter {
     }
   }
 
-  _addRequestHandler (res: RPCRequestCallback) {
+  private addRequestHandler (res: RPCRequestCallback) {
     const handlerId: string = uuid()
     this.handlers[handlerId] = res
 
@@ -456,7 +468,7 @@ class Provider extends EventEmitter {
 
         if (from && !this._isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
 
-        const handlerId = this._addRequestHandler(res)
+        const handlerId = this.addRequestHandler(res)
         const { warning, feesUpdated, ...data } = tx
         
         accounts.addRequest({ 
@@ -508,7 +520,7 @@ class Provider extends EventEmitter {
 
     if (!this._isCurrentAccount(from, currentAccount)) return this.resError('sign request is not from currently selected account.', payload, res)
 
-    const handlerId = this._addRequestHandler(res)
+    const handlerId = this.addRequestHandler(res)
 
     const req = { handlerId, type: 'sign', payload: normalizedPayload, account: currentAccount.getAccounts[0], origin: payload._origin }
 
@@ -560,7 +572,7 @@ class Provider extends EventEmitter {
       return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
-    const handlerId = this._addRequestHandler(res)
+    const handlerId = this.addRequestHandler(res)
 
     accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
   }
@@ -605,7 +617,7 @@ class Provider extends EventEmitter {
 
       if (store('main.currentNetwork.id') === chainId) return res({ id: payload.id, jsonrpc: '2.0', result: null })
 
-      const handlerId = this._addRequestHandler(res)
+      const handlerId = this.addRequestHandler(res)
       
       // Ask user if they want to switch chains
       accounts.addRequest({
@@ -641,7 +653,7 @@ class Provider extends EventEmitter {
     if (!chainName) return this.resError('addChain request missing chainName', payload, res)
     if (!nativeCurrency) return this.resError('addChain request missing nativeCurrency', payload, res)
 
-    const handlerId = this._addRequestHandler(res)
+    const handlerId = this.addRequestHandler(res)
 
     // Check if chain exists
     const id = parseInt(chainId)
@@ -732,7 +744,7 @@ class Provider extends EventEmitter {
       //   }
       // }
 
-      const handlerId = this._addRequestHandler(res)
+      const handlerId = this.addRequestHandler(res)
 
       accounts.addRequest({
         handlerId,
@@ -816,14 +828,39 @@ class Provider extends EventEmitter {
 
 const provider = new Provider()
 
-let network = store('main.currentNetwork.id')
+function getAvailableChains () {
+  const chains: { [id: string]: { id: number, on: boolean } } = store('main.networks.ethereum') || {}
+
+  return Object.values(chains)
+    .filter(chain => chain.on)
+    .map(chain => chain.id)
+    .sort((a, b) => a - b)
+}
+
+function arraysMatch (a: number[] = [], b: number[] = []) {
+  return (
+    a.length === b.length &&
+    a.every((chainId, i) => b[i] === chainId)
+  )
+}
+
+let network = store('main.currentNetwork.id'), availableChains = getAvailableChains()
+
 store.observer(() => {
-  if (network !== store('main.currentNetwork.id')) {
-    network = store('main.currentNetwork.id')
+  const currentNetworkId = store('main.currentNetwork.id')
+  const currentChains = getAvailableChains()
+
+  if (network !== currentNetworkId) {
+    network = currentNetworkId
     provider.chainChanged(network)
     provider.networkChanged(network)
   }
-})
+
+  if (!arraysMatch(currentChains, availableChains)) {
+    availableChains = currentChains
+    provider.chainsChanged(availableChains)
+  }
+}, 'provider')
 
 proxy.on('send', (payload, cd) => provider.send(payload, cd))
 proxy.ready = true

@@ -2,7 +2,12 @@ type RPCCallback<T> = (res: T) => void;
 type RPCRequestCallback = RPCCallback<JSONRPCResponsePayload>
 
 type Address = string // 20 hex bytes, 0x-prefixed
-enum SubscriptionType { ACCOUNTS = 'accountsChanged', CHAIN = 'chainChanged', NETWORK = 'networkChanged' }
+enum SubscriptionType {
+  ACCOUNTS = 'accountsChanged',
+  CHAIN = 'chainChanged',
+  CHAINS = 'chainsChanged',
+  NETWORK = 'networkChanged'
+}
 
 interface RPCId {
   id: number,

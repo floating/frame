@@ -38,6 +38,7 @@ afterAll(() => {
 
 beforeEach(() => {
   provider.handlers = {}
+  provider.subscriptions = { accountsChanged: [], chainChanged: [], chainsChanged: [], networkChanged: [] }
 
   accountRequests = []
   store.set('main.accounts', {})
@@ -852,7 +853,7 @@ describe('#send', () => {
   })
 
   describe('subscriptions', () => {
-    const eventTypes = ['accountsChanged', 'chainChanged', 'networkChanged']
+    const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'networkChanged']
 
     describe('#eth_subscribe', () => {
       const subscribe = (eventType, cb) => send({ id: 9, jsonrpc: '2.0', method: 'eth_subscribe', params: [eventType] }, cb)
@@ -1050,6 +1051,128 @@ describe('#signAndSend', () => {
 
         signAndSend()
       })
+    })
+  })
+})
+
+describe('state change events', () => {
+  describe('#chainChanged', () => {
+    it('fires a chainChanged event to subscribers', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toBe('0x89')
+        done()
+      })
+
+      store.set('main.currentNetwork.id', 137)
+      provider.subscriptions.chainChanged.push(subscriptionId)
+
+      store.getObserver('provider').fire()
+    })
+  })
+
+  describe('#chainsChanged', () => {
+    const networks = {
+      1: {
+        name: 'test',
+        id: 1,
+        on: true
+      },
+      4: {
+        name: 'rinkeby',
+        id: 4,
+        on: true
+      },
+      10: {
+        name: 'optimism',
+        id: 10,
+        on: false
+      }
+    }
+
+    beforeEach(() => {
+      store.set('main.networks.ethereum', networks)
+      store.getObserver('provider').fire()
+    })
+
+    it('fires a chainsChanged event when a chain is added', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1', '0x4', '0x89'])
+        done()
+      })
+
+      const polygon = {
+        name: 'polygon',
+        id: 137,
+        on: true
+      }
+
+      store.set('main.networks.ethereum', { ...networks, 137: polygon })
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider').fire()
+    })
+
+    it('fires a chainsChanged event when a chain is removed', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1'])
+        done()
+      })
+
+      store.set('main.networks.ethereum', { 1: networks[1] })
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider').fire()
+    })
+
+    it('fires a chainsChanged event when a chain connection is turned off', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1', '0x4', '0xa'])
+        done()
+      })
+
+      const chains = { ...networks, 10: { ...networks[10], on: true } }
+      store.set('main.networks.ethereum', chains)
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider').fire()
+    })
+
+    it('fires a chainsChanged event when a chain connection is turned off', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1'])
+        done()
+      })
+
+      const chains = { ...networks, 4: { ...networks[4], on: false } }
+      store.set('main.networks.ethereum', chains)
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider').fire()
     })
   })
 })
