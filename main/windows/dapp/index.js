@@ -8,6 +8,8 @@ const store = require('../../store')
 
 const dev = process.env.NODE_ENV === 'development'
 
+const ghostZ = '#cdcde5'
+
 const topRight = (window) => {
   // pinArea ||
   const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
@@ -106,7 +108,8 @@ const surface = {
     const url = `http://${ens}.localhost:8421/?session=${session}`
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 160
-    const width = area.width - 444 > height ? height : area.width - 444
+    const maxWidth = Math.floor(height * (16/10))
+    const width = area.width - 444 > maxWidth ? maxWidth : area.width - 444
 
     windows[session] = new BrowserWindow({
       session,
@@ -116,8 +119,9 @@ const surface = {
       height,
       show: false,
       frame: false,
-      titleBarStyle: 'hiddenInset',
-      // backgroundColor: '#fff',
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 9, y: 8 },
+      backgroundColor: ghostZ,
       // minimizable: false,
       // maximizable: false,
       // closable: false,
@@ -140,8 +144,8 @@ const surface = {
     // windows[session].positioner = new Positioner(windows[session])
     const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
     const offset = dappViews * 48
-    windows[session].setPosition(pos.x - 444 - offset, pos.y + 80)
-    if (dev) windows[session].openDevTools()
+    windows[session].setPosition(pos.x - 444 - offset + 40, pos.y + 80)
+    // if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../../bundle/dapp.html`)
     const namehash = hash(ens)
@@ -161,6 +165,28 @@ const surface = {
       store.setDappOpen(ens, false)
     })
 
+    // const loadApp = hidden => {
+    //   const view = new BrowserView({
+    //     webPreferences: {
+    //       contextIsolation: true,
+    //       webviewTag: false,
+    //       sandbox: true,
+    //       defaultEncoding: 'utf-8',
+    //       nativeWindowOpen: true,
+    //       nodeIntegration: false
+    //       // scrollBounce: true
+    //       // navigateOnDragDrop: true
+    //     }
+    //   })
+    //   view.setBackgroundColor('#000')
+    //   windows[session].setBrowserView(view)
+    //   view.setBounds({ x: 68, y: hidden ? height : 0, width: width - 68, height: height - 0 })
+    //   view.setAutoResize({ width: true, height: true })
+    //   view.webContents.loadURL('https://app.uniswap.org')
+    //   view.webContents.showDevTools()
+    //   return view
+    // }
+
     const loadApp = hidden => {
       const view = new BrowserView({
         webPreferences: {
@@ -174,14 +200,50 @@ const surface = {
           // navigateOnDragDrop: true
         }
       })
-      windows[session].setBrowserView(view)
-      view.setBounds({ x: 0, y: hidden ? height : 37, width, height: height - 37 })
+      view.setBackgroundColor('#000')
+      windows[session].addBrowserView(view)
+      view.setBounds({ x: 73, y: hidden ? height : 0, width: width - 73, height: height - 0 })
       view.setAutoResize({ width: true, height: true })
-      view.webContents.loadURL(url)
+      view.webContents.loadURL('https://app.uniswap.org')
+      view.webContents.setVisualZoomLevelLimits(1, 3)
       return view
     }
 
+    const appOverlay = hidden => {
+      const view2 = new BrowserView({
+        webPreferences: {
+          contextIsolation: true,
+          webviewTag: false,
+          sandbox: true,
+          defaultEncoding: 'utf-8',
+          nativeWindowOpen: true,
+          nodeIntegration: false
+          // scrollBounce: true
+          // navigateOnDragDrop: true
+        }
+      })
+      // view2.setBackgroundColor('#000')
+      windows[session].addBrowserView(view2)
+      view2.setBackgroundColor('#0000')
+      view2.setBounds({ x: 0, y: 0, width, height: 16 })
+      view2.setAutoResize({ width: true })
+      view2.webContents.loadURL(`file://${__dirname}/index.html`)
+
+      view2.webContents.on('did-finish-load', () => {
+        windows[session].removeBrowserView(view2)
+        windows[session].addBrowserView(view2)
+        setTimeout(() => {
+          windows[session].removeBrowserView(view2)
+          windows[session].addBrowserView(view2)
+        }, 200)
+      })  
+      return view2
+    }
+
     const dapp = store(`main.dapp.details.${namehash}`)
+    // loadApp()
+    appOverlay()
+    return
     if (dapp.color) return loadApp()
 
     // If Frame hasn't collected color data for dapp, do that first

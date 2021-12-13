@@ -473,16 +473,16 @@ if (dev) {
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) {
-      windows.tray.send('main:reload:style', name)
-      // windows.flow.send('main:reload:style', name)
-      windows.dash.send('main:reload:style', name)
+      Object.keys(windows).forEach(win => {
+        windows[win].send('main:reload:style', name)
+      })
     }
   })
   app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
-      windows.tray.reload()
-      // windows.flow.reload()
-      windows.dash.reload()
+      Object.keys(windows).forEach(win => {
+        windows[win].reload()
+      })
     })
   })
 }
@@ -520,9 +520,7 @@ ipcMain.on('tray:mouseout', () => {
 //   }
 // })
 
-// TODO: Make this universal
-ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
-ipcMain.on('dash:contextmenu', (e, x, y) => { if (dev) windows.dash.inspectElement(x, y) })
+ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y) })
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))

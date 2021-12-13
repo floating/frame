@@ -1,6 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
-// import link from '../../resources/link'
+import svg from '../../resources/svg'
 
 class App extends React.Component {
   constructor (...args) {
@@ -19,12 +19,28 @@ class App extends React.Component {
       name.forEach((v, i) => { name[i] = v.charAt(0).toUpperCase() + v.slice(1) })
       name = name.join(' ')
     }
-    const background = dapp && dapp.color ? dapp.color.background : 'white'
-    const color = dapp && dapp.color ? dapp.color.text : 'white'
+    // const background = dapp && dapp.color ? dapp.color.background : 'black'
+    // const color = dapp && dapp.color ? dapp.color.text : 'white'
     return (
-      <div className='splash' style={{ background, color }}>
-        <div className='top'>
-          {dapp && dapp.color ? <div className='title'>{dapp.domain}</div> : null}
+      <div className='splash'>
+        <div className='mainLeft'>
+          <div className='dappIcons'>
+            <div className='dappIconsScroll'>
+              <div className='dappIconsWrap'>
+                <div className='dappIcon'>
+                  {svg.ruby(26)}
+                </div>
+                <div className='dappIcon'>
+                  {svg.inventory(22)}
+                </div>
+                <div className='dappIcon'>
+                  {svg.sync(20)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className='main'>
         </div>
       </div>
     )

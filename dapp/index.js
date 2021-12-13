@@ -24,14 +24,20 @@ document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line
 
-
 link.on('dapp', namehash => {
   link.rpc('getState', (err, state) => {
-    if (err) return console.error('Could not get initial state from main.')
+    if (err) return console.error('Could not get initial state from main')
     const store = _store(state)
+    window.store = store
+    store.observer(() => {
+      document.body.className = 'clip ' + store('main.colorway')
+      setTimeout(() => {
+        document.body.className = store('main.colorway')
+      }, 100)
+    })
     const DappFrame = Restore.connect(App, store)
     ReactDOM.render(<DappFrame id={namehash} />, document.getElementById('frame'))
   })
 })
 
-document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))
+document.addEventListener('contextmenu', e => link.send('*:contextmenu', e.clientX, e.clientY))
