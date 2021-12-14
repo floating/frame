@@ -643,12 +643,14 @@ describe('#adjustNonce', () => {
   let onChainNonce
 
   const mockProxyProvider = {
-    emit: (event, payload, cb) => {
-      if (event === 'send' && payload.method === 'eth_getTransactionCount') {
-        return cb({ result: onChainNonce })
-      }
+    default: {
+      emit: (event, payload, cb) => {
+        if (event === 'send' && payload.method === 'eth_getTransactionCount') {
+          return cb({ result: onChainNonce })
+        }
 
-      cb({ error: 'wrong call!' })
+        cb({ error: 'wrong call!' })
+      }
     }
   }
 

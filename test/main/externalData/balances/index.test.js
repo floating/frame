@@ -108,20 +108,23 @@ describe('#getTokenBalances', () => {
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
 
       expect(tokenBalances.chainId).toBe(1)
-      expect(tokenBalances.balances).toStrictEqual({
-        [olympusDaoToken.address]: {
-          ...olympusDaoToken,
-          balance: new BigNumber(557.830302)
-        },
-        [aaveUsdcToken.address]: {
+      expect(tokenBalances.balances).toEqual([
+        {
           ...aaveUsdcToken,
-          balance: new BigNumber(6245.1)
+          balance: '0x' + new BigNumber('6245100000').toString(16),
+          displayBalance: '6245.1'
         },
-        [zrxToken.address]: {
+        {
           ...zrxToken,
-          balance: new BigNumber(756.5784589845)
+          balance: '0x' + new BigNumber('756578458984500000000').toString(16),
+          displayBalance: '756.5784589845'
+        },
+        {
+          ...olympusDaoToken,
+          balance: '0x' + new BigNumber('557830302000').toString(16),
+          displayBalance: '557.830302'
         }
-      })
+      ])
     })
 
     it('allows a known token to take precedence over one from the list', async () => {
@@ -133,8 +136,9 @@ describe('#getTokenBalances', () => {
       tokenLoader.getTokens.mockReturnValue([olderZrxToken])
 
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
-
-      expect(tokenBalances.balances[zrxToken.address].balance.toString()).toBe('756.5784589845')
+      
+      expect(tokenBalances.balances[1].address).toBe(zrxToken.address)
+      expect(tokenBalances.balances[1].displayBalance).toBe('756.5784589845')
     })
 
     it('does not return a zero balance from the scan of the entire chain', async () => {
@@ -143,8 +147,8 @@ describe('#getTokenBalances', () => {
 
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
 
-      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
-      expect(Object.keys(tokenBalances.balances)).not.toContain(olympusDaoToken.address)
+      expect(tokenBalances.balances).toHaveLength(2)
+      expect(tokenBalances.balances).not.toContainEqual(expect.objectContaining({ address: olympusDaoToken.address }))
     })
 
     it('loads only known token balances when option is set', async () => {
@@ -152,8 +156,8 @@ describe('#getTokenBalances', () => {
 
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens, onlyKnown: true })
       
-      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
-      expect(Object.keys(tokenBalances.balances)).not.toContain(olympusDaoToken.address)
+      expect(tokenBalances.balances).toHaveLength(2)
+      expect(tokenBalances.balances).not.toContainEqual(expect.objectContaining({ address: olympusDaoToken.address }))
     })
   })
 
@@ -172,16 +176,18 @@ describe('#getTokenBalances', () => {
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
 
       expect(tokenBalances.chainId).toBe(1)
-      expect(tokenBalances.balances).toStrictEqual({
-        [aaveUsdcToken.address]: {
+      expect(tokenBalances.balances).toEqual([
+        {
           ...aaveUsdcToken,
-          balance: new BigNumber(6245.1)
+          balance: '0x' + new BigNumber('6245100000').toString(16),
+          displayBalance: '6245.1'
         },
-        [zrxToken.address]: {
+        {
           ...zrxToken,
-          balance: new BigNumber(756.5784589845)
+          balance: '0x' + new BigNumber('756578458984500000000').toString(16),
+          displayBalance: '756.5784589845'
         }
-      })
+      ])
     })
 
     it('returns a zero balance that was previously known', async () => {
@@ -189,17 +195,17 @@ describe('#getTokenBalances', () => {
 
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
 
-      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
-      expect(tokenBalances.balances[aaveUsdcToken.address].balance.isZero()).toBe(true)
-      expect(tokenBalances.balances[zrxToken.address].balance.toString()).toBe('756.5784589845')
+      expect(tokenBalances.balances).toHaveLength(2)
+      expect(tokenBalances.balances[0].balance).toBe('0x0')
+      expect(tokenBalances.balances[1].displayBalance).toBe('756.5784589845')
     })
     
     it('returns a zero balance when the contract call fails', async () => {
       ethers.Contract.mockImplementation(() => ({ balanceOf: jest.fn().mockRejectedValue('unknown contract') }))
       const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
 
-      expect(tokenBalances.balances[aaveUsdcToken.address].balance.isZero()).toBe(true)
-      expect(tokenBalances.balances[zrxToken.address].balance.isZero()).toBe(true)
+      expect(parseInt(tokenBalances.balances[0].balance)).toBe(0)
+      expect(parseInt(tokenBalances.balances[1].balance)).toBe(0)
     })
   })
 })

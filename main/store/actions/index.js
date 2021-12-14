@@ -443,11 +443,6 @@ module.exports = {
       return [...existingBalances, balance]
     })
   },
-  removeBalance: (u, chainId, balance) => {
-    u('main.balances', chainId, (balances = []) => {
-      return balances.filter(b => b.address !== balance.address || b.chainId !== balance.chainId)
-    })
-  },
   // Tokens
   setBalances: (u, address, newBalances) => {
     u('main.balances', address, (balances = []) => {

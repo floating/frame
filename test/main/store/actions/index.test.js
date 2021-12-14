@@ -235,111 +235,65 @@ describe('#addNetwork', () => {
   })
 })
 
-describe('#removeBalance', () => {
-  let balances = {
-    [owner]: {
-      [testTokens.zrx.address]: {
-        ...testTokens.zrx,
-        balance: BigNumber('798.564')
-      }
-    },
-    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': {
-      [testTokens.zrx.address]: {
-        ...testTokens.zrx,
-        balance: BigNumber('8201.343')
-      }
-    }
-  }
-
-  const updaterFn = (node, chainId, update) => {
-    expect(node).toBe('main.balances')
-    expect(chainId).toBe(1)
-
-    balances = update(balances)
-  }
-
-  const removeBalance = key => removeBalanceAction(updaterFn, 1, key)
-
-  it('removes a balance from all accounts', () => {
-    removeBalance(testTokens.zrx.address)
-
-    expect(balances[owner][testTokens.zrx.address]).toBe(undefined)
-    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e'][testTokens.zrx.address]).toBe(undefined)
-  })
-})
-
 describe('#setBalances', () => {
-  const updaterFn = (node, netId, address, update) => {
+  const updaterFn = (node, address, update) => {
     expect(node).toBe('main.balances')
-    expect(netId).toBe(1)
     expect(address).toBe(owner)
 
     balances = update(balances)
   }
 
-  const setBalances = updatedBalances => setBalancesAction(updaterFn, 1, owner, updatedBalances)
+  const setBalances = updatedBalances => setBalancesAction(updaterFn, owner, updatedBalances)
 
   let balances
 
   beforeEach(() => {
-    balances = {
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(30.5)
-      }
-    }
+    balances = [{
+      ...testTokens.badger,
+      balance: new BigNumber(30.5)
+    }]
   })
 
   it('adds a new balance', () => {
-    setBalances({
-      [testTokens.zrx.address]: {
-        ...testTokens.zrx,
-        balance: new BigNumber(7983.2332)
-      }
-    })
+    setBalances([{
+      ...testTokens.zrx,
+      balance: new BigNumber(7983.2332)
+    }])
     
-    expect(balances).toStrictEqual({
-      [testTokens.zrx.address]: {
-        ...testTokens.zrx,
-        balance: new BigNumber(7983.2332)
-      },
-      [testTokens.badger.address]: {
+    expect(balances).toEqual([
+      {
         ...testTokens.badger,
         balance: new BigNumber(30.5)
+      },
+      {
+        ...testTokens.zrx,
+        balance: new BigNumber(7983.2332)
       }
-    })
+    ])
   })
 
   it('updates an existing balance to a positive amount', () => {
-    setBalances({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(41.9)
-      }
-    })
+    setBalances([{
+      ...testTokens.badger,
+      balance: new BigNumber(41.9)
+    }])
     
-    expect(balances).toStrictEqual({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(41.9)
-      }
-    })
+    expect(balances).toEqual([{
+      ...testTokens.badger,
+      balance: new BigNumber(41.9)
+    }])
   })
 
   it('updates an existing balance to zero', () => {
-    setBalances({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(0)
-      }
-    })
+    setBalances([{
+      ...testTokens.badger,
+      balance: new BigNumber(0)
+    }])
     
-    expect(balances).toStrictEqual({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(0)
-      }
-    })
+    expect(balances).toEqual([{
+      ...testTokens.badger,
+      balance: new BigNumber(0)
+    }])
   })
 })
 
