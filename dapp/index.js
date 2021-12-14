@@ -18,8 +18,6 @@ import App from './App'
 import link from '../resources/link'
 import _store from './store'
 
-
-
 document.addEventListener('dragover', e => e.preventDefault())
 document.addEventListener('drop', e => e.preventDefault())
 window.eval = global.eval = () => { throw new Error(`This app does not support window.eval()`) } // eslint-disable-line

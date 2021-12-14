@@ -18,6 +18,8 @@ const menu = require('./menu')
 const store = require('./store').default
 const dapps = require('./dapps')
 
+const dapp = require('./windows/dapp')
+
 // log.transports.file.level = 'info'
 
 // Action Monitor

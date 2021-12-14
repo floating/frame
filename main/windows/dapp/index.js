@@ -83,6 +83,46 @@ const textColor = (r, g, b) => { // http://alienryderflex.com/hsp.html
   return Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b)) > 127.5 ? 'black' : 'white'
 }
 
+const relayerOverlay = (window) => {
+  const { overlay } = window
+  window.removeBrowserView(overlay)
+  window.addBrowserView(overlay)
+}
+
+const openDapp = (window, ens, cb) => {
+  
+  const { width, height } = window.getBounds()
+
+  console.log("WIDTH AND HEIGHT", width, height)
+
+  const view = new BrowserView({
+    webPreferences: {
+      contextIsolation: true,
+      webviewTag: false,
+      sandbox: true,
+      defaultEncoding: 'utf-8',
+      nativeWindowOpen: true,
+      nodeIntegration: false
+      // scrollBounce: true
+      // navigateOnDragDrop: true
+    }
+  })
+  window.addBrowserView(view)
+  view.setBackgroundColor('#0000')
+  view.setBounds({ x: 73, y: 0, width: width - 73, height: height - 0 })
+  view.setAutoResize({ width: true, height: true })
+  view.webContents.loadURL(ens)
+  view.webContents.setVisualZoomLevelLimits(1, 3)
+  window.removeBrowserView(view)
+
+  view.webContents.on('did-finish-load', () => {
+    window.addBrowserView(view)
+    relayerOverlay(window)
+  })
+
+  return view
+}
+
 const surface = {
   openView: (ens, session, windows) => {
     windows.tray.blur()
@@ -109,7 +149,7 @@ const surface = {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 160
     const maxWidth = Math.floor(height * (16/10))
-    const width = area.width - 444 > maxWidth ? maxWidth : area.width - 444
+    const width = area.width - 380 - 80  > maxWidth ? maxWidth : area.width - 380 - 80
 
     windows[session] = new BrowserWindow({
       session,
@@ -139,12 +179,12 @@ const surface = {
       }
     })
 
-    windows[session].dapp = { ens }
+    windows[session].dapp = { ens}
 
     // windows[session].positioner = new Positioner(windows[session])
     const pos = topRight(windows[session]) // windows[session].positioner.calculate('topRight')
     const offset = dappViews * 48
-    windows[session].setPosition(pos.x - 444 - offset + 40, pos.y + 80)
+    windows[session].setPosition(pos.x - 380 - offset, pos.y + 80)
     // if (dev) windows[session].openDevTools()
     windows[session].on('closed', () => { delete windows[session] })
     windows[session].loadURL(`file://${__dirname}/../../../bundle/dapp.html`)
@@ -164,6 +204,35 @@ const surface = {
       delete windows[session]
       store.setDappOpen(ens, false)
     })
+
+    // Add Overlay View
+    windows[session].overlay = new BrowserView({
+      webPreferences: {
+        contextIsolation: true,
+        webviewTag: false,
+        sandbox: true,
+        defaultEncoding: 'utf-8',
+        nativeWindowOpen: true,
+        nodeIntegration: false
+        // scrollBounce: true
+        // navigateOnDragDrop: true
+      }
+    })
+    windows[session].addBrowserView(windows[session].overlay)
+    windows[session].overlay.setBackgroundColor('#0000')
+    windows[session].overlay.setBounds({ x: 0, y: 0, width, height: 16 })
+    windows[session].overlay.setAutoResize({ width: true })
+    windows[session].overlay.webContents.loadURL(`file://${__dirname}/index.html`)
+    windows[session].removeBrowserView(windows[session].overlay)
+    windows[session].overlay.webContents.on('did-finish-load', () => {
+      relayerOverlay(windows[session])
+      setTimeout(() => relayerOverlay(windows[session]), 10)
+    })
+    return
+  
+
+
+
 
     // const loadApp = hidden => {
     //   const view = new BrowserView({
@@ -187,80 +256,82 @@ const surface = {
     //   return view
     // }
 
-    const loadApp = hidden => {
-      const view = new BrowserView({
-        webPreferences: {
-          contextIsolation: true,
-          webviewTag: false,
-          sandbox: true,
-          defaultEncoding: 'utf-8',
-          nativeWindowOpen: true,
-          nodeIntegration: false
-          // scrollBounce: true
-          // navigateOnDragDrop: true
-        }
-      })
-      view.setBackgroundColor('#000')
-      windows[session].addBrowserView(view)
-      view.setBounds({ x: 73, y: hidden ? height : 0, width: width - 73, height: height - 0 })
-      view.setAutoResize({ width: true, height: true })
-      view.webContents.loadURL('https://app.uniswap.org')
-      view.webContents.setVisualZoomLevelLimits(1, 3)
-      return view
-    }
+    // const loadApp = hidden => {
+    //   const view = new BrowserView({
+    //     webPreferences: {
+    //       contextIsolation: true,
+    //       webviewTag: false,
+    //       sandbox: true,
+    //       defaultEncoding: 'utf-8',
+    //       nativeWindowOpen: true,
+    //       nodeIntegration: false
+    //       // scrollBounce: true
+    //       // navigateOnDragDrop: true
+    //     }
+    //   })
+    //   view.setBackgroundColor('#000')
+    //   windows[session].addBrowserView(view)
+    //   view.setBounds({ x: 73, y: hidden ? height : 0, width: width - 73, height: height - 0 })
+    //   view.setAutoResize({ width: true, height: true })
+    //   view.webContents.loadURL('https://app.uniswap.org')
+    //   view.webContents.setVisualZoomLevelLimits(1, 3)
+    //   return view
+    // }
 
-    const appOverlay = hidden => {
-      const view2 = new BrowserView({
-        webPreferences: {
-          contextIsolation: true,
-          webviewTag: false,
-          sandbox: true,
-          defaultEncoding: 'utf-8',
-          nativeWindowOpen: true,
-          nodeIntegration: false
-          // scrollBounce: true
-          // navigateOnDragDrop: true
-        }
-      })
-      // view2.setBackgroundColor('#000')
-      windows[session].addBrowserView(view2)
-      view2.setBackgroundColor('#0000')
-      view2.setBounds({ x: 0, y: 0, width, height: 16 })
-      view2.setAutoResize({ width: true })
-      view2.webContents.loadURL(`file://${__dirname}/index.html`)
+    // const appOverlay = hidden => {
+    //   const view2 = new BrowserView({
+    //     webPreferences: {
+    //       contextIsolation: true,
+    //       webviewTag: false,
+    //       sandbox: true,
+    //       defaultEncoding: 'utf-8',
+    //       nativeWindowOpen: true,
+    //       nodeIntegration: false
+    //       // scrollBounce: true
+    //       // navigateOnDragDrop: true
+    //     }
+    //   })
+    //   // view2.setBackgroundColor('#000')
+    //   windows[session].addBrowserView(view2)
+    //   view2.setBackgroundColor('#0000')
+    //   view2.setBounds({ x: 0, y: 0, width, height: 16 })
+    //   view2.setAutoResize({ width: true })
+    //   view2.webContents.loadURL(`file://${__dirname}/index.html`)
 
-      view2.webContents.on('did-finish-load', () => {
-        windows[session].removeBrowserView(view2)
-        windows[session].addBrowserView(view2)
-        setTimeout(() => {
-          windows[session].removeBrowserView(view2)
-          windows[session].addBrowserView(view2)
-        }, 200)
-      })  
-      return view2
-    }
+    //   view2.webContents.on('did-finish-load', () => {
+    //     windows[session].removeBrowserView(view2)
+    //     windows[session].addBrowserView(view2)
+    //     setTimeout(() => {
+    //       windows[session].removeBrowserView(view2)
+    //       windows[session].addBrowserView(view2)
+    //     }, 200)
+    //   })  
+    //   return view2
+    // }
 
-    const dapp = store(`main.dapp.details.${namehash}`)
+    // const dapp = store(`main.dapp.details.${namehash}`)
     // loadApp()
-    appOverlay()
-    return
-    if (dapp.color) return loadApp()
+    // appOverlay()
+    // if (dapp.color) return loadApp()
 
-    // If Frame hasn't collected color data for dapp, do that first
-    let tempView = loadApp(true)
-    tempView.webContents.on('did-finish-load', async () => {
-      await timeout(200)
-      const color = await getColor(tempView)
-      store.updateDapp(namehash, { color })
-      loadApp()
-      setTimeout(() => {
-        // tempView.destroy()
-        tempView = null
-      }, 0)
-    })
+    // // If Frame hasn't collected color data for dapp, do that first
+    // let tempView = loadApp(true)
+    // tempView.webContents.on('did-finish-load', async () => {
+    //   await timeout(200)
+    //   const color = await getColor(tempView)
+    //   store.updateDapp(namehash, { color })
+    //   loadApp()
+    //   setTimeout(() => {
+    //     // tempView.destroy()
+    //     tempView = null
+    //   }, 0)
+    // })
     // console.log(menu(ens))
     // windows[session].setMenu(menu(ens))
     // Menu.setApplicationMenu(menu(ens))
+  },
+  open: (window, ens, cb) => {
+    openDapp(window, ens, cb)
   }
 }
 

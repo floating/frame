@@ -1,5 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
+
+import DappTile from './DappTile'
 import svg from '../../resources/svg'
 
 class App extends React.Component {
@@ -23,24 +25,22 @@ class App extends React.Component {
     // const color = dapp && dapp.color ? dapp.color.text : 'white'
     return (
       <div className='splash'>
+        <div className='overlay' />
         <div className='mainLeft'>
           <div className='dappIcons'>
             <div className='dappIconsScroll'>
               <div className='dappIconsWrap'>
-                <div className='dappIcon'>
-                  {svg.ruby(26)}
-                </div>
-                <div className='dappIcon'>
-                  {svg.inventory(22)}
-                </div>
-                <div className='dappIcon'>
-                  {svg.sync(20)}
-                </div>
+                <DappTile ens={'https://app.uniswap.org'} />
+                <DappTile ens={'https://app.ens.domains'} />
+                <DappTile ens={'https://frame.sh'} />
               </div>
             </div>
           </div>
         </div>
         <div className='main'>
+          <div className='mainApps'>
+            <DappTile ens={'https://app.uniswap.org'} />
+          </div>
         </div>
       </div>
     )

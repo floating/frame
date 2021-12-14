@@ -21,6 +21,16 @@ body
     padding 0px
     position relative
 
+    .overlay
+      position absolute
+      top 0 
+      right 0
+      bottom 0 
+      left 0
+      background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
+      z-index 9999999999999999
+      pointer-events none
+
     .backdrop
       position absolute
       top 0px
@@ -70,24 +80,9 @@ body
           overflow-x hidden
           -webkit-user-select auto
           -webkit-app-region none
-          cursor pointer
 
           .dappIconsWrap
             padding-top 10px
-          
-            .dappIcon
-              height 56px
-              width 56px
-              background var(--ghostZ)
-              color var(--outerspace)
-              margin 10px
-              border-radius 12px
-              display flex
-              justify-content center
-              align-items center
-
-
-
 
     .main
       position absolute
@@ -97,17 +92,17 @@ body
       right 0
       background var(--ghostZ)
       border-left 1px solid var(--ghostX)
+      color var(--outerspace)
+      display flex
+      justify-content center
+      align-items center
       
-    .grabTop
-      position absolute
-      top 0
-      left 78px
-      right 0
-      height 10px
-      background red
-      -webkit-user-select none
-      -webkit-app-region drag
-      z-index 40000
+      .mainApps
+        width 600px
+        height 300px
+        border-radius 16px
+        border 1px solid var(--ghostY)
+        background var(--ghostY)
 
     .top
       position absolute
@@ -253,3 +248,4 @@ body
         // border-radius 6px
 
 @import './Native/style'
+@import './App/DappTile/style'
