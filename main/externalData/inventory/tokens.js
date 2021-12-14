@@ -1,6 +1,7 @@
-const log = require('electron-log')
+import log from 'electron-log'
+import nebulaApi from '../../nebula'
 
-const nebula = require('../../nebula')('tokenWorker')
+const nebula = nebulaApi('tokenWorker')
 const tokenListPath = '/ipns/k51qzi5uqu5dgj8vqkoy9ctids6zfwn53tazlfgqv44svb0ktdkdw02qopy1y1'
 
 let tokenList = mergeTokens(
@@ -61,7 +62,7 @@ async function loadTokenList () {
 
 let loader
 
-module.exports = {
+export default {
   start: () => {
     loadTokenList()
     loader = setInterval(loadTokenList, 1000 * 60 * 10)

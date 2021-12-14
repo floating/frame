@@ -736,7 +736,7 @@ class Provider extends EventEmitter {
       }
 
       // don't attempt to add the token if it's already been added
-      const tokenExists = store('main.tokens').some((token: TokenDefinition) => token.chainId === chainId && token.address === address)
+      const tokenExists = store('main.tokens.custom').some((token: TokenDefinition) => token.chainId === chainId && token.address === address)
       if (tokenExists) {
         return res()
       }
@@ -804,6 +804,8 @@ class Provider extends EventEmitter {
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
     const targetChain = this.parseTargetChain(payload)
+
+    // console.log({ method, targetChain })
 
     if (!targetChain.id) {
       log.warn('received request with unknown chain', JSON.stringify(payload))

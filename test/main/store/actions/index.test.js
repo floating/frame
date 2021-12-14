@@ -301,7 +301,7 @@ describe('#addCustomTokens', () => {
   let tokens = []
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.tokens')
+    expect(node).toBe('main.tokens.custom')
 
     tokens = update(tokens)
   }
@@ -336,7 +336,7 @@ describe('#removeCustomTokens', () => {
   let tokens = []
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.tokens')
+    expect(node).toBe('main.tokens.custom')
 
     tokens = update(tokens)
   }

@@ -156,23 +156,25 @@ const updateRates = (symbols, chainId) => sendCommandToWorker('updateRates', [sy
 const updateNativeCurrencyData = symbols => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
   if (activeAddress && chainId) {
-    const tokensWithBalance = Object
-      .entries(store('main.balances', chainId, activeAddress) || [])
-      .reduce((tokens, [address, tokenBalance]) => {
-        if (address !== 'native') {
-          const { balance, ...token } = tokenBalance
-          return [...tokens, token]
-        }
+    // const tokensWithBalance = Object
+    //   .entries(store('main.balances', chainId, activeAddress) || [])
+    //   .reduce((tokens, [address, tokenBalance]) => {
+    //     if (address !== 'native') {
+    //       const { balance, ...token } = tokenBalance
+    //       return [...tokens, token]
+    //     }
 
-        return tokens
-      }, [])
+    //     return tokens
+    //   }, [])
       
-    const customTokens = store('main.tokens')
+    const customTokens = store('main.tokens.custom') || []
+    const knownTokens = store('main.tokens.known', activeAddress) || []
+
     const activeSymbol = store('main.networks.ethereum', store('main.currentNetwork.id')).symbol
-    const knownTokens = [...tokensWithBalance, ...customTokens]
 
     sendCommandToWorker('updateChainBalance', [activeAddress, activeSymbol])
-    sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens } } ])
+    sendCommandToWorker('fetchTokenBalances', [activeAddress, [...customTokens, ...knownTokens]])
+    sendCommandToWorker('tokenBalanceScan', [activeAddress])
   }
 }
 
@@ -234,9 +236,9 @@ function start () {
   })
 
   tokenObserver = store.observer(() => {
-    const customTokens = store('main.tokens')
+    const customTokens = store('main.tokens.custom')
     if (activeAddress && chainId) {
-      sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens: customTokens, onlyKnown: true } } ])
+      sendCommandToWorker('fetchTokenBalances', [activeAddress, customTokens])
     }
   })
 

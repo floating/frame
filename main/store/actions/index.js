@@ -474,7 +474,7 @@ module.exports = {
     })
   },
   addCustomTokens: (u, tokens) => {
-    u('main.tokens', existing => {
+    u('main.tokens.custom', existing => {
       // remove any tokens that have been overwritten by one with
       // the same address and chain ID
       const existingTokens = existing.filter(token => !includesToken(tokens, token))
@@ -483,7 +483,7 @@ module.exports = {
     })
   },
   removeCustomTokens: (u, tokens) => {
-    u('main.tokens', existing => {
+    u('main.tokens.custom', existing => {
       return existing.filter(token => !includesToken(tokens, token))
     })
   },

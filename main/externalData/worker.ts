@@ -30,15 +30,21 @@ interface ExternalDataWorkerMessage {
 
 let heartbeat: NodeJS.Timeout
 
-function tokenBalanceScan (addresses: BalanceScanAddresses) {
-  for (const address in addresses) {
-    const { knownTokens, onlyKnown } = addresses[address]
+async function tokenBalanceScan (address: Address) {
+  try {
+    const tokenBalances = await balances.scanForTokenBalances(address)
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
+  } catch (e) {
+    log.error('error scanning for token balances', e)
+  }
+}
 
-    balances.getTokenBalances(address, { knownTokens, onlyKnown })
-      .then(foundTokens => {
-        sendToMainProcess({ type: 'tokenBalances', netId: foundTokens.chainId, address, balances: foundTokens.balances })
-      })
-      .catch(err => log.error('token scan error', err))
+async function fetchTokenBalances (address: Address, tokens: TokenDefinition[]) {
+  try {
+    const tokenBalances = await balances.getTokenBalances(address, tokens)
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
+  } catch (e) {
+    log.error('error fetching token balances', e)
   }
 }
 
@@ -81,7 +87,8 @@ const messageHandler: { [command: string]: (...params: any) => void } = {
   updateRates: ratesScan,
   updateNativeCurrencyData: nativeCurrencyScan,
   updateChainBalance: chainBalanceScan,
-  updateTokenBalances: tokenBalanceScan,
+  fetchTokenBalances: fetchTokenBalances,
+  tokenBalanceScan: tokenBalanceScan,
   updateInventory: inventoryScan,
   heartbeat: resetHeartbeat
 }
