@@ -1,5 +1,9 @@
-type RPCCallback<T> = (res: T) => void;
-type RPCRequestCallback = RPCCallback<JSONRPCResponsePayload>
+type RPCResponsePayload = JSONRPCSuccessResponsePayload & JSONRPCErrorResponsePayload
+
+type RPCCallback<T extends RPCResponsePayload> = (res: T) => void
+type RPCErrorCallback = RPCCallback<JSONRPCErrorResponsePayload>
+type RPCSuccessCallback = RPCCallback<JSONRPCSuccessResponsePayload>
+type RPCRequestCallback = RPCCallback<RPCResponsePayload>
 
 type Address = string // 20 hex bytes, 0x-prefixed
 enum SubscriptionType {
@@ -24,8 +28,11 @@ interface JSONRPCRequestPayload extends RPCId {
   method: string
 }
 
-interface JSONRPCResponsePayload extends RPCId {
-  result?: any,
+interface JSONRPCSuccessResponsePayload extends RPCId {
+  result?: any
+}
+
+interface JSONRPCErrorResponsePayload extends RPCId {
   error?: EVMError
 }
 
@@ -36,34 +43,59 @@ interface EVMError {
 
 type RPCRequestPayload = JSONRPCRequestPayload & InternalPayload
 
-declare namespace RPCRequests {
-  interface TxParams {
-    nonce?: string;
-    gasPrice?: string,
-    gas?: string, // deprecated
-    maxPriorityFeePerGas?: string,
-    maxFeePerGas?: string,
-    gasLimit?: string,
-    from?: Address,
-    to?: Address,
-    data?: string,
-    value?: string,
-    chainId?: string,
-    type?: string,
+interface Balance {
+  chainId: number,
+  name: string,
+  symbol: string,
+  balance: string,
+  decimals: number,
+  displayBalance: string
+}
+
+interface Erc20 extends Balance {
+  address: Address
+}
+
+declare namespace RPC {
+  namespace GetAssets {
+    interface Request extends Omit<RPCRequestPayload, 'method'> {
+      method: 'wallet_getAssets'
+    }
+
+    interface Response extends Omit<RPCResponsePayload, 'result'> {
+      result?: {
+        erc20?: Erc20[],
+        nativeCurrency: Balance[]
+      }
+    }
   }
 
-  interface SendTransaction extends RPCRequestPayload {
-    method: 'eth_sendTransaction',
-    params: TxParams[]
+  namespace SendTransaction {
+    interface TxParams {
+      nonce?: string;
+      gasPrice?: string,
+      gas?: string, // deprecated
+      maxPriorityFeePerGas?: string,
+      maxFeePerGas?: string,
+      gasLimit?: string,
+      from?: Address,
+      to?: Address,
+      data?: string,
+      value?: string,
+      chainId?: string,
+      type?: string,
+    }
+
+    interface Request extends Omit<RPCRequestPayload, 'method'> {
+      method: 'eth_sendTransaction',
+      params: TxParams[]
+    }
   }
 
-  interface Subscribe extends RPCRequestPayload {
-    method: 'eth_subscribe',
-    params: [SubscriptionType]
-  }
-
-  interface Unsubscribe extends RPCRequestPayload {
-    method: 'eth_unsubscribe',
-    params: [string]
+  namespace Subscribe {
+    interface Request extends Omit<RPCRequestPayload, 'method'> {
+      method: 'eth_subscribe',
+      params: SubscriptionType[]
+    }
   }
 }

@@ -394,6 +394,94 @@ describe('#send', () => {
     })
   })
 
+  describe('#wallet_getChains', () => {
+    it('returns a list of active chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, on: true },
+        4: { name: 'rinkeby', id: 4, on: false },
+        1: { name: 'mainnet', id: 1, on: true }
+      })
+
+      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
+        expect(response.error).toBe(undefined)
+        expect(response.id).toBe(14)
+        expect(response.jsonrpc).toBe('2.0')
+        expect(response.result).toEqual(['0x1', '0x89'])
+      })
+    })
+  })
+
+  describe('#wallet_getAssets', () => {
+    const balances = [
+      {
+        address: '0x3472a5a71965499acd81997a54bba8d852c6e53d',
+        chainId: 137,
+        name: 'Polygon Badger',
+        symbol: 'BADGER',
+        balance: '0x1605d9ee98627100000',
+        decimals: 18,
+        displayBalance: '6500'
+      },
+      {
+        address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
+        chainId: 1,
+        name: 'Olympus DAO',
+        symbol: 'OHM',
+        balance: '0xd14d13208',
+        decimals: 9,
+        displayBalance: '56.183829'
+      },
+      {
+        address: '0x0000000000000000000000000000000000000000',
+        chainId: 42161,
+        name: 'Ether',
+        symbol: 'AETH',
+        balance: '0xd8f8753a603f70000',
+        decimals: 18,
+        displayBalance: '250.15'
+      }
+    ]
+
+    beforeAll(() => {
+      store.set('main.balances', address, balances)
+    })
+
+    it('returns an error if no account is selected', done => {
+      accounts.current.mockReturnValueOnce(undefined)
+
+      send({ method: 'wallet_getAssets', id: 21, jsonrpc: '2.0' }, response => {
+        expect(response.id).toBe(21)
+        expect(response.jsonrpc).toBe('2.0')
+        expect(response.result).toBe(undefined)
+        expect(response.error.message.toLowerCase()).toMatch(/no account selected/)
+        done()
+      })
+    })
+
+    it('returns native currencies from all chains', done => {
+      send({ method: 'wallet_getAssets' }, response => {
+        expect(response.error).toBe(undefined)
+        expect(response.result.nativeCurrency).toHaveLength(1)
+
+        expect(response.result.nativeCurrency[0]).toEqual(balances[2])
+
+        done()
+      })
+    })
+
+    it('returns erc20 tokens from all chains', done => {
+      send({ method: 'wallet_getAssets' }, response => {
+        expect(response.error).toBe(undefined)
+        expect(response.result.erc20).toHaveLength(2)
+
+        expect(response.result.erc20[0]).toEqual(balances[0])
+        expect(response.result.erc20[1]).toEqual(balances[1])
+
+        done()
+      })
+    })
+  })
+
   describe('#eth_getTransactionByHash', () => {
     const chain = 4
     const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
@@ -906,7 +994,8 @@ describe('#send', () => {
   
         provider.subscriptions.accountsChanged = ['0xtest1']
         provider.subscriptions.chainChanged = ['0xtest2']
-        provider.subscriptions.networkChanged = ['0xtest2']
+        provider.subscriptions.chainsChanged = ['0xtest2']
+        provider.subscriptions.networkChanged = ['0xtest3']
   
         unsubscribe('0xanothersub', response => {
           expect(response.id).toBe(8)

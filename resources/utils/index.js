@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gweiToWeiHex = exports.weiHexToGweiInt = exports.hexToInt = exports.intToHex = exports.gweiToHex = exports.gweiToWei = exports.weiToHex = exports.weiToGwei = exports.capitalize = exports.randomLetters = void 0;
+exports.gweiToWeiHex = exports.weiHexToGweiInt = exports.hexToInt = exports.intToHex = exports.gweiToHex = exports.gweiToWei = exports.weiToHex = exports.weiToGwei = exports.arraysMatch = exports.capitalize = exports.randomLetters = void 0;
 const ethereumjs_util_1 = require("ethereumjs-util");
 Object.defineProperty(exports, "intToHex", { enumerable: true, get: function () { return ethereumjs_util_1.intToHex; } });
 const weiToGwei = (wei) => wei / 1e9;
@@ -25,3 +25,8 @@ function capitalize(s) {
     return s[0].toUpperCase() + s.substring(1).toLowerCase();
 }
 exports.capitalize = capitalize;
+function arraysMatch(a = [], b = []) {
+    return (a.length === b.length &&
+        a.every((chainId, i) => b[i] === chainId));
+}
+exports.arraysMatch = arraysMatch;

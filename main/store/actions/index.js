@@ -436,37 +436,30 @@ module.exports = {
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
   },
-  setBalance: (u, netId, address, key, balance) => {
-    // key could be 'native' or a contract address
-    u('main.balances', netId, address, (balances = {}) => {
-      const updates = {
-        ...balances,
-        [key]: balance
-      }
+  setBalance: (u, address, balance) => {
+    u('main.balances', address, (balances = []) => {
+      const existingBalances = balances.filter(b => b.address !== balance.address || b.chainId !== balance.chainId)
 
-      return updates
+      return [...existingBalances, balance]
     })
   },
-  removeBalance: (u, chainId, key) => {
-    u('main.balances', chainId, (balances = {}) => {
-      for (const accountAddress in balances) {
-        delete balances[accountAddress][key.toLowerCase()]
-      }
-
-      return balances
+  removeBalance: (u, chainId, balance) => {
+    u('main.balances', chainId, (balances = []) => {
+      return balances.filter(b => b.address !== balance.address || b.chainId !== balance.chainId)
     })
   },
   // Tokens
-  setBalances: (u, netId, address, newBalances) => {
-    u('main.balances', netId, address, (balances = {}) => {
+  setBalances: (u, address, newBalances) => {
+    u('main.balances', address, (balances = []) => {
       // remove zero balances
-      const updatedBalances = { ...balances, ...newBalances }
+      const existingBalances = balances.filter(b => {
+        return newBalances.every(bal => bal.chainId !== b.chainId || bal.address !== b.address)
+      })
 
       // TODO: possibly add an option to filter out zero balances
       //const withoutZeroBalances = Object.entries(updatedBalances)
         //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
-
-      return updatedBalances
+      return [...existingBalances, ...newBalances]
     })
   },
   setScanning: (u, address, scanning) => {

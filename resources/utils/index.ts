@@ -16,9 +16,17 @@ function capitalize (s: string) {
   return s[0].toUpperCase() + s.substring(1).toLowerCase()
 }
 
+function arraysMatch (a: number[] = [], b: number[] = []) {
+  return (
+    a.length === b.length &&
+    a.every((chainId, i) => b[i] === chainId)
+  )
+}
+
 export {
   randomLetters,
   capitalize,
+  arraysMatch,
   weiToGwei,
   weiToHex,
   gweiToWei,

@@ -4,6 +4,8 @@ const { fork } = require('child_process')
 
 const store = require('../store')
 
+const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
+
 let chainId = 0
 let activeAddress
 let trackedAddresses = []
@@ -25,7 +27,7 @@ function createWorker () {
     }
 
     if (message.type === 'chainBalance') {
-      store.setBalance(message.chainId, message.address, 'native', message.balance)
+      store.setBalance(message.address, { ...message.balance, chainId: message.chainId, address: NATIVE_CURRENCY })
     }
 
     if (message.type === 'nativeCurrencyData') {
@@ -44,9 +46,11 @@ function createWorker () {
 
     if (message.type === 'tokenBalances') {
       store.setScanning(message.address, false)
-      store.setBalances(message.netId, message.address, message.balances)
+      store.setBalances(message.address, message.balances)
 
-      const tokenSymbols = Object.keys(message.balances).filter(sym => !networkCurrencies.includes(sym.toLowerCase()))
+      const tokenSymbols = message.balances
+        .filter(balance => !networkCurrencies.includes(balance.symbol))
+        .map(balance => balance.address)
 
       updateRates(tokenSymbols, message.netId)
     }

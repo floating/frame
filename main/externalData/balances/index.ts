@@ -3,6 +3,7 @@ import ethProvider from 'eth-provider'
 import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
 import log from 'electron-log'
+import { addHexPrefix } from 'ethereumjs-util'
 
 import tokenLoader from '../inventory/tokens'
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
@@ -16,8 +17,9 @@ export interface FoundBalances {
   [address: string]: TokenBalance
 }
 
-interface TokenBalance extends TokenDefinition {
-  balance: BigNumber
+export interface TokenBalance extends TokenDefinition {
+  balance: string,
+  displayBalance: string,
 }
 
 export interface BalanceScanOptions {
@@ -32,7 +34,12 @@ async function getChainId () {
 
 async function getNativeCurrencyBalance (address: string) {
   const rawBalance = await provider.request({ method: 'eth_getBalance', params: [address, 'latest'] })
-  const balance = { balance: new BigNumber(rawBalance).shiftedBy(-18) }
+
+  const bnBal = new BigNumber(rawBalance)
+  const balance = {
+    displayBalance: bnBal.shiftedBy(-18).toString(),
+    balance: addHexPrefix(bnBal.toString(16))
+  }
 
   // TODO how to shift the balance, are all coins the same?
   return { address, balance, chainId: await getChainId() }
@@ -45,10 +52,15 @@ function balanceCalls (owner: string, tokens: TokenDefinition[]): Call<BigNumber
     returns: [
       [
         `${token.address.toUpperCase()}_BALANCE`,
-        (val: BigNumber.Value) => ({
-          ...token,
-          balance: new BigNumber(val).shiftedBy(-token.decimals)
-        })
+        (val: BigNumber.Value) => {
+          const bn = new BigNumber(val)
+
+          return {
+            ...token,
+            balance: addHexPrefix(bn.toString(16)),
+            displayBalance: bn.shiftedBy(-token.decimals).toString()
+          }
+        }
       ]
     ]
   }))
@@ -61,20 +73,20 @@ function mergeTokenLists (lowerPriority: TokenDefinition[], higherPriority: Toke
   ]
 }
 
-function relevantBalances (knownAddresses: string[], positiveBalances: FoundBalances, tokenBalance: TokenBalance) {
-  if (knownAddresses.includes(tokenBalance.address) || !tokenBalance.balance.isZero()) {
-    positiveBalances[tokenBalance.address] = tokenBalance
+function relevantBalances (knownAddresses: string[], positiveBalances: TokenBalance[], tokenBalance: TokenBalance) {
+  if (knownAddresses.includes(tokenBalance.address) || parseInt(tokenBalance.balance) > 0) {
+    positiveBalances.push(tokenBalance)
   }
 
   return positiveBalances
 }
 
-async function getTokenBalance (token: TokenDefinition, owner: string, provider: providers.JsonRpcProvider) {
+async function getTokenBalance (token: TokenDefinition, owner: string, provider: providers.JsonRpcProvider)  {
   const contract = new ethers.Contract(token.address, erc20TokenAbi, provider)
 
   try {
     const balance = await contract.balanceOf(owner)
-    return new BigNumber(balance.toString()).shiftedBy(-token.decimals)
+    return new BigNumber(balance.toString())
   } catch (e) {
     log.warn(`could not load balance for token with address ${token.address}`, e)
     return new BigNumber(0)
@@ -83,10 +95,15 @@ async function getTokenBalance (token: TokenDefinition, owner: string, provider:
 
 async function getTokenBalancesFromContracts (owner: string, tokens: TokenDefinition[]) {
   const web3Provider = new providers.Web3Provider(provider)
-  const balances = tokens.map(async token => ({
-    ...token,
-    balance: await getTokenBalance(token, owner, web3Provider)
-  }))
+  const balances = tokens.map(async token => {
+    const bn = await getTokenBalance(token, owner, web3Provider)
+
+    return {
+      ...token,
+      balance: addHexPrefix(bn.toString(16)),
+      displayBalance: bn.shiftedBy(-token.decimals).toString()
+    }
+  })
 
   return (await Promise.all(balances))
 }
@@ -142,7 +159,7 @@ async function getTokenBalances (owner: string, opts: BalanceScanOptions = {}) {
     : await getTokenBalancesFromContracts(owner, tokens)
 
   const intoRelevantBalances = relevantBalances.bind(null, knownTokens.map(kt => kt.address.toLowerCase()))
-  const balances = allBalances.reduce(intoRelevantBalances, {} as FoundBalances)
+  const balances = allBalances.reduce(intoRelevantBalances, [] as TokenBalance[])
 
   return { chainId, balances }
 }

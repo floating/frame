@@ -7,6 +7,8 @@ import svg from '../../../../../../resources/svg'
 
 import BigNumber from 'bignumber.js'
 
+const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
+
 function formatBalance (balance, decimals = 8) {
   return balance
     ? new Intl.NumberFormat('us-US', {
@@ -24,7 +26,7 @@ function formatUsdRate (rate, decimals = 2) {
 }
 
 function balance (rawBalance, quote = {}) {
-  const balance = BigNumber(rawBalance.balance || 0)
+  const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
   const usdRate = BigNumber(quote.price || 0)
   const totalValue = balance.times(usdRate)
   const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
@@ -71,12 +73,11 @@ class Balances extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  getBalances (chainId, defaultSymbol, rawBalances, rates, chainLayer) {
-    const mainBalance = rawBalances[defaultSymbol]
-    const tokenBalances = Object.values(rawBalances)
-      .filter(b => Number(b.chainId) === Number(chainId) && b.symbol !== defaultSymbol)
+  getBalances (chainId, rawBalances, rates, chainLayer) {
+    const tokenBalances = rawBalances
+      .filter(b => b.chainId === chainId && b.address !== NATIVE_CURRENCY)
 
-    const balances = [mainBalance].concat(tokenBalances)
+    const balances = tokenBalances
       .filter(Boolean)
       .map(rawBalance => {
         const rate = rates[rawBalance.address || rawBalance.symbol] || {}
@@ -90,8 +91,12 @@ class Balances extends React.Component {
     const nativeCurrency = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
 
     if (nativeCurrency) {
+      const storedNativeBalance = rawBalances.find(b => {
+        return b.chainId === chainId && b.address === NATIVE_CURRENCY
+      }) || { balance: '0x0' }
+
       const rawNativeCurrency = {
-        balance: this.store('main.balances', chainId, this.store('selected.current'), 'native.balance'), 
+        balance: storedNativeBalance.balance,
         chainId,
         decimals: 18,
         logoURI: nativeCurrency.icon,
@@ -157,15 +162,13 @@ class Balances extends React.Component {
   render () {
     const address = this.store('main.accounts', this.props.id, 'address')
     const { type, id: chainId } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
     const chainLayer = this.store('main.networks', type, chainId, 'layer') || 'testnet'
-    const storedBalances = this.store('main.balances', chainId, address) || {}
+    const storedBalances = this.store('main.balances', address) || []
 
     const rates = this.store('main.rates')
 
     let { balances, totalDisplayValue } = this.getBalances(
       chainId,
-      currentSymbol.toLowerCase(),
       storedBalances,
       rates,
       chainLayer
