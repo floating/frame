@@ -42,9 +42,9 @@ function tokenBalanceScan (addresses: BalanceScanAddresses) {
   }
 }
 
-function chainBalanceScan (address: string) {
+function chainBalanceScan (address: string, symbol: string) {
   balances.getNativeCurrencyBalance(address)
-    .then(balance => sendToMainProcess({ type: 'chainBalance', ...balance }))
+    .then(balance => sendToMainProcess({ type: 'chainBalance', ...balance, symbol }))
     .catch(err => log.error('chain balance scan error', err))
 }
 

@@ -27,7 +27,7 @@ function createWorker () {
     }
 
     if (message.type === 'chainBalance') {
-      store.setBalance(message.address, { ...message.balance, chainId: message.chainId, address: NATIVE_CURRENCY })
+      store.setBalance(message.address, { ...message.balance, symbol: message.symbol, chainId: message.chainId, address: NATIVE_CURRENCY })
     }
 
     if (message.type === 'nativeCurrencyData') {
@@ -168,9 +168,10 @@ const updateActiveBalances = () => {
       }, [])
       
     const customTokens = store('main.tokens')
+    const activeSymbol = store('main.networks.ethereum', store('main.currentNetwork.id')).symbol
     const knownTokens = [...tokensWithBalance, ...customTokens]
 
-    sendCommandToWorker('updateChainBalance', [activeAddress])
+    sendCommandToWorker('updateChainBalance', [activeAddress, activeSymbol])
     sendCommandToWorker('updateTokenBalances', [ { [activeAddress]: { knownTokens } } ])
   }
 }

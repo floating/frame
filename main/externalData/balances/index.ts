@@ -37,11 +37,11 @@ async function getNativeCurrencyBalance (address: string) {
 
   const bnBal = new BigNumber(rawBalance)
   const balance = {
+    // TODO how to shift the balance, are all coins the same?
     displayBalance: bnBal.shiftedBy(-18).toString(),
     balance: addHexPrefix(bnBal.toString(16))
   }
 
-  // TODO how to shift the balance, are all coins the same?
   return { address, balance, chainId: await getChainId() }
 }
 
