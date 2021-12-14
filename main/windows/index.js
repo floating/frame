@@ -522,6 +522,16 @@ ipcMain.on('tray:mouseout', () => {
 
 ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y) })
 
+
+ipcMain.on('*:installDapp', async (e, domain) => {
+  await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+})
+
+ipcMain.on('*:openDapp', async (e, ens) => {
+  const win = BrowserWindow.fromWebContents(e.sender)
+  await dapp.open(win, ens, console.error)
+})
+
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
 
