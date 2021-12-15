@@ -26,8 +26,16 @@ function createWorker () {
       log.debug('received message from scan worker: ', JSON.stringify(message, undefined, 2))
     }
 
+    if (message.type === 'ready') {
+      startWorker()
+    }
+
     if (message.type === 'chainBalance') {
-      store.setBalance(message.address, { ...message.balance, symbol: message.symbol, chainId: message.chainId, address: NATIVE_CURRENCY })
+      const { address, ...balance } = message
+      store.setBalance(address, {
+        ...balance,
+        address: NATIVE_CURRENCY
+      })
     }
 
     if (message.type === 'nativeCurrencyData') {
@@ -47,6 +55,14 @@ function createWorker () {
     if (message.type === 'tokenBalances') {
       store.setScanning(message.address, false)
       store.setBalances(message.address, message.balances)
+
+      // add any non-zero balances to the list of known tokens
+      const nonZeroBalances = message.balances.filter(b => parseInt(b.balance) > 0)
+      store.addKnownTokens(message.address, nonZeroBalances)
+
+      // remove zero balances from the list of known tokens
+      const zeroBalances = message.balances.filter(b => parseInt(b.balance) === 0)
+      store.removeKnownTokens(message.address, zeroBalances)
 
       const tokenSymbols = message.balances
         .filter(balance => !networkCurrencies.includes(balance.symbol))
@@ -155,20 +171,11 @@ const sendHeartbeat = () => sendCommandToWorker('heartbeat')
 const updateRates = (symbols, chainId) => sendCommandToWorker('updateRates', [symbols, chainId])
 const updateNativeCurrencyData = symbols => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
-  if (activeAddress && chainId) {
-    // const tokensWithBalance = Object
-    //   .entries(store('main.balances', chainId, activeAddress) || [])
-    //   .reduce((tokens, [address, tokenBalance]) => {
-    //     if (address !== 'native') {
-    //       const { balance, ...token } = tokenBalance
-    //       return [...tokens, token]
-    //     }
-
-    //     return tokens
-    //   }, [])
-      
+  if (activeAddress) {
     const customTokens = store('main.tokens.custom') || []
-    const knownTokens = store('main.tokens.known', activeAddress) || []
+    const knownTokens = (store('main.tokens.known', activeAddress) || []).filter(
+      token => !customTokens.some(t => t.address === token.address && t.chainId === token.chainId)
+    )
 
     const activeSymbol = store('main.networks.ethereum', store('main.currentNetwork.id')).symbol
 
@@ -199,19 +206,12 @@ function setActiveAddress (address) {
   addAddresses([address])
   activeAddress = address
 
-  scanActiveData()
+  if (heartbeat) {
+    scanActiveData()
+  }
 }
 
-function start () {
-  if (scanWorker) {
-    log.warn('external data worker already scanning')
-    return
-  }
-
-  log.info('starting external data scanner')
-
-  scanWorker = createWorker()
-
+function startWorker () {
   currentNetworkObserver = store.observer(() => {
     const { id } = store('main.currentNetwork')
 
@@ -245,6 +245,17 @@ function start () {
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
   }
+}
+
+function start () {
+  if (scanWorker) {
+    log.warn('external data worker already scanning')
+    return
+  }
+
+  log.info('starting external data scanner')
+
+  scanWorker = createWorker()
 }
 
 function stop () {

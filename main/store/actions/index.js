@@ -487,6 +487,18 @@ module.exports = {
       return existing.filter(token => !includesToken(tokens, token))
     })
   },
+  addKnownTokens: (u, address, tokens) => {
+    u('main.tokens.known', address, (existing = []) => {
+      const existingTokens = existing.filter(token => !includesToken(tokens, token))
+
+      return [...existingTokens, ...tokens]
+    })
+  },
+  removeKnownTokens: (u, address, tokens) => {
+    u('main.tokens.known', address, (existing = []) => {
+      return existing.filter(token => !includesToken(tokens, token))
+    })
+  },
   setColorway: (u, colorway) => {
     u('main.colorway', () => {
       return colorway

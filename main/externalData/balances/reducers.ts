@@ -4,10 +4,6 @@ export interface TokensByChain {
   [chainId: number]: TokenDefinition[]
 }
 
-export function mergeLists<T> (all: T[], lst: T[]): T[] {
-  return all.concat(lst)
-}
-
 export function groupByChain (grouped: TokensByChain, token: TokenDefinition) {
   return {
     ...grouped,

@@ -1,11 +1,6 @@
 // @ts-ignore
 import { createWatcher, aggregate } from '@makerdao/multicall'
 
-// @ts-ignore
-import ethProvider from 'eth-provider'
-
-import { providers } from 'ethers'
-
 const contractAddresses: { [chainId: number]: string } = {
   1: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // mainnet
   3: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // ropsten
@@ -38,14 +33,14 @@ type CallResults<T> = {
 }
 
 export function supportsChain (chainId: number) {
-  return chainId in contractAddresses
+  return chainId === 1 // chainId in contractAddresses
 }
 
-function chainConfig (chainId: number, provider?: providers.Web3Provider) {
+function chainConfig (chainId: number) {
   return {
     multicallAddress: contractAddresses[chainId],
-    rpcUrl: 'http://0.0.0.0:1248'
-    // web3: provider || new providers.Web3Provider(ethProvider())
+    rpcUrl: 'http://127.0.0.1:1248'
+    //web3: provider || new providers.Web3Provider(ethProvider())
   }
 }
 

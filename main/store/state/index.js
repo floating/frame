@@ -183,7 +183,7 @@ const initial = {
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
-    balances: {},
+    balances: [],
     tokens: {
       custom: main('tokens.custom', []), // custom tokens added by users
       known: main('tokens.known', {})

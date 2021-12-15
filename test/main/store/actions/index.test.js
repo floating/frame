@@ -5,8 +5,9 @@ import {
   addNetwork as addNetworkAction,
   removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
-  addCustomTokens as addTokensAction,
+  addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
+  addKnownTokens as addKnownTokensAction,
   setScanning as setScanningAction
 } from '../../../../main/store/actions'
 
@@ -306,7 +307,7 @@ describe('#addCustomTokens', () => {
     tokens = update(tokens)
   }
 
-  const addTokens = tokensToAdd => addTokensAction(updaterFn, tokensToAdd)
+  const addTokens = tokensToAdd => addCustomTokensAction(updaterFn, tokensToAdd)
 
   it('adds a token', () => {
     tokens = [testTokens.zrx]
@@ -391,6 +392,43 @@ describe('#removeCustomTokens', () => {
     removeTokens([tokenToRemove])
 
     expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+})
+
+describe('#addKnownTokens', () => {
+  let tokens = []
+  const account = '0xfaff9f426e8071e03eebbfefe9e7bf4b37565ab9'
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.tokens.known')
+    expect(address).toBe(account)
+
+    tokens = update(tokens)
+  }
+
+  const addTokens = tokensToAdd => addKnownTokensAction(updaterFn, account, tokensToAdd)
+
+  it('adds a token', () => {
+    tokens = [testTokens.zrx]
+
+    addTokens([testTokens.badger])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('overwrites a token', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+
+    const updatedBadgerToken = {
+      ...testTokens.badger,
+      symbol: 'BAD'
+    }
+
+    addTokens([updatedBadgerToken])
+
+    expect(tokens).toHaveLength(2)
+    expect(tokens[0]).toEqual(testTokens.zrx)
+    expect(tokens[1].symbol).toBe('BAD')
   })
 })
 
