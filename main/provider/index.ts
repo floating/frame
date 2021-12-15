@@ -805,8 +805,6 @@ class Provider extends EventEmitter {
     const method = payload.method || ''
     const targetChain = this.parseTargetChain(payload)
 
-    // console.log({ method, targetChain })
-
     if (!targetChain.id) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
       return this.resError(`unknown chain: ${payload.chain}`, payload, res)

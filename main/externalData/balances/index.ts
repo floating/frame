@@ -6,7 +6,6 @@ import { addHexPrefix } from 'ethereumjs-util'
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
 import erc20TokenAbi from './erc-20-abi'
 
-import { providers } from 'ethers'
 import { groupByChain, relevantBalances, TokensByChain } from './reducers'
 import { EthereumProvider } from 'eth-provider'
 
@@ -46,8 +45,8 @@ export default function (eth: EthereumProvider) {
     }))
   }
 
-  async function getTokenBalance (token: TokenDefinition, owner: string, jsonRpcProvider: providers.JsonRpcProvider)  {
-    const contract = new ethers.Contract(token.address, erc20TokenAbi, jsonRpcProvider)
+  async function getTokenBalance (token: TokenDefinition, owner: string)  {
+    const contract = new ethers.Contract(token.address, erc20TokenAbi)
 
     try {
       const functionData = contract.interface.encodeFunctionData('balanceOf', [owner])
@@ -70,10 +69,8 @@ export default function (eth: EthereumProvider) {
   }
 
   async function getTokenBalancesFromContracts (owner: string, tokens: TokenDefinition[]) {
-    const web3Provider = new providers.Web3Provider(eth)
-
     const balances = tokens.map(async token => {
-      const bn = await getTokenBalance(token, owner, web3Provider)
+      const bn = await getTokenBalance(token, owner)
 
       return {
         ...token,
@@ -97,7 +94,7 @@ export default function (eth: EthereumProvider) {
       const batchEnd = batchStart + BATCH_SIZE
 
       try {
-        const results = await multicall(chainId).call(calls.slice(batchStart, batchEnd))
+        const results = await multicall(chainId, eth).call(calls.slice(batchStart, batchEnd))
 
         return Object.values(results.transformed)
       } catch (e) {
@@ -114,7 +111,10 @@ export default function (eth: EthereumProvider) {
 
   return {
     getNativeCurrencyBalance: async function (address: string) {
-      const rawBalance = await eth.request({ method: 'eth_getBalance', params: [address, 'latest'] })
+      const rawBalance = await eth.request({
+        method: 'eth_getBalance',
+        params: [address, 'latest']
+      })
 
       const bnBal = new BigNumber(rawBalance)
       const balance = {
@@ -144,6 +144,4 @@ export default function (eth: EthereumProvider) {
       return balanceCalls.reduce(relevantBalances, [] as TokenBalance[])
     }
   }
-
-
 }

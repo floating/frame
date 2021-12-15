@@ -19,21 +19,19 @@ interface ExternalDataWorkerMessage {
 
 let heartbeat: NodeJS.Timeout
 let balances: BalanceLoader
+let chainId = 0
 
 const eth = ethProvider('frame', { name: 'scanWorker' })
 
-eth.on('connect', () => {
-  getChainId()
+eth.on('chainChanged', chain => chainId = parseInt(chain))
+eth.on('connect', async () => {
+  chainId = parseInt(await eth.request({ method: 'eth_chainId' }))
 
   tokenLoader.start()
   balances = balancesLoader(eth)
 
   sendToMainProcess({ type: 'ready' })
 })
-
-async function getChainId () {
-  return parseInt(await eth.request({ method: 'eth_chainId' }))
-}
 
 async function getChains () {
   try {
@@ -81,10 +79,7 @@ async function fetchTokenBalances (address: Address, tokens: TokenDefinition[]) 
 
 async function chainBalanceScan (address: string, symbol: string) {
   try {
-    const [chainBalance, chainId] = await Promise.all([
-      balances.getNativeCurrencyBalance(address),
-      getChainId()
-    ])
+    const chainBalance = await balances.getNativeCurrencyBalance(address)
 
     sendToMainProcess({ type: 'chainBalance', ...chainBalance, address, symbol, chainId })
   } catch (e) {
