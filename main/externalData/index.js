@@ -82,8 +82,8 @@ function createWorker () {
       const zeroBalances = changedBalances.filter(b => parseInt(b.balance) === 0)
       store.removeKnownTokens(message.address, zeroBalances)
 
-      const tokenSymbols = updatedBalances.map(balance => balance.address)
-      updateRates(tokenSymbols, message.netId)
+      const tokenAddresses = updatedBalances.map(balance => balance.address)
+      updateRates(tokenAddresses, message.netId)
     }
 
     if (message.type === 'rates') {

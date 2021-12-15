@@ -53,16 +53,14 @@ async function tokenBalanceScan (address: Address, tokensToOmit: TokenDefinition
     // for all other chains we need to call each contract individually so don't scan every contract
     const chains = (await getChains()).filter(chainSupportsScan)
     const tokenLists: TokenDefinition[][] = chains.map(tokenLoader.getTokens)
-    const tokens = tokenLists.reduce((all, lst) => all.concat(lst), [])
+    const tokens = tokenLists.reduce((all, tokenList) => {
+      return all.concat(
+        tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
+      )
+    }, [] as TokenDefinition[])
 
-    tokensToOmit.forEach(omittedToken => {
-      const tokenIndex = tokens.findIndex(t => t.chainId === omittedToken.chainId && t.address === omittedToken.address)
-      if (tokenIndex > -1) {
-        tokens.splice(tokenIndex, 1)
-      }
-    })
-
-    const tokenBalances = await balances.getTokenBalances(address, tokens)
+    const tokenBalances = (await balances.getTokenBalances(address, tokens))
+      .filter(balance => parseInt(balance.balance) > 0)
 
     sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
   } catch (e) {

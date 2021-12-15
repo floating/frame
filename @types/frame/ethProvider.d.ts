@@ -1,5 +1,4 @@
 declare module 'eth-provider' {
-
   interface ProviderOpts {
     name: string
   }

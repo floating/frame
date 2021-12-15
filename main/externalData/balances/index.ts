@@ -6,7 +6,7 @@ import { addHexPrefix } from 'ethereumjs-util'
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
 import erc20TokenAbi from './erc-20-abi'
 
-import { groupByChain, relevantBalances, TokensByChain } from './reducers'
+import { groupByChain, TokensByChain } from './reducers'
 import { EthereumProvider } from 'eth-provider'
 
 let id = 1
@@ -46,6 +46,28 @@ export default function (eth: EthereumProvider) {
         ]
       ]
     }))
+  }
+
+  async function getNativeCurrencyBalance (address: string, chainId: number) {
+    try {
+      const rawBalance = await eth.request({
+        method: 'eth_getBalance',
+        params: [address, 'latest'],
+        chain: '0x' + chainId.toString(16)
+      })
+
+      const bnBal = new BigNumber(rawBalance)
+      const balance = {
+        // TODO how to shift the balance, are all coins the same?
+        displayBalance: bnBal.shiftedBy(-18).toString(),
+        balance: addHexPrefix(bnBal.toString(16))
+      }
+
+      return { ...balance, chainId }
+    } catch (e) {
+      log.error(`error loading native currency balance for chain id: ${chainId}`, e)
+      return { balance: '0x0', displayValue: '0.0', chainId }
+    }
   }
 
   async function getTokenBalance (token: TokenDefinition, owner: string)  {
@@ -114,29 +136,15 @@ export default function (eth: EthereumProvider) {
 
   return {
     getCurrencyBalances: async function (address: string, chains: number[]) {
-      const calls = chains.map(async chainId => {
-        const rawBalance = await eth.request({
-          method: 'eth_getBalance',
-          params: [address, 'latest'],
-          chain: '0x' + chainId.toString(16)
-        })
+      const fetchChainBalance = getNativeCurrencyBalance.bind(null, address)
 
-        const bnBal = new BigNumber(rawBalance)
-        const balance = {
-          // TODO how to shift the balance, are all coins the same?
-          displayBalance: bnBal.shiftedBy(-18).toString(),
-          balance: addHexPrefix(bnBal.toString(16))
-        }
-
-        return { ...balance, chainId }
-      })
-
+      const calls = chains.map(fetchChainBalance)
       return Promise.all(calls)
     },
     getTokenBalances: async function (owner: string, tokens: TokenDefinition[]) {
       const tokensByChain = tokens.reduce(groupByChain, {} as TokensByChain)
     
-      const balanceCalls = await Promise.all(
+      const tokenBalances = await Promise.all(
         Object.entries(tokensByChain).map(([chain, tokens]) => {
           const chainId = parseInt(chain)
     
@@ -149,7 +157,7 @@ export default function (eth: EthereumProvider) {
         })
       )
     
-      return balanceCalls.reduce(relevantBalances, [] as TokenBalance[])
+      return ([] as TokenBalance[]).concat(...tokenBalances)
     }
   } as BalanceLoader
 }

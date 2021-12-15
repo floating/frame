@@ -35,7 +35,7 @@ type CallResults<T> = {
 }
 
 export function supportsChain (chainId: number) {
-  return chainId === 1 // chainId in contractAddresses
+  return chainId in contractAddresses
 }
 
 function chainConfig (chainId: number, eth: EthereumProvider) {
