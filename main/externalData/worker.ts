@@ -19,14 +19,10 @@ interface ExternalDataWorkerMessage {
 
 let heartbeat: NodeJS.Timeout
 let balances: BalanceLoader
-let chainId = 0
 
 const eth = ethProvider('frame', { name: 'scanWorker' })
 
-eth.on('chainChanged', chain => chainId = parseInt(chain))
 eth.on('connect', async () => {
-  chainId = parseInt(await eth.request({ method: 'eth_chainId' }))
-
   tokenLoader.start()
   balances = balancesLoader(eth)
 
@@ -51,13 +47,20 @@ function sendToMainProcess (data: any) {
   }
 }
 
-async function tokenBalanceScan (address: Address) {
+async function tokenBalanceScan (address: Address, tokensToOmit: TokenDefinition[] = []) {
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
     const chains = (await getChains()).filter(chainSupportsScan)
-    const tokenLists: any[] = chains.map(tokenLoader.getTokens)
+    const tokenLists: TokenDefinition[][] = chains.map(tokenLoader.getTokens)
     const tokens = tokenLists.reduce((all, lst) => all.concat(lst), [])
+
+    tokensToOmit.forEach(omittedToken => {
+      const tokenIndex = tokens.findIndex(t => t.chainId === omittedToken.chainId && t.address === omittedToken.address)
+      if (tokenIndex > -1) {
+        tokens.splice(tokenIndex, 1)
+      }
+    })
 
     const tokenBalances = await balances.getTokenBalances(address, tokens)
 
@@ -77,11 +80,12 @@ async function fetchTokenBalances (address: Address, tokens: TokenDefinition[]) 
   }
 }
 
-async function chainBalanceScan (address: string, symbol: string) {
+async function chainBalanceScan (address: string) {
   try {
-    const chainBalance = await balances.getNativeCurrencyBalance(address)
+    const chains = await getChains()
+    const chainBalances = await balances.getCurrencyBalances(address, chains)
 
-    sendToMainProcess({ type: 'chainBalance', ...chainBalance, address, symbol, chainId })
+    sendToMainProcess({ type: 'chainBalances', balances: chainBalances, address })
   } catch (e) {
     log.error('error scanning chain balance', e)
   }

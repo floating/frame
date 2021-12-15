@@ -8,6 +8,7 @@ type RPCRequestCallback = RPCCallback<RPCResponsePayload>
 type Address = string // 20 hex bytes, 0x-prefixed
 enum SubscriptionType {
   ACCOUNTS = 'accountsChanged',
+  ASSETS = 'assetsChanged',
   CHAIN = 'chainChanged',
   CHAINS = 'chainsChanged',
   NETWORK = 'networkChanged'
@@ -58,15 +59,17 @@ interface Erc20 extends Balance {
 
 declare namespace RPC {
   namespace GetAssets {
+    interface Assets {
+      erc20?: Erc20[],
+      nativeCurrency: Balance[]
+    }
+
     interface Request extends Omit<RPCRequestPayload, 'method'> {
       method: 'wallet_getAssets'
     }
 
     interface Response extends Omit<RPCResponsePayload, 'result'> {
-      result?: {
-        erc20?: Erc20[],
-        nativeCurrency: Balance[]
-      }
+      result?: Assets
     }
   }
 

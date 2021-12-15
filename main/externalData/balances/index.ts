@@ -17,9 +17,12 @@ interface Balance {
 }
 
 export interface TokenBalance extends TokenDefinition, Balance {}
+export interface CurrencyBalance extends Balance {
+  chainId: number
+}
 
 export interface BalanceLoader {
-  getNativeCurrencyBalance: (address: Address) => Promise<Balance>,
+  getCurrencyBalances: (address: Address, chains: number[]) => Promise<CurrencyBalance[]>,
   getTokenBalances: (address: Address, tokens: TokenDefinition[]) => Promise<TokenBalance[]>
 }
 
@@ -110,20 +113,25 @@ export default function (eth: EthereumProvider) {
   }
 
   return {
-    getNativeCurrencyBalance: async function (address: string) {
-      const rawBalance = await eth.request({
-        method: 'eth_getBalance',
-        params: [address, 'latest']
+    getCurrencyBalances: async function (address: string, chains: number[]) {
+      const calls = chains.map(async chainId => {
+        const rawBalance = await eth.request({
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+          chain: '0x' + chainId.toString(16)
+        })
+
+        const bnBal = new BigNumber(rawBalance)
+        const balance = {
+          // TODO how to shift the balance, are all coins the same?
+          displayBalance: bnBal.shiftedBy(-18).toString(),
+          balance: addHexPrefix(bnBal.toString(16))
+        }
+
+        return { ...balance, chainId }
       })
 
-      const bnBal = new BigNumber(rawBalance)
-      const balance = {
-        // TODO how to shift the balance, are all coins the same?
-        displayBalance: bnBal.shiftedBy(-18).toString(),
-        balance: addHexPrefix(bnBal.toString(16))
-      }
-
-      return balance
+      return Promise.all(calls)
     },
     getTokenBalances: async function (owner: string, tokens: TokenDefinition[]) {
       const tokensByChain = tokens.reduce(groupByChain, {} as TokensByChain)
@@ -143,5 +151,5 @@ export default function (eth: EthereumProvider) {
     
       return balanceCalls.reduce(relevantBalances, [] as TokenBalance[])
     }
-  }
+  } as BalanceLoader
 }

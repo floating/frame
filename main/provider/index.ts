@@ -46,12 +46,30 @@ interface ChainDefinition {
   on: boolean
 }
 
+function loadAssets (accountId: string) {
+  const balances: Balance[] = store('main.balances', accountId) || []
+
+  return balances.reduce((assets, balance) => {
+    const type = (balance.address === NATIVE_CURRENCY) ? 'nativeCurrency' : 'erc20'
+    assets[type].push(balance)
+
+    return assets
+  }, { nativeCurrency: [] as Balance[], erc20: [] as Erc20[] })
+}
+
 class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
   handlers: { [id: string]: any } = {}
-  subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], chainsChanged: [], networkChanged: [] }
+  subscriptions: Subscriptions = {
+    accountsChanged: [],
+    assetsChanged: [],
+    chainChanged: [],
+    chainsChanged: [], 
+    networkChanged: []
+  }
+
   store: (...args: any) => any
 
   constructor () {
@@ -75,6 +93,12 @@ class Provider extends EventEmitter {
   accountsChanged (accounts: string[]) {
     this.subscriptions.accountsChanged.forEach(subscription => {
       this.emit('data:address', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
+    })
+  }
+
+  assetsChanged (account: string, assets: RPC.GetAssets.Assets) {
+    this.subscriptions.assetsChanged.forEach(subscription => {
+      this.emit('data:address', account, { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: { ...assets, account } } })
     })
   }
 
@@ -773,16 +797,9 @@ class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
-    const balances: Balance[] = store('main.balances', currentAccount.id)
+    const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
 
-    const { nativeCurrency, erc20 } = balances.reduce((assets, balance) => {
-      const type = (balance.address === NATIVE_CURRENCY) ? 'nativeCurrency' : 'erc20'
-      assets[type].push(balance)
-
-      return assets
-    }, { nativeCurrency: [] as Balance[], erc20: [] as Erc20[] })
-
-    const { id, jsonrpc, ...rest } = payload
+    const { id, jsonrpc } = payload
     cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
   }
 
@@ -884,7 +901,19 @@ store.observer(() => {
     availableChains = currentChains
     provider.chainsChanged(availableChains)
   }
-}, 'provider')
+}, 'provider:chains')
+
+store.observer(() => {
+  const currentAccountId = store('selected.current')
+
+  if (currentAccountId) {
+    const assets = loadAssets(currentAccountId)
+
+    if (assets.erc20.length > 0 || assets.nativeCurrency.length > 0) {
+      provider.assetsChanged(currentAccountId, assets)
+    }
+  }
+}, 'provider:account')
 
 proxy.on('send', (payload, cd) => provider.send(payload, cd))
 proxy.ready = true

@@ -9,9 +9,8 @@ const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 let chainId = 0
 let activeAddress
 let trackedAddresses = []
-let networkCurrencies = []
 
-let currentNetworkObserver, allNetworksObserver, tokenObserver
+let allNetworksObserver, tokenObserver
 let scanWorker, heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan
 
 function createWorker () {
@@ -30,14 +29,6 @@ function createWorker () {
       startWorker()
     }
 
-    if (message.type === 'chainBalance') {
-      const { address, ...balance } = message
-      store.setBalance(address, {
-        ...balance,
-        address: NATIVE_CURRENCY
-      })
-    }
-
     if (message.type === 'nativeCurrencyData') {
       for (const symbol in message.currencyData) {
         const currencyData = message.currencyData[symbol]
@@ -52,22 +43,46 @@ function createWorker () {
       }
     }
 
+    if (message.type === 'chainBalances') {
+      const { address, balances } = message
+
+      balances
+        .filter(balance => parseInt(balance.balance) > 0)
+        .forEach(balance => {
+          store.setBalance(address, {
+            ...balance,
+            symbol: (store('main.networks.ethereum', balance.chainId) || {}).symbol,
+            address: NATIVE_CURRENCY
+          })
+        })
+    }
+
     if (message.type === 'tokenBalances') {
-      store.setScanning(message.address, false)
-      store.setBalances(message.address, message.balances)
+      const address = message.address
+      const updatedBalances = message.balances || []
+
+      store.setScanning(address, false)
+
+      // only update balances if any have changed
+      const currentTokenBalances = (store('main.balances', address) || []).filter(b => b.address !== NATIVE_CURRENCY)
+      const changedBalances = updatedBalances.filter(newBalance => {
+        const currentBalance = currentTokenBalances.find(b => b.address === newBalance.address && b.chainId === newBalance.chainId)
+        return (!currentBalance || currentBalance.balance !== newBalance.balance)
+      })
+
+      if (changedBalances.length > 0) {
+        store.setBalances(address, changedBalances)
+      }
 
       // add any non-zero balances to the list of known tokens
-      const nonZeroBalances = message.balances.filter(b => parseInt(b.balance) > 0)
+      const nonZeroBalances = changedBalances.filter(b => parseInt(b.balance) > 0)
       store.addKnownTokens(message.address, nonZeroBalances)
 
       // remove zero balances from the list of known tokens
-      const zeroBalances = message.balances.filter(b => parseInt(b.balance) === 0)
+      const zeroBalances = changedBalances.filter(b => parseInt(b.balance) === 0)
       store.removeKnownTokens(message.address, zeroBalances)
 
-      const tokenSymbols = message.balances
-        .filter(balance => !networkCurrencies.includes(balance.symbol))
-        .map(balance => balance.address)
-
+      const tokenSymbols = updatedBalances.map(balance => balance.address)
       updateRates(tokenSymbols, message.netId)
     }
 
@@ -144,7 +159,12 @@ function scanNetworkCurrencyRates () {
     clearInterval(nativeCurrencyScan)
   }
 
-  nativeCurrencyScan = startScan(() => updateNativeCurrencyData(networkCurrencies), 1000 * 15)
+  nativeCurrencyScan = startScan(() => {
+    const networks = store('main.networks.ethereum')
+    const networkCurrencies = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
+
+    updateNativeCurrencyData(networkCurrencies)
+  }, 1000 * 15)
 }
 
 function scanActiveData () {
@@ -177,11 +197,11 @@ const updateActiveBalances = () => {
       token => !customTokens.some(t => t.address === token.address && t.chainId === token.chainId)
     )
 
-    const activeSymbol = store('main.networks.ethereum', store('main.currentNetwork.id')).symbol
+    const trackedTokens = [...customTokens, ...knownTokens]
 
-    sendCommandToWorker('updateChainBalance', [activeAddress, activeSymbol])
-    sendCommandToWorker('fetchTokenBalances', [activeAddress, [...customTokens, ...knownTokens]])
-    sendCommandToWorker('tokenBalanceScan', [activeAddress])
+    sendCommandToWorker('updateChainBalance', [activeAddress])
+    sendCommandToWorker('fetchTokenBalances', [activeAddress, trackedTokens])
+    sendCommandToWorker('tokenBalanceScan', [activeAddress, trackedTokens])
   }
 }
 
@@ -212,32 +232,13 @@ function setActiveAddress (address) {
 }
 
 function startWorker () {
-  currentNetworkObserver = store.observer(() => {
-    const { id } = store('main.currentNetwork')
-
-    if (id !== chainId) {
-      log.debug(`changed scanning network to chainId: ${id}`)
-
-      chainId = id
-      scanActiveData()
-    }
-  })
-
   allNetworksObserver = store.observer(() => {
-    const networks = store('main.networks.ethereum')
-
-    const symbols = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
-    const newSymbolAdded = symbols.some(sym => !networkCurrencies.includes(sym))
-
-    if (!nativeCurrencyScan || newSymbolAdded) {
-      networkCurrencies = [...symbols]
-      scanNetworkCurrencyRates()
-    }
+    scanNetworkCurrencyRates()
   })
 
   tokenObserver = store.observer(() => {
     const customTokens = store('main.tokens.custom')
-    if (activeAddress && chainId) {
+    if (trackedAddressScan && activeAddress && chainId) {
       sendCommandToWorker('fetchTokenBalances', [activeAddress, customTokens])
     }
   })
@@ -245,6 +246,8 @@ function startWorker () {
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
   }
+
+  scanActiveData()
 }
 
 function start () {
@@ -261,7 +264,6 @@ function start () {
 function stop () {
   log.info('stopping external data worker')
 
-  currentNetworkObserver.remove()
   allNetworksObserver.remove()
   tokenObserver.remove()
 

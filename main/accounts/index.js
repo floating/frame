@@ -374,7 +374,9 @@ class Accounts extends EventEmitter {
 
     const summary = currentAccount.summary()
     cb(null, summary)
-    windows.broadcast('main:action', 'setSigner', summary)
+    
+    store.setAccount(summary)
+
     if (currentAccount.status === 'ok') this.verifyAddress(false, (err, verified) => {
       if (!err && !verified) {
         currentAccount.signer = ''

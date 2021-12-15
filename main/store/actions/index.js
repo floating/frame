@@ -120,6 +120,11 @@ module.exports = {
   setBlockNumber: (u, network, id, blockNumber) => {
     u('main.networks', network, id, 'blockNumber', () => blockNumber)
   },
+  setAccount: (u, account) => {
+    u('selected.current', _ => account.id)
+    u('selected.minimized', _ => false)
+    u('selected.open', _ => true)
+  },
   updateAccount: (u, updatedAccount, add) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
