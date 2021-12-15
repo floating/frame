@@ -1,6 +1,7 @@
 // @ts-ignore
 import { createWatcher, aggregate } from '@makerdao/multicall'
 import { EthereumProvider } from 'eth-provider'
+import log from 'electron-log'
 
 import { providers } from 'ethers'
 
@@ -50,9 +51,33 @@ function chainConfig (chainId: number, eth: EthereumProvider) {
 export default function (chainId: number, eth: EthereumProvider) {
   const config = chainConfig(chainId, eth)
 
+  async function call <R, T> (calls: Call<R, T>[]): Promise<CallResults<T>> {
+    return (await aggregate(calls, config)).results
+  }
+
   return {
-    call: async function <R, T> (calls: Call<R, T>[]): Promise<CallResults<T>> {
-      return (await aggregate(calls, config)).results
+    call,
+    batchCall: async function <R, T> (calls: Call<R, T>[], batchSize = 2000) {
+      const numBatches = Math.ceil(calls.length / batchSize)
+
+      const fetches = [...Array(numBatches).keys()].map(async (_, batchIndex) => {
+        const batchStart = batchIndex * batchSize
+        const batchEnd = batchStart + batchSize
+  
+        try {
+          const results = await call(calls.slice(batchStart, batchEnd))
+  
+          return Object.values(results.transformed)
+        } catch (e) {
+          log.error(`multicall error (batch ${batchStart}-${batchEnd}), first call: ${JSON.stringify(calls[batchStart])}`, e)
+          return []
+        }
+      })
+  
+      const fetchResults = await Promise.all(fetches)
+      const callResults = ([] as T[]).concat(...fetchResults)
+  
+      return callResults
     },
     subscribe: function <R, T> (calls: Call<R, T>[], cb: (err: any, val: any) => void) {
       const watcher = createWatcher(calls, config)
