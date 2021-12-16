@@ -27,19 +27,31 @@ class App extends React.Component {
       <div className='splash'>
         <div className='overlay' />
         <div className='mainLeft'>
+          <div className='accountTile'>
+            <div className='accountIcon'>
+            </div>
+          </div>
           <div className='dappIcons'>
             <div className='dappIconsScroll'>
               <div className='dappIconsWrap'>
-                <DappTile ens={'https://app.uniswap.org'} />
-                <DappTile ens={'https://app.ens.domains'} />
-                <DappTile ens={'https://frame.sh'} />
+                {Object.keys(store('main.dapps')).map(id => {
+                  return (
+                    <DappTile ens={store('main.dapps', id, 'ens')} />
+                  )
+                })}
               </div>
             </div>
           </div>
         </div>
         <div className='main'>
           <div className='mainApps'>
-            <DappTile ens={'https://app.uniswap.org'} />
+            {Object.keys(store('main.dapps')).map(id => {
+              return (
+                <pre>
+                  {JSON.stringify(store('main.dapps', id), null, 4)}
+                </pre>
+              )
+            })}
           </div>
         </div>
       </div>

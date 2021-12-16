@@ -12,10 +12,7 @@ module.exports = {
     return sessions[app] && sessions[app].indexOf(session) > -1
   },
   remove: (app, session) => {
-    timers[session] = setTimeout(() => {
-      // TODO: TypeError: Cannot read property 'splice' of undefined
-      sessions[app].splice(sessions[app].indexOf(session), 1)
-      if (sessions[app].length === 0) delete sessions[app]
-    }, 60 * 1000)
+    sessions[app].splice(sessions[app].indexOf(session), 1)
+    if (sessions[app].length === 0) delete sessions[app]
   }
 }

@@ -6,10 +6,100 @@ const resolve = require('./server/resolve')
 const store = require('../store').default
 const ipfs = require('../ipfs')
 const windows = require('../windows')
+const nebula = require('../nebula')()
 
 const server = require('./server')
 
-// const shell = electron.shell ? electron.shell : mock.shell
+const getDappColors = async (dappId) => {
+  const dapp = store('main.dapps', dappId)
+  const session = crypto.randomBytes(6).toString('hex')
+  server.sessions.add(dappId, session)
+
+  const url = `http://${dapp.ens}.localhost:8421/?session=${session}`
+  try {
+    const colors = await windows.extractColors(url)
+    store.updateDapp(dappId, { colors })
+    server.sessions.remove(dappId, session)
+  } catch (e) {
+    log.error(e)
+  }
+}
+
+const updateDappContent = async (dappId, contentURI) => {
+  // TODO: Make sure content is pinned before proceeding
+  store.updateDapp(dappId, { content: contentURI })
+}
+
+const checkStatus = async dappId => {
+  const dapp = store('main.dapps', dappId)
+  const resolved = await nebula.resolve(dapp.ens)
+
+  store.updateDapp(dappId, { record: resolved.record })
+  if (dapp.content !== resolved.record.content) {
+    updateDappContent(dappId, resolved.record.content)
+  }
+
+  if (!dapp.colors) {
+    getDappColors(dappId)
+  }
+
+  // Takes dapp entry and config
+  // Checks if assets are correctly synced
+  // Checks if all assets are up to date with current manifest 
+  // Installs new assets if changed and config is set to sync
+  // Sets status to 'updating' when updating the bundle
+  // Sets status to 'ready' when done
+
+  // dapp.config // the user's prefrences for installing assets from the manifest
+  // dapp.manifest // a copy of the latest manifest we have resolved for the dapp
+  // dapp.meta // meta info about the dapp including name, colors, icons, descriptions, 
+  // dapp.ens // ens name for this dapp
+  // dapp.storage // local storage values for dapp
+}
+
+store.observer(() => {
+  const dapps = store('main.dapps')
+  Object.keys(dapps || {}).filter(id => dapps[id].status === 'initial').forEach(id => {
+    store.updateDapp(id, { status: 'loading' })
+    checkStatus(id)
+  })
+})
+
+const surface = {
+  manifest: (ens) => {
+    // gets the dapp manifest and returns all options and details for user to confirm before installing
+  },
+  add: (dapp) => {
+    const { ens, config } = dapp
+
+    const id = hash(ens)
+    const status = 'initial'
+
+    // Validate ens name and config
+
+    // Check that dapp has not been added already
+    // If ens name has been installed
+    // return error
+
+    // If ens name has not been installed, start install
+    store.appDapp({ id, ens, status, config, manifest: {}, current: {} })
+  },
+  addServerSession (namehash, session) {
+    server.sessions.add(namehash, session)
+  },
+  open (windowId, ens, cb) {
+    const session = crypto.randomBytes(6).toString('hex')
+    const dappId = hash(ens)
+    server.sessions.add(dappId, session)
+    const url = `http://${ens}.localhost:8421/?session=${session}`
+
+    // Add to store
+  }
+}
+
+module.exports = surface
+
+/// Old Dapp Class
 
 class Dapps {
   constructor () {
@@ -204,18 +294,3 @@ class Dapps {
     })
   }
 }
-
-const dapps = new Dapps()
-module.exports = dapps
-
-// DEBUG
-// store.observer(_ => {
-//   console.log('<><><><><><><>')
-//   console.log(store('main.dapp'))
-//   console.log('<><><><><><><>')
-//   // console.log(store('main.dapp.map'))
-// })
-
-// setInterval(async () => {
-//   console.log('peers', (await ipfs.swarm.peers()).length)
-// }, 3000)

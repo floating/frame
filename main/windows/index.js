@@ -9,7 +9,11 @@ const events = new EventEmitter()
 
 const store = require('../store').default
 
-const dapp = require('./dapp')
+const extractColors = require('./extractColors')
+
+require('./frames')
+
+// const dapp = require('./dappOld')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
 
 const dev = process.env.NODE_ENV === 'development'
@@ -449,17 +453,8 @@ const api = {
     if (windows.dash && windows.dash.isVisible()) windows.dash.hide()
     // store.setDashType()
   },
-  // toggleDash: () => {
-  //   if (windows.dash.isVisible()) {
-  //     api.hideDash()
-  //   } else {
-  //     api.showDash()
-  //   }
-  // },
-  openView: (ens, session) => {
-    dapp.openView(ens, session, windows)
-  },
-  events
+  events,
+  extractColors
 }
 
 app.on('web-contents-created', (e, contents) => {
@@ -523,14 +518,17 @@ ipcMain.on('tray:mouseout', () => {
 ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y) })
 
 
-ipcMain.on('*:installDapp', async (e, domain) => {
-  await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+// ipcMain.on('*:installDapp', async (e, domain) => {
+//   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+// })
+
+ipcMain.on('tray:dappWindow', async (e) => {
+  console.log('tray:dappWindow')
+  // await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+  // await dapps.launch(domain, console.error)
+  // dapp.createDappFrame(windows)
 })
 
-ipcMain.on('*:openDapp', async (e, ens) => {
-  const win = BrowserWindow.fromWebContents(e.sender)
-  await dapp.open(win, ens, console.error)
-})
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
