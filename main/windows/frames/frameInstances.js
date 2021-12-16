@@ -6,6 +6,8 @@ import store from '../../store'
 import webPrefrences from './webPrefrences'
 import topRight from './topRight'
 
+const dev = process.env.NODE_ENV === 'development'
+
 export default {
   create: (instances, frame) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
@@ -24,7 +26,7 @@ export default {
       show: true,
       frame: false,
       titleBarStyle: 'hidden',
-      trafficLightPosition: { x: 9, y: 8 },
+      trafficLightPosition: { x: 10, y: 9 },
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       // backgroundThrottling: false,
       icon: path.join(__dirname, './AppIcon.png'),
@@ -61,7 +63,7 @@ export default {
     // })
 
     instances[frame.id] = frameInstance
-    // if (dev) frameInstance.openDevTools()
+    // if (dev) frameInstance.openDevTools({ mode: 'detach' })
   },
   destroy: (instances, frameId) => {
     instances[frameId].destroy()

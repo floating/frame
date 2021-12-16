@@ -552,17 +552,35 @@ module.exports = {
     })
   },
   addFrameView: (u, frameId, view) => {
-    u('main.frames', frameId, 'views', views => {
-      if (views[view.id]) return views
-      
-      if (view.show && view.ready) {
-        Object.keys(views).forEach(id => {
-          if (id !== view.id) views[viewId].show = false
+    if (frameId && view) {
+      u('main.frames', frameId, frame => {
+        let existing
+        Object.keys(frame.views).some(viewId => {
+          if (frame.views[viewId].dappId === view.dappId) {
+            existing = viewId
+            return true
+          } else {
+            return false
+          }
         })
-      }
-      views[view.id] = view
-      return views
-    })
+        if (!existing) {
+          frame.views = frame.views || {}
+          frame.views[view.id] = view
+          frame.currentView = view.id
+        } else {
+          frame.currentView = existing
+        }
+        return frame
+      })
+    }
+  },
+  setCurrentFrameView: (u, frameId, viewId) => {
+    if (frameId) {
+      u('main.frames', frameId, frame => {
+        frame.currentView = viewId
+        return frame
+      })
+    }
   },
   updateFrameView: (u, frameId, viewId, update) => {
     u('main.frames', frameId, 'views', views => {
