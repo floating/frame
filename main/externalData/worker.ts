@@ -7,10 +7,10 @@ log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
 
 import { supportsChain as chainSupportsScan } from '../multicall'
 import balancesLoader, { BalanceLoader } from './balances'
-import tokenLoader from './inventory/tokens'
 import rates from './rates'
 import inventory from './inventory'
 import loadStaticData from './staticData'
+import TokenLoader from './inventory/tokens'
 
 interface ExternalDataWorkerMessage {
   command: string,
@@ -20,6 +20,7 @@ interface ExternalDataWorkerMessage {
 let heartbeat: NodeJS.Timeout
 let balances: BalanceLoader
 
+const tokenLoader = new TokenLoader()
 const eth = ethProvider('frame', { name: 'scanWorker' })
 
 eth.on('connect', async () => {
@@ -52,7 +53,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: TokenDefinition
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
     const chains = (await getChains()).filter(chainSupportsScan)
-    const tokenLists: TokenDefinition[][] = chains.map(tokenLoader.getTokens)
+    const tokenLists = chains.map(chainId => tokenLoader.getTokens(chainId))
     const tokens = tokenLists.reduce((all, tokenList) => {
       return all.concat(
         tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))

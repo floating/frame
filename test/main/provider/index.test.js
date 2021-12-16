@@ -314,7 +314,7 @@ describe('#send', () => {
     
     beforeEach(() => {
       store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
-      store.set('main.tokens', [])
+      store.set('main.tokens.custom', [])
 
       request = {
         id: 10,
@@ -355,7 +355,7 @@ describe('#send', () => {
     })
 
     it('does not add a request for a token that is already added', () => {
-      store.set('main.tokens', [{ address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }])
+      store.set('main.tokens.custom', [{ address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }])
 
       send(request, ({ result }) => {
         expect(result).toBe(true)
@@ -1160,7 +1160,7 @@ describe('state change events', () => {
       store.set('main.currentNetwork.id', 137)
       provider.subscriptions.chainChanged.push(subscriptionId)
 
-      store.getObserver('provider').fire()
+      store.getObserver('provider:chains').fire()
     })
   })
 
@@ -1185,7 +1185,7 @@ describe('state change events', () => {
 
     beforeEach(() => {
       store.set('main.networks.ethereum', networks)
-      store.getObserver('provider').fire()
+      store.getObserver('provider:chains').fire()
     })
 
     it('fires a chainsChanged event when a chain is added', done => {
@@ -1208,7 +1208,7 @@ describe('state change events', () => {
       store.set('main.networks.ethereum', { ...networks, 137: polygon })
       provider.subscriptions.chainsChanged.push(subscriptionId)
 
-      store.getObserver('provider').fire()
+      store.getObserver('provider:chains').fire()
     })
 
     it('fires a chainsChanged event when a chain is removed', done => {
@@ -1225,7 +1225,7 @@ describe('state change events', () => {
       store.set('main.networks.ethereum', { 1: networks[1] })
       provider.subscriptions.chainsChanged.push(subscriptionId)
 
-      store.getObserver('provider').fire()
+      store.getObserver('provider:chains').fire()
     })
 
     it('fires a chainsChanged event when a chain connection is turned off', done => {
@@ -1243,7 +1243,7 @@ describe('state change events', () => {
       store.set('main.networks.ethereum', chains)
       provider.subscriptions.chainsChanged.push(subscriptionId)
 
-      store.getObserver('provider').fire()
+      store.getObserver('provider:chains').fire()
     })
 
     it('fires a chainsChanged event when a chain connection is turned off', done => {
@@ -1261,7 +1261,7 @@ describe('state change events', () => {
       store.set('main.networks.ethereum', chains)
       provider.subscriptions.chainsChanged.push(subscriptionId)
 
-      store.getObserver('provider').fire()
+      store.getObserver('provider:chains').fire()
     })
   })
 })

@@ -4,6 +4,12 @@ import nebulaApi from '../../nebula'
 const nebula = nebulaApi('tokenWorker')
 const tokenListPath = '/ipns/k51qzi5uqu5dgj8vqkoy9ctids6zfwn53tazlfgqv44svb0ktdkdw02qopy1y1'
 
+interface Token extends TokenDefinition {
+  extensions: {
+    omit: boolean
+  }
+}
+
 let tokenList = mergeTokens(
   require('@sushiswap/default-token-list').tokens,
   require('./default-tokens.json').tokens
@@ -17,7 +23,7 @@ async function frameTokenList () {
     // const tokenListRecord = await nebula.resolve('tokens.frame.eth')
     // const tokens = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
 
-    const tokens = (await nebula.ipfs.getJson(tokenListPath)).tokens
+    const tokens: Token[] = (await nebula.ipfs.getJson(tokenListPath)).tokens
 
     log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
 
@@ -29,14 +35,14 @@ async function frameTokenList () {
   return []
 }
 
-function mergeTokens (...tokenLists) {
-  const omitList = []
+function mergeTokens (existingTokens: TokenDefinition[], updatedTokens: Token[]) {
+  const omitList: string[] = []
 
-  const mergedList = tokenLists.reduce((tokens, list) => {
+  const mergedList = [existingTokens, updatedTokens].reduce((tokens, list) => {
     list.forEach(token => {
       const address = token.address.toLowerCase()
       const key = `${token.chainId}:${address}`
-      const omitToken = (token.extensions || {}).omit
+      const omitToken = ((token as any).extensions || {}).omit
 
       if (omitToken) {
         omitList.push(key)
@@ -47,31 +53,36 @@ function mergeTokens (...tokenLists) {
     })
 
     return tokens
-  }, {})
+  }, {} as { [key: string]: TokenDefinition })
 
   return Object.values(mergedList)
 }
 
-async function loadTokenList () {
-  const updatedTokens = await frameTokenList()
+export default class TokenLoader {
+  private tokenList: TokenDefinition[] = []
+  private loader?: NodeJS.Timeout | null
 
-  tokenList = mergeTokens(tokenList, updatedTokens)
+  private async loadTokenList () {
+    const updatedTokens = await frameTokenList()
+  
+    this.tokenList = mergeTokens(this.tokenList, updatedTokens)
+  
+    log.info(`updated token list to contain ${tokenList.length} tokens`)
+  }
 
-  log.info(`updated token list to contain ${tokenList.length} tokens`)
-}
-
-let loader
-
-export default {
-  start: () => {
-    loadTokenList()
-    loader = setInterval(loadTokenList, 1000 * 60 * 10)
-  },
-  stop: () => {
-    if (loader) {
-      clearInterval(loader)
-      loader = null
+  start () {
+    this.loadTokenList()
+    this.loader = setInterval(this.loadTokenList, 1000 * 60 * 10)
+  }
+  
+  stop () {
+    if (this.loader) {
+      clearInterval(this.loader)
+      this.loader = null
     }
-  },
-  getTokens: chainId => tokenList.filter(token => token.chainId === chainId)
+  }
+
+  getTokens (chainId: number) {
+    return this.tokenList.filter(token => token.chainId === chainId)
+  }
 }

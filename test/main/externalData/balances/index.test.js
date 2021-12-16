@@ -7,20 +7,7 @@ import { addHexPrefix, padToEven } from 'ethereumjs-util'
 import ethProvider from 'eth-provider'
 import BigNumber from 'bignumber.js'
 
-// jest.mock('ethers', () => ({
-//   ethers: { Contract: jest.fn() },
-//   providers: { Web3Provider: jest.fn() }
-// }))
-
-// jest.mock('eth-provider', () => jest.fn(() => ({
-//   request: ({ method }) => {
-//     if (method === 'eth_chainId') return '0x1'
-//     throw new Error('unexpected eth call!')
-//   }
-// })))
-
 jest.mock('eth-provider', () => jest.fn(() => ({ request: jest.fn() })))
-jest.mock('../../../../main/externalData/inventory/tokens', () => ({ start: jest.fn(), getTokens: jest.fn(() => []) }))
 jest.mock('../../../../main/multicall')
 
 const callResponse = '0x0000000000000000000000000000000000000000000000000000000000000000'
