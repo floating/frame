@@ -25,7 +25,7 @@ export default {
 
     viewInstance.webContents.on('did-finish-load', () => {
       store.updateFrameView(frameInstance.frameId, view.id, { ready: true })
-      if (dev) viewInstance.webContents.openDevTools({ mode: 'detach' })
+      // if (dev) viewInstance.webContents.openDevTools({ mode: 'detach' })
     })
   
     // Keep reference to view on frame instance
