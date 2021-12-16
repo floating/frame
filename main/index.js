@@ -189,20 +189,17 @@ ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
 
 dapps.add({
+  ens: 'uniswap.eth',
+  config: {
+    key: 'value'
+  }
+})
+dapps.add({
   ens: 'app.ens.eth',
   config: {
     key: 'value'
   }
 })
-setTimeout(() => {
-  dapps.add({
-    ens: 'uniswap.eth',
-    config: {
-      key: 'value'
-    }
-  })
-}, 4000)
-
 
 ipcMain.on('runDapp', async (e, ens) => {
   const win = BrowserWindow.fromWebContents(e.sender)
