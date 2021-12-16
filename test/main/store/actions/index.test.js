@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import log from 'electron-log'
+import { addHexPrefix } from 'ethereumjs-util'
 
 import {
   addNetwork as addNetworkAction,
@@ -251,24 +252,24 @@ describe('#setBalances', () => {
   beforeEach(() => {
     balances = [{
       ...testTokens.badger,
-      balance: new BigNumber(30.5)
+      balance: addHexPrefix(new BigNumber(30.5).toString(16))
     }]
   })
 
   it('adds a new balance', () => {
     setBalances([{
       ...testTokens.zrx,
-      balance: new BigNumber(7983.2332)
+      balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
     }])
     
     expect(balances).toEqual([
       {
         ...testTokens.badger,
-        balance: new BigNumber(30.5)
+        balance: addHexPrefix(new BigNumber(30.5).toString(16))
       },
       {
         ...testTokens.zrx,
-        balance: new BigNumber(7983.2332)
+        balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
       }
     ])
   })
@@ -276,25 +277,58 @@ describe('#setBalances', () => {
   it('updates an existing balance to a positive amount', () => {
     setBalances([{
       ...testTokens.badger,
-      balance: new BigNumber(41.9)
+      balance: addHexPrefix(new BigNumber(41.9).toString(16))
     }])
     
     expect(balances).toEqual([{
       ...testTokens.badger,
-      balance: new BigNumber(41.9)
+      balance: addHexPrefix(new BigNumber(41.9).toString(16))
     }])
   })
 
   it('updates an existing balance to zero', () => {
     setBalances([{
       ...testTokens.badger,
-      balance: new BigNumber(0)
+      balance: '0x0'
     }])
     
     expect(balances).toEqual([{
       ...testTokens.badger,
-      balance: new BigNumber(0)
+      balance: '0x0'
     }])
+  })
+})
+
+describe('#removeBalance', () => {
+  let balances = {
+    [owner]: {
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: addHexPrefix(BigNumber('798.564').toString(16))
+      }
+    },
+    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': {
+      [testTokens.zrx.address]: {
+        ...testTokens.zrx,
+        balance: addHexPrefix(BigNumber('8201.343').toString(16))
+      }
+    }
+  }
+
+  const updaterFn = (node, chainId, update) => {
+    expect(node).toBe('main.balances')
+    expect(chainId).toBe(1)
+
+    balances = update(balances)
+  }
+
+  const removeBalance = key => removeBalanceAction(updaterFn, 1, key)
+
+  it('removes a balance from all accounts', () => {
+    removeBalance(testTokens.zrx.address)
+
+    expect(balances[owner][testTokens.zrx.address]).toBe(undefined)
+    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e'][testTokens.zrx.address]).toBe(undefined)
   })
 })
 

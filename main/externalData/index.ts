@@ -275,7 +275,7 @@ function startWorker () {
   })
 
   tokenObserver = store.observer(() => {
-    const customTokens = store('main.tokens.custom')
+    const customTokens = storeApi.getCustomTokens()
     if (trackedAddressScan && activeAddress) {
       sendCommandToWorker('fetchTokenBalances', [activeAddress, customTokens])
     }

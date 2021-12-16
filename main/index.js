@@ -158,8 +158,7 @@ ipcMain.on('tray:addToken', (e, token, req) => {
 
 ipcMain.on('tray:removeToken', (e, token) => {
   if (token) {
-    // TODO: what to do when removing a tokens?
-    // store.removeBalance(token.chainId, token.address)
+    store.removeBalance(token.chainId, token.address)
     store.removeCustomTokens([token])
   }
 })

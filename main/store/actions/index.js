@@ -462,6 +462,15 @@ module.exports = {
       return [...existingBalances, ...newBalances]
     })
   },
+  removeBalance: (u, chainId, key) => {
+    u('main.balances', chainId, (balances = {}) => {
+      for (const accountAddress in balances) {
+        delete balances[accountAddress][key.toLowerCase()]
+      }
+
+      return balances
+    })
+  },
   setScanning: (u, address, scanning) => {
     if (scanning) {
       u('main.scanning', address, () => true)
