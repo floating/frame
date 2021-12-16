@@ -915,7 +915,7 @@ store.observer(() => {
   }
 }, 'provider:account')
 
-proxy.on('send', (payload, cd) => provider.send(payload, cd))
+proxy.on('send', (payload, cb) => provider.send(payload, cb))
 proxy.ready = true
 
 export default provider
