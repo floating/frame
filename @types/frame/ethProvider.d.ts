@@ -8,12 +8,13 @@ declare module 'eth-provider' {
     jsonrpc?: '2.0',
     method: string,
     params?: any[],
-    chain?: string
+    chainId?: string
   }
 
   interface EthereumProvider extends NodeJS.EventEmitter {
     constructor()
-    request(payload: RequestPayload);
+    request(payload: RequestPayload)
+    setChain(chainId: string)
   }
 
   export default function provider (targets?: string | string[], opts?: ProviderOpts): EthereumProvider

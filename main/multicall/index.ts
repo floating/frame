@@ -43,8 +43,7 @@ function chainConfig (chainId: number, eth: EthereumProvider) {
   return {
     multicallAddress: contractAddresses[chainId],
     //rpcUrl: 'http://127.0.0.1:1248'
-    ethers: new providers.Web3Provider(eth),
-    chain: '0x' + chainId.toString(16)
+    provider: eth
   }
 }
 

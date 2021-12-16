@@ -810,7 +810,7 @@ class Provider extends EventEmitter {
       target.id = store('main.currentNetwork.id')
     }
 
-    const chainId = parseInt(payload.chain || '', 16)
+    const chainId = parseInt(payload.chainId || '', 16)
     if (!!store('main.networks.ethereum', chainId)) {
       target.id = chainId
     }
@@ -824,7 +824,7 @@ class Provider extends EventEmitter {
 
     if (!targetChain.id) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
-      return this.resError(`unknown chain: ${payload.chain}`, payload, res)
+      return this.resError(`unknown chain: ${payload.chainId}`, payload, res)
     }
 
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
@@ -862,7 +862,7 @@ class Provider extends EventEmitter {
     if (method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
 
     // remove custom data
-    const { _origin, chain, ...rpcPayload } = payload
+    const { _origin, chainId, ...rpcPayload } = payload
 
     // Pass everything else to our connection
     this.connection.send(rpcPayload, res, targetChain)

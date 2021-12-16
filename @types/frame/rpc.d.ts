@@ -21,7 +21,7 @@ interface RPCId {
 
 interface InternalPayload {
   _origin: string,
-  chain?: string
+  chainId?: string
 }
 
 interface JSONRPCRequestPayload extends RPCId {

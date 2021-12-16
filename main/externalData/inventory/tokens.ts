@@ -4,6 +4,8 @@ import nebulaApi from '../../nebula'
 const nebula = nebulaApi('tokenWorker')
 const tokenListPath = '/ipns/k51qzi5uqu5dgj8vqkoy9ctids6zfwn53tazlfgqv44svb0ktdkdw02qopy1y1'
 
+import defaultTokenList from './default-tokens.json'
+
 interface TokenSpec extends Token {
   extensions: {
     omit: boolean
@@ -12,7 +14,7 @@ interface TokenSpec extends Token {
 
 let tokenList = mergeTokens(
   require('@sushiswap/default-token-list').tokens,
-  require('./default-tokens.json').tokens
+  defaultTokenList.tokens as TokenSpec[]
 )
 
 async function frameTokenList () {

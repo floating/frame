@@ -61,7 +61,7 @@ export default function (eth: EthereumProvider) {
       const rawBalance = await eth.request({
         method: 'eth_getBalance',
         params: [address, 'latest'],
-        chain: '0x' + chainId.toString(16)
+        chainId: '0x' + chainId.toString(16)
       })
 
       // TODO: do all coins have 18 decimals?
@@ -82,7 +82,7 @@ export default function (eth: EthereumProvider) {
         method: 'eth_call',
         jsonrpc: '2.0',
         id,
-        chain: '0x' + token.chainId.toString(16),
+        chainId: '0x' + token.chainId.toString(16),
         params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
       })
 
@@ -110,6 +110,8 @@ export default function (eth: EthereumProvider) {
 
   async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
     const calls = balanceCalls(owner, tokens)
+
+    eth.setChain('0x' + chainId.toString(16))
 
     return multicall(chainId, eth).batchCall(calls)
   }
