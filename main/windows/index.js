@@ -21,10 +21,10 @@ const fullheight = !!process.env.FULL_HEIGHT
 
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
-const frameWinodws = {}
+const frameWindows = {}
 let tray, trayReady
 
-frames(frameWinodws)
+frames(frameWindows)
 
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 
@@ -297,15 +297,15 @@ const api = {
     }
   },
   sendFrame: (id, channel, ...args) => {
-    if (frameWinodws[id] && !frameWinodws[id].isDestroyed() && frameWinodws[id].send) {
-      frameWinodws[id].send(channel, ...args)
+    if (frameWindows[id] && !frameWindows[id].isDestroyed() && frameWindows[id].send) {
+      frameWindows[id].send(channel, ...args)
     } else {
       log.error(new Error(`A frame with id "${id}" does not exist (windows.sendFrame)`))
     }
   },
   broadcast: (channel, ...args) => {
     Object.keys(windows).forEach(id => api.send(id, channel, ...args))
-    Object.keys(frameWinodws).forEach(id => api.sendFrame(id, channel, ...args))
+    Object.keys(frameWindows).forEach(id => api.sendFrame(id, channel, ...args))
   },
   minimize: (e) => {
     const id = winId(e)
@@ -488,6 +488,9 @@ if (dev) {
     globalShortcut.register('CommandOrControl+R', () => {
       Object.keys(windows).forEach(win => {
         windows[win].reload()
+      })
+      Object.keys(frameWindows).forEach(win => {
+        frameWindows[win].reload()
       })
     })
   })

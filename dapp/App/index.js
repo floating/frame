@@ -22,12 +22,10 @@ class App extends React.Component {
       name.forEach((v, i) => { name[i] = v.charAt(0).toUpperCase() + v.slice(1) })
       name = name.join(' ')
     }
-    // const background = dapp && dapp.color ? dapp.color.background : 'black'
-    // const color = dapp && dapp.color ? dapp.color.text : 'white'
+
     const frame = this.store('main.frames', window.frameId)
-    const currentView = frame.views[frame.currentView]
-    const currentDapp = currentView?.dappId ? this.store('main.dapps', currentView.dappId) : ''
-    const dappBackground = currentDapp?.colors ? currentDapp.colors.background : 'none'
+    const currentView = frame.views[frame.currentView] || {}
+    const currentDapp = currentView.dappId ? this.store('main.dapps', currentView.dappId) : ''
 
     return (
       <div className='splash'>
@@ -52,9 +50,9 @@ class App extends React.Component {
           </div>
         </div>
         <div className='main'>
-          {currentView ? (
+          {currentDapp ? (
             <div className='mainDappBackground' style={{
-              background: dappBackground
+              background: currentDapp.colors ? currentDapp.colors.background : 'none'
             }}/>
           ) : (
             <div className='mainApps'>
