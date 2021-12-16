@@ -188,16 +188,48 @@ ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 
 ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
 
-ipcMain.on('*:openDapp', async (e, dappId) => {
-  const win = BrowserWindow.fromWebContents(e.sender)
-  await dapps.open(win.dappFrameId, dappId, console.error)
-})
-
 dapps.add({
-  ens: 'uniswap.eth',
+  ens: 'app.ens.eth',
   config: {
     key: 'value'
   }
+})
+setTimeout(() => {
+  dapps.add({
+    ens: 'uniswap.eth',
+    config: {
+      key: 'value'
+    }
+  })
+}, 4000)
+
+
+ipcMain.on('runDapp', async (e, ens) => {
+  const win = BrowserWindow.fromWebContents(e.sender)
+  dapps.open(win.frameId, ens)
+})
+
+ipcMain.on('unsetCurrentView', async (e, ens) => {
+  const win = BrowserWindow.fromWebContents(e.sender)
+  dapps.unsetCurrentView(win.frameId)
+})
+
+let nextId = 0
+
+ipcMain.on('*:addFrame', (e, newInstance) => {
+  console.log('addFrame, newInstance', newInstance)
+  if (newInstance) {
+    const frame = {
+      id: (++nextId).toString(),
+      currentView: '',
+      views: {}
+    }
+    store.addFrame(frame)
+  } else {
+    console.log('focus existing')
+    // focus last used instance
+  }
+  
 })
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()

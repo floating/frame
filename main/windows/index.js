@@ -11,7 +11,7 @@ const store = require('../store').default
 
 const extractColors = require('./extractColors')
 
-require('./frames')
+import frames from './frames'
 
 // const dapp = require('./dappOld')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
@@ -21,7 +21,10 @@ const fullheight = !!process.env.FULL_HEIGHT
 
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
+const frameWinodws = {}
 let tray, trayReady
+
+frames(frameWinodws)
 
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 
@@ -293,8 +296,16 @@ const api = {
       log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
     }
   },
+  sendFrame: (id, channel, ...args) => {
+    if (frameWinodws[id] && !frameWinodws[id].isDestroyed() && frameWinodws[id].send) {
+      frameWinodws[id].send(channel, ...args)
+    } else {
+      log.error(new Error(`A frame with id "${id}" does not exist (windows.sendFrame)`))
+    }
+  },
   broadcast: (channel, ...args) => {
     Object.keys(windows).forEach(id => api.send(id, channel, ...args))
+    Object.keys(frameWinodws).forEach(id => api.sendFrame(id, channel, ...args))
   },
   minimize: (e) => {
     const id = winId(e)
@@ -522,12 +533,12 @@ ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y
 //   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
 // })
 
-ipcMain.on('tray:dappWindow', async (e) => {
-  console.log('tray:dappWindow')
-  // await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
-  // await dapps.launch(domain, console.error)
-  // dapp.createDappFrame(windows)
-})
+// ipcMain.on('tray:dappWindow', async (e) => {
+//   console.log('tray:dappWindow')
+//   // await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+//   // await dapps.launch(domain, console.error)
+//   // dapp.createDappFrame(windows)
+// })
 
 
 // Data Change Events

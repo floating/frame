@@ -13,9 +13,9 @@ class App extends React.Component {
     return (
       <div className='dappTile'>
         <div className='dappIcon' onClick={() => {
-          link.send('*:openDapp', this.props.ens)
+          link.send('runDapp', this.props.ens)
         }}>
-          {svg.ruby(26)}
+          {this.props.ens.substr(0, 3)}
         </div>
       </div>
     )
