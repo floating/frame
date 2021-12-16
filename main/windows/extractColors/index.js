@@ -1,6 +1,6 @@
 const { BrowserWindow, BrowserView } = require('electron')
 const pixels = require('get-pixels')
-const fs = require('fs')
+// const fs = require('fs')
 
 const mode = array => {
   if (array.length === 0) return null
@@ -49,9 +49,9 @@ const pixelColor = image => {
 
 const getColor = async (view) => {
   const image = await view.webContents.capturePage()
-  fs.writeFile('test.png', image.toPNG(), (err) => {
-    if (err) throw err
-  })
+  // fs.writeFile('test.png', image.toPNG(), (err) => {
+  //   if (err) throw err
+  // })
   const color = await pixelColor(image)
   return color
 }

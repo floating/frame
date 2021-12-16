@@ -4,9 +4,7 @@ const crypto = require('crypto')
 
 const cheerio = require('cheerio')
 
-const resolve = require('./server/resolve')
 const store = require('../store')
-const ipfs = require('../ipfs')
 const windows = require('../windows')
 const nebula = require('../nebula')()
 
@@ -67,6 +65,9 @@ store.observer(() => {
   })
 })
 
+let nextId = 0
+const getId = () => (++nextId).toString()
+
 const surface = {
   manifest: (ens) => {
     // gets the dapp manifest and returns all options and details for user to confirm before installing
@@ -89,13 +90,21 @@ const surface = {
   addServerSession (namehash, session) {
     server.sessions.add(namehash, session)
   },
-  open (windowId, ens, cb) {
+  unsetCurrentView (frameId) {
+    store.setCurrentFrameView(frameId, '')
+  },
+  open (frameId, ens) {
     const session = crypto.randomBytes(6).toString('hex')
     const dappId = hash(ens)
     server.sessions.add(dappId, session)
     const url = `http://${ens}.localhost:8421/?session=${session}`
-
-    // Add to store
+    const view = {
+      id: getId(),
+      ready: false,
+      dappId,
+      url
+    }
+    store.addFrameView(frameId, view)
   }
 }
 

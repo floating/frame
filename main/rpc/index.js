@@ -22,6 +22,13 @@ const rpc = {
   getState: cb => {
     cb(null, store())
   },
+  getFrameId (window, cb) {
+    if (window.frameId) {
+      cb(null, window.frameId)
+    } else {
+      cb(new Error('No frameId set for this window'))
+    }
+  },
   signTransaction: accounts.signTransaction,
   signMessage: accounts.signMessage,
   getAccounts: accounts.getAccounts,
@@ -275,9 +282,15 @@ ipcMain.on('main:rpc', (event, id, method, ...args) => {
   method = unwrap(method)
   args = args.map(arg => unwrap(arg))
   if (rpc[method]) {
-    rpc[method](...args, (...args) => {
-      event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
-    })
+    if (method === 'getFrameId') {
+      rpc[method](event.sender.getOwnerBrowserWindow(), ...args, (...args) => {
+        event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+      })
+    } else {
+      rpc[method](...args, (...args) => {
+        event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+      })
+    }
   } else {
     const args = [new Error('Unknown RPC method: ' + method)]
     event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))

@@ -4,6 +4,8 @@ import webPrefrences from './webPrefrences'
 
 const store = require('../../store')
 
+const dev = process.env.NODE_ENV === 'development'
+
 export default {
   // Create a view instance on a frame
   create: (frameInstance, view) => {
@@ -22,9 +24,8 @@ export default {
     frameInstance.removeBrowserView(viewInstance)
 
     viewInstance.webContents.on('did-finish-load', () => {
-      const show = store('main.frames', frameInstance.frameId, 'views', view.id, 'show')
-      if (show) frameInstance.addBrowserView(viewInstance)
       store.updateFrameView(frameInstance.frameId, view.id, { ready: true })
+      if (dev) viewInstance.webContents.openDevTools({ mode: 'detach' })
     })
   
     // Keep reference to view on frame instance
