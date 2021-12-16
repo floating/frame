@@ -1,17 +1,65 @@
-const path = require('path')
-const log = require('electron-log')
-const { fork } = require('child_process')
+import path from 'path'
+import log from 'electron-log'
+import { ChildProcess, fork } from 'child_process'
 
-const store = require('../store')
+import store from '../store'
+import { groupByChain } from './balances/reducers'
+import { CurrencyBalance, TokenBalance } from './balances'
+import { CoinData } from './staticData'
+import { Rate } from './rates'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
-let chainId = 0
-let activeAddress
-let trackedAddresses = []
+let activeAddress: Address
+let trackedAddresses: Address[] = []
 
-let allNetworksObserver, tokenObserver
-let scanWorker, heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan
+let allNetworksObserver: Observer, tokenObserver: Observer
+let scanWorker: ChildProcess | null
+let heartbeat: NullableTimeout, trackedAddressScan: NullableTimeout, nativeCurrencyScan: NullableTimeout, inventoryScan: NullableTimeout
+
+interface WorkerMessage {
+  type: string,
+  [key: string]: any
+}
+
+interface WorkerError {
+  code: string
+}
+
+interface CurrencyDataMessage extends Omit<WorkerMessage, 'type'> {
+  type: 'nativeCurrencyData',
+  currencyData: CoinData
+}
+
+interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
+  type: 'tokenBalances',
+  address: Address,
+  balances: TokenBalance[]
+}
+
+interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
+  type: 'chainBalances',
+  address: Address,
+  balances: CurrencyBalance[]
+}
+
+interface RatesMessage extends Omit<WorkerMessage, 'type'> {
+  type: 'rates',
+  rates: { [key: string]: Rate }
+}
+
+const storeApi = {
+  getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
+  getNetworks: () => store('main.networks.ethereum') as Network[],
+  getNetworkMetadata: (id: number) => store('main.networksMeta.ethereum', id) as NetworkMetadata,
+  getNetworksMetadata: () => store('main.networksMeta.ethereum') as NetworkMetadata[],
+  getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
+  getKnownTokens: (address: Address) => (store('main.tokens.custom', address) || []) as Token[],
+  getTokenBalances: (address: Address) => {
+    return ((store('main.balances', address) || []) as Balance[])
+      .filter(balance => balance.address !== NATIVE_CURRENCY)
+  }
+}
 
 function createWorker () {
   if (scanWorker) {
@@ -20,7 +68,7 @@ function createWorker () {
 
   scanWorker = fork(path.resolve(__dirname, 'worker.js'))
 
-  scanWorker.on('message', message => {
+  scanWorker.on('message', (message: WorkerMessage) => {
     if (process.env.LOG_WORKER) {
       log.debug('received message from scan worker: ', JSON.stringify(message, undefined, 2))
     }
@@ -30,41 +78,44 @@ function createWorker () {
     }
 
     if (message.type === 'nativeCurrencyData') {
-      for (const symbol in message.currencyData) {
-        const currencyData = message.currencyData[symbol]
-        const networkIds = Object.entries(store('main.networks.ethereum'))
+      const { currencyData } = (message as CurrencyDataMessage)
+
+      for (const symbol in currencyData) {
+        const dataForSymbol = currencyData[symbol]
+        const networkIds = Object.entries(storeApi.getNetworks())
           .filter(([networkId, network]) => network.symbol.toLowerCase() === symbol)
-          .map(([networkId, network]) => networkId)
+          .map(([networkId, network]) => parseInt(networkId))
 
         networkIds.forEach(networkId => {
-          const existingData = store('main.networksMeta.ethereum', networkId, 'nativeCurrency')
-          store.setNetworkMeta('ethereum', networkId, { ...existingData, ...currencyData })
+          const existingData = storeApi.getNetworkMetadata(networkId).nativeCurrency
+          store.setNativeCurrency('ethereum', networkId, { ...existingData, ...dataForSymbol })
         })
       }
     }
 
     if (message.type === 'chainBalances') {
-      const { address, balances } = message
+      const { address, balances } = (message as ChainBalanceMessage)
 
       balances
         .filter(balance => parseInt(balance.balance) > 0)
         .forEach(balance => {
           store.setBalance(address, {
             ...balance,
-            symbol: (store('main.networks.ethereum', balance.chainId) || {}).symbol,
+            symbol: storeApi.getNetwork(balance.chainId).symbol,
             address: NATIVE_CURRENCY
           })
         })
     }
 
     if (message.type === 'tokenBalances') {
-      const address = message.address
-      const updatedBalances = message.balances || []
+      const balanceMessage = (message as TokenBalanceMessage)
+      const address = balanceMessage.address
+      const updatedBalances = balanceMessage.balances || []
 
       store.setScanning(address, false)
 
       // only update balances if any have changed
-      const currentTokenBalances = (store('main.balances', address) || []).filter(b => b.address !== NATIVE_CURRENCY)
+      const currentTokenBalances = storeApi.getTokenBalances(address)
       const changedBalances = updatedBalances.filter(newBalance => {
         const currentBalance = currentTokenBalances.find(b => b.address === newBalance.address && b.chainId === newBalance.chainId)
         return (!currentBalance || currentBalance.balance !== newBalance.balance)
@@ -76,34 +127,21 @@ function createWorker () {
 
       // add any non-zero balances to the list of known tokens
       const nonZeroBalances = changedBalances.filter(b => parseInt(b.balance) > 0)
-      store.addKnownTokens(message.address, nonZeroBalances)
+      store.addKnownTokens(balanceMessage.address, nonZeroBalances)
 
       // remove zero balances from the list of known tokens
       const zeroBalances = changedBalances.filter(b => parseInt(b.balance) === 0)
-      store.removeKnownTokens(message.address, zeroBalances)
+      store.removeKnownTokens(balanceMessage.address, zeroBalances)
 
-      const tokenAddresses = updatedBalances.map(balance => balance.address)
-      updateRates(tokenAddresses, message.netId)
+      const tokensByChain = updatedBalances.reduce(groupByChain, {})
+
+      for (const chainId in tokensByChain) {
+        updateRates(tokensByChain[chainId].map(t => t.address), parseInt(chainId))
+      }
     }
 
     if (message.type === 'rates') {
-      store.setRates(message.rates)
-    }
-
-    if (message.type === 'icons') {
-      const networks = Object.entries(store('main.networksMeta.ethereum'))
-
-      for (const symbol in message.icons) {
-        const networksWithSymbol = networks
-          .filter(([networkId, network]) => {
-            const networkSymbol = network.nativeCurrency.symbol || ''
-            return networkSymbol.toLowerCase() === symbol.toLowerCase()
-          })
-
-        networksWithSymbol.forEach(([networkId, network]) => {
-          store.setIcon('ethereum', networkId, message.icons[symbol])
-        })
-      }
+      store.setRates((message as RatesMessage).rates)
     }
 
     if (message.type === 'inventory') {
@@ -111,7 +149,7 @@ function createWorker () {
     }
   })
 
-  scanWorker.on('error', err => {
+  scanWorker.on('error', (err: WorkerError) => {
     if (err.code === 'ERR_IPC_CHANNEL_CLOSED') {
       log.error('scan worker IPC channel closed!')
 
@@ -140,7 +178,7 @@ function createWorker () {
   return scanWorker
 }
 
-function sendCommandToWorker (command, args = []) {
+function sendCommandToWorker (command: string, args: any[] = []) {
   if (!scanWorker) {
     log.error(`attempted to send command ${command} to worker, but worker is not running!`)
     return
@@ -149,7 +187,7 @@ function sendCommandToWorker (command, args = []) {
   scanWorker.send({ command, args })
 }
 
-function startScan (fn, interval) {
+function startScan (fn: () => void, interval: number) {
   setTimeout(fn, 0)
   return setInterval(fn, interval)
 }
@@ -160,7 +198,7 @@ function scanNetworkCurrencyRates () {
   }
 
   nativeCurrencyScan = startScan(() => {
-    const networks = store('main.networks.ethereum')
+    const networks = storeApi.getNetworks()
     const networkCurrencies = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
 
     updateNativeCurrencyData(networkCurrencies)
@@ -188,12 +226,12 @@ function scanActiveData () {
 }
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
-const updateRates = (symbols, chainId) => sendCommandToWorker('updateRates', [symbols, chainId])
-const updateNativeCurrencyData = symbols => sendCommandToWorker('updateNativeCurrencyData', [symbols])
+const updateRates = (symbols: string[], chainId: number) => sendCommandToWorker('updateRates', [symbols, chainId])
+const updateNativeCurrencyData = (symbols: string[]) => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
   if (activeAddress) {
-    const customTokens = store('main.tokens.custom') || []
-    const knownTokens = (store('main.tokens.known', activeAddress) || []).filter(
+    const customTokens = storeApi.getCustomTokens()
+    const knownTokens = storeApi.getKnownTokens(activeAddress).filter(
       token => !customTokens.some(t => t.address === token.address && t.chainId === token.chainId)
     )
 
@@ -210,17 +248,17 @@ const updateInventory = () => {
 }
 
 
-function addAddresses (addresses) {
+function addAddresses (addresses: Address[]) {
   trackedAddresses = [...trackedAddresses].concat(addresses).reduce((all, addr) => {
     if (addr && !all.includes(addr)) {
       all.push(addr)
     }
 
     return all
-  }, [])
+  }, [] as Address[])
 }
 
-function setActiveAddress (address) {
+function setActiveAddress (address: Address) {
   log.debug(`externalData setActiveAddress(${address})`)
 
   addAddresses([address])
@@ -238,7 +276,7 @@ function startWorker () {
 
   tokenObserver = store.observer(() => {
     const customTokens = store('main.tokens.custom')
-    if (trackedAddressScan && activeAddress && chainId) {
+    if (trackedAddressScan && activeAddress) {
       sendCommandToWorker('fetchTokenBalances', [activeAddress, customTokens])
     }
   })
@@ -286,7 +324,7 @@ function kill () {
   if (scanWorker) {
     const eventTypes = ['message', 'error', 'exit']
 
-    eventTypes.forEach(evt => scanWorker.removeAllListeners(evt))
+    eventTypes.forEach(evt => scanWorker?.removeAllListeners(evt))
 
     scanWorker.kill()
     scanWorker = null

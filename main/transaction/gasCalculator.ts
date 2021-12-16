@@ -30,13 +30,6 @@ interface GasPrices {
   asap: string
 }
 
-interface Eip1559GasFees {
-  nextBaseFee: string,
-  maxBaseFeePerGas: string,
-  maxPriorityFeePerGas: string,
-  maxFeePerGas: string
-}
-
 function rpcPayload (method: string, params: any[] = [], id = 1): ProviderRequest {
   return {
     method,
@@ -83,7 +76,7 @@ export default class GasCalculator {
     }
   }
   
-  async getFeePerGas (): Promise<Eip1559GasFees> {
+  async getFeePerGas (): Promise<GasFees> {
     // fetch the last 10 blocks and the bottom 10% of priority fees paid for each block
     const blocks = await this._getFeeHistory(10, [10])
     

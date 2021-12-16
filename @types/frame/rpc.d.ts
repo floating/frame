@@ -44,21 +44,21 @@ interface EVMError {
 
 type RPCRequestPayload = JSONRPCRequestPayload & InternalPayload
 
-interface Balance {
-  chainId: number,
-  name: string,
-  symbol: string,
-  balance: string,
-  decimals: number,
-  displayBalance: string
-}
-
-interface Erc20 extends Balance {
-  address: Address
-}
-
 declare namespace RPC {
   namespace GetAssets {
+    interface Balance {
+      chainId: number,
+      name: string,
+      symbol: string,
+      balance: string,
+      decimals: number,
+      displayBalance: string
+    }
+    
+    interface Erc20 extends Balance {
+      address: Address
+    }
+
     interface Assets {
       erc20?: Erc20[],
       nativeCurrency: Balance[]

@@ -4,7 +4,7 @@ import nebulaApi from '../../nebula'
 const nebula = nebulaApi('tokenWorker')
 const tokenListPath = '/ipns/k51qzi5uqu5dgj8vqkoy9ctids6zfwn53tazlfgqv44svb0ktdkdw02qopy1y1'
 
-interface Token extends TokenDefinition {
+interface TokenSpec extends Token {
   extensions: {
     omit: boolean
   }
@@ -23,7 +23,7 @@ async function frameTokenList () {
     // const tokenListRecord = await nebula.resolve('tokens.frame.eth')
     // const tokens = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
 
-    const tokens: Token[] = (await nebula.ipfs.getJson(tokenListPath)).tokens
+    const tokens: TokenSpec[] = (await nebula.ipfs.getJson(tokenListPath)).tokens
 
     log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
 
@@ -35,7 +35,7 @@ async function frameTokenList () {
   return []
 }
 
-function mergeTokens (existingTokens: TokenDefinition[], updatedTokens: Token[]) {
+function mergeTokens (existingTokens: Token[], updatedTokens: TokenSpec[]) {
   const omitList: string[] = []
 
   const mergedList = [existingTokens, updatedTokens].reduce((tokens, list) => {
@@ -53,13 +53,13 @@ function mergeTokens (existingTokens: TokenDefinition[], updatedTokens: Token[])
     })
 
     return tokens
-  }, {} as { [key: string]: TokenDefinition })
+  }, {} as { [key: string]: Token })
 
   return Object.values(mergedList)
 }
 
 export default class TokenLoader {
-  private tokenList: TokenDefinition[] = []
+  private tokenList: Token[] = []
   private loader?: NodeJS.Timeout | null
 
   private async loadTokenList () {

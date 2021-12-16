@@ -1,7 +1,7 @@
 import coingecko, { Market, Coin } from '../coingecko'
 import log from 'electron-log'
 
-interface CoinData {
+export interface CoinData {
   [key: string]: {
     icon: string,
     name: string,

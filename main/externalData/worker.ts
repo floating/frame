@@ -48,7 +48,7 @@ function sendToMainProcess (data: any) {
   }
 }
 
-async function tokenBalanceScan (address: Address, tokensToOmit: TokenDefinition[] = []) {
+async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = []) {
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
@@ -58,7 +58,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: TokenDefinition
       return all.concat(
         tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
       )
-    }, [] as TokenDefinition[])
+    }, [] as Token[])
 
     const tokenBalances = (await balances.getTokenBalances(address, tokens))
       .filter(balance => parseInt(balance.balance) > 0)
@@ -69,7 +69,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: TokenDefinition
   }
 }
 
-async function fetchTokenBalances (address: Address, tokens: TokenDefinition[]) {
+async function fetchTokenBalances (address: Address, tokens: Token[]) {
   try {
     const tokenBalances = await balances.getTokenBalances(address, tokens)
 

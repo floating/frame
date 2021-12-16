@@ -5,7 +5,7 @@ const log = require('electron-log')
 const semver = require('semver')
 const version = require('../../package.json').version
 const windows = require('../windows')
-const store = require('../store')
+const store = require('../store').default
 
 const dev = process.env.NODE_ENV === 'development'
 

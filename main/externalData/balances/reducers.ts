@@ -1,8 +1,8 @@
 export interface TokensByChain {
-  [chainId: number]: TokenDefinition[]
+  [chainId: number]: Token[]
 }
 
-export function groupByChain (grouped: TokensByChain, token: TokenDefinition) {
+export function groupByChain (grouped: TokensByChain, token: Token) {
   return {
     ...grouped,
     [token.chainId]: [...(grouped[token.chainId] || []), token]

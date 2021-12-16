@@ -38,7 +38,7 @@ const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
-type Balance = TokenDefinition & { balance: string, displayBalance: string }
+type Balance = Token & { balance: string, displayBalance: string }
 
 interface ChainDefinition {
   id: number,
@@ -54,7 +54,7 @@ function loadAssets (accountId: string) {
     assets[type].push(balance)
 
     return assets
-  }, { nativeCurrency: [] as Balance[], erc20: [] as Erc20[] })
+  }, { nativeCurrency: [] as Balance[], erc20: [] as RPC.GetAssets.Erc20[] })
 }
 
 class Provider extends EventEmitter {
@@ -760,7 +760,7 @@ class Provider extends EventEmitter {
       }
 
       // don't attempt to add the token if it's already been added
-      const tokenExists = store('main.tokens.custom').some((token: TokenDefinition) => token.chainId === chainId && token.address === address)
+      const tokenExists = store('main.tokens.custom').some((token: Token) => token.chainId === chainId && token.address === address)
       if (tokenExists) {
         return res()
       }

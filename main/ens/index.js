@@ -5,7 +5,7 @@ const contentHash = require('content-hash')
 
 // Frame modules
 const provider = require('../provider').default
-const store = require('../store')
+const store = require('../store').default
 
 // Local modules
 const interfaces = require('./artifacts/interfaces')

@@ -15,7 +15,7 @@ const url = require('url')
 const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
-const store = require('./store')
+const store = require('./store').default
 const dapps = require('./dapps')
 
 // log.transports.file.level = 'info'

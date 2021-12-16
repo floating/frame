@@ -10,7 +10,7 @@ const { addHexPrefix } = require('ethereumjs-util')
 const { usesBaseFee, signerCompatibility, maxFee } = require('../transaction')
 
 const crypt = require('../crypt')
-const store = require('../store')
+const store = require('../store').default
 const dataScanner = require('../externalData')
 
 // Provider Proxy

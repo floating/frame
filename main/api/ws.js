@@ -4,7 +4,7 @@ const log = require('electron-log')
 
 const provider = require('../provider').default
 const accounts = require('../accounts')
-const store = require('../store')
+const store = require('../store').default
 const windows = require('../windows')
 
 const trusted = require('./trusted')

@@ -1,6 +1,6 @@
 const { hash } = require('eth-ens-namehash')
 
-const store = require('../../../store')
+const store = require('../../../store').default
 const nebula = require('../../../nebula')()
 
 const resolve = {

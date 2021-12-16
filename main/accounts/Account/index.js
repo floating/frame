@@ -10,7 +10,7 @@ const nebula = require('../../nebula')()
 
 const signers = require('../../signers')
 const windows = require('../../windows')
-const store = require('../../store')
+const store = require('../../store').default
 
 const { Aragon } = require('../aragon')
 

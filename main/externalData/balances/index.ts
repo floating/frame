@@ -10,13 +10,18 @@ import { EthereumProvider } from 'eth-provider'
 
 let id = 1
 
-interface Balance {
+interface ExternalBalance {
   balance: string,
   displayBalance: string
 }
 
-export interface TokenBalance extends TokenDefinition, Balance {}
-export interface CurrencyBalance extends Balance {
+export interface TokenDefinition extends Omit<Token, 'logoURI'> {
+  logoUri?: string
+}
+
+export interface TokenBalance extends TokenDefinition, ExternalBalance { }
+
+export interface CurrencyBalance extends ExternalBalance {
   chainId: number
 }
 
@@ -25,7 +30,7 @@ export interface BalanceLoader {
   getTokenBalances: (address: Address, tokens: TokenDefinition[]) => Promise<TokenBalance[]>
 }
 
-function createBalance (rawBalance: string, decimals: number): Balance {
+function createBalance (rawBalance: string, decimals: number): ExternalBalance {
   return {
     balance: rawBalance,
     displayBalance: new BigNumber(rawBalance).shiftedBy(-decimals).toString()

@@ -1,5 +1,5 @@
 const EthereumClient = require('../EthereumClient')
-const store = require('../../store')
+const store = require('../../store').default
 
 class Geth extends EthereumClient {
   constructor (options) {

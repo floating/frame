@@ -1,6 +1,6 @@
 const log = require('electron-log')
 const utils = require('web3-utils')
-const store = require('../../../store')
+const store = require('../../../store').default
 const Signer = require('../../Signer')
 const flex = require('../../../flex')
 const { sign, londonToLegacy } = require('../../../transaction')

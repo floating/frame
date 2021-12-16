@@ -19,15 +19,17 @@ function formatBalance (balance, decimals = 8) {
 }
 
 function formatUsdRate (rate, decimals = 2) {
-  return new Intl.NumberFormat('us-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
+  return rate.isNaN()
+    ? '?.??'
+    : new Intl.NumberFormat('us-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
 function balance (rawBalance, quote = {}) {
   const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
-  const usdRate = BigNumber(quote.price || 0)
+  const usdRate = BigNumber(quote.price)
   const totalValue = balance.times(usdRate)
   const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
 
@@ -35,8 +37,8 @@ function balance (rawBalance, quote = {}) {
     ...rawBalance,
     displayBalance: formatBalance(balance, balanceDecimals),
     price: formatUsdRate(usdRate),
-    priceChange: BigNumber(quote['change24hr'] || 0).toFixed(2),
-    totalValue,
+    priceChange: !usdRate.isNaN() && BigNumber(quote['change24hr'] || 0).toFixed(2),
+    totalValue: totalValue.isNaN() ? BigNumber(0) : totalValue,
     displayValue: formatUsdRate(totalValue, 0)
   }
 }
@@ -142,7 +144,7 @@ class Balances extends React.Component {
           <div className='signerBalancePrice'>
             <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balanceInfo.price}</span>
             <span className={priceChangeClass}>
-              <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange}%</span>
+              <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange ? balanceInfo.priceChange + '%' : ''}</span>
             </span>
           </div>
           <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
