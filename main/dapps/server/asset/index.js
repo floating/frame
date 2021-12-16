@@ -2,9 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const cheerio = require('cheerio')
 
-const ipfs = require('../../../ipfs')
+const nebula = require('../../../nebula')()
+const store = require('../../../store')
 
-const resolve = require('../resolve')
 const storage = require('../storage')
 
 const getType = require('./getType')
@@ -17,12 +17,12 @@ const error = (res, code, message) => {
 }
 
 module.exports = {
-  stream: async (res, app, path) => { // Stream assets from IPFS back to the client
+  stream: async (res, namehash, path) => { // Stream assets from IPFS back to the client
     let file
-    const cid = await resolve.rootCid(app)
+    const cid = store(`main.dapps`, namehash, `content`)
 
     try {
-      file = await ipfs.getFile(`${cid}${path}`)
+      file = await nebula.ipfs.getFile(`${cid}${path}`)
       if (!file) throw new Error('Asset not found')
     } catch (e) {
       // console.error('   ---   ' + e.message)
@@ -34,7 +34,7 @@ module.exports = {
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
       res.writeHead(200)
-      res.write(file.content)
+      res.write(file)
       res.end()
     }
 
@@ -51,21 +51,21 @@ module.exports = {
     // })
     // stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
   },
-  dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
+  dapp: async (res, namehash, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
-    const cid = await resolve.rootCid(app)
-    const index = await ipfs.getFile(`${cid}/index.html`)
+    const cid = store(`main.dapps`, namehash, `content`)
+    const index = await nebula.ipfs.getFile(`${cid}/index.html`)
     // res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
     res.writeHead(200)
-    const $ = cheerio.load(index.content.toString('utf8'))
-    $('html').prepend(`
-      <script>
-        const initial = ${JSON.stringify(storage.get(cid) || {})}
-        ${inject}
-      </script>
-    `)
+    const $ = cheerio.load(index)
+    // $('html').prepend(`
+    //   <script>
+    //     // const initial = ${JSON.stringify(storage.get(cid) || {})}
+    //     ${inject}
+    //   </script>
+    // `)
     res.end($.html())
   }
 }

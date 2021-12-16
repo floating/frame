@@ -413,11 +413,6 @@ module.exports = {
       return map
     })
   },
-  updateDapp: (u, namehash, data) => {
-    u(`main.dapp.details.${namehash}`, (oldData) => {
-      return { ...oldData, ...data }
-    })
-  },
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
@@ -529,6 +524,62 @@ module.exports = {
   muteBetaDisclosure: (u) => {
     u('main.mute.betaDisclosure', () => true)
     u('dash.showing', () => true)
+  },
+  // Dapp Frame
+  appDapp: (u, dapp) => {
+    u('main.dapps', dapps => {
+      if (dapps && !dapps[dapp.id]) {
+        dapps[dapp.id] = dapp
+      }
+      return dapps || {}
+    })
+  },
+  updateDapp: (u, dappId, update) => {
+    u('main.dapps', dapps => {
+      if (dapps && dapps[dappId]) {
+        dapps[dappId] = Object.assign({}, dapps[dappId], update)
+      }
+      return dapps || {}
+    })
+  },
+  addFrame: (u, frame) => {
+    u('main.frames', frame.id, () => frame)
+  },
+  removeFrame: (u, frameId) => {
+    u('main.frames', frames => {
+      delete frames[frameId]
+      return frames
+    })
+  },
+  addFrameView: (u, frameId, view) => {
+    u('main.frames', frameId, 'views', views => {
+      if (views[view.id]) return views
+      
+      if (view.show && view.ready) {
+        Object.keys(views).forEach(id => {
+          if (id !== view.id) views[viewId].show = false
+        })
+      }
+      views[view.id] = view
+      return views
+    })
+  },
+  updateFrameView: (u, frameId, viewId, update) => {
+    u('main.frames', frameId, 'views', views => {
+      if ((update.show && views[viewId].ready) || (update.ready && views[viewId].show)) {
+        Object.keys(views).forEach(id => {
+          if (id !== viewId) views[id].show = false
+        })
+      }
+      views[viewId] = Object.assign({}, views[viewId], update)
+      return views
+    })
+  },
+  removeFrameView: (u, frameId, viewId) => {
+    u('main.frames', frameId, 'views', views => {
+      delete views[viewId]
+      return views
+    })
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

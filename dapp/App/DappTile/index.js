@@ -17,9 +17,6 @@ class App extends React.Component {
         }}>
           {svg.ruby(26)}
         </div>
-        <div className='dappName'>
-          Send
-        </div>
       </div>
     )
   }
