@@ -57,11 +57,35 @@ body
       left 0
       bottom 0
       width 72px
-      background var(--ghostY)
+      padding-left 2px
       -webkit-user-select none
       -webkit-app-region drag
-      // active
-      //   cursor grabbing
+
+      .accountTile
+        position absolute
+        top 25px
+        left 5px
+        right 5px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+        color var(--outerspace)
+        margin 6px 0px
+
+        .accountIcon
+          height 58px
+          width 58px
+          background var(--ghostA)
+          border-radius 16px
+          display flex
+          justify-content center
+          align-items center
+          flex-direction column
+          cursor pointer
+
+        .accountIcon:hover
+          background var(--ghostB)
 
       .dappIcons
         position absolute
@@ -90,12 +114,13 @@ body
       left 72px
       bottom 0
       right 0
-      background var(--ghostZ)
       border-left 1px solid var(--ghostX)
       color var(--outerspace)
       display flex
       justify-content center
       align-items center
+      -webkit-user-select none
+      -webkit-app-region drag
       
       .mainApps
         width 600px

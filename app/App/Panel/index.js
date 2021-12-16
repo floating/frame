@@ -136,7 +136,7 @@ class Panel extends React.Component {
         <Main />
         <Badge />
         <div className='launch'>
-          <div className='launchTile' onMouseDown={() => link.send('tray:launchDapp', 'uniswap.eth') }>
+          <div className='launchTile' onMouseDown={() => link.send('tray:dappWindow') }>
             <div className='launchIcon'>
               <div className='dashboradIcon'>
                 {svg.window(16)}

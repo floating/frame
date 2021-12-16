@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, BrowserWindow } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -17,8 +17,6 @@ const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store')
 const dapps = require('./dapps')
-
-const dapp = require('./windows/dapp')
 
 // log.transports.file.level = 'info'
 
@@ -183,9 +181,23 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 
 ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 
-ipcMain.on('tray:launchDapp', async (e, domain) => {
-  await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
-  await dapps.launch(domain, console.error)
+// ipcMain.on('tray:launchDapp', async (e, domain) => {
+//   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+//   await dapps.launch(domain, console.error)
+// })
+
+ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
+
+ipcMain.on('*:openDapp', async (e, dappId) => {
+  const win = BrowserWindow.fromWebContents(e.sender)
+  await dapps.open(win.dappFrameId, dappId, console.error)
+})
+
+dapps.add({
+  ens: 'uniswap.eth',
+  config: {
+    key: 'value'
+  }
 })
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
@@ -215,33 +227,6 @@ app.on('ready', () => {
     }
   })
   store.observer(() => {
-    // console.log('registering shortcut')
-
-    // globalShortcut.unregister('Alt+Space')
-    // let showing = false
-    // globalShortcut.register('Alt+Space', () => {
-    //   showing = !showing
-    //   if (showing) {
-    //     windows.showFlow()
-    //   } else {
-    //     windows.hideFlow()
-    //   }
-    // })
-
-    // const altspace = store('main.shortcuts.altSpace')
-    // if (altspace) {
-    //   console.log('registering shortcut')
-    //   globalShortcut.unregister('Alt+Space')
-    //   let showing = false
-    //   globalShortcut.register('Alt+Space', () => {
-    //     showing = !showing
-    //     if (showing) {
-    //       windows.showFlow()
-    //     } else {
-    //       windows.hideFlow()
-    //     }
-    //   })
-    // }
     const altSlash = store('main.shortcuts.altSlash')
     if (altSlash) {
       globalShortcut.unregister('Alt+/')
@@ -250,6 +235,15 @@ app.on('ready', () => {
       globalShortcut.unregister('Alt+/')
     }
   })
+  // store.observer(() => {
+  //   const altSlash = store('main.shortcuts.altSlash')
+  //   if (altSlash) {
+  //     globalShortcut.unregister('Alt+Space')
+  //     globalShortcut.register('Alt+Space', () => windows.openDapp())
+  //   } else {
+  //     globalShortcut.unregister('Alt+Space')
+  //   }
+  // })
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {

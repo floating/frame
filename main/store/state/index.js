@@ -145,6 +145,16 @@ const initial = {
   main: {
     _version: main('_version', 17),
     colorway: main('colorway', 'dark'),
+    colorwayPrimary: {
+      dark: {
+        background: '#1c1c1b',
+        text: '#ecf1ff'
+      },
+      light: {
+        background: '#cdcde5',
+        text: '#1e3250'
+      }
+    },
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
       welcomeWarning: main('mute.welcomeWarning', false),
@@ -545,6 +555,8 @@ const initial = {
       }
     }),
     ipfs: {},
+    dapps: {},
+    frames: {},
     openDapps: [],
     dapp: {
       details: {},
