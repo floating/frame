@@ -82,7 +82,7 @@ export default function (eth: EthereumProvider) {
       const response = await eth.request({
         method: 'eth_call',
         jsonrpc: '2.0',
-        id,
+        id: id += 1,
         chainId: addHexPrefix(token.chainId.toString(16)),
         params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
       })
