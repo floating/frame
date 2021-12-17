@@ -2,8 +2,11 @@ const fs = require('fs')
 const path = require('path')
 const cheerio = require('cheerio')
 
-const nebula = require('../../../nebula')()
-const store = require('../../../store')
+const nebulaApi = require('../../../nebula').default
+
+const nebula = nebulaApi()
+
+import store from '../../../store'
 
 const storage = require('../storage')
 
