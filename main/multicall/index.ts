@@ -1,5 +1,9 @@
 // @ts-ignore
 import { createWatcher, aggregate } from '@makerdao/multicall'
+import { EthereumProvider } from 'eth-provider'
+import log from 'electron-log'
+
+import { providers } from 'ethers'
 
 const contractAddresses: { [chainId: number]: string } = {
   1: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // mainnet
@@ -16,14 +20,13 @@ const contractAddresses: { [chainId: number]: string } = {
   80001: '0x08411add0b5aa8ee47563b146743c13b3556c9cc' // mumbai
 }
 
+type CallResponse<R, T> = [string, PostProcessor<R, T>]
+type PostProcessor<R, T> = (val: R) => T
+
 export interface Call<R, T> {
   target: string, // address
-  call: any[],
-  returns: [
-    [
-      string, (val: R) => T
-    ]
-  ]
+  call: string[],
+  returns: [CallResponse<R, T>]
 }
 
 type CallResults<T> = {
@@ -36,19 +39,44 @@ export function supportsChain (chainId: number) {
   return chainId in contractAddresses
 }
 
-function chainConfig (chainId: number) {
+function chainConfig (chainId: number, eth: EthereumProvider) {
   return {
-    rpcUrl: 'http://0.0.0.0:1248', // Frame
-    multicallAddress: contractAddresses[chainId]
+    multicallAddress: contractAddresses[chainId],
+    //rpcUrl: 'http://127.0.0.1:1248'
+    provider: eth
   }
 }
 
-export default function (chainId: number) {
-  const config = chainConfig(chainId)
+export default function (chainId: number, eth: EthereumProvider) {
+  const config = chainConfig(chainId, eth)
+
+  async function call <R, T> (calls: Call<R, T>[]): Promise<CallResults<T>> {
+    return (await aggregate(calls, config)).results
+  }
 
   return {
-    call: async function <R, T> (calls: Call<R, T>[]): Promise<CallResults<T>> {
-      return (await aggregate(calls, config)).results
+    call,
+    batchCall: async function <R, T> (calls: Call<R, T>[], batchSize = 2000) {
+      const numBatches = Math.ceil(calls.length / batchSize)
+
+      const fetches = [...Array(numBatches).keys()].map(async (_, batchIndex) => {
+        const batchStart = batchIndex * batchSize
+        const batchEnd = batchStart + batchSize
+  
+        try {
+          const results = await call(calls.slice(batchStart, batchEnd))
+  
+          return Object.values(results.transformed)
+        } catch (e) {
+          log.error(`multicall error (batch ${batchStart}-${batchEnd}), first call: ${JSON.stringify(calls[batchStart])}`, e)
+          return []
+        }
+      })
+  
+      const fetchResults = await Promise.all(fetches)
+      const callResults = ([] as T[]).concat(...fetchResults)
+  
+      return callResults
     },
     subscribe: function <R, T> (calls: Call<R, T>[], cb: (err: any, val: any) => void) {
       const watcher = createWatcher(calls, config)

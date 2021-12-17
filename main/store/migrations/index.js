@@ -381,6 +381,13 @@ const migrations = {
     })
 
     return initial
+  },
+  18: initial => {
+    // move custom tokens to new location
+    const existingCustomTokens = [...(initial.main.tokens || [])]
+    initial.main.tokens = { custom: existingCustomTokens }
+
+    return initial
   }
 }
 

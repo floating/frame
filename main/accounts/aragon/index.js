@@ -2,7 +2,7 @@ const log = require('electron-log')
 const utils = require('ethereumjs-util')
 const Wrapper = require('@aragon/wrapper').default
 const { ensResolve } = require('@aragon/wrapper')
-const store = require('../../store')
+const store = require('../../store').default
 
 const appNames = require('./appNames')
 

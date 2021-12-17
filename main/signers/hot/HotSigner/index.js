@@ -7,7 +7,7 @@ const log = require('electron-log')
 const { v4: uuid } = require('uuid')
 
 const Signer = require('../../Signer').default
-const store = require('../../../store')
+const store = require('../../../store').default
 // Mock windows module during tests
 const windows = app ? require('../../../windows') : { broadcast: () => {} }
 // Mock user data dir during tests

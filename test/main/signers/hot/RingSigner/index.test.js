@@ -36,7 +36,7 @@ describe('Ring signer', () => {
     clean()
 
     hot = await import('../../../../../compiled/signers/hot')
-    store = require('../../../../../compiled/store')
+    store = require('../../../../../compiled/store').default
   })
 
   afterEach(() => {
@@ -172,7 +172,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  }, 400)
+  }, 600)
 
   test('Unlock with wrong password', done => {
     signer.unlock('Wrong password', err => {

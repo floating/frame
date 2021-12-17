@@ -1,7 +1,9 @@
 const { hash } = require('eth-ens-namehash')
 
-const store = require('../../../store')
-const nebula = require('../../../nebula')()
+const store = require('../../../store').default
+const nebulaApi = require('../../../nebula').default
+
+const nebula = nebulaApi()
 
 const resolve = {
   rootCid: async (app) => {

@@ -8,6 +8,7 @@ type RPCRequestCallback = RPCCallback<RPCResponsePayload>
 type Address = string // 20 hex bytes, 0x-prefixed
 enum SubscriptionType {
   ACCOUNTS = 'accountsChanged',
+  ASSETS = 'assetsChanged',
   CHAIN = 'chainChanged',
   CHAINS = 'chainsChanged',
   NETWORK = 'networkChanged'
@@ -20,7 +21,7 @@ interface RPCId {
 
 interface InternalPayload {
   _origin: string,
-  chain?: string
+  chainId?: string
 }
 
 interface JSONRPCRequestPayload extends RPCId {
@@ -43,30 +44,32 @@ interface EVMError {
 
 type RPCRequestPayload = JSONRPCRequestPayload & InternalPayload
 
-interface Balance {
-  chainId: number,
-  name: string,
-  symbol: string,
-  balance: string,
-  decimals: number,
-  displayBalance: string
-}
-
-interface Erc20 extends Balance {
-  address: Address
-}
-
 declare namespace RPC {
   namespace GetAssets {
+    interface Balance {
+      chainId: number,
+      name: string,
+      symbol: string,
+      balance: string,
+      decimals: number,
+      displayBalance: string
+    }
+    
+    interface Erc20 extends Balance {
+      address: Address
+    }
+
+    interface Assets {
+      erc20?: Erc20[],
+      nativeCurrency: Balance[]
+    }
+
     interface Request extends Omit<RPCRequestPayload, 'method'> {
       method: 'wallet_getAssets'
     }
 
     interface Response extends Omit<RPCResponsePayload, 'result'> {
-      result?: {
-        erc20?: Erc20[],
-        nativeCurrency: Balance[]
-      }
+      result?: Assets
     }
   }
 

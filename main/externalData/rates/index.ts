@@ -5,7 +5,7 @@ import coingecko, { CoinId, PlatformId } from '../coingecko'
 
 const FETCH_BATCH_SIZE = 200
 
-interface Rate {
+export interface Rate {
   usd: {
     price: BigNumber,
     change24hr: BigNumber
@@ -16,7 +16,7 @@ interface Rate {
 let allCoins: { [symbol: string]: CoinId }
 
 // { chainId: platformId }
-let allPlatforms: { [chainId: string]: PlatformId }
+let allPlatforms: { [chainId: number]: PlatformId }
 
 function createRate (quote: any): Rate {
   return {
@@ -58,12 +58,12 @@ async function loadPlatforms () {
 
     allPlatforms = platforms.reduce((platformMapping, platform) => {
       if (platform.chain_identifier) {
-        const chainId = platform.chain_identifier
+        const chainId = parseInt(platform.chain_identifier)
         return { ...platformMapping, [chainId]: platform.id }
       }
 
       return platformMapping
-    }, {} as Record<string, string>)
+    }, {} as Record<number, string>)
 
     return allPlatforms
   } catch (e) {

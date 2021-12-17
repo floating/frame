@@ -38,7 +38,7 @@ const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
-type Balance = TokenDefinition & { balance: string, displayBalance: string }
+type Balance = Token & { balance: string, displayBalance: string }
 
 interface ChainDefinition {
   id: number,
@@ -46,12 +46,30 @@ interface ChainDefinition {
   on: boolean
 }
 
+function loadAssets (accountId: string) {
+  const balances: Balance[] = store('main.balances', accountId) || []
+
+  return balances.reduce((assets, balance) => {
+    const type = (balance.address === NATIVE_CURRENCY) ? 'nativeCurrency' : 'erc20'
+    assets[type].push(balance)
+
+    return assets
+  }, { nativeCurrency: [] as Balance[], erc20: [] as RPC.GetAssets.Erc20[] })
+}
+
 class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
   handlers: { [id: string]: any } = {}
-  subscriptions: Subscriptions = { accountsChanged: [], chainChanged: [], chainsChanged: [], networkChanged: [] }
+  subscriptions: Subscriptions = {
+    accountsChanged: [],
+    assetsChanged: [],
+    chainChanged: [],
+    chainsChanged: [], 
+    networkChanged: []
+  }
+
   store: (...args: any) => any
 
   constructor () {
@@ -75,6 +93,12 @@ class Provider extends EventEmitter {
   accountsChanged (accounts: string[]) {
     this.subscriptions.accountsChanged.forEach(subscription => {
       this.emit('data:address', accounts[0], { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: accounts } })
+    })
+  }
+
+  assetsChanged (account: string, assets: RPC.GetAssets.Assets) {
+    this.subscriptions.assetsChanged.forEach(subscription => {
+      this.emit('data:address', account, { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: { ...assets, account } } })
     })
   }
 
@@ -736,7 +760,7 @@ class Provider extends EventEmitter {
       }
 
       // don't attempt to add the token if it's already been added
-      const tokenExists = store('main.tokens').some((token: TokenDefinition) => token.chainId === chainId && token.address === address)
+      const tokenExists = store('main.tokens.custom').some((token: Token) => token.chainId === chainId && token.address === address)
       if (tokenExists) {
         return res()
       }
@@ -773,16 +797,9 @@ class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
-    const balances: Balance[] = store('main.balances', currentAccount.id)
+    const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
 
-    const { nativeCurrency, erc20 } = balances.reduce((assets, balance) => {
-      const type = (balance.address === NATIVE_CURRENCY) ? 'nativeCurrency' : 'erc20'
-      assets[type].push(balance)
-
-      return assets
-    }, { nativeCurrency: [] as Balance[], erc20: [] as Erc20[] })
-
-    const { id, jsonrpc, ...rest } = payload
+    const { id, jsonrpc } = payload
     cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
   }
 
@@ -793,7 +810,7 @@ class Provider extends EventEmitter {
       target.id = store('main.currentNetwork.id')
     }
 
-    const chainId = parseInt(payload.chain || '', 16)
+    const chainId = parseInt(payload.chainId || '', 16)
     if (!!store('main.networks.ethereum', chainId)) {
       target.id = chainId
     }
@@ -807,7 +824,7 @@ class Provider extends EventEmitter {
 
     if (!targetChain.id) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
-      return this.resError(`unknown chain: ${payload.chain}`, payload, res)
+      return this.resError(`unknown chain: ${payload.chainId}`, payload, res)
     }
 
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
@@ -845,7 +862,7 @@ class Provider extends EventEmitter {
     if (method === 'eth_chainId') return this.getChainId(payload, res, targetChain)
 
     // remove custom data
-    const { _origin, chain, ...rpcPayload } = payload
+    const { _origin, chainId, ...rpcPayload } = payload
 
     // Pass everything else to our connection
     this.connection.send(rpcPayload, res, targetChain)
@@ -884,9 +901,21 @@ store.observer(() => {
     availableChains = currentChains
     provider.chainsChanged(availableChains)
   }
-}, 'provider')
+}, 'provider:chains')
 
-proxy.on('send', (payload, cd) => provider.send(payload, cd))
+store.observer(() => {
+  const currentAccountId = store('selected.current')
+
+  if (currentAccountId) {
+    const assets = loadAssets(currentAccountId)
+
+    if (assets.erc20.length > 0 || assets.nativeCurrency.length > 0) {
+      provider.assetsChanged(currentAccountId, assets)
+    }
+  }
+}, 'provider:account')
+
+proxy.on('send', (payload, cb) => provider.send(payload, cb))
 proxy.ready = true
 
 export default provider

@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
-import { JSONRPCRequestPayload, AbstractBlock } from 'ethereum-protocol'
 import log from 'electron-log'
+
+import type { BigNumber } from 'bignumber.js'
 
 interface Connection {
   send (payload: JSONRPCRequestPayload): Promise<any>,
@@ -16,8 +17,24 @@ interface SubscriptionMessage {
   }
 }
 
-type Block = AbstractBlock & {
-  number: string
+interface Block {
+  number: string,
+  hash: string | null,
+  parentHash: string,
+  nonce: string | null,
+  sha3Uncles: string,
+  logsBloom: string | null,
+  transactionsRoot: string,
+  stateRoot: string,
+  miner: string,
+  difficulty: BigNumber,
+  totalDifficulty: BigNumber,
+  extraData: string,
+  size: number,
+  gasLimit: number,
+  gasUsed: number,
+  timestamp: number,
+  uncles: string[],
 }
 
 class BlockMonitor extends EventEmitter {

@@ -1,7 +1,7 @@
-const Restore = require('react-restore')
-const state = require('./state')
-const actions = require('./actions')
-const persist = require('./persist')
+import Restore from 'react-restore'
+import state from './state'
+import * as actions from './actions'
+import persist from './persist'
 
 // TODO: Layer persisted op top of initial state
 
@@ -34,4 +34,4 @@ store.api.feed((state, actionBatch) => {
   })
 })
 
-module.exports = store
+export default store

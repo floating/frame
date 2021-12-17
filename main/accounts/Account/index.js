@@ -6,11 +6,12 @@ const abi = require('../../abi')
 // Provider Proxy
 const proxyProvider = require('../../provider/proxy').default
 
-const nebula = require('../../nebula')()
+const nebulaApi = require('../../nebula').default
+const nebula = nebulaApi()
 
 const signers = require('../../signers')
 const windows = require('../../windows')
-const store = require('../../store')
+const store = require('../../store').default
 
 const { Aragon } = require('../aragon')
 

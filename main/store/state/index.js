@@ -143,7 +143,7 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 17),
+    _version: main('_version', 18),
     colorway: main('colorway', 'dark'),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
@@ -183,8 +183,11 @@ const initial = {
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
-    balances: {},
-    tokens: main('tokens', []), // custom token list added by users
+    balances: [],
+    tokens: {
+      custom: main('tokens.custom', []), // custom tokens added by users
+      known: main('tokens.known', {})
+    },
     rates: {}, // main('rates', {}),
     inventory: {}, // main('rates', {}),
     signers: {},

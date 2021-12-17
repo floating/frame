@@ -3,7 +3,7 @@ const log = require('electron-log')
 
 const provider = require('../provider').default
 const accounts = require('../accounts')
-const store = require('../store')
+const store = require('../store').default
 
 const trusted = require('./trusted')
 const validPayload = require('./validPayload').default

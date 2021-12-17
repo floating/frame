@@ -15,7 +15,7 @@ const url = require('url')
 const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
-const store = require('./store')
+const store = require('./store').default
 const dapps = require('./dapps')
 
 // log.transports.file.level = 'info'
@@ -158,8 +158,7 @@ ipcMain.on('tray:addToken', (e, token, req) => {
 
 ipcMain.on('tray:removeToken', (e, token) => {
   if (token) {
-    // TODO: what to do when removing a tokens?
-    // store.removeBalance(token.chainId, token.address)
+    store.removeBalance(token.chainId, token.address)
     store.removeCustomTokens([token])
   }
 })

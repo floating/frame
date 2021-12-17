@@ -120,6 +120,11 @@ module.exports = {
   setBlockNumber: (u, network, id, blockNumber) => {
     u('main.networks', network, id, 'blockNumber', () => blockNumber)
   },
+  setAccount: (u, account) => {
+    u('selected.current', _ => account.id)
+    u('selected.minimized', _ => false)
+    u('selected.open', _ => true)
+  },
   updateAccount: (u, updatedAccount, add) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
@@ -233,8 +238,8 @@ module.exports = {
       u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
-  setNetworkMeta: (u, netType, netId, meta) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency', () => meta)
+  setNativeCurrency: (u, netType, netId, currency) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency', () => currency)
   },
   addNetwork: (u, net) => {
     try {
@@ -457,6 +462,15 @@ module.exports = {
       return [...existingBalances, ...newBalances]
     })
   },
+  removeBalance: (u, chainId, key) => {
+    u('main.balances', chainId, (balances = {}) => {
+      for (const accountAddress in balances) {
+        delete balances[accountAddress][key.toLowerCase()]
+      }
+
+      return balances
+    })
+  },
   setScanning: (u, address, scanning) => {
     if (scanning) {
       u('main.scanning', address, () => true)
@@ -474,7 +488,7 @@ module.exports = {
     })
   },
   addCustomTokens: (u, tokens) => {
-    u('main.tokens', existing => {
+    u('main.tokens.custom', existing => {
       // remove any tokens that have been overwritten by one with
       // the same address and chain ID
       const existingTokens = existing.filter(token => !includesToken(tokens, token))
@@ -483,7 +497,19 @@ module.exports = {
     })
   },
   removeCustomTokens: (u, tokens) => {
-    u('main.tokens', existing => {
+    u('main.tokens.custom', existing => {
+      return existing.filter(token => !includesToken(tokens, token))
+    })
+  },
+  addKnownTokens: (u, address, tokens) => {
+    u('main.tokens.known', address, (existing = []) => {
+      const existingTokens = existing.filter(token => !includesToken(tokens, token))
+
+      return [...existingTokens, ...tokens]
+    })
+  },
+  removeKnownTokens: (u, address, tokens) => {
+    u('main.tokens.known', address, (existing = []) => {
       return existing.filter(token => !includesToken(tokens, token))
     })
   },

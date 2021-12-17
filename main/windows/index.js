@@ -7,7 +7,7 @@ const log = require('electron-log')
 const EventEmitter = require('events')
 const events = new EventEmitter()
 
-const store = require('../store')
+const store = require('../store').default
 
 const dapp = require('./dapp')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
