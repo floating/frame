@@ -9,8 +9,11 @@ import BigNumber from 'bignumber.js'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
-function formatBalance (balance, decimals = 8) {
-  return balance
+function formatBalance (balance, totalValue, decimals = 8) {
+  const isZero = balance.isZero()
+  if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
+
+  return !isZero
     ? new Intl.NumberFormat('us-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 8
@@ -35,7 +38,7 @@ function balance (rawBalance, quote = {}) {
 
   return {
     ...rawBalance,
-    displayBalance: formatBalance(balance, balanceDecimals),
+    displayBalance: formatBalance(balance, totalValue, balanceDecimals),
     price: formatUsdRate(usdRate),
     priceChange: !usdRate.isNaN() && BigNumber(quote['change24hr'] || 0).toFixed(2),
     totalValue: totalValue.isNaN() ? BigNumber(0) : totalValue,
