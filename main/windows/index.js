@@ -100,7 +100,7 @@ const api = {
       // transparent: true,
       // hasShadow: false,
       show: false,
-      backgroundColor: 'rgba(20, 20, 19, 1)', //'#e4e8f8',
+      backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       backgroundThrottling: false,
       // offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),
@@ -161,7 +161,7 @@ const api = {
       windows.tray.focus()
     }, 1260)
     if (!openedAtLogin) {
-      windows.tray.webContents.once('did-finish-load', () => {
+      windows.tray.once('ready-to-show', () => {
         api.showTray()
       })
     }
@@ -404,7 +404,7 @@ const api = {
       // transparent: true,
       // hasShadow: false,
       show: false,
-      backgroundColor: 'rgba(20, 20, 19, 1)',
+      backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       backgroundThrottling: false,
       offscreen: true,
       // icon: path.join(__dirname, './AppIcon.png'),
