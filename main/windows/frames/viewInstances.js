@@ -2,7 +2,7 @@ import { BrowserView }  from 'electron'
 
 import webPrefrences from './webPrefrences'
 
-const store = require('../../store')
+const store = require('../../store').default
 
 const dev = process.env.NODE_ENV === 'development'
 

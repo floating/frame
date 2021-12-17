@@ -5,10 +5,12 @@ const cheerio = require('cheerio')
 
 const resolve = require('./server/resolve')
 const store = require('../store').default
-const ipfs = require('../ipfs')
+// const ipfs = require('../ipfs')
 
 const windows = require('../windows')
-const nebula = require('../nebula')()
+const nebulaApi = require('../nebula').default
+
+const nebula = nebulaApi()
 
 const server = require('./server')
 
@@ -278,11 +280,11 @@ class Dapps {
   }
 
   async _pin (cid) {
-    await ipfs.pin(cid)
+    // await ipfs.pin(cid)
 
-    const dapp = Object.entries(store('main.dapp.details')).find(([namehash, dapp]) => dapp.cid === cid)
+    // const dapp = Object.entries(store('main.dapp.details')).find(([namehash, dapp]) => dapp.cid === cid)
 
-    return dapp && !!store.updateDapp(dapp[0], { pinned: true })
+    // return dapp && !!store.updateDapp(dapp[0], { pinned: true })
   }
 
   _updateHashes () {

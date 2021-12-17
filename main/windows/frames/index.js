@@ -4,7 +4,7 @@
 const log = require('electron-log')
 const crypto = require('crypto')
 
-const store = require('../../store')
+import store from '../../store'
 
 import frameInstances from './frameInstances.js'
 import viewInstances from './viewInstances'
