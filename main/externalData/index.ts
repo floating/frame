@@ -74,7 +74,7 @@ function createWorker () {
     }
 
     if (message.type === 'ready') {
-      startWorker()
+      startScanning()
     }
 
     if (message.type === 'nativeCurrencyData') {
@@ -269,7 +269,7 @@ function setActiveAddress (address: Address) {
   }
 }
 
-function startWorker () {
+function startScanning () {
   allNetworksObserver = store.observer(() => {
     scanNetworkCurrencyRates()
   })
