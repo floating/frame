@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
+import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
@@ -61,7 +62,7 @@ export default function (eth: EthereumProvider) {
       const rawBalance = await eth.request({
         method: 'eth_getBalance',
         params: [address, 'latest'],
-        chainId: '0x' + chainId.toString(16)
+        chainId: addHexPrefix(chainId.toString(16))
       })
 
       // TODO: do all coins have 18 decimals?
@@ -82,7 +83,7 @@ export default function (eth: EthereumProvider) {
         method: 'eth_call',
         jsonrpc: '2.0',
         id,
-        chainId: '0x' + token.chainId.toString(16),
+        chainId: addHexPrefix(token.chainId.toString(16)),
         params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
       })
 
@@ -111,7 +112,7 @@ export default function (eth: EthereumProvider) {
   async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
     const calls = balanceCalls(owner, tokens)
 
-    eth.setChain('0x' + chainId.toString(16))
+    eth.setChain(addHexPrefix(chainId.toString(16)))
 
     return multicall(chainId, eth).batchCall(calls)
   }
@@ -129,10 +130,7 @@ export default function (eth: EthereumProvider) {
         Object.entries(tokensByChain).map(([chain, tokens]) => {
           const chainId = parseInt(chain)
     
-          const supportsMulticall = multicallSupportsChain(chainId)
-    
-          // in order to prevent a large amount of calls, only use multicall when specified
-          return supportsMulticall
+          return multicallSupportsChain(chainId)
             ? getTokenBalancesFromMulticall(owner, tokens, chainId)
             : getTokenBalancesFromContracts(owner, tokens)
         })
