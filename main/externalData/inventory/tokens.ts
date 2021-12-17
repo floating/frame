@@ -1,10 +1,11 @@
-import log from 'electron-log'
+import tokenLoader from 'electron-log'
 import nebulaApi from '../../nebula'
 
 const nebula = nebulaApi('tokenWorker')
 const tokenListPath = '/ipns/k51qzi5uqu5dgj8vqkoy9ctids6zfwn53tazlfgqv44svb0ktdkdw02qopy1y1'
 
 import defaultTokenList from './default-tokens.json'
+import sushiswapTokenList from '@sushiswap/default-token-list'
 
 interface TokenSpec extends Token {
   extensions: {
@@ -12,13 +13,8 @@ interface TokenSpec extends Token {
   }
 }
 
-let tokenList = mergeTokens(
-  require('@sushiswap/default-token-list').tokens,
-  defaultTokenList.tokens as TokenSpec[]
-)
-
 async function frameTokenList () {
-  log.debug('loading tokens from tokens.frame.eth')
+  tokenLoader.debug('loading tokens from tokens.frame.eth')
 
   try {
     // FIXME: put this back when ENS record is updated correctly
@@ -27,11 +23,11 @@ async function frameTokenList () {
 
     const tokens: TokenSpec[] = (await nebula.ipfs.getJson(tokenListPath)).tokens
 
-    log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
+    tokenLoader.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
 
     return tokens
   } catch (e) {
-    log.warn('Could not load token list from tokens.frame.eth, using default list', e)
+    tokenLoader.warn('Could not load token list from tokens.frame.eth, using default list', e)
   }
 
   return []
@@ -64,12 +60,19 @@ export default class TokenLoader {
   private tokenList: Token[] = []
   private loader?: NodeJS.Timeout | null
 
+  constructor () {
+    this.tokenList = mergeTokens(
+      sushiswapTokenList.tokens as Token[],
+      defaultTokenList.tokens as TokenSpec[]
+    )
+  }
+
   private async loadTokenList () {
     const updatedTokens = await frameTokenList()
   
     this.tokenList = mergeTokens(this.tokenList, updatedTokens)
   
-    log.info(`updated token list to contain ${tokenList.length} tokens`)
+    tokenLoader.info(`updated token list to contain ${this.tokenList.length} tokens`)
   }
 
   start () {

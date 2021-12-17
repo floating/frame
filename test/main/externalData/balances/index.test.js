@@ -7,8 +7,12 @@ import { addHexPrefix, padToEven } from 'ethereumjs-util'
 import ethProvider from 'eth-provider'
 import BigNumber from 'bignumber.js'
 
-jest.mock('eth-provider', () => jest.fn(() => ({ request: jest.fn() })))
 jest.mock('../../../../main/multicall')
+jest.mock('eth-provider', () =>
+  jest.fn(() => ({
+    request: jest.fn(),
+    setChain: jest.fn()
+  })))
 
 const callResponse = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const ownerAddress = '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e'
@@ -117,6 +121,9 @@ describe('#getTokenBalances', () => {
           displayBalance: '17.893'
         }
       ])
+
+      expect(eth.setChain).toHaveBeenNthCalledWith(1, addHexPrefix(aaveUsdcToken.chainId.toString(16)))
+      expect(eth.setChain).toHaveBeenNthCalledWith(2, addHexPrefix(badgerDaoToken.chainId.toString(16)))
     })
   })
 
@@ -205,7 +212,7 @@ function respondToTokenCall (payload) {
   expect(payload.params[1]).toBe('latest')
 
   const token = knownTokens.find(
-    token => token.address === payload.params[0].to && token.chainId === parseInt(payload.chain)
+    token => token.address === payload.params[0].to && token.chainId === parseInt(payload.chainId)
   )
 
   const balance = onChainBalances[token.address]

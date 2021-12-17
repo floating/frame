@@ -1,51 +1,68 @@
-/* globals jest beforeEach afterEach it */
+import TokenLoader from '../../../../main/externalData/inventory/tokens'
+import log from 'electron-log'
 
-const log = require('electron-log')
-log.transports.console.level = false
-
-const mockNebula = {
-  resolve: jest.fn().mockResolvedValue({ record: {} }),
+jest.mock('../../../../main/nebula', () => jest.fn(() => ({
+  resolve: () => ({ record: {} }),
   ipfs: {
-    getJson: jest.fn().mockResolvedValue({
+    getJson: () => ({
       tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }]
     })
   }
-}
+})))
 
-const tokenList = require('../../../../main/externalData/inventory/tokens')
+beforeAll(() => {
+  log.transports.console.level = false
+  jest.useFakeTimers()
+})
 
-jest.mock('../../../../main/nebula', () => jest.fn(() => mockNebula))
+afterAll(() => {
+  log.transports.console.level = 'debug'
+  jest.useRealTimers()
+})
+
+let tokenLoader
 
 beforeEach(() => {
-  tokenList.start()
+  tokenLoader = new TokenLoader()
 })
 
 afterEach(() => {
-  tokenList.stop()
+  tokenLoader.stop()
 })
 
-it('loads the included sushiswap token list', async () => {
-  const tokens = tokenList.getTokens(137)
+it('loads the included sushiswap token list', () => {
+  const tokens = tokenLoader.getTokens(137)
 
   expect(tokens.length).toBeGreaterThan(50)
   expect(tokens[0].name).toBe('Aave')
 })
 
-it('loads a token list from nebula', async () => {
-  const tokens = tokenList.getTokens(299)
+it('loads a token list from nebula', done => {
+  tokenLoader.start()
 
-  expect(tokens.length).toBe(1)
-  expect(tokens[0].name).toBe('another-token')
+  process.nextTick(() => {
+    const tokens = tokenLoader.getTokens(299)
+  
+    expect(tokens.length).toBe(1)
+    expect(tokens[0].name).toBe('another-token')
+    done()
+  })
+
+  // let async requests resolve
+  Promise.resolve().then(() =>
+  Promise.resolve().then(() =>
+    jest.runAllTicks()
+  ))
 })
 
-it('loads the default token list for mainnet', async () => {
-  const tokens = tokenList.getTokens(1)
+it('loads the default token list for mainnet', () => {
+  const tokens = tokenLoader.getTokens(1)
 
   expect(tokens.length).toBeGreaterThan(0)
 })
 
-it('fails to load tokens for an unknown chain', async () => {
-  const tokens = tokenList.getTokens(-1)
+it('fails to load tokens for an unknown chain', () => {
+  const tokens = tokenLoader.getTokens(-1)
 
   expect(tokens.length).toBe(0)
 })
