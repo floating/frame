@@ -1,15 +1,18 @@
-import electron, { BrowserWindow }  from 'electron'
+import electron, { BrowserView, BrowserWindow }  from 'electron'
 import path from 'path'
 
 import store from '../../store'
 
-import webPrefrences from './webPrefrences'
+import webPrefrences from './webPreferences'
 import topRight from './topRight'
 
-const dev = process.env.NODE_ENV === 'development'
+export interface FrameInstance extends BrowserWindow {
+  frameId?: string,
+  views?: { [id: string]: BrowserView }
+}
 
 export default {
-  create: (instances, frame) => {
+  create: (instances: { [id: string]: FrameInstance }, frame: Frame) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 160
     const maxWidth = Math.floor(height * (16/10))
@@ -18,7 +21,7 @@ export default {
   
     const preload = path.resolve(__dirname, '../../../bundle/bridge.js')
   
-    const frameInstance = new BrowserWindow({
+    const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
       y: 0,
       width,
@@ -65,7 +68,7 @@ export default {
     instances[frame.id] = frameInstance
     // if (dev) frameInstance.openDevTools({ mode: 'detach' })
   },
-  destroy: (instances, frameId) => {
+  destroy: (instances: { [id: string]: FrameInstance }, frameId: string) => {
     instances[frameId].destroy()
     delete instances[frameId]
   }

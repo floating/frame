@@ -1,15 +1,13 @@
 import { BrowserView }  from 'electron'
+import { FrameInstance } from './frameInstances'
 
-import webPrefrences from './webPrefrences'
-
-const store = require('../../store').default
-
-const dev = process.env.NODE_ENV === 'development'
+import store from '../../store'
+import webPreferences from './webPreferences'
 
 export default {
   // Create a view instance on a frame
-  create: (frameInstance, view) => {
-    const viewInstance = new BrowserView({ webPrefrences })
+  create: (frameInstance: FrameInstance, view: ViewMetadata) => {
+    const viewInstance = new BrowserView({ webPreferences })
   
     frameInstance.addBrowserView(viewInstance)
     viewInstance.setBackgroundColor('#0fff')
@@ -29,16 +27,21 @@ export default {
     })
   
     // Keep reference to view on frame instance
-    frameInstance.views[view.id] = viewInstance
+    frameInstance.views = { ...(frameInstance.views || {}), [view.id]: viewInstance }
   },
   // Destroy a view instance on a frame
-  destroy: (frameInstance, view) => {
-    frameInstance.removeBrowserView(frameInstance.views[view.id])
-    frameInstance.views[view.id].destory()
-    delete frameInstance.views[view.id]
+  destroy: (frameInstance: FrameInstance, viewId: string) => {
+    const views = frameInstance.views || {}
+
+    frameInstance.removeBrowserView(views[viewId])
+
+    const webcontents = (views[viewId].webContents as any)
+    webcontents.destroy()
+
+    delete views[viewId]
   },
-  position: (frameInstance, viewId) => {
-    const viewInstance = frameInstance.views[viewId]
+  position: (frameInstance: FrameInstance, viewId: string) => {
+    const viewInstance = (frameInstance.views || {})[viewId]
     if (viewInstance) {
       const { width, height } = frameInstance.getBounds()
       viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
