@@ -1,4 +1,4 @@
-import tokenLoader from 'electron-log'
+import log from 'electron-log'
 import nebulaApi from '../../nebula'
 
 const nebula = nebulaApi('tokenWorker')
@@ -14,7 +14,7 @@ interface TokenSpec extends Token {
 }
 
 async function frameTokenList () {
-  tokenLoader.debug('loading tokens from tokens.frame.eth')
+  log.debug('loading tokens from tokens.frame.eth')
 
   try {
     // FIXME: put this back when ENS record is updated correctly
@@ -23,11 +23,11 @@ async function frameTokenList () {
 
     const tokens: TokenSpec[] = (await nebula.ipfs.getJson(tokenListPath)).tokens
 
-    tokenLoader.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
+    log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
 
     return tokens
   } catch (e) {
-    tokenLoader.warn('Could not load token list from tokens.frame.eth, using default list', e)
+    log.warn('Could not load token list from tokens.frame.eth, using default list', e)
   }
 
   return []
@@ -72,12 +72,12 @@ export default class TokenLoader {
   
     this.tokenList = mergeTokens(this.tokenList, updatedTokens)
   
-    tokenLoader.info(`updated token list to contain ${this.tokenList.length} tokens`)
+    log.info(`updated token list to contain ${this.tokenList.length} tokens`)
   }
 
   start () {
     this.loadTokenList()
-    this.loader = setInterval(this.loadTokenList, 1000 * 60 * 10)
+    this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
   }
   
   stop () {

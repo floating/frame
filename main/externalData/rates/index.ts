@@ -86,7 +86,7 @@ async function fetchRates<T> (fetch: (ids: string[], ...params: any) => Promise<
   return Object.assign({}, ...responses)
 }
 
-const fetchPrices = async (ids: string[]) => fetchRates(coingecko.coinPrices, ids)
+const fetchCoinPrices = async (ids: string[]) => fetchRates(coingecko.coinPrices, ids)
 const fetchTokenPrices = async (addresses: string[], platform: string) => fetchRates(coingecko.tokenPrices, addresses, [platform])
 
 async function loadRates (ids: string[], chainId: number) {
@@ -110,7 +110,7 @@ async function loadRates (ids: string[], chainId: number) {
   }, { contracts: [], symbols: {} } as any)
 
   try {
-    const symbolQuotes = await fetchPrices(Object.keys(lookupIds.symbols))
+    const symbolQuotes = await fetchCoinPrices(Object.keys(lookupIds.symbols))
     const tokenQuotes = await fetchTokenPrices(lookupIds.contracts, platforms[chainId] || 'ethereum')
 
     return Object.entries({ ...symbolQuotes, ...tokenQuotes }).reduce((rates, [lookupId, quote]) => {

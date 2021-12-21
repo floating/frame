@@ -66,7 +66,11 @@ function createWorker () {
     scanWorker.kill()
   }
 
-  scanWorker = fork(path.resolve(__dirname, 'worker.js'))
+  const workerArgs = process.env.NODE_ENV === 'development' ? ['--inspect=127.0.0.1:9230'] : []
+
+  scanWorker = fork(path.resolve(__dirname, 'worker.js'), workerArgs)
+
+  log.debug('created external data worker, pid:', scanWorker.pid)
 
   scanWorker.on('message', (message: WorkerMessage) => {
     if (process.env.LOG_WORKER) {
