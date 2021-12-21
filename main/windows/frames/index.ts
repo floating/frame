@@ -9,17 +9,14 @@ import viewInstances from './viewInstances'
 
 // Existing window instances for each frame
 
-interface MainFrames {
-  [id: string]: Frame
-}
 
-function getFrames (): MainFrames {
+function getFrames (): Record<string, Frame> {
   return store('main.frames')
 }
 
-export default (instances: { [id: string]: FrameInstance }) => {
+export default (instances: Record<string, FrameInstance>) => {
   // Create and destroy frames based on state
-  const manageFrames = (frames: MainFrames) => {
+  const manageFrames = (frames: Record<string, Frame>) => {
     const frameIds = Object.keys(frames)
     const instanceIds = Object.keys(instances)
   
@@ -35,7 +32,7 @@ export default (instances: { [id: string]: FrameInstance }) => {
   }
   
   // Create, destroy, show, hide views for each frame based on state
-  const manageViews = (frames: MainFrames) => {
+  const manageViews = (frames: Record<string, Frame>) => {
     const frameIds = Object.keys(frames)
   
     frameIds.forEach(frameId => {
