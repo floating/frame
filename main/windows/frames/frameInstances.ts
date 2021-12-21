@@ -8,11 +8,11 @@ import topRight from './topRight'
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string,
-  views?: { [id: string]: BrowserView }
+  views?: Record<string, BrowserView>
 }
 
 export default {
-  create: (instances: { [id: string]: FrameInstance }, frame: Frame) => {
+  create: (instances: Record<string, FrameInstance>, frame: Frame) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 160
     const maxWidth = Math.floor(height * (16/10))
@@ -68,7 +68,7 @@ export default {
     instances[frame.id] = frameInstance
     // if (dev) frameInstance.openDevTools({ mode: 'detach' })
   },
-  destroy: (instances: { [id: string]: FrameInstance }, frameId: string) => {
+  destroy: (instances: Record<string, FrameInstance>, frameId: string) => {
     instances[frameId].destroy()
     delete instances[frameId]
   }
