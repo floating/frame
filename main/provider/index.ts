@@ -388,8 +388,8 @@ class Provider extends EventEmitter {
   }
   
   private async getGasEstimate (rawTx: TransactionData, chainConfig: Common) {
-    const { chainId, ...rest } = rawTx
-    const txParams = chainConfig.isActivatedEIP(2930) ? rawTx : rest
+    const { from, to, value, data, nonce } = rawTx
+    const txParams = { from, to, value, data, nonce }
 
     const payload: JSONRPCRequestPayload = { method: 'eth_estimateGas', params: [txParams], jsonrpc: '2.0', id: 1 }
     const targetChain: Chain = {
@@ -399,7 +399,10 @@ class Provider extends EventEmitter {
 
     return new Promise<string>((resolve, reject) => {
       this.connection.send(payload, response => {
-        if (response.error) return reject(response.error)
+        if (response.error) {
+          log.warn(`error estimating gas for tx to ${txParams.to}: ${response.error}`)
+          return reject(response.error)
+        }
 
         log.debug(`gas estimate for tx to ${txParams.to}: ${response.result}`)
         return resolve(response.result)

@@ -20,7 +20,7 @@ class ChainConnection extends EventEmitter {
 
     // default chain config to istanbul hardfork until a block is received
     // to update it to london
-    this.chainConfig = chainConfig(parseInt(this.chainId, 'istanbul'))
+    this.chainConfig = chainConfig(parseInt(this.chainId), 'istanbul')
 
     this.primary = {
       status: 'off',

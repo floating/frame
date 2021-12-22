@@ -104,7 +104,7 @@ function maxFee (rawTx: TransactionData) {
 function populate (rawTx: TransactionData, chainConfig: Common, gas: any): TransactionData {
   const txData: TransactionData = { ...rawTx }
 
-  if (chainConfig.isActivatedEIP(1559)) {
+  if (chainConfig.isActivatedEIP(1559) && gas.price.fees) {
     txData.type = intToHex(2)
 
     const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
