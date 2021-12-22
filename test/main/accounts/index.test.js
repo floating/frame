@@ -11,12 +11,13 @@ jest.mock('../../../main/store/persist', () => ({
   queue: jest.fn()
 }))
 
-jest.mock('../../../main/nebula', () => jest.fn(() => ({
-  ens: {
-    lookupAddress: jest.fn()
-  }
-})))
-
+jest.mock('../../../main/nebula', () => ({
+  default: jest.fn(() => ({
+    ens: {
+      lookupAddress: jest.fn()
+    }
+  }))
+}))
 
 const log = require('electron-log')
 log.transports.console.level = false
