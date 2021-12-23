@@ -1,33 +1,31 @@
-const fs = require('fs')
-const path = require('path')
-const cheerio = require('cheerio')
+import cheerio from 'cheerio'
 
-const nebulaApi = require('../../../nebula').default
-
-const nebula = nebulaApi()
-
+import nebulaApi from '../../../nebula'
 import store from '../../../store'
+import getType from './getType'
+import { ServerResponse } from 'http'
 
-const storage = require('../storage')
+const nebula = nebulaApi('frame-dapps')
 
-const getType = require('./getType')
-
-const inject = fs.readFileSync(path.resolve(__dirname, '../../../../bundle/inject.js'), 'utf8')
-
-const error = (res, code, message) => {
+function error (res: ServerResponse, code: number, message: string) {
   res.writeHead(code || 404)
   res.end(message)
 }
 
-module.exports = {
-  stream: async (res, namehash, path) => { // Stream assets from IPFS back to the client
+function getCid (namehash: string): string {
+  return store(`main.dapps`, namehash, `content`)
+}
+
+export default {
+  stream: async (res: ServerResponse, namehash: string, path: string) => { // Stream assets from IPFS back to the client
     let file
-    const cid = store(`main.dapps`, namehash, `content`)
+
+    const cid = getCid(namehash)
 
     try {
       file = await nebula.ipfs.getFile(`${cid}${path}`)
       if (!file) throw new Error('Asset not found')
-    } catch (e) {
+    } catch (e: any) {
       // console.error('   ---   ' + e.message)
       error(res, 404, e.message)
     }
@@ -54,7 +52,7 @@ module.exports = {
     // })
     // stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
   },
-  dapp: async (res, namehash, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
+  dapp: async (res: ServerResponse, namehash: string) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
     const cid = store(`main.dapps`, namehash, `content`)
     const index = await nebula.ipfs.getFile(`${cid}/index.html`)

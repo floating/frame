@@ -526,7 +526,7 @@ module.exports = {
     u('dash.showing', () => true)
   },
   // Dapp Frame
-  appDapp: (u, dapp) => {
+  addDapp: (u, dapp) => {
     u('main.dapps', dapps => {
       if (dapps && !dapps[dapp.id]) {
         dapps[dapp.id] = dapp

@@ -16,7 +16,7 @@ const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store').default
-const dapps = require('./dapps')
+const dapps = require('./dapps').default
 
 // log.transports.file.level = 'info'
 
@@ -196,6 +196,12 @@ dapps.add({
 })
 dapps.add({
   ens: 'app.ens.eth',
+  config: {
+    key: 'value'
+  }
+})
+dapps.add({
+  ens: 'send.frame.eth',
   config: {
     key: 'value'
   }

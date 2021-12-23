@@ -70,3 +70,12 @@ interface Frame {
   currentView: string,
   views: { [id: string]: ViewMetadata }
 }
+
+interface Dapp {
+  id: string,
+  ens: string,
+  status: string,
+  config: string,
+  manifest: any,
+  current: any
+}

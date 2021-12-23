@@ -21,7 +21,8 @@ async function frameTokenList () {
     // const tokenListRecord = await nebula.resolve('tokens.frame.eth')
     // const tokens = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
 
-    const tokens: TokenSpec[] = (await nebula.ipfs.getJson(tokenListPath)).tokens
+    const tokenManifest: { tokens: TokenSpec[] } = await nebula.ipfs.getJson(tokenListPath)
+    const tokens = tokenManifest.tokens
 
     log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
 

@@ -1,12 +1,12 @@
-const http = require('http')
+import http from 'http'
+import { URL } from 'url'
 
-const sessions = require('./sessions')
-const asset = require('./asset')
-const { hash } = require('eth-ens-namehash')
-const ws = require('./ws')
+import sessions from './sessions'
+import asset from './asset'
+import { hash } from 'eth-ens-namehash'
 
 const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`)
+  const url = new URL(req.url || '', `http://${req.headers.host}`)
   const ens = url.hostname.replace('.localhost', '')
   const namehash = hash(ens)
   
@@ -29,4 +29,4 @@ const server = http.createServer((req, res) => {
 
 server.listen(8421, '127.0.0.1')
 
-module.exports = { sessions }
+export default { sessions }
