@@ -24,8 +24,6 @@ const windows = {}
 const frameManager = new FrameManager()
 let tray, trayReady
 
-frames(frameWindows)
-
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 
 // const hideShow = { current: false, running: false, next: false }
@@ -294,13 +292,6 @@ const api = {
       windows[id].send(channel, ...args)
     } else {
       log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
-    }
-  },
-  sendFrame: (id, channel, ...args) => {
-    if (frameWindows[id] && !frameWindows[id].isDestroyed() && frameWindows[id].send) {
-      frameWindows[id].send(channel, ...args)
-    } else {
-      log.error(new Error(`A frame with id "${id}" does not exist (windows.sendFrame)`))
     }
   },
   broadcast: (channel, ...args) => {
