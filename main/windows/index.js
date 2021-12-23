@@ -11,7 +11,7 @@ const store = require('../store').default
 
 const extractColors = require('./extractColors')
 
-import frames from './frames'
+import FrameManager from './frames'
 
 // const dapp = require('./dappOld')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
@@ -21,10 +21,8 @@ const fullheight = !!process.env.FULL_HEIGHT
 
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
-const frameWindows = {}
+const frameManager = new FrameManager()
 let tray, trayReady
-
-frames(frameWindows)
 
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
 
@@ -296,16 +294,10 @@ const api = {
       log.error(new Error(`A window with id "${id}" does not exist (windows.send)`))
     }
   },
-  sendFrame: (id, channel, ...args) => {
-    if (frameWindows[id] && !frameWindows[id].isDestroyed() && frameWindows[id].send) {
-      frameWindows[id].send(channel, ...args)
-    } else {
-      log.error(new Error(`A frame with id "${id}" does not exist (windows.sendFrame)`))
-    }
-  },
   broadcast: (channel, ...args) => {
     Object.keys(windows).forEach(id => api.send(id, channel, ...args))
-    Object.keys(frameWindows).forEach(id => api.sendFrame(id, channel, ...args))
+
+    frameManager.broadcast(channel, args)
   },
   minimize: (e) => {
     const id = winId(e)
@@ -474,6 +466,10 @@ app.on('web-contents-created', (e, contents) => {
   contents.on('new-window', e => e.preventDefault())
 })
 
+app.on('ready', () => {
+  frameManager.start()
+})
+
 if (dev) {
   const path = require('path')
   const watch = require('node-watch')
@@ -489,6 +485,7 @@ if (dev) {
       Object.keys(windows).forEach(win => {
         windows[win].reload()
       })
+
       Object.keys(frameWindows).forEach(win => {
         frameWindows[win].reload()
       })

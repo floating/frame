@@ -12,7 +12,7 @@ export interface FrameInstance extends BrowserWindow {
 }
 
 export default {
-  create: (instances: Record<string, FrameInstance>, frame: Frame) => {
+  create: (frame: Frame) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 160
     const maxWidth = Math.floor(height * (16/10))
@@ -44,10 +44,6 @@ export default {
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()
     })
-    
-    frameInstance.on('closed', () => { 
-      store.removeFrame(frame.id)
-    })
   
     frameInstance.frameId = frame.id
     frameInstance.views = {}
@@ -65,11 +61,7 @@ export default {
     //   setTimeout(() => relayerOverlay(windows[dappFrameId]), 10)
     // })
 
-    instances[frame.id] = frameInstance
+    return frameInstance
     // if (dev) frameInstance.openDevTools({ mode: 'detach' })
-  },
-  destroy: (instances: Record<string, FrameInstance>, frameId: string) => {
-    instances[frameId].destroy()
-    delete instances[frameId]
   }
 }
