@@ -18,25 +18,28 @@ function getCid (namehash: string): string {
 
 export default {
   stream: async (res: ServerResponse, namehash: string, path: string) => { // Stream assets from IPFS back to the client
-    let file
+    let found = false
 
     const cid = getCid(namehash)
 
     try {
-      file = await nebula.ipfs.getFile(`${cid}${path}`)
-      if (!file) throw new Error('Asset not found')
+      for await (const chunk of nebula.ipfs.cat(`${cid}${path}`)) {
+        if (!found) {
+          res.setHeader('content-type', getType(path))
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+          res.writeHead(200)
+
+          found = true
+        }
+
+        res.write(chunk)
+      }
+
+      res.end()
     } catch (e: any) {
       // console.error('   ---   ' + e.message)
       error(res, 404, e.message)
-    }
-
-    if (file) {
-      res.setHeader('content-type', getType(path))
-      res.setHeader('Access-Control-Allow-Origin', '*')
-      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-      res.writeHead(200)
-      res.write(file)
-      res.end()
     }
 
     // file.content.on('data', data => res.write(data))
