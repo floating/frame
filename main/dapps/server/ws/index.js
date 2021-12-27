@@ -6,7 +6,6 @@ const crypto = require('crypto')
 
 const storage = require('../storage')
 const sessions = require('../sessions')
-const resolve = require('../resolve')
 
 const connections = {}
 
@@ -50,7 +49,7 @@ module.exports = server => {
       // check for app server
     } else {
       const { app, session } = qs.parse(req.url.split('?')[1])
-      const hash = resolve.rootCid(app)
+      const hash = nebula.resolve.rootCid(app)
       if (sessions.verify(app, session) && req.headers.origin === 'http://localhost:8421') {
         s.id = uuid()
         connections[app] = connections[app] || []

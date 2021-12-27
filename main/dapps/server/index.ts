@@ -1,19 +1,22 @@
-const http = require('http')
+import http from 'http'
+import { URL } from 'url'
 
-const sessions = require('./sessions')
-const asset = require('./asset')
-const ws = require('./ws')
+import sessions from './sessions'
+import asset from './asset'
+import { hash } from 'eth-ens-namehash'
 
 const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`)
-  const app = url.hostname.replace('.localhost', '')
+  const url = new URL(req.url || '', `http://${req.headers.host}`)
+  const ens = url.hostname.replace('.localhost', '')
+  const namehash = hash(ens)
+  
   // check if dapp is added before progressing 
   // res.writeHead(403)
   // res.end('No dapp session, launch this dapp from Frame')
   if (url.pathname === '/') {
-    return asset.dapp(res, app)
+    return asset.dapp(res, namehash)
   } else {
-    return asset.stream(res, app, url.pathname)
+    return asset.stream(res, namehash, url.pathname)
   }
   // const [app, session] = (url.searchParams.get('dapp') || '').split(':')
   // if (app && session) {
@@ -24,6 +27,6 @@ const server = http.createServer((req, res) => {
   // }
 })
 
-ws(server).listen(8421, '127.0.0.1')
+server.listen(8421, '127.0.0.1')
 
-module.exports = { sessions }
+export default { sessions }

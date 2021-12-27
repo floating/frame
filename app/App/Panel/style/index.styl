@@ -348,6 +348,43 @@
         pointer-events none
 
 
+.launch
+  position absolute
+  bottom 0
+  left 0px
+  right 0
+  height 60px
+  background var(--ghostA)
+  z-index 4000000000
+  display flex
+  justify-content flex-start
+  box-shadow 0px 0px 10px var(--ghostY)
+
+  .launchTile
+    display flex
+    justify-content center
+    align-items center
+    padding 6px
+
+    .launchIcon
+      width 36px
+      height 36px
+      background var(--ghostC)
+      border-radius 18px
+      display flex
+      justify-content center
+      align-items center
+      cursor pointer
+      *
+        pointer-events none
+
+    .launchIcon:hover
+      background var(--ghostD)
+
+    .dashboradIcon
+      svg
+        transform rotate(-90deg)
+
 @import '../Main/style'
 @import '../Notify/style'
 @import '../Local/style'

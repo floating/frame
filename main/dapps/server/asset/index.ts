@@ -1,41 +1,46 @@
-const fs = require('fs')
-const path = require('path')
-const cheerio = require('cheerio')
+import cheerio from 'cheerio'
+import log from 'electron-log'
 
-const ipfs = require('../../../ipfs')
+import nebulaApi from '../../../nebula'
+import store from '../../../store'
+import getType from './getType'
+import { ServerResponse } from 'http'
 
-const resolve = require('../resolve')
-const storage = require('../storage')
+const nebula = nebulaApi('frame-dapps')
 
-const getType = require('./getType')
-
-const inject = fs.readFileSync(path.resolve(__dirname, '../../../../bundle/inject.js'), 'utf8')
-
-const error = (res, code, message) => {
+function error (res: ServerResponse, code: number, message: string) {
   res.writeHead(code || 404)
   res.end(message)
 }
 
-module.exports = {
-  stream: async (res, app, path) => { // Stream assets from IPFS back to the client
-    let file
-    const cid = await resolve.rootCid(app)
+function getCid (namehash: string): string {
+  return store(`main.dapps`, namehash, `content`)
+}
+
+export default {
+  stream: async (res: ServerResponse, namehash: string, path: string) => { // Stream assets from IPFS back to the client
+    let found = false
+
+    const cid = getCid(namehash)
 
     try {
-      file = await ipfs.getFile(`${cid}${path}`)
-      if (!file) throw new Error('Asset not found')
-    } catch (e) {
+      for await (const chunk of nebula.ipfs.cat(`${cid}${path}`)) {
+        if (!found) {
+          res.setHeader('content-type', getType(path))
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+          res.writeHead(200)
+
+          found = true
+        }
+
+        res.write(chunk)
+      }
+
+      res.end()
+    } catch (e: any) {
       // console.error('   ---   ' + e.message)
       error(res, 404, e.message)
-    }
-
-    if (file) {
-      res.setHeader('content-type', getType(path))
-      res.setHeader('Access-Control-Allow-Origin', '*')
-      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-      res.writeHead(200)
-      res.write(file.content)
-      res.end()
     }
 
     // file.content.on('data', data => res.write(data))
@@ -51,21 +56,21 @@ module.exports = {
     // })
     // stream.on('error', err => error(res, err.statusCode, `For security reasons, please launch this app from Frame\n\n(${err.message})`))
   },
-  dapp: async (res, app, session) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
+  dapp: async (res: ServerResponse, namehash: string) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
-    const cid = await resolve.rootCid(app)
-    const index = await ipfs.getFile(`${cid}/index.html`)
+    const cid = store(`main.dapps`, namehash, `content`)
+    const index = await nebula.ipfs.getFile(`${cid}/index.html`)
     // res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
     res.writeHead(200)
-    const $ = cheerio.load(index.content.toString('utf8'))
-    $('html').prepend(`
-      <script>
-        const initial = ${JSON.stringify(storage.get(cid) || {})}
-        ${inject}
-      </script>
-    `)
+    const $ = cheerio.load(index)
+    // $('html').prepend(`
+    //   <script>
+    //     // const initial = ${JSON.stringify(storage.get(cid) || {})}
+    //     ${inject}
+    //   </script>
+    // `)
     res.end($.html())
   }
 }

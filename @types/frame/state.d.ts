@@ -57,3 +57,25 @@ interface Token {
   decimals: number,
   logoURI?: string
 }
+
+interface ViewMetadata {
+  id: string,
+  ready: boolean,
+  dappId: string,
+  url: string
+}
+
+interface Frame {
+  id: string,
+  currentView: string,
+  views: { [id: string]: ViewMetadata }
+}
+
+interface Dapp {
+  id: string,
+  ens: string,
+  status: string,
+  config: string,
+  manifest: any,
+  current: any
+}

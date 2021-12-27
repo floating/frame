@@ -5,7 +5,6 @@ const electron = process.versions.electron
 // @ts-ignore
 delete process.versions.electron
 
-// @ts-ignore
 import nebula from 'nebula'
 
 // @ts-ignore
