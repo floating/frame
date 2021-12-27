@@ -1,17 +1,16 @@
-const sessions = {}
+const sessions: Record<string, string[]> = {}
+const timers: Record<string, NodeJS.Timeout> = {}
 
-const timers = {}
-
-module.exports = {
-  add: (app, session) => {
+export default {
+  add: (app: string, session: string) => {
     sessions[app] = sessions[app] || []
     sessions[app].push(session)
   },
-  verify: (app, session) => {
+  verify: (app: string, session: string) => {
     clearTimeout(timers[session])
     return sessions[app] && sessions[app].indexOf(session) > -1
   },
-  remove: (app, session) => {
+  remove: (app: string, session: string) => {
     sessions[app].splice(sessions[app].indexOf(session), 1)
     if (sessions[app].length === 0) delete sessions[app]
   }

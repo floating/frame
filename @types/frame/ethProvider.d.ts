@@ -13,6 +13,8 @@ declare module 'eth-provider' {
 
   interface EthereumProvider extends NodeJS.EventEmitter {
     constructor()
+
+    connected: boolean
     request(payload: RequestPayload)
     setChain(chainId: string)
   }

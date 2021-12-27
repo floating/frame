@@ -90,7 +90,7 @@ const surface = {
     // return error
 
     // If ens name has not been installed, start install
-    store.addDapp({ id, ens, status, config, manifest: {}, current: {} })
+    store.appDapp({ id, ens, status, config, manifest: {}, current: {} })
   },
   addServerSession (namehash: string /* , session */) {
     // server.sessions.add(namehash, session)
@@ -101,7 +101,6 @@ const surface = {
   open (frameId: string, ens: string) {
     const session = crypto.randomBytes(6).toString('hex')
     const dappId = hash(ens)
-    server.sessions.add(dappId, session)
     const url = `http://${ens}.localhost:8421/?session=${session}`
     const view = {
       id: getId(),
@@ -109,6 +108,9 @@ const surface = {
       dappId,
       url
     }
+
+    server.sessions.add(dappId, session)
+
     store.addFrameView(frameId, view)
   }
 }
