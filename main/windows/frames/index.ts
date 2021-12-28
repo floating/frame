@@ -16,15 +16,17 @@ export default class FrameManager {
 
   start () {
     store.observer(() => {
+      const inFocus = store('main.focusedFrame')
+
       const frames = getFrames()
 
-      this.manageFrames(frames)
+      this.manageFrames(frames, inFocus)
       this.manageViews(frames)
       // manageOverlays(frames)
     })
   }
 
-  manageFrames (frames: Record<string, Frame>) {
+  manageFrames (frames: Record<string, Frame>, inFocus: string) {
     const frameIds = Object.keys(frames)
     const instanceIds = Object.keys(this.frameInstances)
   
@@ -52,6 +54,14 @@ export default class FrameManager {
           frameInstance.destroy()
         }
       })
+
+    if (inFocus) {
+      const focusedFrame = this.frameInstances[inFocus] || { isFocused: () => true }
+
+      if (!focusedFrame.isFocused()) {
+        focusedFrame.show()
+      }
+    }
   }
 
   manageViews (frames: Record<string, Frame>) {
@@ -101,7 +111,7 @@ export default class FrameManager {
     return frameInstance
   }
 
-  sendMessageToFrame (frameId: string, channel: string, ...args: any) {
+  private sendMessageToFrame (frameId: string, channel: string, ...args: any) {
     const frameInstance = this.frameInstances[frameId]
 
     if (frameInstance && !frameInstance.isDestroyed()) {

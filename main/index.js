@@ -217,22 +217,18 @@ ipcMain.on('unsetCurrentView', async (e, ens) => {
   dapps.unsetCurrentView(win.frameId)
 })
 
-let nextId = 0
+ipcMain.on('*:addFrame', (e, id) => {
+  const existingFrame = store('main.frames', id)
 
-ipcMain.on('*:addFrame', (e, newInstance) => {
-  console.log('addFrame, newInstance', newInstance)
-  if (newInstance) {
-    const frame = {
-      id: (++nextId).toString(),
+  if (existingFrame) {
+    store.focusFrame(id)
+  } else {
+    store.addFrame({
+      id,
       currentView: '',
       views: {}
-    }
-    store.addFrame(frame)
-  } else {
-    console.log('focus existing')
-    // focus last used instance
+    })
   }
-  
 })
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()

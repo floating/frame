@@ -551,6 +551,9 @@ module.exports = {
       return frames
     })
   },
+  focusFrame: (u, frameId) => {
+    u('main.focusedFrame', () => frameId)
+  },
   addFrameView: (u, frameId, view) => {
     if (frameId && view) {
       u('main.frames', frameId, frame => {
