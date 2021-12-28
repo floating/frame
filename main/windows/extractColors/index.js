@@ -38,7 +38,8 @@ const pixelColor = image => {
       const selectedColor = mode(colors)
       const colorArray = selectedColor.split(', ')
       const color = {
-        background: `rgb(${selectedColor})`,
+        background: `rgb(${colorArray.join(', ')})`, 
+        backgroundShade: `rgb(${colorArray.map(v => Math.max(v - 2, 0)).join(', ')})`,
         text: textColor(...colorArray)
       }
       resolve(color)

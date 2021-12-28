@@ -141,7 +141,10 @@ class Panel extends React.Component {
           }}>
             <div className='launchIcon'>
               <div className='dashboradIcon'>
-                {svg.window(16)}
+                {svg.send(11)}
+              </div>
+              <div>
+                {'Send'}
               </div>
             </div>
           </div>

@@ -28,7 +28,7 @@ body
       bottom 0 
       left 0
       background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
-      z-index 9999999999999999
+      z-index 999
       pointer-events none
 
     .backdrop
@@ -60,6 +60,7 @@ body
       padding-left 2px
       -webkit-user-select none
       -webkit-app-region drag
+      display none
 
       .accountTile
         position absolute
@@ -111,17 +112,28 @@ body
     .main
       position absolute
       top 0
-      left 72px
+      left 0px
       bottom 0
       right 0
-      border-left 1px solid var(--ghostX)
+      // border-left 1px solid var(--ghostX)
       color var(--outerspace)
       display flex
       justify-content center
       align-items center
       -webkit-user-select none
       -webkit-app-region drag
-      overflow-y scroll
+      // overflow-y scroll
+      z-index 9999
+
+      .mainDappBackgroundTop
+        position absolute
+        top 0
+        left 0
+        right 0
+        height 32px
+        -webkit-user-select none
+        -webkit-app-region drag
+        z-index 2
 
       .mainDappBackground
         position absolute
@@ -131,12 +143,13 @@ body
         right 0
         -webkit-user-select none
         -webkit-app-region drag
+        z-index 1
       
       .mainApps
         width 600px
         height 300px
         border-radius 16px
-        border 1px solid var(--ghostY)
+        // border 1px solid var(--ghostY)
         background var(--ghostY)
 
     .top

@@ -60,6 +60,7 @@ export default class FrameManager {
 
       if (!focusedFrame.isFocused()) {
         focusedFrame.show()
+        focusedFrame.focus()
       }
     }
   }
@@ -92,6 +93,7 @@ export default class FrameManager {
         if (frame.currentView === frameViewId && viewData.ready) {
           frameInstance.addBrowserView(viewInstance)
           viewInstances.position(frameInstance, frameViewId)
+          viewInstance.webContents.focus()
         } else {
           frameInstance.removeBrowserView(viewInstance)
         }
@@ -124,6 +126,12 @@ export default class FrameManager {
 
   broadcast (channel: string, args: any[]) {
     Object.keys(this.frameInstances).forEach(id => this.sendMessageToFrame(id, channel, ...args))
+  }
+
+  reloadFrames () {
+    Object.keys(this.frameInstances).forEach(win => {
+      this.frameInstances[win].webContents.reload()
+    })
   }
 }
 

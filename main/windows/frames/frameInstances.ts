@@ -61,7 +61,8 @@ export default {
     //   setTimeout(() => relayerOverlay(windows[dappFrameId]), 10)
     // })
 
+    // frameInstance.webContents.openDevTools({ mode: 'detach' })
+
     return frameInstance
-    // if (dev) frameInstance.openDevTools({ mode: 'detach' })
   }
 }

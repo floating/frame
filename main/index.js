@@ -228,6 +228,7 @@ ipcMain.on('*:addFrame', (e, id) => {
       currentView: '',
       views: {}
     })
+    dapps.open(id, 'send.frame.eth')
   }
 })
 
