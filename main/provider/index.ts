@@ -815,7 +815,7 @@ class Provider extends EventEmitter {
 
     const { nativeCurrency: nativeCurrencyBalances, erc20: erc20Balances } = loadAssets(currentAccount.id)
 
-    // temporarily load the last known price for native currencies
+    // temporarily load the last known price
     const nativeCurrency = nativeCurrencyBalances.map(balance => {
       const { usd } = getNativeCurrency(balance.chainId)
 
