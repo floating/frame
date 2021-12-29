@@ -5,6 +5,7 @@ import log from 'electron-log'
 import utils from 'web3-utils'
 import ethSignature, { Version } from 'eth-sig-util'
 import crypto from 'crypto'
+import BigNumber from 'bignumber.js'
 import Common from '@ethereumjs/common'
 
 import {
@@ -44,6 +45,12 @@ interface ChainDefinition {
   id: number,
   name: string,
   on: boolean
+}
+
+function getNativeCurrency (chainId: number) {
+  const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
+
+  return (currency || { usd: { price: new BigNumber(0) } }) as Currency
 }
 
 function loadAssets (accountId: string) {
@@ -800,7 +807,17 @@ class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
-    const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
+    const { nativeCurrency: nativeCurrencyBalances, erc20 } = loadAssets(currentAccount.id)
+
+    // temporarily load the last known price for native currencies
+    const nativeCurrency = nativeCurrencyBalances.map(balance => {
+      const { usd } = getNativeCurrency(balance.chainId)
+
+      return {
+        ...balance,
+        lastKnownPrice: { usd }
+      }
+    })
 
     const { id, jsonrpc } = payload
     cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
