@@ -50,21 +50,17 @@ class App extends React.Component {
           </div>
         </div>
         <div className='main'>
+          <div className='mainTop' />
           {currentDapp ? (
-            <div className='mainDappBackground' style={{
-              background: currentDapp.colors ? currentDapp.colors.background : 'none'
-            }}/>
-          ) : (
-            <div className='mainApps'>
-              {Object.keys(store('main.dapps')).map(id => {
-                return (
-                  <pre>
-                    {JSON.stringify(store('main.dapps', id), null, 4)}
-                  </pre>
-                )
-              })}
-            </div>
-          )}
+            <>
+              <div className='mainDappBackgroundTop' style={{
+                background: currentDapp.colors ? currentDapp.colors.background : 'none'
+              }}/>
+              <div className='mainDappBackground' style={{
+                background: currentDapp.colors ? currentDapp.colors.background : 'none'
+              }}/>
+            </>
+          ) : null}
         </div>
       </div>
     )
@@ -72,3 +68,13 @@ class App extends React.Component {
 }
 
 export default Restore.connect(App)
+
+// <div className='mainApps'>
+//   {Object.keys(store('main.dapps')).map(id => {
+//     return (
+//       <pre>
+//         {JSON.stringify(store('main.dapps', id), null, 4)}
+//       </pre>
+//     )
+//   })}
+// </div>

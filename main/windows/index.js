@@ -486,9 +486,7 @@ if (dev) {
         windows[win].reload()
       })
 
-      Object.keys(frameWindows).forEach(win => {
-        frameWindows[win].reload()
-      })
+      frameManager.reloadFrames()
     })
   })
 }
