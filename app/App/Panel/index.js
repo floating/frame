@@ -53,15 +53,6 @@ class Panel extends React.Component {
   //   })
   // }
 
-  // glitch (el) {
-  //   return (
-  //     <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
-  //       {[...Array(10).keys()].map(i => <div key={i + 'hg'} className='line'>{el}</div>)}
-  //       {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null }
-  //     </div>
-  //   )
-  // }
-
   selectNetwork (network) {
     const [type, id] = network.split(':')
     if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
@@ -150,43 +141,6 @@ class Panel extends React.Component {
         <Networks />
         <Main />
         <Badge />
-        {/* <div className='launch'>
-          <div 
-            className='launchButton'
-            onClick={() => {
-              link.send('*:addFrame', 'dappLauncher')
-            }}
-            onMouseEnter={() => this.setState({ glitchOn: true })}
-            onMouseOver={() => this.setState({ glitchOn: true })}
-            onMouseLeave={() => this.setState({ glitchOn: false })}
-          >
-            {this.glitch(<div className='launchButtonInner'>
-              <div className='dashboradIcon'>
-                {svg.send(13)}
-              </div>
-              <div>
-                {'Send'}
-              </div>
-            </div>)}
-          </div>
-        </div> */}
-        {/* <div className='appMenu'>
-          <div className='appMenuItem'>
-            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleFlow')}>
-              {svg.cpu(18)}
-            </div>
-          </div>
-          <div className='appMenuItem'>
-            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleDash', 'signers')}>
-              {svg.inventory(18)}
-            </div>
-          </div>
-          <div className='appMenuItem'>
-            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleDash', 'networks')}>
-              {svg.save(18)}
-            </div>
-          </div>
-        </div> */}
       </div>
     )
   }

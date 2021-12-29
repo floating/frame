@@ -59,6 +59,7 @@ class Launcher extends React.Component {
           <div 
             className='dappTile launchButton'
             onClick={() => {
+              this.setState({ glitchOn: false })
               link.send('*:addFrame', 'dappLauncher')
             }}
             onMouseEnter={() => this.setState({ glitchOn: true })}
