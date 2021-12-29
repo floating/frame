@@ -53,6 +53,12 @@ function getNativeCurrency (chainId: number) {
   return (currency || { usd: { price: new BigNumber(0) } }) as Currency
 }
 
+function getRate (address: Address) {
+  const rate = store('main.rates', address.toLowerCase())
+
+  return (rate || { usd: { price: new BigNumber(0) } }) as Rate
+}
+
 function loadAssets (accountId: string) {
   const balances: Balance[] = store('main.balances', accountId) || []
 
@@ -807,11 +813,20 @@ class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
-    const { nativeCurrency: nativeCurrencyBalances, erc20 } = loadAssets(currentAccount.id)
+    const { nativeCurrency: nativeCurrencyBalances, erc20: erc20Balances } = loadAssets(currentAccount.id)
 
     // temporarily load the last known price for native currencies
     const nativeCurrency = nativeCurrencyBalances.map(balance => {
       const { usd } = getNativeCurrency(balance.chainId)
+
+      return {
+        ...balance,
+        lastKnownPrice: { usd }
+      }
+    })
+
+    const erc20 = erc20Balances.map(balance => {
+      const { usd } = getRate(balance.address)
 
       return {
         ...balance,
