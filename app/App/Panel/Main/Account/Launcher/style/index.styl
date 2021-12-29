@@ -5,8 +5,11 @@
 .launcherTiles
   display inline-flex
   position relative
-  padding-right 6px
-  margin-top 5px
+  margin 5px 0px 0px 0px
+  background var(--ghostY)
+  width 100%
+  box-sizing border-box
+  border-radius 12px
 
 .launchButton
   background var(--ghostB)
@@ -20,7 +23,6 @@
   position relative
   box-sizing border-box
   padding-bottom 10px
-  border-radius 12px
   
   .launchButtonInner
     display flex
@@ -40,16 +42,16 @@
   margin-right 8px
 
 .dappTile
-  height 36px
+  height 32px
   width 88px
   display flex
   justify-content center
   align-items center
   cursor pointer
   box-sizing border-box
-  border-radius 8px
-  background var(--ghostA)
-  margin 0px 5px 0px 0px
+  border-radius 10px
+  background var(--ghostZ)
+  margin 3px 8px 3px 3px
   color var(--outerspace08)
   padding 5px
   // border-right 1px solid var(--ghostA)
@@ -65,5 +67,5 @@
     height 100%
 
 .dappTile:hover
-  background var(--ghostB)
+  background var(--ghostA)
 

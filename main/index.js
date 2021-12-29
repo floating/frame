@@ -189,18 +189,6 @@ ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
 
 dapps.add({
-  ens: 'uniswap.eth',
-  config: {
-    key: 'value'
-  }
-})
-dapps.add({
-  ens: 'app.ens.eth',
-  config: {
-    key: 'value'
-  }
-})
-dapps.add({
   ens: 'send.frame.eth',
   config: {
     key: 'value'

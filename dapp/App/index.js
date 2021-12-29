@@ -54,7 +54,7 @@ class App extends React.Component {
           {currentDapp ? (
             <>
               <div className='mainDappBackgroundTop' style={{
-                background: currentDapp.colors ? currentDapp.colors.backgroundShade : 'none'
+                background: currentDapp.colors ? currentDapp.colors.background : 'none'
               }}/>
               <div className='mainDappBackground' style={{
                 background: currentDapp.colors ? currentDapp.colors.background : 'none'
