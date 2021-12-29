@@ -16,6 +16,12 @@ import Dropdown from '../Components/Dropdown'
 // <DevTools />
 
 class Panel extends React.Component {
+
+  // constructor (...args) {
+  //   super(...args)
+  //   this.state = {}
+  // }
+
   indicator (connection) {
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
@@ -45,6 +51,15 @@ class Panel extends React.Component {
   //     }
   //     // const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
   //   })
+  // }
+
+  // glitch (el) {
+  //   return (
+  //     <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
+  //       {[...Array(10).keys()].map(i => <div key={i + 'hg'} className='line'>{el}</div>)}
+  //       {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null }
+  //     </div>
+  //   )
   // }
 
   selectNetwork (network) {
@@ -135,20 +150,26 @@ class Panel extends React.Component {
         <Networks />
         <Main />
         <Badge />
-        <div className='launch'>
-          <div className='launchTile' onMouseDown={() => {
-            link.send('*:addFrame', 'dappLauncher')
-          }}>
-            <div className='launchIcon'>
+        {/* <div className='launch'>
+          <div 
+            className='launchButton'
+            onClick={() => {
+              link.send('*:addFrame', 'dappLauncher')
+            }}
+            onMouseEnter={() => this.setState({ glitchOn: true })}
+            onMouseOver={() => this.setState({ glitchOn: true })}
+            onMouseLeave={() => this.setState({ glitchOn: false })}
+          >
+            {this.glitch(<div className='launchButtonInner'>
               <div className='dashboradIcon'>
-                {svg.send(11)}
+                {svg.send(13)}
               </div>
               <div>
                 {'Send'}
               </div>
-            </div>
+            </div>)}
           </div>
-        </div>
+        </div> */}
         {/* <div className='appMenu'>
           <div className='appMenuItem'>
             <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleFlow')}>

@@ -44,22 +44,47 @@ class Launcher extends React.Component {
     link.send('tray:action', 'updateAccountModule', this.props.moduleId, { height: 0 })
     document.removeEventListener('keydown', this.h.bind(this))
   }
+  glitch (el) {
+    return (
+      <div className={this.state.glitchOn ? 'glitch glitchOn' : 'glitch'}>
+        {[...Array(10).keys()].map(i => <div key={i + 'hg'} className='line'>{el}</div>)}
+        {!this.state.glitchOn ? <div className='line lastLine'>{el}</div> : null }
+      </div>
+    )
+  }
   render () {
     return (
       <div ref={this.moduleRef} className='launcher'>
-        {this.state.l ? (
-          <div className='launcherTiles'>
-            <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'uniswap.eth') }>
-              <img src={uniswap} />
-            </div>
-            <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', '1inch.eth') }>
-              <img src={oneInch} />
-            </div>
-            <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'sushi.frame.eth')}>
-              <img src={sushi} />
-            </div>
+        <div className='launcherTiles'>
+          <div 
+            className='dappTile launchButton'
+            onClick={() => {
+              link.send('*:addFrame', 'dappLauncher')
+            }}
+            onMouseEnter={() => this.setState({ glitchOn: true })}
+            onMouseOver={() => this.setState({ glitchOn: true })}
+            onMouseLeave={() => this.setState({ glitchOn: false })}
+          >
+            {this.glitch(<div className='launchButtonInner'>
+              <div className='dashboradIcon'>
+                {svg.send(13)}
+              </div>
+              <div>
+                {'Send'}
+              </div>
+            </div>)}
           </div>
-        ) : null}
+          {/* 
+          <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'uniswap.eth') }>
+            <img src={uniswap} />
+          </div>
+          <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', '1inch.eth') }>
+            <img src={oneInch} />
+          </div>
+          <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'sushi.frame.eth')}>
+            <img src={sushi} />
+          </div> */}
+        </div>
       </div>
     )
   }

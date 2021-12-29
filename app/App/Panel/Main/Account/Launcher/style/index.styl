@@ -8,9 +8,40 @@
   padding-right 6px
   margin-top 5px
 
+.launchButton
+  background var(--ghostB)
+  text-transform uppercase
+  font-size 12px
+  font-weight 500
+  letter-spacing 2px
+  width 90px
+  height 40px
+  cursor pointer
+  position relative
+  box-sizing border-box
+  padding-bottom 10px
+  border-radius 12px
+  
+  .launchButtonInner
+    display flex
+    justify-content center
+    align-items center
+    cursor pointer
+    position relative
+
+  *
+    pointer-events none
+
+.launchButton:hover
+  background var(--ghostC)
+
+.dashboradIcon
+  margin-top 0px
+  margin-right 8px
+
 .dappTile
-  height 42px
-  width 68px
+  height 36px
+  width 88px
   display flex
   justify-content center
   align-items center

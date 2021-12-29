@@ -347,46 +347,54 @@
       *
         pointer-events none
 
+// .launch
+//   position absolute
+//   bottom 0
+//   left 0px
+//   right 0
+//   height 40px
+//   background var(--ghostA)
+//   z-index 4000000000
+//   display flex
+//   justify-content center
+//   align-items center
+//   //padding 10px
+//   box-sizing border-box
+//   box-shadow 0px 0px 10px var(--ghostY)
+//   border-top-left-radius 12px
+//   border-top-right-radius 12px
+//   overflow hidden
 
-.launch
-  position absolute
-  bottom 0
-  left 0px
-  right 0
-  height 60px
-  background var(--ghostA)
-  z-index 4000000000
-  display flex
-  justify-content center
-  box-shadow 0px 0px 10px var(--ghostY)
+//   .launchButton
+//     background var(--ghostB)
+//     text-transform uppercase
+//     font-size 12px
+//     font-weight 500
+//     letter-spacing 2px
+//     width 90px
+//     height 40px
+//     cursor pointer
+//     position relative
+//     box-sizing border-box
+//     padding-bottom 10px
+//     border-radius 12px
+    
+//     .launchButtonInner
+//       display flex
+//       justify-content center
+//       align-items center
+//       cursor pointer
+//       position relative
 
-  .launchTile
-    display flex
-    justify-content center
-    align-items center
-    padding 7px 7px 11px 7px
-    text-transform uppercase
-    font-size 11px
-    font-weight 500
-    letter-spacing 1px
+//     *
+//       pointer-events none
 
-    .launchIcon
-      background var(--ghostC)
-      border-radius 12px
-      display flex
-      justify-content center
-      align-items center
-      cursor pointer
-      padding 6px 12px 6px 12px
-      *
-        pointer-events none
+//   .launchButton:hover
+//     background var(--ghostC)
 
-    .launchIcon:hover
-      background var(--ghostD)
-
-    .dashboradIcon
-      margin-top 2px
-      margin-right 6px
+//   .dashboradIcon
+//     margin-top 0px
+//     margin-right 8px
 
 @import '../Main/style'
 @import '../Notify/style'
