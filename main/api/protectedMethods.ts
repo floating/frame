@@ -11,5 +11,6 @@ export default [
   'eth_signTypedData_v3',
   'eth_signTypedData_v4',
   'wallet_addEthereumChain',
-  'wallet_switchEthereumChain'
+  'wallet_switchEthereumChain',
+  'wallet_getAssets'
 ]

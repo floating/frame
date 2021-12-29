@@ -49,6 +49,22 @@ interface Balance {
   displayBalance: string
 }
 
+interface Rate {
+  usd: {
+    price: BigNumber,
+    change24hr: BigNumber
+  }
+}
+
+interface Currency {
+  icon: string,
+  name: string,
+  usd: {
+    price: number,
+    change24hr: number
+  }
+}
+
 interface Token {
   chainId: number,
   name: string,

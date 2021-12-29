@@ -5,13 +5,6 @@ import coingecko, { CoinId, PlatformId } from '../coingecko'
 
 const FETCH_BATCH_SIZE = 200
 
-export interface Rate {
-  usd: {
-    price: BigNumber,
-    change24hr: BigNumber
-  }
-}
-
 // { symbol: coinId }
 let allCoins: { [symbol: string]: CoinId }
 
