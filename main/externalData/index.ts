@@ -5,8 +5,6 @@ import { ChildProcess, fork } from 'child_process'
 import store from '../store'
 import { groupByChain } from './balances/reducers'
 import { CurrencyBalance, TokenBalance } from './balances'
-import { CoinData } from './staticData'
-import { Rate } from './rates'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
@@ -28,7 +26,7 @@ interface WorkerError {
 
 interface CurrencyDataMessage extends Omit<WorkerMessage, 'type'> {
   type: 'nativeCurrencyData',
-  currencyData: CoinData
+  currencyData: Record<string, Currency>
 }
 
 interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
