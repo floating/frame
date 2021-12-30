@@ -15,7 +15,7 @@ export default {
   create: (frame: Frame) => {
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     const height = area.height - 160
-    const maxWidth = Math.floor(height * (16/10))
+    const maxWidth = height // Math.floor(height * (16/10))
     const targetWidth = area.width - 460
     const width = targetWidth > maxWidth ? maxWidth : targetWidth
   
