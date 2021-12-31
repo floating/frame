@@ -43,7 +43,7 @@ interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
 
 interface RatesMessage extends Omit<WorkerMessage, 'type'> {
   type: 'rates',
-  rates: { [key: string]: Rate }
+  rates: Record<string, Rate>
 }
 
 const storeApi = {
