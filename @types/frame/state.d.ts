@@ -1,7 +1,8 @@
 interface Network {
   id: number,
   name: string,
-  symbol: string
+  symbol: string,
+  on: boolean
 }
 
 interface NetworkMetadata {
