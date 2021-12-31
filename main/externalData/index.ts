@@ -81,16 +81,19 @@ function createWorker () {
 
     if (message.type === 'nativeCurrencyData') {
       const { currencyData } = (message as CurrencyDataMessage)
+      const networks = storeApi.getNetworks()
 
       for (const symbol in currencyData) {
         const dataForSymbol = currencyData[symbol]
-        const networkIds = storeApi.getNetworks()
-          .filter(network => network.symbol.toLowerCase() === symbol)
-          .map(network => network.id)
+        const networksForSymbol = networks.filter(network => network.symbol.toLowerCase() === symbol)
 
-        networkIds.forEach(networkId => {
-          const existingData = storeApi.getNetworkMetadata(networkId).nativeCurrency
-          store.setNativeCurrency('ethereum', networkId, { ...existingData, ...dataForSymbol })
+        networksForSymbol.forEach(network => {
+          const networkData = network.layer === 'testnet'
+            // native currencies on testnets have no value
+            ? { ...dataForSymbol, usd: { price: 0, change24hr: 0 } }
+            : dataForSymbol
+
+          store.setNativeCurrency('ethereum', network.id, networkData)
         })
       }
     }
