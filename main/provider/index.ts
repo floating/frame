@@ -41,12 +41,6 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 type Subscriptions = { [key in SubscriptionType]: string[] }
 type Balance = Token & { balance: string, displayBalance: string }
 
-interface ChainDefinition {
-  id: number,
-  name: string,
-  on: boolean
-}
-
 function getNativeCurrency (chainId: number) {
   const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
 
@@ -912,7 +906,7 @@ class Provider extends EventEmitter {
 const provider = new Provider()
 
 function getActiveChains () {
-  const chains: { [id: string]: ChainDefinition } = store('main.networks.ethereum') || {}
+  const chains: Record<string, Network> = store('main.networks.ethereum') || {}
 
   return Object.values(chains)
     .filter(chain => chain.on)

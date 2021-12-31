@@ -48,7 +48,7 @@ interface RatesMessage extends Omit<WorkerMessage, 'type'> {
 
 const storeApi = {
   getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
-  getNetworks: () => store('main.networks.ethereum') as Network[],
+  getNetworks: () => (Object.values(store('main.networks.ethereum') || {})) as Network[],
   getNetworkMetadata: (id: number) => store('main.networksMeta.ethereum', id) as NetworkMetadata,
   getNetworksMetadata: () => store('main.networksMeta.ethereum') as NetworkMetadata[],
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
@@ -84,9 +84,9 @@ function createWorker () {
 
       for (const symbol in currencyData) {
         const dataForSymbol = currencyData[symbol]
-        const networkIds = Object.entries(storeApi.getNetworks())
-          .filter(([networkId, network]) => network.symbol.toLowerCase() === symbol)
-          .map(([networkId, network]) => parseInt(networkId))
+        const networkIds = storeApi.getNetworks()
+          .filter(network => network.symbol.toLowerCase() === symbol)
+          .map(network => network.id)
 
         networkIds.forEach(networkId => {
           const existingData = storeApi.getNetworkMetadata(networkId).nativeCurrency
@@ -201,7 +201,7 @@ function scanNetworkCurrencyRates () {
 
   nativeCurrencyScan = startScan(() => {
     const networks = storeApi.getNetworks()
-    const networkCurrencies = [...new Set(Object.values(networks).map(n => n.symbol.toLowerCase()))]
+    const networkCurrencies = [...new Set(networks.map(n => n.symbol.toLowerCase()))]
 
     updateNativeCurrencyData(networkCurrencies)
   }, 1000 * 15)
@@ -232,12 +232,13 @@ const updateRates = (symbols: string[], chainId: number) => sendCommandToWorker(
 const updateNativeCurrencyData = (symbols: string[]) => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
   if (activeAddress) {
+    const activeNetworkIds = storeApi.getNetworks().filter(network => network.on).map(network => network.id)
     const customTokens = storeApi.getCustomTokens()
     const knownTokens = storeApi.getKnownTokens(activeAddress).filter(
       token => !customTokens.some(t => t.address === token.address && t.chainId === token.chainId)
     )
 
-    const trackedTokens = [...customTokens, ...knownTokens]
+    const trackedTokens = [...customTokens, ...knownTokens].filter(t => activeNetworkIds.includes(t.chainId))
 
     sendCommandToWorker('updateChainBalance', [activeAddress])
     sendCommandToWorker('fetchTokenBalances', [activeAddress, trackedTokens])
