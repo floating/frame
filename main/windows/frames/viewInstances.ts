@@ -12,16 +12,27 @@ import server from '../../dapps/server'
 export default {
   // Create a view instance on a frame
   create: (frameInstance: FrameInstance, view: ViewMetadata) => {
-    const viewInstance = new BrowserView({ webPreferences: Object.assign({ preload: path.resolve('./main/windows/frames/viewPreload.js') }, webPreferences) })
+    const viewInstance = new BrowserView({ 
+      webPreferences: Object.assign({ 
+        preload: path.resolve('./main/windows/frames/viewPreload.js') ,
+        partition: 'persist:' + view.ens
+      }, webPreferences)
+    })
   
     viewInstance.webContents.on('will-navigate', e => e.preventDefault())
     viewInstance.webContents.on('will-attach-webview', e => e.preventDefault())
     viewInstance.webContents.on('new-window', e => e.preventDefault())
 
     viewInstance.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
-      if (!details || !details.frame) return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+      if (!details || !details.frame) return cb({ cancel: true }) // Reject the request
+
+      // Initial request for app
+      if (details.resourceType === 'mainFrame' && details.url === view.url) {
+        return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+      }
+
       const currentURL = details.frame.url
-      if (currentURL !== view.url) return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+      if (currentURL !== view.url) return cb({ cancel: true }) // Reject the request
 
       // Parse the requesting url to get ens name and session
       const url = new URL(currentURL)
@@ -29,7 +40,7 @@ export default {
       const ens = url.hostname.replace('.localhost', '')
 
       // Check that parsed ens name is the same as the ens name used to create this view
-      if (!ens || !session || ens !== view.ens)  return cb({ cancel: true }) // Reject the request
+      if (!ens || !session || ens !== view.ens) return cb({ cancel: true }) // Reject the request
 
       // Check that the parsed ens name has a valid session
       if (!server.sessions.verify(ens, session)) return cb({ cancel: true }) // Reject the request
