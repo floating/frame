@@ -23,8 +23,6 @@ export default {
       const currentURL = details.frame.url
       if (currentURL !== view.url) return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
 
-      console.log('Request origin matches view.url')
-
       // Parse the requesting url to get ens name and session
       const url = new URL(currentURL)
       const session = url.searchParams.get('session')
