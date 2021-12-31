@@ -9,6 +9,8 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
   const ens = url.hostname.replace('.localhost', '')
   const namehash = hash(ens)
+
+  // enforce session here too
   
   // check if dapp is added before progressing 
   // res.writeHead(403)

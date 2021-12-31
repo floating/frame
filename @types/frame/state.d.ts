@@ -78,6 +78,7 @@ interface ViewMetadata {
   id: string,
   ready: boolean,
   dappId: string,
+  ens: string,
   url: string
 }
 
