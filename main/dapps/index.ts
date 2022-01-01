@@ -22,7 +22,7 @@ async function getDappColors (dappId: string) {
 
   const url = `http://${dapp.ens}.localhost:8421/?session=${session}`
   try {
-    const colors = await windows.extractColors(url)
+    const colors = await windows.extractColors(url, dapp.ens)
     store.updateDapp(dappId, { colors })
     server.sessions.remove(dapp.ens, session)
   } catch (e) {

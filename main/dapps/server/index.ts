@@ -1,32 +1,37 @@
 import http from 'http'
 import { URL } from 'url'
+import cookie from 'cookie'
+import { hash } from 'eth-ens-namehash'
+
+import store from '../../store'
 
 import sessions from './sessions'
 import asset from './asset'
-import { hash } from 'eth-ens-namehash'
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
   const ens = url.hostname.replace('.localhost', '')
   const namehash = hash(ens)
 
-  // enforce session here too
-  
   // check if dapp is added before progressing 
-  // res.writeHead(403)
-  // res.end('No dapp session, launch this dapp from Frame')
-  if (url.pathname === '/') {
-    return asset.dapp(res, namehash)
-  } else {
-    return asset.stream(res, namehash, url.pathname)
+  if (!store(`main.dapps`, namehash)) {
+    res.writeHead(404)
+    return res.end('Dapp not installed')
   }
-  // const [app, session] = (url.searchParams.get('dapp') || '').split(':')
-  // if (app && session) {
-  //   if (sessions.verify(app, session)) return asset.dapp(res, app, session)
-  // } else {
-  //   const { __app, __session } = req.headers.cookie ? cookie.parse(req.headers.cookie) : {}
-  //   if (sessions.verify(__app, __session)) return asset.stream(res, __app, url.pathname)
-  // }
+
+  const __frameSession = req.headers.cookie ? cookie.parse(req.headers.cookie).__frameSession : ''
+  const session = url.searchParams.get('session') || __frameSession
+
+  if (sessions.verify(ens, session)) {
+    if (url.pathname === '/') {
+      return asset.dapp(res, namehash)
+    } else {
+      return asset.stream(res, namehash, url.pathname)
+    }
+  } else {
+    res.writeHead(403)
+    return res.end('No dapp session, launch this dapp from Frame')
+  }
 })
 
 server.listen(8421, '127.0.0.1')

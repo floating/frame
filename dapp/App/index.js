@@ -53,12 +53,23 @@ class App extends React.Component {
           <div className='mainTop' />
           {currentDapp ? (
             <>
-              <div className='mainDappBackgroundTop' style={{
-                background: currentDapp.colors ? currentDapp.colors.background : 'none'
-              }}/>
               <div className='mainDappBackground' style={{
                 background: currentDapp.colors ? currentDapp.colors.background : 'none'
-              }}/>
+              }}>
+                {!currentView.ready ? (
+                  <div className='mainDappLoading'>
+                    <div class='loader'
+                      style={{
+                        borderTop: `3px solid ${currentDapp.colors.backgroundShade}`,
+                        borderRight: `3px solid ${currentDapp.colors.backgroundShade}`,
+                        borderBottom: `3px solid ${currentDapp.colors.backgroundShade}`,
+                        borderLeft: `3px solid ${currentDapp.colors.backgroundLight}`
+                      }}
+                    >
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </>
           ) : null}
         </div>

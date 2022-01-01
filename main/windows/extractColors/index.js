@@ -2,6 +2,10 @@ const { BrowserWindow, BrowserView } = require('electron')
 const pixels = require('get-pixels')
 // const fs = require('fs')
 
+import path from 'path'
+
+import webPreferences from '../webPreferences'
+
 const mode = array => {
   if (array.length === 0) return null
   const modeMap = {}
@@ -39,7 +43,8 @@ const pixelColor = image => {
       const colorArray = selectedColor.split(', ')
       const color = {
         background: `rgb(${colorArray.join(', ')})`, 
-        backgroundShade: `rgb(${colorArray.map(v => Math.max(v - 3, 0)).join(', ')})`,
+        backgroundShade: `rgb(${colorArray.map(v => Math.max(parseInt(v) - 5, 0)).join(', ')})`,
+        backgroundLight: `rgb(${colorArray.map(v => Math.min(parseInt(v) + 50, 255)).join(', ')})`,
         text: textColor(...colorArray)
       }
       resolve(color)
@@ -65,7 +70,7 @@ const timeout = ms => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const extractColors = url => {
+const extractColors = (url, ens) => {
   let window = new BrowserWindow({
     x: 0,
     y: 0,
@@ -89,17 +94,12 @@ const extractColors = url => {
     }
   })
 
-  let view = new BrowserView({
-    webPreferences: {
-      contextIsolation: true,
-      webviewTag: false,
-      sandbox: true,
-      defaultEncoding: 'utf-8',
-      nativeWindowOpen: true,
-      nodeIntegration: false,
-      paintWhenInitiallyHidden: true,
+  let view = new BrowserView({ 
+    webPreferences: Object.assign({ 
+      preload: path.resolve('./main/windows/viewPreload.js') ,
+      partition: 'persist:' + ens,
       offscreen: true
-    }
+    }, webPreferences)
   })
 
   window.addBrowserView(view)

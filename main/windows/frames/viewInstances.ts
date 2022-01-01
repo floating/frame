@@ -5,7 +5,7 @@ import { URL } from 'url'
 import { FrameInstance } from './frameInstances'
 
 import store from '../../store'
-import webPreferences from './webPreferences'
+import webPreferences from '../webPreferences'
 
 import server from '../../dapps/server'
 
@@ -14,7 +14,7 @@ export default {
   create: (frameInstance: FrameInstance, view: ViewMetadata) => {
     const viewInstance = new BrowserView({ 
       webPreferences: Object.assign({ 
-        preload: path.resolve('./main/windows/frames/viewPreload.js') ,
+        preload: path.resolve('./main/windows/viewPreload.js') ,
         partition: 'persist:' + view.ens
       }, webPreferences)
     })
