@@ -2,6 +2,7 @@ interface Network {
   id: number,
   name: string,
   symbol: string,
+  layer: string,
   on: boolean
 }
 
