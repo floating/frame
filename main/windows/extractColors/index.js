@@ -102,6 +102,21 @@ const extractColors = (url, ens) => {
     }, webPreferences)
   })
 
+  view.webContents.on('will-navigate', e => e.preventDefault())
+  view.webContents.on('will-attach-webview', e => e.preventDefault())
+  view.webContents.on('new-window', e => e.preventDefault())
+
+  view.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
+    if (!details || !details.frame) return cb({ cancel: true }) // Reject the request
+
+    // Block any dapp requests to Frame during color extraction
+    if (details.url.includes('127.0.0.1:1248') || details.url.includes('localhost:1248')) {
+      return cb({ cancel: true }) 
+    }
+
+    return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+  })
+
   window.addBrowserView(view)
   view.setBounds({ x: 0, y: 0, width: 800, height: 800 })
 
