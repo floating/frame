@@ -31,6 +31,11 @@ export default {
         return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
       }
 
+      // Devtools requests
+      if (details.url.startsWith('devtools://')) {
+        return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+      }
+
       const currentURL = details.frame.url
       if (currentURL !== view.url) return cb({ cancel: true }) // Reject the request
 
@@ -62,7 +67,7 @@ export default {
   
     frameInstance.removeBrowserView(viewInstance)
 
-    // viewInstance.webContents.openDevTools({ mode: 'detach' })
+    viewInstance.webContents.openDevTools({ mode: 'detach' })
 
     viewInstance.webContents.on('did-finish-load', () => {
       store.updateFrameView(frameInstance.frameId, view.id, { ready: true })
