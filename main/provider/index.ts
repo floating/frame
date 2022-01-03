@@ -811,10 +811,11 @@ class Provider extends EventEmitter {
 
     // temporarily load the last known price
     const nativeCurrency = nativeCurrencyBalances.map(balance => {
-      const { usd } = getNativeCurrency(balance.chainId)
+      const { usd, icon } = getNativeCurrency(balance.chainId)
 
       return {
         ...balance,
+        logoURI: icon,
         lastKnownPrice: { usd }
       }
     })
