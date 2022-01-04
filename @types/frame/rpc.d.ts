@@ -54,8 +54,15 @@ declare namespace RPC {
       decimals: number,
       displayBalance: string
     }
+
+    interface NativeCurrency extends Balance {
+      currencyInfo: Currency
+    }
     
     interface Erc20 extends Balance {
+      tokenInfo: {
+        lastKnownPrice: { usd: { price: number, change24hr?: number } }
+      },
       address: Address
     }
 

@@ -57,11 +57,26 @@ function loadAssets (accountId: string) {
   const balances: Balance[] = store('main.balances', accountId) || []
 
   return balances.reduce((assets, balance) => {
-    const type = (balance.address === NATIVE_CURRENCY) ? 'nativeCurrency' : 'erc20'
-    assets[type].push(balance)
+    if (balance.address === NATIVE_CURRENCY) {
+      const currency = getNativeCurrency(balance.chainId)
+
+      assets.nativeCurrency.push({
+        ...balance,
+        currencyInfo: currency
+      })
+    } else {
+      const { usd } = getRate(balance.address)
+
+      assets.erc20.push({
+        ...balance,
+        tokenInfo: {
+          lastKnownPrice: { usd }
+        }
+      })
+    }
 
     return assets
-  }, { nativeCurrency: [] as Balance[], erc20: [] as RPC.GetAssets.Erc20[] })
+  }, { nativeCurrency: [] as RPC.GetAssets.NativeCurrency[], erc20: [] as RPC.GetAssets.Erc20[] })
 }
 
 class Provider extends EventEmitter {
@@ -807,29 +822,9 @@ class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
-    const { nativeCurrency: nativeCurrencyBalances, erc20: erc20Balances } = loadAssets(currentAccount.id)
-
-    // temporarily load the last known price
-    const nativeCurrency = nativeCurrencyBalances.map(balance => {
-      const { usd, icon } = getNativeCurrency(balance.chainId)
-
-      return {
-        ...balance,
-        logoURI: icon,
-        lastKnownPrice: { usd }
-      }
-    })
-
-    const erc20 = erc20Balances.map(balance => {
-      const { usd } = getRate(balance.address)
-
-      return {
-        ...balance,
-        lastKnownPrice: { usd }
-      }
-    })
-
+    const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
     const { id, jsonrpc } = payload
+
     cb({ id, jsonrpc, result: { nativeCurrency, erc20 }})
   }
 
