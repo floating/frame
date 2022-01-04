@@ -1,6 +1,7 @@
 import { BrowserView }  from 'electron'
 import path from 'path'
 import { URL } from 'url'
+import log from 'electron-log'
 
 import { FrameInstance } from './frameInstances'
 
@@ -9,12 +10,24 @@ import webPreferences from '../webPreferences'
 
 import server from '../../dapps/server'
 
+interface extract {
+  session: string, 
+  ens: string
+}
+
+const extract = (l: string) : extract => {
+  const url = new URL(l)
+  const session = url.searchParams.get('session') || ''
+  const ens = url.port === '8421' ? url.hostname.replace('.localhost', '') || '' : ''
+  return { session, ens }
+}
+
 export default {
   // Create a view instance on a frame
   create: (frameInstance: FrameInstance, view: ViewMetadata) => {
     const viewInstance = new BrowserView({ 
       webPreferences: Object.assign({ 
-        preload: path.resolve('./main/windows/viewPreload.js') ,
+        preload: path.resolve('./main/windows/viewPreload.js'),
         partition: 'persist:' + view.ens
       }, webPreferences)
     })
@@ -23,51 +36,59 @@ export default {
     viewInstance.webContents.on('will-attach-webview', e => e.preventDefault())
     viewInstance.webContents.on('new-window', e => e.preventDefault())
 
+    const { session } = extract(view.url)
+
     viewInstance.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
-      if (!details || !details.frame) return cb({ cancel: true }) // Reject the request
+      if (!details || !details.frame) return cb({ cancel: true }) // Reject the request\
 
-      // Initial request for app
-      if (details.resourceType === 'mainFrame' && details.url === view.url) {
+      const appUrl = details.frame.url   
+      
+      if ( // Initial request for app
+        details.resourceType === 'mainFrame' && 
+        details.url === view.url && 
+        !appUrl
+      ) {
         return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
-      }
-
-      // Devtools requests
-      if (details.url.startsWith('devtools://')) {
+      } 
+      else if ( // devtools:// request
+        details.url.startsWith('devtools://') &&
+        details.requestHeaders['Origin'] === 'devtools://devtools'
+      ) {
         return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+      } 
+      else if ( // Reqest from app
+        appUrl === view.url
+      ) {
+        const { ens, session } = extract(appUrl)
+        if (ens !== view.ens || !server.sessions.verify(ens, session)) {
+          return cb({ cancel: true })
+        } else {
+          details.requestHeaders['Origin'] = view.ens
+          return cb({ requestHeaders: details.requestHeaders })
+        }
+      } 
+      else {
+        return cb({ cancel: true }) // Reject the request
       }
-
-      const currentURL = details.frame.url
-      if (currentURL !== view.url) return cb({ cancel: true }) // Reject the request
-
-      // Parse the requesting url to get ens name and session
-      const url = new URL(currentURL)
-      const session = url.searchParams.get('session')
-      const ens = url.hostname.replace('.localhost', '')
-
-      // Check that parsed ens name is the same as the ens name used to create this view
-      if (!ens || !session || ens !== view.ens) return cb({ cancel: true }) // Reject the request
-
-      // Check that the parsed ens name has a valid session
-      if (!server.sessions.verify(ens, session)) return cb({ cancel: true }) // Reject the request
-
-      // Set the origin of this request as the views ens name
-      details.requestHeaders['Origin'] = view.ens
-
-      // Return updated headers 
-      return cb({ requestHeaders: details.requestHeaders })
     })
 
     frameInstance.addBrowserView(viewInstance)
-    // viewInstance.setBackgroundColor('#0fff')
 
     viewInstance.setAutoResize({ width: true, height: true })
   
-    viewInstance.webContents.loadURL(view.url)
     viewInstance.webContents.setVisualZoomLevelLimits(1, 3)
   
     frameInstance.removeBrowserView(viewInstance)
 
     viewInstance.webContents.openDevTools({ mode: 'detach' })
+
+    viewInstance.webContents.session.cookies.set({
+      url: view.url, 
+      name: '__frameSession', 
+      value: session
+    }).then(() => {
+      viewInstance.webContents.loadURL(view.url)
+    }, error => log.error(error))
 
     viewInstance.webContents.on('did-finish-load', () => {
       store.updateFrameView(frameInstance.frameId, view.id, { ready: true })

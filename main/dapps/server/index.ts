@@ -12,15 +12,13 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
   const ens = url.hostname.replace('.localhost', '')
   const namehash = hash(ens)
+  const session = req.headers.cookie ? cookie.parse(req.headers.cookie).__frameSession : ''
 
   // check if dapp is added before progressing 
   if (!store(`main.dapps`, namehash)) {
     res.writeHead(404)
     return res.end('Dapp not installed')
   }
-
-  const __frameSession = req.headers.cookie ? cookie.parse(req.headers.cookie).__frameSession : ''
-  const session = url.searchParams.get('session') || __frameSession
 
   if (sessions.verify(ens, session)) {
     if (url.pathname === '/') {

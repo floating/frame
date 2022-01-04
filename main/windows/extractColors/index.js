@@ -1,6 +1,7 @@
 const { BrowserWindow, BrowserView } = require('electron')
 const pixels = require('get-pixels')
 // const fs = require('fs')
+import log from 'electron-log'
 
 import path from 'path'
 
@@ -70,6 +71,13 @@ const timeout = ms => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+const extractSession = (l) => {
+  const url = new URL(l)
+  const session = url.searchParams.get('session') || ''
+  const ens = url.port === '8421' ? url.hostname.replace('.localhost', '') || '' : ''
+  return { session, ens }
+}
+
 const extractColors = (url, ens) => {
   let window = new BrowserWindow({
     x: 0,
@@ -120,7 +128,15 @@ const extractColors = (url, ens) => {
   window.addBrowserView(view)
   view.setBounds({ x: 0, y: 0, width: 800, height: 800 })
 
-  view.webContents.loadURL(url)
+  const { session } = extractSession(url)
+
+  view.webContents.session.cookies.set({
+    url: view.url, 
+    name: '__frameSession', 
+    value: session
+  }).then(() => {
+    view.webContents.loadURL(url)
+  }, error => log.error(error))
 
   return new Promise((resolve, reject) => {
     view.webContents.on('did-finish-load', async () => {

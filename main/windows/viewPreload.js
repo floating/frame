@@ -1,6 +1,3 @@
-const urlParams = new URLSearchParams(window.location.search)
-document.cookie = `__frameSession=${urlParams.get('session')}; path=/; SameSite=Strict;}`
-
 document.addEventListener('DOMContentLoaded', () => {
   document.body.style.opacity = 0
   const bg = document.body.style.backgroundColor
