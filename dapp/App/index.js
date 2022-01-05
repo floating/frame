@@ -58,7 +58,7 @@ class App extends React.Component {
               }}>
                 {!currentView.ready ? (
                   <div className='mainDappLoading'>
-                    <div class='loader'
+                    <div className='loader'
                       style={{
                         borderTop: `3px solid ${currentDapp.colors.backgroundShade}`,
                         borderRight: `3px solid ${currentDapp.colors.backgroundShade}`,

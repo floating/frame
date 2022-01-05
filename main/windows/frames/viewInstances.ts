@@ -51,8 +51,7 @@ export default {
         return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
       } 
       else if ( // devtools:// request
-        details.url.startsWith('devtools://') &&
-        details.requestHeaders['Origin'] === 'devtools://devtools'
+        details.url.startsWith('devtools://')
       ) {
         return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
       } 

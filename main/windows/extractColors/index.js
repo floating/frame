@@ -131,7 +131,7 @@ const extractColors = (url, ens) => {
   const { session } = extractSession(url)
 
   view.webContents.session.cookies.set({
-    url: view.url, 
+    url: url, 
     name: '__frameSession', 
     value: session
   }).then(() => {
