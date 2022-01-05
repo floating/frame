@@ -18,6 +18,18 @@ const menu = require('./menu')
 const store = require('./store').default
 const dapps = require('./dapps').default
 
+// if (process.defaultApp) {
+//   if (process.argv.length >= 2) {
+//     app.setAsDefaultProtocolClient('dapp', process.execPath, [path.resolve(process.argv[1])])
+//   }
+// } else {
+//   app.setAsDefaultProtocolClient('dapp')
+// }
+
+// app.on('open-url', (event, url) => {
+//   dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+// })
+
 // log.transports.file.level = 'info'
 
 // Action Monitor

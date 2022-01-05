@@ -1,11 +1,8 @@
-@keyframes load {
-  0% {
+@keyframes load
+  0%
     transform rotate(0deg)
-  }
-  100% {
+  100%
     transform rotate(360deg)
-  }
-}
 
 body
   width 100%
@@ -144,7 +141,30 @@ body
         -webkit-user-select none
         -webkit-app-region drag
         z-index 1
-      
+        display flex
+        justify-content center
+        align-items center
+
+        .mainDappLoading
+          .loader,
+          .loader:after
+            border-radius 100%
+            width 128px
+            height 128px
+
+          .loader
+            font-size 7px
+            position relative
+            text-indent -9999em
+            transform translateZ(0)
+            animation load8 0.48s infinite linear !important
+
+          @keyframes load8
+            0%
+              transform rotate(0deg)
+            100%
+              transform rotate(360deg)
+
       .mainApps
         width 600px
         height 300px
@@ -251,24 +271,6 @@ body
         position absolute
         max-height 40px
         max-width 40px
-
-      .loader,
-      .loader:after {
-        border-radius 100%
-        width 80px
-        height 80px
-      }
-      .loader {
-        font-size 7px
-        position relative
-        text-indent -9999em
-        border-top 6px solid thin
-        border-right 6px solid thin
-        border-bottom 6px solid thin
-        border-left 6px solid thick
-        transform translateZ(0)
-        animation load 0.6s infinite linear !important
-      }
 
     .webwrap
       position absolute

@@ -3,7 +3,7 @@ import path from 'path'
 
 import store from '../../store'
 
-import webPrefrences from './webPreferences'
+import webPrefrences from '../webPreferences'
 import topRight from './topRight'
 
 export interface FrameInstance extends BrowserWindow {

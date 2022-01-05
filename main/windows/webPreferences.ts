@@ -8,5 +8,6 @@ export default {
   scrollBounce: true,
   navigateOnDragDrop: false,
   enableRemoteModule: false,
-  disableBlinkFeatures: 'Auxclick'
+  disableBlinkFeatures: 'Auxclick',
+  paintWhenInitiallyHidden: true
 }

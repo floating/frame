@@ -1,6 +1,11 @@
 const { BrowserWindow, BrowserView } = require('electron')
 const pixels = require('get-pixels')
 // const fs = require('fs')
+import log from 'electron-log'
+
+import path from 'path'
+
+import webPreferences from '../webPreferences'
 
 const mode = array => {
   if (array.length === 0) return null
@@ -39,7 +44,8 @@ const pixelColor = image => {
       const colorArray = selectedColor.split(', ')
       const color = {
         background: `rgb(${colorArray.join(', ')})`, 
-        backgroundShade: `rgb(${colorArray.map(v => Math.max(v - 3, 0)).join(', ')})`,
+        backgroundShade: `rgb(${colorArray.map(v => Math.max(parseInt(v) - 5, 0)).join(', ')})`,
+        backgroundLight: `rgb(${colorArray.map(v => Math.min(parseInt(v) + 50, 255)).join(', ')})`,
         text: textColor(...colorArray)
       }
       resolve(color)
@@ -65,7 +71,14 @@ const timeout = ms => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const extractColors = url => {
+const extractSession = (l) => {
+  const url = new URL(l)
+  const session = url.searchParams.get('session') || ''
+  const ens = url.port === '8421' ? url.hostname.replace('.localhost', '') || '' : ''
+  return { session, ens }
+}
+
+const extractColors = (url, ens) => {
   let window = new BrowserWindow({
     x: 0,
     y: 0,
@@ -89,23 +102,41 @@ const extractColors = url => {
     }
   })
 
-  let view = new BrowserView({
-    webPreferences: {
-      contextIsolation: true,
-      webviewTag: false,
-      sandbox: true,
-      defaultEncoding: 'utf-8',
-      nativeWindowOpen: true,
-      nodeIntegration: false,
-      paintWhenInitiallyHidden: true,
+  let view = new BrowserView({ 
+    webPreferences: Object.assign({ 
+      preload: path.resolve('./main/windows/viewPreload.js') ,
+      partition: 'persist:' + ens,
       offscreen: true
+    }, webPreferences)
+  })
+
+  view.webContents.on('will-navigate', e => e.preventDefault())
+  view.webContents.on('will-attach-webview', e => e.preventDefault())
+  view.webContents.on('new-window', e => e.preventDefault())
+
+  view.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
+    if (!details || !details.frame) return cb({ cancel: true }) // Reject the request
+
+    // Block any dapp requests to Frame during color extraction
+    if (details.url.includes('127.0.0.1:1248') || details.url.includes('localhost:1248')) {
+      return cb({ cancel: true }) 
     }
+
+    return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
   })
 
   window.addBrowserView(view)
   view.setBounds({ x: 0, y: 0, width: 800, height: 800 })
 
-  view.webContents.loadURL(url)
+  const { session } = extractSession(url)
+
+  view.webContents.session.cookies.set({
+    url: url, 
+    name: '__frameSession', 
+    value: session
+  }).then(() => {
+    view.webContents.loadURL(url)
+  }, error => log.error(error))
 
   return new Promise((resolve, reject) => {
     view.webContents.on('did-finish-load', async () => {

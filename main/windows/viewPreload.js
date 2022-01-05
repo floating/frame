@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.style.backgroundColor = 'transparent'
   document.documentElement.style.backgroundColor = 'transparent'
   requestAnimationFrame(() => {
-    // document.body.style.transition = '100ms ease-in-out all'
     document.body.style.backgroundColor = bg
     document.body.style.opacity = 1
   })
 }, false)
-
