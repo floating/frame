@@ -15,7 +15,7 @@ const server = http.createServer((req, res) => {
   const session = req.headers.cookie ? cookie.parse(req.headers.cookie).__frameSession : ''
 
   // check if dapp is added before progressing 
-  if (!store(`main.dapps`, namehash)) {
+  if (!store('main.dapps', namehash)) {
     res.writeHead(404)
     return res.end('Dapp not installed')
   }

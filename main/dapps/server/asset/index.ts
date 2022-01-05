@@ -58,7 +58,7 @@ export default {
   },
   dapp: async (res: ServerResponse, namehash: string) => { // Resolve dapp via IPFS, inject functionality and send it back to the client
     // if (!ipfs return error(res, 404, 'IPFS client not running')
-    const cid = store(`main.dapps`, namehash, `content`)
+    const cid = store('main.dapps', namehash, 'content')
     const index = await nebula.ipfs.getFile(`${cid}/index.html`)
     // res.setHeader('Set-Cookie', [`__app=${app}`, `__session=${session}`])
     res.setHeader('Access-Control-Allow-Origin', '*')
