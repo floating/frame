@@ -15,6 +15,7 @@ declare module 'eth-provider' {
     constructor()
 
     connected: boolean
+    chainId: string
     request(payload: RequestPayload)
     setChain(chainId: string)
   }

@@ -68,7 +68,7 @@ export default function (chainId: number, eth: EthereumProvider) {
   
           return Object.values(results.transformed)
         } catch (e) {
-          log.error(`multicall error (batch ${batchStart}-${batchEnd}), first call: ${JSON.stringify(calls[batchStart])}`, e)
+          log.error(`multicall error (batch ${batchStart}-${batchEnd}), chainId: ${chainId}, first call: ${JSON.stringify(calls[batchStart])}`, e)
           return []
         }
       })
