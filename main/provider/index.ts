@@ -55,8 +55,13 @@ function getRate (address: Address) {
 
 function loadAssets (accountId: string) {
   const balances: Balance[] = store('main.balances', accountId) || []
+  const isScanning = store('main.scanning', accountId)
 
-  return balances.reduce((assets, balance) => {
+  const response = { nativeCurrency: [] as RPC.GetAssets.NativeCurrency[], erc20: [] as RPC.GetAssets.Erc20[] }
+
+  if (isScanning) return response
+
+  const bals = balances.reduce((assets, balance) => {
     if (balance.address === NATIVE_CURRENCY) {
       const currency = getNativeCurrency(balance.chainId)
 
@@ -76,7 +81,11 @@ function loadAssets (accountId: string) {
     }
 
     return assets
-  }, { nativeCurrency: [] as RPC.GetAssets.NativeCurrency[], erc20: [] as RPC.GetAssets.Erc20[] })
+  }, response)
+
+  console.log({ bals })
+
+  return bals
 }
 
 class Provider extends EventEmitter {
