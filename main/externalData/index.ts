@@ -10,10 +10,11 @@ const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
 let activeAddress: Address
 let trackedAddresses: Address[] = []
+let outstandingScans = 0
 
 let allNetworksObserver: Observer, tokenObserver: Observer
 let scanWorker: ChildProcess | null
-let heartbeat: NullableTimeout, trackedAddressScan: NullableTimeout, nativeCurrencyScan: NullableTimeout, inventoryScan: NullableTimeout
+let heartbeat: NullableTimeout, trackedAddressScan: NullableTimeout, nativeCurrencyScan: NullableTimeout, inventoryScan: NullableTimeout, scanningReset: NullableTimeout
 
 interface WorkerMessage {
   type: string,
@@ -59,6 +60,24 @@ const storeApi = {
   }
 }
 
+function setScanning (address: Address) {
+  scanningReset = setTimeout(() => endScanning(address), 5000)
+  outstandingScans = 3
+
+  store.setScanning(address, true)
+}
+
+function endScanning (address: Address) {
+  if (scanningReset) {
+    clearTimeout(scanningReset)
+    scanningReset = null
+  }
+
+  outstandingScans = 0
+
+  store.setScanning(address, false)
+}
+
 function createWorker () {
   if (scanWorker) {
     scanWorker.kill()
@@ -99,6 +118,8 @@ function createWorker () {
     }
 
     if (message.type === 'chainBalances') {
+      outstandingScans -= 1
+
       const { address, balances } = (message as ChainBalanceMessage)
 
       balances
@@ -110,14 +131,18 @@ function createWorker () {
             address: NATIVE_CURRENCY
           })
         })
+
+      if (outstandingScans === 0) {
+        endScanning(address)
+      }
     }
 
     if (message.type === 'tokenBalances') {
+      outstandingScans -= 1
+
       const balanceMessage = (message as TokenBalanceMessage)
       const address = balanceMessage.address
       const updatedBalances = balanceMessage.balances || []
-
-      store.setScanning(address, false)
 
       // only update balances if any have changed
       const currentTokenBalances = storeApi.getTokenBalances(address)
@@ -137,6 +162,10 @@ function createWorker () {
       // remove zero balances from the list of known tokens
       const zeroBalances = changedBalances.filter(b => parseInt(b.balance) === 0)
       store.removeKnownTokens(balanceMessage.address, zeroBalances)
+
+      if (outstandingScans === 0) {
+        endScanning(balanceMessage.address)
+      }
 
       const tokensByChain = updatedBalances.reduce(groupByChain, {})
 
@@ -212,7 +241,7 @@ function scanNetworkCurrencyRates () {
 
 function scanActiveData () {
   if (activeAddress) {
-    store.setScanning(activeAddress, true)
+    setScanning(activeAddress)
   }
 
   if (trackedAddressScan) {
@@ -311,7 +340,7 @@ function stop () {
   allNetworksObserver.remove()
   tokenObserver.remove()
 
-  const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan]
+  const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan, scanningReset]
 
   scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
 
@@ -319,6 +348,7 @@ function stop () {
   trackedAddressScan = null
   nativeCurrencyScan = null
   inventoryScan = null
+  scanningReset = null
 }
 
 function restart () {

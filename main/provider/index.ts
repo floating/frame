@@ -55,13 +55,10 @@ function getRate (address: Address) {
 
 function loadAssets (accountId: string) {
   const balances: Balance[] = store('main.balances', accountId) || []
-  const isScanning = store('main.scanning', accountId)
 
   const response = { nativeCurrency: [] as RPC.GetAssets.NativeCurrency[], erc20: [] as RPC.GetAssets.Erc20[] }
 
-  if (isScanning) return response
-
-  const bals = balances.reduce((assets, balance) => {
+  return balances.reduce((assets, balance) => {
     if (balance.address === NATIVE_CURRENCY) {
       const currency = getNativeCurrency(balance.chainId)
 
@@ -82,10 +79,6 @@ function loadAssets (accountId: string) {
 
     return assets
   }, response)
-
-  console.log({ bals })
-
-  return bals
 }
 
 class Provider extends EventEmitter {
@@ -831,6 +824,9 @@ class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
+    const isScanning = store('main.scanning', currentAccount.id)
+    if (isScanning) return this.resError({ message: 'assets not known for account', code: 5901 }, payload, cb)
+
     const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
     const { id, jsonrpc } = payload
 
@@ -942,8 +938,9 @@ store.observer(() => {
 
   if (currentAccountId) {
     const assets = loadAssets(currentAccountId)
+    const isScanning = store('main.scanning', currentAccountId)
 
-    if (assets.erc20.length > 0 || assets.nativeCurrency.length > 0) {
+    if (!isScanning && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
       provider.assetsChanged(currentAccountId, assets)
     }
   }

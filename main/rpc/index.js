@@ -37,6 +37,7 @@ const rpc = {
   // getSigners: signers.getSigners,
   setSigner: (id, cb) => {
     store.toggleDash('hide')
+    store.setScanning(id, true)
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
     setTimeout(() => {
