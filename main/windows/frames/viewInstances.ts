@@ -99,8 +99,13 @@ export default {
   // Destroy a view instance on a frame
   destroy: (frameInstance: FrameInstance, viewId: string) => {
     const views = frameInstance.views || {}
+    const { frameId } = frameInstance
 
-    frameInstance.removeBrowserView(views[viewId])
+    const {url} = store('main.frames', frameId, 'views', viewId)
+    const { ens, session } = extract(url)
+    server.sessions.remove(ens, session)
+
+    if (frameInstance && !frameInstance.isDestroyed()) frameInstance.removeBrowserView(views[viewId])
 
     const webcontents = (views[viewId].webContents as any)
     webcontents.destroy()

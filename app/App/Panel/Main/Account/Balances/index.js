@@ -114,7 +114,7 @@ class Balances extends React.Component {
 
     const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
 
-    return { balances, totalDisplayValue: formatUsdRate(totalValue, 0) }
+    return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
   }
 
 
@@ -130,7 +130,7 @@ class Balances extends React.Component {
       }
     }
     let name = balanceInfo.name
-    if (name.length > 18) name = name.substr(0, 18) + '..'
+    if (name.length > 17) name = name.substr(0, 17) + '..'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
@@ -165,14 +165,14 @@ class Balances extends React.Component {
   }
 
   render () {
-    const address = this.store('main.accounts', this.props.id, 'address')
+    const { address, lastSignerType } = this.store('main.accounts', this.props.id)
     const { type, id: chainId } = this.store('main.currentNetwork')
     const chainLayer = this.store('main.networks', type, chainId, 'layer') || 'testnet'
     const storedBalances = this.store('main.balances', address) || []
 
     const rates = this.store('main.rates')
 
-    let { balances, totalDisplayValue } = this.getBalances(
+    let { balances, totalDisplayValue, totalValue } = this.getBalances(
       chainId,
       storedBalances,
       rates,
@@ -187,6 +187,8 @@ class Balances extends React.Component {
 
     const scanning = this.store('main.scanning', address)
     const initialRateScanComplete = this.store('main.initialRateScan')
+
+    const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
@@ -227,6 +229,19 @@ class Balances extends React.Component {
             </div>
           </div>
         </div>
+        {totalValue.toNumber() > 10000 && hotSigner ? (
+          <div 
+            className='signerBlanceWarning'
+            onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
+          >
+            <div className='signerBlanceWarningTitle'>
+              {'high value account is using hot signer'}
+            </div>
+            {this.state.showHighHotMessage ? <div className='signerBlanceWarningMessage'>
+              {'We recommend using our of our supported hardware signers to increasing the security of your account'}
+            </div> : null}
+          </div>
+        ) : null}
       </div>
     )
   }

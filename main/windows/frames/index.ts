@@ -104,6 +104,10 @@ export default class FrameManager {
   removeFrameInstance (frameId: string) {
     const frameInstance = this.frameInstances[frameId]
 
+    Object.keys(frameInstance.views || {}).forEach(viewId => {
+      viewInstances.destroy(frameInstance, viewId)
+    })
+
     delete this.frameInstances[frameId]
 
     if (frameInstance) {

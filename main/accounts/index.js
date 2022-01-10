@@ -420,7 +420,8 @@ class Accounts extends EventEmitter {
     const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
 
-    store.setAccount({ id: '' })
+    store.unsetAccount()
+
 
     // setTimeout(() => { // Clear signer requests when unset
     //   if (s) {

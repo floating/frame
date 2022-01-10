@@ -601,6 +601,21 @@ module.exports = {
       delete views[viewId]
       return views
     })
+  },
+  unsetAccount: u => {
+    u('selected.minimized', _ => true)
+    u('selected.open', _ => false)
+    u('selected.view', _ => 'default')
+    u('selected.showAccounts', _ => false)
+    setTimeout(_ => {
+      u('selected', signer => {
+        signer.last = signer.current
+        signer.current = ''
+        signer.requests = {}
+        signer.view = 'default'
+        return signer
+      })
+    }, 520)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
