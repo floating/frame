@@ -61,7 +61,7 @@ const storeApi = {
 }
 
 function setScanning (address: Address) {
-  scanningReset = setTimeout(() => endScanning(address), 5000)
+  scanningReset = setTimeout(() => endScanning(address), 8000)
   outstandingScans = 3
 
   store.setScanning(address, true)
