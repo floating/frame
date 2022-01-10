@@ -62,7 +62,7 @@ class _Balances extends React.Component {
           {token.symbol}
         </div>
         <div className='signerBalanceValue' style={(token.displayBalance || '$0').length >= 12 ? { fontSize: '15px', top: '14px' } : {}}>
-          {(balance === undefined ? '-.------' : token.displayBalance)}
+          {(balance === undefined ? '-.-?----' : token.displayBalance)}
         </div>
         <div className='signerBalanceEquivalent' style={(token.usdDisplayValue || '$0').length >= 11 ? { fontSize: '10px', top: '15px' } : {}}>
           {token.usdDisplayValue}

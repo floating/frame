@@ -13,12 +13,10 @@ function formatBalance (balance, totalValue, decimals = 8) {
   const isZero = balance.isZero()
   if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
 
-  return !isZero
-    ? new Intl.NumberFormat('us-US', {
+  return new Intl.NumberFormat('us-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 8
       }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
-    : '-.------'
 }
 
 function formatUsdRate (rate, decimals = 2) {
@@ -119,6 +117,7 @@ class Balances extends React.Component {
 
 
   renderBalance (symbol, balanceInfo, i, doneScanning) {
+    const rawBalance = parseInt(balanceInfo.balance) || 0
     const change = parseFloat(balanceInfo.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
@@ -133,7 +132,7 @@ class Balances extends React.Component {
     if (name.length > 17) name = name.substr(0, 17) + '..'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
+        <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 || rawBalance > 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
               src={balanceInfo.logoURI}
@@ -155,10 +154,10 @@ class Balances extends React.Component {
             <span
               style={(balanceInfo.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
             >
-              {doneScanning || balanceInfo.displayBalance !== '0.00' ? balanceInfo.displayBalance : '---.--'}
+              {(doneScanning || rawBalance > 0) ? balanceInfo.displayBalance : '---.--'}
             </span>
           </div>
-          {doneScanning || balanceInfo.displayValue !== '0' ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
+          {(doneScanning || rawBalance > 0) ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
         </div>
       </div>
     )
@@ -205,7 +204,7 @@ class Balances extends React.Component {
             </div>
           ) : null}
         </div>
-        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, initialRateScanComplete))}
+        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, !scanning))}
         <div className='signerBalanceTotal'>
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
