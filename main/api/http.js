@@ -111,9 +111,9 @@ provider.on('data:address', (account, payload) => { // Make sure the subscriptio
   if (pollSubs[payload.params.subscription]) {
     const { id, origin } = pollSubs[payload.params.subscription]
     const permissions = store('main.permissions', account) || {}
-    const perms = Object.keys(permissions).map(id => permissions[id])
-    const allowed = perms.map(p => p.origin).indexOf(origin) > -1
-    if (!allowed) payload.params.result = []
+    const permission = Object.values(permissions).find(p => p.origin === origin) || {}
+
+    if (!permission.provider) payload.params.result = []
     polls[id] = polls[id] || []
     polls[id].push(JSON.stringify(payload))
     if (pending[id]) pending[id].send()

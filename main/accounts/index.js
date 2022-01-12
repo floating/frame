@@ -373,6 +373,8 @@ class Accounts extends EventEmitter {
       return cb(err)
     }
 
+    dataScanner.setActiveAddress(currentAccount.address)
+
     const summary = currentAccount.summary()
     cb(null, summary)
     
@@ -417,6 +419,9 @@ class Accounts extends EventEmitter {
   unsetSigner (cb) {
     const s = this.current()
     this._current = null
+
+    dataScanner.setActiveAddress('')
+
     const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
 
@@ -882,10 +887,6 @@ class Accounts extends EventEmitter {
     } else {
       log.error('Trying to lock request ' + handlerId + ' but there is no current account')
     }
-  }
-
-  scanSelectedAddress () {
-    dataScanner.setActiveAddress(this.getSelectedAddress())
   }
 
   stopExternalDataScan () {

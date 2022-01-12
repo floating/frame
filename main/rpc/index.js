@@ -37,12 +37,9 @@ const rpc = {
   // getSigners: signers.getSigners,
   setSigner: (id, cb) => {
     store.toggleDash('hide')
-    store.setScanning(id, true)
+
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
-    setTimeout(() => {
-      accounts.scanSelectedAddress()
-    }, 320)
   },
   // setSignerIndex: (index, cb) => {
   //   accounts.setSignerIndex(index, cb)
@@ -54,7 +51,6 @@ const rpc = {
   unsetSigner: (id, cb) => {
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
-    accounts.scanSelectedAddress()
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,

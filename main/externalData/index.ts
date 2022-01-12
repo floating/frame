@@ -33,7 +33,8 @@ interface CurrencyDataMessage extends Omit<WorkerMessage, 'type'> {
 interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
   type: 'tokenBalances',
   address: Address,
-  balances: TokenBalance[]
+  balances: TokenBalance[],
+  source: string
 }
 
 interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
@@ -53,7 +54,7 @@ const storeApi = {
   getNetworkMetadata: (id: number) => store('main.networksMeta.ethereum', id) as NetworkMetadata,
   getNetworksMetadata: () => store('main.networksMeta.ethereum') as NetworkMetadata[],
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-  getKnownTokens: (address: Address) => (store('main.tokens.custom', address) || []) as Token[],
+  getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
   getTokenBalances: (address: Address) => {
     return ((store('main.balances', address) || []) as Balance[])
       .filter(balance => balance.address !== NATIVE_CURRENCY)
@@ -61,8 +62,12 @@ const storeApi = {
 }
 
 function setScanning (address: Address) {
+  if (scanningReset) {
+    clearTimeout(scanningReset)
+  }
+
   scanningReset = setTimeout(() => endScanning(address), 8000)
-  outstandingScans = 3
+  outstandingScans = 2
 
   store.setScanning(address, true)
 }
@@ -118,7 +123,7 @@ function createWorker () {
     }
 
     if (message.type === 'chainBalances') {
-      outstandingScans -= 1
+      outstandingScans = Math.max(-1, outstandingScans - 1)
 
       const { address, balances } = (message as ChainBalanceMessage)
 
@@ -138,11 +143,13 @@ function createWorker () {
     }
 
     if (message.type === 'tokenBalances') {
-      outstandingScans -= 1
-
       const balanceMessage = (message as TokenBalanceMessage)
       const address = balanceMessage.address
       const updatedBalances = balanceMessage.balances || []
+
+      if (balanceMessage.source === 'known') {
+        outstandingScans = Math.max(-1, outstandingScans - 1)
+      }
 
       // only update balances if any have changed
       const currentTokenBalances = storeApi.getTokenBalances(address)
@@ -296,8 +303,10 @@ function addAddresses (addresses: Address[]) {
 function setActiveAddress (address: Address) {
   log.debug(`externalData setActiveAddress(${address})`)
 
-  addAddresses([address])
   activeAddress = address
+  if (!activeAddress) return
+
+  addAddresses([address])
 
   if (heartbeat) {
     scanActiveData()
