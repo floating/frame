@@ -6,12 +6,28 @@
   height 32px
   z-index 20000000000
 
+  .macGrab
+    position absolute 
+    top 0
+    left 0
+    bottom 0
+    right 0
+    -webkit-app-region drag
+
   .macControls
     position absolute 
     top 0
     left 0
     bottom 0
     width 74px
+
+  .linuxGrab
+    position absolute 
+    top 0
+    left 74px
+    bottom 0
+    right 0
+    -webkit-app-region drag
 
   .linuxControls
     position absolute 
@@ -55,6 +71,14 @@
 
     .linuxControlsButton:hover
       background rgba(255, 255, 255, 0.1)
+
+  .windowsGrab
+    position absolute 
+    top 0
+    left 0px
+    bottom 0
+    right 110px
+    -webkit-app-region drag
 
   .windowsControls
     position absolute 
