@@ -82,7 +82,7 @@ export default {
     viewInstance.webContents.openDevTools({ mode: 'detach' })
 
     viewInstance.webContents.session.cookies.set({
-      url: view.url, 
+      url: view.url,
       name: '__frameSession', 
       value: session
     }).then(() => {
