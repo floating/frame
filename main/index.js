@@ -193,6 +193,18 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 
 ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 
+ipcMain.on('frame:close', e => {
+  windows.close(e)
+})
+
+ipcMain.on('frame:min', e => {
+  windows.min(e)
+})
+
+ipcMain.on('frame:max', e => {
+  windows.max(e)
+})
+
 // ipcMain.on('tray:launchDapp', async (e, domain) => {
 //   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
 //   await dapps.launch(domain, console.error)

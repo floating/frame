@@ -280,9 +280,16 @@ const api = {
 
   },
   close: (e) => {
-    const id = winId(e)
-    if (windows[id]) windows[id].close()
-    delete windows[id]
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.close()
+  },
+  max: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.maximize()
+  },
+  min: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.minimize()
   },
   getTray: () => {
     return windows.tray
@@ -316,14 +323,6 @@ const api = {
   },
   quit: () => {
     app.quit()
-  },
-  close: (e) => {
-    const id = winSession(e)
-    if (windows[id]) {
-      windows[id].setClosable(true)
-      windows[id].close()
-    }
-    delete windows[id]
   },
   // flow: () => {
   //   windows.flow = new BrowserWindow({
@@ -478,6 +477,7 @@ if (dev) {
       Object.keys(windows).forEach(win => {
         windows[win].send('main:reload:style', name)
       })
+      frameManager.reloadFrames(true, name)
     }
   })
   app.on('ready', () => {
