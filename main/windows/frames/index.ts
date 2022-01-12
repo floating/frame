@@ -42,6 +42,28 @@ export default class FrameManager {
           this.removeFrameInstance(frameId)
           store.removeFrame(frameId)
         })
+
+        frameInstance.on('maximize', () => {
+          console.log('FRAME MAXIMIZE')
+          // store.updateFrame(frameId, { maximized: true })
+        })
+
+        frameInstance.on('enter-full-screen', () => {
+          console.log('FRAME enter-full-screen')
+          // store.updateFrame(frameId, { maximized: true })
+        })
+
+        frameInstance.on('leave-full-screen', () => {
+          console.log('FRAME leave-full-screen')
+          // store.updateFrame(frameId, { maximized: true })
+        })
+
+        frameInstance.on('unmaximize', () => {
+          console.log('FRAME UNMAXIMIZE')
+          // store.updateFrame(frameId, { maximized: false })
+        })
+
+
       })
 
     // destroy each frame instance that is no longer in the store
