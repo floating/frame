@@ -287,9 +287,21 @@ const api = {
     const win = BrowserWindow.fromWebContents(e.sender)
     win.maximize()
   },
+  unmax: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.unmaximize()
+  },
   min: (e) => {
     const win = BrowserWindow.fromWebContents(e.sender)
     win.minimize()
+  },
+  full: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.setFullScreen(true)
+  },
+  unfull: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.setFullScreen(false)
   },
   getTray: () => {
     return windows.tray

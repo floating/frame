@@ -545,6 +545,9 @@ module.exports = {
   addFrame: (u, frame) => {
     u('main.frames', frame.id, () => frame)
   },
+  updateFrame: (u, frameId, update) => {
+    u('main.frames', frameId, frame => Object.assign({}, frame, update))
+  },
   removeFrame: (u, frameId) => {
     u('main.frames', frames => {
       delete frames[frameId]

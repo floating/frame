@@ -205,6 +205,10 @@ ipcMain.on('frame:max', e => {
   windows.max(e)
 })
 
+ipcMain.on('frame:unmax', e => {
+  windows.unmax(e)
+})
+
 // ipcMain.on('tray:launchDapp', async (e, domain) => {
 //   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
 //   await dapps.launch(domain, console.error)

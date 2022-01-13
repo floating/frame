@@ -15,9 +15,21 @@ class Title extends React.Component {
     link.send('frame:max')
   }
 
+  handleUnmax () {
+    link.send('frame:unmax')
+  }
+
+  handleFull () {
+    link.send('frame:full')
+  }
+
+  handleUnfull () {
+    link.send('frame:unfull')
+  }
+
   render () {
-    const platform = this.store('platform')
-    const maximized = false
+    const platform = 'linux' // this.store('platform')
+    const { fullscreen, maximized } = this.store('main.frames', window.frameId)
     return (
       <div className='nativeControls'>
         {platform === 'darwin' ? (
@@ -38,10 +50,10 @@ class Title extends React.Component {
                   <path d='m11 0v1h-11v-1z' />
                 </svg>
               </div>
-              {maximized ? (
+              {maximized || fullscreen ? (
                 <div 
                   className='windowsControlsButton'
-                  onClick={this.handleMax}
+                  onClick={this.handleUnmax}
                 >
                   <svg width='11' height='11' viewBox='0 0 11 11'>
                     <path d='m11 8.7978h-2.2021v2.2022h-8.7979v-8.7978h2.2021v-2.2022h8.7979zm-3.2979-5.5h-6.6012v6.6011h6.6012zm2.1968-2.1968h-6.6012v1.1011h5.5v5.5h1.1011z' />
@@ -87,13 +99,13 @@ class Title extends React.Component {
                   <path fill='currentColor' d='M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z' />
                 </svg>
               </div>
-              {maximized ? (
+              {maximized || fullscreen ? (
                 <div 
                   className='linuxControlsButton'
-                  onClick={this.handleMax}
+                  onClick={this.handleUnmax}
                 >
                   <svg className='linuxControlsMax' viewBox='0 0 448 512'>
-                    <path fill='currentColor' d='M212.686 315.314L120 408l32.922 31.029c15.12 15.12 4.412 40.971-16.97 40.971h-112C10.697 480 0 469.255 0 456V344c0-21.382 25.803-32.09 40.922-16.971L72 360l92.686-92.686c6.248-6.248 16.379-6.248 22.627 0l25.373 25.373c6.249 6.248 6.249 16.378 0 22.627zm22.628-118.628L328 104l-32.922-31.029C279.958 57.851 290.666 32 312.048 32h112C437.303 32 448 42.745 448 56v112c0 21.382-25.803 32.09-40.922 16.971L376 152l-92.686 92.686c-6.248 6.248-16.379 6.248-22.627 0l-25.373-25.373c-6.249-6.248-6.249-16.378 0-22.627z' />
+                    <path fill='currentColor' d='M4.686 427.314L104 328l-32.922-31.029C55.958 281.851 66.666 256 88.048 256h112C213.303 256 224 266.745 224 280v112c0 21.382-25.803 32.09-40.922 16.971L152 376l-99.314 99.314c-6.248 6.248-16.379 6.248-22.627 0L4.686 449.941c-6.248-6.248-6.248-16.379 0-22.627zM443.314 84.686L344 184l32.922 31.029c15.12 15.12 4.412 40.971-16.97 40.971h-112C234.697 256 224 245.255 224 232V120c0-21.382 25.803-32.09 40.922-16.971L296 136l99.314-99.314c6.248-6.248 16.379-6.248 22.627 0l25.373 25.373c6.248 6.248 6.248 16.379 0 22.627z' />
                   </svg>
                 </div>
               ) : (
