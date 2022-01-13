@@ -28,7 +28,7 @@ class Title extends React.Component {
   }
 
   render () {
-    const platform = 'linux' // this.store('platform')
+    const platform = this.store('platform')
     const { fullscreen, maximized } = this.store('main.frames', window.frameId)
     return (
       <div className='nativeControls'>
