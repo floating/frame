@@ -2,6 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import DappTile from './DappTile'
+import Native from './Native'
 import svg from '../../resources/svg'
 import link from '../../resources/link'
 
@@ -29,6 +30,7 @@ class App extends React.Component {
 
     return (
       <div className='splash'>
+        <Native />
         <div className='overlay' />
         <div className='mainLeft'>
           <div className='accountTile' onClick={() => {
@@ -56,6 +58,7 @@ class App extends React.Component {
               <div className='mainDappBackground' style={{
                 background: currentDapp.colors ? currentDapp.colors.background : 'none'
               }}>
+                <div className='mainDappBackgroundTop' />
                 {!currentView.ready ? (
                   <div className='mainDappLoading'>
                     <div className='loader'
