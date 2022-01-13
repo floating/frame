@@ -77,11 +77,8 @@ class Balances extends React.Component {
   }
 
   getBalances (chainId, rawBalances, rates, chainLayer) {
-    const tokenBalances = rawBalances
-      .filter(b => b.chainId === chainId && b.address !== NATIVE_CURRENCY)
-
-    const balances = tokenBalances
-      .filter(Boolean)
+    const balances = rawBalances
+      .filter(b => b.chainId === chainId && b.address !== NATIVE_CURRENCY) // only tokens
       .map(rawBalance => {
         const rate = rates[rawBalance.address || rawBalance.symbol] || {}
 
@@ -114,7 +111,6 @@ class Balances extends React.Component {
 
     return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
   }
-
 
   renderBalance (symbol, balanceInfo, i, doneScanning) {
     const rawBalance = parseInt(balanceInfo.balance) || 0
@@ -230,14 +226,14 @@ class Balances extends React.Component {
         </div>
         {totalValue.toNumber() > 10000 && hotSigner ? (
           <div 
-            className='signerBlanceWarning'
+            className='signerBalanceWarning'
             onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
           >
-            <div className='signerBlanceWarningTitle'>
+            <div className='signerBalanceWarningTitle'>
               {'high value account is using hot signer'}
             </div>
-            {this.state.showHighHotMessage ? <div className='signerBlanceWarningMessage'>
-              {'We recommend using our of our supported hardware signers to increasing the security of your account'}
+            {this.state.showHighHotMessage ? <div className='signerBalanceWarningMessage'>
+              {'We recommend using one of our supported hardware signers to increase the security of your account'}
             </div> : null}
           </div>
         ) : null}

@@ -17,11 +17,8 @@ async function frameTokenList () {
   log.debug('loading tokens from tokens.frame.eth')
 
   try {
-    // FIXME: put this back when ENS record is updated correctly
-    // const tokenListRecord = await nebula.resolve('tokens.frame.eth')
-    // const tokens = (await nebula.ipfs.getJson(tokenListRecord.record.content)).tokens
-
-    const tokenManifest: { tokens: TokenSpec[] } = await nebula.ipfs.getJson(tokenListPath)
+    const tokenListRecord = await nebula.resolve('tokens.frame.eth')
+    const tokenManifest: { tokens: TokenSpec[] } = await nebula.ipfs.getJson(tokenListRecord.record.content)
     const tokens = tokenManifest.tokens
 
     log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)

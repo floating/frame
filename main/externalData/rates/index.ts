@@ -6,10 +6,10 @@ import coingecko, { CoinId, PlatformId } from '../coingecko'
 const FETCH_BATCH_SIZE = 200
 
 // { symbol: coinId }
-let allCoins: { [symbol: string]: CoinId }
+let allCoins: Record<string, CoinId>
 
 // { chainId: platformId }
-let allPlatforms: { [chainId: number]: PlatformId }
+let allPlatforms: Record<number, PlatformId>
 
 function createRate (quote: any): Rate {
   return {

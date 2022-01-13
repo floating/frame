@@ -374,6 +374,7 @@ class Provider extends EventEmitter {
 
   approveTransactionRequest (req: TransactionRequest, cb: Callback<string>) {
     log.info('approveRequest', req)
+
     accounts.lockRequest(req.handlerId)
     if (req.data.nonce) return this.signAndSend(req, cb)
     this.getNonce(req.data, response => {

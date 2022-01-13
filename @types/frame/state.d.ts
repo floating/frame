@@ -87,7 +87,7 @@ interface ViewMetadata {
 interface Frame {
   id: string,
   currentView: string,
-  views: { [id: string]: ViewMetadata }
+  views: Record<string, ViewMetadata>
 }
 
 interface Dapp {

@@ -17,11 +17,6 @@ import Dropdown from '../Components/Dropdown'
 
 class Panel extends React.Component {
 
-  // constructor (...args) {
-  //   super(...args)
-  //   this.state = {}
-  // }
-
   indicator (connection) {
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {

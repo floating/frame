@@ -24,4 +24,3 @@ declare class Chains extends EventEmitter {
 declare const chainConnection: Chains
 
 export default chainConnection
-

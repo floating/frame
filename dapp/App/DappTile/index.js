@@ -1,6 +1,5 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 class App extends React.Component {
