@@ -101,7 +101,7 @@ export default {
     const views = frameInstance.views || {}
     const { frameId } = frameInstance
 
-    const {url} = store('main.frames', frameId, 'views', viewId)
+    const { url } = store('main.frames', frameId, 'views', viewId)
     const { ens, session } = extract(url)
     server.sessions.remove(ens, session)
 
@@ -113,10 +113,12 @@ export default {
     delete views[viewId]
   },
   position: (frameInstance: FrameInstance, viewId: string) => {
+    const { frameId } = frameInstance
+    const { fullscreen } = store('main.frames', frameId)
     const viewInstance = (frameInstance.views || {})[viewId]
     if (viewInstance) {
       const { width, height } = frameInstance.getBounds()
-      viewInstance.setBounds({ x: 0, y: 32, width: width, height: height - 32 })
+      viewInstance.setBounds({ x: 0, y: fullscreen ? 0 : 32, width: width, height: fullscreen ? height : height - 32})
       // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
       viewInstance.setAutoResize({ width: true, height: true })
     }
