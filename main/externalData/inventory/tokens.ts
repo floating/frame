@@ -2,7 +2,6 @@ import log from 'electron-log'
 import nebulaApi from '../../nebula'
 
 const nebula = nebulaApi('tokenWorker')
-const tokenListPath = '/ipns/k51qzi5uqu5dgj8vqkoy9ctids6zfwn53tazlfgqv44svb0ktdkdw02qopy1y1'
 
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'
