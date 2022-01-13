@@ -44,13 +44,13 @@ type Balance = Token & { balance: string, displayBalance: string }
 function getNativeCurrency (chainId: number) {
   const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
 
-  return (currency || { usd: { price: new BigNumber(0) } }) as Currency
+  return (currency || { usd: { price: 0 } }) as Currency
 }
 
 function getRate (address: Address) {
   const rate = store('main.rates', address.toLowerCase())
 
-  return (rate || { usd: { price: new BigNumber(0) } }) as Rate
+  return (rate || { usd: { price: 0 } }) as Rate
 }
 
 function loadAssets (accountId: string) {

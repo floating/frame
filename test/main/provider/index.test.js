@@ -43,6 +43,7 @@ beforeEach(() => {
   eventTypes.forEach(eventType => provider.subscriptions[eventType] = [])
 
   accountRequests = []
+  store.set('main.scanning', address, false)
   store.set('main.accounts', {})
   store.set('main.currentNetwork.id', 1)
 
@@ -466,7 +467,7 @@ describe('#send', () => {
         expect(response.error).toBe(undefined)
         expect(response.result.nativeCurrency).toHaveLength(1)
 
-        expect(response.result.nativeCurrency[0]).toEqual(balances[2])
+        expect(response.result.nativeCurrency[0]).toEqual(expect.objectContaining(balances[2]))
 
         done()
       })
@@ -477,9 +478,21 @@ describe('#send', () => {
         expect(response.error).toBe(undefined)
         expect(response.result.erc20).toHaveLength(2)
 
-        expect(response.result.erc20[0]).toEqual(balances[0])
-        expect(response.result.erc20[1]).toEqual(balances[1])
+        expect(response.result.erc20[0]).toEqual(expect.objectContaining(balances[0]))
+        expect(response.result.erc20[1]).toEqual(expect.objectContaining(balances[1]))
 
+        done()
+      })
+    })
+
+    it('returns an error while scanning', done => {
+      store.set('main.scanning', address, true)
+
+      send({ method: 'wallet_getAssets', id: 51, jsonrpc: '2.0' }, response => {
+        expect(response.id).toBe(51)
+        expect(response.jsonrpc).toBe('2.0')
+        expect(response.result).toBe(undefined)
+        expect(response.error.code).toBe(5901)
         done()
       })
     })
@@ -1281,10 +1294,14 @@ describe('state change events', () => {
       const balance = {
         symbol: 'ETH',
         balance: '0xe7',
-        address: '0x0000000000000000000000000000000000000000'
+        address: '0x0000000000000000000000000000000000000000',
+        chainId: 1
       }
 
       store.set('main.balances', account, [balance])
+
+      const priceData = { usd: { price: 3815.91 } }
+      store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
 
       provider.once('data:address', ((accountId, event) => {
         expect(accountId).toBe(account)
@@ -1293,7 +1310,7 @@ describe('state change events', () => {
         expect(event.params.subscription).toBe(subscriptionId)
         expect(event.params.result).toEqual({
           account,
-          nativeCurrency: [balance],
+          nativeCurrency: [{ ...balance, currencyInfo: priceData }],
           erc20: []
         })
 
@@ -1313,6 +1330,9 @@ describe('state change events', () => {
 
       store.set('main.balances', account, [balance])
 
+      const priceData = { usd: { price: 225.35 } }
+      store.set('main.rates', balance.address, priceData)
+
       provider.once('data:address', ((accountId, event) => {
         expect(accountId).toBe(account)
         expect(event.method).toBe('eth_subscription')
@@ -1321,7 +1341,7 @@ describe('state change events', () => {
         expect(event.params.result).toEqual({
           account,
           nativeCurrency: [],
-          erc20: [balance]
+          erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }]
         })
 
         done()
@@ -1345,6 +1365,16 @@ describe('state change events', () => {
 
       store.set('main.balances', account, [])
       store.set('selected.current', account)
+
+      store.getObserver('provider:account').fire()
+    })
+
+    it('does not fire an assetsChanged event while scanning', () => {
+      provider.once('data:address', () => { throw new Error('event fired while still scanning!') })
+
+      store.set('main.balances', account, [{ address: '0xany' }])
+      store.set('selected.current', account)
+      store.set('main.scanning', account, true)
 
       store.getObserver('provider:account').fire()
     })
