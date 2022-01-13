@@ -384,11 +384,14 @@ const migrations = {
   },
   18: initial => {
     // move custom tokens to new location
+    let existingCustomTokens = []
+
     if (Array.isArray(initial.main.tokens)) {
-      const existingCustomTokens = [...(initial.main.tokens || [])]
-      initial.main.tokens = { custom: existingCustomTokens }
+      existingCustomTokens = [...initial.main.tokens]
     }
     
+    initial.main.tokens = { custom: existingCustomTokens }
+
     return initial
   }
 }

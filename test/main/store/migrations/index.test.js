@@ -440,9 +440,18 @@ describe('migration 18', () => {
   })
 
   it('migrates no custom tokens to an empty array', () => {
+    state.main.tokens = []
+
+    const updatedState = migrations.apply(state)
+
+    expect(updatedState.main.tokens).toEqual({ custom: []})
+  })
+
+  it('migrates missing custom tokens to an empty array', () => {
     state.main.tokens = undefined
 
     const updatedState = migrations.apply(state)
+
     expect(updatedState.main.tokens).toEqual({ custom: []})
   })
 })
