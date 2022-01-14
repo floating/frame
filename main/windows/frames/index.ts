@@ -56,7 +56,22 @@ export default class FrameManager {
         })
         
         frameInstance.on('leave-full-screen', () => {
-          store.updateFrame(frameId, { fullscreen: false })
+          const platform = store('platform')
+          // Handle broken linux window events
+          if (platform !== 'win32' && platform !== 'darwin' && !frameInstance.isFullScreen()) {
+            if (frameInstance.isMaximized()) {
+              // Trigger views to reposition
+              setTimeout(() => {
+                const frame = frames[frameId]
+                viewInstances.position(frameInstance, frame.currentView)
+              }, 100)
+              store.updateFrame(frameId, { maximized: true })
+            } else {
+              store.updateFrame(frameId, { maximized: false })
+            }
+          } else {
+            store.updateFrame(frameId, { fullscreen: false })
+          }
         })
       })
 
@@ -109,7 +124,9 @@ export default class FrameManager {
         if (frame.currentView === frameViewId && viewData.ready) {
           frameInstance.addBrowserView(viewInstance)
           viewInstances.position(frameInstance, frameViewId)
-          viewInstance.webContents.focus()
+          setTimeout(() => {
+            if (frameInstance.isFocused()) viewInstance.webContents.focus()
+          }, 100)
         } else {
           frameInstance.removeBrowserView(viewInstance)
         }
