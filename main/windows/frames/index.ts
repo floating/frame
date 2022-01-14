@@ -124,6 +124,9 @@ export default class FrameManager {
         if (frame.currentView === frameViewId && viewData.ready) {
           frameInstance.addBrowserView(viewInstance)
           viewInstances.position(frameInstance, frameViewId)
+          // Prevents white flicker when adding view
+          frameInstance.removeBrowserView(viewInstance)
+          frameInstance.addBrowserView(viewInstance)
           setTimeout(() => {
             if (frameInstance.isFocused()) viewInstance.webContents.focus()
           }, 100)

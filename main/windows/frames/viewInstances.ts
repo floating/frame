@@ -79,7 +79,7 @@ export default {
   
     frameInstance.removeBrowserView(viewInstance)
 
-    viewInstance.webContents.openDevTools({ mode: 'detach' })
+    // viewInstance.webContents.openDevTools({ mode: 'detach' })
 
     viewInstance.webContents.session.cookies.set({
       url: view.url,
