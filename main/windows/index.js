@@ -262,6 +262,7 @@ const api = {
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistant
     const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+    windows.tray.setMinimumSize(358, dev && !fullheight ? 740 : area.height)
     windows.tray.setSize(358, dev && !fullheight ? 740 : area.height)
     const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
     windows.tray.setPosition(pos.x, pos.y)
