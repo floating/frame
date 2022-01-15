@@ -73,6 +73,15 @@ export default class FrameManager {
             store.updateFrame(frameId, { fullscreen: false })
           }
         })
+
+        frameInstance.on('focus', () => {
+          // Give focus to current view
+          const { currentView } = frames[frameId]
+          if (currentView && frameInstance) {
+            frameInstance.views = frameInstance.views || {}
+            frameInstance.views[currentView].webContents.focus()
+          } 
+        })
       })
 
     // destroy each frame instance that is no longer in the store
