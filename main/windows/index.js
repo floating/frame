@@ -256,8 +256,20 @@ const api = {
     // hideShow.running = 'show'
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistant
-    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    windows.tray.setSize(358, dev && !fullheight ? 740 : area.height)
+    const screen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
+    if (dev && !fullheight) {
+      windows.tray.setSize(358, 740)
+    } else if (screen.workArea.height === screen.bounds.height) {
+      // Ugly fix for https://github.com/electron/electron/issues/8069
+      // The taskbar size is not being accounted for in the workArea.
+      // This causes us to over-size the tray which makes bottom portion of the tray invisible.
+      // Overflow also makes window manager act weirdly. 
+      // For example, Gnome starts displaying it on the first monitor rather than target monitor if there are multiple monitors.
+      // I don't know how to get the exact taskbar size, so we're going to assume taskbar takes 50 pixels :)
+      windows.tray.setSize(358, screen.workArea.height - 50)
+    } else {
+      windows.tray.setSize(358, screen.workArea.height)
+    }
     const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) windows.tray.focus()
