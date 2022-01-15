@@ -179,6 +179,10 @@ export default class FrameManager {
       })
     }
   }
+
+  isFrameShowing () {
+    return Object.keys(this.frameInstances).some(win => this.frameInstances[win].isVisible())
+  }
 }
 
 // Test actions
