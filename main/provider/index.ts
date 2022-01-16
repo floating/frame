@@ -397,6 +397,7 @@ class Provider extends EventEmitter {
 
     return {
       ...rawTx,
+      from: rawTx.from || accounts.current().id,
       type: '0x0',
       value: addHexPrefix(unpadHexString(value || '0x') || '0'),
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),

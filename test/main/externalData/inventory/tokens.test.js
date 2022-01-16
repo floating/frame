@@ -2,9 +2,9 @@ import TokenLoader from '../../../../main/externalData/inventory/tokens'
 import log from 'electron-log'
 
 jest.mock('../../../../main/nebula', () => jest.fn(() => ({
-  resolve: () => ({ record: {} }),
+  resolve: async () => ({ record: {} }),
   ipfs: {
-    getJson: () => ({
+    getJson: async () => ({
       tokens: [{ name: 'another-token', chainId: 299, address: '0x9999' }]
     })
   }
@@ -37,22 +37,13 @@ it('loads the included sushiswap token list', () => {
   expect(tokens[0].name).toBe('Aave')
 })
 
-it('loads a token list from nebula', done => {
-  tokenLoader.start()
+it('loads a token list from nebula', async () => {
+  await tokenLoader.start()
 
-  process.nextTick(() => {
-    const tokens = tokenLoader.getTokens(299)
-  
-    expect(tokens.length).toBe(1)
-    expect(tokens[0].name).toBe('another-token')
-    done()
-  })
+  const tokens = tokenLoader.getTokens(299)
 
-  // let async requests resolve
-  Promise.resolve().then(() =>
-  Promise.resolve().then(() =>
-    jest.runAllTicks()
-  ))
+  expect(tokens.length).toBe(1)
+  expect(tokens[0].name).toBe('another-token')
 })
 
 it('loads the default token list for mainnet', () => {

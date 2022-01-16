@@ -18,6 +18,7 @@ async function frameTokenList () {
   try {
     const tokenListRecord = await nebula.resolve('tokens.frame.eth')
     const tokenManifest: { tokens: TokenSpec[] } = await nebula.ipfs.getJson(tokenListRecord.record.content)
+
     const tokens = tokenManifest.tokens
 
     log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
@@ -72,8 +73,8 @@ export default class TokenLoader {
     log.info(`updated token list to contain ${this.tokenList.length} tokens`)
   }
 
-  start () {
-    this.loadTokenList()
+  async start () {
+    await this.loadTokenList()
     this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
   }
   
