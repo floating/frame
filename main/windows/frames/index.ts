@@ -130,17 +130,19 @@ export default class FrameManager {
         if (!instanceViewIds.includes(frameViewId)) viewInstances.create(frameInstance, viewData)
         
         // Show the correct one
-        if (frame.currentView === frameViewId && viewData.ready) {
+        if (frame.currentView === frameViewId && viewData.ready && frameInstance.showingView !== frameViewId) {
           frameInstance.addBrowserView(viewInstance)
           viewInstances.position(frameInstance, frameViewId)
           // Prevents white flicker when adding view
           frameInstance.removeBrowserView(viewInstance)
           frameInstance.addBrowserView(viewInstance)
+          frameInstance.showingView = frameViewId
           setTimeout(() => {
             if (frameInstance.isFocused()) viewInstance.webContents.focus()
           }, 100)
-        } else {
+        } else if (frame.currentView !== frameViewId && frameInstance.showingView === frameViewId) {
           frameInstance.removeBrowserView(viewInstance)
+          frameInstance.showingView = ''
         }
       })
     })

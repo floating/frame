@@ -8,7 +8,8 @@ import topRight from './topRight'
 
 export interface FrameInstance extends BrowserWindow {
   frameId?: string,
-  views?: Record<string, BrowserView>
+  views?: Record<string, BrowserView>,
+  showingView?: string
 }
 
 export default {
@@ -44,7 +45,8 @@ export default {
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()
     })
-  
+    
+    frameInstance.showingView = ''
     frameInstance.frameId = frame.id
     frameInstance.views = {}
 
