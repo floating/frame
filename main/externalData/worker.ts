@@ -90,10 +90,14 @@ async function chainBalanceScan (address: string) {
   }
 }
 
-function ratesScan (symbols: string[], chainId: number) {
-  rates(symbols, chainId)
-    .then(loadedRates => sendToMainProcess({ type: 'rates', rates: loadedRates }))
-    .catch(err => log.error('rates scan error', err))
+async function ratesScan (symbols: string[], chainId: number) {
+  try {
+    const loadedRates = await rates(symbols, chainId)
+    sendToMainProcess({ type: 'rates', rates: loadedRates })
+  } catch (e) {
+    log.error('rates scan error', e)
+    sendToMainProcess({ type: 'pause', task: 'rates', interval: 20 * 1000 })
+  }
 }
 
 function nativeCurrencyScan (symbols: string[]) {
