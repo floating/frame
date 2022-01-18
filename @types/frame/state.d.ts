@@ -1,9 +1,22 @@
+interface Connection {
+  on: boolean,
+  connected: boolean,
+  current: string,
+  status: string,
+  network: string,
+  custom: string
+}
+
 interface Network {
   id: number,
   name: string,
   symbol: string,
   layer: string,
-  on: boolean
+  on: boolean,
+  connection: {
+    primary: Connection,
+    secondary: Connection
+  }
 }
 
 interface NetworkMetadata {
