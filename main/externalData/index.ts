@@ -10,6 +10,7 @@ const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
 let activeAddress: Address
 let trackedAddresses: Address[] = []
+let connectedChains: number[] = []
 let outstandingScans = 0
 
 let allNetworksObserver: Observer, tokenObserver: Observer
@@ -92,6 +93,12 @@ function endScanning (address: Address) {
   outstandingScans = 0
 
   store.setScanning(address, false)
+}
+
+function getConnectedNetworks () {
+  const networks = storeApi.getNetworks()
+  return networks
+      .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
 }
 
 function allowRatesScan () {
@@ -265,7 +272,7 @@ function scanNetworkCurrencyRates () {
   }
 
   nativeCurrencyScan = startScan(() => {
-    const networks = storeApi.getNetworks()
+    const networks = getConnectedNetworks()
     const networkCurrencies = [...new Set(networks.map(n => n.symbol.toLowerCase()))]
 
     updateNativeCurrencyData(networkCurrencies)
@@ -301,7 +308,7 @@ const updateRates = (symbols: string[], chainId: number) => {
 const updateNativeCurrencyData = (symbols: string[]) => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
   if (activeAddress) {
-    const activeNetworkIds = storeApi.getNetworks().filter(network => network.on).map(network => network.id)
+    const activeNetworkIds = getConnectedNetworks().map(network => network.id)
     const customTokens = storeApi.getCustomTokens()
     const knownTokens = storeApi.getKnownTokens(activeAddress).filter(
       token => !customTokens.some(t => t.address === token.address && t.chainId === token.chainId)
@@ -346,7 +353,17 @@ function setActiveAddress (address: Address) {
 
 function startScanning () {
   allNetworksObserver = store.observer(() => {
-    scanNetworkCurrencyRates()
+    const connectedNetworkIds = getConnectedNetworks().map(n => n.id)
+
+    if (
+      connectedNetworkIds.length !== connectedChains.length ||
+      connectedNetworkIds.some((chainId, i) => connectedChains[i] !== chainId)
+    ) {
+      connectedChains = connectedNetworkIds
+      
+      scanNetworkCurrencyRates()
+      scanActiveData()
+    }
   })
 
   tokenObserver = store.observer(() => {
