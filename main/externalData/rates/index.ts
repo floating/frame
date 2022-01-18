@@ -40,8 +40,7 @@ async function loadCoins () {
     return allCoins
   } catch (e) {
     log.error('unable to load coin data', e)
-  } finally {
-    setTimeout(loadCoins, 60 * 1000)
+    throw e
   }
 }
 
@@ -61,8 +60,7 @@ async function loadPlatforms () {
     return allPlatforms
   } catch (e) {
     log.error('unable to load asset platform data', e)
-  } finally {
-    setTimeout(loadPlatforms, 60 * 1000)
+    throw e
   }
 }
 

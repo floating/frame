@@ -14,7 +14,12 @@ let outstandingScans = 0
 
 let allNetworksObserver: Observer, tokenObserver: Observer
 let scanWorker: ChildProcess | null
-let heartbeat: NullableTimeout, trackedAddressScan: NullableTimeout, nativeCurrencyScan: NullableTimeout, inventoryScan: NullableTimeout, scanningReset: NullableTimeout
+let heartbeat: NullableTimeout,
+    trackedAddressScan: NullableTimeout,
+    nativeCurrencyScan: NullableTimeout,
+    inventoryScan: NullableTimeout,
+    scanningReset: NullableTimeout,
+    ratesPause: NullableTimeout
 
 interface WorkerMessage {
   type: string,
@@ -46,6 +51,12 @@ interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
 interface RatesMessage extends Omit<WorkerMessage, 'type'> {
   type: 'rates',
   rates: Record<string, Rate>
+}
+
+interface PauseMessage extends Omit<WorkerMessage, 'type'> {
+  type: 'pause',
+  interval: number,
+  task: string
 }
 
 const storeApi = {
@@ -83,6 +94,13 @@ function endScanning (address: Address) {
   store.setScanning(address, false)
 }
 
+function allowRatesScan () {
+  if (ratesPause) {
+    clearTimeout(ratesPause)
+    ratesPause = null
+  }
+}
+
 function createWorker () {
   if (scanWorker) {
     scanWorker.kill()
@@ -101,6 +119,14 @@ function createWorker () {
 
     if (message.type === 'ready') {
       startScanning()
+    }
+
+    if (message.type === 'pause') {
+      const pauseMessage = message as PauseMessage
+
+      if (pauseMessage.task === 'rates') {
+        ratesPause = setTimeout(allowRatesScan, pauseMessage.interval)
+      }
     }
 
     if (message.type === 'nativeCurrencyData') {
@@ -267,7 +293,11 @@ function scanActiveData () {
 }
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
-const updateRates = (symbols: string[], chainId: number) => sendCommandToWorker('updateRates', [symbols, chainId])
+
+const updateRates = (symbols: string[], chainId: number) => {
+  if (!ratesPause) sendCommandToWorker('updateRates', [symbols, chainId])
+}
+
 const updateNativeCurrencyData = (symbols: string[]) => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
   if (activeAddress) {
@@ -306,6 +336,7 @@ function setActiveAddress (address: Address) {
   activeAddress = address
   if (!activeAddress) return
 
+  allowRatesScan()
   addAddresses([address])
 
   if (heartbeat) {
@@ -349,15 +380,18 @@ function stop () {
   allNetworksObserver.remove()
   tokenObserver.remove()
 
-  const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan, scanningReset]
-
+  const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan]
   scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
+
+  const resets = [scanningReset, ratesPause]
+  resets.forEach(reset => { if (reset) clearTimeout(reset) })
 
   heartbeat = null
   trackedAddressScan = null
   nativeCurrencyScan = null
   inventoryScan = null
   scanningReset = null
+  ratesPause = null
 }
 
 function restart () {
