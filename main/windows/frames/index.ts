@@ -195,5 +195,3 @@ export default class FrameManager {
     return Object.keys(this.frameInstances).some(win => this.frameInstances[win].isVisible())
   }
 }
-
-// Test actions
