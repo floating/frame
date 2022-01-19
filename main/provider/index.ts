@@ -838,12 +838,14 @@ class Provider extends EventEmitter {
   private parseTargetChain (payload: RPCRequestPayload) {
     const target: Chain = { type: 'ethereum', id: 0 }
 
-    if (!('chain' in payload)) {
-      target.id = store('main.currentNetwork.id')
+    if (!('chainId' in payload)) {
+      return { ...target, id: store('main.currentNetwork.id') }
     }
 
     const chainId = parseInt(payload.chainId || '', 16)
-    if (!!store('main.networks.ethereum', chainId)) {
+    const chainConnection = this.connection.connections['ethereum'][chainId]
+
+    if (!!chainConnection) {
       target.id = chainId
     }
 
@@ -856,7 +858,7 @@ class Provider extends EventEmitter {
 
     if (!targetChain.id) {
       log.warn('received request with unknown chain', JSON.stringify(payload))
-      return this.resError(`unknown chain: ${payload.chainId}`, payload, res)
+      return this.resError({ message: `unknown chain: ${payload.chainId}`, code: 4901 }, payload, res)
     }
 
     if (method === 'eth_coinbase') return this.getCoinbase(payload, res)
