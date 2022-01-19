@@ -77,6 +77,13 @@ class Device {
     }).catch(err => cb(err))
   }
 
+  ethereumSignTypedData (path, data, cb) {
+    TrezorConnect.ethereumSignTypedData({ device: this.device, path, data, metamask_v4_compat: true }).then(res => {
+      if (!res.success) return cb(new Error(res.payload.error))
+      cb(null, res.payload)
+    }).catch(err => cb(err))
+  }
+
   ethereumVerifyMessage (path, address, message, signature, cb) {
     TrezorConnect.ethereumVerifyMessage({ device: this.device, path, address, message, signature }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
@@ -161,6 +168,11 @@ class Trezor {
   ethereumSignMessage (id, path, message, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
     this.devices[id].ethereumSignMessage(path, message, cb)
+  }
+
+  ethereumSignTypedData (id, path, message, cb) {
+    if (!this.devices[id]) return this.deviceNotFound(id, cb)
+    this.devices[id].ethereumSignTypedData(path, message, cb)
   }
 
   ethereumVerifyMessage (id, path, message, cb) {

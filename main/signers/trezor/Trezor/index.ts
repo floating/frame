@@ -221,18 +221,42 @@ export default class Trezor extends Signer {
 
   // Standard Methods
   signMessage (index: number, message: string, cb: Callback<string>) {
-    const rpcCallback: Callback<any> = (err, result) => {
+    const rpcCallback: FlexCallback<any> = (err, result) => {
       if (err) {
         log.error('signMessage Error')
         log.error(err)
-        if (err.message === 'Unexpected message') err = new Error('Update Trezor Firmware')
-        cb(err, undefined)
+        if (err === 'Unexpected message') return cb(new Error('Update Trezor Firmware'))
+
+        cb(new Error(err))
       } else {
-        cb(null, '0x' + result.signature)
+        cb(null, addHexPrefix(result.signature))
       }
     }
 
     flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), rpcCallback)
+  }
+
+  // Standard Methods
+  signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
+
+    if ((parseInt(versionNum) || 0) < 4) {
+      return cb(new Error(`Invalid version (${version}), Trezor only supports eth_signTypedData version 4+`), undefined)
+    }
+
+    const rpcCallback: FlexCallback<any> = (err, result) => {
+      if (err) {
+        log.error('signMessage Error')
+        log.error(err)
+        if (err === 'Unexpected message') return cb(new Error('Update Trezor Firmware'))
+
+        cb(new Error(err))
+      } else {
+        cb(null, addHexPrefix(result.signature))
+      }
+    }
+
+    flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)
   }
 
   signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
