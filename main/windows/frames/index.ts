@@ -193,8 +193,10 @@ export default class FrameManager {
 
   refocus (id: string) {
     const frameInstance = this.frameInstances[id]
-    frameInstances.reposition(frameInstance)
-    frameInstance.focus()
+    if (frameInstance) {
+      frameInstances.reposition(frameInstance)
+      frameInstance.focus()
+    }
   }
 
   isFrameShowing () {
