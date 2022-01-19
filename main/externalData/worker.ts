@@ -1,12 +1,44 @@
 import log from 'electron-log'
 
+import ethProvider from 'eth-provider'
+
 log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
 log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
 
-import * as balances from './balances'
+import { supportsChain as chainSupportsScan } from '../multicall'
+import balancesLoader, { BalanceLoader } from './balances'
 import rates from './rates'
 import inventory from './inventory'
 import loadStaticData from './staticData'
+import TokenLoader from './inventory/tokens'
+
+interface ExternalDataWorkerMessage {
+  command: string,
+  args: any[]
+}
+
+let heartbeat: NodeJS.Timeout
+let balances: BalanceLoader
+
+const tokenLoader = new TokenLoader()
+const eth = ethProvider('frame', { name: 'scanWorker' })
+
+eth.on('connect', async () => {
+  tokenLoader.start()
+  balances = balancesLoader(eth)
+
+  sendToMainProcess({ type: 'ready' })
+})
+
+async function getChains () {
+  try {
+    const chains: string[] = await eth.request({ method: 'wallet_getChains' })
+    return chains.map(chain => parseInt(chain))
+  } catch (e) {
+    log.error('could not load chains', e)
+    return []
+  }
+}
 
 function sendToMainProcess (data: any) {
   if (process.send) {
@@ -16,42 +48,56 @@ function sendToMainProcess (data: any) {
   }
 }
 
-interface BalanceScanAddresses {
-  [address: string]: {
-    knownTokens: Token[],
-    onlyKnown: boolean
+async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = []) {
+  try {
+    // for chains that support multicall, we can attempt to load every token that we know about,
+    // for all other chains we need to call each contract individually so don't scan every contract
+    const chains = (await getChains()).filter(chainSupportsScan)
+    const tokenLists = chains.map(chainId => tokenLoader.getTokens(chainId))
+    const tokens = tokenLists.reduce((all, tokenList) => {
+      return all.concat(
+        tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
+      )
+    }, [] as Token[])
+
+    const tokenBalances = (await balances.getTokenBalances(address, tokens))
+      .filter(balance => parseInt(balance.balance) > 0)
+
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances, source: 'scan' })
+  } catch (e) {
+    log.error('error scanning for token balances', e)
   }
 }
 
-interface ExternalDataWorkerMessage {
-  command: string,
-  args: any
-}
+async function fetchTokenBalances (address: Address, tokens: Token[]) {
+  try {
+    const tokenBalances = await balances.getTokenBalances(address, tokens)
 
-let heartbeat: NodeJS.Timeout
-
-function tokenBalanceScan (addresses: BalanceScanAddresses) {
-  for (const address in addresses) {
-    const { knownTokens, onlyKnown } = addresses[address]
-
-    balances.getTokenBalances(address, { knownTokens, onlyKnown })
-      .then(foundTokens => {
-        sendToMainProcess({ type: 'tokenBalances', netId: foundTokens.chainId, address, balances: foundTokens.balances })
-      })
-      .catch(err => log.error('token scan error', err))
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances, source: 'known' })
+  } catch (e) {
+    log.error('error fetching token balances', e)
   }
 }
 
-function chainBalanceScan (address: string) {
-  balances.getNativeCurrencyBalance(address)
-    .then(balance => sendToMainProcess({ type: 'chainBalance', ...balance }))
-    .catch(err => log.error('chain balance scan error', err))
+async function chainBalanceScan (address: string) {
+  try {
+    const chains = await getChains()
+    const chainBalances = await balances.getCurrencyBalances(address, chains)
+
+    sendToMainProcess({ type: 'chainBalances', balances: chainBalances, address })
+  } catch (e) {
+    log.error('error scanning chain balance', e)
+  }
 }
 
-function ratesScan (symbols: string[], chainId: number) {
-  rates(symbols, chainId)
-    .then(loadedRates => sendToMainProcess({ type: 'rates', rates: loadedRates }))
-    .catch(err => log.error('rates scan error', err))
+async function ratesScan (symbols: string[], chainId: number) {
+  try {
+    const loadedRates = await rates(symbols, chainId)
+    sendToMainProcess({ type: 'rates', rates: loadedRates })
+  } catch (e) {
+    log.error('rates scan error', e)
+    sendToMainProcess({ type: 'pause', task: 'rates', interval: 20 * 1000 })
+  }
 }
 
 function nativeCurrencyScan (symbols: string[]) {
@@ -81,7 +127,8 @@ const messageHandler: { [command: string]: (...params: any) => void } = {
   updateRates: ratesScan,
   updateNativeCurrencyData: nativeCurrencyScan,
   updateChainBalance: chainBalanceScan,
-  updateTokenBalances: tokenBalanceScan,
+  fetchTokenBalances: fetchTokenBalances,
+  tokenBalanceScan: tokenBalanceScan,
   updateInventory: inventoryScan,
   heartbeat: resetHeartbeat
 }

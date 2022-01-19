@@ -1,4 +1,4 @@
-const store = require('../../../store')
+const store = require('../../../store').default
 
 module.exports = {
   get: hash => store(`main.dapp.storage.${hash}`),

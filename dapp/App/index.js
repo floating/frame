@@ -1,6 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-// import link from '../../resources/link'
+
+import DappTile from './DappTile'
+import Native from './Native'
+import svg from '../../resources/svg'
+import link from '../../resources/link'
 
 class App extends React.Component {
   constructor (...args) {
@@ -19,12 +23,58 @@ class App extends React.Component {
       name.forEach((v, i) => { name[i] = v.charAt(0).toUpperCase() + v.slice(1) })
       name = name.join(' ')
     }
-    const background = dapp && dapp.color ? dapp.color.background : 'white'
-    const color = dapp && dapp.color ? dapp.color.text : 'white'
+
+    const frame = this.store('main.frames', window.frameId)
+    const currentView = frame.views[frame.currentView] || {}
+    const currentDapp = currentView.dappId ? this.store('main.dapps', currentView.dappId) : ''
+
     return (
-      <div className='splash' style={{ background, color }}>
-        <div className='top'>
-          {dapp && dapp.color ? <div className='title'>{dapp.domain}</div> : null}
+      <div className='splash'>
+        <Native />
+        <div className='overlay' />
+        <div className='mainLeft'>
+          <div className='accountTile' onClick={() => {
+            link.send('unsetCurrentView')
+          }}>
+            <div className='accountIcon'>
+            </div>
+          </div>
+          <div className='dappIcons'>
+            <div className='dappIconsScroll'>
+              <div className='dappIconsWrap'>
+                {Object.keys(store('main.dapps')).map(id => {
+                  return (
+                    <DappTile ens={store('main.dapps', id, 'ens')} />
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className='main'>
+          <div className='mainTop' />
+          {currentDapp ? (
+            <>
+              <div className='mainDappBackground' style={{
+                background: currentDapp.colors ? currentDapp.colors.background : 'none'
+              }}>
+                <div className='mainDappBackgroundTop' />
+                {!currentView.ready ? (
+                  <div className='mainDappLoading'>
+                    <div className='loader'
+                      style={{
+                        borderTop: `3px solid ${currentDapp.colors.backgroundShade}`,
+                        borderRight: `3px solid ${currentDapp.colors.backgroundShade}`,
+                        borderBottom: `3px solid ${currentDapp.colors.backgroundShade}`,
+                        borderLeft: `3px solid ${currentDapp.colors.backgroundLight}`
+                      }}
+                    >
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
     )
@@ -32,3 +82,13 @@ class App extends React.Component {
 }
 
 export default Restore.connect(App)
+
+// <div className='mainApps'>
+//   {Object.keys(store('main.dapps')).map(id => {
+//     return (
+//       <pre>
+//         {JSON.stringify(store('main.dapps', id), null, 4)}
+//       </pre>
+//     )
+//   })}
+// </div>

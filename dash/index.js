@@ -24,7 +24,7 @@ link.rpc('getState', (err, state) => {
   ReactDOM.render(<Flow />, document.getElementById('flow'))
 })
 
-document.addEventListener('contextmenu', e => link.send('dash:contextmenu', e.clientX, e.clientY))
+document.addEventListener('contextmenu', e => link.send('*:contextmenu', e.clientX, e.clientY))
 
 // document.addEventListener('mouseout', e => { if (e.clientX < 0) link.send('tray:mouseout') })
 // document.addEventListener('contextmenu', e => link.send('tray:contextmenu', e.clientX, e.clientY))

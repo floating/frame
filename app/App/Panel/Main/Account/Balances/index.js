@@ -7,34 +7,39 @@ import svg from '../../../../../../resources/svg'
 
 import BigNumber from 'bignumber.js'
 
-function formatBalance (balance, decimals = 8) {
-  return balance
-    ? new Intl.NumberFormat('us-US', {
+const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
+
+function formatBalance (balance, totalValue, decimals = 8) {
+  const isZero = balance.isZero()
+  if (!isZero && balance.toNumber() < 0.001 && totalValue.toNumber() < 1) return '<0.001'
+
+  return new Intl.NumberFormat('us-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 8
       }).format(balance.toFixed(decimals, BigNumber.ROUND_FLOOR))
-    : '-.------'
 }
 
 function formatUsdRate (rate, decimals = 2) {
-  return new Intl.NumberFormat('us-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
+  return rate.isNaN()
+    ? '?.??'
+    : new Intl.NumberFormat('us-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(rate.toFixed(decimals, BigNumber.ROUND_FLOOR))
 }
 
 function balance (rawBalance, quote = {}) {
-  const balance = BigNumber(rawBalance.balance || 0)
-  const usdRate = BigNumber(quote.price || 0)
+  const balance = BigNumber(rawBalance.balance || 0).shiftedBy(-rawBalance.decimals)
+  const usdRate = BigNumber(quote.price)
   const totalValue = balance.times(usdRate)
   const balanceDecimals = Math.max(2, usdRate.shiftedBy(1).toFixed(0, BigNumber.ROUND_DOWN).length)
 
   return {
     ...rawBalance,
-    displayBalance: formatBalance(balance, balanceDecimals),
+    displayBalance: formatBalance(balance, totalValue, balanceDecimals),
     price: formatUsdRate(usdRate),
-    priceChange: BigNumber(quote['change24hr'] || 0).toFixed(2),
-    totalValue,
+    priceChange: !usdRate.isNaN() && BigNumber(quote['change24hr'] || 0).toFixed(2),
+    totalValue: totalValue.isNaN() ? BigNumber(0) : totalValue,
     displayValue: formatUsdRate(totalValue, 0)
   }
 }
@@ -71,13 +76,9 @@ class Balances extends React.Component {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
-  getBalances (chainId, defaultSymbol, rawBalances, rates, chainLayer) {
-    const mainBalance = rawBalances[defaultSymbol]
-    const tokenBalances = Object.values(rawBalances)
-      .filter(b => Number(b.chainId) === Number(chainId) && b.symbol !== defaultSymbol)
-
-    const balances = [mainBalance].concat(tokenBalances)
-      .filter(Boolean)
+  getBalances (chainId, rawBalances, rates, chainLayer) {
+    const balances = rawBalances
+      .filter(b => b.chainId === chainId && b.address !== NATIVE_CURRENCY) // only tokens
       .map(rawBalance => {
         const rate = rates[rawBalance.address || rawBalance.symbol] || {}
 
@@ -90,8 +91,12 @@ class Balances extends React.Component {
     const nativeCurrency = this.store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
 
     if (nativeCurrency) {
+      const storedNativeBalance = rawBalances.find(b => {
+        return b.chainId === chainId && b.address === NATIVE_CURRENCY
+      }) || { balance: '0x0' }
+
       const rawNativeCurrency = {
-        balance: this.store('main.balances', chainId, this.store('selected.current'), 'native.balance'), 
+        balance: storedNativeBalance.balance,
         chainId,
         decimals: 18,
         logoURI: nativeCurrency.icon,
@@ -104,11 +109,11 @@ class Balances extends React.Component {
 
     const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
 
-    return { balances, totalDisplayValue: formatUsdRate(totalValue, 0) }
+    return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
   }
 
-
   renderBalance (symbol, balanceInfo, i, doneScanning) {
+    const rawBalance = parseInt(balanceInfo.balance) || 0
     const change = parseFloat(balanceInfo.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
@@ -120,10 +125,10 @@ class Balances extends React.Component {
       }
     }
     let name = balanceInfo.name
-    if (name.length > 18) name = name.substr(0, 18) + '..'
+    if (name.length > 17) name = name.substr(0, 17) + '..'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
+        <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 || rawBalance > 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
               src={balanceInfo.logoURI}
@@ -137,7 +142,7 @@ class Balances extends React.Component {
           <div className='signerBalancePrice'>
             <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balanceInfo.price}</span>
             <span className={priceChangeClass}>
-              <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange}%</span>
+              <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange ? balanceInfo.priceChange + '%' : ''}</span>
             </span>
           </div>
           <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
@@ -145,27 +150,25 @@ class Balances extends React.Component {
             <span
               style={(balanceInfo.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
             >
-              {doneScanning || balanceInfo.displayBalance !== '0.00' ? balanceInfo.displayBalance : '---.--'}
+              {(doneScanning || rawBalance > 0) ? balanceInfo.displayBalance : '---.--'}
             </span>
           </div>
-          {doneScanning || balanceInfo.displayValue !== '0' ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
+          {(doneScanning || rawBalance > 0) ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
         </div>
       </div>
     )
   }
 
   render () {
-    const address = this.store('main.accounts', this.props.id, 'address')
+    const { address, lastSignerType } = this.store('main.accounts', this.props.id)
     const { type, id: chainId } = this.store('main.currentNetwork')
-    const currentSymbol = this.store('main.networks', type, chainId, 'symbol') || 'ETH'
     const chainLayer = this.store('main.networks', type, chainId, 'layer') || 'testnet'
-    const storedBalances = this.store('main.balances', chainId, address) || {}
+    const storedBalances = this.store('main.balances', address) || []
 
     const rates = this.store('main.rates')
 
-    let { balances, totalDisplayValue } = this.getBalances(
+    let { balances, totalDisplayValue, totalValue } = this.getBalances(
       chainId,
-      currentSymbol.toLowerCase(),
       storedBalances,
       rates,
       chainLayer
@@ -179,6 +182,8 @@ class Balances extends React.Component {
 
     const scanning = this.store('main.scanning', address)
     const initialRateScanComplete = this.store('main.initialRateScan')
+
+    const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (
       <div ref={this.moduleRef} className='balancesBlock'>
@@ -195,7 +200,7 @@ class Balances extends React.Component {
             </div>
           ) : null}
         </div>
-        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, initialRateScanComplete))}
+        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, !scanning))}
         <div className='signerBalanceTotal'>
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
@@ -219,6 +224,19 @@ class Balances extends React.Component {
             </div>
           </div>
         </div>
+        {totalValue.toNumber() > 10000 && hotSigner ? (
+          <div 
+            className='signerBalanceWarning'
+            onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
+          >
+            <div className='signerBalanceWarningTitle'>
+              {'high value account is using hot signer'}
+            </div>
+            {this.state.showHighHotMessage ? <div className='signerBalanceWarningMessage'>
+              {'We recommend using one of our supported hardware signers to increase the security of your account'}
+            </div> : null}
+          </div>
+        ) : null}
       </div>
     )
   }

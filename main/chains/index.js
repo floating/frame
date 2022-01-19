@@ -6,7 +6,7 @@ const { Hardfork } = require('@ethereumjs/common')
 const provider = require('eth-provider')
 const log = require('electron-log')
 
-const store = require('../store')
+const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
@@ -20,7 +20,7 @@ class ChainConnection extends EventEmitter {
 
     // default chain config to istanbul hardfork until a block is received
     // to update it to london
-    this.chainConfig = chainConfig(parseInt(this.chainId, 'istanbul'))
+    this.chainConfig = chainConfig(parseInt(this.chainId), 'istanbul')
 
     this.primary = {
       status: 'off',

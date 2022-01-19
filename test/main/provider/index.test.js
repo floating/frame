@@ -39,8 +39,13 @@ afterAll(() => {
 beforeEach(() => {
   provider.handlers = {}
 
+  const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'assetsChanged', 'networkChanged']
+  eventTypes.forEach(eventType => provider.subscriptions[eventType] = [])
+
   accountRequests = []
+  store.set('main.scanning', address, false)
   store.set('main.accounts', {})
+  store.set('main.currentNetwork.id', 1)
 
   connection.send = jest.fn()
   connection.connections = { ethereum: {} }
@@ -83,26 +88,64 @@ describe('#getRawTx', () => {
 })
 
 describe('#send', () => {
-  const send = (request, cb = jest.fn(), targetChain) => provider.send(request, cb, targetChain)
+  const send = (request, cb = jest.fn()) => provider.send(request, cb)
+
+  it('passes the given target chain to the connection', () => {
+    store.set('main.networks.ethereum', 10, { id: 10 })
+
+    const request = { method: 'eth_testFrame' }
+
+    send({ ...request, chainId: '0xa' })
+
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 10 })
+  })
+
+  it('passes the default target chain to the connection when none is given', () => {
+    store.set('main.currentNetwork.id', 137)
+
+    const request = { method: 'eth_testFrame' }
+
+    send(request)
+
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 137 })
+  })
+
+  it('returns an error when an unknown chain is given', () => {
+    const request = { method: 'eth_testFrame', chainId: '0x63' }
+
+    send(request, response => {
+      expect(connection.send).not.toHaveBeenCalled()
+      expect(response.error.message).toMatch(/unknown chain/)
+      expect(response.result).toBe(undefined)
+    })
+  })
+
+  it('returns an error when an invalid chain is given', () => {
+    const request = { method: 'eth_testFrame', chainId: 'test' }
+
+    send(request, response => {
+      expect(connection.send).not.toHaveBeenCalled()
+      expect(response.error.message).toMatch(/unknown chain/)
+      expect(response.result).toBe(undefined)
+    })
+  })
 
   describe('#eth_chainId', () => {
-    it('returns the current chain id from the store', done => {
+    it('returns the current chain id from the store', () => {
       store.set('main.networks.ethereum', 1, { id: 1 })
       store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
 
       send({ method: 'eth_chainId' }, response => {
         expect(response.result).toBe('0x1')
-        done()
       })
     })
 
-    it('returns a chain id from the target chain', done => {
+    it('returns a chain id from the target chain', () => {
       store.set('main.networks.ethereum', 4, { id: 4 })
 
-      send({ method: 'eth_chainId' }, response => {
+      send({ method: 'eth_chainId', chainId: '0x4' }, response => {
         expect(response.result).toBe('0x4')
-        done()
-      }, { type: 'ethereum', id: 4 })
+      })
     })
   })
 
@@ -218,7 +261,7 @@ describe('#send', () => {
           expect(response.error).toBe(undefined)
 
           const permissions = response.result
-          expect(permissions).toHaveLength(13)
+          expect(permissions).toHaveLength(14)
           expect(permissions.map(p => p.parentCapability)).toEqual(expect.arrayContaining(
             [
               'eth_coinbase',
@@ -233,7 +276,8 @@ describe('#send', () => {
               'eth_signTypedData_v3',
               'eth_signTypedData_v4',
               'wallet_switchEthereumChain',
-              'wallet_addEthereumChain'
+              'wallet_addEthereumChain',
+              'wallet_getAssets'
             ]
           ))
 
@@ -274,7 +318,7 @@ describe('#send', () => {
     
     beforeEach(() => {
       store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
-      store.set('main.tokens', [])
+      store.set('main.tokens.custom', [])
 
       request = {
         id: 10,
@@ -315,7 +359,7 @@ describe('#send', () => {
     })
 
     it('does not add a request for a token that is already added', () => {
-      store.set('main.tokens', [{ address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }])
+      store.set('main.tokens.custom', [{ address: '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e', chainId: 1 }])
 
       send(request, ({ result }) => {
         expect(result).toBe(true)
@@ -354,20 +398,119 @@ describe('#send', () => {
     })
   })
 
+  describe('#wallet_getChains', () => {
+    it('returns a list of active chains', () => {
+      store.set('main.networks.ethereum', {
+        137: { name: 'polygon', id: 137, on: true },
+        4: { name: 'rinkeby', id: 4, on: false },
+        1: { name: 'mainnet', id: 1, on: true }
+      })
+
+      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
+        expect(response.error).toBe(undefined)
+        expect(response.id).toBe(14)
+        expect(response.jsonrpc).toBe('2.0')
+        expect(response.result).toEqual(['0x1', '0x89'])
+      })
+    })
+  })
+
+  describe('#wallet_getAssets', () => {
+    const balances = [
+      {
+        address: '0x3472a5a71965499acd81997a54bba8d852c6e53d',
+        chainId: 137,
+        name: 'Polygon Badger',
+        symbol: 'BADGER',
+        balance: '0x1605d9ee98627100000',
+        decimals: 18,
+        displayBalance: '6500'
+      },
+      {
+        address: '0x383518188c0c6d7730d91b2c03a03c837814a899',
+        chainId: 1,
+        name: 'Olympus DAO',
+        symbol: 'OHM',
+        balance: '0xd14d13208',
+        decimals: 9,
+        displayBalance: '56.183829'
+      },
+      {
+        address: '0x0000000000000000000000000000000000000000',
+        chainId: 42161,
+        name: 'Ether',
+        symbol: 'AETH',
+        balance: '0xd8f8753a603f70000',
+        decimals: 18,
+        displayBalance: '250.15'
+      }
+    ]
+
+    beforeAll(() => {
+      store.set('main.balances', address, balances)
+    })
+
+    it('returns an error if no account is selected', done => {
+      accounts.current.mockReturnValueOnce(undefined)
+
+      send({ method: 'wallet_getAssets', id: 21, jsonrpc: '2.0' }, response => {
+        expect(response.id).toBe(21)
+        expect(response.jsonrpc).toBe('2.0')
+        expect(response.result).toBe(undefined)
+        expect(response.error.message.toLowerCase()).toMatch(/no account selected/)
+        done()
+      })
+    })
+
+    it('returns native currencies from all chains', done => {
+      send({ method: 'wallet_getAssets' }, response => {
+        expect(response.error).toBe(undefined)
+        expect(response.result.nativeCurrency).toHaveLength(1)
+
+        expect(response.result.nativeCurrency[0]).toEqual(expect.objectContaining(balances[2]))
+
+        done()
+      })
+    })
+
+    it('returns erc20 tokens from all chains', done => {
+      send({ method: 'wallet_getAssets' }, response => {
+        expect(response.error).toBe(undefined)
+        expect(response.result.erc20).toHaveLength(2)
+
+        expect(response.result.erc20[0]).toEqual(expect.objectContaining(balances[0]))
+        expect(response.result.erc20[1]).toEqual(expect.objectContaining(balances[1]))
+
+        done()
+      })
+    })
+
+    it('returns an error while scanning', done => {
+      store.set('main.scanning', address, true)
+
+      send({ method: 'wallet_getAssets', id: 51, jsonrpc: '2.0' }, response => {
+        expect(response.id).toBe(51)
+        expect(response.jsonrpc).toBe('2.0')
+        expect(response.result).toBe(undefined)
+        expect(response.error.code).toBe(5901)
+        done()
+      })
+    })
+  })
+
   describe('#eth_getTransactionByHash', () => {
+    const chain = 4
     const txHash = '0x06c1c968d4bd20c0ebfed34f6f34d8a5d189d9d2ce801f2ee8dd45dac32628d5'
-    const request = { method: 'eth_getTransactionByHash', params: [txHash] }
-    const chain = '4'
+    const request = { method: 'eth_getTransactionByHash', params: [txHash], chainId: '0x' + chain.toString(16) }
 
     let blockResult
 
     beforeEach(() => {
       connection.send.mockImplementation((payload, res, targetChain) => {
-        if (targetChain.id === chain && payload.params[0] === txHash) {
-          return res({ result: blockResult })
-        }
+        expect(targetChain.id).toBe(chain)
+        expect(payload.params[0]).toBe(txHash)
 
-        res({ error: 'invalid request' })
+        return res({ result: blockResult })
       })
     })
 
@@ -381,7 +524,7 @@ describe('#send', () => {
         expect(response.result.blockHash).toBe('0xc1b0227f0721a05357b2b417e3872c5f6f01da209422013fe66ee291527fb123')
         expect(response.result.blockNumber).toBe('0xc80d08')
         done()
-      }, { type: 'ethereum', id: chain })
+      })
     })
 
     it('uses maxFeePerGas as the gasPrice if one is not defined', done => {
@@ -395,7 +538,7 @@ describe('#send', () => {
         expect(response.result.gasPrice).toBe(fee)
         expect(response.result.maxFeePerGas).toBe(fee)
         done()
-      }, { type: 'ethereum', id: chain })
+      })
     })
 
     it('maintains the gasPrice if maxFeePerGas exists', done => {
@@ -411,14 +554,16 @@ describe('#send', () => {
         expect(response.result.gasPrice).toBe(gasPrice)
         expect(response.result.maxFeePerGas).toBe(maxFeePerGas)
         done()
-      }, { type: 'ethereum', id: chain })
+      })
     })
 
     it('returns a response with no result attribute', done => {
+      mockConnectionError('no transaction!')
+
       send(request, response => {
-        expect(response.error).toBe('invalid request')
+        expect(response.error.message).toBe('no transaction!')
         done()
-      }, '1')
+      })
     })
   })
 
@@ -800,15 +945,84 @@ describe('#send', () => {
     }, 100)
 
     it('passes a request with an unknown version through to the connection', done => {
+      mockConnectionError('received unhandled request')
+
       const params = [address, 'test']
 
-      connection.send.mockImplementation((payload, cb, targetChain) => {
-        cb({ error: 'received unhandled request' })
+      send({ method: 'eth_signTypedData_v5', params }, err => {
+        expect(err.error.message).toBe('received unhandled request')
+        done()
+      })
+    })
+  })
+
+  describe('subscriptions', () => {
+    const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'networkChanged']
+
+    describe('#eth_subscribe', () => {
+      const subscribe = (eventType, cb) => send({ id: 9, jsonrpc: '2.0', method: 'eth_subscribe', params: [eventType] }, cb)
+
+      eventTypes.forEach(eventType => {
+        it(`subscribes to ${eventType} events`, () => {
+          subscribe(eventType, response => {
+            expect(response.id).toBe(9)
+            expect(response.jsonrpc).toBe('2.0')
+            expect(response.error).toBe(undefined)
+            expect(response.result).toMatch(/0x\w{32}$/)
+
+            expect(provider.subscriptions[eventType]).toHaveLength(1)
+          })
+        })
       })
 
-      send({ method: 'eth_signTypedData_v5', params }, err => {
-        expect(err.error).toBe('received unhandled request')
-        done()
+      it('returns an error from the node if attempting to unsubscribe to an unknown event', () => {
+        mockConnectionError('unknown event!')
+  
+        subscribe('everythingChanged', response => {
+          expect(response.id).toBe(9)
+          expect(response.jsonrpc).toBe('2.0')
+          expect(response.error.message).toBe('unknown event!')
+          expect(response.result).toBe(undefined)
+        })
+      })
+    })
+
+    describe('#eth_unsubscribe', () => {
+      const unsubscribe = (id, cb) => send({ id: 8, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [id] }, cb)
+  
+      eventTypes.forEach(eventType => {
+        it(`unsubscribes from ${eventType} events`, () => {
+          const subId = '0x1acc2933618a0ff548f03b1c99420366'
+          provider.subscriptions[eventType] = [subId]
+  
+          unsubscribe(subId, response => {
+            expect(response.id).toBe(8)
+            expect(response.jsonrpc).toBe('2.0')
+            expect(response.error).toBe(undefined)
+            expect(response.result).toBe(true)
+            expect(provider.subscriptions[eventType]).toHaveLength(0)
+          })
+        })
+      })
+  
+      it('returns an error from the node if attempting to unsubscribe from an unknown subscription', () => {
+        mockConnectionError('unknown subscription!')
+  
+        provider.subscriptions.accountsChanged = ['0xtest1']
+        provider.subscriptions.chainChanged = ['0xtest2']
+        provider.subscriptions.chainsChanged = ['0xtest2']
+        provider.subscriptions.networkChanged = ['0xtest3']
+  
+        unsubscribe('0xanothersub', response => {
+          expect(response.id).toBe(8)
+          expect(response.jsonrpc).toBe('2.0')
+          expect(response.error.message).toBe('unknown subscription!')
+          expect(response.result).toBe(undefined)
+
+          eventTypes.forEach(eventType => {
+            expect(provider.subscriptions[eventType]).toHaveLength(1)
+          })
+        })
       })
     })
   })
@@ -919,16 +1133,15 @@ describe('#signAndSend', () => {
     })
 
     describe('failure', () => {
-      let errorMessage
+      let errorMessage = 'invalid transaction!'
 
       beforeEach(() => {
-        errorMessage = 'invalid transaction!'
-        connection.send.mockImplementation((_, cb) => cb({ error: { message: errorMessage } }))
+        mockConnectionError(errorMessage)
       })
 
       it('handles a transaction send failure', done => {
         signAndSend(err => {
-          expect(err).toBe(errorMessage)
+          expect(err.message).toBe(errorMessage)
           done()
         })
       })
@@ -946,3 +1159,230 @@ describe('#signAndSend', () => {
     })
   })
 })
+
+describe('state change events', () => {
+  describe('#chainChanged', () => {
+    it('fires a chainChanged event to subscribers', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toBe('0x89')
+        done()
+      })
+
+      store.set('main.currentNetwork.id', 137)
+      provider.subscriptions.chainChanged.push(subscriptionId)
+
+      store.getObserver('provider:chains').fire()
+    })
+  })
+
+  describe('#chainsChanged', () => {
+    const networks = {
+      1: {
+        name: 'test',
+        id: 1,
+        on: true
+      },
+      4: {
+        name: 'rinkeby',
+        id: 4,
+        on: true
+      },
+      10: {
+        name: 'optimism',
+        id: 10,
+        on: false
+      }
+    }
+
+    beforeEach(() => {
+      store.set('main.networks.ethereum', networks)
+      store.getObserver('provider:chains').fire()
+    })
+
+    it('fires a chainsChanged event when a chain is added', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1', '0x4', '0x89'])
+        done()
+      })
+
+      const polygon = {
+        name: 'polygon',
+        id: 137,
+        on: true
+      }
+
+      store.set('main.networks.ethereum', { ...networks, 137: polygon })
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider:chains').fire()
+    })
+
+    it('fires a chainsChanged event when a chain is removed', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1'])
+        done()
+      })
+
+      store.set('main.networks.ethereum', { 1: networks[1] })
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider:chains').fire()
+    })
+
+    it('fires a chainsChanged event when a chain connection is turned off', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1', '0x4', '0xa'])
+        done()
+      })
+
+      const chains = { ...networks, 10: { ...networks[10], on: true } }
+      store.set('main.networks.ethereum', chains)
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider:chains').fire()
+    })
+
+    it('fires a chainsChanged event when a chain connection is turned off', done => {
+      const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+
+      provider.once('data', event => {
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual(['0x1'])
+        done()
+      })
+
+      const chains = { ...networks, 4: { ...networks[4], on: false } }
+      store.set('main.networks.ethereum', chains)
+      provider.subscriptions.chainsChanged.push(subscriptionId)
+
+      store.getObserver('provider:chains').fire()
+    })
+  })
+
+  describe('#assetsChanged', () => {
+    const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
+    const account = '0xce070f8134f69a4d55cc4bef4a7c8d0bb56ff1d9'
+
+    beforeEach(() => {
+      provider.subscriptions.assetsChanged.push(subscriptionId)
+      provider.removeAllListeners('data:address')
+    })
+
+    it('fires an assetsChanged event when native currency assets are present', done => {
+      const balance = {
+        symbol: 'ETH',
+        balance: '0xe7',
+        address: '0x0000000000000000000000000000000000000000',
+        chainId: 1
+      }
+
+      store.set('main.balances', account, [balance])
+
+      const priceData = { usd: { price: 3815.91 } }
+      store.set('main.networksMeta.ethereum.1.nativeCurrency', priceData)
+
+      provider.once('data:address', ((accountId, event) => {
+        expect(accountId).toBe(account)
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual({
+          account,
+          nativeCurrency: [{ ...balance, currencyInfo: priceData }],
+          erc20: []
+        })
+
+        done()
+      }))
+
+      store.set('selected.current', account)
+      store.getObserver('provider:account').fire()
+    })
+
+    it('fires an assetsChanged event when erc20 assets are present', done => {
+      const balance = {
+        symbol: 'OHM',
+        balance: '0x606401fc9',
+        address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
+      }
+
+      store.set('main.balances', account, [balance])
+
+      const priceData = { usd: { price: 225.35 } }
+      store.set('main.rates', balance.address, priceData)
+
+      provider.once('data:address', ((accountId, event) => {
+        expect(accountId).toBe(account)
+        expect(event.method).toBe('eth_subscription')
+        expect(event.jsonrpc).toBe('2.0')
+        expect(event.params.subscription).toBe(subscriptionId)
+        expect(event.params.result).toEqual({
+          account,
+          nativeCurrency: [],
+          erc20: [{ ...balance, tokenInfo: { lastKnownPrice: { ...priceData } } }]
+        })
+
+        done()
+      }))
+
+      store.set('selected.current', account)
+      store.getObserver('provider:account').fire()
+    })
+
+    it('does not fire an assetsChanged event when no account is selected', () => {
+      provider.once('data:address', () => { throw new Error('event fired when no account selected!') })
+
+      store.set('main.balances', account, [{ address: '0xany' }])
+      store.set('selected.current', undefined)
+
+      store.getObserver('provider:account').fire()
+    })
+
+    it('does not fire an assetsChanged event when no assets are present', () => {
+      provider.once('data:address', () => { throw new Error('event fired when account has no assets!') })
+
+      store.set('main.balances', account, [])
+      store.set('selected.current', account)
+
+      store.getObserver('provider:account').fire()
+    })
+
+    it('does not fire an assetsChanged event while scanning', () => {
+      provider.once('data:address', () => { throw new Error('event fired while still scanning!') })
+
+      store.set('main.balances', account, [{ address: '0xany' }])
+      store.set('selected.current', account)
+      store.set('main.scanning', account, true)
+
+      store.getObserver('provider:account').fire()
+    })
+  })
+})
+
+// utility functions //
+
+function mockConnectionError (message) {
+  connection.send.mockImplementation((p, cb) => cb({ id: p.id, jsonrpc: p.jsonrpc, error: { message, code: -1 } }))
+}

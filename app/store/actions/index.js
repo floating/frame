@@ -1,25 +1,9 @@
 import { v4 } from 'uuid'
 import { URL } from 'url'
 
-// export const syncMain = (u, main) => u('main', _ => main)
-
-export const pathSync = (u, path, value) => {
-  u(path, () => value)
-}
-
-// export const syncPanel = (u, panel) => u('panel', _ => panel)
+export const pathSync = (u, path, value) => u(path, () => value)
 
 // Convert to synthetic actions
-
-export const setSigner = (u, signer) => {
-  u('selected.current', _ => signer.id)
-  u('selected.minimized', _ => false)
-  u('selected.open', _ => true)
-  // setTimeout(_ => {
-
-  // }, 50)
-}
-
 export const setSettingsView = (u, index, subindex = 0) => {
   u('selected.settings.viewIndex', () => index)
   u('selected.settings.subIndex', () => subindex)
@@ -41,11 +25,8 @@ export const notify = (u, type, data = {}) => {
 }
 
 export const clickGuard = (u, on) => u('view.clickGuard', () => on)
-
 export const toggleAddAccount = (u) => u('view.addAccount', show => !show)
-
 export const toggleAddNetwork = (u) => u('view.addNetwork', show => !show)
-
 export const updateBadge = (u, type) => u('view.badge', _ => type)
 
 export const toggleSettings = u => {
@@ -88,69 +69,8 @@ export const setView = (u, view) => u('selected.view', _ => view)
 export const toggleDataView = (u, id) => {
   u('selected.requests', id, 'viewData', view => !view)
 }
-
 export const updateExternalRates = (u, rates) => u('main.rates', () => rates)
-
-export const resetSigner = u => {
-  u('selected.view', _ => 'default')
-  u('selected.showAccounts', _ => false)
-}
-
-export const unsetSigner = u => {
-  u('selected.minimized', _ => true)
-  u('selected.open', _ => false)
-  resetSigner(u)
-  setTimeout(_ => {
-    u('selected', signer => {
-      signer.last = signer.current
-      signer.current = ''
-      signer.requests = {}
-      signer.view = 'default'
-      return signer
-    })
-  }, 520)
-}
-
 export const nodeProvider = (u, connected) => u('node.provider', _ => connected)
-
-// export const removeSigner = (u, signer, state) => {
-//   let status = 'Removing'
-//   u('signers', (signers, state) => {
-//     if (state.signer.current === signer.id) unsetSigner(u)
-//     if (signers[signer.id]) signers[signer.id].removing = true
-//     return signers
-//   })
-//   setTimeout(_ => {
-//     u('signers', signers => {
-//       if (signers[signer.id] && signers[signer.id].removing) signers[signer.id].status = status
-//       return signers
-//     })
-//   }, 1200)
-//   setTimeout(_ => {
-//     u('signers', signers => {
-//       if (signers[signer.id] && signers[signer.id].removing && signers[signer.id].status === status) delete signers[signer.id]
-//       return signers
-//     })
-//   }, 4200)
-// }
-
-// export const updateSigner = (u, signer) => {
-//   u('signers', signer.id, _ => signer)
-//   u('selected', s => {
-//     if (s.current === signer.id && (signer.status !== 'ok' || signer.accounts[0] !== s.accounts[0])) {
-//       s.last = s.current
-//       s.current = ''
-//       s.accounts = []
-//       s.requests = {}
-//       s.view = 'default'
-//       s.minimized = true
-//       s.open = false
-//       s.showAccounts = false
-//     }
-//     return s
-//   })
-// }
-
 export const setCurrent = (u, id) => u('view.current', _ => id)
 export const updateUrl = (u, id, url) => u('view.data', id, 'url', () => url)
 export const updateTitle = (u, id, title) => u('view.data', id, 'title', _ => title)

@@ -2,7 +2,7 @@ const windows = require('../windows')
 const geth = require('./Geth')
 const parity = require('./Parity')
 const ipfs = require('./Ipfs')
-const store = require('../store')
+const store = require('../store').default
 const { app } = require('electron')
 
 // Parity

@@ -1,12 +1,14 @@
 import BigNumber from 'bignumber.js'
 import log from 'electron-log'
+import { addHexPrefix } from 'ethereumjs-util'
 
 import {
   addNetwork as addNetworkAction,
   removeBalance as removeBalanceAction,
   setBalances as setBalancesAction,
-  addCustomTokens as addTokensAction,
+  addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
+  addKnownTokens as addKnownTokensAction,
   setScanning as setScanningAction
 } from '../../../../main/store/actions'
 
@@ -235,18 +237,80 @@ describe('#addNetwork', () => {
   })
 })
 
+describe('#setBalances', () => {
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.balances')
+    expect(address).toBe(owner)
+
+    balances = update(balances)
+  }
+
+  const setBalances = updatedBalances => setBalancesAction(updaterFn, owner, updatedBalances)
+
+  let balances
+
+  beforeEach(() => {
+    balances = [{
+      ...testTokens.badger,
+      balance: addHexPrefix(new BigNumber(30.5).toString(16))
+    }]
+  })
+
+  it('adds a new balance', () => {
+    setBalances([{
+      ...testTokens.zrx,
+      balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
+    }])
+    
+    expect(balances).toEqual([
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(new BigNumber(30.5).toString(16))
+      },
+      {
+        ...testTokens.zrx,
+        balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
+      }
+    ])
+  })
+
+  it('updates an existing balance to a positive amount', () => {
+    setBalances([{
+      ...testTokens.badger,
+      balance: addHexPrefix(new BigNumber(41.9).toString(16))
+    }])
+    
+    expect(balances).toEqual([{
+      ...testTokens.badger,
+      balance: addHexPrefix(new BigNumber(41.9).toString(16))
+    }])
+  })
+
+  it('updates an existing balance to zero', () => {
+    setBalances([{
+      ...testTokens.badger,
+      balance: '0x0'
+    }])
+    
+    expect(balances).toEqual([{
+      ...testTokens.badger,
+      balance: '0x0'
+    }])
+  })
+})
+
 describe('#removeBalance', () => {
   let balances = {
     [owner]: {
       [testTokens.zrx.address]: {
         ...testTokens.zrx,
-        balance: BigNumber('798.564')
+        balance: addHexPrefix(BigNumber('798.564').toString(16))
       }
     },
     '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': {
       [testTokens.zrx.address]: {
         ...testTokens.zrx,
-        balance: BigNumber('8201.343')
+        balance: addHexPrefix(BigNumber('8201.343').toString(16))
       }
     }
   }
@@ -268,91 +332,16 @@ describe('#removeBalance', () => {
   })
 })
 
-describe('#setBalances', () => {
-  const updaterFn = (node, netId, address, update) => {
-    expect(node).toBe('main.balances')
-    expect(netId).toBe(1)
-    expect(address).toBe(owner)
-
-    balances = update(balances)
-  }
-
-  const setBalances = updatedBalances => setBalancesAction(updaterFn, 1, owner, updatedBalances)
-
-  let balances
-
-  beforeEach(() => {
-    balances = {
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(30.5)
-      }
-    }
-  })
-
-  it('adds a new balance', () => {
-    setBalances({
-      [testTokens.zrx.address]: {
-        ...testTokens.zrx,
-        balance: new BigNumber(7983.2332)
-      }
-    })
-    
-    expect(balances).toStrictEqual({
-      [testTokens.zrx.address]: {
-        ...testTokens.zrx,
-        balance: new BigNumber(7983.2332)
-      },
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(30.5)
-      }
-    })
-  })
-
-  it('updates an existing balance to a positive amount', () => {
-    setBalances({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(41.9)
-      }
-    })
-    
-    expect(balances).toStrictEqual({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(41.9)
-      }
-    })
-  })
-
-  it('updates an existing balance to zero', () => {
-    setBalances({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(0)
-      }
-    })
-    
-    expect(balances).toStrictEqual({
-      [testTokens.badger.address]: {
-        ...testTokens.badger,
-        balance: new BigNumber(0)
-      }
-    })
-  })
-})
-
 describe('#addCustomTokens', () => {
   let tokens = []
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.tokens')
+    expect(node).toBe('main.tokens.custom')
 
     tokens = update(tokens)
   }
 
-  const addTokens = tokensToAdd => addTokensAction(updaterFn, tokensToAdd)
+  const addTokens = tokensToAdd => addCustomTokensAction(updaterFn, tokensToAdd)
 
   it('adds a token', () => {
     tokens = [testTokens.zrx]
@@ -382,7 +371,7 @@ describe('#removeCustomTokens', () => {
   let tokens = []
 
   const updaterFn = (node, update) => {
-    expect(node).toBe('main.tokens')
+    expect(node).toBe('main.tokens.custom')
 
     tokens = update(tokens)
   }
@@ -437,6 +426,43 @@ describe('#removeCustomTokens', () => {
     removeTokens([tokenToRemove])
 
     expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+})
+
+describe('#addKnownTokens', () => {
+  let tokens = []
+  const account = '0xfaff9f426e8071e03eebbfefe9e7bf4b37565ab9'
+
+  const updaterFn = (node, address, update) => {
+    expect(node).toBe('main.tokens.known')
+    expect(address).toBe(account)
+
+    tokens = update(tokens)
+  }
+
+  const addTokens = tokensToAdd => addKnownTokensAction(updaterFn, account, tokensToAdd)
+
+  it('adds a token', () => {
+    tokens = [testTokens.zrx]
+
+    addTokens([testTokens.badger])
+
+    expect(tokens).toStrictEqual([testTokens.zrx, testTokens.badger])
+  })
+
+  it('overwrites a token', () => {
+    tokens = [testTokens.zrx, testTokens.badger]
+
+    const updatedBadgerToken = {
+      ...testTokens.badger,
+      symbol: 'BAD'
+    }
+
+    addTokens([updatedBadgerToken])
+
+    expect(tokens).toHaveLength(2)
+    expect(tokens[0]).toEqual(testTokens.zrx)
+    expect(tokens[1].symbol).toBe('BAD')
   })
 })
 

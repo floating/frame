@@ -1,26 +1,32 @@
-import { addHexPrefix } from 'ethereumjs-util'
-
-const weiToGwei = v => v / 1e9
-const weiToHex = wei => addHexPrefix(wei.toString(16))
-const gweiToWei = v => v * 1e9
-const gweiToHex = gwei => weiToHex(gwei * 1e9)
-const intToHex = v => '0x' + v.toString(16)
-const hexToInt = v => parseInt(v, 'hex')
-const weiHexToGweiInt = v => hexToInt(v) / 1e9
-const gweiToWeiHex = v => intToHex(gweiToWei(v))
-
-function randomLetters (num) {
-  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.gweiToWeiHex = exports.weiHexToGweiInt = exports.hexToInt = exports.intToHex = exports.gweiToHex = exports.gweiToWei = exports.weiToHex = exports.weiToGwei = exports.arraysMatch = exports.capitalize = exports.randomLetters = void 0;
+const ethereumjs_util_1 = require("ethereumjs-util");
+Object.defineProperty(exports, "intToHex", { enumerable: true, get: function () { return ethereumjs_util_1.intToHex; } });
+const weiToGwei = (wei) => wei / 1e9;
+exports.weiToGwei = weiToGwei;
+const weiToHex = (wei) => (0, ethereumjs_util_1.addHexPrefix)(wei.toString(16));
+exports.weiToHex = weiToHex;
+const gweiToWei = (gwei) => gwei * 1e9;
+exports.gweiToWei = gweiToWei;
+const gweiToHex = (gwei) => weiToHex(gwei * 1e9);
+exports.gweiToHex = gweiToHex;
+const hexToInt = (hexStr) => parseInt(hexStr, 16);
+exports.hexToInt = hexToInt;
+const weiHexToGweiInt = (weiHex) => hexToInt(weiHex) / 1e9;
+exports.weiHexToGweiInt = weiHexToGweiInt;
+const gweiToWeiHex = (gwei) => (0, ethereumjs_util_1.intToHex)(gweiToWei(gwei));
+exports.gweiToWeiHex = gweiToWeiHex;
+function randomLetters(num) {
+    return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('');
 }
-
-export {
-  randomLetters,
-  weiToGwei,
-  weiToHex,
-  gweiToWei,
-  gweiToHex,
-  intToHex,
-  hexToInt,
-  weiHexToGweiInt, 
-  gweiToWeiHex
+exports.randomLetters = randomLetters;
+function capitalize(s) {
+    return s[0].toUpperCase() + s.substring(1).toLowerCase();
 }
+exports.capitalize = capitalize;
+function arraysMatch(a = [], b = []) {
+    return (a.length === b.length &&
+        a.every((chainId, i) => b[i] === chainId));
+}
+exports.arraysMatch = arraysMatch;

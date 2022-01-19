@@ -6,8 +6,8 @@ const crypto = require('crypto')
 const accounts = require('../accounts')
 const signers = require('../signers')
 const launch = require('../launch')
-const provider = require('../provider')
-const store = require('../store')
+const provider = require('../provider').default
+const store = require('../store').default
 const dapps = require('../dapps')
 // const ens = require('../ens')
 // const ipfs = require('../ipfs')
@@ -22,6 +22,13 @@ const rpc = {
   getState: cb => {
     cb(null, store())
   },
+  getFrameId (window, cb) {
+    if (window.frameId) {
+      cb(null, window.frameId)
+    } else {
+      cb(new Error('No frameId set for this window'))
+    }
+  },
   signTransaction: accounts.signTransaction,
   signMessage: accounts.signMessage,
   getAccounts: accounts.getAccounts,
@@ -30,11 +37,9 @@ const rpc = {
   // getSigners: signers.getSigners,
   setSigner: (id, cb) => {
     store.toggleDash('hide')
+
     accounts.setSigner(id, cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
-    setTimeout(() => {
-      accounts.scanSelectedAddress()
-    }, 320)
   },
   // setSignerIndex: (index, cb) => {
   //   accounts.setSignerIndex(index, cb)
@@ -46,7 +51,6 @@ const rpc = {
   unsetSigner: (id, cb) => {
     accounts.unsetSigner(cb)
     provider.accountsChanged(accounts.getSelectedAddresses())
-    accounts.scanSelectedAddress()
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
@@ -118,7 +122,7 @@ const rpc = {
   approveRequest (req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
-      provider.approveRequest(req, (err, res) => {
+      provider.approveTransactionRequest(req, (err, res) => {
         if (err) return accounts.setRequestError(req.handlerId, err)
         setTimeout(() => accounts.setTxSent(req.handlerId, res), 1800)
       })
@@ -275,9 +279,15 @@ ipcMain.on('main:rpc', (event, id, method, ...args) => {
   method = unwrap(method)
   args = args.map(arg => unwrap(arg))
   if (rpc[method]) {
-    rpc[method](...args, (...args) => {
-      event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
-    })
+    if (method === 'getFrameId') {
+      rpc[method](event.sender.getOwnerBrowserWindow(), ...args, (...args) => {
+        event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+      })
+    } else {
+      rpc[method](...args, (...args) => {
+        event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))
+      })
+    }
   } else {
     const args = [new Error('Unknown RPC method: ' + method)]
     event.sender.send('main:rpc', id, ...args.map(arg => arg instanceof Error ? wrap(arg.message) : wrap(arg)))

@@ -9,7 +9,7 @@ const { execFile } = require('child_process')
 const tar = require('tar')
 const extractZip = require('extract-zip')
 const latest = require('../latest.json')
-const store = require('../../store')
+const store = require('../../store').default
 const { mkdirp, remove } = require('fs-extra')
 
 const userData = app ? app.getPath('userData') : './test/.userData'

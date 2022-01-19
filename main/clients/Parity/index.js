@@ -5,7 +5,7 @@ const { app } = require('electron')
 // Mock windows module if running tests
 const windows = app ? require('../../windows') : { broadcast: () => {} }
 
-const store = require('../../store')
+const store = require('../../store').default
 
 const EthereumClient = require('../EthereumClient')
 
