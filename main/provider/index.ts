@@ -426,11 +426,12 @@ class Provider extends EventEmitter {
     return new Promise<string>((resolve, reject) => {
       this.connection.send(payload, response => {
         if (response.error) {
-          log.warn(`error estimating gas for tx to ${txParams.to}: ${response.error}`)
+          log.warn(`error estimating gas for tx to ${txParams.to}:`, response.error.message)
           return reject(response.error)
         }
 
-        log.debug(`gas estimate for tx to ${txParams.to}: ${response.result}`)
+        log.debug(`gas estimate for tx to ${txParams.to}:`, response.result)
+
         return resolve(response.result)
       }, targetChain)
     })
