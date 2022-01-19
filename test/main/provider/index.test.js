@@ -48,7 +48,7 @@ beforeEach(() => {
   store.set('main.currentNetwork.id', 1)
 
   connection.send = jest.fn()
-  connection.connections = { ethereum: {} }
+  connection.connections = { ethereum: { 4: { chainConfig: { chainId: 4 } } } }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
   accounts.signTransaction = jest.fn()
@@ -91,7 +91,7 @@ describe('#send', () => {
   const send = (request, cb = jest.fn()) => provider.send(request, cb)
 
   it('passes the given target chain to the connection', () => {
-    store.set('main.networks.ethereum', 10, { id: 10 })
+    connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 } }
 
     const request = { method: 'eth_testFrame' }
 
