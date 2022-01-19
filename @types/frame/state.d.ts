@@ -27,6 +27,12 @@ interface NetworkMetadata {
   gas: GasData
 }
 
+interface Permission {
+  origin: string,
+  provider: boolean, // whether or not to grant access
+  handlerId?: string
+}
+
 interface NativeCurrency {
   symbol: string
 }
