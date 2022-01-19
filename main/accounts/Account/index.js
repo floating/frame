@@ -41,6 +41,11 @@ class Account {
     this.signer = '' // Matched Signer ID
     this.signerStatus = ''
     if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
+
+    const existingPermissions = store('main.permissions', this.address) || {}
+    const currentSendDappPermission = Object.values(existingPermissions).find(p => ((p.origin || '').toLowerCase()).includes('send.frame.eth'))
+    store.setPermission(this.address, currentSendDappPermission || { handlerId: 'send-dapp-native', origin: 'send.frame.eth', provider: true })
+
     this.update(true)
     this.acctObs = store.observer(() => {
       // When signer data changes in any way this will rerun to make sure we're matched correctly
