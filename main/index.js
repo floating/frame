@@ -237,7 +237,7 @@ ipcMain.on('*:addFrame', (e, id) => {
   const existingFrame = store('main.frames', id)
 
   if (existingFrame) {
-    store.focusFrame(id)
+    windows.refocusFrame(id)
   } else {
     store.addFrame({
       id,

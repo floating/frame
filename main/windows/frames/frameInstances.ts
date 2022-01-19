@@ -12,22 +12,31 @@ export interface FrameInstance extends BrowserWindow {
   showingView?: string
 }
 
+const place = (frameInstance: FrameInstance) => {
+  const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
+  const height = area.height - 160
+  const maxWidth = Math.floor(height * 1.24)
+  const targetWidth = area.width - 460
+  const width = targetWidth > maxWidth ? maxWidth : targetWidth
+  frameInstance.setMinimumSize(400, 300)
+  frameInstance.setSize(width, height)
+  const pos = topRight(frameInstance) 
+  frameInstance.setPosition(pos.x - 380, pos.y + 80)
+}
+
 export default {
-  create: (frame: Frame) => {
-    const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-    const height = area.height - 160
-    const maxWidth = Math.floor(height * (16/10))
-    const targetWidth = area.width - 460
-    const width = targetWidth > maxWidth ? maxWidth : targetWidth
-  
+  reposition: (frameInstance: FrameInstance) => {
+    place(frameInstance)
+  },
+  create: (frame: Frame) => {  
     const preload = path.resolve(__dirname, '../../../bundle/bridge.js')
   
     const frameInstance: FrameInstance = new BrowserWindow({
       x: 0,
       y: 0,
-      width,
-      height,
-      show: true,
+      width: 0,
+      height: 0,
+      show: false,
       frame: false,
       titleBarStyle: 'hidden',
       trafficLightPosition: { x: 10, y: 9 },
@@ -37,9 +46,7 @@ export default {
       // skipTaskbar: process.platform !== 'linux',
       webPreferences: { ...webPrefrences, preload }
     })
-  
-    const pos = topRight(frameInstance) 
-    frameInstance.setPosition(pos.x - 380, pos.y + 80)
+
     frameInstance.loadURL(`file://${__dirname}/../../../bundle/dapp.html`)
   
     frameInstance.on('ready-to-show', () => {
@@ -49,6 +56,12 @@ export default {
     frameInstance.showingView = ''
     frameInstance.frameId = frame.id
     frameInstance.views = {}
+
+    place(frameInstance)
+
+    setTimeout(() => {
+      frameInstance.show()
+    }, 0)
 
     // Create the frame's overlay view
     // const overlayInstance = new BrowserView({ webPrefrences })
