@@ -10,7 +10,7 @@ class CustomTokens extends React.Component {
   }
 
   render () {
-    const tokens = this.store('main.tokens')    
+    const tokens = this.store('main.tokens.custom')    
 
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>

@@ -1314,14 +1314,38 @@
   width 24px
 
 .monitorTo
-  font-family FiraCode, monospace
+  font-family Exo2
+  display flex
+  justify-content flex-start
+  align-items center
+  font-weight 600
+  height 20px
+  max-width 214px
+  overflow hidden
+  *
+    flex-shrink 0
+
   svg
     position relative
     padding 0px 3px
-    top -1px
+    top -2px
 
 .monitorValue
   font-family FiraCode, monospace
+  margin 0px 1px
+  font-weight 500
+  font-size 15px
+  
+.monitorSub
+  font-size 10px
+  text-transform uppercase
+  letter-spacing 1px
+
+.monitorSubHighlight
+  font-size 13px
+  margin-left 1px
+  color var(--moon)
+  font-weight 500
 
 .monitorArrow
   padding-top 1px
@@ -1447,7 +1471,7 @@ span
   left 53px
   right 53px
   height 40px
-  padding 14px 16px 3px 0px
+  padding 10px 16px 3px 0px
   font-size 14px
   text-transform none
   transition var(--standardSlow)

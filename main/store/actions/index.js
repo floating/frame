@@ -120,6 +120,11 @@ module.exports = {
   setBlockNumber: (u, network, id, blockNumber) => {
     u('main.networks', network, id, 'blockNumber', () => blockNumber)
   },
+  setAccount: (u, account) => {
+    u('selected.current', _ => account.id)
+    u('selected.minimized', _ => false)
+    u('selected.open', _ => true)
+  },
   updateAccount: (u, updatedAccount, add) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
@@ -233,8 +238,8 @@ module.exports = {
       u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
-  setNetworkMeta: (u, netType, netId, meta) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency', () => meta)
+  setNativeCurrency: (u, netType, netId, currency) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency', () => currency)
   },
   addNetwork: (u, net) => {
     try {
@@ -408,11 +413,6 @@ module.exports = {
       return map
     })
   },
-  updateDapp: (u, namehash, data) => {
-    u(`main.dapp.details.${namehash}`, (oldData) => {
-      return { ...oldData, ...data }
-    })
-  },
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
@@ -436,15 +436,25 @@ module.exports = {
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
   },
-  setBalance: (u, netId, address, key, balance) => {
-    // key could be 'native' or a contract address
-    u('main.balances', netId, address, (balances = {}) => {
-      const updates = {
-        ...balances,
-        [key]: balance
-      }
+  setBalance: (u, address, balance) => {
+    u('main.balances', address, (balances = []) => {
+      const existingBalances = balances.filter(b => b.address !== balance.address || b.chainId !== balance.chainId)
 
-      return updates
+      return [...existingBalances, balance]
+    })
+  },
+  // Tokens
+  setBalances: (u, address, newBalances) => {
+    u('main.balances', address, (balances = []) => {
+      // remove zero balances
+      const existingBalances = balances.filter(b => {
+        return newBalances.every(bal => bal.chainId !== b.chainId || bal.address !== b.address)
+      })
+
+      // TODO: possibly add an option to filter out zero balances
+      //const withoutZeroBalances = Object.entries(updatedBalances)
+        //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
+      return [...existingBalances, ...newBalances]
     })
   },
   removeBalance: (u, chainId, key) => {
@@ -454,19 +464,6 @@ module.exports = {
       }
 
       return balances
-    })
-  },
-  // Tokens
-  setBalances: (u, netId, address, newBalances) => {
-    u('main.balances', netId, address, (balances = {}) => {
-      // remove zero balances
-      const updatedBalances = { ...balances, ...newBalances }
-
-      // TODO: possibly add an option to filter out zero balances
-      //const withoutZeroBalances = Object.entries(updatedBalances)
-        //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
-
-      return updatedBalances
     })
   },
   setScanning: (u, address, scanning) => {
@@ -486,7 +483,7 @@ module.exports = {
     })
   },
   addCustomTokens: (u, tokens) => {
-    u('main.tokens', existing => {
+    u('main.tokens.custom', existing => {
       // remove any tokens that have been overwritten by one with
       // the same address and chain ID
       const existingTokens = existing.filter(token => !includesToken(tokens, token))
@@ -495,7 +492,19 @@ module.exports = {
     })
   },
   removeCustomTokens: (u, tokens) => {
-    u('main.tokens', existing => {
+    u('main.tokens.custom', existing => {
+      return existing.filter(token => !includesToken(tokens, token))
+    })
+  },
+  addKnownTokens: (u, address, tokens) => {
+    u('main.tokens.known', address, (existing = []) => {
+      const existingTokens = existing.filter(token => !includesToken(tokens, token))
+
+      return [...existingTokens, ...tokens]
+    })
+  },
+  removeKnownTokens: (u, address, tokens) => {
+    u('main.tokens.known', address, (existing = []) => {
       return existing.filter(token => !includesToken(tokens, token))
     })
   },
@@ -515,6 +524,101 @@ module.exports = {
   muteBetaDisclosure: (u) => {
     u('main.mute.betaDisclosure', () => true)
     u('dash.showing', () => true)
+  },
+  // Dapp Frame
+  appDapp: (u, dapp) => {
+    u('main.dapps', dapps => {
+      if (dapps && !dapps[dapp.id]) {
+        dapps[dapp.id] = dapp
+      }
+      return dapps || {}
+    })
+  },
+  updateDapp: (u, dappId, update) => {
+    u('main.dapps', dapps => {
+      if (dapps && dapps[dappId]) {
+        dapps[dappId] = Object.assign({}, dapps[dappId], update)
+      }
+      return dapps || {}
+    })
+  },
+  addFrame: (u, frame) => {
+    u('main.frames', frame.id, () => frame)
+  },
+  updateFrame: (u, frameId, update) => {
+    u('main.frames', frameId, frame => Object.assign({}, frame, update))
+  },
+  removeFrame: (u, frameId) => {
+    u('main.frames', frames => {
+      delete frames[frameId]
+      return frames
+    })
+  },
+  focusFrame: (u, frameId) => {
+    u('main.focusedFrame', () => frameId)
+  },
+  addFrameView: (u, frameId, view) => {
+    if (frameId && view) {
+      u('main.frames', frameId, frame => {
+        let existing
+        Object.keys(frame.views).some(viewId => {
+          if (frame.views[viewId].dappId === view.dappId) {
+            existing = viewId
+            return true
+          } else {
+            return false
+          }
+        })
+        if (!existing) {
+          frame.views = frame.views || {}
+          frame.views[view.id] = view
+          frame.currentView = view.id
+        } else {
+          frame.currentView = existing
+        }
+        return frame
+      })
+    }
+  },
+  setCurrentFrameView: (u, frameId, viewId) => {
+    if (frameId) {
+      u('main.frames', frameId, frame => {
+        frame.currentView = viewId
+        return frame
+      })
+    }
+  },
+  updateFrameView: (u, frameId, viewId, update) => {
+    u('main.frames', frameId, 'views', views => {
+      if ((update.show && views[viewId].ready) || (update.ready && views[viewId].show)) {
+        Object.keys(views).forEach(id => {
+          if (id !== viewId) views[id].show = false
+        })
+      }
+      views[viewId] = Object.assign({}, views[viewId], update)
+      return views
+    })
+  },
+  removeFrameView: (u, frameId, viewId) => {
+    u('main.frames', frameId, 'views', views => {
+      delete views[viewId]
+      return views
+    })
+  },
+  unsetAccount: u => {
+    u('selected.minimized', _ => true)
+    u('selected.open', _ => false)
+    u('selected.view', _ => 'default')
+    u('selected.showAccounts', _ => false)
+    setTimeout(_ => {
+      u('selected', signer => {
+        signer.last = signer.current
+        signer.current = ''
+        signer.requests = {}
+        signer.view = 'default'
+        return signer
+      })
+    }, 520)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

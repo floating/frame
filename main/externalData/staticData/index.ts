@@ -1,17 +1,6 @@
 import coingecko, { Market, Coin } from '../coingecko'
 import log from 'electron-log'
 
-interface CoinData {
-  [key: string]: {
-    icon: string,
-    name: string,
-    usd: {
-      price: number,
-      change24hr: number
-    }
-  }
-}
-
 function byMarketCap (coin1: Market, coin2: Market) {
   return (coin2.market_cap || 1) - (coin1.market_cap || 1)
 }
@@ -49,7 +38,7 @@ async function loadCoinData (allCoins: Coin[], symbol: string): Promise<Market> 
 }
 
 async function load (symbols: string[]) {
-  const data: CoinData = {}
+  const data: Record<string, Currency> = {}
 
   const allCoins = await coingecko.listCoins()
 

@@ -16,6 +16,7 @@ import Dropdown from '../Components/Dropdown'
 // <DevTools />
 
 class Panel extends React.Component {
+
   indicator (connection) {
     const status = [connection.primary.status, connection.secondary.status]
     if (status.indexOf('connected') > -1) {
@@ -135,23 +136,6 @@ class Panel extends React.Component {
         <Networks />
         <Main />
         <Badge />
-        {/* <div className='appMenu'>
-          <div className='appMenuItem'>
-            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleFlow')}>
-              {svg.cpu(18)}
-            </div>
-          </div>
-          <div className='appMenuItem'>
-            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleDash', 'signers')}>
-              {svg.inventory(18)}
-            </div>
-          </div>
-          <div className='appMenuItem'>
-            <div className='appMenuItemButton' onMouseDown={() => link.send('tray:toggleDash', 'networks')}>
-              {svg.save(18)}
-            </div>
-          </div>
-        </div> */}
       </div>
     )
   }

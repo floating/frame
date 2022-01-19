@@ -5,18 +5,11 @@ import coingecko, { CoinId, PlatformId } from '../coingecko'
 
 const FETCH_BATCH_SIZE = 200
 
-interface Rate {
-  usd: {
-    price: BigNumber,
-    change24hr: BigNumber
-  }
-}
-
 // { symbol: coinId }
-let allCoins: { [symbol: string]: CoinId }
+let allCoins: Record<string, CoinId>
 
 // { chainId: platformId }
-let allPlatforms: { [chainId: string]: PlatformId }
+let allPlatforms: Record<number, PlatformId>
 
 function createRate (quote: any): Rate {
   return {
@@ -47,8 +40,7 @@ async function loadCoins () {
     return allCoins
   } catch (e) {
     log.error('unable to load coin data', e)
-  } finally {
-    setTimeout(loadCoins, 60 * 1000)
+    throw e
   }
 }
 
@@ -58,18 +50,17 @@ async function loadPlatforms () {
 
     allPlatforms = platforms.reduce((platformMapping, platform) => {
       if (platform.chain_identifier) {
-        const chainId = platform.chain_identifier
+        const chainId = parseInt(platform.chain_identifier)
         return { ...platformMapping, [chainId]: platform.id }
       }
 
       return platformMapping
-    }, {} as Record<string, string>)
+    }, {} as Record<number, string>)
 
     return allPlatforms
   } catch (e) {
     log.error('unable to load asset platform data', e)
-  } finally {
-    setTimeout(loadPlatforms, 60 * 1000)
+    throw e
   }
 }
 
@@ -86,7 +77,7 @@ async function fetchRates<T> (fetch: (ids: string[], ...params: any) => Promise<
   return Object.assign({}, ...responses)
 }
 
-const fetchPrices = async (ids: string[]) => fetchRates(coingecko.coinPrices, ids)
+const fetchCoinPrices = async (ids: string[]) => fetchRates(coingecko.coinPrices, ids)
 const fetchTokenPrices = async (addresses: string[], platform: string) => fetchRates(coingecko.tokenPrices, addresses, [platform])
 
 async function loadRates (ids: string[], chainId: number) {
@@ -110,7 +101,7 @@ async function loadRates (ids: string[], chainId: number) {
   }, { contracts: [], symbols: {} } as any)
 
   try {
-    const symbolQuotes = await fetchPrices(Object.keys(lookupIds.symbols))
+    const symbolQuotes = await fetchCoinPrices(Object.keys(lookupIds.symbols))
     const tokenQuotes = await fetchTokenPrices(lookupIds.contracts, platforms[chainId] || 'ethereum')
 
     return Object.entries({ ...symbolQuotes, ...tokenQuotes }).reduce((rates, [lookupId, quote]) => {

@@ -1,155 +1,142 @@
-// @ts-ignore
-import ethProvider from 'eth-provider'
 import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
+import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
-import tokenLoader from '../inventory/tokens'
 import multicall, { Call, supportsChain as multicallSupportsChain } from '../../multicall'
 import erc20TokenAbi from './erc-20-abi'
 
-import { providers } from 'ethers'
+import { groupByChain, TokensByChain } from './reducers'
+import { EthereumProvider } from 'eth-provider'
 
-const provider = ethProvider('frame', { name: 'scanWorker' })
+let id = 1
 
-export interface FoundBalances {
-  [address: string]: TokenBalance
+interface ExternalBalance {
+  balance: string,
+  displayBalance: string
 }
 
-interface TokenBalance extends Token {
-  balance: BigNumber
+export interface TokenDefinition extends Omit<Token, 'logoURI'> {
+  logoUri?: string
 }
 
-export interface BalanceScanOptions {
-  knownTokens?: Token[],
-  omit?: string[],
-  onlyKnown?: boolean // if true, only scan for known tokens, not all tokens for a given chain
+export interface TokenBalance extends TokenDefinition, ExternalBalance { }
+
+export interface CurrencyBalance extends ExternalBalance {
+  chainId: number
 }
 
-async function getChainId () {
-  return parseInt(await provider.request({ method: 'eth_chainId' }))
+export interface BalanceLoader {
+  getCurrencyBalances: (address: Address, chains: number[]) => Promise<CurrencyBalance[]>,
+  getTokenBalances: (address: Address, tokens: TokenDefinition[]) => Promise<TokenBalance[]>
 }
 
-async function getNativeCurrencyBalance (address: string) {
-  const rawBalance = await provider.request({ method: 'eth_getBalance', params: [address, 'latest'] })
-  const balance = { balance: new BigNumber(rawBalance).shiftedBy(-18) }
-
-  // TODO how to shift the balance, are all coins the same?
-  return { address, balance, chainId: await getChainId() }
+function createBalance (rawBalance: string, decimals: number): ExternalBalance {
+  return {
+    balance: rawBalance,
+    displayBalance: new BigNumber(rawBalance).shiftedBy(-decimals).toString()
+  }
 }
 
-function balanceCalls (owner: string, tokens: Token[]): Call<BigNumber.Value, TokenBalance>[] {
-  return tokens.map(token => ({
-    target: token.address,
-    call: ['balanceOf(address)(uint256)', owner],
-    returns: [
-      [
-        `${token.address.toUpperCase()}_BALANCE`,
-        (val: BigNumber.Value) => ({
-          ...token,
-          balance: new BigNumber(val).shiftedBy(-token.decimals)
-        })
+export default function (eth: EthereumProvider) {
+  function balanceCalls (owner: string, tokens: TokenDefinition[]): Call<ethers.BigNumber, TokenBalance>[] {
+    return tokens.map(token => ({
+      target: token.address,
+      call: ['balanceOf(address)(uint256)', owner],
+      returns: [
+        [
+          `${token.address.toUpperCase()}_BALANCE`,
+          (bn: ethers.BigNumber) => {
+            return {
+              ...token,
+              ...createBalance(bn.toHexString(), token.decimals)
+            }
+          }
+        ]
       ]
-    ]
-  }))
-}
-
-function mergeTokenLists (lowerPriority: Token[], higherPriority: Token[]) {
-  return [
-    ...higherPriority,
-    ...(lowerPriority.filter(token => !higherPriority.find(t => t.address === token.address)))
-  ]
-}
-
-function relevantBalances (knownAddresses: string[], positiveBalances: FoundBalances, tokenBalance: TokenBalance) {
-  if (knownAddresses.includes(tokenBalance.address) || !tokenBalance.balance.isZero()) {
-    positiveBalances[tokenBalance.address] = tokenBalance
+    }))
   }
 
-  return positiveBalances
-}
+  async function getNativeCurrencyBalance (address: string, chainId: number) {
+    try {
+      const rawBalance = await eth.request({
+        method: 'eth_getBalance',
+        params: [address, 'latest'],
+        chainId: addHexPrefix(chainId.toString(16))
+      })
 
-async function getTokenBalance (token: Token, owner: string, provider: providers.JsonRpcProvider) {
-  const contract = new ethers.Contract(token.address, erc20TokenAbi, provider)
-
-  try {
-    const balance = await contract.balanceOf(owner)
-    return new BigNumber(balance.toString()).shiftedBy(-token.decimals)
-  } catch (e) {
-    log.warn(`could not load balance for token with address ${token.address}`, e)
-    return new BigNumber(0)
+      // TODO: do all coins have 18 decimals?
+      return { ...createBalance(rawBalance, 18), chainId }
+    } catch (e) {
+      log.error(`error loading native currency balance for chain id: ${chainId}`, e)
+      return { balance: '0x0', displayValue: '0.0', chainId }
+    }
   }
-}
 
-async function getTokenBalancesFromContracts (owner: string, tokens: Token[]) {
-  const web3Provider = new providers.Web3Provider(provider)
-  const balances = tokens.map(async token => ({
-    ...token,
-    balance: await getTokenBalance(token, owner, web3Provider)
-  }))
-
-  return (await Promise.all(balances))
-}
-
-async function getTokenBalancesFromMulticall (owner: string, tokens: Token[], chainId: number) {
-  const calls = balanceCalls(owner, tokens)
-  const BATCH_SIZE = 2000
-
-  const numBatches = Math.ceil(calls.length / BATCH_SIZE)
-
-  // multicall seems to time out sometimes with very large requests, so batch them
-  const fetches = [...Array(numBatches).keys()].map(async (_, batchIndex) => {
-    const batchStart = batchIndex * BATCH_SIZE
-    const batchEnd = batchStart + BATCH_SIZE
+  async function getTokenBalance (token: TokenDefinition, owner: string)  {
+    const contract = new ethers.Contract(token.address, erc20TokenAbi)
 
     try {
-      const results = await multicall(chainId).call(calls.slice(batchStart, batchEnd))
+      const functionData = contract.interface.encodeFunctionData('balanceOf', [owner])
 
-      return Object.values(results.transformed)
+      const response = await eth.request({
+        method: 'eth_call',
+        jsonrpc: '2.0',
+        id: id += 1,
+        chainId: addHexPrefix(token.chainId.toString(16)),
+        params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
+      })
+
+      const result = contract.interface.decodeFunctionResult('balanceOf', response)
+
+      return result.balance.toHexString()
     } catch (e) {
-      log.error(`unable to load token balances (batch ${batchStart}-${batchEnd}`, e)
-      return []
+      log.warn(`could not load balance for token with address ${token.address}`, e)
+      return '0x0'
     }
-  })
+  }
 
-  const fetchResults = await Promise.all(fetches)
-  const balanceResults = ([] as TokenBalance[]).concat(...fetchResults)
+  async function getTokenBalancesFromContracts (owner: string, tokens: TokenDefinition[]) {
+    const balances = tokens.map(async token => {
+      const rawBalance = await getTokenBalance(token, owner)
 
-  return balanceResults
-}
+      return {
+        ...token,
+        ...createBalance(rawBalance, token.decimals)
+      }
+    })
 
-async function getTokenBalances (owner: string, opts: BalanceScanOptions = {}) {
-  const chainId = await getChainId()
-  const symbolsToOmit = (opts.omit || []).map(symbol => symbol.toLowerCase())
-  const knownTokens = opts.knownTokens || []
-  const useMulticall = multicallSupportsChain(chainId)
+    return Promise.all(balances)
+  }
 
-  // for chains that support multicall, we can attempt to load every token that the chain supports,
-  // for all other chains we need to call each contract individually so limit the calls
-  // to only currently known tokens
-  const tokenList = !opts.onlyKnown && useMulticall
-    ? mergeTokenLists(tokenLoader.getTokens(chainId), knownTokens)
-    : knownTokens
+  async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
+    const calls = balanceCalls(owner, tokens)
 
-  const tokens = tokenList
-    .filter(token => 
-      token.chainId === chainId && !symbolsToOmit.includes(token.symbol.toLowerCase())
-    )
-    .map(token => ({ ...token, address: token.address.toLowerCase() }))
-  
-  const allBalances = useMulticall
-    ? await getTokenBalancesFromMulticall(owner, tokens, chainId)
-    : await getTokenBalancesFromContracts(owner, tokens)
+    eth.setChain(addHexPrefix(chainId.toString(16)))
 
-  const intoRelevantBalances = relevantBalances.bind(null, knownTokens.map(kt => kt.address.toLowerCase()))
-  const balances = allBalances.reduce(intoRelevantBalances, {} as FoundBalances)
+    return multicall(chainId, eth).batchCall(calls)
+  }
 
-  return { chainId, balances }
-}
+  return {
+    getCurrencyBalances: async function (address: string, chains: number[]) {
+      const fetchChainBalance = getNativeCurrencyBalance.bind(null, address)
 
-tokenLoader.start()
-
-export {
-  getNativeCurrencyBalance,
-  getTokenBalances
+      return Promise.all(chains.map(fetchChainBalance))
+    },
+    getTokenBalances: async function (owner: string, tokens: TokenDefinition[]) {
+      const tokensByChain = tokens.reduce(groupByChain, {} as TokensByChain)
+    
+      const tokenBalances = await Promise.all(
+        Object.entries(tokensByChain).map(([chain, tokens]) => {
+          const chainId = parseInt(chain)
+    
+          return multicallSupportsChain(chainId)
+            ? getTokenBalancesFromMulticall(owner, tokens, chainId)
+            : getTokenBalancesFromContracts(owner, tokens)
+        })
+      )
+    
+      return ([] as TokenBalance[]).concat(...tokenBalances)
+    }
+  } as BalanceLoader
 }

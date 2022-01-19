@@ -5,7 +5,13 @@ const scan = async (address) => {
 
   const getSet = async (address, offset) => {
     const url = `https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
-    const options = { method: 'GET' }
+    const options = {
+      method: 'GET',
+      headers: {
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36'
+      }
+    }
+
     const set = await (await fetch(url, options)).json()
     set.assets.forEach(a => {
       inventory[a.id] = a

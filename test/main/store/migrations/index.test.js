@@ -421,3 +421,37 @@ describe('migration 17', () => {
     expect(lattice.tag).toBe('')
   })
 })
+
+describe('migration 18', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 17,
+        tokens: ['AVAX', 'OHM']
+      }
+    }
+  })
+
+  it('migrates tokens to custom tokens', () => {
+    state.main.tokens = ['AVAX', 'OHM']
+
+    const updatedState = migrations.apply(state)
+    expect(updatedState.main.tokens).toEqual({ custom: ['AVAX', 'OHM'] })
+  })
+
+  it('migrates no custom tokens to an empty array', () => {
+    state.main.tokens = []
+
+    const updatedState = migrations.apply(state)
+
+    expect(updatedState.main.tokens).toEqual({ custom: []})
+  })
+
+  it('migrates missing custom tokens to an empty array', () => {
+    state.main.tokens = undefined
+
+    const updatedState = migrations.apply(state)
+
+    expect(updatedState.main.tokens).toEqual({ custom: []})
+  })
+})

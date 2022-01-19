@@ -2,7 +2,7 @@ const log = require('electron-log')
 const utils = require('ethereumjs-util')
 const Wrapper = require('@aragon/wrapper').default
 const { ensResolve } = require('@aragon/wrapper')
-const store = require('../../store')
+const store = require('../../store').default
 
 const appNames = require('./appNames')
 
@@ -24,7 +24,7 @@ const registryAddress = () => {
 const resolveAragon = async (domain, registryAddress) => {
   const executor = async (resolve, reject) => {
     try {
-      const address = await ensResolve(domain, { provider: require('../../provider'), registryAddress })
+      const address = await ensResolve(domain, { provider: require('../../provider').default, registryAddress })
       if (address.replace('0x', '')) return resolve(address)
       throw new Error('Invalid address')
     } catch (e) {
@@ -40,7 +40,7 @@ const resolveName = (name) => {
       // Look up registry address based on current network connection
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
       const options = {
-        provider: require('../../provider'),
+        provider: require('../../provider').default,
         apm: {
           ipfs: {
             gateway: 'https://ipfs.eth.aragon.network/ipfs'
@@ -86,7 +86,7 @@ class Aragon {
       setTimeout(() => {
         log.info('\n ** Setting Up Aragon DAO:', this.dao)
         this.inSetup = true
-        this.provider = require('../../provider')
+        this.provider = require('../../provider').default
         let options
         try {
           options = {

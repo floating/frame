@@ -454,13 +454,19 @@ class TransactionRequest extends React.Component {
                     <div className='monitorIcon'>{svg.octicon('radio-tower', { height: 17 })}</div>
                     <div className='monitorIconIndicator' />
                     <div className='monitorTop'>
-                      <div className='monitorValue'><span>{currentSymbol}</span>{value}</div>
-                      <div className='monitorArrow'>{svg.longArrow(13)}</div>
                       {toAddress ? (
                         <div className='monitorTo'>
-                          {toAddress.substring(0, 5)}
-                          {svg.octicon('kebab-horizontal', { height: 14 })}
-                          {toAddress.substr(toAddress.length - 3)}
+                          <span className='monitorSub'>{'TO'}</span>
+                          <span className='monitorValue'>
+                            {toAddress.substring(0, 5)}
+                            {svg.octicon('kebab-horizontal', { height: 14 })}
+                            {toAddress.substr(toAddress.length - 3)}
+                          </span>
+                          <span className='monitorSub'>{'ON'}</span>
+                          <span className='monitorSub monitorSubHighlight'>
+                            {}
+                            {this.store('main.networks', this.chain.type, parseInt(req.payload.chainId), 'name')}
+                          </span>
                         </div>
                       ) : (
                         <div className='monitorDeploy'>deploy</div>

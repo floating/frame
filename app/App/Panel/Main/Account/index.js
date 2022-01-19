@@ -289,7 +289,6 @@ class _AccountMain extends React.Component {
     const chainId = this.store('main.currentNetwork.id')
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
-      if (chainId !== 1 && id === 'inventory') return undefined
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 5
       return this.renderModule(id, module, slideHeight - module.height - 5, i, id => {

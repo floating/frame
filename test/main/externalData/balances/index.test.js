@@ -1,26 +1,20 @@
-import { getTokenBalances } from '../../../../main/externalData/balances'
-import tokenLoader from '../../../../main/externalData/inventory/tokens'
+import balanceLoader from '../../../../main/externalData/balances'
 import multicall, { supportsChain } from '../../../../main/multicall'
 
 import log from 'electron-log'
 import { ethers } from 'ethers'
+import { addHexPrefix, padToEven } from 'ethereumjs-util'
+import ethProvider from 'eth-provider'
 import BigNumber from 'bignumber.js'
 
-jest.mock('ethers', () => ({
-  ethers: { Contract: jest.fn() },
-  providers: { Web3Provider: jest.fn() }
-}))
-
-jest.mock('eth-provider', () => jest.fn(() => ({
-  request: ({ method }) => {
-    if (method === 'eth_chainId') return '0x1'
-    throw new Error('unexpected eth call!')
-  }
-})))
-
-jest.mock('../../../../main/externalData/inventory/tokens', () => ({ start: jest.fn(), getTokens: jest.fn(() => []) }))
 jest.mock('../../../../main/multicall')
+jest.mock('eth-provider', () =>
+  jest.fn(() => ({
+    request: jest.fn(),
+    setChain: jest.fn()
+  })))
 
+const callResponse = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const ownerAddress = '0xbfa641051ba0a0ad1b0acf549a89536a0d76472e'
 
 const aaveUsdcToken = {
@@ -51,6 +45,7 @@ const badgerDaoToken = {
   decimals: 18
 }
 
+let eth, balancesLoader, onChainBalances
 const knownTokens = [aaveUsdcToken, zrxToken, badgerDaoToken]
 
 beforeAll(() => {
@@ -62,13 +57,15 @@ afterAll(() => {
 })
 
 describe('#getTokenBalances', () => {
-  let onChainBalances
-
   beforeEach(() => {
+    eth = ethProvider()
+    balancesLoader = balanceLoader(eth)
+
     onChainBalances = {
       [aaveUsdcToken.address]: new BigNumber('6245100000'),
       [zrxToken.address]: new BigNumber('756578458984500000000'),
-      [olympusDaoToken.address]: new BigNumber('557830302000')
+      [olympusDaoToken.address]: new BigNumber('557830302000'),
+      [badgerDaoToken.address]: new BigNumber('17893000000000000000')
     }
   })
 
@@ -77,22 +74,24 @@ describe('#getTokenBalances', () => {
       supportsChain.mockReturnValue(true)
 
       multicall.mockImplementation(chainId => {
-        expect(chainId).toBe(1)
-  
         return {
-          call: async function (tokenCalls) {
-            const transformed = tokenCalls.reduce((results, tc) => {
-              if (
-                tc.call[0] === 'balanceOf(address)(uint256)' &&
-                tc.call[1] === ownerAddress
-              ) {
-                results[tc.target] = tc.returns[0][1](onChainBalances[tc.target].toString())
+          batchCall: async function (tokenCalls) {
+            return tokenCalls.map(tc => {
+              expect(tc.call[0]).toBe('balanceOf(address)(uint256)')
+              expect(tc.call[1]).toBe(ownerAddress)
+
+              const token = knownTokens.find(
+                token => token.address === tc.target && token.chainId === parseInt(chainId)
+              )
+
+              if (token) {
+                return tc.returns[0][1](
+                  ethers.BigNumber.from(onChainBalances[token.address].toString())
+                )
               }
               
-              return results
-            }, {})
-  
-            return { transformed }
+              return '0x0'
+            })
           }
         }
       })
@@ -102,104 +101,127 @@ describe('#getTokenBalances', () => {
       multicall.mockReset()
     })
     
-    it('loads all token balances for the current chain', async () => {
-      tokenLoader.getTokens.mockReturnValue([olympusDaoToken])
+    it('loads token balances for multiple chains', async () => {
+      const tokenBalances = await balancesLoader.getTokenBalances(ownerAddress, knownTokens)
 
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
-
-      expect(tokenBalances.chainId).toBe(1)
-      expect(tokenBalances.balances).toStrictEqual({
-        [olympusDaoToken.address]: {
-          ...olympusDaoToken,
-          balance: new BigNumber(557.830302)
-        },
-        [aaveUsdcToken.address]: {
+      expect(tokenBalances).toEqual([
+        {
           ...aaveUsdcToken,
-          balance: new BigNumber(6245.1)
+          balance: addHexPrefix(padToEven(new BigNumber('6245100000').toString(16))),
+          displayBalance: '6245.1'
         },
-        [zrxToken.address]: {
+        {
           ...zrxToken,
-          balance: new BigNumber(756.5784589845)
+          balance: addHexPrefix(padToEven(new BigNumber('756578458984500000000').toString(16))),
+          displayBalance: '756.5784589845'
+        },
+        {
+          ...badgerDaoToken,
+          balance: addHexPrefix(padToEven(new BigNumber('17893000000000000000').toString(16))),
+          displayBalance: '17.893'
         }
-      })
-    })
+      ])
 
-    it('allows a known token to take precedence over one from the list', async () => {
-      const olderZrxToken = {
-        ...zrxToken,
-        decimals: 9
-      }
-
-      tokenLoader.getTokens.mockReturnValue([olderZrxToken])
-
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
-
-      expect(tokenBalances.balances[zrxToken.address].balance.toString()).toBe('756.5784589845')
-    })
-
-    it('does not return a zero balance from the scan of the entire chain', async () => {
-      onChainBalances[olympusDaoToken.address] = new BigNumber(0)
-      tokenLoader.getTokens.mockReturnValue([olympusDaoToken])
-
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
-
-      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
-      expect(Object.keys(tokenBalances.balances)).not.toContain(olympusDaoToken.address)
-    })
-
-    it('loads only known token balances when option is set', async () => {
-      tokenLoader.getTokens.mockReturnValue([olympusDaoToken])
-
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens, onlyKnown: true })
-      
-      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
-      expect(Object.keys(tokenBalances.balances)).not.toContain(olympusDaoToken.address)
+      expect(eth.setChain).toHaveBeenNthCalledWith(1, addHexPrefix(aaveUsdcToken.chainId.toString(16)))
+      expect(eth.setChain).toHaveBeenNthCalledWith(2, addHexPrefix(badgerDaoToken.chainId.toString(16)))
     })
   })
 
   describe('using direct contract calls', () => {
+    let callHandler = jest.fn(respondToTokenCall)
+
     beforeEach(() => {
-      ethers.Contract.mockImplementation(address => ({ balanceOf: async () => onChainBalances[address] }))
-      
       supportsChain.mockReturnValue(false)
+
+      eth.request.mockImplementation(async payload => {
+        verifyBasePayload(payload)
+
+        return callHandler(payload)
+      })
     })
 
     afterEach(() => {
       expect(multicall).not.toHaveBeenCalled()
     })
     
-    it('loads token balances for the current chain', async () => {
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
+    it('loads token balances for multiple chains', async () => {
+      const tokenBalances = await balancesLoader.getTokenBalances(ownerAddress, knownTokens)
 
-      expect(tokenBalances.chainId).toBe(1)
-      expect(tokenBalances.balances).toStrictEqual({
-        [aaveUsdcToken.address]: {
+      expect(tokenBalances).toEqual([
+        {
           ...aaveUsdcToken,
-          balance: new BigNumber(6245.1)
+          balance: addHexPrefix(padToEven(new BigNumber('6245100000').toString(16))),
+          displayBalance: '6245.1'
         },
-        [zrxToken.address]: {
+        {
           ...zrxToken,
-          balance: new BigNumber(756.5784589845)
+          balance: addHexPrefix(padToEven(new BigNumber('756578458984500000000').toString(16))),
+          displayBalance: '756.5784589845'
+        },
+        {
+          ...badgerDaoToken,
+          balance: addHexPrefix(padToEven(new BigNumber('17893000000000000000').toString(16))),
+          displayBalance: '17.893'
         }
-      })
-    })
-
-    it('returns a zero balance that was previously known', async () => {
-      onChainBalances[aaveUsdcToken.address] = new BigNumber(0)
-
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
-
-      expect(Object.keys(tokenBalances.balances)).toHaveLength(2)
-      expect(tokenBalances.balances[aaveUsdcToken.address].balance.isZero()).toBe(true)
-      expect(tokenBalances.balances[zrxToken.address].balance.toString()).toBe('756.5784589845')
+      ])
     })
     
-    it('returns a zero balance when the contract call fails', async () => {
-      ethers.Contract.mockImplementation(() => ({ balanceOf: jest.fn().mockRejectedValue('unknown contract') }))
-      const tokenBalances = await getTokenBalances(ownerAddress, { knownTokens })
+    it('handles an error retrieving one balance', async () => {
+      callHandler.mockImplementation(payload => {
+        if (payload.params[0].to === zrxToken.address) {
+          throw new Error('invalid token contract!')
+        }
 
-      expect(tokenBalances.balances[aaveUsdcToken.address].balance.isZero()).toBe(true)
-      expect(tokenBalances.balances[zrxToken.address].balance.isZero()).toBe(true)
+        return respondToTokenCall(payload)
+      })
+  
+      const tokenBalances = await balancesLoader.getTokenBalances(ownerAddress, knownTokens)
+
+      expect(tokenBalances).toEqual([
+        {
+          ...aaveUsdcToken,
+          balance: addHexPrefix(padToEven(new BigNumber('6245100000').toString(16))),
+          displayBalance: '6245.1'
+        },
+        {
+          ...zrxToken,
+          balance: '0x0',
+          displayBalance: '0'
+        },
+        {
+          ...badgerDaoToken,
+          balance: addHexPrefix(padToEven(new BigNumber('17893000000000000000').toString(16))),
+          displayBalance: '17.893'
+        }
+      ])
     })
   })
 })
+
+// helper functions //
+
+function verifyBasePayload (payload) {
+  expect(payload.jsonrpc).toBe('2.0')
+  expect(Number.isInteger(payload.id)).toBe(true)
+  expect(payload.method).toBe('eth_call')
+}
+
+function respondToTokenCall (payload) {
+  expect(payload.params[0].value).toBe('0x0')
+  expect(payload.params[0].data).toBe('0x70a08231000000000000000000000000bfa641051ba0a0ad1b0acf549a89536a0d76472e')
+  expect(payload.params[1]).toBe('latest')
+
+  const token = knownTokens.find(
+    token => token.address === payload.params[0].to && token.chainId === parseInt(payload.chainId)
+  )
+
+  const balance = onChainBalances[token.address]
+
+  if (balance) {
+    const hexBalance = balance.toString(16)
+
+    return callResponse.slice(0, callResponse.length - hexBalance.length) + hexBalance
+  }
+
+  return callResponse
+}

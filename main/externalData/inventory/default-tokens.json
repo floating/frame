@@ -40791,6 +40791,16 @@
         "symbol":"ZZZV2",
         "decimals":18,
         "logoURI":"https://assets.coingecko.com/coins/images/13584/thumb/zzz_finance.jpg?1609919864"
-     }
+     },
+     {
+      "chainId":4,
+      "name":"JoeBar",
+      "symbol":"xJOE",
+      "address":"0x57319d41f71e81f3c65f2a47ca4e001ebafd4f33",
+      "decimals":18,
+      "extensions":{
+         "omit":true
+      }
+   }
   ]
 }
