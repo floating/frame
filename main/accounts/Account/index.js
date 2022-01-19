@@ -44,7 +44,10 @@ class Account {
 
     const existingPermissions = store('main.permissions', this.address) || {}
     const currentSendDappPermission = Object.values(existingPermissions).find(p => ((p.origin || '').toLowerCase()).includes('send.frame.eth'))
-    store.setPermission(this.address, currentSendDappPermission || { handlerId: 'send-dapp-native', origin: 'send.frame.eth', provider: true })
+
+    if (!currentSendDappPermission) {
+      store.setPermission(this.address, { handlerId: 'send-dapp-native', origin: 'send.frame.eth', provider: true })
+    }
 
     this.update(true)
     this.acctObs = store.observer(() => {
