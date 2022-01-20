@@ -3,8 +3,6 @@ import { createWatcher, aggregate } from '@makerdao/multicall'
 import { EthereumProvider } from 'eth-provider'
 import log from 'electron-log'
 
-import { providers } from 'ethers'
-
 const contractAddresses: { [chainId: number]: string } = {
   1: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // mainnet
   3: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // ropsten

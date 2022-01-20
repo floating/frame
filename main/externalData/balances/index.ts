@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
-import { ethers } from 'ethers'
+import { BigNumber as EthersBigNumber } from '@ethersproject/bignumber'
+import { Interface } from '@ethersproject/abi'
 import { addHexPrefix } from 'ethereumjs-util'
 import log from 'electron-log'
 
@@ -10,6 +11,7 @@ import { groupByChain, TokensByChain } from './reducers'
 import { EthereumProvider } from 'eth-provider'
 
 let id = 1
+const erc20Interface = new Interface(erc20TokenAbi)
 
 interface ExternalBalance {
   balance: string,
@@ -39,14 +41,14 @@ function createBalance (rawBalance: string, decimals: number): ExternalBalance {
 }
 
 export default function (eth: EthereumProvider) {
-  function balanceCalls (owner: string, tokens: TokenDefinition[]): Call<ethers.BigNumber, TokenBalance>[] {
+  function balanceCalls (owner: string, tokens: TokenDefinition[]): Call<EthersBigNumber, TokenBalance>[] {
     return tokens.map(token => ({
       target: token.address,
       call: ['balanceOf(address)(uint256)', owner],
       returns: [
         [
           `${token.address.toUpperCase()}_BALANCE`,
-          (bn: ethers.BigNumber) => {
+          (bn: EthersBigNumber) => {
             return {
               ...token,
               ...createBalance(bn.toHexString(), token.decimals)
@@ -74,10 +76,8 @@ export default function (eth: EthereumProvider) {
   }
 
   async function getTokenBalance (token: TokenDefinition, owner: string)  {
-    const contract = new ethers.Contract(token.address, erc20TokenAbi)
-
     try {
-      const functionData = contract.interface.encodeFunctionData('balanceOf', [owner])
+      const functionData = erc20Interface.encodeFunctionData('balanceOf', [owner])
 
       const response = await eth.request({
         method: 'eth_call',
@@ -87,7 +87,7 @@ export default function (eth: EthereumProvider) {
         params: [{ to: token.address, value: '0x0', data: functionData }, 'latest']
       })
 
-      const result = contract.interface.decodeFunctionResult('balanceOf', response)
+      const result = erc20Interface.decodeFunctionResult('balanceOf', response)
 
       return result.balance.toHexString()
     } catch (e) {
