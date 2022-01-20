@@ -321,7 +321,7 @@ class Settings extends React.Component {
                 </div>
               </div>
               <div className='signerPermissionDetails'>
-                Show mainnet gas price (Gwei) in menubar
+                Show current gas price (Gwei) in menubar
               </div>
             </div>
           ) : null}
