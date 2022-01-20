@@ -72,7 +72,7 @@ export default class LedgerEthereumApp {
       const legacyMessage = message[0] !== tx.type
       const rawTxHex = legacyMessage ? rlp.encode(message).toString('hex') : message.toString('hex')
 
-      return this.eth.signTransaction(path, rawTxHex)
+      return this.eth.signTransaction(path, rawTxHex, null)
     })
 
     return addHexPrefix(signedTx.serialize().toString('hex'))
