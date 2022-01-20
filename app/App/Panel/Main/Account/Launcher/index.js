@@ -75,16 +75,6 @@ class Launcher extends React.Component {
               </div>
             </div>)}
           </div>
-          {/* 
-          <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'uniswap.eth') }>
-            <img src={uniswap} />
-          </div>
-          <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', '1inch.eth') }>
-            <img src={oneInch} />
-          </div>
-          <div className='dappTile' onMouseDown={() => link.send('tray:launchDapp', 'sushi.frame.eth')}>
-            <img src={sushi} />
-          </div> */}
         </div>
       </div>
     )
