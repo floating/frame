@@ -369,7 +369,8 @@ function startScanning () {
   tokenObserver = store.observer(() => {
     const customTokens = storeApi.getCustomTokens()
     if (trackedAddressScan && activeAddress) {
-      sendCommandToWorker('fetchTokenBalances', [activeAddress, customTokens])
+      const activeTokens = customTokens.filter(t => connectedChains.includes(t.chainId))
+      sendCommandToWorker('fetchTokenBalances', [activeAddress, activeTokens])
     }
   })
 
