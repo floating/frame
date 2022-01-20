@@ -41,9 +41,7 @@ export default {
       titleBarStyle: 'hidden',
       trafficLightPosition: { x: 10, y: 9 },
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-      // backgroundThrottling: false,
       icon: path.join(__dirname, './AppIcon.png'),
-      // skipTaskbar: process.platform !== 'linux',
       webPreferences: { ...webPrefrences, preload }
     })
 
@@ -58,10 +56,6 @@ export default {
     frameInstance.views = {}
 
     place(frameInstance)
-
-    setTimeout(() => {
-      frameInstance.show()
-    }, 0)
 
     // Create the frame's overlay view
     // const overlayInstance = new BrowserView({ webPrefrences })
