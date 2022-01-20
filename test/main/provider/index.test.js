@@ -905,44 +905,22 @@ describe('#send', () => {
       })
     }, 100)
 
-    it('does not submit a V3 request to a Ledger', done => {
-      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'ledger' })
+    // these signers only support V4+
+    const hardwareSigners = ['Ledger', 'Lattice', 'Trezor']
 
-      // Ledger only supports V4+
-      const params = [address, typedData]
+    hardwareSigners.forEach(signerType => {
+      it(`does not submit a V3 request to a ${signerType}`, done => {
+        accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: signerType.toLowerCase() })
 
-      send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error.message).toMatch(/Ledger/)
-        expect(err.error.code).toBe(-1)
-        done()
-      })
-    }, 100)
+        const params = [address, typedData]
 
-    it('does not submit a V3 request to a Lattice', done => {
-      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'lattice' })
-
-      // Lattice only supports V4+
-      const params = [address, typedData]
-
-      send({ method: 'eth_signTypedData_v3', params }, err => {
-        expect(err.error.message).toMatch(/Lattice/)
-        expect(err.error.code).toBe(-1)
-        done()
-      })
-    }, 100)
-
-    it('does not submit a request to a Trezor', done => {
-      accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: 'trezor' })
-
-      // Trezor does not support signing typed data
-      const params = [address, typedData]
-
-      send({ method: 'eth_signTypedData_v4', params }, err => {
-        expect(err.error.message).toMatch(/Trezor/)
-        expect(err.error.code).toBe(-1)
-        done()
-      })
-    }, 100)
+        send({ method: 'eth_signTypedData_v3', params }, err => {
+          expect(err.error.message).toMatch(new RegExp(signerType))
+          expect(err.error.code).toBe(-1)
+          done()
+        })
+      }, 100)
+    })
 
     it('passes a request with an unknown version through to the connection', done => {
       mockConnectionError('received unhandled request')
