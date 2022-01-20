@@ -471,6 +471,9 @@ const api = {
     if (windows.dash && windows.dash.isVisible()) windows.dash.hide()
     // store.setDashType()
   },
+  refocusFrame: (frameId) => {
+    frameManager.refocus(frameId)
+  },
   events,
   extractColors
 }

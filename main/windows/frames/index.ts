@@ -191,6 +191,12 @@ export default class FrameManager {
     }
   }
 
+  refocus (id: string) {
+    const frameInstance = this.frameInstances[id]
+    frameInstances.reposition(frameInstance)
+    frameInstance.focus()
+  }
+
   isFrameShowing () {
     return Object.keys(this.frameInstances).some(win => this.frameInstances[win].isVisible())
   }
