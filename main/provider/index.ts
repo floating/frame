@@ -3,9 +3,8 @@ import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
 import utils from 'web3-utils'
-import ethSignature, { Version } from 'eth-sig-util'
+import { recoverTypedMessage, Version } from 'eth-sig-util'
 import crypto from 'crypto'
-import BigNumber from 'bignumber.js'
 import Common from '@ethereumjs/common'
 
 import {
@@ -290,16 +289,18 @@ class Provider extends EventEmitter {
         cb(err)
       } else {
         const sig = signature || ''
-        const recoveredAddress = ethSignature.recoverTypedMessage({ data, sig }, req.version)
-        if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
-          const err = new Error('TypedData signature verification failed')
+        try {
+          const recoveredAddress = recoverTypedMessage({ data, sig }, req.version)
+          if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+            throw new Error('TypedData signature verification failed')
+          }
 
+          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
+          cb(null, sig)
+        } catch (err: any) {
           this.resError(err.message, payload, res)
 
           cb(err)
-        } else {
-          res({ id: payload.id, jsonrpc: payload.jsonrpc, result: sig })
-          cb(null, sig)
         }
       }
     })
@@ -626,14 +627,8 @@ class Provider extends EventEmitter {
 
     const signerType = (currentAccount.lastSignerType || '').toLowerCase()
 
-    // check for signers that don't support signing typed data at all
-    if (['trezor'].includes(signerType)) {
-      const signerName = signerType[0].toUpperCase() + signerType.substring(1)
-      return this.resError(`${signerName} does not support eth_signTypedData`, payload, res)
-    }
-
     // check for signers that only support signing a specific version of typed data
-    if (version !== 'V4' && ['ledger', 'lattice'].includes(signerType)) {
+    if (version !== 'V4' && ['ledger', 'lattice', 'trezor'].includes(signerType)) {
       const signerName = signerType[0].toUpperCase() + signerType.substring(1)
       return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
