@@ -71,7 +71,13 @@ export default {
       }
     })
 
+    const { fullscreen } = store('main.frames', frameInstance.frameId)
+
+    const { width, height } = frameInstance.getBounds()
+
     frameInstance.addBrowserView(viewInstance)
+
+    viewInstance.setBounds({ x: 0, y: fullscreen ? 0 : 32, width: width, height: fullscreen ? height : height - 32})
 
     viewInstance.setAutoResize({ width: true, height: true })
   
