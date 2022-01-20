@@ -22,8 +22,6 @@ import {
   hashPersonalMessage,
 } from 'ethereumjs-util'
 
-// @ts-ignore
-import { arraysMatch, capitalize } from '../../resources/utils' // TODO: include this in TS build
 import proxy from './proxy'
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
@@ -39,6 +37,19 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
 type Balance = Token & { balance: string, displayBalance: string }
+
+// TODO: these utility functions exist in ../../resources/utils but that file is not
+// yet part of the TS build
+function capitalize (s: string) {
+  return s[0].toUpperCase() + s.substring(1).toLowerCase()
+}
+
+function arraysMatch (a: number[] = [], b: number[] = []) {
+  return (
+    a.length === b.length &&
+    a.every((chainId, i) => b[i] === chainId)
+  )
+}
 
 function getNativeCurrency (chainId: number) {
   const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
