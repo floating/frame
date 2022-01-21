@@ -30,18 +30,23 @@ async function getDappColors (dappId: string) {
   }
 }
 
-async function updateDappContent (dappId: string, contentURI: string) {
+// TODO: change to correct manifest type one Nebula version with types are published
+async function updateDappContent (dappId: string, contentURI: string, manifest: any) {
   // TODO: Make sure content is pinned before proceeding
-  store.updateDapp(dappId, { content: contentURI })
+  store.updateDapp(dappId, { content: contentURI, manifest })
 }
 
 async function checkStatus (dappId: string) {
   const dapp = store('main.dapps', dappId)
   const resolved = await nebula.resolve(dapp.ens)
 
+  const version = ((resolved.manifest || {}).version) || 'unknown'
+
+  log.info(`resolved content for ${dapp.ens}, version: ${version}`)
+
   store.updateDapp(dappId, { record: resolved.record })
   if (dapp.content !== resolved.record.content) {
-    updateDappContent(dappId, resolved.record.content)
+    updateDappContent(dappId, resolved.record.content, resolved.manifest)
   }
 
   if (!dapp.colors) {
