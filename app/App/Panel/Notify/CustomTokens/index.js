@@ -37,7 +37,7 @@ class CustomTokens extends React.Component {
                   <div className={this.state.tokenExpanded === i ? 'customTokensListItem customTokensListItemExpanded' : 'customTokensListItem'}>
                     <div className='customTokensListItemTitle'>
                       <div className='customTokensListItemName'>
-                        <img src={token.logoURI} />
+                        <img src={`https://proxy.pylon.link?target=${token.logoURI}`} />
                         <div className='customTokensListItemText'>
                           <div className='customTokensListItemSymbol'>{token.symbol}</div>
                           <div className='customTokensListItemSub'>{token.name}</div>
