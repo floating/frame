@@ -115,13 +115,34 @@
         font-family 'OpenSans', sans-serif
         font-weight 500
 
+        img:before
+          content attr(alt)
+          top 0
+          bottom 0
+          left 0
+          right 0
+          border-radius 13px
+          position absolute
+          background var(--outerspace)
+          color var(--ghostF)
+          display flex
+          justify-content center
+          align-items center
+          font-size 11px
+          font-weight 600
+          letter-spacing -0.5px
+          margin-left -0.5px
+          top -0.5px
+
         img
+          position relative
           height 28px
           width 28px
-          border-radius 10px
+          border-radius 20px
           margin-right 12px
           border 2px solid var(--ghostC)
           background var(--ghostC)
+          overflow hidden
 
         .customTokensListItemText
           display flex
