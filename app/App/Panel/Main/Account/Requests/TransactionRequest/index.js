@@ -456,13 +456,14 @@ class TransactionRequest extends React.Component {
                     <div className='monitorTop'>
                       {toAddress ? (
                         <div className='monitorTo'>
-                          <span className='monitorSub'>{'TO'}</span>
+                          <span className='monitorSub'>{'TO'} </span>
                           <span className='monitorValue'>
-                            {toAddress.substring(0, 5)}
+                            <span className='monitorValue0x'>{'0x'}</span>
+                            {toAddress.substring(2, 5)}
                             {svg.octicon('kebab-horizontal', { height: 14 })}
                             {toAddress.substr(toAddress.length - 3)}
-                          </span>
-                          <span className='monitorSub'>{'ON'}</span>
+                           </span>
+                          <span className='monitorSub'>{'ON'} </span>
                           <span className='monitorSub monitorSubHighlight'>
                             {}
                             {this.store('main.networks', this.chain.type, parseInt(req.payload.chainId), 'name')}

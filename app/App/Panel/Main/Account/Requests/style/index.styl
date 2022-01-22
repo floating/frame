@@ -1318,36 +1318,44 @@
   display flex
   justify-content flex-start
   align-items center
-  font-weight 600
-  height 22px
+  font-weight 500
+  height 26px
+  min-height 26px
+  max-height 26px
   max-width 214px
+  font-size 8px
   overflow hidden
-  // background red
+  position relative
+  top -2px
+
   *
     flex-shrink 0
+    padding 2px
 
   svg
     position relative
     padding 0px 3px
-    top -2px
+    top 1px
 
 .monitorValue
-  font-family FiraCode, monospace
-  margin 0px 1px
-  font-weight 500
-  font-size 14px
+  display flex
+  justify-content center
+  align-items center
   color var(--outerspace)
-  
-.monitorSub
-  font-size 9px
-  text-transform uppercase
-  letter-spacing 1px
+  font-size 14px
+  position relative
+  top -1px
+
+.monitorValue0x
+  text-transform lowercase
+  padding 0
 
 .monitorSubHighlight
-  font-size 14px
-  margin-left 1px
   color var(--outerspace)
-  font-weight 500
+  font-size 14px
+  text-transform uppercase
+  position relative
+  top -1px
 
 .monitorArrow
   padding-top 1px
