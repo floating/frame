@@ -146,7 +146,6 @@ const api = {
         tray.setContextMenu(menuHide)
       })
       windows.tray.on('hide', () => {
-        windows.tray.blur()
         tray.setContextMenu(menuShow)
       })
       setTimeout(() => {
