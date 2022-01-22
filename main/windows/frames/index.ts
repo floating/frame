@@ -1,6 +1,7 @@
 // Frames are the windows that run dapps and other functionality
 // They are rendered based on the state of `main.frames`
 
+import { screen } from 'electron'
 import log from 'electron-log'
 import store from '../../store'
 
@@ -191,7 +192,13 @@ export default class FrameManager {
   refocus (id: string) {
     const frameInstance = this.frameInstances[id]
     if (frameInstance) {
-      frameInstances.reposition(frameInstance)
+      const { x, y } = frameInstance.getBounds()
+      const frameScreen = screen.getDisplayNearestPoint({ x, y })
+      const currentScreen = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+      frameInstance.setVisibleOnAllWorkspaces(true)
+      frameInstance.setVisibleOnAllWorkspaces(false)
+      if (currentScreen.id !== frameScreen.id) frameInstances.reposition(frameInstance)
+      frameInstance.show()
       frameInstance.focus()
     }
   }
