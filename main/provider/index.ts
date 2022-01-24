@@ -858,6 +858,13 @@ class Provider extends EventEmitter {
     return target
   }
 
+  sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
+    this.send(payload, res => {
+      if (res.error) return cb(new Error(`sendAsync Error: ${res.error}`))
+      cb(null, res)
+    })
+  }
+
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
     const targetChain = this.parseTargetChain(payload)
