@@ -133,7 +133,7 @@
     "gridplus-sdk": "0.9.3",
     "hdkey": "2.0.1",
     "nebula": "0.1.2",
-    "node-fetch": "2.6.2",
+    "node-fetch": "2.6.7",
     "node-hid": "2.1.1",
     "query-string": "7.1.0",
     "react": "17.0.2",
@@ -148,7 +148,7 @@
     "zxcvbn": "4.4.2"
   },
   "devDependencies": {
-    "@babel/core": "7.16.10",
+    "@babel/core": "7.16.12",
     "@babel/node": "7.16.8",
     "@babel/plugin-proposal-decorators": "7.16.7",
     "@babel/plugin-proposal-do-expressions": "7.16.7",
@@ -175,7 +175,7 @@
     "electron-notarize": "1.1.1",
     "hardhat": "2.8.3",
     "jest": "27.4.7",
-    "node-watch": "0.7.2",
+    "node-watch": "0.7.3",
     "parcel-bundler": "1.12.3",
     "rimraf": "3.0.2",
     "shx": "0.3.4",
