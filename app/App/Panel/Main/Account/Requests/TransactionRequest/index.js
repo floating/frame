@@ -466,7 +466,7 @@ class TransactionRequest extends React.Component {
                           <span className='monitorSub'>{'ON'} </span>
                           <span className='monitorSub monitorSubHighlight'>
                             {}
-                            {this.store('main.networks', this.chain.type, parseInt(req.payload.chainId), 'name')}
+                            {this.store('main.networks', this.chain.type, this.chain.id, 'name')}
                           </span>
                         </div>
                       ) : (
