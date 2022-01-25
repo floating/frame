@@ -10,11 +10,11 @@ const { addHexPrefix } = require('ethereumjs-util')
 const { usesBaseFee, signerCompatibility, maxFee } = require('../transaction')
 
 const crypt = require('../crypt')
-const store = require('../store')
+const store = require('../store').default
 const dataScanner = require('../externalData')
 
 // Provider Proxy
-const proxyProvider = require('../provider/proxy')
+const proxyProvider = require('../provider/proxy').default
 
 const Account = require('./Account')
 const windows = require('../windows')
@@ -181,7 +181,8 @@ class Accounts extends EventEmitter {
       const tx = {
         id: 1,
         jsonrpc: '2.0',
-        method: 'eth_sendTransaction'
+        method: 'eth_sendTransaction',
+        chainId: targetChain.id
       }
 
       if (type === 'speed') {
@@ -199,7 +200,7 @@ class Accounts extends EventEmitter {
       proxyProvider.emit('send', tx, (res = {}) => {
         if (res.error) return reject(new Error(res.error.message))
         resolve()
-      }, targetChain)
+      })
     })
   }
 
@@ -208,9 +209,9 @@ class Accounts extends EventEmitter {
       // TODO: Route to account even if it's not current
       if (!account)  return reject(new Error('Unable to determine target account'))
       if (!targetChain || !targetChain.type || !targetChain.id) return reject(new Error('Unable to determine target chain'))
-      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', params: [] }, (res) => {
+      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', chainId: targetChain.id, params: [] }, (res) => {
         if (res.error) return reject(new Error(JSON.stringify(res.error)))
-        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', params: [hash] }, receiptRes => {
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', chainId: targetChain.id, params: [hash] }, receiptRes => {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && account.requests[id]) {
             account.requests[id].tx.receipt = receiptRes.result
@@ -260,8 +261,8 @@ class Accounts extends EventEmitter {
             const receiptBlock = parseInt(account.requests[id].tx.receipt.blockNumber, 16)
             resolve(blockHeight - receiptBlock)
           }
-        }, targetChain)
-      }, targetChain)
+        })
+      })
     })
   }
 
@@ -283,7 +284,7 @@ class Accounts extends EventEmitter {
       log.error('txMonitor had no target chain')
       setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8 * 1000)
     } else {
-      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'] }, newHeadRes => {
+      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'], chainId: targetChain.id }, newHeadRes => {
         if (newHeadRes.error) {
           log.warn(newHeadRes.error)
           const monitor = async () => {
@@ -336,17 +337,17 @@ class Accounts extends EventEmitter {
                 // proxyProvider.removeListener('data', handler)
                 
                 proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
-                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', params: [headSub] }, res => {
+                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', chainId: targetChain.id, params: [headSub] }, res => {
                   if (res.error) {
                     log.error('error sending message eth_unsubscribe', res)
                   }
-                }, targetChain)
+                })
               }
             }
           }
           proxyProvider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
         }
-      }, targetChain)
+      })
     }
   }
 
@@ -372,9 +373,13 @@ class Accounts extends EventEmitter {
       return cb(err)
     }
 
+    dataScanner.setActiveAddress(currentAccount.address)
+
     const summary = currentAccount.summary()
     cb(null, summary)
-    windows.broadcast('main:action', 'setSigner', summary)
+    
+    store.setAccount(summary)
+
     if (currentAccount.status === 'ok') this.verifyAddress(false, (err, verified) => {
       if (!err && !verified) {
         currentAccount.signer = ''
@@ -414,9 +419,15 @@ class Accounts extends EventEmitter {
   unsetSigner (cb) {
     const s = this.current()
     this._current = null
+
+    dataScanner.setActiveAddress('')
+
     const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
-    windows.broadcast('main:action', 'unsetSigner', summary)
+
+    store.unsetAccount()
+
+
     // setTimeout(() => { // Clear signer requests when unset
     //   if (s) {
     //     s.requests = {}
@@ -855,7 +866,7 @@ class Accounts extends EventEmitter {
 
         const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex') }
 
-        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [from, 'pending'] }, (res) => {
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', chainId: targetChain.id, params: [from, 'pending'] }, (res) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
             const adjustedNonce = intToHex(nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust)
@@ -863,7 +874,7 @@ class Accounts extends EventEmitter {
             txRequest.data.nonce = adjustedNonce
             currentAccount.update()
           }
-        }, targetChain)
+        })
       }
     }
   }
@@ -876,10 +887,6 @@ class Accounts extends EventEmitter {
     } else {
       log.error('Trying to lock request ' + handlerId + ' but there is no current account')
     }
-  }
-
-  scanSelectedAddress () {
-    dataScanner.setActiveAddress(this.getSelectedAddress())
   }
 
   stopExternalDataScan () {

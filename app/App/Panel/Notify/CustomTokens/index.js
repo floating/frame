@@ -10,7 +10,7 @@ class CustomTokens extends React.Component {
   }
 
   render () {
-    const tokens = this.store('main.tokens')    
+    const tokens = this.store('main.tokens.custom')    
 
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
@@ -37,7 +37,11 @@ class CustomTokens extends React.Component {
                   <div className={this.state.tokenExpanded === i ? 'customTokensListItem customTokensListItemExpanded' : 'customTokensListItem'}>
                     <div className='customTokensListItemTitle'>
                       <div className='customTokensListItemName'>
-                        <img src={token.logoURI} />
+                        <img 
+                          src={`https://proxy.pylon.link?type=icon&target=${token.logoURI}`} 
+                          value={token.symbol.toUpperCase()}
+                          alt={token.symbol.toUpperCase()}
+                        />
                         <div className='customTokensListItemText'>
                           <div className='customTokensListItemSymbol'>{token.symbol}</div>
                           <div className='customTokensListItemSub'>{token.name}</div>

@@ -1,7 +1,7 @@
 const ipfs = require('ipfs-core')
 const peers = require('./peers.json')
 
-const store = require('../store')
+const store = require('../store').default
 
 // const peers = require('./peers.json')
 const ens = require('../ens')

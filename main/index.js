@@ -1,4 +1,4 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, BrowserWindow } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -15,8 +15,20 @@ const url = require('url')
 const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
-const store = require('./store')
-const dapps = require('./dapps')
+const store = require('./store').default
+const dapps = require('./dapps').default
+
+// if (process.defaultApp) {
+//   if (process.argv.length >= 2) {
+//     app.setAsDefaultProtocolClient('dapp', process.execPath, [path.resolve(process.argv[1])])
+//   }
+// } else {
+//   app.setAsDefaultProtocolClient('dapp')
+// }
+
+// app.on('open-url', (event, url) => {
+//   dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+// })
 
 // log.transports.file.level = 'info'
 
@@ -181,9 +193,59 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 
 ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 
-ipcMain.on('tray:launchDapp', async (e, domain) => {
-  await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
-  await dapps.launch(domain, console.error)
+ipcMain.on('frame:close', e => {
+  windows.close(e)
+})
+
+ipcMain.on('frame:min', e => {
+  windows.min(e)
+})
+
+ipcMain.on('frame:max', e => {
+  windows.max(e)
+})
+
+ipcMain.on('frame:unmax', e => {
+  windows.unmax(e)
+})
+
+// ipcMain.on('tray:launchDapp', async (e, domain) => {
+//   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+//   await dapps.launch(domain, console.error)
+// })
+
+ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
+
+dapps.add({
+  ens: 'send.frame.eth',
+  config: {
+    key: 'value'
+  }
+})
+
+ipcMain.on('runDapp', async (e, ens) => {
+  const win = BrowserWindow.fromWebContents(e.sender)
+  dapps.open(win.frameId, ens)
+})
+
+ipcMain.on('unsetCurrentView', async (e, ens) => {
+  const win = BrowserWindow.fromWebContents(e.sender)
+  dapps.unsetCurrentView(win.frameId)
+})
+
+ipcMain.on('*:addFrame', (e, id) => {
+  const existingFrame = store('main.frames', id)
+
+  if (existingFrame) {
+    windows.refocusFrame(id)
+  } else {
+    store.addFrame({
+      id,
+      currentView: '',
+      views: {}
+    })
+    dapps.open(id, 'send.frame.eth')
+  }
 })
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
@@ -213,33 +275,6 @@ app.on('ready', () => {
     }
   })
   store.observer(() => {
-    // console.log('registering shortcut')
-
-    // globalShortcut.unregister('Alt+Space')
-    // let showing = false
-    // globalShortcut.register('Alt+Space', () => {
-    //   showing = !showing
-    //   if (showing) {
-    //     windows.showFlow()
-    //   } else {
-    //     windows.hideFlow()
-    //   }
-    // })
-
-    // const altspace = store('main.shortcuts.altSpace')
-    // if (altspace) {
-    //   console.log('registering shortcut')
-    //   globalShortcut.unregister('Alt+Space')
-    //   let showing = false
-    //   globalShortcut.register('Alt+Space', () => {
-    //     showing = !showing
-    //     if (showing) {
-    //       windows.showFlow()
-    //     } else {
-    //       windows.hideFlow()
-    //     }
-    //   })
-    // }
     const altSlash = store('main.shortcuts.altSlash')
     if (altSlash) {
       globalShortcut.unregister('Alt+/')
@@ -248,6 +283,15 @@ app.on('ready', () => {
       globalShortcut.unregister('Alt+/')
     }
   })
+  // store.observer(() => {
+  //   const altSlash = store('main.shortcuts.altSlash')
+  //   if (altSlash) {
+  //     globalShortcut.unregister('Alt+Space')
+  //     globalShortcut.register('Alt+Space', () => windows.openDapp())
+  //   } else {
+  //     globalShortcut.unregister('Alt+Space')
+  //   }
+  // })
 })
 
 ipcMain.on('tray:action', (e, action, ...args) => {

@@ -68,7 +68,7 @@ Frame exposes system-wide JSON-RPC endpoints `ws://127.0.0.1:1248` and `http://1
 
 ### Frame's injected provider
 
-Frame also has a browser extension for injecting a Frame-connected [EIP-1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md) provider into web apps as `window.etheruem`. This can be used to inject a connection when an app does not provide the option to connect to Frame natively.
+Frame also has a browser extension for injecting a Frame-connected [EIP-1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md) provider into web apps as `window.ethereum`. This can be used to inject a connection when an app does not provide the option to connect to Frame natively.
 
 ### Related
   - [Frame Chat](https://discord.gg/UH7NGqY) - Feel free to drop in and ask questions!

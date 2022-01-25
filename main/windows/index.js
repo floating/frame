@@ -7,9 +7,13 @@ const log = require('electron-log')
 const EventEmitter = require('events')
 const events = new EventEmitter()
 
-const store = require('../store')
+const store = require('../store').default
 
-const dapp = require('./dapp')
+const extractColors = require('./extractColors')
+
+import FrameManager from './frames'
+
+// const dapp = require('./dappOld')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
 
 const dev = process.env.NODE_ENV === 'development'
@@ -17,6 +21,7 @@ const fullheight = !!process.env.FULL_HEIGHT
 
 const winId = e => e.sender.webContents.browserWindowOptions.id
 const windows = {}
+const frameManager = new FrameManager()
 let tray, trayReady
 
 const openedAtLogin = app && app.getLoginItemSettings() && app.getLoginItemSettings().wasOpenedAtLogin
@@ -93,7 +98,7 @@ const api = {
       // transparent: true,
       // hasShadow: false,
       show: false,
-      backgroundColor: 'rgba(20, 20, 19, 1)', //'#e4e8f8',
+      backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       backgroundThrottling: false,
       // offscreen: true,
       icon: path.join(__dirname, './AppIcon.png'),
@@ -141,7 +146,6 @@ const api = {
         tray.setContextMenu(menuHide)
       })
       windows.tray.on('hide', () => {
-        windows.tray.blur()
         tray.setContextMenu(menuShow)
       })
       setTimeout(() => {
@@ -150,11 +154,14 @@ const api = {
     }
     if (dev) windows.tray.openDevTools()
     setTimeout(() => {
-      windows.tray.on('blur', _ => store('main.autohide') && !store('dash.showing') ? api.hideTray(true) : null)
+      windows.tray.on('blur', _ => {
+        const frameShowing = frameManager.isFrameShowing()
+        if (store('main.autohide') && !store('dash.showing') && !frameShowing) api.hideTray(true)
+      })
       windows.tray.focus()
     }, 1260)
     if (!openedAtLogin) {
-      windows.tray.webContents.once('did-finish-load', () => {
+      windows.tray.once('ready-to-show', () => {
         api.showTray()
       })
     }
@@ -193,7 +200,8 @@ const api = {
     this.gasObserver = store.observer(() => {
       let title = ''
       if (store('platform') === 'darwin' && store('main.menubarGasPrice')) {
-        const gasPrice = store('main.networksMeta.ethereum.1.gas.price.levels.fast')
+        const currentNetwork = store('main.currentNetwork')
+        const gasPrice = store('main.networksMeta.ethereum', currentNetwork.id, 'gas.price.levels.fast')
         if (!gasPrice) return
         const gasDisplay = Math.round(parseInt(gasPrice, 'hex') / 1000000000).toString()
         title = gasDisplay // ɢ 🄶 Ⓖ ᴳᵂᴱᴵ
@@ -257,19 +265,15 @@ const api = {
     windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     windows.tray.setResizable(false) // Keeps height consistant
     const screen = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint())
-    if (dev && !fullheight) {
-      windows.tray.setSize(358, 740)
-    } else if (screen.workArea.height === screen.bounds.height) {
-      // Ugly fix for https://github.com/electron/electron/issues/8069
-      // The taskbar size is not being accounted for in the workArea.
-      // This causes us to over-size the tray which makes bottom portion of the tray invisible.
-      // Overflow also makes window manager act weirdly. 
-      // For example, Gnome starts displaying it on the first monitor rather than target monitor if there are multiple monitors.
-      // I don't know how to get the exact taskbar size, so we're going to assume taskbar takes 50 pixels :)
-      windows.tray.setSize(358, screen.workArea.height - 50)
-    } else {
-      windows.tray.setSize(358, screen.workArea.height)
-    }
+    // Ugly fix for https://github.com/electron/electron/issues/8069
+    // The taskbar size is not being accounted for in the workArea.
+    // This causes us to over-size the tray which makes bottom portion of the tray invisible.
+    // Overflow also makes window manager act weirdly. 
+    // For example, Gnome starts displaying it on the first monitor rather than target monitor if there are multiple monitors.
+    // I don't know how to get the exact taskbar size, so we're going to assume taskbar takes 50 pixels :)
+    const height = dev && !fullheight ? 740 : screen.workArea.height === screen.bounds.height ? screen.workArea.height - 50 : screen.workArea.height
+    windows.tray.setMinimumSize(358, height)
+    windows.tray.setSize(358, height)
     const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) windows.tray.focus()
@@ -287,9 +291,28 @@ const api = {
 
   },
   close: (e) => {
-    const id = winId(e)
-    if (windows[id]) windows[id].close()
-    delete windows[id]
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.close()
+  },
+  max: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.maximize()
+  },
+  unmax: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.unmaximize()
+  },
+  min: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.minimize()
+  },
+  full: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.setFullScreen(true)
+  },
+  unfull: (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    win.setFullScreen(false)
   },
   getTray: () => {
     return windows.tray
@@ -303,6 +326,8 @@ const api = {
   },
   broadcast: (channel, ...args) => {
     Object.keys(windows).forEach(id => api.send(id, channel, ...args))
+
+    frameManager.broadcast(channel, args)
   },
   minimize: (e) => {
     const id = winId(e)
@@ -321,14 +346,6 @@ const api = {
   },
   quit: () => {
     app.quit()
-  },
-  close: (e) => {
-    const id = winSession(e)
-    if (windows[id]) {
-      windows[id].setClosable(true)
-      windows[id].close()
-    }
-    delete windows[id]
   },
   // flow: () => {
   //   windows.flow = new BrowserWindow({
@@ -401,7 +418,7 @@ const api = {
       // transparent: true,
       // hasShadow: false,
       show: false,
-      backgroundColor: 'rgba(20, 20, 19, 1)',
+      backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       backgroundThrottling: false,
       offscreen: true,
       // icon: path.join(__dirname, './AppIcon.png'),
@@ -461,17 +478,11 @@ const api = {
     if (windows.dash && windows.dash.isVisible()) windows.dash.hide()
     // store.setDashType()
   },
-  // toggleDash: () => {
-  //   if (windows.dash.isVisible()) {
-  //     api.hideDash()
-  //   } else {
-  //     api.showDash()
-  //   }
-  // },
-  openView: (ens, session) => {
-    dapp.openView(ens, session, windows)
+  refocusFrame: (frameId) => {
+    frameManager.refocus(frameId)
   },
-  events
+  events,
+  extractColors
 }
 
 app.on('web-contents-created', (e, contents) => {
@@ -480,21 +491,28 @@ app.on('web-contents-created', (e, contents) => {
   contents.on('new-window', e => e.preventDefault())
 })
 
+app.on('ready', () => {
+  frameManager.start()
+})
+
 if (dev) {
   const path = require('path')
   const watch = require('node-watch')
   watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) {
-      windows.tray.send('main:reload:style', name)
-      // windows.flow.send('main:reload:style', name)
-      windows.dash.send('main:reload:style', name)
+      Object.keys(windows).forEach(win => {
+        windows[win].send('main:reload:style', name)
+      })
+      frameManager.reloadFrames(true, name)
     }
   })
   app.on('ready', () => {
     globalShortcut.register('CommandOrControl+R', () => {
-      windows.tray.reload()
-      // windows.flow.reload()
-      windows.dash.reload()
+      Object.keys(windows).forEach(win => {
+        windows[win].reload()
+      })
+
+      frameManager.reloadFrames()
     })
   })
 }
@@ -532,9 +550,20 @@ ipcMain.on('tray:mouseout', () => {
 //   }
 // })
 
-// TODO: Make this universal
-ipcMain.on('tray:contextmenu', (e, x, y) => { if (dev) windows.tray.inspectElement(x, y) })
-ipcMain.on('dash:contextmenu', (e, x, y) => { if (dev) windows.dash.inspectElement(x, y) })
+ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y) })
+
+
+// ipcMain.on('*:installDapp', async (e, domain) => {
+//   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+// })
+
+// ipcMain.on('tray:dappWindow', async (e) => {
+//   console.log('tray:dappWindow')
+//   // await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
+//   // await dapps.launch(domain, console.error)
+//   // dapp.createDappFrame(windows)
+// })
+
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))

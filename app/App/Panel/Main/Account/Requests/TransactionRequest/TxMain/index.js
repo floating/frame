@@ -33,6 +33,8 @@ class TxRecipient extends React.Component {
           <div className='_txMainValue'>
             <span className='_txMainValueSymbol'>{currentSymbol}</span>
             <span className='_txMainValueAmount'>{value}</span>
+          </div>
+          <div className='_txMainValue'>
             <span className='_txMainValueEq'>{'≈'}</span>
             <span className='_txMainValueEqSymbol'>{'$'}</span>
             <span className='_txMainValueEqAmount'>{(value * etherUSD).toFixed(2)}</span>

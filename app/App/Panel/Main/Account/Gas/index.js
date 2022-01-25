@@ -57,10 +57,11 @@ class Gas extends React.Component {
     return this.toDisplayUSD(BigNumber(value * gasLimit).shiftedBy(-9).multipliedBy(nativeUSD))
   }
 
-  txEstimates (type, id, gasPrice, calculatedFees) {
+  txEstimates (type, id, gasPrice, calculatedFees, currentSymbol) {
+
     const estimates = [
       {
-        label: 'Send ETH',
+        label: 'Send ' + currentSymbol,
         estimatedGas: gasToSendEth
       },
       {
@@ -116,6 +117,7 @@ class Gas extends React.Component {
     const { type, id } = this.store('main.currentNetwork')
     const levels = this.store('main.networksMeta', type, id, 'gas.price.levels')
     const fees = this.store('main.networksMeta', type, id, 'gas.price.fees')
+    const currentSymbol = this.store('main.networks', type, id, 'symbol') || 'ETH'
     const gasPrice = this.levelDisplay(levels.fast)
 
     const { nextBaseFee, maxPriorityFeePerGas } = (fees || {})
@@ -125,9 +127,7 @@ class Gas extends React.Component {
       priorityFee: this.levelDisplay(maxPriorityFeePerGas)
     }
 
-    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, fees ? calculatedFees : null)
-
-    // const currentSymbol = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'symbol') || '?'
+    const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, fees ? calculatedFees : null, currentSymbol)
 
     return (
       <div ref={this.moduleRef}>

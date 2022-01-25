@@ -1,7 +1,7 @@
 const Client = require('../Client')
 const axios = require('axios')
 const log = require('electron-log')
-const store = require('../../store')
+const store = require('../../store').default
 const { hexToNumber } = require('web3-utils')
 
 const SYNC_CHECK_INTERVAL = 3000

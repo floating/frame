@@ -1,6 +1,7 @@
 import log from 'electron-log'
 import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
+import { TypedDataUtils } from 'eth-sig-util'
 import { Device as TrezorDevice } from 'trezor-connect'
 
 import Signer from '../../Signer'
@@ -221,18 +222,51 @@ export default class Trezor extends Signer {
 
   // Standard Methods
   signMessage (index: number, message: string, cb: Callback<string>) {
-    const rpcCallback: Callback<any> = (err, result) => {
+    const rpcCallback: FlexCallback<any> = (err, result) => {
       if (err) {
         log.error('signMessage Error')
         log.error(err)
-        if (err.message === 'Unexpected message') err = new Error('Update Trezor Firmware')
-        cb(err, undefined)
+        if (err === 'Unexpected message') return cb(new Error('Update Trezor Firmware'))
+
+        cb(new Error(err))
       } else {
-        cb(null, '0x' + result.signature)
+        cb(null, addHexPrefix(result.signature))
       }
     }
 
     flex.rpc('trezor.ethereumSignMessage', this.device.path, this.getPath(index), this.normalize(message), rpcCallback)
+  }
+
+  // Standard Methods
+  signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
+    const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
+
+    if ((parseInt(versionNum) || 0) < 4) {
+      return cb(new Error(`Invalid version (${version}), Trezor only supports eth_signTypedData version 4+`), undefined)
+    }
+
+    const rpcCallback: FlexCallback<any> = (err, result) => {
+      if (err) {
+        log.error('signMessage Error')
+        log.error(err)
+        if (err === 'Unexpected message') return cb(new Error('Update Trezor Firmware'))
+
+        cb(new Error(err))
+      } else {
+        cb(null, addHexPrefix(result.signature))
+      }
+    }
+
+    if (this.isTrezorOne()) {
+      // Trezor One requires hashed input
+      const { types, primaryType, domain, message } = TypedDataUtils.sanitizeData(typedData)
+      const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, true).toString('hex')
+      const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, true).toString('hex')
+
+      flex.rpc('trezor.ethereumSignTypedHash', this.device.path, this.getPath(index), domainSeparatorHash, messageHash, rpcCallback)
+    } else {
+      flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)
+    }
   }
 
   signTransaction (index: number, rawTx: TransactionData, cb: Callback<string>) {
@@ -262,6 +296,10 @@ export default class Trezor extends Signer {
     })
     .then(signedTx => cb(null, addHexPrefix(signedTx.serialize().toString('hex'))))
     .catch(err => cb(err.message, undefined))
+  }
+
+  private isTrezorOne () {
+    return this.model.toLowerCase().includes('one')
   }
 
   private normalize (hex: string) {

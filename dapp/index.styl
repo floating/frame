@@ -1,114 +1,8 @@
-// Colors
-bg = #dadfea // #dce1e8
-v = #4e5758
-
-shift = rgba(33, 55, 86, 1)
-shift08 = rgba(33, 55, 86, 0.8)
-shift05 = rgba(33, 55, 86, 0.5)
-
-outerspace01 = rgba(33, 45, 46, 0.1)
-outerspace03 = rgba(33, 45, 46, 0.3)
-outerspace05 = rgba(33, 45, 46, 0.5)
-outerspace08 = rgba(33, 45, 46, 0.8)
-nebula = #3a4547
-outerspace = #212d2e
-outerspaceShade = #1c2526
-outerspaceLight = #29393a
-outerspacePulse = #395153
-outerspaceShader = rgb(16, 36, 38) // rgb(24, 54, 56)
-outerspaceDark = #0b1819
-outerspaceDarker = #02090a
-spacewhite = rgba(247, 251, 255, 1)
-spacewhite07 = rgba(247, 251, 255, 0.5)
-
-highlightest = rgba(244, 250, 255, 1)
-highlighter = rgba(240, 246, 255, 1)
-highlight = rgba(237, 242, 253, 1)
-lowlight = rgba(232, 236, 248, 1)
-lowlight0 = rgba(232, 236, 248, 0)
-lowerlight = rgba(227, 232, 245, 1)
-light = rgba(235, 240, 250, 1)
-lightShade = rgba(220, 224, 244, 1) // #d9e1ef
-lightShader = rgba(190, 194, 214, 1)
-thinner = rgba(16, 44, 180, .02)
-thin = rgba(16, 44, 180, .04)
-thick = rgba(16, 44, 180, .07)
-doubleThick = rgba(16, 44, 180, .14)
-tripleThick = rgba(16, 44, 180, .21)
-thick0 = rgba(16, 44, 180, 0)
-
-whiteglow = rgba(232, 236, 249, 1)
-whiteglowShade = rgba(208, 212, 225, 1)
-
-hardware = rgba(170, 240, 255, 1)
-smart = rgba(150, 255, 210, 1)
-smart04 = rgba(150, 255, 210, 0.4)
-smart02 = rgba(150, 255, 210, 0.2)
-smartShade = rgba(100, 205, 150, 1)
-hot = rgba(255, 150, 150, 1)
-
-shader = rgba(16, 44, 60, 0.7)
-
-phase = #212d2e
-phaseShade = #1c2526
-
-good = rgb(0, 210, 180)
-goodShade = rgb(0, 190, 160)
-good01 = rgba(0, 210, 180, 0.1)
-good02 = rgba(0, 210, 180, 0.2)
-good03 = rgba(0, 210, 180, 0.3)
-good04 = rgba(0, 210, 180, 0.4)
-good06 = rgba(0, 210, 180, 0.6)
-
-
-// berry = rgb(250, 150, 205)
-
-bad = rgb(250, 100, 155)
-bad01 = rgba(250, 100, 155, 0.1)
-bad02 = rgba(250, 100, 155, 0.2)
-bad03 = rgba(250, 100, 155, 0.3)
-bad04 = rgba(250, 100, 155, 0.4)
-bad06 = rgba(250, 100, 155, 0.6)
-bad08 = rgba(250, 100, 155, 0.8)
-badLight = rgb(255, 104, 159)
-badLighter = rgb(255, 107, 163)
-badShade = rgb(230, 80, 135)
-badDark = rgb(100, 0, 00)
-
-pending = rgb(94, 110, 255)
-pending02 = rgba(94, 110, 255, 0.4)
-pending01 = rgba(94, 110, 255, 0.2)
-pending04 = rgba(94, 110, 255, 0.4)
-pending08 = rgba(94, 110, 255, 0.8)
-pendingShade = rgb(74, 90, 235)
-pendingShader = rgb(64, 80, 225)
-
-// Shadows
-cardDrop = 0px 1px 1px rgba(0, 34, 42, 0.05)
-cardDrop0 = 0px 1px 1px rgba(0, 34, 42, 0)
-reverseCardDrop = 0px 1px 1px rgba(0, 34, 32, 0.1)
-
-// Transistions
-standard = .32s cubic-bezier(.82,0,.12,1) all
-standardSlow = .64s cubic-bezier(.82,0,.12,1) all
-var(--standardSlower) = .96s cubic-bezier(.82,0,.12,1) all
-standardSlowest = 1.6s cubic-bezier(.82,0,.12,1) all
-standardFast = .16s cubic-bezier(.82,0,.12,1) all
-var(--standardFaster) = .08s cubic-bezier(.82,0,.12,1) all
-// 0.18s cubic-bezier(0.8, 1, 0.2, 1) all
-cubic = cubic-bezier(.82,0,.12,1)
-
-settle = .5s cubic-bezier(0.475, -0.175, 0.32, 1.075) all
-settleFast = .25s cubic-bezier(0.475, -0.175, 0.32, 1.075) all
-
-@keyframes load {
-  0% {
+@keyframes load
+  0%
     transform rotate(0deg)
-  }
-  100% {
+  100%
     transform rotate(360deg)
-  }
-}
 
 body
   width 100%
@@ -117,13 +11,22 @@ body
   padding 0px
   font-family OpenSans
   font-weight 300
-  background light
 
   #frame
     width 100%
     height 100%
     padding 0px
     position relative
+
+    .overlay
+      position absolute
+      top 0 
+      right 0
+      bottom 0 
+      left 0
+      background linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%)
+      z-index 999
+      pointer-events none
 
     .backdrop
       position absolute
@@ -143,8 +46,117 @@ body
       right 0px
       bottom 0px
       z-index 0
-      pointer-events none
-      background black
+      background var(--ghostZ)
+
+    .mainLeft
+      position absolute
+      top 0
+      left 0
+      bottom 0
+      width 72px
+      padding-left 2px
+      -webkit-user-select none
+      display none
+
+      .accountTile
+        position absolute
+        top 26px
+        left 5px
+        right 5px
+        display flex
+        justify-content center
+        align-items center
+        flex-direction column
+        color var(--outerspace)
+        margin 6px 0px
+
+        .accountIcon
+          height 58px
+          width 58px
+          background var(--ghostA)
+          border-radius 16px
+          display flex
+          justify-content center
+          align-items center
+          flex-direction column
+          cursor pointer
+
+        .accountIcon:hover
+          background var(--ghostB)
+
+      .dappIcons
+        position absolute
+        top 72px
+        bottom 72px
+        left 0px
+        right 0px
+        display flex
+        justify-content center
+        align-items center
+
+        .dappIconsScroll
+          max-height 100%
+          width 100%
+          overflow-y scroll
+          overflow-x hidden
+          -webkit-user-select auto
+
+          .dappIconsWrap
+            padding-top 10px
+
+    .main
+      position absolute
+      top 0
+      left 0px
+      bottom 0
+      right 0
+      // border-left 1px solid var(--ghostX)
+      color var(--outerspace)
+      display flex
+      justify-content center
+      align-items center
+      -webkit-user-select none
+      // overflow-y scroll
+      z-index 9999
+      
+      .mainDappBackground
+        position absolute
+        top 0
+        left 0
+        bottom 0
+        right 0
+        -webkit-user-select none
+        z-index 1
+        display flex
+        justify-content center
+        align-items center
+
+        .mainDappLoading
+          .loader,
+          .loader:after
+            border-radius 100%
+            width 128px
+            height 128px
+
+          .loader
+            font-size 7px
+            position relative
+            text-indent -9999em
+            transform translateZ(0)
+            animation load8 0.48s infinite linear !important
+
+          @keyframes load8
+            0%
+              transform rotate(0deg)
+            100%
+              transform rotate(360deg)
+
+      .mainApps
+        width 600px
+        height 300px
+        border-radius 16px
+        // border 1px solid var(--ghostY)
+        background var(--ghostY)
 
     .top
       position absolute
@@ -174,7 +186,6 @@ body
         justify-content center
         align-items center
         font-size 12px
-        -webkit-app-region drag
         font-weight 300
         letter-spacing 1px
         pointer-events none
@@ -246,24 +257,6 @@ body
         max-height 40px
         max-width 40px
 
-      .loader,
-      .loader:after {
-        border-radius 100%
-        width 80px
-        height 80px
-      }
-      .loader {
-        font-size 7px
-        position relative
-        text-indent -9999em
-        border-top 6px solid thin
-        border-right 6px solid thin
-        border-bottom 6px solid thin
-        border-left 6px solid thick
-        transform translateZ(0)
-        animation load 0.6s infinite linear !important
-      }
-
     .webwrap
       position absolute
       top 37px
@@ -289,4 +282,5 @@ body
         width 100%
         // border-radius 6px
 
-@import './Native/style'
+@import './App/Native/style'
+@import './App/DappTile/style'

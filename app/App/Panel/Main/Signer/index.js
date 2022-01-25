@@ -56,7 +56,7 @@ class _Balances extends React.Component {
     return (
       <div className='signerBalance' key={k} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceLogo'>
-          <img src={token.logoURI} />
+          <img src={`https://proxy.pylon.link?type=icon&target=${token.logoURI}`} />
         </div>
         <div className='signerBalanceCurrency'>
           {token.symbol}

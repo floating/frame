@@ -567,3 +567,244 @@ body
   // transform translateX(500px)
   pointer-events none
 
+
+.glitch
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+  display flex
+  justify-content center
+  align-items center
+  color var(--outerspace)
+
+.line
+  display none
+
+.lastLine
+  display block
+  opacity 1
+
+.glitchOn
+  .line
+    display block
+
+  .line:not(:first-child)
+    position absolute
+
+  .line:nth-child(1)
+    animation clip 3000ms -300ms linear infinite, glitch1 1000ms -228ms linear infinite
+
+  .line:nth-child(2)
+    animation clip 3000ms -600ms linear infinite, glitch2 1000ms -927ms linear infinite
+
+ @keyframes glitch1
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(-3px)
+	  color var(--good)
+  90%
+	  transform translateX(0px)
+	  color var(--bad)
+  95%
+	  transform translateX(3px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+ @keyframes glitch2
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(5px)
+	  color var(--good)
+  90%
+	  transform translateX(5px)
+	  color var(--bad)
+  95%
+	  transform translateX(3px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+.line:nth-child(3)
+  animation clip 3000ms -900ms linear infinite, glitch3 1000ms -496ms linear infinite
+
+@keyframes glitch3
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(-2px)
+	  color var(--good)
+  90%
+	  transform translateX(-4px)
+	  color var(--bad)
+  95%
+	  transform translateX(4px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+.line:nth-child(4)
+  animation clip 3000ms -1200ms linear infinite, glitch4 1000ms -660ms linear infinite
+
+@keyframes glitch4
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(3px)
+	  color var(--good)
+  90%
+	  transform translateX(1px)
+	  color var(--bad)
+  95%
+	  transform translateX(-2px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+.line:nth-child(5)
+  animation clip 3000ms -11000ms linear infinite, glitch5 1000ms -399ms linear infinite
+
+@keyframes glitch5
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(-2px)
+	  color var(--good)
+  90%
+	  transform translateX(-3px)
+	  color var(--bad)
+  95%
+	  transform translateX(-4px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+.line:nth-child(6)
+  animation clip 3000ms -1800ms linear infinite, glitch6 1000ms -657ms linear infinite
+
+@keyframes glitch6
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(-4px)
+	  color var(--good)
+  90%
+	  transform translateX(-4px)
+	  color var(--bad)
+  95%
+	  transform translateX(1px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+.line:nth-child(7)
+  animation clip 3000ms -2100ms linear infinite, glitch7 1000ms -619ms linear infinite
+
+@keyframes glitch7
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(2px)
+	  color var(--good)
+  90%
+	  transform translateX(-3px)
+	  color var(--bad)
+  95%
+	  transform translateX(4px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+.line:nth-child(8)
+  animation clip 3000ms -2400ms linear infinite, glitch8 1000ms -380ms linear infinite
+
+@keyframes glitch8
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+  85%
+	  transform translateX(0px)
+	  color var(--good)
+  90%
+	  transform translateX(-2px)
+	  color var(--bad)
+  95%
+	  transform translateX(2px)
+	  color var(--outerspace)
+  100%
+	  transform translateX(0)
+
+.line:nth-child(9)
+  animation clip 3000ms -2700ms linear infinite, glitch9 1000ms -863ms linear infinite
+
+@keyframes glitch9
+  0%
+	  transform translateX(0)
+  80%
+	  transform translateX(0)
+	  color var(--outerspace)
+	85%
+	  transform translateX(-3px)
+	  color var(--good)
+	90%
+	  transform translateX(-1px)
+	  color var(--bad)
+	95%
+	  transform translateX(-4px)
+	  color var(--outerspace)
+	100%
+	  transform translateX(0)
+
+.line:nth-child(10)
+	animation clip 3000ms -3000ms linear infinite, glitch10 1000ms -745ms linear infinite
+
+@keyframes glitch10
+	0%
+		transform translateX(0)
+	80%
+    transform translateX(0)
+    color var(--outerspace)
+	85%
+    transform translateX(-1px)
+    color var(--good)
+	90%
+    transform translateX(-3px)
+    color var(--bad)
+	95%
+    transform translateX(-1px)
+    color var(--outerspace)
+	100%
+		transform translateX(0)
+
+@keyframes clip
+  0%
+    clip-path polygon(0 100%, 100% 100%, 100% 120%, 0 120%)
+  100%
+    clip-path polygon(0 -20%, 100% -20%, 100% 0%, 0 0)

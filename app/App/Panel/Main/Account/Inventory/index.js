@@ -58,7 +58,7 @@ class Balances extends React.Component {
                       const { tokenId, name, img } = inventory[k].assets[id]
                       return (
                         <div className='inventoryCollectionItem'>
-                          {img ? <img src={img} /> : null}
+                          {img ? <img src={`https://proxy.pylon.link?type=nft&target=${img}`} /> : null}
                         </div>
                       )
                     })}

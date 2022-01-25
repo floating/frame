@@ -34,7 +34,7 @@ describe('Seed signer', () => {
     clean()
 
     hot = await import('../../../../../compiled/signers/hot')
-    store = require('../../../../../compiled/store')
+    store = require('../../../../../compiled/store').default
   })
 
   afterEach(() => {

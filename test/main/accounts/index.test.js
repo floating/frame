@@ -11,12 +11,13 @@ jest.mock('../../../main/store/persist', () => ({
   queue: jest.fn()
 }))
 
-jest.mock('../../../main/nebula', () => jest.fn(() => ({
-  ens: {
-    lookupAddress: jest.fn()
-  }
-})))
-
+jest.mock('../../../main/nebula', () => ({
+  default: jest.fn(() => ({
+    ens: {
+      lookupAddress: jest.fn()
+    }
+  }))
+}))
 
 const log = require('electron-log')
 log.transports.console.level = false
@@ -643,12 +644,14 @@ describe('#adjustNonce', () => {
   let onChainNonce
 
   const mockProxyProvider = {
-    emit: (event, payload, cb) => {
-      if (event === 'send' && payload.method === 'eth_getTransactionCount') {
-        return cb({ result: onChainNonce })
-      }
+    default: {
+      emit: (event, payload, cb) => {
+        if (event === 'send' && payload.method === 'eth_getTransactionCount') {
+          return cb({ result: onChainNonce })
+        }
 
-      cb({ error: 'wrong call!' })
+        cb({ error: 'wrong call!' })
+      }
     }
   }
 

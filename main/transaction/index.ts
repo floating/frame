@@ -36,13 +36,11 @@ export interface Signature {
   s: string
 }
 
-export interface RawTransaction { 
-  chainId: string,
-  type: string
-}
-
-export interface TransactionData extends JsonTx {
+export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   warning?: string,
+  gas?: string,
+  from?: string,
+  feesUpdated?: boolean,
   chainId: string,
   type: string
 }
@@ -82,11 +80,11 @@ function typeSupportsBaseFee (type: string | undefined) {
   return parseInt(type || '0') === 2
 }
 
-function usesBaseFee (rawTx: RawTransaction) {
+function usesBaseFee (rawTx: TransactionData) {
   return typeSupportsBaseFee(rawTx.type)
 }
 
-function maxFee (rawTx: RawTransaction) {
+function maxFee (rawTx: TransactionData) {
   const chainId = parseInt(rawTx.chainId)
 
   // for ETH-based chains, the max fee should be 2 ETH
@@ -103,10 +101,10 @@ function maxFee (rawTx: RawTransaction) {
   return 10 * 1e18
 }
 
-function populate (rawTx: RawTransaction, chainConfig: Common, gas: any): TransactionData {
+function populate (rawTx: TransactionData, chainConfig: Common, gas: any): TransactionData {
   const txData: TransactionData = { ...rawTx }
 
-  if (chainConfig.isActivatedEIP(1559)) {
+  if (chainConfig.isActivatedEIP(1559) && gas.price.fees) {
     txData.type = intToHex(2)
 
     const maxPriorityFee = toBN(gas.price.fees.maxPriorityFeePerGas)
