@@ -39,8 +39,8 @@ async function updateDappContent (dappId: string, contentURI: string, manifest: 
 let retryTimer: NodeJS.Timeout
 async function checkStatus (dappId: string) {
   clearTimeout(retryTimer)
+  const dapp = store('main.dapps', dappId)
   try { 
-    const dapp = store('main.dapps', dappId)
     const resolved = await nebula.resolve(dapp.ens)
 
     const version = ((resolved.manifest || {}).version) || 'unknown'
@@ -61,9 +61,14 @@ async function checkStatus (dappId: string) {
     }
   } catch (e) {
     log.error('Check status error', e)
-    retryTimer = setTimeout(() => {
-      store.updateDapp(dappId, { status: 'initial' })
-    }, 5000)
+    const retry = dapp.checkStatusRetryCount || 0
+    if (retry <= 8) {
+      retryTimer = setTimeout(() => {
+        store.updateDapp(dappId, { status: 'initial', checkStatusRetryCount: retry + 1 })
+      }, 2500)
+    } else {
+      store.updateDapp(dappId, { checkStatusRetryCount: 0 })
+    }
   }
 
   // Takes dapp entry and config
