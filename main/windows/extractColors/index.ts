@@ -1,15 +1,13 @@
-const { BrowserWindow, BrowserView } = require('electron')
-const pixels = require('get-pixels')
-// const fs = require('fs')
-import log from 'electron-log'
-
 import path from 'path'
+import log from 'electron-log'
+import pixels from 'get-pixels'
+import { BrowserWindow, BrowserView } from 'electron'
 
 import webPreferences from '../webPreferences'
 
-const mode = array => {
-  if (array.length === 0) return null
-  const modeMap = {}
+function mode (array: string[]) {
+  if (array.length === 0) return ''
+  const modeMap: Record<string, number> = {}
   let maxEl = array[0]; let maxCount = 1
   for (let i = 0; i < array.length; i++) {
     const el = array[i]
@@ -26,10 +24,11 @@ const mode = array => {
   return maxEl
 }
 
-const pixelColor = image => {
-  const executor = async (resolve, reject) => {
+async function pixelColor (image: Electron.NativeImage) {
+  return new Promise((resolve, reject) => {
     pixels(image.toPNG(), 'image/png', (err, pixels) => {
       if (err) return reject(err)
+
       const colors = []
       const width = pixels.shape[0]
       const height = 37
@@ -40,69 +39,62 @@ const pixelColor = image => {
         for (let dive = 0; dive < depth; dive++) rgb.push(pixels.data[step + dive])
         colors.push(`${rgb[0]}, ${rgb[1]}, ${rgb[2]}`)
       }
+
       const selectedColor = mode(colors)
       const colorArray = selectedColor.split(', ')
+
       const color = {
         background: `rgb(${colorArray.join(', ')})`, 
         backgroundShade: `rgb(${colorArray.map(v => Math.max(parseInt(v) - 5, 0)).join(', ')})`,
         backgroundLight: `rgb(${colorArray.map(v => Math.min(parseInt(v) + 50, 255)).join(', ')})`,
-        text: textColor(...colorArray)
+        text: textColor(...(colorArray.map(a => parseInt(a)) as [number, number, number]))
       }
+
       resolve(color)
     })
-  }
-  return new Promise(executor)
+  })
 }
 
-const getColor = async (view) => {
+async function getColor (view: BrowserView) {
   const image = await view.webContents.capturePage()
-  // fs.writeFile('test.png', image.toPNG(), (err) => {
-  //   if (err) throw err
-  // })
-  const color = await pixelColor(image)
-  return color
+  return pixelColor(image)
 }
 
-const textColor = (r, g, b) => { // http://alienryderflex.com/hsp.html
+function textColor (r: number, g: number, b: number) { // http://alienryderflex.com/hsp.html
   return Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b)) > 127.5 ? 'black' : 'white'
 }
 
-const timeout = ms => {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-const extractSession = (l) => {
+function extractSession (l: string) {
   const url = new URL(l)
   const session = url.searchParams.get('session') || ''
   const ens = url.port === '8421' ? url.hostname.replace('.localhost', '') || '' : ''
   return { session, ens }
 }
 
-const extractColors = (url, ens) => {
-  let window = new BrowserWindow({
+async function extractColors (url: string, ens: string) {
+  let window: BrowserWindow | null = new BrowserWindow({
     x: 0,
     y: 0,
     width: 800,
     height: 800,
     show: false,
     focusable: false,
-    backgroundThrottling: false,
     frame: false,
-    focus: false,
     titleBarStyle: 'hidden',
     paintWhenInitiallyHidden: true,
     webPreferences: {
+      backgroundThrottling: false,
       webviewTag: false,
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
       disableBlinkFeatures: 'Auxclick',
-      enableRemoteModule: false,
+      // enableRemoteModule: false,
       offscreen: true
     }
   })
 
-  let view = new BrowserView({ 
+  let view: BrowserView | null = new BrowserView({ 
     webPreferences: Object.assign({ 
       preload: path.resolve('./main/windows/viewPreload.js') ,
       partition: 'persist:' + ens,
@@ -130,23 +122,33 @@ const extractColors = (url, ens) => {
 
   const { session } = extractSession(url)
 
-  view.webContents.session.cookies.set({
-    url: url, 
-    name: '__frameSession', 
-    value: session
-  }).then(() => {
-    view.webContents.loadURL(url)
-  }, error => log.error(error))
-
-  return new Promise((resolve, reject) => {
-    view.webContents.on('did-finish-load', async () => {
-      await timeout(500)
-      const color = await getColor(view)
-      view = null
-      window = null
-      resolve(color)
+  try {
+    await view.webContents.session.cookies.set({
+      url: url, 
+      name: '__frameSession', 
+      value: session
     })
-  })
+
+    await view.webContents.loadURL(url)
+
+    const color = await getColor(view)
+
+    return color
+  } catch (e) {
+    log.error(`error extracting colors for ${ens}`, e)
+  } finally {
+    if (view) {
+      const webcontents = (view.webContents as any)
+      webcontents.destroy()
+
+      view = null
+    }
+
+    if (window) {
+      window.destroy()
+      window = null
+    }
+  }
 }
 
-module.exports = extractColors
+export default extractColors
