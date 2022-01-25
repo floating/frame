@@ -60,6 +60,7 @@ async function checkStatus (dappId: string) {
       surface.open('dappLauncher', 'send.frame.eth')
     }
   } catch (e) {
+    log.error('Check status error', e)
     retryTimer = setTimeout(() => {
       store.updateDapp(dappId, { status: 'initial' })
     }, 5000)
