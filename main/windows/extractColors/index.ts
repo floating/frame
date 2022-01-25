@@ -39,8 +39,8 @@ async function pixelColor (image: Electron.NativeImage) {
         for (let dive = 0; dive < depth; dive++) rgb.push(pixels.data[step + dive])
         colors.push(`${rgb[0]}, ${rgb[1]}, ${rgb[2]}`)
       }
-      const selectedColor = mode(colors)
 
+      const selectedColor = mode(colors)
       const colorArray = selectedColor.split(', ')
 
       const color = {
@@ -135,7 +135,7 @@ async function extractColors (url: string, ens: string) {
 
     return color
   } catch (e) {
-    log.error(`error when extracting colors for ${ens}`, e)
+    log.error(`error extracting colors for ${ens}`, e)
   } finally {
     if (view) {
       const webcontents = (view.webContents as any)
