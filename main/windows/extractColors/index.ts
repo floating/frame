@@ -57,11 +57,7 @@ async function pixelColor (image: Electron.NativeImage) {
 
 async function getColor (view: BrowserView) {
   const image = await view.webContents.capturePage()
-  // fs.writeFile('test.png', image.toPNG(), (err) => {
-  //   if (err) throw err
-  // })
-  const color = await pixelColor(image)
-  return color
+  return pixelColor(image)
 }
 
 function textColor (r: number, g: number, b: number) { // http://alienryderflex.com/hsp.html
