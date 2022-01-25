@@ -131,25 +131,35 @@ body
         justify-content center
         align-items center
 
-        .mainDappLoading
-          .loader,
-          .loader:after
-            border-radius 100%
-            width 128px
-            height 128px
+      .mainDappLoading
+        .mainDappLoadingText
+          font-family Exo2
+          text-transform uppercase
+          font-size 16px
+          font-weight 500
 
-          .loader
-            font-size 7px
-            position relative
-            text-indent -9999em
-            transform translateZ(0)
-            animation load8 0.48s infinite linear !important
+        .loader,
+        .loader:after
+          border-radius 100%
+          width 128px
+          height 128px
 
-          @keyframes load8
-            0%
-              transform rotate(0deg)
-            100%
-              transform rotate(360deg)
+        .loader
+          font-size 7px
+          position relative
+          text-indent -9999em
+          transform translateZ(0)
+          animation load8 0.48s infinite linear !important
+          border-top 3px solid var(--ghostY)
+          border-right 3px solid var(--ghostY)
+          border-bottom 3px solid var(--ghostY)
+          border-left 3px solid var(--ghostD)
+
+        @keyframes load8
+          0%
+            transform rotate(0deg)
+          100%
+            transform rotate(360deg)
 
       .mainApps
         width 600px

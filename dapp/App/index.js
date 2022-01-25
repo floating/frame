@@ -28,6 +28,9 @@ class App extends React.Component {
     const currentView = frame.views[frame.currentView] || {}
     const currentDapp = currentView.dappId ? this.store('main.dapps', currentView.dappId) : ''
 
+    // Hard code send dapp status for now
+    const sendDapp = this.store('main.dapps', '0xe8d705c28f65bc3fe10df8b22f9daa265b99d0e1893b2df49fd38120f0410bca') || {}
+
     return (
       <div className='splash'>
         <Native />
@@ -74,6 +77,16 @@ class App extends React.Component {
                 ) : null}
               </div>
             </>
+          ) : !currentView.ready ? (
+            sendDapp.status === 'failed' ? (
+              <div className='mainDappLoading'>
+                <div className='mainDappLoadingText'>{'Send dapp failed to load'}</div>
+              </div>
+            ) : (
+              <div className='mainDappLoading'>
+                <div className='loader' />
+              </div>
+            ) 
           ) : null}
         </div>
       </div>

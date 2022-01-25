@@ -56,18 +56,18 @@ async function checkStatus (dappId: string) {
 
     store.updateDapp(dappId, { status: 'ready' })
 
-    if (store('main.dapps', dappId, 'config.openWhenReady')) {
-      surface.open('dappLauncher', 'send.frame.eth')
-    }
+    // The frame id 'dappLauncher' needs to refrence target frame
+    if (dapp.openWhenReady) surface.open('dappLauncher', dapp.ens)
+
   } catch (e) {
     log.error('Check status error', e)
     const retry = dapp.checkStatusRetryCount || 0
-    if (retry <= 8) {
+    if (retry < 4) {
       retryTimer = setTimeout(() => {
         store.updateDapp(dappId, { status: 'initial', checkStatusRetryCount: retry + 1 })
-      }, 2500)
+      }, 1000)
     } else {
-      store.updateDapp(dappId, { checkStatusRetryCount: 0 })
+      store.updateDapp(dappId, { status: 'failed', checkStatusRetryCount: 0 })
     }
   }
 
@@ -141,7 +141,7 @@ const surface = {
 
       store.addFrameView(frameId, view)
     } else {
-      store.updateDapp(dappId, { ens, status: 'initial', config: { openWhenReady: true } })
+      store.updateDapp(dappId, { ens, status: 'initial', openWhenReady: true })
     }
   }
 }
