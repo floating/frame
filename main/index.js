@@ -214,7 +214,7 @@ ipcMain.on('frame:unmax', e => {
 //   await dapps.launch(domain, console.error)
 // })
 
-ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
+// ipcMain.on('addDapp', (dapp) => dapps.add(dapp))
 
 dapps.add({
   ens: 'send.frame.eth',
@@ -223,10 +223,10 @@ dapps.add({
   }
 })
 
-ipcMain.on('runDapp', async (e, ens) => {
-  const win = BrowserWindow.fromWebContents(e.sender)
-  dapps.open(win.frameId, ens)
-})
+// ipcMain.on('runDapp', async (e, ens) => {
+//   const win = BrowserWindow.fromWebContents(e.sender)
+//   dapps.open(win.frameId, ens)
+// })
 
 ipcMain.on('unsetCurrentView', async (e, ens) => {
   const win = BrowserWindow.fromWebContents(e.sender)

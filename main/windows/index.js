@@ -9,7 +9,7 @@ const events = new EventEmitter()
 
 const store = require('../store').default
 
-const extractColors = require('./extractColors')
+const extractColors = require('./extractColors').default
 
 import FrameManager from './frames'
 
