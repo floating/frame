@@ -1,14 +1,9 @@
 import path from 'path'
 import log from 'electron-log'
+import pixels from 'get-pixels'
 import { BrowserWindow, BrowserView } from 'electron'
 
-// @ts-ignore
-import pixels from 'get-pixels'
-
 import webPreferences from '../webPreferences'
-
-console.log({ pixels })
-
 
 function mode (array: string[]) {
   if (array.length === 0) return ''
@@ -31,7 +26,7 @@ function mode (array: string[]) {
 
 async function pixelColor (image: Electron.NativeImage) {
   return new Promise((resolve, reject) => {
-    pixels(image.toPNG(), 'image/png', (err: any, pixels: any) => {
+    pixels(image.toPNG(), 'image/png', (err, pixels) => {
       if (err) return reject(err)
 
       const colors = []
