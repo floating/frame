@@ -36,21 +36,33 @@ async function updateDappContent (dappId: string, contentURI: string, manifest: 
   store.updateDapp(dappId, { content: contentURI, manifest })
 }
 
+let retryTimer: NodeJS.Timeout
 async function checkStatus (dappId: string) {
-  const dapp = store('main.dapps', dappId)
-  const resolved = await nebula.resolve(dapp.ens)
+  clearTimeout(retryTimer)
+  try { 
+    const dapp = store('main.dapps', dappId)
+    const resolved = await nebula.resolve(dapp.ens)
 
-  const version = ((resolved.manifest || {}).version) || 'unknown'
+    const version = ((resolved.manifest || {}).version) || 'unknown'
 
-  log.info(`resolved content for ${dapp.ens}, version: ${version}`)
+    log.info(`resolved content for ${dapp.ens}, version: ${version}`)
 
-  store.updateDapp(dappId, { record: resolved.record })
-  if (dapp.content !== resolved.record.content) {
-    updateDappContent(dappId, resolved.record.content, resolved.manifest)
-  }
+    store.updateDapp(dappId, { record: resolved.record })
+    if (dapp.content !== resolved.record.content) {
+      updateDappContent(dappId, resolved.record.content, resolved.manifest)
+    }
 
-  if (!dapp.colors) {
-    getDappColors(dappId)
+    if (!dapp.colors) getDappColors(dappId)
+
+    store.updateDapp(dappId, { status: 'ready' })
+
+    if (store('main.dapps', dappId, 'config.openWhenReady')) {
+      surface.open('dappLauncher', 'send.frame.eth')
+    }
+  } catch (e) {
+    retryTimer = setTimeout(() => {
+      store.updateDapp(dappId, { status: 'initial' })
+    }, 5000)
   }
 
   // Takes dapp entry and config
@@ -106,18 +118,25 @@ const surface = {
   open (frameId: string, ens: string) {
     const session = crypto.randomBytes(6).toString('hex')
     const dappId = hash(ens)
-    const url = `http://${ens}.localhost:8421/?session=${session}`
-    const view = {
-      id: getId(),
-      ready: false,
-      dappId,
-      ens,
-      url
+
+    const dapp = store('main.dapps', dappId)
+
+    if (dapp.status === 'ready') {
+      const url = `http://${ens}.localhost:8421/?session=${session}`
+      const view = {
+        id: getId(),
+        ready: false,
+        dappId,
+        ens,
+        url
+      }
+
+      server.sessions.add(ens, session)
+
+      store.addFrameView(frameId, view)
+    } else {
+      store.updateDapp(dappId, { ens, status: 'initial', config: { openWhenReady: true } })
     }
-
-    server.sessions.add(ens, session)
-
-    store.addFrameView(frameId, view)
   }
 }
 
