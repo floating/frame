@@ -166,8 +166,6 @@ function createWorker () {
 
       const currentChainBalances = storeApi.getCurrencyBalances(address)
 
-      console.log({ balances })
-
       balances
         .filter(balance => {
           return (
