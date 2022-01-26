@@ -166,11 +166,13 @@ function createWorker () {
 
       const currentChainBalances = storeApi.getCurrencyBalances(address)
 
+      console.log({ balances })
+
       balances
         .filter(balance => {
           return (
             // only update positive balances
-            parseInt(balance.balance) > 0 && // only update positive balances
+            parseInt(balance.balance) > 0 &&
             // only update balances if any have changed
             (currentChainBalances.find(b => b.chainId === balance.chainId) || {}).balance !== balance.balance
           )
