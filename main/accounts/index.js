@@ -172,7 +172,7 @@ class Accounts extends EventEmitter {
       if (currentAccount.requests[id].type !== 'transaction') return reject(new Error('Request is not transaction'))
 
       const data = JSON.parse(JSON.stringify(currentAccount.requests[id].data))
-      const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 'hex')}
+      const targetChain = { type: 'ethereum', id: parseInt(data.chainId, 16)}
       const { levels } = store('main.networksMeta', targetChain.type, targetChain.id, 'gas.price')
 
       // Set the gas default to asap

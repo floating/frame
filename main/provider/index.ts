@@ -532,7 +532,19 @@ class Provider extends EventEmitter {
   }
 
   sendTransaction (payload: RPC.SendTransaction.Request, res: RPCRequestCallback) {
-    const newTx = payload.params[0]
+    const txParams = payload.params[0]
+    const targetChain = payload.chainId
+    const txChain = txParams.chainId
+
+    if (targetChain && txChain && targetChain !== txChain) {
+      return this.resError(`Chain for transaction (${txChain}) does not match request target chain (${targetChain})`, payload, res)
+    }
+
+    const newTx = {
+      ...txParams,
+      chainId: txChain || targetChain
+    }
+
     const currentAccount = accounts.current()
 
     log.debug(`sendTransaction(${JSON.stringify(newTx)}`)
