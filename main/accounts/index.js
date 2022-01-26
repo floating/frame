@@ -182,7 +182,7 @@ class Accounts extends EventEmitter {
         id: 1,
         jsonrpc: '2.0',
         method: 'eth_sendTransaction',
-        chainId: targetChain.id
+        chainId: addHexPrefix(targetChain.id.toString(16))
       }
 
       if (type === 'speed') {
@@ -209,9 +209,11 @@ class Accounts extends EventEmitter {
       // TODO: Route to account even if it's not current
       if (!account)  return reject(new Error('Unable to determine target account'))
       if (!targetChain || !targetChain.type || !targetChain.id) return reject(new Error('Unable to determine target chain'))
-      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', chainId: targetChain.id, params: [] }, (res) => {
+      const targetChainId = addHexPrefix(targetChain.id.toString(16))
+
+      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', chainId: targetChainId, params: [] }, (res) => {
         if (res.error) return reject(new Error(JSON.stringify(res.error)))
-        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', chainId: targetChain.id, params: [hash] }, receiptRes => {
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', chainId: targetChainId, params: [hash] }, receiptRes => {
           if (receiptRes.error) return reject(new Error(receiptRes.error))
           if (receiptRes.result && account.requests[id]) {
             account.requests[id].tx.receipt = receiptRes.result
@@ -284,7 +286,8 @@ class Accounts extends EventEmitter {
       log.error('txMonitor had no target chain')
       setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8 * 1000)
     } else {
-      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'], chainId: targetChain.id }, newHeadRes => {
+      const targetChainId = addHexPrefix(targetChain.id.toString(16))
+      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'], chainId: targetChainId }, newHeadRes => {
         if (newHeadRes.error) {
           log.warn(newHeadRes.error)
           const monitor = async () => {
@@ -337,7 +340,7 @@ class Accounts extends EventEmitter {
                 // proxyProvider.removeListener('data', handler)
                 
                 proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
-                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', chainId: targetChain.id, params: [headSub] }, res => {
+                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', chainId: targetChainId, params: [headSub] }, res => {
                   if (res.error) {
                     log.error('error sending message eth_unsubscribe', res)
                   }
@@ -864,9 +867,7 @@ class Accounts extends EventEmitter {
       } else {
         const { from, chainId } = txRequest.data
 
-        const targetChain = { type: 'ethereum', id: parseInt(chainId, 'hex') }
-
-        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', chainId: targetChain.id, params: [from, 'pending'] }, (res) => {
+        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', chainId, params: [from, 'pending'] }, (res) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 'hex')
             const adjustedNonce = intToHex(nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust)
