@@ -1358,6 +1358,7 @@ describe('state change events', () => {
 
       store.set('selected.current', account)
       store.getObserver('provider:account').fire()
+      jest.advanceTimersByTime(800)
     })
 
     it('fires an assetsChanged event when erc20 assets are present', done => {
@@ -1388,6 +1389,7 @@ describe('state change events', () => {
 
       store.set('selected.current', account)
       store.getObserver('provider:account').fire()
+      jest.advanceTimersByTime(800)
     })
 
     it('does not fire an assetsChanged event when no account is selected', () => {
