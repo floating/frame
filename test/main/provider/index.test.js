@@ -48,7 +48,7 @@ beforeEach(() => {
   store.set('main.currentNetwork.id', 1)
 
   connection.send = jest.fn()
-  connection.connections = { ethereum: { 4: { chainConfig: { chainId: 4 } } } }
+  connection.connections = { ethereum: { 4: { chainConfig: chainConfig(4, 'london') } } }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
   accounts.signTransaction = jest.fn()
@@ -570,24 +570,85 @@ describe('#send', () => {
   describe('#eth_sendTransaction', () => {
     let tx
 
-    const sendTransaction = cb => provider.send({
-      jsonrpc: '2.0',
-      id: 7,
-      method: 'eth_sendTransaction',
-      params: [tx]
-    }, cb)
+    const sendTransaction = (cb, chainId) => {
+      const payload = {
+        jsonrpc: '2.0',
+        id: 7,
+        method: 'eth_sendTransaction',
+        params: [tx]
+      }
+
+      if (chainId) payload.chainId = chainId
+
+      provider.send(payload, cb)
+    }
+
+    beforeEach(() => {
+      tx = {
+        from: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+        to: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
+        chainId: '0x1',
+        gasLimit: weiToHex(21000),
+        type: '0x1',
+        nonce: '0xa'
+      }
+
+      const chainIds = [1, 137]
+
+        chainIds.forEach(chainId => {
+          store.set('main.networksMeta.ethereum', chainId, 'gas', {
+            price: {
+              selected: 'standard',
+              levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
+              fees: {
+                maxPriorityFeePerGas: gweiToHex(1),
+                maxBaseFeePerGas: gweiToHex(8)
+              }
+            }
+          })
+
+          connection.connections.ethereum[chainId] = {
+            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
+          }
+        })
+    })
+
+    it('rejects a transaction with a mismatched chain id', done => {
+      sendTransaction(response => {
+        try {
+          expect(response.result).toBe(undefined)
+          expect(response.error.message.toLowerCase()).toMatch(/does not match/)
+          done()
+        } catch (e) { done(e) }
+      }, '0x4')
+    })
+
+    it('populates the transaction with the request chain id if not provided in the transaction', done => {
+      delete tx.chainId
+
+      sendTransaction(() => {
+        try {
+          const initialRequest = accountRequests[0]
+          expect(initialRequest.data.chainId).toBe('0x89')
+          done()
+        } catch (e) { done(e) }
+      }, '0x89')
+    })
+
+    it('maintains transaction chain id if no target chain provided with the request', done => {
+      tx.chainId = '0x89'
+
+      sendTransaction(() => {
+        try {
+          const initialRequest = accountRequests[0]
+          expect(initialRequest.data.chainId).toBe('0x89')
+          done()
+        } catch (e) { done(e) }
+      })
+    })
 
     describe('replacing gas fees', () => {
       beforeEach(() => {
-        tx = {
-          from: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
-          to: '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
-          chainId: '0x1',
-          gasLimit: weiToHex(21000),
-          type: '0x1',
-          nonce: '0xa'
-        }
-
         const chainIds = [1, 137]
 
         chainIds.forEach(chainId => {
