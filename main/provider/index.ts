@@ -950,15 +950,26 @@ store.observer(() => {
   }
 }, 'provider:chains')
 
+let debouncedAssets: RPC.GetAssets.Assets | null = null
+
 store.observer(() => {
   const currentAccountId = store('selected.current')
 
   if (currentAccountId) {
-    const assets = loadAssets(currentAccountId)
     const isScanning = store('main.scanning', currentAccountId)
+    const assets = loadAssets(currentAccountId)
 
     if (!isScanning && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
-      provider.assetsChanged(currentAccountId, assets)
+      if (!debouncedAssets) {
+        setTimeout(() => {
+          if (debouncedAssets) {
+            provider.assetsChanged(currentAccountId, debouncedAssets)
+            debouncedAssets = null
+          }
+        }, 800)
+      }
+
+      debouncedAssets = assets
     }
   }
 }, 'provider:account')

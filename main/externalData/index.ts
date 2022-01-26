@@ -67,6 +67,10 @@ const storeApi = {
   getNetworksMetadata: () => store('main.networksMeta.ethereum') as NetworkMetadata[],
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
+  getCurrencyBalances: (address: Address) => {
+    return ((store('main.balances', address) || []) as Balance[])
+      .filter(balance => balance.address === NATIVE_CURRENCY)
+  },
   getTokenBalances: (address: Address) => {
     return ((store('main.balances', address) || []) as Balance[])
       .filter(balance => balance.address !== NATIVE_CURRENCY)
@@ -160,8 +164,17 @@ function createWorker () {
 
       const { address, balances } = (message as ChainBalanceMessage)
 
+      const currentChainBalances = storeApi.getCurrencyBalances(address)
+
       balances
-        .filter(balance => parseInt(balance.balance) > 0)
+        .filter(balance => {
+          return (
+            // only update positive balances
+            parseInt(balance.balance) > 0 && // only update positive balances
+            // only update balances if any have changed
+            (currentChainBalances.find(b => b.chainId === balance.chainId) || {}).balance !== balance.balance
+          )
+        })
         .forEach(balance => {
           store.setBalance(address, {
             ...balance,
