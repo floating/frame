@@ -193,6 +193,7 @@ class Accounts extends EventEmitter {
           to: currentAccount.getSelectedAddress(),
           value: '0x0',
           nonce: data.nonce,
+          chainId: addHexPrefix(targetChain.id.toString(16)),
           _origin: currentAccount.requests[id].origin
         }]
       }
