@@ -230,4 +230,4 @@ class Signers extends EventEmitter {
   }
 }
 
-module.exports = new Signers()
+export default new Signers()

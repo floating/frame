@@ -1,23 +1,21 @@
-const EventEmitter = require('events')
-const hdKey = require('hdkey')
-const log = require('electron-log')
-const publicKeyToAddress = require('ethereum-public-key-to-address')
-const { shell, Notification } = require('electron')
-const fetch = require('node-fetch')
-const { addHexPrefix } = require('ethereumjs-util')
+import hdKey from 'hdkey'
+import fetch from 'node-fetch'
+import publicKeyToAddress from 'ethereum-public-key-to-address'
 
-// const bip39 = require('bip39')
-const { usesBaseFee, signerCompatibility, maxFee } = require('../transaction')
+import EventEmitter from 'events'
+import log from 'electron-log'
+import { shell, Notification } from 'electron'
+import { addHexPrefix } from 'ethereumjs-util'
 
-const crypt = require('../crypt')
-const store = require('../store').default
-const dataScanner = require('../externalData')
+import crypt from '../crypt'
+import store from '../store'
+import dataScanner from '../externalData'
+import windows from '../windows'
+import Account from './Account'
+import { usesBaseFee, signerCompatibility, maxFee } from '../transaction'
 
 // Provider Proxy
-const proxyProvider = require('../provider/proxy').default
-
-const Account = require('./Account')
-const windows = require('../windows')
+import proxyProvider from'../provider/proxy'
 
 // const weiToGwei = v => Math.ceil(v / 1e9)
 const gweiToWei = v => Math.ceil(v * 1e9)
@@ -27,20 +25,27 @@ const weiHexToGweiInt = v => hexToInt(v) / 1e9
 const weiIntToEthInt = v => v / 1e18
 const gweiToWeiHex = v => intToHex(gweiToWei(v))
 
-const notify = (title, body, action) => {
-  const notification = { title, body }
-  const note = new Notification(notification)
-  note.on('click', action)
-  setTimeout(() => note.show(), 1000)
+function notify (title: string, body: string, action: (event: Electron.Event) => void) {
+  const notification = new Notification({ title, body })
+  notification.on('click', action)
+
+  setTimeout(() => notification.show(), 1000)
 }
 
-class Accounts extends EventEmitter {
+export interface AccountRequest {
+  origin: string,
+  payload: JSONRPCRequestPayload,
+  handlerId: string,
+  account: string
+}
+
+export class Accounts extends EventEmitter {
+  _current = ''
+  accounts: Record<string, Account> = {}
+
   constructor () {
     super()
 
-    this._current = ''
-    this.accounts = {}
-    this.timers = {}
     const stored = store('main.accounts')
     Object.keys(stored).forEach(id => {
       this.accounts[id] = new Account(JSON.parse(JSON.stringify(stored[id])), this)
@@ -907,4 +912,4 @@ class Accounts extends EventEmitter {
   // }
 }
 
-module.exports = new Accounts()
+export default new Accounts()

@@ -572,4 +572,4 @@ store.api.feed((state, actions) => {
   })
 })
 
-module.exports = api
+export default api

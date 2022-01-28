@@ -1,46 +1,90 @@
-const log = require('electron-log')
-const { isValidAddress } = require('ethereumjs-util')
+import log from 'electron-log'
+import { isValidAddress } from 'ethereumjs-util'
 
-const abi = require('../../abi')
+import abi from '../../abi'
+import nebulaApi from '../../nebula'
+import signers from '../../signers'
+import windows from '../../windows'
+import store from '../../store'
+import { Aragon } from '../aragon'
 
 // Provider Proxy
-const proxyProvider = require('../../provider/proxy').default
+import proxyProvider from '../../provider/proxy'
+import { Type as SignerType } from '../../signers/Signer'
+import { AccountRequest, Accounts } from '..'
 
-const nebulaApi = require('../../nebula').default
-const nebula = nebulaApi()
+const nebula = nebulaApi('accounts')
 
-const signers = require('../../signers')
-const windows = require('../../windows')
-const store = require('../../store').default
-
-const { Aragon } = require('../aragon')
-
-const capitalize = (s) => {
+function capitalize (s: string) {
   if (typeof s !== 'string') return ''
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+interface SmartAccount {
+  name: string,
+  type: string,
+  actor: Address,
+  agent: Address,
+  ens: string,
+  apps: any,
+  dao: any,
+}
+
+interface SignerOptions {
+  type?: SignerType
+}
+
+interface AccountOptions {
+  address?: Address,
+  name?: string,
+  ensName?: string,
+  created?: string,
+  lastSignerType: SignerType,
+  smart?: SmartAccount,
+  options: SignerOptions
+}
+
 class Account {
-  constructor ({ lastSignerType, tokens, name, ensName, created, address, smart, options = {} }, accounts) {
-    address = address ? address.toLowerCase() : '0x'
+  id: Address
+  address: Address
+  name: string
+  ensName?: string
+  created: string
+  smart?: SmartAccount
+
+  lastSignerType: SignerType
+  signer: string
+  signerStatus: string
+  aragon?: Aragon
+
+  accounts: Accounts
+  requests: Record<string, AccountRequest> = {}
+
+  status = 'ok'
+
+  constructor ({ lastSignerType, name, ensName, created, address, smart, options = { } }: AccountOptions, accounts: Accounts) {
     this.accounts = accounts // Parent Accounts Module
+
+    address = (address && address.toLowerCase()) || '0x'
     this.id = address // Account ID
-    this.status = 'ok' // Current Status
-    this.name = name || capitalize(options.type) + ' Account'
-    this.lastSignerType = lastSignerType || options.type
-    this.created = created || `new:${Date.now()}`
     this.address = address
-    this.smart = smart
+    this.lastSignerType = lastSignerType || options.type
+
+    this.name = name || capitalize(options.type || '') + ' Account'
     this.ensName = ensName
-    // Update actor to just store actor's address
-    if (this.smart && this.smart.actor) {
-      this.smart.actor = this.smart.actor.toLowerCase()
-    }
-    this.tokens = tokens || {}
-    this.requests = {}
+
+    this.created = created || `new:${Date.now()}`
+
     this.signer = '' // Matched Signer ID
     this.signerStatus = ''
-    if (this.smart && this.smart.type === 'aragon') this.aragon = new Aragon(this.smart)
+
+    if (smart) {
+      this.smart = { ...smart, actor: (smart.actor || '').toLowerCase() }
+
+      if (this.smart.type === 'aragon') {
+        this.aragon = new Aragon(this.smart)
+      }
+    }
 
     const existingPermissions = store('main.permissions', this.address) || {}
     const currentSendDappPermission = Object.values(existingPermissions).find(p => ((p.origin || '').toLowerCase()).includes('send.frame.eth'))
@@ -141,11 +185,6 @@ class Account {
       delete this.requests[req.handlerId]
       this.update()
     }
-  }
-
-  updateTokens (tokens) { // Tokens are now handle by the account and need to be included in `update`
-    this.tokens = tokens
-    this.update()
   }
 
   resError (error, payload, res) {
@@ -272,8 +311,6 @@ class Account {
       smart: this.smart,
       requests: this.requests,
       ensName: this.ensName,
-      // permissions: this.permissions,
-      tokens: this.tokens,
       created: this.created
     }))
     if (update.smart && update.smart.actor && update.smart.actor.account) {
@@ -407,4 +444,4 @@ class Account {
   }
 }
 
-module.exports = Account
+export default Account

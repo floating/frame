@@ -21,6 +21,14 @@ export interface AppVersion {
   patch: number
 }
 
+export enum Type {
+  Ledger = 'ledger',
+  Trezor = 'trezor',
+  Lattice = 'lattice',
+  Seed = 'seed',
+  Ring = 'ring'
+}
+
 export default class Signer extends EventEmitter {
   id = ''
   type = ''
