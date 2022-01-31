@@ -100,14 +100,14 @@ export default class LatticeAdapter extends SignerAdapter {
         lattice.on('update', emitUpdate)
 
         lattice.on('connect', (paired: boolean) => {
+          store.updateLattice(deviceId, { paired })
+
           if (paired) {
             // Lattice recognizes the private key and remembers if this
             // client is already paired between sessions
             const { derivation } = getLatticeSettings(deviceId)
 
             lattice.deriveAddresses({ derivation })
-          } else {
-            store.updateLattice(deviceId, { paired: false })
           }
         })
 

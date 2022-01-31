@@ -80,7 +80,7 @@ export default class Lattice extends Signer {
     this.status = Status.CONNECTING
     this.emit('update')
 
-    log.debug('connecting to Lattice', { name: this.name, baseUrl, privateKey })
+    log.debug('connecting to Lattice', { name: this.name, baseUrl })
 
     this.connection = new Client({
       name: devicePermission(this.tag),
@@ -95,7 +95,7 @@ export default class Lattice extends Signer {
 
       const [patch, minor, major] = this.connection?.fwVersion || [0, 0, 0]
 
-      log.debug(`Connected to Lattice with deviceId=${this.deviceId}, firmware v${major}.${minor}.${patch}`)
+      log.debug(`Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`)
 
       this.appVersion = { major, minor, patch }
 
