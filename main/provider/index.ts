@@ -91,7 +91,7 @@ function loadAssets (accountId: string) {
   }, response)
 }
 
-class Provider extends EventEmitter {
+export class Provider extends EventEmitter {
   connected = false
   connection = Chains
 

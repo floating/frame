@@ -125,7 +125,7 @@ module.exports = {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
   },
-  updateAccount: (u, updatedAccount, add) => {
+  updateAccount: (u, updatedAccount) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
       // if (add) return updatedAccount // Account is new and should be added

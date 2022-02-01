@@ -21,12 +21,9 @@ export interface AppVersion {
   patch: number
 }
 
+// in order of increasing priority
 export enum Type {
-  Ledger = 'ledger',
-  Trezor = 'trezor',
-  Lattice = 'lattice',
-  Seed = 'seed',
-  Ring = 'ring'
+  ring, seed, trezor, ledger, lattice
 }
 
 export default class Signer extends EventEmitter {

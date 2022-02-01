@@ -25,6 +25,18 @@ interface ABI {
   inputs: ABIInput[]
 }
 
+export interface DecodedCallData {
+  contractAddress: string,
+  contractName: string,
+  source: string,
+  method: string,
+  args: Array<{
+    name: string,
+    type: string,
+    value: string
+  }>
+}
+
 function parseAbi (abiData: string): ABI[] {
   try {
     return JSON.parse(abiData)

@@ -117,3 +117,13 @@ interface Dapp {
   manifest: any,
   current: any
 }
+
+interface Signer {
+  id: string,
+  name: string,
+  model: string,
+  type: string,
+  addresses: Address[],
+  status: string,
+  createdAt: number
+}

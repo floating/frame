@@ -12,10 +12,11 @@ import store from '../store'
 import dataScanner from '../externalData'
 import windows from '../windows'
 import Account from './Account'
-import { usesBaseFee, signerCompatibility, maxFee } from '../transaction'
+import { usesBaseFee, signerCompatibility, maxFee, TransactionData } from '../transaction'
 
 // Provider Proxy
 import proxyProvider from'../provider/proxy'
+import { DecodedCallData } from '../abi'
 
 // const weiToGwei = v => Math.ceil(v / 1e9)
 const gweiToWei = v => Math.ceil(v * 1e9)
@@ -32,11 +33,32 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
   setTimeout(() => notification.show(), 1000)
 }
 
+type RequestType = 'transaction' | 'access'
+type RequestMode = 'normal' | 'monitor'
+
 export interface AccountRequest {
+  type: RequestType,
   origin: string,
   payload: JSONRPCRequestPayload,
   handlerId: string,
-  account: string
+  account: string,
+  mode?: RequestMode,
+  created?: number,
+  res?: (response?: RPCResponsePayload) => void
+}
+
+export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
+  type: 'transaction',
+  payload: RPC.SendTransaction.Request,
+  data: TransactionData,
+  decodedData?: DecodedCallData,
+  warning?: string,
+  feesUpdatedByUser: boolean
+}
+
+export interface AccessRequest extends Omit<AccountRequest, 'type'> {
+  type: 'access',
+  address: Address
 }
 
 export class Accounts extends EventEmitter {
@@ -121,8 +143,8 @@ export class Accounts extends EventEmitter {
 
   rename (id, name) { this.accounts[id].rename(name) }
 
-  update (account, add) {
-    store.updateAccount(account, add)
+  update (account) {
+    store.updateAccount(account)
   }
 
   current () {
@@ -531,7 +553,7 @@ export class Accounts extends EventEmitter {
     }
   }
 
-  resolveRequest (req) {
+  resolveRequest (req: AccountRequest) {
     const currentAccount = this.current()
     if (currentAccount && currentAccount.resolveRequest) {
       currentAccount.resolveRequest(req)
