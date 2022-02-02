@@ -30,6 +30,7 @@ import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, Swi
 import Chains, { Chain } from '../chains'
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
 import FrameAccount from '../accounts/Account'
+import { capitalize, arraysMatch } from '../../resources/utils'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
@@ -37,19 +38,6 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
 type Balance = Token & { balance: string, displayBalance: string }
-
-// TODO: these utility functions exist in ../../resources/utils but that file is not
-// yet part of the TS build
-function capitalize (s: string) {
-  return s[0].toUpperCase() + s.substring(1).toLowerCase()
-}
-
-function arraysMatch (a: number[] = [], b: number[] = []) {
-  return (
-    a.length === b.length &&
-    a.every((chainId, i) => b[i] === chainId)
-  )
-}
 
 function getNativeCurrency (chainId: number) {
   const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')

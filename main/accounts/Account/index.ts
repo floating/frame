@@ -11,17 +11,13 @@ import windows from '../../windows'
 import store from '../../store'
 import { Aragon } from '../aragon'
 import { TransactionData } from '../../transaction'
+import { capitalize } from '../../../resources/utils'
 import { Type as SignerType } from '../../signers/Signer'
 
 // Provider Proxy
 import proxyProvider from '../../provider/proxy'
 
 const nebula = nebulaApi('accounts')
-
-function capitalize (s: string) {
-  if (typeof s !== 'string') return ''
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
 
 function getPermissions (address: Address) {
   return (store('main.permissions', address) || {}) as Record<string, Permission>
