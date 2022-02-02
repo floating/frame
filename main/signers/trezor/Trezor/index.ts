@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import utils from 'web3-utils'
 import { padToEven, stripHexPrefix, addHexPrefix } from 'ethereumjs-util'
-import { TypedDataUtils } from 'eth-sig-util'
+import { TypedData, TypedDataUtils } from 'eth-sig-util'
 import { Device as TrezorDevice } from 'trezor-connect'
 
 import Signer from '../../Signer'
@@ -238,7 +238,7 @@ export default class Trezor extends Signer {
   }
 
   // Standard Methods
-  signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
+  signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {

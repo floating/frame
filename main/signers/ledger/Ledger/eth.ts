@@ -1,5 +1,5 @@
 import { rlp, addHexPrefix, stripHexPrefix, padToEven } from 'ethereumjs-util'
-import { TypedDataUtils, TypedMessage } from 'eth-sig-util'
+import { TypedData, TypedDataUtils, TypedMessage } from 'eth-sig-util'
 import log from 'electron-log'
 
 import Transport from '@ledgerhq/hw-transport'
@@ -48,7 +48,7 @@ export default class LedgerEthereumApp {
     return addHexPrefix(hashedSignature)
   }
 
-  async signTypedData (path: string, typedData: TypedMessage<any>) {
+  async signTypedData (path: string, typedData: TypedData) {
     let domainSeparatorHex, hashStructMessageHex
 
     try {

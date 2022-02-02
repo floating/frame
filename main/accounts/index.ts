@@ -23,7 +23,7 @@ import {
 // Provider Proxy
 import proxyProvider from'../provider/proxy'
 import { Chain } from '../chains'
-import { Version } from 'eth-sig-util'
+import { TypedData, Version } from 'eth-sig-util'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -450,7 +450,7 @@ export class Accounts extends EventEmitter {
     currentAccount.signMessage(message, cb)
   }
 
-  signTypedData (version: Version, address: Address, typedData: any, cb: Callback<string>) {
+  signTypedData (version: Version, address: Address, typedData: TypedData, cb: Callback<string>) {
     const currentAccount = this.current()
 
     if (!currentAccount) return cb(new Error('No Account Selected'))
