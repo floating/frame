@@ -1,20 +1,20 @@
+import { assert } from 'console'
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
+import { Version } from 'eth-sig-util'
 
+import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
 import abi from '../../abi'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
 import store from '../../store'
 import { Aragon } from '../aragon'
+import { TransactionData } from '../../transaction'
+import { Type as SignerType } from '../../signers/Signer'
 
 // Provider Proxy
 import proxyProvider from '../../provider/proxy'
-import { Type as SignerType } from '../../signers/Signer'
-import { AccessRequest, AccountRequest, Accounts, TransactionRequest } from '..'
-import { assert } from 'console'
-import { TransactionData } from '../../transaction'
-import { Version } from 'eth-sig-util'
 
 const nebula = nebulaApi('accounts')
 
@@ -38,7 +38,7 @@ interface SmartAccount {
 }
 
 interface SignerOptions {
-  type?: SignerType
+  type?: string
 }
 
 interface AccountOptions {
@@ -51,7 +51,7 @@ interface AccountOptions {
   options: SignerOptions
 }
 
-class Account {
+class FrameAccount {
   id: Address
   address: Address
   name: string
@@ -83,7 +83,7 @@ class Account {
     this.lastSignerType = lastSignerType || (options.type as SignerType)
 
 
-    this.name = name || capitalize(options.type ? SignerType[options.type] : '') + ' Account'
+    this.name = name || capitalize(options.type || '') + ' Account'
     this.ensName = ensName
 
     this.created = created || `new:${Date.now()}`
@@ -169,7 +169,8 @@ class Account {
 
     const signerOrdinal = (signer: Signer) => {
       const isOk = signer.status === 'ok' ? 2 : 1
-      const typeIndex = Math.max(Object.values(SignerType).indexOf(signer.type), 0)
+      const signerIndex = Object.values(SignerType).findIndex(type => type === signer.type)
+      const typeIndex = Math.max(signerIndex, 0)
 
       return isOk * typeIndex
     }
@@ -188,6 +189,10 @@ class Account {
     }
 
     this.resolveRequest(req)
+  }
+
+  getRequest <T extends AccountRequest> (id: string) {
+    return this.requests[id] as T
   }
 
   resolveRequest <T> (req: AccountRequest, result?: T) {
@@ -215,10 +220,10 @@ class Account {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
-  addRequest (req: AccountRequest, res: RPCCallback<any>) {
+  addRequest (req: AccountRequest, res: RPCCallback<any> = () => {}) {
     const add = async (r: AccountRequest) => {
       this.requests[r.handlerId] = req
-      this.requests[r.handlerId].mode = 'normal'
+      this.requests[r.handlerId].mode = RequestMode.Normal
       this.requests[r.handlerId].created = Date.now()
       this.requests[r.handlerId].res = res
       this.update()
@@ -333,20 +338,17 @@ class Account {
       requests: this.requests,
       ensName: this.ensName,
       created: this.created
-    }))
+    })) as Account
+
     if (update.smart && update.smart.actor && update.smart.actor.account) {
       update.signer = update.smart.actor.account.signer
-      if (update.signer) update.signer.type = 'aragon'
+      if (update.signer) update.lastSignerType = SignerType.Aragon
     }
     return update
   }
 
   update () {
     this.accounts.update(this.summary())
-  }
-
-  delete () {
-
   }
 
   rename (name: string) {
@@ -466,4 +468,4 @@ class Account {
   }
 }
 
-export default Account
+export default FrameAccount

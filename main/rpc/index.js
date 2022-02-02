@@ -3,7 +3,7 @@ const fs = require('fs')
 const utils = require('web3-utils')
 const crypto = require('crypto')
 
-const accounts = require('../accounts')
+const accounts = require('../accounts').default
 const signers = require('../signers')
 const launch = require('../launch')
 const provider = require('../provider').default

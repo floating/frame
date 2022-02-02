@@ -5,7 +5,6 @@ import log from 'electron-log'
 import utils from 'web3-utils'
 import { recoverTypedMessage, Version } from 'eth-sig-util'
 import crypto from 'crypto'
-import Common from '@ethereumjs/common'
 
 import {
   padToEven,
@@ -27,9 +26,10 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
 
-import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest } from '../accounts'
+import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
+import FrameAccount from '../accounts/Account'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
@@ -231,8 +231,12 @@ export class Provider extends EventEmitter {
     if (signed.length === 134) { // Aragon smart signed message
       try {
         signed = '0x' + signed.substring(4)
-        const actor = accounts.current().smart && accounts.current().smart.actor
-        address = accounts.get(actor.id).address
+
+        const currentAccount = accounts.current()
+        if (!currentAccount) return cb(new Error('no account selected'))
+
+        const actor = (currentAccount.smart && currentAccount.smart.actor) || ''
+        address = accounts.get(actor).address
       } catch (e) {
         return cb(new Error('Could not resolve message or actor for smart accoount'))
       }
@@ -400,7 +404,13 @@ export class Provider extends EventEmitter {
       }
 
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
-      this.signAndSend(updatedReq, cb)
+
+      if (updatedReq) {
+        this.signAndSend(updatedReq, cb)
+      } else {
+        log.error(`could not find request with handlerId="${req.handlerId}"`)
+        cb(new Error('could not find request'))
+      }
     })
   }
 
@@ -409,7 +419,7 @@ export class Provider extends EventEmitter {
 
     return {
       ...rawTx,
-      from: rawTx.from || accounts.current().id,
+      from: rawTx.from || ((accounts.current() || {}).id),
       type: '0x0',
       value: addHexPrefix(unpadHexString(value || '0x') || '0'),
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
@@ -425,7 +435,7 @@ export class Provider extends EventEmitter {
     return handlerId
   }
   
-  private async getGasEstimate (rawTx: TransactionData, chainConfig: Common) {
+  private async getGasEstimate (rawTx: TransactionData) {
     const { from, to, value, data, nonce } = rawTx
     const txParams = { from, to, value, data, nonce }
 
@@ -449,7 +459,8 @@ export class Provider extends EventEmitter {
   }
 
   private isCurrentAccount (address: string, account = accounts.current()) {
-    return address && (account.id.toLowerCase() === address.toLowerCase())
+    const accountToCheck = account || accounts.current() || { id: '' }
+    return address && (accountToCheck.id.toLowerCase() === address.toLowerCase())
   }
 
   private gasFees (rawTx: TransactionData) {
@@ -514,7 +525,7 @@ export class Provider extends EventEmitter {
 
     const estimateGas = rawTx.gasLimit
       ? Promise.resolve(rawTx)
-      : this.getGasEstimate(rawTx, chainConfig)
+      : this.getGasEstimate(rawTx)
         .then(gasLimit => ({ ...rawTx, gasLimit }))
         .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
 
@@ -542,7 +553,7 @@ export class Provider extends EventEmitter {
 
     const newTx = {
       ...txParams,
-      chainId: txChain || targetChain
+      chainId: (txChain || targetChain) as string
     }
 
     const currentAccount = accounts.current()
@@ -566,11 +577,11 @@ export class Provider extends EventEmitter {
           type: 'transaction', 
           data, 
           payload, 
-          account: currentAccount.id, 
+          account: (currentAccount as FrameAccount).id, 
           origin: payload._origin, 
           warning,
           feesUpdatedByUser: feesUpdated || false
-        }, res)
+        } as TransactionRequest, res)
       }
     })
   }
@@ -612,7 +623,7 @@ export class Provider extends EventEmitter {
 
     const handlerId = this.addRequestHandler(res)
 
-    const req = { handlerId, type: 'sign', payload: normalizedPayload, account: currentAccount.getAccounts[0], origin: payload._origin }
+    const req = { handlerId, type: 'sign', payload: normalizedPayload, account: (currentAccount as FrameAccount).getAccounts()[0], origin: payload._origin } as const
 
     const _res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
@@ -634,9 +645,9 @@ export class Provider extends EventEmitter {
     }
 
     let [from = '', typedData = {}, ...additionalParams] = payload.params
-    const currentAccount = accounts.current()
-
-    if (!this.isCurrentAccount(from, currentAccount)) return this.resError('signTypedData request is not from currently selected account.', payload, res)
+    
+    if (!this.isCurrentAccount(from)) return this.resError('signTypedData request is not from currently selected account.', payload, res)
+    const currentAccount = accounts.current() as FrameAccount
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof (typedData) === 'string') {
@@ -658,7 +669,7 @@ export class Provider extends EventEmitter {
 
     const handlerId = this.addRequestHandler(res)
 
-    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
+    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts()[0], origin: payload._origin } as SignTypedDataRequest)
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
@@ -710,10 +721,10 @@ export class Provider extends EventEmitter {
           type, 
           id: params[0].chainId
         },
-        account: accounts.getAccounts()[0],
+        account: (accounts.getAccounts() || [])[0],
         origin: payload._origin,
         payload
-      }, res)
+      } as SwitchChainRequest, res)
     } catch (e) {
       return this.resError(e as EVMError, payload, res)
     }
@@ -760,10 +771,10 @@ export class Provider extends EventEmitter {
           blockExplorerUrls, 
           iconUrls
         },
-        account: accounts.getAccounts()[0],
+        account: (accounts.getAccounts() || [])[0],
         origin: payload._origin,
         payload
-      }, res)
+      } as AddChainRequest, res)
     }
   }
 
@@ -833,10 +844,10 @@ export class Provider extends EventEmitter {
         handlerId,
         type: 'addToken',
         token,
-        account: accounts.current().id,
+        account: (accounts.current() as FrameAccount).id,
         origin: payload._origin,
         payload
-      }, res)
+      } as AddTokenRequest, res)
     }, targetChain)
   }
 

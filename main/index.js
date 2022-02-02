@@ -5,6 +5,9 @@ app.commandLine.appendSwitch('force-gpu-rasterization', true)
 app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
+
+process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || './../../../bundle'
+
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
@@ -43,7 +46,7 @@ const dapps = require('./dapps').default
 // })
 
 
-const accounts = require('./accounts')
+const accounts = require('./accounts').default
 const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
@@ -261,7 +264,7 @@ app.on('ready', () => {
   if (app.dock) app.dock.hide()
 
   protocol.interceptFileProtocol('file', (req, cb) => {
-    const appOrigin = path.resolve(__dirname, '../')
+    const appOrigin = path.resolve(__dirname, '../../')
     const filePath = url.fileURLToPath(req.url)
 
     if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line

@@ -1,4 +1,4 @@
-import log = require('electron-log')
+import log from 'electron-log'
 
 import Wrapper from '@aragon/wrapper'
 // @ts-ignore
@@ -154,8 +154,10 @@ class Aragon {
             this.provider.fillTransaction(newTx, (err, fullTx) => {
               if (err) return cb(err)
 
-              const value = (fullTx && fullTx.value !== undefined) ? fullTx.value : '0x'
-              cb(null, { ...fullTx, value })
+              const filledTx = fullTx as TransactionData
+
+              const value = filledTx.value !== undefined ? filledTx.value : '0x'
+              cb(null, { ...filledTx, value })
             })
           }
         })

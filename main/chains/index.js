@@ -10,7 +10,7 @@ const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
-const accounts = require('../accounts')
+const { default: accounts } = require('../accounts')
 
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {

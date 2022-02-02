@@ -118,12 +118,28 @@ interface Dapp {
   current: any
 }
 
+type SignerType = 'ring' | 'seed' | 'aragon' | 'trezor' | 'ledger' | 'lattice'
+type AccountStatus = 'ok'
+
 interface Signer {
   id: string,
   name: string,
   model: string,
-  type: string,
+  type: SignerType,
   addresses: Address[],
   status: string,
   createdAt: number
+}
+
+interface Account {
+  id: string,
+  name: string,
+  lastSignerType: SignerType,
+  address: Address,
+  status: AccountStatus,
+  signer: string,
+  smart?: any,
+  requests: Record<string, any>,
+  ensName: string,
+  created: string
 }
