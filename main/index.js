@@ -6,13 +6,14 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || './../../../bundle'
 
+const path = require('path')
+process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+console.log('BUNDLE', process.env.BUNDLE_LOCATION)
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
 const log = require('electron-log')
-const path = require('path')
 const url = require('url')
 
 const data = require('./data')
@@ -51,7 +52,7 @@ const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 // const clients = require('./clients')
-const signers = require('./signers')
+const signers = require('./signers').default
 const persist = require('./store/persist')
 
 log.info('Chrome: v' + process.versions.chrome)

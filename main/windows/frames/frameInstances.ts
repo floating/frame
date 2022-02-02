@@ -45,7 +45,7 @@ export default {
       webPreferences: { ...webPrefrences, preload }
     })
 
-    frameInstance.loadURL(`file://${__dirname}/../../../bundle/dapp.html`)
+    frameInstance.loadURL(`file://${process.env.BUNDLE_LOCATION}/dapp.html`)
   
     frameInstance.on('ready-to-show', () => {
       frameInstance.show()

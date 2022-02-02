@@ -1,4 +1,3 @@
-import { assert } from 'console'
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
 import { Version } from 'eth-sig-util'
@@ -74,10 +73,7 @@ class FrameAccount {
     const formattedAddress = (address && address.toLowerCase()) || '0x'
     this.id = formattedAddress // Account ID
     this.address = formattedAddress
-
-    assert(lastSignerType || options.type, 'signer type must be specified!')
     this.lastSignerType = lastSignerType || (options.type as SignerType)
-
 
     this.name = name || capitalize(options.type || '') + ' Account'
     this.ensName = ensName
@@ -111,11 +107,9 @@ class FrameAccount {
       if (updatedSigner) {
         if (this.signer !== updatedSigner.id || this.signerStatus !== updatedSigner.status) {
           this.signer = updatedSigner.id
+          const signerType = Object.values(SignerType).find(type => type === updatedSigner.type)
 
-          this.lastSignerType = updatedSigner.type
-            ? SignerType[updatedSigner.type as keyof typeof SignerType]
-            : this.lastSignerType
-
+          this.lastSignerType = signerType || this.lastSignerType
           this.signerStatus = updatedSigner.status
 
           if (updatedSigner.status === 'ok' && this.id === this.accounts._current) {

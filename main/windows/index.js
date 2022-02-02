@@ -102,14 +102,14 @@ const api = {
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
-        preload: path.resolve(__dirname, process.env.BUNDLE_LOCATION, 'bridge.js'),
+        preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
         worldSafeExecuteJavaScript: true,
         backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
 
     const trayUrl = url.format({
-      pathname: path.join(__dirname, process.env.BUNDLE_LOCATION, 'tray.html'),
+      pathname: path.join(process.env.BUNDLE_LOCATION, 'tray.html'),
       protocol: 'file',
       slashes: true
     })
@@ -416,14 +416,14 @@ const api = {
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
-        preload: path.resolve(__dirname, process.env.BUNDLE_LOCATION, 'bridge.js'),
+        preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
         worldSafeExecuteJavaScript: true,
         backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
 
     const dashUrl = url.format({
-      pathname: path.join(__dirname, process.env.BUNDLE_LOCATION, 'dash.html'),
+      pathname: path.join(process.env.BUNDLE_LOCATION, 'dash.html'),
       protocol: 'file',
       slashes: true
     })
@@ -485,7 +485,7 @@ app.on('ready', () => {
 if (dev) {
   const path = require('path')
   const watch = require('node-watch')
-  watch(path.resolve(__dirname, process.env.BUNDLE_LOCATION), { recursive: true }, (evt, name) => {
+  watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) {
       Object.keys(windows).forEach(win => {
         windows[win].send('main:reload:style', name)

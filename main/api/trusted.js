@@ -1,7 +1,7 @@
 const { v5: uuidv5 } = require('uuid')
 
 const store = require('../store').default
-const accounts = require('../accounts')
+const accounts = require('../accounts').default
 
 const log = require('electron-log')
 
