@@ -1,9 +1,19 @@
 {
   "compilerOptions": {
+    "target": "es2021",
+    "module": "commonjs",
+    "lib": ["es2021", "dom"],
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "composite": true,
+    "allowJs": true,
+
+    "outDir": "./compiled",
+    "typeRoots": ["./node_modules/@types", "./@types"]
   },
-  "files": [
-    "package.json"
-  ]
+  "include": ["package.json", "./main/**/*.ts", "./main/**/*.js", "./resources/**/*.ts", "./resources/**/*.js"],
+  "exclude": ["**/__mocks__/*"]
 }

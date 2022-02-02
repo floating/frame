@@ -1,14 +1,20 @@
-const log = require('electron-log')
-const utils = require('ethereumjs-util')
-const Wrapper = require('@aragon/wrapper').default
-const { ensResolve } = require('@aragon/wrapper')
-const store = require('../../store').default
+import log from 'electron-log'
 
-const appNames = require('./appNames')
+import Wrapper, { ensResolve } from '@aragon/wrapper'
 
-const registryAddress = () => {
-  const network = store('main.currentNetwork.id')
-  const addresses = {
+import store from '../../store'
+import appNames from './appNames'
+import { Provider } from '../../provider'
+import { TransactionData } from '../../transaction'
+
+function getNetworkId () {
+  return parseInt(store('main.currentNetwork.id') || '0')
+}
+
+function registryAddress () {
+  const network = getNetworkId()
+
+  const addresses: Record<number, Address> = {
     1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     3: '0x6afe2cacee211ea9179992f89dc61ff25c61e923',
     4: '0x98df287b6c145399aaa709692c8d308357bc085d',
@@ -17,12 +23,13 @@ const registryAddress = () => {
     137: '0x3c70a0190d09f34519e6e218364451add21b7d4b',
     80001: '0x431f0eed904590b176f9ff8c36a1c4ff0ee9b982'
   }
+
   if (addresses[network]) return addresses[network]
   throw new Error('Unable to locate Aragon ENS registry for current network')
 }
 
-const resolveAragon = async (domain, registryAddress) => {
-  const executor = async (resolve, reject) => {
+async function resolveAragon (domain: string, registryAddress: Address) {
+  return new Promise<string>(async (resolve, reject) => {
     try {
       const address = await ensResolve(domain, { provider: require('../../provider').default, registryAddress })
       if (address.replace('0x', '')) return resolve(address)
@@ -30,12 +37,11 @@ const resolveAragon = async (domain, registryAddress) => {
     } catch (e) {
       reject(new Error(`Unable to resolve DAO ${domain} on current network`))
     }
-  }
-  return new Promise(executor)
+  })
 }
 
-const resolveName = (name) => {
-  const executor = async (resolve, reject) => {
+async function resolveName (name: string) {
+  return new Promise(async (resolve, reject) => {
     try {
       // Look up registry address based on current network connection
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
@@ -53,7 +59,7 @@ const resolveName = (name) => {
       await wrap.init()
       const subscription = wrap.apps.subscribe(apps => {
         subscription.unsubscribe()
-        const appsSummary = {}
+        const appsSummary: Record<string, Record<string, string>> = {}
         apps.forEach(app => {
           const { appId, proxyAddress } = app
           const name = appNames[appId]
@@ -66,15 +72,30 @@ const resolveName = (name) => {
     } catch (e) {
       reject(e)
     }
-  }
-  return new Promise(executor)
+  })
+}
+
+export interface AragonOptions {
+  dao: Address,
+  agent: Address,
+  actor: Address
 }
 
 class Aragon {
-  constructor ({ name, apps, dao, agent, actor, ens }) {
-    this.dao = dao
-    this.agent = agent
-    this.actor = actor // Actor is now just the acting accounts address
+  dao: Address
+  agent: Address
+  actor: Address
+
+  provider?: Provider
+  wrap?: Wrapper
+
+  inSetup = false
+
+  constructor (opts: AragonOptions) {
+    this.dao = opts.dao
+    this.agent = opts.agent
+    this.actor = opts.actor // Actor is now just the acting accounts address
+
     store.observer(() => this.setup())
   }
 
@@ -101,7 +122,7 @@ class Aragon {
         wrap.init().then(() => {
           this.wrap = wrap
           this.inSetup = false
-        }).catch(err => {
+        }).catch((err: any) => {
           log.error(err)
           this.inSetup = false
         })
@@ -109,11 +130,7 @@ class Aragon {
     }
   }
 
-  bufferToHex (value) {
-    return utils.bufferToHex(value)
-  }
-
-  pathTransaction (tx, cb) {
+  pathTransaction (tx: RPC.SendTransaction.TxParams, cb: Callback<RPC.SendTransaction.TxParams>) {
     if (!this.wrap) {
       this.setup()
       return cb(new Error('Aragon wrapper was not ready or is not on correct network, try again'))
@@ -125,27 +142,26 @@ class Aragon {
       if (!newTx) return cb(new Error('Could not calculate a transaction path for Aragon smart account, make sure your acting account has the necessary permissions'))
       delete newTx.nonce
       newTx.chainId = tx.chainId
-      this.provider.getNonce(newTx, res => {
-        if (res.error) return cb(res.error)
-        newTx.nonce = res.result
-        this.provider.fillTransaction(newTx, (err, fullTx) => {
-          if (err) return cb(err)
-          if (typeof fullTx.value === 'undefined') fullTx.value = '0x'
-          cb(null, fullTx)
-        })
-      })
-    }).catch(cb)
-  }
 
-  aragonSignMessage (message, cb) {
-    this.aragon((err, wrap) => {
-      if (err) return cb(err)
-      const params = ['0x' + utils.keccak(message).toString('hex')]
-      wrap.calculateTransactionPath(this.actor, this.agent, 'presignHash', params).then(result => {
-        log.warn('Trying to sign as Aragon DAO...', result)
-      }).catch(cb)
-    })
+      if (this.provider) {
+        this.provider.getNonce(newTx, res => {
+          if (res.error) return cb(new Error(res.error.message))
+          newTx.nonce = res.result
+
+          if (this.provider) {
+            this.provider.fillTransaction(newTx, (err, fullTx) => {
+              if (err) return cb(err)
+
+              const filledTx = fullTx as TransactionData
+
+              const value = filledTx.value !== undefined ? filledTx.value : '0x'
+              cb(null, { ...filledTx, value })
+            })
+          }
+        })
+      }
+    }).catch(cb)
   }
 }
 
-module.exports = { Aragon, resolveName }
+export { Aragon, resolveName }

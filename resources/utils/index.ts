@@ -6,6 +6,7 @@ const gweiToWei = (gwei: number) => gwei * 1e9
 const gweiToHex = (gwei: number) => weiToHex(gwei * 1e9)
 const hexToInt = (hexStr: string) => parseInt(hexStr, 16)
 const weiHexToGweiInt = (weiHex: string) => hexToInt(weiHex) / 1e9
+const weiIntToEthInt = (wei: number) => wei / 1e18
 const gweiToWeiHex = (gwei: number) => intToHex(gweiToWei(gwei))
 
 function randomLetters (num: number) {
@@ -34,5 +35,6 @@ export {
   intToHex,
   hexToInt,
   weiHexToGweiInt,
+  weiIntToEthInt,
   gweiToWeiHex
 }

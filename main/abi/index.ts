@@ -1,20 +1,64 @@
-const fetch = require('node-fetch')
-const { id } = require('@ethersproject/hash')
-const { defaultAbiCoder } = require('@ethersproject/abi')
-const log = require('electron-log')
+import log from 'electron-log'
+import fetch from 'node-fetch'
+import { id } from '@ethersproject/hash'
+import { defaultAbiCoder } from '@ethersproject/abi'
 
-function parseAbi (abiData) {
+interface EtherscanSourceCodeResponse {
+  status: string,
+  message: string,
+  result: ContractSourceCodeResult[]
+}
+
+interface ContractSourceCodeResult {
+  ABI: string,
+  ContractName: string
+}
+
+interface ABIInput {
+  type: string,
+  name: string
+}
+
+interface ABI {
+  type: string,
+  name: string,
+  inputs: ABIInput[]
+}
+
+export interface DecodedCallData {
+  contractAddress: string,
+  contractName: string,
+  source: string,
+  method: string,
+  args: Array<{
+    name: string,
+    type: string,
+    value: string
+  }>
+}
+
+function parseAbi (abiData: string): ABI[] {
   try {
     return JSON.parse(abiData)
   } catch (e) {
-    log.warn(`could not parse ABI data: "${abiData}"`)
+    log.warn(`could not parse ABI data: ${abiData}`)
+    throw e
   }
 }
 
-module.exports = {
-  decodeCalldata: async (contractAddress, calldata) => {
+async function fetchSourceCode (contractAddress: Address) {
+  try {
     const res = await fetch(`https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`)
-    const data = await res.json()
+    return res.json() as Promise<EtherscanSourceCodeResponse>
+  } catch (e) {
+    log.warn(`could not fetch source code for contract ${contractAddress}`, e)
+  }
+}
+
+export default {
+  decodeCalldata: async (contractAddress: Address, calldata: string) => {
+    const data = await fetchSourceCode(contractAddress)
+
     if (data && data.message === 'OK' && data.result) {
       const abi = parseAbi(data.result[0].ABI)
 

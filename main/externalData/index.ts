@@ -441,4 +441,4 @@ function kill () {
   }
 }
 
-module.exports = { start, stop, kill, setActiveAddress }
+export default { start, stop, kill, setActiveAddress }

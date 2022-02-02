@@ -1,3 +1,4 @@
+/// <reference path="./environment.d.ts" />
 /// <reference path="./rpc.d.ts" />
 /// <reference path="./restore.d.ts" />
 /// <reference path="./state.d.ts" />

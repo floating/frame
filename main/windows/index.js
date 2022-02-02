@@ -11,10 +11,7 @@ const store = require('../store').default
 
 const extractColors = require('./extractColors').default
 
-import FrameManager from './frames'
-
-// const dapp = require('./dappOld')
-const winSession = e => e.sender.webContents.browserWindowOptions.session
+const FrameManager = require('./frames').default
 
 const dev = process.env.NODE_ENV === 'development'
 const fullheight = !!process.env.FULL_HEIGHT
@@ -55,10 +52,6 @@ const center = (window) => {
     x: Math.floor(((screenSize.x + screenSize.width) - (screenSize.width / 2)) - (windowSize[0] / 2)),
     y: Math.floor(((screenSize.y + screenSize.height) - (screenSize.height / 2)) - (windowSize[1] / 2))
   }
-}
-
-const timeout = ms => {
-  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 const detectMouse = () => {
@@ -109,14 +102,14 @@ const api = {
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
-        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+        preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
         worldSafeExecuteJavaScript: true,
         backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
 
     const trayUrl = url.format({
-      pathname: path.join(__dirname, '/../../bundle/tray.html'),
+      pathname: path.join(process.env.BUNDLE_LOCATION, 'tray.html'),
       protocol: 'file',
       slashes: true
     })
@@ -422,14 +415,14 @@ const api = {
         sandbox: true,
         disableBlinkFeatures: 'Auxclick',
         enableRemoteModule: false,
-        preload: path.resolve(__dirname, '../../bundle/bridge.js'),
+        preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),
         worldSafeExecuteJavaScript: true,
         backgroundThrottling: false // Allows repaint when window is hidden
       }
     })
 
     const dashUrl = url.format({
-      pathname: path.join(__dirname, '/../../bundle/dash.html'),
+      pathname: path.join(process.env.BUNDLE_LOCATION, 'dash.html'),
       protocol: 'file',
       slashes: true
     })
@@ -491,7 +484,7 @@ app.on('ready', () => {
 if (dev) {
   const path = require('path')
   const watch = require('node-watch')
-  watch(path.resolve(__dirname, '../../', 'bundle'), { recursive: true }, (evt, name) => {
+  watch(path.resolve(process.env.BUNDLE_LOCATION), { recursive: true }, (evt, name) => {
     if (name.indexOf('css') > -1) {
       Object.keys(windows).forEach(win => {
         windows[win].send('main:reload:style', name)
