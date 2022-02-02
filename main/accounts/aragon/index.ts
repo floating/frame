@@ -1,8 +1,6 @@
 import log from 'electron-log'
 
-import Wrapper from '@aragon/wrapper'
-// @ts-ignore
-import { ensResolve } from '@aragon/wrapper'
+import Wrapper, { ensResolve } from '@aragon/wrapper'
 
 import store from '../../store'
 import appNames from './appNames'

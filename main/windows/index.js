@@ -113,7 +113,6 @@ const api = {
       protocol: 'file',
       slashes: true
     })
-    console.log('BUNDLE: ', trayUrl)
 
     windows.tray.loadURL(trayUrl)
 
