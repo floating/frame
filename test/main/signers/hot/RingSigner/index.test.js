@@ -17,7 +17,7 @@ const mockPersist = {
 }
 
 jest.mock('electron')
-jest.mock('../../../../../compiled/store/persist', () => mockPersist)
+jest.mock('../../../../../compiled/main/store/persist', () => mockPersist)
 jest.mock('../../../../../main/store/persist', () => mockPersist)
 
 // Stubs
@@ -35,8 +35,8 @@ describe('Ring signer', () => {
 
     clean()
 
-    hot = await import('../../../../../compiled/signers/hot')
-    store = require('../../../../../compiled/store').default
+    hot = await import('../../../../../compiled/main/signers/hot')
+    store = require('../../../../../compiled/main/store').default
   })
 
   afterEach(() => {

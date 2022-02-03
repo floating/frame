@@ -28,6 +28,7 @@ import packageFile from '../../package.json'
 
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
+import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
@@ -633,9 +634,12 @@ export class Provider extends EventEmitter {
     }
 
     let [from = '', typedData = {}, ...additionalParams] = payload.params
-    
-    if (!this.isCurrentAccount(from)) return this.resError('signTypedData request is not from currently selected account.', payload, res)
-    const currentAccount = accounts.current() as FrameAccount
+
+    const targetAccount = accounts.get(from.toLowerCase())
+
+    if (!targetAccount) {
+      return this.resError(`unknown account: ${from}`, payload, res)
+    }
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof (typedData) === 'string') {
@@ -647,17 +651,17 @@ export class Provider extends EventEmitter {
       }
     }
 
-    const signerType = (currentAccount.lastSignerType || '').toLowerCase()
+    const signerType = getSignerType(targetAccount.lastSignerType)
 
     // check for signers that only support signing a specific version of typed data
-    if (version !== 'V4' && ['ledger', 'lattice', 'trezor'].includes(signerType)) {
-      const signerName = signerType[0].toUpperCase() + signerType.substring(1)
+    if (version !== 'V4' && signerType && [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)) {
+      const signerName = capitalize(signerType)
       return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
 
-    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts()[0], origin: payload._origin } as SignTypedDataRequest)
+    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: targetAccount.address, origin: payload._origin } as SignTypedDataRequest)
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {

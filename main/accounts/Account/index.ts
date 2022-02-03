@@ -11,7 +11,7 @@ import store from '../../store'
 import { Aragon } from '../aragon'
 import { TransactionData } from '../../transaction'
 import { capitalize } from '../../../resources/utils'
-import { Type as SignerType } from '../../signers/Signer'
+import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
 // Provider Proxy
 import proxyProvider from '../../provider/proxy'
@@ -107,7 +107,7 @@ class FrameAccount {
       if (updatedSigner) {
         if (this.signer !== updatedSigner.id || this.signerStatus !== updatedSigner.status) {
           this.signer = updatedSigner.id
-          const signerType = Object.values(SignerType).find(type => type === updatedSigner.type)
+          const signerType = getSignerType(updatedSigner.type)
 
           this.lastSignerType = signerType || this.lastSignerType
           this.signerStatus = updatedSigner.status

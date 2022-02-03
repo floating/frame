@@ -8,7 +8,7 @@ import { addHexPrefix, intToHex} from 'ethereumjs-util'
 
 import store from '../store'
 import dataScanner from '../externalData'
-import { Type as SignerType } from '../signers/Signer'
+import { getType as getSignerType } from '../signers/Signer'
 import windows from '../windows'
 import FrameAccount from './Account'
 import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
@@ -76,7 +76,7 @@ export class Accounts extends EventEmitter {
 
     const accountOpts = {
       ...account,
-      lastSignerType: Object.values(SignerType).find(type => type === account.lastSignerType),
+      lastSignerType: getSignerType(account.lastSignerType),
       options: { type: 'aragon' }
     }
 
@@ -729,6 +729,7 @@ export class Accounts extends EventEmitter {
 
       // Complete update
       const previousFee = { type: txType, baseFee: intToHex(currentBaseFee), priorityFee: intToHex(maxPriorityFeePerGas) }
+
       this.completeTxFeeUpdate(currentAccount, handlerId, userUpdate, previousFee, cb)
     } catch (e) {
       cb(e as Error)

@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
 
@@ -11,16 +12,8 @@ jest.mock('../../../main/store/persist', () => ({
   queue: jest.fn()
 }))
 
-jest.mock('../../../main/nebula', () => ({
-  default: jest.fn(() => ({
-    ens: {
-      lookupAddress: jest.fn()
-    }
-  }))
-}))
+jest.mock('../../../main/nebula', () => jest.fn(() => ({ ens: { lookupAddress: jest.fn() } })))
 
-const log = require('electron-log')
-log.transports.console.level = false
 
 const weiToHex = wei => addHexPrefix(wei.toString(16))
 const gweiToHex = gwei => weiToHex(gwei * 1e9)
@@ -41,10 +34,20 @@ const account = {
 let Accounts, request
 
 beforeAll(async () => {
+  log.transports.console.level = false
+
+  jest.useFakeTimers()
+
   store.updateAccount(account)
 
   // need to import this after mocks are set up
   Accounts = (await import('../../../main/accounts')).default
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
+
+  jest.useRealTimers()
 })
 
 beforeEach(() => {
@@ -76,13 +79,6 @@ afterEach(() => {
       Accounts.removeRequest(account, id)
     })
   })
-})
-
-it('loads the list of accounts', () => {
-  const accounts = Accounts.list()
-
-  expect(accounts).toHaveLength(1)
-  expect(accounts[0].address).toBe('0x22dd63c3619818fdbc262c78baee43cb61e9cccf')
 })
 
 it('sets the account signer', () => {
@@ -169,9 +165,11 @@ describe('#setBaseFee', () => {
     const updatedBaseFee = 6 // gwei
 
     setBaseFee(gweiToHex(updatedBaseFee), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9)))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(2e9 + (updatedBaseFee * 1e9)))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -180,9 +178,11 @@ describe('#setBaseFee', () => {
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
     setBaseFee(gweiToHex(6), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(8))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(8))
+        done()
+      } catch (e) { done(e) }
     }, 1, true)
   })
 
@@ -191,9 +191,11 @@ describe('#setBaseFee', () => {
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
     setBaseFee(gweiToHex(8), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -203,9 +205,11 @@ describe('#setBaseFee', () => {
     const expectedMaxFee = weiToHex(maxBaseFee + parseInt(request.data.maxPriorityFeePerGas))
 
     setBaseFee(highBaseFee, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -218,9 +222,11 @@ describe('#setBaseFee', () => {
     request.data.gasLimit = weiToHex(gasLimit)
 
     setBaseFee(highBaseFee, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -229,9 +235,11 @@ describe('#setBaseFee', () => {
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
     setBaseFee(gweiToHex(10), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
+        done()
+      } catch (e) { done(e) }
     }, 1, true)
   })
 })
@@ -316,10 +324,12 @@ describe('#setPriorityFee', () => {
     const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
     setPriorityFee(weiToHex(priorityFee), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(priorityFee))
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(priorityFee))
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -328,10 +338,12 @@ describe('#setPriorityFee', () => {
     request.data.maxPriorityFeePerGas = gweiToHex(2)
 
     setPriorityFee(gweiToHex(2), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
-      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(2))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(gweiToHex(10))
+        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(gweiToHex(2))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -342,10 +354,12 @@ describe('#setPriorityFee', () => {
     const expectedMaxFee = weiToHex(priorityFeeChange + parseInt(request.data.maxFeePerGas))
 
     setPriorityFee(highPriorityFee, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(maxPriorityFee))
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(expectedMaxFee)
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -362,18 +376,22 @@ describe('#setPriorityFee', () => {
     const expectedPriorityFee = maxFee - (parseInt(request.data.maxFeePerGas) - parseInt(request.data.maxPriorityFeePerGas))
 
     setPriorityFee(highPriorityFee, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
-      expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.maxPriorityFeePerGas).toBe(weiToHex(expectedPriorityFee))
+        expect(Accounts.current().requests[1].data.maxFeePerGas).toBe(weiToHex(maxFee))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
   it('updates the feesUpdatedByUser flag', done => {
     setPriorityFee('0x12a05f200', err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
+        done()
+      } catch (e) { done(e) }
     }, 1, true)
   })
 })
@@ -454,9 +472,11 @@ describe('#setGasPrice', () => {
 
   it('sets a valid gas price', done => {
     setGasPrice('0x23', err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasPrice).toBe('0x23')
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasPrice).toBe('0x23')
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -464,9 +484,11 @@ describe('#setGasPrice', () => {
     request.data.gasPrice = gweiToHex(10)
 
     setGasPrice(gweiToHex(10), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(10))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasPrice).toBe(gweiToHex(10))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -479,9 +501,11 @@ describe('#setGasPrice', () => {
     request.data.gasLimit = weiToHex(gasLimit)
 
     setGasPrice(highPrice, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxFee))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasPrice).toBe(weiToHex(maxFee))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -490,9 +514,11 @@ describe('#setGasPrice', () => {
     const highPrice = gweiToHex(10200)
 
     setGasPrice(highPrice, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasPrice).toBe(maxPrice)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasPrice).toBe(maxPrice)
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -500,9 +526,11 @@ describe('#setGasPrice', () => {
     request.data.gasPrice = gweiToHex(30)
     
     setGasPrice(gweiToHex(45), err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
+        done()
+      } catch (e) { done(e) }
     }, 1, true)
   })
 })
@@ -582,9 +610,11 @@ describe('#setGasLimit', () => {
 
   it('sets a valid gas limit', done => {
     setGasLimit('0x61a8', err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasLimit).toBe('0x61a8')
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasLimit).toBe('0x61a8')
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -598,9 +628,11 @@ describe('#setGasLimit', () => {
     request.data.gasPrice = weiToHex(gasPrice)
 
     setGasLimit(gasLimit, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -614,9 +646,11 @@ describe('#setGasLimit', () => {
     request.data.maxFeePerGas = weiToHex(maxFeePerGas)
 
     setGasLimit(gasLimit, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasLimit).toBe(weiToHex(maxLimit))
+        done()
+      } catch (e) { done(e) }
     })
   })
 
@@ -625,17 +659,21 @@ describe('#setGasLimit', () => {
     const highLimit = weiToHex(13e6)
 
     setGasLimit(highLimit, err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].data.gasLimit).toBe(maxLimit)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].data.gasLimit).toBe(maxLimit)
+        done()
+      } catch (e) { done(e) }
     })
   })
 
   it('updates the feesUpdatedByUser flag', done => {
     setGasLimit('0x61a8', err => {
-      expect(err).toBe(undefined)
-      expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
-      done()
+      try {
+        expect(err).toBeFalsy()
+        expect(Accounts.current().requests[1].feesUpdatedByUser).toBe(true)
+        done()
+      } catch (e) { done(e) }
     }, 1, true)
   })
 })
@@ -644,14 +682,12 @@ describe('#adjustNonce', () => {
   let onChainNonce
 
   const mockProxyProvider = {
-    default: {
-      emit: (event, payload, cb) => {
-        if (event === 'send' && payload.method === 'eth_getTransactionCount') {
-          return cb({ result: onChainNonce })
-        }
-
-        cb({ error: 'wrong call!' })
+    emit: (event, payload, cb) => {
+      if (event === 'send' && payload.method === 'eth_getTransactionCount') {
+        return cb({ result: onChainNonce })
       }
+
+      cb({ error: 'wrong call!' })
     }
   }
 

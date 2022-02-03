@@ -32,6 +32,10 @@ export enum Type {
   Lattice = 'lattice'
 }
 
+export function getType (typeValue: string) {
+  return Object.values(Type).find(type => type === typeValue)
+}
+
 export default class Signer extends EventEmitter {
   id = ''
   type = ''
