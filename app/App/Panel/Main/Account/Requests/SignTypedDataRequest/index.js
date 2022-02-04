@@ -27,9 +27,12 @@ class TransactionRequest extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = { allowInput: false, dataView: false }
+
+    const props = args[0] || {}
+
     setTimeout(() => {
       this.setState({ allowInput: true })
-    }, 2000)
+    }, props.signingDelay || 1500)
   }
 
   copyAddress (e) {

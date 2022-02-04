@@ -11,6 +11,10 @@ import AddTokenRequest from './AddTokenRequest'
 import link from '../../../../../../resources/link'
 import SignTypedDataRequest from './SignTypedDataRequest'
 
+function isHardwareSigner (account = {}) {
+  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+}
+
 class Requests extends React.Component {
   constructor (props, context) {
     super(props, context)
@@ -82,7 +86,10 @@ class Requests extends React.Component {
   // } 
 
   render () {
-    let requests = this.store('main.accounts', this.props.id, 'requests') || {}
+    const activeAccount =  this.store('main.accounts', this.props.id)
+    const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
+
+    let requests = activeAccount.requests || {}
     requests = Object.keys(requests).map(key => requests[key])
     // .filter(req => {
     //   if (req.type === 'transaction') return this.props.addresses.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
@@ -111,10 +118,6 @@ class Requests extends React.Component {
     const containMonitor = (monitor.length * monitorHeight) + 20
     const containHeight = containNormal + containMonitor + 40
 
-    const current = (this.store('selected.current') === this.props.id) && this.props.status === 'ok'
-    const open = current && this.store('selected.open')
-    // let minimized = this.store('selected.minimized')
-
     return (
       <div ref={this.moduleRef} className={this.store('selected.view') === 'default' ? 'signerRequests' : 'signerRequests signerRequestsHidden'}>
         {/* <div className='requestTitle'>
@@ -133,10 +136,10 @@ class Requests extends React.Component {
               const z = 2000 + i
               if (req.mode === 'normal') pos = (((normal.length - 1) - i) * 6) + 36
               if (req.mode === 'monitor') pos = containNormal + 10 + ((i - normal.length) * monitorHeight) + 55
-              if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} onTop={i === normal.length - 1} accountId={this.props.id} />
+              if (req.type === 'transaction') return <TransactionRequest key={req.handlerId} req={req} pos={pos} z={z} i={i} onTop={i === normal.length - 1} accountId={this.props.id} signingDelay={signingDelay} />
               if (req.type === 'access') return <ProviderRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
-              if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
-              if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
+              if (req.type === 'sign') return <SignatureRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} signingDelay={signingDelay} />
+              if (req.type === 'signTypedData') return <SignTypedDataRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} signingDelay={signingDelay} />
               if (req.type === 'addChain' || req.type === 'switchChain') return <ChainRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               if (req.type === 'addToken') return <AddTokenRequest key={req.handlerId} req={req} pos={pos} z={z} onTop={i === normal.length - 1} />
               return null
