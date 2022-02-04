@@ -641,8 +641,14 @@ export class Accounts extends EventEmitter {
 
   remove (address = '') {
     address = address.toLowerCase()
-    windows.broadcast('main:action', 'unsetSigner')
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.address === address) {
+      store.unsetAccount()
+    }
+
     if (this.accounts[address]) this.accounts[address].close()
+
     store.removeAccount(address)
     delete this.accounts[address]
   }
