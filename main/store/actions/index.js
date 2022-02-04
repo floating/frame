@@ -457,10 +457,17 @@ module.exports = {
       return [...existingBalances, ...newBalances]
     })
   },
-  removeBalance: (u, chainId, key) => {
-    u('main.balances', chainId, (balances = {}) => {
+  removeBalance: (u, chainId, address) => {
+    u('main.balances', (balances = {}) => {
+      const key = address.toLowerCase()
+
       for (const accountAddress in balances) {
-        delete balances[accountAddress][key.toLowerCase()]
+        const balanceIndex = balances[accountAddress]
+          .findIndex(balance => balance.chainId === chainId && balance.address.toLowerCase() === key)
+
+        if (balanceIndex > -1) {
+          balances[accountAddress].splice(balanceIndex, 1)
+        }
       }
 
       return balances
