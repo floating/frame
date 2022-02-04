@@ -304,11 +304,19 @@ describe('#removeBalance', () => {
     [owner]: [{
         ...testTokens.zrx,
         balance: addHexPrefix(BigNumber('798.564').toString(16))
+      },
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(BigNumber('15.543').toString(16))
       }
     ],
     '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': [{
       ...testTokens.zrx,
       balance: addHexPrefix(BigNumber('8201.343').toString(16))
+    },
+    {
+      ...testTokens.badger,
+      balance: addHexPrefix(BigNumber('101.988').toString(16))
     }]
   }
 
@@ -324,7 +332,9 @@ describe('#removeBalance', () => {
     removeBalance(testTokens.zrx.address)
 
     expect(balances[owner]).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
+    expect(balances[owner]).toHaveLength(1)
     expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
+    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).toHaveLength(1)
   })
 })
 
