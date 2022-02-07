@@ -832,14 +832,13 @@ class Account extends React.Component {
     // let currentIndex = this.store('main.accounts', this.props.id, 'index')
     // const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-    let address = this.store('main.accounts', this.props.id, 'address')
-    address = address || '0x'
-    let ensName = this.store('main.accounts', this.props.id, 'ensName')
+
+    // TODO: use active to render currently active account
+    const { address, ensName, active } = this.store('main.accounts', this.props.id)
+    const formattedAddress = address || '0x'
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
-
-    const { id } = this.store('main.currentNetwork')
 
     return this.props.status !== 'ok' ? (
       <div className='signerStatusNotOk'>{status}</div>
@@ -868,12 +867,12 @@ class Account extends React.Component {
               ) : ensName ? (
                 <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
               ) : (
-                <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
+                <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{formattedAddress.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {formattedAddress.substr(formattedAddress.length - 5)}</div>
               )
               }
             </div>
             <div className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}>
-              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}{svg.octicon('clippy', { height: 14 })}</span> : formattedAddress}
             </div>
           </div>
         </div>

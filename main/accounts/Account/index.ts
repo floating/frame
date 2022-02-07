@@ -65,6 +65,7 @@ class FrameAccount {
   accountObserver: Observer
 
   status = 'ok'
+  active = false
 
   constructor (params: AccountOptions, accounts: Accounts) {
     const { lastSignerType, name, ensName, created, address, smart, options = { } } = params
@@ -345,6 +346,7 @@ class FrameAccount {
       lastSignerType: this.lastSignerType,
       address: this.address,
       status: this.status,
+      active: this.active,
       signer: this.signer,
       smart: this.smart,
       requests: this.requests,
