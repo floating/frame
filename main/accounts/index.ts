@@ -70,7 +70,7 @@ export class Accounts extends EventEmitter {
   // Public
   addAragon (account: Account, cb: Callback<Account>) {
     const existing = accountsApi.getAccount(account.address)
-    if (existing) return cb(null, existing) // Account already exists...
+    if (existing.id) return cb(null, existing) // Account already exists
 
     log.info('Aragon account not found, creating account')
 

@@ -54,9 +54,12 @@ async function resolveName (name: string) {
           ensRegistryAddress: registryAddress()
         }
       }
+
       const address = await resolveAragon(domain, options.apm.ensRegistryAddress)
       const wrap = new Wrapper(address, options)
+
       await wrap.init()
+
       const subscription = wrap.apps.subscribe(apps => {
         subscription.unsubscribe()
         const appsSummary: Record<string, Record<string, string>> = {}
@@ -67,6 +70,7 @@ async function resolveName (name: string) {
         })
         if (!appsSummary.kernel) return reject(new Error('Unable to locate DAO kernel'))
         if (!appsSummary.agent) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
+
         resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.currentNetwork.id') })
       })
     } catch (e) {
