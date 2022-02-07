@@ -142,7 +142,9 @@ class TransactionRequest extends React.Component {
 
   render () {
     const req = this.props.req
+    const originalNotice = (req.notice || '').toLowerCase()
     let notice = req.notice
+
     const status = req.status
     const mode = req.mode
     const toAddress = req.data && req.data.to ? req.data.to : ''
@@ -178,8 +180,12 @@ class TransactionRequest extends React.Component {
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
-    if (notice && notice.toLowerCase().includes('insufficient funds for')) notice = 'insufficient funds for gas'
-    // const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
+
+    const insufficientFundsMatch = originalNotice.includes('insufficient funds')
+    if (insufficientFundsMatch) {
+      notice = originalNotice.includes('for gas') ? 'insufficient funds for gas' : 'insufficient funds'
+    }
+
     const txMeta = { replacement: false, possible: true, notice: '' }
     // TODO
     // if (signer locked) {
