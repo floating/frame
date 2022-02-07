@@ -178,7 +178,7 @@ class TransactionRequest extends React.Component {
     const confirmations = req.tx && req.tx.confirmations ? req.tx.confirmations : 0
     const statusClass = req.status === 'error' ? 'txStatus txStatusError' : 'txStatus'
     // if (!success && !error) statusClass += ' txStatusCompact'
-    if (notice && notice.toLowerCase().startsWith('insufficient funds for')) notice = 'insufficient funds'
+    if (notice && notice.toLowerCase().includes('insufficient funds for')) notice = 'insufficient funds for gas'
     // const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
     const txMeta = { replacement: false, possible: true, notice: '' }
     // TODO
