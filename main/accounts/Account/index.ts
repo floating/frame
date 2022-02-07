@@ -43,6 +43,7 @@ interface AccountOptions {
   created?: string,
   lastSignerType?: SignerType,
   smart?: SmartAccount,
+  active: boolean,
   options: SignerOptions
 }
 
@@ -68,7 +69,7 @@ class FrameAccount {
   active = false
 
   constructor (params: AccountOptions, accounts: Accounts) {
-    const { lastSignerType, name, ensName, created, address, smart, options = { } } = params
+    const { lastSignerType, name, ensName, created, address, smart, active, options = { } } = params
     this.accounts = accounts // Parent Accounts Module
 
     const formattedAddress = (address && address.toLowerCase()) || '0x'
