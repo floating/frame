@@ -30,7 +30,10 @@ class TxRecipient extends React.Component {
           </div>
           {req.data.to ? (
             <div className='_txRecipientSlice _txRecipientValue'>
-              <span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 4)}</span>
+              {req.recipient
+                ? <span>{req.recipient}</span>
+                : <span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{'req.data.to.substr(req.data.to.length - 4)'}</span>
+              }
               {req.decodedData && req.decodedData.contractName ? ( 
                 <span className={'_txRecipientContract'}>{(() => {
                   if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
