@@ -39,6 +39,15 @@ class Device {
     this.emit('trezor:needPhrase', this.device)
   }
 
+  enteringPhrase () {
+    this.emit('trezor:enteringPhrase', this.device)
+
+    TrezorConnect.uiResponse({
+      type: 'ui-receive_passphrase',
+      payload: { value: '', passphraseOnDevice: true }
+    })
+  }
+
   inputPin (pin, cb) {
     TrezorConnect.uiResponse({ device: this.device, type: 'ui-receive_pin', payload: pin })
     cb()
@@ -126,7 +135,16 @@ class Trezor {
         if (device) device.needPin()
       } else if (e.type === 'ui-request_passphrase') {
         const device = this.devices[e.payload.device.path]
-        if (device) device.needPhrase()
+
+        if (device) {
+          const capabilities = (device.device.features || {}).capabilities || []
+
+          if (capabilities.includes('Capability_PassphraseEntry')) {
+            device.enteringPhrase()
+          } else {
+            device.needPhrase()
+          }
+        }
       }
     })
     const manifest = { email: 'jordan@frame.sh', appUrl: 'https://frame.sh' }

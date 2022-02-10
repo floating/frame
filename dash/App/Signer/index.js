@@ -9,7 +9,8 @@ function isHardwareSigner (type = '') {
 }
 
 function isLoading (status = '') {
-  return ['loading', 'connecting', 'addresses', 'pairing'].includes(status.toLowerCase())
+  const statusToCheck = status.toLowerCase()
+  return ['loading', 'connecting', 'addresses', 'input', 'pairing'].some(s => statusToCheck.includes(s))
 }
 
 class Signer extends React.Component {
