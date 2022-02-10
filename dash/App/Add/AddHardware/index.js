@@ -1,6 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
 import Signer from '../../Signer'
@@ -13,7 +14,6 @@ class AddHardware extends React.Component {
   }
 
   render () {
-    const accounts = this.store('main.accounts')
     const signers = this.store('main.signers')
     const isType = id => this.store('main.signers', id, 'type') === this.props.type
     const toDevice = id => this.store('main.signers', id)
@@ -54,11 +54,22 @@ class AddHardware extends React.Component {
                 )
               })
             ) : (
-              <div className='addAccountItemDevice'>
-                <div className='addAccountItemDeviceTitle'>
-                  No Devices Found
+              <>
+                <div className='addAccountItemDevice'>
+                  <div className='addAccountItemDeviceTitle'>
+                    No Devices Found
+                  </div>
                 </div>
-              </div>
+                {
+                  this.deviceName === 'trezor'
+                    ? <div className='addAccountItemTrezorBridgeWarning'>
+                      <span>Don't see your Trezor? Make sure you've installed the </span>
+                      <span className='openBridgeUrl' onClick={() => link.send('tray:openExternal', 'https://wiki.trezor.io/Trezor_Bridge') }>Trezor bridge</span>
+                      <span> in order to connect</span>
+                    </div>
+                    : null
+                }
+              </>
             )}
           </div>
           <div
