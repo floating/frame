@@ -21,7 +21,7 @@ function validateNetworkSettings (network) {
 
 function includesToken (tokens, token) {
   const existingAddress = token.address.toLowerCase()
-  return tokens.some(t => 
+  return tokens.some(t =>
     t.address.toLowerCase() === existingAddress && t.chainId === token.chainId
   )
 }
@@ -188,6 +188,15 @@ module.exports = {
   setLatticeDerivation: (u, value) => {
     u('main.latticeSettings.derivation', () => value)
   },
+  setWebsocketProtocol: (u, value) => {
+    u('main.websocketProtocol', () => value)
+  },
+  setWebsocketSSLKeyFilePath: (u, value) => {
+    u('main.websocketProtocol.keyFilePath', () => value)
+  },
+  setWebsocketSSLCertFilePath: (u, value) => {
+    u('main.websocketProtocol.certFilePath', () => value)
+  },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
@@ -263,22 +272,22 @@ module.exports = {
         },
         connection: {
           presets: { local: 'direct' },
-          primary: { 
-            on: true, 
-            current: 'custom', 
-            status: 'loading', 
-            connected: false, 
-            type: '', 
-            network: '', 
+          primary: {
+            on: true,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
             custom: primaryRpc
           },
-          secondary: { 
-            on: false, 
-            current: 'custom', 
-            status: 'loading', 
-            connected: false, 
-            type: '', 
-            network: '', 
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
             custom: secondaryRpc
           }
         },
@@ -311,7 +320,7 @@ module.exports = {
     try {
       net.id = validateNetworkSettings(net)
       newNet.id = validateNetworkSettings(newNet)
-      
+
       u('main', main => {
         const updatedNetwork = Object.assign({}, main.networks[net.type][net.id], newNet)
 
@@ -320,7 +329,7 @@ module.exports = {
             updatedNetwork[k] = updatedNetwork[k].trim()
           }
         })
-        
+
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
 
@@ -329,7 +338,7 @@ module.exports = {
           main.currentNetwork.type = updatedNetwork.type
           main.currentNetwork.id = updatedNetwork.id
         }
-        
+
         return main
       })
     } catch (e) {
@@ -452,8 +461,8 @@ module.exports = {
       })
 
       // TODO: possibly add an option to filter out zero balances
-      //const withoutZeroBalances = Object.entries(updatedBalances)
-        //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
+      // const withoutZeroBalances = Object.entries(updatedBalances)
+      // .filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
       return [...existingBalances, ...newBalances]
     })
   },
