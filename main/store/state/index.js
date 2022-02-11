@@ -7,10 +7,10 @@ const latestStateVersion = () => {
   const state = persist.get('main')
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
-    return state 
+    return state
   }
 
-  // valid states are less than or equal to the latest migration we know about 
+  // valid states are less than or equal to the latest migration we know about
   const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
 
   if (versions.length === 0) {
@@ -183,6 +183,11 @@ const initial = {
       endpointMode: main('latticeSettings.endpointMode', 'default'),
       endpointCustom: main('latticeSettings.endpointCustom', '')
     },
+    websocketProtocol: main('websocketProtocol', 'http'),
+    websocketSSL: {
+      keyFilePath: main('websocketSSL.keyFilePath', ''),
+      certFilePath: main('websocketSSL.certFilePath', '')
+    },
     ledger: {
       derivation: main('ledger.derivation', 'live'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)
@@ -277,7 +282,7 @@ const initial = {
         }
       }
     },
-    networks: main('networks', { 
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
