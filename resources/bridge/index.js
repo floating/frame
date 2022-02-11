@@ -1,6 +1,31 @@
-import { ipcRenderer } from 'electron'
-// import state from '../../state'
+import { contextBridge, ipcRenderer } from 'electron'
 import rpc from './rpc'
+
+const validChannels = [
+  'open-file-dialog'
+]
+
+const listeners = validChannels.reduce((result, channel) => {
+  result[channel] = []
+  return result
+}, {})
+
+const invoke = (channel, ...data) =>
+  validChannels.includes(channel) ? ipcRenderer.invoke(channel, data) : Promise.reject(new Error('IPC channel not valid'))
+
+const on = (channel, listener) => {
+  if (!validChannels.includes(channel) || listeners[channel].includes(listener.toString())) {
+    return undefined
+  }
+  listeners[channel].push(listener.toString())
+  return ipcRenderer.on(channel, listener)
+}
+
+contextBridge.exposeInMainWorld('ipc', {
+  invoke,
+  on
+})
+// import state from '../../state'
 
 // const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
