@@ -58,6 +58,7 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   automaticFeeUpdateNotice?: {
     previousFee: any,
   },
+  recipient?: string, // ens name
   updatedFees?: boolean,
   feeAtTime?: string,
   warning?: string,

@@ -210,6 +210,40 @@ class FrameAccount {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
+  private async populateRequestCallData (req: TransactionRequest) {
+    const { to, data: calldata } = req.data || {}
+
+    if (calldata) {
+      try {
+        const decodedData = await abi.decodeCalldata(to || '', calldata)
+        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+
+        if (decodedData && knownTxRequest) {
+          knownTxRequest.decodedData = decodedData
+          this.update()
+        }
+      } catch (e) {
+        log.warn(e)
+      }
+    }
+  }
+
+  private async populateRequestEnsName (req: TransactionRequest) {
+    const { to } = req.data
+
+    try {
+      const ensName: string = ((await nebula.ens.reverseLookup([to])) || [])[0]
+      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+
+      if (ensName && knownTxRequest) {
+        knownTxRequest.recipient = ensName
+        this.update()
+      }
+    } catch (e) {
+      log.warn(e)
+    }
+  }
+
   addRequest (req: AccountRequest, res: RPCCallback<any> = () => {}) {
     const add = async (r: AccountRequest) => {
       this.requests[r.handlerId] = req
@@ -221,20 +255,8 @@ class FrameAccount {
       windows.broadcast('main:action', 'setSignerView', 'default')
       windows.broadcast('main:action', 'setPanelView', 'default')
       if ((req || {}).type === 'transaction') {
-        const txRequest = req as TransactionRequest
-        if (txRequest.data && txRequest.data.data) {
-          const { to, data } = txRequest.data
-          try {
-            const decodedData = await abi.decodeCalldata(to || '', data)
-            if (decodedData && this.requests[r.handlerId]) {
-              const knownTxRequest = this.requests[r.handlerId] as TransactionRequest
-              knownTxRequest.decodedData = decodedData
-              this.update()
-            }
-          } catch (e) {
-            log.warn(e)
-          }
-        }
+        this.populateRequestCallData(req as TransactionRequest)
+        this.populateRequestEnsName(req as TransactionRequest)
       }
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome

@@ -17,6 +17,8 @@ class TxRecipient extends React.Component {
   }
   render () {
     const req = this.props.req
+    const ensName = (req.recipient && req.recipient.length < 25) ? req.recipient : ''
+
     return (
       <div className='_txRecipient'>
         <div className='_txRecipientInner'>
@@ -30,7 +32,10 @@ class TxRecipient extends React.Component {
           </div>
           {req.data.to ? (
             <div className='_txRecipientSlice _txRecipientValue'>
-              <span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{req.data.to.substr(req.data.to.length - 4)}</span>
+              {ensName
+                ? <span>{ensName}</span>
+                : <span>{req.data.to.substring(0, 6)}{svg.octicon('kebab-horizontal', { height: 15 })}{'req.data.to.substr(req.data.to.length - 4)'}</span>
+              }
               {req.decodedData && req.decodedData.contractName ? ( 
                 <span className={'_txRecipientContract'}>{(() => {
                   if (req.decodedData.contractName.length > 11) return `${req.decodedData.contractName.substr(0, 9)}..`
