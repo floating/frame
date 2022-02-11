@@ -135,6 +135,7 @@
     "nebula": "0.1.2",
     "node-fetch": "2.6.7",
     "node-hid": "2.1.1",
+    "node-openssl-cert": "^0.1.40",
     "query-string": "7.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -198,5 +199,9 @@
       "react/no-find-dom-node": 0
     }
   },
+  "browserslist": [
+    "electron >= 15",
+    "node >= 16"
+  ],
   "repository": "github:floating/frame"
 }
