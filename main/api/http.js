@@ -1,4 +1,6 @@
 const http = require('http')
+const https = require('https')
+const fs = require('fs')
 const log = require('electron-log')
 
 const provider = require('../provider').default
@@ -120,4 +122,23 @@ provider.on('data:address', (account, payload) => { // Make sure the subscriptio
   }
 })
 
-module.exports = () => http.createServer(handler)
+module.exports = {
+  http: () => http.createServer(handler),
+  https: () => {
+    const keyFilePath = store('main.websocketSSL.keyFilePath') || ''
+    const certFilePath = store('main.websocketSSL.certFilePath') || ''
+
+    if (keyFilePath && certFilePath) {
+      try {
+        const httpsOpts = {
+          key: fs.readFileSync(keyFilePath),
+          cert: fs.readFileSync(certFilePath)
+          // ca: fs.readFileSync('/path/to/ca.pem')
+        }
+        return https.createServer(httpsOpts, handler)
+      } catch (e) {
+        log.error('Error creating HTTPS server')
+      }
+    }
+  }
+}
