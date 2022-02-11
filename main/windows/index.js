@@ -544,10 +544,7 @@ ipcMain.on('tray:mouseout', () => {
 
 ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y) })
 
-ipcMain.handle('open-file-dialog', (event, [options]) => {
-  console.log('opening dialog', options)
-  return dialog.showOpenDialog(windows.tray, options)
-})
+ipcMain.handle('open-file-dialog', (event, [options]) => dialog.showOpenDialog(windows.tray, options))
 
 // ipcMain.on('*:installDapp', async (e, domain) => {
 //   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
