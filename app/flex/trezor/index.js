@@ -1,6 +1,12 @@
-const TrezorConnect = require('trezor-connect').default
-const { DEVICE_EVENT, DEVICE } = require('trezor-connect')
 const EventEmitter = require('events')
+const {
+  default: TrezorConnect,
+  DEVICE_EVENT,
+  DEVICE,
+  UI_EVENT,
+  UI
+} = require('trezor-connect')
+
 const events = new EventEmitter()
 events.setMaxListeners(128)
 let ready = false
@@ -43,18 +49,18 @@ class Device {
     this.emit('trezor:enteringPhrase', this.device)
 
     TrezorConnect.uiResponse({
-      type: 'ui-receive_passphrase',
+      type: UI.RECEIVE_PASSPHRASE,
       payload: { value: '', passphraseOnDevice: true }
     })
   }
 
   inputPin (pin, cb) {
-    TrezorConnect.uiResponse({ device: this.device, type: 'ui-receive_pin', payload: pin })
+    TrezorConnect.uiResponse({ device: this.device, type: UI.RECEIVE_PIN, payload: pin })
     cb()
   }
 
   inputPhrase (phrase, cb) {
-    TrezorConnect.uiResponse({ device: this.device, type: 'ui-receive_passphrase', payload: { value: phrase } })
+    TrezorConnect.uiResponse({ device: this.device, type: UI.RECEIVE_PASSPHRASE, payload: { value: phrase } })
     cb()
   }
 
@@ -112,6 +118,7 @@ class Trezor {
   constructor (emit) {
     this.emit = emit
     this.devices = {}
+
     TrezorConnect.on(DEVICE_EVENT, e => {
       if (e.type === DEVICE.CONNECT || e.type === DEVICE.CHANGED) {
         // when plugging in the Trezor, the first event can sometimes be "unacquired" which
@@ -129,11 +136,12 @@ class Trezor {
         delete this.devices[e.payload.path]
       }
     })
-    TrezorConnect.on('UI_EVENT', e => {
-      if (e.type === 'ui-request_pin') {
+
+    TrezorConnect.on(UI_EVENT, e => {
+      if (e.type === UI.REQUEST_PIN) {
         const device = this.devices[e.payload.device.path]
         if (device) device.needPin()
-      } else if (e.type === 'ui-request_passphrase') {
+      } else if (e.type === UI.REQUEST_PASSPHRASE) {
         const device = this.devices[e.payload.device.path]
 
         if (device) {
@@ -147,8 +155,10 @@ class Trezor {
         }
       }
     })
+
     const manifest = { email: 'jordan@frame.sh', appUrl: 'https://frame.sh' }
     const config = { manifest, popup: false, webusb: false, debug: false, lazyLoad: false }
+
     try {
       TrezorConnect.init(config).then(() => {
         ready = true
