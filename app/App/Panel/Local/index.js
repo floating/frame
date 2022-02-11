@@ -459,23 +459,11 @@ class Settings extends React.Component {
                 this.state.websocketProtocol === 'https' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'
               }
             >
-              <input
-                type='file'
-                tabIndex='-1'
-                placeholder='/path/to/key.pem'
-                value={this.state.websocketSSL.keyFilePath}
-                onChange={(e) => {}}
-              />
-              <input
-                type='file'
-                tabIndex='-1'
-                placeholder='/path/to/cert.pem'
-                value={this.state.websocketSSL.certFilePath}
-                onChange={(e) => {}}
-              />
-              <input type='button' onClick={() => {}}>
+              <input tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath} onChange={(e) => {}} />
+              <input tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath} onChange={(e) => {}} />
+              <button type='button' className='settingsButton' onClick={() => {}}>
                 Generate Certificate
-              </input>
+              </button>
             </div>
           </div>
 
