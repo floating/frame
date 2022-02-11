@@ -74,9 +74,10 @@ class TransactionRequest extends React.Component {
       id: parseInt(props.req.data.chainId, 'hex')
     }
     this.state = { allowInput: false, dataView: false }
+
     setTimeout(() => {
       this.setState({ allowInput: true })
-    }, 1700)
+    }, props.signingDelay || 1500)
   }
 
   copyAddress (data) {
