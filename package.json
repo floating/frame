@@ -24,7 +24,7 @@
         ]
       },
       "hardenedRuntime": true,
-      "gatekeeperAssess": false,
+      "gatekeeperAssess": true,
       "entitlements": "build/entitlements.mac.plist",
       "requirements": "build/electron-builder-requirements.txt"
     },
@@ -65,7 +65,8 @@
     "prod": "npm run compile && npm run bundle && npm run launch",
     "hot": "npm run compile && npm run bundle && npm run launch:hot",
     "clean": "rimraf dist bundle compiled .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm cache clean --force && npm install && npm audit fix && npm run bundle",
-    "scrub": "npx rimraf dist bundle compiled .cache node_modules && npm install",
+    "scrub": "npx rimraf dist bundle compiled .cache node_modules && npm run setup",
+    "setup": "npm install && allow-scripts",
     "watch:compile": "shx mkdir -p ./compiled/main/windows && npm run copy-assets && tsc -w",
     "compile": "tsc && npm run copy-assets",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
@@ -161,6 +162,8 @@
     "@babel/preset-env": "7.16.11",
     "@babel/preset-react": "7.16.7",
     "@babel/preset-typescript": "7.16.7",
+    "@lavamoat/allow-scripts": "^2.0.0",
+    "@lavamoat/preinstall-always-fail": "^1.0.0",
     "@ledgerhq/hw-transport-mocker": "6.20.0",
     "@nomiclabs/hardhat-waffle": "2.0.2",
     "@types/cookie": "0.4.1",
@@ -171,7 +174,6 @@
     "@types/node-fetch": "2.5.12",
     "@types/node-hid": "1.3.1",
     "babel-eslint": "10.1.0",
-    "cli-sleep": "1.0.1",
     "electron": "15.3.2",
     "electron-builder": "22.14.5",
     "electron-notarize": "1.1.1",
@@ -199,5 +201,30 @@
       "react/no-find-dom-node": 0
     }
   },
-  "repository": "github:floating/frame"
+  "repository": "github:floating/frame",
+  "lavamoat": {
+    "allowScripts": {
+      "@aragon/wrapper>@aragon/os>@aragon/truffle-config-v4>@truffle/hdwallet-provider>@ethereumjs/common>ethereumjs-util>ethereum-cryptography>keccak": true,
+      "@aragon/wrapper>@aragon/os>@aragon/truffle-config-v4>@truffle/hdwallet-provider>@ethereumjs/common>ethereumjs-util>ethereum-cryptography>secp256k1": true,
+      "@aragon/wrapper>radspec>date-fns": true,
+      "@aragon/wrapper>radspec>web3-eth>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>bufferutil": true,
+      "@aragon/wrapper>radspec>web3-eth>web3-core>web3-core-requestmanager>web3-providers-ws>websocket>utf-8-validate": true,
+      "@aragon/wrapper>web3": true,
+      "@aragon/wrapper>web3>web3-core>web3-core-requestmanager>web3-providers-ws>@web3-js/websocket": true,
+      "@aragon/wrapper>web3>web3-eth>web3-eth-accounts>@web3-js/scrypt-shim": true,
+      "@babel/node>core-js": true,
+      "@lavamoat/preinstall-always-fail": false,
+      "@ledgerhq/hw-transport-node-hid-noevents>node-hid": true,
+      "@ledgerhq/hw-transport-node-hid-singleton>usb-detection": true,
+      "babel-polyfill>babel-runtime>core-js": true,
+      "babel-polyfill>core-js": true,
+      "electron": true,
+      "gridplus-sdk": false,
+      "hardhat>@ethereumjs/vm>core-js-pure": true,
+      "nebula>ipfs-http-client>ipfs-core-utils>ipfs-unixfs>protobufjs": true,
+      "parcel-bundler": true,
+      "parcel-bundler>deasync": true,
+      "react-restore>babel-core>babel-register>core-js": true
+    }
+  }
 }
