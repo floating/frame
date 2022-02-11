@@ -459,8 +459,8 @@ class Settings extends React.Component {
                 this.state.websocketProtocol === 'https' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'
               }
             >
-              <input tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath} onChange={(e) => {}} />
-              <input tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath} onChange={(e) => {}} />
+              <input tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath} onFocus={(e) => window.ipc.invoke('open-file-dialog', { message: 'Select a certificate key file', filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })} onChange={(e) => {}} />
+              <input tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath} onFocus={(e) => window.ipc.invoke('open-file-dialog', { message: 'Select a certificate cert file', filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })} onChange={(e) => {}} />
               <button type='button' className='settingsButton' onClick={() => {}}>
                 Generate Certificate
               </button>
