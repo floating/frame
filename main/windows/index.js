@@ -546,7 +546,7 @@ ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y
 
 ipcMain.handle('open-file-dialog', (event, [options]) => {
   console.log('opening dialog', options)
-  dialog.showOpenDialog(windows.tray, options)
+  return dialog.showOpenDialog(windows.tray, options)
 })
 
 // ipcMain.on('*:installDapp', async (e, domain) => {

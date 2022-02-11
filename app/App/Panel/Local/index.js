@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component, createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
@@ -6,7 +6,7 @@ import svg from '../../../../resources/svg'
 
 import Dropdown from '../../Components/Dropdown'
 
-class Settings extends React.Component {
+class Settings extends Component {
   constructor (props, context) {
     super(props, context)
     this.customMessage = 'Custom Endpoint'
@@ -29,6 +29,8 @@ class Settings extends React.Component {
         this.setState({ primaryCustom, secondaryCustom })
       }
     })
+    this.webSocketSSLKeyFileInput = createRef()
+    this.webSocketSSLCertFileInput = createRef()
   }
 
   appInfo () {
@@ -118,6 +120,24 @@ class Settings extends React.Component {
     this.setState({ latticeEndpoint: value })
     // TODO: Update to target specific Lattice device rather than global
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
+  }
+
+  async inputWebSocketSSLKeyFile (e) {
+    e.preventDefault()
+    this.webSocketSSLKeyFileInput.current.blur()
+    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate key file', filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })
+    if (!canceled) {
+      this.setState({ websocketSSL: { keyFilePath: filePaths } })
+    }
+  }
+
+  async inputWebSocketSSLCertFile (e) {
+    e.preventDefault()
+    this.webSocketSSLCertFileInput.current.blur()
+    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate cert file', filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })
+    if (!canceled) {
+      this.setState({ websocketSSL: { certFilePath: filePaths } })
+    }
   }
 
   localShake (key) {
@@ -459,8 +479,14 @@ class Settings extends React.Component {
                 this.state.websocketProtocol === 'https' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'
               }
             >
-              <input tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath} onFocus={(e) => window.ipc.invoke('open-file-dialog', { message: 'Select a certificate key file', filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })} onChange={(e) => {}} />
-              <input tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath} onFocus={(e) => window.ipc.invoke('open-file-dialog', { message: 'Select a certificate cert file', filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })} onChange={(e) => {}} />
+              <input
+                tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath}
+                onFocus={e => this.inputWebSocketSSLKeyFile(e)} onChange={(e) => {}} ref={this.webSocketSSLKeyFileInput}
+              />
+              <input
+                tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath}
+                onFocus={e => this.inputWebSocketSSLCertFile(e)} onChange={(e) => {}} ref={this.webSocketSSLCertFileInput}
+              />
               <button type='button' className='settingsButton' onClick={() => {}}>
                 Generate Certificate
               </button>
