@@ -1,3 +1,6 @@
+
+import { promisify } from 'util'
+import fs from 'fs'
 import FrameManager from './frames'
 
 const electron = require('electron')
@@ -545,6 +548,106 @@ ipcMain.on('tray:mouseout', () => {
 ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y) })
 
 ipcMain.handle('open-file-dialog', (event, [options]) => dialog.showOpenDialog(windows.tray, options))
+
+ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
+  const NodeOpenSSL = require('node-openssl-cert')
+  const openssl = new NodeOpenSSL()
+
+  const rsakeyoptions = {
+    encryption: {
+      password: 'test',
+      cipher: 'des3'
+    },
+    rsa_keygen_bits: 2048,
+    format: 'PKCS8'
+  }
+  const csroptions = {
+    hash: 'sha512',
+    days: 240,
+    subject: {
+      organizationName: 'Frame Labs',
+      organizationalUnitName: [
+        'IT'
+      ],
+      commonName: [
+        'frame.sh',
+        'www.frame.sh'
+      ],
+      emailAddress: 'support@frame.sh'
+    }
+  }
+
+  const generateRSAPrivateKey = promisify(openssl.generateRSAPrivateKey).bind(openssl)
+  const generateCSR = promisify(openssl.generateCSR).bind(openssl)
+  const selfSignCSR = promisify(openssl.selfSignCSR).bind(openssl)
+  const writeFile = promisify(fs.writeFile).bind(fs)
+
+  let pkey
+  let csr
+  let crt
+
+  try {
+    pkey = await generateRSAPrivateKey(rsakeyoptions)
+  } catch (e) {
+    console.log('private key generation error', e)
+  }
+  try {
+    // currently failing here - unpromisified version works, dammit
+    csr = await generateCSR(csroptions, pkey, 'frame')
+  } catch (e) {
+    console.log('csr generation error', e)
+  }
+
+  try {
+    crt = await selfSignCSR(csr, csroptions, pkey, 'frame')
+  } catch (e) {
+    console.log('self signing error', e)
+  }
+
+  const userDataPath = app.getPath('userData')
+  const certFilePath = path.join(userDataPath, 'frame_crt.pem')
+  const keyFilePath = path.join(userDataPath, 'frame_key.pem')
+
+  const certFileError = await writeFile(certFilePath, crt)
+  console.log('certFileError', certFileError)
+  const keyFileError = await writeFile(keyFilePath, pkey)
+  console.log('keyFileError', keyFileError)
+
+  return Promise.resolve({ certFilePath, keyFilePath })
+  // console.log(cmd1)
+
+  // openssl.generateRSAPrivateKey(rsakeyoptions, (err, key, cmd) => {
+  //   console.log(cmd)
+  //   console.log(err)
+  //   openssl.generateCSR(csroptions, key, 'test', (err, csr, cmd) => {
+  //     if (err) {
+  //       console.log(err)
+  //       console.log(cmd.files.config)
+  //     } else {
+  //       console.log(cmd)
+  //       // console.log(csr);
+  //       // console.log(cmd.files.config);
+  //       csroptions.days = 240
+  //       openssl.selfSignCSR(csr, csroptions, key, 'test', (err, crt, cmd) => {
+  //         if (err) {
+  //           console.log(err)
+  //           console.log(cmd.files.config)
+  //         } else {
+  //           console.log(cmd.command)
+  //           console.log(crt)
+  //           console.log(cmd.files.config)
+  //         }
+  //       })
+  //     }
+  //   })
+  // })
+
+  // openssl.selfSignCSRv2({ options: {} }, (err, key, cmd) => {
+  //   console.log(cmd)
+  //   console.log(key)
+  //   console.log(err)
+  // })
+})
 
 // ipcMain.on('*:installDapp', async (e, domain) => {
 //   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
