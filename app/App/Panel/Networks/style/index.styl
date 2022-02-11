@@ -74,7 +74,6 @@
     right 0
     bottom 0
     width 100%
-    height 100%
     border none 
     outline none
     background transparent
@@ -261,6 +260,27 @@
   justify-content flex-start
   align-items center
   padding 20px
+
+.settingsButton
+  width 100%
+  color white
+  border-radius 12px
+  height 40px
+  font-size 13px
+  text-transform uppercase
+  font-weight 400
+  letter-spacing 1px
+  display flex
+  justify-content center
+  align-items center
+  background var(--ghostB)
+  transition var(--standardFast)
+  cursor pointer
+  * 
+    pointer-events none
+
+  .settingsButton:hover
+    background var(--ghostC)
 
 .viewLicense
   width 100%
@@ -522,11 +542,7 @@
   z-index 20
 
   input
-    position absolute
-    top 0
-    right 0
-    bottom 0
-    left 0px
+    position relative
     outline none
     border none
     width 100%
@@ -541,7 +557,7 @@
 .connectionCustomInputOn
   margin-top 10px
   margin-bottom 2px
-  height 35px
+  height auto
   opacity 1
 
 .signerPermissionNetwork
