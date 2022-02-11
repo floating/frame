@@ -228,7 +228,7 @@ const api = {
       // hideShow.running = 'hide'
 
     if (windows && windows.tray) {
-      windows.tray.send('main:action', 'trayOpen', false)
+      store.trayOpen(false)
       if (store('main.reveal')) detectMouse()
       // windows.tray.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       // windows.tray.setAlwaysOnTop(false)
@@ -263,6 +263,7 @@ const api = {
     const pos = topRight(windows.tray) // windows.tray.positioner.calculate('topRight')
     windows.tray.setPosition(pos.x, pos.y)
     if (!glide) windows.tray.focus()
+    store.trayOpen(true)
     windows.tray.emit('show')
     windows.tray.show()
     events.emit('tray:show')

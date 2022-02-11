@@ -12,8 +12,9 @@ let activeAddress: Address
 let trackedAddresses: Address[] = []
 let connectedChains: number[] = []
 let outstandingScans = 0
+let activeScanInterval = 30 * 1000 // 30 seconds
 
-let allNetworksObserver: Observer, tokenObserver: Observer
+let allNetworksObserver: Observer, tokenObserver: Observer, trayObserver: Observer
 let scanWorker: ChildProcess | null
 let heartbeat: NullableTimeout,
     trackedAddressScan: NullableTimeout,
@@ -274,14 +275,23 @@ function sendCommandToWorker (command: string, args: any[] = []) {
   scanWorker.send({ command, args })
 }
 
-function startScan (fn: () => void, interval: number) {
+function startScan (fn: () => void, interval: number | (() => number)) {
   setTimeout(fn, 0)
-  return setInterval(fn, interval)
+  return performScan(fn, interval)
+}
+
+function performScan (fn: () => void, interval: number | (() => number)) {
+  const timeoutInterval = (typeof interval === 'number') ? interval : interval()
+
+  return setTimeout(() => {
+    fn()
+    performScan(fn, interval)
+  }, timeoutInterval)
 }
 
 function scanNetworkCurrencyRates () {
   if (nativeCurrencyScan) {
-    clearInterval(nativeCurrencyScan)
+    clearTimeout(nativeCurrencyScan)
   }
 
   nativeCurrencyScan = startScan(() => {
@@ -298,15 +308,15 @@ function scanActiveData () {
   }
 
   if (trackedAddressScan) {
-    clearInterval(trackedAddressScan)
+    clearTimeout(trackedAddressScan)
   }
 
   if (inventoryScan) {
-    clearInterval(inventoryScan)
+    clearTimeout(inventoryScan)
   }
 
-  // update balances for the active account every 15 seconds
-  trackedAddressScan = startScan(updateActiveBalances, 1000 * 15)
+  // update balances for the active account every 30 seconds
+  trackedAddressScan = startScan(updateActiveBalances, () => activeScanInterval)
 
   // update inventory for the active account every 60 seconds
   inventoryScan = startScan(() => updateInventory(), 1000 * 60)
@@ -387,6 +397,11 @@ function startScanning () {
     }
   })
 
+  trayObserver = store.observer(() => {
+    const open = store('tray.open')
+    activeScanInterval = open ? 30 * 1000 : 3 * 60 * 1000
+  }, 'externalData:tray')
+
   if (!heartbeat) {
     heartbeat = startScan(sendHeartbeat, 1000 * 20)
   }
@@ -410,9 +425,10 @@ function stop () {
 
   allNetworksObserver.remove()
   tokenObserver.remove()
+  trayObserver.remove()
 
   const scanners = [heartbeat, trackedAddressScan, nativeCurrencyScan, inventoryScan]
-  scanners.forEach(scanner => { if (scanner) clearInterval(scanner) })
+  scanners.forEach(scanner => { if (scanner) clearTimeout(scanner) })
 
   const resets = [scanningReset, ratesPause]
   resets.forEach(reset => { if (reset) clearTimeout(reset) })
