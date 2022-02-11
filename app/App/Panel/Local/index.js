@@ -140,6 +140,12 @@ class Settings extends Component {
     }
   }
 
+  async generateCertificateButtonClicked (e) {
+    e.preventDefault()
+    const { certFilePath, keyFilePath } = await window.ipc.invoke('generate-ssl-cert', {})
+    this.setState({ websocketSSL: { certFilePath, keyFilePath } })
+  }
+
   localShake (key) {
     const localShake = Object.assign({}, this.state.localShake)
     localShake[key] = true
@@ -481,13 +487,13 @@ class Settings extends Component {
             >
               <input
                 tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath}
-                onFocus={e => this.inputWebSocketSSLKeyFile(e)} onChange={(e) => {}} ref={this.webSocketSSLKeyFileInput}
+                onFocus={e => this.inputWebSocketSSLKeyFile(e)} ref={this.webSocketSSLKeyFileInput}
               />
               <input
                 tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath}
-                onFocus={e => this.inputWebSocketSSLCertFile(e)} onChange={(e) => {}} ref={this.webSocketSSLCertFileInput}
+                onFocus={e => this.inputWebSocketSSLCertFile(e)} ref={this.webSocketSSLCertFileInput}
               />
-              <button type='button' className='settingsButton' onClick={() => {}}>
+              <button type='button' className='settingsButton' onClick={(e) => this.generateCertificateButtonClicked(e)}>
                 Generate Certificate
               </button>
             </div>
