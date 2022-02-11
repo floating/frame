@@ -122,7 +122,7 @@ class Settings extends Component {
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
   }
 
-  async inputWebSocketSSLKeyFile (e) {
+  async webSocketSSLKeyFileInputFocusHandler (e) {
     e.preventDefault()
     this.webSocketSSLKeyFileInput.current.blur()
     const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate key file', defaultPath: this.state.websocketSSL.keyFilePath, filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })
@@ -131,7 +131,7 @@ class Settings extends Component {
     }
   }
 
-  async inputWebSocketSSLCertFile (e) {
+  async webSocketSSLCertFileInputFocusHandler (e) {
     e.preventDefault()
     this.webSocketSSLCertFileInput.current.blur()
     const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate cert file', defaultPath: this.state.websocketSSL.certFilePath, filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })
@@ -140,7 +140,7 @@ class Settings extends Component {
     }
   }
 
-  async generateCertificateButtonClicked (e) {
+  async generateCertificateButtonClickHandler (e) {
     e.preventDefault()
     const { certFilePath, keyFilePath } = await window.ipc.invoke('generate-ssl-cert', {})
     this.setState({ websocketSSL: { certFilePath, keyFilePath } })
@@ -487,13 +487,13 @@ class Settings extends Component {
             >
               <input
                 tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath}
-                onFocus={e => this.inputWebSocketSSLKeyFile(e)} ref={this.webSocketSSLKeyFileInput}
+                onFocus={e => this.webSocketSSLKeyFileInputFocusHandler(e)} ref={this.webSocketSSLKeyFileInput}
               />
               <input
                 tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath}
-                onFocus={e => this.inputWebSocketSSLCertFile(e)} ref={this.webSocketSSLCertFileInput}
+                onFocus={e => this.webSocketSSLCertFileInputFocusHandler(e)} ref={this.webSocketSSLCertFileInput}
               />
-              <button type='button' className='settingsButton' onClick={(e) => this.generateCertificateButtonClicked(e)}>
+              <button type='button' className='settingsButton' onClick={(e) => this.generateCertificateButtonClickHandler(e)}>
                 Generate Certificate
               </button>
             </div>
