@@ -39,7 +39,8 @@ interface Collection {
 }
 
 async function fetchAssets (address: Address, offset: number) {
-  const url = `https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
+  const url = `http://proxy.pylon.link?type=api&target=https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
+
   const options = {
     method: 'GET',
     headers: {
