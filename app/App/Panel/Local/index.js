@@ -16,7 +16,9 @@ class Settings extends React.Component {
     const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
     const latticeEndpoint = context.store('main.latticeSettings.endpointCustom')
     const latticeEndpointMode = context.store('main.latticeSettings.endpointMode')
-    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeEndpointMode, resetConfirm: false, expandNetwork: false }
+    const websocketProtocol = context.store('main.websocketProtocol')
+    const websocketSSL = context.store('main.websocketSSL')
+    this.state = { localShake: {}, primaryCustom, secondaryCustom, latticeEndpoint, latticeEndpointMode, websocketProtocol, websocketSSL, resetConfirm: false, expandNetwork: false }
     context.store.observer(() => {
       const { type, id } = context.store('main.currentNetwork')
       if (this.network !== id || this.networkType !== type) {
@@ -157,7 +159,7 @@ class Settings extends React.Component {
 
   discord () {
     return (
-      <div className='discordInvite' onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY') }>
+      <div className='discordInvite' onClick={() => link.send('tray:openExternal', 'https://discord.gg/UH7NGqY')}>
         <div>Need help?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
@@ -227,7 +229,7 @@ class Settings extends React.Component {
             <div>Inject a connection with our browser extension!</div>
           </div>
           <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh')}>
               Feature Requests
             </div>
           </div>
@@ -350,7 +352,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'Derivation path for connected Trezor devices'}
+              Derivation path for connected Trezor devices
             </div>
           </div>
           <div className='signerPermission localSetting' style={{ zIndex: 206 }}>
@@ -363,7 +365,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'Derivation path for connected Ledger devices'}
+              Derivation path for connected Ledger devices
             </div>
           </div>
           {this.store('main.ledger.derivation') === 'live' ? (
@@ -396,7 +398,7 @@ class Settings extends React.Component {
               />
             </div>
             <div className='signerPermissionDetails'>
-              {'Derivation path for connected Lattice devices'}
+              Derivation path for connected Lattice devices
             </div>
           </div>
           <div className='signerPermission localSetting' style={{ zIndex: 203 }}>
@@ -409,7 +411,7 @@ class Settings extends React.Component {
                   { text: '5', value: 5 },
                   { text: '10', value: 10 },
                   { text: '20', value: 20 },
-                  { text: '40', value: 40 },
+                  { text: '40', value: 40 }
                 ]}
               />
             </div>
@@ -421,16 +423,59 @@ class Settings extends React.Component {
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Lattice Relay</div>
               <Dropdown
-                  syncValue={this.store('main.latticeSettings.endpointMode')}
-                  onChange={(value) => {
-                    link.send('tray:action', 'setLatticeEndpointMode', value)
-                    this.setState({ latticeEndpointMode: value })
-                  }}
-                  options={[{ text: 'Default', value: 'default' }, { text: 'Custom', value: 'custom' }]}
+                syncValue={this.store('main.latticeSettings.endpointMode')}
+                onChange={(value) => {
+                  link.send('tray:action', 'setLatticeEndpointMode', value)
+                  this.setState({ latticeEndpointMode: value })
+                }}
+                options={[{ text: 'Default', value: 'default' }, { text: 'Custom', value: 'custom' }]}
               />
             </div>
             <div className={this.state.latticeEndpointMode === 'custom' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'}>
-              <input tabIndex='-1' placeholder={'Custom Relay'} value={this.state.latticeEndpoint} onChange={e => this.inputLatticeEndpoint(e)} />
+              <input tabIndex='-1' placeholder='Custom Relay' value={this.state.latticeEndpoint} onChange={e => this.inputLatticeEndpoint(e)} />
+            </div>
+          </div>
+
+          <div
+            className='signerPermission localSetting'
+            style={{ zIndex: 202 }}
+          >
+            <div className='signerPermissionControls'>
+              <div className='signerPermissionSetting'>WebSocket Protocol</div>
+              <Dropdown
+                syncValue={this.store('main.websocketProtocol')}
+                onChange={(value) => {
+                  link.send('tray:action', 'setWebsocketProtocol', value)
+                  this.setState({ websocketProtocol: value })
+                }}
+                options={[
+                  { text: 'HTTP', value: 'http' },
+                  { text: 'HTTPS', value: 'https' }
+                ]}
+              />
+            </div>
+            <div
+              className={
+                this.state.websocketProtocol === 'https' ? 'connectionCustomInput connectionCustomInputOn' : 'connectionCustomInput'
+              }
+            >
+              <input
+                type='file'
+                tabIndex='-1'
+                placeholder='/path/to/key.pem'
+                value={this.state.websocketSSL.keyFilePath}
+                onChange={(e) => {}}
+              />
+              <input
+                type='file'
+                tabIndex='-1'
+                placeholder='/path/to/cert.pem'
+                value={this.state.websocketSSL.certFilePath}
+                onChange={(e) => {}}
+              />
+              <input type='button' onClick={() => {}}>
+                Generate Certificate
+              </input>
             </div>
           </div>
 
