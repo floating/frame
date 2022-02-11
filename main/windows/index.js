@@ -1,5 +1,7 @@
+import FrameManager from './frames'
+
 const electron = require('electron')
-const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut } = electron
+const { app, BrowserWindow, ipcMain, Tray, Menu, globalShortcut, dialog } = electron
 const url = require('url')
 const path = require('path')
 const log = require('electron-log')
@@ -10,8 +12,6 @@ const events = new EventEmitter()
 const store = require('../store').default
 
 const extractColors = require('./extractColors').default
-
-import FrameManager from './frames'
 
 // const dapp = require('./dappOld')
 const winSession = e => e.sender.webContents.browserWindowOptions.session
@@ -232,7 +232,7 @@ const api = {
     //   hideShow.next = false
     //   if (hideShow.running !== 'hide') hideShow.next = 'hide'
     // } else {
-      // hideShow.running = 'hide'
+    // hideShow.running = 'hide'
 
     if (windows && windows.tray) {
       windows.tray.send('main:action', 'trayOpen', false)
@@ -278,10 +278,9 @@ const api = {
     // windows.tray.send('main:action', 'trayOpen', true)
     // windows.tray.send('main:action', 'setSignerView', 'default')
 
-     // if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
+    // if (hideShow.next === 'hide') setTimeout(() => api.hideTray(), 0)
     // hideShow.running = false
     // hideShow.next = false
-
   },
   close: (e) => {
     const win = BrowserWindow.fromWebContents(e.sender)
@@ -385,7 +384,7 @@ const api = {
     windows.flow.setResizable(false) // Keeps height consistant
     // const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
     // windows.tray.setSize(358, dev ? 740 : area.height)
-    const {x, y} = center(windows.flow) // windows.tray.positioner.calculate('topRight')
+    const { x, y } = center(windows.flow) // windows.tray.positioner.calculate('topRight')
     windows.flow.setPosition(x, y)
     // if (!glide) windows.tray.focus()
     // windows.flow.emit('show')
@@ -449,7 +448,7 @@ const api = {
     // if (!windows.tray) return api.tray()
     // windows.flow.setPosition(0, 0)
     // console.log('send type to dash window', type)
-    //store.setDashType(type)
+    // store.setDashType(type)
     setTimeout(() => {
       windows.dash.setAlwaysOnTop(true)
       // hideShow.running = 'show'
@@ -457,7 +456,7 @@ const api = {
       windows.dash.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
       windows.dash.setSize(360, dev && !fullheight ? 740 - 120 : area.height - 120)
-      const {x, y} = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
+      const { x, y } = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
       windows.dash.setPosition(x - 380, y + 60)
       // if (!glide) windows.tray.focus()
       // windows.flow.emit('show')
@@ -545,6 +544,10 @@ ipcMain.on('tray:mouseout', () => {
 
 ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y) })
 
+ipcMain.handle('open-file-dialog', (event, [options]) => {
+  console.log('opening dialog', options)
+  dialog.showOpenDialog(windows.tray, options)
+})
 
 // ipcMain.on('*:installDapp', async (e, domain) => {
 //   await dapps.add(domain, {}, err => { if (err) console.error('error adding...', err) })
@@ -556,7 +559,6 @@ ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y
 //   // await dapps.launch(domain, console.error)
 //   // dapp.createDappFrame(windows)
 // })
-
 
 // Data Change Events
 store.observer(_ => api.broadcast('permissions', JSON.stringify(store('permissions'))))
