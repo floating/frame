@@ -2,7 +2,8 @@ import { contextBridge, ipcRenderer } from 'electron'
 import rpc from './rpc'
 
 const validChannels = [
-  'open-file-dialog'
+  'open-file-dialog',
+  'generate-ssl-cert'
 ]
 
 const listeners = validChannels.reduce((result, channel) => {
