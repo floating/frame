@@ -125,7 +125,7 @@ class Settings extends Component {
   async inputWebSocketSSLKeyFile (e) {
     e.preventDefault()
     this.webSocketSSLKeyFileInput.current.blur()
-    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate key file', filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })
+    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate key file', defaultPath: this.state.websocketSSL.keyFilePath, filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })
     if (!canceled) {
       this.setState({ websocketSSL: { keyFilePath: filePaths } })
     }
@@ -134,7 +134,7 @@ class Settings extends Component {
   async inputWebSocketSSLCertFile (e) {
     e.preventDefault()
     this.webSocketSSLCertFileInput.current.blur()
-    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate cert file', filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })
+    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate cert file', defaultPath: this.state.websocketSSL.certFilePath, filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })
     if (!canceled) {
       this.setState({ websocketSSL: { certFilePath: filePaths } })
     }
