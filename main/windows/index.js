@@ -579,41 +579,37 @@ ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
 
   return new Promise((resolve, reject) => {
     openssl.generateRSAPrivateKey(rsakeyoptions, (err, key, cmd) => {
+      if (err) {
+        reject(err)
+      }
       console.log(cmd)
-      console.log(err)
       openssl.generateCSR(csroptions, key, 'test', (err, csr, cmd) => {
         if (err) {
-          console.log(err)
-          console.log(cmd.files.config)
-        } else {
-          console.log(cmd)
-          // console.log(csr);
-          // console.log(cmd.files.config);
-          csroptions.days = 240
-          openssl.selfSignCSR(csr, csroptions, key, 'test', (err, crt, cmd) => {
-            if (err) {
-              console.log(err)
-              console.log(cmd.files.config)
-            } else {
-              console.log(cmd.command)
-              console.log(crt)
-              console.log(cmd.files.config)
-              const userDataPath = app.getPath('userData')
-              const certFilePath = path.join(userDataPath, 'frame_crt.pem')
-              const keyFilePath = path.join(userDataPath, 'frame_key.pem')
-
-              fs.writeFile(certFilePath, crt, (certFileError) => {
-                console.log('certFileError', certFileError)
-              })
-
-              fs.writeFile(keyFilePath, key, (keyFileError) => {
-                console.log('keyFileError', keyFileError)
-              })
-
-              resolve({ certFilePath, keyFilePath })
-            }
-          })
+          reject(err)
         }
+
+        openssl.selfSignCSR(csr, csroptions, key, 'test', (err, crt, cmd) => {
+          if (err) {
+            reject(err)
+          }
+
+          console.log(cmd.command)
+          console.log(crt)
+          console.log(cmd.files.config)
+          const userDataPath = app.getPath('userData')
+          const certFilePath = path.join(userDataPath, 'frame_crt.pem')
+          const keyFilePath = path.join(userDataPath, 'frame_key.pem')
+
+          fs.writeFile(certFilePath, crt, (certFileError) => {
+            console.log('certFileError', certFileError)
+          })
+
+          fs.writeFile(keyFilePath, key, (keyFileError) => {
+            console.log('keyFileError', keyFileError)
+          })
+
+          resolve({ certFilePath, keyFilePath })
+        })
       })
     })
   })
