@@ -82,7 +82,13 @@ class CustomTokens extends React.Component {
                         </div>
                       </div>
                       <div className='customTokensListItemRemoveButton'
-                           onClick={() => link.send('tray:removeToken', token)}
+                           onClick={() => {
+                             this.setState({ tokenExpanded: false })
+                             setTimeout(() => {
+                              link.send('tray:removeToken', token)
+                             }, 100)
+                            }
+                          }
                       >
                         {'Remove Token'}
                       </div>
