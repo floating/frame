@@ -7,6 +7,7 @@ import svg from '../../../../../../resources/svg'
 
 import BigNumber from 'bignumber.js'
 
+const UNKNOWN = '?.??'
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
 function formatBalance (balance, totalValue, decimals = 8) {
@@ -21,7 +22,7 @@ function formatBalance (balance, totalValue, decimals = 8) {
 
 function formatUsdRate (rate, decimals = 2) {
   return rate.isNaN()
-    ? '?.??'
+    ? UNKNOWN
     : new Intl.NumberFormat('us-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
@@ -153,7 +154,7 @@ class Balances extends React.Component {
               {(doneScanning || rawBalance > 0) ? balanceInfo.displayBalance : '---.--'}
             </span>
           </div>
-          {(doneScanning || rawBalance > 0) ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
+          {(doneScanning || rawBalance > 0) ? <div className={balanceInfo.displayValue === UNKNOWN ? 'signerBalanceEquivalent unknownBalance' : 'signerBalanceEquivalent'}>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
         </div>
       </div>
     )
