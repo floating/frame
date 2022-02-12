@@ -5,11 +5,11 @@ on:
     branches:
       - 'build-workflow'
 
-# env:
-#  GH_TOKEN: ${{ secrets.GITHUB_DEPLOYMENT_TOKEN }}
+env:
+ GH_TOKEN: ${{ secrets.GITHUB_DEPLOYMENT_TOKEN }}
 
 jobs:
-  build:
+  build_linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,4 +18,19 @@ jobs:
       with:
         node-version: 16.4.0
         cache: 'npm'
-    - run: echo "hello, world!"
+    - run: npm run setup
+    - run: npm run compile
+    - run: npm run test:unit
+
+  build_windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 16.4.0
+        cache: 'npm'
+    - run: npm run setup
+    - run: npm run compile
+    - run: npm run test:unit
