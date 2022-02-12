@@ -6,7 +6,7 @@ on:
       - 'build-workflow'
 
 env:
- GH_TOKEN: ${{ secrets.GITHUB_DEPLOYMENT_TOKEN }}
+ GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
 
 jobs:
   build_linux:
@@ -21,9 +21,14 @@ jobs:
     - run: npm run setup
     - run: npm run compile
     - run: npm run test:unit
+    - run: npm run release
 
   build_windows:
     runs-on: windows-latest
+
+    env:
+      CSC_LINK: ${{ secrets.WINDOWS_CSC_CERTIFICATE }}
+      CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_PASSWORD }}
     
     steps:
     - uses: actions/checkout@v2
@@ -34,5 +39,11 @@ jobs:
     - run: npm run setup
     - run: npm run compile
     - run: npm run test:unit
-    - run: (gc package.json) -replace 'sleep 4', 'TIMEOUT /T 4' | Out-File package.json -encoding ASCII
-    - run: gc package.json
+    # - name: Create code signing certificate from base64-encoded file
+    #   run: |
+    #     New-Item -ItemType directory -Path signing
+    #     Set-Content -Path signing\code-signing-certificate.txt -Value '${{ secrets.WINDOWS_CSC_CERTIFICATE }}'
+    #     certutil -decode signing\code-signing-certificate.txt signing\code-signing-certificate.pfx
+    - name: Replace sleep commands with Windows-specific versions
+      run: (gc package.json) -replace 'sleep 4', 'TIMEOUT /T 4' | Out-File package.json -encoding ASCII
+    - run: npm run release
