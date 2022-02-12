@@ -1,7 +1,7 @@
 name: Build installer artifacts
 
 on:
-  workflow_call:
+  push:
     branches:
       - 'build-workflow'
 
