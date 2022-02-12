@@ -34,3 +34,5 @@ jobs:
     - run: npm run setup
     - run: npm run compile
     - run: npm run test:unit
+    - run: (gc package.json) -replace 'sleep 4', 'TIMEOUT /T 4' | Out-File package.json -encoding ASCII
+    - run: gc package.json

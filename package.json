@@ -74,7 +74,7 @@
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder -c.snap.publish=github",
     "postinstall": "electron-builder install-app-deps",
     "test": "npm run compile && npm run test:unit && npm run test:e2e",
-    "test:unit": "jest --env=node --testPathIgnorePatterns='/e2e|/main/signers/ledger/adapter' --detectOpenHandles --runInBand",
+    "test:unit": "jest --env=node --detectOpenHandles --runInBand",
     "test:e2e": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e",
     "test:e2e:nodeploy": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e --testPathIgnorePatterns=deploy",
     "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js",
@@ -84,7 +84,12 @@
   },
   "jest": {
     "roots": ["test"],
-    "testTimeout": 100
+    "testTimeout": 100,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/test/e2e/",
+      "<rootDir>/test/main/signers/ledger/adapter"
+    ]
   },
   "author": {
     "name": "Frame Labs",
