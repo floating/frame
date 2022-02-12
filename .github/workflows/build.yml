@@ -1,12 +1,12 @@
 name: Build installer artifacts
 
 on:
-  push:
+  workflow_call:
     branches:
       - 'build-workflow'
 
-env:
- GH_TOKEN: ${{ secrets.GITHUB_DEPLOYMENT_TOKEN }}
+# env:
+#  GH_TOKEN: ${{ secrets.GITHUB_DEPLOYMENT_TOKEN }}
 
 jobs:
   build:
@@ -18,7 +18,4 @@ jobs:
       with:
         node-version: 16.4.0
         cache: 'npm'
-    - run: npm run setup
-    - run: npm run compile
-    - run: npm run test:unit
-    - run: npm run release
+    - run: echo "hello, world!"

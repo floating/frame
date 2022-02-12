@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'beta.*'
+      - 'build-workflow'
 
 jobs:
   build:
@@ -18,3 +19,4 @@ jobs:
     - run: npm run setup
     - run: npm run compile
     - run: npm run test:unit
+    - uses: ./.github/build.yml
