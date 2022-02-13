@@ -105,7 +105,7 @@ describe('Ring signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  })
+  }, 400)
 
   test('Close signer', done => {
     try {
