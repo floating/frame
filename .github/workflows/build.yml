@@ -41,4 +41,4 @@ jobs:
       - name: Sleep for 4 seconds
         shell: bash
         run: sleep 4
-      # - run: npm run publish
+      - run: npm run publish
