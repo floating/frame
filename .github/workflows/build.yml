@@ -22,7 +22,7 @@ jobs:
     - run: npm run compile
     - run: npm run test:unit
     - run: npm run bundle
-    - run: sleep 4
+    - run: sleep 4 # sleep for 4 seconds before publishing
     - run: npm run release
 
   build_windows:
@@ -41,12 +41,6 @@ jobs:
     - run: npm run setup
     - run: npm run compile
     - run: npm run test:unit
-    # - name: Create code signing certificate from base64-encoded file
-    #   run: |
-    #     New-Item -ItemType directory -Path signing
-    #     Set-Content -Path signing\code-signing-certificate.txt -Value '${{ secrets.WINDOWS_CSC_CERTIFICATE }}'
-    #     certutil -decode signing\code-signing-certificate.txt signing\code-signing-certificate.pfx
-    # - name: Replace sleep commands with Windows-specific versions
-    #   run: (gc package.json) -replace 'sleep 4', 'TIMEOUT /T 4' | Out-File package.json -encoding ASCII
-    - run: Start-Sleep -s 4
-    - run: npm run release # sleep for 4 seconds before publishing
+    - run: npm run bundle
+    - run: Start-Sleep -s 4 # sleep for 4 seconds before publishing
+    - run: npm run release 
