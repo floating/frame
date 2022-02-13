@@ -3,7 +3,7 @@ name: Build installer artifacts
 on:
   push:
     branches:
-      - '0.5'
+      - 'build-workflow'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
@@ -23,7 +23,7 @@ jobs:
     - run: npm run test:unit
     - run: npm run bundle
     - run: sleep 4 # sleep for 4 seconds before publishing
-    - run: npm run release
+    # - run: npm run release
 
   build_windows:
     runs-on: windows-latest
@@ -43,4 +43,20 @@ jobs:
     - run: npm run test:unit
     - run: npm run bundle
     - run: Start-Sleep -s 4 # sleep for 4 seconds before publishing
-    - run: npm run release 
+    # - run: npm run release
+
+  build-mac:
+    runs-on: macos-11
+    
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 16.4.0
+        cache: 'npm'
+    - run: npm run setup
+    - run: npm run compile
+    - run: npm run test:unit
+    - run: npm run bundle
+    - run: sleep 4 # sleep for 4 seconds before publishing
+    # - run: npm run release
