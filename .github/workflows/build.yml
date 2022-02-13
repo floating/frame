@@ -49,5 +49,4 @@ jobs:
     # - name: Replace sleep commands with Windows-specific versions
     #   run: (gc package.json) -replace 'sleep 4', 'TIMEOUT /T 4' | Out-File package.json -encoding ASCII
     - run: npm run bundle
-    - run: ping 1.2.3.4 -n 1 -w 4000 # sleep for 4 seconds
-    - run: npm run publish
+    - run: ping 1.2.3.4 -n 1 -w 4000 && npm run publish # sleep for 4 seconds before publishing
