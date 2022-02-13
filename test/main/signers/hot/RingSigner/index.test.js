@@ -84,7 +84,7 @@ describe('Ring signer', () => {
         done()
       } catch(e) { done(e) }
     })
-  }, 1000)
+  }, 1500)
 
   test('Scan for signers', done => {
     jest.useFakeTimers()
@@ -105,7 +105,7 @@ describe('Ring signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  }, 400)
+  }, 800)
 
   test('Close signer', done => {
     try {

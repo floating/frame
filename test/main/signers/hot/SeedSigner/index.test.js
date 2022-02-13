@@ -85,7 +85,7 @@ describe('Seed signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  })
+  }, 800)
 
   test('Unlock with wrong password', (done) => {
     signer.unlock('Wrong password', err => {
