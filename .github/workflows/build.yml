@@ -1,4 +1,4 @@
-name: Build installer artifacts
+name: Build and publish installer artifacts
 
 on:
   push:
@@ -37,7 +37,7 @@ jobs:
       - run: npm run setup
       - run: npm run compile
       - run: npm run test:unit
-      # - run: npm run bundle
+      - run: npm run bundle
       - name: Sleep for 4 seconds
         shell: bash
         run: sleep 4
