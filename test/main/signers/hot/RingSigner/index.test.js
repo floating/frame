@@ -181,7 +181,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done (e) }
     })
-  }, 200)
+  }, 400)
 
   test('Unlock', done => {
     signer.unlock(PASSWORD, err => {

@@ -93,14 +93,14 @@ describe('Seed signer', () => {
       expect(signer.status).toBe('locked')
       done()
     })
-  }, 200)
+  }, 400)
 
   test('Unlock', (done) => {
     signer.unlock(PASSWORD, err => {
       expect(err).toBe(null)
       done()
     })
-  }, 200)
+  }, 400)
 
   test('Sign message', (done) => {
     const message = '0x' + Buffer.from('test').toString('hex')

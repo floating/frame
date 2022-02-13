@@ -16,17 +16,17 @@ jobs:
           - ubuntu-latest
         include:
           - os: macos-11
-            SIGNING_CERT_CONTENT: ${{ secrets.APPLE_DEVELOPER_SIGNING_CERTIFICATE }}
-            SIGNING_CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+            cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
+            cert_password_key: APPLE_CERTIFICATE_PASSWORD
           - os: windows-latest
-            SIGNING_CERT_CONTENT: ${{ secrets.WINDOWS_CSC_CERTIFICATE }}
-            SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_CSC_PASSWORD }}
+            cert_key: WINDOWS_CSC_CERTIFICATE
+            cert_password_key: WINDOWS_CSC_PASSWORD
 
     runs-on: ${{ matrix.os }}
 
     env:
-      CSC_LINK: ${{ matrix.SIGNING_CERT_CONTENT }}
-      CSC_KEY_PASSWORD: ${{ matrix.SIGNING_CERT_PASSWORD }}
+      CSC_LINK: ${{ secrets[matrix.cert_key] }}
+      CSC_KEY_PASSWORD: ${{ secrets[matrix.cert_password_key] }}
 
     steps:
       - uses: actions/checkout@v2
