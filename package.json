@@ -71,7 +71,7 @@
     "compile": "tsc && npm run copy-assets",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
     "copy-assets": "shx cp ./main/windows/*.png ./compiled/main/windows",
-    "publish": "electron-builder -c.snap.publish=github",
+    "release": "electron-builder -c.snap.publish=github",
     "postinstall": "electron-builder install-app-deps",
     "test": "npm run compile && npm run test:unit && npm run test:e2e",
     "test:unit": "jest --env=node --detectOpenHandles --runInBand",
