@@ -14,9 +14,19 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-11
+        include:
+          - os: macos-11
+            SIGNING_CERT_CONTENT: ${{ secrets.APPLE_DEVELOPER_SIGNING_CERTIFICATE }}
+            SIGNING_CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          - os: windows-latest
+            SIGNING_CERT_CONTENT: ${{ secrets.WINDOWS_CSC_CERTIFICATE }}
+            SIGNING_CERT_PASSWORD: ${{ secrets.WINDOWS_CSC_PASSWORD }}
 
     runs-on: ${{ matrix.os }}
+
+    env:
+      CSC_LINK: ${{ matrix.SIGNING_CERT_CONTENT }}
+      CSC_KEY_PASSWORD: ${{ matrix.SIGNING_CERT_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
@@ -29,40 +39,4 @@ jobs:
       - run: npm run test:unit
       # - run: npm run bundle
       # - run: sleep 4 # sleep for 4 seconds before publishing
-      # - run: npm run publish
-
-  build_windows:
-    runs-on: windows-latest
-
-    env:
-      CSC_LINK: ${{ secrets.WINDOWS_CSC_CERTIFICATE }}
-      CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_PASSWORD }}
-    
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16.4.0
-          cache: 'npm'
-      - run: npm run setup
-      - run: npm run compile
-      - run: npm run test:unit
-      # - run: npm run bundle
-      # - run: Start-Sleep -s 4 # sleep for 4 seconds before publishing
-      # - run: npm run publish
-
-  # build-mac:
-  #   runs-on: macos-11
-    
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: 16.4.0
-  #         cache: 'npm'
-  #     - run: npm run setup
-  #     - run: npm run compile
-  #     - run: npm run test:unit
-  #     - run: npm run bundle
-  #     - run: sleep 4 # sleep for 4 seconds before publishing
       # - run: npm run publish
