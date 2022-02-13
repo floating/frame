@@ -9,7 +9,7 @@ env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
 
 jobs:
-  build_nix:
+  build_release:
     strategy:
       matrix:
         os:
@@ -38,5 +38,7 @@ jobs:
       - run: npm run compile
       - run: npm run test:unit
       # - run: npm run bundle
-      # - run: sleep 4 # sleep for 4 seconds before publishing
+      - name: Sleep for 4 seconds
+        shell: bash
+        run: sleep 4
       # - run: npm run publish
