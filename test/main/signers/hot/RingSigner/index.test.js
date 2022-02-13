@@ -190,7 +190,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  }, 200)
+  }, 400)
 
   test('Sign message', done => {
     const message = '0x' + Buffer.from('test').toString('hex')
