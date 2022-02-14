@@ -12,8 +12,8 @@ jobs:
   build_release:
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
+        # os:
+        #   - ubuntu-latest
         include:
           - os: macos-11
             cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
@@ -45,5 +45,4 @@ jobs:
       - name: Sleep for 4 seconds
         shell: bash
         run: sleep 4
-      - run: echo $APPLE_ID
       - run: npm run publish
