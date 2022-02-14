@@ -24,7 +24,7 @@
         ]
       },
       "hardenedRuntime": true,
-      "gatekeeperAssess": true,
+      "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "requirements": "build/electron-builder-requirements.txt"
     },
