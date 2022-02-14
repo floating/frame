@@ -122,28 +122,37 @@ class Settings extends Component {
     this.inputLatticeTimeout = setTimeout(() => link.send('tray:action', 'setLatticeEndpointCustom', this.state.latticeEndpoint), 1000)
   }
 
-  async webSocketSSLKeyFileInputFocusHandler (e) {
+  async webSocketSSLKeyPathInputFocusHandler (e) {
     e.preventDefault()
     this.webSocketSSLKeyFileInput.current.blur()
-    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate key file', defaultPath: this.state.websocketSSL.keyFilePath, filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })
+    clearTimeout(this.webSocketSSLKeyPathTimeout)
+    const { canceled, filePaths: [keyFilePath] } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate key file', defaultPath: this.state.websocketSSL.keyFilePath, filters: [{ name: 'SSLKeyFile', extensions: ['pem'] }] })
     if (!canceled) {
-      this.setState({ websocketSSL: { keyFilePath: filePaths } })
+      this.setState({ websocketSSL: { keyFilePath } })
+      this.webSocketSSLKeyPathTimeout = setTimeout(() => link.send('tray:action', 'setWebsocketSSLKeyFilePath', this.state.websocketSSL.keyFilePath), 1000)
     }
   }
 
-  async webSocketSSLCertFileInputFocusHandler (e) {
+  async webSocketSSLCertPathInputFocusHandler (e) {
     e.preventDefault()
     this.webSocketSSLCertFileInput.current.blur()
-    const { canceled, filePaths } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate cert file', defaultPath: this.state.websocketSSL.certFilePath, filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })
+    clearTimeout(this.webSocketSSLCertPathTimeout)
+    const { canceled, filePaths: [certFilePath] } = await window.ipc.invoke('open-file-dialog', { message: 'Select an SSL certificate cert file', defaultPath: this.state.websocketSSL.certFilePath, filters: [{ name: 'SSLCertFile', extensions: ['pem'] }] })
     if (!canceled) {
-      this.setState({ websocketSSL: { certFilePath: filePaths } })
+      this.setState({ websocketSSL: { certFilePath } })
+      this.webSocketSSLCertPathTimeout = setTimeout(() => link.send('tray:action', 'setWebsocketSSLCertFilePath', this.state.websocketSSL.certFilePath), 1000)
     }
   }
 
   async generateCertificateButtonClickHandler (e) {
     e.preventDefault()
+    clearTimeout(this.generateCertificateTimeout)
     const { certFilePath, keyFilePath } = await window.ipc.invoke('generate-ssl-cert', {})
     this.setState({ websocketSSL: { certFilePath, keyFilePath } })
+    this.generateCertificateTimeout = setTimeout(() => {
+      link.send('tray:action', 'setWebsocketSSLKeyFilePath', this.state.websocketSSL.keyFilePath)
+      link.send('tray:action', 'setWebsocketSSLCertFilePath', this.state.websocketSSL.certFilePath)
+    }, 1000)
   }
 
   localShake (key) {
@@ -223,7 +232,7 @@ class Settings extends Component {
   render () {
     const { type, id } = this.store('main.currentNetwork')
     const networks = this.store('main.networks')
-    const connection = networks[type][id].connection
+    // const connection = networks[type][id].connection
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
     presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
@@ -487,11 +496,13 @@ class Settings extends Component {
             >
               <input
                 tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath}
-                onFocus={e => this.webSocketSSLKeyFileInputFocusHandler(e)} ref={this.webSocketSSLKeyFileInput}
+                onFocus={e => this.webSocketSSLKeyPathInputFocusHandler(e)} ref={this.webSocketSSLKeyFileInput}
+                onChange={e => console.log('keyFilePath change', e)}
               />
               <input
                 tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath}
-                onFocus={e => this.webSocketSSLCertFileInputFocusHandler(e)} ref={this.webSocketSSLCertFileInput}
+                onFocus={e => this.webSocketSSLCertPathInputFocusHandler(e)} ref={this.webSocketSSLCertFileInput}
+                onChange={e => console.log('certFilePath change', e)}
               />
               <button type='button' className='settingsButton' onClick={(e) => this.generateCertificateButtonClickHandler(e)}>
                 Generate Certificate
