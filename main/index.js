@@ -12,6 +12,7 @@ const log = require('electron-log')
 const path = require('path')
 const url = require('url')
 
+const api = require('./api')
 const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
@@ -41,7 +42,6 @@ const dapps = require('./dapps').default
 //     })
 //   })
 // })
-
 
 const accounts = require('./accounts')
 const launch = require('./launch')
@@ -183,7 +183,7 @@ ipcMain.on('tray:syncPath', (e, path, value) => {
   store.syncPath(path, value)
 })
 
-ipcMain.on('tray:ready', () => require('./api'))
+ipcMain.on('tray:ready', () => api.init())
 
 ipcMain.on('tray:updateRestart', () => {
   updater.quitAndInstall(true, true)
@@ -281,6 +281,14 @@ app.on('ready', () => {
       globalShortcut.register('Alt+/', () => windows.trayClick())
     } else {
       globalShortcut.unregister('Alt+/')
+    }
+  })
+  store.observer(() => {
+    const websocketProtocol = store('main.websocketProtocol')
+    const websocketSSLKeyFilePath = store('main.websocketSSL.keyFilePath')
+    const websocketSSLCertFilePath = store('main.websocketSSL.certFilePath')
+    if (websocketProtocol === 'https' || (websocketSSLKeyFilePath && websocketSSLCertFilePath)) { // assume only called once on value change
+      api.init()
     }
   })
   // store.observer(() => {
