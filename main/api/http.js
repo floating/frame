@@ -132,12 +132,13 @@ module.exports = {
       try {
         const httpsOpts = {
           key: fs.readFileSync(keyFilePath),
-          cert: fs.readFileSync(certFilePath)
+          cert: fs.readFileSync(certFilePath),
           // ca: fs.readFileSync('/path/to/ca.pem')
+          passphrase: 'frame'
         }
         return https.createServer(httpsOpts, handler)
       } catch (e) {
-        log.error('Error creating HTTPS server')
+        log.error('Error creating HTTPS server', e)
       }
     }
   }
