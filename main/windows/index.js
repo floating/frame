@@ -555,7 +555,7 @@ ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
 
   const rsakeyoptions = {
     encryption: {
-      password: 'test',
+      password: 'frame',
       cipher: 'des3'
     },
     rsa_keygen_bits: 2048,
@@ -583,12 +583,13 @@ ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
         reject(err)
       }
       console.log(cmd)
-      openssl.generateCSR(csroptions, key, 'test', (err, csr, cmd) => {
+      openssl.generateCSR(csroptions, key, 'frame', (err, csr, cmd) => {
         if (err) {
           reject(err)
         }
 
-        openssl.selfSignCSR(csr, csroptions, key, 'test', (err, crt, cmd) => {
+        csroptions.days = 240
+        openssl.selfSignCSR(csr, csroptions, key, 'frame', (err, crt, cmd) => {
           if (err) {
             reject(err)
           }
