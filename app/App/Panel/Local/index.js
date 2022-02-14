@@ -144,14 +144,23 @@ class Settings extends Component {
     }
   }
 
+  websocketSSLCertPasswordChangeHandler (e) {
+    e.preventDefault()
+    clearTimeout(this.websocketSSLCertPasswordTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ websocketSSL: { certPassword: value } })
+    this.websocketSSLCertPasswordTimeout = setTimeout(() => link.send('tray:action', 'setWebsocketSSLCertPassword', this.state.websocketSSL.certPassword), 1000)
+  }
+
   async generateCertificateButtonClickHandler (e) {
     e.preventDefault()
     clearTimeout(this.generateCertificateTimeout)
-    const { certFilePath, keyFilePath } = await window.ipc.invoke('generate-ssl-cert', {})
-    this.setState({ websocketSSL: { certFilePath, keyFilePath } })
+    const { certFilePath, keyFilePath, certPassword } = await window.ipc.invoke('generate-ssl-cert', {})
+    this.setState({ websocketSSL: { certFilePath, keyFilePath, certPassword } })
     this.generateCertificateTimeout = setTimeout(() => {
       link.send('tray:action', 'setWebsocketSSLKeyFilePath', this.state.websocketSSL.keyFilePath)
       link.send('tray:action', 'setWebsocketSSLCertFilePath', this.state.websocketSSL.certFilePath)
+      link.send('tray:action', 'setWebsocketSSLCertPassword', this.state.websocketSSL.certPassword)
     }, 1000)
   }
 
@@ -497,12 +506,15 @@ class Settings extends Component {
               <input
                 tabIndex='-1' className='' placeholder='/path/to/key.pem' value={this.state.websocketSSL.keyFilePath}
                 onFocus={e => this.webSocketSSLKeyPathInputFocusHandler(e)} ref={this.webSocketSSLKeyFileInput}
-                onChange={e => console.log('keyFilePath change', e)}
               />
               <input
                 tabIndex='-1' className='' placeholder='/path/to/cert.pem' value={this.state.websocketSSL.certFilePath}
                 onFocus={e => this.webSocketSSLCertPathInputFocusHandler(e)} ref={this.webSocketSSLCertFileInput}
-                onChange={e => console.log('certFilePath change', e)}
+              />
+              <input
+                type='password'
+                tabIndex='-1' className='' placeholder='password' value={this.state.websocketSSL.certPassword}
+                onChange={e => this.websocketSSLCertPasswordChangeHandler(e)}
               />
               <button type='button' className='settingsButton' onClick={(e) => this.generateCertificateButtonClickHandler(e)}>
                 Generate Certificate

@@ -127,6 +127,7 @@ module.exports = {
   https: () => {
     const keyFilePath = store('main.websocketSSL.keyFilePath') || ''
     const certFilePath = store('main.websocketSSL.certFilePath') || ''
+    const certPassword = store('main.websocketSSL.certPassword')
 
     if (keyFilePath && certFilePath) {
       try {
@@ -134,7 +135,7 @@ module.exports = {
           key: fs.readFileSync(keyFilePath),
           cert: fs.readFileSync(certFilePath),
           // ca: fs.readFileSync('/path/to/ca.pem')
-          passphrase: 'frame'
+          passphrase: certPassword
         }
         return https.createServer(httpsOpts, handler)
       } catch (e) {

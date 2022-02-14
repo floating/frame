@@ -186,7 +186,8 @@ const initial = {
     websocketProtocol: main('websocketProtocol', 'http'),
     websocketSSL: {
       keyFilePath: main('websocketSSL.keyFilePath', ''),
-      certFilePath: main('websocketSSL.certFilePath', '')
+      certFilePath: main('websocketSSL.certFilePath', ''),
+      certPassword: main('websocketSSL.certPassword', '')
     },
     ledger: {
       derivation: main('ledger.derivation', 'live'),

@@ -552,10 +552,11 @@ ipcMain.handle('open-file-dialog', (event, [options]) => dialog.showOpenDialog(w
 ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
   const NodeOpenSSL = require('node-openssl-cert')
   const openssl = new NodeOpenSSL()
+  const certPassword = 'frame'
 
   const rsakeyoptions = {
     encryption: {
-      password: 'frame',
+      password: certPassword,
       cipher: 'des3'
     },
     rsa_keygen_bits: 2048,
@@ -583,13 +584,13 @@ ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
         reject(err)
       }
       console.log(cmd)
-      openssl.generateCSR(csroptions, key, 'frame', (err, csr, cmd) => {
+      openssl.generateCSR(csroptions, key, certPassword, (err, csr, cmd) => {
         if (err) {
           reject(err)
         }
 
         csroptions.days = 240
-        openssl.selfSignCSR(csr, csroptions, key, 'frame', (err, crt, cmd) => {
+        openssl.selfSignCSR(csr, csroptions, key, certPassword, (err, crt, cmd) => {
           if (err) {
             reject(err)
           }
@@ -609,7 +610,7 @@ ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
             console.log('keyFileError', keyFileError)
           })
 
-          resolve({ certFilePath, keyFilePath })
+          resolve({ certFilePath, keyFilePath, certPassword })
         })
       })
     })

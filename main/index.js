@@ -287,7 +287,9 @@ app.on('ready', () => {
     const websocketProtocol = store('main.websocketProtocol')
     const websocketSSLKeyFilePath = store('main.websocketSSL.keyFilePath')
     const websocketSSLCertFilePath = store('main.websocketSSL.certFilePath')
-    if (websocketProtocol === 'https' || (websocketSSLKeyFilePath && websocketSSLCertFilePath)) { // assume only called once on value change
+    const websocketSSLCertPassword = store('main.websocketSSL.certPassword')
+    console.log('observing', websocketSSLKeyFilePath, websocketSSLCertFilePath, websocketSSLCertPassword)
+    if (websocketProtocol === 'https' || (websocketSSLKeyFilePath && websocketSSLCertFilePath && websocketSSLCertPassword)) {
       api.init()
     }
   })
