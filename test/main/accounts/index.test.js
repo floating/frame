@@ -1,7 +1,9 @@
 import log from 'electron-log'
 import { addHexPrefix } from 'ethereumjs-util'
 import store from '../../../main/store'
+import provider from '../../../main/provider'
 
+jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn() }))
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/externalData')
@@ -13,7 +15,6 @@ jest.mock('../../../main/store/persist', () => ({
 }))
 
 jest.mock('../../../main/nebula', () => jest.fn(() => ({ ens: { lookupAddress: jest.fn() } })))
-
 
 const weiToHex = wei => addHexPrefix(wei.toString(16))
 const gweiToHex = gwei => weiToHex(gwei * 1e9)
@@ -55,6 +56,7 @@ beforeEach(() => {
     handlerId: 1,
     type: 'transaction',
     data: {
+      from : '0x22dd63c3619818fdbc262c78baee43cb61e9cccf',
       chainId: '0x1',
       gasLimit: weiToHex(21000),
       gasPrice: gweiToHex(30),
@@ -71,6 +73,9 @@ beforeEach(() => {
   }
 
   Accounts.setSigner(account.address, jest.fn())
+
+  provider.emit = jest.fn()
+  provider.send = jest.fn()
 })
 
 afterEach(() => {
@@ -681,19 +686,18 @@ describe('#setGasLimit', () => {
 describe('#adjustNonce', () => {
   let onChainNonce
 
-  const mockProxyProvider = {
-    emit: (event, payload, cb) => {
-      if (event === 'send' && payload.method === 'eth_getTransactionCount') {
-        return cb({ result: onChainNonce })
-      }
-
-      cb({ error: 'wrong call!' })
-    }
-  }
-
-  jest.mock('../../../main/provider/proxy', () => mockProxyProvider)
-
   beforeEach(() => {
+    provider.send.mockImplementation((payload, cb) => {
+      expect(payload).toEqual(expect.objectContaining({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'eth_getTransactionCount',
+        params: ['0x22dd63c3619818fdbc262c78baee43cb61e9cccf', 'pending']
+      }))
+
+      cb({ result: onChainNonce })
+    })
+
     onChainNonce = '0x0'
     Accounts.addRequest(request, jest.fn())
   })

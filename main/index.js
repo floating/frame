@@ -45,8 +45,8 @@ const dapps = require('./dapps').default
 //   })
 // })
 
-
 const accounts = require('./accounts').default
+
 const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')

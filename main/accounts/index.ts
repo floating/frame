@@ -21,7 +21,7 @@ import {
 } from './types'
 
 // Provider Proxy
-import proxyProvider from'../provider/proxy'
+import provider from'../provider'
 import { Chain } from '../chains'
 import { TypedData, Version } from 'eth-sig-util'
 
@@ -170,11 +170,15 @@ export class Accounts extends EventEmitter {
         }]
       }
 
-      proxyProvider.emit('send', tx, (res: RPCResponsePayload) => {
+      this.sendRequest(tx, (res: RPCResponsePayload) => {
         if (res.error) return reject(new Error(res.error.message))
         resolve()
       })
     })
+  }
+
+  private sendRequest (payload: { method: string, params: any[], chainId: string }, cb: RPCRequestCallback) {
+    provider.send({ id: 1, jsonrpc: '2.0', ...payload, _origin: 'frame.eth' }, cb)
   }
 
   private async confirmations (account: FrameAccount, id: string, hash: string, targetChain: Chain) {
@@ -184,10 +188,10 @@ export class Accounts extends EventEmitter {
       if (!targetChain || !targetChain.type || !targetChain.id) return reject(new Error('Unable to determine target chain'))
       const targetChainId = addHexPrefix(targetChain.id.toString(16))
 
-      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_blockNumber', chainId: targetChainId, params: [] }, (res: RPCResponsePayload) => {
+      this.sendRequest({ method: 'eth_blockNumber', params: [], chainId: targetChainId }, (res: RPCResponsePayload) => {
         if (res.error) return reject(new Error(JSON.stringify(res.error)))
 
-        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionReceipt', chainId: targetChainId, params: [hash] }, (receiptRes: RPCResponsePayload) => {
+        this.sendRequest({ method: 'eth_getTransactionReceipt', params: [hash], chainId: targetChainId }, (receiptRes: RPCResponsePayload) => {
           if (receiptRes.error) return reject(receiptRes.error)
 
           if (receiptRes.result && account.requests[id]) {
@@ -267,7 +271,7 @@ export class Accounts extends EventEmitter {
       }
 
       const targetChainId = addHexPrefix(targetChain.id.toString(16))
-      proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_subscribe', params: ['newHeads'], chainId: targetChainId }, (newHeadRes: RPCResponsePayload) => {
+      this.sendRequest({ method: 'eth_subscribe', params: ['newHeads'], chainId: targetChainId }, (newHeadRes: RPCResponsePayload) => {
         if (newHeadRes.error) {
           log.warn(newHeadRes.error)
           const monitor = async () => {
@@ -307,7 +311,7 @@ export class Accounts extends EventEmitter {
               } catch (e) {
                 log.error(e)
                 // proxyProvider.removeListener('data', handler)
-                proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+                provider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
                 setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 60 * 1000)
                 return
               }
@@ -322,8 +326,8 @@ export class Accounts extends EventEmitter {
                 setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8000)
                 // proxyProvider.removeListener('data', handler)
                 
-                proxyProvider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
-                proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_unsubscribe', chainId: targetChainId, params: [headSub] }, (res: RPCResponsePayload) => {
+                provider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+                this.sendRequest({ method: 'eth_unsubscribe', chainId: targetChainId, params: [headSub] }, (res: RPCResponsePayload) => {
                   if (res.error) {
                     log.error('error sending message eth_unsubscribe', res)
                   }
@@ -331,7 +335,8 @@ export class Accounts extends EventEmitter {
               }
             }
           }
-          proxyProvider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
+
+          provider.on(`data:${targetChain.type}:${targetChain.id}`, handler)
         }
       })
     }
@@ -864,7 +869,7 @@ export class Accounts extends EventEmitter {
       } else {
         const { from, chainId } = txRequest.data
 
-        proxyProvider.emit('send', { id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', chainId, params: [from, 'pending'] }, (res: RPCResponsePayload) => {
+        this.sendRequest({ method: 'eth_getTransactionCount', chainId, params: [from, 'pending'] }, (res: RPCResponsePayload) => {
           if (res.result) {
             const newNonce = parseInt(res.result, 16)
             const adjustedNonce = intToHex(nonceAdjust === 1 ? newNonce : newNonce + nonceAdjust)

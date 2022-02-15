@@ -10,7 +10,6 @@ const store = require('../store').default
 const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasCalculator } = require('../transaction/gasCalculator')
-const { default: accounts } = require('../accounts')
 
 class ChainConnection extends EventEmitter {
   constructor (type, chainId) {
@@ -98,7 +97,7 @@ class ChainConnection extends EventEmitter {
 
         store.setGasFees(this.type, this.chainId, feeMarket)
 
-        accounts.updatePendingFees(this.chainId)
+        this.emit('update', { type: 'fees', chainId: parseInt(this.chainId) })
       } catch (e) {
         log.error(`could not update gas prices for chain ${this.chainId}`, { feeMarket, chainConfig: this.chainConfig }, e)
       }
@@ -382,6 +381,12 @@ class Chains extends EventEmitter {
               this.emit(`data:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
               if (current.type === type && current.id === parseInt(chainId)) this.emit('data', ...args)
+            })
+
+            this.connections[type][chainId].on('update', (...args) => {
+              this.emit(`update:${type}:${chainId}`, ...args)
+              const current = store('main.currentNetwork')
+              if (current.type === type && current.id === parseInt(chainId)) this.emit('update', ...args)
             })
 
             this.connections[type][chainId].on('error', (...args) => {
