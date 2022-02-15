@@ -39,7 +39,7 @@ interface Collection {
 }
 
 async function fetchAssets (address: Address, offset: number) {
-  const url = `http://proxy.pylon.link?type=api&target=https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
+  const url = `https://proxy.pylon.link?type=api&target=https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
 
   const options = {
     method: 'GET',
@@ -50,6 +50,15 @@ async function fetchAssets (address: Address, offset: number) {
 
   try {
     const res = await fetch(url, options)
+
+    if (res.status >= 300) {
+      const contentType = (res.headers.get('content-type') || '').toLowerCase()
+      const errorMsg = contentType.includes('json') ? await res.json() : ''
+
+      log.warn('unable to fetch inventory', errorMsg)
+      return { assets: [] }
+    }
+
     return res.json() as Promise<InventorySet>
   } catch (e) {
     log.warn(`could not fetch assets ${address}`, e)
