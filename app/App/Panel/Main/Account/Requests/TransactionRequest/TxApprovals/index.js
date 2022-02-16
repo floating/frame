@@ -13,16 +13,18 @@ class TxApproval extends React.Component {
     }
   }
 
-  approve (reqId, approvalId) {
-    link.send('confirmRequestApproval', reqId, approvalId)
-  }
-
   decline (req) {
     link.rpc('declineRequest', req, () => {})
   }
 
   render () {
-    const { approval, req, editValue } = this.props
+    const { 
+      message,
+      title,
+      req,
+      onApprove,
+      editValue
+    } = this.props
 
     return (
       <div className='approveTransactionWarning'>
@@ -48,9 +50,7 @@ class TxApproval extends React.Component {
           </div>
           <div
             className='approveTransactionWarningProceed'
-            onMouseDown={() => {
-              this.approve(req.handlerId, approval.key)
-            }}
+            onMouseDown={onApprove}
           >Proceed
           </div>
         </div>
@@ -61,10 +61,10 @@ class TxApproval extends React.Component {
           <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
             {svg.alert(32)}
           </div>
-          {/* <div className='approveTransactionWarningTitle'>{otherChain ? 'chain warning' : 'estimated to fail'} </div> */}
+          <div className='approveTransactionWarningTitle'>{title}</div>
           <div className='approveTransactionWarningMessage'>
             <div className='approveTransactionWarningMessageInner'>
-              {approval.message}
+              {message}
             </div>
             {
               editValue ? React.cloneElement(editValue) : null

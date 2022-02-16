@@ -134,6 +134,9 @@ const rpc = {
       }
     })
   },
+  confirmRequestApproval (req, approvalType, cb) {
+    accounts.confirmRequestApproval(req.handlerId, approvalType)
+  },
   approveRequest (req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
@@ -153,7 +156,7 @@ const rpc = {
       })
     }
   },
-  declineRequest (req) {
+  declineRequest (req, cb) {
     if (
       req.type === 'transaction' ||
       req.type === 'sign' ||
@@ -162,9 +165,6 @@ const rpc = {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
-  },
-  removeRequestWarning (reqId) {
-    accounts.removeRequestWarning(reqId)
   },
   addAragon (account, cb) {
     accounts.addAragon(account, cb)

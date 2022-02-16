@@ -14,6 +14,7 @@ import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
 import provider from '../../provider'
+import { ApprovalType } from '../../../resources/constants'
 
 const nebula = nebulaApi('accounts')
 
@@ -199,16 +200,16 @@ class FrameAccount {
     }
   }
 
-  addRequiredApproval (req: TransactionRequest, key: string, message: string, data: any = {}) {
-    req.approvals = {
-      ...(req.approvals || {}),
-      [key]: {
-        key,
-        message,
+  addRequiredApproval (req: TransactionRequest, type: string, data: any = {}) {
+    // TODO: turn TransactionRequest into its own class
+    req.approvals = [
+      ...(req.approvals || []),
+      {
+        type,
         data,
         approved: false
       }
-    }
+    ]
   }
 
   resError (err: string | Error, payload: RPCResponsePayload, res: RPCErrorCallback) {
@@ -232,9 +233,8 @@ class FrameAccount {
         if (decodedData && knownTxRequest) {
           this.addRequiredApproval(
             knownTxRequest,
-            'approveTokenSpend',
-            'Are you sure you want to approve unlimited token spend?',
-            { amount: decodedData.args[1] }
+            ApprovalType.TokenSpendApproval,
+            { amount: decodedData.args[1].value }
           )
 
           knownTxRequest.decodedData = decodedData
@@ -268,14 +268,16 @@ class FrameAccount {
       this.requests[r.handlerId].mode = RequestMode.Normal
       this.requests[r.handlerId].created = Date.now()
       this.requests[r.handlerId].res = res
-      this.update()
-      windows.showTray()
-      windows.broadcast('main:action', 'setSignerView', 'default')
-      windows.broadcast('main:action', 'setPanelView', 'default')
+
       if ((req || {}).type === 'transaction') {
         this.populateRequestCallData(req as TransactionRequest)
         this.populateRequestEnsName(req as TransactionRequest)
       }
+
+      this.update()
+      windows.showTray()
+      windows.broadcast('main:action', 'setSignerView', 'default')
+      windows.broadcast('main:action', 'setPanelView', 'default')
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {

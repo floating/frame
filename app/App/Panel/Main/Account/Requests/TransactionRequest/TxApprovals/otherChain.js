@@ -1,8 +1,8 @@
 import React from 'react'
 import Restore from 'react-restore'
-import TxApproval from '..'
+import TxApproval from '.'
 
-class TokenSpendApproval extends React.Component {
+class OtherChainApproval extends React.Component {
   constructor (...args) {
     super(...args)
   }
@@ -21,4 +21,4 @@ class TokenSpendApproval extends React.Component {
   }
 }
 
-export default Restore.connect(TokenSpendApproval)
+export default Restore.connect(OtherChainApproval)

@@ -45,8 +45,7 @@ export interface TransactionReceipt {
 }
 
 export interface Approval {
-  key: string,
-  message: string,
+  type: string,
   data: any,
   approved: boolean
 }
@@ -61,7 +60,7 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
     hash?: string,
     confirmations: number
   },
-  approvals: Record<string, Approval>,
+  approvals: Approval[],
   locked?: boolean,
   automaticFeeUpdateNotice?: {
     previousFee: any,
@@ -69,7 +68,6 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   recipient?: string, // ens name
   updatedFees?: boolean,
   feeAtTime?: string,
-  warning?: string,
   completed?: number,
   feesUpdatedByUser: boolean
 }
