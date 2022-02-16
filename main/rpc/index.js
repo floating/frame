@@ -153,7 +153,7 @@ const rpc = {
       })
     }
   },
-  declineRequest (req, cb) {
+  declineRequest (req) {
     if (
       req.type === 'transaction' ||
       req.type === 'sign' ||

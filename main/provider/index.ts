@@ -580,6 +580,7 @@ export class Provider extends EventEmitter {
           payload, 
           account: (currentAccount as FrameAccount).id, 
           origin: payload._origin, 
+          approvals: {},
           warning,
           feesUpdatedByUser: feesUpdated || false
         } as TransactionRequest, res)

@@ -44,6 +44,13 @@ export interface TransactionReceipt {
   blockNumber: string
 }
 
+export interface Approval {
+  key: string,
+  message: string,
+  data: any,
+  approved: boolean
+}
+
 export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   type: 'transaction',
   payload: RPC.SendTransaction.Request,
@@ -54,6 +61,7 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
     hash?: string,
     confirmations: number
   },
+  approvals: Record<string, Approval>,
   locked?: boolean,
   automaticFeeUpdateNotice?: {
     previousFee: any,

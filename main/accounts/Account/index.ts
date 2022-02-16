@@ -199,6 +199,18 @@ class FrameAccount {
     }
   }
 
+  addRequiredApproval (req: TransactionRequest, key: string, message: string, data: any = {}) {
+    req.approvals = {
+      ...(req.approvals || {}),
+      [key]: {
+        key,
+        message,
+        data,
+        approved: false
+      }
+    }
+  }
+
   resError (err: string | Error, payload: RPCResponsePayload, res: RPCErrorCallback) {
     const error = typeof err === 'string'
       ? { message: err, code: -1 }
@@ -218,6 +230,13 @@ class FrameAccount {
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
         if (decodedData && knownTxRequest) {
+          this.addRequiredApproval(
+            knownTxRequest,
+            'approveTokenSpend',
+            'Are you sure you want to approve unlimited token spend?',
+            { amount: decodedData.args[1] }
+          )
+
           knownTxRequest.decodedData = decodedData
           this.update()
         }

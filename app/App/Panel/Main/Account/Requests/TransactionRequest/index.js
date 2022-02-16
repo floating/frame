@@ -19,6 +19,7 @@ import TxFeeNew from './TxFeeNew'
 import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import TxOverlay from './TxOverlay'
+import TokenSpendApproval from './TxApprovals/TokenSpendApproval'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -250,65 +251,73 @@ class TransactionRequest extends React.Component {
       }
     }
 
+    const requiredApproval = (Object.values(req.approvals) || []).filter(a => !a.approved)[0]
+    const showWarning = !status && mode !== 'monitor'
+
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-            {(req.warning || otherChain) && !status &&
-            status !== 'error' && 
-            status !== 'pending' && 
-            status !== 'verifying' && 
-            !status &&
-            mode !== 'monitor' ? (
-              <div className='approveTransactionWarning'>
-                <div className='approveTransactionWarningOptions'>
-                  <div
-                    className='approveTransactionWarningReject'
-                    onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
-                  >Reject
-                  </div>
-                  <div
-                    className='approveTransactionWarningPreview'
-                    onMouseEnter={() => {
-                      this.setState({ warningPreview: true })
-                    }}
-                    onMouseMove={() => {
-                      this.setState({ warningPreview: true })
-                    }}
-                    onMouseLeave={() => {
-                      this.setState({ warningPreview: false })
-                    }}
-                  >
-                    Preview
-                  </div>
-                  <div
-                    className='approveTransactionWarningProceed'
-                    onMouseDown={() => {
-                      if (otherChain) {
-                        this.setState({ allowOtherChain: true})
-                      } else {
-                        this.removeWarning(this.props.req.handlerId)
-                      }
-                    }}
-                  >Proceed
-                  </div>
-                </div>
-                <div className='approveTransactionWarningFill' style={this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
-                  <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
-                    {svg.alert(32)}
-                  </div>
-                  <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
-                    {svg.alert(32)}
-                  </div>
-                  <div className='approveTransactionWarningTitle'>{otherChain ? 'chain warning' : 'estimated to fail'} </div>
-                  <div className='approveTransactionWarningMessage'>
-                    <div className='approveTransactionWarningMessageInner'>
-                      {otherChain ? 'transaction is not on currently selected chain' : req.warning}</div>
-                    </div>
-                </div>
-              </div>
-            ) : null}
+            {
+              !showWarning
+                ? null
+                : (
+                  (req.warning || otherChain)
+                    ? (
+                      <div className='approveTransactionWarning'>
+                        <div className='approveTransactionWarningOptions'>
+                          <div
+                            className='approveTransactionWarningReject'
+                            onMouseDown={() => this.decline(this.props.req.handlerId, this.props.req)}
+                          >Reject
+                          </div>
+                          <div
+                            className='approveTransactionWarningPreview'
+                            onMouseEnter={() => {
+                              this.setState({ warningPreview: true })
+                            }}
+                            onMouseMove={() => {
+                              this.setState({ warningPreview: true })
+                            }}
+                            onMouseLeave={() => {
+                              this.setState({ warningPreview: false })
+                            }}
+                          >
+                            Preview
+                          </div>
+                          <div
+                            className='approveTransactionWarningProceed'
+                            onMouseDown={() => {
+                              if (otherChain) {
+                                this.setState({ allowOtherChain: true })
+                              } else {
+                                this.removeWarning(this.props.req.handlerId)
+                              }
+                            }}
+                          >Proceed
+                          </div>
+                        </div>
+                        <div className='approveTransactionWarningFill' style={this.state.warningPreview ? { opacity: 0 } : { opacity: 1 }}>
+                          <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
+                            {svg.alert(32)}
+                          </div>
+                          <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
+                            {svg.alert(32)}
+                          </div>
+                          <div className='approveTransactionWarningTitle'>{otherChain ? 'chain warning' : 'estimated to fail'} </div>
+                          <div className='approveTransactionWarningMessage'>
+                            <div className='approveTransactionWarningMessageInner'>
+                              {otherChain ? 'transaction is not on currently selected chain' : requiredApproval.message || req.warning}</div>
+                            </div>
+                        </div>
+                      </div>
+                    ) : (
+                      requiredApproval
+                        ? <TokenSpendApproval req={req} approval={requiredApproval} />
+                        : null
+                    )
+                )}
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
                 <div className='txNonceControl'>
