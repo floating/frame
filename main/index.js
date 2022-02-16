@@ -86,7 +86,8 @@ const externalWhitelist = [
   'https://shop.trezor.io/?offer_id=10&aff_id=3270',
   'https://discord.gg/UH7NGqY',
   'https://frame.canny.io',
-  'https://feedback.frame.sh'
+  'https://feedback.frame.sh',
+  'https://wiki.trezor.io/Trezor_Bridge'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
