@@ -230,15 +230,26 @@ class FrameAccount {
         const decodedData = await abi.decodeCalldata(to || '', calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
+        
+        
         if (decodedData && knownTxRequest) {
-          this.addRequiredApproval(
-            knownTxRequest,
-            ApprovalType.TokenSpendApproval,
-            { amount: decodedData.args[1].value }
-          )
+          console.log(decodedData.args)
+          if (abi.isErc20Approval(decodedData)) {
+            const decimals = 
+            const approvalData = {
+              decimals: await 
+            } 
+            console.log('ERC20!')
+          //const token = store('token')
+            this.addRequiredApproval(
+              knownTxRequest,
+              ApprovalType.TokenSpendApproval,
+              { amount: decodedData.args[1].value }
+            )
 
-          knownTxRequest.decodedData = decodedData
-          this.update()
+            knownTxRequest.decodedData = decodedData
+            this.update()
+          }
         }
       } catch (e) {
         log.warn(e)

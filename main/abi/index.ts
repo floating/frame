@@ -73,7 +73,7 @@ function decodeData (abi: string, calldata: string) {
 }
 
 export default {
-  decodeCalldata: async (contractAddress: Address, calldata: string) => {
+  decodeCalldata: async (contractAddress: Address, calldata: string): Promise<DecodedCallData | undefined> => {
     const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi }]
     const data = await fetchSourceCode(contractAddress)
 
@@ -95,5 +95,13 @@ export default {
     }
 
     log.warn(`Unable to decode data for contract ${contractAddress}`)
+  },
+  isErc20Approval: function (data: DecodedCallData) {
+    return (
+      data.method === 'approve' &&
+      data.args.length === 2 &&
+      data.args[0].name === 'spender' && data.args[0].type === 'address' &&
+      data.args[1].name === 'value' && data.args[1].type === 'uint256'
+    )
   }
 }
