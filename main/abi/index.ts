@@ -1,6 +1,5 @@
 import log from 'electron-log'
 import fetch from 'node-fetch'
-import { ethers } from 'ethers'
 import { Interface } from '@ethersproject/abi'
 import erc20 from '../externalData/balances/erc-20-abi'
 
@@ -37,7 +36,7 @@ export interface DecodedCallData {
 
 function parseAbi (abiData: string): Interface {
   try {
-    return new ethers.utils.Interface(abiData)
+    return new Interface(abiData)
   } catch (e) {
     log.warn(`could not parse ABI data: ${abiData}`)
     throw e
