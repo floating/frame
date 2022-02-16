@@ -7,6 +7,7 @@ import svg from '../../../../../../resources/svg'
 
 import BigNumber from 'bignumber.js'
 
+const UNKNOWN = '?'
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
 function formatBalance (balance, totalValue, decimals = 8) {
@@ -21,7 +22,7 @@ function formatBalance (balance, totalValue, decimals = 8) {
 
 function formatUsdRate (rate, decimals = 2) {
   return rate.isNaN()
-    ? '?'
+    ? UNKNOWN
     : new Intl.NumberFormat('us-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
