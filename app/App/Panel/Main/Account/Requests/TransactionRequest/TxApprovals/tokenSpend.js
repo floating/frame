@@ -41,7 +41,7 @@ class TokenSpendApproval extends React.Component {
       message={message}
       req={this.props.req}
       editValue={editValue}
-      onApprove={() => this.approve() }/>
+      onApprove={() => this.approve()}/>
   }
 }
 

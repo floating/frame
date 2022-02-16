@@ -151,7 +151,6 @@ class TransactionRequest extends React.Component {
     }
 
     if (approval.type === ApprovalType.GasLimitApproval) {
-      console.dir(approval)
       return (
         <TxApproval
           title={'estimated to fail'}
