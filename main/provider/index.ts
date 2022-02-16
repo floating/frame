@@ -21,7 +21,6 @@ import {
   hashPersonalMessage,
 } from 'ethereumjs-util'
 
-import proxy from './proxy'
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
@@ -108,7 +107,14 @@ export class Provider extends EventEmitter {
 
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
+
     this.connection.on('error', err => log.error(err))
+
+    this.connection.on('update', event => {
+      if (event.type === 'fees') {
+        return accounts.updatePendingFees(event.chainId)
+      }
+    })
 
     this.getNonce = this.getNonce.bind(this)
   }
@@ -931,7 +937,6 @@ export class Provider extends EventEmitter {
   }
 
   emit (type: string | symbol, ...args: any[]) {
-    proxy.emit(type, ...args)
     return super.emit(type, ...args)
   }
 }
@@ -988,8 +993,5 @@ store.observer(() => {
     }
   }
 }, 'provider:account')
-
-proxy.on('send', (payload, cb) => provider.send(payload, cb))
-proxy.ready = true
 
 export default provider

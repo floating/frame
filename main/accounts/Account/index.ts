@@ -13,8 +13,7 @@ import { TransactionData } from '../../transaction'
 import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
-// Provider Proxy
-import proxyProvider from '../../provider/proxy'
+import provider from '../../provider'
 
 const nebula = nebulaApi('accounts')
 
@@ -128,13 +127,10 @@ class FrameAccount {
     }, `account:${this.address}`)
 
     if (this.created.split(':')[0] === 'new') {
-      proxyProvider.on('connect', () => {
-        proxyProvider.emit('send', { jsonrpc: '2.0', id: '1', method: 'eth_blockNumber' }, (response: any) => {
+      provider.on('connect', () => {
+        provider.send({ jsonrpc: '2.0', id: 1, chainId: '0x1', method: 'eth_blockNumber', _origin: 'frame.eth', params: [] }, (response: any) => {
           if (response.result) this.created = parseInt(response.result, 16) + ':' + this.created.split(':')[1]
           this.update()
-        }, {
-          type: 'ethereum', 
-          id: 1
         })
       })
     }
@@ -213,7 +209,7 @@ class FrameAccount {
   private async populateRequestCallData (req: TransactionRequest) {
     const { to, data: calldata } = req.data || {}
 
-    if (calldata) {
+    if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
       try {
         const decodedData = await abi.decodeCalldata(to || '', calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
