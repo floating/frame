@@ -21,7 +21,7 @@ function formatBalance (balance, totalValue, decimals = 8) {
 
 function formatUsdRate (rate, decimals = 2) {
   return rate.isNaN()
-    ? '?.??'
+    ? '?'
     : new Intl.NumberFormat('us-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals

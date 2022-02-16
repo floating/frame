@@ -209,7 +209,7 @@ export class Accounts extends EventEmitter {
                   }
                 }).catch(e => console.log('Unable to fetch exchange rate', e))
               } else {
-                txRequest.feeAtTime = '?.??'
+                txRequest.feeAtTime = '?'
                 account.update()
               }
             }
