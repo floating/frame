@@ -1,7 +1,10 @@
 import log from 'electron-log'
 import fetch from 'node-fetch'
-import { id } from '@ethersproject/hash'
-import { defaultAbiCoder } from '@ethersproject/abi'
+import { ethers } from 'ethers'
+import { Interface } from '@ethersproject/abi'
+import erc20 from '../externalData/balances/erc-20-abi'
+
+const erc20Abi = JSON.stringify(erc20)
 
 interface EtherscanSourceCodeResponse {
   status: string,
@@ -14,15 +17,10 @@ interface ContractSourceCodeResult {
   ContractName: string
 }
 
-interface ABIInput {
-  type: string,
-  name: string
-}
-
-interface ABI {
-  type: string,
+interface ContractSource {
+  abi: string,
   name: string,
-  inputs: ABIInput[]
+  source: string
 }
 
 export interface DecodedCallData {
@@ -37,9 +35,9 @@ export interface DecodedCallData {
   }>
 }
 
-function parseAbi (abiData: string): ABI[] {
+function parseAbi (abiData: string): Interface {
   try {
-    return JSON.parse(abiData)
+    return new ethers.utils.Interface(abiData)
   } catch (e) {
     log.warn(`could not parse ABI data: ${abiData}`)
     throw e
@@ -55,42 +53,48 @@ async function fetchSourceCode (contractAddress: Address) {
   }
 }
 
+function decodeData (abi: string, calldata: string) {
+  const contractInterface = parseAbi(abi)
+
+  if (contractInterface) {
+    const sighash = calldata.slice(0, 10)
+
+    try {
+      const abiMethod = contractInterface.getFunction(sighash)
+      const decoded = contractInterface.decodeFunctionData(sighash, calldata)
+
+      return {
+        method: abiMethod.name,
+        args: abiMethod.inputs.map((input, i) => ({ name: input.name, type: input.type, value: decoded[i].toString() }))
+      }
+    } catch (e) {
+      log.warn('unknown ABI method for signature', sighash)
+    }
+  }
+}
+
 export default {
   decodeCalldata: async (contractAddress: Address, calldata: string) => {
+    const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi }]
     const data = await fetchSourceCode(contractAddress)
 
     if (data && data.message === 'OK' && data.result) {
-      const abi = parseAbi(data.result[0].ABI)
+      contractSources.push({ name: data.result[0].ContractName, source: 'etherscan', abi: data.result[0].ABI })
+    }
 
-      if (abi) {
-        const selector = calldata.slice(2, 10)
-        const abiMethod = abi.find(abiItem => {
-          if (abiItem.type === 'function') {
-            const signature = `${abiItem.name}(${abiItem.inputs.map(input => input.type).join(',')})`
-            return selector === id(signature).slice(2, 10)
-          }
-          return false
-        })
+    for (const source of contractSources.reverse()) {
+      const decodedCall = decodeData(source.abi, calldata)
 
-        if (!abiMethod) {
-          log.error('No matching ABI method')
-          return
-        }
-
-        const payload = `0x${calldata.slice(10, calldata.length)}`
-        const types = abiMethod.inputs.map(input => input.type)
-        const decoded = defaultAbiCoder.decode(types, payload)
-
+      if (decodedCall) {
         return {
           contractAddress,
-          contractName: data.result[0].ContractName,
-          source: 'etherscan',
-          method: abiMethod.name,
-          args: abiMethod.inputs.map((input, i) => ({ name: input.name, type: input.type, value: decoded[i].toString() }))
+          contractName: source.name,
+          source: source.source,
+          ...decodedCall
         }
       }
-    } else {
-      throw new Error('Unable to decode data ' + JSON.stringify(data))
     }
+
+    log.warn(`Unable to decode data for contract ${contractAddress}`)
   }
 }
