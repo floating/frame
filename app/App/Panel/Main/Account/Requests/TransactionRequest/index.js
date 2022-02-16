@@ -280,7 +280,7 @@ class TransactionRequest extends React.Component {
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (
       otherChain 
-        ? { type: ApprovalType.OtherChainApproval, req }
+        ? { type: ApprovalType.OtherChainApproval }
         : (req.approvals || []).filter(a => !a.approved)[0]
     )
 
