@@ -77,6 +77,7 @@ class FrameAccount {
     this.address = formattedAddress
     this.lastSignerType = lastSignerType || (options.type as SignerType)
 
+    this.active = active
     this.name = name || capitalize(options.type || '') + ' Account'
     this.ensName = ensName
 
