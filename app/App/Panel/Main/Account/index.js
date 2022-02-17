@@ -876,11 +876,17 @@ class Account extends React.Component {
             </div>
           </div>
         </div>
-        {!this.state.addressHover ? (
-          <div className={requests.length > 0 ? 'accountNotificationBadge accountNotificationBadgeActive' : 'accountNotificationBadge'}>
-            {requests.length}
-          </div>
-        ) : null}
+        {(() => {
+          if (this.state.addressHover) return null
+          let requestBadgeClass = 'accountNotificationBadge'
+          if (active) requestBadgeClass += ' accountNotificationBadgeReady'
+          if (requests.length > 0) requestBadgeClass += ' accountNotificationBadgeActive'
+          return (
+            <div className={requestBadgeClass}>
+              {requests.length}
+            </div>
+          )
+        })()}
         {/* <div
           className='addressSelect' onMouseDown={e => {
             e.stopPropagation()
