@@ -134,8 +134,8 @@ const rpc = {
       }
     })
   },
-  confirmRequestApproval (req, approvalType, cb) {
-    accounts.confirmRequestApproval(req.handlerId, approvalType)
+  confirmRequestApproval (req, approvalType, approvalData, cb) {
+    accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
   },
   approveRequest (req, cb) {
     accounts.setRequestPending(req)

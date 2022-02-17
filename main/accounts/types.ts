@@ -47,7 +47,8 @@ export interface TransactionReceipt {
 export interface Approval {
   type: string,
   data: any,
-  approved: boolean
+  approved: boolean,
+  approve: (data: any) => void
 }
 
 export interface TransactionRequest extends Omit<AccountRequest, 'type'> {

@@ -5,7 +5,6 @@ import Wrapper, { ensResolve } from '@aragon/wrapper'
 import store from '../../store'
 import appNames from './appNames'
 import { Provider, TransactionMetadata } from '../../provider'
-import { TransactionData } from '../../transaction'
 
 function getNetworkId () {
   return parseInt(store('main.currentNetwork.id') || '0')

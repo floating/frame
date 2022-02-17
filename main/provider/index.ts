@@ -41,9 +41,14 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 type Subscriptions = { [key in SubscriptionType]: string[] }
 type Balance = Token & { balance: string, displayBalance: string }
 
+interface RequiredApproval {
+  type: ApprovalType,
+  data: any
+}
+
 export interface TransactionMetadata {
   tx: TransactionData,
-  approvals: Approval[]
+  approvals: RequiredApproval[]
 }
 
 function getNativeCurrency (chainId: number) {
@@ -523,7 +528,7 @@ export class Provider extends EventEmitter {
     if (!newTx) return cb(new Error('No transaction data'))
 
     try {
-      const approvals: Approval[] = []
+      const approvals: RequiredApproval[] = []
       const rawTx = this.getRawTx(newTx)
       const gas = this.gasFees(rawTx)
       const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
@@ -538,8 +543,7 @@ export class Provider extends EventEmitter {
               data: {
                 message: err.message,
                 gasLimit: '0x00'
-              },
-              approved: false
+              }
             })
 
             return { ...rawTx, gasLimit: '0x00' }
@@ -591,17 +595,23 @@ export class Provider extends EventEmitter {
 
         const handlerId = this.addRequestHandler(res)
         const { feesUpdated, ...data } = txMetadata.tx
-        
-        accounts.addRequest({ 
+
+        const req = { 
           handlerId, 
           type: 'transaction', 
           data, 
           payload, 
           account: (currentAccount as FrameAccount).id, 
           origin: payload._origin, 
-          approvals: txMetadata.approvals,
+          approvals: [],
           feesUpdatedByUser: feesUpdated || false
-        } as TransactionRequest, res)
+        } as TransactionRequest
+
+        accounts.addRequest(req, res)
+
+        txMetadata.approvals.forEach(approval => {
+          currentAccount?.addRequiredApproval(req, approval.type, approval.data)
+        })
       }
     })
   }

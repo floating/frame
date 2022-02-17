@@ -162,7 +162,7 @@ class TransactionRequest extends React.Component {
 
     if (approval.type === ApprovalType.TokenSpendApproval) {
       return (
-        <TokenSpendApproval amount={approval.data.amount} req={this.props.req} />
+        <TokenSpendApproval {...approval.data} req={this.props.req} />
       )
     }
   }

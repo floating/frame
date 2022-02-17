@@ -1,5 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
+import BigNumber from 'bignumber.js'
 
 import link from '../../../../../../../../resources/link'
 import TxApproval from '.'
@@ -12,16 +13,28 @@ class TokenSpendApproval extends React.Component {
     const props = args[0] || {}
 
     this.state = {
-      amount: props.amount
+      amount: props.decimals && new BigNumber(props.amount).shiftedBy(-props.decimals)
     }
   }
 
   approve () {
-    link.rpc('confirmRequestApproval', this.props.req, ApprovalType.TokenSpendApproval, () => {})
+    const approvalData = {
+      amount: this.state.amount
+        ? new BigNumber(this.state.amount).shiftedBy(this.props.decimals)
+        : this.props.amount
+    }
+
+    link.rpc('confirmRequestApproval', this.props.req, ApprovalType.TokenSpendApproval, approvalData, () => {})
   }
 
   render () {
-    const editValue = (
+    const {
+      req,
+      contract
+    } = this.props
+
+    // only allow editing of amount if it was provided
+    const editValue = (this.state.amount !== undefined) && (
       <div>
         <label for='changeAmount'>
           Change amount to approve
@@ -33,13 +46,12 @@ class TokenSpendApproval extends React.Component {
       </div>
     )
 
-    // TODO: create message from contract data
-    const message = `confirm that you want to allow <contract> to spend tokens`
+    const message = `confirm that you want to allow contract ${contract} to spend tokens`
 
     return <TxApproval
       title={'approve token spend'}
       message={message}
-      req={this.props.req}
+      req={req}
       editValue={editValue}
       onApprove={() => this.approve()}/>
   }

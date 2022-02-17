@@ -124,7 +124,7 @@ export class Accounts extends EventEmitter {
     }
   }
 
-  confirmRequestApproval (reqId: string, approvalType: ApprovalType) {
+  confirmRequestApproval (reqId: string, approvalType: ApprovalType, approvalData: any) {
     log.info('approveRequest', reqId, approvalType)
 
     const currentAccount = this.current()
@@ -134,8 +134,7 @@ export class Accounts extends EventEmitter {
       const approval = (txRequest.approvals || []).find(a => a.type === approvalType)
 
       if (approval) {
-        approval.approved = true
-        currentAccount.update()
+        approval.approve(approvalData)
       }
     }
   }

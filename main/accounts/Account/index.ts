@@ -1,9 +1,10 @@
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
 import { Version } from 'eth-sig-util'
+import BigNumber from 'bignumber.js'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
-import abi from '../../abi'
+import { decodeCalldata, encodeErc20Call, getErc20Decimals, isErc20Approval } from '../../abi'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -18,8 +19,18 @@ import { ApprovalType } from '../../../resources/constants'
 
 const nebula = nebulaApi('accounts')
 
-function getPermissions (address: Address) {
-  return (store('main.permissions', address) || {}) as Record<string, Permission>
+const storeApi = {
+  getPermissions: function (address: Address) {
+    return (store('main.permissions', address) || {}) as Record<string, Permission>
+  },
+  findToken: function (accountAddress: Address, contractAddress: Address, chainId: number) {
+    const allTokens = [
+      ...store('main.tokens.custom'),
+      ...store('main.tokens.known', accountAddress)
+    ] as Token[]
+
+    return allTokens.find(token => token.address === contractAddress && token.chainId === chainId)
+  }
 }
 
 interface SmartAccount {
@@ -94,7 +105,7 @@ class FrameAccount {
       }
     }
 
-    const existingPermissions = getPermissions(this.address)
+    const existingPermissions = storeApi.getPermissions(this.address)
     const currentSendDappPermission = Object.values(existingPermissions).find(p => ((p.origin || '').toLowerCase()).includes('send.frame.eth'))
 
     if (!currentSendDappPermission) {
@@ -200,14 +211,26 @@ class FrameAccount {
     }
   }
 
-  addRequiredApproval (req: TransactionRequest, type: string, data: any = {}) {
+  addRequiredApproval (req: TransactionRequest, type: ApprovalType, data: any = {}, onApprove: (data: any) => void = () => {}) {
     // TODO: turn TransactionRequest into its own class
+    const approve = (data: any) => {
+      const confirmedApproval = req.approvals.find(a => a.type === type)
+
+      if (confirmedApproval) {
+        onApprove(data)
+
+        confirmedApproval.approved = true
+        this.update()
+      }
+    }
+
     req.approvals = [
       ...(req.approvals || []),
       {
         type,
         data,
-        approved: false
+        approved: false,
+        approve
       }
     ]
   }
@@ -227,24 +250,42 @@ class FrameAccount {
 
     if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
       try {
-        const decodedData = await abi.decodeCalldata(to || '', calldata)
+        const decodedData = await decodeCalldata(to || '', calldata)
         const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
 
-        
-        
         if (decodedData && knownTxRequest) {
-          console.log(decodedData.args)
-          if (abi.isErc20Approval(decodedData)) {
-            const decimals = 
-            const approvalData = {
-              decimals: await 
-            } 
-            console.log('ERC20!')
-          //const token = store('token')
+          if (isErc20Approval(decodedData)) {
+            const spender = decodedData.args[0].value
+            const amount = decodedData.args[1].value
+
+            const targetChain = parseInt(req.data.chainId, 16)
+            let decimals = 0
+
+            // first check if we already have data about the token
+            const token = storeApi.findToken(this.address, decodedData.contractAddress, targetChain)
+
+            if (token) {
+              decimals = token.decimals
+            } else {
+              // if not, try to get token data from the contract
+              decimals = await getErc20Decimals(provider, decodedData.contractAddress)
+            }
+
             this.addRequiredApproval(
               knownTxRequest,
               ApprovalType.TokenSpendApproval,
-              { amount: decodedData.args[1].value }
+              {
+                decimals,
+                amount,
+                contract: decodedData.contractAddress
+              },
+              data => {
+                req.data.data = encodeErc20Call('approve', [spender, data.amount])
+
+                if (req.decodedData) {
+                  req.decodedData.args[1].value = data.amount
+                }
+              }
             )
 
             knownTxRequest.decodedData = decodedData
