@@ -355,7 +355,6 @@
         .accountActive
           color var(--good)
 
-  
       .signerSelectIcon
         transition var(--standard)
         pointer-events none
@@ -478,8 +477,12 @@
       // .signerIconHot
       //   color var(--hot)
 
-      // .signerIconHardware
-      //   color var(--hardware)
+      .signerIconTrezor
+        transform translateY(-3px)
+
+      .signerIconLedger
+        transform translateY(-1px)
+        
 
       // .signerIconSmart
       //   color var(--smart)
@@ -909,6 +912,9 @@
           will-change transform
           svg
             transition var(--standardSlow)
+
+  // .signerTopActive
+  //   background var(--ghostC)
 
   .accountListWrap
     position absolute

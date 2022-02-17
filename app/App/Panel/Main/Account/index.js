@@ -673,8 +673,8 @@ class Account extends React.Component {
         ) : null} */}
         {(_ => {
           const type = this.props.lastSignerType 
-          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconHardware'>{svg.ledger(20)}</div>
-          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconHardware'>{svg.trezor(20)}</div>
+          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
+          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
           if (type === 'seed' || type === 'ring') return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
           if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
           if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
@@ -980,7 +980,7 @@ class Account extends React.Component {
             {!this.state.hideSignerStatus && open ? (
               <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
             ) : null}
-            <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+            <div className={this.props.active ? 'signerTop signerTopActive' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {!this.state.addressHover ? this.renderType() : null} 
               {!this.state.addressHover ? this.renderSignerIndicator() : null} 
               {!this.state.addressHover ? (
