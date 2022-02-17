@@ -2,7 +2,6 @@ import log from 'electron-log'
 import fetch from 'node-fetch'
 import { Interface } from '@ethersproject/abi'
 import erc20 from '../externalData/balances/erc-20-abi'
-import { Provider } from '../provider'
 
 const erc20Abi = JSON.stringify(erc20)
 
@@ -46,27 +45,40 @@ function parseAbi (abiData: string): Interface {
   }
 }
 
-async function fetchSourceCode (contractAddress: Address): Promise<ContractSourceCodeResult | undefined> {
-  try {
-    const res = await fetch(`https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`)
-    const data = await (res.json() as Promise<EtherscanSourceCodeResponse>)
+async function fetchSourceCode (contractAddress: Address) {
+  const res = await fetch(`https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=3SYU5MW5QK8RPCJV1XVICHWKT774993S24`)
 
-    if (data && data.message === 'OK' && (data.result || []).length > 0) {
-      const implementation = data.result[0].Implementation
+  if (res.status === 200 && (res.headers.get('content-type') || '').toLowerCase().includes('json')) {
+    const parsedResponse = await (res.json() as Promise<EtherscanSourceCodeResponse>)
+
+    if (parsedResponse.message === 'OK') return parsedResponse.result
+  }
+
+  return []
+}
+
+
+async function fetchAbi (contractAddress: Address): Promise<ContractSourceCodeResult | undefined> {
+  try {
+    const sources = await fetchSourceCode(contractAddress)
+
+    if (sources.length > 0) {
+      const source = sources[0]
+      const implementation = source.Implementation
 
       if (implementation) {
         // this is a proxy contract, return the ABI for the source
-        return fetchSourceCode(implementation)
+        return fetchAbi(implementation)
       }
 
-      return data.result[0]
+      return source
     }
   } catch (e) {
     log.warn(`could not fetch source code for contract ${contractAddress}`, e)
   }
 }
 
-function decodeData (abi: string, calldata: string) {
+export function decodeCallData (calldata: string, abi: string) {
   const contractInterface = parseAbi(abi)
 
   if (contractInterface) {
@@ -86,16 +98,16 @@ function decodeData (abi: string, calldata: string) {
   }
 }
 
-export async function decodeCalldata (contractAddress: Address, calldata: string): Promise<DecodedCallData | undefined> {
+export async function decodeContractCall (contractAddress: Address, calldata: string): Promise<DecodedCallData | undefined> {
   const contractSources: ContractSource[] = [{ name: 'ERC-20', source: 'erc-20 contract', abi: erc20Abi }]
-  const contractSource = await fetchSourceCode(contractAddress)
+  const contractSource = await fetchAbi(contractAddress)
 
   if (contractSource) {
     contractSources.push({ name: contractSource.ContractName, source: 'etherscan', abi: contractSource.ABI })
   }
 
   for (const source of contractSources.reverse()) {
-    const decodedCall = decodeData(source.abi, calldata)
+    const decodedCall = decodeCallData(calldata, source.abi)
 
     if (decodedCall) {
       return {
@@ -108,41 +120,4 @@ export async function decodeCalldata (contractAddress: Address, calldata: string
   }
 
   log.warn(`Unable to decode data for contract ${contractAddress}`)
-}
-
-export function isErc20Approval (data: DecodedCallData) {
-  return (
-    data.method === 'approve' &&
-    data.args.length === 2 &&
-    data.args[0].name === 'spender' && data.args[0].type === 'address' &&
-    data.args[1].name === 'value' && data.args[1].type === 'uint256'
-  )
-}
-
-export async function getErc20Decimals (provider: Provider, contractAddress: Address) {
-  const erc20Interface = parseAbi(erc20Abi)
-  const calldata = erc20Interface.encodeFunctionData('decimals')
-
-  return new Promise<number>(resolve => {
-    provider.send({
-      id: 1,
-      jsonrpc: '2.0',
-      _origin: 'frame.eth',
-      method: 'eth_call',
-      params: [
-        {
-          to: contractAddress,
-          data: calldata,
-          value: '0x0'
-        }, 'latest'
-      ]
-    }, res => resolve(parseInt(res.result, 16)))
-  })
-
-  // if the contract doesnt provide decimals, try to get the data from Etherscan
-}
-
-export function encodeErc20Call (fn: string, params: any[]) {
-  const erc20Interface = parseAbi(erc20Abi)
-  return erc20Interface.encodeFunctionData(fn, params)
 }

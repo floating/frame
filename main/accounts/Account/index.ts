@@ -1,10 +1,10 @@
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
 import { Version } from 'eth-sig-util'
-import BigNumber from 'bignumber.js'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
-import { decodeCalldata, encodeErc20Call, getErc20Decimals, isErc20Approval } from '../../abi'
+import { decodeContractCall } from '../../abi'
+import erc20 from '../../abi/erc20'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -22,14 +22,6 @@ const nebula = nebulaApi('accounts')
 const storeApi = {
   getPermissions: function (address: Address) {
     return (store('main.permissions', address) || {}) as Record<string, Permission>
-  },
-  findToken: function (accountAddress: Address, contractAddress: Address, chainId: number) {
-    const allTokens = [
-      ...store('main.tokens.custom'),
-      ...store('main.tokens.known', accountAddress)
-    ] as Token[]
-
-    return allTokens.find(token => token.address === contractAddress && token.chainId === chainId)
   }
 }
 
@@ -245,56 +237,47 @@ class FrameAccount {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
-  private async populateRequestCallData (req: TransactionRequest) {
-    const { to, data: calldata } = req.data || {}
+  private async checkForErc20Approve (req: TransactionRequest, calldata: string) {
+    const decodedData = erc20.decodeCallData(req.data.to || '', calldata)
 
-    if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
-      try {
-        const decodedData = await decodeCalldata(to || '', calldata)
-        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+    if (decodedData && erc20.isApproval(decodedData)) {
+      const spender = decodedData.args[0].value
+        const amount = decodedData.args[1].value
+        const decimals = await erc20.getDecimals(provider, decodedData.contractAddress)
 
-        if (decodedData && knownTxRequest) {
-          if (isErc20Approval(decodedData)) {
-            const spender = decodedData.args[0].value
-            const amount = decodedData.args[1].value
+        this.addRequiredApproval(
+          req,
+          ApprovalType.TokenSpendApproval,
+          {
+            decimals,
+            amount,
+            contract: decodedData.contractAddress
+          },
+          data => {
+            req.data.data = erc20.encodeFunctionData('approve', [spender, data.amount])
 
-            const targetChain = parseInt(req.data.chainId, 16)
-            let decimals = 0
-
-            // first check if we already have data about the token
-            const token = storeApi.findToken(this.address, decodedData.contractAddress, targetChain)
-
-            if (token) {
-              decimals = token.decimals
-            } else {
-              // if not, try to get token data from the contract
-              decimals = await getErc20Decimals(provider, decodedData.contractAddress)
+            if (req.decodedData) {
+              req.decodedData.args[1].value = data.amount
             }
-
-            this.addRequiredApproval(
-              knownTxRequest,
-              ApprovalType.TokenSpendApproval,
-              {
-                decimals,
-                amount,
-                contract: decodedData.contractAddress
-              },
-              data => {
-                req.data.data = encodeErc20Call('approve', [spender, data.amount])
-
-                if (req.decodedData) {
-                  req.decodedData.args[1].value = data.amount
-                }
-              }
-            )
-
-            knownTxRequest.decodedData = decodedData
-            this.update()
           }
-        }
-      } catch (e) {
-        log.warn(e)
-      }
+        )
+
+        req.decodedData = decodedData
+        this.update()
+    }
+  }
+
+  private async populateRequestCallData (req: TransactionRequest, calldata: string) {
+    try {
+      const decodedData = await decodeContractCall(req.data.to || '', calldata)
+      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+
+      if (knownTxRequest && decodedData) {
+        knownTxRequest.decodedData = decodedData
+        this.update()
+      } 
+    } catch (e) {
+      log.warn(e)
     }
   }
 
@@ -322,8 +305,16 @@ class FrameAccount {
       this.requests[r.handlerId].res = res
 
       if ((req || {}).type === 'transaction') {
-        this.populateRequestCallData(req as TransactionRequest)
-        this.populateRequestEnsName(req as TransactionRequest)
+        const txRequest = req as TransactionRequest
+        const calldata = txRequest.data.data
+
+        if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
+          await this.checkForErc20Approve(txRequest, calldata)
+
+          this.populateRequestCallData(txRequest, calldata)
+        }
+
+        this.populateRequestEnsName(txRequest)
       }
 
       this.update()
