@@ -9,7 +9,6 @@ import { addHexPrefix, intToHex} from 'ethereumjs-util'
 import store from '../store'
 import dataScanner from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
-import windows from '../windows'
 import FrameAccount from './Account'
 import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
@@ -92,7 +91,7 @@ export class Accounts extends EventEmitter {
     if (account) return cb(null, account) // Account already exists...
     log.info('Account not found, creating account')
     const created = 'new:' + Date.now()
-    this.accounts[address] = new FrameAccount({ address, created, options }, this)
+    this.accounts[address] = new FrameAccount({ address, created, options, active: false }, this)
   }
 
   rename (id: string, name: string) {
@@ -344,6 +343,8 @@ export class Accounts extends EventEmitter {
 
   // Set Current Account
   setSigner (id: string, cb: Callback<Account>) {
+    const previouslyActiveAccount = this.current()
+
     this._current = id
     const currentAccount = this.current()
 
@@ -356,8 +357,16 @@ export class Accounts extends EventEmitter {
 
     dataScanner.setActiveAddress(currentAccount.address)
 
+    currentAccount.active = true
+    currentAccount.update()
+
     const summary = currentAccount.summary()
     cb(null, summary)
+
+    if (previouslyActiveAccount && previouslyActiveAccount.address !== currentAccount.address) {
+      previouslyActiveAccount.active = false
+      previouslyActiveAccount.update()
+    }
     
     store.setAccount(summary)
 
@@ -400,8 +409,6 @@ export class Accounts extends EventEmitter {
   }
 
   unsetSigner (cb: Callback<{ id: string, status: string }>) {
-    this._current = null
-
     dataScanner.setActiveAddress('')
 
     const summary = { id: '', status: '' }
@@ -646,8 +653,21 @@ export class Accounts extends EventEmitter {
 
   remove (address = '') {
     address = address.toLowerCase()
-    windows.broadcast('main:action', 'unsetSigner')
+
+    const currentAccount = this.current()
+    if (currentAccount && currentAccount.address === address) {
+      store.unsetAccount()
+
+      const defaultAccount = (Object.values(this.accounts).filter(a => a.address !== address) || [])[0]
+      if (defaultAccount) {
+        this._current = defaultAccount.id
+        defaultAccount.active = true
+        defaultAccount.update()
+      }
+    }
+
     if (this.accounts[address]) this.accounts[address].close()
+
     store.removeAccount(address)
     delete this.accounts[address]
   }

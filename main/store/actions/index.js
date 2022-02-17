@@ -625,7 +625,7 @@ module.exports = {
         signer.view = 'default'
         return signer
       })
-    }, 520)
+    }, 320)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

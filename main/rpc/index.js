@@ -17,6 +17,7 @@ function randomLetters (num) {
 }
 
 const { resolveName } = require('../accounts/aragon')
+const { arraysEqual } = require('../../resources/utils')
 
 const rpc = {
   getState: cb => {
@@ -38,8 +39,15 @@ const rpc = {
   setSigner: (id, cb) => {
     store.toggleDash('hide')
 
+    const previousAddresses = accounts.getSelectedAddresses()
+
     accounts.setSigner(id, cb)
-    provider.accountsChanged(accounts.getSelectedAddresses())
+
+    const currentAddresses = accounts.getSelectedAddresses()
+
+    if (!arraysEqual(previousAddresses, currentAddresses)) {
+      provider.accountsChanged(currentAddresses)
+    }
   },
   // setSignerIndex: (index, cb) => {
   //   accounts.setSignerIndex(index, cb)
@@ -49,8 +57,15 @@ const rpc = {
   //   }, 320)
   // },
   unsetSigner: (id, cb) => {
+    const previousAddresses = accounts.getSelectedAddresses()
+
     accounts.unsetSigner(cb)
-    provider.accountsChanged(accounts.getSelectedAddresses())
+
+    const currentAddresses = accounts.getSelectedAddresses()
+
+    if (!arraysEqual(previousAddresses, currentAddresses)) {
+      provider.accountsChanged(currentAddresses)
+    }
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
