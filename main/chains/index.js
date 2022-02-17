@@ -105,15 +105,23 @@ class ChainConnection extends EventEmitter {
   }
 
   update (priority) {
+    const network = store('main.networks', this.type, this.chainId)
+
+    if (!network) {
+      // since we poll to re-connect there may be a timing issue where we try
+      // to update a network after it's been removed, so double-check here
+      return
+    }
+
     if (priority === 'primary') {
       const { status, connected, type, network } = this.primary
       const details = { status, connected, type, network }
-      log.info('    Updating primary connection to status, ', details)
+      log.info(`Updating primary connection for chain ${this.chainId}`, details)
       store.setPrimary(this.type, this.chainId, details)
     } else if (priority === 'secondary') {
       const { status, connected, type, network } = this.secondary
       const details = { status, connected, type, network }
-      log.info('    Updating secondary connection to status, ', details)
+      log.info(`Updating secondary connection for chain ${this.chainId}`, details)
       store.setSecondary(this.type, this.chainId, details)
     }
   }
@@ -319,14 +327,25 @@ class ChainConnection extends EventEmitter {
     }
   }
 
-  close () {
+  close (update = true) {
     if (this.observer) this.observer.remove()
-    if (this.primary.provider) this.primary.provider.close()
-    if (this.secondary.provider) this.secondary.provider.close()
-    this.primary = { status: 'loading', network: '', type: '', connected: false }
-    this.secondary = { status: 'loading', network: '', type: '', connected: false }
-    this.update('primary')
-    this.update('secondary')
+
+    if (this.primary.provider) {
+      this.primary.provider.removeAllListeners()
+      this.primary.provider.close()
+    }
+
+    if (this.secondary.provider) {
+      this.secondary.provider.removeAllListeners()
+      this.secondary.provider.close()
+    }
+
+    if (update) {
+      this.primary = { status: 'loading', network: '', type: '', connected: false }
+      this.secondary = { status: 'loading', network: '', type: '', connected: false }
+      this.update('primary')
+      this.update('secondary')
+    }
   }
 
   resError (error, payload, res) {
@@ -358,6 +377,17 @@ class Chains extends EventEmitter {
 
     store.observer(() => {
       const networks = store('main.networks')
+
+      Object.keys(this.connections).forEach(type => {
+        Object.keys(this.connections[type]).forEach(chainId => {
+          if (!networks[type][chainId]) {
+            this.connections[type][chainId].removeAllListeners()
+            this.connections[type][chainId].close(false)
+            delete this.connections[type][chainId]
+          }
+        })
+      })
+
       Object.keys(networks).forEach(type => {
         this.connections[type] = this.connections[type] || {}
         Object.keys(networks[type]).forEach(chainId => {
