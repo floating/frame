@@ -24,7 +24,15 @@ class TokenSpendApproval extends React.Component {
         : this.props.amount
     }
 
-    link.rpc('confirmRequestApproval', this.props.req, ApprovalType.TokenSpendApproval, approvalData, () => {})
+    link.rpc(
+      'confirmRequestApproval', 
+      this.props.req, 
+      ApprovalType.TokenSpendApproval, 
+      approvalData, 
+      () => {
+        console.log('confirmRequestApproval cb')
+      }
+    )
   }
 
   render () {
@@ -50,6 +58,11 @@ class TokenSpendApproval extends React.Component {
       type={'approveTokenSpend'}
       tokenApproval={tokenApproval}
       req={req}
+      updateApprovalAmount={(amount) => {
+        this.setState({
+          amount:  amount ? new BigNumber(amount) : ''
+        })
+      }}
       onApprove={() => this.approve()} />
   }
 }

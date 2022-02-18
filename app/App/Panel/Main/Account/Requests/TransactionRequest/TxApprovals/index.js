@@ -4,6 +4,8 @@ import Restore from 'react-restore'
 import link from '../../../../../../../../resources/link'
 import svg from '../../../../../../../../resources/svg'
 
+const MAX_INT = Math.pow(2, 256) - 1
+
 class TxApproval extends React.Component {
   constructor (...args) {
     super(...args)
@@ -25,7 +27,9 @@ class TxApproval extends React.Component {
       req,
       onApprove,
       editValue,
-      tokenApproval
+      tokenApproval,
+      updateApprovalAmount,
+      type
     } = this.props
 
     return (
@@ -83,7 +87,7 @@ class TxApproval extends React.Component {
             {svg.alert(32)}
           </div>
           <div className='approveTransactionWarningTitle'>{title}</div>
-          {this.props.type === 'approveTokenSpend' ? this.state.inEditApproval ? (
+          {type === 'approveTokenSpend' ? this.state.inEditApproval ? (
             <div className='approveTokenSpend'>
               <div className='approveTokenSpendEdit'>
                 <div className='approveTokenSpendEditTitle'>
@@ -94,9 +98,9 @@ class TxApproval extends React.Component {
                     {tokenApproval.symbol}
                   </div>
                   <input 
-                    value={tokenApproval.amount}
+                    value={tokenApproval.amount.toNumber() === MAX_INT ? '~UNLIMITED' : tokenApproval.amount}
                     onChange={(e) => {
-                      e.target.value
+                      if (updateApprovalAmount) updateApprovalAmount(e.target.value)
                     }}
                   />
                 </div>
@@ -104,11 +108,21 @@ class TxApproval extends React.Component {
                   <div className='approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected'>
                     Requested
                   </div>
-                  <div className='approveTokenSpendPresetButton'>
+                  <div 
+                    className='approveTokenSpendPresetButton'
+                    onClick={() => {
+                      if (updateApprovalAmount) updateApprovalAmount(MAX_INT)
+                    }}
+                  >
                     <span className='approveTokenSpendPresetButtonTilda'>{'~'}</span>
                     <span className='approveTokenSpendPresetButtonInfinity'>{svg.infinity(20)}</span>
                   </div>
-                  <div className='approveTokenSpendPresetButton'>
+                  <div 
+                    className='approveTokenSpendPresetButton'
+                    onClick={() => {
+                      if (updateApprovalAmount) updateApprovalAmount('0')
+                    }}
+                  >
                     Custom
                   </div>
                 </div>
