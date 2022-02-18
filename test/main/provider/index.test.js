@@ -82,6 +82,12 @@ describe('#getRawTx', () => {
     expect(tx.value).toBe('0x0')
   })
 
+  it('turns an un-prefixed zero value into the correct hex value for zero', () => {
+    const tx = provider.getRawTx({ value: '0' })
+
+    expect(tx.value).toBe('0x0')
+  })
+
   it('turns an undefined value into the correct hex value for zero', () => {
     const tx = provider.getRawTx({ value: undefined })
 
