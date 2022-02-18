@@ -411,12 +411,13 @@ export class Provider extends EventEmitter {
 
   private getRawTx (newTx: RPC.SendTransaction.TxParams): TransactionData {
     const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
+    const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
     return {
       ...rawTx,
       from: rawTx.from || ((accounts.current() || {}).id),
       type: '0x0',
-      value: addHexPrefix(unpadHexString(value || '0x') || '0'),
+      value: parsedValue,
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
@@ -514,27 +515,32 @@ export class Provider extends EventEmitter {
   async fillTransaction (newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionData>) {
     if (!newTx) return cb(new Error('No transaction data'))
 
-    const rawTx = this.getRawTx(newTx)
-    const gas = this.gasFees(rawTx)
-    const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
+    try {
+      const rawTx = this.getRawTx(newTx)
+      const gas = this.gasFees(rawTx)
+      const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
-    const estimateGas = rawTx.gasLimit
-      ? Promise.resolve(rawTx)
-      : this.getGasEstimate(rawTx)
-        .then(gasLimit => ({ ...rawTx, gasLimit }))
-        .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
+      const estimateGas = rawTx.gasLimit
+        ? Promise.resolve(rawTx)
+        : this.getGasEstimate(rawTx)
+          .then(gasLimit => ({ ...rawTx, gasLimit }))
+          .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
 
-    estimateGas
-      .then(tx => {
-        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+      estimateGas
+        .then(tx => {
+          const populatedTransaction = populateTransaction(tx, chainConfig, gas)
 
-        log.info({ populatedTransaction })
+          log.info({ populatedTransaction })
 
-        return populatedTransaction
-      })
-      .then(tx => this.checkExistingNonceGas(tx))
-      .then(tx => cb(null, tx))
-      .catch(cb)
+          return populatedTransaction
+        })
+        .then(tx => this.checkExistingNonceGas(tx))
+        .then(tx => cb(null, tx))
+        .catch(cb)
+      } catch (e) {
+        log.error('error creating transaction', e)
+        cb(e as Error)
+      }
   }
 
   sendTransaction (payload: RPC.SendTransaction.Request, res: RPCRequestCallback) {
