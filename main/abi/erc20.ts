@@ -1,3 +1,5 @@
+import log from 'electron-log'
+
 import { decodeCallData as decodeContractData, DecodedCallData } from '.'
 import { Interface } from '@ethersproject/abi'
 import erc20 from '../externalData/balances/erc-20-abi'
@@ -28,10 +30,12 @@ function isApproval (data: DecodedCallData) {
   )
 }
 
-async function getDecimals (provider: Provider, contractAddress: Address) {
-  const calldata = erc20Interface.encodeFunctionData('decimals')
+async function callContractFunction (provider: Provider, contractAddress: Address, functionName: string) {
+  const calldata = erc20Interface.encodeFunctionData(functionName)
 
-  return new Promise<number>(resolve => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => reject({ message: `request to contract ${contractAddress} timed out`}), 2500)
+
     provider.send({
       id: 1,
       jsonrpc: '2.0',
@@ -44,10 +48,32 @@ async function getDecimals (provider: Provider, contractAddress: Address) {
           value: '0x0'
         }, 'latest'
       ]
-    }, res => resolve(res.result ? parseInt(res.result, 16) : 0))
+    }, res => {
+      if (!res.result) return reject(res.error || { message: 'unknown error' })
+
+      resolve(erc20Interface.decodeFunctionResult(functionName, res.result))
+    })
+  })
+}
+
+async function getTokenData (provider: Provider, contractAddress: Address) {
+  const contractFnCall = callContractFunction.bind(null, provider, contractAddress)
+
+  const calls = await Promise.all([
+    contractFnCall('decimals').then(res => parseInt(res as string, 16) || 0),
+    contractFnCall('name').then(res => ((res as string[] || [])[0] || '').trim()),
+    contractFnCall('symbol').then(res => ((res as string[] || [])[0] || '').trim())
+  ]).catch(err => {
+    log.warn(err.message)
+
+    return [0, '', '']
   })
 
-  // if the contract doesnt provide decimals, try to get the data from Etherscan
+  return {
+    decimals: calls[0],
+    name: calls[1],
+    symbol: calls[2]
+  }
 }
 
 function encodeFunctionData (fn: string, params: any[]) {
@@ -57,6 +83,6 @@ function encodeFunctionData (fn: string, params: any[]) {
 export default {
   encodeFunctionData,
   decodeCallData,
-  getDecimals,
+  getTokenData,
   isApproval
 }

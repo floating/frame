@@ -243,13 +243,15 @@ class FrameAccount {
     if (decodedData && erc20.isApproval(decodedData)) {
       const spender = decodedData.args[0].value
         const amount = decodedData.args[1].value
-        const decimals = await erc20.getDecimals(provider, decodedData.contractAddress)
+        const { decimals, name, symbol } = await erc20.getTokenData(provider, decodedData.contractAddress)
 
         this.addRequiredApproval(
           req,
           ApprovalType.TokenSpendApproval,
           {
             decimals,
+            name,
+            symbol,
             amount,
             contract: decodedData.contractAddress
           },
