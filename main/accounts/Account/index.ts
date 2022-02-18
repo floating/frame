@@ -3,8 +3,8 @@ import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
 import { Version } from 'eth-sig-util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
-import { decodeContractCall } from '../../abi'
-import erc20 from '../../abi/erc20'
+import { decodeContractCall } from '../../contracts'
+import erc20 from '../../contracts/erc20'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -16,6 +16,7 @@ import { getType as getSignerType, Type as SignerType } from '../../signers/Sign
 
 import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
+import Erc20Contract from '../../contracts/erc20'
 
 const nebula = nebulaApi('accounts')
 
@@ -238,34 +239,37 @@ class FrameAccount {
   }
 
   private async checkForErc20Approve (req: TransactionRequest, calldata: string) {
-    const decodedData = erc20.decodeCallData(req.data.to || '', calldata)
+    const contractAddress = req.data.to
+    if (!contractAddress) return
 
-    if (decodedData && erc20.isApproval(decodedData)) {
-      const spender = decodedData.args[0].value
-        const amount = decodedData.args[1].value
-        const { decimals, name, symbol } = await erc20.getTokenData(provider, decodedData.contractAddress)
+    const contract = new Erc20Contract(contractAddress, provider)
+    const decodedData = contract.decodeCallData(calldata)
 
-        this.addRequiredApproval(
-          req,
-          ApprovalType.TokenSpendApproval,
-          {
-            decimals,
-            name,
-            symbol,
-            amount,
-            contract: decodedData.contractAddress
-          },
-          data => {
-            req.data.data = erc20.encodeFunctionData('approve', [spender, data.amount])
+    if (decodedData && Erc20Contract.isApproval(decodedData)) {
+      const spender = decodedData.args[0].toLowerCase()
+      const amount = decodedData.args[1].toNumber()
+      const { decimals, name, symbol } = await contract.getTokenData()
 
-            if (req.decodedData) {
-              req.decodedData.args[1].value = data.amount
-            }
+      this.addRequiredApproval(
+        req,
+        ApprovalType.TokenSpendApproval,
+        {
+          decimals,
+          name,
+          symbol,
+          amount,
+          contract: contractAddress
+        },
+        data => {
+          req.data.data = contract.encodeCallData('approve', [spender, data.amount])
+
+          if (req.decodedData) {
+            req.decodedData.args[1].value = data.amount
           }
-        )
+        }
+      )
 
-        req.decodedData = decodedData
-        this.update()
+      this.update()
     }
   }
 
