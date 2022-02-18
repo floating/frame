@@ -30,30 +30,27 @@ class TokenSpendApproval extends React.Component {
   render () {
     const {
       req,
-      contract
+      contract,
+      name,
+      symbol
     } = this.props
 
-    // only allow editing of amount if it was provided
-    const editValue = (this.state.amount !== undefined) && (
-      <div>
-        <label for='changeAmount'>
-          Change amount to approve
-          <input
-            id='changeAmount'
-            value={this.state.amount}
-            onChange={e => this.setState({ amount: e.target.value })}></input>
-        </label>
-      </div>
-    )
+    const token = this.store('main.tokens.known')
 
-    const message = `confirm that you want to allow contract ${contract} to spend tokens`
+    const tokenApproval = {
+      contract,
+      amount: this.state.amount,
+      token,
+      name,
+      symbol
+    }
 
     return <TxApproval
-      title={'approve token spend'}
-      message={message}
+      title={'token approval'}
+      type={'approveTokenSpend'}
+      tokenApproval={tokenApproval}
       req={req}
-      editValue={editValue}
-      onApprove={() => this.approve()}/>
+      onApprove={() => this.approve()} />
   }
 }
 
