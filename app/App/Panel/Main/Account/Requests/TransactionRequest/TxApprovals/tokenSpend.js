@@ -7,33 +7,6 @@ import TxApproval from '.'
 import { ApprovalType } from '../../../../../../../../resources/constants'
 
 class TokenSpendApproval extends React.Component {
-  constructor (...args) {
-    super(...args)
-
-    const props = args[0] || {}
-
-    this.state = {
-      amount: props.decimals && new BigNumber(props.amount).shiftedBy(-props.decimals)
-    }
-  }
-
-  approve () {
-    const approvalData = {
-      amount: this.state.amount
-        ? new BigNumber(this.state.amount).shiftedBy(this.props.decimals)
-        : this.props.amount
-    }
-
-    link.rpc(
-      'confirmRequestApproval', 
-      this.props.req, 
-      ApprovalType.TokenSpendApproval, 
-      approvalData, 
-      () => {
-        console.log('confirmRequestApproval cb')
-      }
-    )
-  }
 
   render () {
     const {
@@ -47,10 +20,11 @@ class TokenSpendApproval extends React.Component {
 
     const tokenApproval = {
       contract,
-      amount: this.state.amount,
       token,
       name,
-      symbol
+      symbol,
+      decimals: this.props.decimals,
+      requestedAmount: this.props.amount
     }
 
     return <TxApproval
@@ -58,12 +32,7 @@ class TokenSpendApproval extends React.Component {
       type={'approveTokenSpend'}
       tokenApproval={tokenApproval}
       req={req}
-      updateApprovalAmount={(amount) => {
-        this.setState({
-          amount:  amount ? new BigNumber(amount) : ''
-        })
-      }}
-      onApprove={() => this.approve()} />
+    />
   }
 }
 
