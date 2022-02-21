@@ -1,7 +1,14 @@
 // @ts-ignore
 import { createWatcher, aggregate } from '@makerdao/multicall'
 import { EthereumProvider } from 'eth-provider'
+import { Interface } from '@ethersproject/interface'
 import log from 'electron-log'
+
+const multicallInterface = new ethers.utils.Interface(multicallAbi)
+const multicallAbi = [
+  'function aggregate(tuple(address target, bytes callData)[]) returns (uint256 blockNumber, bytes[] returndata)',
+  'function tryAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls) returns (tuple(bool success, bytes returndata)[] result)'
+]
 
 const multicallAddresses: { [chainId: number]: string } = {
   30: '0x6c62bf5440de2cb157205b15c424bceb5c3368f5', // RSK mainnet
@@ -42,7 +49,7 @@ type CallResults<T> = {
 }
 
 export function supportsChain (chainId: number) {
-  return chainId in contractAddresses
+  return (chainId in multicallAddresses) || (chainId in multicall2Addresses)
 }
 
 function chainConfig (chainId: number, eth: EthereumProvider) {
