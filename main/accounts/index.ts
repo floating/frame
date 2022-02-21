@@ -125,7 +125,7 @@ export class Accounts extends EventEmitter {
   }
 
   confirmRequestApproval (reqId: string, approvalType: ApprovalType, approvalData: any) {
-    log.info('approveRequest', reqId, approvalType)
+    log.info('confirmRequestApproval', reqId, approvalType)
 
     const currentAccount = this.current()
     if (currentAccount && currentAccount.requests[reqId]) {

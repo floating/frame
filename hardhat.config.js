@@ -1,6 +1,5 @@
 require("@nomiclabs/hardhat-waffle")
 
-const BigNumber = require('bignumber.js')
 const { ethers, utils } = require('ethers')
 const ethProvider = require('eth-provider')
 
@@ -17,16 +16,17 @@ taskWithDefaultParams('send-tx', 'send a test transaction')
   return new Promise((resolve, reject) => {
     setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
 
+    const chainId = '0x' + parseInt(chain).toString(16)
     const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, { origin: 'frame-hardhat-worker' })
 
-    eth.request({ method: 'eth_accounts', params: [], id: 2, chainId: chain, jsonrpc: '2.0' })
+    eth.request({ method: 'eth_accounts', params: [], id: 2, chainId, jsonrpc: '2.0' })
       .then(accounts => ({
         value: utils.parseEther(amount || '.0002').toHexString(),
         from: accounts[0],
         to,
         data: '0x'
       }))
-      .then(tx => eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId: chain }))
+      .then(tx => eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId }))
       .then(txHash => {
         console.log(`success! tx hash: ${txHash}`)
         return txHash
@@ -50,6 +50,7 @@ taskWithDefaultParams('send-token-approval', 'approve token contract for spendin
   return new Promise((resolve, reject) => {
     setTimeout(() => reject(new Error('request timed out!')), 60 * 1000)
 
+    const chainId = '0x' + parseInt(chain).toString(16)
     const eth = ethProvider(provider === 'hardhat' ? 'http://127.0.0.1:8545' : provider, { origin: 'frame-hardhat-worker' })
     const abi = new utils.Interface([
       'function approve(address spender, uint256 value)'
@@ -57,11 +58,9 @@ taskWithDefaultParams('send-token-approval', 'approve token contract for spendin
 
     const bnAmount = ethers.BigNumber.from(amount).mul(ethers.BigNumber.from(10).pow(parseInt(decimals)))
 
-    eth.request({ method: 'eth_accounts', params: [], id: 2, chainId: chain, jsonrpc: '2.0' })
+    eth.request({ method: 'eth_accounts', params: [], id: 2, chainId, jsonrpc: '2.0' })
       .then(accounts => {
         const data = abi.encodeFunctionData('approve', [accounts[0], bnAmount])
-
-        console.log({ data })
 
         return {
           value: '0x0',
@@ -70,7 +69,7 @@ taskWithDefaultParams('send-token-approval', 'approve token contract for spendin
           data
         }
       })
-      .then(tx => { console.log({ tx }); return eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId: chain }) })
+      .then(tx => { console.log({ tx }); return eth.request({ method: 'eth_sendTransaction', params: [tx], id: 2, chainId }) })
       .then(resolve)
       .catch(reject)
     })

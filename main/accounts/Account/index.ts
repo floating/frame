@@ -243,12 +243,12 @@ class FrameAccount {
     const contractAddress = req.data.to
     if (!contractAddress) return
 
-    const contract = new Erc20Contract(contractAddress, provider)
+    const contract = new Erc20Contract(contractAddress, req.data.chainId, provider)
     const decodedData = contract.decodeCallData(calldata)
 
     if (decodedData && Erc20Contract.isApproval(decodedData)) {
       const spender = decodedData.args[0].toLowerCase()
-      const amount = decodedData.args[1].toNumber()
+      const amount = decodedData.args[1].toHexString()
       const { decimals, name, symbol } = await contract.getTokenData()
 
       this.addRequiredApproval(
@@ -263,10 +263,13 @@ class FrameAccount {
         },
         (data: { amount: string }) => {
           // amount is a hex string
+          const approvedAmount = new BigNumber(data.amount).toString()
+          log.info(`changing approved amount for request ${req.handlerId} to ${approvedAmount}`)
+
           req.data.data = contract.encodeCallData('approve', [spender, data.amount])
 
           if (req.decodedData) {
-            req.decodedData.args[1].value = new BigNumber(data.amount).toString()
+            req.decodedData.args[1].value = approvedAmount
           }
         }
       )

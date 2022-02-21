@@ -36,12 +36,11 @@ export interface DecodedCallData {
   }>
 }
 
-function parseAbi (abiData: string): Interface {
+function parseAbi (abiData: string): Interface | undefined {
   try {
     return new Interface(abiData)
   } catch (e) {
     log.warn(`could not parse ABI data: ${abiData}`)
-    throw e
   }
 }
 
