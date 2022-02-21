@@ -1,11 +1,11 @@
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
+import BigNumber from 'bignumber.js'
 import { Version } from 'eth-sig-util'
 import BigNumber from 'bignumber.js'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
 import { decodeContractCall } from '../../contracts'
-import erc20 from '../../contracts/erc20'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -261,11 +261,12 @@ class FrameAccount {
           amount,
           contract: contractAddress
         },
-        data => {
+        (data: { amount: string }) => {
+          // amount is a hex string
           req.data.data = contract.encodeCallData('approve', [spender, data.amount])
 
           if (req.decodedData) {
-            req.decodedData.args[1].value = data.amount
+            req.decodedData.args[1].value = new BigNumber(data.amount).toString()
           }
         }
       )
