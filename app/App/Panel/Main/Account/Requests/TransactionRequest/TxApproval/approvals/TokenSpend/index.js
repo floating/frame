@@ -44,30 +44,6 @@ class TokenSpend extends React.Component {
     }
   }
 
-  decline (req) {
-    link.rpc('declineRequest', req, () => {})
-  }
-
-  approve () {
-    const approvalData = {
-      amount: this.state.amount
-    }
-
-    link.rpc(
-      'confirmRequestApproval', 
-      this.props.req, 
-      ApprovalType.TokenSpendApproval, 
-      approvalData, 
-      (err) => {
-        if (err) {
-          console.log('confirmRequestApproval err', err)
-        } else {
-          console.log('confirmRequestApproval success')
-        }
-      }
-    )
-  }
-
   setAmount (amount) {
     this.setState({ amount })
   }
@@ -113,7 +89,7 @@ class TokenSpend extends React.Component {
               opacity: 0,
               pointerEvents: 'none'
             } : {}}
-            onClick={() => this.decline(req)}
+            onClick={() => this.props.onDecline(req)}
           >
             Reject
           </div>
@@ -131,7 +107,13 @@ class TokenSpend extends React.Component {
               opacity: 0,
               pointerEvents: 'none'
             } : {}}
-            onClick={this.approve.bind(this)}
+            onClick={() => {
+              this.props.onApprove(
+                this.props.req, 
+                ApprovalType.TokenSpendApproval,
+                { amount: this.state.amount }
+              )
+            }}
           >
             Proceed
           </div>
