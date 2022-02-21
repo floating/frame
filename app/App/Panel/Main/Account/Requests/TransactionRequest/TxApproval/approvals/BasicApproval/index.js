@@ -1,24 +1,15 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../../../../../resources/link'
 import svg from '../../../../../../../../../../resources/svg'
 
-class GasLimit extends React.Component {
+class BasicApproval extends React.Component {
   constructor (...args) {
     super(...args)
 
     this.state = {
       inPreview: false
     }
-  }
-
-  approve () {
-    link.rpc('confirmRequestApproval', this.props.req, this.props.approval.type, () => {})
-  }
-
-  decline () {
-    link.rpc('declineRequest', this.props.req, () => {})
   }
 
   render () {
@@ -28,7 +19,7 @@ class GasLimit extends React.Component {
         <div className='approveTransactionWarningOptions'>
           <div
             className='approveTransactionWarningReject'
-            onClick={() => this.decline()}
+            onClick={() => this.props.onDecline(this.props.req)}
           >
             Reject
           </div>
@@ -48,7 +39,7 @@ class GasLimit extends React.Component {
           </div>
           <div
             className='approveTransactionWarningProceed'
-            onClick={() => this.approve()}
+            onClick={() => this.props.onApproval(this.props.req, this.props.approval.type)}
           >
             Proceed
           </div>
@@ -64,7 +55,7 @@ class GasLimit extends React.Component {
             {svg.alert(32)}
           </div>
           <div className='approveTransactionWarningTitle'>
-            {'estimated to fail'}
+            {approval && approval.data && approval.data.title}
           </div>
           <div className='approveTransactionWarningMessage'>
             <div className='approveTransactionWarningMessageInner'>
@@ -77,4 +68,4 @@ class GasLimit extends React.Component {
   }
 }
 
-export default Restore.connect(GasLimit)
+export default Restore.connect(BasicApproval)

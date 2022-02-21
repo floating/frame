@@ -256,7 +256,13 @@ class TransactionRequest extends React.Component {
     const showWarning = !status && mode !== 'monitor'
     const requiredApproval = showWarning && (
       otherChain 
-        ? { type: ApprovalType.OtherChainApproval }
+        ? { 
+          type: ApprovalType.OtherChainApproval,
+          data: {
+            message: 'transaction is not on currently selected chain',
+            title: 'chain warning'
+          }
+        }
         : (req.approvals || []).filter(a => !a.approved)[0]
     )
 
