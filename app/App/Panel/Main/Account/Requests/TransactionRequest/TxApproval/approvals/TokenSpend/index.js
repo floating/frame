@@ -2,10 +2,10 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import link from '../../../../../../../../resources/link'
-import svg from '../../../../../../../../resources/svg'
+import link from '../../../../../../../../../../resources/link'
+import svg from '../../../../../../../../../../resources/svg'
 
-import { ApprovalType } from '../../../../../../../../resources/constants'
+import { ApprovalType } from '../../../../../../../../../../resources/constants'
 
 const nFormat = (num, digits = 2) => {
   num = Number(num)
@@ -30,11 +30,13 @@ const nFormat = (num, digits = 2) => {
 
 const MAX_INT = Math.pow(2, 256) - 1
 
-class TxApproval extends React.Component {
+class TokenSpend extends React.Component {
   constructor (...args) {
     super(...args)
-    this.decimals = this.props.tokenApproval.decimals
-    this.requestedAmount = new BigNumber(this.props.tokenApproval.requestedAmount).shiftedBy(-this.decimals).toNumber()
+
+    console.log('this.props.approval', this.props.approval)
+    this.decimals = this.props.approval.data.decimals
+    this.requestedAmount = new BigNumber(this.props.approval.data.amount).shiftedBy(-this.decimals).toNumber()
     this.maxAmount = this.decimals && new BigNumber(MAX_INT).shiftedBy(-this.decimals).toNumber()
 
     this.state = {
@@ -71,15 +73,9 @@ class TxApproval extends React.Component {
   }
 
   render () {
-    const { 
-      message,
-      title,
-      req,
-      editValue,
-      tokenApproval,
-      type
-    } = this.props
-
+    const { req, approval } = this.props
+    const { data } = approval
+    
     const displayAmount = this.state.amount > 9e15 ? {
       number: '',
       symbol: 'unlimited'
@@ -95,33 +91,17 @@ class TxApproval extends React.Component {
               pointerEvents: 'none'
             } : {}}
             onClick={() => this.decline(req)}
-          >Reject
+          >
+            Reject
           </div>
-          {this.props.type === 'approveTokenSpend' ? (
-            <div
-              className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
-              onClick={() => {
-                this.setState({ inEditApproval: !this.state.inEditApproval })
-              }}
-            >
-              {this.state.inEditApproval ? 'Done' : 'Edit' }
-            </div>
-          ) : (
-            <div
-              className='approveTransactionWarningPreview'
-              onMouseEnter={() => {
-                this.setState({ inPreview: true })
-              }}
-              onMouseMove={() => {
-                this.setState({ inPreview: true })
-              }}
-              onMouseLeave={() => {
-                this.setState({ inPreview: false })
-              }}
-            >
-              Preview
-            </div>
-          )}
+          <div
+            className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
+            onClick={() => {
+              this.setState({ inEditApproval: !this.state.inEditApproval })
+            }}
+          >
+            {this.state.inEditApproval ? 'Done' : 'Edit' }
+          </div>
           <div
             className='approveTransactionWarningProceed'
             style={this.state.inEditApproval ? {
@@ -129,18 +109,19 @@ class TxApproval extends React.Component {
               pointerEvents: 'none'
             } : {}}
             onClick={this.approve.bind(this)}
-          >Proceed
+          >
+            Proceed
           </div>
         </div>
-        <div className='approveTransactionWarningFill' style={this.state.inPreview ? { opacity: 0 } : { opacity: 1 }}>
+        <div className='approveTransactionWarningFill'>
           <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
             {svg.alert(32)}
           </div>
           <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
             {svg.alert(32)}
           </div>
-          <div className='approveTransactionWarningTitle'>{title}</div>
-          {type === 'approveTokenSpend' ? this.state.inEditApproval ? (
+          <div className='approveTransactionWarningTitle'>{'token approval'}</div>
+          {this.state.inEditApproval ? (
             <div className='approveTokenSpend'>
               <div className='approveTokenSpendEdit'>
                 <div className='approveTokenSpendEditTitle'>
@@ -148,7 +129,7 @@ class TxApproval extends React.Component {
                 </div>
                 <div className='approveTokenSpendAmount'>
                   <div className='approveTokenSpendSymbol'>
-                    {tokenApproval.symbol}
+                    {data.symbol}
                   </div>
                   {this.state.mode === 'custom' ? (
                     <input 
@@ -197,15 +178,15 @@ class TxApproval extends React.Component {
           ) : (
             <div className='approveTokenSpend'>
               <div className='approveTokenSpendDescription'>
-                {tokenApproval.contract ? (
+                {data.contract ? (
                   <div className='approveTokenSpendContractAddress'>
                     <div className='approveTokenSpendContractAddressLarge'>
-                      {tokenApproval.contract.substring(0, 6)}
+                      {data.contract.substring(0, 6)}
                       {svg.octicon('kebab-horizontal', { height: 15 })}
-                      {tokenApproval.contract.substr(tokenApproval.contract.length - 4)}
+                      {data.contract.substr(data.contract.length - 4)}
                     </div>
                     <div className='approveTokenSpendContractAddressFull'>
-                      {tokenApproval.contract}
+                      {data.contract}
                     </div>
                   </div>
                 ) : null}
@@ -213,24 +194,13 @@ class TxApproval extends React.Component {
                   {'wants approval to spend'}
                 </div>
                 <div className='approveTokenSpendToken'>
-                  {tokenApproval.symbol}
+                  {data.symbol}
                 </div>
                 <div className='approveTokenSpendTokenName'>
-                  {tokenApproval.name}
+                  {data.name}
                 </div>
               </div>
             </div>
-          ) : (
-            <>
-              <div className='approveTransactionWarningMessage'>
-                <div className='approveTransactionWarningMessageInner'>
-                  {message}
-                </div>
-                {
-                  editValue ? React.cloneElement(editValue) : null
-                }
-              </div>
-            </>
           )}
         </div>
       </div>
@@ -238,4 +208,4 @@ class TxApproval extends React.Component {
   }
 }
 
-export default Restore.connect(TxApproval)
+export default Restore.connect(TokenSpend)

@@ -20,8 +20,7 @@ import TxFeeNew from './TxFeeNew'
 import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import TxOverlay from './TxOverlay'
-import TokenSpendApproval from './TxApprovals/tokenSpend'
-import TxApproval from './TxApprovals'
+import TxApproval from './TxApproval'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -139,33 +138,10 @@ class TransactionRequest extends React.Component {
     return bn.toFixed(2, BigNumber.ROUND_UP).toString()
   }
 
-  getApprovalComponent (approval) {
-    if (approval.type === ApprovalType.OtherChainApproval) {
-      return (
-        <TxApproval
-          title={'chain warning'}
-          message={'transaction is not on currently selected chain'}
-          req={this.props.req}
-          onApprove={() => this.setState({ allowOtherChain: true })} />
-      )
-    }
-
-    if (approval.type === ApprovalType.GasLimitApproval) {
-      return (
-        <TxApproval
-          title={'estimated to fail'}
-          message={approval.data.message}
-          req={this.props.req}
-          onApprove={() => link.rpc('confirmRequestApproval', this.props.req, approval.type, () => {}) } />
-      )
-    }
-
-    if (approval.type === ApprovalType.TokenSpendApproval) {
-      return (
-        <TokenSpendApproval {...approval.data} req={this.props.req} />
-      )
-    }
+  allowOtherChain () {
+    this.setState({ allowOtherChain: true })
   }
+
 
   render () {
     const req = this.props.req
@@ -284,14 +260,16 @@ class TransactionRequest extends React.Component {
         : (req.approvals || []).filter(a => !a.approved)[0]
     )
 
-    const approvalComponent = requiredApproval && this.getApprovalComponent(requiredApproval)
-
     return (
       <div key={req.handlerId} className={requestClass} style={{ transform: `translateY(${this.props.pos}px)`, height, zIndex: z }}>
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-            {approvalComponent}
+             <TxApproval
+              req={this.props.req}
+              approval={requiredApproval}
+              allowOtherChain={this.allowOtherChain.bind(this)}
+            />
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
                 <div className='txNonceControl'>
