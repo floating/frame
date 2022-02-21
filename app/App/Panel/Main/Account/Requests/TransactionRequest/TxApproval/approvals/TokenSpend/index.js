@@ -28,17 +28,13 @@ const nFormat = (num, digits = 2) => {
   }
 }
 
-const MAX_INT = Math.pow(2, 256) - 1
+const MAX_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 class TokenSpend extends React.Component {
   constructor (...args) {
     super(...args)
-
-    console.log('this.props.approval', this.props.approval)
     this.decimals = this.props.approval.data.decimals
-    this.requestedAmount = new BigNumber(this.props.approval.data.amount).shiftedBy(-this.decimals).toNumber()
-    this.maxAmount = this.decimals && new BigNumber(MAX_INT).shiftedBy(-this.decimals).toNumber()
-
+    this.requestedAmount = '0x' + new BigNumber(this.props.approval.data.amount).integerValue().toString(16)
     this.state = {
       inPreview: false,
       inEditApproval: false,
@@ -54,7 +50,7 @@ class TokenSpend extends React.Component {
 
   approve () {
     const approvalData = {
-      amount: new BigNumber(this.state.amount).shiftedBy(this.decimals)
+      amount: this.state.amount
     }
 
     link.rpc(
@@ -62,8 +58,12 @@ class TokenSpend extends React.Component {
       this.props.req, 
       ApprovalType.TokenSpendApproval, 
       approvalData, 
-      () => {
-        console.log('confirmRequestApproval cb')
+      (err) => {
+        if (err) {
+          console.log('confirmRequestApproval err', err)
+        } else {
+          console.log('confirmRequestApproval success')
+        }
       }
     )
   }
@@ -72,14 +72,37 @@ class TokenSpend extends React.Component {
     this.setState({ amount })
   }
 
+  setCustomAmount (value) {
+    if (value === '') {
+      this.setState({ mode: 'custom', amount: '0x0', customInput: value })
+    } else {
+      const max = new BigNumber(MAX_HEX)
+      const custom = new BigNumber(value).shiftedBy(this.decimals)
+
+      let amount
+      if (max.comparedTo(custom) === -1) {
+        amount = MAX_HEX
+      } else {
+        amount = '0x' + custom.integerValue().toString(16)
+      }
+      
+      this.setState({ mode: 'custom', amount, customInput: value })
+    }
+  }
+
   render () {
     const { req, approval } = this.props
     const { data } = approval
-    
-    const displayAmount = this.state.amount > 9e15 ? {
+
+    const displayInt = new BigNumber(this.state.amount).shiftedBy(-this.decimals).integerValue()
+
+    const displayAmount = this.state.amount === MAX_HEX ? {
       number: '',
       symbol: 'unlimited'
-    } : nFormat(this.state.amount)
+    } : displayInt > 9e12 ? {
+      number: '',
+      symbol: '~unlimited'
+    } : nFormat(displayInt)
 
     return (
       <div className='approveTransactionWarning'>
@@ -136,12 +159,22 @@ class TokenSpend extends React.Component {
                       autoFocus
                       value={this.state.customInput}
                       onChange={(e) => {
-                        this.setState({ mode: 'custom', amount: new BigNumber(e.target.value).toNumber(), customInput: e.target.value })
+                        e.preventDefault()
+                        e.stopPropagation()
+                        this.setCustomAmount(e.target.value)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') return this.setState({ inEditApproval: false })
                       }}
                     />
                   ) : (
                     <div>
-                      <div className='approveTokenSpendAmountNoInput'>
+                      <div 
+                        className='approveTokenSpendAmountNoInput'
+                        onClick={() => {
+                          this.setCustomAmount(this.state.customInput)
+                        }}
+                      >
                         <div className='approveTokenSpendAmountNoInputNumber'>{displayAmount.number}</div>
                         <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div> 
                       </div>
@@ -159,7 +192,8 @@ class TokenSpend extends React.Component {
                   <div 
                     className={this.state.mode === 'unlimited' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
                     onClick={() => {
-                      this.setState({ mode: 'unlimited', amount: this.maxAmount })
+                      const amount = MAX_HEX
+                      this.setState({ mode: 'unlimited', amount })
                     }}
                   >
                     <span className='approveTokenSpendPresetButtonInfinity'>{'Unlimited'}</span>
@@ -167,7 +201,7 @@ class TokenSpend extends React.Component {
                   <div 
                     className={this.state.mode === 'custom' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
                     onClick={() => {
-                      this.setState({ mode: 'custom', amount: parseFloat(this.state.customInput) })
+                      this.setCustomAmount(this.state.customInput)
                     }}
                   >
                     Custom
