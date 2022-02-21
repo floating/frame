@@ -22,6 +22,7 @@ class GasLimit extends React.Component {
   }
 
   render () {
+    const { approval } = this.props
     return (
       <div className='approveTransactionWarning'>
         <div className='approveTransactionWarningOptions'>
