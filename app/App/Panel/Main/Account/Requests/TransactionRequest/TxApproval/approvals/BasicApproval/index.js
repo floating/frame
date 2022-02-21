@@ -39,7 +39,7 @@ class BasicApproval extends React.Component {
           </div>
           <div
             className='approveTransactionWarningProceed'
-            onClick={() => this.props.onApproval(this.props.req, this.props.approval.type)}
+            onClick={() => this.props.onApprove(this.props.req, this.props.approval.type)}
           >
             Proceed
           </div>

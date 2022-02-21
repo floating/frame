@@ -26,7 +26,7 @@ class TxApproval extends React.Component {
           <BasicApproval
             req={req}
             approval={approval}
-            onApproval={this.approve}
+            onApprove={this.approve}
             onDecline={this.decline}
           />
         )
@@ -38,7 +38,7 @@ class TxApproval extends React.Component {
           <BasicApproval
             req={req}
             approval={approval}
-            onApproval={allowOtherChain}
+            onApprove={allowOtherChain}
             onDecline={this.decline}
           />
         )
@@ -49,7 +49,7 @@ class TxApproval extends React.Component {
           <TokenSpend 
             req={req}
             approval={approval}
-            onApproval={this.approve}
+            onApprove={this.approve}
             onDecline={this.decline}
           />
         )
