@@ -1,9 +1,10 @@
 import log from 'electron-log'
 import { isValidAddress, addHexPrefix } from 'ethereumjs-util'
+import BigNumber from 'bignumber.js'
 import { Version } from 'eth-sig-util'
 
 import { AccessRequest, AccountRequest, Accounts, RequestMode, TransactionRequest } from '..'
-import abi from '../../abi'
+import { decodeContractCall } from '../../contracts'
 import nebulaApi from '../../nebula'
 import signers from '../../signers'
 import windows from '../../windows'
@@ -14,11 +15,15 @@ import { capitalize } from '../../../resources/utils'
 import { getType as getSignerType, Type as SignerType } from '../../signers/Signer'
 
 import provider from '../../provider'
+import { ApprovalType } from '../../../resources/constants'
+import Erc20Contract from '../../contracts/erc20'
 
 const nebula = nebulaApi('accounts')
 
-function getPermissions (address: Address) {
-  return (store('main.permissions', address) || {}) as Record<string, Permission>
+const storeApi = {
+  getPermissions: function (address: Address) {
+    return (store('main.permissions', address) || {}) as Record<string, Permission>
+  }
 }
 
 interface SmartAccount {
@@ -93,7 +98,7 @@ class FrameAccount {
       }
     }
 
-    const existingPermissions = getPermissions(this.address)
+    const existingPermissions = storeApi.getPermissions(this.address)
     const currentSendDappPermission = Object.values(existingPermissions).find(p => ((p.origin || '').toLowerCase()).includes('send.frame.eth'))
 
     if (!currentSendDappPermission) {
@@ -199,6 +204,30 @@ class FrameAccount {
     }
   }
 
+  addRequiredApproval (req: TransactionRequest, type: ApprovalType, data: any = {}, onApprove: (data: any) => void = () => {}) {
+    // TODO: turn TransactionRequest into its own class
+    const approve = (data: any) => {
+      const confirmedApproval = req.approvals.find(a => a.type === type)
+
+      if (confirmedApproval) {
+        onApprove(data)
+
+        confirmedApproval.approved = true
+        this.update()
+      }
+    }
+
+    req.approvals = [
+      ...(req.approvals || []),
+      {
+        type,
+        data,
+        approved: false,
+        approve
+      }
+    ]
+  }
+
   resError (err: string | Error, payload: RPCResponsePayload, res: RPCErrorCallback) {
     const error = typeof err === 'string'
       ? { message: err, code: -1 }
@@ -209,21 +238,56 @@ class FrameAccount {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, error })
   }
 
-  private async populateRequestCallData (req: TransactionRequest) {
-    const { to, data: calldata } = req.data || {}
+  private async checkForErc20Approve (req: TransactionRequest, calldata: string) {
+    const contractAddress = req.data.to
+    if (!contractAddress) return
 
-    if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
-      try {
-        const decodedData = await abi.decodeCalldata(to || '', calldata)
-        const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+    const contract = new Erc20Contract(contractAddress, req.data.chainId, provider)
+    const decodedData = contract.decodeCallData(calldata)
 
-        if (decodedData && knownTxRequest) {
-          knownTxRequest.decodedData = decodedData
-          this.update()
+    if (decodedData && Erc20Contract.isApproval(decodedData)) {
+      const spender = decodedData.args[0].toLowerCase()
+      const amount = decodedData.args[1].toHexString()
+      const { decimals, name, symbol } = await contract.getTokenData()
+
+      this.addRequiredApproval(
+        req,
+        ApprovalType.TokenSpendApproval,
+        {
+          decimals,
+          name,
+          symbol,
+          amount,
+          contract: contractAddress
+        },
+        (data: { amount: string }) => {
+          // amount is a hex string
+          const approvedAmount = new BigNumber(data.amount).toString()
+          log.info(`changing approved amount for request ${req.handlerId} to ${approvedAmount}`)
+
+          req.data.data = contract.encodeCallData('approve', [spender, data.amount])
+
+          if (req.decodedData) {
+            req.decodedData.args[1].value = approvedAmount
+          }
         }
-      } catch (e) {
-        log.warn(e)
-      }
+      )
+
+      this.update()
+    }
+  }
+
+  private async populateRequestCallData (req: TransactionRequest, calldata: string) {
+    try {
+      const decodedData = await decodeContractCall(req.data.to || '', calldata)
+      const knownTxRequest = this.requests[req.handlerId] as TransactionRequest
+
+      if (knownTxRequest && decodedData) {
+        knownTxRequest.decodedData = decodedData
+        this.update()
+      } 
+    } catch (e) {
+      log.warn(e)
     }
   }
 
@@ -249,14 +313,24 @@ class FrameAccount {
       this.requests[r.handlerId].mode = RequestMode.Normal
       this.requests[r.handlerId].created = Date.now()
       this.requests[r.handlerId].res = res
+
+      if ((req || {}).type === 'transaction') {
+        const txRequest = req as TransactionRequest
+        const calldata = txRequest.data.data
+
+        if (calldata && calldata !== '0x' && parseInt(calldata, 16) !== 0) {
+          await this.checkForErc20Approve(txRequest, calldata)
+
+          this.populateRequestCallData(txRequest, calldata)
+        }
+
+        this.populateRequestEnsName(txRequest)
+      }
+
       this.update()
       windows.showTray()
       windows.broadcast('main:action', 'setSignerView', 'default')
       windows.broadcast('main:action', 'setPanelView', 'default')
-      if ((req || {}).type === 'transaction') {
-        this.populateRequestCallData(req as TransactionRequest)
-        this.populateRequestEnsName(req as TransactionRequest)
-      }
     }
     // Add a filter to make sure we're adding the request to an account that controls the outcome
     if (this.smart) {

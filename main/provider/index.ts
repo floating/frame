@@ -31,6 +31,8 @@ import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
+import { Approval } from '../accounts/types'
+import { ApprovalType } from '../../resources/constants'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
@@ -38,6 +40,16 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 
 type Subscriptions = { [key in SubscriptionType]: string[] }
 type Balance = Token & { balance: string, displayBalance: string }
+
+interface RequiredApproval {
+  type: ApprovalType,
+  data: any
+}
+
+export interface TransactionMetadata {
+  tx: TransactionData,
+  approvals: RequiredApproval[]
+}
 
 function getNativeCurrency (chainId: number) {
   const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
@@ -512,10 +524,11 @@ export class Provider extends EventEmitter {
     return tx
   }
 
-  async fillTransaction (newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionData>) {
+  async fillTransaction (newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionMetadata>) {
     if (!newTx) return cb(new Error('No transaction data'))
 
     try {
+      const approvals: RequiredApproval[] = []
       const rawTx = this.getRawTx(newTx)
       const gas = this.gasFees(rawTx)
       const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
@@ -524,7 +537,17 @@ export class Provider extends EventEmitter {
         ? Promise.resolve(rawTx)
         : this.getGasEstimate(rawTx)
           .then(gasLimit => ({ ...rawTx, gasLimit }))
-          .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
+          .catch(err => {
+            approvals.push({
+              type: ApprovalType.GasLimitApproval,
+              data: {
+                message: err.message,
+                gasLimit: '0x00'
+              }
+            })
+
+            return { ...rawTx, gasLimit: '0x00' }
+         })
 
       estimateGas
         .then(tx => {
@@ -535,13 +558,13 @@ export class Provider extends EventEmitter {
           return populatedTransaction
         })
         .then(tx => this.checkExistingNonceGas(tx))
-        .then(tx => cb(null, tx))
+        .then(tx => cb(null, { tx, approvals }))
         .catch(cb)
-      } catch (e) {
-        log.error('error creating transaction', e)
-        cb(e as Error)
-      }
-  }
+    } catch (e) {
+      log.error('error creating transaction', e)
+      cb(e as Error)
+    }
+    }
 
   sendTransaction (payload: RPC.SendTransaction.Request, res: RPCRequestCallback) {
     const txParams = payload.params[0]
@@ -561,28 +584,34 @@ export class Provider extends EventEmitter {
 
     log.debug(`sendTransaction(${JSON.stringify(newTx)}`)
 
-    this.fillTransaction(newTx, (err, transaction) => {
+    this.fillTransaction(newTx, (err, transactionMetadata) => {
       if (err) {
         this.resError(err, payload, res)
       } else {
-        const tx = transaction as TransactionData
-        const from = tx.from
+        const txMetadata = transactionMetadata as TransactionMetadata
+        const from = txMetadata.tx.from
 
         if (from && !this.isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
 
         const handlerId = this.addRequestHandler(res)
-        const { warning, feesUpdated, ...data } = tx
-        
-        accounts.addRequest({ 
+        const { feesUpdated, ...data } = txMetadata.tx
+
+        const req = {
           handlerId, 
           type: 'transaction', 
           data, 
           payload, 
           account: (currentAccount as FrameAccount).id, 
           origin: payload._origin, 
-          warning,
+          approvals: [],
           feesUpdatedByUser: feesUpdated || false
-        } as TransactionRequest, res)
+        } as TransactionRequest
+
+        accounts.addRequest(req, res)
+
+        txMetadata.approvals.forEach(approval => {
+          currentAccount?.addRequiredApproval(req, approval.type, approval.data)
+        })
       }
     })
   }

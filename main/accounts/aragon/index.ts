@@ -4,8 +4,7 @@ import Wrapper, { ensResolve } from '@aragon/wrapper'
 
 import store from '../../store'
 import appNames from './appNames'
-import { Provider } from '../../provider'
-import { TransactionData } from '../../transaction'
+import { Provider, TransactionMetadata } from '../../provider'
 
 function getNetworkId () {
   return parseInt(store('main.currentNetwork.id') || '0')
@@ -156,7 +155,7 @@ class Aragon {
             this.provider.fillTransaction(newTx, (err, fullTx) => {
               if (err) return cb(err)
 
-              const filledTx = fullTx as TransactionData
+              const filledTx = (fullTx as TransactionMetadata).tx
 
               const value = filledTx.value !== undefined ? filledTx.value : '0x'
               cb(null, { ...filledTx, value })

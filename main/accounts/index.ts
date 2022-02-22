@@ -23,6 +23,7 @@ import {
 import provider from'../provider'
 import { Chain } from '../chains'
 import { TypedData, Version } from 'eth-sig-util'
+import { ApprovalType } from '../../resources/constants'
 
 function notify (title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -123,14 +124,18 @@ export class Accounts extends EventEmitter {
     }
   }
 
-  removeRequestWarning (reqId: string) {
-    log.info('removeRequestWarning: ', reqId)
+  confirmRequestApproval (reqId: string, approvalType: ApprovalType, approvalData: any) {
+    log.info('confirmRequestApproval', reqId, approvalType)
 
     const currentAccount = this.current()
     if (currentAccount && currentAccount.requests[reqId]) {
       const txRequest = this.getTransactionRequest(currentAccount, reqId)
-      delete txRequest.warning
-      currentAccount.update()
+
+      const approval = (txRequest.approvals || []).find(a => a.type === approvalType)
+
+      if (approval) {
+        approval.approve(approvalData)
+      }
     }
   }
 

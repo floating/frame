@@ -1,5 +1,5 @@
 import type { Version } from 'eth-sig-util'
-import type { DecodedCallData } from '../abi'
+import type { DecodedCallData } from '../contracts'
 import type { Chain } from '../chains'
 import type { TransactionData } from '../transaction'
 
@@ -44,6 +44,13 @@ export interface TransactionReceipt {
   blockNumber: string
 }
 
+export interface Approval {
+  type: string,
+  data: any,
+  approved: boolean,
+  approve: (data: any) => void
+}
+
 export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   type: 'transaction',
   payload: RPC.SendTransaction.Request,
@@ -54,6 +61,7 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
     hash?: string,
     confirmations: number
   },
+  approvals: Approval[],
   locked?: boolean,
   automaticFeeUpdateNotice?: {
     previousFee: any,
@@ -61,7 +69,6 @@ export interface TransactionRequest extends Omit<AccountRequest, 'type'> {
   recipient?: string, // ens name
   updatedFees?: boolean,
   feeAtTime?: string,
-  warning?: string,
   completed?: number,
   feesUpdatedByUser: boolean
 }
