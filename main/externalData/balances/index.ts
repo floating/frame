@@ -41,20 +41,14 @@ function createBalance (rawBalance: string, decimals: number): ExternalBalance {
 }
 
 export default function (eth: EthereumProvider) {
-  function balanceCalls (owner: string, tokens: TokenDefinition[]): Call<EthersBigNumber, TokenBalance>[] {
+  function balanceCalls (owner: string, tokens: TokenDefinition[]): Call<EthersBigNumber, ExternalBalance>[] {
     return tokens.map(token => ({
       target: token.address,
-      call: ['balanceOf(address)(uint256)', owner],
+      call: ['function balanceOf(address address) returns (uint256 value)', owner],
       returns: [
-        [
-          `${token.address.toUpperCase()}_BALANCE`,
-          (bn: EthersBigNumber) => {
-            return {
-              ...token,
-              ...createBalance(bn.toHexString(), token.decimals)
-            }
-          }
-        ]
+        (bn: EthersBigNumber) => {
+          return createBalance(bn.toHexString(), token.decimals)
+        }
       ]
     }))
   }
@@ -112,9 +106,15 @@ export default function (eth: EthereumProvider) {
   async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
     const calls = balanceCalls(owner, tokens)
 
-    eth.setChain(addHexPrefix(chainId.toString(16)))
+    const results = await multicall(chainId, eth).batchCall(calls)
 
-    return multicall(chainId, eth).batchCall(calls)
+    return results.map((result, i) => {
+      const balance = result.success ? result.returnValues[0] : createBalance('0x0', tokens[i].decimals)
+      return {
+        ...tokens[i],
+        ...balance
+      }
+    })
   }
 
   return {
