@@ -1,14 +1,17 @@
-// @ts-ignore
-import { createWatcher, aggregate } from '@makerdao/multicall'
+
 import { EthereumProvider } from 'eth-provider'
-import { Interface } from '@ethersproject/interface'
+import { Interface } from '@ethersproject/abi'
 import log from 'electron-log'
 
-const multicallInterface = new ethers.utils.Interface(multicallAbi)
+const functionSignature = /function\s+(?<signature>\w+)/
+
 const multicallAbi = [
-  'function aggregate(tuple(address target, bytes callData)[]) returns (uint256 blockNumber, bytes[] returndata)',
+  'function aggregate(tuple(address target, bytes callData)[] calls) returns (uint256 blockNumber, bytes[] returndata)',
   'function tryAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls) returns (tuple(bool success, bytes returndata)[] result)'
 ]
+
+const multicallInterface = new Interface(multicallAbi)
+const memoizedInterfaces: Record<string, Interface> = {}
 
 const multicallAddresses: { [chainId: number]: string } = {
   30: '0x6c62bf5440de2cb157205b15c424bceb5c3368f5', // RSK mainnet
@@ -28,40 +31,42 @@ const multicall2Addresses: { [chainId: number]: string } = {
   42: '0x5ba1e12693dc8f9c48aad8770482f4739beed696', // kovan
 }
 
-type CallResponse<R, T> = [string, PostProcessor<R, T>]
+type CallResult<T> = { success: boolean, returnValues: T[] }
 type PostProcessor<R, T> = (val: R) => T
+
+enum MulticallVersion {
+  V1 = 1, V2 = 2
+}
 
 export interface Call<R, T> {
   target: string, // address
   call: string[],
-  returns: [CallResponse<R, T>]
+  returns: [PostProcessor<R, T>]
 }
 
 interface MulticallConfig {
   address: Address,
-  provider: EthereumProvider
-}
-
-type CallResults<T> = {
-  transformed: {
-    [returnKey: string]: T
-  }
+  provider: EthereumProvider,
+  version: MulticallVersion
 }
 
 export function supportsChain (chainId: number) {
   return (chainId in multicallAddresses) || (chainId in multicall2Addresses)
 }
 
-function chainConfig (chainId: number, eth: EthereumProvider) {
+function chainConfig (chainId: number, eth: EthereumProvider): MulticallConfig {
   return {
-    multicallAddress: contractAddresses[chainId],
+    address: multicallAddresses[chainId] || multicall2Addresses[chainId],
     //rpcUrl: 'http://127.0.0.1:1248'
-    provider: eth
+    provider: eth,
+    version: (chainId in multicall2Addresses) ? MulticallVersion.V2 : MulticallVersion.V1
   }
 }
 
-async function makeCall (config: MulticallConfig, data: string) {
-  return config.provider.request({
+async function makeCall (functionName: string, params: any[], config: MulticallConfig) {
+  const data = multicallInterface.encodeFunctionData(functionName, params)
+
+  const response = await config.provider.request({
     id: 1,
     jsonrpc: '2.0',
     method: 'eth_call',
@@ -69,17 +74,83 @@ async function makeCall (config: MulticallConfig, data: string) {
       { to: config.address, data }, 'latest'
     ]
   })
+
+  return multicallInterface.decodeFunctionResult(functionName, response)
 }
 
-async function aggregate (config: MulticallConfig) {
-  const response = await makeCall(config, aggData)
+function buildCallData <R, T> (calls: Call<R, T>[]) {
+  return calls.map(({ target, call }) => {
+    const [fnSignature, ...params] = call
+    const fnName = getFunctionNameFromSignature(fnSignature)
+
+    const callInterface = getInterface(fnSignature)
+    const calldata = callInterface.encodeFunctionData(fnName, params)
+
+    return [target, calldata]
+  })
+}
+
+function getResultData (results: any, call: string[]) {
+  const [fnSignature] = call
+  const callInterface = memoizedInterfaces[fnSignature]
+  const fnName = getFunctionNameFromSignature(fnSignature)
+
+  return callInterface.decodeFunctionResult(fnName, results)
+}
+
+function getFunctionNameFromSignature (signature: string) {
+  const m = signature.match(functionSignature)
+
+  if (!m) {
+    throw new Error(`could not parse function name from signature: ${signature}`)
+  }
+  
+  return (m.groups || {}).signature
+}
+
+function getInterface (functionSignature: string) {
+  if (!(functionSignature in memoizedInterfaces)) {
+    memoizedInterfaces[functionSignature] = new Interface([functionSignature])
+  }
+
+  return memoizedInterfaces[functionSignature]
+}
+ 
+async function aggregate <R, T> (calls: Call<R, T>[], config: MulticallConfig): Promise<CallResult<T>[]> {
+  const aggData = buildCallData(calls)
+  const response = await makeCall('aggregate', [aggData], config)
+
+  return calls.map(({ call, returns }, i) => {
+    const resultData = getResultData(response.returndata[i], call)
+
+    return { success: true, returnValues: returns.map((handler, j) => handler(resultData[j])) }
+  })
+}
+
+async function tryAggregate <R, T> (calls: Call<R, T>[], config: MulticallConfig) {
+  const aggData = buildCallData(calls)
+  const response = await makeCall('tryAggregate', [false, aggData], config)
+
+  return calls.map(({ call, returns }, i) => {
+    const results = response.result[i]
+
+    if (!results.success) {
+      return { success: false, returnValues: [] }
+    }
+
+    const resultData = getResultData(results.returndata, call)
+
+    return { success: true, returnValues: returns.map((handler, j) => handler(resultData[j])) }
+  })
 }
 
 export default function (chainId: number, eth: EthereumProvider) {
   const config = chainConfig(chainId, eth)
 
-  async function call <R, T> (calls: Call<R, T>[]): Promise<CallResults<T>> {
-    return (await aggregate(calls, config)).results
+  async function call <R, T> (calls: Call<R, T>[]): Promise<CallResult<T>[]> {
+    return config.version === MulticallVersion.V2
+      ? tryAggregate(calls, config)
+      : aggregate(calls, config)
   }
 
   return {
@@ -94,7 +165,7 @@ export default function (chainId: number, eth: EthereumProvider) {
         try {
           const results = await call(calls.slice(batchStart, batchEnd))
   
-          return Object.values(results.transformed)
+          return results
         } catch (e) {
           log.error(`multicall error (batch ${batchStart}-${batchEnd}), chainId: ${chainId}, first call: ${JSON.stringify(calls[batchStart])}`, e)
           return []
@@ -102,19 +173,9 @@ export default function (chainId: number, eth: EthereumProvider) {
       })
   
       const fetchResults = await Promise.all(fetches)
-      const callResults = ([] as T[]).concat(...fetchResults)
+      const callResults = ([] as CallResult<T>[]).concat(...fetchResults)
   
       return callResults
-    },
-    subscribe: function <R, T> (calls: Call<R, T>[], cb: (err: any, val: any) => void) {
-      const watcher = createWatcher(calls, config)
-
-      watcher.subscribe((update: any) => cb(null, update))
-      watcher.onError(cb)
-
-      watcher.start()
-
-      return watcher
     }
   }
 }
