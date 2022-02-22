@@ -80,6 +80,11 @@ class TokenSpend extends React.Component {
       symbol: '~unlimited'
     } : nFormat(displayInt)
 
+    const symbol = data.symbol || '???'
+    const name = data.name || 'Unknown Token'
+
+    const inputLock = !data.symbol || !data.name || !this.decimals
+
     return (
       <div className='approveTransactionWarning'>
         <div className='approveTransactionWarningOptions'>
@@ -134,9 +139,13 @@ class TokenSpend extends React.Component {
                 </div>
                 <div className='approveTokenSpendAmount'>
                   <div className='approveTokenSpendSymbol'>
-                    {data.symbol}
+                    {symbol}
                   </div>
-                  {this.state.mode === 'custom' ? (
+                  {this.state.mode === 'custom' ? inputLock ? (
+                    <div className='approveTokenSpendAmountNoInput'>
+                      <div className='approveTokenSpendAmountNoInputSymbol'>{'cannot set unknown'}</div>
+                    </div>
+                  ) : (
                     <input 
                       autoFocus
                       value={this.state.customInput}
@@ -210,10 +219,10 @@ class TokenSpend extends React.Component {
                   {'wants approval to spend'}
                 </div>
                 <div className='approveTokenSpendToken'>
-                  {data.symbol}
+                  {symbol}
                 </div>
                 <div className='approveTokenSpendTokenName'>
-                  {data.name}
+                  {name}
                 </div>
               </div>
             </div>
