@@ -106,8 +106,6 @@ export default function (eth: EthereumProvider) {
   async function getTokenBalancesFromMulticall (owner: string, tokens: TokenDefinition[], chainId: number) {
     const calls = balanceCalls(owner, tokens)
 
-    eth.setChain(addHexPrefix(chainId.toString(16)))
-
     const results = await multicall(chainId, eth).batchCall(calls)
 
     return results.map((result, i) => {
