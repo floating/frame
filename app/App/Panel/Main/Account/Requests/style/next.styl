@@ -897,8 +897,9 @@
     z-index 20000
     font-size 12px
     text-transform uppercase
-    font-weight 400
+    font-weight 600
     background var(--ghostD)
+    letter-spacing 1px
 
     .approveTransactionWarningReject
       position absolute 
@@ -924,11 +925,29 @@
       text-align center
       box-sizing border-box
       border-radius 8px
-      transition var(--standard)
       background var(--ghostE)
       cursor help
       *
         pointer-event none
+
+    .approveTokenSpendEditButton
+      position absolute 
+      right 110px
+      top 0px
+      bottom 0
+      left 110px
+      padding 7px
+      text-align center
+      box-sizing border-box
+      border-radius 8px
+      background var(--ghostE)
+      cursor pointer    
+      *
+        pointer-event none
+
+    // .approveTokenSpendDoneButton
+    //   background var(--good)
+    //   color var(--goodOver)
 
     // .approveTransactionWarningPreview:hover
       // background var(--ghostF)

@@ -1,10 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import link from '../../../../../../../../resources/link'
-import svg from '../../../../../../../../resources/svg'
+import svg from '../../../../../../../../../../resources/svg'
 
-class TxApproval extends React.Component {
+class BasicApproval extends React.Component {
   constructor (...args) {
     super(...args)
 
@@ -13,26 +12,16 @@ class TxApproval extends React.Component {
     }
   }
 
-  decline (req) {
-    link.rpc('declineRequest', req, () => {})
-  }
-
   render () {
-    const { 
-      message,
-      title,
-      req,
-      onApprove,
-      editValue
-    } = this.props
-
+    const { approval } = this.props
     return (
       <div className='approveTransactionWarning'>
         <div className='approveTransactionWarningOptions'>
           <div
             className='approveTransactionWarningReject'
-            onMouseDown={() => this.decline(req)}
-          >Reject
+            onClick={() => this.props.onDecline(this.props.req)}
+          >
+            Reject
           </div>
           <div
             className='approveTransactionWarningPreview'
@@ -50,25 +39,28 @@ class TxApproval extends React.Component {
           </div>
           <div
             className='approveTransactionWarningProceed'
-            onMouseDown={onApprove}
-          >Proceed
+            onClick={() => this.props.onApprove(this.props.req, this.props.approval.type)}
+          >
+            Proceed
           </div>
         </div>
-        <div className='approveTransactionWarningFill' style={this.state.inPreview ? { opacity: 0 } : { opacity: 1 }}>
+        <div 
+          className='approveTransactionWarningFill'
+          style={this.state.inPreview ? { opacity: 0 } : { opacity: 1 }}
+        >
           <div className='approveTransactionWarningIcon approveTransactionWarningIconLeft'>
             {svg.alert(32)}
           </div>
           <div className='approveTransactionWarningIcon approveTransactionWarningIconRight'>
             {svg.alert(32)}
           </div>
-          <div className='approveTransactionWarningTitle'>{title}</div>
+          <div className='approveTransactionWarningTitle'>
+            {approval && approval.data && approval.data.title}
+          </div>
           <div className='approveTransactionWarningMessage'>
             <div className='approveTransactionWarningMessageInner'>
-              {message}
+              {approval && approval.data && approval.data.message}
             </div>
-            {
-              editValue ? React.cloneElement(editValue) : null
-            }
           </div>
         </div>
       </div>
@@ -76,4 +68,4 @@ class TxApproval extends React.Component {
   }
 }
 
-export default Restore.connect(TxApproval)
+export default Restore.connect(BasicApproval)

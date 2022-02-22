@@ -4,14 +4,16 @@ import { Web3Provider } from '@ethersproject/providers'
 import erc20Abi from '../externalData/balances/erc-20-abi'
 import type { Provider } from '../provider'
 
-function createWeb3ProviderWrapper (provider: Provider) {
+function createWeb3ProviderWrapper (chainId: string, provider: Provider) {
   const wrappedSend = (request: { method: string, params?: any[] }, cb: (error: any, response: any) => void) => {
     provider.sendAsync({
       method: request.method,
       params: request.params || [],
       id: 1,
       jsonrpc: '2.0',
-      _origin: 'frame.eth' }, cb)
+      _origin: 'frame.eth',
+      chainId
+    }, cb)
   }
 
   return {
@@ -23,8 +25,8 @@ function createWeb3ProviderWrapper (provider: Provider) {
 export default class Erc20Contract {
   private contract: Contract
 
-  constructor (address: Address, provider: Provider) {
-    const web3Provider = new Web3Provider(createWeb3ProviderWrapper(provider))
+  constructor (address: Address, chainId: string, provider: Provider) {
+    const web3Provider = new Web3Provider(createWeb3ProviderWrapper(chainId, provider))
     this.contract = new Contract(address, erc20Abi, web3Provider)
   }
 
