@@ -2,7 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import link from '../../../../../../../../../../resources/link'
 import svg from '../../../../../../../../../../resources/svg'
 
 import { ApprovalType } from '../../../../../../../../../../resources/constants'
@@ -33,6 +32,7 @@ const MAX_HEX = '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 class TokenSpend extends React.Component {
   constructor (...args) {
     super(...args)
+
     this.decimals = this.props.approval.data.decimals
     this.requestedAmount = '0x' + new BigNumber(this.props.approval.data.amount).integerValue().toString(16)
     this.state = {
@@ -90,6 +90,7 @@ class TokenSpend extends React.Component {
         <div className='approveTransactionWarningOptions'>
           <div
             className='approveTransactionWarningReject'
+            role='button'
             style={this.state.inEditApproval ? {
               opacity: 0,
               pointerEvents: 'none'
@@ -108,6 +109,7 @@ class TokenSpend extends React.Component {
           </div>
           <div
             className='approveTransactionWarningProceed'
+            role='button'
             style={this.state.inEditApproval ? {
               opacity: 0,
               pointerEvents: 'none'
