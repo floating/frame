@@ -43,7 +43,7 @@ const accountsApi = {
 export { RequestMode, AccountRequest, AccessRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from './types'
 
 export class Accounts extends EventEmitter {
-  _current: string | null = ''
+  _current: string
   accounts: Record<string, FrameAccount>
 
   constructor () {
@@ -54,6 +54,8 @@ export class Accounts extends EventEmitter {
 
       return accounts
     }, {} as Record<string, FrameAccount>)
+
+    this._current = Object.values(this.accounts).find(acct => acct.active)?.id || ''
 
     dataScanner.start()
   }
