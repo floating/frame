@@ -11,7 +11,7 @@ beforeEach(() => {
   eth.request = jest.fn()
 })
 
-it('encodes aggregated correctly', async () => {
+it('encodes aggregated calls correctly', async () => {
   eth.request.mockImplementationOnce(async (payload) => {
     expect(payload.method).toBe('eth_call')
     expect(payload.params[0].to).toBe('0x5ba1e12693dc8f9c48aad8770482f4739beed696')
