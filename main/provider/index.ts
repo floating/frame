@@ -596,7 +596,7 @@ export class Provider extends EventEmitter {
         const handlerId = this.addRequestHandler(res)
         const { feesUpdated, ...data } = txMetadata.tx
 
-        const req = { 
+        const req = {
           handlerId, 
           type: 'transaction', 
           data, 
