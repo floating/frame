@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
 import svg from '../../../../../../../../../../resources/svg'
+import link from '../../../../../../../../../../resources/link'
 
 import { ApprovalType } from '../../../../../../../../../../resources/constants'
 
@@ -77,7 +78,7 @@ class TokenSpend extends React.Component {
       symbol: 'unlimited'
     } : displayInt > 9e12 ? {
       number: '',
-      symbol: '~unlimited'
+      symbol: this.props.approval.data.decimals ? '~unlimited' : 'unknown'
     } : nFormat(displayInt)
 
     const symbol = data.symbol || '???'
@@ -103,7 +104,19 @@ class TokenSpend extends React.Component {
             className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
             role='button'
             onClick={() => {
-              this.setState({ inEditApproval: !this.state.inEditApproval })
+              if (this.state.mode === 'custom' && this.state.customInput === '') {
+                this.setState({ mode: 'requested', amount: this.requestedAmount }) 
+              } 
+              
+              if (this.state.inEditApproval) {
+                this.setState({ exiting: true })
+                setTimeout(() => {
+                  this.setState({ exiting: false, inEditApproval: false })
+                }, 600)
+              } else {
+                this.setState({ inEditApproval: true })
+              }
+                
             }}
           >
             {this.state.inEditApproval ? 'Done' : 'Edit' }
@@ -135,97 +148,107 @@ class TokenSpend extends React.Component {
           </div>
           <div className='approveTransactionWarningTitle'>{'token approval'}</div>
           {this.state.inEditApproval ? (
-            <div className='approveTokenSpend'>
-              <div className='approveTokenSpendEdit'>
-                <div className='approveTokenSpendEditTitle'>
-                  {'Token Spend Limit'}
+            <div className={'approveTokenSpend'}>
+              {this.state.exiting ? (
+                <div className='approveTokenSpendConfirm'>
+                  {displayAmount.number ? <div className='approveTokenSpendConfirmNumber'>{displayAmount.number}</div> : null}
+                  {displayAmount.symbol ? <div className='approveTokenSpendConfirmNumberText'>{displayAmount.symbol}</div> : null}
+                  <div className='approveTokenSpendConfirmSymbol'>{data.symbol}</div>
                 </div>
-                <div className='approveTokenSpendAmount'>
-                  <div className='approveTokenSpendSymbol'>
-                    {symbol}
+              ) : (
+                <div className='approveTokenSpendEdit'>
+                  <div className='approveTokenSpendEditTitle'>
+                    {'Token Spend Limit'}
                   </div>
-                  {this.state.mode === 'custom' ? inputLock ? (
-                    <div className='approveTokenSpendAmountNoInput'>
-                      <div className='approveTokenSpendAmountNoInputSymbol'>{'cannot set unknown'}</div>
+                  <div className='approveTokenSpendAmount'>
+                    <div className='approveTokenSpendSymbol'>
+                      {symbol}
                     </div>
-                  ) : (
-                    <input
-                      autoFocus
-                      type='text'
-                      value={this.state.customInput}
-                      onChange={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        this.setCustomAmount(e.target.value)
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') return this.setState({ inEditApproval: false })
-                      }}
-                    />
-                  ) : (
-                    <div>
-                      <div 
-                        className='approveTokenSpendAmountNoInput'
-                        role='textbox'
-                        onClick={() => {
-                          this.setCustomAmount(this.state.customInput)
+                    {this.state.mode === 'custom' ? (
+                      <input 
+                        autoFocus
+                        type='text'
+                        value={this.state.customInput}
+                        onChange={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          this.setCustomAmount(e.target.value)
                         }}
-                      >
-                        <div className='approveTokenSpendAmountNoInputNumber'>{displayAmount.number}</div>
-                        <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div> 
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className='approveTokenSpendPresets'>
-                  <div
-                    className={this.state.mode === 'requested' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
-                    role='button'
-                    onClick={() => {
-                      this.setState({ mode: 'requested', amount: this.requestedAmount })
-                    }}
-                  >
-                    Requested
-                  </div>
-                  <div 
-                    className={this.state.mode === 'unlimited' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
-                    role='button'
-                    onClick={() => {
-                      const amount = MAX_HEX
-                      this.setState({ mode: 'unlimited', amount })
-                    }}
-                  >
-                    <span className='approveTokenSpendPresetButtonInfinity'>{'Unlimited'}</span>
-                  </div>
-                  {
-                    inputLock
-                      ? null
-                      : (<div
-                          className={this.state.mode === 'custom' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
-                          role='button'
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') return this.setState({ inEditApproval: false })
+                        }}
+                      />
+                    ) : (
+                      <div>
+                        <div 
+                          className='approveTokenSpendAmountNoInput'
+                          role='textbox'
                           onClick={() => {
                             this.setCustomAmount(this.state.customInput)
                           }}
                         >
-                          Custom
+                          <div className='approveTokenSpendAmountNoInputNumber'>{displayAmount.number}</div>
+                          <div className='approveTokenSpendAmountNoInputSymbol'>{displayAmount.symbol}</div> 
                         </div>
-                        )
-                  }
+                      </div>
+                    )}
+                  </div>
+                  <div className='approveTokenSpendPresets'>
+                    <div
+                      className={this.state.mode === 'requested' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                      role='button'
+                      onClick={() => {
+                        this.setState({ mode: 'requested', amount: this.requestedAmount })
+                      }}
+                    >
+                      Requested
+                    </div>
+                    <div 
+                      className={this.state.mode === 'unlimited' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                      role='button'
+                      onClick={() => {
+                        const amount = MAX_HEX
+                        this.setState({ mode: 'unlimited', amount })
+                      }}
+                    >
+                      <span className='approveTokenSpendPresetButtonInfinity'>{'Unlimited'}</span>
+                    </div>
+                    {!inputLock ? (
+                      <div 
+                        className={this.state.mode === 'custom' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                        role='button'
+                        onClick={() => {
+                          this.setCustomAmount(this.state.customInput)
+                        }}
+                      >
+                        Custom
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ) : (
             <div className='approveTokenSpend'>
               <div className='approveTokenSpendDescription'>
-                {data.contract ? (
-                  <div className='approveTokenSpendContractAddress'>
-                    <div className='approveTokenSpendContractAddressLarge'>
-                      {data.contract.substring(0, 6)}
+                {data.spender ? (
+                  <div className='approveTokenSpendSpenderAddress'>
+                    <div className='approveTokenSpendSpenderAddressLarge'>
+                      {data.spender.substring(0, 6)}
                       {svg.octicon('kebab-horizontal', { height: 15 })}
-                      {data.contract.substr(data.contract.length - 4)}
+                      {data.spender.substr(data.contract.length - 4)}
                     </div>
-                    <div className='approveTokenSpendContractAddressFull'>
-                      {data.contract}
+                    <div 
+                      className='approveTokenSpendSpenderAddressFull' 
+                      onClick={() => {
+                        link.send('tray:clipboardData', data.spender)
+                        this.setState({ copyTokenRequester: true })
+                        setTimeout(() => {
+                          this.setState({ copyTokenRequester: false })
+                        }, 1000) 
+                      }}
+                    >
+                      {this.state.copyTokenRequester ? 'ADDRESS COPIED' : data.spender}
                     </div>
                   </div>
                 ) : null}
@@ -233,7 +256,21 @@ class TokenSpend extends React.Component {
                   {'wants approval to spend'}
                 </div>
                 <div className='approveTokenSpendToken'>
-                  {symbol}
+                  <div className='approveTokenSpendTokenSymbol'>
+                    {symbol}
+                  </div>
+                  <div 
+                    className='approveTokenSpendTokenContract'
+                    onClick={() => {
+                      link.send('tray:clipboardData', data.contract)
+                      this.setState({ copyTokenContract: true })
+                      setTimeout(() => {
+                        this.setState({ copyTokenContract: false })
+                      }, 1000) 
+                    }}
+                  >
+                    {this.state.copyTokenContract ? 'ADDRESS COPIED' : data.contract}
+                  </div>
                 </div>
                 <div className='approveTokenSpendTokenName'>
                   {name}

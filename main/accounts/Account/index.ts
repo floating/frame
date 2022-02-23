@@ -258,7 +258,8 @@ class FrameAccount {
           name,
           symbol,
           amount,
-          contract: contractAddress
+          contract: contractAddress,
+          spender
         },
         (data: { amount: string }) => {
           // amount is a hex string

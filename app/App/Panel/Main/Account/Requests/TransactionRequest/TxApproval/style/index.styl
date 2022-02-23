@@ -1,3 +1,11 @@
+  @keyframes click
+    0% 
+      transform scale(1.4)
+      opacity 0
+    100%
+      transform scale(1)
+      opacity 1
+
 .approveTokenSpend
   position absolute
   top 0px
@@ -5,6 +13,30 @@
   right 0px
   bottom 110px
   font-family 'Exo2'
+
+  .approveTokenSpendConfirm
+    position absolute
+    top 0px
+    left 0px
+    right 0px
+    bottom 0px
+    display flex
+    justify-content center
+    align-items center
+    z-index 10
+    animation click 400ms
+    font-family 'Exo2'
+    font-size 16px
+    color var(--outerspace)
+    text-transform uppercase 
+    font-weight 500
+    letter-spacing 1px
+
+    div
+      margin 3px
+
+    .approveTokenSpendConfirmNumberText
+      color var(--moon)  
 
   .approveTokenSpendEdit
     position absolute
@@ -78,7 +110,7 @@
     align-items center
     flex-direction column
 
-    .approveTokenSpendContract
+    .approveTokenSpendSpender
       font-size 12px
       font-weight 400
       text-transform uppercase
@@ -86,7 +118,7 @@
       letter-spacing 1px
       margin 0px 2px 2px 2px
 
-    .approveTokenSpendContractAddress
+    .approveTokenSpendSpenderAddress
       font-size 20px
       font-family FiraCode, monospace
       font-weight 400
@@ -98,14 +130,15 @@
       svg
         padding 5px
 
-      .approveTokenSpendContractAddressFull
+      .approveTokenSpendSpenderAddressFull
         font-size 13px
         display none
+        cursor pointer
 
-    .approveTokenSpendContractAddress:hover
-      .approveTokenSpendContractAddressLarge
+    .approveTokenSpendSpenderAddress:hover
+      .approveTokenSpendSpenderAddressLarge
         display none
-      .approveTokenSpendContractAddressFull
+      .approveTokenSpendSpenderAddressFull
         display block
 
       
@@ -123,21 +156,40 @@
       justify-content center
       align-items center
       flex-direction column
-      font-weight 600
-      letter-spacing 3px
       background var(--ghostB)
-      width calc(100% - 10px)
+      width calc(100%)
       padding 0px 20px 2px 22px
       box-sizing border-box
-      border-radius 15px
+      // border-radius 15px
       margin-top 4px
-      text-transform uppercase
       // color var(--moon)
+
+      .approveTokenSpendTokenSymbol
+        text-transform uppercase
+        font-weight 600
+        letter-spacing 3px
+        display block
+
+      .approveTokenSpendTokenContract
+        font-family FiraCode, monospace
+        position relative
+        top 2px
+        font-size 13px
+        cursor pointer
+        display none
+
+    .approveTokenSpendToken:hover
+      .approveTokenSpendTokenSymbol
+        display none
+
+      .approveTokenSpendTokenContract
+        display block
+        
 
     .approveTokenSpendTokenName
       font-weight 600
       font-size 12px
-      margin-top 1px
+      margin-top 4px
       margin-left 1px
       text-transform uppercase
       letter-spacing 2px
@@ -209,3 +261,8 @@
       font-weight 600
       box-sizing border-box
       text-transform uppercase
+
+  .approveTokenSpendAmountExit
+    transition var(--standardFast)
+    transform scale(0.9)
+    color var(--good)
