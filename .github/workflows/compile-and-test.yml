@@ -17,4 +17,5 @@ jobs:
         cache: 'npm'
     - run: npm run setup
     - run: npm run compile
-    - run: npm run test:unit
+    - run: npm run test:main
+    - run: npm run test:components

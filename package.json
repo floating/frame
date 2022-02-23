@@ -76,6 +76,7 @@
     "postinstall": "electron-builder install-app-deps",
     "test": "npm run compile && npm run test:unit && npm run test:e2e",
     "test:unit": "jest --env=node --detectOpenHandles --runInBand",
+    "test:main": "jest --env=node --detectOpenHandles --runInBand ./test/main",
     "test:components": "jest --env=jsdom --detectOpenHandles ./test/app",
     "test:e2e": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e",
     "test:e2e:nodeploy": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e --testPathIgnorePatterns=deploy",

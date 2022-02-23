@@ -1,10 +1,20 @@
 import ethProvider from 'eth-provider'
+import log from 'electron-log'
 
 import multicall from '../../../main/multicall'
 
 jest.mock('eth-provider', () => () => ({ request: jest.fn() }))
 
 let eth
+
+beforeAll(() => {
+  log.transports.console.level = false
+})
+
+afterAll(() => {
+  log.transports.console.level = 'debug'
+})
+
 beforeEach(() => {
   eth = ethProvider()
   eth.request = jest.fn()
