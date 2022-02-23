@@ -33,7 +33,7 @@ class TokenSpend extends React.Component {
   constructor (...args) {
     super(...args)
 
-    this.decimals = this.props.approval.data.decimals
+    this.decimals = this.props.approval.data.decimals || 0
     this.requestedAmount = '0x' + new BigNumber(this.props.approval.data.amount).integerValue().toString(16)
     this.state = {
       inPreview: false,
@@ -101,6 +101,7 @@ class TokenSpend extends React.Component {
           </div>
           <div
             className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
+            role='button'
             onClick={() => {
               this.setState({ inEditApproval: !this.state.inEditApproval })
             }}
@@ -148,8 +149,9 @@ class TokenSpend extends React.Component {
                       <div className='approveTokenSpendAmountNoInputSymbol'>{'cannot set unknown'}</div>
                     </div>
                   ) : (
-                    <input 
+                    <input
                       autoFocus
+                      type='text'
                       value={this.state.customInput}
                       onChange={(e) => {
                         e.preventDefault()
@@ -164,6 +166,7 @@ class TokenSpend extends React.Component {
                     <div>
                       <div 
                         className='approveTokenSpendAmountNoInput'
+                        role='textbox'
                         onClick={() => {
                           this.setCustomAmount(this.state.customInput)
                         }}
@@ -175,7 +178,9 @@ class TokenSpend extends React.Component {
                   )}
                 </div>
                 <div className='approveTokenSpendPresets'>
-                  <div className={this.state.mode === 'requested' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                  <div
+                    className={this.state.mode === 'requested' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                    role='button'
                     onClick={() => {
                       this.setState({ mode: 'requested', amount: this.requestedAmount })
                     }}
@@ -184,6 +189,7 @@ class TokenSpend extends React.Component {
                   </div>
                   <div 
                     className={this.state.mode === 'unlimited' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                    role='button'
                     onClick={() => {
                       const amount = MAX_HEX
                       this.setState({ mode: 'unlimited', amount })
@@ -191,14 +197,20 @@ class TokenSpend extends React.Component {
                   >
                     <span className='approveTokenSpendPresetButtonInfinity'>{'Unlimited'}</span>
                   </div>
-                  <div 
-                    className={this.state.mode === 'custom' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
-                    onClick={() => {
-                      this.setCustomAmount(this.state.customInput)
-                    }}
-                  >
-                    Custom
-                  </div>
+                  {
+                    inputLock
+                      ? null
+                      : (<div
+                          className={this.state.mode === 'custom' ? 'approveTokenSpendPresetButton approveTokenSpendPresetButtonSelected' : 'approveTokenSpendPresetButton'}
+                          role='button'
+                          onClick={() => {
+                            this.setCustomAmount(this.state.customInput)
+                          }}
+                        >
+                          Custom
+                        </div>
+                        )
+                  }
                 </div>
               </div>
             </div>
