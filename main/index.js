@@ -87,7 +87,8 @@ const externalWhitelist = [
   'https://discord.gg/UH7NGqY',
   'https://frame.canny.io',
   'https://feedback.frame.sh',
-  'https://wiki.trezor.io/Trezor_Bridge'
+  'https://wiki.trezor.io/Trezor_Bridge',
+  'https://opensea.io'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
@@ -137,7 +138,8 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
+  const validHost = externalWhitelist.some(entry => url.startsWith(entry))
+  if (validHost) shell.openExternal(url)
 })
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {

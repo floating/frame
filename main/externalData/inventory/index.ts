@@ -27,6 +27,8 @@ interface AssetContract {
 }
 
 interface InventorySet {
+  next: string | null,
+  previous: string | null,
   assets: AssetSet[]
 }
 
@@ -38,8 +40,24 @@ interface Collection {
   large_image_url: string
 }
 
-async function fetchAssets (address: Address, offset: number) {
-  const url = `https://proxy.pylon.link?type=api&target=https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
+async function fetchAssets (address: Address, cursor?: string) {
+  const queryParams = {
+    owner: address,
+    order_direction: 'desc',
+    limit: '50',
+    cursor
+  }
+
+  const queryStr = Object.entries(queryParams).reduce((params, [key, value]) => {
+    if (value) {
+      params.push([key, value].join('='))
+    }
+
+    return params
+  }, [] as string[]).join('&')
+
+  const target = encodeURIComponent(`https://api.opensea.io/api/v1/assets?${queryStr}`)
+  const url = `https://proxy.pylon.link?type=api&target=${target}`
 
   const options = {
     method: 'GET',
@@ -56,39 +74,33 @@ async function fetchAssets (address: Address, offset: number) {
       const errorMsg = contentType.includes('json') ? await res.json() : ''
 
       log.warn('unable to fetch inventory', errorMsg)
-      return { assets: [] }
+      return { assets: [], next: null, previous: null }
     }
 
     return res.json() as Promise<InventorySet>
   } catch (e) {
     log.warn(`could not fetch assets ${address}`, e)
 
-    return { assets: [] }
+    return { assets: [], next: null, previous: null }
   }
 }
 
-async function scan (address: Address) {
-  const inventory: Record<string, AssetSet> = {}
+async function loadAssets (address: Address, cursor?: string): Promise<AssetSet[]> {
+  const set = await fetchAssets(address, cursor)
 
-  async function getSet (address: Address, offset = 0) {
-    const set = await fetchAssets(address, offset)
-    set.assets.forEach(a => {
-      inventory[a.id] = a
-    })
-    if (set.assets.length === 50) await getSet(address, offset + 50)
-  }
-  
-  await getSet(address)
-  return inventory
+  return (set.next && set.next !== cursor)
+    ? [...set.assets, ...(await loadAssets(address, set.next))]
+    : set.assets
 }
 
 export default async function (address: Address) {
-  let i = await scan(address)
-  const inventory: Record<string, any> = {}
-  let a = Object.keys(i).forEach(a => {
-    const { collection } = i[a]
-    if (!inventory[collection.slug]) {
-      inventory[collection.slug] = {
+  const assets = await loadAssets(address)
+  
+  const inventory = assets.reduce((collectedInventory, asset) => {
+    const { name, id, token_id, image_url, description, external_link, permalink, traits, asset_contract, collection } = asset
+
+    if (!collectedInventory[collection.slug]) {
+      collectedInventory[collection.slug] = {
         meta: {
           name: collection.name,
           description: collection.description,
@@ -98,8 +110,8 @@ export default async function (address: Address) {
         assets: {}
       }
     }
-    const { name, id, token_id, image_url, description, external_link, permalink, traits, asset_contract } = i[a]
-    inventory[collection.slug].assets[id] = { 
+
+    collectedInventory[collection.slug].assets[id] = {
       name, 
       id,
       tokenId: token_id,
@@ -118,9 +130,11 @@ export default async function (address: Address) {
         description: asset_contract.description,
         img: asset_contract.image_url,
         link: asset_contract.external_link
-      },
-
+      }
     }
-  })
+
+    return collectedInventory
+  }, {} as Record<string, any>)
+
   return inventory
 }
