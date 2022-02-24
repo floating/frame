@@ -188,7 +188,7 @@ class _AccountMain extends React.Component {
   //     slideHeight += modulePositions[i].height
   //   })
   // }
-  renderModule (id, module, top, index, expandModule, expanded) {
+  renderModule (id, module, top, index, expandModule, expanded, expandedData) {
     // console.log(id, module, top, index)
     let hidden = false
     let style = { 
@@ -254,6 +254,7 @@ class _AccountMain extends React.Component {
               id={this.props.id}
               expandModule={expandModule}
               expanded={expanded}
+              expandedData={expandedData}
             /> :
             id === 'permissions' ? <Permissions
               moduleId={id}
@@ -283,6 +284,9 @@ class _AccountMain extends React.Component {
       </div>
     )
   }
+  expandModule (id, data) {
+    this.setState({ expandedModule: id, expandedModuleData: data || {} }) 
+  }
   render () {
     const accountModules = this.store('panel.account.modules')
     const accountModuleOrder = this.store('panel.account.moduleOrder')
@@ -291,9 +295,13 @@ class _AccountMain extends React.Component {
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 5
-      return this.renderModule(id, module, slideHeight - module.height - 5, i, id => {
-        this.setState({ expandedModule: id }) 
-      })
+      return this.renderModule(
+        id, 
+        module, 
+        slideHeight - module.height - 5, 
+        i, 
+        this.expandModule.bind(this)
+      )
     })
     return (
       <div className='accountMain'>
@@ -306,9 +314,15 @@ class _AccountMain extends React.Component {
             <div className='moduleExpanded' onMouseDown={(e) => {
               e.stopPropagation()
             }}>
-              {this.renderModule(this.state.expandedModule, { height: '100%' }, 0, 0, id => {
-                this.setState({ expandedModule: id }) 
-              }, true)}
+              {this.renderModule(
+                this.state.expandedModule, 
+                { height: '100%' }, 
+                0, 
+                0, 
+                this.expandModule.bind(this), 
+                true,
+                this.state.expandedModuleData
+              )}
             </div>
           </div>
         ) : null}
