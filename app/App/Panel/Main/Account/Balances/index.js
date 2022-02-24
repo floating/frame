@@ -132,7 +132,7 @@ class Balances extends React.Component {
         <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 || rawBalance > 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
-              src={`https://proxy.pylon.link?type=icon&target=${balanceInfo.logoURI}`}
+              src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balanceInfo.logoURI)}`}
               value={symbol.toUpperCase()}
               alt={symbol.toUpperCase()}
             />
