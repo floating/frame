@@ -85,32 +85,22 @@ async function fetchAssets (address: Address, cursor?: string) {
   }
 }
 
-async function scan (address: Address) {
-  const inventory: Record<string, AssetSet> = {}
-  let cursor = ''
+async function loadAssets (address: Address, cursor?: string): Promise<AssetSet[]> {
+  const set = await fetchAssets(address, cursor)
 
-  async function getSet (address: Address) {
-    const set = await fetchAssets(address, cursor)
-    set.assets.forEach(a => {
-      inventory[a.id] = a
-    })
-    if (set.next && set.next !== cursor) {
-      cursor = set.next
-      await getSet(address)
-    }
-  }
-  
-  await getSet(address)
-  return inventory
+  return (set.next && set.next !== cursor)
+    ? [...set.assets, ...(await loadAssets(address, set.next))]
+    : set.assets
 }
 
 export default async function (address: Address) {
-  let i = await scan(address)
-  const inventory: Record<string, any> = {}
-  let a = Object.keys(i).forEach(a => {
-    const { collection } = i[a]
-    if (!inventory[collection.slug]) {
-      inventory[collection.slug] = {
+  const assets = await loadAssets(address)
+  
+  const inventory = assets.reduce((collectedInventory, asset) => {
+    const { name, id, token_id, image_url, description, external_link, permalink, traits, asset_contract, collection } = asset
+
+    if (!collectedInventory[collection.slug]) {
+      collectedInventory[collection.slug] = {
         meta: {
           name: collection.name,
           description: collection.description,
@@ -120,8 +110,8 @@ export default async function (address: Address) {
         assets: {}
       }
     }
-    const { name, id, token_id, image_url, description, external_link, permalink, traits, asset_contract } = i[a]
-    inventory[collection.slug].assets[id] = { 
+
+    collectedInventory[collection.slug].assets[id] = {
       name, 
       id,
       tokenId: token_id,
@@ -140,9 +130,11 @@ export default async function (address: Address) {
         description: asset_contract.description,
         img: asset_contract.image_url,
         link: asset_contract.external_link
-      },
-
+      }
     }
-  })
+
+    return collectedInventory
+  }, {} as Record<string, any>)
+
   return inventory
 }
