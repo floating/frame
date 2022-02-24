@@ -99,8 +99,8 @@ class Device {
     }).catch(err => cb(err))
   }
 
-  ethereumSignTypedHash (path, domainSeparatorHash, messageHash, cb) {
-    TrezorConnect.ethereumSignTypedData({ device: this.device, path, domain_separator_hash: domainSeparatorHash, message_hash: messageHash }).then(res => {
+  ethereumSignTypedHash (path, data, domainSeparatorHash, messageHash, cb) {
+    TrezorConnect.ethereumSignTypedData({ device: this.device, path, data, domain_separator_hash: domainSeparatorHash, message_hash: messageHash, metamask_v4_compat: true }).then(res => {
       if (!res.success) return cb(new Error(res.payload.error))
       cb(null, res.payload)
     }).catch(err => cb(err))
@@ -210,9 +210,9 @@ class Trezor {
     this.devices[id].ethereumSignTypedData(path, message, cb)
   }
 
-  ethereumSignTypedHash (id, path, domainSeparatorHash, messageHash, cb) {
+  ethereumSignTypedHash (id, path, data, domainSeparatorHash, messageHash, cb) {
     if (!this.devices[id]) return this.deviceNotFound(id, cb)
-    this.devices[id].ethereumSignTypedHash(path, domainSeparatorHash, messageHash, cb)
+    this.devices[id].ethereumSignTypedHash(path, data, domainSeparatorHash, messageHash, cb)
   }
 
   ethereumVerifyMessage (id, path, message, cb) {

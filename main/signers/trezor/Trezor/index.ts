@@ -263,7 +263,7 @@ export default class Trezor extends Signer {
       const domainSeparatorHash = TypedDataUtils.hashStruct('EIP712Domain', domain, types, true).toString('hex')
       const messageHash = TypedDataUtils.hashStruct(primaryType as any, message, types, true).toString('hex')
 
-      flex.rpc('trezor.ethereumSignTypedHash', this.device.path, this.getPath(index), domainSeparatorHash, messageHash, rpcCallback)
+      flex.rpc('trezor.ethereumSignTypedHash', this.device.path, this.getPath(index), typedData, domainSeparatorHash, messageHash, rpcCallback)
     } else {
       flex.rpc('trezor.ethereumSignTypedData', this.device.path, this.getPath(index), typedData, rpcCallback)
     }
