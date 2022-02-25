@@ -31,7 +31,6 @@ import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
 import FrameAccount from '../accounts/Account'
 import { capitalize, arraysMatch } from '../../resources/utils'
-import { Approval } from '../accounts/types'
 import { ApprovalType } from '../../resources/constants'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
@@ -564,7 +563,7 @@ export class Provider extends EventEmitter {
       log.error('error creating transaction', e)
       cb(e as Error)
     }
-    }
+  }
 
   sendTransaction (payload: RPC.SendTransaction.Request, res: RPCRequestCallback) {
     const txParams = payload.params[0]
@@ -577,7 +576,7 @@ export class Provider extends EventEmitter {
 
     const newTx = {
       ...txParams,
-      chainId: (txChain || targetChain) as string
+      chainId: txChain || (targetChain as string)
     }
 
     const currentAccount = accounts.current()

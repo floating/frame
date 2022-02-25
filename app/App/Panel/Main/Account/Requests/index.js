@@ -87,15 +87,9 @@ class Requests extends React.Component {
 
   render () {
     const activeAccount =  this.store('main.accounts', this.props.id)
+    const requests = Object.values(activeAccount.requests || {})
     const signingDelay = isHardwareSigner(activeAccount) ? 200 : 1500
 
-    let requests = activeAccount.requests || {}
-    requests = Object.keys(requests).map(key => requests[key])
-    // .filter(req => {
-    //   if (req.type === 'transaction') return this.props.addresses.map(a => a.toLowerCase()).indexOf(req && req.data ? req.data.from.toLowerCase() : null) > -1
-    //   return true
-    // })
-    // transitionName='slideUp' transitionEnterTimeout={960} transitionLeaveTimeout={640}
     const normal = requests.filter(req => req.mode === 'normal')
     normal.sort((a, b) => {
       if (a.created > b.created) return -1

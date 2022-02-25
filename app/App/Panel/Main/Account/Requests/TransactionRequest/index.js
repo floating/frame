@@ -11,9 +11,6 @@ import link from '../../../../../../../resources/link'
 
 import TxBar from './TxBar'
 
-// import TxFee from './TxFee'
-
-
 // New Tx
 import TxMain from './TxMain'
 import TxFeeNew from './TxFeeNew'

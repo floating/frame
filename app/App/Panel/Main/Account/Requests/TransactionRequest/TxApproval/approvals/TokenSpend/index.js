@@ -7,28 +7,30 @@ import link from '../../../../../../../../../../resources/link'
 
 import { ApprovalType } from '../../../../../../../../../../resources/constants'
 
-const nFormat = (num, digits = 2) => {
-  num = Number(num)
-  const lookup = [
-    { value: 1, symbol: '' },
-    { value: 1e6, symbol: 'million' },
-    { value: 1e9, symbol: 'billion' },
-    { value: 1e12, symbol: 'trillion' },
-    { value: 1e15, symbol: 'quadrillion' },
-    { value: 1e18, symbol: 'quintillion' }
-  ]
-  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  const item = lookup.slice().reverse().find(function(item) { return num >= item.value })
+const numberRegex = /\.0+$|(\.[0-9]*[1-9])0+$/
+const MAX_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+
+const digitsLookup = [
+  { value: 1, symbol: '' },
+  { value: 1e6, symbol: 'million' },
+  { value: 1e9, symbol: 'billion' },
+  { value: 1e12, symbol: 'trillion' },
+  { value: 1e15, symbol: 'quadrillion' },
+  { value: 1e18, symbol: 'quintillion' }
+]
+
+function nFormat (n, digits = 2)  {
+  const num = Number(n)
+  const item = digitsLookup.slice().reverse().find(item => num >= item.value)
+
   return item ? {
-    number: (num / item.value).toFixed(digits).replace(rx, '$1'),
+    number: (num / item.value).toFixed(digits).replace(numberRegex, '$1'),
     symbol: item.symbol
   } : {
     number: '0',
     symbol: ''
   }
 }
-
-const MAX_HEX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 class TokenSpend extends React.Component {
   constructor (...args) {

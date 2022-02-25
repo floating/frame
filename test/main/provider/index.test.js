@@ -3,7 +3,7 @@ import accounts from '../../../main/accounts'
 import connection from '../../../main/chains'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
-import { weiToHex, gweiToHex, capitalize } from '../../../resources/utils'
+import { weiToHex, gweiToHex } from '../../../resources/utils'
 import { Type as SignerType } from '../../../main/signers/Signer'
 
 import { validate as validateUUID } from 'uuid'

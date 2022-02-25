@@ -847,7 +847,6 @@ class Account extends React.Component {
     // const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
 
-    // TODO: use active to render currently active account
     const { address, ensName, active } = this.store('main.accounts', this.props.id)
     const formattedAddress = address || '0x'
 

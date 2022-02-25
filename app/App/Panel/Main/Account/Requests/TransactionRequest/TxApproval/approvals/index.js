@@ -1,2 +1,2 @@
-export {default as BasicApproval} from './BasicApproval'
-export {default as TokenSpend } from './TokenSpend'
+export { default as BasicApproval } from './BasicApproval'
+export { default as TokenSpend } from './TokenSpend'
