@@ -268,11 +268,14 @@ class TransactionRequest extends React.Component {
         <TxOverlay {...this.props} overlay={this.state.overlayMode} overlayMode={this.overlayMode.bind(this)}/>
         {req.type === 'transaction' ? (
           <div className='approveTransaction'>
-             <TxApproval
-              req={this.props.req}
-              approval={requiredApproval}
-              allowOtherChain={this.allowOtherChain.bind(this)}
-            />
+            {
+              !!requiredApproval ? (
+                <TxApproval
+                 req={this.props.req}
+                 approval={requiredApproval}
+                 allowOtherChain={this.allowOtherChain.bind(this)} />
+              ) : null
+            }
             <div className='approveTransactionPayload'>
               <div className={notice ? 'txNonce txNonceSet' : 'txNonce'} style={!this.store('main.nonceAdjust') || error || status || mode === 'monitor' ? { pointerEvents: 'none' } : {}}>
                 <div className='txNonceControl'>

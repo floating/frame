@@ -22,7 +22,7 @@ class TxApproval extends React.Component {
   render () {
     const { req, approval, allowOtherChain } = this.props
 
-    if (!supportedApprovals.includes(approval)) {
+    if (!supportedApprovals.includes(approval.type)) {
       throw new Error(`attempted to create unsupported approval: ${JSON.stringify(approval)}`)
     }
 
