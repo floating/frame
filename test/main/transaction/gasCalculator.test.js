@@ -1,5 +1,4 @@
-/* globals it beforeEach expect */
-import GasCalculator from '../../main/transaction/gasCalculator'
+import GasCalculator from '../../../main/transaction/gasCalculator'
 
 let requestHandlers
 let testConnection = {

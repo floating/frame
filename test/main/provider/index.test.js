@@ -4,6 +4,7 @@ import connection from '../../../main/chains'
 import store from '../../../main/store'
 import chainConfig from '../../../main/chains/config'
 import { weiToHex, gweiToHex } from '../../../resources/utils'
+import { Type as SignerType } from '../../../main/signers/Signer'
 
 import { validate as validateUUID } from 'uuid'
 import { utils } from 'ethers'
@@ -51,6 +52,7 @@ beforeEach(() => {
   connection.connections = { ethereum: { 4: { chainConfig: chainConfig(4, 'london') } } }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
+  accounts.get = jest.fn(addr => addr === address ? { address, lastSignerType: 'ring' } : undefined)
   accounts.signTransaction = jest.fn()
   accounts.setTxSigned = jest.fn()
 })
@@ -76,6 +78,12 @@ describe('#getRawTx', () => {
 
   it('turns a zero value into the correct hex value for zero', () => {
     const tx = provider.getRawTx({ value: '0x' })
+
+    expect(tx.value).toBe('0x0')
+  })
+
+  it('turns an un-prefixed zero value into the correct hex value for zero', () => {
+    const tx = provider.getRawTx({ value: '0' })
 
     expect(tx.value).toBe('0x0')
   })
@@ -946,7 +954,7 @@ describe('#send', () => {
       verifyRequest('V1')
     })
 
-    it('does not submit a request from an account other than the current one', done => {
+    it('does not submit a request from an unknown account', done => {
       const params = ['0xa4581bfe76201f3aa147cce8e360140582260441', typedData]
 
       send({ method: 'eth_signTypedData_v3', params }, err => {
@@ -954,7 +962,7 @@ describe('#send', () => {
         expect(err.error.code).toBe(-1)
         done()
       })
-    }, 100)
+    })
 
     it('does not submit a request with malformed type data', done => {
       const params = [address, 'test']
@@ -964,23 +972,25 @@ describe('#send', () => {
         expect(err.error.code).toBe(-1)
         done()
       })
-    }, 100)
+    })
 
     // these signers only support V4+
-    const hardwareSigners = ['Ledger', 'Lattice', 'Trezor']
+    const hardwareSigners = [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor]
 
     hardwareSigners.forEach(signerType => {
       it(`does not submit a V3 request to a ${signerType}`, done => {
-        accounts.current.mockReturnValueOnce({ id: address, getAccounts: () => [address], lastSignerType: signerType.toLowerCase() })
+        accounts.get.mockImplementationOnce(addr => {
+          return addr === address ? { address, lastSignerType: signerType } : {}
+        })
 
         const params = [address, typedData]
 
         send({ method: 'eth_signTypedData_v3', params }, err => {
-          expect(err.error.message).toMatch(new RegExp(signerType))
+          expect(err.error.message).toMatch(new RegExp(signerType, 'i'))
           expect(err.error.code).toBe(-1)
           done()
         })
-      }, 100)
+      })
     })
 
     it('passes a request with an unknown version through to the connection', done => {

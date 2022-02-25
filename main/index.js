@@ -5,11 +5,14 @@ app.commandLine.appendSwitch('force-gpu-rasterization', true)
 app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
+
+const path = require('path')
+process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
 const log = require('electron-log')
-const path = require('path')
 const url = require('url')
 
 const data = require('./data')
@@ -42,13 +45,13 @@ const dapps = require('./dapps').default
 //   })
 // })
 
+const accounts = require('./accounts').default
 
-const accounts = require('./accounts')
 const launch = require('./launch')
 const updater = require('./updater')
 require('./rpc')
 // const clients = require('./clients')
-const signers = require('./signers')
+const signers = require('./signers').default
 const persist = require('./store/persist')
 
 log.info('Chrome: v' + process.versions.chrome)
@@ -83,7 +86,9 @@ const externalWhitelist = [
   'https://shop.trezor.io/?offer_id=10&aff_id=3270',
   'https://discord.gg/UH7NGqY',
   'https://frame.canny.io',
-  'https://feedback.frame.sh'
+  'https://feedback.frame.sh',
+  'https://wiki.trezor.io/Trezor_Bridge',
+  'https://opensea.io'
 ]
 
 global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
@@ -133,7 +138,8 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  if (externalWhitelist.indexOf(url) > -1) shell.openExternal(url)
+  const validHost = externalWhitelist.some(entry => url.startsWith(entry))
+  if (validHost) shell.openExternal(url)
 })
 
 ipcMain.on('tray:openExplorer', (e, hash, chain) => {
@@ -164,12 +170,17 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
 })
 
 ipcMain.on('tray:addToken', (e, token, req) => {
-  if (token) store.addCustomTokens([token])
+  if (token) {
+    log.info('adding custom token', token)
+    store.addCustomTokens([token])
+  }
   accounts.resolveRequest(req)
 })
 
 ipcMain.on('tray:removeToken', (e, token) => {
   if (token) {
+    log.info('removing custom token', token)
+
     store.removeBalance(token.chainId, token.address)
     store.removeCustomTokens([token])
   }
@@ -261,7 +272,7 @@ app.on('ready', () => {
   if (app.dock) app.dock.hide()
 
   protocol.interceptFileProtocol('file', (req, cb) => {
-    const appOrigin = path.resolve(__dirname, '../')
+    const appOrigin = path.resolve(__dirname, '../../')
     const filePath = url.fileURLToPath(req.url)
 
     if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line

@@ -73,6 +73,15 @@ export default class TrezorSignerAdapter extends SignerAdapter {
       })
     }
 
+    const enteringPhraseListener = (device: TrezorDevice) => {
+      log.debug(`Trezor ${device.id} waiting for passphrase entry on device`)
+
+      this.withSigner(device, signer => {
+        signer.status = 'waiting for input on device'
+        signer.update()
+      })
+    }
+
     const scanListener = (err: any) => {
       if (err) return log.error(err)
     }
@@ -96,6 +105,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
         'trezor:update': updateListener,
         'trezor:needPin': needPinListener,
         'trezor:needPhrase': needPhraseListener,
+        'trezor:enteringPhrase': enteringPhraseListener,
         'trezor:scan': scanListener
       }
 

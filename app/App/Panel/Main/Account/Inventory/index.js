@@ -34,15 +34,36 @@ class Balances extends React.Component {
         <div className='moduleHeader'>
           {'Inventory'}
           {this.props.expanded ? (
-            <div className='moduleHeaderClose' onMouseDown={() => this.props.expandModule(false)}>
+            <div className='moduleHeaderClose' onMouseDown={() => {
+              this.props.expandModule(false)
+            }}>
               {svg.close(12)}
             </div>
           ) : null}
         </div>  
         <div>
-          {collections.length ? collections.map(k => {
+          {collections.length ? collections.filter(k => {
+            if (this.props.expanded) {
+              const expandedData = this.props.expandedData || {}
+              const current = expandedData.currentCollection
+              return current === k
+            } else {
+              return true
+            }
+          }).sort((a, b) => {
+            const assetsLengthA = Object.keys(inventory[a].assets).length
+            const assetsLengthB = Object.keys(inventory[b].assets).length
+            if (assetsLengthA > assetsLengthB) return -1
+            if (assetsLengthA < assetsLengthB) return 1
+            return 0
+          }).map(k => {
             return (
-              <div className='inventoryCollection' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
+              <div 
+                className='inventoryCollection'
+                onClick={() => {
+                  this.props.expandModule(this.props.moduleId, { currentCollection: k })
+                }}
+              >
                 <div className='inventoryCollectionTop'>
                   <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
                   <div className='inventoryCollectionCount'>{Object.keys(inventory[k].assets).length}</div>
@@ -55,10 +76,15 @@ class Balances extends React.Component {
                       b = inventory[k].assets[b].tokenId
                       return a < b ? -1 : b > a ? 1 : 0
                     }).map(id => {
-                      const { tokenId, name, img } = inventory[k].assets[id]
+                      const { tokenId, name, img, openSeaLink } = inventory[k].assets[id]
                       return (
-                        <div className='inventoryCollectionItem'>
-                          {img ? <img src={`https://proxy.pylon.link?type=nft&target=${img}`} /> : null}
+                        <div 
+                          className='inventoryCollectionItem'
+                          onClick={() => {
+                            this.store.notify('openExternal', { url: openSeaLink })
+                          }}
+                        >
+                          {img ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`} /> : null}
                         </div>
                       )
                     })}

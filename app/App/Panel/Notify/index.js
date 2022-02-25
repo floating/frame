@@ -444,7 +444,8 @@ class Notify extends React.Component {
             Open External Link
           </div>
           <div className='notifyBody'>
-            <div className='notifyBodyLine'>{`Frame will now open ${url} in your browser`}</div>
+            <div className='notifyBodyLineUrl'>{url}</div>
+            <div className='notifyBodyLine'>{'Open Link in Browser?'}</div>
           </div>
           <div className='notifyInput'>
             <div

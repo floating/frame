@@ -92,7 +92,7 @@ declare namespace RPC {
       to?: Address,
       data?: string,
       value?: string,
-      chainId?: string,
+      chainId: string,
       type?: string,
     }
 

@@ -17,7 +17,7 @@ const mockPersist = {
 }
 
 jest.mock('electron')
-jest.mock('../../../../../compiled/store/persist', () => mockPersist)
+jest.mock('../../../../../compiled/main/store/persist', () => mockPersist)
 jest.mock('../../../../../main/store/persist', () => mockPersist)
 
 // Stubs
@@ -35,8 +35,8 @@ describe('Ring signer', () => {
 
     clean()
 
-    hot = await import('../../../../../compiled/signers/hot')
-    store = require('../../../../../compiled/store').default
+    hot = await import('../../../../../compiled/main/signers/hot')
+    store = require('../../../../../compiled/main/store').default
   })
 
   afterEach(() => {
@@ -84,7 +84,7 @@ describe('Ring signer', () => {
         done()
       } catch(e) { done(e) }
     })
-  }, 1000)
+  }, 1500)
 
   test('Scan for signers', done => {
     jest.useFakeTimers()
@@ -105,7 +105,7 @@ describe('Ring signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  })
+  }, 800)
 
   test('Close signer', done => {
     try {
@@ -181,7 +181,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done (e) }
     })
-  }, 200)
+  }, 400)
 
   test('Unlock', done => {
     signer.unlock(PASSWORD, err => {
@@ -190,7 +190,7 @@ describe('Ring signer', () => {
         done()
       } catch (e) { done(e) }
     })
-  }, 200)
+  }, 400)
 
   test('Sign message', done => {
     const message = '0x' + Buffer.from('test').toString('hex')

@@ -188,7 +188,7 @@ class _AccountMain extends React.Component {
   //     slideHeight += modulePositions[i].height
   //   })
   // }
-  renderModule (id, module, top, index, expandModule, expanded) {
+  renderModule (id, module, top, index, expandModule, expanded, expandedData) {
     // console.log(id, module, top, index)
     let hidden = false
     let style = { 
@@ -254,6 +254,7 @@ class _AccountMain extends React.Component {
               id={this.props.id}
               expandModule={expandModule}
               expanded={expanded}
+              expandedData={expandedData}
             /> :
             id === 'permissions' ? <Permissions
               moduleId={id}
@@ -283,6 +284,9 @@ class _AccountMain extends React.Component {
       </div>
     )
   }
+  expandModule (id, data) {
+    this.setState({ expandedModule: id, expandedModuleData: data || {} }) 
+  }
   render () {
     const accountModules = this.store('panel.account.modules')
     const accountModuleOrder = this.store('panel.account.moduleOrder')
@@ -291,9 +295,13 @@ class _AccountMain extends React.Component {
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
       slideHeight += module.height + 5
-      return this.renderModule(id, module, slideHeight - module.height - 5, i, id => {
-        this.setState({ expandedModule: id }) 
-      })
+      return this.renderModule(
+        id, 
+        module, 
+        slideHeight - module.height - 5, 
+        i, 
+        this.expandModule.bind(this)
+      )
     })
     return (
       <div className='accountMain'>
@@ -306,9 +314,15 @@ class _AccountMain extends React.Component {
             <div className='moduleExpanded' onMouseDown={(e) => {
               e.stopPropagation()
             }}>
-              {this.renderModule(this.state.expandedModule, { height: '100%' }, 0, 0, id => {
-                this.setState({ expandedModule: id }) 
-              }, true)}
+              {this.renderModule(
+                this.state.expandedModule, 
+                { height: '100%' }, 
+                0, 
+                0, 
+                this.expandModule.bind(this), 
+                true,
+                this.state.expandedModuleData
+              )}
             </div>
           </div>
         ) : null}
@@ -673,8 +687,8 @@ class Account extends React.Component {
         ) : null} */}
         {(_ => {
           const type = this.props.lastSignerType 
-          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconHardware'>{svg.ledger(20)}</div>
-          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconHardware'>{svg.trezor(20)}</div>
+          if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
+          if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
           if (type === 'seed' || type === 'ring') return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
           if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>
           if (type === 'lattice') return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(22)}</div>
@@ -832,14 +846,12 @@ class Account extends React.Component {
     // let currentIndex = this.store('main.accounts', this.props.id, 'index')
     // const status = this.props.status.charAt(0).toUpperCase() + this.props.status.substr(1)
     // if (this.state.accountHighlight === 'active') currentIndex = this.state.highlightIndex
-    let address = this.store('main.accounts', this.props.id, 'address')
-    address = address || '0x'
-    let ensName = this.store('main.accounts', this.props.id, 'ensName')
+
+    const { address, ensName, active } = this.store('main.accounts', this.props.id)
+    const formattedAddress = address || '0x'
 
     let requests = this.store('main.accounts', this.props.id, 'requests') || {}
     requests = Object.keys(requests).filter(r => requests[r].mode === 'normal')
-
-    const { id } = this.store('main.currentNetwork')
 
     return this.props.status !== 'ok' ? (
       <div className='signerStatusNotOk'>{status}</div>
@@ -868,20 +880,26 @@ class Account extends React.Component {
               ) : ensName ? (
                 <div className='transactionToAddressLarge transactionToAddressENS' style={{ fontSize: this.getAddressSize() + 'px' }}>{ensName}</div>
               ) : (
-                <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{address.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {address.substr(address.length - 5)}</div>
+                <div className={this.props.name ? 'transactionToAddressLarge' : 'transactionToAddressLarge transactionToAddressENS'}>{formattedAddress.substring(0, 6)} {svg.octicon('kebab-horizontal', { height: 16 })} {formattedAddress.substr(formattedAddress.length - 5)}</div>
               )
               }
             </div>
             <div className={this.state.addressHover ? 'transactionToAddressFull' : 'transactionToAddressFull transactionToAddressFullHidden'}>
-              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}{svg.octicon('clippy', { height: 14 })}</span> : address}
+              {this.state.copied ? <span className='transactionToAddressFullCopied'>{'Address Copied'}{svg.octicon('clippy', { height: 14 })}</span> : formattedAddress}
             </div>
           </div>
         </div>
-        {!this.state.addressHover ? (
-          <div className={requests.length > 0 ? 'accountNotificationBadge accountNotificationBadgeActive' : 'accountNotificationBadge'}>
-            {requests.length}
-          </div>
-        ) : null}
+        {(() => {
+          if (this.state.addressHover) return null
+          let requestBadgeClass = 'accountNotificationBadge'
+          if (active) requestBadgeClass += ' accountNotificationBadgeReady'
+          if (requests.length > 0) requestBadgeClass += ' accountNotificationBadgeActive'
+          return (
+            <div className={requestBadgeClass}>
+              {requests.length}
+            </div>
+          )
+        })()}
         {/* <div
           className='addressSelect' onMouseDown={e => {
             e.stopPropagation()
@@ -975,7 +993,7 @@ class Account extends React.Component {
             {!this.state.hideSignerStatus && open ? (
               <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
             ) : null}
-            <div className={open ? 'signerTop signerTopOpen' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+            <div className={this.props.active ? 'signerTop signerTopActive' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
               {!this.state.addressHover ? this.renderType() : null} 
               {!this.state.addressHover ? this.renderSignerIndicator() : null} 
               {!this.state.addressHover ? (

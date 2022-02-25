@@ -269,17 +269,17 @@
     height 63px
     background var(--ghostB)
     margin 0px 5px 0px 5px
-    box-shadow 0px 2px 10px var(--ghostY)
+    box-shadow 0px 2px 2px var(--ghostZ)
 
     div
       z-index 3004
 
     .accountNotificationBadge
       position absolute
-      top 14px
+      top 15px
       right 60px
-      height 32px
-      width 32px
+      height 33px
+      width 33px
       z-index 400000
       border-radius 18px
       display flex
@@ -288,8 +288,14 @@
       font-size 17px
       font-weight 400
       font-family FiraCode, monospace
-      color var(--ghostX)
-      transition standard
+      color var(--ghostZ)
+      transition var(--standard)
+      border 1px solid var(--ghostZ)
+
+    .accountNotificationBadgeReady
+      color var(--outerspace)
+      background var(--ghostC)
+      transition var(--standardFast)
       border 1px solid var(--ghostX)
 
     .accountNotificationBadgeActive
@@ -345,7 +351,10 @@
 
         div, svg
           pointer-events none
-  
+        
+        .accountActive
+          color var(--good)
+
       .signerSelectIcon
         transition var(--standard)
         pointer-events none
@@ -468,8 +477,12 @@
       // .signerIconHot
       //   color var(--hot)
 
-      // .signerIconHardware
-      //   color var(--hardware)
+      .signerIconTrezor
+        transform translateY(-3px)
+
+      .signerIconLedger
+        transform translateY(-1px)
+        
 
       // .signerIconSmart
       //   color var(--smart)
@@ -900,6 +913,9 @@
           svg
             transition var(--standardSlow)
 
+  // .signerTopActive
+  //   background var(--ghostC)
+
   .accountListWrap
     position absolute
     top 100px
@@ -1078,9 +1094,6 @@
 
         .accountPageButton:hover
           background var(--ghostD)
-
-  .signerTopOpen
-    background var(--ghostC)
 
   .accountMenu
     position absolute

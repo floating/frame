@@ -10,6 +10,7 @@ import Signer from '../../Signer'
 import LedgerEthereumApp from './eth'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
 import { signerCompatibility, londonToLegacy, TransactionData } from '../../../transaction'
+import { TypedData } from 'eth-sig-util'
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
@@ -427,7 +428,7 @@ export default class Ledger extends Signer {
     })
   }
 
-  signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
+  signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {

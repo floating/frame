@@ -12,6 +12,7 @@ import { sign, signerCompatibility, londonToLegacy } from '../../../transaction'
 import type { TransactionData } from '../../../transaction'
 import { TypedTransaction } from '@ethereumjs/tx'
 import { Derivation, getDerivationPath } from '../../Signer/derive'
+import { TypedData } from 'eth-sig-util'
 
 const ADDRESS_LIMIT = 10
 const HARDENED_OFFSET = 0x80000000
@@ -80,7 +81,7 @@ export default class Lattice extends Signer {
     this.status = Status.CONNECTING
     this.emit('update')
 
-    log.debug('connecting to Lattice', { name: this.name, baseUrl, privateKey })
+    log.debug('connecting to Lattice', { name: this.name, baseUrl })
 
     this.connection = new Client({
       name: devicePermission(this.tag),
@@ -95,7 +96,7 @@ export default class Lattice extends Signer {
 
       const [patch, minor, major] = this.connection?.fwVersion || [0, 0, 0]
 
-      log.debug(`Connected to Lattice with deviceId=${this.deviceId}, firmware v${major}.${minor}.${patch}`)
+      log.debug(`Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`)
 
       this.appVersion = { major, minor, patch }
 
@@ -248,7 +249,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  async signTypedData (index: number, version: string, typedData: any, cb: Callback<string>) {
+  async signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
     const versionNum = (version.match(/[Vv](\d+)/) || [])[1]
 
     if ((parseInt(versionNum) || 0) < 4) {
@@ -302,7 +303,7 @@ export default class Lattice extends Signer {
     }
   }
 
-  private async sign (index: number, protocol: string, payload: string) {
+  private async sign (index: number, protocol: string, payload: string | TypedData) {
     const clientSign = promisify((this.connection as Client).sign).bind(this.connection)
 
     const data = {

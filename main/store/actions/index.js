@@ -125,7 +125,7 @@ module.exports = {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
   },
-  updateAccount: (u, updatedAccount, add) => {
+  updateAccount: (u, updatedAccount) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
       // if (add) return updatedAccount // Account is new and should be added
@@ -457,10 +457,17 @@ module.exports = {
       return [...existingBalances, ...newBalances]
     })
   },
-  removeBalance: (u, chainId, key) => {
-    u('main.balances', chainId, (balances = {}) => {
+  removeBalance: (u, chainId, address) => {
+    u('main.balances', (balances = {}) => {
+      const key = address.toLowerCase()
+
       for (const accountAddress in balances) {
-        delete balances[accountAddress][key.toLowerCase()]
+        const balanceIndex = balances[accountAddress]
+          .findIndex(balance => balance.chainId === chainId && balance.address.toLowerCase() === key)
+
+        if (balanceIndex > -1) {
+          balances[accountAddress].splice(balanceIndex, 1)
+        }
       }
 
       return balances
@@ -487,8 +494,9 @@ module.exports = {
       // remove any tokens that have been overwritten by one with
       // the same address and chain ID
       const existingTokens = existing.filter(token => !includesToken(tokens, token))
+      const tokensToAdd = tokens.map(t => ({ ...t, address: t.address.toLowerCase() }))
 
-      return [...existingTokens, ...tokens]
+      return [...existingTokens, ...tokensToAdd]
     })
   },
   removeCustomTokens: (u, tokens) => {
@@ -499,8 +507,9 @@ module.exports = {
   addKnownTokens: (u, address, tokens) => {
     u('main.tokens.known', address, (existing = []) => {
       const existingTokens = existing.filter(token => !includesToken(tokens, token))
+      const tokensToAdd = tokens.map(t => ({ ...t, address: t.address.toLowerCase() }))
 
-      return [...existingTokens, ...tokens]
+      return [...existingTokens, ...tokensToAdd]
     })
   },
   removeKnownTokens: (u, address, tokens) => {
@@ -618,7 +627,7 @@ module.exports = {
         signer.view = 'default'
         return signer
       })
-    }, 520)
+    }, 320)
   }
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)

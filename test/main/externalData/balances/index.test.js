@@ -77,7 +77,7 @@ describe('#getTokenBalances', () => {
         return {
           batchCall: async function (tokenCalls) {
             return tokenCalls.map(tc => {
-              expect(tc.call[0]).toBe('balanceOf(address)(uint256)')
+              expect(tc.call[0]).toBe('function balanceOf(address address) returns (uint256 value)')
               expect(tc.call[1]).toBe(ownerAddress)
 
               const token = knownTokens.find(
@@ -85,9 +85,12 @@ describe('#getTokenBalances', () => {
               )
 
               if (token) {
-                return tc.returns[0][1](
-                  ethers.BigNumber.from(onChainBalances[token.address].toString())
-                )
+                return {
+                  success: true,
+                  returnValues: [
+                    tc.returns[0](ethers.BigNumber.from(onChainBalances[token.address].toString()))
+                  ]
+                }
               }
               
               return '0x0'
@@ -121,9 +124,6 @@ describe('#getTokenBalances', () => {
           displayBalance: '17.893'
         }
       ])
-
-      expect(eth.setChain).toHaveBeenNthCalledWith(1, addHexPrefix(aaveUsdcToken.chainId.toString(16)))
-      expect(eth.setChain).toHaveBeenNthCalledWith(2, addHexPrefix(badgerDaoToken.chainId.toString(16)))
     })
   })
 

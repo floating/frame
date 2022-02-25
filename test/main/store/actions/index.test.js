@@ -301,23 +301,27 @@ describe('#setBalances', () => {
 
 describe('#removeBalance', () => {
   let balances = {
-    [owner]: {
-      [testTokens.zrx.address]: {
+    [owner]: [{
         ...testTokens.zrx,
         balance: addHexPrefix(BigNumber('798.564').toString(16))
+      },
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(BigNumber('15.543').toString(16))
       }
+    ],
+    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': [{
+      ...testTokens.zrx,
+      balance: addHexPrefix(BigNumber('8201.343').toString(16))
     },
-    '0xd0e3872f5fa8ecb49f1911f605c0da90689a484e': {
-      [testTokens.zrx.address]: {
-        ...testTokens.zrx,
-        balance: addHexPrefix(BigNumber('8201.343').toString(16))
-      }
-    }
+    {
+      ...testTokens.badger,
+      balance: addHexPrefix(BigNumber('101.988').toString(16))
+    }]
   }
 
-  const updaterFn = (node, chainId, update) => {
+  const updaterFn = (node, update) => {
     expect(node).toBe('main.balances')
-    expect(chainId).toBe(1)
 
     balances = update(balances)
   }
@@ -327,8 +331,10 @@ describe('#removeBalance', () => {
   it('removes a balance from all accounts', () => {
     removeBalance(testTokens.zrx.address)
 
-    expect(balances[owner][testTokens.zrx.address]).toBe(undefined)
-    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e'][testTokens.zrx.address]).toBe(undefined)
+    expect(balances[owner]).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
+    expect(balances[owner]).toHaveLength(1)
+    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).not.toContainEqual(expect.objectContaining({ address: testTokens.zrx.address }))
+    expect(balances['0xd0e3872f5fa8ecb49f1911f605c0da90689a484e']).toHaveLength(1)
   })
 })
 

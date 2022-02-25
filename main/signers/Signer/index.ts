@@ -4,6 +4,7 @@ import EventEmitter from 'stream'
 import { TransactionData } from '../../transaction'
 import { deriveHDAccounts } from './derive'
 import crypt from '../../crypt'
+import { TypedData } from 'eth-sig-util'
 
 export interface SignerSummary {
   id: string,
@@ -19,6 +20,20 @@ export interface AppVersion {
   major: number,
   minor: number,
   patch: number
+}
+
+// in order of increasing priority
+export enum Type {
+  Ring = 'ring',
+  Seed = 'seed',
+  Aragon = 'aragon',
+  Trezor = 'trezor',
+  Ledger = 'ledger',
+  Lattice = 'lattice'
+}
+
+export function getType (typeValue: string) {
+  return Object.values(Type).find(type => type === typeValue)
 }
 
 export default class Signer extends EventEmitter {
@@ -93,7 +108,7 @@ export default class Signer extends EventEmitter {
     console.warn('Signer:' + this.type + ' did not implement a signTransaction method')
   }
 
-  signTypedData (index: number, version: string, typedData: string, cb: Callback<string>) {
+  signTypedData (index: number, version: string, typedData: TypedData, cb: Callback<string>) {
     return cb(new Error(`Signer: ${this.type} does not support eth_signTypedData`), undefined)
   }
 }

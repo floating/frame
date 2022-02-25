@@ -38,7 +38,7 @@ class CustomTokens extends React.Component {
                     <div className='customTokensListItemTitle'>
                       <div className='customTokensListItemName'>
                         <img 
-                          src={`https://proxy.pylon.link?type=icon&target=${token.logoURI}`} 
+                          src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`}
                           value={token.symbol.toUpperCase()}
                           alt={token.symbol.toUpperCase()}
                         />
@@ -82,7 +82,13 @@ class CustomTokens extends React.Component {
                         </div>
                       </div>
                       <div className='customTokensListItemRemoveButton'
-                           onClick={() => link.send('tray:removeToken', token)}
+                           onClick={() => {
+                             this.setState({ tokenExpanded: false })
+                             setTimeout(() => {
+                              link.send('tray:removeToken', token)
+                             }, 100)
+                            }
+                          }
                       >
                         {'Remove Token'}
                       </div>

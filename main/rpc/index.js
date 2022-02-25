@@ -3,8 +3,8 @@ const fs = require('fs')
 const utils = require('web3-utils')
 const crypto = require('crypto')
 
-const accounts = require('../accounts')
-const signers = require('../signers')
+const accounts = require('../accounts').default
+const signers = require('../signers').default
 const launch = require('../launch')
 const provider = require('../provider').default
 const store = require('../store').default
@@ -17,6 +17,7 @@ function randomLetters (num) {
 }
 
 const { resolveName } = require('../accounts/aragon')
+const { arraysEqual } = require('../../resources/utils')
 
 const rpc = {
   getState: cb => {
@@ -38,8 +39,15 @@ const rpc = {
   setSigner: (id, cb) => {
     store.toggleDash('hide')
 
+    const previousAddresses = accounts.getSelectedAddresses()
+
     accounts.setSigner(id, cb)
-    provider.accountsChanged(accounts.getSelectedAddresses())
+
+    const currentAddresses = accounts.getSelectedAddresses()
+
+    if (!arraysEqual(previousAddresses, currentAddresses)) {
+      provider.accountsChanged(currentAddresses)
+    }
   },
   // setSignerIndex: (index, cb) => {
   //   accounts.setSignerIndex(index, cb)
@@ -49,8 +57,15 @@ const rpc = {
   //   }, 320)
   // },
   unsetSigner: (id, cb) => {
+    const previousAddresses = accounts.getSelectedAddresses()
+
     accounts.unsetSigner(cb)
-    provider.accountsChanged(accounts.getSelectedAddresses())
+
+    const currentAddresses = accounts.getSelectedAddresses()
+
+    if (!arraysEqual(previousAddresses, currentAddresses)) {
+      provider.accountsChanged(currentAddresses)
+    }
   },
   // setSignerIndex: signers.setSignerIndex,
   // unsetSigner: signers.unsetSigner,
@@ -119,6 +134,9 @@ const rpc = {
       }
     })
   },
+  confirmRequestApproval (req, approvalType, approvalData, cb) {
+    accounts.confirmRequestApproval(req.handlerId, approvalType, approvalData)
+  },
   approveRequest (req, cb) {
     accounts.setRequestPending(req)
     if (req.type === 'transaction') {
@@ -147,9 +165,6 @@ const rpc = {
       accounts.declineRequest(req.handlerId)
       provider.declineRequest(req)
     }
-  },
-  removeRequestWarning (reqId) {
-    accounts.removeRequestWarning(reqId)
   },
   addAragon (account, cb) {
     accounts.addAragon(account, cb)

@@ -6,6 +6,7 @@ const gweiToWei = (gwei: number) => gwei * 1e9
 const gweiToHex = (gwei: number) => weiToHex(gwei * 1e9)
 const hexToInt = (hexStr: string) => parseInt(hexStr, 16)
 const weiHexToGweiInt = (weiHex: string) => hexToInt(weiHex) / 1e9
+const weiIntToEthInt = (wei: number) => wei / 1e18
 const gweiToWeiHex = (gwei: number) => intToHex(gweiToWei(gwei))
 
 function randomLetters (num: number) {
@@ -16,16 +17,23 @@ function capitalize (s: string) {
   return s[0].toUpperCase() + s.substring(1).toLowerCase()
 }
 
-function arraysMatch (a: number[] = [], b: number[] = []) {
+function arraysEqual <T> (a: T[] = [], b: T[] = []) {
+  if (a.length !== b.length) return false
+
+  return arraysMatch(a.sort(), b.sort())
+}
+
+function arraysMatch <T> (a: T[] = [], b: T[] = []) {
   return (
     a.length === b.length &&
-    a.every((chainId, i) => b[i] === chainId)
+    a.every((elem, i) => b[i] === elem)
   )
 }
 
 export {
   randomLetters,
   capitalize,
+  arraysEqual,
   arraysMatch,
   weiToGwei,
   weiToHex,
@@ -34,5 +42,6 @@ export {
   intToHex,
   hexToInt,
   weiHexToGweiInt,
+  weiIntToEthInt,
   gweiToWeiHex
 }

@@ -117,3 +117,30 @@ interface Dapp {
   manifest: any,
   current: any
 }
+
+type SignerType = 'ring' | 'seed' | 'aragon' | 'trezor' | 'ledger' | 'lattice'
+type AccountStatus = 'ok'
+
+interface Signer {
+  id: string,
+  name: string,
+  model: string,
+  type: SignerType,
+  addresses: Address[],
+  status: string,
+  createdAt: number
+}
+
+interface Account {
+  id: string,
+  name: string,
+  lastSignerType: SignerType,
+  active: boolean,
+  address: Address,
+  status: AccountStatus,
+  signer: string,
+  smart?: any,
+  requests: Record<string, any>,
+  ensName: string,
+  created: string
+}

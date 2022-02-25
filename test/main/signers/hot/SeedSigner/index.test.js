@@ -15,7 +15,7 @@ const mockPersist = {
 }
 
 jest.mock('electron')
-jest.mock('../../../../../compiled/store/persist', () => mockPersist)
+jest.mock('../../../../../compiled/main/store/persist', () => mockPersist)
 jest.mock('../../../../../main/store/persist', () => mockPersist)
 
 // Stubs
@@ -33,8 +33,8 @@ describe('Seed signer', () => {
 
     clean()
 
-    hot = await import('../../../../../compiled/signers/hot')
-    store = require('../../../../../compiled/store').default
+    hot = await import('../../../../../compiled/main/signers/hot')
+    store = require('../../../../../compiled/main/store').default
   })
 
   afterEach(() => {
@@ -85,7 +85,7 @@ describe('Seed signer', () => {
     hot.scan(signers)
 
     jest.runAllTimers()
-  })
+  }, 800)
 
   test('Unlock with wrong password', (done) => {
     signer.unlock('Wrong password', err => {
@@ -93,14 +93,14 @@ describe('Seed signer', () => {
       expect(signer.status).toBe('locked')
       done()
     })
-  }, 200)
+  }, 400)
 
   test('Unlock', (done) => {
     signer.unlock(PASSWORD, err => {
       expect(err).toBe(null)
       done()
     })
-  }, 200)
+  }, 400)
 
   test('Sign message', (done) => {
     const message = '0x' + Buffer.from('test').toString('hex')

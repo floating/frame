@@ -5,7 +5,6 @@ import log from 'electron-log'
 import utils from 'web3-utils'
 import { recoverTypedMessage, Version } from 'eth-sig-util'
 import crypto from 'crypto'
-import Common from '@ethereumjs/common'
 
 import {
   padToEven,
@@ -22,14 +21,17 @@ import {
   hashPersonalMessage,
 } from 'ethereumjs-util'
 
-import proxy from './proxy'
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
 
-import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest } from '../accounts'
+import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
+import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
+import FrameAccount from '../accounts/Account'
+import { capitalize, arraysMatch } from '../../resources/utils'
+import { ApprovalType } from '../../resources/constants'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
@@ -38,17 +40,14 @@ const permission = (date: number, method: string) => ({ parentCapability: method
 type Subscriptions = { [key in SubscriptionType]: string[] }
 type Balance = Token & { balance: string, displayBalance: string }
 
-// TODO: these utility functions exist in ../../resources/utils but that file is not
-// yet part of the TS build
-function capitalize (s: string) {
-  return s[0].toUpperCase() + s.substring(1).toLowerCase()
+interface RequiredApproval {
+  type: ApprovalType,
+  data: any
 }
 
-function arraysMatch (a: number[] = [], b: number[] = []) {
-  return (
-    a.length === b.length &&
-    a.every((chainId, i) => b[i] === chainId)
-  )
+export interface TransactionMetadata {
+  tx: TransactionData,
+  approvals: RequiredApproval[]
 }
 
 function getNativeCurrency (chainId: number) {
@@ -91,7 +90,7 @@ function loadAssets (accountId: string) {
   }, response)
 }
 
-class Provider extends EventEmitter {
+export class Provider extends EventEmitter {
   connected = false
   connection = Chains
 
@@ -119,7 +118,14 @@ class Provider extends EventEmitter {
 
     this.connection.on('close', () => { this.connected = false })
     this.connection.on('data', data => this.emit('data', data))
+
     this.connection.on('error', err => log.error(err))
+
+    this.connection.on('update', event => {
+      if (event.type === 'fees') {
+        return accounts.updatePendingFees(event.chainId)
+      }
+    })
 
     this.getNonce = this.getNonce.bind(this)
   }
@@ -231,8 +237,12 @@ class Provider extends EventEmitter {
     if (signed.length === 134) { // Aragon smart signed message
       try {
         signed = '0x' + signed.substring(4)
-        const actor = accounts.current().smart && accounts.current().smart.actor
-        address = accounts.get(actor.id).address
+
+        const currentAccount = accounts.current()
+        if (!currentAccount) return cb(new Error('no account selected'))
+
+        const actor = (currentAccount.smart && currentAccount.smart.actor) || ''
+        address = accounts.get(actor).address
       } catch (e) {
         return cb(new Error('Could not resolve message or actor for smart accoount'))
       }
@@ -400,18 +410,25 @@ class Provider extends EventEmitter {
       }
 
       const updatedReq = accounts.updateNonce(req.handlerId, response.result)
-      this.signAndSend(updatedReq, cb)
+
+      if (updatedReq) {
+        this.signAndSend(updatedReq, cb)
+      } else {
+        log.error(`could not find request with handlerId="${req.handlerId}"`)
+        cb(new Error('could not find request'))
+      }
     })
   }
 
   private getRawTx (newTx: RPC.SendTransaction.TxParams): TransactionData {
     const { gas, gasLimit, gasPrice, data, value, type, ...rawTx } = newTx
+    const parsedValue = !value || parseInt(value, 16) === 0 ? '0x0' : addHexPrefix(unpadHexString(value) || '0')
 
     return {
       ...rawTx,
-      from: rawTx.from || accounts.current().id,
+      from: rawTx.from || ((accounts.current() || {}).id),
       type: '0x0',
-      value: addHexPrefix(unpadHexString(value || '0x') || '0'),
+      value: parsedValue,
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
       chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
@@ -425,7 +442,7 @@ class Provider extends EventEmitter {
     return handlerId
   }
   
-  private async getGasEstimate (rawTx: TransactionData, chainConfig: Common) {
+  private async getGasEstimate (rawTx: TransactionData) {
     const { from, to, value, data, nonce } = rawTx
     const txParams = { from, to, value, data, nonce }
 
@@ -449,7 +466,8 @@ class Provider extends EventEmitter {
   }
 
   private isCurrentAccount (address: string, account = accounts.current()) {
-    return address && (account.id.toLowerCase() === address.toLowerCase())
+    const accountToCheck = account || accounts.current() || { id: '' }
+    return address && (accountToCheck.id.toLowerCase() === address.toLowerCase())
   }
 
   private gasFees (rawTx: TransactionData) {
@@ -505,30 +523,46 @@ class Provider extends EventEmitter {
     return tx
   }
 
-  async fillTransaction (newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionData>) {
+  async fillTransaction (newTx: RPC.SendTransaction.TxParams, cb: Callback<TransactionMetadata>) {
     if (!newTx) return cb(new Error('No transaction data'))
 
-    const rawTx = this.getRawTx(newTx)
-    const gas = this.gasFees(rawTx)
-    const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
+    try {
+      const approvals: RequiredApproval[] = []
+      const rawTx = this.getRawTx(newTx)
+      const gas = this.gasFees(rawTx)
+      const chainConfig = this.connection.connections['ethereum'][parseInt(rawTx.chainId)].chainConfig
 
-    const estimateGas = rawTx.gasLimit
-      ? Promise.resolve(rawTx)
-      : this.getGasEstimate(rawTx, chainConfig)
-        .then(gasLimit => ({ ...rawTx, gasLimit }))
-        .catch(err => ({ ...rawTx, gasLimit: '0x00', warning: err.message }))
+      const estimateGas = rawTx.gasLimit
+        ? Promise.resolve(rawTx)
+        : this.getGasEstimate(rawTx)
+          .then(gasLimit => ({ ...rawTx, gasLimit }))
+          .catch(err => {
+            approvals.push({
+              type: ApprovalType.GasLimitApproval,
+              data: {
+                message: err.message,
+                gasLimit: '0x00'
+              }
+            })
 
-    estimateGas
-      .then(tx => {
-        const populatedTransaction = populateTransaction(tx, chainConfig, gas)
+            return { ...rawTx, gasLimit: '0x00' }
+         })
 
-        log.info({ populatedTransaction })
+      estimateGas
+        .then(tx => {
+          const populatedTransaction = populateTransaction(tx, chainConfig, gas)
 
-        return populatedTransaction
-      })
-      .then(tx => this.checkExistingNonceGas(tx))
-      .then(tx => cb(null, tx))
-      .catch(cb)
+          log.info({ populatedTransaction })
+
+          return populatedTransaction
+        })
+        .then(tx => this.checkExistingNonceGas(tx))
+        .then(tx => cb(null, { tx, approvals }))
+        .catch(cb)
+    } catch (e) {
+      log.error('error creating transaction', e)
+      cb(e as Error)
+    }
   }
 
   sendTransaction (payload: RPC.SendTransaction.Request, res: RPCRequestCallback) {
@@ -542,35 +576,41 @@ class Provider extends EventEmitter {
 
     const newTx = {
       ...txParams,
-      chainId: txChain || targetChain
+      chainId: txChain || (targetChain as string)
     }
 
     const currentAccount = accounts.current()
 
     log.debug(`sendTransaction(${JSON.stringify(newTx)}`)
 
-    this.fillTransaction(newTx, (err, transaction) => {
+    this.fillTransaction(newTx, (err, transactionMetadata) => {
       if (err) {
         this.resError(err, payload, res)
       } else {
-        const tx = transaction as TransactionData
-        const from = tx.from
+        const txMetadata = transactionMetadata as TransactionMetadata
+        const from = txMetadata.tx.from
 
         if (from && !this.isCurrentAccount(from, currentAccount)) return this.resError('Transaction is not from currently selected account', payload, res)
 
         const handlerId = this.addRequestHandler(res)
-        const { warning, feesUpdated, ...data } = tx
-        
-        accounts.addRequest({ 
+        const { feesUpdated, ...data } = txMetadata.tx
+
+        const req = {
           handlerId, 
           type: 'transaction', 
           data, 
           payload, 
-          account: currentAccount.id, 
+          account: (currentAccount as FrameAccount).id, 
           origin: payload._origin, 
-          warning,
+          approvals: [],
           feesUpdatedByUser: feesUpdated || false
-        }, res)
+        } as TransactionRequest
+
+        accounts.addRequest(req, res)
+
+        txMetadata.approvals.forEach(approval => {
+          currentAccount?.addRequiredApproval(req, approval.type, approval.data)
+        })
       }
     })
   }
@@ -612,7 +652,7 @@ class Provider extends EventEmitter {
 
     const handlerId = this.addRequestHandler(res)
 
-    const req = { handlerId, type: 'sign', payload: normalizedPayload, account: currentAccount.getAccounts[0], origin: payload._origin }
+    const req = { handlerId, type: 'sign', payload: normalizedPayload, account: (currentAccount as FrameAccount).getAccounts()[0], origin: payload._origin } as const
 
     const _res = (data: any) => {
       if (this.handlers[req.handlerId]) this.handlers[req.handlerId](data)
@@ -634,9 +674,12 @@ class Provider extends EventEmitter {
     }
 
     let [from = '', typedData = {}, ...additionalParams] = payload.params
-    const currentAccount = accounts.current()
 
-    if (!this.isCurrentAccount(from, currentAccount)) return this.resError('signTypedData request is not from currently selected account.', payload, res)
+    const targetAccount = accounts.get(from.toLowerCase())
+
+    if (!targetAccount) {
+      return this.resError(`unknown account: ${from}`, payload, res)
+    }
 
     // HACK: Standards clearly say, that second param is an object but it seems like in the wild it can be a JSON-string.
     if (typeof (typedData) === 'string') {
@@ -648,17 +691,17 @@ class Provider extends EventEmitter {
       }
     }
 
-    const signerType = (currentAccount.lastSignerType || '').toLowerCase()
+    const signerType = getSignerType(targetAccount.lastSignerType)
 
     // check for signers that only support signing a specific version of typed data
-    if (version !== 'V4' && ['ledger', 'lattice', 'trezor'].includes(signerType)) {
-      const signerName = signerType[0].toUpperCase() + signerType.substring(1)
+    if (version !== 'V4' && signerType && [SignerType.Ledger, SignerType.Lattice, SignerType.Trezor].includes(signerType)) {
+      const signerName = capitalize(signerType)
       return this.resError(`${signerName} only supports eth_signTypedData_v4+`, payload, res)
     }
 
     const handlerId = this.addRequestHandler(res)
 
-    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: currentAccount.getAccounts[0], origin: payload._origin })
+    accounts.addRequest({ handlerId, type: 'signTypedData', version, payload, account: targetAccount.address, origin: payload._origin } as SignTypedDataRequest)
   }
 
   subscribe (payload: RPC.Subscribe.Request, res: RPCSuccessCallback) {
@@ -710,10 +753,10 @@ class Provider extends EventEmitter {
           type, 
           id: params[0].chainId
         },
-        account: accounts.getAccounts()[0],
+        account: (accounts.getAccounts() || [])[0],
         origin: payload._origin,
         payload
-      }, res)
+      } as SwitchChainRequest, res)
     } catch (e) {
       return this.resError(e as EVMError, payload, res)
     }
@@ -760,10 +803,10 @@ class Provider extends EventEmitter {
           blockExplorerUrls, 
           iconUrls
         },
-        account: accounts.getAccounts()[0],
+        account: (accounts.getAccounts() || [])[0],
         origin: payload._origin,
         payload
-      }, res)
+      } as AddChainRequest, res)
     }
   }
 
@@ -833,10 +876,10 @@ class Provider extends EventEmitter {
         handlerId,
         type: 'addToken',
         token,
-        account: accounts.current().id,
+        account: (accounts.current() as FrameAccount).id,
         origin: payload._origin,
         payload
-      }, res)
+      } as AddTokenRequest, res)
     }, targetChain)
   }
 
@@ -928,7 +971,6 @@ class Provider extends EventEmitter {
   }
 
   emit (type: string | symbol, ...args: any[]) {
-    proxy.emit(type, ...args)
     return super.emit(type, ...args)
   }
 }
@@ -985,8 +1027,5 @@ store.observer(() => {
     }
   }
 }, 'provider:account')
-
-proxy.on('send', (payload, cb) => provider.send(payload, cb))
-proxy.ready = true
 
 export default provider

@@ -334,6 +334,12 @@ describe('signer device changes', () => {
       expect(latticeSigner.deriveAddresses).toHaveBeenCalled()
     })
 
+    it('updates the Lattice to paired if signer is paired after connecting', () => {
+      latticeSigner.emit('connect', true)
+
+      expect(store.updateLattice).toHaveBeenCalledWith('NBaJ8e', expect.objectContaining({ paired: true }))
+    })
+
     it('updates the Lattice to unpaired if signer is not paired after connecting', () => {
       latticeSigner.deriveAddresses.mockImplementation(() => {
         throw new Error('tried to derive addresses for un-paired Lattice!')
