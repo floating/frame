@@ -199,6 +199,7 @@ export class Accounts extends EventEmitter {
 
         this.sendRequest({ method: 'eth_getTransactionReceipt', params: [hash], chainId: targetChainId }, (receiptRes: RPCResponsePayload) => {
           if (receiptRes.error) return reject(receiptRes.error)
+          if (!this.accounts[account.address]) return reject(new Error('account closed'))
 
           if (receiptRes.result && account.requests[id]) {
             const txRequest = this.getTransactionRequest(account, id)
@@ -211,7 +212,7 @@ export class Accounts extends EventEmitter {
               const network = targetChain
               if (network.type === 'ethereum' && network.id === 1) {
                 fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then((res: any) => {
-                  if (res && res.message === 'OK' && res.result && res.result.ethusd && txRequest.tx && txRequest.tx.receipt) {
+                  if (res && res.message === 'OK' && res.result && res.result.ethusd && txRequest.tx && txRequest.tx.receipt && this.accounts[account.address]) {
                     const { gasUsed } = txRequest.tx.receipt
 
                     txRequest.feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(txRequest.data.gasPrice || '0x0')) * res.result.ethusd) * 100) / 100).toFixed(2)
@@ -281,8 +282,10 @@ export class Accounts extends EventEmitter {
         if (newHeadRes.error) {
           log.warn(newHeadRes.error)
           const monitor = async () => {
-
-            if (!account) return log.error('txMonitor internal monitor had no target account')
+            if (!this.accounts[account.address]) {
+              clearTimeout(monitorTimer)
+              return log.error('txMonitor internal monitor had no target account')
+            }
 
             let confirmations
             try {
@@ -290,6 +293,7 @@ export class Accounts extends EventEmitter {
               txRequest.tx = { ...txRequest.tx, confirmations }
 
               account.update()
+
               if (confirmations > 12) {
                 txRequest.status = RequestStatus.Confirmed
                 txRequest.notice = 'Confirmed'
@@ -308,6 +312,17 @@ export class Accounts extends EventEmitter {
           const monitorTimer = setInterval(monitor, 15000)
         } else if (newHeadRes.result) {
           const headSub = newHeadRes.result
+
+          const removeSubscription = async (requestRemoveTimeout: number) => {
+            setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), requestRemoveTimeout)
+            provider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
+            this.sendRequest({ method: 'eth_unsubscribe', chainId: targetChainId, params: [headSub] }, (res: RPCResponsePayload) => {
+              if (res.error) {
+                log.error('error sending message eth_unsubscribe', res)
+              }
+            })
+          }
+
           const handler = async (payload: RPCRequestPayload) => {
             if (payload.method === 'eth_subscription' && (payload.params as any).subscription === headSub) {
               // const newHead = payload.params.result
@@ -316,10 +331,8 @@ export class Accounts extends EventEmitter {
                 confirmations = await this.confirmations(account, id, hash, targetChain)
               } catch (e) {
                 log.error(e)
-                // proxyProvider.removeListener('data', handler)
-                provider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
-                setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 60 * 1000)
-                return
+
+                return removeSubscription(60 * 1000)
               }
 
               txRequest.tx = { ...txRequest.tx, confirmations }
@@ -329,15 +342,8 @@ export class Accounts extends EventEmitter {
                 txRequest.status = RequestStatus.Confirmed
                 txRequest.notice = 'Confirmed'
                 account.update()
-                setTimeout(() => this.accounts[account.address] && this.removeRequest(account, id), 8000)
-                // proxyProvider.removeListener('data', handler)
                 
-                provider.off(`data:${targetChain.type}:${targetChain.id}`, handler)
-                this.sendRequest({ method: 'eth_unsubscribe', chainId: targetChainId, params: [headSub] }, (res: RPCResponsePayload) => {
-                  if (res.error) {
-                    log.error('error sending message eth_unsubscribe', res)
-                  }
-                })
+                removeSubscription(8000)
               }
             }
           }
