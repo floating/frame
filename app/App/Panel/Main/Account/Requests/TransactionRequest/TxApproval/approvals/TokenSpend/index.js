@@ -69,6 +69,21 @@ class TokenSpend extends React.Component {
     }
   }
 
+  startEditing () {
+    this.setState({ inEditApproval: true })
+  }
+
+  doneEditing () {
+    if (this.state.mode === 'custom' && this.state.customInput === '') {
+      this.setState({ mode: 'requested', amount: this.requestedAmount })
+    }
+
+    this.setState({ exiting: true })
+    setTimeout(() => {
+      this.setState({ exiting: false, inEditApproval: false })
+    }, 600)
+  }
+
   render () {
     const { req, approval } = this.props
     const { data } = approval
@@ -106,19 +121,11 @@ class TokenSpend extends React.Component {
             className={this.state.inEditApproval ? 'approveTokenSpendEditButton approveTokenSpendDoneButton' : 'approveTokenSpendEditButton'}
             role='button'
             onClick={() => {
-              if (this.state.mode === 'custom' && this.state.customInput === '') {
-                this.setState({ mode: 'requested', amount: this.requestedAmount }) 
-              } 
-              
               if (this.state.inEditApproval) {
-                this.setState({ exiting: true })
-                setTimeout(() => {
-                  this.setState({ exiting: false, inEditApproval: false })
-                }, 600)
+                this.doneEditing()
               } else {
-                this.setState({ inEditApproval: true })
+                this.startEditing()
               }
-                
             }}
           >
             {this.state.inEditApproval ? 'Done' : 'Edit' }
@@ -170,6 +177,7 @@ class TokenSpend extends React.Component {
                       <input 
                         autoFocus
                         type='text'
+                        aria-label='Custom Amount'
                         value={this.state.customInput}
                         onChange={(e) => {
                           e.preventDefault()
@@ -177,7 +185,7 @@ class TokenSpend extends React.Component {
                           this.setCustomAmount(e.target.value)
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') return this.setState({ inEditApproval: false })
+                          if (e.key === 'Enter') return this.doneEditing()
                         }}
                       />
                     ) : (
@@ -185,7 +193,8 @@ class TokenSpend extends React.Component {
                         <div 
                           className='approveTokenSpendAmountNoInput'
                           role='textbox'
-                          onClick={() => {
+                          style={inputLock ? { cursor: 'default' } : null}
+                          onClick={inputLock ? null : () => {
                             this.setCustomAmount(this.state.customInput)
                           }}
                         >
