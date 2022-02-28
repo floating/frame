@@ -78,7 +78,46 @@ describe('changing approval amounts', () => {
       const custom = queryByRole('button', { name: 'Custom' })
       fireEvent.click(custom)
 
-      const enterAmount = queryByRole('textbox')
+      const enterAmount = queryByRole('textbox', { name: 'Custom Amount' })
+      fireEvent.change(enterAmount, { target: { value: '50' } })
+
+      const proceed = queryByRole('button', { name: 'Proceed' })
+      fireEvent.click(proceed)
+    })
+  })
+
+  it('does not allows the user to set the token approval to a custom amount for an unknown token', async () => {
+    return new Promise(async (resolve, reject) => {
+      const onApprove = function (req, approvalType, data) {
+        try {
+          expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
+
+          // 50 * 1e6 to account for decimals
+          expect(data.amount).toBe('0x2faf080')
+          resolve()
+        } catch (e) { reject(e) }
+      }
+
+      const { queryByRole } = render(
+        <TokenSpend
+          onApprove={onApprove}
+          approval={{
+            data: {
+              symbol: 'aUSDC',
+              name: 'Aave USDC',
+              decimals: 6,
+              amount: addHexPrefix(100e6.toString(16))
+            }
+          }}/>
+      )
+
+      const edit = queryByRole('button', { name: 'Edit' })
+      fireEvent.click(edit)
+
+      const custom = queryByRole('button', { name: 'Custom' })
+      fireEvent.click(custom)
+
+      const enterAmount = queryByRole('textbox', { name: 'Custom Amount' })
       fireEvent.change(enterAmount, { target: { value: '50' } })
 
       const proceed = queryByRole('button', { name: 'Proceed' })
@@ -163,7 +202,7 @@ describe('changing approval amounts', () => {
     const custom = queryByRole('button', { name: 'Custom' })
     fireEvent.click(custom)
 
-    const enterAmount = queryByRole('textbox')
+    const enterAmount = queryByRole('textbox', { name: 'Custom Amount' })
     fireEvent.change(enterAmount, { target: { value: '50' } })
 
     const requested = queryByRole('button', { name: 'Requested' })
@@ -191,11 +230,18 @@ describe('changing approval amounts', () => {
       const edit = queryByRole('button', { name: 'Edit' })
       fireEvent.click(edit)
 
+      const custom = queryByRole('button', { name: 'Custom' })
+      expect(custom).toBeNull()
+
       const requestedAmount = queryByRole('textbox')
       const children = requestedAmount.querySelectorAll('div')
       const displayedContent = [...children].map(c => c.textContent).join(' ').trim()
 
       expect(displayedContent).toBe(data.decimals ? '100' : '100 million')
+
+      // ensure clicked on requested amount textbox doesn't allow user to enter a custom amount
+      fireEvent.click(requestedAmount)
+      expect(queryByRole('textbox', { name: 'Custom Amount' })).toBeNull()
     })
   })
 })
