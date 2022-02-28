@@ -36,7 +36,7 @@ class HotSigner extends Signer {
     fs.writeFileSync(path.resolve(SIGNERS_PATH, `${id}.json`), JSON.stringify(signer))
 
     // Log
-    log.info('Signer saved to disk')
+    log.debug('Signer saved to disk')
   }
 
   delete () {

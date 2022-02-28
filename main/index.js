@@ -16,7 +16,7 @@ const log = require('electron-log')
 const url = require('url')
 
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
-log.transports.file.level = process.env.NODE_ENV === 'production' ? 'verbose' : false
+log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
 const data = require('./data')
 const windows = require('./windows')
