@@ -415,7 +415,7 @@ function start () {
     return
   }
 
-  log.info('starting external data scanner')
+  log.info('starting external data worker')
 
   scanWorker = createWorker()
 }

@@ -312,7 +312,7 @@ export default class Ledger extends Signer {
             const path = this.getPath(i)
             const { address } = await this.eth.getAddress(path, false, false)
 
-            log.debug(`Found Ledger Live address #${i}: ${address}`)
+            log.verbose(`Found Ledger Live address #${i}: ${address}`)
 
             if (this.derivation === Derivation.live) {
               // don't update if the derivation was changed while this request was running
@@ -373,8 +373,9 @@ export default class Ledger extends Signer {
 
           const path = this.getPath(index)
           const result = await this.getAddress(path, display, true)
+          const address = currentAddress.toLowerCase()
 
-          if (result.address.toLowerCase() !== currentAddress.toLowerCase()) {
+          if (result.address.toLowerCase() !== address) {
             const err = new Error('Address does not match device')
             log.error(err)
 
@@ -383,7 +384,7 @@ export default class Ledger extends Signer {
             return cb(err, undefined)
           }
 
-          log.debug('Address matches device')
+          log.info(`address ${address} matches device`)
 
           cb(null, true)
         } catch (e) {
@@ -412,7 +413,7 @@ export default class Ledger extends Signer {
           const path = this.getPath(index)
           const signedMessage = await this.eth.signMessage(path, message)
 
-          log.debug('successfully signed message on Ledger: ', message)
+          log.info('successfully signed message on Ledger: ', message)
 
           cb(null, signedMessage)
         } catch (e) {
@@ -445,7 +446,7 @@ export default class Ledger extends Signer {
           const path = this.getPath(index)
           const signedData = await this.eth.signTypedData(path, typedData)
 
-          log.debug('successfully signed typed data on Ledger: ', typedData)
+          log.info('successfully signed typed data on Ledger: ', typedData)
 
           cb(null, signedData)
         } catch (e) {
@@ -475,7 +476,7 @@ export default class Ledger extends Signer {
           const path = this.getPath(index)
           const signedTx = await this.eth.signTransaction(path, ledgerTx)
 
-          log.debug('successfully signed transaction on Ledger: ', ledgerTx)
+          log.info('successfully signed transaction on Ledger: ', ledgerTx)
 
           cb(null, signedTx)
         } catch (e) {

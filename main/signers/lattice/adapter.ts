@@ -88,7 +88,7 @@ export default class LatticeAdapter extends SignerAdapter {
       Object.entries(devices).forEach(([deviceId, device]) => {
         if (deviceId in this.knownSigners) return
 
-        log.debug('Initializing Lattice device', { deviceId })
+        log.info('Initializing Lattice device', { deviceId })
 
         const { deviceName, tag, baseUrl, privKey, accountLimit } = getLatticeSettings(deviceId)
 

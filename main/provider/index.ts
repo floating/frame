@@ -459,7 +459,7 @@ export class Provider extends EventEmitter {
           return reject(response.error)
         }
 
-        log.debug(`gas estimate for tx to ${txParams.to}: ${response.result}`)
+        log.verbose(`gas estimate for tx to ${txParams.to}: ${response.result}`)
         return resolve(response.result)
       }, targetChain)
     })
@@ -581,7 +581,7 @@ export class Provider extends EventEmitter {
 
     const currentAccount = accounts.current()
 
-    log.debug(`sendTransaction(${JSON.stringify(newTx)}`)
+    log.verbose(`sendTransaction(${JSON.stringify(newTx)}`)
 
     this.fillTransaction(newTx, (err, transactionMetadata) => {
       if (err) {

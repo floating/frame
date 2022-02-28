@@ -81,7 +81,7 @@ export default class Lattice extends Signer {
     this.status = Status.CONNECTING
     this.emit('update')
 
-    log.debug('connecting to Lattice', { name: this.name, baseUrl })
+    log.info('connecting to Lattice', { name: this.name, baseUrl })
 
     this.connection = new Client({
       name: devicePermission(this.tag),
@@ -96,7 +96,7 @@ export default class Lattice extends Signer {
 
       const [patch, minor, major] = this.connection?.fwVersion || [0, 0, 0]
 
-      log.debug(`Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`)
+      log.info(`Connected to Lattice with deviceId=${this.deviceId} paired=${paired}, firmware v${major}.${minor}.${patch}`)
 
       this.appVersion = { major, minor, patch }
 
@@ -138,7 +138,7 @@ export default class Lattice extends Signer {
   }
 
   async pair (pairingCode: string) {
-    log.debug(`pairing to Lattice ${this.deviceId} with code`, pairingCode)
+    log.info(`pairing to Lattice ${this.deviceId} with code`, pairingCode)
 
     this.status = Status.PAIRING
     this.emit('update')
@@ -147,7 +147,7 @@ export default class Lattice extends Signer {
       const pair = promisify((this.connection as Client).pair).bind(this.connection, pairingCode)
       const hasActiveWallet = !!(await pair())
 
-      log.debug(`successfully paired to Lattice ${this.deviceId}`)
+      log.info(`successfully paired to Lattice ${this.deviceId}`)
 
       this.emit('paired', hasActiveWallet)
 
@@ -175,7 +175,7 @@ export default class Lattice extends Signer {
 
       const connection = this.connection as Client
 
-      log.debug(`deriving addresses for Lattice ${connection.name}`)
+      log.info(`deriving addresses for Lattice ${connection.name}`)
 
       const getAddresses = promisify(connection.getAddresses).bind(connection)
       const addressLimit = derivation === Derivation.live ? 1 : ADDRESS_LIMIT
@@ -214,7 +214,7 @@ export default class Lattice extends Signer {
   async verifyAddress (index: number, currentAddress: string, display = true, cb: Callback<boolean>) {
     const connection = this.connection as Client
 
-    log.debug(`verifying address ${currentAddress} for Lattice ${connection.name}`)
+    log.info(`verifying address ${currentAddress} for Lattice ${connection.name}`)
 
     try {
       const addresses = await this.deriveAddresses({ retries: 0 })
@@ -225,7 +225,7 @@ export default class Lattice extends Signer {
         throw new Error('Address does not match device')
       }
 
-      log.debug(`address ${currentAddress} matches device`)
+      log.info(`address ${currentAddress} matches device`)
 
       cb(null, true)
     } catch (e) {
