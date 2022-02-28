@@ -20,7 +20,7 @@ export default class LedgerEthereumApp {
   }
 
   async deriveAddresses (derivation: Derivation) {
-    log.debug(`deriving ${derivation} Ledger addresses`)
+    log.info(`deriving ${derivation} Ledger addresses`)
 
     const path = getDerivationPath(derivation)
 

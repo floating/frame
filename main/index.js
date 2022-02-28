@@ -15,6 +15,9 @@ process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__d
 const log = require('electron-log')
 const url = require('url')
 
+log.transports.console.level = process.env.LOG_LEVEL || 'info'
+log.transports.file.level = process.env.NODE_ENV === 'production' ? 'verbose' : false
+
 const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')

@@ -545,7 +545,7 @@ export class Accounts extends EventEmitter {
   }
 
   removeRequest (account: FrameAccount, handlerId: string) {
-    log.debug(`removeRequest(${account.id}, ${handlerId})`)
+    log.info(`removeRequest(${account.id}, ${handlerId})`)
 
     delete account.requests[handlerId]
     account.update()

@@ -122,7 +122,7 @@ function createWorker () {
 
   scanWorker = fork(path.resolve(__dirname, 'worker.js'), workerArgs)
 
-  log.debug('created external data worker, pid:', scanWorker.pid)
+  log.info('created external data worker, pid:', scanWorker.pid)
 
   scanWorker.on('message', (message: WorkerMessage) => {
     if (process.env.LOG_WORKER) {
@@ -415,7 +415,7 @@ function start () {
     return
   }
 
-  log.info('starting external data scanner')
+  log.info('starting external data worker')
 
   scanWorker = createWorker()
 }
