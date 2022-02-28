@@ -4,6 +4,7 @@ import ethProvider from 'eth-provider'
 
 log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
 log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
+log.transports.file.level = process.env.LOG_WORKER ? 'debug' : 'info'
 
 import { supportsChain as chainSupportsScan } from '../multicall'
 import balancesLoader, { BalanceLoader } from './balances'
