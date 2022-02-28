@@ -239,7 +239,7 @@ describe('changing approval amounts', () => {
 
       expect(displayedContent).toBe(data.decimals ? '100' : '100 million')
 
-      // ensure clicked on requested amount textbox doesn't allow user to enter a custom amount
+      // ensure click on requested amount textbox doesn't allow user to enter a custom amount
       fireEvent.click(requestedAmount)
       expect(queryByRole('textbox', { name: 'Custom Amount' })).toBeNull()
     })
