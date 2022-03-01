@@ -7,11 +7,7 @@ import store from '../../../../../../../../../../../main/store'
 import ApproveTokenSpendComponent from '../../../../../../../../../../../app/App/Panel/Main/Account/Requests/TransactionRequest/TxApproval/approvals/TokenSpend'
 import { ApprovalType } from '../../../../../../../../../../../resources/constants'
 
-jest.mock('../../../../../../../../../../../main/store/persist', () => ({
-  get: jest.fn(),
-  set: jest.fn(),
-  queue: jest.fn()
-}))
+jest.mock('../../../../../../../../../../../main/store/persist')
 
 const TokenSpend = Restore.connect(ApproveTokenSpendComponent, store)
 

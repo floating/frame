@@ -16,7 +16,7 @@ class PersistStore extends Conf {
     }
     electron.app.on('quit', () => this.writeUpdates())
     super(options)
-    setInterval(() => this.writeUpdates(), 5 * 1000)
+    setInterval(() => this.writeUpdates(), 30 * 1000)
   }
 
   addCrashReportFields () {

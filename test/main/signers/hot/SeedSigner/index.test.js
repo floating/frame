@@ -8,15 +8,9 @@ import log from 'electron-log'
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 
-const mockPersist = {
-  get: jest.fn(),
-  set: jest.fn(),
-  queue: jest.fn()
-}
-
 jest.mock('electron')
-jest.mock('../../../../../compiled/main/store/persist', () => mockPersist)
-jest.mock('../../../../../main/store/persist', () => mockPersist)
+jest.mock('../../../../../compiled/main/store/persist', () => ({ get: jest.fn(), set: jest.fn(), queue: jest.fn() }))
+jest.mock('../../../../../main/store/persist')
 
 // Stubs
 const signers = { add: () => {} }
