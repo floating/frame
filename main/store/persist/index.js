@@ -16,11 +16,28 @@ class PersistStore extends Conf {
     }
     electron.app.on('quit', () => this.writeUpdates())
     super(options)
-    setInterval(() => this.writeUpdates(), 30 * 1000)
+    setInterval(() => this.writeUpdates(), 5 * 1000)
+  }
+
+  addCrashReportFields () {
+    const fields = ['networks', 'networksMeta', 'balances', 'tokens', 'accounts']
+
+    fields.forEach(field => {
+      const fieldStateData = (this.store.main.__['18']?.main || {})[field]
+
+      if (fieldStateData) {
+        electron.crashReporter.addExtraParameter(field, JSON.stringify(fieldStateData))
+      }
+    })
   }
 
   writeUpdates () {
     if (this.blockUpdates) return
+
+    if (electron && electron.crashReporter) {
+      this.addCrashReportFields()
+    }
+
     const updates = { ...this.updates }
     this.updates = null
     if (Object.keys(updates || {}).length > 0) super.set(updates)
