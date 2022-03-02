@@ -6,7 +6,8 @@ import type { BigNumber } from 'bignumber.js'
 interface Connection {
   send (payload: JSONRPCRequestPayload): Promise<any>,
   on: (event: string, handler: any) => void,
-  off: (event: string, handler: any) => void
+  off: (event: string, handler: any) => void,
+  chainId: string
 }
 
 interface SubscriptionMessage {
@@ -103,7 +104,7 @@ class BlockMonitor extends EventEmitter {
       .send({ id: 1, jsonrpc: '2.0', method: 'eth_getBlockByNumber', params: ['latest', false] })
       .then(this.handleBlock)
       .catch(err => {
-        log.error(`Could not load block`, err)
+        log.error(`Could not load block for chain ${this.connection.chainId}`, err)
       })
   }
 
