@@ -7,7 +7,6 @@ jest.mock('node-fetch')
 const address = '0xc340c965a1277394b91a50e7c6eA57DEfbabcd91'
 
 const asset = {
-  id: 'frame-test-nft-1',
   asset_contract: {},
   collection: {
     slug: 'frames-super-cool-nfts'
@@ -35,7 +34,7 @@ it('loads more than 50 inventory items', async () => {
     expect(uri).toMatch(new RegExp(`^https://proxy.pylon.link`))
 
     const queryParams = parseQueryParams(uri)
-    expect(queryParams.type).toMatch('api')
+    expect(queryParams.type).toBe('api')
     expect(queryParams.target).toMatch(new RegExp('https://api.opensea.io/api/v\\d/assets'))
     expect(queryParams.owner).toBe(address)
     expect(queryParams.cursor).toBeUndefined()
@@ -51,7 +50,7 @@ it('loads more than 50 inventory items', async () => {
     expect(uri).toMatch(new RegExp(`^https://proxy.pylon.link`))
 
     const queryParams = parseQueryParams(uri)
-    expect(queryParams.type).toMatch('api')
+    expect(queryParams.type).toBe('api')
     expect(queryParams.target).toMatch(new RegExp('https://api.opensea.io/api/v\\d/assets'))
     expect(queryParams.owner).toBe(address)
     expect(queryParams.cursor).toBe('acursor')
@@ -64,4 +63,15 @@ it('loads more than 50 inventory items', async () => {
 
   expect(result.success).toBe(true)
   expect(Object.keys(result.inventory['frames-super-cool-nfts'].assets)).toHaveLength(60)
+})
+
+it('returns an unsuccessful call to load inventory', async () => {
+  fetch.mockImplementationOnce(async (url, options) => {
+    return { status: 401, json: async () => ({ assets: [{ ...asset, id: 'one-two'}] })}
+  })
+
+  const result = await loadInventory(address)
+
+  expect(result.success).toBe(false)
+  expect(Object.keys(result.inventory)).toHaveLength(0)
 })
