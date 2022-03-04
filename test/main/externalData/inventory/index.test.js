@@ -66,8 +66,9 @@ it('loads more than 50 inventory items', async () => {
 })
 
 it('returns an unsuccessful call to load inventory', async () => {
-  fetch.mockImplementationOnce(async (url, options) => {
-    return { status: 401, json: async () => ({ assets: [{ ...asset, id: 'one-two'}] })}
+  fetch.mockResolvedValue({
+    status: 401,
+    json: async () => ({ assets: [{ ...asset, id: 'one-two'}] })
   })
 
   const result = await loadInventory(address)
