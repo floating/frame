@@ -40793,14 +40793,25 @@
         "logoURI":"https://assets.coingecko.com/coins/images/13584/thumb/zzz_finance.jpg?1609919864"
      },
      {
-      "chainId":4,
-      "name":"JoeBar",
-      "symbol":"xJOE",
-      "address":"0x57319d41f71e81f3c65f2a47ca4e001ebafd4f33",
-      "decimals":18,
-      "extensions":{
-         "omit":true
+        "chainId":4,
+        "name":"JoeBar",
+        "symbol":"xJOE",
+        "address":"0x57319d41f71e81f3c65f2a47ca4e001ebafd4f33",
+        "decimals":18,
+        "extensions":{
+          "omit":true
+        }
+      },
+      {
+       "chainId":80001,
+       "name": "Wrapped Matic",
+        "address": "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
+        "symbol": "WMATIC",
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0/logo.png",
+        "extensions":{
+            "omit":true
+        }
       }
-   }
   ]
 }
