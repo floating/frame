@@ -19,8 +19,32 @@ class PersistStore extends Conf {
     setInterval(() => this.writeUpdates(), 30 * 1000)
   }
 
+  addCrashReportFields () {
+    const latestVersion = Object.keys(this.store.main.__).reduce((highest, version) => {
+      const vInt = parseInt(version)
+      if (Number.isInteger(vInt) && vInt > parseInt(highest)) return version
+
+      return highest
+    }, '0')
+
+    const fields = ['networks', 'networksMeta', 'balances', 'tokens', 'accounts']
+
+    fields.forEach(field => {
+      const fieldStateData = (this.store.main.__[latestVersion].main || {})[field]
+
+      if (fieldStateData) {
+        electron.crashReporter.addExtraParameter(field, JSON.stringify(fieldStateData))
+      }
+    })
+  }
+
   writeUpdates () {
     if (this.blockUpdates) return
+
+    if (electron && electron.crashReporter) {
+      this.addCrashReportFields()
+    }
+
     const updates = { ...this.updates }
     this.updates = null
     if (Object.keys(updates || {}).length > 0) super.set(updates)

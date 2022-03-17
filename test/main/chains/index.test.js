@@ -125,11 +125,7 @@ const state = {
 jest.mock('eth-provider', () => target => mockConnections[target].connection)
 jest.mock('../../../main/store/state', () => () => state)
 jest.mock('../../../main/accounts', () => ({ updatePendingFees: jest.fn() }))
-jest.mock('../../../main/store/persist', () => ({
-  get: jest.fn(),
-  set: jest.fn(),
-  queue: jest.fn()
-}))
+jest.mock('../../../main/store/persist')
 
 const mockConnections = {
   'infuraRinkeby': {

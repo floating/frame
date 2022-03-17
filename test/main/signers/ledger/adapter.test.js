@@ -8,11 +8,7 @@ import { Status } from '../../../../main/signers/ledger/Ledger'
 
 jest.mock('node-hid')
 
-jest.mock('../../../../main/store/persist', () => ({
-  get: jest.fn(),
-  set: jest.fn(),
-  queue: jest.fn()
-}))
+jest.mock('../../../../main/store/persist')
 
 jest.mock('../../../../main/signers/ledger/Ledger', () => {
   const L = jest.requireActual('../../../../main/signers/ledger/Ledger')

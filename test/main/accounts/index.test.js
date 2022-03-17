@@ -8,11 +8,7 @@ jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/externalData')
 
-jest.mock('../../../main/store/persist', () => ({
-  get: jest.fn(),
-  set: jest.fn(),
-  queue: jest.fn()
-}))
+jest.mock('../../../main/store/persist')
 
 jest.mock('../../../main/nebula', () => jest.fn(() => ({ ens: { lookupAddress: jest.fn() } })))
 
