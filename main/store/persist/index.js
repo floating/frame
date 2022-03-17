@@ -20,10 +20,17 @@ class PersistStore extends Conf {
   }
 
   addCrashReportFields () {
+    const latestVersion = Object.keys(this.store.main.__).reduce((highest, version) => {
+      const vInt = parseInt(version)
+      if (Number.isInteger(vInt) && vInt > parseInt(highest)) return version
+
+      return highest
+    }, '0')
+
     const fields = ['networks', 'networksMeta', 'balances', 'tokens', 'accounts']
 
     fields.forEach(field => {
-      const fieldStateData = (this.store.main.__['18']?.main || {})[field]
+      const fieldStateData = (this.store.main.__[latestVersion].main || {})[field]
 
       if (fieldStateData) {
         electron.crashReporter.addExtraParameter(field, JSON.stringify(fieldStateData))
