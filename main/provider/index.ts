@@ -460,7 +460,7 @@ export class Provider extends EventEmitter {
         }
 
         const estimatedLimit = parseInt(response.result, 16)
-        const paddedLimit = Math.ceil(estimatedLimit * 1.5)
+        const paddedLimit = Math.ceil(estimatedLimit * 1.15)
 
         log.verbose(`gas estimate for tx to ${txParams.to}: ${estimatedLimit}, using ${paddedLimit} as gas limit`)
         return resolve(addHexPrefix(paddedLimit.toString(16)))
