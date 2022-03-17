@@ -26,10 +26,14 @@ interface AssetContract {
   external_link: string
 }
 
-interface InventorySet {
+interface AssetResponse {
   next: string | null,
   previous: string | null,
   assets: AssetSet[]
+}
+
+interface LoadedAssets extends AssetResponse {
+  success: boolean
 }
 
 interface Collection {
@@ -40,7 +44,12 @@ interface Collection {
   large_image_url: string
 }
 
-async function fetchAssets (address: Address, cursor?: string) {
+interface InventoryResult {
+  success: boolean,
+  inventory: Record<string, any>
+}
+
+async function fetchAssets (address: Address, cursor?: string): Promise<LoadedAssets> {
   const queryParams = {
     owner: address,
     order_direction: 'desc',
@@ -74,27 +83,38 @@ async function fetchAssets (address: Address, cursor?: string) {
       const errorMsg = contentType.includes('json') ? await res.json() : ''
 
       log.warn('unable to fetch inventory', errorMsg)
-      return { assets: [], next: null, previous: null }
+      return { success: false, assets: [], next: null, previous: null }
     }
 
-    return res.json() as Promise<InventorySet>
+    const data = (await res.json()) as AssetResponse
+
+    return { ...data, success: true }
   } catch (e) {
     log.warn(`could not fetch assets ${address}`, e)
 
-    return { assets: [], next: null, previous: null }
+    return { success: false, assets: [], next: null, previous: null }
   }
 }
 
-async function loadAssets (address: Address, cursor?: string): Promise<AssetSet[]> {
+async function loadAssets (address: Address, cursor?: string): Promise<LoadedAssets> {
   const set = await fetchAssets(address, cursor)
+  let nextAssets = { success: true, assets: [] as AssetSet[] }
 
-  return (set.next && set.next !== cursor)
-    ? [...set.assets, ...(await loadAssets(address, set.next))]
-    : set.assets
+  if (set.success && set.next && set.next !== cursor) {
+    nextAssets = await loadAssets(address, set.next)
+  }
+
+  return {
+    ...set,
+    success: set.success && nextAssets.success,
+    assets: [...set.assets, ...nextAssets.assets]
+  }
 }
 
-export default async function (address: Address) {
-  const assets = await loadAssets(address)
+export default async function (address: Address): Promise<InventoryResult> {
+  const { success, assets } = await loadAssets(address)
+
+  log.debug(`loaded ${assets.length} inventory items, success: ${success}`)
   
   const inventory = assets.reduce((collectedInventory, asset) => {
     const { name, id, token_id, image_url, description, external_link, permalink, traits, asset_contract, collection } = asset
@@ -136,5 +156,5 @@ export default async function (address: Address) {
     return collectedInventory
   }, {} as Record<string, any>)
 
-  return inventory
+  return { success, inventory }
 }

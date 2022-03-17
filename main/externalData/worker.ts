@@ -110,7 +110,11 @@ function nativeCurrencyScan (symbols: string[]) {
 function inventoryScan (addresses: string[]) {
   addresses.forEach(address => {
     inventory(address)
-      .then(inventory => sendToMainProcess({ type: 'inventory', address, inventory }))
+      .then(result => {
+        if (result.success) {
+          sendToMainProcess({ type: 'inventory', address, inventory: result.inventory })
+        }
+      })
       .catch(err => log.error('inventory scan error', err))
   })
 }
