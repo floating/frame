@@ -603,22 +603,22 @@ describe('#send', () => {
 
       const chainIds = [1, 137]
 
-        chainIds.forEach(chainId => {
-          store.set('main.networksMeta.ethereum', chainId, 'gas', {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
-              fees: {
-                maxPriorityFeePerGas: gweiToHex(1),
-                maxBaseFeePerGas: gweiToHex(8)
-              }
+      chainIds.forEach(chainId => {
+        store.set('main.networksMeta.ethereum', chainId, 'gas', {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
+            fees: {
+              maxPriorityFeePerGas: gweiToHex(1),
+              maxBaseFeePerGas: gweiToHex(8)
             }
-          })
-
-          connection.connections.ethereum[chainId] = {
-            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
           }
         })
+
+        connection.connections.ethereum[chainId] = {
+          chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
+        }
+      })
     })
 
     it('rejects a transaction with a mismatched chain id', done => {
@@ -650,6 +650,23 @@ describe('#send', () => {
         try {
           const initialRequest = accountRequests[0]
           expect(initialRequest.data.chainId).toBe('0x89')
+          done()
+        } catch (e) { done(e) }
+      })
+    })
+
+    it('pads the gas estimate from the network by 15 percent', done => {
+      connection.send.mockImplementationOnce((payload, cb) => {
+        expect(payload.method).toBe('eth_estimateGas')
+        cb({ result: addHexPrefix((150000).toString(16)) })
+      })
+
+      delete tx.gasLimit
+
+      sendTransaction(() => {
+        try {
+          const initialRequest = accountRequests[0]
+          expect(initialRequest.data.gasLimit).toBe(addHexPrefix((172500).toString(16)))
           done()
         } catch (e) { done(e) }
       })
