@@ -269,13 +269,14 @@ describe('#send', () => {
           expect(response.error).toBe(undefined)
 
           const permissions = response.result
-          expect(permissions).toHaveLength(14)
+          expect(permissions).toHaveLength(15)
           expect(permissions.map(p => p.parentCapability)).toEqual(expect.arrayContaining(
             [
               'eth_coinbase',
               'eth_accounts',
               'eth_requestAccounts',
               'eth_sendTransaction',
+              'eth_sendRawTransaction',
               'personal_sign',
               'personal_ecRecover',
               'eth_sign',
@@ -1010,14 +1011,18 @@ describe('#send', () => {
       })
     })
 
-    it('passes a request with an unknown version through to the connection', done => {
-      mockConnectionError('received unhandled request')
+    const unknownVersions = ['_v5', '_v1.1', 'v3']
 
-      const params = [address, 'test']
-
-      send({ method: 'eth_signTypedData_v5', params }, err => {
-        expect(err.error.message).toBe('received unhandled request')
-        done()
+    unknownVersions.forEach(versionExtension => {
+      it(`passes a request with unhandled method eth_signTypedData${versionExtension} through to the connection`, done => {
+        mockConnectionError('received unhandled request')
+  
+        const params = [address, 'test']
+  
+        send({ method: `eth_signTypedData${versionExtension}`, params }, err => {
+          expect(err.error.message).toBe('received unhandled request')
+          done()
+        })
       })
     })
   })

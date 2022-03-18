@@ -946,11 +946,9 @@ export class Provider extends EventEmitter {
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
-    const signTypedDataMatcher = /eth_signTypedData_?(v[134]|$)/
-    const signTypedDataRequest = method.match(signTypedDataMatcher)
-
-    if (signTypedDataRequest) {
-      const version = (signTypedDataRequest[1] || 'v1').toUpperCase() as Version
+    if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {
+      const underscoreIndex = method.lastIndexOf('_')
+      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1) : 'v1').toUpperCase() as Version
       return this.signTypedData(payload, version, res)
     }
     
