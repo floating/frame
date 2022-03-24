@@ -2,6 +2,7 @@ import path from 'path'
 import log from 'electron-log'
 import { ChildProcess, fork } from 'child_process'
 
+import Pylon from '@framelabs/pylon-client'
 import store from '../store'
 import { groupByChain } from './balances/reducers'
 import { CurrencyBalance, TokenBalance } from './balances'
@@ -77,6 +78,9 @@ const storeApi = {
       .filter(balance => balance.address !== NATIVE_CURRENCY)
   }
 }
+
+// @ts-ignore
+const pylon = new Pylon('wss://data.pylon.link')
 
 function setScanning (address: Address) {
   if (scanningReset) {
@@ -232,9 +236,9 @@ function createWorker () {
       store.setRates((message as RatesMessage).rates)
     }
 
-    if (message.type === 'inventory') {
-      store.setInventory(message.address, message.inventory)
-    }
+    // if (message.type === 'inventory') {
+    //   store.setInventory(message.address, message.inventory)
+    // }
   })
 
   scanWorker.on('error', (err: WorkerError) => {
@@ -317,9 +321,6 @@ function scanActiveData () {
 
   // update balances for the active account every 30 seconds
   trackedAddressScan = startScan(updateActiveBalances, () => activeScanInterval)
-
-  // update inventory for the active account every 60 seconds
-  inventoryScan = startScan(() => updateInventory(), 1000 * 60)
 }
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
@@ -345,11 +346,6 @@ const updateActiveBalances = () => {
   }
 }
 
-const updateInventory = () => {
-  if (activeAddress) { sendCommandToWorker('updateInventory', [[activeAddress]]) }
-}
-
-
 function addAddresses (addresses: Address[]) {
   trackedAddresses = [...trackedAddresses].concat(addresses).reduce((all, addr) => {
     if (addr && !all.includes(addr)) {
@@ -368,6 +364,12 @@ function setActiveAddress (address: Address) {
 
   allowRatesScan()
   addAddresses([address])
+
+  if (pylon) {
+    pylon.inventories([activeAddress])
+  } else {
+    log.error('Pylon not initialized!')
+  }
 
   if (heartbeat) {
     scanActiveData()
@@ -409,7 +411,19 @@ function startScanning () {
   scanActiveData()
 }
 
-function start () {
+async function start () {
+  pylon.on('connection', () => {
+    console.log(' ---> CONNECTED TO PYLON!')
+  })
+
+  pylon.on('inventories', (updates: any[]) => {
+    console.log('GOT SOME INVENTORY!')
+    updates.forEach(update => {
+      console.log({ update })
+      store.setInventory(update.id, update.data.inventory)
+    })
+  })
+
   if (scanWorker) {
     log.warn('external data worker already scanning')
     return

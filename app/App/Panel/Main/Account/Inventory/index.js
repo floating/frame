@@ -51,8 +51,8 @@ class Balances extends React.Component {
               return true
             }
           }).sort((a, b) => {
-            const assetsLengthA = Object.keys(inventory[a].assets).length
-            const assetsLengthB = Object.keys(inventory[b].assets).length
+            const assetsLengthA = Object.keys(inventory[a].items).length
+            const assetsLengthB = Object.keys(inventory[b].items).length
             if (assetsLengthA > assetsLengthB) return -1
             if (assetsLengthA < assetsLengthB) return 1
             return 0
@@ -66,17 +66,17 @@ class Balances extends React.Component {
               >
                 <div className='inventoryCollectionTop'>
                   <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
-                  <div className='inventoryCollectionCount'>{Object.keys(inventory[k].assets).length}</div>
+                  <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
                   <div className='inventoryCollectionLine' />
                 </div>
                 {this.props.expanded ? (
                   <div className='inventoryCollectionItems'>
-                    {Object.keys(inventory[k].assets || {}).sort((a, b) => {
-                      a = inventory[k].assets[a].tokenId
-                      b = inventory[k].assets[b].tokenId
+                    {Object.keys(inventory[k].items || {}).sort((a, b) => {
+                      a = inventory[k].items[a].tokenId
+                      b = inventory[k].items[b].tokenId
                       return a < b ? -1 : b > a ? 1 : 0
                     }).map(id => {
-                      const { tokenId, name, img, openSeaLink } = inventory[k].assets[id]
+                      const { tokenId, name, img, openSeaLink } = inventory[k].items[id]
                       return (
                         <div 
                           className='inventoryCollectionItem'
