@@ -4,7 +4,6 @@ import { ChildProcess, fork } from 'child_process'
 
 import Pylon, { AssetType } from '@framelabs/pylon-client'
 import store from '../store'
-import { groupByChain } from './balances/reducers'
 import { CurrencyBalance, TokenBalance } from './balances'
 import Inventory from './inventory'
 import Rates from './rates'
@@ -212,10 +211,6 @@ function createWorker () {
       if (outstandingScans === 0) {
         endScanning(balanceMessage.address)
       }
-
-      // for (const chainId in tokensByChain) {
-      //   updateRates(tokensByChain[chainId].map(t => t.address), parseInt(chainId))
-      // }
     }
   })
 
@@ -286,10 +281,6 @@ function scanActiveData () {
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
 
-const updateRates = (symbols: string[], chainId: number) => {
-  //if (!ratesPause) sendCommandToWorker('updateRates', [symbols, chainId])
-}
-
 const updateNativeCurrencyData = (symbols: string[]) => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
   if (activeAddress) {
@@ -326,6 +317,7 @@ function setActiveAddress (address: Address) {
   if (!activeAddress) return
 
   addAddresses([address])
+  updateRatesSubscription()
 
   if (heartbeat) {
     scanActiveData()
