@@ -46,14 +46,10 @@ async function load (symbols: string[]) {
     const lookupSymbol = (symbol === 'aeth' || symbol === 'oeth') ? 'eth' : symbol
     const coinData = await loadCoinData(allCoins, lookupSymbol)
 
-      data[symbol] = {
-        icon: coinData.image,
-        name: coinData.name,
-        usd: {
-          price: coinData.current_price || 0,
-          change24hr: coinData.price_change_percentage_24h || 0
-        }
-      }
+    data[symbol] = {
+      icon: coinData.image,
+      name: coinData.name
+    }
   }
 
   return data

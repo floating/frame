@@ -8,8 +8,6 @@ log.transports.file.level = ['development', 'test'].includes(process.env.NODE_EN
 
 import { supportsChain as chainSupportsScan } from '../multicall'
 import balancesLoader, { BalanceLoader } from './balances'
-import rates from './rates'
-import inventory from './inventory'
 import loadStaticData from './staticData'
 import TokenLoader from './inventory/tokens'
 
@@ -91,32 +89,10 @@ async function chainBalanceScan (address: string) {
   }
 }
 
-async function ratesScan (symbols: string[], chainId: number) {
-  try {
-    const loadedRates = await rates(symbols, chainId)
-    sendToMainProcess({ type: 'rates', rates: loadedRates })
-  } catch (e) {
-    log.error('rates scan error', e)
-    sendToMainProcess({ type: 'pause', task: 'rates', interval: 20 * 1000 })
-  }
-}
-
 function nativeCurrencyScan (symbols: string[]) {
   loadStaticData(symbols)
     .then(currencyData => sendToMainProcess({ type: 'nativeCurrencyData', currencyData }))
     .catch(err => log.error('native currency scan error', err))
-}
-
-function inventoryScan (addresses: string[]) {
-  addresses.forEach(address => {
-    inventory(address)
-      .then(result => {
-        if (result.success) {
-          sendToMainProcess({ type: 'inventory', address, inventory: result.inventory })
-        }
-      })
-      .catch(err => log.error('inventory scan error', err))
-  })
 }
 
 function resetHeartbeat () {
@@ -129,12 +105,10 @@ function resetHeartbeat () {
 }
 
 const messageHandler: { [command: string]: (...params: any) => void } = {
-  updateRates: ratesScan,
   updateNativeCurrencyData: nativeCurrencyScan,
   updateChainBalance: chainBalanceScan,
   fetchTokenBalances: fetchTokenBalances,
   tokenBalanceScan: tokenBalanceScan,
-  updateInventory: inventoryScan,
   heartbeat: resetHeartbeat
 }
 

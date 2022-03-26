@@ -238,8 +238,8 @@ module.exports = {
       u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
-  setNativeCurrency: (u, netType, netId, currency) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency', () => currency)
+  setNativeCurrencyData: (u, netType, netId, currency) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency', existing => ({ ...existing, ...currency }))
   },
   addNetwork: (u, net) => {
     try {

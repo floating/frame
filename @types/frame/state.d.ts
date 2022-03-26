@@ -60,12 +60,14 @@ interface GasLevels {
   custom?: string
 }
 
+type HexAmount = string
+
 interface Balance {
   chainId: number,
   address: Address,
   name: string,
   symbol: string,
-  balance: string,
+  balance: HexAmount,
   decimals: number,
   displayBalance: string
 }
@@ -79,11 +81,7 @@ interface Rate {
 
 interface Currency {
   icon: string,
-  name: string,
-  usd: {
-    price: number,
-    change24hr: number
-  }
+  name: string
 }
 
 interface Token {
