@@ -311,9 +311,9 @@ function addAddresses (addresses: Address[]) {
 function setActiveAddress (address: Address) {
   log.verbose(`externalData setActiveAddress(${address})`)
 
+  activeAddress = address
   inventory.setAddresses([activeAddress])
 
-  activeAddress = address
   if (!activeAddress) return
 
   addAddresses([address])
