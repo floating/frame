@@ -125,7 +125,13 @@ const api = {
     //   if (trezor && details.responseHeaders['x-frame-options']) delete details.responseHeaders['x-frame-options'] // remove 'x-frame-options' header to allow embedding https://connect.trezor.io into an 'iframe' for Tezor flex work around
     //   res({ cancel: false, responseHeaders: details.responseHeaders })
     // })
-    windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+    windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => {
+      const page = webContents.getURL().split('/').pop()
+      if ((page === 'dash.html' || page === 'tray.html') && permission === 'media') {
+        return res(true)
+      }
+      res(false)
+    })
     windows.tray.setResizable(false)
     windows.tray.setMovable(false)
     windows.tray.setSize(0, 0)

@@ -26,7 +26,10 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
-      "requirements": "build/electron-builder-requirements.txt"
+      "requirements": "build/electron-builder-requirements.txt",
+      "extendInfo": {
+        "NSCameraUsageDescription": "Please give us access to your camera"
+      }
     },
     "win": {
       "publisherName": "Frame Labs, Inc.",
