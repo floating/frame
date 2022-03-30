@@ -36,7 +36,7 @@ function debounce (func: (...args: any) => any, timeout = 300) {
   return (...args: any) => {
     clearTimeout(timer)
     timer = setTimeout(() => {
-      func(args)
+      func(...args)
     }, timeout)
   }
 }

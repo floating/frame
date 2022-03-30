@@ -7,7 +7,7 @@ log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
 import { supportsChain as chainSupportsScan } from '../../multicall'
-import balancesLoader, { BalanceLoader } from '.'
+import balancesLoader, { BalanceLoader } from './scan'
 import TokenLoader from '../inventory/tokens'
 
 interface ExternalDataWorkerMessage {
