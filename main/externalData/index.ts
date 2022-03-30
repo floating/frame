@@ -368,9 +368,9 @@ export default function () {
   inventory.start()
   rates.start()
 
-  function updateRatesSubscription () {
+  function updateRatesSubscription (address?: Address) {
     const subscribedCurrencies = connectedChains.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
-    const knownTokens = activeAddress ? storeApi.getKnownTokens(activeAddress) : []
+    const knownTokens = address ? storeApi.getKnownTokens(address) : []
     const subscribedTokens = knownTokens.map(token => ({ type: AssetType.Token, chainId: token.chainId, address: token.address }))
 
     rates.setAssets([
@@ -389,7 +389,7 @@ export default function () {
     log.verbose('updating external data due to address update(s)', { address })
 
     inventory.setAddresses([address])
-    updateRatesSubscription()
+    updateRatesSubscription(address)
   }, 800)
 
   const allNetworksObserver = store.observer(() => {
