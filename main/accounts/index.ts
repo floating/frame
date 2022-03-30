@@ -7,7 +7,7 @@ import { shell, Notification } from 'electron'
 import { addHexPrefix, intToHex} from 'ethereumjs-util'
 
 import store from '../store'
-import dataScanner from '../externalData'
+import ExternalDataScanner, { DataScanner } from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
 import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
@@ -47,6 +47,8 @@ export class Accounts extends EventEmitter {
   _current: string
   accounts: Record<string, FrameAccount>
 
+  private readonly dataScanner: DataScanner
+
   constructor () {
     super()
 
@@ -58,7 +60,7 @@ export class Accounts extends EventEmitter {
 
     this._current = Object.values(this.accounts).find(acct => acct.active)?.id || ''
 
-    dataScanner.start()
+    this.dataScanner = ExternalDataScanner()
   }
 
   get (id: string) {
@@ -368,8 +370,6 @@ export class Accounts extends EventEmitter {
       return cb(err)
     }
 
-    dataScanner.setActiveAddress(currentAccount.address)
-
     currentAccount.active = true
     currentAccount.update()
 
@@ -422,8 +422,6 @@ export class Accounts extends EventEmitter {
   }
 
   unsetSigner (cb: Callback<{ id: string, status: string }>) {
-    dataScanner.setActiveAddress('')
-
     const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
 
@@ -516,8 +514,7 @@ export class Accounts extends EventEmitter {
   }
 
   close () {
-    dataScanner.stop()
-    dataScanner.kill()
+    this.dataScanner.close()
     // usbDetect.stopMonitoring()
   }
 
@@ -923,10 +920,6 @@ export class Accounts extends EventEmitter {
     } else {
       log.error('Trying to lock request ' + handlerId + ' but there is no current account')
     }
-  }
-
-  stopExternalDataScan () {
-    dataScanner.stop()
   }
 
   // removeAllAccounts () {

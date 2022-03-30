@@ -13,16 +13,21 @@ export default function inventory (pylon: Pylon, store: Store) {
   }
 
   function start () {
+    log.verbose('starting inventory updates')
+
     pylon.on('inventories', handleUpdates)
   }
 
   function stop () {
+    log.verbose('stopping inventory updates')
+
     pylon.inventories([])
     pylon.off('inventories', handleUpdates)
   }
 
   function setAddresses (addresses: Address[]) {
-    log.verbose(`inventory.setAddresses(${addresses})`)
+    log.verbose('setting addresses for inventory updates', addresses)
+
     pylon.inventories(addresses)
   }
 

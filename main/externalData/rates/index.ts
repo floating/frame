@@ -49,17 +49,22 @@ export default function rates (pylon: Pylon, store: Store) {
   }
 
   function start () {
+    log.verbose('starting rates updates')
+
     pylon.on('rates', handleUpdates)
   }
 
   function stop () {
-    pylon.rates([])
+    log.verbose('stopping rates updates')
+
+    pylon.assets([])
     pylon.off('rates', handleUpdates)
   }
 
   function setAssets (assetIds: AssetId[]) {
-    log.verbose(`rates.setAddresses(${assetIds})`)
-    pylon.rates(assetIds)
+    log.verbose('setting assets for rates updates', JSON.stringify(assetIds))
+
+    pylon.assets(assetIds)
   }
 
   return {

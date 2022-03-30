@@ -6,10 +6,9 @@ log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
 log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-import { supportsChain as chainSupportsScan } from '../multicall'
-import balancesLoader, { BalanceLoader } from './balances'
-import loadStaticData from './staticData'
-import TokenLoader from './inventory/tokens'
+import { supportsChain as chainSupportsScan } from '../../multicall'
+import balancesLoader, { BalanceLoader } from '.'
+import TokenLoader from '../inventory/tokens'
 
 interface ExternalDataWorkerMessage {
   command: string,
@@ -89,12 +88,6 @@ async function chainBalanceScan (address: string) {
   }
 }
 
-function nativeCurrencyScan (symbols: string[]) {
-  loadStaticData(symbols)
-    .then(currencyData => sendToMainProcess({ type: 'nativeCurrencyData', currencyData }))
-    .catch(err => log.error('native currency scan error', err))
-}
-
 function resetHeartbeat () {
   clearTimeout(heartbeat)
 
@@ -105,7 +98,6 @@ function resetHeartbeat () {
 }
 
 const messageHandler: { [command: string]: (...params: any) => void } = {
-  updateNativeCurrencyData: nativeCurrencyScan,
   updateChainBalance: chainBalanceScan,
   fetchTokenBalances: fetchTokenBalances,
   tokenBalanceScan: tokenBalanceScan,

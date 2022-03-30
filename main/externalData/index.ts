@@ -7,6 +7,7 @@ import store from '../store'
 import { CurrencyBalance, TokenBalance } from './balances'
 import Inventory from './inventory'
 import Rates from './rates'
+import { arraysMatch, debounce } from '../../resources/utils'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
@@ -31,11 +32,6 @@ interface WorkerError {
   code: string
 }
 
-interface CurrencyDataMessage extends Omit<WorkerMessage, 'type'> {
-  type: 'nativeCurrencyData',
-  currencyData: Record<string, Currency>
-}
-
 interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
   type: 'tokenBalances',
   address: Address,
@@ -49,7 +45,12 @@ interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
   balances: CurrencyBalance[]
 }
 
+export interface DataScanner {
+  close: () => void
+}
+
 const storeApi = {
+  getActiveAddress: () => (store('selected.current') || '') as Address,
   getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
   getNetworks: () => (Object.values(store('main.networks.ethereum') || {})) as Network[],
   getNetworkMetadata: (id: number) => store('main.networksMeta.ethereum', id) as NetworkMetadata,
@@ -65,10 +66,6 @@ const storeApi = {
       .filter(balance => balance.address !== NATIVE_CURRENCY)
   }
 }
-
-const pylon = new Pylon('wss://data.pylon.link')
-const inventory = Inventory(pylon, store)
-const rates = Rates(pylon, store)
 
 function setScanning (address: Address) {
   if (scanningReset) {
@@ -98,23 +95,6 @@ function getConnectedNetworks () {
       .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
 }
 
-function updateRatesSubscription () {
-  const chainIds = getConnectedNetworks().map(n => n.id)
-  const knownTokens = storeApi.getKnownTokens(activeAddress)
-
-  subscribeToRates(chainIds, knownTokens)
-}
-
-function subscribeToRates (chainIds: number[], tokens: Token[]) {
-  const subscribedCurrencies = chainIds.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
-  const subscribedTokens = tokens.map(token => ({ type: AssetType.Token, chainId: token.chainId, address: token.address }))
-
-  rates.setAssets([
-    ...subscribedCurrencies,
-    ...subscribedTokens
-  ])
-}
-
 function createWorker () {
   if (scanWorker) {
     scanWorker.kill()
@@ -133,20 +113,6 @@ function createWorker () {
 
     if (message.type === 'ready') {
       startScanning()
-    }
-
-    if (message.type === 'nativeCurrencyData') {
-      const { currencyData } = (message as CurrencyDataMessage)
-      const networks = storeApi.getNetworks()
-
-      for (const symbol in currencyData) {
-        const dataForSymbol = currencyData[symbol]
-        const networksForSymbol = networks.filter(network => network.symbol.toLowerCase() === symbol)
-
-        networksForSymbol.forEach(network => {
-          store.setNativeCurrencyData('ethereum', network.id, dataForSymbol)
-        })
-      }
     }
 
     if (message.type === 'chainBalances') {
@@ -205,7 +171,7 @@ function createWorker () {
         const zeroBalances = changedBalances.filter(b => parseInt(b.balance) === 0)
         store.removeKnownTokens(balanceMessage.address, zeroBalances)
 
-        updateRatesSubscription()
+       // updateRatesSubscription()
       }
 
       if (outstandingScans === 0) {
@@ -281,7 +247,6 @@ function scanActiveData () {
 
 const sendHeartbeat = () => sendCommandToWorker('heartbeat')
 
-const updateNativeCurrencyData = (symbols: string[]) => sendCommandToWorker('updateNativeCurrencyData', [symbols])
 const updateActiveBalances = () => {
   if (activeAddress) {
     const activeNetworkIds = getConnectedNetworks().map(network => network.id)
@@ -312,12 +277,12 @@ function setActiveAddress (address: Address) {
   log.verbose(`externalData setActiveAddress(${address})`)
 
   activeAddress = address
-  inventory.setAddresses([activeAddress])
+  // inventory.setAddresses([activeAddress])
 
   if (!activeAddress) return
 
   addAddresses([address])
-  updateRatesSubscription()
+  //updateRatesSubscription()
 
   if (heartbeat) {
     scanActiveData()
@@ -325,23 +290,7 @@ function setActiveAddress (address: Address) {
 }
 
 function startScanning () {
-  allNetworksObserver = store.observer(() => {
-    const connectedNetworkIds = getConnectedNetworks().map(n => n.id)
-
-    if (
-      connectedNetworkIds.length !== connectedChains.length ||
-      connectedNetworkIds.some((chainId, i) => connectedChains[i] !== chainId)
-    ) {
-      connectedChains = connectedNetworkIds
-      
-      updateRatesSubscription()
-
-      const networks = getConnectedNetworks()
-      const networkCurrencies = [...new Set(networks.map(n => n.symbol.toLowerCase()))]
-      updateNativeCurrencyData(networkCurrencies)
-      scanActiveData()
-    }
-  })
+  
 
   tokenObserver = store.observer(() => {
     const customTokens = storeApi.getCustomTokens()
@@ -364,8 +313,6 @@ function startScanning () {
 }
 
 async function start () {
-  inventory.start()
-  rates.start()
 
   if (scanWorker) {
     log.warn('external data worker already scanning')
@@ -379,9 +326,6 @@ async function start () {
 
 function stop () {
   log.info('stopping external data worker')
-
-  inventory.stop()
-  rates.stop()
 
   allNetworksObserver.remove()
   tokenObserver.remove()
@@ -414,4 +358,69 @@ function kill () {
   }
 }
 
-export default { start, stop, kill, setActiveAddress }
+export default function () {
+  const pylon = new Pylon('wss://data.pylon.link')
+  const inventory = Inventory(pylon, store)
+  const rates = Rates(pylon, store)
+
+  let connectedChains: number[] = []
+
+  inventory.start()
+  rates.start()
+
+  const handleNetworkUpdate = debounce(() => {
+    log.verbose('updating external data due to network update(s)', { connectedChains })
+
+    updateRatesSubscription()
+  }, 500)
+
+  const handleAddressUpdate = debounce((address: Address) => {
+    log.verbose('updating external data due to address update(s)', { address })
+
+    inventory.setAddresses([address])
+    updateRatesSubscription()
+  }, 800)
+
+  const allNetworksObserver = store.observer(() => {
+    const connectedNetworkIds = getConnectedNetworks().map(n => n.id).sort()
+
+    if (!arraysMatch(connectedChains, connectedNetworkIds)) {
+      connectedChains = connectedNetworkIds
+
+      handleNetworkUpdate()
+    }
+  }, 'externalData:networks')
+
+  const activeAddressObserver = store.observer(() => {
+    const activeAddress = storeApi.getActiveAddress()
+
+    handleAddressUpdate(activeAddress)
+  }, 'externalData:activeAddress')
+
+  function updateRatesSubscription () {
+    const chainIds = getConnectedNetworks().map(n => n.id)
+    const knownTokens = activeAddress ? storeApi.getKnownTokens(activeAddress) : []
+
+    subscribeToRates(chainIds, knownTokens)
+  }
+
+  function subscribeToRates (chainIds: number[], tokens: Token[]) {
+    const subscribedCurrencies = chainIds.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
+    const subscribedTokens = tokens.map(token => ({ type: AssetType.Token, chainId: token.chainId, address: token.address }))
+
+    rates.setAssets([
+      ...subscribedCurrencies,
+      ...subscribedTokens
+    ])
+  }
+
+  return {
+    close: () => {
+      allNetworksObserver.remove()
+      activeAddressObserver.remove()
+
+      inventory.stop()
+      rates.stop()
+    }
+  } as DataScanner
+}
