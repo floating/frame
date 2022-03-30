@@ -1,6 +1,6 @@
 import log from 'electron-log'
+import Pylon from '@framelabs/pylon-client'
 
-import Pylon, { AssetType } from '@framelabs/pylon-client'
 import store from '../store'
 import Inventory from './inventory'
 import Rates from './assets'
@@ -14,7 +14,6 @@ export interface DataScanner {
 const storeApi = {
   getActiveAddress: () => (store('selected.current') || '') as Address,
   getNetworks: () => (Object.values(store('main.networks.ethereum') || {})) as Network[],
-  getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
   getConnectedNetworks: () => {
     return storeApi.getNetworks()
       .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
@@ -34,21 +33,10 @@ export default function () {
   rates.start()
   balances.start()
 
-  function updateRatesSubscription (address?: Address) {
-    const subscribedCurrencies = connectedChains.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
-    const knownTokens = address ? storeApi.getKnownTokens(address) : []
-    const subscribedTokens = knownTokens.map(token => ({ type: AssetType.Token, chainId: token.chainId, address: token.address }))
-
-    rates.setAssets([
-      ...subscribedCurrencies,
-      ...subscribedTokens
-    ])
-  }
-
   const handleNetworkUpdate = debounce(() => {
     log.verbose('updating external data due to network update(s)', { connectedChains })
 
-    updateRatesSubscription()
+    rates.updateSubscription(connectedChains)
   }, 500)
 
   const handleAddressUpdate = debounce((address: Address) => {
@@ -56,7 +44,7 @@ export default function () {
 
     balances.setAddress(address)
     inventory.setAddresses([address])
-    updateRatesSubscription(address)
+    rates.updateSubscription(connectedChains, address)
   }, 800)
 
   const allNetworksObserver = store.observer(() => {
