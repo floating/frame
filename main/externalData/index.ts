@@ -368,6 +368,17 @@ export default function () {
   inventory.start()
   rates.start()
 
+  function updateRatesSubscription () {
+    const subscribedCurrencies = connectedChains.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
+    const knownTokens = activeAddress ? storeApi.getKnownTokens(activeAddress) : []
+    const subscribedTokens = knownTokens.map(token => ({ type: AssetType.Token, chainId: token.chainId, address: token.address }))
+
+    rates.setAssets([
+      ...subscribedCurrencies,
+      ...subscribedTokens
+    ])
+  }
+
   const handleNetworkUpdate = debounce(() => {
     log.verbose('updating external data due to network update(s)', { connectedChains })
 
@@ -396,23 +407,6 @@ export default function () {
 
     handleAddressUpdate(activeAddress)
   }, 'externalData:activeAddress')
-
-  function updateRatesSubscription () {
-    const chainIds = getConnectedNetworks().map(n => n.id)
-    const knownTokens = activeAddress ? storeApi.getKnownTokens(activeAddress) : []
-
-    subscribeToRates(chainIds, knownTokens)
-  }
-
-  function subscribeToRates (chainIds: number[], tokens: Token[]) {
-    const subscribedCurrencies = chainIds.map(chainId => ({ type: AssetType.NativeCurrency, chainId }))
-    const subscribedTokens = tokens.map(token => ({ type: AssetType.Token, chainId: token.chainId, address: token.address }))
-
-    rates.setAssets([
-      ...subscribedCurrencies,
-      ...subscribedTokens
-    ])
-  }
 
   return {
     close: () => {
