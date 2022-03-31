@@ -131,7 +131,7 @@ class Balances extends React.Component {
     if (name.length > 17) name = name.substr(0, 17) + '..'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: doneScanning || i === 0 || rawBalance > 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
+        <div className='signerBalanceInner' style={{ opacity: 1, transitionDelay: (0.1 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
               src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balanceInfo.logoURI)}`}

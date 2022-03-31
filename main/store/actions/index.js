@@ -446,7 +446,6 @@ module.exports = {
   // Tokens
   setBalances: (u, address, newBalances) => {
     u('main.balances', address, (balances = []) => {
-      // remove zero balances
       const existingBalances = balances.filter(b => {
         return newBalances.every(bal => bal.chainId !== b.chainId || bal.address !== b.address)
       })

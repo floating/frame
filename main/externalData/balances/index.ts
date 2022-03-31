@@ -188,5 +188,14 @@ export default function (store: Store) {
     updateBalances(address, chains)
   }
 
-  return { start, stop, setAddress, addNetworks }
+  function addTokens (address: Address, tokens: Token[]) {
+    if (!workerController) {
+      throw new Error('balances controller not started!')
+    }
+
+    log.verbose('adding balances updates', { address, tokens: tokens.map(t => t.address) })
+    workerController.updateTokenBalances(address, tokens)
+  }
+
+  return { start, stop, setAddress, addNetworks, addTokens }
 }

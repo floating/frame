@@ -13,6 +13,7 @@ export interface DataScanner {
 
 const storeApi = {
   getActiveAddress: () => (store('selected.current') || '') as Address,
+  getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
   getConnectedNetworks: () => {
     const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
@@ -52,8 +53,12 @@ export default function () {
     rates.updateSubscription(connectedChains, activeAccount)
   }, 800)
 
-  const handleKnownTokensUpdate = debounce(() => {
-    log.verbose('updating external data due to known tokens update(s)', { activeAccount })
+  const handleTokensUpdate = debounce((tokens: Token[]) => {
+    log.verbose('updating external data due to token update(s)', { activeAccount })
+
+    if (activeAccount) {
+      balances.addTokens(activeAccount, tokens)
+    }
 
     rates.updateSubscription(connectedChains, activeAccount)
   })
@@ -71,20 +76,26 @@ export default function () {
 
   const activeAddressObserver = store.observer(() => {
     const activeAddress = storeApi.getActiveAddress()
-    const knownTokens = storeApi.getKnownTokens(activeAddress)
+    const knownTokens = activeAddress ? storeApi.getKnownTokens(activeAddress) : []
 
     if (activeAddress !== activeAccount) {
       activeAccount = activeAddress
       handleAddressUpdate()
     } else {
-      handleKnownTokensUpdate(knownTokens)
+      handleTokensUpdate(knownTokens)
     }
   }, 'externalData:activeAccount')
+
+  const customTokensObserver = store.observer(() => {
+    const customTokens = storeApi.getCustomTokens()
+    handleTokensUpdate(customTokens)
+  }, 'externalData:customTokens')
 
   return {
     close: () => {
       allNetworksObserver.remove()
       activeAddressObserver.remove()
+      customTokensObserver.remove()
 
       inventory.stop()
       rates.stop()
