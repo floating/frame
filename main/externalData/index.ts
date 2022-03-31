@@ -13,6 +13,7 @@ export interface DataScanner {
 
 const storeApi = {
   getActiveAddress: () => (store('selected.current') || '') as Address,
+  getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
   getNetworks: () => (Object.values(store('main.networks.ethereum') || {})) as Network[],
   getConnectedNetworks: () => {
     return storeApi.getNetworks()
@@ -27,41 +28,62 @@ export default function () {
   const rates = Rates(pylon, store)
   const balances = Balances(store)
 
-  let connectedChains: number[] = []
+  let connectedChains: number[] = [], activeAccount: Address = ''
 
   inventory.start()
   rates.start()
   balances.start()
 
-  const handleNetworkUpdate = debounce(() => {
-    log.verbose('updating external data due to network update(s)', { connectedChains })
+  const handleNetworkUpdate = debounce((newlyConnected: number[]) => {
+    log.verbose('updating external data due to network update(s)', { connectedChains, newlyConnected })
 
-    rates.updateSubscription(connectedChains)
+    rates.updateSubscription(connectedChains, activeAccount)
+
+    if (newlyConnected.length > 0 && activeAccount) {
+      balances.addNetworks(activeAccount, newlyConnected)
+    }
   }, 500)
 
-  const handleAddressUpdate = debounce((address: Address) => {
-    log.verbose('updating external data due to address update(s)', { address })
+  const handleAddressUpdate = debounce(() => {
+    log.verbose('updating external data due to address update(s)', { activeAccount })
 
-    balances.setAddress(address)
-    inventory.setAddresses([address])
-    rates.updateSubscription(connectedChains, address)
+    balances.setAddress(activeAccount)
+    inventory.setAddresses([activeAccount])
+    rates.updateSubscription(connectedChains, activeAccount)
   }, 800)
+
+  const handleKnownTokensUpdate = debounce(() => {
+    log.verbose('updating external data due to known tokens update(s)', { activeAccount })
+
+    rates.updateSubscription(connectedChains, activeAccount)
+  })
 
   const allNetworksObserver = store.observer(() => {
     const connectedNetworkIds = storeApi.getConnectedNetworks().map(n => n.id).sort()
 
     if (!arraysMatch(connectedChains, connectedNetworkIds)) {
+      const newlyConnectedNetworks = connectedNetworkIds.filter(c => !connectedChains.includes(c))
       connectedChains = connectedNetworkIds
 
-      handleNetworkUpdate()
+      handleNetworkUpdate(newlyConnectedNetworks)
     }
   }, 'externalData:networks')
 
   const activeAddressObserver = store.observer(() => {
     const activeAddress = storeApi.getActiveAddress()
+    const knownTokens = storeApi.getKnownTokens(activeAddress)
 
-    handleAddressUpdate(activeAddress)
-  }, 'externalData:activeAddress')
+    if (activeAddress !== activeAccount) {
+      activeAccount = activeAddress
+      handleAddressUpdate()
+    } else {
+      handleKnownTokensUpdate(knownTokens)
+    }
+  }, 'externalData:activeAccount')
+
+  const knownTokensObserver = store.observer(() => {
+
+  })
 
   return {
     close: () => {

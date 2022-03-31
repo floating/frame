@@ -96,12 +96,14 @@ class Balances extends React.Component {
         return b.chainId === chainId && b.address === NATIVE_CURRENCY
       }) || { balance: '0x0' }
 
+      const symbol = this.store('main.networks.ethereum', chainId, 'symbol')
+
       const rawNativeCurrency = {
         balance: storedNativeBalance.balance,
         chainId,
         decimals: 18,
         logoURI: nativeCurrency.icon,
-        name: nativeCurrency.name,
+        name: nativeCurrency.name || symbol,
         symbol: this.store('main.networks.ethereum', chainId, 'symbol')
       }
       const nativeBalance = balance(rawNativeCurrency, chainLayer === 'testnet' ? { price: 0 } : nativeCurrency.usd)
@@ -151,10 +153,10 @@ class Balances extends React.Component {
             <span
               style={(balanceInfo.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
             >
-              {(doneScanning || rawBalance > 0) ? balanceInfo.displayBalance : '---.--'}
+              {balanceInfo.displayBalance}
             </span>
           </div>
-          {(doneScanning || rawBalance > 0) ? <div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div> : null}
+          {<div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div>}
         </div>
       </div>
     )

@@ -61,9 +61,9 @@ export default function (store: Store) {
   }
 
   function startScan (address: Address) {
-    log.debug(`starting balances scan for ${address}`)
-
     stopScan()
+
+    log.debug(`starting balances scan for ${address}`)
 
     const scanForAddress = () => {
       // update balances for the active account every 20 seconds
@@ -92,15 +92,21 @@ export default function (store: Store) {
   }
 
   function updateActiveBalances (address: Address) {
+    store.setScanning(address, true)
+
     const activeNetworkIds = storeApi.getConnectedNetworks().map(network => network.id)
+    updateBalances(address, activeNetworkIds)
+  }
+
+  function updateBalances (address: Address, chains: number[]) {
     const customTokens = storeApi.getCustomTokens()
     const knownTokens = storeApi.getKnownTokens(address).filter(
       token => !customTokens.some(t => t.address === token.address && t.chainId === token.chainId)
     )
 
-    const trackedTokens = [...customTokens, ...knownTokens].filter(t => activeNetworkIds.includes(t.chainId))
+    const trackedTokens = [...customTokens, ...knownTokens].filter(t => chains.includes(t.chainId))
 
-    workerController?.updateActiveBalances(address, trackedTokens)
+    workerController?.updateBalances(address, trackedTokens)
   }
 
   function handleChainBalanceUpdate (address: Address, balances: CurrencyBalance[]) {
@@ -135,13 +141,27 @@ export default function (store: Store) {
     if (changedBalances.length > 0) {
       store.setBalances(address, changedBalances)
 
+      const knownTokens = storeApi.getKnownTokens(address)
+
       // add any non-zero balances to the list of known tokens
-      const nonZeroBalances = changedBalances.filter(b => parseInt(b.balance) > 0)
-      store.addKnownTokens(address, nonZeroBalances)
+      const unknownBalances = changedBalances
+        .filter(b => parseInt(b.balance) > 0 && !knownTokens.some(t => t.address === b.address && t.chainId === b.chainId))
+
+      if (unknownBalances.length > 0) {
+        store.addKnownTokens(address, unknownBalances)
+      }
 
       // remove zero balances from the list of known tokens
-      const zeroBalances = changedBalances.filter(b => parseInt(b.balance) === 0)
-      store.removeKnownTokens(address, zeroBalances)
+      const zeroBalances = changedBalances
+        .filter(b => parseInt(b.balance) === 0 && knownTokens.some(t => t.address === b.address && t.chainId === b.chainId))
+
+      if (zeroBalances.length > 0) {
+        store.removeKnownTokens(address, zeroBalances)
+      }
+    }
+
+    if (source === BalanceSource.Known) {
+      store.setScanning(address, false)
     }
   }
 
@@ -159,5 +179,14 @@ export default function (store: Store) {
     }
   }
 
-  return { start, stop, setAddress }
+  function addNetworks (address: Address, chains: number[]) {
+    if (!workerController) {
+      throw new Error('balances controller not started!')
+    }
+
+    log.verbose('adding balances updates', { address, chains })
+    updateBalances(address, chains)
+  }
+
+  return { start, stop, setAddress, addNetworks }
 }

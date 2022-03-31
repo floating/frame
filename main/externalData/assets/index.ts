@@ -36,7 +36,7 @@ export default function rates (pylon: Pylon, store: Store) {
     const nativeCurrencyUpdates = updates.filter(u => u.id.type === AssetType.NativeCurrency)
 
     if (nativeCurrencyUpdates.length > 0) {
-      log.verbose(`got currency rate updates for chains: ${nativeCurrencyUpdates.map(u => u.id.chainId)}`)
+      log.debug(`got currency rate updates for chains: ${nativeCurrencyUpdates.map(u => u.id.chainId)}`)
       
       nativeCurrencyUpdates.forEach(u => {
         storeApi.setNativeCurrencyRate(u.id.chainId, {
@@ -51,7 +51,7 @@ export default function rates (pylon: Pylon, store: Store) {
     const tokenUpdates = updates.filter(u => u.id.type === AssetType.Token)
 
     if (tokenUpdates.length > 0) {
-      log.verbose(`got token rate updates for addresses: ${tokenUpdates.map(u => u.id.address)}`)
+      log.debug(`got token rate updates for addresses: ${tokenUpdates.map(u => u.id.address)}`)
 
       const tokenRates = tokenUpdates.reduce((allRates, update) => {
         // address is always defined for tokens
