@@ -84,7 +84,7 @@ function usesBaseFee (rawTx: TransactionData) {
   return typeSupportsBaseFee(rawTx.type)
 }
 
-function maxFee (rawTx: TransactionData, chainMetadata: NetworkMetadata) {
+function maxFee (chainMetadata: NetworkMetadata) {
   // if max exists in metadata, use it
   if (chainMetadata.maxFee) {
     return parseInt(chainMetadata.maxFee, 16)
