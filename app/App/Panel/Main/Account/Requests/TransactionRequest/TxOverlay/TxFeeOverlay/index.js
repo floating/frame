@@ -22,8 +22,8 @@ function maxFee (tx = { chainId: '' }) {
     return 250 * 1e18
   }
 
-  // for all other chains, default to 10 of the chain's currency
-  return 10 * 1e18
+  // for all other chains, default to 50 of the chain's currency
+  return 50 * 1e18
 }
 
 //  <div className='txModuleTop'>
