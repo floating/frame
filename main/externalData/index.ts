@@ -14,7 +14,7 @@ export interface DataScanner {
 const storeApi = {
   getActiveAddress: () => (store('selected.current') || '') as Address,
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-  getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
+  getKnownTokens: (address: Address) => (address ? store('main.tokens.known', address) : []) as Token[],
   getConnectedNetworks: () => {
     const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
     return networks
@@ -76,7 +76,7 @@ export default function () {
 
   const activeAddressObserver = store.observer(() => {
     const activeAddress = storeApi.getActiveAddress()
-    const knownTokens = activeAddress ? storeApi.getKnownTokens(activeAddress) : []
+    const knownTokens = storeApi.getKnownTokens(activeAddress)
 
     if (activeAddress !== activeAccount) {
       activeAccount = activeAddress

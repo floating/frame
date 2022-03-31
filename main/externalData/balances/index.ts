@@ -14,7 +14,7 @@ export default function (store: Store) {
         .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
     },
     getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-    getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
+    getKnownTokens: (address: Address) => (address ? store('main.tokens.known', address) : []) as Token[],
     getCurrencyBalances: (address: Address) => {
       return ((store('main.balances', address) || []) as Balance[])
         .filter(balance => balance.address === NATIVE_CURRENCY)
