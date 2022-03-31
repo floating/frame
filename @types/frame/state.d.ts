@@ -23,6 +23,7 @@ interface NetworkMetadata {
   id: number,
   name: string,
   nativeCurrency: NativeCurrency,
+  maxFee?: string, // hex
   symbol: string,
   gas: GasData
 }

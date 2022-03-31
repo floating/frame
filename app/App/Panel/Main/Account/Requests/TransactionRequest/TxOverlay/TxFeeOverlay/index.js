@@ -9,23 +9,6 @@ import { usesBaseFee } from '../../../../../../../../../main/transaction'
 
 import BigNumber from 'bignumber.js'
 
-function maxFee (tx = { chainId: '' }) {
-  const chainId = parseInt(tx.chainId)
-
-  // for ETH-based chains, the max fee should be 2 ETH
-  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 42161, 421611].includes(chainId)) {
-    return 2 * 1e18
-  }
-
-  // for Fantom, the max fee should be 250 FTM
-  if ([250, 4002].includes(chainId)) {
-    return 250 * 1e18
-  }
-
-  // for all other chains, default to 10 of the chain's currency
-  return 10 * 1e18
-}
-
 //  <div className='txModuleTop'>
 // <div className={'txModuleTopData txModuleTopDataExpanded'}>
   // <div className='transactionDataNotice'>{svg.octicon('issue-opened', { height: 26 })}</div>
@@ -60,6 +43,8 @@ class TxFeeOverlay extends React.Component {
     }
 
     this.state.gasLimit = BigNumber(props.req.data.gasLimit, 16).toString()
+
+    this.maxTotalFee = this.store('main.networksMeta.ethereum', props.req.data.chainId, 'maxFee') || 10e18 // in gwei
   }
 
   mouseDetect (e) {
@@ -109,10 +94,9 @@ class TxFeeOverlay extends React.Component {
       baseFee = this.limitRange(baseFee, 0, 9999)
       const priorityFee = parseFloat(this.state.priorityFee)
       const gasLimit = parseInt(this.state.gasLimit)
-      const maxTotalFee = maxFee(this.props.req.data)
       
-      if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
-        baseFee = Math.floor(maxTotalFee / gasLimit / 1e9) - priorityFee
+      if (gweiToWei(baseFee + priorityFee) * gasLimit > this.maxTotalFee) {
+        baseFee = Math.floor(this.maxTotalFee / gasLimit / 1e9) - priorityFee
       }
       link.rpc('setBaseFee', gweiToWeiHex(baseFee), this.props.req.handlerId, e => {
         if (e) console.error(e)
@@ -130,10 +114,9 @@ class TxFeeOverlay extends React.Component {
       priorityFee = this.limitRange(priorityFee, 0, 9999)
       const baseFee = parseFloat(this.state.baseFee)
       const gasLimit = parseInt(this.state.gasLimit)
-      const maxTotalFee = maxFee(this.props.req.data)
 
-      if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
-        priorityFee = Math.floor(maxTotalFee / gasLimit / 1e9) - baseFee
+      if (gweiToWei(baseFee + priorityFee) * gasLimit > this.maxTotalFee) {
+        priorityFee = Math.floor(this.maxTotalFee / gasLimit / 1e9) - baseFee
       }
       link.rpc('setPriorityFee', gweiToWeiHex(priorityFee), this.props.req.handlerId, e => {
         if (e) console.error(e)
@@ -152,10 +135,9 @@ class TxFeeOverlay extends React.Component {
       if (isNaN(gasPrice)) return
       gasPrice = this.limitRange(gasPrice, 0, 9999)
       const gasLimit = parseInt(this.state.gasLimit)
-      const maxTotalFee = maxFee(this.props.req.data)
 
-      if (gweiToWei(gasPrice) * gasLimit > maxTotalFee) {
-        gasPrice = Math.floor(maxTotalFee / gasLimit / 1e9)
+      if (gweiToWei(gasPrice) * gasLimit > this.maxTotalFee) {
+        gasPrice = Math.floor(this.maxTotalFee / gasLimit / 1e9)
       }
       link.rpc('setGasPrice', gweiToWeiHex(gasPrice), this.props.req.handlerId, e => {
         if (e) console.error(e)
@@ -172,19 +154,17 @@ class TxFeeOverlay extends React.Component {
       if (isNaN(gasLimit)) return
       if (gasLimit > 12.5e6) gasLimit = 12.5e6
 
-      const maxTotalFee = maxFee(this.props.req.data)
-
       if (usesBaseFee(this.props.req.data)) {
         const baseFee = parseFloat(this.state.baseFee)
         const priorityFee = parseFloat(this.state.priorityFee)
 
-        if (gweiToWei(baseFee + priorityFee) * gasLimit > maxTotalFee) {
-          gasLimit = Math.floor(maxTotalFee / gweiToWei(baseFee + priorityFee))
+        if (gweiToWei(baseFee + priorityFee) * gasLimit > this.maxTotalFee) {
+          gasLimit = Math.floor(this.maxTotalFee / gweiToWei(baseFee + priorityFee))
         }
       } else {
         const gasPrice = parseFloat(this.state.gasPrice)
-        if (gweiToWei(gasPrice) * gasLimit > maxTotalFee) {
-          gasLimit = Math.floor(maxTotalFee / gweiToWei(gasPrice))
+        if (gweiToWei(gasPrice) * gasLimit > this.maxTotalFee) {
+          gasLimit = Math.floor(this.maxTotalFee / gweiToWei(gasPrice))
         }
       }
       link.rpc('setGasLimit', '0x' + gasLimit.toString(16), this.props.req.handlerId, e => {

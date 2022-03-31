@@ -342,7 +342,7 @@ export class Provider extends EventEmitter {
     }
 
     const payload = req.payload
-    const maxTotalFee = maxFee(rawTx)
+    const maxTotalFee = maxFee(rawTx, store('main.networksMeta.ethereum', rawTx.chainId))
 
     if (this.feeTotalOverMax(rawTx, maxTotalFee)) {
       const chainId = parseInt(rawTx.chainId)

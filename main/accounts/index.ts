@@ -10,7 +10,7 @@ import store from '../store'
 import dataScanner from '../externalData'
 import { getType as getSignerType } from '../signers/Signer'
 import FrameAccount from './Account'
-import { usesBaseFee, signerCompatibility, maxFee, TransactionData, SignerCompatibility } from '../transaction'
+import { usesBaseFee, signerCompatibility, maxFee as maxTxFee, TransactionData, SignerCompatibility } from '../transaction'
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 
 import {
@@ -30,6 +30,10 @@ function notify (title: string, body: string, action: (event: Electron.Event) =>
   notification.on('click', action)
 
   setTimeout(() => notification.show(), 1000)
+}
+
+function maxFee (tx: TransactionData) {
+  return maxTxFee(tx, store('main.networksMeta.ethereum', tx.chainId))
 }
 
 const accountsApi = {

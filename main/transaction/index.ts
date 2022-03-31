@@ -84,17 +84,15 @@ function usesBaseFee (rawTx: TransactionData) {
   return typeSupportsBaseFee(rawTx.type)
 }
 
-function maxFee (rawTx: TransactionData) {
-  const chainId = parseInt(rawTx.chainId)
-
-  // for ETH-based chains, the max fee should be 2 ETH
-  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 42161, 421611].includes(chainId)) {
-    return 2 * 1e18
+function maxFee (rawTx: TransactionData, chainMetadata: NetworkMetadata) {
+  // if max exists in metadata, use it
+  if (chainMetadata.maxFee) {
+    return parseInt(chainMetadata.maxFee, 16)
   }
 
-  // for Fantom, the max fee should be 250 FTM
-  if ([250, 4002].includes(chainId)) {
-    return 250 * 1e18
+  // as a default for ETH-based chains, the max fee should be 2 ETH
+  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 42161, 421611].includes(chainMetadata.id)) {
+    return 2 * 1e18
   }
 
   // for all other chains, default to 10 of the chain's currency
