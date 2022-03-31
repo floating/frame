@@ -115,7 +115,7 @@ class Balances extends React.Component {
     return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
   }
 
-  renderBalance (symbol, balanceInfo, i, doneScanning) {
+  renderBalance (symbol, balanceInfo, i) {
     const rawBalance = parseInt(balanceInfo.balance) || 0
     const change = parseFloat(balanceInfo.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
@@ -203,7 +203,7 @@ class Balances extends React.Component {
             </div>
           ) : null}
         </div>
-        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, !scanning))}
+        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i))}
         <div className='signerBalanceTotal'>
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
