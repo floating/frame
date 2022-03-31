@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import BalancesWorkerController, { BalanceSource } from './controller'
+import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
@@ -67,7 +67,10 @@ export default function (store: Store) {
 
     const scanForAddress = () => {
       // update balances for the active account every 20 seconds
-      setTimeout(() => updateActiveBalances(address), 0)
+      setTimeout(() => {
+        updateActiveBalances(address)
+      }, 0)
+
       scan = setTimeout(() => scanForAddress(), 20 * 1000)
     }
 
@@ -92,8 +95,6 @@ export default function (store: Store) {
   }
 
   function updateActiveBalances (address: Address) {
-    store.setScanning(address, true)
-
     const activeNetworkIds = storeApi.getConnectedNetworks().map(network => network.id)
     updateBalances(address, activeNetworkIds)
   }
@@ -106,7 +107,12 @@ export default function (store: Store) {
 
     const trackedTokens = [...customTokens, ...knownTokens].filter(t => chains.includes(t.chainId))
 
-    workerController?.updateBalances(address, trackedTokens, chains)
+    if (trackedTokens.length > 0) {
+      workerController?.updateKnownTokenBalances(address, trackedTokens)
+    }
+
+    workerController?.updateChainBalances(address, chains)
+    workerController?.scanForTokenBalances(address, trackedTokens, chains)
   }
 
   function handleChainBalanceUpdate (address: Address, balances: CurrencyBalance[]) {
@@ -130,7 +136,7 @@ export default function (store: Store) {
       })
   }
 
-  function handleTokenBalanceUpdate (address: Address, balances: TokenBalance[], source: BalanceSource) {
+  function handleTokenBalanceUpdate (address: Address, balances: TokenBalance[]) {
     // only update balances if any have changed
     const currentTokenBalances = storeApi.getTokenBalances(address)
     const changedBalances = balances.filter(newBalance => {
@@ -158,11 +164,10 @@ export default function (store: Store) {
       if (zeroBalances.length > 0) {
         store.removeKnownTokens(address, zeroBalances)
       }
+
     }
 
-    if (source === BalanceSource.Known) {
-      store.setScanning(address, false)
-    }
+    store.accountTokensUpdated(address)
   }
 
   function setAddress (address: Address) {
@@ -194,7 +199,7 @@ export default function (store: Store) {
     }
 
     log.verbose('adding balances updates', { address, tokens: tokens.map(t => t.address) })
-    workerController.updateTokenBalances(address, tokens)
+    workerController.updateKnownTokenBalances(address, tokens)
   }
 
   return { start, stop, setAddress, addNetworks, addTokens }

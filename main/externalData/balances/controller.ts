@@ -10,16 +10,10 @@ interface WorkerMessage {
   [key: string]: any
 }
 
-export enum BalanceSource {
-  Known = 'known',
-  Scan = 'scan'
-}
-
 interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
   type: 'tokenBalances',
   address: Address,
-  balances: TokenBalance[],
-  source: BalanceSource
+  balances: TokenBalance[]
 }
 
 interface ChainBalanceMessage extends Omit<WorkerMessage, 'type'> {
@@ -94,15 +88,16 @@ export default class BalancesWorkerController extends EventEmitter {
     return !!this.heartbeat
   }
 
-  updateBalances (address: Address, tokens: Token[], chains: number[]) {
-    this.updateTokenBalances(address, tokens)
-
+  updateChainBalances (address: Address, chains: number[]) {
     this.sendCommandToWorker('updateChainBalance', [address, chains])
-    this.sendCommandToWorker('tokenBalanceScan', [address, tokens, chains])
   }
 
-  updateTokenBalances (address: Address, tokens: Token[]) {
+  updateKnownTokenBalances (address: Address, tokens: Token[]) {
     this.sendCommandToWorker('fetchTokenBalances', [address, tokens])
+  }
+
+  scanForTokenBalances (address: Address, tokens: Token[], chains: number[]) {
+    this.sendCommandToWorker('tokenBalanceScan', [address, tokens, chains])
   }
 
   // sending messages

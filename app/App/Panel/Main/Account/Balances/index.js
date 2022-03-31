@@ -115,7 +115,7 @@ class Balances extends React.Component {
     return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
   }
 
-  renderBalance (symbol, balanceInfo, i) {
+  renderBalance (symbol, balanceInfo, i, scanning) {
     const rawBalance = parseInt(balanceInfo.balance) || 0
     const change = parseFloat(balanceInfo.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
@@ -131,7 +131,7 @@ class Balances extends React.Component {
     if (name.length > 17) name = name.substr(0, 17) + '..'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: 1, transitionDelay: (0.1 * i) + 's' }}>
+        <div className='signerBalanceInner' style={{ opacity: !scanning || i === 0 || rawBalance > 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
               src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balanceInfo.logoURI)}`}
@@ -177,14 +177,14 @@ class Balances extends React.Component {
       chainLayer
     )
 
-    const balancesLength = balances.length
-
     if (!this.props.expanded) {
       balances = balances.slice(0, 5)
     }
 
-    const scanning = this.store('main.scanning', address)
-    const initialRateScanComplete = this.store('main.initialRateScan')
+    const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
+
+    // scan if balances are more than 5 minutes old
+    const scanning = !lastBalanceUpdate || (new Date() - lastBalanceUpdate) > (1000 * 60 * 5)
 
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
@@ -197,13 +197,8 @@ class Balances extends React.Component {
               {svg.close(12)}
             </div>
           ) : null}
-          {balancesLength === 0 || scanning ? (
-            <div className='moduleHeaderLoading'>
-              <div className='moduleHeaderLoadingLoader' />
-            </div>
-          ) : null}
         </div>
-        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i))}
+        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, scanning))}
         <div className='signerBalanceTotal'>
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
@@ -223,7 +218,7 @@ class Balances extends React.Component {
               {'Total: '}
             </div>
             <div className='signerBalanceTotalValue'>
-              {svg.usd(11)}{balances.length > 0 && initialRateScanComplete ? totalDisplayValue : '---.--'}
+              {svg.usd(11)}{balances.length > 0 ? totalDisplayValue : '---.--'}
             </div>
           </div>
         </div>

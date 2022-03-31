@@ -125,6 +125,13 @@ module.exports = {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
   },
+  accountTokensUpdated: (u, address) => {
+    u('main.accounts', address, account => {
+      account.balances = { ...account.balances, lastUpdated: new Date() }
+
+      return account
+    })
+  },
   updateAccount: (u, updatedAccount) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
@@ -429,7 +436,6 @@ module.exports = {
     u('main.ipfs', () => ipfs)
   },
   setRates: (u, rates) => {
-    u('main.initialRateScan', () => true)
     u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
   // Inventory

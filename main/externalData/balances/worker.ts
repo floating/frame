@@ -61,7 +61,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], c
     const tokenBalances = (await balances.getTokenBalances(address, tokens))
       .filter(balance => parseInt(balance.balance) > 0)
 
-    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances, source: 'scan' })
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
   } catch (e) {
     log.error('error scanning for token balances', e)
   }
@@ -71,7 +71,7 @@ async function fetchTokenBalances (address: Address, tokens: Token[]) {
   try {
     const tokenBalances = await balances.getTokenBalances(address, tokens)
 
-    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances, source: 'known' })
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
   } catch (e) {
     log.error('error fetching token balances', e)
   }
