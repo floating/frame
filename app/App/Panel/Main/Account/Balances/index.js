@@ -104,7 +104,7 @@ class Balances extends React.Component {
         decimals: 18,
         logoURI: nativeCurrency.icon,
         name: nativeCurrency.name || symbol,
-        symbol: this.store('main.networks.ethereum', chainId, 'symbol')
+        symbol
       }
       const nativeBalance = balance(rawNativeCurrency, chainLayer === 'testnet' ? { price: 0 } : nativeCurrency.usd)
       balances.unshift(nativeBalance)

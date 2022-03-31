@@ -94,7 +94,7 @@ export default class BalancesWorkerController extends EventEmitter {
     return !!this.heartbeat
   }
 
-  updateBalances (address: Address, tokens: Token[], chains?: number[]) {
+  updateBalances (address: Address, tokens: Token[], chains: number[]) {
     this.sendCommandToWorker('updateChainBalance', [address, chains])
     this.sendCommandToWorker('fetchTokenBalances', [address, tokens])
     this.sendCommandToWorker('tokenBalanceScan', [address, tokens, chains])

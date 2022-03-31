@@ -106,7 +106,7 @@ export default function (store: Store) {
 
     const trackedTokens = [...customTokens, ...knownTokens].filter(t => chains.includes(t.chainId))
 
-    workerController?.updateBalances(address, trackedTokens)
+    workerController?.updateBalances(address, trackedTokens, chains)
   }
 
   function handleChainBalanceUpdate (address: Address, balances: CurrencyBalance[]) {

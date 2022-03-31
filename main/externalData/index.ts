@@ -14,9 +14,9 @@ export interface DataScanner {
 const storeApi = {
   getActiveAddress: () => (store('selected.current') || '') as Address,
   getKnownTokens: (address: Address) => (store('main.tokens.known', address) || []) as Token[],
-  getNetworks: () => (Object.values(store('main.networks.ethereum') || {})) as Network[],
   getConnectedNetworks: () => {
-    return storeApi.getNetworks()
+    const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
+    return networks
       .filter(n => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected)
   }
 }
@@ -80,10 +80,6 @@ export default function () {
       handleKnownTokensUpdate(knownTokens)
     }
   }, 'externalData:activeAccount')
-
-  const knownTokensObserver = store.observer(() => {
-
-  })
 
   return {
     close: () => {
