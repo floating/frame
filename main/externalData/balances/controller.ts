@@ -80,7 +80,7 @@ export default class BalancesWorkerController extends EventEmitter {
     const exitCode = this.worker.exitCode
     const killed = this.worker.killed || this.worker.kill('SIGTERM')
 
-    log.debug(`worker controller closed, exitCode: ${exitCode}, killed by controller: ${killed}`)
+    log.info(`worker controller closed, exitCode: ${exitCode}, killed by controller: ${killed}`)
 
     this.emit('close')
     this.removeAllListeners()
