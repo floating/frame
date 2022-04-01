@@ -258,7 +258,7 @@ describe('#maxFee', () => {
     expect(maxFee(tx)).toBe(2e18)
   })
 
-  it('sets the max fee as 1000 FTM on Fantom', () => {
+  it('sets the max fee as 250 FTM on Fantom', () => {
     const tx = {
       chainId: addHexPrefix((250).toString(16))
     }
@@ -266,12 +266,12 @@ describe('#maxFee', () => {
     expect(maxFee(tx)).toBe(250e18)
   })
 
-  it('sets the max fee as 10 on other chains', () => {
+  it('sets the max fee as 50 on other chains', () => {
     const tx = {
       chainId: addHexPrefix((255).toString(16))
     }
 
-    expect(maxFee(tx)).toBe(1e19)
+    expect(maxFee(tx)).toBe(5e19)
   })
 })
 
