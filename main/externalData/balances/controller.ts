@@ -71,7 +71,7 @@ export default class BalancesWorkerController extends EventEmitter {
 
   close () {
     if (this.heartbeat) {
-      clearTimeout(this.heartbeat)
+      clearInterval(this.heartbeat)
       this.heartbeat = undefined
     }
 
