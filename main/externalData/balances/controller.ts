@@ -41,7 +41,7 @@ export default class BalancesWorkerController extends EventEmitter {
       if (message.type === 'ready') {
         log.info(`balances worker ready, pid: ${this.worker.pid}`)
 
-        this.heartbeat = this.startMessages(this.sendHeartbeat.bind(this), 1000 * 20)
+        this.heartbeat = setInterval(() => this.sendHeartbeat(), 1000 * 20)
 
         this.emit('ready')
       }
@@ -58,7 +58,8 @@ export default class BalancesWorkerController extends EventEmitter {
     })
   
     this.worker.on('exit', code => {
-      log.warn(`balances worker exited with code ${code}, pid: ${this.worker.pid}`)
+      const exitCode = code || this.worker.signalCode
+      log.warn(`balances worker exited with code ${exitCode}, pid: ${this.worker.pid}`)
       this.close()
     })
   
@@ -69,19 +70,20 @@ export default class BalancesWorkerController extends EventEmitter {
   }
 
   close () {
-    this.worker.removeAllListeners()
-
     if (this.heartbeat) {
       clearTimeout(this.heartbeat)
       this.heartbeat = undefined
     }
+
+    this.worker.removeAllListeners()
   
+    const exitCode = this.worker.exitCode
     const killed = this.worker.killed || this.worker.kill('SIGTERM')
 
-    this.emit('close', killed)
-    this.removeAllListeners()
+    log.debug(`worker controller closed, exitCode: ${exitCode}, killed by controller: ${killed}`)
 
-    return killed
+    this.emit('close')
+    this.removeAllListeners()
   }
 
   isRunning () {
@@ -102,24 +104,15 @@ export default class BalancesWorkerController extends EventEmitter {
 
   // sending messages
   private sendCommandToWorker (command: string, args: any[] = []) {
+    if (!this.worker.connected) {
+      log.error(`attempted to send command "${command}" to worker but worker is not running!`)
+      return
+    }
+
     this.worker.send({ command, args })
   }
 
   private sendHeartbeat () {
     this.sendCommandToWorker('heartbeat')
-  }
-
-  private startMessages (fn: () => void, interval: number | (() => number)) {
-    setTimeout(fn, 0)
-    return this.scheduleMessage(fn, interval)
-  }
-
-  private scheduleMessage (fn: () => void, interval: number | (() => number)) {
-    const timeoutInterval = (typeof interval === 'number') ? interval : interval()
-  
-    return setTimeout(() => {
-      fn()
-      this.scheduleMessage(fn, interval)
-    }, timeoutInterval)
   }
 }

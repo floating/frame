@@ -4,6 +4,7 @@ import BalancesWorkerController from './controller'
 import { CurrencyBalance, TokenBalance } from './scan'
 
 const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
+const RESTART_WAIT = 5 // seconds
 
 export default function (store: Store) {
   const storeApi = {
@@ -29,12 +30,17 @@ export default function (store: Store) {
   let workerController: BalancesWorkerController | null
 
   function attemptRestart () {
-    log.warn('balances controller stopped, restarting')
+    log.warn(`balances controller stopped, restarting in ${RESTART_WAIT} seconds`)
     stop()
 
     setTimeout(() => {
       start()
-    }, 5 * 1000)
+    }, RESTART_WAIT * 1000)
+  }
+
+  function handleClose () {
+    workerController = null
+    attemptRestart()
   }
 
   function start () {
@@ -42,7 +48,7 @@ export default function (store: Store) {
 
     workerController = new BalancesWorkerController()
     
-    workerController.once('close', attemptRestart)
+    workerController.once('close', handleClose)
     workerController.on('chainBalances', handleChainBalanceUpdate)
     workerController.on('tokenBalances', handleTokenBalanceUpdate)
   }
@@ -54,7 +60,7 @@ export default function (store: Store) {
 
     if (workerController) {
       // if controller is explicitly stopped, don't attempt to restart
-      workerController.off('close', attemptRestart)
+      workerController.off('close', handleClose)
       workerController.close()
       workerController = null
     }
