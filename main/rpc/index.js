@@ -1,4 +1,4 @@
-const { ipcMain, dialog } = require('electron')
+const { ipcMain, dialog, systemPreferences } = require('electron')
 const fs = require('fs')
 const utils = require('web3-utils')
 const crypto = require('crypto')
@@ -29,6 +29,16 @@ const rpc = {
     } else {
       cb(new Error('No frameId set for this window'))
     }
+  },
+  askCameraPermission: cb => {
+    const mediaAccessStatus = systemPreferences.getMediaAccessStatus('camera')
+    if(mediaAccessStatus === "granted"){
+      return cb(true)
+    }
+
+    systemPreferences.askForMediaAccess("camera")
+      .then(access => {cb(access)})
+      .catch(() => {cb(false)})
   },
   signTransaction: accounts.signTransaction,
   signMessage: accounts.signMessage,

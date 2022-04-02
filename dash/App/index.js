@@ -10,6 +10,7 @@ import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
 import AddKeystore from './Add/AddKeystore'
 import AddAddress from './Add/AddAddress'
+import AddHardwareKeystone from './Add/AddHardwareKeystone'
 
 class AddAccounts extends React.Component {
   constructor (...args) {
@@ -60,6 +61,13 @@ class AddAccounts extends React.Component {
       </div>
     )
   }
+  renderAddKeystone() {
+    return (
+      <div className='addAccounts cardShow'>
+        <AddHardwareKeystone type={'keystone'} close={this.props.close} />
+      </div>
+    )
+  }
   renderAddLattice () {
     return (
       <div className='addAccounts cardShow'>
@@ -90,6 +98,7 @@ class AddAccounts extends React.Component {
         </div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
+        {/*<div className='accountTypeSelect' onClick={() => this.setState({ view: 'keystone' })}>Keystone Device</div>*/}
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
         {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
@@ -110,6 +119,8 @@ class AddAccounts extends React.Component {
     //   return this.renderAddGnosis()
     } else if (view === 'ledger')  {
       return this.renderAddLedger()
+    } else if (view === 'keystone')  {
+      return this.renderAddKeystone()
     } else if (view === 'trezor')  {
       return this.renderAddTrezor()
     } else if (view === 'lattice')  {
@@ -141,6 +152,7 @@ class Dash extends React.Component {
         const signer = this.store('main.signers', s)
         if (
           signer.type === 'ledger' || 
+          signer.type === 'keystone' ||
           signer.type === 'trezor' ||
           signer.type === 'lattice'
         ) {

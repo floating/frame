@@ -688,6 +688,7 @@ class Account extends React.Component {
         {(_ => {
           const type = this.props.lastSignerType 
           if (type === 'ledger') return <div className='signerSelectIconWrap signerIconLedger'>{svg.ledger(20)}</div>
+          if (type === 'keystone') return <div className='signerSelectIconWrap signerIconLedger'>{svg.keystone(24)}</div>
           if (type === 'trezor') return <div className='signerSelectIconWrap signerIconTrezor'>{svg.trezor(20)}</div>
           if (type === 'seed' || type === 'ring') return <div className='signerSelectIconWrap signerIconHot'>{svg.flame(24)}</div>
           if (type === 'aragon') return <div className='signerSelectIconWrap signerIconSmart'>{svg.aragon(28)}</div>

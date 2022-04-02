@@ -269,6 +269,7 @@ class Signer extends React.Component {
           {(_ => {
             const type = this.props.type
             if (type === 'ledger') return <div className='signerIconWrap signerIconHardware'>{svg.ledger(20)}</div>
+            if (type === 'keystone') return <div className='signerIconWrap signerIconHardware'>{svg.keystone(24)}</div>
             if (type === 'trezor') return <div className='signerIconWrap signerIconHardware'>{svg.trezor(20)}</div>
             if (type === 'seed' || type === 'ring') return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
             if (type === 'aragon') return <div className='signerIconWrap signerIconSmart'>{svg.aragon(28)}</div>
