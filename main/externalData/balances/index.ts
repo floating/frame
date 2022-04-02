@@ -35,6 +35,11 @@ export default function (store: Store) {
 
     setTimeout(() => {
       start()
+
+      const activeAddress = (store('selected.current') || '') as Address
+      if (activeAddress) {
+        startScan(activeAddress)
+      }
     }, RESTART_WAIT * 1000)
   }
 
