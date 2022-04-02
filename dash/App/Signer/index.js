@@ -5,7 +5,7 @@ import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
 function isHardwareSigner (type = '') {
-  return ['ledger', 'trezor', 'lattice'].includes(type.toLowerCase())
+  return ['ledger', 'trezor', 'lattice', 'keystone'].includes(type.toLowerCase())
 }
 
 function isLoading (status = '') {
@@ -249,6 +249,7 @@ class Signer extends React.Component {
     const status = this.getStatus()
 
     const hwSigner = isHardwareSigner(this.props.type)
+    const isKeystoneSigner = this.props.type === 'keystone'
     const loading = isLoading(status)
     const disconnected = this.props.type === 'lattice' && !loading && status !== 'ok'
 
@@ -372,9 +373,11 @@ class Signer extends React.Component {
             <div className='signerControlOption'>Deactivte all Accounts</div>
             <div className='signerControlOption'>Reload Signer</div>
             <div className='signerControlOption signerControlOptionEffect'>Lock Signer</div> */}
-            <div className='signerControlOption' onMouseDown={() => {
-              link.send('dash:reloadSigner', this.props.id)
-            }}>{hwSigner ? 'Reconnect' : 'Reload Signer'}</div>
+            {
+              !isKeystoneSigner && <div className='signerControlOption' onMouseDown={() => {
+                link.send('dash:reloadSigner', this.props.id)
+              }}>{hwSigner ? 'Reconnect' : 'Reload Signer'}</div>
+            }
             <div className='signerControlOption signerControlOptionImportant' onMouseDown={() => {
               link.send('dash:removeSigner', this.props.id)
             }}>Remove Signer</div>
