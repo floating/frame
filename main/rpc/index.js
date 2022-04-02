@@ -104,6 +104,10 @@ const rpc = {
 
     cb(null, { id: 'lattice-' + deviceId })
   },
+  createKeystone (ur, cb) {
+    store.syncKeystone(ur)
+    cb()
+  },
   async latticePair (id, pin, cb) {
     const signer = signers.get(id)
 

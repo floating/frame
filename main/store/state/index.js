@@ -187,6 +187,7 @@ const initial = {
       derivation: main('ledger.derivation', 'live'),
       liveAccountLimit: main('ledger.liveAccountLimit', 5)
     },
+    keystone: main('keystone', {}),
     trezor: {
       derivation: main('trezor.derivation', 'standard')
     },

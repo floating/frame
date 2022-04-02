@@ -118,7 +118,7 @@ interface Dapp {
   current: any
 }
 
-type SignerType = 'ring' | 'seed' | 'aragon' | 'trezor' | 'ledger' | 'lattice'
+type SignerType = 'ring' | 'seed' | 'aragon' | 'trezor' | 'ledger' | 'lattice' | 'keystone'
 type AccountStatus = 'ok'
 
 interface Signer {
