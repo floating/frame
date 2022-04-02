@@ -29,7 +29,8 @@ export enum Type {
   Aragon = 'aragon',
   Trezor = 'trezor',
   Ledger = 'ledger',
-  Lattice = 'lattice'
+  Lattice = 'lattice',
+  Keystone = 'keystone'
 }
 
 export function getType (typeValue: string) {
