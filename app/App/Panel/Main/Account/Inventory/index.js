@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 
-class Balances extends React.Component {
+class Inventory extends React.Component {
   constructor (...args) {
     super(...args)
     this.moduleRef = React.createRef()
@@ -15,7 +15,8 @@ class Balances extends React.Component {
       })
     }
     this.state = {
-      expand: false
+      expand: false,
+      hoverAsset: false
     }
   }
 
@@ -26,6 +27,7 @@ class Balances extends React.Component {
   componentWillUnmount () {
     if (this.resizeObserver) this.resizeObserver.disconnect()
   }
+
   render () {
     const inventory = this.store('main.inventory', this.props.id)
     const collections = Object.keys(inventory || {})
@@ -63,34 +65,86 @@ class Balances extends React.Component {
                 onClick={() => {
                   this.props.expandModule(this.props.moduleId, { currentCollection: k })
                 }}
+                style={this.props.expanded ? {
+                  position: 'absolute',
+                  top: '30px',
+                  right: '0',
+                  bottom: '0',
+                  left: '0'
+                } : {}}
               >
-                <div className='inventoryCollectionTop'>
-                  <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
-                  <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
-                  <div className='inventoryCollectionLine' />
-                </div>
                 {this.props.expanded ? (
-                  <div className='inventoryCollectionItems'>
-                    {Object.keys(inventory[k].items || {}).sort((a, b) => {
-                      a = inventory[k].items[a].tokenId
-                      b = inventory[k].items[b].tokenId
-                      return a < b ? -1 : b > a ? 1 : 0
-                    }).map(id => {
-                      const { tokenId, name, img, openSeaLink } = inventory[k].items[id]
-                      return (
-                        <div 
-                          className='inventoryCollectionItem'
-                          onClick={() => {
-                            this.store.notify('openExternal', { url: openSeaLink })
-                          }}
-                        >
-                          {img ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`} /> : null}
+                  <>
+                    {this.state.hoverAsset ? (
+                      <>
+                        <div className='inventoryPreview'>
+                          <div className='inventoryPreviewMedia'>
+                            {this.state.hoverAsset.img ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(this.state.hoverAsset.img)}`} /> : null}
+                          </div>
                         </div>
-                      )
-                    })}
+                        <div className='inventoryPreviewTitle'>{this.state.hoverAsset.name}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className='inventoryPreview'>
+                          <div 
+                            className='inventoryPreviewMedia'
+                            style={{
+                              background: `url(https://proxy.pylon.link?type=nft&target=${encodeURIComponent(inventory[k].meta.image)})`,
+                              backgroundRepeat: 'no-repeat',
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center'
+                            }}
+                          />
+                        </div>
+                        <div className='inventoryPreviewTitle'>{inventory[k].meta.name}</div>
+                      </>
+                    )}
+                    <div className='inventoryCollectionItems'>
+                      {Object.keys(inventory[k].items || {}).sort((a, b) => {
+                        a = inventory[k].items[a].tokenId
+                        b = inventory[k].items[b].tokenId
+                        return a < b ? -1 : b > a ? 1 : 0
+                      }).map(id => {
+                        const { tokenId, name, img, openSeaLink } = inventory[k].items[id]
+                        return (
+                          <div 
+                            className='inventoryCollectionItem'
+                            onClick={() => {
+                              this.store.notify('openExternal', { url: openSeaLink })
+                            }}
+                            onMouseEnter={() => {
+                              this.setState({
+                                hoverAsset: {
+                                  name,
+                                  tokenId,
+                                  img
+                                }
+                              })
+                            }}
+                            onMouseLeave={() => {
+                              this.setState({
+                                hoverAsset: false
+                              })
+                            }}
+                          >
+                            {img ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(img)}`} /> : null}
+                          </div>
+                        )
+                      })}
+                      <div className='inventoryCollectionLine' />
+                    </div>
+                  </>
+                ) : (
+                  <div className='inventoryCollectionTop'>
+                    {/* <div className='inventoryCollectionImage' >
+                      {inventory[k].meta.image ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(inventory[k].meta.image)}`} /> : null}
+                    </div> */}
+                    <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
+                    <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
                     <div className='inventoryCollectionLine' />
                   </div>
-                ) : null}
+                )}
               </div>
             )
           }) : inventory ? (
@@ -104,4 +158,4 @@ class Balances extends React.Component {
   }
 }
 
-export default Restore.connect(Balances)
+export default Restore.connect(Inventory)
