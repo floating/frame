@@ -108,6 +108,34 @@
       display flex
       align-items center
 
+.signerBalancesLoading
+  position absolute
+  top 32px
+  left 5px
+  right 5px
+  height 52px
+  z-index 200
+  border-radius 11px
+  display flex
+  justify-content center
+  align-items center
+
+  .loader, .loader:after
+    border-radius 100%
+    width 22px
+    height 22px
+
+  .loader
+    font-size 7px
+    position relative
+    text-indent -9999em
+    border-top 3px solid var(--ghostZ)
+    border-right 3px solid var(--ghostZ)
+    border-bottom 3px solid var(--ghostZ)
+    border-left 3px solid var(--ghostE)
+    transform translateZ(0)
+    animation load8 0.4s infinite linear !important
+
 .signerBalance
   position relative
   margin-left 17px

@@ -34,7 +34,13 @@ class Balances extends React.Component {
     if (!this.props.expanded) permissionList = permissionList.slice(0, 3)
     
     return (
-      <div ref={this.moduleRef}>
+      <div 
+        ref={this.moduleRef}
+        style={this.props.expanded ? {
+          height: '100%',
+          overflowY: 'scroll'
+        }: {}}
+      >
         <div className='moduleHeader'>
           {'Permissions'}
           {this.props.expanded ? (

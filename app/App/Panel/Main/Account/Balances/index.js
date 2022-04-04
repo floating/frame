@@ -116,7 +116,7 @@ class Balances extends React.Component {
   }
 
   renderBalance (symbol, balanceInfo, i, scanning) {
-    const rawBalance = parseInt(balanceInfo.balance) || 0
+    // const rawBalance = parseInt(balanceInfo.balance) || 0
     const change = parseFloat(balanceInfo.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
@@ -131,7 +131,7 @@ class Balances extends React.Component {
     if (name.length > 17) name = name.substr(0, 17) + '..'
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: !scanning || i === 0 || rawBalance > 0 ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
+        <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
               src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balanceInfo.logoURI)}`}
@@ -184,12 +184,19 @@ class Balances extends React.Component {
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 
     // scan if balances are more than 5 minutes old
-    const scanning = !lastBalanceUpdate || (new Date() - lastBalanceUpdate) > (1000 * 60 * 5)
+    const scanning = !lastBalanceUpdate || (new Date() - new Date(lastBalanceUpdate)) > (1000 * 60)
 
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (
-      <div ref={this.moduleRef} className='balancesBlock'>
+      <div 
+        ref={this.moduleRef}
+        className='balancesBlock'
+        style={this.props.expanded ? {
+          height: '100%',
+          overflowY: 'scroll'
+        }: {}}
+      >
         <div className={'moduleHeader moduleHeaderBorderless'}>
           <span>balances</span>
           {this.props.expanded ? (
@@ -198,8 +205,16 @@ class Balances extends React.Component {
             </div>
           ) : null}
         </div>
+        {scanning ? (
+          <div className='signerBalancesLoading'>
+            <div className='loader' />
+          </div>
+        ) : null}
         {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, scanning))}
-        <div className='signerBalanceTotal'>
+        <div 
+          className='signerBalanceTotal'
+          style={scanning ? { opacity: 0 } : { opacity: 1 }}
+        >
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
               <div className='signerBalanceButton signerBalanceShowAll' onMouseDown={() => this.props.expandModule(this.props.moduleId)}>
@@ -226,6 +241,7 @@ class Balances extends React.Component {
           <div 
             className='signerBalanceWarning'
             onClick={() => this.setState({ showHighHotMessage: !this.state.showHighHotMessage })}
+            style={scanning ? { opacity: 0 } : { opacity: 1 }}
           >
             <div className='signerBalanceWarningTitle'>
               {'high value account is using hot signer'}
