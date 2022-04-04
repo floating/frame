@@ -24,7 +24,7 @@ interface ChainUpdate {
 
 export default function rates (pylon: Pylon, store: Store) {
   const storeApi = {
-    getKnownTokens: (address?: Address) => (address ? store('main.tokens.known', address) : []) as Token[],
+    getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
     setNativeCurrencyData: (chainId: number, currencyData: Currency) => store.setNativeCurrencyData('ethereum', chainId, currencyData),
     setNativeCurrencyRate: (chainId: number, rate: Rate) => store.setNativeCurrencyData('ethereum', chainId, rate),
     setTokenRates: (rates: Record<Address, Rate>) => store.setRates(rates)
