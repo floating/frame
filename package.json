@@ -227,7 +227,11 @@
       "nebula>ipfs-http-client>ipfs-core-utils>ipfs-unixfs>protobufjs": true,
       "parcel-bundler": true,
       "parcel-bundler>deasync": true,
-      "react-restore>babel-core>babel-register>core-js": true
+      "react-restore>babel-core>babel-register>core-js": true,
+      "$root$": true,
+      "hardhat>ethereum-cryptography>keccak": true,
+      "hdkey>secp256k1": true,
+      "node-hid": true
     }
   }
 }
