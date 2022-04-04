@@ -213,7 +213,7 @@ class Balances extends React.Component {
         {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, scanning))}
         <div 
           className='signerBalanceTotal'
-          style={scanning ? { opacity: 0 } : { opacity: 1 }}
+          style={{ opacity: !scanning ? 1 : 0, transitionDelay: (0.6) + 's'}}
         >
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
