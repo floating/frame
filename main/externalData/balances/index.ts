@@ -8,6 +8,7 @@ const RESTART_WAIT = 5 // seconds
 
 export default function (store: Store) {
   const storeApi = {
+    getActiveAddress: () => (store('selected.current') || '') as Address,
     getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Network,
     getConnectedNetworks: () => {
       const networks = (Object.values(store('main.networks.ethereum') || {})) as Network[]
@@ -36,7 +37,7 @@ export default function (store: Store) {
     setTimeout(() => {
       start()
 
-      const activeAddress = (store('selected.current') || '') as Address
+      const activeAddress = storeApi.getActiveAddress()
       if (activeAddress) {
         startScan(activeAddress)
       }
