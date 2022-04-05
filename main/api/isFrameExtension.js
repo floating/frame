@@ -4,7 +4,6 @@ const dev = process.env.NODE_ENV === 'development'
 
 module.exports = req => {
   const origin = req.headers.origin
-  console.log('isFrameExtension?', origin)
   if (!origin) return false
   const query = queryString.parse(req.url.replace('/', ''))
 

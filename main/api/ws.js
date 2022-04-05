@@ -20,9 +20,7 @@ const subs = {}
 const handler = (socket, req) => {
   socket.id = uuid()
   socket.origin = req.headers.origin
-  console.log('socket origin', socket.origin)
   socket.isFrameExtension = isFrameExtension(req)
-  console.log('socket.isFrameExtension', socket.isFrameExtension)
   const res = payload => {
     if (socket.readyState === socket.OPEN) {
       socket.send(JSON.stringify(payload), err => { if (err) log.info(err) })
