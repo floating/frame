@@ -45,6 +45,70 @@ function balance (rawBalance, quote = {}) {
   }
 }
 
+
+class Balance extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      initialMount: true
+    }
+  }
+
+  componentDidMount () {
+    setTimeout(() => {
+      this.setState({ initialMount: false })
+    }, 200)
+  }
+
+  render () {
+    const { symbol, balance, i, scanning } = this.props
+    console.log(symbol, balance, i, scanning)
+    const change = parseFloat(balance.priceChange)
+    const direction = change < 0 ? -1 : change > 0 ? 1 : 0
+    let priceChangeClass = 'signerBalanceCurrentPriceChange'
+    if (direction !== 0) {
+      if (direction === 1) {
+        priceChangeClass += ' signerBalanceCurrentPriceChangeUp'
+      } else {
+        priceChangeClass += ' signerBalanceCurrentPriceChangeDown'
+      }
+    }
+    let name = balance.name
+    if (name.length > 17) name = name.substr(0, 17) + '..'
+    return (
+      <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
+        <div className='signerBalanceInner' style={{ opacity: !scanning && !this.state.initialMount ? 1 : 0, transitionDelay: (0.05 * i) + 's' }}>
+          <div className='signerBalanceLogo'>
+            <img 
+              src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}
+              value={symbol.toUpperCase()}
+              alt={symbol.toUpperCase()}
+            />
+          </div>
+          <div className='signerBalanceCurrency'>
+            {name}
+          </div>
+          <div className='signerBalancePrice'>
+            <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balance.price}</span>
+            <span className={priceChangeClass}>
+              <span>{direction === 1 ? '+' : ''}{balance.priceChange ? balance.priceChange + '%' : ''}</span>
+            </span>
+          </div>
+          <div className='signerBalanceValue' style={(balance.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
+            <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
+            <span
+              style={(balance.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
+            >
+              {balance.displayBalance}
+            </span>
+          </div>
+          {<div className='signerBalanceEquivalent'>{svg.usd(10)}{balance.displayValue}</div>}
+        </div>
+      </div>
+    )
+  }
+}
+
 class Balances extends React.Component {
   constructor (...args) {
     super(...args)
@@ -115,53 +179,6 @@ class Balances extends React.Component {
     return { balances, totalDisplayValue: formatUsdRate(totalValue, 0), totalValue }
   }
 
-  renderBalance (symbol, balanceInfo, i, scanning) {
-    // const rawBalance = parseInt(balanceInfo.balance) || 0
-    const change = parseFloat(balanceInfo.priceChange)
-    const direction = change < 0 ? -1 : change > 0 ? 1 : 0
-    let priceChangeClass = 'signerBalanceCurrentPriceChange'
-    if (direction !== 0) {
-      if (direction === 1) {
-        priceChangeClass += ' signerBalanceCurrentPriceChangeUp'
-      } else {
-        priceChangeClass += ' signerBalanceCurrentPriceChangeDown'
-      }
-    }
-    let name = balanceInfo.name
-    if (name.length > 17) name = name.substr(0, 17) + '..'
-    return (
-      <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0, transitionDelay: (0.1 * i) + 's' }}>
-          <div className='signerBalanceLogo'>
-            <img 
-              src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balanceInfo.logoURI)}`}
-              value={symbol.toUpperCase()}
-              alt={symbol.toUpperCase()}
-            />
-          </div>
-          <div className='signerBalanceCurrency'>
-            {name}
-          </div>
-          <div className='signerBalancePrice'>
-            <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balanceInfo.price}</span>
-            <span className={priceChangeClass}>
-              <span>{direction === 1 ? '+' : ''}{balanceInfo.priceChange ? balanceInfo.priceChange + '%' : ''}</span>
-            </span>
-          </div>
-          <div className='signerBalanceValue' style={(balanceInfo.displayBalance || '0').length >= 12 ? { fontSize: '15px', top: '10px' } : {}}>
-            <span className='signerBalanceSymbol'>{symbol.toUpperCase()}</span>
-            <span
-              style={(balanceInfo.displayBalance || '0').length >= 12 ? { marginTop: '-3px' } : {}}
-            >
-              {balanceInfo.displayBalance}
-            </span>
-          </div>
-          {<div className='signerBalanceEquivalent'>{svg.usd(10)}{balanceInfo.displayValue}</div>}
-        </div>
-      </div>
-    )
-  }
-
   render () {
     const { address, lastSignerType } = this.store('main.accounts', this.props.id)
     const { type, id: chainId } = this.store('main.currentNetwork')
@@ -183,7 +200,7 @@ class Balances extends React.Component {
 
     const lastBalanceUpdate = this.store('main.accounts', address, 'balances.lastUpdated')
 
-    // scan if balances are more than 5 minutes old
+    // scan if balances are more than a minute old
     const scanning = !lastBalanceUpdate || (new Date() - new Date(lastBalanceUpdate)) > (1000 * 60)
 
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
@@ -210,10 +227,12 @@ class Balances extends React.Component {
             <div className='loader' />
           </div>
         ) : null}
-        {balances.map(({ symbol, ...balance }, i) => this.renderBalance(symbol, balance, i, scanning))}
+        {balances.map(({ symbol, ...balance }, i) => {
+          return <Balance symbol={symbol} balance={balance} i={i} scanning={scanning} />
+        })}
         <div 
           className='signerBalanceTotal'
-          style={{ opacity: !scanning ? 1 : 0, transitionDelay: (0.6) + 's'}}
+          style={{ opacity: !scanning ? 1 : 0, transitionDelay: '0.6s'}}
         >
           {!this.props.expanded ? (
             <div className='signerBalanceButtons'>
