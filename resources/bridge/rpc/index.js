@@ -1,4 +1,4 @@
-const { ipcRenderer } = require('electron')
+import { ipcRenderer } from 'electron'
 let i = 0
 const newId = () => ++i
 

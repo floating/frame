@@ -50,6 +50,11 @@ export interface TransactionMetadata {
   approvals: RequiredApproval[]
 }
 
+function isScanning (account: Address) {
+  const lastUpdated = store('main.accounts', account, 'balances.lastUpdated') as Date
+  return !lastUpdated || (new Date().getTime() - lastUpdated.getTime()) > (1000 * 60 * 5)
+}
+
 function getNativeCurrency (chainId: number) {
   const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
 
@@ -890,8 +895,7 @@ export class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
-    const isScanning = store('main.scanning', currentAccount.id)
-    if (isScanning) return this.resError({ message: 'assets not known for account', code: 5901 }, payload, cb)
+    if (isScanning(currentAccount.id)) return this.resError({ message: 'assets not known for account', code: 5901 }, payload, cb)
 
     const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
     const { id, jsonrpc } = payload
@@ -1011,10 +1015,9 @@ store.observer(() => {
   const currentAccountId = store('selected.current')
 
   if (currentAccountId) {
-    const isScanning = store('main.scanning', currentAccountId)
     const assets = loadAssets(currentAccountId)
 
-    if (!isScanning && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
+    if (!isScanning(currentAccountId) && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
       if (!debouncedAssets) {
         setTimeout(() => {
           if (debouncedAssets) {

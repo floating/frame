@@ -1,4 +1,4 @@
-import balanceLoader from '../../../../main/externalData/balances'
+import balanceLoader from '../../../../main/externalData/balances/scan'
 import multicall, { supportsChain } from '../../../../main/multicall'
 
 import log from 'electron-log'

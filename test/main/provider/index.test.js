@@ -44,7 +44,6 @@ beforeEach(() => {
   eventTypes.forEach(eventType => provider.subscriptions[eventType] = [])
 
   accountRequests = []
-  store.set('main.scanning', address, false)
   store.set('main.accounts', {})
   store.set('main.currentNetwork.id', 1)
 
@@ -455,7 +454,8 @@ describe('#send', () => {
       }
     ]
 
-    beforeAll(() => {
+    beforeEach(() => {
+      store.set('main.accounts', address, { balances: { lastUpdated: new Date() } })
       store.set('main.balances', address, balances)
     })
 
@@ -495,7 +495,10 @@ describe('#send', () => {
     })
 
     it('returns an error while scanning', done => {
-      store.set('main.scanning', address, true)
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+
+      store.set('main.accounts', address, 'balances.lastUpdated', yesterday)
 
       send({ method: 'wallet_getAssets', id: 51, jsonrpc: '2.0' }, response => {
         expect(response.id).toBe(51)
@@ -1357,6 +1360,9 @@ describe('state change events', () => {
     const account = '0xce070f8134f69a4d55cc4bef4a7c8d0bb56ff1d9'
 
     beforeEach(() => {
+      accounts.current = () => ({ id: account })
+      store.set('main.accounts', account, 'balances.lastUpdated', new Date())
+
       provider.subscriptions.assetsChanged.push(subscriptionId)
       provider.removeAllListeners('data:address')
     })
@@ -1442,14 +1448,22 @@ describe('state change events', () => {
       store.getObserver('provider:account').fire()
     })
 
-    it('does not fire an assetsChanged event while scanning', () => {
-      provider.once('data:address', () => { throw new Error('event fired while still scanning!') })
+    it('does not fire an assetsChanged event while scanning', async () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
 
+      store.set('main.accounts', account, 'balances.lastUpdated', yesterday)
       store.set('main.balances', account, [{ address: '0xany' }])
       store.set('selected.current', account)
-      store.set('main.scanning', account, true)
 
-      store.getObserver('provider:account').fire()
+      return new Promise((resolve, reject) => {
+        provider.once('data:address', () => reject('event fired while still scanning!'))
+
+        store.getObserver('provider:account').fire()
+        jest.advanceTimersByTime(800)
+
+        resolve()
+      })
     })
   })
 })

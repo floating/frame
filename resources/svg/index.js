@@ -1,7 +1,7 @@
 import React from 'react'
 import Octicon, { getIconByName } from '@githubprimer/octicons-react'
 
-module.exports = {
+export default {
   logo: size => {
     return (
       <div style={{ width: size + 'px', height: size + 'px' }}>

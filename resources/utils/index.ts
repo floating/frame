@@ -30,11 +30,23 @@ function arraysMatch <T> (a: T[] = [], b: T[] = []) {
   )
 }
 
+function debounce (func: (...args: any) => any, timeout = 300) {
+  let timer: NodeJS.Timeout
+
+  return (...args: any) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      func(...args)
+    }, timeout)
+  }
+}
+
 export {
   randomLetters,
   capitalize,
   arraysEqual,
   arraysMatch,
+  debounce,
   weiToGwei,
   weiToHex,
   gweiToWei,

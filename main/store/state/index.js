@@ -37,6 +37,16 @@ const main = (path, def) => {
   return found
 }
 
+function loadAccounts () {
+  const accounts = main('accounts', {})
+  const updatedEntries = Object.entries(accounts).map(([id, account]) => {
+    // remove lastUpdated from balances
+    return [id, { ...account, balances: { lastUpdated: undefined } }]
+  })
+
+  return Object.fromEntries(updatedEntries)
+}
+
 const initial = {
   panel: { // Panel view
     show: false,
@@ -190,10 +200,10 @@ const initial = {
     trezor: {
       derivation: main('trezor.derivation', 'standard')
     },
-    accounts: main('accounts', {}),
+    accounts: loadAccounts(),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
-    balances: [],
+    balances: {},
     tokens: main('tokens', { custom: [], known: {} }),
     rates: {}, // main('rates', {}),
     inventory: {}, // main('rates', {}),

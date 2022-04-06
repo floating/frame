@@ -6,12 +6,9 @@ log.transports.console.format = '[scanWorker] {h}:{i}:{s} {text}'
 log.transports.console.level = process.env.LOG_WORKER ? 'debug' : 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-import { supportsChain as chainSupportsScan } from '../multicall'
-import balancesLoader, { BalanceLoader } from './balances'
-import rates from './rates'
-import inventory from './inventory'
-import loadStaticData from './staticData'
-import TokenLoader from './inventory/tokens'
+import { supportsChain as chainSupportsScan } from '../../multicall'
+import balancesLoader, { BalanceLoader } from './scan'
+import TokenLoader from '../inventory/tokens'
 
 interface ExternalDataWorkerMessage {
   command: string,
@@ -49,12 +46,12 @@ function sendToMainProcess (data: any) {
   }
 }
 
-async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = []) {
+async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = [], chains?: number[]) {
   try {
     // for chains that support multicall, we can attempt to load every token that we know about,
     // for all other chains we need to call each contract individually so don't scan every contract
-    const chains = (await getChains()).filter(chainSupportsScan)
-    const tokenLists = chains.map(chainId => tokenLoader.getTokens(chainId))
+    const eligibleChains = (chains || await getChains()).filter(chainSupportsScan)
+    const tokenLists = eligibleChains.map(chainId => tokenLoader.getTokens(chainId))
     const tokens = tokenLists.reduce((all, tokenList) => {
       return all.concat(
         tokenList.filter(token => tokensToOmit.every(t => t.chainId !== token.chainId || t.address !== token.address))
@@ -64,7 +61,7 @@ async function tokenBalanceScan (address: Address, tokensToOmit: Token[] = []) {
     const tokenBalances = (await balances.getTokenBalances(address, tokens))
       .filter(balance => parseInt(balance.balance) > 0)
 
-    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances, source: 'scan' })
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
   } catch (e) {
     log.error('error scanning for token balances', e)
   }
@@ -74,49 +71,21 @@ async function fetchTokenBalances (address: Address, tokens: Token[]) {
   try {
     const tokenBalances = await balances.getTokenBalances(address, tokens)
 
-    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances, source: 'known' })
+    sendToMainProcess({ type: 'tokenBalances', address, balances: tokenBalances })
   } catch (e) {
     log.error('error fetching token balances', e)
   }
 }
 
-async function chainBalanceScan (address: string) {
+async function chainBalanceScan (address: string, chains?: number[]) {
   try {
-    const chains = await getChains()
-    const chainBalances = await balances.getCurrencyBalances(address, chains)
+    const availableChains = chains || (await getChains())
+    const chainBalances = await balances.getCurrencyBalances(address, availableChains)
 
     sendToMainProcess({ type: 'chainBalances', balances: chainBalances, address })
   } catch (e) {
     log.error('error scanning chain balance', e)
   }
-}
-
-async function ratesScan (symbols: string[], chainId: number) {
-  try {
-    const loadedRates = await rates(symbols, chainId)
-    sendToMainProcess({ type: 'rates', rates: loadedRates })
-  } catch (e) {
-    log.error('rates scan error', e)
-    sendToMainProcess({ type: 'pause', task: 'rates', interval: 20 * 1000 })
-  }
-}
-
-function nativeCurrencyScan (symbols: string[]) {
-  loadStaticData(symbols)
-    .then(currencyData => sendToMainProcess({ type: 'nativeCurrencyData', currencyData }))
-    .catch(err => log.error('native currency scan error', err))
-}
-
-function inventoryScan (addresses: string[]) {
-  addresses.forEach(address => {
-    inventory(address)
-      .then(result => {
-        if (result.success) {
-          sendToMainProcess({ type: 'inventory', address, inventory: result.inventory })
-        }
-      })
-      .catch(err => log.error('inventory scan error', err))
-  })
 }
 
 function resetHeartbeat () {
@@ -129,12 +98,9 @@ function resetHeartbeat () {
 }
 
 const messageHandler: { [command: string]: (...params: any) => void } = {
-  updateRates: ratesScan,
-  updateNativeCurrencyData: nativeCurrencyScan,
   updateChainBalance: chainBalanceScan,
   fetchTokenBalances: fetchTokenBalances,
   tokenBalanceScan: tokenBalanceScan,
-  updateInventory: inventoryScan,
   heartbeat: resetHeartbeat
 }
 
