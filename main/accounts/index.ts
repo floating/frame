@@ -213,14 +213,14 @@ export class Accounts extends EventEmitter {
             if (!txRequest.feeAtTime) {
               const network = targetChain
               if (network.type === 'ethereum' && network.id === 1) {
-                fetch('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=KU5RZ9156Q51F592A93RUKHW1HDBBUPX9W').then(res => res.json()).then((res: any) => {
-                  if (res && res.message === 'OK' && res.result && res.result.ethusd && txRequest.tx && txRequest.tx.receipt && this.accounts[account.address]) {
-                    const { gasUsed } = txRequest.tx.receipt
+                const ethPrice = store('main.networksMeta.ethereum.1.nativeCurrency.usd.price')
 
-                    txRequest.feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(txRequest.data.gasPrice || '0x0')) * res.result.ethusd) * 100) / 100).toFixed(2)
-                    account.update()
-                  }
-                }).catch(e => console.log('Unable to fetch exchange rate', e))
+                if (ethPrice && txRequest.tx && txRequest.tx.receipt && this.accounts[account.address]) {
+                  const { gasUsed } = txRequest.tx.receipt
+
+                  txRequest.feeAtTime = (Math.round(weiIntToEthInt((hexToInt(gasUsed) * hexToInt(txRequest.data.gasPrice || '0x0')) * res.result.ethusd) * 100) / 100).toFixed(2)
+                  account.update()
+                }
               } else {
                 txRequest.feeAtTime = '?'
                 account.update()
