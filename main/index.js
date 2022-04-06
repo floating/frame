@@ -146,7 +146,7 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  const validHost = externalWhitelist.some(entry => url.startsWith(entry))
+  const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
   if (validHost) shell.openExternal(url)
 })
 
