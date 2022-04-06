@@ -75,12 +75,13 @@ class Balance extends React.Component {
     }
     let name = balance.name
     if (name.length > 17) name = name.substr(0, 17) + '..'
+
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner' style={{ opacity: !scanning && !this.state.initialMount ? 1 : 0, transitionDelay: (0.05 * i) + 's' }}>
           <div className='signerBalanceLogo'>
             <img 
-              src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}
+              src={balance.logoURI && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}
               value={symbol.toUpperCase()}
               alt={symbol.toUpperCase()}
             />

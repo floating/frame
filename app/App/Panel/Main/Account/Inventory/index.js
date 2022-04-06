@@ -83,9 +83,9 @@ class Inventory extends React.Component {
                       ) : (
                         <div 
                           className='inventoryPreviewCollection'
-                          style={{
+                          style={inventory[k].meta.image ? {
                             backgroundImage: `url(https://proxy.pylon.link?type=nft&target=${encodeURIComponent(inventory[k].meta.image)})`
-                          }}
+                          } : {}}
                         />
                       )}
                     </div>
