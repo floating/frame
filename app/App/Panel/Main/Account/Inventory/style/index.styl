@@ -36,7 +36,7 @@
 
   .inventoryCollectionItems
     position absolute
-    top 199px
+    top 189px
     bottom 0
     left 0
     right 0
@@ -112,20 +112,25 @@
   padding 20px
 
 .inventoryPreviewTitle
-  background var(--ghostD)
+  background var(--ghostC)
   box-shadow 0px 1px 4px var(--ghostA)
   position absolute
-  top 162px
+  top 158px
   left 3px
   right 3px
-  height 40px
-  border-radius 7px
+  height 30px
   z-index 4
   display flex
   justify-content center
   align-items center
   font-weight 400
-  font-size 14px
+  font-size 12px
+  border-radius 3px
+  border-bottom-left-radius 8px
+  border-bottom-right-radius 8px
+  text-transform uppercase
+  letter-spacing 1px
+  padding-bottom 2px
 
 .inventoryPreview
   position absolute
@@ -134,20 +139,39 @@
   right 3px
   height 154px
   background var(--ghostA)
-  border-radius 12px
   z-index 3
   display flex
   justify-content center
   align-items center
   flex-direction column
+  border-radius 3px
+  border-top-left-radius 8px
+  border-top-right-radius 8px
+
+  .inventoryPreviewCollection
+    background-repeat no-repeat
+    background-size cover
+    background-position center
+    position absolute
+    left 50%
+    height 100px 
+    width 100px
+    margin-left -56px
+    z-index 2
+    border-radius 56px
+    box-shadow 0px 5px 10px var(--ghostY)
+    border 6px solid var(--ghostB)
 
   .inventoryPreviewMedia
-    width 100%
-    height 160px
-    background var(--ghostA)
+    position absolute
+    top 12px
+    left 12px
+    right 12px
+    bottom 12px
+    z-index 1
+    opacity 1
     overflow hidden
-    border-radius 8px
-    overflow hidden
+    z-index 4
 
     img
       width 100%
