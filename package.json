@@ -108,7 +108,7 @@
     "@ethereumjs/tx": "3.5.0",
     "@ethersproject/contracts": "5.5.0",
     "@ethersproject/providers": "5.5.0",
-    "@framelabs/pylon-client": "0.0.6",
+    "@framelabs/pylon-client": "0.0.7",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "6.25.0",
     "@ledgerhq/hw-transport-node-hid-noevents": "6.24.1",

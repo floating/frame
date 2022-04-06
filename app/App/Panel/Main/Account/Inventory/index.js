@@ -127,9 +127,6 @@ class Inventory extends React.Component {
                   </>
                 ) : (
                   <div className='inventoryCollectionTop'>
-                    {/* <div className='inventoryCollectionImage' >
-                      {inventory[k].meta.image ? <img src={`https://proxy.pylon.link?type=nft&target=${encodeURIComponent(inventory[k].meta.image)}`} /> : null}
-                    </div> */}
                     <div className='inventoryCollectionName'>{inventory[k].meta.name}</div>
                     <div className='inventoryCollectionCount'>{Object.keys(inventory[k].items).length}</div>
                     <div className='inventoryCollectionLine' />

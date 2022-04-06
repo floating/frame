@@ -108,13 +108,15 @@ export default function rates (pylon: Pylon, store: Store) {
     pylon.off('rates', handleRatesUpdates)
     pylon.off('chains', handleChainUpdates)
 
-    pylon.assets([])
+    pylon.rates([])
+    pylon.chains([])
   }
 
   function setAssets (assetIds: AssetId[]) {
     log.verbose('setting ids for asset updates', JSON.stringify(assetIds))
 
-    pylon.assets(assetIds)
+    pylon.rates(assetIds)
+    pylon.chains([...new Set(assetIds.map(id => id.chainId))])
   }
 
   return {
