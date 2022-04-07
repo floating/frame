@@ -6,7 +6,7 @@ const migrations = require('../migrations')
 
 class PersistStore extends Conf {
   constructor (options) {
-    options = { configName: 'config', ...options }
+    options = { configFileMode: 0o600, configName: 'config', ...options }
     let defaultCwd = __dirname
     if (electron && electron.app) defaultCwd = electron.app.getPath('userData')
     if (options.cwd) {
