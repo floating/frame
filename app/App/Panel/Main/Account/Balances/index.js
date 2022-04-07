@@ -62,7 +62,6 @@ class Balance extends React.Component {
 
   render () {
     const { symbol, balance, i, scanning } = this.props
-    console.log(symbol, balance, i, scanning)
     const change = parseFloat(balance.priceChange)
     const direction = change < 0 ? -1 : change > 0 ? 1 : 0
     let priceChangeClass = 'signerBalanceCurrentPriceChange'
