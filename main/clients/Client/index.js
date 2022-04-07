@@ -74,7 +74,7 @@ class Client extends EventEmitter {
         await this._extract(fileName)
 
         // Update version file
-        fs.writeFileSync(this.versionFile, this.latest.version)
+        fs.writeFileSync(this.versionFile, this.latest.version, { mode: 0o600 })
 
         // Log and emit state
         log.info(`${this.name}: installed`)
