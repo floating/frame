@@ -74,10 +74,7 @@ process.on('uncaughtException', (e) => {
   }
   log.error('uncaughtException')
   log.error(e)
-  // Kill all clients running as child processes
-  // clients.stop()
-  throw e
-  // setTimeout(() => app.quit(), 50)
+  app.quit()
 })
 
 const externalWhitelist = [
