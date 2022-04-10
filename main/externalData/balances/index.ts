@@ -56,8 +56,6 @@ export default function (store: Store) {
     start()
 
     const activeAddress = storeApi.getActiveAddress()
-
-    console.log({ activeAddress })
     if (activeAddress) {
       startScan(activeAddress)
     }
