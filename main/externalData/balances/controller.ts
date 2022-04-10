@@ -63,6 +63,11 @@ export default class BalancesWorkerController extends EventEmitter {
       this.close()
     })
   
+    this.worker.on('disconnect', () => {
+      log.warn(`balances worker disconnected`)
+      this.close()
+    })
+
     this.worker.on('error', err => {
       log.warn(`balances worker sent error, pid: ${this.worker.pid}`, err)
       this.close()
@@ -104,12 +109,18 @@ export default class BalancesWorkerController extends EventEmitter {
 
   // sending messages
   private sendCommandToWorker (command: string, args: any[] = []) {
-    if (!this.worker.connected) {
-      log.error(`attempted to send command "${command}" to worker but worker is not running!`)
-      return
-    }
+    log.debug(`sending command ${command} to worker`)
 
-    this.worker.send({ command, args })
+    try {
+      if (!this.worker.connected || !this.worker.channel) {
+        log.error(`attempted to send command "${command}" to worker but worker cannot be reached!`)
+        return
+      }
+
+      this.worker.send({ command, args })
+    } catch (e) {
+      log.error(`unknown error sending command "${command}" to worker`, e)
+    }
   }
 
   private sendHeartbeat () {

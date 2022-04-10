@@ -34,14 +34,7 @@ export default function (store: Store) {
     log.warn(`balances controller stopped, restarting in ${RESTART_WAIT} seconds`)
     stop()
 
-    setTimeout(() => {
-      start()
-
-      const activeAddress = storeApi.getActiveAddress()
-      if (activeAddress) {
-        startScan(activeAddress)
-      }
-    }, RESTART_WAIT * 1000)
+    setTimeout(restart, RESTART_WAIT * 1000)
   }
 
   function handleClose () {
@@ -57,6 +50,17 @@ export default function (store: Store) {
     workerController.once('close', handleClose)
     workerController.on('chainBalances', handleChainBalanceUpdate)
     workerController.on('tokenBalances', handleTokenBalanceUpdate)
+  }
+
+  function restart () {
+    start()
+
+    const activeAddress = storeApi.getActiveAddress()
+
+    console.log({ activeAddress })
+    if (activeAddress) {
+      startScan(activeAddress)
+    }
   }
 
   function stop () {
