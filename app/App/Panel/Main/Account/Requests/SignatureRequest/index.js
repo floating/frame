@@ -4,6 +4,7 @@ import { fromWei, isHex } from 'web3-utils'
 import { stripHexPrefix } from 'ethereumjs-util'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
+import QRSignModal from '../../../../../Components/QRSignModal'
 
 function decodeMessage (rawMessage) {
   if (isHex(rawMessage)) {
@@ -57,6 +58,9 @@ class TransactionRequest extends React.Component {
     const payload = this.props.req.payload
 
     const message = decodeMessage(payload.params[1])
+    const activeAccount = Object.values(this.store('main.accounts')).find(account => account.active).address
+    const signRequests = this.store('main.keystone.signRequests')
+    const signRequest = signRequests.find(request => request.address === activeAccount)
 
     let requestClass = 'signerRequest'
     if (status === 'success') requestClass += ' signerRequestSuccess'
@@ -112,6 +116,17 @@ class TransactionRequest extends React.Component {
                   </div>
                 </>
               )}
+              <QRSignModal
+                showModal={status === 'pending' && signRequest}
+                signRequest={signRequest}
+                submitSignature={(signature) => {
+                  link.rpc('submitKeystoneSignature', signature, () => {})}
+                }
+                cancelRequestSignature={() => {
+                  link.rpc('cancelKeystoneRequestSignature', signRequest.request.requestId, () => {})
+                  this.decline(this.props.req.handlerId, this.props.req)
+                }}
+              />
             </div>
           </div>
         ) : (

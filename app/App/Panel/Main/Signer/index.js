@@ -296,6 +296,7 @@ class Signer extends React.Component {
                 if (this.props.signer) {
                   if (this.props.signer.type === 'ledger') return svg.ledger(24)
                   if (this.props.signer.type === 'trezor') return svg.trezor(20)
+                  if (this.props.signer.type === 'keystone') return svg.keystone(24)
                   if (this.props.signer.type === 'seed' || this.props.signer.type === 'ring') return svg.flame(21)
                   if (this.props.signer.type === 'aragon') return svg.aragon(32)
                   if (this.props.signer.type === 'lattice') return svg.lattice(32)

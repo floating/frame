@@ -12,7 +12,7 @@ import link from '../../../../../../resources/link'
 import SignTypedDataRequest from './SignTypedDataRequest'
 
 function isHardwareSigner (account = {}) {
-  return ['ledger', 'lattice', 'trezor'].includes(account.lastSignerType)
+  return ['ledger', 'lattice', 'trezor', 'keystone'].includes(account.lastSignerType)
 }
 
 class Requests extends React.Component {

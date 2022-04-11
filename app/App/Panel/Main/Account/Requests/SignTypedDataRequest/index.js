@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import utils from 'web3-utils'
 import svg from '../../../../../../../resources/svg'
 import link from '../../../../../../../resources/link'
+import QRSignModal from '../../../../../Components/QRSignModal'
 
 const SimpleJSON = ({ json }) => {
   return (
@@ -74,6 +75,10 @@ class TransactionRequest extends React.Component {
     if (status === 'error') requestClass += ' signerRequestError'
     const mode = req.mode
     const height = mode === 'monitor' ? '215px' : '340px'
+
+    const activeAccount = Object.values(this.store('main.accounts')).find(account => account.active).address
+    const signRequests = this.store('main.keystone.signRequests')
+    const signRequest = signRequests.find(request => request.address === activeAccount)
 
     const messageToSign = typedData.domain
      ? (
@@ -151,6 +156,17 @@ class TransactionRequest extends React.Component {
                   {messageToSign}
                 </>
               )}
+              <QRSignModal
+                showModal={status === 'pending' && signRequest}
+                signRequest={signRequest}
+                submitSignature={(signature) => {
+                  link.rpc('submitKeystoneSignature', signature, () => {})
+                }}
+                cancelRequestSignature={() => {
+                  link.rpc('cancelKeystoneRequestSignature', signRequest.request.requestId, () => {})
+                  this.decline(this.props.req.handlerId, this.props.req)
+                }}
+              />
             </div>
           </div>
         ) : (

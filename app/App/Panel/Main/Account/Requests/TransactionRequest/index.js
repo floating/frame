@@ -18,6 +18,7 @@ import TxData from './TxData'
 import TxRecipient from './TxRecipient'
 import TxOverlay from './TxOverlay'
 import TxApproval from './TxApproval'
+import QRSignModal from '../../../../../Components/QRSignModal'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -160,6 +161,10 @@ class TransactionRequest extends React.Component {
     const nativeUSD = nativeCurrency && nativeCurrency.usd && layer !== 'testnet' ? nativeCurrency.usd.price : 0
     const value = this.hexToDisplayValue(req.data.value || '0x')
     const currentSymbol = this.store('main.networks', this.chain.type, this.chain.id, 'symbol') || '?'
+
+    const activeAccount = Object.values(this.store('main.accounts')).find(account => account.active).address
+    const signRequests = this.store('main.keystone.signRequests')
+    const signRequest = signRequests.find(request => request.address === activeAccount)
 
     let maxFeePerGas, maxFee, maxFeeUSD
 
@@ -489,6 +494,17 @@ class TransactionRequest extends React.Component {
                   {/* <TxModule top={165} req={req} /> */}
                 </>
               )}
+              <QRSignModal
+                showModal={status === 'pending' && signRequest}
+                signRequest={signRequest}
+                submitSignature={(signature) => {
+                  link.rpc('submitKeystoneSignature', signature, () => {})
+                }}
+                cancelRequestSignature={() => {
+                  link.rpc('cancelKeystoneRequestSignature', signRequest.request.requestId, () => {})
+                  this.decline(req)
+                }}
+              />
             </div>
           </div>
         ) : (
