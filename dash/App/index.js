@@ -98,7 +98,7 @@ class AddAccounts extends React.Component {
         </div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
-        {/*<div className='accountTypeSelect' onClick={() => this.setState({ view: 'keystone' })}>Keystone Device</div>*/}
+        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keystone' })}>Keystone Device</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
         {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}

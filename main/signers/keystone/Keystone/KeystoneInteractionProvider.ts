@@ -31,6 +31,7 @@ export class KeystoneInteractionProvider extends EventEmitter implements Interac
     KeystoneInteractionProvider.instance = this;
   }
 
+  // This function is not used in Frame for syncing but is required in InteractionProvider
   readCryptoHDKeyOrCryptoAccount = () => Promise.resolve(CryptoAccount.fromCBOR(Buffer.from('', "hex")))
 
   requestSignature = (
