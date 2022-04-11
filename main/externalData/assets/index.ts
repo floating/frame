@@ -74,7 +74,7 @@ export default function rates (pylon: Pylon, store: Store) {
   function handleChainUpdates (updates: ChainUpdate[]) {
     if (updates.length === 0) return
 
-    log.verbose(`got chain updates for ${updates.map(u => u.id)}`)
+    log.debug(`got chain updates for ${updates.map(u => u.id)}`)
 
     updates.forEach(update => {
       storeApi.setNativeCurrencyData(update.data.chainId, {

@@ -5,7 +5,7 @@ export default function inventory (pylon: Pylon, store: Store) {
   function handleUpdates (updates: any[]) {
     if (updates.length === 0) return
 
-    log.verbose(`got inventory updates for ${updates.map(u => u.id)}`)
+    log.debug(`got inventory updates for ${updates.map(u => u.id)}`)
 
     updates.forEach(update => {
       store.setInventory(update.id, update.data.inventory)

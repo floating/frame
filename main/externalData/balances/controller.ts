@@ -1,13 +1,12 @@
 import log from 'electron-log'
-import { ChildProcess, fork } from 'child_process'
-
-import { CurrencyBalance, TokenBalance } from './scan'
 import path from 'path'
+import { ChildProcess, fork } from 'child_process'
 import { EventEmitter } from 'stream'
 
+import { CurrencyBalance, TokenBalance } from './scan'
+
 interface WorkerMessage {
-  type: string,
-  [key: string]: any
+  type: string
 }
 
 interface TokenBalanceMessage extends Omit<WorkerMessage, 'type'> {
@@ -36,7 +35,7 @@ export default class BalancesWorkerController extends EventEmitter {
     log.info('created balances worker, pid:', this.worker.pid)
 
     this.worker.on('message', (message: WorkerMessage) => {
-      log.debug(`balances controller message: ${JSON.stringify(message)}`)
+      log.debug(`balances controller received message: ${JSON.stringify(message)}`)
 
       if (message.type === 'ready') {
         log.info(`balances worker ready, pid: ${this.worker.pid}`)
@@ -52,8 +51,8 @@ export default class BalancesWorkerController extends EventEmitter {
       }
 
       if (message.type === 'tokenBalances') {
-        const { address, balances, source } = (message as TokenBalanceMessage)
-        this.emit('tokenBalances', address, balances, source)
+        const { address, balances } = (message as TokenBalanceMessage)
+        this.emit('tokenBalances', address, balances)
       }
     })
   

@@ -77,7 +77,7 @@ export default function (store: Store) {
   function startScan (address: Address) {
     stopScan()
 
-    log.debug(`starting balances scan for ${address}`)
+    log.verbose(`starting balances scan for ${address}`)
 
     const scanForAddress = () => {
       // update balances for the active account every 20 seconds
