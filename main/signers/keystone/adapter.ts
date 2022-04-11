@@ -1,18 +1,20 @@
 import log from 'electron-log'
 
 // @ts-ignore
-import { v5 as uuid } from 'uuid'
+import { v5 as uuid, stringify } from 'uuid'
 
 import { SignerAdapter } from '../adapters'
 import Keystone from './Keystone'
 import store from '../../store'
-import { CryptoAccount, CryptoHDKey } from "@keystonehq/bc-ur-registry-eth";
+import { CryptoAccount, CryptoHDKey, ETHSignature } from "@keystonehq/bc-ur-registry-eth";
+import { SignRequest } from "./Keystone/KeystoneInteractionProvider";
 
 const ns = '3bbcee75-cecc-5b56-8031-b6641c1ed1f1'
 
 export default class KeystoneSignerAdapter extends SignerAdapter {
   private knownSigners: { [id: string]: Keystone }
   private observer: any;
+  private signerObserver: any;
 
   constructor() {
     super('keystone')
@@ -31,6 +33,25 @@ export default class KeystoneSignerAdapter extends SignerAdapter {
           }
         }
       })
+    })
+
+    this.signerObserver = store.observer(() => {
+      const signRequests = store('main.keystone.signRequests')
+      const signature = store('main.keystone.signature')
+
+      if(signature){
+        const currentSignRequest = signRequests.find((signRequest: SignRequest) => {
+          const ethSignature = ETHSignature.fromCBOR(Buffer.from(signature.cbor, 'hex'))
+          const signId = stringify(ethSignature.getRequestId())
+          return signId === signRequest.request.requestId
+        })
+
+        if(currentSignRequest){
+          const {signerId, request} = currentSignRequest
+          const currentSigner = this.knownSigners[signerId]
+          currentSigner.keystoneKeyring.submitSignature(request.requestId, signature.cbor)
+        }
+      }
     })
 
     super.open()
