@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'beta.*'
+      - 'build-usb-deps'
 
 jobs:
 
