@@ -22,7 +22,7 @@ jobs:
         node-version: 16.13.2
     - run: echo "hello, world!"
     - name: install Linux dev tools
-      if: ${{ matrix.os }} == ubuntu-latest
+      if: ${{ matrix.os }} == ubuntau-latest
       run: sudo apt install -y libudev-dev
 
   build:
