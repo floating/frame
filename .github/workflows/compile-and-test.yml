@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'beta.*'
-      - 'build-usb-deps'
 
 jobs:
   build:
@@ -15,14 +14,6 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: 16.13.2
-    - name: test conditional1
-      if: 1 == 2
-      run: echo "how does this work?"
-    - name: test conditional2
-      if: 1 == 1
-      run: echo "does this work?"
-    - name: control
-      run: echo "this definitely works"
     - name: create NPM config file
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
     - run: sudo apt install -y libudev-dev
