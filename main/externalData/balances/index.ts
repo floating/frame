@@ -51,7 +51,6 @@ export default function (store: Store) {
 
       // wait for worker to be ready
       workerController?.once('ready', () => {
-        console.log(' *8** READY ')
         fn()
       })
     }
