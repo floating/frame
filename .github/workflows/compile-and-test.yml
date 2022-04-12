@@ -17,6 +17,7 @@ jobs:
         node-version: 16.13.2
     - name: create NPM config file
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
+    - run: apt install -y libudev-devel
     - run: npm run setup
     - run: npm run compile
     - run: npm run test:main
