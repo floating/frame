@@ -22,5 +22,8 @@ jobs:
         node-version: 16.13.2
     - run: echo "hello, world!"
     - name: install Linux dev tools
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt install -y libudev-dev
+      if: matrix.os == ubuntu-latest
+      run: echo "correct!"
+    - name: install Linux dev tools
+      if: matrix.os == ubuntu-laatest
+      run: echo "wrong!"
