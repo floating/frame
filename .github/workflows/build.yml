@@ -1,4 +1,4 @@
-name: Build and publish installer artifacts
+name: Build and publish installer artifacts for all platforms
 
 on:
   push:
