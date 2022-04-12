@@ -6,6 +6,24 @@ on:
       - 'beta.*'
 
 jobs:
+
+  test_conditional:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 16.13.2
+    - run: echo "hello, world!"
+    - name: install Linux dev tools
+        if: ${{ matrix.os }} == ubuntu-latest
+        run: sudo apt install -y libudev-dev
+        
   build:
     runs-on: ubuntu-latest
 
