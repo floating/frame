@@ -113,10 +113,14 @@ export default function rates (pylon: Pylon, store: Store) {
   }
 
   function setAssets (assetIds: AssetId[]) {
-    log.verbose('setting ids for asset updates', JSON.stringify(assetIds))
+    const chains = [...new Set(assetIds.map(id => id.chainId))]
+
+    log.verbose('subscribing to rates updates for native currencies on chains:', assetIds.filter(a => a.type === AssetType.NativeCurrency).map(a => a.chainId))
+    log.verbose('subscribing to rates updates for tokens:', assetIds.filter(a => a.type === AssetType.Token).map(a => a.address))
+    log.verbose('subscribing to chain updates for chains:', chains)
 
     pylon.rates(assetIds)
-    pylon.chains([...new Set(assetIds.map(id => id.chainId))])
+    pylon.chains(chains)
   }
 
   return {

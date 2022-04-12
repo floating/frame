@@ -37,16 +37,6 @@ const main = (path, def) => {
   return found
 }
 
-function loadAccounts () {
-  const accounts = main('accounts', {})
-  const updatedEntries = Object.entries(accounts).map(([id, account]) => {
-    // remove lastUpdated from balances
-    return [id, { ...account, balances: { lastUpdated: undefined } }]
-  })
-
-  return Object.fromEntries(updatedEntries)
-}
-
 const initial = {
   panel: { // Panel view
     show: false,
@@ -200,7 +190,7 @@ const initial = {
     trezor: {
       derivation: main('trezor.derivation', 'standard')
     },
-    accounts: loadAccounts(),
+    accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
     balances: {},
@@ -580,10 +570,24 @@ const initial = {
   }
 }
 
-// Remove permissions granted to unknown origins
+// --- remove state that should not persist from session to session
+
 Object.keys(initial.main.accounts).forEach(id => {
+  // Remove permissions granted to unknown origins
   const permissions = initial.main.permissions[id]
   if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
+
+  // remote lastUpdated timestamp from balances
+  initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
+
+Object.entries(initial.main.networksMeta).forEach(([platform, chains]) => {
+  Object.values(chains).forEach(chainMeta => {
+    // remove stale price data
+    chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
+  })
+})
+
+// ---
 
 module.exports = () => migrations.apply(initial)
