@@ -38,6 +38,14 @@
     ]
   },
   "scripts": {
+    "clean": "npx rimraf dist bundle compiled .cache node_modules",
+    "setup:full": "npm run clean && npm cache clean --force && npm install --cache /tmp/empty-cache --ignore-scripts && allow-scripts && npm audit fix",
+    "setup:clean": "npm run clean && npm run setup",
+    "setup": "npm install --ignore-scripts && npm run install:scripts",
+    "install:scripts": "allow-scripts",
+
+    "rebuild:usb": "electron-rebuild --forceAbi 98 -o usb-detection",
+
     "start": "npm run launch",
     "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash  && npm run bundle:dapp && npm run bundle:dapp:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
@@ -64,16 +72,13 @@
     "launch:inspect": "cross-env NODE_ENV=production LOG_LEVEL=verbose electron --inspect ./compiled/main",
     "prod": "npm run compile && npm run bundle && npm run launch",
     "hot": "npm run compile && npm run bundle && npm run launch:hot",
-    "clean": "rimraf dist bundle compiled .cache package-lock.json \"node_modules/!(rimraf|.bin)\" && npm cache clean --force && npm run setup && npm audit fix && npm run bundle",
-    "scrub": "npx rimraf dist bundle compiled .cache node_modules && npm run setup",
-    "setup": "npm install --ignore-scripts && allow-scripts",
     "watch:compile": "shx mkdir -p ./compiled/main/windows && npm run copy-assets && tsc -w",
     "compile": "tsc && npm run copy-assets",
     "build": "npm run compile && sleep 4 && npm run bundle && sleep 4 && electron-builder",
     "copy-assets": "shx cp ./main/windows/*.png ./compiled/main/windows",
     "publish": "electron-builder -c.snap.publish=github",
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && npm run publish",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps && npm run rebuild:usb",
     "test": "npm run compile && npm run test:main && npm run test:components && npm run test:e2e",
     "test:unit": "jest --detectOpenHandles --runInBand",
     "test:main": "jest --env=node --detectOpenHandles --runInBand ./test/main",
@@ -180,6 +185,7 @@
     "electron": "15.5.1",
     "electron-builder": "23.0.3",
     "electron-notarize": "1.2.1",
+    "electron-rebuild": "^3.2.7",
     "hardhat": "2.9.3",
     "jest": "27.5.1",
     "node-watch": "0.7.3",
@@ -233,7 +239,8 @@
       "hdkey>secp256k1": true,
       "node-hid": false,
       "@aragon/wrapper>web3>web3-core>web3-core-requestmanager>web3-providers-ws>@web3-js/websocket>es5-ext": true,
-      "gridplus-sdk>secp256k1": true
+      "gridplus-sdk>secp256k1": true,
+      "electron-rebuild>lzma-native": true
     }
   }
 }
