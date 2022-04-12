@@ -581,9 +581,11 @@ Object.keys(initial.main.accounts).forEach(id => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
-Object.values(initial.main.networksMeta).forEach(meta => {
-  // remove stale price data
-  meta.nativeCurrency = { ...meta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
+Object.entries(initial.main.networksMeta).forEach(([platform, chains]) => {
+  Object.values(chains).forEach(chainMeta => {
+    // remove stale price data
+    chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
+  })
 })
 
 // ---

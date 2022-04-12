@@ -42,6 +42,21 @@ export default function (store: Store) {
     attemptRestart()
   }
 
+  function runWhenReady (fn: () => any) {
+    if (workerController?.isRunning()) {
+      // worker is running, start the scan
+      fn()
+    } else {
+      log.verbose('worker controller not running yet, waiting for ready event')
+
+      // wait for worker to be ready
+      workerController?.once('ready', () => {
+        console.log(' *8** READY ')
+        fn()
+      })
+    }
+  }
+
   function start () {
     log.verbose('starting balances updates')
 
@@ -88,15 +103,7 @@ export default function (store: Store) {
       scan = setTimeout(() => scanForAddress(), 20 * 1000)
     }
 
-    if (workerController?.isRunning()) {
-      // worker is running, start the scan
-      scanForAddress()
-    } else {
-      log.debug('worker controller not running yet, waiting for ready event')
-
-      // wait for worker to be ready
-      workerController?.once('ready', () => scanForAddress())
-    }
+    runWhenReady(() => scanForAddress())
   }
 
   function stopScan () {
@@ -204,7 +211,7 @@ export default function (store: Store) {
     }
 
     log.verbose('adding balances updates', { address, chains })
-    updateBalances(address, chains)
+    runWhenReady(() => updateBalances(address, chains))
   }
 
   function addTokens (address: Address, tokens: Token[]) {
@@ -213,7 +220,7 @@ export default function (store: Store) {
     }
 
     log.verbose('adding balances updates', { address, tokens: tokens.map(t => t.address) })
-    workerController.updateKnownTokenBalances(address, tokens)
+    runWhenReady(() => workerController?.updateKnownTokenBalances(address, tokens))
   }
 
   return { start, stop, setAddress, addNetworks, addTokens }
