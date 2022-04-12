@@ -16,10 +16,10 @@ jobs:
       with:
         node-version: 16.13.2
     - name: test conditional1
-      if: 1 === 2
+      if: 1 == 2
       run: echo "how does this work?"
     - name: test conditional2
-      if: 1 === 1
+      if: 1 == 1
       run: echo "does this work?"
     - name: control
       run: echo "this definitely works"
