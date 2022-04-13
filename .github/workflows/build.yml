@@ -1,7 +1,9 @@
 name: Build and publish installer artifacts for all platforms
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Compile and run unit tests
     branches:
       - '0.5'
       - 'windows-build'
