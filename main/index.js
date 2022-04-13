@@ -1,10 +1,15 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, BrowserWindow } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, crashReporter, BrowserWindow } = require('electron')
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
 app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
+
+crashReporter.start({
+  submitURL: 'http://crash.frame.sh/',
+  rateLimit: true
+})
 
 const path = require('path')
 process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
@@ -69,10 +74,7 @@ process.on('uncaughtException', (e) => {
   }
   log.error('uncaughtException')
   log.error(e)
-  // Kill all clients running as child processes
-  // clients.stop()
-  throw e
-  // setTimeout(() => app.quit(), 50)
+  app.quit()
 })
 
 const externalWhitelist = [
@@ -141,7 +143,7 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  const validHost = externalWhitelist.some(entry => url.startsWith(entry))
+  const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
   if (validHost) shell.openExternal(url)
 })
 

@@ -38,7 +38,7 @@ class CustomTokens extends React.Component {
                     <div className='customTokensListItemTitle'>
                       <div className='customTokensListItemName'>
                         <img 
-                          src={`https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`}
+                          src={token.logoURI && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`}
                           value={token.symbol.toUpperCase()}
                           alt={token.symbol.toUpperCase()}
                         />

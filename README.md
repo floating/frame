@@ -46,7 +46,7 @@ Frame is a native web3 interface that lets you sign data, securely manage accoun
 › git clone https://github.com/floating/frame
 
 # Install
-› npm install
+› npm run setup
 
 # Run
 › npm run prod

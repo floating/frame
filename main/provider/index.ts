@@ -50,6 +50,11 @@ export interface TransactionMetadata {
   approvals: RequiredApproval[]
 }
 
+function isScanning (account: Address) {
+  const lastUpdated = store('main.accounts', account, 'balances.lastUpdated') as Date
+  return !lastUpdated || (new Date().getTime() - lastUpdated.getTime()) > (1000 * 60 * 5)
+}
+
 function getNativeCurrency (chainId: number) {
   const currency = store('main.networksMeta.ethereum', chainId, 'nativeCurrency')
 
@@ -459,8 +464,11 @@ export class Provider extends EventEmitter {
           return reject(response.error)
         }
 
-        log.verbose(`gas estimate for tx to ${txParams.to}: ${response.result}`)
-        return resolve(response.result)
+        const estimatedLimit = parseInt(response.result, 16)
+        const paddedLimit = Math.ceil(estimatedLimit * 1.15)
+
+        log.verbose(`gas estimate for tx to ${txParams.to}: ${estimatedLimit}, using ${paddedLimit} as gas limit`)
+        return resolve(addHexPrefix(paddedLimit.toString(16)))
       }, targetChain)
     })
   }
@@ -887,8 +895,7 @@ export class Provider extends EventEmitter {
     const currentAccount = accounts.current()
     if (!currentAccount) return this.resError('no account selected', payload, cb)
 
-    const isScanning = store('main.scanning', currentAccount.id)
-    if (isScanning) return this.resError({ message: 'assets not known for account', code: 5901 }, payload, cb)
+    if (isScanning(currentAccount.id)) return this.resError({ message: 'assets not known for account', code: 5901 }, payload, cb)
 
     const { nativeCurrency, erc20 } = loadAssets(currentAccount.id)
     const { id, jsonrpc } = payload
@@ -943,11 +950,9 @@ export class Provider extends EventEmitter {
     if (method === 'eth_unsubscribe' && this.ifSubRemove(payload.params[0])) return res({ id: payload.id, jsonrpc: '2.0', result: true }) // Subscription was ours
     if (method === 'eth_sign' || method === 'personal_sign') return this.sign(payload, res)
 
-    const signTypedDataMatcher = /eth_signTypedData_?(v[134]|$)/
-    const signTypedDataRequest = method.match(signTypedDataMatcher)
-
-    if (signTypedDataRequest) {
-      const version = (signTypedDataRequest[1] || 'v1').toUpperCase() as Version
+    if (['eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].includes(method)) {
+      const underscoreIndex = method.lastIndexOf('_')
+      const version = (underscoreIndex > 3 ? method.substring(underscoreIndex + 1) : 'v1').toUpperCase() as Version
       return this.signTypedData(payload, version, res)
     }
     
@@ -1010,10 +1015,9 @@ store.observer(() => {
   const currentAccountId = store('selected.current')
 
   if (currentAccountId) {
-    const isScanning = store('main.scanning', currentAccountId)
     const assets = loadAssets(currentAccountId)
 
-    if (!isScanning && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
+    if (!isScanning(currentAccountId) && (assets.erc20.length > 0 || assets.nativeCurrency.length > 0)) {
       if (!debouncedAssets) {
         setTimeout(() => {
           if (debouncedAssets) {

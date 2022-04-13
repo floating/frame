@@ -44,7 +44,6 @@ beforeEach(() => {
   eventTypes.forEach(eventType => provider.subscriptions[eventType] = [])
 
   accountRequests = []
-  store.set('main.scanning', address, false)
   store.set('main.accounts', {})
   store.set('main.currentNetwork.id', 1)
 
@@ -269,13 +268,14 @@ describe('#send', () => {
           expect(response.error).toBe(undefined)
 
           const permissions = response.result
-          expect(permissions).toHaveLength(14)
+          expect(permissions).toHaveLength(15)
           expect(permissions.map(p => p.parentCapability)).toEqual(expect.arrayContaining(
             [
               'eth_coinbase',
               'eth_accounts',
               'eth_requestAccounts',
               'eth_sendTransaction',
+              'eth_sendRawTransaction',
               'personal_sign',
               'personal_ecRecover',
               'eth_sign',
@@ -454,7 +454,8 @@ describe('#send', () => {
       }
     ]
 
-    beforeAll(() => {
+    beforeEach(() => {
+      store.set('main.accounts', address, { balances: { lastUpdated: new Date() } })
       store.set('main.balances', address, balances)
     })
 
@@ -494,7 +495,10 @@ describe('#send', () => {
     })
 
     it('returns an error while scanning', done => {
-      store.set('main.scanning', address, true)
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+
+      store.set('main.accounts', address, 'balances.lastUpdated', yesterday)
 
       send({ method: 'wallet_getAssets', id: 51, jsonrpc: '2.0' }, response => {
         expect(response.id).toBe(51)
@@ -603,22 +607,22 @@ describe('#send', () => {
 
       const chainIds = [1, 137]
 
-        chainIds.forEach(chainId => {
-          store.set('main.networksMeta.ethereum', chainId, 'gas', {
-            price: {
-              selected: 'standard',
-              levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
-              fees: {
-                maxPriorityFeePerGas: gweiToHex(1),
-                maxBaseFeePerGas: gweiToHex(8)
-              }
+      chainIds.forEach(chainId => {
+        store.set('main.networksMeta.ethereum', chainId, 'gas', {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
+            fees: {
+              maxPriorityFeePerGas: gweiToHex(1),
+              maxBaseFeePerGas: gweiToHex(8)
             }
-          })
-
-          connection.connections.ethereum[chainId] = {
-            chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
           }
         })
+
+        connection.connections.ethereum[chainId] = {
+          chainConfig: chainConfig(chainId, chainId === 1 ? 'london' : 'istanbul')
+        }
+      })
     })
 
     it('rejects a transaction with a mismatched chain id', done => {
@@ -650,6 +654,23 @@ describe('#send', () => {
         try {
           const initialRequest = accountRequests[0]
           expect(initialRequest.data.chainId).toBe('0x89')
+          done()
+        } catch (e) { done(e) }
+      })
+    })
+
+    it('pads the gas estimate from the network by 15 percent', done => {
+      connection.send.mockImplementationOnce((payload, cb) => {
+        expect(payload.method).toBe('eth_estimateGas')
+        cb({ result: addHexPrefix((150000).toString(16)) })
+      })
+
+      delete tx.gasLimit
+
+      sendTransaction(() => {
+        try {
+          const initialRequest = accountRequests[0]
+          expect(initialRequest.data.gasLimit).toBe(addHexPrefix((172500).toString(16)))
           done()
         } catch (e) { done(e) }
       })
@@ -993,14 +1014,18 @@ describe('#send', () => {
       })
     })
 
-    it('passes a request with an unknown version through to the connection', done => {
-      mockConnectionError('received unhandled request')
+    const unknownVersions = ['_v5', '_v1.1', 'v3']
 
-      const params = [address, 'test']
-
-      send({ method: 'eth_signTypedData_v5', params }, err => {
-        expect(err.error.message).toBe('received unhandled request')
-        done()
+    unknownVersions.forEach(versionExtension => {
+      it(`passes a request with unhandled method eth_signTypedData${versionExtension} through to the connection`, done => {
+        mockConnectionError('received unhandled request')
+  
+        const params = [address, 'test']
+  
+        send({ method: `eth_signTypedData${versionExtension}`, params }, err => {
+          expect(err.error.message).toBe('received unhandled request')
+          done()
+        })
       })
     })
   })
@@ -1335,6 +1360,9 @@ describe('state change events', () => {
     const account = '0xce070f8134f69a4d55cc4bef4a7c8d0bb56ff1d9'
 
     beforeEach(() => {
+      accounts.current = () => ({ id: account })
+      store.set('main.accounts', account, 'balances.lastUpdated', new Date())
+
       provider.subscriptions.assetsChanged.push(subscriptionId)
       provider.removeAllListeners('data:address')
     })
@@ -1420,14 +1448,22 @@ describe('state change events', () => {
       store.getObserver('provider:account').fire()
     })
 
-    it('does not fire an assetsChanged event while scanning', () => {
-      provider.once('data:address', () => { throw new Error('event fired while still scanning!') })
+    it('does not fire an assetsChanged event while scanning', async () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
 
+      store.set('main.accounts', account, 'balances.lastUpdated', yesterday)
       store.set('main.balances', account, [{ address: '0xany' }])
       store.set('selected.current', account)
-      store.set('main.scanning', account, true)
 
-      store.getObserver('provider:account').fire()
+      return new Promise((resolve, reject) => {
+        provider.once('data:address', () => reject('event fired while still scanning!'))
+
+        store.getObserver('provider:account').fire()
+        jest.advanceTimersByTime(800)
+
+        resolve()
+      })
     })
   })
 })

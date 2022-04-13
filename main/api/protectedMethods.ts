@@ -3,6 +3,7 @@ export default [
   'eth_accounts',
   'eth_requestAccounts',
   'eth_sendTransaction',
+  'eth_sendRawTransaction',
   'personal_sign',
   'personal_ecRecover',
   'eth_sign',

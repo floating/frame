@@ -193,7 +193,7 @@ const initial = {
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
     permissions: main('permissions', {}),
-    balances: [],
+    balances: {},
     tokens: main('tokens', { custom: [], known: {} }),
     rates: {}, // main('rates', {}),
     inventory: {}, // main('rates', {}),
@@ -570,10 +570,24 @@ const initial = {
   }
 }
 
-// Remove permissions granted to unknown origins
+// --- remove state that should not persist from session to session
+
 Object.keys(initial.main.accounts).forEach(id => {
+  // Remove permissions granted to unknown origins
   const permissions = initial.main.permissions[id]
   if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
+
+  // remote lastUpdated timestamp from balances
+  initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
+
+Object.entries(initial.main.networksMeta).forEach(([platform, chains]) => {
+  Object.values(chains).forEach(chainMeta => {
+    // remove stale price data
+    chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
+  })
+})
+
+// ---
 
 module.exports = () => migrations.apply(initial)

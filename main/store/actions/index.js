@@ -125,6 +125,13 @@ module.exports = {
     u('selected.minimized', _ => false)
     u('selected.open', _ => true)
   },
+  accountTokensUpdated: (u, address) => {
+    u('main.accounts', address, account => {
+      account.balances = { ...account.balances, lastUpdated: new Date() }
+
+      return account
+    })
+  },
   updateAccount: (u, updatedAccount) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
@@ -238,8 +245,8 @@ module.exports = {
       u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
-  setNativeCurrency: (u, netType, netId, currency) => {
-    u('main.networksMeta', netType, netId, 'nativeCurrency', () => currency)
+  setNativeCurrencyData: (u, netType, netId, currency) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency', existing => ({ ...existing, ...currency }))
   },
   addNetwork: (u, net) => {
     try {
@@ -429,7 +436,6 @@ module.exports = {
     u('main.ipfs', () => ipfs)
   },
   setRates: (u, rates) => {
-    u('main.initialRateScan', () => true)
     u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
   // Inventory
@@ -446,7 +452,6 @@ module.exports = {
   // Tokens
   setBalances: (u, address, newBalances) => {
     u('main.balances', address, (balances = []) => {
-      // remove zero balances
       const existingBalances = balances.filter(b => {
         return newBalances.every(bal => bal.chainId !== b.chainId || bal.address !== b.address)
       })
