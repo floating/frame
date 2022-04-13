@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'beta.*'
+      - '0.5'
 
 jobs:
   build:

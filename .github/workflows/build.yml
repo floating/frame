@@ -1,10 +1,11 @@
 name: Build and publish installer artifacts for all platforms
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Compile and run unit tests"]
+    types: [completed]
     branches:
       - '0.5'
-      - 'windows-build'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
