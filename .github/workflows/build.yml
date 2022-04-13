@@ -1,9 +1,7 @@
 name: Build and publish installer artifacts for all platforms
 
 on:
-  workflow_run:
-    workflows: ["Compile and run unit tests"]
-    types: [completed]
+  push:
     branches:
       - '0.5'
 
