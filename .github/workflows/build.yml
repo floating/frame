@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - '0.5'
-      - 'update-win-build'
+      - 'windows-build'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
