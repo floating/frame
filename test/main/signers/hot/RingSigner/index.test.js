@@ -128,14 +128,16 @@ describe('Ring signer', () => {
   }, 1000)
 
   test('Add private key', done => {
-    const privateKey = crypto.randomBytes(32).toString('hex')
-    signer.addPrivateKey(privateKey, PASSWORD, err => {
-      try {
-        expect(err).toBe(null)
-        expect(signer.addresses.length).toBe(2)
-        done()
-      } catch (e) { done(e) }
-    })
+    try {
+      const privateKey = crypto.randomBytes(32).toString('hex')
+      signer.addPrivateKey(privateKey, PASSWORD, err => {
+        try {
+          expect(err).toBe(null)
+          expect(signer.addresses.length).toBe(2)
+          done()
+        } catch (e) { done(e) }
+      })
+    } catch (e) { done(e) }
   }, 400)
 
   test('Remove private key', done => {
