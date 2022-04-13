@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'beta.*'
-      - 'windows-build'
 
 jobs:
   build:
