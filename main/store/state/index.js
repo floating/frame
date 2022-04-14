@@ -1,4 +1,4 @@
-const { v5: uuidv5 } = require('uuid')
+const { v4: generateUuid, v5: uuidv5 } = require('uuid')
 
 const persist = require('../persist')
 const migrations = require('../migrations')
@@ -143,7 +143,8 @@ const initial = {
   },
   platform: process.platform,
   main: {
-    _version: main('_version', 18),
+    _version: main('_version', 19),
+    instanceId: main('instanceId', generateUuid()),
     colorway: main('colorway', 'dark'),
     colorwayPrimary: {
       dark: {

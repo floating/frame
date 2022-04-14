@@ -1,4 +1,5 @@
-const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, crashReporter, BrowserWindow } = require('electron')
+const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, BrowserWindow } = require('electron')
+
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -6,10 +7,9 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-crashReporter.start({
-  submitURL: 'http://crash.frame.sh/',
-  rateLimit: true
-})
+setTimeout(() => {
+  myUndefinedFunction()
+}, 9000)
 
 const path = require('path')
 process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
@@ -17,6 +17,7 @@ process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__d
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
 
+const Sentry = require('@sentry/electron')
 const log = require('electron-log')
 const url = require('url')
 
@@ -28,6 +29,41 @@ const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store').default
 const dapps = require('./dapps').default
+
+function getCrashReportFields () {
+  const fields = ['networks', 'networksMeta', 'tokens']
+
+  return fields.reduce((extra, field) => {
+    return { ...extra, [field]: JSON.stringify(store('main', field) || {}) }
+    // if (field === 'accounts') {
+    //   // scrub account information
+    //   const accountData = Object.fromEntries(Object.entries(store('main.accounts') || {}).map(([id, account]) => {
+    //     return [
+    //       truncateAddress(id),
+    //       {
+    //         ...account,
+    //         id: truncateAddress(account.id),
+    //         address: truncateAddress(account.address)
+    //       }
+    //     ]
+    //   }))
+
+    //   return { ...extra, accounts: JSON.stringify(accountData) }
+    // }
+  }, {})
+}
+
+Sentry.init({
+  dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069',
+  beforeSend: (evt) => {
+    return {
+      ...evt,
+      user: { ...evt.user, ip_address: undefined }, // remove IP address
+      tags: { ...evt.tags, 'frame.instance_id': store('main.instanceId') },
+      extra: getCrashReportFields()
+    }
+  }
+})
 
 // if (process.defaultApp) {
 //   if (process.argv.length >= 2) {
@@ -74,6 +110,7 @@ process.on('uncaughtException', (e) => {
   }
   log.error('uncaughtException')
   log.error(e)
+
   app.quit()
 })
 
