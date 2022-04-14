@@ -137,7 +137,7 @@ module.exports = {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
       // if (add) return updatedAccount // Account is new and should be added
-      return { ...updatedAccount, balances: account.balances }
+      return { ...updatedAccount, balances: (account || {}).balances }
     })
   },
   removeAccount: (u, id) => {
