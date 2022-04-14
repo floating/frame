@@ -94,7 +94,7 @@ describe('Seed signer', () => {
         done()
       })
     } catch (e) { done (e) }
-  }, 400)
+  }, 2000)
 
   test('Unlock', (done) => {
     try {
