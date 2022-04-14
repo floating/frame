@@ -43,7 +43,6 @@
     "setup:clean": "npm run clean && npm run setup",
     "setup": "npm install --ignore-scripts && npm run install:scripts",
     "install:scripts": "allow-scripts",
-
     "start": "npm run launch",
     "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:dash  && npm run bundle:dapp && npm run bundle:dapp:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --public-url . -d bundle -o bridge.js --target electron",
@@ -171,6 +170,7 @@
     "@lavamoat/preinstall-always-fail": "^1.0.0",
     "@ledgerhq/hw-transport-mocker": "6.24.1",
     "@nomiclabs/hardhat-waffle": "2.0.3",
+    "@sentry/electron": "^3.0.7",
     "@testing-library/react": "^13.0.0",
     "@types/cookie": "0.4.1",
     "@types/get-pixels": "3.3.2",

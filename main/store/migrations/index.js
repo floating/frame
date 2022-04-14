@@ -1,9 +1,5 @@
 import log from 'electron-log'
 
-function randomLetters (num) {
-  return [...Array(num)].map(() => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
-}
-
 const migrations = {
   4: initial => {
     // If persisted state still has main.gasPrice, move gas settings into networks
