@@ -51,8 +51,8 @@ export interface TransactionMetadata {
 }
 
 function isScanning (account: Address) {
-  const lastUpdated = store('main.accounts', account, 'balances.lastUpdated') as Date
-  return !lastUpdated || (new Date().getTime() - lastUpdated.getTime()) > (1000 * 60 * 5)
+  const lastUpdated = store('main.accounts', account, 'balances.lastUpdated') as number
+  return !lastUpdated || (new Date().getTime() - lastUpdated) > (1000 * 60 * 5)
 }
 
 function getNativeCurrency (chainId: number) {

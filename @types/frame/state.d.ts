@@ -140,5 +140,8 @@ interface Account {
   smart?: any,
   requests: Record<string, any>,
   ensName: string,
-  created: string
+  created: string,
+  balances: {
+    lastUpdated?: number
+  }
 }
