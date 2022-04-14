@@ -7,10 +7,6 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist', true)
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
-setTimeout(() => {
-  myUndefinedFunction()
-}, 9000)
-
 const path = require('path')
 process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
