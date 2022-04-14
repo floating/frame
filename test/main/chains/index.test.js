@@ -198,7 +198,7 @@ Object.values(mockConnections).forEach(chain => {
     })
     
     store.toggleConnection('ethereum', chain.id, 'primary', true)
-  })
+  }, 500)
 
   it(`sets fee market prices on a new London block on ${chain.name}`, done => {
     block = {
@@ -225,5 +225,5 @@ Object.values(mockConnections).forEach(chain => {
     })
     
     store.toggleConnection('ethereum', chain.id, 'primary', true)
-  })
+  }, 500)
 })
