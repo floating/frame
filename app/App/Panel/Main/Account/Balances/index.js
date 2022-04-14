@@ -202,7 +202,6 @@ class Balances extends React.Component {
 
     // scan if balances are more than a minute old
     const scanning = !lastBalanceUpdate || (new Date() - new Date(lastBalanceUpdate)) > (1000 * 60)
-
     const hotSigner = ['ring', 'seed'].includes(lastSignerType)
 
     return (

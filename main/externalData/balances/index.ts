@@ -184,7 +184,6 @@ export default function (store: Store) {
       if (zeroBalances.length > 0) {
         store.removeKnownTokens(address, zeroBalances)
       }
-
     }
 
     store.accountTokensUpdated(address)

@@ -45,7 +45,7 @@ class Main extends React.Component {
 
       return 0
     } catch (e) {
-      log.error(e)
+      console.error(e)
       return 0
     }
   }

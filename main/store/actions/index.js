@@ -127,16 +127,17 @@ module.exports = {
   },
   accountTokensUpdated: (u, address) => {
     u('main.accounts', address, account => {
-      account.balances = { ...account.balances, lastUpdated: new Date() }
+      const balances = { ...account.balances, lastUpdated: new Date().getTime() }
+      const updated = { ...account, balances }
 
-      return account
+      return updated
     })
   },
   updateAccount: (u, updatedAccount) => {
     u('main.accounts', updatedAccount.id, account => {
       // if (account) return updatedAccount // Account exists
       // if (add) return updatedAccount // Account is new and should be added
-      return updatedAccount
+      return { ...updatedAccount, balances: (account || {}).balances }
     })
   },
   removeAccount: (u, id) => {
