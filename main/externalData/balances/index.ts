@@ -68,11 +68,7 @@ export default function (store: Store) {
 
   function restart () {
     start()
-
-    const activeAddress = storeApi.getActiveAddress()
-    if (activeAddress) {
-      startScan(activeAddress)
-    }
+    setAddress(storeApi.getActiveAddress())
   }
 
   function stop () {
@@ -191,7 +187,8 @@ export default function (store: Store) {
 
   function setAddress (address: Address) {
     if (!workerController) {
-      throw new Error('balances controller not started!')
+      log.warn(`tried to set address to ${address} but balances controller is not running`)
+      return
     }
 
     if (address) {
@@ -205,7 +202,8 @@ export default function (store: Store) {
 
   function addNetworks (address: Address, chains: number[]) {
     if (!workerController) {
-      throw new Error('balances controller not started!')
+      log.warn('tried to add networks but balances controller is not running')
+      return
     }
 
     log.verbose('adding balances updates', { address, chains })
@@ -214,7 +212,8 @@ export default function (store: Store) {
 
   function addTokens (address: Address, tokens: Token[]) {
     if (!workerController) {
-      throw new Error('balances controller not started!')
+      log.warn('tried to add tokens but balances controller is not running')
+      return
     }
 
     log.verbose('adding balances updates', { address, tokens: tokens.map(t => t.address) })
