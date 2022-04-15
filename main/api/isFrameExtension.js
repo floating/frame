@@ -10,7 +10,7 @@ module.exports = req => {
   // Match production extension ids exactly
   if (
     origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf' || // production chrome
-    origin === 'moz-extension://bd0560a2-8c13-4cb4-a856-eceab7e771d8', // production firefox
+    origin === 'moz-extension://bd0560a2-8c13-4cb4-a856-eceab7e771d8' || // production firefox
     origin === 'safari-web-extension://7655eadc-658f-4faf-b22c-bff822d0154e' // production safari
   ) {
     return true
