@@ -84,7 +84,6 @@ export default function (store: Store) {
     }
   }
 
-  let tested = false
   function startScan (address: Address) {
     stopScan()
 
@@ -97,34 +96,6 @@ export default function (store: Store) {
       }, 0)
 
       scan = setTimeout(() => scanForAddress(), 20 * 1000)
-    }
-
-    if (!tested) {
-
-      setTimeout(() => {
-        // --> simulate worker closing for whatever reason
-        workerController?.emit('close')
-
-        // --> clear token balances
-        const balances = storeApi.getTokenBalances(address)
-        balances.forEach(bal => {
-          store.removeBalance(bal.chainId, bal.address)
-        })
-
-        // --> simulate sleep and network de-activating
-        setTimeout(() => {
-          store.activateNetwork('ethereum', 4, false)
-        }, 500)
-
-        // --> simulate wake up and network re-activating before controller is restarted
-        // on 5 second timeout
-        setTimeout(() => {
-          store.activateNetwork('ethereum', 4, true)
-        }, 2000)
-
-        // verify scan starts with active address and balances come back when worker restart
-      }, 9000)
-      tested = true
     }
 
     runWhenReady(() => scanForAddress())
