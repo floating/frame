@@ -659,7 +659,7 @@ describe('#send', () => {
       })
     })
 
-    it('pads the gas estimate from the network by 15 percent', done => {
+    it('pads the gas estimate from the network by 50 percent', done => {
       connection.send.mockImplementationOnce((payload, cb) => {
         expect(payload.method).toBe('eth_estimateGas')
         cb({ result: addHexPrefix((150000).toString(16)) })
@@ -670,7 +670,7 @@ describe('#send', () => {
       sendTransaction(() => {
         try {
           const initialRequest = accountRequests[0]
-          expect(initialRequest.data.gasLimit).toBe(addHexPrefix((172500).toString(16)))
+          expect(initialRequest.data.gasLimit).toBe(addHexPrefix((225000).toString(16)))
           done()
         } catch (e) { done(e) }
       })
