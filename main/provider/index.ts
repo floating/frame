@@ -922,8 +922,12 @@ export class Provider extends EventEmitter {
 
   sendAsync (payload: RPCRequestPayload, cb: Callback<RPCResponsePayload>) {
     this.send(payload, res => {
-      if (res.error) return cb(new Error(`sendAsync Error: ${res.error}`))
-      cb(null, res)
+      if (res.error) {
+        const errMessage = res.error.message || `sendAsync error did not have message`
+        cb(new Error(errMessage))
+      } else {
+        cb(null, res)
+      }
     })
   }
 
