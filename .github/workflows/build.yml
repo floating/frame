@@ -3,13 +3,31 @@ name: Build and publish installer artifacts for all platforms
 on:
   push:
     branches:
-      - '0.5'
+      - 'auto-release'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
 
 jobs:
+  create_draft_release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: read version from package.json
+      id: package-version
+      uses: martinbeentjes/npm-get-version-action@master
+    - name: create new draft release
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+        automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
+        prerelease: true
+        draft: true
+        title: ${{ steps.package-version.outputs.current-version}}
+
   build_release:
+    needs: [create_draft_release]
     strategy:
       fail-fast: false
       matrix:
