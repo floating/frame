@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
     - name: read version from package.json
       id: package-version
       uses: martinbeentjes/npm-get-version-action@master
@@ -17,7 +18,7 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
-        automatic_release_tag: v${{ steps.package-version.outputs.current-version}}
+        automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
         prerelease: true
         draft: true
         title: ${{ steps.package-version.outputs.current-version}}
