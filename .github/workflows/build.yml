@@ -3,7 +3,7 @@ name: Build and publish installer artifacts for all platforms
 on:
   push:
     branches:
-      - 'auto-release'
+      - '0.5'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
