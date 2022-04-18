@@ -23,7 +23,7 @@ class MockConnection extends EventEmitter {
     this.close = () => {
       if (this.connected) {
         this.connected = false
-        process.nextTick(() => this.emit('close'))
+        this.emit('close')
       }
     }
 

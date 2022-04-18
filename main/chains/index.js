@@ -143,8 +143,8 @@ class ChainConnection extends EventEmitter {
 
   killProvider (provider) {
     if (provider) {
-      provider.removeAllListeners()
       provider.close()
+      provider.removeAllListeners()
     }
   }
 
