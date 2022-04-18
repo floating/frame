@@ -10,13 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: delete release
-      uses: dev-drprasad/delete-tag-and-release@v0.2.0
-      with:
-        delete_release: true
-        tag_name: v0.5.0-beta14x
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
     - name: create new draft release
       uses: marvinpinto/action-automatic-releases@latest
       with:
