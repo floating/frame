@@ -14,11 +14,18 @@ jobs:
     - name: read version from package.json
       id: package-version
       uses: martinbeentjes/npm-get-version-action@master
-    - name: create new draft release
-      uses: marvinpinto/action-automatic-releases@latest
+    - name: delete release
+      uses: dev-drprasad/delete-tag-and-release@v0.2.0
       with:
-        repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
-        automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
-        prerelease: true
-        draft: true
-        title: ${{ steps.package-version.outputs.current-version}}
+        delete_release: true
+        tag_name: v${{ steps.package-version.outputs.current-version }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+    # - name: create new draft release
+    #   uses: marvinpinto/action-automatic-releases@latest
+    #   with:
+    #     repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+    #     automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
+    #     prerelease: true
+    #     draft: true
+    #     title: ${{ steps.package-version.outputs.current-version}}
