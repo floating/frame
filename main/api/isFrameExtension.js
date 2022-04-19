@@ -7,25 +7,16 @@ module.exports = req => {
   if (!origin) return false
   const query = queryString.parse(req.url.replace('/', ''))
 
-  // Match production extension ids exactly
-  if (
-    origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf' || // production chrome
-    origin === 'moz-extension://bd0560a2-8c13-4cb4-a856-eceab7e771d8' || // production firefox
-    origin === 'safari-web-extension://7655eadc-658f-4faf-b22c-bff822d0154e' // production safari
-  ) {
+  const mozOrigin = origin.startsWith('moz-extension://') 
+  const extOrigin = origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://') || origin.startsWith('safari-web-extension://')
+
+  if (origin === 'chrome-extension://ldcoohedfbjoobcadoglnnmmfbdlmmhf') { // Match production chrome
     return true
+  } else if (mozOrigin || (dev && extOrigin)) {
+    // In production, match any Firefox extension origin where query.identity === 'frame-extension'
+    // In dev, match any extension where query.identity === 'frame-extension'
+    return query.identity === 'frame-extension'
+  } else {
+    return false
   }
-
-  // If in dev mode, match any extension where query.identity === 'frame-extension'
-  if (dev) {
-    if (
-      origin.startsWith('chrome-extension://') > -1 || 
-      origin.startsWith('moz-extension://') > -1 ||
-      origin.startsWith('safari-web-extension://')
-    ) {
-      return query.identity === 'frame-extension'
-    }
-  }
-
-  return false
 }
