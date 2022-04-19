@@ -3,7 +3,7 @@ name: Test removing old draft releases
 on:
   push:
     branches:
-      - 'remove-draft-release
+      - 'remove-draft-release'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
