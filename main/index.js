@@ -1,4 +1,7 @@
 const { app, ipcMain, protocol, shell, dialog, clipboard, globalShortcut, BrowserWindow } = require('electron')
+const fs = require('fs')
+const { validateSSL } = require('ssl-validator')
+
 app.commandLine.appendSwitch('enable-accelerated-2d-canvas', true)
 app.commandLine.appendSwitch('enable-gpu-rasterization', true)
 app.commandLine.appendSwitch('force-gpu-rasterization', true)
@@ -284,14 +287,28 @@ app.on('ready', () => {
     }
   })
   store.observer(() => {
-    const websocketProtocol = store('main.websocketProtocol')
+    // const websocketProtocol = store('main.websocketProtocol')
     const websocketSSLKeyFilePath = store('main.websocketSSL.keyFilePath')
     const websocketSSLCertFilePath = store('main.websocketSSL.certFilePath')
     const websocketSSLCertPassword = store('main.websocketSSL.certPassword')
     console.log('observing', websocketSSLKeyFilePath, websocketSSLCertFilePath, websocketSSLCertPassword)
-    if (websocketProtocol === 'https' || (websocketSSLKeyFilePath && websocketSSLCertFilePath && websocketSSLCertPassword)) {
-      api.init()
-    }
+    // if (websocketProtocol === 'https' || (websocketSSLKeyFilePath && websocketSSLCertFilePath && websocketSSLCertPassword)) {
+    //   let isValid = false
+    //   try {
+    //     // read cert file, key file
+    //     const keyFile = fs.readFileSync(websocketSSLKeyFilePath)
+    //     const certFile = fs.readFileSync(websocketSSLCertFilePath)
+    //     validateSSL(certFile, { key: keyFile, domain: '127.0.0.1' })
+    //     isValid = true
+    //   } catch (e) {
+    //     // send message to renderer
+
+    //   }
+    //   if (isValid) {
+
+    //     api.init()
+    //   }
+    // }
   })
   // store.observer(() => {
   //   const altSlash = store('main.shortcuts.altSlash')

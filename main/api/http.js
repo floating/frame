@@ -127,16 +127,23 @@ module.exports = {
   https: () => {
     const keyFilePath = store('main.websocketSSL.keyFilePath') || ''
     const certFilePath = store('main.websocketSSL.certFilePath') || ''
+    const CACertFilePath = store('main.websocketSSL.CACertFilePath') || '/Users/sam/Library/Application Support/Electron/frame_ca_crt.pem'
     const certPassword = store('main.websocketSSL.certPassword')
 
     if (keyFilePath && certFilePath) {
+      console.log('ca', fs.readFileSync(CACertFilePath, 'utf-8'))
       try {
         const httpsOpts = {
-          key: fs.readFileSync(keyFilePath),
-          cert: fs.readFileSync(certFilePath),
-          // ca: fs.readFileSync('/path/to/ca.pem')
-          passphrase: certPassword
+          key: fs.readFileSync(keyFilePath, 'utf-8'),
+          cert: fs.readFileSync(certFilePath, 'utf-8'),
+          ca: fs.readFileSync(CACertFilePath, 'utf-8'),
+          passphrase: certPassword,
+          requestCert: true,
+          rejectUnauthorized: false,
+          enableTrace: true,
+          HTTP_CONNECTION: 'Upgrade'
         }
+        console.log('creating https server')
         return https.createServer(httpsOpts, handler)
       } catch (e) {
         log.error('Error creating HTTPS server', e)

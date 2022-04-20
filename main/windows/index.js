@@ -1,6 +1,5 @@
-
-import { promisify } from 'util'
 import fs from 'fs'
+// import { spawn } from 'child_process'
 import FrameManager from './frames'
 
 const electron = require('electron')
@@ -550,71 +549,198 @@ ipcMain.on('*:contextmenu', (e, x, y) => { if (dev) e.sender.inspectElement(x, y
 ipcMain.handle('open-file-dialog', (event, [options]) => dialog.showOpenDialog(windows.tray, options))
 
 ipcMain.handle('generate-ssl-cert', async (event, [options]) => {
-  const NodeOpenSSL = require('node-openssl-cert')
-  const openssl = new NodeOpenSSL()
+  const { NodeOpenSSL } = require('node-openssl')
+  const openssl = new NodeOpenSSL('/usr/local/opt/openssl@3/bin/openssl')
   const certPassword = 'frame'
 
-  const rsakeyoptions = {
-    encryption: {
-      password: certPassword,
-      cipher: 'des3'
+  // const RSAKeyOptions = {
+  //   encryption: {
+  //     password: certPassword,
+  //     cipher: 'des3'
+  //   },
+  //   rsa_keygen_bits: 2048,
+  //   format: 'PKCS8'
+  // }
+  // const csroptions = {
+  //   hash: 'sha512',
+  //   days: 240,
+  //   subject: {
+  //     organizationName: 'Frame Labs',
+  //     organizationalUnitName: [
+  //       'IT'
+  //     ],
+  //     commonName: [
+  //       'frame.sh',
+  //       'www.frame.sh'
+  //     ],
+  //     emailAddress: 'support@frame.sh'
+  //   }
+  // }
+
+  // const CACSROptions = {
+  //   hash: 'sha256',
+  //   days: 240,
+  //   startdate: new Date('1984-02-04 00:00:00'),
+  //   enddate: new Date('2143-06-04 04:16:23'),
+  //   subject: {
+  //     organizationName: 'Frame Labs',
+  //     organizationalUnitName: [
+  //       'IT'
+  //     ],
+  //     commonName: [
+  //       'Frame Root Certificate Authority'
+  //     ]
+  //   },
+  //   extensions: {
+  //     basicConstraints: {
+  //       critical: true,
+  //       CA: true,
+  //       pathlen: 1
+  //     },
+  //     keyUsage: {
+  //       critical: true,
+  //       usages: [
+  //         'digitalSignature',
+  //         'keyEncipherment',
+  //         'keyCertSign'
+  //       ]
+  //     },
+  //     extendedKeyUsage: {
+  //       critical: true,
+  //       usages: [
+  //         'serverAuth',
+  //         'clientAuth'
+  //       ]
+  //     },
+  //     SANs: {
+  //       IP: [
+  //         '127.0.0.1'
+  //       ]
+  //     }
+  //   }
+  // }
+
+  const distinguishedName = {
+    C: 'US',
+    O: 'Frame Labs',
+    OU: 'IT',
+    CN: 'localhost',
+    emailAddress: 'support@frame.sh'
+  }
+
+  const userDataPath = app.getPath('userData')
+  const csrCertFilePath = path.join(userDataPath, 'frame_csr.pem')
+  const certFilePath = path.join(userDataPath, 'frame_crt.pem')
+  const keyFilePath = path.join(userDataPath, 'frame_key.pem')
+  const caCertFilePath = path.join(userDataPath, 'frame_ca_crt.pem')
+  const caKeyFilePath = path.join(userDataPath, 'frame_ca.key')
+
+  // const pKey = await openssl.generatePrivateKey({ encrypted: true, encryptOpts: { cipher: 'des3', password: certPassword } })
+  // console.log('generated pkey', pKey)
+  const csrOpts = {
+    altNames: {
+      'DNS.1': 'localhost',
+      'DNS.2': 'frame',
+      'DNS.3': 'frame.local',
+      'IP.1': '127.0.0.1',
+      'IP.2': '0.0.0.0'
     },
-    rsa_keygen_bits: 2048,
-    format: 'PKCS8'
+    distinguishedName,
+    outputKeyFile: keyFilePath,
+    keyPassword: certPassword,
+    outputFile: csrCertFilePath
   }
-  const csroptions = {
-    hash: 'sha512',
-    days: 240,
-    subject: {
-      organizationName: 'Frame Labs',
-      organizationalUnitName: [
-        'IT'
-      ],
-      commonName: [
-        'frame.sh',
-        'www.frame.sh'
-      ],
-      emailAddress: 'support@frame.sh'
-    }
+  const { files } = await openssl.generateCSR(csrOpts)
+  const caOpts = {
+    distinguishedName,
+    expiryDays: 365,
+    keyFile: caKeyFilePath,
+    outputFile: caCertFilePath
   }
+  const ca = await openssl.generateRootCA(caOpts)
+  const caCsrOpts = {
+    outputFile: certFilePath,
+    expiryDays: 750
+  }
+  await ca.signCSR({ ...caCsrOpts, csrFile: files.csr })
 
-  return new Promise((resolve, reject) => {
-    openssl.generateRSAPrivateKey(rsakeyoptions, (err, key, cmd) => {
-      if (err) {
-        reject(err)
-      }
-      console.log(cmd)
-      openssl.generateCSR(csroptions, key, certPassword, (err, csr, cmd) => {
-        if (err) {
-          reject(err)
-        }
+  // spawn('security', ['add-trusted-cert', '-d', '-r', 'trustRoot', '-k', '~/Library/Keychains/login.keychain-db', `"${caCertFilePath}"`])
+  return Promise.resolve({ certFilePath, keyFilePath, certPassword, CACertFilePath: caCertFilePath })
 
-        csroptions.days = 240
-        openssl.selfSignCSR(csr, csroptions, key, certPassword, (err, crt, cmd) => {
-          if (err) {
-            reject(err)
-          }
+  // return new Promise((resolve, reject) => {
 
-          console.log(cmd.command)
-          console.log(crt)
-          console.log(cmd.files.config)
-          const userDataPath = app.getPath('userData')
-          const certFilePath = path.join(userDataPath, 'frame_crt.pem')
-          const keyFilePath = path.join(userDataPath, 'frame_key.pem')
+  //   openssl.generateRSAPrivateKey(RSAKeyOptions, (err, cakey, cmd) => {
+  //     if (err) {
+  //       reject(err)
+  //     }
+  //     console.log(cmd)
+  //     openssl.generateCSR(CACSROptions, cakey, certPassword, (err, csr, cmd) => {
+  //       if (err) {
+  //         reject(err)
+  //       }
 
-          fs.writeFile(certFilePath, crt, (certFileError) => {
-            console.log('certFileError', certFileError)
-          })
+  //       csroptions.days = 240
+  //       openssl.selfSignCSR(csr, CACSROptions, cakey, certPassword, (err, cacrt, cmd) => {
+  //         if (err) {
+  //           reject(err)
+  //         }
 
-          fs.writeFile(keyFilePath, key, (keyFileError) => {
-            console.log('keyFileError', keyFileError)
-          })
+  //         console.log(cmd.command)
+  //         console.log(cacrt)
+  //         console.log(cmd.files.config)
+  //         const userDataPath = app.getPath('userData')
+  //         const CACertFilePath = path.join(userDataPath, 'frame_ca_crt.pem')
+  //         // const keyFilePath = path.join(userDataPath, 'frame_key.pem')
 
-          resolve({ certFilePath, keyFilePath, certPassword })
-        })
-      })
-    })
-  })
+  //         fs.writeFile(CACertFilePath, cacrt, (certFileError) => {
+  //           console.log('certFileError', certFileError)
+  //         })
+
+  //         // fs.writeFile(keyFilePath, key, (keyFileError) => {
+  //         //   console.log('keyFileError', keyFileError)
+  //         // })
+
+  //         openssl.generateRSAPrivateKey(RSAKeyOptions, (err, key, cmd) => {
+  //           if (err) {
+  //             reject(err)
+  //           }
+  //           console.log(cmd)
+  //           openssl.generateCSR(csroptions, key, certPassword, (err, csr, cmd) => {
+  //             if (err) {
+  //               reject(err)
+  //             }
+
+  //             csroptions.days = 240
+  //             openssl.CASignCSR(csr, csroptions, false, cacrt, cakey, certPassword, (err, crt, cmd) => {
+  //               if (err) {
+  //                 reject(err)
+  //               }
+
+  //               console.log(cmd.command)
+  //               console.log(crt)
+  //               console.log(cmd.files.config)
+  //               const userDataPath = app.getPath('userData')
+  //               const certFilePath = path.join(userDataPath, 'frame_crt.pem')
+  //               const keyFilePath = path.join(userDataPath, 'frame_key.pem')
+
+  //               console.log('ca path: ', CACertFilePath)
+
+  //               fs.writeFile(certFilePath, crt, (certFileError) => {
+  //                 console.log('certFileError', certFileError)
+  //               })
+
+  //               fs.writeFile(keyFilePath, key, (keyFileError) => {
+  //                 console.log('keyFileError', keyFileError)
+  //               })
+
+  //               resolve({ certFilePath, keyFilePath, certPassword, CACertFilePath })
+  //             })
+  //           })
+  //         })
+  //       })
+  //     })
+  //   })
+  // })
 })
 
 // ipcMain.on('*:installDapp', async (e, domain) => {

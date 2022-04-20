@@ -29,6 +29,9 @@ class Settings extends Component {
         this.setState({ primaryCustom, secondaryCustom })
       }
     })
+    window.ipc.on('ssl-cert-validated', (certIsValid, certValidationMessage) => {
+      this.setState({ websocketSSL: { certIsValid, certValidationMessage } })
+    })
     this.webSocketSSLKeyFileInput = createRef()
     this.webSocketSSLCertFileInput = createRef()
   }
@@ -155,12 +158,13 @@ class Settings extends Component {
   async generateCertificateButtonClickHandler (e) {
     e.preventDefault()
     clearTimeout(this.generateCertificateTimeout)
-    const { certFilePath, keyFilePath, certPassword } = await window.ipc.invoke('generate-ssl-cert', {})
-    this.setState({ websocketSSL: { certFilePath, keyFilePath, certPassword } })
+    const { certFilePath, keyFilePath, certPassword, CACertFilePath } = await window.ipc.invoke('generate-ssl-cert', {})
+    this.setState({ websocketSSL: { certFilePath, keyFilePath, certPassword, CACertFilePath } })
     this.generateCertificateTimeout = setTimeout(() => {
       link.send('tray:action', 'setWebsocketSSLKeyFilePath', this.state.websocketSSL.keyFilePath)
       link.send('tray:action', 'setWebsocketSSLCertFilePath', this.state.websocketSSL.certFilePath)
       link.send('tray:action', 'setWebsocketSSLCertPassword', this.state.websocketSSL.certPassword)
+      link.send('tray.action', 'setWebsocketSSLCACertFilePath', this.state.websocketSSL.CACertFilePath)
     }, 1000)
   }
 
@@ -516,6 +520,7 @@ class Settings extends Component {
                 tabIndex='-1' className='' placeholder='password' value={this.state.websocketSSL.certPassword}
                 onChange={e => this.websocketSSLCertPasswordChangeHandler(e)}
               />
+              <div className='cert-status-panel'>{this.certStatus}</div>
               <button type='button' className='settingsButton' onClick={(e) => this.generateCertificateButtonClickHandler(e)}>
                 Generate Certificate
               </button>

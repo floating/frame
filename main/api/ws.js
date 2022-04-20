@@ -16,7 +16,6 @@ const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
-
 const handler = (socket, req) => {
   socket.id = uuid()
   socket.origin = req.headers.origin
@@ -76,6 +75,9 @@ const handler = (socket, req) => {
 
 module.exports = server => {
   const ws = new WebSocket.Server({ server })
+  ws.on('error', (err) => {
+    console.log(err)
+  })
   ws.on('connection', handler)
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {

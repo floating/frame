@@ -3,7 +3,8 @@ import rpc from './rpc'
 
 const validChannels = [
   'open-file-dialog',
-  'generate-ssl-cert'
+  'generate-ssl-cert',
+  'ssl-cert-validated'
 ]
 
 const listeners = validChannels.reduce((result, channel) => {

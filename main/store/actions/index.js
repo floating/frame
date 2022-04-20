@@ -200,6 +200,9 @@ module.exports = {
   setWebsocketSSLCertPassword: (u, value) => {
     u('main.websocketSSL.certPassword', () => value)
   },
+  setWebsocketSSLCACertFilePath: (u, value) => {
+    u('main.websocketSSL.CACertFilePath', () => value)
+  },
   setLedgerDerivation: (u, value) => {
     u('main.ledger.derivation', () => value)
   },
