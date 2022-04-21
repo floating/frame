@@ -76,15 +76,6 @@ export default class BalancesWorkerController extends EventEmitter {
     })
   }
 
-  private stopWorker () {
-    if (this.heartbeat) {
-      clearInterval(this.heartbeat)
-      this.heartbeat = undefined
-    }
-
-    this.worker.kill('SIGTERM')
-  }
-
   close () {
     log.info(`closing worker controller`)
 
@@ -107,6 +98,20 @@ export default class BalancesWorkerController extends EventEmitter {
     this.sendCommandToWorker('tokenBalanceScan', [address, tokens, chains])
   }
 
+  // private
+  private stopWorker () {
+    if (this.heartbeat) {
+      clearInterval(this.heartbeat)
+      this.heartbeat = undefined
+    }
+
+    this.worker.kill('SIGTERM')
+  }
+
+  private isWorkerReachable () {
+    return this.worker.connected && this.worker.channel && this.worker.listenerCount('error') > 0
+  }
+
   // sending messages
   private sendCommandToWorker (command: string, args: any[] = []) {
     log.debug(`sending command ${command} to worker`)
@@ -125,9 +130,5 @@ export default class BalancesWorkerController extends EventEmitter {
 
   private sendHeartbeat () {
     this.sendCommandToWorker('heartbeat')
-  }
-
-  private isWorkerReachable () {
-    return this.worker.connected && this.worker.channel && this.worker.listenerCount('error') > 0
   }
 }
