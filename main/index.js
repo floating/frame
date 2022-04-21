@@ -101,6 +101,8 @@ log.info('Electron: v' + process.versions.electron)
 log.info('Node: v' + process.versions.node)
 
 process.on('uncaughtException', (e) => {
+  Sentry.captureException(e)
+
   if (e.code === 'EPIPE') {
     log.error('uncaught EPIPE error', e)
     return
