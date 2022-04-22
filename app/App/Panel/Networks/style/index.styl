@@ -328,6 +328,89 @@
   position relative
   z-index 999999999
 
+  .connectionTitle
+    height 12px
+    display flex
+    justify-content center
+    align-items center
+    font-size 8px
+    text-transform uppercase
+    padding 8px 16px
+    letter-spacing 1px
+    margin-left -1px
+    font-weight 600
+    color var(--outerspace08)
+
+  .dappConnections
+    background var(--ghostZ08)
+    position relative
+    margin 0px 7px 7px 7px
+    border-radius 12px
+    padding 4px 0px 4px 0px
+    font-size 14px
+    font-weight 300
+
+    .dappConnection
+      display flex
+      justify-content space-between
+      align-items center
+      transition var(--standard)
+      transform translateZ(0)
+      margin 4px 4px 0px 4px
+      transform scale(1)
+      background var(--ghostA)
+      position relative
+      border-radius 8px
+      height 33px
+      box-sizing border-box
+
+      .dappConnectionOrigin
+        padding 0px 32px
+        color var(--outerspace)
+
+      .dappConnectionIndicator
+        color var(--outerspace)
+        cursor pointer
+        position absolute 
+        top 50%
+        margin-top -2px
+        left 13px
+        bottom 0px
+        width 5px
+        height 5px
+        border-radius 3px
+        display flex
+        justify-content center
+        align-items center
+        border-radius 12px
+        background var(--good)
+        *
+          pointer-events none
+
+      .dappConnectionChangeChain
+        color var(--outerspace)
+        cursor pointer
+        position absolute 
+        top 0px
+        right 0px
+        bottom 0px
+        width 41px
+        display flex
+        justify-content center
+        align-items center
+        border-radius 12px
+        *
+          pointer-events none
+
+      .dappConnectionChangeChain:hover
+        background var(--ghostB)
+
+      .dappConnectionChangeConnected
+        background var(--good)
+
+    .dappConnection:first-child
+      margin 0px 4px 0px 4px
+
 .connectionTitle
   justify-content space-between
   height 26px
@@ -564,7 +647,7 @@
     color var(--outerspace03)
 
 .networkBreak
-  padding 32px 16px 0px 16px
+  padding 16px 16px 0px 16px
   margin-bottom 8px
   font-size 11px
   text-transform uppercase
@@ -653,8 +736,8 @@
 
 .signerDrawer
   position relative
-  height 40px
-  margin-top -20px
+  height 39px
+  margin-top -19px
 
   .showControls
     position absolute
@@ -669,7 +752,7 @@
     margin-left -50px
     padding-bottom 2px
     letter-spacing 1px
-    font-size 11px
+    font-size 10px
     display flex
     justify-content center
     align-items center

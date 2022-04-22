@@ -142,6 +142,20 @@ class _Network extends React.Component {
     if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
   }
 
+  renderConnection (origin) {
+    return (
+      <div className='dappConnection'>
+        <div className='dappConnectionIndicator' />
+        <div className='dappConnectionOrigin'> 
+          {origin}
+        </div>
+        <div className='dappConnectionChangeChain'> 
+          {svg.select(18)}
+        </div>
+      </div>
+    )
+  }
+
   render () {
     const changed = (
       this.state.id && 
@@ -257,6 +271,14 @@ class _Network extends React.Component {
                   </>
                 ) : null}
               </div>
+            </div>
+            <div className='connectionTitle'>
+              {'Connected'}
+            </div>
+            <div className='dappConnections'>
+              {this.renderConnection('http://send.frame.eth')}
+              {this.renderConnection('http://toher.eth')}
+              {this.renderConnection('http://origin.eth')}
             </div>
           </div>
         ) : null}
