@@ -28,9 +28,9 @@ export default class BalancesWorkerController extends EventEmitter {
 
   constructor () {
     super()
-  
+
     const workerArgs = process.env.NODE_ENV === 'development' ? ['--inspect=127.0.0.1:9230'] : []
-    this.worker = fork(path.resolve(__dirname, 'worker.js'), workerArgs)
+    this.worker = fork(path.resolve(__dirname, 'worker.js'), [], { execArgv: workerArgs })
 
     log.info('created balances worker, pid:', this.worker.pid)
 
@@ -56,38 +56,30 @@ export default class BalancesWorkerController extends EventEmitter {
       }
     })
   
-    this.worker.on('exit', code => {
-      const exitCode = code || this.worker.signalCode
-      log.warn(`balances worker exited with code ${exitCode}, pid: ${this.worker.pid}`)
-      this.close()
+    this.worker.on('close', (code, signal) => {
+      // emitted after exit or error and when all stdio streams are closed
+      log.warn(`balances worker exited with code ${code}, signal: ${signal}, pid: ${this.worker.pid}`)
+      this.worker.removeAllListeners()
+
+      this.emit('close')
+      this.removeAllListeners()
     })
   
     this.worker.on('disconnect', () => {
       log.warn(`balances worker disconnected`)
-      this.close()
+      this.stopWorker()
     })
 
     this.worker.on('error', err => {
       log.warn(`balances worker sent error, pid: ${this.worker.pid}`, err)
-      this.close()
+      this.stopWorker()
     })
   }
 
   close () {
-    if (this.heartbeat) {
-      clearInterval(this.heartbeat)
-      this.heartbeat = undefined
-    }
+    log.info(`closing worker controller`)
 
-    this.worker.removeAllListeners()
-  
-    const exitCode = this.worker.exitCode
-    const killed = this.worker.killed || this.worker.kill('SIGTERM')
-
-    log.info(`worker controller closed, exitCode: ${exitCode}, killed by controller: ${killed}`)
-
-    this.emit('close')
-    this.removeAllListeners()
+    this.stopWorker()
   }
 
   isRunning () {
@@ -106,12 +98,26 @@ export default class BalancesWorkerController extends EventEmitter {
     this.sendCommandToWorker('tokenBalanceScan', [address, tokens, chains])
   }
 
+  // private
+  private stopWorker () {
+    if (this.heartbeat) {
+      clearInterval(this.heartbeat)
+      this.heartbeat = undefined
+    }
+
+    this.worker.kill('SIGTERM')
+  }
+
+  private isWorkerReachable () {
+    return this.worker.connected && this.worker.channel && this.worker.listenerCount('error') > 0
+  }
+
   // sending messages
   private sendCommandToWorker (command: string, args: any[] = []) {
     log.debug(`sending command ${command} to worker`)
 
     try {
-      if (!this.worker.connected || !this.worker.channel) {
+      if (!this.isWorkerReachable()) {
         log.error(`attempted to send command "${command}" to worker but worker cannot be reached!`)
         return
       }
