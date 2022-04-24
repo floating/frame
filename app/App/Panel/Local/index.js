@@ -209,7 +209,7 @@ class Settings extends React.Component {
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'} onClick={e => this.expandNetwork(e, false)}>
+      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'}>
         <div className='panelHeader' style={{ zIndex: 50, pointerEvents: 'none' }}>
           <div className='panelHeaderTitle'>Settings</div>
         </div>

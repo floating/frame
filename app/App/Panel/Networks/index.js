@@ -1,93 +1,243 @@
-import React from 'react'
+import React, { createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
 import Dropdown from '../../Components/Dropdown'
 
-class _Network extends React.Component {
+import Gas from './Gas'
+
+class _SettingsModule extends React.Component {
   constructor (props, context) {
     super(props, context)
-    this.customMessage = 'Custom Endpoint'
-    const { id, name, type, explorer, symbol, layer } = this.props
-    this.network = id
-    this.networkType = type
-    const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
-    const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
-    this.newNetworkIdDefault = 'ID'
-    this.newNetworkNameDefault = 'New Network'
-    this.newNetworkExplorerDefault = 'Block Explorer'
-    this.newNetworkSymbolDefault = 'ETH'
-    this.newNetworkType = 'ethereum'
     this.state = {
-      id, 
-      name, 
-      explorer, 
-      type, 
-      symbol, 
-      layer,
-      submitted: false, 
-      newNetworkId: this.newNetworkIdDefault,
-      newNetworkName: this.newNetworkNameDefault,
-      newNetworkExplorer: this.newNetworkExplorerDefault,
-      newNetworkSymbol: this.newNetworkSymbolDefault,
-      newNetworkType: this.newNetworkType,
-      localShake: {}, 
-      primaryCustom, 
-      secondaryCustom, 
-      resetConfirm: false, 
-      expandNetwork: false,
-      showControls: false
+      expanded: false
     }
- }
-
-  okProtocol (location) {
-    if (location === 'injected') return true
-    if (location.endsWith('.ipc')) return true
-    if (location.startsWith('wss://') || location.startsWith('ws://')) return true
-    if (location.startsWith('https://') || location.startsWith('http://')) return true
-    return false
   }
+  render () {
+    const { id, name, type, explorer, symbol, layer } = this.props
+    const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '---'
+    return (
+      <div className='sliceContainer' ref={this.ref}>
+        <div 
+          className='sliceTile'
+          onClick={() => {
+            this.setState({ expanded: !this.state.expanded })
+          }}
+        >
+          <div>{`${symbol} | $${price.toLocaleString()}`}</div>
+        </div>
+        {this.state.expanded ? (
+          <>
+            <div className='chainConfig cardShow'>  
+              <div className='chainConfigRow'>  
+                <input
+                  className='chainIdInput'
+                  value={this.state.id} spellCheck='false'
+                  onChange={(e) => {
+                    if (type === 'ethereum' && id === 1) return
+                    this.setState({ id: e.target.value })
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '') this.setState({ id: this.props.id })
+                  }}
+                />
+                <input
+                  className='chainSymbolInput'
+                  value={this.state.symbol} spellCheck='false'
+                  onChange={(e) => {
+                    if (type === 'ethereum' && id === 1) return
+                    if (e.target.value.length > 8) return e.preventDefault()
+                    this.setState({ symbol: e.target.value })
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '') this.setState({ symbol: this.props.symbol })
+                  }}
+                />
+                <Dropdown
+                  syncValue={this.state.layer}
+                  onChange={layer => this.setState({ layer })}
+                  options={type === 'ethereum' && id === 1 ? [
+                    { text: 'mainnet', value: 'mainnet'}
+                  ] : [
+                    { text: 'rollup', value: 'rollup'}, 
+                    { text: 'sidechain', value: 'sidechain'}, 
+                    { text: 'testnet', value: 'testnet'}, 
+                    { text: 'other', value: 'other'}
+                  ]}
+                />
+              </div>
+              <div className='chainConfigRow'>
+                <input
+                  value={this.state.explorer} spellCheck='false'
+                  onChange={(e) => {
+                    this.setState({ explorer: e.target.value })
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '') this.setState({ explorer: this.props.explorer })
+                  }}
+                />
+              </div>
+            </div>
 
-  okPort (location) {
-    const match = location.match(/^(?:https?|wss?).*:(?<port>\d{4,})/)
+            {type === 'ethereum' && id === 1 ? (
+              <div className='chainMore cardShow'>
+                <div className='moduleButton moduleButtonLocked'>
+                  {svg.lock(11)}
+                </div>
+              </div>
+            ) : (
+              <div className='chainMore cardShow'>
+                <div
+                  className='moduleButton moduleButtonBad' onMouseDown={() => {
+                    const { id, name, type, explorer } = this.props
+                    link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
+                  }}
+                >
+                  {svg.trash(13)} 
+                  <span>remove chain</span>
+                </div>
+              </div>
+            )}
 
-    if (match) {
-      const portStr = (match.groups || { port: 0 }).port
-      const port = parseInt(portStr)
-      return port >= 0 && port <= 65535
+            {changed ? (
+              <div className='chainConfigSave cardShow'>
+                <div
+                  className='moduleButton moduleButtonGood' onMouseDown={() => {
+                    const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer, layer: this.props.layer }
+                    const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer, layer: this.state.layer }
+                    let empty = false
+                    Object.keys(newNet).forEach(k => {
+                      if (typeof newNet[k] === 'string') {
+                        newNet[k] = newNet[k].trim()
+                      }
+                      if (newNet[k] === '') empty = true
+                    })
+                    if (empty) return
+                    this.setState(newNet)
+                    this.setState({ submitted: true })
+                    link.send('tray:action', 'updateNetwork', net, newNet)
+                    setTimeout(() => this.setState({ submitted: false }), 1600)
+                  }}>
+                    {svg.save(11)} <span> save changes</span>
+                  </div>
+                </div>
+              ) : (this.state.submitted ? (
+                <div className='chainConfigSave'>
+                  <div className='moduleButton'>
+                    {svg.octicon('check', { height: 22 })}
+                  </div>
+                </div>
+              ) : null
+            )}
+          </>
+        ) : null}
+      </div>
+    )
+  }
+}
+
+const SettingsModule = Restore.connect(_SettingsModule)
+
+
+// class _FeeModule extends React.Component {
+//   constructor (props, context) {
+//     super(props, context)
+//     this.state = {
+//       expanded: false
+//     }
+//   }
+//   renderCloseBars () {
+//     return (
+//       <div 
+//       className='sliceContainerClose'
+//       onClick={() => {
+//         this.setState({ expanded: false })
+//       }}
+//     >
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//       {svg.chevron(12)}
+//     </div>
+//     )
+//   }
+//   render () {
+//     const { id } = this.props
+//     const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', id, 'gas.price.levels.fast'), 'hex') / 1e9) || '---'
+//     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '---'
+//     const change24hr = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.change24hr') || '---'
+//     const symbol = this.store('main.networks.ethereum', id, 'symbol') || '---'
+
+//     return (
+//       <div className='sliceContainer' ref={this.ref}>
+//         <div 
+//           className={this.state.expanded ? 'sliceTile sliceTileHighlight' : 'sliceTile'}
+//           onClick={() => {
+//             this.setState({ expanded: !this.state.expanded })
+//           }}
+//         >
+//           <div>{`${gas} Gwei`}</div>
+//         </div>
+//         {this.state.expanded ? (
+//           <>
+//             {this.renderCloseBars()}
+//             <div className='sliceTile'>{'hello'}</div>
+//           </>
+//         ) : null}
+//       </div>
+//     )
+//   }
+// }
+
+// const FeeModule = Restore.connect(_FeeModule)
+
+
+class _ChainModule extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      expanded: false
     }
-
-    return true
+    this.ref = createRef()
   }
 
-  inputPrimaryCustom (e) {
-    e.preventDefault()
-    clearTimeout(this.customPrimaryInputTimeout)
-    const value = e.target.value.replace(/\s+/g, '')
-    this.setState({ primaryCustom: value })
-    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', this.props.type, this.props.id, this.state.primaryCustom), 1000)
-  }
+  // clickHandler (e) {
+  //   if (!e.composedPath().includes(this.ref.current)) {
+  //     if (this.state.expanded) this.setState({ expanded: false })
+  //   }
+  // }
 
-  inputSecondaryCustom (e) {
-    e.preventDefault()
-    clearTimeout(this.customSecondaryInputTimeout)
-    const value = e.target.value.replace(/\s+/g, '')
-    this.setState({ secondaryCustom: value })
-    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', this.props.type, this.props.id, this.state.secondaryCustom), 1000)
-  }
+  // componentDidMount () {
+  //   document.addEventListener('click', this.clickHandler.bind(this))
+  // }
 
-  localShake (key) {
-    const localShake = Object.assign({}, this.state.localShake)
-    localShake[key] = true
-    this.setState({ localShake })
-    setTimeout(() => {
-      const localShake = Object.assign({}, this.state.localShake)
-      localShake[key] = false
-      this.setState({ localShake })
-    }, 1010)
-  }
+  // componentDidUnmount () {
+  //   document.removeEventListener('click', this.clickHandler.bind(this))
+  // }
 
+  renderConnection (origin) {
+    return (
+      <div 
+        className='sliceTile'
+        onClick={() => {
+          this.setState({ expanded: !this.state.expanded })
+        }}
+      >
+        <div className='sliceTileIndicatorLarge' />
+        <div className='sliceTileConnectionName'> 
+          {'Pylon'}
+        </div>
+        <div className='sliceTileBlock'>
+          {svg.cube(14)}
+          {(1223434).toLocaleString('en')}
+        </div>
+      </div>
+    )
+  }
   status (type, id, layer) {
     const connection = this.store('main.networks', type, id, 'connection', layer)
     let status = connection.status
@@ -114,7 +264,6 @@ class _Network extends React.Component {
       </div>
     )
   }
-
   indicator (status) {
     if (status === 'connected') {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
@@ -124,56 +273,9 @@ class _Network extends React.Component {
       return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
     }
   }
-
-  customSecondaryFocus () {
-    if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
-  }
-
-  customSecondaryBlur () {
-    if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
-  }
-
-
-  customPrimaryFocus () {
-    if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
-  }
-
-  customPrimaryBlur () {
-    if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
-  }
-
-  renderConnection (origin) {
-    return (
-      <div className='dappConnection'>
-        <div className='dappConnectionIndicator' />
-        <div className='dappConnectionOrigin'> 
-          {origin}
-        </div>
-        <div className='dappConnectionChangeChain'> 
-          {svg.select(18)}
-        </div>
-      </div>
-    )
-  }
-
   render () {
-    const changed = (
-      this.state.id && 
-      this.state.name && 
-      this.state.symbol && 
-      this.state.symbol && 
-      this.state.explorer && 
-      this.state.type &&
-      this.state.layer && (
-        this.props.id !== this.state.id ||
-        this.props.name !== this.state.name ||
-        this.props.symbol !== this.state.symbol ||
-        this.props.explorer !== this.state.explorer ||
-        this.props.type !== this.state.type || 
-        this.props.layer !== this.state.layer
-      )
-    )
-    const { id, type, connection } = this.props
+    // console.log('this.state.expanded', this.state.expanded)
+    const { id, type, connection, changed } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
@@ -181,36 +283,10 @@ class _Network extends React.Component {
     presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
-    const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9) || '---'
-    const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '---'
-    const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '---'
-    const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '---'
-
     return (
-      <div className='network'>
-        <div className='networkActive'>
-          <div className='networkName'>
-            <input
-              value={this.state.name} spellCheck='false'
-              onChange={(e) => {
-                this.setState({ name: e.target.value })
-              }}
-              onBlur={(e) => {
-                if (e.target.value === '') this.setState({ name: this.props.name })
-              }}
-            />
-          </div>
-          {this.props.id === 1 ? (
-            <div className='mainnetToggleLock'>{svg.lock(9)}</div>
-          ) : (
-            <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
-              link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
-            }}>
-              <div className='signerPermissionToggleSwitch' />
-            </div>
-          )}
-        </div>
-        {this.props.on ? (
+      <div className='sliceContainer' ref={this.ref}>
+        {this.renderConnection('connection')}
+        {this.state.expanded ? (
           <div className='connectionLevels'>
             <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
               <div className={connection.primary.on ? 'connectionOption connectionOptionOn' : 'connectionOption'}>
@@ -272,157 +348,251 @@ class _Network extends React.Component {
                 ) : null}
               </div>
             </div>
-            <div className='connectionTitle'>
-              {'Connected'}
-            </div>
-            <div className='dappConnections'>
-              {this.renderConnection('http://send.frame.eth')}
-              {this.renderConnection('http://toher.eth')}
-              {this.renderConnection('http://origin.eth')}
-            </div>
-          </div>
+          </div>   
         ) : null}
-        {/* <div className='signerDrawer' onMouseDown={() => this.setState({ showDetails: !this.state.showDetails })}>
-          <div className='showControls'>
-            {this.state.showDetails ? 'hide' : 'details'}
-          </div>
-          <div className='showControlsLine' />
-        </div> */}
+      </div>
+    )
+  }
+}
 
-        {this.props.on && false ? (
-          <div className='chainData'>
-            <div>{`Gas Price ${gas}`}</div>
-            <div>{`Block Height ${1234}`}</div>
-            <div>{`1 ${symbol} = $${price.toLocaleString()} ${change24hr > 0 ? '+' : change24hr < 0 ? '-' : ''} ${Math.abs(change24hr).toFixed(2)}%`}</div>
-          </div>
-        ) : null}
+const ChainModule = Restore.connect(_ChainModule)
 
-        {/* <div className='chainShow' onMouseDown={() => {
-          this.setState({ showControls: !this.state.showControls })
-        }}>
-          show more
-        </div> */}
+class _Network extends React.Component {
+  constructor (props, context) {
+    super(props, context)
+    this.customMessage = 'Custom Endpoint'
+    const { id, name, type, explorer, symbol, layer } = this.props
+    this.network = id
+    this.networkType = type
+    const primaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.primary.custom') || this.customMessage
+    const secondaryCustom = context.store('main.networks', this.networkType, this.network, 'connection.secondary.custom') || this.customMessage
+    this.newNetworkIdDefault = 'ID'
+    this.newNetworkNameDefault = 'New Network'
+    this.newNetworkExplorerDefault = 'Block Explorer'
+    this.newNetworkSymbolDefault = 'ETH'
+    this.newNetworkType = 'ethereum'
+    this.state = {
+      id, 
+      name, 
+      explorer, 
+      type, 
+      symbol, 
+      layer,
+      submitted: false, 
+      newNetworkId: this.newNetworkIdDefault,
+      newNetworkName: this.newNetworkNameDefault,
+      newNetworkExplorer: this.newNetworkExplorerDefault,
+      newNetworkSymbol: this.newNetworkSymbolDefault,
+      newNetworkType: this.newNetworkType,
+      localShake: {}, 
+      primaryCustom, 
+      secondaryCustom, 
+      resetConfirm: false, 
+      expandNetwork: false,
+      showControls: false,
+      active: [0,0,0]
+    }
+    const setActiveRandom = () => {
+      const a = Math.round(Math.random() * 1)
+      const b = Math.round(Math.random() * 1)
+      const c = Math.round(Math.random() * 1)
+      this.setState({ active: [a, b, c] })
+      setTimeout(() => {
+        setActiveRandom()
+      }, Math.round(Math.random() * 500))
+    }
+    setActiveRandom()
+ }
 
-        <div className='signerDrawer'>
-          <div className='showControls' onMouseDown={() => this.setState({ showControls: !this.state.showControls })}>
-            <span>{this.state.showControls ? 'less' : 'more'}</span>
-          </div>
-          <div className='showControlsLine' />
+  okProtocol (location) {
+    if (location === 'injected') return true
+    if (location.endsWith('.ipc')) return true
+    if (location.startsWith('wss://') || location.startsWith('ws://')) return true
+    if (location.startsWith('https://') || location.startsWith('http://')) return true
+    return false
+  }
+
+  okPort (location) {
+    const match = location.match(/^(?:https?|wss?).*:(?<port>\d{4,})/)
+
+    if (match) {
+      const portStr = (match.groups || { port: 0 }).port
+      const port = parseInt(portStr)
+      return port >= 0 && port <= 65535
+    }
+
+    return true
+  }
+
+  inputPrimaryCustom (e) {
+    e.preventDefault()
+    clearTimeout(this.customPrimaryInputTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ primaryCustom: value })
+    this.customPrimaryInputTimeout = setTimeout(() => link.send('tray:action', 'setPrimaryCustom', this.props.type, this.props.id, this.state.primaryCustom), 1000)
+  }
+
+  inputSecondaryCustom (e) {
+    e.preventDefault()
+    clearTimeout(this.customSecondaryInputTimeout)
+    const value = e.target.value.replace(/\s+/g, '')
+    this.setState({ secondaryCustom: value })
+    this.customSecondaryInputTimeout = setTimeout(() => link.send('tray:action', 'setSecondaryCustom', this.props.type, this.props.id, this.state.secondaryCustom), 1000)
+  }
+
+  localShake (key) {
+    const localShake = Object.assign({}, this.state.localShake)
+    localShake[key] = true
+    this.setState({ localShake })
+    setTimeout(() => {
+      const localShake = Object.assign({}, this.state.localShake)
+      localShake[key] = false
+      this.setState({ localShake })
+    }, 1010)
+  }
+
+  // status (type, id, layer) {
+  //   const connection = this.store('main.networks', type, id, 'connection', layer)
+  //   let status = connection.status
+  //   const current = connection.current
+
+  //   if (current === 'custom') {
+  //     if (layer === 'primary' && this.state.primaryCustom !== '' && this.state.primaryCustom !== this.customMessage) {
+  //       if (!this.okProtocol(this.state.primaryCustom)) status = 'invalid target'
+  //       else if (!this.okPort(this.state.primaryCustom)) status = 'invalid port'
+  //     }
+
+  //     if (layer === 'secondary' && this.state.secondaryCustom !== '' && this.state.secondaryCustom !== this.customMessage) {
+  //       if (!this.okProtocol(this.state.secondaryCustom)) status = 'invalid target'
+  //       else if (!this.okPort(this.state.secondaryCustom)) status = 'invalid port'
+  //     }
+  //   }
+  //   if (status === 'connected' && !connection.network) status = 'loading'
+  //   if (!this.store('main.networks', type, id, 'on')) status = 'off'
+
+  //   return (
+  //     <div className='connectionOptionStatus'>
+  //       {this.indicator(status)}
+  //       <div className='connectionOptionStatusText'>{status}</div>
+  //     </div>
+  //   )
+  // }
+
+  // indicator (status) {
+  //   if (status === 'connected') {
+  //     return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+  //   } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+  //     return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+  //   } else {
+  //     return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+  //   }
+  // }
+
+  customSecondaryFocus () {
+    if (this.state.secondaryCustom === this.customMessage) this.setState({ secondaryCustom: '' })
+  }
+
+  customSecondaryBlur () {
+    if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
+  }
+
+
+  customPrimaryFocus () {
+    if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
+  }
+
+  customPrimaryBlur () {
+    if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
+  }
+
+  renderConnection (origin, active) {
+    return (
+      <div className='sliceTile'>
+        <div className={active ? 'sliceTileIndicator sliceTileIndicatorActive' : 'sliceTileIndicator' } />
+        <div className='sliceTileOrigin'> 
+          {origin}
         </div>
+        <div className='sliceTileChangeChain'> 
+          {svg.select(18)}
+        </div>
+      </div>
+    )
+  }
 
-        {this.state.showControls ? (
-          <div className='chainConfig cardShow'>  
-            <div className='chainConfigRow'>  
-              <input
-                className='chainIdInput'
-                value={this.state.id} spellCheck='false'
-                onChange={(e) => {
-                  if (type === 'ethereum' && id === 1) return
-                  this.setState({ id: e.target.value })
-                }}
-                onBlur={(e) => {
-                  if (e.target.value === '') this.setState({ id: this.props.id })
-                }}
-              />
-              <input
-                className='chainSymbolInput'
-                value={this.state.symbol} spellCheck='false'
-                onChange={(e) => {
-                  if (type === 'ethereum' && id === 1) return
-                  if (e.target.value.length > 8) return e.preventDefault()
-                  this.setState({ symbol: e.target.value })
-                }}
-                onBlur={(e) => {
-                  if (e.target.value === '') this.setState({ symbol: this.props.symbol })
-                }}
-              />
-              <Dropdown
-                syncValue={this.state.layer}
-                onChange={layer => this.setState({ layer })}
-                options={type === 'ethereum' && id === 1 ? [
-                  { text: 'mainnet', value: 'mainnet'}
-                ] : [
-                  { text: 'rollup', value: 'rollup'}, 
-                  { text: 'sidechain', value: 'sidechain'}, 
-                  { text: 'testnet', value: 'testnet'}, 
-                  { text: 'other', value: 'other'}
-                ]}
-                customClass='darkerDrop'
-              />
-            </div>
-            <div className='chainConfigRow'>
-              <input
-                value={this.state.explorer} spellCheck='false'
-                onChange={(e) => {
-                  this.setState({ explorer: e.target.value })
-                }}
-                onBlur={(e) => {
-                  if (e.target.value === '') this.setState({ explorer: this.props.explorer })
-                }}
-              />
-            </div>
+  render () {
+    const changed = (
+      this.state.id && 
+      this.state.name && 
+      this.state.symbol && 
+      this.state.symbol && 
+      this.state.explorer && 
+      this.state.type &&
+      this.state.layer && (
+        this.props.id !== this.state.id ||
+        this.props.name !== this.state.name ||
+        this.props.symbol !== this.state.symbol ||
+        this.props.explorer !== this.state.explorer ||
+        this.props.type !== this.state.type || 
+        this.props.layer !== this.state.layer
+      )
+    )
+    const { id, type, connection } = this.props
+
+    const networkPresets = this.store('main.networkPresets', type)
+    let presets = networkPresets[id] || {}
+    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
+    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
+    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+
+    const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9) || '---'
+    const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '---'
+    const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '---'
+    const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '---'
+
+    return (
+      <div className='network'>
+        <div className='networkActive'>
+          <div className='networkName'>
+            <input
+              value={this.state.name} spellCheck='false'
+              onChange={(e) => {
+                this.setState({ name: e.target.value })
+              }}
+              onBlur={(e) => {
+                if (e.target.value === '') this.setState({ name: this.props.name })
+              }}
+            />
           </div>
-        ) : null}
-
-        {this.state.showControls ? (
-          type === 'ethereum' && id === 1 ? (
-            <div className='chainMore cardShow'>
-              <div className='moduleButton moduleButtonLocked'>
-                {svg.lock(11)}
-              </div>
-            </div>
+          {this.props.id === 1 ? (
+            <div className='mainnetToggleLock'>{svg.lock(9)}</div>
           ) : (
-            <div className='chainMore cardShow'>
-              <div
-                className='moduleButton moduleButtonBad' onMouseDown={() => {
-                  const { id, name, type, explorer } = this.props
-                  link.send('tray:action', 'removeNetwork', { id, name, explorer, type })
-                }}
-              >
-                {svg.trash(13)} 
-                <span>remove chain</span>
-              </div>
+            <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
+              link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
+            }}>
+              <div className='signerPermissionToggleSwitch' />
             </div>
-          )
-        ) : null}
+          )}
+        </div>
+        {this.props.on ? (
+          <>
+            <ChainModule changed={changed} {...this.props} />
+            <Gas id={this.props.id} /> 
+            {/* <FeeModule changed={changed} {...this.props} /> */}
+            <div className='sliceContainer'>
+              {this.renderConnection('send.frame.eth', this.state.active[0])}
+              {this.renderConnection('http://uniswap.io', this.state.active[1])}
+              {this.renderConnection('http://app.aave.com', this.state.active[2])}
+            </div>
 
-        {changed ? (
-          <div className='chainConfigSave cardShow'>
-            <div
-              className='moduleButton moduleButtonGood' onMouseDown={() => {
-                const net = { id: this.props.id, name: this.props.name, type: this.props.type, symbol: this.props.symbol, explorer: this.props.explorer, layer: this.props.layer }
-                const newNet = { id: this.state.id, name: this.state.name, type: this.state.type, symbol: this.state.symbol, explorer: this.state.explorer, layer: this.state.layer }
-                let empty = false
-                Object.keys(newNet).forEach(k => {
-                  if (typeof newNet[k] === 'string') {
-                    newNet[k] = newNet[k].trim()
-                  }
-                  if (newNet[k] === '') empty = true
-                })
-                if (empty) return
-                this.setState(newNet)
-                this.setState({ submitted: true })
-                link.send('tray:action', 'updateNetwork', net, newNet)
-                setTimeout(() => this.setState({ submitted: false }), 1600)
-              }}>
-                {svg.save(11)} <span> save changes</span>
-              </div>
-            </div>
-          ) : (this.state.submitted ? (
-            <div className='chainConfigSave'>
-              <div className='moduleButton'>
-                {svg.octicon('check', { height: 22 })}
-              </div>
-            </div>
-          ) : null
-        )}
+            <SettingsModule changed={changed} {...this.props} />
+          </>
+        ) : null}
       </div>
     )
   }
 }
 
 const Network = Restore.connect(_Network)
-
 
 
 class Settings extends React.Component {
@@ -484,10 +654,10 @@ class Settings extends React.Component {
     if (network.type !== type || network.id !== id) link.send('tray:action', 'selectNetwork', type, id)
   }
 
-  expandNetwork (e, expand) {
-    e.stopPropagation()
-    this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
-  }
+  // expandNetwork (e, expand) {
+  //   e.stopPropagation()
+  //   this.setState({ expandNetwork: expand !== undefined ? expand : !this.state.expandNetwork })
+  // }
 
   renderConnections (layer) {
     const nets = []
@@ -537,7 +707,7 @@ class Settings extends React.Component {
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'} onMouseDown={e => this.expandNetwork(e, false)}>
+      <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'}>
         <div className='panelHeader' style={{ zIndex: 50 }}>
           <div className='panelHeaderTitle'>Chains</div>
           <div className='panelHeaderAddChain' onMouseDown={() => this.store.notify('addChain')}>
