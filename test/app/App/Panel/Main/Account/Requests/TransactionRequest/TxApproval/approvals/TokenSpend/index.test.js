@@ -168,7 +168,7 @@ describe('changing approval amounts', () => {
     fireEvent.click(proceed)
   })
 
-  it('allows the user to set the revert the token approval to the original request', done => {
+  it('allows the user to revert the token approval back to the original request', done => {
     const onApprove = function (req, approvalType, data) {
       try {
         expect(approvalType).toBe(ApprovalType.TokenSpendApproval)
