@@ -95,7 +95,9 @@ export default function (store: Store) {
         updateActiveBalances(address)
       }, 0)
 
-      scan = setTimeout(() => scanForAddress(), 20 * 1000)
+      scan = setTimeout(() => {
+        if (workerController?.isRunning()) scanForAddress()
+      }, 20 * 1000)
     }
 
     runWhenReady(() => scanForAddress())
