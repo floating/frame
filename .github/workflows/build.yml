@@ -4,46 +4,47 @@ on:
   push:
     branches:
       - '0.5'
+      - 'mac-only'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
 
 jobs:
-  create_draft_release:
-    runs-on: ubuntu-latest
+  # create_draft_release:
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: read version from package.json
-      id: package-version
-      uses: martinbeentjes/npm-get-version-action@master
-    - name: remove old draft releases
-      run: gh release list | grep -e "Draft.*v${{ steps.package-version.outputs.current-version }}" | awk '{print $3}' | xargs -r gh release delete
-    - name: create new draft release
-      uses: marvinpinto/action-automatic-releases@latest
-      with:
-        repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
-        automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
-        prerelease: true
-        draft: true
-        title: ${{ steps.package-version.outputs.current-version}}
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: read version from package.json
+  #     id: package-version
+  #     uses: martinbeentjes/npm-get-version-action@master
+  #   - name: remove old draft releases
+  #     run: gh release list | grep -e "Draft.*v${{ steps.package-version.outputs.current-version }}" | awk '{print $3}' | xargs -r gh release delete
+  #   - name: create new draft release
+  #     uses: marvinpinto/action-automatic-releases@latest
+  #     with:
+  #       repo_token: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
+  #       automatic_release_tag: v${{ steps.package-version.outputs.current-version }}
+  #       prerelease: true
+  #       draft: true
+  #       title: ${{ steps.package-version.outputs.current-version}}
 
   build_release:
-    needs: [create_draft_release]
+    # needs: [create_draft_release]
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
+        # os:
+        #   - ubuntu-latest
         include:
           - os: macos-11
             cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
             cert_password_key: APPLE_CERTIFICATE_PASSWORD
             apple_id_key: APPLE_ID
             apple_id_password_key: APPLE_ID_PASSWORD
-          - os: windows-latest
-            cert_key: WINDOWS_CSC_CERTIFICATE
-            cert_password_key: WINDOWS_CSC_PASSWORD
+          # - os: windows-latest
+          #   cert_key: WINDOWS_CSC_CERTIFICATE
+          #   cert_password_key: WINDOWS_CSC_PASSWORD
 
     runs-on: ${{ matrix.os }}
 
