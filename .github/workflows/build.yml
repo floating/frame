@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - '0.5'
-      - 'beta.17'
 
 env:
  GH_TOKEN: ${{ secrets.GH_RELEASE_DEPLOYMENT_TOKEN }}
