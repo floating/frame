@@ -125,10 +125,10 @@
 
       .signerPermissionToggleSwitchLocked
         position absolute
-        top 2px
-        left 2px
-        bottom 2px
-        right 2px
+        top 0px
+        left 0px
+        bottom 0px
+        right 0px
         border-radius 10px
         display flex
         align-items center
@@ -137,14 +137,22 @@
         *
           pointer-events none
 
+        .signerPermissionToggleSwitch
+          opacity 1
+          transition var(--standard)
+
         svg
           transition var(--standard)
           opacity 0
           color var(--ghostC)
 
       .signerPermissionToggleSwitchLocked:hover
+        .signerPermissionToggleSwitch
+          opacity 0
+
         svg
           opacity 1
+
 
     .signerPermissionToggleOn
       background var(--good)
@@ -904,27 +912,26 @@
   top 2px
   height 20px
   border-radius 12px
-  margin-left 4px
-  background var(--ghostB)
+  margin-left 8px
+  background var(--ghostZ)
   display flex
   justify-content center
   align-items center
   cursor pointer
   transition var(--standardFast)
-  padding 0px 8px 0px 7px
+  padding 0px 8px 0px 6px
   z-index 4
+  font-family FiraCode, monospace
+  font-size 12px
+  font-weight 600
   *
     pointer-events none
-
-  font-family FiraCode, monospace
-  font-size 11px
-  font-weight 600
 
   .chainIdBadgeIcon
     color var(--good)
     position relative
     top 0px
-    margin-right 4px
+    margin-right 6px
 
 .chainSettings
   position absolute

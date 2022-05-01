@@ -130,7 +130,7 @@ class Gas extends React.Component {
           {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block</div> : null }
           <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
             <div className='gasGweiNum'>
-              <div className='gasGweiNumIcon'>{svg.gas(6)}</div>
+              <div className='gasGweiNumIcon'>{svg.gas(7)}</div>
               {calculatedFees.actualBaseFee}
             </div >
             <span className='gasGweiLabel'>{'GWEI'}</span>
@@ -147,7 +147,7 @@ class Gas extends React.Component {
               <div className='gasArrowInner'>{svg.chevron(27)}</div>
             </div>
             <div  className='gasGweiNum'>
-            <div className='gasGweiNumIcon'>{svg.gas(8)}</div>
+            <div className='gasGweiNumIcon'>{svg.gas(9)}</div>
               {gasPrice}
             </div >
             <span className='gasGweiLabel'>{'GWEI'}</span>
@@ -163,7 +163,7 @@ class Gas extends React.Component {
           </div>
           <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
             <div  className='gasGweiNum'>
-              <div className='gasGweiNumIcon'>{svg.gas(6)}</div>
+              <div className='gasGweiNumIcon'>{svg.gas(7)}</div>
               {calculatedFees.priorityFee}
             </div >
             <span className='gasGweiLabel'>{'GWEI'}</span>
@@ -175,7 +175,7 @@ class Gas extends React.Component {
             return (
               <div className='gasEstimate'>
                 <div className='gasEstimateRange'>
-                  <span style={{ fontSize: '11px', marginRight: '-2px', marginTop: '-1px' }}>{!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}</span>
+                  <span className='gasEstimateSymbol' style={{ fontSize: '11px', marginRight: '-2px', marginTop: '-1px' }}>{!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}</span>
                   <span className='gasEstimateRangeLow'>{`${!estimate.low ? 0 : estimate.low < 0.01 ? 0.01 : estimate.low < 1 ? estimate.low.toFixed(2) : estimate.low}`}</span>
                 </div>
                 <div className='gasEstimateLabel'>{estimate.label}</div>

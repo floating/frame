@@ -652,7 +652,7 @@ class _Network extends React.Component {
           <div className='networkName'>
             {this.state.name}
             <div className='chainIdBadge'>
-              <div className='chainIdBadgeIcon'>{svg.chain(11)}</div>
+              <div className='chainIdBadgeIcon'>{svg.chain(12)}</div>
               <div className='chainIdBadgeNumber'>{id}</div>
             </div>
             {/* <input
@@ -682,6 +682,7 @@ class _Network extends React.Component {
             {this.props.id === 1 ? (
               <div className='signerPermissionToggleSwitchLocked'>
                 {svg.lock(10)}
+                <div className='signerPermissionToggleSwitch' />
               </div>
             ) : (
               <div className='signerPermissionToggleSwitch' />

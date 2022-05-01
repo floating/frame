@@ -107,7 +107,7 @@
   right 0px
   top 0px
   height 59px
-  padding-top 21px
+  padding-top 23px
   box-sizing border-box
   display flex
   justify-content space-between
@@ -138,13 +138,13 @@
     left 8px
     right 8px
     top 10px
-    height 4px
-    background var(--ghostY)
+    height 3px
+    background var(--ghostZ)
     border-radius 2px
 
     .panelMenuMark
       width 38px
-      height 4px
+      height 3px
       background var(--outerspace)
       transform translateX(14px)
       border-radius 2px
@@ -152,8 +152,8 @@
       margin-left -1px
 
   .panelMenuItem
-    height 28px
-    width 46px
+    height 25px
+    width 40px
     border-radius 8px
     display flex
     justify-content center
@@ -162,16 +162,17 @@
     transition none
     pointer-events auto
     transform translate3d(0, 0, 0)
-    background var(--ghostC)
+    background var(--ghostA)
     position absolute
     // box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
     cursor pointer
+    border 2px solid var(--ghostZ)
 
     *
       pointer-events none
 
   .panelMenuItem:hover
-    background var(--ghostD)
+    background var(--ghostB)
 
   .panelMenuItemAccounts
     right 120px
