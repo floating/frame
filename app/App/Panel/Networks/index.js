@@ -3,9 +3,12 @@ import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
+import Filter from '../Filter'
+
 import Dropdown from '../../Components/Dropdown'
 
 import Gas from './Gas'
+import chainMeta from './chainMeta'
 
 class _SettingsModule extends React.Component {
   constructor (props, context) {
@@ -15,17 +18,24 @@ class _SettingsModule extends React.Component {
     }
   }
   render () {
-    const { id, name, type, explorer, symbol, layer } = this.props
-    const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '---'
+    const { id, name, type, explorer, symbol, layer, changed } = this.props
+    const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
     return (
       <div className='sliceContainer' ref={this.ref}>
         <div 
-          className='sliceTile'
+          className='sliceTile sliceTileClickable'
           onClick={() => {
             this.setState({ expanded: !this.state.expanded })
           }}
         >
-          <div>{`${symbol} | $${price.toLocaleString()}`}</div>
+          <div className='sliceChainId'>
+            <div className='sliceChainIdIcon'>{svg.chain(12)}</div>
+            <div className='sliceChainIdNumber'>{id}</div>
+          </div>
+          <div className='sliceChainId'>
+            <div className='sliceChainIdIcon'>{symbol}</div>
+            <div className='sliceChainIdNumber'>{price.toLocaleString()}</div>
+          </div>
         </div>
         {this.state.expanded ? (
           <>
@@ -222,18 +232,18 @@ class _ChainModule extends React.Component {
   renderConnection (origin) {
     return (
       <div 
-        className='sliceTile'
+        className='sliceTile sliceTileClickable'
         onClick={() => {
           this.setState({ expanded: !this.state.expanded })
         }}
       >
-        <div className='sliceTileIndicatorLarge' />
+        <div className={this.props.active ? 'sliceTileIndicatorLarge sliceTileIndicatorActive' : 'sliceTileIndicatorLarge' } />
         <div className='sliceTileConnectionName'> 
           {'Pylon'}
         </div>
         <div className='sliceTileBlock'>
-          {svg.cube(14)}
-          {(1223434).toLocaleString('en')}
+          <div className='sliceTileBlockIcon'>{svg.cube(13)}</div>
+          <div>{1223434}</div>
         </div>
       </div>
     )
@@ -312,7 +322,14 @@ class _ChainModule extends React.Component {
                       </div>
                     </div>
                     <div className={connection.primary.current === 'custom' && connection.primary.on ? 'connectionCustomInput connectionCustomInputOn cardShow' : 'connectionCustomInput'}>
-                      <input tabIndex='-1' value={this.state.primaryCustom} onFocus={() => this.customPrimaryFocus()} onBlur={() => this.customPrimaryBlur()} onChange={e => this.inputPrimaryCustom(e)} />
+                      <input 
+                        className='customInput'
+                        tabIndex='-1'
+                        value={this.state.primaryCustom}
+                        onFocus={() => this.customPrimaryFocus()} 
+                        onBlur={() => this.customPrimaryBlur()}
+                        onChange={e => this.inputPrimaryCustom(e)}
+                      />
                     </div>
                   </>
                 ) : null}
@@ -356,6 +373,82 @@ class _ChainModule extends React.Component {
 }
 
 const ChainModule = Restore.connect(_ChainModule)
+
+
+
+class _OriginModule extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      expanded: false
+    }
+    this.ref = createRef()
+  }
+
+  // clickHandler (e) {
+  //   if (!e.composedPath().includes(this.ref.current)) {
+  //     if (this.state.expanded) this.setState({ expanded: false })
+  //   }
+  // }
+
+  // componentDidMount () {
+  //   document.addEventListener('click', this.clickHandler.bind(this))
+  // }
+
+  // componentDidUnmount () {
+  //   document.removeEventListener('click', this.clickHandler.bind(this))
+  // }
+
+  indicator (status) {
+    if (status === 'connected') {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
+    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
+    } else {
+      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
+    }
+  }
+  render () {
+    // console.log('this.state.expanded', this.state.expanded)
+    const { id, type, connection, changed, origin, active } = this.props
+
+    const networkPresets = this.store('main.networkPresets', type)
+    let presets = networkPresets[id] || {}
+    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
+    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
+    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
+
+    return (
+      <>      
+        <div 
+          className='sliceTile sliceTileClickable'
+          onClick={() => {
+            this.setState({ expanded: !this.state.expanded})
+          }}
+        >
+          <div className={active ? 'sliceTileIndicator sliceTileIndicatorActive' : 'sliceTileIndicator' } />
+          <div className='sliceTileOrigin'> 
+            {origin}
+          </div>
+          <div className='sliceTileChangeChain'> 
+            {svg.select(18)}
+          </div>
+        </div>
+        {this.state.expanded ? (
+          <div>
+            {' HELLLO '}
+          </div>
+        ) : null}
+      </>
+
+    )
+  }
+}
+
+const OriginModule = Restore.connect(_OriginModule)
+
+
+
 
 class _Network extends React.Component {
   constructor (props, context) {
@@ -496,7 +589,6 @@ class _Network extends React.Component {
     if (this.state.secondaryCustom === '') this.setState({ secondaryCustom: this.customMessage })
   }
 
-
   customPrimaryFocus () {
     if (this.state.primaryCustom === this.customMessage) this.setState({ primaryCustom: '' })
   }
@@ -505,25 +597,10 @@ class _Network extends React.Component {
     if (this.state.primaryCustom === '') this.setState({ primaryCustom: this.customMessage })
   }
 
-  renderConnection (origin, active) {
-    return (
-      <div className='sliceTile'>
-        <div className={active ? 'sliceTileIndicator sliceTileIndicatorActive' : 'sliceTileIndicator' } />
-        <div className='sliceTileOrigin'> 
-          {origin}
-        </div>
-        <div className='sliceTileChangeChain'> 
-          {svg.select(18)}
-        </div>
-      </div>
-    )
-  }
-
   render () {
     const changed = (
       this.state.id && 
       this.state.name && 
-      this.state.symbol && 
       this.state.symbol && 
       this.state.explorer && 
       this.state.type &&
@@ -536,7 +613,7 @@ class _Network extends React.Component {
         this.props.layer !== this.state.layer
       )
     )
-    const { id, type, connection } = this.props
+    const { id, type, connection, filter } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)
     let presets = networkPresets[id] || {}
@@ -545,15 +622,40 @@ class _Network extends React.Component {
     presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
 
     const gas = Math.round(parseInt(this.store('main.networksMeta.ethereum', this.state.id, 'gas.price.levels.fast'), 'hex') / 1e9) || '---'
-    const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '---'
-    const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '---'
-    const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '---'
+    const price = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.price') || '?'
+    const change24hr = this.store('main.networksMeta.ethereum', this.state.id, 'nativeCurrency.usd.change24hr') || '?'
+    const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '?'
+
+    const hexId = '0x' + parseInt(id).toString('16')
+    // console.log('hexId', hexId)
+    // console.log(chainMeta[hexId])
+
+    if (
+      filter &&
+      !this.state.id.toString().includes(filter) && 
+      !this.state.name.includes(filter) && 
+      !this.state.symbol.includes(filter) && 
+      !this.state.explorer.includes(filter) && 
+      !this.state.type.includes(filter) &&
+      !this.state.layer.includes(filter)
+    ) return null
 
     return (
       <div className='network'>
         <div className='networkActive'>
+          {/* <div 
+            style={{
+              background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'yellow'
+            }}
+            className='chainBadge' 
+          /> */}
           <div className='networkName'>
-            <input
+            {this.state.name}
+            <div className='chainIdBadge'>
+              <div className='chainIdBadgeIcon'>{svg.chain(11)}</div>
+              <div className='chainIdBadgeNumber'>{id}</div>
+            </div>
+            {/* <input
               value={this.state.name} spellCheck='false'
               onChange={(e) => {
                 this.setState({ name: e.target.value })
@@ -561,31 +663,50 @@ class _Network extends React.Component {
               onBlur={(e) => {
                 if (e.target.value === '') this.setState({ name: this.props.name })
               }}
-            />
+            /> */}
           </div>
-          {this.props.id === 1 ? (
-            <div className='mainnetToggleLock'>{svg.lock(9)}</div>
-          ) : (
-            <div className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onMouseDown={() => {
+
+          {/* <div className='chainIdBadgeBackground' /> */}
+
+          <div className='chainSettings' onClick={() => {
+            alert('show chain settings')
+          }}>
+            {svg.gear(11)}
+          </div>
+          <div 
+            className={this.props.on ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} 
+            onClick={this.props.id !== 1 ? () => {
               link.send('tray:action', 'activateNetwork', type, id, !this.props.on)
-            }}>
+            } : null}
+          >
+            {this.props.id === 1 ? (
+              <div className='signerPermissionToggleSwitchLocked'>
+                {svg.lock(10)}
+              </div>
+            ) : (
               <div className='signerPermissionToggleSwitch' />
-            </div>
-          )}
+            )}
+          </div>
         </div>
         {this.props.on ? (
-          <>
-            <ChainModule changed={changed} {...this.props} />
-            <Gas id={this.props.id} /> 
+          <div className='chainModules'>
+            <ChainModule changed={changed} {...this.props} active={this.state.active[0] || this.state.active[1] || this.state.active[2]}/>
+            {/* <SettingsModule changed={changed} {...this.props} /> */}
             {/* <FeeModule changed={changed} {...this.props} /> */}
+            <Gas id={this.props.id} /> 
             <div className='sliceContainer'>
-              {this.renderConnection('send.frame.eth', this.state.active[0])}
-              {this.renderConnection('http://uniswap.io', this.state.active[1])}
-              {this.renderConnection('http://app.aave.com', this.state.active[2])}
+              <OriginModule origin={'send.frame.eth'} active={ this.state.active[0]} {...this.props} />
+              <OriginModule origin={'http://uniswap.io'} active={ this.state.active[1]} {...this.props} />
+              <OriginModule origin={'and 4 more dapps using this chain'} active={ this.state.active[2]} {...this.props} />
             </div>
-
-            <SettingsModule changed={changed} {...this.props} />
-          </>
+            <div className='chainFooter'>
+              <div className='chainCurrencyItem'>
+                <div className='chainCurrencyItemSymbol'>{symbol}</div>
+                <div className='chainCurrencyItemAt'>{'@'}</div>
+                <div className='sliceChainIdNumber'>{'$' + price.toLocaleString() + ''}</div>
+              </div>
+            </div>
+          </div>
         ) : null}
       </div>
     )
@@ -628,7 +749,10 @@ class Settings extends React.Component {
       primaryCustom, 
       secondaryCustom, 
       resetConfirm: false, 
-      expandNetwork: false 
+      expandNetwork: false,
+      findFocus: false, 
+      findHover: false,
+      findInput: ''
     }
   }
 
@@ -662,6 +786,9 @@ class Settings extends React.Component {
   renderConnections (layer) {
     const nets = []
     const networks = this.store('main.networks')
+
+    const { filter } = this.state
+
     Object.keys(networks).forEach(type => {
       nets.push(
         <div key={type}>
@@ -682,6 +809,7 @@ class Settings extends React.Component {
                 connection={networks[type][id].connection}
                 layer={networks[type][id].layer}
                 on={networks[type][id].on}
+                filter={filter}
               />
             })
           }
@@ -706,19 +834,60 @@ class Settings extends React.Component {
         networkOptions.push({ text: networks[type][id].name, value: type + ':' + id })
       })
     })
+    const { findHover, findFocus, findInput } = this.state
+    console.log( findHover, findFocus, findInput )
     return (
       <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'}>
-        <div className='panelHeader' style={{ zIndex: 50 }}>
-          <div className='panelHeaderTitle'>Chains</div>
-          <div className='panelHeaderAddChain' onMouseDown={() => this.store.notify('addChain')}>
-            <div className='panelHeaderAddChainInner'>
-              {'Add Chain'}
-            </div>
+        {/* <div 
+          className='chainFilter'
+          style={findHover || findFocus || findInput ? {
+            transform: `translateY(0px)`
+          } : null}
+          onMouseEnter={() => {
+            this.setState({ findHover: true })
+          }}
+          onMouseLeave={() => {
+            this.setState({ findHover: false })
+          }}
+        >
+          <div className='chainFilterTitle'>
+            {'Find'}
           </div>
-        </div>
+          <div className='chainFilterInput'>
+            <input 
+              value={findInput}
+              tabIndex='-1'
+              onMouseEnter={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (!findInput) e.target.focus({ preventScroll: true })
+              }}
+              onFocus={() => {
+                this.setState({ findFocus: true })
+              }}
+              onBlur={() => {
+                this.setState({ findFocus: false })
+              }}
+              onChange={(e) => {
+                this.setState({ findInput: e.target.value })
+              }}
+            />
+          </div>
+        </div> */}
         <div className='localSettingsWrap'>
-          <div className='networkBreak'>
-            <div className='networkBreakLayer'>Mainnet</div>
+          <div className='panelHeader' style={{ zIndex: 50 }}>
+            <Filter 
+              buttonActionName={'Add Chain'} 
+              buttonAction={() => this.store.notify('addChain')}
+              onInput={input => {
+                this.setState({ filter: input })
+              }}
+            />
+            {/* <div className='panelHeaderAddChain' >
+              <div className='panelHeaderAddChainInner'>
+                {'Add Chain'}
+              </div>
+            </div> */}
           </div>
           {this.renderConnections('mainnet')}
           <div className='networkBreak'>

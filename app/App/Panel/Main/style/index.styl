@@ -31,7 +31,7 @@
 
   #panelWrap
     width 100%
-    padding-top 67px
+    padding-top 0px
     padding-bottom 67px
     will-change scroll-position
 
@@ -114,12 +114,12 @@
   pointer-events none
 
 .panelHeader
-  position absolute
-  left 0
-  right 0
-  top 0px 
-  height 63px
-  background var(--ghostA)
+  position relative
+  // left 16px
+  // right 16px
+  height 64px
+  width 100%
+  // background var(--ghostF)
   z-index 20000000000
   transition var(--standardFast)
 
@@ -140,7 +140,7 @@
     cursor pointer
     height 32px
     width 106px
-    border-radius 16px
+    border-radius 8px
     background var(--ghostB)
     display flex
     justify-content center

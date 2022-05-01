@@ -123,13 +123,16 @@ class Gas extends React.Component {
     const feeEstimatesUSD = this.txEstimates(type, id, gasPrice, fees ? calculatedFees : null, currentSymbol)
 
     return (
-      <div className='sliceContainer'>
+      <div className='infoContainer'>
         {/* <div className='moduleHeader'>{'Fee Monitor'}</div>   */}
         <div className='sliceGasBlock'>
           {this.state.baseHover ? <div className='feeToolTip feeToolTipBase cardShow'>The current base fee is added with a buffer to cover the next 3 blocks, any amount greater than your block's base fee is refunded</div> : null}
           {this.state.prioHover ? <div className='feeToolTip feeToolTipPriority cardShow'>A priority tip paid to validators is added to incentivize quick inclusion of your transaction into a block</div> : null }
           <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-            <span className='gasGweiNum'>{calculatedFees.actualBaseFee}</span>
+            <div className='gasGweiNum'>
+              <div className='gasGweiNumIcon'>{svg.gas(6)}</div>
+              {calculatedFees.actualBaseFee}
+            </div >
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Current Base'}</span>
           </div>
@@ -143,7 +146,10 @@ class Gas extends React.Component {
               <div className='gasArrowNotify'>+</div>
               <div className='gasArrowInner'>{svg.chevron(27)}</div>
             </div>
-            <span className='gasGweiNum'>{gasPrice}</span>
+            <div  className='gasGweiNum'>
+            <div className='gasGweiNumIcon'>{svg.gas(8)}</div>
+              {gasPrice}
+            </div >
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Recommended'}</span>
             <div 
@@ -156,7 +162,10 @@ class Gas extends React.Component {
             </div>
           </div>
           <div className='gasItem gasItemSmall' style={ !fees ? { pointerEvents: 'none', opacity: 0 } : {}}>
-            <span className='gasGweiNum'>{calculatedFees.priorityFee}</span>
+            <div  className='gasGweiNum'>
+              <div className='gasGweiNumIcon'>{svg.gas(6)}</div>
+              {calculatedFees.priorityFee}
+            </div >
             <span className='gasGweiLabel'>{'GWEI'}</span>
             <span className='gasLevelLabel'>{'Priority Tip'}</span>
           </div>
@@ -166,8 +175,8 @@ class Gas extends React.Component {
             return (
               <div className='gasEstimate'>
                 <div className='gasEstimateRange'>
-                  <span style={{ fontSize: '11px', marginRight: '-2px', marginTop: '-1px' }}>{!estimate.low || estimate.low >= 1 ? `$` : '<$'}</span>
-                  <span className='gasEstimateRangeLow'>{`${!estimate.low ? 0 : estimate.low < 1 ? 1 : estimate.low}`}</span>
+                  <span style={{ fontSize: '11px', marginRight: '-2px', marginTop: '-1px' }}>{!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}</span>
+                  <span className='gasEstimateRangeLow'>{`${!estimate.low ? 0 : estimate.low < 0.01 ? 0.01 : estimate.low < 1 ? estimate.low.toFixed(2) : estimate.low}`}</span>
                 </div>
                 <div className='gasEstimateLabel'>{estimate.label}</div>
               </div>

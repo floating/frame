@@ -1,9 +1,8 @@
 .sliceGasBlock
   position relative
   display flex
-  margin 0px 4px 4px 4px
-  background var(--ghostA)
   border-radius 8px
+  padding 2px
 
   .feeToolTip
     background var(--ghostB)
@@ -53,8 +52,7 @@
     align-items center
     flex-direction column
     height 56px
-    padding 8px 10px 8px 10px
-    margin 4px 0px 0px 0px
+    padding 12px 10px 8px 10px
     box-sizing border-box
 
     .gasArrowNotify
@@ -143,6 +141,12 @@
     .gasGweiNum
       font-size 20px
       font-family 'FiraCode', monospace
+      display flex
+      justify-content center
+      align-items center
+
+      .gasGweiNumIcon
+        margin -1px 4px 0px -4px
 
     .gasGweiLabel
       font-size 8px
@@ -182,7 +186,7 @@
   color var(--outerspace)
   display flex
   padding 0px 45px
-  margin 0px 4px 0px 4px
+  margin 4px 3px 0px 3px
   background var(--ghostA)
 
   .gasEstimate

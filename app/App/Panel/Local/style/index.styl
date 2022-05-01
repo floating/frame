@@ -29,15 +29,14 @@
   justify-content center
   align-items center
   transform translateZ(0)
-  // margin 0px 0px 0px 0px
-  background var(--ghostA)
-  padding 20px 10px
+  // background var(--ghostA)
+  padding 0px 10px
   border-radius 12px
-  font-size 13px
-  font-weight 300
+  font-size 12px
+  font-weight 400
   position relative
   z-index 1
-
+  line-height 20px
 
   @keyframes spin
     0% 
@@ -56,19 +55,19 @@
     justify-content center
     align-items center
     padding 20px
-    color var(--outerspace08)
+    // color var(--outerspace08)
     
     .snipItBrowserExtensionIcon:hover
-      background var(--ghostD)
+      background var(--ghostB)
 
     .snipItBrowserExtensionIcon
       display flex
       justify-content center
       align-items center
-      background var(--ghostC)
-      height 60px
-      width 60px
-      border 1px solid var(--thick)
+      background var(--ghostA)
+      height 42px
+      width 42px
+      border 3px solid var(--ghostY)
       border-radius 12px
       margin 0px 5px
       box-shadow cardDrop // , 0px 4px 2px -3px rgba(0, 25, 35, 0.14)
@@ -76,6 +75,15 @@
 
       *
         pointer-events none
+
+    .snipItBrowserExtensionIconChrome
+      color var(--smart)
+
+    .snipItBrowserExtensionIconFirefox
+      color var(--bad)
+
+    .snipItBrowserExtensionIconSafari
+      color var(--hardware)
 
     // .snipItSpinRight
     //   svg

@@ -4,12 +4,21 @@ import Restore from 'react-restore'
 
 import Account from './Account'
 
+import Filter from '../Filter'
+
 import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
 let firstScroll = true
 
 class Main extends React.Component {
+  constructor (...args) {
+    super(...args)
+    this.state = {
+      filter: ''
+    }
+  }
+
   reportScroll () {
     this.store.initialScrollPos(ReactDOM.findDOMNode(this.scroll).scrollTop)
   }
@@ -56,14 +65,25 @@ class Main extends React.Component {
     const scrollTop = this.store('selected.position.scrollTop')
     const open = current && this.store('selected.open')
     const sortedAccounts = Object.keys(accounts).sort((a, b) => this.accountSort(accounts, a, b))
+
+    const { filter } = this.state
+
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
               <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none', opacity: 0 } : { opacity: 1, transform: 'translateY(0px)' }}>
-                <div className='panelHeaderTitle'>Accounts</div>
-                <div className={!this.store('dash.showing') ? 'panelHeaderUpdate' : 'panelHeaderUpdate panelHeaderUpdateNotify'} onMouseDown={() => {
+                <Filter 
+                  onInput={input => {
+                    this.setState({ filter: input })
+                  }}
+                  buttonActionName={'Add Account'}
+                  buttonAction={() => {
+                    link.send('tray:action', 'toggleDash')
+                  }
+                } />
+                {/* <div className={!this.store('dash.showing') ? 'panelHeaderUpdate' : 'panelHeaderUpdate panelHeaderUpdateNotify'} onMouseDown={() => {
                   link.send('tray:action', 'toggleDash')
                 }}>
                   <div className='panelHeaderUpdateInner'>
@@ -72,11 +92,20 @@ class Main extends React.Component {
                     </div>
                     <div className='panelHeaderUpdateOn' />
                   </div>
-                </div>
+                </div> */}
               </div>
               {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {
-                return <Account key={id} {...accounts[id]} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
+                const account = accounts[id]
+                // console.log('account', account)
+                // console.log('filter', filter)
+                if (
+                  filter &&
+                  !account.address.includes(filter) &&
+                  !account.name.includes(filter) &&
+                  !account.ensName.includes(filter)
+                ) return null
+                return <Account key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
               })}
               {Object.keys(accounts).length === 0 ? (
                 <div className='noSigners'>
