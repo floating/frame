@@ -638,7 +638,7 @@ class Notify extends React.Component {
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
             {svg.octicon('x', { height: 17 })}
           </div>
-          <AddToken req={this.store('view.notifyData')} />
+          <AddToken req={this.store('view.notifyData')} currentNetworkId={this.store('main.currentNetwork.id')} />
         </div>
       )
     } else if (notify === 'customTokens') {
