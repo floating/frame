@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { Component } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 
-class AddToken extends React.Component {
+class AddToken extends Component {
   constructor (props, context) {
     super(props, context)
 
@@ -22,11 +22,20 @@ class AddToken extends React.Component {
     this.state = {
       name: this.token.name || this.nameDefault,
       symbol: (this.token.symbol || '').toUpperCase() || this.symbolDefault,
-      chainId: (Number.isInteger(chainId) && chainId) || this.chainDefault,
+      chainId: (Number.isInteger(chainId) && chainId) || props.currentNetworkId || this.chainDefault,
       address: (this.token.address || '').toLowerCase() || this.addressDefault,
       decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
       logoURI: this.token.logoURI || this.logoURIDefault
     }
+  }
+
+  async updateTokenData(contractAddress, chainId) {
+    const { name, symbol, decimals } = await window.ipc.invoke('tray:getTokenDetails', contractAddress, chainId)
+    this.setState({
+      name,
+      symbol,
+      decimals,
+    })
   }
 
   render () {
@@ -115,7 +124,12 @@ class AddToken extends React.Component {
                     if (!e.target.value) return this.setState({ chainId: '' })
 
                     const chainId = parseInt(e.target.value)
-                    if (!Number.isInteger(chainId)) return e.preventDefault()
+                    if (!Number.isInteger(chainId)) {
+                      return e.preventDefault()
+                    }
+                    ;(async () => {
+                      await this.updateTokenData(this.state.address, chainId)
+                    })()
 
                     this.setState({ chainId })
                   }}
@@ -136,7 +150,13 @@ class AddToken extends React.Component {
                   className={this.state.address === this.addressDefault ? 'tokenInput tokenInputAddress tokenInputDim' : 'tokenInput tokenInputAddress'}
                   value={this.state.address} spellCheck='false'
                   onChange={(e) => {
-                    if (e.target.value.length > 42) return e.preventDefault()
+                    if (e.target.value.length > 42) {
+                      return e.preventDefault()
+                    }
+                    ;(async () => {
+                      await this.updateTokenData(e.target.value, this.state.chainId)
+                    })()
+
                     this.setState({ address: e.target.value })
                   }}
                   onFocus={(e) => {
