@@ -1,24 +1,42 @@
-import { ipcRenderer } from 'electron'
-// import state from '../../state'
+import { contextBridge, ipcRenderer } from 'electron'
 import rpc from './rpc'
+
+const validChannels = ['tray:getTokenDetails']
+
+const invoke = (channel, ...data) =>
+  validChannels.includes(channel)
+    ? ipcRenderer.invoke(channel, ...data)
+    : Promise.reject(new Error('IPC channel not valid'))
+
+contextBridge.exposeInMainWorld('ipc', {
+  invoke,
+})
 
 // const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
 // process.once('loaded', () => { global.setImmediate = _setImmediate })
 // webFrame.executeJavaScript(`window.__initialState = ${JSON.stringify(state())}`)
 
-const unwrap = v => v !== undefined || v !== null ? JSON.parse(v) : v
-const wrap = v => v !== undefined || v !== null ? JSON.stringify(v) : v
+const unwrap = (v) => (v !== undefined || v !== null ? JSON.parse(v) : v)
+const wrap = (v) => (v !== undefined || v !== null ? JSON.stringify(v) : v)
 const source = 'bridge:link'
 
-window.addEventListener('message', e => {
-  if (e.origin !== 'file://') return
-  const data = unwrap(e.data)
-  if (e.origin === 'file://' && data.source !== source) {
-    if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({ id: data.id, args, source, method: 'rpc' }), e.origin))
-    if (data.method === 'event') return ipcRenderer.send(...data.args)
-  }
-}, false)
+window.addEventListener(
+  'message',
+  (e) => {
+    if (e.origin !== 'file://') return
+    const data = unwrap(e.data)
+    if (e.origin === 'file://' && data.source !== source) {
+      if (data.method === 'rpc') {
+        return rpc(...data.args, (...args) =>
+          e.source.postMessage(wrap({ id: data.id, args, source, method: 'rpc' }), e.origin),
+        )
+      }
+      if (data.method === 'event') return ipcRenderer.send(...data.args)
+    }
+  },
+  false,
+)
 
 ipcRenderer.on('main:action', (...args) => {
   args.shift()
