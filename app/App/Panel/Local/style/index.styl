@@ -29,14 +29,15 @@
   justify-content center
   align-items center
   transform translateZ(0)
-  // background var(--ghostA)
   padding 0px 10px
-  border-radius 12px
-  font-size 12px
+  font-size 13px
   font-weight 400
+  font-family 'Exo2'
   position relative
   z-index 1
-  line-height 20px
+  line-height 22px
+  margin-bottom 32px
+  margin-top 32px
 
   @keyframes spin
     0% 
@@ -54,19 +55,18 @@
     display flex
     justify-content center
     align-items center
-    padding 20px
-    // color var(--outerspace08)
+    padding 10px
     
     .snipItBrowserExtensionIcon:hover
-      background var(--ghostB)
+      background var(--ghostC)
 
     .snipItBrowserExtensionIcon
       display flex
       justify-content center
       align-items center
-      background var(--ghostA)
-      height 42px
-      width 42px
+      background var(--ghostB)
+      height 50px
+      width 50px
       border 3px solid var(--ghostY)
       border-radius 12px
       margin 0px 5px
@@ -76,14 +76,14 @@
       *
         pointer-events none
 
-    .snipItBrowserExtensionIconChrome
-      color var(--smart)
+    // .snipItBrowserExtensionIconChrome
+    //   color var(--mint)
 
-    .snipItBrowserExtensionIconFirefox
-      color var(--bad)
+    // .snipItBrowserExtensionIconFirefox
+    //   color var(--moonHighlight)
 
-    .snipItBrowserExtensionIconSafari
-      color var(--hardware)
+    // .snipItBrowserExtensionIconSafari
+    //   color var(--hardware2)
 
     // .snipItSpinRight
     //   svg
@@ -267,7 +267,7 @@
   margin-bottom 6px
   width 100%
   border-radius 12px
-  height 40px
+  height 46px
   font-size 13px
   text-transform uppercase
   font-weight 400
@@ -275,15 +275,16 @@
   display flex
   justify-content center
   align-items center
-  background var(--ghostB)
+  background var(--ghostA)
   transition var(--standardFast)
-  color var(--moon)
   cursor pointer
+  box-sizing border-box
+  border 3px solid var(--ghostY)
   * 
     pointer-events none
 
 .addCustonTokenButton:hover
-  background var(--ghostC)
+  background var(--ghostB)
 
 .signerPermissionToggle
   position relative

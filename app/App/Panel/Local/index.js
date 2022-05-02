@@ -168,8 +168,10 @@ class Settings extends React.Component {
 
   quit () {
     return (
-      <div className='quitFrame'>
-        <div onClick={() => link.send('tray:quit')} className='quitFrameButton'>Quit</div>
+      <div className='addCustonTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
+        <div className='addCustonTokenButton' onClick={() => link.send('tray:quit')}>
+          Quit
+        </div>
       </div>
     )
   }
@@ -215,6 +217,7 @@ class Settings extends React.Component {
         <div className='localSettingsWrap'>
           <Filter />
           <div className='snipIt'>
+            <div>Using a dapp that doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
               <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome' onClick={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
                 {svg.chrome(24)}
@@ -226,20 +229,24 @@ class Settings extends React.Component {
                 {svg.safari(24)}
               </div>
             </div>
-            <div>Using a dapp that doesn't support Frame natively?</div>
             <div>Inject a connection with our browser extension!</div>
           </div>
-          {this.discord()}
-          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
+          {/* <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
             <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
-              Custom Tokens
+              Manage Custom Tokens
             </div>
-          </div>
-          <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+          </div> */}
+          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustonTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Request a Feature 
             </div>
           </div>
+          {this.discord()}
+          {/* <div className='requestFeature'>
+            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+              Request a Feature 
+            </div>
+          </div> */}
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Summon Shortcut</div>

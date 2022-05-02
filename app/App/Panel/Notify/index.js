@@ -50,6 +50,48 @@ class Notify extends React.Component {
     )
   }
 
+  updateOriginChain () {
+    return (
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBoxSlide'>
+          <div className='notifyBox'>
+            <div className='notifyFrameIcon'>
+              <img src={frameIcon} />
+            </div>
+            <div className='notifyTitle'>
+              Update Chain
+            </div>
+            <div className='notifyBody'>
+              <div className='notifyBodyBlock notifyBodyBlockBig'>
+                {'origin'}
+              </div>
+              <div className='notifyBodyBlock notifyBodyBlockBig'>
+                <div>List of chains</div>
+                {/* <div 
+                  className='notifyBodyLink' 
+                  style={{marginTop: '20px'}}
+                  onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
+                >
+                  feedback.frame.sh
+                </div> */}
+              </div>
+            </div>
+            <div className='notifyInput'>
+              <div
+                className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
+                  // link.send('tray:action', 'muteBetaDisclosure')
+                  this.store.notify()
+                }}
+              >
+                <div className='notifyInputOptionText notifyBetaGo'>Update Chain</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   betaDisclosure () {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
@@ -540,6 +582,15 @@ class Notify extends React.Component {
             {svg.octicon('x', { height: 17 })}
           </div>
           {this.nonceWarning()}
+        </div>
+      )
+    } else if (notify === 'updateOriginChain') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {svg.octicon('x', { height: 17 })}
+          </div>
+          {this.updateOriginChain()}
         </div>
       )
     } else if (notify === 'gasFeeWarning') {

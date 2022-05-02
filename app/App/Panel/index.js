@@ -100,7 +100,7 @@ class Panel extends React.Component {
             <div className='panelMenuMark' style={{ transform: `translateX(${markLeft}px)` }} />
           </div>
           <div className='panelMenuItem panelMenuItemAccounts' onMouseDown={() => this.store.setPanelView('default')}>
-            {svg.accounts(15)}
+            {svg.accounts(16)}
             {/* <div className='panelDetailIndicator'>
               {this.indicator(this.store('main.networks', type, id, 'connection'))}
             </div> */}
@@ -122,7 +122,7 @@ class Panel extends React.Component {
             />
           </div> */}
           <div className='panelMenuItem panelMenuItemConnections' onMouseDown={() => this.store.setPanelView('networks')}>
-            {svg.chain(16)}
+            {svg.chain(15)}
           </div>
           <div className='panelMenuItem panelMenuItemSettings' onMouseDown={() => this.store.setPanelView('settings')}>
             {svg.octicon('settings', { height: 16 })}

@@ -103,7 +103,8 @@ class Main extends React.Component {
                   filter &&
                   !account.address.includes(filter) &&
                   !account.name.includes(filter) &&
-                  !account.ensName.includes(filter)
+                  !account.ensName.includes(filter) &&
+                  !account.lastSignerType.includes(filter)
                 ) return null
                 return <Account key={id} {...account} index={i} reportScroll={() => this.reportScroll()} resetScroll={() => this.resetScroll()} />
               })}

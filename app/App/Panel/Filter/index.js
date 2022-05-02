@@ -68,7 +68,8 @@ class Filter extends React.Component {
             onMouseLeave={() => this.setState({ glitchOn: false })}
           >
             {this.glitch(<div className='filterButtonInner'>
-              {buttonActionName}
+              {'+'}
+              {svg.chain(14)}
             </div>)}
           </div>
         ) : null}

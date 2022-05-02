@@ -1,8 +1,30 @@
+.sliceTileGasPrice
+  display flex
+  justify-content center
+  align-items center
+  justify-content center
+
+  .sliceTileGasPriceIcon
+    margin 0px 8px 0px 15px
+
+  .sliceTileGasPriceNumber
+    margin 0px 8px 0px 0px
+    font-family 'FiraCode', monospace
+    font-weight 100
+    font-size 19px
+    letter-spacing -1px
+
+  .sliceTileGasPriceUnit
+    margin 0px 0px 0px 0px
+    text-transform uppercase
+    font-size 8px
+    font-weight 600
+
 .sliceGasBlock
   position relative
   display flex
   border-radius 8px
-  padding 2px
+  padding 24px 0px 20px 0px
 
   .feeToolTip
     background var(--ghostB)
@@ -146,9 +168,11 @@
       align-items center
 
       .gasGweiNumIcon
-        margin -2px 6px 0px -12px
+        margin -1px 4px 0px -12px
 
     .gasGweiLabel
+      position relative
+      top -2px
       font-size 8px
       letter-spacing 1px
       padding-left 1px
@@ -182,36 +206,31 @@
 
 .sliceGasEstimateBlock
   position relative
-  border-radius 8px
   color var(--outerspace)
   display flex
-  padding 0px 45px
-  margin 4px 3px 0px 3px
-  background var(--ghostA)
+  padding-right 10px
+
 
   .gasEstimate
     display flex
     flex-direction column
-    justify-content center
+    justify-content flex-end
     align-items center
-    width calc(100% / 3)
-    padding 4px 0px 0px 0px
     box-sizing border-box
+    margin-left 17px
 
     .gasEstimateRange
       display flex
       justify-content center
       align-items center
-      font-size 14px
+      font-size 15px
       text-transform uppercase
-      font-weight 400
-      letter-spacing 0px
+      font-weight 600
       font-family 'FiraCode', monospace
 
       .gasEstimateRangeCurrency
-        font-size 12px
+        font-size 10px
         color var(--good)
-        padding-right 0px
         font-weight 600
 
       .gasEstimateRangeDash
@@ -226,14 +245,11 @@
       font-size 8px
       text-transform uppercase
       font-weight 600
-      letter-spacing 1px
-      padding-left 1px
-      padding-bottom 3px
       white-space nowrap
 
   .gasEstimateSymbol
-    color var(--good)
-    padding-right 5px
+    font-size 9px
+    font-weight bold
 
   .gasEstimate:last-child
     border-bottom none

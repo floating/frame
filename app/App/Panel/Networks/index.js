@@ -7,7 +7,11 @@ import Filter from '../Filter'
 
 import Dropdown from '../../Components/Dropdown'
 
+import Connection from './Connection'
 import Gas from './Gas'
+import Usage from './Usage'
+import Tokens from './Tokens'
+
 import chainMeta from './chainMeta'
 
 class _SettingsModule extends React.Component {
@@ -229,7 +233,7 @@ class _ChainModule extends React.Component {
   //   document.removeEventListener('click', this.clickHandler.bind(this))
   // }
 
-  renderConnection (origin) {
+  renderConnection (origin, id) {
     return (
       <div 
         className='sliceTile sliceTileClickable'
@@ -242,7 +246,9 @@ class _ChainModule extends React.Component {
           {'Pylon'}
         </div>
         <div className='sliceTileBlock'>
-          <div className='sliceTileBlockIcon'>{svg.cube(13)}</div>
+          <div className='sliceTileBlockIcon'>{svg.chain(16)}</div>
+          <div className='sliceTileChainId'>{id}</div>
+          <div className='sliceTileBlockIcon'>{svg.cube(16)}</div>
           <div>{1223434}</div>
         </div>
       </div>
@@ -295,7 +301,7 @@ class _ChainModule extends React.Component {
 
     return (
       <div className='sliceContainer' ref={this.ref}>
-        {this.renderConnection('connection')}
+        {this.renderConnection('connection', id)}
         {this.state.expanded ? (
           <div className='connectionLevels'>
             <div className='signerPermission signerPermissionNetwork cardShow' style={{ zIndex: 2 }}>
@@ -376,78 +382,6 @@ const ChainModule = Restore.connect(_ChainModule)
 
 
 
-class _OriginModule extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.state = {
-      expanded: false
-    }
-    this.ref = createRef()
-  }
-
-  // clickHandler (e) {
-  //   if (!e.composedPath().includes(this.ref.current)) {
-  //     if (this.state.expanded) this.setState({ expanded: false })
-  //   }
-  // }
-
-  // componentDidMount () {
-  //   document.addEventListener('click', this.clickHandler.bind(this))
-  // }
-
-  // componentDidUnmount () {
-  //   document.removeEventListener('click', this.clickHandler.bind(this))
-  // }
-
-  indicator (status) {
-    if (status === 'connected') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorGood' /></div>
-    } else if (status === 'loading' || status === 'syncing' || status === 'pending' || status === 'standby') {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorPending' /></div>
-    } else {
-      return <div className='connectionOptionStatusIndicator'><div className='connectionOptionStatusIndicatorBad' /></div>
-    }
-  }
-  render () {
-    // console.log('this.state.expanded', this.state.expanded)
-    const { id, type, connection, changed, origin, active } = this.props
-
-    const networkPresets = this.store('main.networkPresets', type)
-    let presets = networkPresets[id] || {}
-    presets = Object.keys(presets).map(i => ({ text: i, value: type + ':' + id + ':' + i }))
-    presets = presets.concat(Object.keys(networkPresets.default).map(i => ({ text: i, value: type + ':' + id + ':' + i })))
-    presets.push({ text: 'Custom', value: type + ':' + id + ':' + 'custom' })
-
-    return (
-      <>      
-        <div 
-          className='sliceTile sliceTileClickable'
-          onClick={() => {
-            this.setState({ expanded: !this.state.expanded})
-          }}
-        >
-          <div className={active ? 'sliceTileIndicator sliceTileIndicatorActive' : 'sliceTileIndicator' } />
-          <div className='sliceTileOrigin'> 
-            {origin}
-          </div>
-          <div className='sliceTileChangeChain'> 
-            {svg.select(18)}
-          </div>
-        </div>
-        {this.state.expanded ? (
-          <div>
-            {' HELLLO '}
-          </div>
-        ) : null}
-      </>
-
-    )
-  }
-}
-
-const OriginModule = Restore.connect(_OriginModule)
-
-
 
 
 class _Network extends React.Component {
@@ -483,18 +417,7 @@ class _Network extends React.Component {
       resetConfirm: false, 
       expandNetwork: false,
       showControls: false,
-      active: [0,0,0]
     }
-    const setActiveRandom = () => {
-      const a = Math.round(Math.random() * 1)
-      const b = Math.round(Math.random() * 1)
-      const c = Math.round(Math.random() * 1)
-      this.setState({ active: [a, b, c] })
-      setTimeout(() => {
-        setActiveRandom()
-      }, Math.round(Math.random() * 500))
-    }
-    setActiveRandom()
  }
 
   okProtocol (location) {
@@ -643,18 +566,16 @@ class _Network extends React.Component {
     return (
       <div className='network'>
         <div className='networkActive'>
-          {/* <div 
-            style={{
-              background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : 'yellow'
-            }}
-            className='chainBadge' 
-          /> */}
+          {chainMeta[hexId] && chainMeta[hexId].icon ? (
+            <div className='chainBadge' 
+            >
+              <img src={chainMeta[hexId].icon} />
+            </div>
+          ) : (
+            <div className='chainBadge' />
+          )}
           <div className='networkName'>
             {this.state.name}
-            <div className='chainIdBadge'>
-              <div className='chainIdBadgeIcon'>{svg.chain(12)}</div>
-              <div className='chainIdBadgeNumber'>{id}</div>
-            </div>
             {/* <input
               value={this.state.name} spellCheck='false'
               onChange={(e) => {
@@ -691,15 +612,10 @@ class _Network extends React.Component {
         </div>
         {this.props.on ? (
           <div className='chainModules'>
-            <ChainModule changed={changed} {...this.props} active={this.state.active[0] || this.state.active[1] || this.state.active[2]}/>
-            {/* <SettingsModule changed={changed} {...this.props} /> */}
-            {/* <FeeModule changed={changed} {...this.props} /> */}
+            <Connection changed={changed} {...this.props} />
             <Gas id={this.props.id} /> 
-            <div className='sliceContainer'>
-              <OriginModule origin={'send.frame.eth'} active={ this.state.active[0]} {...this.props} />
-              <OriginModule origin={'http://uniswap.io'} active={ this.state.active[1]} {...this.props} />
-              <OriginModule origin={'and 4 more dapps using this chain'} active={ this.state.active[2]} {...this.props} />
-            </div>
+            <Usage changed={changed} {...this.props} />
+            <Tokens changed={changed} {...this.props} />
             <div className='chainFooter'>
               <div className='chainCurrencyItem'>
                 <div className='chainCurrencyItemSymbol'>{symbol}</div>

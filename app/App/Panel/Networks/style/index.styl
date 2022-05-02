@@ -58,7 +58,7 @@
 .network
   background var(--ghostA)
   border-radius 17px
-  margin 0px 0px 24px 0px
+  margin 0px 0px 8px 0px
   position relative
   box-shadow 0px 4px 8px var(--ghostY)
   // border-top 2px solid var(--ghostC)
@@ -76,18 +76,29 @@
 
     .chainBadge
       position absolute
-      left 15px
-      top 21px
-      bottom 21px
-      width 20px
-      border-radius 15px
-      background blue
+      left 12px
+      top 15px
+      bottom 15px
+      width 32px
+      border-radius 16px
+      background var(--ghostB)
+      box-sizing border-box
+      overflow hidden
+      display flex
+      justify-content center
+      align-items center
+      color var(--outerspace)
+
+      img
+        max-height 22px
+        max-width 22px
+        color var(--outerspace)
 
     .networkName
       position absolute
-      left 16px
+      left 54px
       right 100px
-      top 2px
+      top 1px
       bottom 4px
       font-size 18px
       text-align left
@@ -166,7 +177,7 @@
 
 .localSettings
   position absolute
-  top 59px
+  top 69px
   right 0px
   bottom 0px
   left 0px
@@ -412,25 +423,25 @@
   margin-top 50px
   margin-bottom 30px
 
-  .quitFrameButton
-    width 100%
-    border-radius 12px
-    height 40px
-    font-size 13px
-    text-transform uppercase
-    font-weight 400
-    letter-spacing 1px
-    display flex
-    justify-content center
-    align-items center
-    background var(--ghostB)
-    transition var(--standardFast)
-    cursor pointer
-    * 
-      pointer-events none
+  // .quitFrameButton
+    // width 100%
+    // border-radius 12px
+    // // height 40px
+    // // font-size 13px
+    // text-transform uppercase
+    // font-weight 400
+    // letter-spacing 1px
+    // display flex
+    // justify-content center
+    // align-items center
+    // background var(--ghostB)
+    // transition var(--standardFast)
+    // cursor pointer
+    // * 
+    //   pointer-events none
 
-  .quitFrameButton:hover
-    background var(--ghostC)
+  // .quitFrameButton:hover
+  //   background var(--ghostC)
 
 .connectionLevels
   position relative
@@ -461,7 +472,7 @@
   justify-content center
   align-items center
   position relative
-  padding 16px 15px 16px 13px
+  padding 10px 15px 24px 13px
   font-family FiraCode, monospace
   font-size 12px
   font-weight 600
@@ -489,7 +500,7 @@
 .sliceContainer
   background var(--ghostZ)
   position relative
-  margin 0px 6px 0px 6px
+  margin 0px 6px 12px 6px
   border-radius 12px
   padding 3px 0px 3px 0px
   font-size 14px
@@ -508,10 +519,12 @@
       position relative
       margin 0px 18px
       top 2px
-    
 
   .sliceContainerClose:hover
     color var(--white)
+
+  .sliceTileCenter
+    justify-content center
 
   .sliceTile
     cursor pointer
@@ -520,43 +533,43 @@
     align-items center
     transition var(--standardFast)
     transform translateZ(0)
-    margin 3px 3px 0px 3px
+    // margin 3px 3px 0px 3px
     transform scale(1)
     background var(--ghostA)
     position relative
     border-radius 9px
-    height 33px
+    height 42px
     box-sizing border-box
     font-size 12px
     font-weight 300
     *
       pointer-events none
 
-    .sliceTileOrigin
-      padding 0px 32px 2px 32px
-      color var(--outerspace)
-
     .sliceTileConnectionName
-      padding 0px 32px
+      padding 0px 39px
       color var(--outerspace)
       text-transform uppercase
-      font-size 11px
+      font-size 13px
       font-weight 400
-      letter-spacing 2px
+      letter-spacing 1px
 
     .sliceTileBlock
       display flex
-      justify-conent center
       align-items center
-      padding-right 12px
+      padding-right 11px
       font-family FiraCode, monospace
-      font-size 12px
+      font-size 14px
+      font-weight 600
       position relative
-      top 0px
+      top 1px
+      bottom 0px
 
       .sliceTileBlockIcon
         color var(--good)
-        padding-right 10px
+        padding-right 5px
+
+      .sliceTileChainId
+        padding-right 15px
 
     .sliceTileIndicator
       color var(--outerspace)
@@ -583,11 +596,11 @@
       cursor pointer
       position absolute 
       top 50%
-      margin-top -4px
-      left 12px
+      margin-top -5px
+      left 15px
       bottom 0px
-      width 8px
-      height 8px
+      width 10px
+      height 10px
       border-radius 4px
       display flex
       justify-content center
@@ -666,9 +679,8 @@
   transform translateZ(0)
   padding 8px 16px
   margin 2px
-  border-radius 8px
   transform scale(1)
-  background var(--ghostA)
+  border-bottom 3px solid var(--ghostY)
 
   .connectionOptionToggle
     width 100%
@@ -913,7 +925,7 @@
   height 20px
   border-radius 12px
   margin-left 8px
-  background var(--ghostZ)
+  background var(--ghostB)
   display flex
   justify-content center
   align-items center
@@ -1096,3 +1108,5 @@
     margin-top 0px
 
 @import '../Gas/style/index.styl'
+@import '../Usage/style/index.styl'
+@import '../Tokens/style/index.styl'

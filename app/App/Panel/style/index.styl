@@ -106,8 +106,8 @@
   left 0px
   right 0px
   top 0px
-  height 59px
-  padding-top 23px
+  height 69px
+  padding-top 25px
   box-sizing border-box
   display flex
   justify-content space-between
@@ -119,19 +119,20 @@
   // pointer-events none
   transition var(--standardFast)
   background var(--ghostA)
-  border-bottom-left-radius 8px
-  border-bottom-right-radius 8px
+  border-bottom-left-radius 12px
+  border-bottom-right-radius 12px
+  box-shadow 0px 2px 3px var(--ghostZ)
 
   .panelTitle
     position absolute
-    left 18px
+    left 16px
     right 170px
-    top 20px
+    top 24px
     bottom 10px
     display flex
     align-items center
     font-family 'Exo2'
-    font-size 20px
+    font-size 22px
 
   .panelMenuMarker
     position absolute
@@ -141,8 +142,10 @@
     height 3px
     background var(--ghostZ)
     border-radius 2px
+    z-index 20000
 
     .panelMenuMark
+      position relative
       width 38px
       height 3px
       background var(--outerspace)
@@ -150,10 +153,43 @@
       border-radius 2px
       transition var(--standard)
       margin-left -1px
+      z-index 20002
+    
+    // .panelMenuMark::after
+    //   content ''
+    //   position absolute
+    //   top 0
+    //   left 0
+    //   right 0
+    //   bottom 0
+    //   width 38px
+    //   height 3px
+    //   background var(--outerspace)
+    //   // transform translateX(14px)
+    //   border-radius 2px
+    //   transition var(--standard)
+    //   z-index 20002
+
+    // .panelMenuMark::before
+    //   content ''
+    //   position absolute
+    //   top 5px
+    //   left -5px
+    //   right -5px
+    //   // height 40px
+    //   // background red
+    //   // transform perspective(300px) skew(20deg)
+    //   border-bottom: 20px solid var(--outerspace)
+    //   border-left: 10px solid transparent
+    //   border-right: 10px solid transparent
+    //   filter blur(9px)
+    //   opacity 0.1
+    //   // perspective 20px
+
 
   .panelMenuItem
-    height 25px
-    width 40px
+    height 28px
+    width 44px
     border-radius 8px
     display flex
     justify-content center
@@ -162,17 +198,17 @@
     transition none
     pointer-events auto
     transform translate3d(0, 0, 0)
-    background var(--ghostA)
+    background var(--ghostB)
     position absolute
     // box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
     cursor pointer
-    border 2px solid var(--ghostZ)
+    border 3px solid var(--ghostZ)
 
     *
       pointer-events none
 
   .panelMenuItem:hover
-    background var(--ghostB)
+    background var(--ghostC)
 
   .panelMenuItemAccounts
     right 120px
