@@ -1,6 +1,16 @@
-import { ipcRenderer } from 'electron'
-// import state from '../../state'
+import { contextBridge, ipcRenderer } from 'electron'
 import rpc from './rpc'
+
+const validChannels = ['tray:getTokenDetails']
+
+const invoke = (channel, ...data) =>
+  validChannels.includes(channel)
+    ? ipcRenderer.invoke(channel, ...data)
+    : Promise.reject(new Error('IPC channel not valid'))
+
+contextBridge.exposeInMainWorld('ipc', {
+  invoke,
+})
 
 // const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
