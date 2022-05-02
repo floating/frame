@@ -95,6 +95,8 @@ require('./rpc')
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
+const { default: Erc20Contract } = require('./contracts/erc20')
+const { default: provider } = require('./provider')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -214,6 +216,11 @@ ipcMain.on('tray:addChain', (e, chain, req) => {
 ipcMain.on('tray:switchChain', (e, type, id, req) => {
   if (type && id) store.selectNetwork(type, id)
   accounts.resolveRequest(req)
+})
+
+ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
+  const contract = new Erc20Contract(contractAddress, chainId, provider)
+  return contract.getTokenData()
 })
 
 ipcMain.on('tray:addToken', (e, token, req) => {
