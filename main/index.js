@@ -8,7 +8,7 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
 const path = require('path')
-process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
@@ -26,7 +26,7 @@ const menu = require('./menu')
 const store = require('./store').default
 const dapps = require('./dapps').default
 
-function getCrashReportFields () {
+function getCrashReportFields() {
   const fields = ['networks', 'networksMeta', 'tokens']
 
   return fields.reduce((extra, field) => {
@@ -58,9 +58,9 @@ Sentry.init({
       ...evt,
       user: { ...evt.user, ip_address: undefined }, // remove IP address
       tags: { ...evt.tags, 'frame.instance_id': store('main.instanceId') },
-      extra: getCrashReportFields()
+      extra: getCrashReportFields(),
     }
-  }
+  },
 })
 
 // if (process.defaultApp) {
@@ -95,6 +95,8 @@ require('./rpc')
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
+const { default: Erc20Contract } = require('./contracts/erc20')
+const { default: provider } = require('./provider')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -109,7 +111,10 @@ process.on('uncaughtException', (e) => {
   }
 
   if (e.code === 'EADDRINUSE') {
-    dialog.showErrorBox('Frame is already running', 'Frame is already running or another application is using port 1248.')
+    dialog.showErrorBox(
+      'Frame is already running',
+      'Frame is already running or another application is using port 1248.',
+    )
   } else {
     dialog.showErrorBox('An error occured, Frame will quit', e.message)
   }
@@ -135,10 +140,12 @@ const externalWhitelist = [
   'https://frame.canny.io',
   'https://feedback.frame.sh',
   'https://wiki.trezor.io/Trezor_Bridge',
-  'https://opensea.io'
+  'https://opensea.io',
 ]
 
-global.eval = () => { throw new Error(`This app does not support global.eval()`) } // eslint-disable-line
+global.eval = () => {
+  throw new Error('This app does not support global.eval()')
+} // eslint-disable-line
 
 ipcMain.on('tray:resetAllSettings', () => {
   persist.clear()
@@ -185,7 +192,7 @@ ipcMain.on('dash:reloadSigner', (e, id) => {
 })
 
 ipcMain.on('tray:openExternal', (e, url) => {
-  const validHost = externalWhitelist.some(entry => url === entry || url.startsWith(entry + '/'))
+  const validHost = externalWhitelist.some((entry) => url === entry || url.startsWith(entry + '/'))
   if (validHost) shell.openExternal(url)
 })
 
@@ -214,6 +221,11 @@ ipcMain.on('tray:addChain', (e, chain, req) => {
 ipcMain.on('tray:switchChain', (e, type, id, req) => {
   if (type && id) store.selectNetwork(type, id)
   accounts.resolveRequest(req)
+})
+
+ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
+  const contract = new Erc20Contract(contractAddress, chainId, provider)
+  return contract.getTokenData()
 })
 
 ipcMain.on('tray:addToken', (e, token, req) => {
@@ -251,19 +263,19 @@ ipcMain.on('tray:refreshMain', () => windows.broadcast('main:action', 'syncMain'
 
 ipcMain.on('tray:toggleFlow', () => windows.toggleFlow())
 
-ipcMain.on('frame:close', e => {
+ipcMain.on('frame:close', (e) => {
   windows.close(e)
 })
 
-ipcMain.on('frame:min', e => {
+ipcMain.on('frame:min', (e) => {
   windows.min(e)
 })
 
-ipcMain.on('frame:max', e => {
+ipcMain.on('frame:max', (e) => {
   windows.max(e)
 })
 
-ipcMain.on('frame:unmax', e => {
+ipcMain.on('frame:unmax', (e) => {
   windows.unmax(e)
 })
 
@@ -277,8 +289,8 @@ ipcMain.on('frame:unmax', e => {
 dapps.add({
   ens: 'send.frame.eth',
   config: {
-    key: 'value'
-  }
+    key: 'value',
+  },
 })
 
 // ipcMain.on('runDapp', async (e, ens) => {
@@ -300,7 +312,7 @@ ipcMain.on('*:addFrame', (e, id) => {
     store.addFrame({
       id,
       currentView: '',
-      views: {}
+      views: {},
     })
     dapps.open(id, 'send.frame.eth')
   }
@@ -325,7 +337,7 @@ app.on('ready', () => {
     if (filePath.startsWith(appOrigin)) cb({ path: filePath }) // eslint-disable-line
   })
 
-  store.observer(_ => {
+  store.observer((_) => {
     if (store('dash.showing')) {
       windows.showDash()
     } else {
@@ -363,7 +375,9 @@ app.on('quit', async () => {
   // await clients.stop()
   accounts.close()
 })
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit()
+})
 
 let launchStatus = store('main.launch')
 store.observer(() => {
