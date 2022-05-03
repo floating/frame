@@ -12,7 +12,7 @@ class AddToken extends Component {
     this.decimalsDefault = '?'
     this.addressDefault = 'Contract Address'
     this.logoURIDefault = 'Logo URI'
-    
+
     this.req = props.req || {}
     this.token = this.req.token || {}
 
@@ -29,20 +29,20 @@ class AddToken extends Component {
     }
   }
 
-  async updateTokenData(contractAddress, chainId) {
+  async updateTokenData (contractAddress, chainId) {
     const { name, symbol, decimals } = await window.ipc.invoke('tray:getTokenDetails', contractAddress, chainId)
     this.setState({
       name: name || this.nameDefault,
       symbol: symbol || this.symbolDefault,
-      decimals: decimals || this.decimalsDefault,
+      decimals: decimals || this.decimalsDefault
     })
   }
 
-  isDefault(statePropName) {
-    if(this.state[statePropName] === undefined) {
-      return false;
+  isDefault (statePropName) {
+    if (this.state[statePropName] === undefined) {
+      return false
     }
-    return this.state[statePropName] === this[`${statePropName}Default`];
+    return this.state[statePropName] === this[`${statePropName}Default`]
   }
 
   render () {
@@ -64,7 +64,7 @@ class AddToken extends Component {
             <div className='tokenRow'>
               <div className='tokenName'>
                 <label className='tokenInputLabel'>
-                  Token Name                
+                  Token Name
                   <input
                     className={`tokenInput tokenInputAddress ${this.isDefault('name') ? 'tokenInputDim' : ''}`}
                     value={this.state.name} spellCheck='false'
@@ -85,7 +85,7 @@ class AddToken extends Component {
             <div className='tokenRow'>
               <div className='tokenSymbol'>
                 <label className='tokenInputLabel'>
-                  Symbol                
+                  Symbol
                   <input
                     className={`tokenInput tokenInputAddress ${this.isDefault('symbol') ? 'tokenInputDim' : ''}`}
                     value={this.state.symbol} spellCheck='false'
@@ -127,7 +127,7 @@ class AddToken extends Component {
                     }}
                   />
                 </label>
-                
+
               </div>
 
               <div className='tokenChainId'>
@@ -144,7 +144,7 @@ class AddToken extends Component {
                         return e.preventDefault()
                       }
 
-                      this.setState({ chainId })                      
+                      this.setState({ chainId })
                       await this.updateTokenData(this.state.address, chainId)
                     }}
                     onFocus={(e) => {
@@ -187,7 +187,7 @@ class AddToken extends Component {
             <div className='tokenRow'>
               <div className='tokenLogoUri'>
                 <label className='tokenInputLabel'>
-                  Logo URI                
+                  Logo URI
                   <input
                     className={`tokenInput tokenInputAddress ${this.isDefault('logoURI') ? 'tokenInputDim' : ''}`}
                     value={this.state.logoURI} spellCheck='false'
@@ -207,8 +207,8 @@ class AddToken extends Component {
 
             <div className='tokenRow'>
               {newTokenReady ? (
-                <div 
-                  className='addTokenSubmit addTokenSubmitEnabled' 
+                <div
+                  className='addTokenSubmit addTokenSubmitEnabled'
                   onMouseDown={() => {
                     const { name, symbol, chainId, address, decimals, logoURI } = this.state
                     const token = { name, symbol, chainId, address, decimals, logoURI }
@@ -221,8 +221,8 @@ class AddToken extends Component {
                   Add Token
                 </div>
               ) : (
-                <div 
-                  className='addTokenSubmit' 
+                <div
+                  className='addTokenSubmit'
                 >
                   Fill in Token Details
                 </div>

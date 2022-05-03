@@ -9,7 +9,7 @@ const invoke = (channel, ...data) =>
     : Promise.reject(new Error('IPC channel not valid'))
 
 contextBridge.exposeInMainWorld('ipc', {
-  invoke,
+  invoke
 })
 
 // const dev = process.env.NODE_ENV === 'development'
