@@ -1,10 +1,70 @@
+// .network::before
+//   content ''
+//   position absolute
+//   top 6px
+//   left 124px
+//   right 124px
+//   height 1px
+//   border-radius 2px
+//   background var(--good)
+//   border 1px solid var(--ghostZ)
+// .chainFilter
+//   position absolute
+//   bottom 3px
+//   left 0
+//   right 0
+//   height 90px
+//   background var(--ghostB)
+//   z-index 200
+//   border-top-left-radius 8px
+//   border-top-right-radius 8px
+//   transform translateY(60px)
+//   transition var(--standard)
+//   box-shadow 0px -2px 4px var(--ghostZ)
+
+//   .chainFilterTitle
+//     height 30px
+//     display flex
+//     justify-content center
+//     align-items center
+//     font-size 12px
+//     text-transform uppercase
+//     letter-spacing 2px
+//     font-weight 400
+//     color var(--moon)
+//     padding-bottom 3px
+
+//   .chainFilterInput
+//     height 60px
+//     background var(--ghostA)
+//     display flex
+//     justify-content center
+//     align-items center
+//     position relative
+
+//     input
+//       width 100%
+//       position absolute
+//       top 0
+//       right 0
+//       bottom 0px
+//       left 0
+//       display flex
+//       justify-content center
+//       align-items center
+//       font-size 20px
+//       padding-bottom 5px
+
 .network
   background var(--ghostA)
-  border-radius 12px
-  margin 0px 0px 16px 0px
-  // border-bottom 2px solid var(--ghostZ)
-  // box-shadow 0px 6px 8px 0px var(--ghostY)
-  // box-shadow 0px 18px 70px -32px var(--ghostY)
+  border-radius 17px
+  margin 0px 0px 8px 0px
+  position relative
+  box-shadow 0px 4px 8px var(--ghostY)
+  // border-top 2px solid var(--ghostC)
+
+  .chainModules
+    padding-bottom 0px
 
   .networkActive
     position relative
@@ -12,29 +72,58 @@
     align-items space-between
     width 100%
     box-sizing border-box
-    height 60px
+    height 62px
+
+    .chainBadge
+      position absolute
+      left 12px
+      top 15px
+      bottom 15px
+      width 32px
+      border-radius 16px
+      background var(--ghostB)
+      box-sizing border-box
+      overflow hidden
+      display flex
+      justify-content center
+      align-items center
+      color var(--outerspace)
+
+      img
+        max-height 22px
+        max-width 22px
+        color var(--outerspace)
 
     .networkName
       position absolute
-      left 0px
-      right 74px
-      top 0px
-      bottom 0px
+      left 54px
+      right 100px
+      top 1px
+      bottom 4px
+      font-size 18px
+      text-align left
+      font-weight 400
+      padding-left 0px
+      font-family 'Exo2', sans-serif
+      display flex
+      align-items center
+      // justify-content center
 
-      input 
-        font-size 20px
-        text-align left
-        font-weight 400
-        padding-left 16px
-        font-family 'Exo2', sans-serif
+
+      // input 
+      //   font-size 20px
+      //   text-align left
+      //   font-weight 400
+      //   padding-left 13px
+      //   font-family 'Exo2', sans-serif
 
     .signerPermissionToggle
       position absolute
       right 16px
-      top 0
-      margin-top 22px
-      height 20px
-      width 40px
+      top 50%
+      margin-top -9px
+      height 18px
+      width 38px
       border-radius 12px
 
       .signerPermissionToggleSwitch
@@ -42,8 +131,39 @@
         top 2px
         left 2px
         bottom 2px
-        width 16px
+        width 14px
         border-radius 10px
+
+      .signerPermissionToggleSwitchLocked
+        position absolute
+        top 0px
+        left 0px
+        bottom 0px
+        right 0px
+        border-radius 10px
+        display flex
+        align-items center
+        justify-content center
+        cursor pointer
+        *
+          pointer-events none
+
+        .signerPermissionToggleSwitch
+          opacity 1
+          transition var(--standard)
+
+        svg
+          transition var(--standard)
+          opacity 0
+          color var(--ghostC)
+
+      .signerPermissionToggleSwitchLocked:hover
+        .signerPermissionToggleSwitch
+          opacity 0
+
+        svg
+          opacity 1
+
 
     .signerPermissionToggleOn
       background var(--good)
@@ -57,7 +177,7 @@
 
 .localSettings
   position absolute
-  top 59px
+  top 69px
   right 0px
   bottom 0px
   left 0px
@@ -67,7 +187,7 @@
   transition var(--standardFast)
   transform translateZ(0)  
   
-  input 
+  .customInput
     position absolute
     top 0
     left 0
@@ -202,7 +322,7 @@
     // background linear-gradient(-180deg, var(--bg0) 0%, var(--ghostC) 70%)
 
   .localSettingsWrap
-    padding 120px 6px 60px 6px
+    padding 0px 6px 60px 6px
     overflow-x hidden
     overflow-y scroll
     position relative
@@ -303,30 +423,250 @@
   margin-top 50px
   margin-bottom 30px
 
-  .quitFrameButton
-    width 100%
-    border-radius 12px
-    height 40px
-    font-size 13px
-    text-transform uppercase
-    font-weight 400
-    letter-spacing 1px
+  // .quitFrameButton
+    // width 100%
+    // border-radius 12px
+    // // height 40px
+    // // font-size 13px
+    // text-transform uppercase
+    // font-weight 400
+    // letter-spacing 1px
+    // display flex
+    // justify-content center
+    // align-items center
+    // background var(--ghostB)
+    // transition var(--standardFast)
+    // cursor pointer
+    // * 
+    //   pointer-events none
+
+  // .quitFrameButton:hover
+  //   background var(--ghostC)
+
+.connectionLevels
+  position relative
+  z-index 999999999
+
+  .connectionTitle
+    height 12px
     display flex
     justify-content center
     align-items center
-    background var(--ghostB)
-    transition var(--standardFast)
+    font-size 8px
+    text-transform uppercase
+    padding 8px 16px
+    letter-spacing 1px
+    margin-left -1px
+    font-weight 600
+    color var(--outerspace08)
+
+.infoContainer
+  position relative
+  margin 10px 10px 12px 10px
+  border-radius 12px
+  font-size 14px
+  font-weight 300
+
+.chainFooter
+  display flex
+  justify-content center
+  align-items center
+  position relative
+  padding 10px 15px 24px 13px
+  font-family FiraCode, monospace
+  font-size 12px
+  font-weight 600
+
+  .chainCurrencyItem
+    display flex
+    justify-content center
+    align-items center
+    position relative
+    border-radius 12px
+
+    .chainCurrencyItemIcon
+      color var(--good)
+      position relative
+      top 0px
+      margin-right 8px
+      
+    .chainCurrencyItemSymbol
+      margin-right 8px
+
+    .chainCurrencyItemAt
+      margin-right 8px
+      color var(--good)
+
+.sliceContainer
+  background var(--ghostZ)
+  position relative
+  margin 0px 6px 12px 6px
+  border-radius 12px
+  padding 3px 0px 3px 0px
+  font-size 14px
+  font-weight 300
+
+  .sliceContainerClose
     cursor pointer
-    * 
+    height 16px
+    display flex
+    justify-content center
+    align-items center
+    border-radius 8px
+    color black
+    div
+      pointer-events none
+      position relative
+      margin 0px 18px
+      top 2px
+
+  .sliceContainerClose:hover
+    color var(--white)
+
+  .sliceTileCenter
+    justify-content center
+
+  .sliceTile
+    cursor pointer
+    display flex
+    justify-content space-between
+    align-items center
+    transition var(--standardFast)
+    transform translateZ(0)
+    // margin 3px 3px 0px 3px
+    transform scale(1)
+    background var(--ghostA)
+    position relative
+    border-radius 9px
+    height 42px
+    box-sizing border-box
+    font-size 12px
+    font-weight 300
+    *
       pointer-events none
 
-  .quitFrameButton:hover
-    background var(--ghostC)
+    .sliceTileConnectionName
+      padding 0px 39px
+      color var(--outerspace)
+      text-transform uppercase
+      font-size 13px
+      font-weight 400
+      letter-spacing 1px
 
-.connectionLevels
-  padding-bottom 15px
-  position relative
-  z-index 999999999
+    .sliceTileBlock
+      display flex
+      align-items center
+      padding-right 11px
+      font-family FiraCode, monospace
+      font-size 14px
+      font-weight 600
+      position relative
+      top 1px
+      bottom 0px
+
+      .sliceTileBlockIcon
+        color var(--good)
+        padding-right 5px
+
+      .sliceTileChainId
+        padding-right 15px
+
+    .sliceTileIndicator
+      color var(--outerspace)
+      cursor pointer
+      position absolute 
+      top 50%
+      margin-top -2px
+      left 13px
+      bottom 0px
+      width 5px
+      height 5px
+      border-radius 3px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 12px
+      background var(--good)
+      *
+        pointer-events none
+
+
+    .sliceTileIndicatorLarge
+      color var(--outerspace)
+      cursor pointer
+      position absolute 
+      top 50%
+      margin-top -5px
+      left 14px
+      bottom 0px
+      width 10px
+      height 10px
+      border-radius 4px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 12px
+      background var(--good)
+      *
+        pointer-events none
+
+    .sliceTileIndicatorActive
+      background var(--goodHighlight)
+      box-shadow 0px 0px 4px var(--goodHighlight)
+
+    .sliceTileChangeChain
+      color var(--outerspace)
+      cursor pointer
+      position absolute 
+      top 0px
+      right 0px
+      bottom 0px
+      width 41px
+      display flex
+      justify-content center
+      align-items center
+      border-radius 12px
+      *
+        pointer-events none
+
+    .sliceTileChangeChain:hover
+      background var(--ghostB)
+
+    .sliceTileChangeConnected
+      background var(--good)
+
+    .sliceChainId
+      display flex
+      justify-content center
+      align-items center
+      font-family FiraCode, monospace
+      font-size 12px
+      margin 10px
+
+      .sliceChainIdIcon
+        margin-right 6px
+
+  .sliceTile:first-child
+    margin 0px 3px 0px 3px
+
+  .sliceTileHighlight
+    background var(--ghostB)
+
+  .sliceTileClickable:hover
+    background var(--ghostB)
+    box-shadow 0px 2px 2px var(--ghostZ)
+    // animation 4s shake ease-in-out infinite alternate
+
+  .sliceTileClickable:active
+    transform translateY(0px)
+    // animation-name shake-little
+    // animation-duration 2s
+    // animation-timing-function: ease-in-out
+    // animation-iteration-count: infinite
+    // box-shadow 0px 1px 1px var(--ghostZ)
+
+.sliceContainer:last-child
+  margin 0px 6px 0px 6px
 
 .connectionTitle
   justify-content space-between
@@ -338,10 +678,9 @@
   transition var(--standard)
   transform translateZ(0)
   padding 8px 16px
-  margin 4px 8px
-  border-radius 8px
+  margin 2px
   transform scale(1)
-  background var(--ghostB)
+  border-bottom 3px solid var(--ghostY)
 
   .connectionOptionToggle
     width 100%
@@ -516,7 +855,7 @@
   position relative
   padding-top 0px
   transition var(--standardFast)
-  background var(--ghostA)
+  background var(--ghostZ)
   border-radius 8px
   transform translateZ(0)
   z-index 20
@@ -555,7 +894,7 @@
   height 20px
   width 40px
   border-radius 12px
-  background var(--ghostC)
+  background var(--ghostZ)
   display flex
   justify-content center
   align-items center
@@ -563,8 +902,77 @@
   svg
     color var(--outerspace03)
 
+.chainIdBadgeBackground
+  position absolute
+  right 13px
+  top 50%
+  margin-top -13px
+  height 26px
+  width 136px
+  border-radius 12px
+  // background var(--ghostC)
+  background var(--ghostZ)
+  display flex
+  justify-content center
+  align-items center
+  cursor pointer
+  transition var(--standardFast)
+  display none
+
+.chainIdBadge
+  position relative
+  top 2px
+  height 20px
+  border-radius 12px
+  margin-left 8px
+  background var(--ghostB)
+  display flex
+  justify-content center
+  align-items center
+  cursor pointer
+  transition var(--standardFast)
+  padding 0px 8px 0px 6px
+  z-index 4
+  font-family FiraCode, monospace
+  font-size 12px
+  font-weight 600
+  *
+    pointer-events none
+
+  .chainIdBadgeIcon
+    color var(--good)
+    position relative
+    top 0px
+    margin-right 6px
+
+.chainSettings
+  position absolute
+  right 60px
+  top 50%
+  margin-top -10px
+  height 20px
+  width 40px
+  border-radius 12px
+  background var(--ghostC)
+  display flex
+  justify-content center
+  align-items center
+  cursor pointer
+  transition var(--standardFast)
+  *
+    pointer-events none
+
+  svg
+    transition var(--standardFast)
+    color var(--outerspace08)
+
+.chainSettings:hover
+  background var(--ghostD)
+  svg
+    color var(--outerspace)
+
 .networkBreak
-  padding 32px 16px 0px 16px
+  padding 16px 16px 0px 16px
   margin-bottom 8px
   font-size 11px
   text-transform uppercase
@@ -611,9 +1019,12 @@
 
 
 .chainConfig
-  padding 8px 8px
+  padding 8px
+  margin 4px
+  border-radius 8px
   position relative
   z-index 99999999
+  background var(--ghostA)
 
   .chainConfigRow
     position relative
@@ -653,8 +1064,8 @@
 
 .signerDrawer
   position relative
-  height 40px
-  margin-top -20px
+  height 39px
+  margin-top -19px
 
   .showControls
     position absolute
@@ -669,7 +1080,7 @@
     margin-left -50px
     padding-bottom 2px
     letter-spacing 1px
-    font-size 11px
+    font-size 10px
     display flex
     justify-content center
     align-items center
@@ -695,3 +1106,7 @@
     background var(--ghostZ)
     z-index 1
     margin-top 0px
+
+@import '../Gas/style/index.styl'
+@import '../Usage/style/index.styl'
+@import '../Tokens/style/index.styl'

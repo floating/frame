@@ -218,7 +218,7 @@ const api = {
       clearTimeout(this.recentAutohide)
       this.recentAutohideTimeout = setTimeout(() => {
         this.recentAutohide = false
-      }, 400)
+      }, 50)
     }
     // hideShow.current = 'hidden'
     // if (hideShow.running) {

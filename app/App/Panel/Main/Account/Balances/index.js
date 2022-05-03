@@ -47,18 +47,18 @@ function balance (rawBalance, quote = {}) {
 
 
 class Balance extends React.Component {
-  constructor (...args) {
-    super(...args)
-    this.state = {
-      initialMount: true
-    }
-  }
+  // constructor (...args) {
+  //   super(...args)
+  //   this.state = {
+  //     initialMount: true
+  //   }
+  // }
 
-  componentDidMount () {
-    setTimeout(() => {
-      this.setState({ initialMount: false })
-    }, 200)
-  }
+  // componentDidMount () {
+  //   setTimeout(() => {
+  //     this.setState({ initialMount: false })
+  //   }, 200)
+  // }
 
   render () {
     const { symbol, balance, i, scanning } = this.props
@@ -77,7 +77,7 @@ class Balance extends React.Component {
 
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
-        <div className='signerBalanceInner' style={{ opacity: !scanning && !this.state.initialMount ? 1 : 0, transitionDelay: (0.05 * i) + 's' }}>
+        <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceLogo'>
             <img 
               src={balance.logoURI && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}

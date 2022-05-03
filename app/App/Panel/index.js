@@ -90,9 +90,9 @@ class Panel extends React.Component {
         }
       })
     })
-    let markLeft = 6
-    if (this.store('panel.view') === 'networks') markLeft = 282
-    if (this.store('panel.view') === 'settings') markLeft = 318
+    let markLeft = 189
+    if (this.store('panel.view') === 'networks') markLeft = 244
+    if (this.store('panel.view') === 'settings') markLeft = 300
     return (
       <div id='panel' style={{ opacity }}>
         <div className='panelMenu'>
@@ -100,24 +100,34 @@ class Panel extends React.Component {
             <div className='panelMenuMark' style={{ transform: `translateX(${markLeft}px)` }} />
           </div>
           <div className='panelMenuItem panelMenuItemAccounts' onMouseDown={() => this.store.setPanelView('default')}>
-            <div className='panelDetailIndicator'>
+            {svg.accounts(16)}
+            {/* <div className='panelDetailIndicator'>
               {this.indicator(this.store('main.networks', type, id, 'connection'))}
-            </div>
+            </div> */}
           </div>
-          <div className='panelMenuItemNetwork'>
+          <div key={this.store('panel.view')} className='panelTitle'>
+            {this.store('panel.view') === 'default' ? (
+              'Accounts' 
+            ) : this.store('panel.view') === 'networks' ? (
+              'Chains'
+            ) : this.store('panel.view') === 'settings' ? (
+              'Settings'
+            ) : null}
+          </div>
+          {/* <div className='panelMenuItemNetwork'>
             <Dropdown
               syncValue={type + ':' + id}
               onChange={(network) => this.selectNetwork(network)}
               options={networkOptions}
             />
-          </div>
+          </div> */}
           <div className='panelMenuItem panelMenuItemConnections' onMouseDown={() => this.store.setPanelView('networks')}>
-            {svg.broadcast(15)}
+            {svg.chain(15)}
           </div>
           <div className='panelMenuItem panelMenuItemSettings' onMouseDown={() => this.store.setPanelView('settings')}>
-            {svg.octicon('settings', { height: 18 })}
+            {svg.octicon('settings', { height: 16 })}
           </div>
-          {type === 'ethereum' ? (
+          {/* {type === 'ethereum' ? (
             <div className='panelMenuData' style={{ opacity: this.store('view.addAccount') ? 0 : 1 }}>
               <div className='panelMenuDataItem'>
                 {gasPrice || '---'}
@@ -129,7 +139,7 @@ class Panel extends React.Component {
                 <div>{baseRate}</div>
               </div>
             </div>
-          ) : null}
+          ) : null} */}
         </div>
         <Notify />
         <Local />

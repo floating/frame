@@ -6,6 +6,8 @@ import svg from '../../../../resources/svg'
 
 import Dropdown from '../../Components/Dropdown'
 
+import Filter from '../Filter'
+
 class Settings extends React.Component {
   constructor (props, context) {
     super(props, context)
@@ -166,8 +168,10 @@ class Settings extends React.Component {
 
   quit () {
     return (
-      <div className='quitFrame'>
-        <div onClick={() => link.send('tray:quit')} className='quitFrameButton'>Quit</div>
+      <div className='addCustonTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
+        <div className='addCustonTokenButton' onClick={() => link.send('tray:quit')}>
+          Quit
+        </div>
       </div>
     )
   }
@@ -209,34 +213,40 @@ class Settings extends React.Component {
       })
     })
     return (
-      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'} onClick={e => this.expandNetwork(e, false)}>
-        <div className='panelHeader' style={{ zIndex: 50, pointerEvents: 'none' }}>
-          <div className='panelHeaderTitle'>Settings</div>
-        </div>
+      <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'}>
         <div className='localSettingsWrap'>
+          <Filter />
           <div className='snipIt'>
             <div>Using a dapp that doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
-              <div className='snipItBrowserExtensionIcon snipItSpinLeft' onClick={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
-                {svg.chrome(30)}
+              <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome' onClick={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
+                {svg.chrome(24)}
               </div>
-              <div className='snipItBrowserExtensionIcon snipItSpinRight' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
-                {svg.firefox(30)}
+              <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconFirefox' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
+                {svg.firefox(24)}
+              </div>
+              <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
+                {svg.safari(24)}
               </div>
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>
-          <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
-              Feature Requests
+          {/* <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
+              Manage Custom Tokens
+            </div>
+          </div> */}
+          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustonTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+              Request a Feature 
             </div>
           </div>
           {this.discord()}
-          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
-              Custom Tokens
+          {/* <div className='requestFeature'>
+            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+              Request a Feature 
             </div>
-          </div>
+          </div> */}
           <div className='signerPermission localSetting' style={{ zIndex: 214 }}>
             <div className='signerPermissionControls'>
               <div className='signerPermissionSetting'>Summon Shortcut</div>

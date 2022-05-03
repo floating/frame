@@ -2,7 +2,7 @@ import React from 'react'
 import Restore from 'react-restore'
 
 import DappTile from './DappTile'
-import Native from './Native'
+import Native from '../../resources/Native'
 import svg from '../../resources/svg'
 import link from '../../resources/link'
 
