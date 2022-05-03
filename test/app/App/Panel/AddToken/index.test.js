@@ -44,7 +44,7 @@ describe('token metadata lookup', () => {
   })
 
 
-  it('should perform a lookup and display the expected token data', async () => {
+  it('should perform a lookup on a contract address and display the expected token data', async () => {
     const { getByLabelText } = render(
       <AddToken currentNetworkId={1} />
     )
