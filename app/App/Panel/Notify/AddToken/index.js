@@ -30,20 +30,11 @@ class AddToken extends Component {
   }
 
   async updateTokenData(contractAddress, chainId) {
-    let { name, symbol, decimals } = await window.ipc.invoke('tray:getTokenDetails', contractAddress, chainId)
-    if(name === '') {
-      name = this.nameDefault
-    }
-    if(symbol === '') {
-      symbol = this.symbolDefault
-    }
-    if(decimals === 0) {
-      decimals = this.decimalsDefault
-    }
+    const { name, symbol, decimals } = await window.ipc.invoke('tray:getTokenDetails', contractAddress, chainId)
     this.setState({
-      name,
-      symbol,
-      decimals,
+      name: name || this.nameDefault,
+      symbol: symbol || this.symbolDefault,
+      decimals: decimals || this.decimalsDefault,
     })
   }
 
@@ -145,18 +136,16 @@ class AddToken extends Component {
                   <input
                     className={`tokenInput tokenInputAddress ${this.isDefault('chainId') ? 'tokenInputDim' : ''}`}
                     value={this.state.chainId} spellCheck='false'
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       if (!e.target.value) return this.setState({ chainId: '' })
 
                       const chainId = parseInt(e.target.value)
                       if (!Number.isInteger(chainId)) {
                         return e.preventDefault()
                       }
-                      ;(async () => {
-                        await this.updateTokenData(this.state.address, chainId)
-                      })()
 
-                      this.setState({ chainId })
+                      this.setState({ chainId })                      
+                      await this.updateTokenData(this.state.address, chainId)
                     }}
                     onFocus={(e) => {
                       if (e.target.value === this.chainIdDefault) this.setState({ chainId: '' })
@@ -176,15 +165,13 @@ class AddToken extends Component {
                   <input
                     className={`tokenInput tokenInputAddress ${this.isDefault('address') ? 'tokenInputDim' : ''}`}
                     value={this.state.address} spellCheck='false'
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       if (e.target.value.length > 42) {
                         return e.preventDefault()
                       }
-                      ;(async () => {
-                        await this.updateTokenData(e.target.value, this.state.chainId)
-                      })()
 
                       this.setState({ address: e.target.value })
+                      await this.updateTokenData(e.target.value, this.state.chainId)
                     }}
                     onFocus={(e) => {
                       if (e.target.value === this.addressDefault) this.setState({ address: '' })
