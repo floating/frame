@@ -1,5 +1,4 @@
 module.exports = {
-  "testTimeout": 100,
   "roots": [
     "test"
   ],
