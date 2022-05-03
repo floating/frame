@@ -78,9 +78,9 @@ describe('token metadata lookup', () => {
         const tokenDecimalsInput = getByLabelText('Decimals')
         const tokenChainIdInput = getByLabelText('Chain ID')
 
-        expect(tokenNameInput.value).toEqual('')
-        expect(tokenSymbolInput.value).toEqual('')
-        expect(tokenDecimalsInput.value).toEqual('0')
+        expect(tokenNameInput.value).toEqual('Token Name')
+        expect(tokenSymbolInput.value).toEqual('SYMBOL')
+        expect(tokenDecimalsInput.value).toEqual('?')
         expect(tokenChainIdInput.value).toEqual('2')
 
         await user.type(tokenChainIdInput, '{Backspace}1')
