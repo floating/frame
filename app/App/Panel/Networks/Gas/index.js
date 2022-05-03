@@ -129,7 +129,7 @@ class Gas extends React.Component {
         }}
       >
         <div className='sliceTileGasPrice'> 
-          <div className='sliceTileGasPriceIcon'>{svg.gas(10)}</div>
+          <div className='sliceTileGasPriceIcon'>{svg.gas(9)}</div>
           <div className='sliceTileGasPriceNumber'>{gasPrice}</div>
           <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
         </div>

@@ -27,7 +27,6 @@ class _OriginModule extends React.Component {
         setTimeout(() => {
           this.setState({ active: true })
           this.setState({ activeCount: ++this.state.activeCount })
-          console.log(this.state.activeCount)
           this.clearTimeout = setTimeout(() => {
             this.setState({ active: false })
           }, 1000)
@@ -43,7 +42,6 @@ class _OriginModule extends React.Component {
     const reqs = this.state.reqsTimes
     reqs.push(this.state.activeCount)
     reqs.shift()
-    console.log({ reqsTimes: reqs, activeCount: 0, reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2) })
     this.setState({ reqsTimes: reqs, activeCount: 0, reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2) })
   }
 
@@ -86,7 +84,7 @@ class _OriginModule extends React.Component {
         <div 
           className='sliceOrigin'
           onClick={() => {
-            this.store.notify('updateOriginChain', origin)
+            this.store.notify('updateOriginChain', { origin: origin })
           }}
         >
           <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />
@@ -159,7 +157,6 @@ class ChainModule extends React.Component {
     }
   }
   render () {
-    // console.log('this.state.expanded', this.state.expanded)
     const { id, type, connection, changed } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)
@@ -170,13 +167,12 @@ class ChainModule extends React.Component {
 
     return (
       <div className='sliceContainer' ref={this.ref}>
-        {this.renderHeader('connection', id)}
-        {this.state.expanded ? (
+        {false && this.renderHeader('connection', id)}
+        {!this.state.expanded ? (
           <div className='sliceContainer'>
             <OriginModule origin={'send.frame.eth'} {...this.props} />
             <OriginModule origin={'uniswap.io'} {...this.props} />
             <OriginModule origin={'app.aave.eth'} {...this.props} />
-            <OriginModule origin={'app.ens.domains'} {...this.props} />
             <div className='viewAllOrigin'>
               {'view all'}
             </div>

@@ -12,16 +12,41 @@
   align-items center
   text-align center
   opacity 1
-  background var(--ghostX09)
+  background var(--ghostY)
   
   ::selection
     background var(--moon) //  #ffb7b7
 
+
+  .originSwapTitle
+    color var(--good)
+
+  .originSwapOrigin
+    padding 40px
+    
+  .originSwapChainList
+    background var(--ghostZ)
+    border-radius 12px
+
+    .originSwapChainListItem
+      display flex
+      justify-content center
+      align-items center
+      height 64px
+      cursor pointer
+      border-bottom 1px solid var(--ghostX)
+
+    .originSwapChainListItem:hover
+      background var(--ghostA)
+
+    .originSwapChainListItem:last-child
+      border-bottom 0px solid var(--ghostX)
+
   .notifyCloseButton
     position absolute
     top 23px
-    width 50px
-    margin-left -25px
+    width 100px
+    margin-left -50px
     left 50%
     height 25px
     border-radius 8px
@@ -32,8 +57,8 @@
     font-size 11px
     font-weight 600
     cursor pointer
-    background var(--moon)
-    color var(--moonOver)
+    background var(--ghostB)
+    color var(--moon)
 
     *
       pointer-events none
