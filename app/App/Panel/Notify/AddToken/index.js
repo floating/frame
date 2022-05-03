@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
 import link from '../../../../../resources/link'
+
 class AddToken extends Component {
   constructor (props, context) {
     super(props, context)
@@ -29,7 +30,16 @@ class AddToken extends Component {
   }
 
   async updateTokenData(contractAddress, chainId) {
-    const { name, symbol, decimals } = await window.ipc.invoke('tray:getTokenDetails', contractAddress, chainId)
+    let { name, symbol, decimals } = await window.ipc.invoke('tray:getTokenDetails', contractAddress, chainId)
+    if(name === '') {
+      name = this.nameDefault
+    }
+    if(symbol === '') {
+      symbol = this.symbolDefault
+    }
+    if(decimals === 0) {
+      decimals = this.decimalsDefault
+    }
     this.setState({
       name,
       symbol,
