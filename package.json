@@ -87,17 +87,6 @@
     "test:clients": "mocha test/clients/*.test.js",
     "local:rpc": "ganache-cli --account=\"0x2d6945dbddb8dcf5492004e6f720f8e971196ff61a61c4be99714ebc71e06c00,  5000000000000000000000\" --account=\"0xaef6a68a47c1628081e4e6df195f5f712ae4eb7da332a6d74dca06ae32a3e7ae,5000\""
   },
-  "jest": {
-    "testTimeout": 100,
-    "roots": [
-      "test"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/test/e2e/",
-      "<rootDir>/test/main/signers/ledger/adapter"
-    ]
-  },
   "author": {
     "name": "Frame Labs",
     "email": "jordan@frame.sh",
@@ -142,8 +131,8 @@
     "node-fetch": "2.6.7",
     "node-hid": "2.1.1",
     "query-string": "7.1.1",
-    "react": "18.0.0",
-    "react-dom": "18.0.0",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
     "react-restore": "0.5.0",
     "react-transition-group": "4.4.2",
     "semver": "7.3.6",
@@ -172,6 +161,7 @@
     "@ledgerhq/hw-transport-mocker": "6.24.1",
     "@nomiclabs/hardhat-waffle": "2.0.3",
     "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^14.1.1",
     "@types/cookie": "0.4.1",
     "@types/get-pixels": "3.3.2",
     "@types/hdkey": "^2.0.1",
@@ -210,6 +200,9 @@
       "react/no-find-dom-node": 0
     }
   },
+  "browserslist": [
+    "last 1 Electron major version"
+  ],
   "repository": "github:floating/frame",
   "lavamoat": {
     "allowScripts": {
