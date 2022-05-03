@@ -20,7 +20,6 @@ const url = require('url')
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store').default
@@ -308,7 +307,6 @@ ipcMain.on('*:addFrame', (e, id) => {
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
-  data()
   menu()
   windows.tray()
   // if (process.platform === 'darwin' || process.platform === 'win32') {

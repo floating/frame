@@ -11,6 +11,8 @@ import AddRing from './Add/AddRing'
 import AddKeystore from './Add/AddKeystore'
 import AddAddress from './Add/AddAddress'
 
+import Native from '../../resources/Native'
+
 class AddAccounts extends React.Component {
   constructor (...args) {
     super(...args)
@@ -163,6 +165,7 @@ class Dash extends React.Component {
       
       return (
       <div className='dash'>
+        <Native />
         {this.state.showAddAccounts ? <AddAccounts close={() => this.setState({ showAddAccounts: false })} /> : null}
         <div className='newAccount' onClick={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
           <div className='newAccountIcon'>{'+'}</div> 
