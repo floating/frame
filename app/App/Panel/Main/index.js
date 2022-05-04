@@ -97,8 +97,6 @@ class Main extends React.Component {
               {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {
                 const account = accounts[id]
-                // console.log('account', account)
-                // console.log('filter', filter)
                 if (
                   filter &&
                   !account.address.includes(filter) &&
