@@ -1,16 +1,5 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron'
 import rpc from './rpc'
-
-const validChannels = ['tray:getTokenDetails']
-
-const invoke = (channel, ...data) =>
-  validChannels.includes(channel)
-    ? ipcRenderer.invoke(channel, ...data)
-    : Promise.reject(new Error('IPC channel not valid'))
-
-contextBridge.exposeInMainWorld('ipc', {
-  invoke
-})
 
 // const dev = process.env.NODE_ENV === 'development'
 // const _setImmediate = setImmediate
@@ -25,19 +14,25 @@ window.addEventListener('message', e => {
   if (e.origin !== 'file://') return
   const data = unwrap(e.data)
   if (e.origin === 'file://' && data.source !== source) {
-    if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({ id: data.id, args, source, method: 'rpc' }), e.origin))
+    if (data.method === 'rpc') return rpc(...data.args, (...args) => e.source.postMessage(wrap({ method: 'rpc', id: data.id, args, source }), e.origin))
     if (data.method === 'event') return ipcRenderer.send(...data.args)
+    if (data.method === 'invoke') {
+      (async () => {
+        const args = await ipcRenderer.invoke(...data.args)
+        window.postMessage(wrap({ method: 'invoke', channel: 'action', id: data.id, args, source }), '*')
+      })()
+    }
   }
 }, false)
 
 ipcRenderer.on('main:action', (...args) => {
   args.shift()
-  window.postMessage(wrap({ channel: 'action', args, source, method: 'event' }), '*')
+  window.postMessage(wrap({ method: 'event', channel: 'action', args, source }), '*')
 })
 
 ipcRenderer.on('main:flex', (...args) => {
   args.shift()
-  window.postMessage(wrap({ channel: 'flex', args, source, method: 'event' }), '*')
+  window.postMessage(wrap({ method: 'event', channel: 'flex', args, source }), '*')
 })
 
 ipcRenderer.on('main:reload:style', (e, name, ok) => {
@@ -51,5 +46,5 @@ ipcRenderer.on('main:reload:style', (e, name, ok) => {
 
 ipcRenderer.on('main:dapp', (...args) => {
   args.shift()
-  window.postMessage(wrap({ channel: 'dapp', args, source, method: 'event' }), '*')
+  window.postMessage(wrap({ method: 'event', channel: 'dapp', args, source }), '*')
 })
