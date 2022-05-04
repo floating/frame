@@ -7,13 +7,11 @@ import userEvent from '@testing-library/user-event'
 
 import Restore from 'react-restore'
 import store from '../../../../../main/store'
+import link from '../../../../../resources/link'
 import AddTokenComponent from '../../../../../app/App/Panel/Notify/AddToken'
 
 jest.mock('../../../../../main/store/persist')
-
-global.ipc = {
-  invoke: jest.fn()
-}
+jest.mock('../../../../../resources/link')
 
 const AddToken = Restore.connect(AddTokenComponent, store)
 const user = userEvent.setup()
@@ -37,7 +35,7 @@ it('should generate the expected HTML', async () => {
 
 describe('token metadata lookup', () => {
   beforeEach(() => {
-    global.ipc.invoke.mockImplementation((channel, contractAddress, chainId) => {
+    link.invoke.mockImplementation((channel, contractAddress, chainId) => {
       const tokenData = chainId === 1 ? { name: 'Frame Test', symbol: 'FRT', decimals: '18' } : { name: '', symbol: '', decimals: 0 }
       return Promise.resolve(tokenData)
     })
@@ -56,11 +54,13 @@ describe('token metadata lookup', () => {
     const tokenDecimalsInput = getByLabelText('Decimals')
     const tokenChainIdInput = getByLabelText('Chain ID')
 
-    expect(contractAddressInput.value).toEqual('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
-    expect(tokenNameInput.value).toEqual('Frame Test')
-    expect(tokenSymbolInput.value).toEqual('FRT')
-    expect(tokenDecimalsInput.value).toEqual('18')
-    expect(tokenChainIdInput.value).toEqual('1')
+    await waitFor(() => {
+      expect(contractAddressInput.value).toEqual('0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0')
+      expect(tokenNameInput.value).toEqual('Frame Test')
+      expect(tokenSymbolInput.value).toEqual('FRT')
+      expect(tokenDecimalsInput.value).toEqual('18')
+      expect(tokenChainIdInput.value).toEqual('1')
+    })
   })
 
   describe('when the chain id is changed', () => {
