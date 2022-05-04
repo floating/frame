@@ -79,7 +79,7 @@ describe('Ring signer', () => {
         expect(store(`main.signers.${signer.id}.id`)).toBe(signer.id)
         done()
       })
-    } catch(e) { done(e) }
+    } catch (e) { done(e) }
   }, 2000)
 
   test('Scan for signers', done => {
@@ -179,8 +179,8 @@ describe('Ring signer', () => {
         expect(err).toBeTruthy()
         done()
       })
-    } catch (e) { done (e) }
-  }, 400)
+    } catch (e) { done(e) }
+  }, 500)
 
   test('Unlock', done => {
     try {
@@ -189,7 +189,7 @@ describe('Ring signer', () => {
         done()
       })
     } catch (e) { done(e) }
-  }, 400)
+  }, 500)
 
   test('Sign message', done => {
     try {
@@ -212,7 +212,7 @@ describe('Ring signer', () => {
       value: '0x0',
       chainId: '0x1'
     }
-    
+
     try {
       signer.signTransaction(0, rawTx, (err, result) => {
         expect(err).toBe(null)
