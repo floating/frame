@@ -7,5 +7,5 @@
     "<rootDir>/test/e2e/",
     "<rootDir>/test/main/signers/ledger/adapter"    
   ],
-  "testTimeout": 500
+  "testTimeout": 100
 }
