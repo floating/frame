@@ -30,7 +30,7 @@ class AddToken extends Component {
   }
 
   async updateTokenData (contractAddress, chainId) {
-    const { name, symbol, decimals } = await window.ipc.invoke('tray:getTokenDetails', contractAddress, chainId)
+    const { name, symbol, decimals } = await link.invoke('tray:getTokenDetails', contractAddress, chainId)
     this.setState({
       name: name || this.nameDefault,
       symbol: symbol || this.symbolDefault,
