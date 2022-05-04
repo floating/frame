@@ -61,7 +61,7 @@ describe('token metadata lookup', () => {
       expect(tokenDecimalsInput.value).toEqual('18')
       expect(tokenChainIdInput.value).toEqual('1')
     })
-  })
+  }, 500)
 
   describe('when the chain id is changed', () => {
     it('should perform a lookup and display the expected token data', async () => {
@@ -90,6 +90,6 @@ describe('token metadata lookup', () => {
         expect(tokenDecimalsInput.value).toEqual('18')
         expect(tokenChainIdInput.value).toEqual('1')
       })
-    })
+    }, 500)
   })
 })
