@@ -290,7 +290,6 @@ class _ChainModule extends React.Component {
     }
   }
   render () {
-    // console.log('this.state.expanded', this.state.expanded)
     const { id, type, connection, changed } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)
@@ -550,8 +549,6 @@ class _Network extends React.Component {
     const symbol = this.store('main.networks.ethereum', this.state.id, 'symbol') || '?'
 
     const hexId = '0x' + parseInt(id).toString('16')
-    // console.log('hexId', hexId)
-    // console.log(chainMeta[hexId])
 
     if (
       filter &&

@@ -9,7 +9,7 @@ class Bridge extends React.Component {
         <div className='badge' style={{ transform: 'translateY(0px)', height: '196px' }}>
           <div className='badgeInner'>
             <div className='badgeMessage'>
-              Your update is ready and will be installed next time you launch Frame
+              Your update is ready, relaunch Frame to switch
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>

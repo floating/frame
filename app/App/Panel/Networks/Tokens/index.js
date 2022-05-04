@@ -80,7 +80,6 @@ class ChainModule extends React.Component {
     }
   }
   render () {
-    // console.log('this.state.expanded', this.state.expanded)
     const { id, type, connection, changed } = this.props
 
     const networkPresets = this.store('main.networkPresets', type)

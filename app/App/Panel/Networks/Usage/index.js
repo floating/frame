@@ -69,7 +69,6 @@ class _OriginModule extends React.Component {
     }
   }
   render () {
-    // console.log('this.state.expanded', this.state.expanded)
     const { id, type, connection, changed, origin } = this.props
     const { active } = this.state
 
@@ -93,7 +92,7 @@ class _OriginModule extends React.Component {
           </div>
           <div className='sliceOriginReqs'> 
             <div className='sliceOriginReqsNumber'>{this.state.reqsAverage }</div>
-            <div className='sliceOriginReqsLabel'>{'req/sec'}</div>
+            <div className='sliceOriginReqsLabel'>{'reqs/s'}</div>
           </div>
         </div>
         {this.state.expanded ? (
