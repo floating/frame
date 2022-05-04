@@ -77,9 +77,9 @@
     "release": "npm run compile && sleep 4 && npm run bundle && sleep 4 && npm run publish",
     "postinstall": "electron-builder install-app-deps",
     "test": "npm run compile && npm run test:main && npm run test:components && npm run test:e2e",
-    "test:unit": "jest --detectOpenHandles --runInBand",
-    "test:main": "jest --env=node --detectOpenHandles --runInBand ./test/main",
-    "test:components": "jest --env=jsdom --detectOpenHandles --testTimeout=300 ./test/app",
+    "test:unit": "npm run test:unit:main && npm run test:unit:components",
+    "test:unit:main": "jest --env=node --detectOpenHandles --runInBand ./test/main",
+    "test:unit:components": "jest --env=jsdom --detectOpenHandles --testTimeout=500 ./test/app",
     "test:e2e": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e",
     "test:e2e:nodeploy": "jest --env=node --detectOpenHandles --runInBand --testPathPattern=e2e --testPathIgnorePatterns=deploy",
     "test:usbAdapters": "ELECTRON_RUN_AS_NODE=true ./node_modules/.bin/electron ./node_modules/jest/bin/jest.js ./test/main/signers/ledger/adapter.test.js --testPathIgnorePatterns=''",
@@ -187,7 +187,7 @@
     "ts-jest": "27.1.4",
     "typescript": "4.6.3"
   },
-  "standard": {
+  "standardx": {
     "parser": "babel-eslint",
     "env": [
       "jest"
