@@ -8,7 +8,7 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
 const path = require('path')
-process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
@@ -94,7 +94,10 @@ require('./rpc')
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
+
 const { default: showUnhandledExceptionDialog } = require('./windows/dialog/unhandledException')
+const { default: Erc20Contract } = require('./contracts/erc20')
+const { default: provider } = require('./provider')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -215,6 +218,11 @@ ipcMain.on('tray:addChain', (e, chain, req) => {
 ipcMain.on('tray:switchChain', (e, type, id, req) => {
   if (type && id) store.selectNetwork(type, id)
   accounts.resolveRequest(req)
+})
+
+ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
+  const contract = new Erc20Contract(contractAddress, chainId, provider)
+  return contract.getTokenData()
 })
 
 ipcMain.on('tray:addToken', (e, token, req) => {

@@ -19,6 +19,13 @@ link.rpc = (...args) => {
 link.send = (...args) => {
   window.postMessage(wrap({ args, source, method: 'event' }), '*')
 }
+link.invoke = (...args) => {
+  return new Promise((resolve, reject) => {
+    const id = v4()
+    handlers[id] = resolve
+    window.postMessage(wrap({ id, args, source, method: 'invoke' }), '*')
+  })
+}
 
 window.addEventListener('message', e => {
   if (e.origin !== 'file://') return
@@ -28,6 +35,10 @@ window.addEventListener('message', e => {
     if (data.method === 'rpc') {
       if (!handlers[data.id]) return console.log('link.rpc response had no handler')
       handlers[data.id](...args)
+      delete handlers[data.id]
+    } else if (data.method === 'invoke') {
+      if (!handlers[data.id]) return console.log('link.invoke response had no handler')
+      handlers[data.id](args)
       delete handlers[data.id]
     } else if (data.method === 'event') {
       if (!data.channel) return console.log('link.on event had no channel')
