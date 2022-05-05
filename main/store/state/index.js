@@ -46,7 +46,7 @@ const initial = {
         'launcher',
         'requests',
         // 'activity',
-        'gas',
+        // 'gas',
         'balances',
         'inventory',
         'permissions',

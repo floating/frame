@@ -12,7 +12,7 @@
 
 #panelScroll
   position absolute
-  top 59px
+  top 69px
   right 0
   bottom 0
   left 0
@@ -30,9 +30,7 @@
     display none
 
   #panelWrap
-    width 100%
-    padding-top 67px
-    padding-bottom 67px
+    padding 0px 4px 67px 4px
     will-change scroll-position
 
     .noSigners
@@ -114,16 +112,13 @@
   pointer-events none
 
 .panelHeader
-  position absolute
-  left 0
-  right 0
-  top 0px 
-  height 63px
-  background var(--ghostA)
+  position relative
+  height 64px
   z-index 20000000000
   transition var(--standardFast)
+  box-sizing border-box
+  margin 4px
 
-  
   .panelHeaderTitle
     position absolute 
     left 0
@@ -140,7 +135,7 @@
     cursor pointer
     height 32px
     width 106px
-    border-radius 16px
+    border-radius 8px
     background var(--ghostB)
     display flex
     justify-content center

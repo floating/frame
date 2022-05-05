@@ -50,6 +50,55 @@ class Notify extends React.Component {
     )
   }
 
+  updateOriginChain ({ origin = 'Unknown' }) {
+    return (
+      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+        <div className='notifyBoxSlide'>
+          <div className='notifyBox'>
+            <div className='notifyBody'>
+              <div className='originSwapTitle'>
+                Switch chain for:
+              </div>
+              <div className='originSwapOrigin'>
+                {origin}
+              </div>
+              <div className='originSwapChainList'>
+                {Object.keys(this.store('main.networks.ethereum')).filter(id => {
+                  return this.store('main.networks.ethereum', id, 'on')
+                }).map(id => {
+                  return (
+                    <div className='originSwapChainListItem' onClick={() => {
+                      alert('Set the chain for this origin and close notify dialog')
+                    }}>
+                      {this.store('main.networks.ethereum', id, 'name')}
+                    </div>
+                  )
+                })}
+                {/* <div 
+                  className='notifyBodyLink' 
+                  style={{marginTop: '20px'}}
+                  onMouseDown={() => { link.send('tray:openExternal', 'https://frame.canny.io') }}
+                >
+                  feedback.frame.sh
+                </div> */}
+              </div>
+            </div>
+            {/* <div className='notifyInput'>
+              <div
+                className='notifyInputOption notifyInputSingleButton' onMouseDown={() => {
+                  // link.send('tray:action', 'muteBetaDisclosure')
+                  this.store.notify()
+                }}
+              >
+                <div className='notifyInputOptionText notifyBetaGo'>Update Chain</div>
+              </div>
+            </div> */}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   betaDisclosure () {
     return (
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
@@ -522,7 +571,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.mainnet()}
         </div>
@@ -537,16 +586,25 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.nonceWarning()}
+        </div>
+      )
+    } else if (notify === 'updateOriginChain') {
+      return (
+        <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
+          <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
+            {'close'}
+          </div>
+          {this.updateOriginChain(this.store('view.notifyData'))}
         </div>
       )
     } else if (notify === 'gasFeeWarning') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.gasFeeWarning(this.store('view.notifyData'))}
         </div>
@@ -555,7 +613,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.noSignerWarning(this.store('view.notifyData'))}
         </div>
@@ -564,7 +622,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.signerLockedWarning(this.store('view.notifyData'))}
         </div>
@@ -573,7 +631,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.signerCompatibilityWarning(this.store('view.notifyData'))}
         </div>
@@ -582,7 +640,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.contractData()}
         </div>
@@ -591,7 +649,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.hotAccountWarning()}
         </div>
@@ -600,7 +658,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.hotSignerMismatch()}
         </div>
@@ -609,7 +667,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.openExternal(this.store('view.notifyData'))}
         </div>
@@ -618,7 +676,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           {this.openExplorer(this.store('view.notifyData'))}
         </div>
@@ -627,7 +685,7 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           <AddChain req={this.store('view.notifyData')} />
         </div>
@@ -636,16 +694,16 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
-          <AddToken req={this.store('view.notifyData')} />
+          <AddToken req={this.store('view.notifyData')} currentNetworkId={this.store('main.currentNetwork.id')} />
         </div>
       )
     } else if (notify === 'customTokens') {
       return (
         <div className='notify cardShow' onMouseDown={() => this.store.notify()}>
           <div className='notifyCloseButton' onMouseDown={() => this.store.notify()}>
-            {svg.octicon('x', { height: 17 })}
+            {'close'}
           </div>
           <CustomTokens req={this.store('view.notifyData')} />
         </div>

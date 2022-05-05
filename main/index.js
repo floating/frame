@@ -8,7 +8,7 @@ app.commandLine.appendSwitch('enable-native-gpu-memory-buffers', true)
 app.commandLine.appendSwitch('force-color-profile', 'srgb')
 
 const path = require('path')
-process.env['BUNDLE_LOCATION'] = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
+process.env.BUNDLE_LOCATION = process.env.BUNDLE_LOCATION || path.resolve(__dirname, './../..', 'bundle')
 
 // app.commandLine.appendSwitch('enable-transparent-visuals', true)
 // if (process.platform === 'linux') app.commandLine.appendSwitch('disable-gpu', true)
@@ -20,7 +20,6 @@ const url = require('url')
 log.transports.console.level = process.env.LOG_LEVEL || 'info'
 log.transports.file.level = ['development', 'test'].includes(process.env.NODE_ENV) ? false : 'verbose'
 
-const data = require('./data')
 const windows = require('./windows')
 const menu = require('./menu')
 const store = require('./store').default
@@ -95,6 +94,8 @@ require('./rpc')
 // const clients = require('./clients')
 const signers = require('./signers').default
 const persist = require('./store/persist')
+const { default: Erc20Contract } = require('./contracts/erc20')
+const { default: provider } = require('./provider')
 
 log.info('Chrome: v' + process.versions.chrome)
 log.info('Electron: v' + process.versions.electron)
@@ -216,6 +217,11 @@ ipcMain.on('tray:switchChain', (e, type, id, req) => {
   accounts.resolveRequest(req)
 })
 
+ipcMain.handle('tray:getTokenDetails', (e, contractAddress, chainId) => {
+  const contract = new Erc20Contract(contractAddress, chainId, provider)
+  return contract.getTokenData()
+})
+
 ipcMain.on('tray:addToken', (e, token, req) => {
   if (token) {
     log.info('adding custom token', token)
@@ -308,7 +314,6 @@ ipcMain.on('*:addFrame', (e, id) => {
 
 // if (process.platform !== 'darwin' && process.platform !== 'win32') app.disableHardwareAcceleration()
 app.on('ready', () => {
-  data()
   menu()
   windows.tray()
   // if (process.platform === 'darwin' || process.platform === 'win32') {

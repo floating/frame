@@ -9,7 +9,7 @@ class Bridge extends React.Component {
         <div className='badge' style={{ transform: 'translateY(0px)', height: '196px' }}>
           <div className='badgeInner'>
             <div className='badgeMessage'>
-              Your update is ready and will be installed next restart
+              Your update is ready, relaunch Frame to switch
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>
@@ -18,7 +18,7 @@ class Bridge extends React.Component {
             </div>
             <div className='badgeInput'>
               <div className='badgeInputButton'>
-                <div className='badgeInputInner' onMouseDown={() => link.send('tray:updateRestart')}>Restart Now</div>
+                <div className='badgeInputInner' onMouseDown={() => link.send('tray:updateRestart')}>Relaunch Now</div>
               </div>
             </div>
           </div>

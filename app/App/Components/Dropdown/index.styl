@@ -9,12 +9,12 @@
 .dropdown
   letter-spacing 1px
   height 28px
-  border-radius 14px
+  border-radius 8px
   font-weight 400
   width 130px
   font-size 12px
   text-transform uppercase
-  background var(--ghostC)
+  background var(--ghostB)
   overflow hidden
   padding 0px 0px 0px 0px
   transition var(--standardFast), 0s linear background
@@ -22,9 +22,9 @@
   z-index 99999999999999999
   pointer-events auto
   cursor pointer
-  // box-shadow 5px 5px 20px 0px var(--tripleThick) 
-  // box-shadow 0px 4px 6px -1px var(--thin) // 0px 2px 0px var(--thin), 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
-  // 
+
+.dropdown:hover
+  background var(--ghostC)
 
 // .dropdown:hover
 //   background var(--ghostD)
@@ -73,7 +73,7 @@
     height 7px
     width 7px
     border-radius 3.5px
-    background var(--ghostB)
+    background var(--ghostA)
 
   .dropdownItemIndicatorBad
     background var(--bad)

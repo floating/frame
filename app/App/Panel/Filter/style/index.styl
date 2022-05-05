@@ -1,0 +1,69 @@
+.filter
+  position relative
+  width 100%
+  box-sizing border-box
+  height 34px
+  margin 32px 0px 32px 0px
+
+  .filterWrap
+    background var(--ghostA)
+    position absolute
+    left 0px
+    top 0
+    bottom 0
+    right 105px
+    border-radius 8px
+
+    .filterInput
+      background transparent
+      border 0
+      outline 0
+      color var(--outerspace)
+      position absolute
+      left 36px
+      top 0
+      bottom 0
+      right 0px
+      font-size 16px
+      font-weight 200
+
+  .filterIcon
+    position absolute
+    left 0
+    top 2px
+    bottom 0
+    width 40px
+    display flex
+    justify-content center
+    align-items center
+    color var(--outerspace03)
+
+.filterWrap:hover
+  background var(--ghostB)
+
+.filterButton
+  background var(--ghostA)
+  text-transform uppercase
+  font-size 16px
+  font-weight 500
+  width 60px
+  border-radius 8px
+  position absolute 
+  top 0px
+  right 0px
+  bottom 0px
+  cursor pointer
+  box-sizing border-box
+  
+  .filterButtonInner
+    display flex
+    justify-content center
+    align-items center
+    cursor pointer
+    position relative
+
+  *
+    pointer-events none
+
+.filterButton:hover
+  background var(--ghostB)
