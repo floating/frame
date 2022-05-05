@@ -179,7 +179,7 @@ class FrameAccount {
   setAccess (req: AccessRequest, access: boolean) {
     if (req.address.toLowerCase() === this.address)  {
       // Permissions do no live inside the account summary
-      store.setPermission(this.address, { handlerId: req.handlerId, origin: req.origin, provider: access })
+      store.toggleAccess(req.origin, this.address, access)
     }
 
     this.resolveRequest(req)

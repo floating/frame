@@ -98,9 +98,9 @@ module.exports = {
       return {}
     })
   },
-  toggleAccess: (u, address, handlerId) => {
-    u('main.permissions', address, permissions => {
-      permissions[handlerId].provider = !permissions[handlerId].provider
+  toggleAccess: (u, origin, address, allowed) => {
+    u('main.dapps', origin, address, permissions => {
+      permissions.allowed = allowed
       return permissions
     })
   },
