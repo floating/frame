@@ -11,10 +11,9 @@ const addPermissionRequest = (address, origin) => {
   return new Promise((resolve, reject) => {
     const handlerId = uuidv5(origin, uuidv5.DNS)
     accounts.addRequest({ handlerId, type: 'access', origin, address }, () => {
-      const permissions = store('main.permissions', address) || {}
-      const perms = Object.keys(permissions).map(id => permissions[id])
-      const permIndex = perms.map(p => p.origin).indexOf(origin)
-      if (perms[permIndex] && perms[permIndex].provider) {
+      const permissions = store('main.dapps', origin, address) || {}
+
+      if (permissions.allowed) {
         resolve(true)
       } else {
         reject(new Error('Origin does not have provider permissions'))
@@ -31,10 +30,9 @@ module.exports = async origin => {
   if (!account) return
   const address = account.address
   if (!address) return
-  const permissions = store('main.permissions', address) || {}
-  const perms = Object.keys(permissions).map(id => permissions[id])
-  const permIndex = perms.map(p => p.origin).indexOf(origin)
-  if (permIndex === -1) {
+  const permissions = store('main.dapps', origin, address) || {}
+
+  if (!('allowed' in permissions)) {
     try {
       return await addPermissionRequest(address, origin)
     } catch (e) {
@@ -42,6 +40,6 @@ module.exports = async origin => {
       return false
     }
   } else {
-    return perms[permIndex] && perms[permIndex].provider
+    return permissions.allowed
   }
 }
