@@ -119,11 +119,11 @@ const migrations = {
         initial.main.addresses[id] = addressesToMove[id]
       })
     }
-    
+
     // Before the v6 state migration
     // If users have very old state they will first need to do an older account migration
     moveOldAccountsToNewAddresses()
-  
+
     // Once this is complete they can now do the current account migration
     const newAccounts = {}
     // const nameCount = {}
@@ -134,14 +134,14 @@ const migrations = {
       // Normalize address case
       addresses[address.toLowerCase()] = addresses[address]
       address = address.toLowerCase()
-  
+
       const hasPermissions = addresses[address] && addresses[address].permissions && Object.keys(addresses[address].permissions).length > 0
       // const hasTokens = addresses[address] && addresses[address].tokens && Object.keys(addresses[address].tokens).length > 0
       if (!hasPermissions) return log.info(`Address ${address} did not have any permissions or tokens`)
-  
+
       // Copy Account permissions
       initial.main.permissions[address] = addresses[address] && addresses[address].permissions ? Object.assign({}, addresses[address].permissions) : {}
-  
+
       const matchingAccounts = []
       Object.keys(accounts).sort((a, b) => accounts[a].created > accounts[b].created ? 1 : -1).forEach(id => {
         if (accounts[id].addresses && accounts[id].addresses.map && accounts[id].addresses.map(a => a.toLowerCase()).indexOf(address) > -1) {
@@ -167,7 +167,6 @@ const migrations = {
         newAccounts[address].tokens = addresses[address] && addresses[address].tokens ? addresses[address].tokens : {}
         newAccounts[address] = Object.assign({}, newAccounts[address])
       }
-  
     })
     initial.main.backup = initial.main.backup || {}
     initial.main.backup.accounts = Object.assign({}, initial.main.accounts)
@@ -179,9 +178,9 @@ const migrations = {
   },
   8: initial => { // Add on/off value to chains
     Object.keys(initial.main.networks.ethereum).forEach(chainId => {
-      initial.main.networks.ethereum[chainId].on = chainId === '1' || chainId === initial.main.currentNetwork.id ? true : false
+      initial.main.networks.ethereum[chainId].on = !!(chainId === '1' || chainId === initial.main.currentNetwork.id)
     })
-  
+
     return initial
   },
   9: initial => {
@@ -201,7 +200,7 @@ const migrations = {
 
     return initial
   },
-  10: initial => {  // Add Optimism to persisted networks
+  10: initial => { // Add Optimism to persisted networks
     initial.main.networks.ethereum[10] = {
       id: 10,
       type: 'ethereum',
@@ -223,7 +222,7 @@ const migrations = {
     }
     return initial
   },
-  11: initial => { 
+  11: initial => {
     // Convert all Ξ symbols to ETH
     Object.keys(initial.main.networks.ethereum).forEach(chain => {
       if (initial.main.networks.ethereum[chain].symbol === 'Ξ') {
@@ -244,11 +243,11 @@ const migrations = {
             initial.main.accounts[account].created = block + ':' + Date.now()
           }
         }
-  
+
         let [block, localTime] = initial.main.accounts[account].created.split(':')
         if (block.startsWith('0x')) block = parseInt(block, 'hex')
         if (block > 12726312) block = 12726312
-        initial.main.accounts[account].created = block + ':' + localTime 
+        initial.main.accounts[account].created = block + ':' + localTime
       } catch (e) {
         log.error('Migration error', e)
         delete initial.main.accounts[account]
@@ -285,7 +284,7 @@ const migrations = {
         initial.main.networksMeta.ethereum[networkId].gas = {
           price: {
             selected: gasSettings.price.selected || defaultMeta.gas.price.selected,
-            levels: gasSettings.price.levels || defaultMeta.gas.price.levels,
+            levels: gasSettings.price.levels || defaultMeta.gas.price.levels
           }
         }
       } else {
@@ -301,7 +300,7 @@ const migrations = {
       if (primary.current === 'matic') primary.current = 'infura'
       if (secondary.current === 'matic') secondary.current = 'infura'
     }
-  
+
     // add arbitrum network information
     if (!initial.main.networks.ethereum[42161]) {
       initial.main.networks.ethereum[42161] = {
@@ -385,10 +384,21 @@ const migrations = {
     if (Array.isArray(initial.main.tokens)) {
       existingCustomTokens = [...initial.main.tokens]
     }
-    
+
     initial.main.tokens = { custom: existingCustomTokens }
 
     return initial
+  },
+  19: initial => {
+    // move permisions to dapps
+    Object.entries(initial.main.permissions).forEach(([origin, permission]) => {
+      initial.main.dapps[origin] = {
+        default: {
+          chainId: 1
+        },
+        permission
+      }
+    })
   }
 }
 
