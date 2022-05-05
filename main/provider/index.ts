@@ -752,7 +752,13 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
+      const currentChain = store('main.dapps', payload._origin, currentAccount.id, chainId)
+
       store.switchDappChain(payload._origin, currentAccount.id, chainId)
+
+      if (currentChain !== chainId) {
+        this.chainChanged(currentAccount.id, chainId)
+      }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: null })
     } catch (e) {
