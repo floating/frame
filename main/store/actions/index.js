@@ -87,10 +87,13 @@ module.exports = {
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
-  setPermission: (u, address, permission) => {
-    u('main.permissions', address, (permissions = {}) => {
-      permissions[permission.handlerId] = permission
-      return permissions
+  setPermission: (u, origin, address, permission) => {
+    u('main.dapps', origin, (dappPermissions = {}) => {
+      dappPermissions[address] = {
+        ...permission,
+        chainId: dappPermissions.chainId
+      }
+      return dappPermissions
     })
   },
   clearPermissions: (u, address) => {
