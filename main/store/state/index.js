@@ -7,10 +7,10 @@ const latestStateVersion = () => {
   const state = persist.get('main')
   if (!state || !state.__) {
     // log.info('Persisted state: returning base state')
-    return state 
+    return state
   }
 
-  // valid states are less than or equal to the latest migration we know about 
+  // valid states are less than or equal to the latest migration we know about
   const versions = Object.keys(state.__).filter(v => v <= migrations.latest).sort((a, b) => a - b)
 
   if (versions.length === 0) {
@@ -156,6 +156,7 @@ const initial = {
         text: '#1e3250'
       }
     },
+    dapps: main('dapps', {}),
     mute: {
       alphaWarning: main('mute.alphaWarning', false),
       welcomeWarning: main('mute.welcomeWarning', false),
@@ -193,7 +194,6 @@ const initial = {
     },
     accounts: main('accounts', {}),
     addresses: main('addresses', {}), // Should be removed after 0.5 release
-    permissions: main('permissions', {}),
     balances: {},
     tokens: main('tokens', { custom: [], known: {} }),
     rates: {}, // main('rates', {}),
@@ -278,7 +278,7 @@ const initial = {
         }
       }
     },
-    networks: main('networks', { 
+    networks: main('networks', {
       ethereum: {
         1: {
           id: 1,
@@ -556,7 +556,6 @@ const initial = {
       }
     }),
     ipfs: {},
-    dapps: {},
     frames: {},
     openDapps: [],
     dapp: {
