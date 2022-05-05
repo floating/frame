@@ -9,7 +9,8 @@ import {
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
-  setScanning as setScanningAction
+  setScanning as setScanningAction,
+  switchDappChain as switchDappChainAction
 } from '../../../../main/store/actions'
 
 beforeAll(() => {
@@ -507,5 +508,36 @@ describe('#setScanning', () => {
     jest.advanceTimersByTime(1000)
 
     expect(isScanning).toBe(false)
+  })
+})
+
+describe('#switchDappChain', () => {
+  const account = '0xea674fdde714fd979de3edf0f56aa9716b898ec8'
+
+  let dapps = { }
+
+  const updaterFn = (node, dapp, address, chainIdKey, update) => {
+    const nodePath = [node, dapp, address, chainIdKey].join('.')
+    expect(nodePath).toBe('main.dapps.frame.eth.' + address + '.chainId')
+
+    dapps[dapp][account].chainId = update()
+  }
+
+  beforeEach(() => {
+    dapps = {
+      'frame.eth': {
+        [account]: {
+          chainId: 1
+        }
+      }
+    }
+  })
+
+  const switchChain = chainId => switchDappChainAction(updaterFn, 'frame.eth', account, chainId)
+
+  it('switches the chain for a dapp', () => {
+    switchChain(4)
+
+    expect(dapps['frame.eth'][account].chainId).toBe(4)
   })
 })

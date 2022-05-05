@@ -424,6 +424,9 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
+  switchDappChain: (u, dappId, account, chainId) => {
+    u('main.dapps', dappId, account, 'chainId', () => chainId)
+  },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
   },

@@ -148,11 +148,11 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the current default chain changes
-  chainChanged (chainId: number) {
+  chainChanged (account: string, chainId: number) {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chain } })
+      this.emit('data:address', account, { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chain } })
     })
   }
 
@@ -741,6 +741,9 @@ export class Provider extends EventEmitter {
       if (!params || !params[0]) throw new Error('Params not supplied')
       
       const type = 'ethereum'
+      
+      const currentAccount = accounts.current()
+      if (!currentAccount) return this.resError('no account selected', payload, res)
 
       const chainId = parseInt(params[0].chainId)
       if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
@@ -749,22 +752,9 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      if (store('main.currentNetwork.id') === chainId) return res({ id: payload.id, jsonrpc: '2.0', result: null })
+      store.switchDappChain(payload._origin, currentAccount.id, chainId)
 
-      const handlerId = this.addRequestHandler(res)
-      
-      // Ask user if they want to switch chains
-      accounts.addRequest({
-        handlerId,
-        type: 'switchChain',
-        chain: { 
-          type, 
-          id: params[0].chainId
-        },
-        account: (accounts.getAccounts() || [])[0],
-        origin: payload._origin,
-        payload
-      } as SwitchChainRequest, res)
+      return res({ id: payload.id, jsonrpc: '2.0', result: null })
     } catch (e) {
       return this.resError(e as EVMError, payload, res)
     }
