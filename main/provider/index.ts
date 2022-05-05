@@ -900,10 +900,15 @@ export class Provider extends EventEmitter {
   }
 
   private parseTargetChain (payload: RPCRequestPayload) {
+    // priority:
+    //  1. chainId specified in payload
+    //  2. account-specific chainId for origin (TODO: implement this now?)
+    //  3. default chainId for origin
+
     const target: Chain = { type: 'ethereum', id: 0 }
 
     if (!('chainId' in payload)) {
-      return { ...target, id: store('main.currentNetwork.id') }
+      return { ...target, id: store('main.dapps', payload._origin, 'chainId') }
     }
 
     const chainId = parseInt(payload.chainId || '', 16)
