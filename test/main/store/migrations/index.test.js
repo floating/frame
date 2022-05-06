@@ -162,21 +162,21 @@ describe('migration 14', () => {
   connectionPriorities.forEach(priority => {
     it(`updates the ${priority} polygon connection from matic to infura`, () => {
       state.main.networks.ethereum[137].connection[priority].current = 'matic'
-  
+
       const updatedState = migrations.apply(state)
-  
+
       expect(updatedState.main.networks.ethereum[137].connection[priority].current).toBe('infura')
 
       // ensure other settings weren't changed
       expect(updatedState.main.networks.ethereum[137].connection[priority].on)
         .toBe(state.main.networks.ethereum[137].connection[priority].on)
     })
-  
+
     it(`does not update the ${priority} polygon connection if not matic`, () => {
       state.main.networks.ethereum[137].connection[priority].current = 'local'
-  
+
       const updatedState = migrations.apply(state)
-  
+
       expect(updatedState.main.networks.ethereum[137].connection[priority].current).toBe('local')
 
       // ensure other settings weren't changed
@@ -235,7 +235,7 @@ describe('migration 14', () => {
 
     expect(arbitrum.gas.fees.maxFeePerGas).toBe(undefined)
     expect(arbitrum).toMatchObject({
-      gas: { fees: {} , price: { selected: 'standard', levels: {} } }
+      gas: { fees: {}, price: { selected: 'standard', levels: {} } }
     })
   })
 
@@ -299,7 +299,7 @@ describe('migration 15', () => {
 
   it('adds the Polygon explorer if one does not exist', () => {
     delete state.main.networks.ethereum['137'].explorer
-    
+
     const updatedState = migrations.apply(state)
     const polygon = updatedState.main.networks.ethereum['137']
 
@@ -322,7 +322,7 @@ describe('migration 16', () => {
       main: {
         _version: 15,
         currentNetwork: {
-          type: 'ethereum', 
+          type: 'ethereum',
           id: '1'
         },
         networks: {
@@ -394,21 +394,21 @@ describe('migration 17', () => {
   it('adds paired state to existing Lattices', () => {
     const updatedState = migrations.apply(state)
 
-    const lattice = updatedState.main.lattice['McBbS7']
+    const lattice = updatedState.main.lattice.McBbS7
     expect(lattice.paired).toBe(true)
   })
 
   it('sets the device name of existing Lattices to be "GridPlus"', () => {
     const updatedState = migrations.apply(state)
 
-    const lattice = updatedState.main.lattice['McBbS7']
+    const lattice = updatedState.main.lattice.McBbS7
     expect(lattice.deviceName).toBe('GridPlus')
   })
 
   it('sets the tag of an existing Lattice to the old suffix', () => {
     const updatedState = migrations.apply(state)
 
-    const lattice = updatedState.main.lattice['McBbS7']
+    const lattice = updatedState.main.lattice.McBbS7
     expect(lattice.tag).toBe('my-laptop')
   })
 
@@ -417,7 +417,7 @@ describe('migration 17', () => {
 
     const updatedState = migrations.apply(state)
 
-    const lattice = updatedState.main.lattice['McBbS7']
+    const lattice = updatedState.main.lattice.McBbS7
     expect(lattice.tag).toBe('')
   })
 })
@@ -444,7 +444,7 @@ describe('migration 18', () => {
 
     const updatedState = migrations.apply(state)
 
-    expect(updatedState.main.tokens).toEqual({ custom: []})
+    expect(updatedState.main.tokens).toEqual({ custom: [] })
   })
 
   it('migrates missing custom tokens to an empty array', () => {
@@ -452,6 +452,39 @@ describe('migration 18', () => {
 
     const updatedState = migrations.apply(state)
 
-    expect(updatedState.main.tokens).toEqual({ custom: []})
+    expect(updatedState.main.tokens).toEqual({ custom: [] })
+  })
+})
+
+describe('migration 19', () => {
+  beforeEach(() => {
+    state = {
+      main: {
+        _version: 18,
+        permissions: {
+          'https://app.olympusdao.finance': true,
+          'https://app.pangolin.exchange': false
+        },
+        dapps: {}
+      }
+    }
+  })
+
+  it('migrates permissions to dapps', () => {
+    const updatedState = migrations.apply(state)
+    expect(updatedState.main.dapps).toEqual({
+      'https://app.olympusdao.finance': {
+        default: {
+          chainId: 1
+        },
+        permission: true
+      },
+      'https://app.pangolin.exchange': {
+        default: {
+          chainId: 1
+        },
+        permission: false
+      }
+    })
   })
 })
