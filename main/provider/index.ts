@@ -147,12 +147,12 @@ export class Provider extends EventEmitter {
     })
   }
 
-  // fires when the current default chain changes
-  chainChanged (account: string, chainId: number) {
+  // fires when the chain changes for a dapp/origin
+  chainChanged (chainId: number, origin?: string) {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data:address', account, { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chain } })
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin, result: chain } })
     })
   }
 
@@ -752,12 +752,12 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      const currentChain = store('main.dapps', payload._origin, currentAccount.id, chainId)
+      const currentChain = store('main.dapps', payload._origin, 'chainId')
 
-      store.switchDappChain(payload._origin, currentAccount.id, chainId)
+      store.switchDappChain(payload._origin, chainId)
 
       if (currentChain !== chainId) {
-        this.chainChanged(currentAccount.id, chainId)
+        this.chainChanged(chainId, payload._origin)
       }
 
       return res({ id: payload.id, jsonrpc: '2.0', result: null })
@@ -902,9 +902,8 @@ export class Provider extends EventEmitter {
   private parseTargetChain (payload: RPCRequestPayload) {
     // priority:
     //  1. chainId specified in payload
-    //  2. account-specific chainId for origin (TODO: implement this now?)
-    //  3. default chainId for origin
-
+    //  (future) account-specific chainId for origin
+    //  2. default chainId for origin
     const target: Chain = { type: 'ethereum', id: 0 }
 
     if (!('chainId' in payload)) {

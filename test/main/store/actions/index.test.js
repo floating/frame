@@ -512,32 +512,28 @@ describe('#setScanning', () => {
 })
 
 describe('#switchDappChain', () => {
-  const account = '0xea674fdde714fd979de3edf0f56aa9716b898ec8'
-
   let dapps = { }
 
-  const updaterFn = (node, dapp, address, chainIdKey, update) => {
-    const nodePath = [node, dapp, address, chainIdKey].join('.')
-    expect(nodePath).toBe('main.dapps.frame.eth.' + address + '.chainId')
+  const updaterFn = (node, dapp, chainIdKey, update) => {
+    const nodePath = [node, dapp, chainIdKey].join('.')
+    expect(nodePath).toBe('main.dapps.frame.eth.chainId')
 
-    dapps[dapp][account].chainId = update()
+    dapps[dapp].chainId = update()
   }
 
   beforeEach(() => {
     dapps = {
       'frame.eth': {
-        [account]: {
-          chainId: 1
-        }
+        chainId: 1
       }
     }
   })
 
-  const switchChain = chainId => switchDappChainAction(updaterFn, 'frame.eth', account, chainId)
+  const switchChain = chainId => switchDappChainAction(updaterFn, 'frame.eth', chainId)
 
   it('switches the chain for a dapp', () => {
     switchChain(4)
 
-    expect(dapps['frame.eth'][account].chainId).toBe(4)
+    expect(dapps['frame.eth'].chainId).toBe(4)
   })
 })

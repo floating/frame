@@ -87,13 +87,10 @@ module.exports = {
   toggleLaunch: u => u('main.launch', launch => !launch),
   toggleReveal: u => u('main.reveal', reveal => !reveal),
   toggleNonceAdjust: u => u('main.nonceAdjust', nonceAdjust => !nonceAdjust),
-  setPermission: (u, origin, address, permission) => {
-    u('main.dapps', origin, (dappPermissions = {}) => {
-      dappPermissions[address] = {
-        ...permission,
-        chainId: dappPermissions.chainId
-      }
-      return dappPermissions
+  setPermission: (u, address, permission) => {
+    u('main.permissions', address, (permissions = {}) => {
+      permissions[permission.handlerId] = permission
+      return permissions
     })
   },
   clearPermissions: (u, address) => {
@@ -101,9 +98,9 @@ module.exports = {
       return {}
     })
   },
-  toggleAccess: (u, origin, address, allowed) => {
-    u('main.dapps', origin, address, permissions => {
-      permissions.allowed = allowed
+  toggleAccess: (u, address, handlerId) => {
+    u('main.permissions', address, permissions => {
+      permissions[handlerId].provider = !permissions[handlerId].provider
       return permissions
     })
   },
@@ -427,8 +424,8 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
-  switchDappChain: (u, dappId, account, chainId) => {
-    u('main.dapps', dappId, account, 'chainId', () => chainId)
+  switchDappChain: (u, dappId, chainId) => {
+    u('main.dapps', dappId, 'chainId', () => chainId)
   },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)

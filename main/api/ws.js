@@ -80,16 +80,20 @@ module.exports = server => {
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
     const subscription = subs[payload.params.subscription]
-    if (subscription) subscription.socket.send(JSON.stringify(payload))
+
+    // if an origin is passed, make sure the subscription is from that origin
+    if (subscription && (!params.origin || params.origin === subscription.origin)) {
+      subscription.socket.send(JSON.stringify(payload))
+    }
   })
 
   provider.on('data:address', (address, payload) => { // Make sure the subscription has access based on current account
     const subscription = subs[payload.params.subscription]
     if (subscription) {
-      // TODO: what is the correct key here?
-      const permissions = store('main.dapps', subscription.origin, address) || {}
+      const permissions = store('main.permissions', address) || {}
+      const permission = Object.values(permissions).find(p => p.origin === subscription.origin) || {}
 
-      if (!permissions.allowed) payload.params.result = []
+      if (!permission.provider) payload.params.result = []
       subscription.socket.send(JSON.stringify(payload))
     }
   })
