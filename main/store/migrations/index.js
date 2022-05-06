@@ -391,7 +391,9 @@ const migrations = {
   },
   19: initial => {
     // move permisions to dapps
-    Object.entries(initial.main.permissions).forEach(([origin, permission]) => {
+    const permissions = initial.main.permissions || {}
+
+    Object.entries(permissions).forEach(([origin, permission]) => {
       initial.main.dapps[origin] = {
         default: {
           chainId: 1
@@ -399,6 +401,8 @@ const migrations = {
         permission
       }
     })
+
+    return initial
   }
 }
 
