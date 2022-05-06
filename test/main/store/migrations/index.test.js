@@ -470,7 +470,7 @@ describe('migration 19', () => {
     }
   })
 
-  it('migrates permissions to dapps', () => {
+  it('should migrate permissions to dapps', () => {
     const updatedState = migrations.apply(state)
     expect(updatedState.main.dapps).toEqual({
       'https://app.olympusdao.finance': {
@@ -486,5 +486,11 @@ describe('migration 19', () => {
         permission: false
       }
     })
+  })
+
+  it('should migrate zero permissions to an empty object', () => {
+    state.main.permissions = {}
+    const updatedState = migrations.apply(state)
+    expect(updatedState.main.dapps).toEqual({})
   })
 })
