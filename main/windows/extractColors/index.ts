@@ -93,6 +93,7 @@ async function extractColors (url: string, ens: string) {
       offscreen: true
     }
   })
+  window.webContents.openDevTools();
 
   let view: BrowserView | null = new BrowserView({ 
     webPreferences: Object.assign({ 

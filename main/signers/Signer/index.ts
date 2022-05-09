@@ -62,7 +62,7 @@ export default class Signer extends EventEmitter {
   }
 
   getCoinbase (cb: Callback<string>) {
-    cb(null, this.addresses[0])
+    cb(null, this.addresses[0].toString())
   }
 
   verifyAddress (index: number, current: string, display: boolean, cb: Callback<boolean>) {
@@ -77,7 +77,7 @@ export default class Signer extends EventEmitter {
       name: this.name || this.type + ' signer',
       type: this.type,
       model: this.model,
-      addresses: this.addresses,
+      addresses: this.addresses.map(addr => addr.toString()),
       status: this.status,
       appVersion: this.appVersion || { major: 0, minor: 0, patch: 0 }
     }

@@ -70,7 +70,7 @@ export default class LatticeAdapter extends SignerAdapter {
           reloadAddresses = reloadAddresses || (lattice.addresses.length < lattice.accountLimit)
           needsUpdate = true
         }
-
+        //@ts-expect-error -- baseUrl was made private in gridplus-sdk@v1.2.4
         if (baseUrl !== lattice.connection.baseUrl) {
           // if any connection settings have changed, re-connect
           this.reload(lattice)
