@@ -148,11 +148,11 @@ export class Provider extends EventEmitter {
   }
 
   // fires when the current default chain changes
-  chainChanged (chainId: number) {
+  chainChanged (chainId: number, origin?: string) {
     const chain = intToHex(chainId)
 
     this.subscriptions.chainChanged.forEach(subscription => {
-      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, result: chain } })
+      this.emit('data', { method: 'eth_subscription', jsonrpc: '2.0', params: { subscription, origin, result: chain } })
     })
   }
 
@@ -741,6 +741,8 @@ export class Provider extends EventEmitter {
       if (!params || !params[0]) throw new Error('Params not supplied')
       
       const type = 'ethereum'
+      const currentAccount = accounts.current()
+      if (!currentAccount) return this.resError('no account selected', payload, res)
 
       const chainId = parseInt(params[0].chainId)
       if (!Number.isInteger(chainId)) throw new Error('Invalid chain id')
@@ -749,22 +751,14 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      if (store('main.currentNetwork.id') === chainId) return res({ id: payload.id, jsonrpc: '2.0', result: null })
+      const currentChain = store('main.dapps', payload._origin, 'chainId')
+      store.switchDappChain(payload._origin, chainId)
 
-      const handlerId = this.addRequestHandler(res)
-      
-      // Ask user if they want to switch chains
-      accounts.addRequest({
-        handlerId,
-        type: 'switchChain',
-        chain: { 
-          type, 
-          id: params[0].chainId
-        },
-        account: (accounts.getAccounts() || [])[0],
-        origin: payload._origin,
-        payload
-      } as SwitchChainRequest, res)
+      if (currentChain !== chainId) {
+        this.chainChanged(chainId, payload._origin)
+      }
+
+      return res({ id: payload.id, jsonrpc: '2.0', result: null })
     } catch (e) {
       return this.resError(e as EVMError, payload, res)
     }
@@ -907,7 +901,8 @@ export class Provider extends EventEmitter {
     const target: Chain = { type: 'ethereum', id: 0 }
 
     if (!('chainId' in payload)) {
-      return { ...target, id: store('main.currentNetwork.id') }
+      console.log('parseTargetChain', payload)
+      return { ...target, id: store('main.dapps', payload._origin, 'chainId') }
     }
 
     const chainId = parseInt(payload.chainId || '', 16)

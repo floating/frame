@@ -16,7 +16,6 @@ const logTraffic = process.env.LOG_TRAFFIC
 
 const subs = {}
 
-
 const handler = (socket, req) => {
   socket.id = uuid()
   socket.origin = req.headers.origin
@@ -80,7 +79,10 @@ module.exports = server => {
   // Send data to the socket that initiated the subscription
   provider.on('data', payload => {
     const subscription = subs[payload.params.subscription]
-    if (subscription) subscription.socket.send(JSON.stringify(payload))
+    // if an origin is passed, make sure the subscription is from that origin
+    if (subscription && (!payload.params.origin || payload.params.origin === subscription.origin)) {
+      subscription.socket.send(JSON.stringify(payload))
+    }
   })
 
   provider.on('data:address', (address, payload) => { // Make sure the subscription has access based on current account
