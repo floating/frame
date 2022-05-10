@@ -572,13 +572,15 @@ const initial = {
 
 // --- remove state that should not persist from session to session
 
-Object.keys(initial.main.accounts).forEach(id => {
+Object.keys(initial.main.dapps).forEach(dappId => {
   // Remove permissions granted to unknown origins
-  const permissions = initial.main.permissions[id]
+  const permissions = initial.main.dapps[dappId].permissions
   if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
+})
 
+Object.keys(initial.main.accounts).forEach(accountId => {
   // remote lastUpdated timestamp from balances
-  initial.main.accounts[id].balances = { lastUpdated: undefined }
+  initial.main.accounts[accountId].balances = { lastUpdated: undefined }
 })
 
 Object.entries(initial.main.networksMeta).forEach(([platform, chains]) => {
