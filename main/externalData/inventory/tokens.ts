@@ -1,7 +1,9 @@
 import log from 'electron-log'
 import nebulaApi from '../../nebula'
 
-const nebula = nebulaApi('tokenWorker')
+const ethProvider = require('eth-provider')
+const connection = ethProvider('frame')
+const nebula = nebulaApi(connection)
 
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'

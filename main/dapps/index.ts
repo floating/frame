@@ -9,7 +9,7 @@ import windows from '../windows'
 import nebulaApi from '../nebula'
 import server from './server'
 
-const nebula = nebulaApi('frame-dapps')
+const nebula = nebulaApi()
 
 function getDapp (dappId: string): Dapp {
   return store('main.dapps', dappId)

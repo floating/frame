@@ -18,7 +18,7 @@ import provider from '../../provider'
 import { ApprovalType } from '../../../resources/constants'
 import Erc20Contract from '../../contracts/erc20'
 
-const nebula = nebulaApi('accounts')
+const nebula = nebulaApi()
 
 const storeApi = {
   getPermissions: function (address: Address) {

@@ -25,6 +25,7 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
 
+import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
@@ -116,7 +117,11 @@ export class Provider extends EventEmitter {
     
     this.connection.syncDataEmit(this)
 
-    this.connection.on('connect', () => { 
+    this.connection.on('connect', () => {
+      if (!this.connected) {
+        proxyConnection.emit('connect')
+      }
+
       this.connected = true
       this.emit('connect')
     })
@@ -130,6 +135,13 @@ export class Provider extends EventEmitter {
       if (event.type === 'fees') {
         return accounts.updatePendingFees(event.chainId)
       }
+    })
+
+    proxyConnection.on('provider:send', (payload: RPCRequestPayload) => {
+      const { id, method } = payload
+      this.send(payload, ({ error, result }) => {
+        proxyConnection.emit('payload', { id, method, error, result })
+      })
     })
 
     this.getNonce = this.getNonce.bind(this)
