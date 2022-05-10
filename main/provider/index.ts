@@ -25,7 +25,7 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
 
-import proxyConnection from './proxy'
+import proxy from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
@@ -119,7 +119,7 @@ export class Provider extends EventEmitter {
 
     this.connection.on('connect', () => {
       if (!this.connected) {
-        proxyConnection.emit('connect')
+        proxy.connection.emit('connect')
       }
 
       this.connected = true
@@ -137,10 +137,10 @@ export class Provider extends EventEmitter {
       }
     })
 
-    proxyConnection.on('provider:send', (payload: RPCRequestPayload) => {
+    proxy.connection.on('provider:send', (payload: RPCRequestPayload) => {
       const { id, method } = payload
       this.send(payload, ({ error, result }) => {
-        proxyConnection.emit('payload', { id, method, error, result })
+        proxy.connection.emit('payload', { id, method, error, result })
       })
     })
 

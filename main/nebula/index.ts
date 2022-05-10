@@ -10,14 +10,12 @@ import nebula from 'nebula'
 // @ts-ignore
 process.versions.electron = electron
 
-// @ts-ignore
-import EthereumProvider from 'ethereum-provider'
-import proxyConnection from '../provider/proxy'
+import proxy from '../provider/proxy'
 
 const authToken = process.env.NEBULA_AUTH_TOKEN ? process.env.NEBULA_AUTH_TOKEN + '@' : ''
 const pylonUrl = `https://${authToken}@ipfs.nebula.land`
 
 // all ENS interaction happens on mainnet
-export default function (connection = proxyConnection) {
-  return nebula(pylonUrl, new EthereumProvider(connection))
+export default function (provider = proxy.provider) {
+  return nebula(pylonUrl, provider)
 }

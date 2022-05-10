@@ -1,8 +1,8 @@
+import log from 'electron-log'
+import { EventEmitter } from 'stream'
+
 // @ts-ignore
-import log from 'electron-log';
-
-
-import { EventEmitter } from "stream";
+import EthereumProvider from 'ethereum-provider'
 
 class ProviderProxyConnection extends EventEmitter {
   async send (payload: RPCRequestPayload) {
@@ -14,4 +14,9 @@ class ProviderProxyConnection extends EventEmitter {
   }
 }
 
-export default new ProviderProxyConnection()
+const connection = new ProviderProxyConnection()
+
+export default {
+  connection,
+  provider: new EthereumProvider(connection)
+}
