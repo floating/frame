@@ -36,7 +36,9 @@ module.exports = async origin => {
   const permIndex = perms.map(p => p.origin).indexOf(origin)
   if (permIndex === -1) {
     try {
-      return await addPermissionRequest(address, origin)
+      await addPermissionRequest(address, origin)
+      store.initDapp(origin, '0x1')
+      return true
     } catch (e) {
       log.error(e)
       return false
