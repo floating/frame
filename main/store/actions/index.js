@@ -424,6 +424,12 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
+  initOrigin: (u, originId, chainId) => {
+    u('main.origins', () => ({ [originId]: { chainId } }))
+  },
+  switchOriginChain: (u, originId, chainId) => {
+    u('main.origins', originId, 'chainId', () => chainId)
+  },
   expandDock: (u, expand) => {
     u('dock.expand', (s) => expand)
   },
