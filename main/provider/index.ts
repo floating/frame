@@ -752,6 +752,7 @@ export class Provider extends EventEmitter {
       if (exists === false) throw new Error('Chain does not exist')
 
       const currentChain = store('main.dapps', payload._origin, 'chainId')
+      
       store.switchDappChain(payload._origin, chainId)
 
       if (currentChain !== chainId) {
@@ -901,8 +902,8 @@ export class Provider extends EventEmitter {
     const target: Chain = { type: 'ethereum', id: 0 }
 
     if (!('chainId' in payload)) {
-      console.log('parseTargetChain', payload)
-      return { ...target, id: store('main.dapps', payload._origin, 'chainId') }
+      const chainId = store('main.dapps', payload._origin, 'chainId') || store('main.dapps', payload._origin, 'default', 'chainId')
+      return { ...target, id: chainId || 1 }
     }
 
     const chainId = parseInt(payload.chainId || '', 16)
