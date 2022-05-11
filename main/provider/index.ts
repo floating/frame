@@ -771,22 +771,15 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      if (store('main.currentNetwork.id') === chainId) return res({ id: payload.id, jsonrpc: '2.0', result: null })
-
-      const handlerId = this.addRequestHandler(res)
+      const currentChain = store('main.origins', payload._origin, 'chainId')
       
-      // Ask user if they want to switch chains
-      accounts.addRequest({
-        handlerId,
-        type: 'switchChain',
-        chain: { 
-          type, 
-          id: params[0].chainId
-        },
-        account: (accounts.getAccounts() || [])[0],
-        origin: payload._origin,
-        payload
-      } as SwitchChainRequest, res)
+      store.switchOriginChain(payload._origin, chainId)
+
+      if (currentChain !== chainId) {
+        this.chainChanged(chainId, payload._origin)
+      }
+
+      return res({ id: payload.id, jsonrpc: '2.0', result: undefined })
     } catch (e) {
       return this.resError(e as EVMError, payload, res)
     }
