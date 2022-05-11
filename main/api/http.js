@@ -42,6 +42,9 @@ const handler = (req, res) => {
       const payload = validPayload(input)
       if (!payload) return console.warn('Invalid Payload', input)
       payload._origin = origin
+      if (origin) {
+        store.initOrigin(origin, '0x1')
+      }
       if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + JSON.stringify(payload.params))
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
         let error = { message: 'Permission denied, approve ' + origin + ' in Frame to continue', code: 4001 }

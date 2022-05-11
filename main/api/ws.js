@@ -39,6 +39,9 @@ const handler = (socket, req) => {
       }
     }
     payload._origin = origin
+    if (origin) {
+      store.initOrigin(origin, '0x1')
+    }
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick(true)
     if (logTraffic) log.info('req -> | ' + (socket.isFrameExtension ? 'ext | ' : 'ws | ') + origin + ' | ' + payload.method + ' | -> | ' + payload.params)
