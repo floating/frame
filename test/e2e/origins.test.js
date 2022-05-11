@@ -9,7 +9,7 @@ const frame = provider('frame', { origin: 'frame.sh' })
 it('should be able to change the chain for a given origin', async done => {
   try {
     store.observer(() => {
-      const chainId = store('main.dapps')
+      const { chainId } = store('main.origins')
       console.log('got chain yo', chainId)
       if (chainId === '0x4') {
         done()
