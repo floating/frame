@@ -424,6 +424,9 @@ module.exports = {
   setDappStorage: (u, hash, state) => {
     if (state) u(`main.dapp.storage.${hash}`, () => state)
   },
+  initDapp: (u, dappId, chainId) => {
+    u('main.dapps', () => ({ [dappId]: { default: { chainId }, chainId } }))
+  },
   switchDappChain: (u, dappId, chainId) => {
     u('main.dapps', dappId, 'chainId', () => chainId)
   },
