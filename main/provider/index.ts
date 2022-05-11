@@ -928,15 +928,16 @@ export class Provider extends EventEmitter {
   private parseTargetChain (payload: RPCRequestPayload) {
     const target: Chain = { type: 'ethereum', id: 0 }
 
-    if (!('chainId' in payload)) {
-      return { ...target, id: store('main.currentNetwork.id') }
-    }
+    if ('chainId' in payload) {
+      const chainId = parseInt(payload.chainId || '', 16)
+      const chainConnection = this.connection.connections['ethereum'][chainId] || {}
 
-    const chainId = parseInt(payload.chainId || '', 16)
-    const chainConnection = this.connection.connections['ethereum'][chainId] || {}
-
-    if (chainConnection.chainConfig) {
-      target.id = chainId
+      if (chainConnection.chainConfig) {
+        target.id = chainId
+      }
+    } else {
+      const chainId = store('main.dapps', payload._origin, 'chainId')
+      target.id = chainId || 1
     }
 
     return target
