@@ -9,7 +9,8 @@ import {
   addCustomTokens as addCustomTokensAction,
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
-  setScanning as setScanningAction
+  setScanning as setScanningAction,
+  switchOriginChain as switchOriginChainAction
 } from '../../../../main/store/actions'
 
 beforeAll(() => {
@@ -507,5 +508,32 @@ describe('#setScanning', () => {
     jest.advanceTimersByTime(1000)
 
     expect(isScanning).toBe(false)
+  })
+})
+
+describe('#switchOriginChain', () => {
+  let origins = { }
+
+  const updaterFn = (node, origin, chainIdKey, update) => {
+    const nodePath = [node, origin, chainIdKey].join('.')
+    expect(nodePath).toBe('main.origins.frame.eth.chainId')
+
+    origins[origin].chainId = update()
+  }
+
+  beforeEach(() => {
+    origins = {
+      'frame.eth': {
+        chainId: 1
+      }
+    }
+  })
+
+  const switchChain = chainId => switchOriginChainAction(updaterFn, 'frame.eth', chainId)
+
+  it('should switch the chain for an origin', () => {
+    switchChain(4)
+
+    expect(origins['frame.eth'].chainId).toBe(4)
   })
 })
