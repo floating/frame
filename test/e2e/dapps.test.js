@@ -27,14 +27,3 @@ it('should be able to change the chain', async done => {
     console.log(err)
   }
 }, 30 * 1000)
-
-// dapp requests permission
-// - verify permission requested
-
-// user grants permission
-// - verify dapp receives perm decision
-// - verify perm only granted for that dapp
-
-// user denies permission
-// - verify dapp receives perm decision
-// - verify perm only granted for that dapp
