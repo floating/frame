@@ -6,7 +6,7 @@ jest.mock('../../main/store/persist')
 
 const frame = provider('frame', { origin: 'frame.sh' })
 
-it('should be able to change the chain', async done => {
+it('should be able to change the chain for a given origin', async done => {
   try {
     store.observer(() => {
       const chainId = store('main.dapps')
