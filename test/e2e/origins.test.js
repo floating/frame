@@ -1,28 +1,31 @@
 
 import provider from 'eth-provider'
-import store from '../../main/store'
 
 jest.mock('../../main/store/persist')
 
-const frame = provider('frame', { origin: 'frame.sh' })
+const frame = provider('frame', { origin: 'frame.test' })
 
-it('should be able to change the chain for a given origin', async done => {
+it('should be able to change the chain for a given origin', (done) => {
   try {
-    store.observer(() => {
-      const { chainId } = store('main.origins')
-      console.log('got chain yo', chainId)
-      if (chainId === '0x4') {
+    (async () => {
+      await frame.request({
+        method: 'eth_accounts',
+        params: [],
+        origin: 'frame.test'
+      })
+      const chainChangedListener = (chainId) => {
+        expect(chainId).toBe('0x4')
         done()
       }
-    })
-    console.log('requesting chain change')
-    await frame.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x4' }],
-      origin: 'https://frame.sh'
-    })
-    console.log('change requested')
-    // verify chain changed only for that origin
+      frame.on('chainChanged', chainChangedListener)
+      await frame.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x4' }],
+        origin: 'frame.test'
+      })
+      frame.off('chainChanged', chainChangedListener)
+      frame.close()
+    })()
   } catch (err) {
     console.log(err)
   }
