@@ -76,7 +76,9 @@ class SignerStatus extends React.Component {
           this.props.hideSignerStatus(true)
         }
       })
-      this.inputRef.current.focus()
+      if (this.inputRef.current) {
+        this.inputRef.current.focus()
+      }
     }, 100)
   }
 
