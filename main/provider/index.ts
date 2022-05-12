@@ -1,5 +1,5 @@
 // @ts-ignore
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid, v5 as uuidv5 } from 'uuid'
 import EventEmitter from 'events'
 import log from 'electron-log'
 import utils from 'web3-utils'
@@ -771,9 +771,10 @@ export class Provider extends EventEmitter {
       const exists = Boolean(store('main.networks', type, chainId))
       if (exists === false) throw new Error('Chain does not exist')
 
-      const currentChain = store('main.origins', payload._origin, 'chainId')
+      const originId = uuidv5(payload._origin, uuidv5.DNS)
+      const currentChain = store('main.origins', originId, 'chainId')
       
-      store.switchOriginChain(payload._origin, chainId)
+      store.switchOriginChain(originId, chainId)
 
       if (currentChain !== chainId) {
         this.chainChanged(chainId, payload._origin)
@@ -949,6 +950,7 @@ export class Provider extends EventEmitter {
 
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
+    // console.log('got payload', { ...payload, params: undefined })
     const targetChain = this.parseTargetChain(payload)
 
     if (!targetChain.id) {

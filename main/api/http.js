@@ -1,4 +1,5 @@
 const http = require('http')
+const { v5: uuidv5 } = require('uuid')
 const log = require('electron-log')
 
 const provider = require('../provider').default
@@ -43,7 +44,7 @@ const handler = (req, res) => {
       if (!payload) return console.warn('Invalid Payload', input)
       payload._origin = origin
       if (origin) {
-        store.initOrigin(origin, '0x1')
+        store.initOrigin(uuidv5(origin, uuidv5.DNS), 1)
       }
       if (logTraffic) log.info('req -> | http | ' + req.headers.origin + ' | ' + payload.method + ' | -> | ' + JSON.stringify(payload.params))
       if (protectedMethods.indexOf(payload.method) > -1 && !(await trusted(origin))) {
