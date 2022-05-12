@@ -1,5 +1,5 @@
 const WebSocket = require('ws')
-const { v4: uuid } = require('uuid')
+const { v4: uuid, v5: uuidv5 } = require('uuid')
 const log = require('electron-log')
 
 const provider = require('../provider').default
@@ -39,8 +39,9 @@ const handler = (socket, req) => {
       }
     }
     payload._origin = origin
+    
     if (origin) {
-      store.initOrigin(origin, '0x1')
+      store.initOrigin(uuidv5(origin, uuidv5.DNS), 1)
     }
     // Extension custom action for summoning Frame
     if (origin === 'frame-extension' && payload.method === 'frame_summon') return windows.trayClick(true)
