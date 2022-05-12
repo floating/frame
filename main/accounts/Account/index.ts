@@ -143,7 +143,12 @@ class FrameAccount {
       })
     }
 
-    this.lookupAddress() // We need to recheck this on every network change...
+    if (nebula.ready()) {
+      this.lookupAddress() // We need to recheck this on every network change...
+    } else {
+      nebula.once('ready', this.lookupAddress.bind(this))
+    }
+
     this.update()
   }
 

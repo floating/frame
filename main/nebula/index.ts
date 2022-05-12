@@ -13,6 +13,7 @@ process.versions.electron = electron
 // @ts-ignore
 import EthereumProvider from 'ethereum-provider'
 import proxyConnection from '../provider/proxy'
+import { EventEmitter } from 'stream'
 
 const authToken = process.env.NEBULA_AUTH_TOKEN ? process.env.NEBULA_AUTH_TOKEN + '@' : ''
 const pylonUrl = `https://${authToken}@ipfs.nebula.land`
@@ -22,5 +23,17 @@ const mainnetProvider = new EthereumProvider(proxyConnection)
 mainnetProvider.setChain(1)
 
 export default function (provider = mainnetProvider) {
-  return nebula(pylonUrl, provider)
+  let ready = false
+  const events = new EventEmitter()
+
+  provider.on('connect', () => {
+    ready = true
+    events.emit('ready')
+  })
+
+  return {
+    once: events.once.bind(events),
+    ready: () => ready,
+    ...nebula(pylonUrl, provider)
+  }
 }
