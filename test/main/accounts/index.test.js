@@ -10,7 +10,7 @@ jest.mock('../../../main/externalData')
 
 jest.mock('../../../main/store/persist')
 
-jest.mock('../../../main/nebula', () => jest.fn(() => ({ ens: { lookupAddress: jest.fn() } })))
+jest.mock('../../../main/nebula', () => jest.fn(() => ({ ready: () => true, ens: { lookupAddress: jest.fn() } })))
 
 const weiToHex = wei => addHexPrefix(wei.toString(16))
 const gweiToHex = gwei => weiToHex(gwei * 1e9)

@@ -3,7 +3,7 @@ import { hash } from 'eth-ens-namehash'
 import store from '../../../store'
 import nebulaApi from '../../../nebula'
 
-const nebula = nebulaApi('frame-dapps')
+const nebula = nebulaApi()
 
 const resolve = {
   rootCid: async (app: string) => {
