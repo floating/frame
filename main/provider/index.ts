@@ -194,7 +194,7 @@ export class Provider extends EventEmitter {
     const { type, id } = (targetChain || store('main.currentNetwork'))
 
     const connection = this.connection.connections[type][id]
-    const chainConnected = (connection.primary.connected || connection.secondary.connected)
+    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
 
     const response = chainConnected
       ? { result: id.toString() }
@@ -207,7 +207,7 @@ export class Provider extends EventEmitter {
     const { type, id } = (targetChain || store('main.currentNetwork'))
 
     const connection = this.connection.connections[type][id]
-    const chainConnected = (connection.primary.connected || connection.secondary.connected)
+    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
 
     const response = chainConnected
       ? { result: intToHex(id) }

@@ -1,7 +1,7 @@
 import TokenLoader from '../../../../main/externalData/inventory/tokens'
 import log from 'electron-log'
 
-jest.mock('eth-provider')
+jest.mock('eth-provider', () => () => ({ connected: true }))
 
 jest.mock('../../../../main/nebula', () => jest.fn(() => ({
   resolve: async () => ({ record: {} }),
