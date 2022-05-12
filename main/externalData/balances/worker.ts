@@ -19,10 +19,11 @@ let heartbeat: NodeJS.Timeout
 let balances: BalanceLoader
 
 const eth = ethProvider('frame', { name: 'scanWorker' })
-const tokenLoader = new TokenLoader(eth)
+const tokenLoader = new TokenLoader()
 
 eth.on('connect', async () => {
-  tokenLoader.start()
+  await tokenLoader.start()
+
   balances = balancesLoader(eth)
 
   sendToMainProcess({ type: 'ready' })

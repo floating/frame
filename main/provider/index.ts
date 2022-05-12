@@ -25,7 +25,7 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
 
-import proxy from './proxy'
+import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
@@ -118,10 +118,6 @@ export class Provider extends EventEmitter {
     this.connection.syncDataEmit(this)
 
     this.connection.on('connect', () => {
-      if (!this.connected) {
-        proxy.connection.emit('connect')
-      }
-
       this.connected = true
       this.emit('connect')
     })
@@ -137,10 +133,10 @@ export class Provider extends EventEmitter {
       }
     })
 
-    proxy.connection.on('provider:send', (payload: RPCRequestPayload) => {
+    proxyConnection.on('provider:send', (payload: RPCRequestPayload) => {
       const { id, method } = payload
       this.send(payload, ({ error, result }) => {
-        proxy.connection.emit('payload', { id, method, error, result })
+        proxyConnection.emit('payload', { id, method, error, result })
       })
     })
 
@@ -208,11 +204,12 @@ export class Provider extends EventEmitter {
 
   getChainId (payload: JSONRPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
-    const chain = store('main.networks', type, id) as Network
-    const chainConnected = (chain.connection.primary.connected || chain.connection.secondary.connected)
+
+    const connection = this.connection.connections[type][id]
+    const chainConnected = (connection.primary.connected || connection.secondary.connected)
 
     const response = chainConnected
-      ? { result: intToHex(chain.id) }
+      ? { result: intToHex(id) }
       : { error: { message: 'not connected', code: 1 } }
 
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })

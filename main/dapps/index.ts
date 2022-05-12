@@ -2,6 +2,10 @@ import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
 import crypto from 'crypto'
 
+// @ts-ignore
+import EthereumProvider from 'ethereum-provider'
+
+import proxyConnection from '../provider/proxy'
 import store from '../store'
 
 // @ts-ignore
@@ -9,7 +13,10 @@ import windows from '../windows'
 import nebulaApi from '../nebula'
 import server from './server'
 
-const nebula = nebulaApi()
+const mainnetProvider = new EthereumProvider(proxyConnection)
+mainnetProvider.setChain(1)
+
+const nebula = nebulaApi(mainnetProvider)
 
 function getDapp (dappId: string): Dapp {
   return store('main.dapps', dappId)
@@ -89,7 +96,13 @@ store.observer(() => {
   const dapps = store('main.dapps')
   Object.keys(dapps || {}).filter(id => dapps[id].status === 'initial').forEach(id => {
     store.updateDapp(id, { status: 'loading' })
-    checkStatus(id)
+
+    if (mainnetProvider.connected) {
+      checkStatus(id)
+    }
+    else {
+      mainnetProvider.once('connect', () => checkStatus(id))
+    }
   })
 })
 

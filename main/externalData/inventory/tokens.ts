@@ -1,6 +1,8 @@
 import log from 'electron-log'
-import nebulaApi from '../../nebula'
 
+import ethProvider from 'eth-provider'
+
+import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'
 
@@ -40,15 +42,16 @@ export default class TokenLoader {
   private tokenList: Token[] = []
   private loader?: NodeJS.Timeout | null
 
-  private readonly nebula: Nebula
+  private readonly eth = ethProvider('frame', { name: 'tokenLoader' })
+  private readonly nebula = nebulaApi(this.eth)
 
-  constructor (provider: EthereumProvider) {
-    this.nebula = nebulaApi(provider)
-
+  constructor () {
     this.tokenList = mergeTokens(
       sushiswapTokenList.tokens as Token[],
       defaultTokenList.tokens as TokenSpec[]
     )
+
+    this.eth.on('connect', this.start.bind(this))
   }
 
   private async loadTokenList () {
@@ -79,8 +82,21 @@ export default class TokenLoader {
   }
 
   async start () {
-    await this.loadTokenList()
-    this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
+    log.verbose('starting token loader')
+
+    return new Promise((resolve, reject) => {
+      const connectTimeout = setTimeout(() => reject('could not connect to provider'), 30 * 1000)
+
+      const startLoading = () => {
+        clearTimeout(connectTimeout)
+        this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
+        resolve(this.loadTokenList())
+      }
+
+      if (this.eth.connected) return startLoading()
+
+      this.eth.once('connect', startLoading.bind(this))
+    })
   }
   
   stop () {
