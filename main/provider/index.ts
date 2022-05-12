@@ -197,13 +197,25 @@ export class Provider extends EventEmitter {
   getNetVersion (payload: JSONRPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
     const chain = store('main.networks', type, id)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: `${chain.id}` })
+    const chainConnected = (chain.connection.primary.connected || chain.connection.secondary.connected)
+
+    const response = chainConnected
+      ? { result: chain.id.toString() }
+      : { error: { message: 'not connected', code: 1 } }
+
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
   getChainId (payload: JSONRPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
-    const chain = store('main.networks', type, id)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: intToHex(chain.id) })
+    const chain = store('main.networks', type, id) as Network
+    const chainConnected = (chain.connection.primary.connected || chain.connection.secondary.connected)
+
+    const response = chainConnected
+      ? { result: intToHex(chain.id) }
+      : { error: { message: 'not connected', code: 1 } }
+
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
   getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {

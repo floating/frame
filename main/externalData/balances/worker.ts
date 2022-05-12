@@ -18,8 +18,8 @@ interface ExternalDataWorkerMessage {
 let heartbeat: NodeJS.Timeout
 let balances: BalanceLoader
 
-const tokenLoader = new TokenLoader()
 const eth = ethProvider('frame', { name: 'scanWorker' })
+const tokenLoader = new TokenLoader(eth)
 
 eth.on('connect', async () => {
   tokenLoader.start()

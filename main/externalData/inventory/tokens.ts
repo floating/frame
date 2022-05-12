@@ -1,36 +1,16 @@
 import log from 'electron-log'
 import nebulaApi from '../../nebula'
 
-const ethProvider = require('eth-provider')
-const connection = ethProvider('frame')
-const nebula = nebulaApi(connection)
-
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'
+
+import type { Nebula } from 'nebula/dist/nebula'
+import type { EthereumProvider } from 'eth-provider'
 
 interface TokenSpec extends Token {
   extensions: {
     omit: boolean
   }
-}
-
-async function frameTokenList () {
-  log.debug('loading tokens from tokens.frame.eth')
-
-  try {
-    const tokenListRecord = await nebula.resolve('tokens.frame.eth')
-    const tokenManifest: { tokens: TokenSpec[] } = await nebula.ipfs.getJson(tokenListRecord.record.content)
-
-    const tokens = tokenManifest.tokens
-
-    log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
-
-    return tokens
-  } catch (e) {
-    log.warn('Could not load token list from tokens.frame.eth, using default list', e)
-  }
-
-  return []
 }
 
 function mergeTokens (existingTokens: Token[], updatedTokens: TokenSpec[]) {
@@ -60,7 +40,11 @@ export default class TokenLoader {
   private tokenList: Token[] = []
   private loader?: NodeJS.Timeout | null
 
-  constructor () {
+  private readonly nebula: Nebula
+
+  constructor (provider: EthereumProvider) {
+    this.nebula = nebulaApi(provider)
+
     this.tokenList = mergeTokens(
       sushiswapTokenList.tokens as Token[],
       defaultTokenList.tokens as TokenSpec[]
@@ -68,11 +52,30 @@ export default class TokenLoader {
   }
 
   private async loadTokenList () {
-    const updatedTokens = await frameTokenList()
+    const updatedTokens = await this.frameTokenList()
   
     this.tokenList = mergeTokens(this.tokenList, updatedTokens)
   
     log.info(`updated token list to contain ${this.tokenList.length} tokens`)
+  }
+
+  async frameTokenList () {
+    log.debug('loading tokens from tokens.frame.eth')
+
+    try {
+      const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
+      const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
+
+      const tokens = tokenManifest.tokens
+
+      log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
+
+      return tokens
+    } catch (e) {
+      log.warn('Could not load token list from tokens.frame.eth, using default list', e)
+    }
+
+    return []
   }
 
   async start () {
