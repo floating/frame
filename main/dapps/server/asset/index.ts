@@ -1,5 +1,4 @@
 import cheerio from 'cheerio'
-import log from 'electron-log'
 
 import nebulaApi from '../../../nebula'
 import store from '../../../store'

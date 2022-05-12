@@ -149,6 +149,7 @@ class FrameAccount {
 
   async lookupAddress () {
     try {
+      console.log('LOOKUP ADDRESS')
       this.ensName = (await nebula.ens.reverseLookup(this.address))[0]
       this.update()
     } catch (e) {

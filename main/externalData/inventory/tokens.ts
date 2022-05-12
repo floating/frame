@@ -6,9 +6,6 @@ import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'
 
-import type { Nebula } from 'nebula/dist/nebula'
-import type { EthereumProvider } from 'eth-provider'
-
 interface TokenSpec extends Token {
   extensions: {
     omit: boolean
@@ -50,8 +47,6 @@ export default class TokenLoader {
       sushiswapTokenList.tokens as Token[],
       defaultTokenList.tokens as TokenSpec[]
     )
-
-    this.eth.on('connect', this.start.bind(this))
   }
 
   private async loadTokenList () {

@@ -99,8 +99,7 @@ store.observer(() => {
 
     if (mainnetProvider.connected) {
       checkStatus(id)
-    }
-    else {
+    } else {
       mainnetProvider.once('connect', () => checkStatus(id))
     }
   })
