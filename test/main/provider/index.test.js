@@ -197,9 +197,11 @@ describe('#send', () => {
       })
     })
 
-    it('adds switch chain request if chain exists', done => {
+    it('should switch to a chain and notify listeners if it exists in the store', done => {
       store.set('main.networks.ethereum', 1, { id: 1 })
       store.set('main.currentNetwork', { type: 'ethereum', id: 137 })
+      store.switchOriginChain = jest.fn()
+      const chainChangedListener = jest.spyOn(provider, 'chainChanged')
 
       send({ 
         method: 'wallet_addEthereumChain', 
@@ -216,16 +218,12 @@ describe('#send', () => {
             blockExplorerUrls: ['https://pylon.link'],
             iconUrls: [''] // Currently ignored
           }
-        ] 
+        ],
+        _origin: 'frame.test'
       }, () => {
-        try {
-          expect(accountRequests).toHaveLength(1)
-          expect(accountRequests[0].handlerId).toBeTruthy()
-          expect(accountRequests[0].type).toBe('switchChain')
-          done()
-        } catch (e) { 
-          done(e) 
-        }
+        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1)
+        expect(chainChangedListener).toHaveBeenCalledWith(1, 'frame.test')
+        done()
       })
     })
   })
@@ -235,8 +233,8 @@ describe('#send', () => {
       store.set('main.networks.ethereum', 1, { id: 1 })
       store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chainId: 42161 }})
       store.switchOriginChain = jest.fn()
-
       const chainChangedListener = jest.spyOn(provider, 'chainChanged')
+
       send({ 
         method: 'wallet_switchEthereumChain', 
         params: [{
