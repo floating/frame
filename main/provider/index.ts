@@ -25,6 +25,7 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
 
+import proxyConnection from './proxy'
 import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
@@ -116,7 +117,7 @@ export class Provider extends EventEmitter {
     
     this.connection.syncDataEmit(this)
 
-    this.connection.on('connect', () => { 
+    this.connection.on('connect', () => {
       this.connected = true
       this.emit('connect')
     })
@@ -130,6 +131,13 @@ export class Provider extends EventEmitter {
       if (event.type === 'fees') {
         return accounts.updatePendingFees(event.chainId)
       }
+    })
+
+    proxyConnection.on('provider:send', (payload: RPCRequestPayload) => {
+      const { id, method } = payload
+      this.send(payload, ({ error, result }) => {
+        proxyConnection.emit('payload', { id, method, error, result })
+      })
     })
 
     this.getNonce = this.getNonce.bind(this)
@@ -184,14 +192,28 @@ export class Provider extends EventEmitter {
 
   getNetVersion (payload: JSONRPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
-    const chain = store('main.networks', type, id)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: `${chain.id}` })
+
+    const connection = this.connection.connections[type][id]
+    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
+
+    const response = chainConnected
+      ? { result: id.toString() }
+      : { error: { message: 'not connected', code: 1 } }
+
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
   getChainId (payload: JSONRPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.currentNetwork'))
-    const chain = store('main.networks', type, id)
-    res({ id: payload.id, jsonrpc: payload.jsonrpc, result: intToHex(chain.id) })
+
+    const connection = this.connection.connections[type][id]
+    const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
+
+    const response = chainConnected
+      ? { result: intToHex(id) }
+      : { error: { message: 'not connected', code: 1 } }
+
+    res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
   getChains (payload: JSONRPCRequestPayload, res: RPCSuccessCallback) {

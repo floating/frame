@@ -10,18 +10,30 @@ import nebula from 'nebula'
 // @ts-ignore
 process.versions.electron = electron
 
-import ethProvider from 'eth-provider'
+// @ts-ignore
+import EthereumProvider from 'ethereum-provider'
+import proxyConnection from '../provider/proxy'
+import { EventEmitter } from 'stream'
 
 const authToken = process.env.NEBULA_AUTH_TOKEN ? process.env.NEBULA_AUTH_TOKEN + '@' : ''
 const pylonUrl = `https://${authToken}@ipfs.nebula.land`
 
-// TODO: in the future we should use a cross chain provider, for now all ENS
-// interaction will happen on the main chain
+// all ENS interaction happens on mainnet
+const mainnetProvider = new EthereumProvider(proxyConnection)
+mainnetProvider.setChain(1)
 
-const ethNode = process.env.RINKEBY
-  ? 'wss://rinkeby.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'
-  : 'wss://mainnet.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'
+export default function (provider = mainnetProvider) {
+  let ready = false
+  const events = new EventEmitter()
 
-export default function (name: string) {
-  return nebula(pylonUrl, ethProvider(ethNode, { name }))
+  provider.on('connect', () => {
+    ready = true
+    events.emit('ready')
+  })
+
+  return {
+    once: events.once.bind(events),
+    ready: () => ready,
+    ...nebula(pylonUrl, provider)
+  }
 }
