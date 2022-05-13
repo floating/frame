@@ -236,9 +236,7 @@ describe('#send', () => {
       store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chainId: 42161 }})
       store.switchOriginChain = jest.fn()
 
-      const chainChangedListener = jest.fn()
-      provider.chainChanged = chainChangedListener
-
+      const chainChangedListener = jest.spyOn(provider, 'chainChanged')
       send({ 
         method: 'wallet_switchEthereumChain', 
         params: [{
