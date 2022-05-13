@@ -1,7 +1,6 @@
 import { hash } from 'eth-ens-namehash'
 import log from 'electron-log'
 import crypto from 'crypto'
-
 import store from '../store'
 
 // @ts-ignore
@@ -9,7 +8,7 @@ import windows from '../windows'
 import nebulaApi from '../nebula'
 import server from './server'
 
-const nebula = nebulaApi('frame-dapps')
+const nebula = nebulaApi()
 
 function getDapp (dappId: string): Dapp {
   return store('main.dapps', dappId)
@@ -89,7 +88,12 @@ store.observer(() => {
   const dapps = store('main.dapps')
   Object.keys(dapps || {}).filter(id => dapps[id].status === 'initial').forEach(id => {
     store.updateDapp(id, { status: 'loading' })
-    checkStatus(id)
+
+    if (nebula.ready()) {
+      checkStatus(id)
+    } else {
+      nebula.once('ready', () => checkStatus(id))
+    }
   })
 })
 

@@ -1,12 +1,11 @@
 import cheerio from 'cheerio'
-import log from 'electron-log'
 
 import nebulaApi from '../../../nebula'
 import store from '../../../store'
 import getType from './getType'
 import { ServerResponse } from 'http'
 
-const nebula = nebulaApi('frame-dapps')
+const nebula = nebulaApi()
 
 function error (res: ServerResponse, code: number, message: string) {
   res.writeHead(code || 404)

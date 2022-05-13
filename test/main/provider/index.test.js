@@ -47,7 +47,12 @@ beforeEach(() => {
   store.set('main.accounts', {})
 
   connection.send = jest.fn()
-  connection.connections = { ethereum: { 4: { chainConfig: chainConfig(4, 'london') } } }
+  connection.connections = {
+    ethereum: {
+      1: { chainConfig: chainConfig(1, 'london'), primary: { connected: true }},
+      4: { chainConfig: chainConfig(4, 'london'), primary: { connected: true }}
+    }
+  }
 
   accounts.current = jest.fn(() => ({ id: address, getAccounts: () => [address] }))
   accounts.get = jest.fn(addr => addr === address ? { address, lastSignerType: 'ring' } : undefined)
@@ -97,7 +102,7 @@ describe('#send', () => {
   const send = (request, cb = jest.fn()) => provider.send(request, cb)
 
   it('passes the given target chain to the connection', () => {
-    connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 } }
+    connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
 
     const request = { method: 'eth_testFrame' }
 
@@ -149,6 +154,15 @@ describe('#send', () => {
 
       send({ method: 'eth_chainId', chainId: '0x4' }, response => {
         expect(response.result).toBe('0x4')
+      })
+    })
+
+    it('returns an error for a disconnected chain', () => {
+      connection.connections.ethereum[11] = { chainConfig: chainConfig(11, 'london'), primary: { connected: false } }
+
+      send({ method: 'eth_chainId', chainId: '0xb' }, response => {
+        expect(response.error.message).toBe('not connected')
+        expect(response.result).toBeUndefined()
       })
     })
   })

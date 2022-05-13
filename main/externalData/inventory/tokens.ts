@@ -1,8 +1,8 @@
 import log from 'electron-log'
+
+import ethProvider from 'eth-provider'
+
 import nebulaApi from '../../nebula'
-
-const nebula = nebulaApi('tokenWorker')
-
 import defaultTokenList from './default-tokens.json'
 import sushiswapTokenList from '@sushiswap/default-token-list'
 
@@ -10,25 +10,6 @@ interface TokenSpec extends Token {
   extensions: {
     omit: boolean
   }
-}
-
-async function frameTokenList () {
-  log.debug('loading tokens from tokens.frame.eth')
-
-  try {
-    const tokenListRecord = await nebula.resolve('tokens.frame.eth')
-    const tokenManifest: { tokens: TokenSpec[] } = await nebula.ipfs.getJson(tokenListRecord.record.content)
-
-    const tokens = tokenManifest.tokens
-
-    log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
-
-    return tokens
-  } catch (e) {
-    log.warn('Could not load token list from tokens.frame.eth, using default list', e)
-  }
-
-  return []
 }
 
 function mergeTokens (existingTokens: Token[], updatedTokens: TokenSpec[]) {
@@ -58,6 +39,9 @@ export default class TokenLoader {
   private tokenList: Token[] = []
   private loader?: NodeJS.Timeout | null
 
+  private readonly eth = ethProvider('frame', { name: 'tokenLoader' })
+  private readonly nebula = nebulaApi(this.eth)
+
   constructor () {
     this.tokenList = mergeTokens(
       sushiswapTokenList.tokens as Token[],
@@ -66,16 +50,48 @@ export default class TokenLoader {
   }
 
   private async loadTokenList () {
-    const updatedTokens = await frameTokenList()
+    const updatedTokens = await this.frameTokenList()
   
     this.tokenList = mergeTokens(this.tokenList, updatedTokens)
   
     log.info(`updated token list to contain ${this.tokenList.length} tokens`)
   }
 
+  async frameTokenList () {
+    log.debug('loading tokens from tokens.frame.eth')
+
+    try {
+      const tokenListRecord = await this.nebula.resolve('tokens.frame.eth')
+      const tokenManifest: { tokens: TokenSpec[] } = await this.nebula.ipfs.getJson(tokenListRecord.record.content)
+
+      const tokens = tokenManifest.tokens
+
+      log.info(`loaded ${tokens.length} tokens from tokens.frame.eth`)
+
+      return tokens
+    } catch (e) {
+      log.warn('Could not load token list from tokens.frame.eth, using default list', e)
+    }
+
+    return []
+  }
+
   async start () {
-    await this.loadTokenList()
-    this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
+    log.verbose('starting token loader')
+
+    return new Promise((resolve, reject) => {
+      const connectTimeout = setTimeout(() => reject('could not connect to provider'), 30 * 1000)
+
+      const startLoading = () => {
+        clearTimeout(connectTimeout)
+        this.loader = setInterval(() => this.loadTokenList(), 1000 * 60 * 10)
+        resolve(this.loadTokenList())
+      }
+
+      if (this.eth.connected) return startLoading()
+
+      this.eth.once('connect', startLoading.bind(this))
+    })
   }
   
   stop () {
