@@ -1,4 +1,3 @@
-
 import provider from 'eth-provider'
 
 jest.mock('../../main/store/persist')
