@@ -25,7 +25,7 @@ import store from '../store'
 import protectedMethods from '../api/protectedMethods'
 import packageFile from '../../package.json'
 
-import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from '../accounts'
+import accounts, { AccountRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from '../accounts'
 import Chains, { Chain } from '../chains'
 import { getType as getSignerType, Type as SignerType } from '../signers/Signer'
 import { populate as populateTransaction, usesBaseFee, maxFee, TransactionData } from '../transaction'
@@ -752,9 +752,8 @@ export class Provider extends EventEmitter {
       const originId = uuidv5(payload._origin, uuidv5.DNS)
       const currentChain = store('main.origins', originId, 'chainId')
       
-      store.switchOriginChain(originId, chainId)
-
       if (currentChain !== chainId) {
+        store.switchOriginChain(originId, chainId)
         this.chainChanged(chainId, payload._origin)
       }
 
