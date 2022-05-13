@@ -928,7 +928,7 @@ export class Provider extends EventEmitter {
 
   send (payload: RPCRequestPayload, res: RPCRequestCallback = () => {}) {
     const method = payload.method || ''
-    // console.log('got payload', { ...payload, params: undefined })
+
     const targetChain = this.parseTargetChain(payload)
 
     if (!targetChain.id) {
