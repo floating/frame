@@ -45,7 +45,6 @@ beforeEach(() => {
 
   accountRequests = []
   store.set('main.accounts', {})
-  store.set('main.currentNetwork.id', 1)
 
   connection.send = jest.fn()
   connection.connections = {
@@ -113,13 +112,11 @@ describe('#send', () => {
   })
 
   it('passes the default target chain to the connection when none is given', () => {
-    store.set('main.currentNetwork.id', 137)
-
     const request = { method: 'eth_testFrame' }
 
     send(request)
 
-    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 137 })
+    expect(connection.send).toHaveBeenCalledWith(request, expect.any(Function), { type: 'ethereum', id: 1 })
   })
 
   it('returns an error when an unknown chain is given', () => {
@@ -171,7 +168,7 @@ describe('#send', () => {
   })
 
   describe('#wallet_addEthereumChain', () => {
-    it('adds the current chain to the store', done => {
+    it('should create an addChain request', done => {
       send({ 
         method: 'wallet_addEthereumChain', 
         params: [
@@ -234,27 +231,28 @@ describe('#send', () => {
   })
 
   describe('#wallet_switchEthereumChain', () => {
-    it('switches to chain if chain exists in store', done => {
-      store.set('main.currentNetwork', { type: 'ethereum', id: 42161 })
+    it('should switch to a chain and notify listeners if it exists in the store', done => {
+      store.set('main.networks.ethereum', 1, { id: 1 })
+      store.set('main.origins', { '8073729a-5e59-53b7-9e69-5d9bcff94087': { chainId: 42161 }})
+      store.switchOriginChain = jest.fn()
+
+      const chainChangedListener = jest.fn()
+      provider.chainChanged = chainChangedListener
 
       send({ 
         method: 'wallet_switchEthereumChain', 
         params: [{
-          chainId: '0x1'
-        }]
+          chainId: '0x1',
+        }],
+        _origin: 'frame.test'
       }, () => {
-        try {
-          expect(accountRequests).toHaveLength(1)
-          expect(accountRequests[0].handlerId).toBeTruthy()
-          expect(accountRequests[0].type).toBe('switchChain')
-          done()
-        } catch (e) { 
-          done(e) 
-        }
+        expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1)
+        expect(chainChangedListener).toHaveBeenCalledWith(1, 'frame.test')
+        done()
       })
     })
 
-    it('rejects switch if chain doesn\'t exist in the store', done => {
+    it('should reject if the chain does not exist in the store', done => {
       send({
         method: 'wallet_switchEthereumChain', 
         params: [{
