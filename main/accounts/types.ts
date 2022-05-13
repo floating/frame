@@ -88,11 +88,6 @@ export interface AddChainRequest extends Omit<AccountRequest, 'type'> {
   chain: Chain
 }
 
-export interface SwitchChainRequest extends Omit<AccountRequest, 'type'> {
-  type: 'switchChain',
-  chain: Chain
-}
-
 export interface AddTokenRequest extends Omit<AccountRequest, 'type'> {
   type: 'addToken',
   token: Token

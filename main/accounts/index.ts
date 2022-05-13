@@ -41,7 +41,7 @@ const accountsApi = {
   },
 }
 
-export { RequestMode, AccountRequest, AccessRequest, TransactionRequest, SignTypedDataRequest, SwitchChainRequest, AddChainRequest, AddTokenRequest } from './types'
+export { RequestMode, AccountRequest, AccessRequest, TransactionRequest, SignTypedDataRequest, AddChainRequest, AddTokenRequest } from './types'
 
 export class Accounts extends EventEmitter {
   _current: string
