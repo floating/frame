@@ -62,8 +62,13 @@ export default function (store: Store) {
     workerController = new BalancesWorkerController()
     
     workerController.once('close', handleClose)
-    workerController.on('chainBalances', handleChainBalanceUpdate)
-    workerController.on('tokenBalances', handleTokenBalanceUpdate)
+    workerController.on('chainBalances', (address, balances) => {
+      handleUpdate(address, handleChainBalanceUpdate.bind(null, balances))
+    })
+
+    workerController.on('tokenBalances', (address, balances) => {
+      handleUpdate(address, handleTokenBalanceUpdate.bind(null, balances))
+    })
   }
 
   function restart () {
@@ -133,7 +138,15 @@ export default function (store: Store) {
     workerController?.scanForTokenBalances(address, trackedTokens, chains)
   }
 
-  function handleChainBalanceUpdate (address: Address, balances: CurrencyBalance[]) {
+  function handleUpdate (address: Address, updateFn: (address: Address) => void) {
+    // because updates come from another process its possible to receive updates after an account
+    // has been removed but before we stop the scan, so check to make sure the account exists
+    if (store('main.accounts', address)) {
+      updateFn(address)
+    }
+  }
+
+  function handleChainBalanceUpdate (balances: CurrencyBalance[], address: Address) {
     const currentChainBalances = storeApi.getCurrencyBalances(address)
 
     balances
@@ -154,7 +167,7 @@ export default function (store: Store) {
       })
   }
 
-  function handleTokenBalanceUpdate (address: Address, balances: TokenBalance[]) {
+  function handleTokenBalanceUpdate (balances: TokenBalance[], address: Address) {
     // only update balances if any have changed
     const currentTokenBalances = storeApi.getTokenBalances(address)
     const changedBalances = balances.filter(newBalance => {
