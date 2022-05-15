@@ -1,11 +1,20 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import Native from '../../resources/Native'
-import Local from './Panel/Local'
+// import Native from '../../resources/Native'
+import link from '../../resources/link'
+
+import Command from './Command'
+
+import Main from './Main'
 import Accounts from './Accounts'
 
 import Chains from './Panel/Networks'
+
+import Dapps from './Dapps'
+import Tokens from './Tokens'
+import Settings from './Settings'
+
 
 class Dash extends React.Component {
   constructor(props, context) {
@@ -19,18 +28,20 @@ class Dash extends React.Component {
   renderPanel () {
     const selected = this.store('dash.panel')
     console.log('selected', selected)
-    if ( selected === 'accounts') {
-      return <Accounts />
-    } else if ( selected === 'chains') {
-      return <Chains />
-    } else {
-      return <Local />
-    }
+    if (selected === 'accounts') return <Accounts />
+    if (selected === 'chains') return <Chains />
+    if (selected === 'dapps') return <Dapps />
+    if (selected === 'tokens') return <Tokens />
+    if (selected === 'settings') return <Settings />
+    return <Main />
   }
   render () {
     return (
       <div className='dash'>
-        {this.renderPanel()}
+        <Command />
+        <div className='dashMain'>
+          {this.renderPanel()}
+        </div>
       </div>
     )
   }

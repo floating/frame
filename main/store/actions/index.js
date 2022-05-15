@@ -529,12 +529,20 @@ module.exports = {
     })
   },
   // Dashboard
-  setDashType: (u, type) => {
-    // console.log('set dash type', type)
-    u('dash.type', () => type)
-  },
+  // setDashType: (u, type) => {
+  //   // console.log('set dash type', type)
+  //   u('dash.type', () => type)
+  // },
   toggleDash: (u, force) => {
     u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
+  },
+  closeDash: (u) => {
+    u('dash', () => {
+      return ({
+        showing: false,
+        panel: 'default'
+      })
+    })
   },
   setDash: (u, panel) => {
     u('dash', () => {

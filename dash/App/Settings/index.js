@@ -1,12 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
-import link from '../../../../resources/link'
-import svg from '../../../../resources/svg'
+import link from '../../../resources/link'
+import svg from '../../../resources/svg'
 // import Client from '../Client'
 
-import Dropdown from '../../Components/Dropdown'
+import Dropdown from '../Components/Dropdown'
 
-import Filter from '../Filter'
+import Filter from '../Panel/Filter'
 
 class Settings extends React.Component {
   constructor (props, context) {
@@ -31,22 +31,22 @@ class Settings extends React.Component {
     })
   }
 
-  appInfo () {
-    return (
-      <div className='appInfo'>
-        <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../../package.json').version}</div>
-        <div className='appInfoLine appInfoLineReset'>
-          {this.state.resetConfirm ? (
-            <span className='appInfoLineResetConfirm'>
-              Are you sure you want to reset everything? <span className='pointer' onClick={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onClick={() => this.setState({ resetConfirm: false })}>No</span>
-            </span>
-          ) : (
-            <span className='pointer' onClick={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
-          )}
-        </div>
-      </div>
-    )
-  }
+  // appInfo () {
+  //   return (
+  //     <div className='appInfo'>
+  //       <div className='appInfoLine appInfoLineVersion'>{'v' + require('../../../package.json').version}</div>
+  //       <div className='appInfoLine appInfoLineReset'>
+  //         {this.state.resetConfirm ? (
+  //           <span className='appInfoLineResetConfirm'>
+  //             Are you sure you want to reset everything? <span className='pointer' onClick={() => link.send('tray:resetAllSettings')}>Yes</span> <span>/</span> <span className='pointer' onClick={() => this.setState({ resetConfirm: false })}>No</span>
+  //           </span>
+  //         ) : (
+  //           <span className='pointer' onClick={() => this.setState({ resetConfirm: true })}>Reset All Settings & Data</span>
+  //         )}
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   okProtocol (location) {
     if (location === 'injected') return true
@@ -215,53 +215,12 @@ class Settings extends React.Component {
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
-          {/* <div className='panelHeader'>
-            <div className='panelHeaderTitle'>
-              {'Settings'}
-            </div>
-          </div> */}
-          <Filter />
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'accounts')}>
-            {'Accounts'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'chains')}>
-            {'Chains'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'tokens')}>
-            {'Tokens'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'dapps')}>
-            {'Dapps'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'dapps')}>
-            {'Settings'}
-          </div>
-          <div className='snipIt'>
-            <div>Using a dapp that doesn't support Frame natively?</div>
-            <div className='snipItBrowserExtensionIcons'>
-              <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome' onClick={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
-                {svg.chrome(24)}
-              </div>
-              <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconFirefox' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
-                {svg.firefox(24)}
-              </div>
-              <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
-                {svg.safari(24)}
-              </div>
-            </div>
-            <div>Inject a connection with our browser extension!</div>
-          </div>
+          <Filter />   
           {/* <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
             <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
               Manage Custom Tokens
             </div>
           </div> */}
-          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
-              Request a Feature 
-            </div>
-          </div>
-          {this.discord()}
           {/* <div className='requestFeature'>
             <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Request a Feature 
@@ -477,9 +436,6 @@ class Settings extends React.Component {
               When should Frame relock your hot signers?
             </div>
           </div>
-          {this.quit()}
-          <div className='viewLicense' onClick={() => this.store.notify('openExternal', { url: 'https://github.com/floating/frame/blob/master/LICENSE' })}>View License</div>
-          {this.appInfo()}
         </div>
       </div>
     )

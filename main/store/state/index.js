@@ -43,7 +43,7 @@ const initial = {
     view: 'default',
     account: {
       moduleOrder: [
-        'launcher',
+        // 'launcher',
         'requests',
         // 'activity',
         // 'gas',

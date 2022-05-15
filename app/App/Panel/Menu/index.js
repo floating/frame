@@ -2,9 +2,6 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
-import sushi from './logo.png'
-import oneInch from './1inch.png'
-import uniswap from './uniswap.png'
 
 class Launcher extends React.Component {
   constructor (...args) {
@@ -57,9 +54,12 @@ class Launcher extends React.Component {
       <div ref={this.moduleRef} className='panelMenu'>
         <div 
           className={'panelMenuItem panelMenuItemOpen'}
-          onMouseDown={() => link.send('tray:action', 'setDash', 'default')}
-        >
-          {svg.window(15)}
+          onClick={() => link.send('tray:action', 'setDash', 'default')}
+          onMouseEnter={() => this.setState({ glitchOn: true })}
+          onMouseOver={() => this.setState({ glitchOn: true })}
+          onMouseLeave={() => this.setState({ glitchOn: false })}
+        > 
+          {this.glitch(svg.window(15))}
         </div>
         <div 
           className={'panelMenuItem panelMenuItemSend'}
@@ -71,12 +71,7 @@ class Launcher extends React.Component {
           onMouseOver={() => this.setState({ glitchOn: true })}
           onMouseLeave={() => this.setState({ glitchOn: false })}
         >
-
-          {this.glitch(<div className='launchButtonInner'>
-            <div className='dashboradIcon'>
-              {svg.send(15)}
-            </div>
-          </div>)}
+          {this.glitch(svg.send(15))}
         </div>
       </div>
     )

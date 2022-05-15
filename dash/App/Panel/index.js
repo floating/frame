@@ -4,7 +4,7 @@ import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 import Main from './Main'
-import Local from './Local'
+// import Local from './Local'
 import Networks from './Networks'
 import Notify from './Notify'
 // import Phase from './Phase'
@@ -150,9 +150,8 @@ class Panel extends React.Component {
           ) : null} */}
         </div>
         <Notify />
-        <Local />
-        <Networks />
         <Main />
+        <Networks />
         <Badge />
       </div>
     )
