@@ -56,87 +56,28 @@ class Launcher extends React.Component {
     return (
       <div ref={this.moduleRef} className='panelMenu'>
         <div 
-            className='dappTile launchButton'
-            onClick={() => {
-              this.setState({ glitchOn: false })
-              link.send('*:addFrame', 'dappLauncher')
-            }}
-            onMouseEnter={() => this.setState({ glitchOn: true })}
-            onMouseOver={() => this.setState({ glitchOn: true })}
-            onMouseLeave={() => this.setState({ glitchOn: false })}
-          >
-            {this.glitch(<div className='launchButtonInner'>
-              <div className='dashboradIcon'>
-                {svg.send(13)}
-              </div>
-              <div>
-                {'Send'}
-              </div>
-            </div>)}
-          </div>
-        {/* <div className='mainWindowMarker'>
-          {this.store('dash.showing') ? (
-            <div className='panelMenuMark panelMenuMarkGood' style={{ transform: `translateX(8px)` }} />
-          ) : null}
-        </div> */}
-        {/* <div className='panelMenuMarker'>
-          <div className='panelMenuMark' style={{ transform: `translateX(${markLeft}px)` }} />
-        </div> */}
-        <div 
           className={'panelMenuItem panelMenuItemOpen'}
           onMouseDown={() => link.send('tray:action', 'setDash', 'default')}
         >
           {svg.window(15)}
         </div>
-
         <div 
           className={'panelMenuItem panelMenuItemSend'}
-          onMouseDown={() => link.send('tray:action', 'setDash', 'default')}
+          onClick={() => {
+            this.setState({ glitchOn: false })
+            link.send('*:addFrame', 'dappLauncher')
+          }}
+          onMouseEnter={() => this.setState({ glitchOn: true })}
+          onMouseOver={() => this.setState({ glitchOn: true })}
+          onMouseLeave={() => this.setState({ glitchOn: false })}
         >
-          {svg.send(15)}
-        </div>
-        {/* <div key={this.store('panel.view')} className='panelTitle'>
-          {this.store('panel.view') === 'default' ? (
-            'Accounts' 
-          ) : this.store('panel.view') === 'networks' ? (
-            'Chains'
-          ) : this.store('panel.view') === 'settings' ? (
-            'Settings'
-          ) : null}
-        </div> */}
-        {/* <div className='panelMenuItemNetwork'>
-          <Dropdown
-            syncValue={type + ':' + id}
-            onChange={(network) => this.selectNetwork(network)}
-            options={networkOptions}
-          />
-        </div> */}
-                    {/* <div className='panelDetailIndicator'>
-            {this.indicator(this.store('main.networks', type, id, 'connection'))}
-          </div> */}
-        {/* <div className='panelMenuItem panelMenuItemAccounts' onMouseDown={() => this.store.setPanelView('default')}>
-          {svg.accounts(15)}
 
+          {this.glitch(<div className='launchButtonInner'>
+            <div className='dashboradIcon'>
+              {svg.send(15)}
+            </div>
+          </div>)}
         </div>
-        <div className='panelMenuItem panelMenuItemConnections' onMouseDown={() => this.store.setPanelView('networks')}>
-          {svg.chain(16)}
-        </div> */}
-        {/* <div className='panelMenuItem panelMenuItemSettings' onMouseDown={() => this.store.setPanelView('settings')}>
-          {svg.settings(15)}
-        </div> */}
-        {/* {type === 'ethereum' ? (
-          <div className='panelMenuData' style={{ opacity: this.store('view.addAccount') ? 0 : 1 }}>
-            <div className='panelMenuDataItem'>
-              {gasPrice || '---'}
-              <div className='svg'>{svg.gas(9)}</div>
-            </div>
-            <div className='panelMenuDataDivide' />
-            <div className='panelMenuDataItem'>
-              <div className='usd'>{svg.usd(10.5)}</div>
-              <div>{baseRate}</div>
-            </div>
-          </div>
-        ) : null} */}
       </div>
     )
   }
