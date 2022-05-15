@@ -78,11 +78,7 @@ class Main extends React.Component {
                   onInput={input => {
                     this.setState({ filter: input })
                   }}
-                  buttonActionName={'Add Account'}
-                  buttonAction={() => {
-                    link.send('tray:action', 'toggleDash')
-                  }
-                } />
+                />
                 {/* <div className={!this.store('dash.showing') ? 'panelHeaderUpdate' : 'panelHeaderUpdate panelHeaderUpdateNotify'} onMouseDown={() => {
                   link.send('tray:action', 'toggleDash')
                 }}>

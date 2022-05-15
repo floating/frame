@@ -82,7 +82,7 @@ const initial = {
     }
   },
   dash: {
-    type: 'signers',
+    panel: 'default',
     showing: false
   },
   flow: {},

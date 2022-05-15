@@ -536,6 +536,14 @@ module.exports = {
   toggleDash: (u, force) => {
     u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
   },
+  setDash: (u, panel) => {
+    u('dash', () => {
+      return ({
+        showing: true,
+        panel
+      })
+    })
+  },
   muteBetaDisclosure: (u) => {
     u('main.mute.betaDisclosure', () => true)
     u('dash.showing', () => true)

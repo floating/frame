@@ -7,7 +7,7 @@ import Main from './Main'
 import Local from './Local'
 import Networks from './Networks'
 import Notify from './Notify'
-// import Phase from './Phase'
+import Menu from './Menu'
 import Badge from './Badge'
 
 import Dropdown from '../Components/Dropdown'
@@ -59,22 +59,22 @@ class Panel extends React.Component {
   
   render () {
     const opacity = this.store('tray.initial') ? 0 : 1 // open ? 'translate3d(0px, 0px, 0px)' : 'translate3d(370px, 0px, 0px)'
-    const { type, id } = this.store('main.currentNetwork')
+    // const { type, id } = this.store('main.currentNetwork')
 
-    const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
+    // const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
 
-    const chainLayer = this.store('main.networks', type, id, 'layer')
-    const baseRate = chainLayer === 'testnet' ? 'TEST' : 
-      nativeCurrency && nativeCurrency.usd ? (
-        nativeCurrency.usd.price < 100 ? 
-          (Math.round(nativeCurrency.usd.price * 100) / 100).toFixed(2)
-        :
-          Math.floor(nativeCurrency.usd.price).toLocaleString()
-    ) : '---'
+    // const chainLayer = this.store('main.networks', type, id, 'layer')
+    // const baseRate = chainLayer === 'testnet' ? 'TEST' : 
+    //   nativeCurrency && nativeCurrency.usd ? (
+    //     nativeCurrency.usd.price < 100 ? 
+    //       (Math.round(nativeCurrency.usd.price * 100) / 100).toFixed(2)
+    //     :
+    //       Math.floor(nativeCurrency.usd.price).toLocaleString()
+    // ) : '---'
 
-    let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.fast')
-    if (!gasPrice) gasPrice = this.store('main.networksMeta', type, id, 'gas.price.fees.maxFeePerGas')
-    if (gasPrice) gasPrice = this.hexToDisplayGwei(gasPrice)
+    // let gasPrice = this.store('main.networksMeta', type, id, 'gas.price.levels.fast')
+    // if (!gasPrice) gasPrice = this.store('main.networksMeta', type, id, 'gas.price.fees.maxFeePerGas')
+    // if (gasPrice) gasPrice = this.hexToDisplayGwei(gasPrice)
     const networks = this.store('main.networks')
     const networkOptions = []
     Object.keys(networks).forEach(type => {
@@ -90,57 +90,12 @@ class Panel extends React.Component {
         }
       })
     })
-    let markLeft = 189
-    if (this.store('panel.view') === 'networks') markLeft = 244
-    if (this.store('panel.view') === 'settings') markLeft = 300
+    let markLeft = 11
+    if (this.store('panel.view') === 'networks') markLeft = 68
+    if (this.store('panel.view') === 'settings') markLeft = 122
     return (
       <div id='panel' style={{ opacity }}>
-        <div className='panelMenu'>
-          <div className='panelMenuMarker'>
-            <div className='panelMenuMark' style={{ transform: `translateX(${markLeft}px)` }} />
-          </div>
-          <div className='panelMenuItem panelMenuItemAccounts' onMouseDown={() => this.store.setPanelView('default')}>
-            {svg.accounts(16)}
-            {/* <div className='panelDetailIndicator'>
-              {this.indicator(this.store('main.networks', type, id, 'connection'))}
-            </div> */}
-          </div>
-          <div key={this.store('panel.view')} className='panelTitle'>
-            {this.store('panel.view') === 'default' ? (
-              'Accounts' 
-            ) : this.store('panel.view') === 'networks' ? (
-              'Chains'
-            ) : this.store('panel.view') === 'settings' ? (
-              'Settings'
-            ) : null}
-          </div>
-          {/* <div className='panelMenuItemNetwork'>
-            <Dropdown
-              syncValue={type + ':' + id}
-              onChange={(network) => this.selectNetwork(network)}
-              options={networkOptions}
-            />
-          </div> */}
-          <div className='panelMenuItem panelMenuItemConnections' onMouseDown={() => this.store.setPanelView('networks')}>
-            {svg.chain(15)}
-          </div>
-          <div className='panelMenuItem panelMenuItemSettings' onMouseDown={() => this.store.setPanelView('settings')}>
-            {svg.octicon('settings', { height: 16 })}
-          </div>
-          {/* {type === 'ethereum' ? (
-            <div className='panelMenuData' style={{ opacity: this.store('view.addAccount') ? 0 : 1 }}>
-              <div className='panelMenuDataItem'>
-                {gasPrice || '---'}
-                <div className='svg'>{svg.gas(9)}</div>
-              </div>
-              <div className='panelMenuDataDivide' />
-              <div className='panelMenuDataItem'>
-                <div className='usd'>{svg.usd(10.5)}</div>
-                <div>{baseRate}</div>
-              </div>
-            </div>
-          ) : null} */}
-        </div>
+        <Menu />
         <Notify />
         <Local />
         <Networks />

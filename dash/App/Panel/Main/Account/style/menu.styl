@@ -1,0 +1,114 @@
+.signerMenu
+  position absolute
+  left 0
+  top 0
+  right 0
+  display flex
+  align-items center
+  justify-content center
+  height 90px
+  z-index 3004
+  pointer-events none
+
+  .signerMenuItemRight
+    opacity 0
+    right 70px
+    transition var(--standard)
+    transition-delay 0.16s
+
+  .signerMenuItemLeft
+    opacity 0
+    left 70px
+    transition var(--standard)
+    transition-delay 0.16s
+
+  .signerMenuItem
+    position absolute
+    top -5px
+    width 90px
+    height 70px
+    display flex
+    align-items center
+    justify-content center
+    flex-direction column
+    text-align center
+    -webkit-app-region no-drag
+    overflow hidden
+    pointer-events none
+    z-index 3010
+
+    .signerMenuItemIcon
+      height 44px
+      width 24px
+      display flex
+      align-items center
+      justify-content center
+      transition var(--standard)
+      flex-direction column
+      opacity 0
+      position relative
+
+      .iconUnderline
+        height 2px
+        opacity 0
+        border-radius 2px
+        background var(--outerspace)
+        transition var(--standard)
+        position absolute
+        bottom 0
+        left 0
+        right 0
+
+      svg
+        color var(--outerspace)
+        margin-bottom 7px
+        margin-top 14px
+
+.signerMenuOpen
+  .signerMenuItem
+    pointer-events auto
+    .signerMenuItemIcon
+      opacity 0.6
+      transition none
+      .iconUnderline
+        transition var(--standard)
+  .signerMenuItem:hover
+    .signerMenuItemIcon
+      opacity 1
+  .signerMenuItemRight
+    opacity 1
+    right 0px
+  .signerMenuItemLeft
+    opacity 1
+    left 0px
+
+.signerMenuOpen.signerMenuDefault
+  .signerMenuItemLeft
+    .signerMenuItemIcon
+      opacity 1
+      .iconUnderline
+        right 0px
+        opacity 1
+
+  .signerMenuItemRight
+    .signerMenuItemIcon
+      .iconUnderline
+        left -120px
+        opacity 0
+
+.signerMenuOpen.signerMenuSettings
+  .signerMenuItemLeft
+    .signerMenuItemIcon
+      .iconUnderline
+        margin-right -1px
+        margin-left -2px
+        right -120px
+        opacity 0
+
+  .signerMenuItemRight
+    .signerMenuItemIcon
+      opacity 1
+      .iconUnderline
+        margin-right -2px
+        margin-left 0px
+        opacity 1

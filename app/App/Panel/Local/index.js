@@ -215,6 +215,11 @@ class Settings extends React.Component {
     return (
       <div className={this.store('panel.view') !== 'settings' ? 'localSettings cardHide' : 'localSettings cardShow'}>
         <div className='localSettingsWrap'>
+          <div className='panelHeader'>
+            <div className='panelHeaderTitle'>
+              {'Settings'}
+            </div>
+          </div>
           <Filter />
           <div className='snipIt'>
             <div>Using a dapp that doesn't support Frame natively?</div>

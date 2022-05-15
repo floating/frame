@@ -103,11 +103,12 @@
 
 .panelMenu
   position absolute
-  left 0px
-  right 0px
-  top 0px
-  height 69px
-  padding-top 25px
+  left 5px
+  right 5px
+  // width 100px
+  top 15px
+  height 56px
+  // padding-top 20px
   box-sizing border-box
   display flex
   justify-content space-between
@@ -115,45 +116,93 @@
   z-index 100000000000
   opacity 1
   transform translate3d(0, 0, 0)
-  // background linear-gradient(rgba(240, 240, 255, 0.5), rgba(240, 240, 255, 0))
-  // pointer-events none
-  transition var(--standardFast)
   background var(--ghostA)
-  border-bottom-left-radius 12px
-  border-bottom-right-radius 12px
-  box-shadow 0px 2px 3px var(--ghostZ)
+  /// padding 2px 0px 0px 15px
+  // box-shadow 0px 10px 4px var(--ghostY)
+  border-radius 14px
+  // border-top-right-radius 12px
+
+  .panelMenuItem
+    height 29px
+    width 44px
+    top 11px
+    border-radius 9px
+    display flex
+    justify-content center
+    align-items center
+    -webkit-app-region no-drag
+    transition none
+    pointer-events auto
+    transform translate3d(0, 0, 0)
+    background var(--ghostB)
+    position absolute
+    // box-shadow 0px 18px 12px var(--ghostZ)
+    cursor pointer
+    border 3px solid var(--ghostZ)
+
+    *
+      pointer-events none
+
+  .panelMenuItem:hover
+    background var(--ghostC)
+
+  .panelMenuItemOpen
+    left 9px
+
+  .panelMenuItemSend
+    right 9px
 
   .panelTitle
     position absolute
-    left 16px
+    left 60px
     right 170px
     top 24px
     bottom 10px
     display flex
     align-items center
+    justify-content center
     font-family 'Exo2'
-    font-size 22px
+    font-size 18px
+    font-weight 600
+    display none
 
-  .panelMenuMarker
+  .mainWindowMarker
     position absolute
-    left 8px
-    right 8px
+    left 9px
     top 10px
     height 3px
     background var(--ghostZ)
     border-radius 2px
     z-index 20000
+    cursor pointer
+    width 50px
+    // background blue
 
-    .panelMenuMark
-      position relative
-      width 36px
-      height 3px
-      background var(--outerspace)
-      transform translateX(14px)
-      border-radius 2px
-      transition var(--standard)
-      margin-left -1px
-      z-index 20002
+  .panelMenuMarker
+    position absolute
+    // left 8px
+    right 9px
+    top 10px
+    height 3px
+    background var(--ghostZ)
+    border-radius 2px
+    z-index 20000
+    cursor pointer
+    width 165px
+    // background blue
+
+  .panelMenuMark
+    position relative
+    width 36px
+    height 3px
+    background var(--outerspace)
+    transform translateX(14px)
+    border-radius 2px
+    transition var(--standard)
+    margin-left -1px
+    z-index 20002
+  .panelMenuMarkGood
+    background var(--good)
     
     // .panelMenuMark::after
     //   content ''
@@ -207,46 +256,29 @@
     //   box-shadow 0px 0px 10px var(--good02)
 
 
-  .panelMenuItem
-    height 28px
-    width 44px
-    border-radius 8px
-    display flex
-    justify-content center
-    align-items center
-    -webkit-app-region no-drag
-    transition none
-    pointer-events auto
-    transform translate3d(0, 0, 0)
-    background var(--ghostB)
-    position absolute
-    // box-shadow 0px 4px 6px -1px var(--thin) // , 0px 8px 8px -2px var(--thin), 0px 0px 10px -2px var(--thin)
-    cursor pointer
-    border 3px solid var(--ghostZ)
+  
+  
+  // .panelMenuItemOpen
+  //   color var(--good)
+  //   cursor pointer
 
-    *
-      pointer-events none
+  // .panelMenuItemAccounts
+  //   right 120px
+  //   svg
+  //     stroke ver(--outerspace)
+  //     stroke-width 2
 
-  .panelMenuItem:hover
-    background var(--ghostC)
-
-  .panelMenuItemAccounts
-    right 120px
-    svg
-      stroke ver(--outerspace)
-      stroke-width 2
-
-  .panelMenuItemNetwork
-    position absolute
-    left 45px
+  // .panelMenuItemNetwork
+  //   position absolute
+  //   left 45px
     
-  .panelMenuItemConnections
-    right 64px
+  // .panelMenuItemConnections
+  //   right 64px
 
-  .panelMenuItemSettings
-    right 9px
-    svg
-      transform rotate(90deg)
+  // .panelMenuItemSettings
+  //   right 9px
+    // svg
+    //   transform rotate(90deg)
        
   .panelDetail
     display flex
