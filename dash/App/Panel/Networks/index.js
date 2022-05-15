@@ -751,7 +751,7 @@ class Settings extends React.Component {
     const { findHover, findFocus, findInput } = this.state
     console.log( findHover, findFocus, findInput )
     return (
-      <div className={this.store('panel.view') !== 'networks' ? 'localSettings cardHide' : 'localSettings cardShow'}>
+      <div className={'localSettings cardShow'}>
         {/* <div 
           className='chainFilter'
           style={findHover || findFocus || findInput ? {

@@ -18,7 +18,16 @@ class _OriginModule extends React.Component {
       reqsAverage: 0,
       reqsTimes: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     }
+    this.ref = createRef()
+  }
+  averageReqs () {
+    const reqs = this.state.reqsTimes
+    reqs.push(this.state.activeCount)
+    reqs.shift()
+    this.setState({ reqsTimes: reqs, activeCount: 0, reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2) })
+  }
 
+  componentDidMount () {
     const setActiveRandom = () => {
       const isActive = Math.round(Math.random() * 1 + 0.3)
       if (isActive) {
@@ -36,13 +45,6 @@ class _OriginModule extends React.Component {
     }
     setInterval(() => this.averageReqs(), 1000)
     setActiveRandom()
-    this.ref = createRef()
-  }
-  averageReqs () {
-    const reqs = this.state.reqsTimes
-    reqs.push(this.state.activeCount)
-    reqs.shift()
-    this.setState({ reqsTimes: reqs, activeCount: 0, reqsAverage: (Math.round(average(reqs) * 100) / 100).toFixed(2) })
   }
 
   // clickHandler (e) {
@@ -112,7 +114,7 @@ class ChainModule extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
-      expanded: false
+      expanded: true
     }
     this.ref = createRef()
   }
