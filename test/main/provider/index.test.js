@@ -45,6 +45,7 @@ beforeEach(() => {
 
   accountRequests = []
   store.set('main.accounts', {})
+  store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 1 })
 
   connection.send = jest.fn()
   connection.connections = {
@@ -99,12 +100,13 @@ describe('#getRawTx', () => {
 })
 
 describe('#send', () => {
-  const send = (request, cb = jest.fn()) => provider.send(request, cb)
+  const send = (request, cb = jest.fn()) => provider.send({ ...request, _origin: 'frame.test' }, cb)
 
   it('passes the given target chain to the connection', () => {
     connection.connections.ethereum[10] = { chainConfig: { hardfork: 'london', chainId: 10 }, primary: { connected: true } }
 
-    const request = { method: 'eth_testFrame' }
+    store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 10 })
+    const request = { method: 'eth_testFrame'  }
 
     send({ ...request, chainId: '0xa' })
 
@@ -142,9 +144,8 @@ describe('#send', () => {
   describe('#eth_chainId', () => {
     it('returns the current chain id from the store', () => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
 
-      send({ method: 'eth_chainId' }, response => {
+      send({ method: 'eth_chainId', chainId: '0x1' }, response => {
         expect(response.result).toBe('0x1')
       })
     })
@@ -184,7 +185,7 @@ describe('#send', () => {
             blockExplorerUrls: ['https://pylon.link'],
             iconUrls: [''] // Currently ignored
           }
-        ] 
+        ]
       }, () => {
         try {
           expect(accountRequests).toHaveLength(1)
@@ -199,7 +200,7 @@ describe('#send', () => {
 
     it('should switch to a chain and notify listeners if it exists in the store', done => {
       store.set('main.networks.ethereum', 1, { id: 1 })
-      store.set('main.currentNetwork', { type: 'ethereum', id: 137 })
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 137 })
       store.switchOriginChain = jest.fn()
       const chainChangedListener = jest.spyOn(provider, 'chainChanged')
 
@@ -218,8 +219,7 @@ describe('#send', () => {
             blockExplorerUrls: ['https://pylon.link'],
             iconUrls: [''] // Currently ignored
           }
-        ],
-        _origin: 'frame.test'
+        ]
       }, () => {
         expect(store.switchOriginChain).toHaveBeenCalledWith('8073729a-5e59-53b7-9e69-5d9bcff94087', 1)
         expect(chainChangedListener).toHaveBeenCalledWith(1, 'frame.test')
@@ -253,7 +253,8 @@ describe('#send', () => {
         method: 'wallet_switchEthereumChain', 
         params: [{
           chainId: '0x1234'
-        }]
+        }],
+        _origin: 'frame.test'
       }, () => {
         try {
           expect(accountRequests).toHaveLength(0)
@@ -268,7 +269,8 @@ describe('#send', () => {
   describe('#wallet_getPermissions', () => {
     it('returns all allowed permissions', done => {
       const request = {
-        method: 'wallet_getPermissions'
+        method: 'wallet_getPermissions',
+        _origin: 'frame.test'
       }
 
       send(request, response => {
@@ -310,7 +312,8 @@ describe('#send', () => {
         params: [
           { eth_accounts: {} },
           { eth_signTransaction: {} }
-        ]
+        ],
+        _origin: 'frame.test'
       }
 
       send(request, response => {
@@ -333,7 +336,6 @@ describe('#send', () => {
     let request
     
     beforeEach(() => {
-      store.set('main.currentNetwork', { type: 'ethereum', id: 1 })
       store.set('main.tokens.custom', [])
 
       request = {
@@ -348,7 +350,8 @@ describe('#send', () => {
             decimals: 18,
             image: 'https://badgerdao.io/icon.jpg'
           }
-        }
+        },
+        _origin: 'frame.test'
       }
     })
 
@@ -422,7 +425,7 @@ describe('#send', () => {
         1: { name: 'mainnet', id: 1, on: true }
       })
 
-      send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
+        send({ method: 'wallet_getChains', id: 14, jsonrpc: '2.0' }, response => {
         expect(response.error).toBe(undefined)
         expect(response.id).toBe(14)
         expect(response.jsonrpc).toBe('2.0')
@@ -600,7 +603,7 @@ describe('#send', () => {
 
       if (chainId) payload.chainId = chainId
 
-      provider.send(payload, cb)
+      provider.send({ ...payload, _origin: 'frame.test' }, cb)
     }
 
     beforeEach(() => {
