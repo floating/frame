@@ -77,16 +77,14 @@ class Balance extends React.Component {
     let name = balance.name
     if (name.length > 17) name = name.substr(0, 17) + '..'
 
-    console.log('chainMeta', chainMeta)
-    console.log(chainId)
-    console.log(chainMeta['0x' + chainId.toString(16)].icon)
+    const chainHex = '0x' + chainId.toString(16)
 
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
           <div className='signerBalanceChainIcon'>
             <img 
-              src={chainMeta['0x' + chainId.toString(16)].icon}
+              src={chainMeta[chainHex] ? chainMeta[chainHex].icon : ''}
               value={chainId}
               alt={chainId}
             />

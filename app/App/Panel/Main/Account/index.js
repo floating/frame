@@ -614,7 +614,7 @@ class Account extends React.Component {
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({ top: bounds.top - 59, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
+      this.store.initialSignerPos({ top: bounds.top - 76, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
@@ -944,7 +944,7 @@ class Account extends React.Component {
       style.bottom = initial.bottom // open ? 3 : initial.bottom
       style.left = 0
       style.right = 0
-      style.zIndex = '1000000000000'
+      style.zIndex = '100000000'
       const panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 62 - 3 : initial.height - 3
       let top = (initial.top - 3) * -1
@@ -993,7 +993,11 @@ class Account extends React.Component {
             {!this.state.hideSignerStatus && open ? (
               <SignerStatus open={open} signer={signer} hideSignerStatus={this.hideSignerStatus.bind(this)} />
             ) : null}
-            <div className={this.props.active ? 'signerTop signerTopActive' : 'signerTop'} onMouseEnter={() => this.setState({ openHover: true })} onMouseLeave={() => this.setState({ openHover: false })}>
+            <div 
+              className={this.props.active ? 'signerTop signerTopActive' : 'signerTop'} 
+              onMouseEnter={() => this.setState({ openHover: true })} 
+              onMouseLeave={() => this.setState({ openHover: false })}
+            >
               {!this.state.addressHover ? this.renderType() : null} 
               {!this.state.addressHover ? this.renderSignerIndicator() : null} 
               {!this.state.addressHover ? (
