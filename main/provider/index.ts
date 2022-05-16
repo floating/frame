@@ -191,7 +191,7 @@ export class Provider extends EventEmitter {
   }
 
   getNetVersion (payload: JSONRPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.currentNetwork'))
+    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId'))
 
     const connection = this.connection.connections[type][id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
@@ -204,7 +204,7 @@ export class Provider extends EventEmitter {
   }
 
   getChainId (payload: JSONRPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
-    const { type, id } = (targetChain || store('main.currentNetwork'))
+    const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId'))
 
     const connection = this.connection.connections[type][id]
     const chainConnected = (connection.primary?.connected || connection.secondary?.connected)
@@ -929,8 +929,7 @@ export class Provider extends EventEmitter {
         target.id = chainId
       }
     } else {
-      const chainId = store('main.dapps', payload._origin, 'chainId')
-      target.id = chainId || 1
+      target.id = store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId')
     }
 
     return target
