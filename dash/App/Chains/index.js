@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
-import Filter from '../Filter'
+// import Filter from '../Filter'
 
 import Dropdown from '../Components/Dropdown'
 

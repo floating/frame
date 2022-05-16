@@ -1,10 +1,10 @@
 import React from 'react'
 import Restore from 'react-restore'
-import svg from '../../../../resources/svg'
-import link from '../../../../resources/link'
+import svg from '../../../resources/svg'
+import link from '../../../resources/link'
 
 import BigNumber from 'bignumber.js'
-import { usesBaseFee } from '../../../../main/transaction'
+import { usesBaseFee } from '../../../main/transaction'
 
 import frameIcon from './FrameIcon.png'
 

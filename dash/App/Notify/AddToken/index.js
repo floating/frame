@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Restore from 'react-restore'
-import link from '../../../../../resources/link'
+import link from '../../../../resources/link'
 
 class AddToken extends Component {
   constructor (props, context) {

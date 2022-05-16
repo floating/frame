@@ -11,7 +11,7 @@ import Accounts from './Accounts'
 
 import Chains from './Chains'
 
-import Notify from './Panel/Notify'
+import Notify from './Notify'
 
 import Dapps from './Dapps'
 import Tokens from './Tokens'

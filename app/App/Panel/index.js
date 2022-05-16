@@ -4,8 +4,6 @@ import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
 import Main from './Main'
-import Local from './Local'
-import Networks from './Networks'
 import Notify from './Notify'
 import Menu from './Menu'
 import Badge from './Badge'
@@ -97,8 +95,6 @@ class Panel extends React.Component {
       <div id='panel' style={{ opacity }}>
         <Menu />
         <Notify />
-        <Local />
-        <Networks />
         <Main />
         <Badge />
       </div>

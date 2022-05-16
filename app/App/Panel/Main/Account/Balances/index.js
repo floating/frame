@@ -97,7 +97,7 @@ class Balance extends React.Component {
             />
           </div>
           <div className='signerBalanceCurrency'>
-            {name + ' ' +  chainId}
+            {name}
           </div>
           <div className='signerBalancePrice'>
             <span className='signerBalanceCurrentPrice'>{svg.usd(10)}{balance.price}</span>

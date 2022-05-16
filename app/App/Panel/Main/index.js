@@ -4,7 +4,7 @@ import Restore from 'react-restore'
 
 import Account from './Account'
 
-import Filter from '../Filter'
+// import Filter from '../../Components/Filter'
 
 import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
