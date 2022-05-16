@@ -5,6 +5,8 @@ import Restore from 'react-restore'
 import link from '../../../../../../resources/link'
 import svg from '../../../../../../resources/svg'
 
+import chainMeta from '../../../../../../resources/chainMeta'
+
 import BigNumber from 'bignumber.js'
 
 const UNKNOWN = '?'
@@ -75,9 +77,20 @@ class Balance extends React.Component {
     let name = balance.name
     if (name.length > 17) name = name.substr(0, 17) + '..'
 
+    console.log('chainMeta', chainMeta)
+    console.log(chainId)
+    console.log(chainMeta['0x' + chainId.toString(16)].icon)
+
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
+          <div className='signerBalanceChainIcon'>
+            <img 
+              src={chainMeta['0x' + chainId.toString(16)].icon}
+              value={chainId}
+              alt={chainId}
+            />
+          </div>
           <div className='signerBalanceLogo'>
             <img 
               src={balance.logoURI && `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(balance.logoURI)}`}

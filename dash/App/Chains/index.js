@@ -12,7 +12,7 @@ import Gas from './Gas'
 import Usage from './Usage'
 import Tokens from './Tokens'
 
-import chainMeta from './chainMeta'
+import chainMeta from '../../../resources/chainMeta'
 
 class _SettingsModule extends React.Component {
   constructor (props, context) {

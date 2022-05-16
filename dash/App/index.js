@@ -11,6 +11,8 @@ import Accounts from './Accounts'
 
 import Chains from './Chains'
 
+import Notify from './Panel/Notify'
+
 import Dapps from './Dapps'
 import Tokens from './Tokens'
 import Settings from './Settings'
@@ -39,6 +41,7 @@ class Dash extends React.Component {
     return (
       <div className='dash'>
         <Command />
+        <Notify />
         <div className='dashMain'>
           <div className='dashMainOverlay' />
           {this.renderPanel()}

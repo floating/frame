@@ -187,6 +187,47 @@
   .signerBalanceCurrentPriceChangeDown
     color var(--bad)
 
+  .signerBalanceChainIcon
+    position absolute
+    left -6px
+    top 10px
+    height 16px
+    width 16px
+    background var(--foreverwhite)
+    border-radius 16px
+    overflow hidden
+    z-index 2
+    color black
+
+    img:before
+      content attr(alt)
+      top 0
+      bottom 0
+      left 0
+      right 0
+      border-radius 13px
+      position absolute
+      background var(--outerspace)
+      color var(--ghostF)
+      display flex
+      justify-content center
+      align-items center
+      font-size 11px
+      font-weight 600
+      letter-spacing -0.5px
+      margin-left -0.5px
+     
+    img
+      height 12px
+      width 12px
+      border-radius 6px
+      position absolute
+      top 2px
+      left 2px
+      overflow hidden
+
+
+
   .signerBalanceLogo
     position absolute
     left 0px
@@ -196,6 +237,7 @@
     background var(--foreverwhite)
     border-radius 16px
     overflow hidden
+    z-index 1
 
     img:before
       content attr(alt)
