@@ -6,7 +6,7 @@ import svg from '../../../resources/svg'
 
 import Dropdown from '../Components/Dropdown'
 
-import Filter from '../Panel/Filter'
+// import Filter from '../Panel/Filter'
 
 class Settings extends React.Component {
   constructor (props, context) {
@@ -168,8 +168,8 @@ class Settings extends React.Component {
 
   quit () {
     return (
-      <div className='addCustonTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
-        <div className='addCustonTokenButton' onClick={() => link.send('tray:quit')}>
+      <div className='addCustomTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
+        <div className='addCustomTokenButton' onClick={() => link.send('tray:quit')}>
           Quit
         </div>
       </div>
@@ -215,9 +215,9 @@ class Settings extends React.Component {
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
-          <Filter />   
-          {/* <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
+          {/* <Filter />    */}
+          {/* <div className='addCustomTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustomTokenButton' onClick={() => this.store.notify('customTokens')}>
               Manage Custom Tokens
             </div>
           </div> */}

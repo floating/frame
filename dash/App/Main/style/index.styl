@@ -1,18 +1,19 @@
 .requestFeature
-  padding 30px 0px 0px 0px
+  padding 0px 0px 0px 0px
   display flex
   justify-content center
   align-items center
 
   .requestFeatureButton:hover
-    background var(--moonLight)
+     background var(--ghostB)
 
   .requestFeatureButton
-    background var(--moon)
-    color var(--moonOver)
+    background var(--ghostA)
+    color var(--moon)
+    box-shadow 0px 4px 8px var(--ghostY)
     padding 0px 30px
     border-radius 12px
-    height 30px
+    height 46px
     font-size 13px
     display flex
     justify-content center
@@ -20,6 +21,7 @@
     text-transform uppercase
     font-weight 400
     cursor pointer
+    box-sizing border-box
     *
       pointer-events none
 
@@ -56,21 +58,22 @@
     justify-content center
     align-items center
     padding 10px
+    width 100%
     
     .snipItBrowserExtensionIcon:hover
-      background var(--ghostC)
+      background var(--ghostB)
 
     .snipItBrowserExtensionIcon
       display flex
       justify-content center
       align-items center
-      background var(--ghostB)
-      height 50px
-      width 50px
-      border 3px solid var(--ghostY)
+      background var(--ghostA)
+      height 64px
+      width 64px
+      // border 3px solid var(--ghostY)
       border-radius 12px
-      margin 0px 5px
-      box-shadow cardDrop // , 0px 4px 2px -3px rgba(0, 25, 35, 0.14)
+      margin 12px
+      box-shadow 0px 4px 8px var(--ghostY)
       cursor pointer
 
       *
@@ -97,12 +100,19 @@
 .dashModule
   height 120px
   background var(--ghostA)
-  margin-bottom 5px
-  border-radius 8px
+  margin-bottom 8px
+  border-radius 12px
   cursor pointer
+  display flex
+  justify-content center
+  align-items center
+  box-shadow 0px 4px 8px var(--ghostY)
+
+  .dashModuleIcon
+    margin-right 20px
 
 .dashModule:hover
-  background var(--ghostB)
+  background var(--ghostA)
 
 .signerSettings
   position absolute
@@ -272,10 +282,10 @@
   margin-bottom 6px
   padding 12px
 
-.addCustonTokenButton
+.addCustomTokenButton
   padding 0px
   margin-bottom 6px
-  width 100%
+  // width 100%
   border-radius 12px
   height 46px
   font-size 13px
@@ -289,11 +299,11 @@
   transition var(--standardFast)
   cursor pointer
   box-sizing border-box
-  border 3px solid var(--ghostY)
+  box-shadow 0px 4px 8px var(--ghostY)
   * 
     pointer-events none
 
-.addCustonTokenButton:hover
+.addCustomTokenButton:hover
   background var(--ghostB)
 
 .signerPermissionToggle

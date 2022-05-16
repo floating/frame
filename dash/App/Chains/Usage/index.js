@@ -1,10 +1,10 @@
 import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
-import Dropdown from '../../../Components/Dropdown'
+import Dropdown from '../../Components/Dropdown'
 
-import link from '../../../../../resources/link'
-import svg from '../../../../../resources/svg'
+import link from '../../../../resources/link'
+import svg from '../../../../resources/svg'
 
 const average = (array) => (array.reduce((a, b) => a + b) / array.length).toFixed(2)
 
@@ -168,7 +168,7 @@ class ChainModule extends React.Component {
 
     return (
       <div className='sliceContainer' ref={this.ref}>
-        {false && this.renderHeader('connection', id)}
+        {this.renderHeader('connection', id)}
         {!this.state.expanded ? (
           <div className='sliceContainer'>
             <OriginModule origin={'send.frame.eth'} {...this.props} />

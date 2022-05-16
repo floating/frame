@@ -2,9 +2,9 @@ import React, { createRef } from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
 
-import svg from '../../../../../resources/svg'
+import svg from '../../../../resources/svg'
 // import link from '../../../../../resources/link'
-import { weiToGwei, hexToInt } from '../../../../../resources/utils'
+import { weiToGwei, hexToInt } from '../../../../resources/utils'
 
 // estimated gas to perform various common tasks
 const gasToSendEth = 21 * 1000

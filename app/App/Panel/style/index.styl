@@ -103,10 +103,10 @@
 
 .panelMenu
   position absolute
-  left 5px
-  right 5px
+  left 18px
+  right 18px
   // width 100px
-  top 12px
+  top 10px
   height 63px
   // padding-top 20px
   box-sizing border-box
@@ -116,17 +116,17 @@
   z-index 100000000000
   opacity 1
   transform translate3d(0, 0, 0)
-  background var(--ghostA)
+  // background var(--ghostA)
   /// padding 2px 0px 0px 15px
   // box-shadow 0px 10px 4px var(--ghostY)
-  border-radius 14px
+  // border-radius 16px
   // border-top-right-radius 12px
 
   .panelMenuItem
-    height 29px
-    width 44px
-    top 14px
-    border-radius 9px
+    height 32px
+    width 48px
+    top 12px
+    border-radius 12px
     display flex
     justify-content center
     align-items center
@@ -136,21 +136,27 @@
     transform translate3d(0, 0, 0)
     background var(--ghostB)
     position absolute
-    // box-shadow 0px 18px 12px var(--ghostZ)
     cursor pointer
     border 3px solid var(--ghostZ)
+    // box-shadow 3px 3px 9px var(--ghostZ), 0px -3px 9px var(--ghostB)
+    // background blue
 
     *
       pointer-events none
 
   .panelMenuItem:hover
     background var(--ghostC)
+    // box-shadow 3px 7px 9px var(--ghostZ), 0px -3px 9px var(--ghostB)
+
+  .panelMenuItem:active
+    background var(--ghostC)
+    // box-shadow 0px 2px 9px var(--ghostZ), 0px 0px 9px var(--ghostB)
 
   .panelMenuItemOpen
-    left 14px
+    left 0px
 
   .panelMenuItemSend
-    right 14px
+    right 0px
 
   .panelTitle
     position absolute

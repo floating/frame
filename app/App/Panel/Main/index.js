@@ -71,25 +71,9 @@ class Main extends React.Component {
     return (
       <div className={this.store('panel.view') !== 'default' ? 'card cardHide' : 'card cardShow'}>
         <div id='panelScroll' style={current ? { overflow: 'hidden', pointerEvents: 'none' } : {}}>
+          <div className='panelScrollOverlay' />
           <div id='panelSlide' ref={ref => { if (ref) this.scroll = ref }} style={current ? { overflow: 'visible' } : {}}>
             <div id='panelWrap' style={current && scrollTop > 0 ? { marginTop: '-' + scrollTop + 'px' } : {}}>
-              <div className='panelHeader' style={open ? { zIndex: 50, pointerEvents: 'none', opacity: 0 } : { opacity: 1, transform: 'translateY(0px)' }}>
-                <Filter 
-                  onInput={input => {
-                    this.setState({ filter: input })
-                  }}
-                />
-                {/* <div className={!this.store('dash.showing') ? 'panelHeaderUpdate' : 'panelHeaderUpdate panelHeaderUpdateNotify'} onMouseDown={() => {
-                  link.send('tray:action', 'toggleDash')
-                }}>
-                  <div className='panelHeaderUpdateInner'>
-                    <div className={!this.store('dash.showing') ? 'panelHeaderUpdateToggle' : 'panelHeaderUpdateToggle panelHeaderUpdateToggleOn'}>
-                      {'+'}
-                    </div>
-                    <div className='panelHeaderUpdateOn' />
-                  </div>
-                </div> */}
-              </div>
               {/* {untethered.sort().map((id, i) => <PendingSigner key={'signers' + id} {...this.store('main.signers', id)} index={i} />)} */}
               {sortedAccounts.map((id, i) => {
                 const account = accounts[id]

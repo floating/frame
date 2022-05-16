@@ -9,7 +9,7 @@ import Command from './Command'
 import Main from './Main'
 import Accounts from './Accounts'
 
-import Chains from './Panel/Networks'
+import Chains from './Chains'
 
 import Dapps from './Dapps'
 import Tokens from './Tokens'
@@ -40,6 +40,7 @@ class Dash extends React.Component {
       <div className='dash'>
         <Command />
         <div className='dashMain'>
+          <div className='dashMainOverlay' />
           {this.renderPanel()}
         </div>
       </div>

@@ -22,18 +22,49 @@ div
   height 100%
   overflow-y scroll
   overflow-x hidden
-  background var(--ghostZ)
+  background var(--ghostA)
   position relative
 
   .dashMain
     position absolute 
-    top 65px
-    bottom 0
-    right 0
-    left 0
+    top 80px
+    right 5px
+    bottom 40px
+    left 5px
     overflow-y scroll
     overflow-x hidden
     z-index 1000
+    position absolute
+    background var(--ghostZ)
+    border-radius 16px
+
+    .dashMainOverlay
+      position absolute
+      top 0px
+      right 0px
+      bottom 0px
+      left 0px
+      // background red
+      border-radius 16px
+      z-index 40000000
+      box-shadow inset 0px 0px 6px var(--ghostY)
+      pointer-events none
+
+    .originTitle
+      margin 30px 10px 5px 10px
+      font-size 18px
+
+  .panelScrollOverlay
+    position absolute
+    top 0px
+    right 0px
+    bottom 0px
+    left 0px
+    // background red
+    border-radius 16px
+    z-index 40000000
+    box-shadow inset 0px 0px 6px var(--ghostX)
+    pointer-events none
 
   .addAccounts
     position absolute
@@ -216,6 +247,7 @@ div
       flex-wrap wrap
       padding 0px 10px 0px 10px
 
+@import './App/Chains/style'
 @import './App/Panel/style'
 @import './App/Command/style'
 @import './App/Main/style'

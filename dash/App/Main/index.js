@@ -6,7 +6,7 @@ import svg from '../../../resources/svg'
 
 import Dropdown from '../Components/Dropdown'
 
-import Filter from '../Panel/Filter'
+// import Filter from '../Panel/Filter'
 
 class Settings extends React.Component {
   constructor (props, context) {
@@ -168,8 +168,8 @@ class Settings extends React.Component {
 
   quit () {
     return (
-      <div className='addCustonTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
-        <div className='addCustonTokenButton' onClick={() => link.send('tray:quit')}>
+      <div className='addCustomTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
+        <div className='addCustomTokenButton' onClick={() => link.send('tray:quit')}>
           Quit
         </div>
       </div>
@@ -215,60 +215,55 @@ class Settings extends React.Component {
     return (
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
-          {/* <div className='panelHeader'>
-            <div className='panelHeaderTitle'>
-              {'Settings'}
-            </div>
-          </div> */}
-          <Filter />
+          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'accounts')}>
+            <div className='dashModuleIcon'>{svg.accounts(24)}</div>
+            <div className='dashModuleTitle'>{'Accounts'}</div>
+          </div>
+          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'chains')}>
+            <div className='dashModuleIcon'>{svg.chain(24)}</div>
+            <div className='dashModuleTitle'>{'Chains'}</div>
+          </div>
+          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'dapps')}>
+            <div className='dashModuleIcon'>{svg.window(24)}</div>
+            <div className='dashModuleTitle'>{'Dapps'}</div>
+          </div>
+          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'tokens')}>
+            <div className='dashModuleIcon'>{svg.tokens(24)}</div>
+            <div className='dashModuleTitle'>{'Tokens'}</div>
+          </div>
+          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'settings')}>
+            <div className='dashModuleIcon'>{svg.settings(24)}</div>
+            <div className='dashModuleTitle'>{'Settings'}</div>
+          </div>
           <div className='snipIt'>
             <div>Using a dapp that doesn't support Frame natively?</div>
             <div className='snipItBrowserExtensionIcons'>
               <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconChrome' onClick={() => this.store.notify('openExternal', { url: 'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf' })}>
-                {svg.chrome(24)}
+                {svg.chrome(28)}
               </div>
               <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconFirefox' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
-                {svg.firefox(24)}
+                {svg.firefox(28)}
               </div>
               <div className='snipItBrowserExtensionIcon snipItBrowserExtensionIconSafari' onClick={() => this.store.notify('openExternal', { url: 'https://addons.mozilla.org/en-US/firefox/addon/frame-extension' })}>
-                {svg.safari(24)}
+                {svg.safari(28)}
               </div>
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'accounts')}>
-            {svg.accounts(17)}
-            {'Accounts'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'chains')}>
-            {svg.chain(17)}
-            {'Chains'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'dapps')}>
-            {svg.window(17)}
-            {'Dapps'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'tokens')}>
-            {'Tokens'}
-          </div>
-          <div className='dashModule' onMouseDown={() => link.send('tray:action', 'setDash', 'settings')}>
-            {svg.settings(17)}
-            {'Settings'}
-          </div>
-          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+          <div className='requestFeature'>
+            <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Request a Feature 
             </div>
           </div>
           {this.discord()}
           
-          {/* <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
+          {/* <div className='addCustomTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustomTokenButton' onClick={() => this.store.notify('customTokens')}>
               Manage Custom Tokens
             </div>
           </div> */}
-          {/* <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+          {/* <div className='addCustomTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustomTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Request a Feature 
             </div>
           </div> */}

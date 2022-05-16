@@ -12,13 +12,27 @@
 
 #panelScroll
   position absolute
-  top 74px
-  right 0
-  bottom 0
-  left 0
+  top 80px
+  right 5px
+  bottom 40px
+  left 5px
   display flex
   justify-content center
   align-items center
+  background var(--ghostZ)
+  border-radius 16px
+
+  .panelScrollOverlay
+    position absolute
+    top 0px
+    right 0px
+    bottom 0px
+    left 0px
+    // background red
+    border-radius 16px
+    z-index 40000000
+    box-shadow inset 0px 0px 6px var(--ghostX)
+    pointer-events none
 
   #panelSlide
     max-height 100%
@@ -30,7 +44,7 @@
     display none
 
   #panelWrap
-    padding 0px 4px 67px 4px
+    padding 6px 4px 67px 4px
     will-change scroll-position
 
     .noSigners

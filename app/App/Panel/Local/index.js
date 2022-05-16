@@ -168,8 +168,8 @@ class Settings extends React.Component {
 
   quit () {
     return (
-      <div className='addCustonTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
-        <div className='addCustonTokenButton' onClick={() => link.send('tray:quit')}>
+      <div className='addCustomTokenButtonWrap quitFrame' style={{ zIndex: 215 }}>
+        <div className='addCustomTokenButton' onClick={() => link.send('tray:quit')}>
           Quit
         </div>
       </div>
@@ -236,13 +236,13 @@ class Settings extends React.Component {
             </div>
             <div>Inject a connection with our browser extension!</div>
           </div>
-          {/* <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => this.store.notify('customTokens')}>
+          {/* <div className='addCustomTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustomTokenButton' onClick={() => this.store.notify('customTokens')}>
               Manage Custom Tokens
             </div>
           </div> */}
-          <div className='addCustonTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustonTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
+          <div className='addCustomTokenButtonWrap' style={{ zIndex: 215 }}>
+            <div className='addCustomTokenButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Request a Feature 
             </div>
           </div>

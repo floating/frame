@@ -1,11 +1,11 @@
 import React, { createRef } from 'react'
 import Restore from 'react-restore'
-import link from '../../../../resources/link'
-import svg from '../../../../resources/svg'
+import link from '../../../resources/link'
+import svg from '../../../resources/svg'
 
 import Filter from '../Filter'
 
-import Dropdown from '../../Components/Dropdown'
+import Dropdown from '../Components/Dropdown'
 
 import Connection from './Connection'
 import Gas from './Gas'
@@ -789,23 +789,6 @@ class Settings extends React.Component {
           </div>
         </div> */}
         <div className='localSettingsWrap'>
-          <div className='panelHeader' style={{ zIndex: 50 }}>
-            <div className='panelHeaderTitle'>
-              {'Chains'}
-            </div>
-            <Filter 
-              buttonActionName={'Add Chain'} 
-              buttonAction={() => this.store.notify('addChain')}
-              onInput={input => {
-                this.setState({ filter: input })
-              }}
-            />
-            {/* <div className='panelHeaderAddChain' >
-              <div className='panelHeaderAddChainInner'>
-                {'Add Chain'}
-              </div>
-            </div> */}
-          </div>
           {this.renderConnections('mainnet')}
           <div className='networkBreak'>
             <div className='networkBreakLayer'>Rollups</div>
