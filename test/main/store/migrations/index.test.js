@@ -457,8 +457,6 @@ describe('migration 18', () => {
 })
 
 describe('migration 19', () => {
-  let state
-  
   beforeEach(() => {
     state = {
       main: {
