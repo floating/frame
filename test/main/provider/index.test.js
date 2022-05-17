@@ -1,4 +1,3 @@
-import provider from '../../../main/provider'
 import accounts from '../../../main/accounts'
 import connection from '../../../main/chains'
 import store from '../../../main/store'
@@ -13,6 +12,7 @@ import log from 'electron-log'
 
 const address = '0x22dd63c3619818fdbc262c78baee43cb61e9cccf'
 
+let provider
 let accountRequests = []
 
 jest.mock('../../../main/store')
@@ -37,15 +37,17 @@ afterAll(() => {
   jest.useRealTimers()
 })
 
-beforeEach(() => {
+beforeEach(async () => {  
+  store.set('main.accounts', {})
+  store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 1 })
+  
+  provider = (await import('../../../main/provider')).default
   provider.handlers = {}
 
   const eventTypes = ['accountsChanged', 'chainChanged', 'chainsChanged', 'assetsChanged', 'networkChanged']
   eventTypes.forEach(eventType => provider.subscriptions[eventType] = [])
 
   accountRequests = []
-  store.set('main.accounts', {})
-  store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 1 })
 
   connection.send = jest.fn()
   connection.connections = {
@@ -1249,7 +1251,6 @@ describe('state change events', () => {
   describe('#chainChanged', () => {
     it('fires a chainChanged event to subscribers', done => {
       const subscriptionId = '0x9509a964a8d24a17fcfc7b77fc575b71'
-
       provider.once('data', event => {
         expect(event.method).toBe('eth_subscription')
         expect(event.jsonrpc).toBe('2.0')
@@ -1257,10 +1258,8 @@ describe('state change events', () => {
         expect(event.params.result).toBe('0x89')
         done()
       })
-
-      store.set('main.currentNetwork.id', 137)
+      store.set('main.origins', '8073729a-5e59-53b7-9e69-5d9bcff94087', { chainId: 137 })
       provider.subscriptions.chainChanged.push(subscriptionId)
-
       store.getObserver('provider:chains').fire()
     })
   })
