@@ -391,8 +391,9 @@ const migrations = {
     return initial
   },
   19: initial => {
-    // delete main.currentNetwork
+    // delete main.currentNetwork and main.clients
     delete initial.main.currentNetwork
+    delete initial.main.clients
 
     return initial
   }
