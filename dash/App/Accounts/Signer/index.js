@@ -315,7 +315,7 @@ class Signer extends React.Component {
             <div className='signerAccounts'>{signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
               const added = this.store('main.accounts', address.toLowerCase())
               return (
-                <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onMouseDown={() => {
+                <div key={address} className={!added ?  'signerAccount' : 'signerAccount signerAccountAdded'} onClick={() => {
                   if (this.store('main.accounts', address.toLowerCase())) {
                     link.rpc('removeAccount', address, {}, () => { })
                   } else {

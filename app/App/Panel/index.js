@@ -97,6 +97,7 @@ class Panel extends React.Component {
         <Notify />
         <Main />
         <Badge />
+        <Menu position='bottom' />
       </div>
     )
   }

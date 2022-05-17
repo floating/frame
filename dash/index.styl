@@ -80,10 +80,10 @@ div
 
     .addAccountsHeader
       .addAccountsHeaderTitle
-        margin-top 80px
-        margin-bottom 40px
-        font-size 13px
-        font-weight 400
+        margin-top 20px
+        margin-bottom 20px
+        font-size 14px
+        font-weight 300
         height 50px
         display flex
         justify-content center
@@ -107,6 +107,7 @@ div
         font-weight 600
         padding-bottom 1px
         padding-left 1px
+        display none
 
         *
           pointer-events none
@@ -116,44 +117,44 @@ div
 
     .accountTypeSelect
       height 70px
-      width 320px
+      // width 320px
       font-weight 300
-      background var(--ghostC)
-      border-radius 16px
-      margin 20px
+      border-radius 12px
+      margin 6px 6px 8px 6px
       display flex
       justify-content center
       align-items center
       cursor pointer
       background var(--ghostA)
-      border-bottom 2px solid var(--ghostZ)
-      box-shadow 0px 8px 8px -4px var(--ghostY)
-      font-size 17px
+      // border-bottom 2px solid var(--ghostZ)
+      box-shadow 0px 4px 8px var(--ghostY)
+      font-size 16px
 
     .accountTypeSelect:hover
-      transform translateY(-1px)
-      color var(--good)
-      animation 5s shake ease-in-out infinite alternate
+      //transform translateY(-1px)
+      background var(--ghostB)
+      // color var(--good)
+      // animation 5s shake ease-in-out infinite alternate
 
-    .accountTypeSelect:active
-      color var(--good)
-      transform translateY(2px)
-      animation shake-little 2s ease-in-out infinite
-      box-shadow 0px 2px 12px 0px var(--ghostY)
+    // .accountTypeSelect:active
+    //   color var(--good)
+    //   transform translateY(2px)
+    //   animation shake-little 2s ease-in-out infinite
+    //   box-shadow 0px 2px 12px 0px var(--ghostY)
 
   .newAccount
     height 60px
     position relative
     background var(--ghostA)
-    border-radius 16px
+    border-radius 12px
     display flex
     justify-content center
     align-items center
-    margin 16px 14px 64px 14px
+    margin 6px 6px 64px 6px
     cursor pointer
-    font-size 19px
-    border-bottom 2px solid var(--ghostZ)
-    box-shadow 0px 8px 8px -4px var(--ghostY)
+    font-size 16px
+    // border-bottom 2px solid var(--ghostZ)
+    box-shadow 0px 4px 8px var(--ghostY)
     padding-top 0px
     padding-left 30px
     padding-bottom 1px
@@ -170,22 +171,23 @@ div
       left 0
       bottom 5px
       width 64px
-      font-size 34px
+      font-size 28px
       display flex
       justify-content center
       align-items center
       font-weight 200
     
   .newAccount:hover
-    transform translateY(-1px)
-    color var(--good)
-    animation 5s shake ease-in-out infinite alternate
+    background var(--ghostB)
+    // transform translateY(-1px)
+    // color var(--good)
+    // animation 5s shake ease-in-out infinite alternate
 
-  .newAccount:active
-    color var(--good)
-    transform translateY(2px)
-    animation shake-little 2s ease-in-out infinite
-    box-shadow 0px 2px 12px 0px var(--ghostY)
+  // .newAccount:active
+  //   color var(--good)
+  //   transform translateY(2px)
+  //   animation shake-little 2s ease-in-out infinite
+  //   box-shadow 0px 2px 12px 0px var(--ghostY)
 
   .signers
     width 100%
@@ -232,8 +234,8 @@ div
       overflow hidden
       background var(--ghostA)
       box-sizing border-box
-      margin 0px 5px 40px 5px
-      border-radius 16px
+      margin 0px 0px 40px 0px
+      border-radius 12px
       display flex
       justify-content center
       align-items center
@@ -241,11 +243,12 @@ div
       font-weight 400
       letter-spacing 2px
       text-transform uppercase
+      box-shadow 0px 4px 8px var(--ghostY)
 
     .signersList
       display flex
       flex-wrap wrap
-      padding 0px 10px 0px 10px
+      padding 0px 6px 0px 6px
 
 @import './App/Chains/style'
 @import './App/Command/style'
