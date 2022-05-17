@@ -16,20 +16,9 @@ class CustomTokens extends React.Component {
       <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
           <div className='customTokens'>
-            <div className='customTokensTitle'>
-              <div
-                className='customTokensTitleText'
-              >
-                Custom Tokens
-              </div>
-              <div
-                className='customTokensAddToken'
-                onClick={() => {
-                  link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addToken', notifyData: this.props.req }})
-                }}
-              >
-                Add Token
-              </div>
+            <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addToken', notifyData: this.props.req }})}>
+              <div className='newAccountIcon'>{svg.plus(16)}</div> 
+              Add New Token
             </div>
             <div className='customTokensList'>
               {tokens.length > 0 ? [].concat(tokens).sort((a, b) => {
