@@ -162,14 +162,6 @@ module.exports = {
       return signers
     })
   },
-  // Ethereum and IPFS clients
-  setClientState: (u, client, state) => u(`main.clients.${client}.state`, () => state),
-  updateClient: (u, client, key, value) => u(`main.clients.${client}.${key}`, () => value),
-  toggleClient: (u, client, on) => u(`main.clients.${client}.on`, (value) => on !== undefined ? on : !value),
-  resetClient: (u, client, on) => {
-    const data = { on: false, state: 'off', latest: false, installed: false, version: null }
-    u(`main.clients.${client}`, () => data)
-  },
   setLatticeConfig: (u, id, key, value) => {
     u('main.lattice', id, key, () => value)
   },
