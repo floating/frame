@@ -81,7 +81,7 @@ export default {
 
     viewInstance.setAutoResize({ width: true, height: true })
   
-    viewInstance.webContents.setVisualZoomLevelLimits(1, 3)
+    // viewInstance.webContents.setVisualZoomLevelLimits(1, 3)
   
     frameInstance.removeBrowserView(viewInstance)
 
