@@ -38,6 +38,7 @@ const NATIVE_CURRENCY = '0x0000000000000000000000000000000000000000'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
+type Origins = Record<string, { chainId: number }>
 type Subscriptions = { [key in SubscriptionType]: string[] }
 type Balance = Token & { balance: string, displayBalance: string }
 
@@ -1011,17 +1012,19 @@ function getActiveChains () {
     .sort((a, b) => a - b)
 }
 
-let network = store('main.currentNetwork.id'), availableChains = getActiveChains()
+let origins: Origins = store('main.origins')
+let availableChains = getActiveChains()
 
 store.observer(() => {
-  const currentNetworkId = store('main.currentNetwork.id')
+  const currentOrigins: Origins = store('main.origins')
   const currentChains = getActiveChains()
 
-  if (network !== currentNetworkId) {
-    network = currentNetworkId
-    provider.chainChanged(network)
-    provider.networkChanged(network)
-  }
+  Object.entries(currentOrigins).forEach(([origin, { chainId }]) => {
+    if(origins[origin].chainId !== chainId) {
+      provider.chainChanged(chainId)
+      provider.networkChanged(chainId)
+    }
+  })
 
   if (!arraysMatch(currentChains, availableChains)) {
     availableChains = currentChains
