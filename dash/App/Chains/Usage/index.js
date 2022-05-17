@@ -1,8 +1,6 @@
 import React, { createRef } from 'react'
 import Restore from 'react-restore'
 
-import Dropdown from '../../Components/Dropdown'
-
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 

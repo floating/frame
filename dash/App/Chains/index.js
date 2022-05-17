@@ -5,7 +5,7 @@ import svg from '../../../resources/svg'
 
 // import Filter from '../Filter'
 
-import Dropdown from '../Components/Dropdown'
+import Dropdown from '../../../resources/Components/Dropdown'
 
 import Connection from './Connection'
 import Gas from './Gas'

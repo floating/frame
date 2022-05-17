@@ -2,11 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
-// import Client from '../Client'
 
-import Dropdown from '../Components/Dropdown'
-
-// import Filter from '../Panel/Filter'
+import Dropdown from '../../../resources/Components/Dropdown'
 
 class Settings extends React.Component {
   constructor (props, context) {
