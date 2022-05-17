@@ -204,39 +204,6 @@ const initial = {
     updater: {
       dontRemind: main('updater.dontRemind', [])
     },
-    clients: {
-      ipfs: {
-        on: false, // main('clients.ipfs.on', false),
-        installed: false,
-        latest: false,
-        version: null,
-        state: 'off'
-      },
-      geth: {
-        on: false, // main('clients.geth.on', false),
-        blockNumber: 0,
-        currentBlock: 0,
-        highestBlock: 0,
-        installed: false,
-        latest: false,
-        version: null,
-        state: 'off'
-      },
-      parity: {
-        on: main('clients.parity.on', false),
-        blockNumber: 0,
-        currentBlock: 0,
-        highestBlock: 0,
-        installed: false,
-        latest: false,
-        version: null,
-        state: 'off'
-      }
-    },
-    currentNetwork: main('currentNetwork', {
-      type: 'ethereum',
-      id: 1
-    }),
     networkPresets: {
       ethereum: {
         default: {
