@@ -458,7 +458,7 @@ export class Provider extends EventEmitter {
       value: parsedValue,
       data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
       gasLimit: gasLimit || gas,
-      chainId: rawTx.chainId || utils.toHex(store('main.currentNetwork.id'))
+      chainId: rawTx.chainId
     }
   }
 
@@ -507,7 +507,7 @@ export class Provider extends EventEmitter {
   getNonce (rawTx: TransactionData, res: RPCRequestCallback) {
     const targetChain: Chain = {
       type: 'ethereum',
-      id: (rawTx && rawTx.chainId) ? parseInt(rawTx.chainId, 16) : store('main.currentNetwork.id')
+      id: parseInt(rawTx.chainId, 16)
     }
 
     this.connection.send({ id: 1, jsonrpc: '2.0', method: 'eth_getTransactionCount', params: [rawTx.from, 'pending'] }, res, targetChain)
