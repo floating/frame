@@ -116,7 +116,7 @@ class AddHardwareLattice extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>GridPlus</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div>
+            {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div> */}
             <div className='addAccountItemSummary'>GridPlus Lattice1</div>
           </div>
           <div className='addAccountItemOption'>

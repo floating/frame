@@ -1,6 +1,9 @@
 import React from 'react'
 import Restore from 'react-restore'
 
+import link from '../../../resources/link'
+import svg from '../../../resources/svg'
+
 import Signer from './Signer'
 
 import AddHardware from './Add/AddHardware'
@@ -86,7 +89,7 @@ class AddAccounts extends React.Component {
       <div className='addAccounts cardShow'>
         <div className='addAccountsHeader'>
           <div className='addAccountsHeaderTitle'>What type of account would you like to add?</div>
-          <div className='addAccountsHeaderClose' onClick={() => this.props.close()}>{'done'}</div>
+          {/* <div className='addAccountsHeaderClose' onClick={() => this.props.close()}>{'done'}</div> */}
         </div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
         <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
@@ -137,68 +140,74 @@ class Dash extends React.Component {
     }
   }
   render () {
-      const hardwareSigners = Object.keys(this.store('main.signers')).map(s => {
-        const signer = this.store('main.signers', s)
-        if (
-          signer.type === 'ledger' || 
-          signer.type === 'trezor' ||
-          signer.type === 'lattice'
-        ) {
-          return signer
-        } else {
-          return false
-        }
-      }).filter(s => s)
-      const hotSigners = Object.keys(this.store('main.signers')).map(s => {
-        const signer = this.store('main.signers', s)
-        if (
-          signer.type === 'seed' || 
-          signer.type === 'ring'
-        ) {
-          return signer
-        } else {
-          return false
-        }
-      }).filter(s => s)
-      
-      return (
-      <div>
-        {this.state.showAddAccounts ? <AddAccounts close={() => this.setState({ showAddAccounts: false })} /> : null}
-        <div className='newAccount' onClick={() => this.setState({ showAddAccounts: !this.state.showAddAccounts })}>
-          <div className='newAccountIcon'>{'+'}</div> 
-          Add New Account
-        </div>
-        <div className='signers'>
-          <div className='signersMid'>
-            <div className='signersHeader'>
-              Your Hardware Signers
-            </div>
-            <div className='signersList'>
-              {hardwareSigners.length ? (
-                hardwareSigners
-                  .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-                  .map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
-              ) : (
-                <div className='noSigners'>
-                  {'No hardware signers detected'}
-                </div>
-              )}
-            </div>
-            <div className='signersHeader'>
-              Your Hot Signers
-            </div>
-            <div className='signersList'>
-              {hotSigners.length ? (
-                hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
-              ) : (
-                <div className='noSigners'>
-                  {'No hot signers detected'}
-                </div>
-              )}
+    const hardwareSigners = Object.keys(this.store('main.signers')).map(s => {
+      const signer = this.store('main.signers', s)
+      if (
+        signer.type === 'ledger' || 
+        signer.type === 'trezor' ||
+        signer.type === 'lattice'
+      ) {
+        return signer
+      } else {
+        return false
+      }
+    }).filter(s => s)
+    const hotSigners = Object.keys(this.store('main.signers')).map(s => {
+      const signer = this.store('main.signers', s)
+      if (
+        signer.type === 'seed' || 
+        signer.type === 'ring'
+      ) {
+        return signer
+      } else {
+        return false
+      }
+    }).filter(s => s)
+
+    const { showAddAccounts } = this.props.data
+    return (   
+      showAddAccounts ? (
+        <AddAccounts 
+          close={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: false } })} 
+        /> 
+       ) : (
+        <div>
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Account
+          </div>
+          <div className='signers'>
+            <div className='signersMid'>
+              <div className='signersHeader'>
+                Your Hardware Signers
+              </div>
+              <div className='signersList'>
+                {hardwareSigners.length ? (
+                  hardwareSigners
+                    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+                    .map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
+                ) : (
+                  <div className='noSigners'>
+                    {'No hardware signers detected'}
+                  </div>
+                )}
+              </div>
+              <div className='signersHeader'>
+                Your Hot Signers
+              </div>
+              <div className='signersList'>
+                {hotSigners.length ? (
+                  hotSigners.map((signer, index) => <Signer index={index} key={signer.id} {...signer} />)
+                ) : (
+                  <div className='noSigners'>
+                    {'No hot signers detected'}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )
     )
   }
 }

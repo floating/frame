@@ -28,20 +28,19 @@ class Dash extends React.Component {
     }
   }
   renderPanel () {
-    const selected = this.store('dash.panel')
-    console.log('selected', selected)
-    if (selected === 'accounts') return <Accounts />
-    if (selected === 'chains') return <Chains />
-    if (selected === 'dapps') return <Dapps />
-    if (selected === 'tokens') return <Tokens />
-    if (selected === 'settings') return <Settings />
+    const { view, data } = this.store('dash.nav')[0] || { view: 'default', data: {} }
+    if (view === 'accounts') return <Accounts data={data} />
+    if (view === 'chains') return <Chains data={data} />
+    if (view === 'dapps') return <Dapps data={data} />
+    if (view === 'tokens') return <Tokens data={data} />
+    if (view === 'settings') return <Settings data={data} />
+    if (view === 'notify') return <Notify data={data} />
     return <Main />
   }
   render () {
     return (
       <div className='dash'>
         <Command />
-        <Notify />
         <div className='dashMain'>
           <div className='dashMainOverlay' />
           {this.renderPanel()}

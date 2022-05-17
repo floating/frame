@@ -35,7 +35,7 @@ class AddHardware extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>{this.deviceName}</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div>
+            {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div> */}
             <div className='addAccountItemSummary'>{`Unlock your ${this.deviceName} to get started`}</div>
           </div>
           <div className='addAccountItemDevices'>
@@ -74,7 +74,7 @@ class AddHardware extends React.Component {
           </div>
           <div
             className='addAccountItemFooter' onMouseDown={() => {
-              const open = url => this.store.notify('openExternal', { url })
+              const open = url => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url }} })
               if (this.deviceName === 'ledger') return open('https://shop.ledger.com/pages/ledger-nano-x?r=1fb484cde64f')
               if (this.deviceName === 'trezor') return open('https://shop.trezor.io/?offer_id=10&aff_id=3270')
             }}

@@ -213,11 +213,6 @@ class Settings extends React.Component {
       <div className={'localSettings cardShow'}>
         <div className='localSettingsWrap'>
           {/* <Filter />    */}
-          {/* <div className='addCustomTokenButtonWrap' style={{ zIndex: 215 }}>
-            <div className='addCustomTokenButton' onClick={() => this.store.notify('customTokens')}>
-              Manage Custom Tokens
-            </div>
-          </div> */}
           {/* <div className='requestFeature'>
             <div className='requestFeatureButton' onClick={() => link.send('tray:openExternal', 'https://feedback.frame.sh') }>
               Request a Feature 
@@ -277,7 +272,9 @@ class Settings extends React.Component {
               <div
                 className={this.store('main.nonceAdjust') ? 'signerPermissionToggle signerPermissionToggleOn' : 'signerPermissionToggle'} onClick={_ => {
                   link.send('tray:action', 'toggleNonceAdjust')
-                  if (!this.store('main.nonceAdjust')) this.store.notify('nonceWarning')
+                  if (!this.store('main.nonceAdjust')) {
+                    link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'nonceWarning', notifyData: {}} })
+                  }
                 }}
               >
                 <div className='signerPermissionToggleSwitch' />

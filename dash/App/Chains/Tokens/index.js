@@ -32,7 +32,7 @@ class ChainModule extends React.Component {
       <div 
         className='sliceTile sliceTileClickable'
         onClick={() => {
-          this.store.notify('customTokens')
+          link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'customTokens', notifyData: {} }})
         }}
       >
         <div className='sliceTileTokens'>

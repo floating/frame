@@ -214,7 +214,7 @@ class AddToken extends Component {
                     const token = { name, symbol, chainId, address, decimals, logoURI }
                     link.send('tray:addToken', token, this.props.req)
                     setTimeout(() => {
-                      this.store.notify()
+                      link.send('tray:action', 'backDash')
                     }, 400)
                   }}
                 >

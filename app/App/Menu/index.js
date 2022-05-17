@@ -54,12 +54,14 @@ class Launcher extends React.Component {
       <div ref={this.moduleRef} className='panelMenu'>
         <div 
           className={'panelMenuItem panelMenuItemOpen'}
-          onClick={() => link.send('tray:action', 'setDash', 'default')}
+          onClick={() => link.send('tray:action', 'setDash', { 
+            showing: !this.store('dash.showing')
+          })}
           onMouseEnter={() => this.setState({ glitchOn: true })}
           onMouseOver={() => this.setState({ glitchOn: true })}
           onMouseLeave={() => this.setState({ glitchOn: false })}
         > 
-          {this.glitch(svg.window(15))}
+          {this.glitch(svg.sidebar(15))}
         </div>
         <div 
           className={'panelMenuItem panelMenuItemSend'}

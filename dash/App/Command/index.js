@@ -5,18 +5,22 @@ import svg from '../../../resources/svg'
 
 class Command extends React.Component {
   render () {
+    const { view, data } = this.store('dash.nav')[0] || { view: '', data: {} }
     return (
       <div className='command'>
-        {this.store('dash.panel') !== 'default' ? (
+        {this.store('dash.nav').length ? (
           <div 
             className='commandItem commandItemBack cardShow'
             onClick={() => {
-              link.send('tray:action', 'setDash', 'default')
+              link.send('tray:action', 'backDash')
             }}
           >
             {svg.chevronLeft(16)}
           </div>
         ) : null}
+        <div key={view} className='commandTitle cardShow'>
+          {view}
+        </div>
         
         {/* <div 
           className='commandInput'

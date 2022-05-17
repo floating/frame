@@ -107,7 +107,7 @@ class AddPhrase extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Watch Account</div>
             </div>
-            <div className='addAccountItemClose' onClick={() => this.props.close()}>{'Done'}</div>
+            {/* <div className='addAccountItemClose' onClick={() => this.props.close()}>{'Done'}</div> */}
             <div className='addAccountItemSummary'>Watch accounts work like normal accounts but cannot sign</div>
           </div>
           <div className='addAccountItemOption'>

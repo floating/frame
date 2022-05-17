@@ -116,14 +116,14 @@ class AddRing extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Private Key</div>
             </div>
-            <div className='addAccountItemClose' onClick={() => this.props.close()}>{'DONE'}</div>
+            {/* <div className='addAccountItemClose' onClick={() => this.props.close()}>{'DONE'}</div> */}
             <div className='addAccountItemSummary'>A private key account lets you add accounts from individual private keys</div>
           </div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onClick={() => {
                 this.adding()
-                if (network === 'ethereum:1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+                if (network === 'ethereum:1') setTimeout(() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'hotAccountWarning', notifyData: {} } }), 800)
               }}
             >
               Add Keyring Account

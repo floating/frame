@@ -82,8 +82,8 @@ const initial = {
     }
   },
   dash: {
-    panel: 'default',
-    showing: false
+    showing: false,
+    nav: []
   },
   flow: {},
   dapps: {},

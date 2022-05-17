@@ -83,7 +83,7 @@ class _OriginModule extends React.Component {
         <div 
           className='sliceOrigin'
           onClick={() => {
-            this.store.notify('updateOriginChain', { origin: origin })
+            link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'updateOriginChain', notifyData: { origin } }})
           }}
         >
           <div className={active ? 'sliceOriginIndicator sliceOriginIndicatorActive' : 'sliceOriginIndicator' } />

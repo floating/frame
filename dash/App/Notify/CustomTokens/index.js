@@ -24,7 +24,9 @@ class CustomTokens extends React.Component {
               </div>
               <div
                 className='customTokensAddToken'
-                onClick={() => this.store.notify('addToken', this.props.req)}
+                onClick={() => {
+                  link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addToken', notifyData: this.props.req }})
+                }}
               >
                 Add Token
               </div>

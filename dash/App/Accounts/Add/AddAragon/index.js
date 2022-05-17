@@ -162,7 +162,7 @@ class AddAragon extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Aragon DAO</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div>
+            {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div> */}
             <div className='addAccountItemSummary'>An Aragon smart account allows you to use your Aragon DAO with any dapp</div>
           </div>
           <div className='addAccountItemOption'>
@@ -215,7 +215,7 @@ class AddAragon extends React.Component {
           <div
             className='addAccountItemFooter' onMouseDown={() => {
               const net = this.store('main.currentNetwork.id')
-              const open = url => this.store.notify('openExternal', { url })
+              const open = url => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url }} })
               if (net === '1') return open('https://mainnet.aragon.org')
               if (net === '4') return open('https://rinkeby.aragon.org')
               return open('https://aragon.org')

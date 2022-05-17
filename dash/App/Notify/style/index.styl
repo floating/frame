@@ -1,10 +1,12 @@
 .notify
-  position fixed
-  top 0px
-  right 0px
-  left 0px
-  bottom 0px
-  z-index 9999999999999999
+  // position fixed
+  // top 0px
+  // right 0px
+  // left 0px
+  // bottom 0px
+  // z-index 9999999999999999
+  width 100%
+  height 100%
   pointer-events auto
   transition var(--standard)
   display flex
@@ -78,7 +80,7 @@
     border-radius 12px
     box-sizing border-box
     position absolute
-    top 64px
+    top 5px
     bottom 5px
     left 5px
     right 5px
@@ -183,12 +185,13 @@
           padding 8px
           margin-bottom 8px
           background var(--ghostB)
-          border-radius 8px
+          border-radius 12px
+          border 3px solid var(--ghostZ)
 
         .notifyBodyBlockBig
-          padding 16px
-          font-size 17px
-          background var(--ghostC)
+          padding 32px
+          font-size 16px
+          background var(--ghostB)
 
         .notifyBodyLink
           text-decoration underline
@@ -330,21 +333,27 @@
           border-top-right-radius 20px
           border-bottom-right-radius 20px
 
-        .notifyInputSingleButton:before
-          content ''
-          position absolute
-          top 0
-          left 0
-          right 0
-          bottom 2px
-          background var(--ghostC)
-          z-index 2
-          border-radius 19px
+        // .notifyInputSingleButton:before
+        //   content ''
+        //   position absolute
+        //   display none
+        //   top 0
+        //   left 0
+        //   right 0
+        //   bottom 2px
+        //   background var(--ghostB)
+        //   border 3px solid var(--ghostZ)
+        //   z-index 2
+        //   border-radius 12px
 
         .notifyInputSingleButton
           left 50%
           transform translate(-50%, 0)
-          border-radius 20px
+          border-radius 12px
+          height 50px
+          background var(--ghostB)
+          background var(--ghostB)
+          border 3px solid var(--ghostZ)
 
     .introInstructions
       position relative

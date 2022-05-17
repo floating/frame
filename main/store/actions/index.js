@@ -537,19 +537,21 @@ module.exports = {
     u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
   },
   closeDash: (u) => {
-    u('dash', () => {
-      return ({
-        showing: false,
-        panel: 'default'
-      })
+    u('dash.showing', () => false)
+  },
+  setDash: (u, update) => {
+    u('dash', dash => Object.assign(dash, update))
+  },
+  navDash: (u, navItem) => {
+    u('dash.nav', nav => {
+      nav.unshift(navItem)
+      return nav
     })
   },
-  setDash: (u, panel) => {
-    u('dash', () => {
-      return ({
-        showing: true,
-        panel
-      })
+  backDash: (u) => {
+    u('dash.nav', nav => {
+      nav.shift()
+      return nav
     })
   },
   muteBetaDisclosure: (u) => {

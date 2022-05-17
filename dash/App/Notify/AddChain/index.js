@@ -255,7 +255,7 @@ class AddChain extends React.Component {
                     }
                     link.send('tray:addChain', net, this.props.req)
                     setTimeout(() => {
-                      this.store.notify()
+                      link.send('tray:action', 'backDash')
                     }, 400)
                   }}
                 >

@@ -242,7 +242,7 @@
     left 0
     right 0
     display flex
-    justify-content flex-start
+    justify-content center
     align-items center
     font-size 22px
     font-family 'Exo2', sans-serif
@@ -250,6 +250,7 @@
     font-weight 400
     // background red
     width 100%
+    margin 12px 0px
     // margin-top 10px
     // background blue
 
@@ -272,21 +273,23 @@
       margin-left 0px
       margin-bottom 2px
       text-transform capitalize
+      text-shadow 0px 4px 8px var(--ghostX)
 
     // .addAccountItemIconSmart
     //   color var(--smart)
 
     .addAccountItemIcon
       position relative
-      height 44px
-      width 44px
+      height 40px
+      width 40px
       display flex
       justify-content center
       align-items center
       color var(--outerspace)
+      margin 2px 8px 2px 0px
       border-radius 12px
-      margin 12px 9px
       background var(--ghostB)
+      box-shadow 0px 4px 8px var(--ghostY)
 
     .addAccountItemIconHex
       width 45px
@@ -334,19 +337,21 @@
     justify-content center
     z-index 9999999
     // line-height px
-    font-size 13px
+    font-size 10px
     text-transform uppercase
-    letter-spacing 0px
+    letter-spacing 1px
     height 50px
     text-align center
     min-height 22px
     box-sizing border-box
     position absolute
     font-weight 500
+    line-height 22px
     top 67px
     left 20px
     right 20px
     color var(--good)
+    text-shadow 0px 2px 1px var(--ghostX)
 
   .addAccountItemTrezorBridgeWarning
     display flex

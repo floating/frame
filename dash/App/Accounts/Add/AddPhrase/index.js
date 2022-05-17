@@ -116,14 +116,14 @@ class AddPhrase extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Seed Phrase</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div>
+            {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'DONE'}</div> */}
             <div className='addAccountItemSummary'>A phrase account uses a list of words to backup and restore your account</div>
           </div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {
                 this.adding()
-                setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+                setTimeout(() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'hotAccountWarning', notifyData: {} } }), 800)
               }}
             >
               Add Phrase Account

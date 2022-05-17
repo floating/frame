@@ -132,14 +132,15 @@ class AddRing extends React.Component {
               </div>
               <div className='addAccountItemTopTitle'>Keystore</div>
             </div>
-            <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div>
+            {/* <div className='addAccountItemClose' onMouseDown={() => this.props.close()}>{'Done'}</div> */}
             <div className='addAccountItemSummary'>A keystore account lets you add accounts from your keystore.json file</div>
           </div>
           <div className='addAccountItemOption'>
             <div
               className='addAccountItemOptionIntro' onMouseDown={() => {
                 this.adding()
-                if (network === 'ethereum:1') setTimeout(() => this.store.notify('hotAccountWarning'), 800)
+                if (network === 'ethereum:1') setTimeout(() => 
+                link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'hotAccountWarning', notifyData: {} } }), 800)
               }}
             >
               Add Keyring Account

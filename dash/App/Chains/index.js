@@ -22,6 +22,7 @@ class _SettingsModule extends React.Component {
     }
   }
   render () {
+    
     const { id, name, type, explorer, symbol, layer, changed } = this.props
     const price = this.store('main.networksMeta.ethereum', id, 'nativeCurrency.usd.price') || '?'
     return (
@@ -672,7 +673,7 @@ class Settings extends React.Component {
 
   discord () {
     return (
-      <div className='discordInvite' onMouseDown={() => this.store.notify('openExternal', { url: 'https://discord.gg/UH7NGqY' })}>
+      <div className='discordInvite' onMouseDown={() => link.send('tray:action', 'navDash', { view: 'openExternal', data: { notify: 'hotAccountWarning', notifyData: { url: 'https://discord.gg/UH7NGqY' }}})}>
         <div>Need help?</div>
         <div className='discordLink'>Join our Discord!</div>
       </div>
@@ -789,6 +790,10 @@ class Settings extends React.Component {
           </div>
         </div> */}
         <div className='localSettingsWrap'>
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Chain
+          </div>
           {this.renderConnections('mainnet')}
           <div className='networkBreak'>
             <div className='networkBreakLayer'>Rollups</div>

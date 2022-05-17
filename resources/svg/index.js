@@ -633,6 +633,24 @@ export default {
       </div>
     )
   },
+  sidebar: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 512 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M0 96C0 60.65 28.65 32 64 32H448C483.3 32 512 60.65 512 96V416C512 451.3 483.3 480 448 480H64C28.65 480 0 451.3 0 416V96zM224 416H448V96H224V416zM88 96C74.75 96 64 106.7 64 120C64 133.3 74.75 144 88 144H136C149.3 144 160 133.3 160 120C160 106.7 149.3 96 136 96H88zM88 240H136C149.3 240 160 229.3 160 216C160 202.7 149.3 192 136 192H88C74.75 192 64 202.7 64 216C64 229.3 74.75 240 88 240zM88 288C74.75 288 64 298.7 64 312C64 325.3 74.75 336 88 336H136C149.3 336 160 325.3 160 312C160 298.7 149.3 288 136 288H88z' />
+        </svg>
+      </div>
+    )
+  },
+  plus: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 448 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z' />
+        </svg>
+      </div>
+    )
+  },
   infinity: size => {
     return (
       <div style={{ width: size + 'px', height: size + 'px' }}>
