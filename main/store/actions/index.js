@@ -29,29 +29,7 @@ function includesToken (tokens, token) {
 module.exports = {
   ...panelActions,
   // setSync: (u, key, payload) => u(key, () => payload),
-  selectNetwork: (u, type, id) => {
-    id = parseInt(id)
-    if (!Number.isInteger(id)) return
-    const reset = { status: 'loading', connected: false, type: '', network: '' }
-    u('main.currentNetwork', selected => {
-      u('main.networks', selected.type, selected.id, connection => {
-        connection.primary = Object.assign({}, connection.primary, reset)
-        connection.secondary = Object.assign({}, connection.secondary, reset)
-        return connection
-      })
-      return { type, id }
-    })
-  },
   activateNetwork: (u, type, chainId, active) => {
-    if (!active) {
-      u('main.currentNetwork', (current) => {
-        if (current.type === type && current.id === chainId) {
-          return { type: 'ethereum', id: 1 }
-        } else {
-          return current
-        }
-      })
-    }
     u('main.networks', type, chainId, 'on', () => active)
   },
   selectPrimary: (u, netType, netId, value) => {
