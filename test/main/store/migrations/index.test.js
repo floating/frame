@@ -464,6 +464,35 @@ describe('migration 19', () => {
         currentNetwork: {
           id: 1,
           type: 'ethereum'
+        },
+        clients: {
+          ipfs: {
+            on: false,
+            installed: false,
+            latest: false,
+            version: null,
+            state: 'off'
+          },
+          geth: {
+            on: false,
+            blockNumber: 0,
+            currentBlock: 0,
+            highestBlock: 0,
+            installed: false,
+            latest: false,
+            version: null,
+            state: 'off'
+          },
+          parity: {
+            on: false,
+            blockNumber: 0,
+            currentBlock: 0,
+            highestBlock: 0,
+            installed: false,
+            latest: false,
+            version: null,
+            state: 'off'
+          }
         }
       }
     }
@@ -472,5 +501,10 @@ describe('migration 19', () => {
   it('should delete main.currentNetwork', () => {
     const updatedState = migrations.apply(state, 19)
     expect(updatedState.main.currentNetwork).toBeUndefined()
+  })
+
+  it('should delete main.clients', () => {
+    const updatedState = migrations.apply(state, 19)
+    expect(updatedState.main.clients).toBeUndefined()
   })
 })
