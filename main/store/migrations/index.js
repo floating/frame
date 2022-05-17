@@ -389,16 +389,25 @@ const migrations = {
     initial.main.tokens = { custom: existingCustomTokens }
 
     return initial
+  },
+  19: initial => {
+    // delete main.currentNetwork
+    delete initial.main.currentNetwork
+
+    return initial
   }
 }
 
+// Version number of latest known migration
+const latest = Math.max(...Object.keys(migrations))
+
 module.exports = {
   // Apply migrations to current state
-  apply: state => {
+  apply: (state, migrateToVersion = latest) => {
     state.main._version = state.main._version || 0
     Object.keys(migrations).sort((a, b) => a - b).forEach(version => {
-      if (parseInt(state.main._version) < version) {
-        log.info('Applying state migration: ' + version)
+      if (parseInt(state.main._version) < version && version <= migrateToVersion) {
+        log.info(`Applying state migration: ${version}`)
         state = migrations[version](state)
         state.main._version = version
       }
@@ -406,6 +415,5 @@ module.exports = {
 
     return state
   },
-  // Version number of latest known migration
-  latest: Math.max(...Object.keys(migrations))
+  latest
 }
