@@ -19,14 +19,16 @@ interface RPCId {
   jsonrpc: string
 }
 
-interface InternalPayload {
-  _origin: string,
-  chainId?: string
-}
+
 
 interface JSONRPCRequestPayload extends RPCId {
   params: any[],
   method: string
+}
+
+interface InternalPayload extends JSONRPCRequestPayload {
+  _origin: string,
+  chainId?: string
 }
 
 interface JSONRPCSuccessResponsePayload extends RPCId {
