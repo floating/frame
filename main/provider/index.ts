@@ -191,7 +191,7 @@ export class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, result: accounts.getSelectedAddresses().map(a => a.toLowerCase()) })
   }
 
-  getNetVersion (payload: InternalPayload, res: RPCRequestCallback, targetChain: Chain) {
+  getNetVersion (payload: RPCRequestPayload, res: RPCRequestCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId'))
 
     const connection = this.connection.connections[type][id]
@@ -204,7 +204,7 @@ export class Provider extends EventEmitter {
     res({ id: payload.id, jsonrpc: payload.jsonrpc, ...response })
   }
 
-  getChainId (payload: InternalPayload, res: RPCSuccessCallback, targetChain: Chain) {
+  getChainId (payload: RPCRequestPayload, res: RPCSuccessCallback, targetChain: Chain) {
     const { type, id } = (targetChain || store('main.origins', uuidv5(payload._origin, uuidv5.DNS), 'chainId'))
 
     const connection = this.connection.connections[type][id]
