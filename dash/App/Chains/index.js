@@ -565,12 +565,17 @@ class _Network extends React.Component {
       <div className='network'>
         <div className='networkActive'>
           {chainMeta[hexId] && chainMeta[hexId].icon ? (
-            <div className='chainBadge' 
+            <div 
+              className='chainBadge'
+              style={{ background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : '' }}
             >
               <img src={chainMeta[hexId].icon} />
             </div>
           ) : (
-            <div className='chainBadge' />
+            <div 
+              className='chainBadge'
+              style={{ background: chainMeta[hexId] ? chainMeta[hexId].primaryColor : '' }}
+            />
           )}
           <div className='networkName'>
             {this.state.name}

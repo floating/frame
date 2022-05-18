@@ -82,7 +82,10 @@ class Balance extends React.Component {
     return (
       <div className={i === 0 ? 'signerBalance signerBalanceBase' : 'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
         <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
-          <div className='signerBalanceChainIcon'>
+          <div 
+            className='signerBalanceChainIcon'
+            style={{ background: chainMeta[chainHex] ? chainMeta[chainHex].primaryColor : '' }}
+          >
             <img 
               src={chainMeta[chainHex] ? chainMeta[chainHex].icon : ''}
               value={chainId}
@@ -253,7 +256,9 @@ class Balances extends React.Component {
             </div>
           ) : (
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceAddToken' onMouseDown={() => link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' }})}>
+              <div className='signerBalanceButton signerBalanceAddToken' onMouseDown={() => {
+                link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' }})
+              }}>
                 <span>Add Token</span>
               </div>
             </div>
