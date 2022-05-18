@@ -1,6 +1,7 @@
 import log from 'electron-log'
 
 const panelActions = require('./panel')
+const supportedNetworkTypes = ['ethereum']
 
 function validateNetworkSettings (network) {
   const networkId = parseInt(network.id)
@@ -11,9 +12,9 @@ function validateNetworkSettings (network) {
     typeof (network.name) !== 'string' ||
     typeof (network.explorer) !== 'string' ||
     typeof (network.symbol) !== 'string' ||
-    ['ethereum'].indexOf(network.type) === -1
+    !supportedNetworkTypes.includes(network.type)
   ) {
-    throw new Error('Invalid network settings ' + JSON.stringify(network))
+    throw new Error(`Invalid network settings: ${JSON.stringify(network)}`)
   }
 
   return networkId
