@@ -361,12 +361,12 @@ class ChainConnection extends EventEmitter {
   }
 
   send (payload, res) {
-    if (this.primary.provider && this.primary.connected) { // && this.primary.network === store('main.currentNetwork.id')) {
+    if (this.primary.provider && this.primary.connected) {
       this.primary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
       })
-    } else if (this.secondary.provider && this.secondary.connected) { //  && this.secondary.network === store('main.currentNetwork.id')) {
+    } else if (this.secondary.provider && this.secondary.connected) {
       this.secondary.provider.sendAsync(payload, (err, result) => {
         if (err) return this.resError(err, payload, res)
         res(result)
