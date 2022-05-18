@@ -22,7 +22,49 @@ div
   height 100%
   overflow-y scroll
   overflow-x hidden
-  background var(--ghostZ)
+  background var(--ghostA)
+  position relative
+
+  .dashMain
+    position absolute 
+    top 80px
+    right 5px
+    bottom 40px
+    left 5px
+    overflow-y scroll
+    overflow-x hidden
+    z-index 1000
+    position absolute
+    background var(--ghostZ)
+    border-radius 16px
+
+    .dashMainOverlay
+      position absolute
+      top 0px
+      right 0px
+      bottom 0px
+      left 0px
+      // background red
+      border-radius 16px
+      z-index 40000000
+      box-shadow inset 0px 0px 6px var(--ghostY)
+      pointer-events none
+
+    .originTitle
+      margin 30px 10px 5px 10px
+      font-size 18px
+
+  .panelScrollOverlay
+    position absolute
+    top 0px
+    right 0px
+    bottom 0px
+    left 0px
+    // background red
+    border-radius 16px
+    z-index 40000000
+    box-shadow inset 0px 0px 6px var(--ghostX)
+    pointer-events none
 
   .addAccounts
     position absolute
@@ -38,10 +80,10 @@ div
 
     .addAccountsHeader
       .addAccountsHeaderTitle
-        margin-top 80px
-        margin-bottom 40px
-        font-size 13px
-        font-weight 400
+        margin-top 20px
+        margin-bottom 20px
+        font-size 14px
+        font-weight 300
         height 50px
         display flex
         justify-content center
@@ -65,6 +107,7 @@ div
         font-weight 600
         padding-bottom 1px
         padding-left 1px
+        display none
 
         *
           pointer-events none
@@ -73,45 +116,48 @@ div
         background var(--ghostC)
 
     .accountTypeSelect
-      height 70px
-      width 320px
+      height 90px
+      // width 320px
       font-weight 300
-      background var(--ghostC)
-      border-radius 16px
-      margin 20px
+      border-radius 12px
+      margin 6px 6px 8px 6px
       display flex
       justify-content center
       align-items center
       cursor pointer
       background var(--ghostA)
-      border-bottom 2px solid var(--ghostZ)
-      box-shadow 0px 8px 8px -4px var(--ghostY)
-      font-size 17px
+      // border-bottom 2px solid var(--ghostZ)
+      box-shadow 0px 4px 8px var(--ghostY)
+      font-size 16px
+
+      .accountTypeSelectIcon
+        margin-right 12px
 
     .accountTypeSelect:hover
-      transform translateY(-1px)
-      color var(--good)
-      animation 5s shake ease-in-out infinite alternate
+      //transform translateY(-1px)
+      background var(--ghostB)
+      // color var(--good)
+      // animation 5s shake ease-in-out infinite alternate
 
-    .accountTypeSelect:active
-      color var(--good)
-      transform translateY(2px)
-      animation shake-little 2s ease-in-out infinite
-      box-shadow 0px 2px 12px 0px var(--ghostY)
+    // .accountTypeSelect:active
+    //   color var(--good)
+    //   transform translateY(2px)
+    //   animation shake-little 2s ease-in-out infinite
+    //   box-shadow 0px 2px 12px 0px var(--ghostY)
 
   .newAccount
     height 60px
     position relative
     background var(--ghostA)
-    border-radius 16px
+    border-radius 12px
     display flex
     justify-content center
     align-items center
-    margin 16px 14px 64px 14px
+    margin 6px 6px 64px 6px
     cursor pointer
-    font-size 19px
-    border-bottom 2px solid var(--ghostZ)
-    box-shadow 0px 8px 8px -4px var(--ghostY)
+    font-size 16px
+    // border-bottom 2px solid var(--ghostZ)
+    box-shadow 0px 4px 8px var(--ghostY)
     padding-top 0px
     padding-left 30px
     padding-bottom 1px
@@ -121,29 +167,31 @@ div
     font-family 'Exo2', OpenSans, sans-serif
     font-weight 400
     transform rotate(0.0001deg)
+    z-index 5
 
     .newAccountIcon
       position absolute
       top 0
       left 0
-      bottom 5px
+      bottom 0px
       width 64px
-      font-size 34px
+      font-size 28px
       display flex
       justify-content center
       align-items center
       font-weight 200
     
   .newAccount:hover
-    transform translateY(-1px)
-    color var(--good)
-    animation 5s shake ease-in-out infinite alternate
+    background var(--ghostB)
+    // transform translateY(-1px)
+    // color var(--good)
+    // animation 5s shake ease-in-out infinite alternate
 
-  .newAccount:active
-    color var(--good)
-    transform translateY(2px)
-    animation shake-little 2s ease-in-out infinite
-    box-shadow 0px 2px 12px 0px var(--ghostY)
+  // .newAccount:active
+  //   color var(--good)
+  //   transform translateY(2px)
+  //   animation shake-little 2s ease-in-out infinite
+  //   box-shadow 0px 2px 12px 0px var(--ghostY)
 
   .signers
     width 100%
@@ -190,8 +238,8 @@ div
       overflow hidden
       background var(--ghostA)
       box-sizing border-box
-      margin 0px 5px 40px 5px
-      border-radius 16px
+      margin 0px 0px 40px 0px
+      border-radius 12px
       display flex
       justify-content center
       align-items center
@@ -199,11 +247,26 @@ div
       font-weight 400
       letter-spacing 2px
       text-transform uppercase
+      box-shadow 0px 4px 8px var(--ghostY)
 
     .signersList
       display flex
       flex-wrap wrap
-      padding 0px 10px 0px 10px
+      padding 0px 6px 0px 6px
+
+@import './App/Chains/style'
+@import './App/Command/style'
+@import './App/Main/style'
+@import './App/Accounts/Add/style'
+@import './App/Accounts/Signer/style'
+
+@import './App/Notify/style'
+@import './App/Tokens/style'
+// @import '../Local/style'
+// @import '../Badge/style'
+// @import '../Networks/style'
+// @import '../Filter/style'
+@import './App/card.styl'
 
   // .bar
   //   background var(--ghostE)
@@ -354,6 +417,3 @@ div
 // .hidden
 //   visibility hidden
 
-@import './App/Add/style'
-@import './App/Signer/style'
-// @import './App/Components/'

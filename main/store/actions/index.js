@@ -507,12 +507,31 @@ module.exports = {
     })
   },
   // Dashboard
-  setDashType: (u, type) => {
-    // console.log('set dash type', type)
-    u('dash.type', () => type)
-  },
+  // setDashType: (u, type) => {
+  //   // console.log('set dash type', type)
+  //   u('dash.type', () => type)
+  // },
   toggleDash: (u, force) => {
     u('dash.showing', s => force === 'hide' ? false : force === 'show' ? true : !s)
+  },
+  closeDash: (u) => {
+    u('dash.showing', () => false)
+  },
+  setDash: (u, update) => {
+    u('dash', dash => Object.assign(dash, update))
+  },
+  navDash: (u, navItem) => {
+    u('dash.nav', nav => {
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
+      return nav
+    })
+    u('dash.showing', () => true)
+  },
+  backDash: (u) => {
+    u('dash.nav', nav => {
+      nav.shift()
+      return nav
+    })
   },
   muteBetaDisclosure: (u) => {
     u('main.mute.betaDisclosure', () => true)

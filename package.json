@@ -126,7 +126,7 @@
     "@ledgerhq/hw-transport-mocker": "6.24.1",
     "@nomiclabs/hardhat-waffle": "2.0.3",
     "@testing-library/react": "^13.0.0",
-    "@testing-library/user-event": "^14.1.1",
+    "@testing-library/user-event": "^14.2.0",
     "@types/cookie": "0.4.1",
     "@types/get-pixels": "3.3.2",
     "@types/hdkey": "^2.0.1",

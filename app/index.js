@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Restore from 'react-restore'
 
-import Panel from './App/Panel'
+import App from './App'
 
 import link from '../resources/link'
 import _store from './store'
@@ -28,7 +28,7 @@ link.rpc('getState', (err, state) => {
       document.body.className = store('main.colorway')
     }, 100)
   })
-  const Frame = Restore.connect(Panel, store)
+  const Frame = Restore.connect(App, store)
   ReactDOM.render(<Frame />, document.getElementById('frame'))
 })
 // document.addEventListener('mouseover', e => link.send('tray:focus'))

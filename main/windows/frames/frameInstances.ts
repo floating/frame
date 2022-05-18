@@ -36,6 +36,8 @@ export default {
       y: 0,
       width: 0,
       height: 0,
+      transparent: process.platform === 'darwin',
+      // hasShadow: false,
       show: false,
       frame: false,
       titleBarStyle: 'hidden',

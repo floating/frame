@@ -88,7 +88,7 @@ const api = {
       id: 'tray',
       width: 360,
       frame: false,
-      // transparent: true,
+      transparent: process.platform === 'darwin',
       // hasShadow: false,
       show: false,
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
@@ -401,12 +401,14 @@ const api = {
       id: 'dash',
       width: 360,
       frame: false,
-      // transparent: true,
+      transparent: process.platform === 'darwin',
       // hasShadow: false,
       show: false,
       backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
       backgroundThrottling: false,
       offscreen: true,
+      // titleBarStyle: 'hidden',
+      // trafficLightPosition: { x: 10, y: 9 },
       // icon: path.join(__dirname, './AppIcon.png'),
       skipTaskbar: process.platform !== 'linux',
       webPreferences: {
@@ -449,9 +451,9 @@ const api = {
       windows.dash.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
       windows.dash.setResizable(false) // Keeps height consistant
       const area = electron.screen.getDisplayNearestPoint(electron.screen.getCursorScreenPoint()).workArea
-      windows.dash.setSize(360, dev && !fullheight ? 740 - 120 : area.height - 120)
+      windows.dash.setSize(360, dev && !fullheight ? 740 : area.height)
       const {x, y} = topRight(windows.dash) // windows.tray.positioner.calculate('topRight')
-      windows.dash.setPosition(x - 380, y + 60)
+      windows.dash.setPosition(x - 363, y)
       // if (!glide) windows.tray.focus()
       // windows.flow.emit('show')
       windows.dash.show()
