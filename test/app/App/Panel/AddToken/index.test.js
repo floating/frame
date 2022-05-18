@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event'
 import Restore from 'react-restore'
 import store from '../../../../../main/store'
 import link from '../../../../../resources/link'
-import AddTokenComponent from '../../../../../app/App/Panel/Notify/AddToken'
+import AddTokenComponent from '../../../../../app/App/Notify/AddToken'
 
 jest.mock('../../../../../main/store/persist')
 jest.mock('../../../../../resources/link')
