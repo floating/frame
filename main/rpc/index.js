@@ -37,8 +37,6 @@ const rpc = {
   // Review
   // getSigners: signers.getSigners,
   setSigner: (id, cb) => {
-    store.toggleDash('hide')
-
     const previousAddresses = accounts.getSelectedAddresses()
 
     accounts.setSigner(id, cb)

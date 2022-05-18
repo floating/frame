@@ -43,7 +43,7 @@ const initial = {
     view: 'default',
     account: {
       moduleOrder: [
-        'launcher',
+        // 'launcher',
         'requests',
         // 'activity',
         // 'gas',
@@ -82,8 +82,8 @@ const initial = {
     }
   },
   dash: {
-    type: 'signers',
-    showing: false
+    showing: false,
+    nav: []
   },
   flow: {},
   dapps: {},
