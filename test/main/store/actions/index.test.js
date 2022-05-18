@@ -598,7 +598,7 @@ describe('#removeNetwork', () => {
     expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Invalid chain id'))
   })
 
-  it('should throw an error when deleting mainnet', () => {
+  it('should log an error when deleting mainnet', () => {
     removeNetwork(1)
     expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Cannot remove mainnet'))
   })
@@ -654,6 +654,97 @@ describe('#removeNetwork', () => {
           chainId: 4
         }
       })
+    })
+  })
+})
+
+describe('#updateNetwork', () => {
+  let main
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main')
+    main = update(main)
+  }
+
+  beforeEach(() => {
+    main = {
+      origins: {
+        'frame.eth': {
+          chainId: 1
+        },
+        'frame.test': {
+          chainId: 4
+        },
+        'frame.sh': {
+          chainId: 50
+        },
+        'frame.test2': {
+          chainId: 4
+        }
+      },
+      networks: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      },
+      networksMeta: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      }
+    }
+  })
+
+  const updateNetwork = (existingNetwork, newNetwork) => updateNetworkAction(updaterFn, existingNetwork, newNetwork)
+
+  it('should log an error when passed an invalid existing network', () => {
+    updateNetwork({ id: 'invalid' })
+    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Invalid network settings: {"id":"invalid"}'))
+  })
+
+  it('should log an error when passed an invalid new network', () => {
+    updateNetwork({ id: '0x1', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: 'invalid' })
+    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Invalid network settings: {"id":"invalid"}'))
+  })
+
+  it('should update the network', () => {
+    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
+
+    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }, 137: {} })
+  })
+
+  it('should trim string properties', () => {
+    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test     ', explorer: '   explorer.test    ', symbol: 'TEST  ' })
+
+    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 66: { id: 66, type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' }, 137: {} })
+  })
+
+  it('should update the chainId for origins using the updated network', () => {
+    updateNetwork({ id: '0x4', type: 'ethereum', name: '', explorer: '', symbol: '' }, { id: '0x42', type: 'ethereum', name: 'test', explorer: 'explorer.test', symbol: 'TEST' })
+
+    expect(main.origins).toStrictEqual({
+      'frame.eth': {
+        chainId: 1
+      },
+      'frame.test': {
+        chainId: 66
+      },
+      'frame.sh': {
+        chainId: 50
+      },
+      'frame.test2': {
+        chainId: 66
+      }
     })
   })
 })
