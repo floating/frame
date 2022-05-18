@@ -614,7 +614,7 @@ class Account extends React.Component {
     } else {
       const bounds = this.signer.getBoundingClientRect()
       this.props.reportScroll()
-      this.store.initialSignerPos({ top: bounds.top - 76, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
+      this.store.initialSignerPos({ top: bounds.top - 80, bottom: document.body.clientHeight - bounds.top - this.signer.clientHeight + 3, height: this.signer.clientHeight, index: this.props.index })
       link.rpc('setSigner', this.props.id, (err, status) => { if (err) return console.log(err) })
     }
   }
@@ -942,8 +942,8 @@ class Account extends React.Component {
       style.position = 'absolute'
       style.top = initial.top // open ? 40 : initial.top
       style.bottom = initial.bottom // open ? 3 : initial.bottom
-      style.left = 0
-      style.right = 0
+      style.left = '4px'
+      style.right = '4px'
       style.zIndex = '100000000'
       const panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 62 - 3 : initial.height - 3

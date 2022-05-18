@@ -55,7 +55,7 @@ class AddToken extends Component {
     )
 
     return (
-      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
           <div className='addTokenTitle'>
             Add New Token

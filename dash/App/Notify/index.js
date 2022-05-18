@@ -9,8 +9,6 @@ import { usesBaseFee } from '../../../main/transaction'
 import frameIcon from './FrameIcon.png'
 
 import AddChain from './AddChain'
-import AddToken from './AddToken'
-import CustomTokens from './CustomTokens'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
@@ -649,18 +647,6 @@ class Notify extends React.Component {
       return (
         <div className='notify cardShow'>
           <AddChain req={notifyData} />
-        </div>
-      )
-    } else if (notify === 'addToken') {
-      return (
-        <div className='notify cardShow'>
-          <AddToken req={notifyData} currentNetworkId={this.store('main.currentNetwork.id')} />
-        </div>
-      )
-    } else if (notify === 'customTokens') {
-      return (
-        <div className='notify cardShow'>
-          <CustomTokens req={notifyData} />
         </div>
       )
     } else {

@@ -3,12 +3,21 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
-import CustomTokens from '../Notify/CustomTokens'
+import AddToken from './AddToken'
+import CustomTokens from './CustomTokens'
 
 class Tokens extends React.Component {
   render () {
+    const { notify } = this.props.data
+    console.log('this.props', this.props)
     return (
-      <CustomTokens />
+      <div>
+        {notify === 'addToken' ? (
+          <AddToken />
+        ) : (
+          <CustomTokens />
+        )}
+      </div>
     ) 
   }
 }

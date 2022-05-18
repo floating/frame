@@ -68,6 +68,7 @@ class Launcher extends React.Component {
           onClick={() => {
             this.setState({ glitchOn: false })
             link.send('*:addFrame', 'dappLauncher')
+            link.send('tray:action', 'setDash', { showing: false })
           }}
           onMouseEnter={() => this.setState({ glitchOn: true })}
           onMouseOver={() => this.setState({ glitchOn: true })}

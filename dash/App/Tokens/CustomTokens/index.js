@@ -13,13 +13,13 @@ class CustomTokens extends React.Component {
     const tokens = this.store('main.tokens.custom')    
 
     return (
-      <div className='notifyBoxWrap' onMouseDown={e => e.stopPropagation()}>
+      <div className='notifyBoxWrap cardShow' onMouseDown={e => e.stopPropagation()}>
         <div className='notifyBoxSlide'>
+          <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken', notifyData: this.props.req }})}>
+            <div className='newAccountIcon'>{svg.plus(16)}</div> 
+            Add New Token
+          </div>
           <div className='customTokens'>
-            <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'addToken', notifyData: this.props.req }})}>
-              <div className='newAccountIcon'>{svg.plus(16)}</div> 
-              Add New Token
-            </div>
             <div className='customTokensList'>
               {tokens.length > 0 ? [].concat(tokens).sort((a, b) => {
                 return a.chainId <= b.chainId

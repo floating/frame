@@ -544,9 +544,10 @@ module.exports = {
   },
   navDash: (u, navItem) => {
     u('dash.nav', nav => {
-      nav.unshift(navItem)
+      if (JSON.stringify(nav[0]) !== JSON.stringify(navItem)) nav.unshift(navItem)      
       return nav
     })
+    u('dash.showing', () => true)
   },
   backDash: (u) => {
     u('dash.nav', nav => {

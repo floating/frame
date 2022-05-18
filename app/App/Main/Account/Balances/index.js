@@ -253,7 +253,7 @@ class Balances extends React.Component {
             </div>
           ) : (
             <div className='signerBalanceButtons'>
-              <div className='signerBalanceButton signerBalanceAddToken' onMouseDown={() => this.store.notify('addToken')}>
+              <div className='signerBalanceButton signerBalanceAddToken' onMouseDown={() => link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' }})}>
                 <span>Add Token</span>
               </div>
             </div>

@@ -171,7 +171,7 @@ class Dash extends React.Component {
           close={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: false } })} 
         /> 
        ) : (
-        <div>
+        <div className='cardShow'>
           <div className='newAccount' onClick={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true } })}>
             <div className='newAccountIcon'>{svg.plus(16)}</div> 
             Add New Account
