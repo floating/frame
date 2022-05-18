@@ -302,11 +302,12 @@ module.exports = {
         delete main.networks[net.type][net.id]
         main.networks[updatedNetwork.type][updatedNetwork.id] = updatedNetwork
 
-        const { type, id } = main.currentNetwork
-        if (net.type === type && net.id === id) {
-          main.currentNetwork.type = updatedNetwork.type
-          main.currentNetwork.id = updatedNetwork.id
-        }
+        const currentOrigins = u('main.origins')
+        Object.entries(currentOrigins).forEach(([origin, { chainId }]) => {
+          if(net.id === chainId) {
+            u('main.origins', origin, 'chainId', () => updatedNetwork.id)
+          }
+        })
         
         return main
       })
@@ -322,11 +323,13 @@ module.exports = {
       if (!Number.isInteger(net.id)) throw new Error('Invalid chain id')
       if (net.type === 'ethereum' && net.id === 1) throw new Error('Cannot remove mainnet')
       u('main', main => {
-        // If deleting a network that the user is currently on, move them to mainnet
-        if (net.type === main.currentNetwork.type && net.id === main.currentNetwork.id) {
-          main.currentNetwork.type = 'ethereum'
-          main.currentNetwork.id = 1
-        }
+        const currentOrigins = u('main.origins')
+        // If deleting a network that an origin is currently using, switch them to mainnet
+        Object.entries(currentOrigins).forEach(([origin, { chainId }]) => {
+          if(net.id === chainId) {
+            u('main.origins', origin, 'chainId', () => 1)
+          }
+        })
         let netCount = 0
         Object.keys(main.networks[net.type]).forEach(id => {
           netCount++
