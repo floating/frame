@@ -111,7 +111,7 @@ class AddPhrase extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHot'>{svg.quote(18)}</div>
+                <div className='addAccountItemIconType addAccountItemIconHot'>{svg.seedling(18)}</div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>
               <div className='addAccountItemTopTitle'>Seed Phrase</div>

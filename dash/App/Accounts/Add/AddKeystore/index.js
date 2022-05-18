@@ -127,7 +127,7 @@ class AddRing extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHot' style={{ marginTop: '2px' }}>{svg.octicon('key', { height: 23 })}</div>
+                <div className='addAccountItemIconType addAccountItemIconHot' style={{ marginTop: '2px' }}>{svg.file(21)}</div>
                 <div className='addAccountItemIconHex addAccountItemIconHexHot' />
               </div>
               <div className='addAccountItemTopTitle'>Keystore</div>

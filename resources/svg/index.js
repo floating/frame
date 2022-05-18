@@ -660,5 +660,23 @@ export default {
       </div>
     )
   },
+  seedling: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 512 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M64 95.1H0c0 123.8 100.3 224 224 224v128C224 465.6 238.4 480 255.1 480S288 465.6 288 448V320C288 196.3 187.7 95.1 64 95.1zM448 32c-84.25 0-157.4 46.5-195.8 115.3c27.75 30.12 48.25 66.88 59 107.5C424 243.1 512 147.9 512 32H448z' />
+        </svg>
+      </div>
+    )
+  },
+  file: size => {
+    return (
+      <div style={{ width: size + 'px', height: size + 'px' }}>
+        <svg viewBox='0 0 512 512' width={size + 'px'} height={size + 'px'}>
+          <path fill='currentColor' d='M0 64C0 28.65 28.65 0 64 0H224V128C224 145.7 238.3 160 256 160H384V448C384 483.3 355.3 512 320 512H64C28.65 512 0 483.3 0 448V64zM256 128V0L384 128H256z' />
+        </svg>
+      </div>
+    )
+  },
   octicon: (name, settings) => <Octicon icon={getIconByName(name)} height={settings.height} />
 }

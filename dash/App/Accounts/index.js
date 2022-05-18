@@ -80,9 +80,12 @@ class AddAccounts extends React.Component {
   renderAddAragon () {
     return (
       <div className='addAccounts cardShow'>
-       <AddAragon close={this.props.close} />
+        <AddAragon close={this.props.close} />
       </div>
     )
+  }
+  createNewAccount (type) {
+    link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: true, newAccountType: type } })
   }
   renderDefault () {
     return (
@@ -91,42 +94,64 @@ class AddAccounts extends React.Component {
           <div className='addAccountsHeaderTitle'>What type of account would you like to add?</div>
           {/* <div className='addAccountsHeaderClose' onClick={() => this.props.close()}>{'done'}</div> */}
         </div>
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'lattice' })}>GridPlus Lattice1</div>
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'ledger' })}>Ledger Device</div>
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'trezor' })}>Trezor Device</div>
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'aragon' })}>Aragon DAO</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('lattice')}>
+          <div className='accountTypeSelectIcon'>{svg.lattice(22)}</div>
+          <div className='accountTypeSelectIcon'>{'GridPlus Lattice1'}</div>
+        </div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('ledger')}>
+          <div className='accountTypeSelectIcon'>{svg.ledger(17)}</div>
+          <div className='accountTypeSelectIcon'>{'Ledger Device'}</div>
+        </div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('trezor')}>
+          <div className='accountTypeSelectIcon'>{svg.trezor(17)}</div>
+          <div className='accountTypeSelectIcon'>{'Trezor Device'}</div>
+        </div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('aragon')}>
+          <div className='accountTypeSelectIcon'>{svg.aragon(30)}</div>
+          <div className='accountTypeSelectIcon'>{'Aragon DAO'}</div>
+        </div>
         {/* <div className='accountTypeSelect' onClick={() => this.setState({ view: 'gnosis' })}>Gnosis Safe</div> */}
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'seed' })}>Seed Phrase</div>
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keyring' })}>Private Key</div>
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'keystore' })}>Keystore File (json)</div>
-        <div className='accountTypeSelect' onClick={() => this.setState({ view: 'nonsigning' })}>Watch-only Account</div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('seed')}>
+          <div className='accountTypeSelectIcon'>{svg.seedling(23)}</div>
+          <div className='accountTypeSelectIcon'>{'Seed Phrase'}</div>
+        </div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('keyring')}>
+          <div className='accountTypeSelectIcon'>{svg.octicon('key', { height: 23 })}</div>
+          <div className='accountTypeSelectIcon'>{'Private Key'}</div>
+        </div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('keystore')}>
+          <div className='accountTypeSelectIcon'>{svg.file(20)}</div>
+          <div className='accountTypeSelectIcon'>{'Keystore File (json)'}</div>
+        </div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('nonsigning')}>
+          <div className='accountTypeSelectIcon'>{svg.mask(24)}</div>
+          <div className='accountTypeSelectIcon'>{'Watch-only Account'}</div>
+        </div>
       </div>
     )
   }
   render () {
-    const view = this.state.view
-    if (view === 'default') {
-      return this.renderDefault()
-    } else if (view === 'aragon')  {
+    console.log('this.props', this.props)
+    const { newAccountType } = this.props.data
+    
+    if (newAccountType === 'aragon')  {
       return this.renderAddAragon()
-    // } else if (view === 'gnosis')  {
-    //   return this.renderAddGnosis()
-    } else if (view === 'ledger')  {
+    } else if (newAccountType === 'ledger')  {
       return this.renderAddLedger()
-    } else if (view === 'trezor')  {
+    } else if (newAccountType === 'trezor')  {
       return this.renderAddTrezor()
-    } else if (view === 'lattice')  {
+    } else if (newAccountType === 'lattice')  {
       return this.renderAddLattice()
-    } else if (view === 'seed')  {
+    } else if (newAccountType === 'seed')  {
       return this.renderAddSeed()
-    } else if (view === 'keyring')  {
+    } else if (newAccountType === 'keyring')  {
       return this.renderAddKeyring()
-    } else if (view === 'keystore')  {
+    } else if (newAccountType === 'keystore')  {
       return this.renderAddKeystore()
-    } else if (view === 'nonsigning')  {
+    } else if (newAccountType === 'nonsigning')  {
       return this.renderAddNonsigning()
     } else {
-      return 'Cannot find ' + view
+      return this.renderDefault()
     }
   }
 }
@@ -169,6 +194,7 @@ class Dash extends React.Component {
       showAddAccounts ? (
         <AddAccounts 
           close={() => link.send('tray:action', 'navDash', { view: 'accounts', data: { showAddAccounts: false } })} 
+          {...this.props}
         /> 
        ) : (
         <div className='cardShow'>

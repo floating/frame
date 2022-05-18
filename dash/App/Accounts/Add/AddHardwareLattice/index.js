@@ -112,7 +112,7 @@ class AddHardwareLattice extends React.Component {
           <div className='addAccountItemTop'>
             <div className='addAccountItemTopType'>
               <div className='addAccountItemIcon'>
-                <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.lattice(24)}</div>
+                <div className='addAccountItemIconType addAccountItemIconHardware'>{svg.lattice(22)}</div>
               </div>
               <div className='addAccountItemTopTitle'>GridPlus</div>
             </div>

@@ -946,7 +946,7 @@ class Account extends React.Component {
       style.zIndex = '100000000'
       const panelHeight = document.body.offsetHeight
       style.height = open ? panelHeight - 62 - 3 : initial.height - 3
-      let top = (initial.top - 3) * -1
+      let top = (initial.top - 6) * -1
       style.transform = open ? `translateY(${top}px)` : 'translateY(0px)'
     } else if (this.store('selected.current') !== '') {
       // Not currently selected, but another signer is
