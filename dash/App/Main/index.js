@@ -255,14 +255,26 @@ class Settings extends React.Component {
             <div>Inject a connection with our browser extension!</div>
           </div>
           <div className='requestFeature'>
-            <div className='requestFeatureButton' onClick={() => {
+            <div className='requestFeatureButton requestFeatureButtonMoon' onClick={() => {
               link.send('tray:openExternal', 'https://feedback.frame.sh')
             }}>
               Request a Feature 
             </div>
           </div>
-          {this.discord()}
-          {this.quit()}
+          <div className='requestFeature'>
+            <div className='requestFeatureButton requestFeatureButtonGood' onClick={() => {
+              link.send('tray:openExternal', 'https://feedback.frame.sh')
+            }}>
+              Need help? Join our Discord!
+            </div>
+          </div>
+          <div className='requestFeature'>
+            <div className='requestFeatureButton' onClick={() => {
+              link.send('tray:openExternal', 'https://feedback.frame.sh')
+            }}>
+              Quit
+            </div>
+          </div>
           <div 
             className='viewLicense' 
             onClick={() => link.send('tray:action', 'navDash', { view: 'notify', data: { notify: 'openExternal', notifyData: { url: 'https://github.com/floating/frame/blob/master/LICENSE' } }})}

@@ -9,7 +9,6 @@
 
   .requestFeatureButton
     background var(--ghostA)
-    color var(--moon)
     box-shadow 0px 4px 8px var(--ghostY)
     padding 0px 30px
     border-radius 12px
@@ -18,12 +17,21 @@
     display flex
     justify-content center
     align-items center
-    text-transform uppercase
+    width 244px
+    margin-bottom 32px
+    // text-transform uppercase
     font-weight 400
     cursor pointer
     box-sizing border-box
     *
       pointer-events none
+
+  .requestFeatureButtonMoon
+    color var(--moon)
+
+  .requestFeatureButtonGood
+    color var(--good)
+
 
 .snipIt
   display flex
