@@ -10,7 +10,9 @@ import {
   removeCustomTokens as removeTokensAction,
   addKnownTokens as addKnownTokensAction,
   setScanning as setScanningAction,
-  switchOriginChain as switchOriginChainAction
+  switchOriginChain as switchOriginChainAction,
+  removeNetwork as removeNetworkAction,
+  updateNetwork as updateNetworkAction
 } from '../../../../main/store/actions'
 
 beforeAll(() => {
@@ -19,6 +21,10 @@ beforeAll(() => {
 
 afterAll(() => {
   log.transports.console.level = 'debug'
+})
+
+beforeEach(() => {
+  jest.spyOn(log, 'error')
 })
 
 const owner = '0xa8be0f701d0f37088600164e71bffc0ad652c251'
@@ -535,5 +541,119 @@ describe('#switchOriginChain', () => {
     switchChain(4)
 
     expect(origins['frame.eth'].chainId).toBe(4)
+  })
+})
+
+describe('#removeNetwork', () => {
+  let main
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main')
+    main = update(main)
+  }
+
+  beforeEach(() => {
+    main = {
+      origins: {
+        'frame.eth': {
+          chainId: 1
+        },
+        'frame.test': {
+          chainId: 4
+        },
+        'frame.sh': {
+          chainId: 50
+        },
+        'frame.test2': {
+          chainId: 4
+        }
+      },
+      networks: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      },
+      networksMeta: {
+        'ethereum': {
+          1: {},
+          4: {},
+          137: {}
+        },
+        'cosmos': {
+          50: {}
+        }
+      }
+    }
+  })
+
+  const removeNetwork = (networkId, networkType = 'ethereum') => removeNetworkAction(updaterFn, { id: networkId, type: networkType })
+
+  it('should log an error when deleting an invalid network', () => {
+    removeNetwork('not a network')
+    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Invalid chain id'))
+  })
+
+  it('should throw an error when deleting mainnet', () => {
+    removeNetwork(1)
+    expect(log.error.mock.calls[log.error.mock.calls.length - 1][0]).toStrictEqual(new Error('Cannot remove mainnet'))
+  })
+
+  it('should delete the network and meta', () => {
+    removeNetwork(4)
+
+    expect(main.networks.ethereum).toStrictEqual({ 1: {}, 137: {} })
+    expect(main.networksMeta.ethereum).toStrictEqual({ 1: {}, 137: {} })
+  })
+
+  it('should switch the chain for origins using the deleted network to mainnet', () => {
+    removeNetwork(4)
+
+    expect(main.origins).toStrictEqual({
+      'frame.eth': {
+        chainId: 1
+      },
+      'frame.test': {
+        chainId: 1
+      },
+      'frame.sh': {
+        chainId: 50
+      },
+      'frame.test2': {
+        chainId: 1
+      }
+    })
+  })
+
+  describe('when passed the last network of a given type', () => {
+    it('should not delete the last network of a given type', () => {
+      removeNetwork(50, 'cosmos')
+  
+      expect(main.networks.cosmos[50]).toStrictEqual({})
+      expect(main.networksMeta.cosmos[50]).toStrictEqual({})
+    })
+
+    it('should not update its origins', () => {
+      removeNetwork(50, 'cosmos')
+  
+      expect(main.origins).toStrictEqual({
+        'frame.eth': {
+          chainId: 1
+        },
+        'frame.test': {
+          chainId: 4
+        },
+        'frame.sh': {
+          chainId: 50
+        },
+        'frame.test2': {
+          chainId: 4
+        }
+      })
+    })
   })
 })
