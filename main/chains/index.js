@@ -405,31 +405,31 @@ class Chains extends EventEmitter {
             this.connections[type][chainId].on('connect', (...args) => {
               this.emit(`connect:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('connect', ...args)
+              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('connect', ...args)
             })
 
             this.connections[type][chainId].on('close', (...args) => {
               this.emit(`close:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('close', ...args)
+              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('close', ...args)
             })
 
             this.connections[type][chainId].on('data', (...args) => {
               this.emit(`data:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('data', ...args)
+              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('data', ...args)
             })
 
             this.connections[type][chainId].on('update', (...args) => {
               this.emit(`update:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('update', ...args)
+              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('update', ...args)
             })
 
             this.connections[type][chainId].on('error', (...args) => {
               this.emit(`error:${type}:${chainId}`, ...args)
               const current = store('main.currentNetwork')
-              if (current.type === type && current.id === parseInt(chainId)) this.emit('error', ...args)
+              if (current?.type === type && current?.id === parseInt(chainId)) this.emit('error', ...args)
             })
 
           } else if (!chainConfig.on && this.connections[type][chainId]) {
@@ -448,10 +448,8 @@ class Chains extends EventEmitter {
       const { type, id } = targetChain
       chainType = type
       chainId = id
-    } else { // Use currently selected network
-      const { type, id } = store('main.currentNetwork')
-      chainType = type
-      chainId = id
+    } else {
+      log.error(`Target chain did not exist for send`)
     }
     if (this.connections[chainType] && this.connections[chainType][chainId]) {
       this.connections[chainType][chainId].send(payload, res)
