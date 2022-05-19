@@ -10,12 +10,13 @@ class AddAragon extends React.Component {
     this.state = {
       adding: false,
       agent: '0x0000000000000000000000000000000000000000',
+      chainId: 1,
       index: 0,
       status: '',
       error: false,
       name: ''
     }
-    this.forms = [React.createRef()]
+    this.forms = [React.createRef(), React.createRef()]
   }
 
   onChange (key, e) {
@@ -74,7 +75,7 @@ class AddAragon extends React.Component {
   }
 
   actorAccount  (actorAddress) {
-    link.rpc('resolveAragonName', this.state.name, (err, dao) => {
+    link.rpc('resolveAragonName', this.state.name, this.state.chainId, (err, dao) => {
       this.next()
       if (err) return this.setState({ status: err, error: true })
       const aragonAccount = {
@@ -83,11 +84,13 @@ class AddAragon extends React.Component {
         name: dao.name + ' DAO',
         smart: {
           type: 'aragon',
+          chain: { id: this.state.chainId, type: 'ethereum' },
           actor: actorAddress, // Reference to Frame account that will act on behalf of the agent
           dao: dao.apps.kernel.proxyAddress, // DAO Address
           agent: dao.apps.agent.proxyAddress // Agent Address
         }
       }
+
       link.rpc('addAragon', aragonAccount, (err) => {
         if (err) {
           this.setState({ status: err, error: true })
@@ -172,9 +175,16 @@ class AddAragon extends React.Component {
             <div className='addAccountItemOptionSetup' style={{ transform: `translateX(-${100 * this.state.index}%)` }}>
               <div className='addAccountItemOptionSetupFrames'>
                 <div className='addAccountItemOptionSetupFrame'>
+                  <div className='addAccountItemOptionTitle'>enter chain id</div>
+                  <div className='addAccountItemOptionInputPhrase'>
+                    <input tabIndex='-1' ref={this.forms[0]} value={this.state.chainId} onChange={e => this.onChange('chainId', e)} onFocus={e => this.onFocus('chainId', e)} onBlur={e => this.onBlur('chainId', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
+                  </div>
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
+                </div>
+                <div className='addAccountItemOptionSetupFrame'>
                   <div className='addAccountItemOptionTitle'>enter dao name</div>
                   <div className='addAccountItemOptionInputPhrase'>
-                    <input tabIndex='-1' ref={this.forms[0]} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
+                    <input tabIndex='-1' ref={this.forms[1]} value={this.state.name} onChange={e => this.onChange('name', e)} onFocus={e => this.onFocus('name', e)} onBlur={e => this.onBlur('name', e)} onKeyPress={e => { if (e.key === 'Enter') this.next() }} />
                   </div>
                   <div className='addAccountItemOptionSubmit' onMouseDown={() => this.next()}>Next</div>
                 </div>

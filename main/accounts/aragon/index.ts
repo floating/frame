@@ -5,7 +5,11 @@ import Wrapper, { ensResolve } from '@aragon/wrapper'
 import store from '../../store'
 import appNames from './appNames'
 import { Provider, TransactionMetadata } from '../../provider'
+import proxyConnection from '../../provider/proxy'
 import { Chain } from '../../chains'
+
+// @ts-ignore
+import EthereumProvider from 'ethereum-provider'
 
 const addresses: Record<number, Address> = {
   1: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
@@ -19,25 +23,28 @@ const addresses: Record<number, Address> = {
 
 function registryAddress (chainId: number) {
   if (addresses[chainId]) return addresses[chainId]
-  throw new Error('Unable to locate Aragon ENS registry for current network')
+  throw new Error(`Unable to locate Aragon ENS registry for chain: ${chainId}`)
 }
 
-async function resolveAragon (domain: string, registryAddress: Address) {
+async function resolveAragon (domain: string, chainId: number, registryAddress: Address) {
   return new Promise<string>(async (resolve, reject) => {
     try {
-      const address = await ensResolve(domain, { provider: require('../../provider').default, registryAddress })
+      const provider = new EthereumProvider(proxyConnection)
+      provider.setChain(chainId)
+
+      const address = await ensResolve(domain, { provider, registryAddress })
       if (address.replace('0x', '')) return resolve(address)
       throw new Error('Invalid address')
     } catch (e) {
-      reject(new Error(`Unable to resolve DAO ${domain} on current network`))
+      reject(new Error(`Unable to resolve DAO ${domain} on chain: ${chainId}`))
     }
   })
 }
 
-async function resolveName (name: string) {
+async function resolveName (name: string, chainId: number) {
   return new Promise(async (resolve, reject) => {
     try {
-      // Look up registry address based on current network connection
+      // Look up registry address using given chain id
       const domain = name.indexOf('.') > -1 ? name : `${name}.aragonid.eth`
       const options = {
         provider: require('../../provider').default,
@@ -45,11 +52,11 @@ async function resolveName (name: string) {
           ipfs: {
             gateway: 'https://ipfs.eth.aragon.network/ipfs'
           },
-          ensRegistryAddress: registryAddress()
+          ensRegistryAddress: registryAddress(chainId)
         }
       }
 
-      const address = await resolveAragon(domain, options.apm.ensRegistryAddress)
+      const address = await resolveAragon(domain, chainId, options.apm.ensRegistryAddress)
       const wrap = new Wrapper(address, options)
 
       await wrap.init()
@@ -65,7 +72,7 @@ async function resolveName (name: string) {
         if (!appsSummary.kernel) return reject(new Error('Unable to locate DAO kernel'))
         if (!appsSummary.agent) return reject(new Error('Unable to locate DAO agent, make sure it is installed'))
 
-        resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: store('main.currentNetwork.id') })
+        resolve({ name: domain.split('.')[0], domain, apps: appsSummary, ens: address, network: chainId })
       })
     } catch (e) {
       reject(e)
@@ -112,7 +119,7 @@ class Aragon {
         try {
           options = {
             provider: this.provider,
-            apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress() }
+            apm: { ipfs: { gateway: 'https://ipfs.eth.aragon.network/ipfs' }, ensRegistryAddress: registryAddress(this.chain.id) }
           }
         } catch (e) {
           console.log('TODO: If Aragon smart account setup fails disable it for current network', e)
