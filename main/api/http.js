@@ -104,10 +104,12 @@ const handler = (req, res) => {
 // Track subscriptions
 provider.on('data', payload => {
   if (pollSubs[payload.params.subscription]) {
-    const { id } = pollSubs[payload.params.subscription]
+    const { id, origin } = pollSubs[payload.params.subscription]
     polls[id] = polls[id] || []
     polls[id].push(JSON.stringify(payload))
-    if (pending[id]) pending[id].send()
+    if (pending[id] && (!payload.params.origin || payload.params.origin === origin)) {
+      pending[id].send(JSON.stringify(payload))
+    }
   }
 })
 
